@@ -60,12 +60,12 @@ pub(crate) fn expand_specs(state: &GameState, controller: PlayerId, specs: &[Tar
 /// wherever in the list a slot of several targets stands. The nth target of a `TargetSpec::EACH_OPPONENT` is a slot of at
 /// most one target for the nth opponent in seat order (`expand_specs`).
 fn recorded_spec(state: &GameState, item: &StackItem, specs: &[TargetSpec], slot: usize) -> Option<(TargetSpec, Option<PlayerId>)> {
-    let at = item.spec(slot) as usize;
+    let at = state.spec(item, slot) as usize;
     let spec = specs.get(at)?;
     if spec.max != TargetSpec::EACH_OPPONENT {
         return Some((*spec, None));
     }
-    let nth = slot - item.spec_targets(at).start;
+    let nth = slot - state.spec_targets(item, at).start;
     let opponent = state.seats().filter(|&p| p != item.controller).nth(nth);
     Some((TargetSpec { min: 0, max: 1, ..*spec }, opponent))
 }
@@ -83,7 +83,7 @@ pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, 
     let specs = target_specs(cards, state, item);
     // CR 702.47c: the slots of spliced text follow the spell's own, in the order the cards were spliced, and are numbered on
     // from them (`StackItem::spec_of`).
-    if item.kind == StackKind::Spell && item.spec(slot) as usize >= specs.len() && item.data.iter().any(|&d| d != 0) {
+    if item.kind == StackKind::Spell && state.spec(item, slot) as usize >= specs.len() && item.data.iter().any(|&d| d != 0) {
         let mut all = specs.to_vec();
         for &spliced in item.data.iter().filter(|&&d| d != 0) {
             all.extend_from_slice(cards.get(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets));
@@ -126,14 +126,15 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
         for _ in 0..modal.times(item.modes, i) {
             // The targets recorded for this instance's slots (`StackItem::spec_of`), their slots renumbered from its first.
             let ends = spec_at + mode.targets.len();
-            let n = (next..item.target_count as usize).take_while(|&t| (item.spec(t) as usize) < ends).count();
+            let n = (next..item.target_count as usize).take_while(|&t| (cx.s().spec(item, t) as usize) < ends).count();
             let mut sub = *item;
             sub.modes = modal.once(i);
-            let of: Vec<u8> = (0..n).map(|t| item.spec(next + t) - spec_at as u8).collect();
-            sub.set_targets(&item.targets()[next..next + n], &of, &item.shares()[next..next + n]);
+            let of: Vec<u8> = (0..n).map(|t| cx.s().spec(item, next + t) - spec_at as u8).collect();
+            let (targets, shares) = (cx.s().targets(item)[next..next + n].to_vec(), cx.s().shares(item)[next..next + n].to_vec());
+            cx.st().set_item_targets(&mut sub, &targets, &of, &shares);
             spec_at = ends;
             next += n;
-            if sub.targets().iter().any(|&t| t != Target::None) && (0..n).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &sub, slot)) {
+            if targets.iter().any(|&t| t != Target::None) && (0..n).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &sub, slot)) {
                 continue;
             }
             (mode.effect)(cx, &sub)?;
@@ -145,7 +146,7 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
 /// Whether target `slot` of an item is still legal (CR 608.2b): the target is still what it was, the slot's filter
 /// still takes it, and nothing forbids the source to target it.
 pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], item: &StackItem, slot: usize) -> bool {
-    let target = item.target(slot);
+    let target = state.target(item, slot);
     // A slot that chose no target (an "up to" slot) has nothing to be legal (CR 601.2c).
     if target == Target::None {
         return false;
@@ -161,7 +162,7 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     }
     let q = Reader { cards, state, events };
     // A slot of its own sees what the slots before it chose (CR 601.2c).
-    let earlier = if item.target_count > 1 { &item.targets()[..slot] } else { &[][..] };
+    let earlier = if item.target_count > 1 { &state.targets(item)[..slot] } else { &[][..] };
     (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false }, &asker, target) && layers::can_target(cards, state, events, &asker, target)
 }
 
@@ -342,7 +343,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
 
     // CR 608.2b: a spell or ability whose every target has become illegal does nothing.
     let count = item.target_count as usize;
-    let chose_any = item.targets().iter().any(|&t| t != Target::None);
+    let chose_any = cx.s().targets(&item).iter().any(|&t| t != Target::None);
     let mut fizzles = chose_any && (0..count).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &item, slot));
     // CR 702.103e: a bestowed Aura spell whose target is illegal does not fizzle: it ceases to be bestowed and resolves as
     // the creature spell it is.
@@ -605,28 +606,28 @@ mod tests {
     #[test]
     fn a_slot_of_any_number_of_targets_may_come_before_a_slot_of_one() {
         let table = CardTable::new([&CARD]);
-        let state = GameState::new(2, 0);
+        let mut state = GameState::new(2, 0);
         let ability = AbilityRef { card: table.id_of(&CARD), index: 0 };
         let t = |n: u32| Target::Object(ObjectId(n));
-        let item_of = |targets: &[Target], of: &[u8]| {
-            let mut item = crate::actions::stack_item(StackKind::Triggered, ObjectId(0), ability, PlayerId(0), targets);
-            item.set_spec_of(of);
+        let item_of = |state: &mut GameState, targets: &[Target], of: &[u8]| {
+            let mut item = crate::actions::stack_item(StackKind::Triggered, ObjectId(0), ability, PlayerId(0), &[]);
+            state.set_item_targets(&mut item, targets, of, &[]);
             item
         };
 
         // Two for the first slot, one for the second, one for the third.
-        let item = item_of(&[t(1), t(2), t(3), t(4)], &[0, 0, 1, 2]);
+        let item = item_of(&mut state, &[t(1), t(2), t(3), t(4)], &[0, 0, 1, 2]);
         assert_eq!(labels(&table, &state, &item), ["any number", "any number", "one", "up to one"]);
-        assert_eq!((item.spec_targets(0), item.spec_targets(1), item.spec_targets(2)), (0..2, 2..3, 3..4));
+        assert_eq!((state.spec_targets(&item, 0), state.spec_targets(&item, 1), state.spec_targets(&item, 2)), (0..2, 2..3, 3..4));
 
         // None for the first slot: the first target is the second slot's, not the first's.
-        let item = item_of(&[t(3)], &[1]);
+        let item = item_of(&mut state, &[t(3)], &[1]);
         assert_eq!(labels(&table, &state, &item), ["one"]);
-        assert_eq!((item.spec_targets(0), item.spec_targets(1), item.spec_targets(2)), (0..0, 0..1, 1..1));
+        assert_eq!((state.spec_targets(&item, 0), state.spec_targets(&item, 1), state.spec_targets(&item, 2)), (0..0, 0..1, 1..1));
 
         // Three for the first slot and the "up to one" left unchosen at the end, where no place is kept for it.
-        let item = item_of(&[t(1), t(2), t(5), t(3)], &[0, 0, 0, 1]);
+        let item = item_of(&mut state, &[t(1), t(2), t(5), t(3)], &[0, 0, 0, 1]);
         assert_eq!(labels(&table, &state, &item), ["any number", "any number", "any number", "one"]);
-        assert_eq!(item.spec_targets(2), 4..4);
+        assert_eq!(state.spec_targets(&item, 2), 4..4);
     }
 }

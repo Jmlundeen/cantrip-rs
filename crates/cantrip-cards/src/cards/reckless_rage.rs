@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let hits: Vec<(ObjectId, Target, u16)> = [(0, 4), (1, 2)]
         .into_iter()
         .filter(|&(slot, _)| g.target_legal(item, slot))
-        .map(|(slot, amount)| (item.object, item.target(slot), amount))
+        .map(|(slot, amount)| (item.object, g.state().target(item, slot), amount))
         .collect();
     g.damage_together(&hits);
     Ok(())

@@ -10,7 +10,7 @@ fn you_cast_a_spell_that_targets_your_creature(q: &dyn Query, source: ObjectId, 
     if let Event::SpellCast { spell, player, .. } = event
         && *player == q.controller(source)
         && let Some(item) = q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == *spell)
-        && item.targets().iter().filter_map(|t| t.object()).any(|id| {
+        && q.state().targets(item).iter().filter_map(|t| t.object()).any(|id| {
             targets::permanent(q, id) && q.chars(id).is(CardType::Creature) && q.controller(id) == *player
         })
     {

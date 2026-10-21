@@ -25,7 +25,7 @@ fn player(_: &dyn Query, _: &Asker, t: Target) -> bool {
 
 /// "Probe Zap deals 3 damage to target player."
 fn zap(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    g.damage(item.object, item.targets()[0], 3);
+    g.damage(item.object, item.target(0), 3);
     Ok(())
 }
 

@@ -30,7 +30,7 @@ fn animation(replaces_creature_types: bool) -> Animation<'static> {
 }
 
 fn the_artifact(item: &StackItem) -> ObjectId {
-    match item.targets()[0] {
+    match item.target(0) {
         Target::Object(id) => id,
         other => panic!("an artifact, not {other:?}"),
     }

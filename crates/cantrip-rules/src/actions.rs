@@ -3940,14 +3940,17 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         serial: 0,
         gift: None,
         inline_shares: [0; cantrip_state::INLINE_TARGETS],
-        spill: None,
+        spill: Span::default(),
         exile_after: false,
         flashback: false,
         since: 0,
         copied: false,
         cast_known: u32::MAX,
     };
-    item.set_targets(targets, &[], &[]);
+    // Targets announced with the action are one at most (`targets_with_action`); more are set by `set_item_targets`.
+    assert!(targets.len() <= cantrip_state::INLINE_TARGETS, "a stack item made with more targets than it holds");
+    item.target_count = targets.len() as u8;
+    item.inline_targets[..targets.len()].copy_from_slice(targets);
     item
 }
 
@@ -4946,7 +4949,7 @@ pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec:
 fn set_item_shares(cx: &mut Cx, shares: &[u8]) {
     let at = cx.s().stack.len() - 1;
     let mut with = cx.s().stack[at];
-    with.set_shares(shares);
+    cx.st().set_item_shares(&mut with, shares);
     cx.st().stack_set(at, with);
 }
 
@@ -4967,8 +4970,8 @@ fn add_cost(a: ManaCost, b: ManaCost) -> ManaCost {
 fn set_item_targets(cx: &mut Cx, targets: &[Target], of: &[u8]) {
     let at = cx.s().stack.len() - 1;
     let mut with = cx.s().stack[at];
-    let shares = with.shares().to_vec();
-    with.set_targets(targets, of, &shares);
+    let shares = cx.s().shares(&with).to_vec();
+    cx.st().set_item_targets(&mut with, targets, of, &shares);
     cx.st().stack_set(at, with);
 }
 

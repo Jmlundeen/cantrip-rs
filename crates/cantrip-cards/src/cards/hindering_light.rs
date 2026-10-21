@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn targets_you_or_yours(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Target::Object(spell) = t else { return false };
     let Some(item) = q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell) else { return false };
-    item.targets().iter().any(|&aimed| match aimed {
+    q.state().targets(item).iter().any(|&aimed| match aimed {
         Target::Player(p) => p == asker.controller,
         Target::Object(id) => cantrip_mechanics::targets::permanent(q, id) && q.controller(id) == asker.controller,
         _ => false,

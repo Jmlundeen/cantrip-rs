@@ -662,7 +662,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         // give its gift after the permanent has left.
         gift: cx.s().obj(trigger.source).gift,
         inline_shares: [0; cantrip_state::INLINE_TARGETS],
-        spill: None,
+        spill: cantrip_state::Span::default(),
         exile_after: false,
         flashback: false,
         // Put on the stack now, or, a delayed triggered ability, created when its `Delayed` was (CR 701.27f).
@@ -670,7 +670,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         copied: false,
         cast_known: u32::MAX,
     };
-    item.set_targets(&targets, &of, &shares);
+    cx.st().set_item_targets(&mut item, &targets, &of, &shares);
     cx.st().stack_push(item);
     ops::became_targets(cx, targets.iter().copied(), trigger.source, trigger.controller);
     // The controller of a triggered ability puts it on the stack (CR 603.3a) and is who commits its crime (CR 700.13).

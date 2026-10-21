@@ -44,5 +44,6 @@ pub fn next_damage_to_target(g: &mut dyn Game, item: &StackItem, slot: usize, in
     if !g.target_legal(item, slot) {
         return;
     }
-    this_turn(g, item, item.target(slot), index, Shield::Next(n));
+    let target = g.state().target(item, slot);
+    this_turn(g, item, target, index, Shield::Next(n));
 }

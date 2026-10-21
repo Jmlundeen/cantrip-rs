@@ -14,9 +14,9 @@ use cantrip_oracle as oracle;
 /// a reflexive triggered ability (CR 603.12) that triggers only if at least one Equipment really became attached, carrying
 /// the creature as its subject.
 fn attach_equipment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = item.spec_targets(1).next().and_then(|slot| targets::object(g, item, slot)) else { return Ok(()) };
+    let Some(creature) = g.state().spec_targets(item, 1).next().and_then(|slot| targets::object(g, item, slot)) else { return Ok(()) };
     let mut attached = false;
-    for slot in item.spec_targets(0) {
+    for slot in g.state().spec_targets(item, 0) {
         let Some(equipment) = targets::object(g, item, slot) else { continue };
         attached |= g.attach(equipment, creature);
     }

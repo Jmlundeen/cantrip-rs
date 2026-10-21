@@ -17,7 +17,7 @@ fn mimic(g: &dyn Query) -> CardId {
 
 /// "{0}: This becomes a copy of target creature until end of turn, except it has [the second ability]."
 fn copy_for_the_turn(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(id) = item.targets()[0] {
+    if let Target::Object(id) = item.target(0) {
         let values = g.copiable_values(id).with_ability(AbilityRef { card: mimic(g), index: 1 });
         g.become_copy(item.object, item.object, values, Duration::EndOfTurn);
     }
@@ -26,7 +26,7 @@ fn copy_for_the_turn(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend>
 
 /// "{0}: This becomes a copy of target creature." No duration: as long as it stays on the battlefield.
 fn copy_for_good(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(id) = item.targets()[0] {
+    if let Target::Object(id) = item.target(0) {
         let values = g.copiable_values(id);
         g.become_copy(item.object, item.object, values, Duration::Indefinite);
     }

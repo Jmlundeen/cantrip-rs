@@ -22,9 +22,9 @@ static GEAR: CardDef = CardDef {
 
 /// Create a Probe Gear token attached to target permanent.
 fn arm(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let [Target::Object(host)] = item.targets() {
+    if let (Target::Object(host), 1) = (item.target(0), item.target_count) {
         let gear = g.card_id(&GEAR);
-        g.create_token_attached(gear, item.controller, *host)?;
+        g.create_token_attached(gear, item.controller, host)?;
     }
     Ok(())
 }

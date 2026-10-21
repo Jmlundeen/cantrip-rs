@@ -839,10 +839,20 @@ fn position(s: &GameState, canon: &Canon) -> Position {
     }
     for item in &s.stack {
         let mut i = *item;
-        let refs = (canon.id(i.object), i.targets().iter().map(|&t| canon.target(t)).collect::<Vec<_>>(), canon.target(i.subject), canon.members(i.members));
+        let refs = (
+            canon.id(i.object),
+            s.targets(item).iter().map(|&t| canon.target(t)).collect::<Vec<_>>(),
+            s.spec_of(item).to_vec(),
+            s.shares(item).to_vec(),
+            canon.target(i.subject),
+            canon.members(i.members),
+        );
         i.object = ObjectId::NONE;
-        let (of, shares) = (i.spec_of().to_vec(), i.shares().to_vec());
-        i.set_targets(&vec![Target::None; i.targets().len()], &of, &shares);
+        // The targets, their slots and shares are in `refs`, read through the arena: not where the arena keeps them.
+        i.inline_targets = [Target::None; cantrip_state::INLINE_TARGETS];
+        i.inline_spec_of = [0; cantrip_state::INLINE_TARGETS];
+        i.inline_shares = [0; cantrip_state::INLINE_TARGETS];
+        i.spill = cantrip_state::Span::default();
         i.subject = Target::None;
         i.members = cantrip_state::Span::default();
         i.serial = 0;

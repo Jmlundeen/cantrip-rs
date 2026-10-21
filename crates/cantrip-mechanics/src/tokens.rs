@@ -136,7 +136,7 @@ pub fn investigate(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend
 }
 
 fn put_plus_one_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(Target::Object(creature)) = item.targets().first().copied() {
+    if let Target::Object(creature) = item.target(0) {
         g.add_counters(creature, CounterKind::PlusOne, 1);
     }
     Ok(())

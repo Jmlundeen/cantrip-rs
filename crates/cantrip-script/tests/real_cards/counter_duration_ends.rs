@@ -13,7 +13,7 @@ fn creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
 }
 
 fn the_creature(item: &StackItem) -> ObjectId {
-    match item.targets()[0] {
+    match item.target(0) {
         Target::Object(id) => id,
         other => panic!("a creature, not {other:?}"),
     }

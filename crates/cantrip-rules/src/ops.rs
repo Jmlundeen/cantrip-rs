@@ -489,20 +489,35 @@ pub fn look_at(cx: &mut Cx, player: PlayerId, cards: &[ObjectId]) {
 /// creature, with ward {2} if cloaked), and its card's own "enters" replacements do not apply. The permanent, if it entered
 /// face down; a card kept from entering or sent elsewhere keeps its own characteristics (CR 701.40f, 701.58f).
 pub fn put_onto_battlefield_face_down(cx: &mut Cx, id: ObjectId, controller: PlayerId, how: FaceDown, tapped: bool) -> R<Option<ObjectId>> {
+    Ok(put_all_onto_battlefield_face_down(cx, &[id], controller, how, tapped)?.first().copied().flatten())
+}
+
+/// `put_onto_battlefield_face_down` for several objects at once (CR 110.2a): they enter together, each face down, so each
+/// sees the others enter (CR 603.6a). For each object, the permanent it became, or None if it did not enter face down.
+pub fn put_all_onto_battlefield_face_down(cx: &mut Cx, ids: &[ObjectId], controller: PlayerId, how: FaceDown, tapped: bool) -> R<Vec<Option<ObjectId>>> {
+    let values = Copiable::of(cx.cards().face_down_values(how));
     // CR 708.2b: a face-down permanent can't be turned face down; an object that changed zones is no longer the one
     // chosen (CR 400.7).
-    if !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-        return Ok(None);
-    }
-    let values = Copiable::of(cx.cards().face_down_values(how));
-    let was = cx.s().obj(id).copy;
-    cx.st().update_obj(id, |o| o.copy = Some(values));
-    let entered = put_onto_battlefield(cx, &[(id, controller, tapped)], ZoneReason::Other)?
-        .first()
+    let moving: Vec<(ObjectId, Option<Copiable>)> = ids
+        .iter()
         .copied()
-        .filter(|&new| cx.s().obj(new).zone.is(ZoneKind::Battlefield) && cx.s().obj(new).face_down);
-    if entered.is_none() && live(cx.s(), id) {
-        cx.st().update_obj(id, |o| o.copy = was);
+        .filter(|&id| live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::Battlefield))
+        .map(|id| (id, cx.s().obj(id).copy))
+        .collect();
+    for &(id, _) in &moving {
+        cx.st().update_obj(id, |o| o.copy = Some(values));
+    }
+    let objects: Vec<(ObjectId, PlayerId, bool)> = moving.iter().map(|&(id, _)| (id, controller, tapped)).collect();
+    let arrived = put_onto_battlefield(cx, &objects, ZoneReason::Other)?;
+    let mut entered: Vec<Option<ObjectId>> = vec![None; ids.len()];
+    for (k, &(id, was)) in moving.iter().enumerate() {
+        let new = arrived.get(k).copied().filter(|&new| cx.s().obj(new).zone.is(ZoneKind::Battlefield) && cx.s().obj(new).face_down);
+        if new.is_none() && live(cx.s(), id) {
+            cx.st().update_obj(id, |o| o.copy = was);
+        }
+        if let Some(at) = ids.iter().position(|&i| i == id) {
+            entered[at] = new;
+        }
     }
     Ok(entered)
 }
@@ -1331,7 +1346,8 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
     if new_targets {
         item = retarget(cx, top, copy, spell, copier)?;
     }
-    became_targets(cx, item.targets().iter().copied(), copy, copier);
+    let targets = cx.s().targets(&item).to_vec();
+    became_targets(cx, targets, copy, copier);
     cx.emit(Event::Copied { copy, original: spell, player: copier });
     Ok(Some(copy))
 }
@@ -1370,7 +1386,8 @@ pub fn copy_ability(cx: &mut Cx, ability: Target, copier: PlayerId, new_targets:
         item = retarget(cx, top, item.object, item.object, copier)?;
     }
     // Each object or player it targets becomes a target once, however many of its slots name it (CR 115.2).
-    became_targets(cx, item.targets().iter().copied(), item.object, copier);
+    let targets = cx.s().targets(&item).to_vec();
+    became_targets(cx, targets, item.object, copier);
     Ok(Some(cx.s().stack[top].serial))
 }
 
@@ -1385,9 +1402,11 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
     // ability, CR 303.4a); the face's it is on the stack as, not its card's (CR 715.3b, 720.3b, 709.3b).
     let specs = crate::resolve::spell_specs(cx.cards(), cx.s(), &item);
     let asker = Asker { source: object, controller: chooser };
+    let mut targets = cx.s().targets(&item).to_vec();
+    let mut changed = false;
     for (at, spec) in specs.iter().enumerate() {
         // The targets chosen for this slot, as `target_legal` reads them (`StackItem::spec_of`).
-        let run = item.spec_targets(at);
+        let run = cx.s().spec_targets(&item, at);
         // A slot of one target for each opponent (`TargetSpec::EACH_OPPONENT`) is a slot for each, in seat order, each
         // asked on its own with the opponent it is for (`resolve::expand_specs`); any other is asked whole.
         let parts: Vec<(std::ops::Range<usize>, TargetSpec, Option<PlayerId>)> = if spec.max == TargetSpec::EACH_OPPONENT {
@@ -1398,14 +1417,14 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
             vec![(run, *spec, None)]
         };
         for (run, spec, slot_player) in parts {
-            let current: Vec<Target> = item.targets()[run.clone()].to_vec();
+            let current: Vec<Target> = targets[run.clone()].to_vec();
             // A slot that chose no target (CR 601.2c) has none to change (CR 115.7d); the copy keeps the number of
             // targets the original chose for it.
             if current.iter().all(|&t| t == Target::None) {
                 continue;
             }
             // A slot sees what the slots before it now target (CR 601.2c: "another target creature").
-            let earlier = if item.target_count > 1 { &item.targets()[..run.start] } else { &[][..] };
+            let earlier = if item.target_count > 1 { &targets[..run.start] } else { &[][..] };
             let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, item.subject, slot_player);
             // "With total mana value X or less" holds of the new targets together (CR 115.7d, 601.2c), X as it was.
             let (candidates, total) = crate::actions::within_total(cx, &spec, item.x, candidates);
@@ -1429,26 +1448,29 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
                 && chosen.iter().enumerate().all(|(i, t)| !chosen[..i].contains(t))
                 && total.as_ref().is_none_or(|t| t.allows(&candidates, &chosen))
             {
-                for (slot, &t) in run.zip(&chosen) {
-                    item.set_target(slot, t);
-                }
+                targets[run].copy_from_slice(&chosen);
+                changed = true;
             }
         }
+    }
+    if changed {
+        let (of, shares) = (cx.s().spec_of(&item).to_vec(), cx.s().shares(&item).to_vec());
+        cx.st().set_item_targets(&mut item, &targets, &of, &shares);
     }
     cx.st().stack_set(top, item);
     Ok(item)
 }
 
-/// Whether target `slot` of `item` changed to `to` keeps the targets of its slot within the slot's total mana value
+/// Whether target `slot` of `item`, its targets being `targets`, changed to `to` keeps the targets of its slot within the slot's total mana value
 /// (`TargetSpec::total_mana_value`, CR 115.7a, 601.2c), the X the item was put on the stack with; true for a slot with none.
-fn fits_total(cx: &Cx, item: &StackItem, slot: usize, spec: &TargetSpec, to: Target) -> bool {
+fn fits_total(cx: &Cx, item: &StackItem, targets: &[Target], slot: usize, spec: &TargetSpec, to: Target) -> bool {
     let Some(most) = spec.total_limit(item.x) else { return true };
     let value = |t: Target| match t {
         Target::Object(id) => cx.mana_value(id),
         _ => 0,
     };
-    let run = item.spec_targets(item.spec(slot) as usize);
-    let total: u32 = run.map(|i| if i == slot { value(to) } else { value(item.target(i)) }).sum();
+    let run = cx.s().spec_targets(item, cx.s().spec(item, slot) as usize);
+    let total: u32 = run.map(|i| if i == slot { value(to) } else { value(targets.get(i).copied().unwrap_or(Target::None)) }).sum();
     total <= u32::from(most)
 }
 
@@ -1458,9 +1480,10 @@ pub fn choose_new_targets(cx: &mut Cx, spell: ObjectId, chooser: PlayerId) -> R<
     let Some(at) = cx.s().stack.iter().position(|i| i.kind == StackKind::Spell && i.object == spell) else {
         return Ok(());
     };
-    let before = cx.s().stack[at];
+    let before = cx.s().targets(&cx.s().stack[at]).to_vec();
     let after = retarget(cx, at, spell, spell, chooser)?;
-    became_targets(cx, after.targets().iter().copied().filter(|t| !before.targets().contains(t)), spell, after.controller);
+    let new: Vec<Target> = cx.s().targets(&after).iter().copied().filter(|t| !before.contains(t)).collect();
+    became_targets(cx, new, spell, after.controller);
     Ok(())
 }
 
@@ -1475,33 +1498,34 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         _ => None,
     };
     let Some(at) = at else { return Ok(()) };
-    let item = cx.s().stack[at];
+    let mut item = cx.s().stack[at];
     let count = item.target_count as usize;
     let asker = Asker { source: item.object, controller: item.controller };
+    let all = cx.s().targets(&item).to_vec();
     // Nobody is asked anything when some target has nowhere else to go, since then nothing changes at all.
     let mut options: Vec<Vec<Target>> = Vec::with_capacity(count);
     for slot in 0..count {
         // A slot that chose no target has none to change.
-        if item.target(slot) == Target::None {
+        if all[slot] == Target::None {
             options.push(Vec::new());
             continue;
         }
         let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return Ok(()) };
         let others: Vec<Target> =
-            crate::actions::target_candidates_given(cx, &asker, &spec, &item.targets()[..slot], item.subject, slot_player)
+            crate::actions::target_candidates_given(cx, &asker, &spec, &all[..slot], item.subject, slot_player)
                 .into_iter()
-                .filter(|&t| t != item.target(slot) && fits_total(cx, &item, slot, &spec, t))
+                .filter(|&t| t != all[slot] && fits_total(cx, &item, &all, slot, &spec, t))
                 .collect();
         if others.is_empty() {
             return Ok(());
         }
         options.push(others);
     }
-    let mut changed = item;
+    let mut changed = all.clone();
     for (slot, others) in options.into_iter().enumerate() {
         // A slot with a total mana value judges each new target with the ones already changed (CR 115.7a, 601.2c).
         let others: Vec<Target> = match crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) {
-            Some((spec, _)) if spec.total_mana_value.is_some() => others.into_iter().filter(|&t| fits_total(cx, &changed, slot, &spec, t)).collect(),
+            Some((spec, _)) if spec.total_mana_value.is_some() => others.into_iter().filter(|&t| fits_total(cx, &item, &changed, slot, &spec, t)).collect(),
             _ => others,
         };
         if others.is_empty() {
@@ -1524,10 +1548,12 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
                 _ => others[0],
             }
         };
-        changed.set_target(slot, new);
+        changed[slot] = new;
     }
-    cx.st().stack_set(at, changed);
-    became_targets(cx, changed.targets().iter().copied(), item.object, item.controller);
+    let (of, shares) = (cx.s().spec_of(&item).to_vec(), cx.s().shares(&item).to_vec());
+    cx.st().set_item_targets(&mut item, &changed, &of, &shares);
+    cx.st().stack_set(at, item);
+    became_targets(cx, changed, item.object, item.controller);
     Ok(())
 }
 
@@ -1549,32 +1575,35 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
     if !live(cx.s(), to) || !cx.s().obj(to).zone.is(ZoneKind::Battlefield) {
         return Ok(());
     }
-    let item = cx.s().stack[at];
+    let mut item = cx.s().stack[at];
     let count = item.target_count as usize;
     let asker = Asker { source: item.object, controller: item.controller };
     let new = Target::Object(to);
-    // Whether target `slot` of `of` is legal for its instance of "target", given the targets before it.
-    let legal = |cx: &Cx, of: &StackItem, slot: usize| -> bool {
-        let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), of, slot) else { return false };
-        crate::actions::target_candidates_given(cx, &asker, &spec, &of.targets()[..slot], of.subject, slot_player).contains(&of.target(slot))
-            && fits_total(cx, of, slot, &spec, of.target(slot))
+    let all = cx.s().targets(&item).to_vec();
+    let spec_of = cx.s().spec_of(&item).to_vec();
+    // Whether target `slot` of the item, its targets being `list`, is legal for its instance of "target", given the targets
+    // before it.
+    let legal = |cx: &Cx, list: &[Target], slot: usize| -> bool {
+        let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return false };
+        crate::actions::target_candidates_given(cx, &asker, &spec, &list[..slot], item.subject, slot_player).contains(&list[slot])
+            && fits_total(cx, &item, list, slot, &spec, list[slot])
     };
     let changeable: Vec<usize> = (0..count)
         .filter(|&slot| {
-            let current = item.target(slot);
+            let current = all[slot];
             if current == Target::None || current == new {
                 return false;
             }
             // CR 115.3: not for an instance of "target" that already has it.
-            if (0..count).any(|j| j != slot && item.spec(j) == item.spec(slot) && item.target(j) == new) {
+            if (0..count).any(|j| j != slot && spec_of[j] == spec_of[slot] && all[j] == new) {
                 return false;
             }
-            let mut changed = item;
-            changed.set_target(slot, new);
-            legal(cx, &changed, slot) && (slot + 1..count).all(|k| item.target(k) == Target::None || !legal(cx, &item, k) || legal(cx, &changed, k))
+            let mut changed = all.clone();
+            changed[slot] = new;
+            legal(cx, &changed, slot) && (slot + 1..count).all(|k| all[k] == Target::None || !legal(cx, &all, k) || legal(cx, &changed, k))
         })
         .collect();
-    let candidates: Vec<Target> = changeable.iter().map(|&s| item.target(s)).collect();
+    let candidates: Vec<Target> = changeable.iter().map(|&s| all[s]).collect();
     // The same object held by two instances of "target" (CR 115.3) is two different targets to change, which may do different
     // things (Spellskite's ruling, 2020-08-07): the choice is then of the instance, each named by its slot's text.
     let shared = candidates.iter().enumerate().any(|(i, t)| candidates[..i].contains(t));
@@ -1587,7 +1616,7 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
                 .iter()
                 .map(|&slot| {
                     let text = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot).map_or("", |(spec, _)| spec.label);
-                    Label::TargetSlot(if text.is_empty() { NTH.get(slot).copied().unwrap_or("Another of its targets") } else { text }, item.target(slot))
+                    Label::TargetSlot(if text.is_empty() { NTH.get(slot).copied().unwrap_or("Another of its targets") } else { text }, all[slot])
                 })
                 .collect();
             let eligible = (0..modes.len() as u8).collect();
@@ -1616,9 +1645,8 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
             }
         }
     };
-    let mut changed = item;
-    changed.set_target(slot, new);
-    cx.st().stack_set(at, changed);
+    cx.st().set_item_target(&mut item, slot, new);
+    cx.st().stack_set(at, item);
     became_targets(cx, [new], item.object, item.controller);
     Ok(())
 }

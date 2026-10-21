@@ -901,6 +901,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield_face_down(self, object, controller, how, tapped).map_err(|_| Suspend)
     }
 
+    fn put_all_onto_battlefield_face_down(&mut self, objects: &[ObjectId], controller: PlayerId, how: FaceDown, tapped: bool) -> Result<Vec<Option<ObjectId>>, Suspend> {
+        ops::put_all_onto_battlefield_face_down(self, objects, controller, how, tapped).map_err(|_| Suspend)
+    }
+
     fn turn_face_up(&mut self, permanent: ObjectId, player: PlayerId) {
         ops::turn_face_up(self, permanent, player);
     }

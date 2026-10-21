@@ -13,11 +13,11 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let me = g.card_id(&CARD);
     let spell_card = g.obj(item.object).card;
     let own = if spell_card == me { 0 } else { g.card(spell_card).spell.map_or(0, |s| s.targets.len()) };
-    let Some(slot) = item.spec_targets(own).next() else { return Ok(()) };
+    let Some(slot) = g.state().spec_targets(item, own).next() else { return Ok(()) };
     if !g.target_legal(item, slot) {
         return Ok(());
     }
-    let Target::Object(card) = item.target(slot) else { return Ok(()) };
+    let Target::Object(card) = g.state().target(item, slot) else { return Ok(()) };
     let controller = item.controller;
     let creature = g.put_onto_battlefield(card, controller, false)?;
     if creature != card || g.obj(creature).zone.is(ZoneKind::Battlefield) {

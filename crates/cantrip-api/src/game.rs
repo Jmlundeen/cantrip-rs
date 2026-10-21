@@ -687,6 +687,9 @@ pub trait Game: Query {
     /// did not enter face down: a card that changed zones since it was chosen (CR 400.7), or one a rule or effect kept off
     /// the battlefield or sent elsewhere, which keeps its own characteristics (CR 701.40f, 701.58f).
     fn put_onto_battlefield_face_down(&mut self, object: ObjectId, controller: PlayerId, how: FaceDown, tapped: bool) -> Result<Option<ObjectId>, Suspend>;
+    /// `put_onto_battlefield_face_down` for several objects at once (CR 110.2a): they enter together, so each sees the others
+    /// enter (CR 603.6a). For each object, the permanent it became, or None if it did not enter face down.
+    fn put_all_onto_battlefield_face_down(&mut self, objects: &[ObjectId], controller: PlayerId, how: FaceDown, tapped: bool) -> Result<Vec<Option<ObjectId>>, Suspend>;
     /// `player` turns a face-down permanent face up (CR 701.40b, 708.2, 708.8): the player taking the special action, or
     /// the controller of the effect that turns it up. Recorded as `Event::TurnedFaceUp`. Nothing if it is not one.
     fn turn_face_up(&mut self, permanent: ObjectId, player: PlayerId);

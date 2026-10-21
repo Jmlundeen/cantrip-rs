@@ -19,7 +19,7 @@ fn land(q: &dyn Query, _: &Asker, t: Target) -> bool {
 }
 
 fn the_land(item: &StackItem) -> ObjectId {
-    match item.targets()[0] {
+    match item.target(0) {
         Target::Object(id) => id,
         other => panic!("a land, not {other:?}"),
     }

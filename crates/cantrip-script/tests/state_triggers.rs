@@ -30,7 +30,7 @@ static FRAIL: CardDef = CardDef {
 };
 
 fn shrink(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(id) = item.targets()[0] {
+    if let Target::Object(id) = item.target(0) {
         cantrip_mechanics::pump(g, item.object, id, -1, -1);
     }
     Ok(())

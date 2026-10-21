@@ -127,7 +127,7 @@ fn spell_facts(game: &Game, spell: ObjectId) -> (Vec<Target>, Option<i32>, Vec<S
     let x = (def.cost.x > 0).then_some(i32::from(item.x));
     // The log says "kicked" for this count, so it is the kicker's alone: an optional additional cost (`paid`: behold, blight,
     // bargain) is not a kicker, and its payment shows in the log as what it did (a card revealed, a creature sacrificed).
-    (item.targets().to_vec(), x, modes, i32::from(item.kicked), item.gift)
+    (game.state.targets(item).to_vec(), x, modes, i32::from(item.kicked), item.gift)
 }
 
 impl Tracker {
@@ -268,13 +268,13 @@ impl Tracker {
         for item in state.stack.iter().filter(|i| i.kind != StackKind::Spell) {
             if !self.stack.contains_key(&item.serial) {
                 let text = game.cards.ability(item.ability).text().to_string();
-                self.stack.insert(item.serial, Seen { source: item.object, ability: item.ability, controller: item.controller, targets: item.targets().to_vec() });
+                self.stack.insert(item.serial, Seen { source: item.object, ability: item.ability, controller: item.controller, targets: state.targets(item).to_vec() });
                 out.push(Proto::AbilityPut {
                     serial: item.serial,
                     source: item.object,
                     controller: item.controller,
                     text,
-                    targets: item.targets().to_vec(),
+                    targets: state.targets(item).to_vec(),
                     triggered: item.kind == StackKind::Triggered,
                     modes: Vec::new(),
                 });

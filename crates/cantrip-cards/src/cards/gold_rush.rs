@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// (CR 608.2b), so no Treasure is made; with no target chosen it still resolves and makes the Treasure.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_a_treasure(g, item)?;
-    if let Some(creature) = item.spec_targets(0).next().and_then(|slot| targets::object(g, item, slot)) {
+    if let Some(creature) = g.state().spec_targets(item, 0).next().and_then(|slot| targets::object(g, item, slot)) {
         let bonus = 2 * tokens::treasures_controlled(g, item.controller).len() as i16;
         pump(g, item.object, creature, bonus, bonus);
     }

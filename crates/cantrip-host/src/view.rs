@@ -934,7 +934,7 @@ impl<'a> Projector<'a> {
             oracle_text: text.to_string(),
             ..Default::default()
         };
-        for t in item.targets() {
+        for t in self.game.state.targets(item) {
             if let Some(message) = target_view(game, handles, *t) {
                 view.targets.push(SpellTargetView {
                     player: message.player,
@@ -1402,7 +1402,7 @@ impl<'a> Projector<'a> {
             view.exiled_with = handles.handle(link.by);
         }
         if let Some(item) = item {
-            for t in item.targets() {
+            for t in s.targets(&item) {
                 if let Some(message) = target_view(game, handles, *t) {
                     view.targets.push(SpellTargetView {
                         player: message.player,

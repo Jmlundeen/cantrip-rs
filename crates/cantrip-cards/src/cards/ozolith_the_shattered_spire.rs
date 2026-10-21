@@ -15,7 +15,7 @@ fn apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 }
 
 fn put_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(Target::Object(permanent)) = item.targets().first().copied() {
+    if let Target::Object(permanent) = item.target(0) {
         g.add_counters(permanent, CounterKind::PlusOne, 1);
     }
     Ok(())

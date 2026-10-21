@@ -14,8 +14,8 @@ fn creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
 
 /// Target creature fights target creature.
 fn fight(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let [Target::Object(a), Target::Object(b)] = item.targets() {
-        g.fight(*a, *b);
+    if let (Target::Object(a), Target::Object(b), 2) = (item.target(0), item.target(1), item.target_count) {
+        g.fight(a, b);
     }
     Ok(())
 }

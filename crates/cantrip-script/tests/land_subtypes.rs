@@ -91,7 +91,7 @@ fn a_land(q: &dyn Query, _: &Asker, t: Target) -> bool {
 }
 
 fn wings(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(id) = item.targets()[0] {
+    if let Target::Object(id) = item.target(0) {
         g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
     }
     Ok(())

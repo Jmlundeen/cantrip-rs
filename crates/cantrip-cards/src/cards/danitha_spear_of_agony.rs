@@ -6,7 +6,7 @@ fn matching(q: &dyn Query, me: &Asker, e: &Event) -> Option<Fired> {
  if let Event::SpellCast { spell, player, .. } = e
  && *player == me.controller
  && let Some(item) = q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == *spell)
- && item.targets().iter().any(|t| match *t {
+ && q.state().targets(item).iter().any(|t| match *t {
  Target::Player(p) => p != me.controller,
  Target::Object(id) => targets::permanent(q,id) && q.controller(id) != me.controller && q.chars(id).is(CardType::Creature),
  _ => false,

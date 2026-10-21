@@ -32,7 +32,7 @@ fn permanents_targeted(q: &dyn Query, spell: ObjectId) -> Vec<ObjectId> {
     let Some(item) = state.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell).or_else(|| state.left_stack(spell)) else {
         return Vec::new();
     };
-    item.targets()
+    state.targets(item)
         .iter()
         .filter_map(|t| t.object())
         .filter(|&id| targets::permanent(q, id))

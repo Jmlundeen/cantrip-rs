@@ -6,7 +6,7 @@ fn matching(q: &dyn Query, me: &Asker, e: &Event) -> Option<Fired> {
  if let Event::SpellCast { spell, player, .. } = e
  && *player == me.controller
  && (q.chars(*spell).has_subtype(Subtype::Equipment) || q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == *spell).is_some_and(|i|
- i.targets().iter().filter_map(|t| t.object()).any(|id| targets::permanent(q,id) && q.controller(id) == me.controller && q.chars(id).is(CardType::Creature)))) {
+ q.state().targets(i).iter().filter_map(|t| t.object()).any(|id| targets::permanent(q,id) && q.controller(id) == me.controller && q.chars(id).is(CardType::Creature)))) {
  Fired::PLAIN
  } else { None }
 }

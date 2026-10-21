@@ -11,14 +11,14 @@ use cantrip_oracle as oracle;
 /// not the opponent is still a legal target. The creatures are pumped or shrunk each only if its own target is legal. The
 /// spell is countered on resolution only when every target is illegal (CR 608.2b), which the core judges.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(opponent) = item.spec_targets(0).next().and_then(|slot| targets::player(g, item, slot)) {
+    if let Some(opponent) = g.state().spec_targets(item, 0).next().and_then(|slot| targets::player(g, item, slot)) {
         g.lose_life(opponent, 1);
     }
     g.gain_life(item.controller, 1);
-    if let Some(creature) = item.spec_targets(1).next().and_then(|slot| targets::object(g, item, slot)) {
+    if let Some(creature) = g.state().spec_targets(item, 1).next().and_then(|slot| targets::object(g, item, slot)) {
         pump(g, item.object, creature, 1, 1);
     }
-    if let Some(creature) = item.spec_targets(2).next().and_then(|slot| targets::object(g, item, slot)) {
+    if let Some(creature) = g.state().spec_targets(item, 2).next().and_then(|slot| targets::object(g, item, slot)) {
         pump(g, item.object, creature, -1, -1);
     }
     Ok(())

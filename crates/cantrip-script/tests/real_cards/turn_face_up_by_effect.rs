@@ -10,7 +10,7 @@ use cantrip_engine::*;
 
 /// "Turn target face-down permanent face up."
 fn unveil(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(id) = item.targets()[0] {
+    if let Target::Object(id) = item.target(0) {
         g.turn_face_up(id, item.controller);
     }
     Ok(())

@@ -10,7 +10,7 @@ use cantrip_engine::*;
 
 /// "Put a stun counter on target creature."
 fn stun(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(id) = item.targets()[0] {
+    if let Target::Object(id) = item.target(0) {
         g.add_counters(id, CounterKind::Stun, 1);
     }
     Ok(())
