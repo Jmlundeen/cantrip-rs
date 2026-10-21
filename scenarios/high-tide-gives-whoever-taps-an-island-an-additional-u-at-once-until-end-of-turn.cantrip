@@ -1,0 +1,49 @@
+# High Tide: "Until end of turn, whenever a player taps an Island for mana, that player adds an additional {U}." A delayed
+# triggered ability (CR 603.7b) that is a mana ability (CR 605.1b), so it never goes on the stack but resolves at once with
+# the Island's mana ability (CR 605.4a). Turn 3: Bot1's first Island, tapped before High Tide, makes {U} alone; after it
+# resolves Bot1's second Island makes {U}{U} with the stack still empty, the additional {U} produced by High Tide, the
+# ability's source (CR 106.3, 603.7d), and pays for Lord of Atlantis. "A player ... that player": Bot2 taps its one Island
+# in response for {U}{U} - into Bot2's pool, not High Tide's controller's - and casts Counterspell with it. It ends with the
+# turn: on turn 4 Bot2's Island makes {U} alone.
+
+[Bot1 Deck]
+Island
+High Tide
+Island
+Lord of Atlantis
+Island x16
+
+[Bot2 Deck]
+Island
+Counterspell
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+? Bot1.Mana = {U}
+Bot1.Hand.High Tide.Cast
+Bot1.Pass
+Bot1.Battlefield.Island#2.Activate
+? Delayed = High Tide
+? Stack.Count = 0
+? Bot1.Mana = {U}{U}
+? Bot1.ManaFrom = {U} High Tide; {U} Island
+Bot1.Hand.Lord of Atlantis.Cast
+Bot2.Battlefield.Island.Activate
+? Stack = Lord of Atlantis
+? Bot2.Mana = {U}{U}
+? Bot1.Mana =
+Bot2.Hand.Counterspell.Cast(Lord of Atlantis)
+[T4 Bot2.Main1]
+? Delayed.Count = 0
+Bot2.Battlefield.Island.Activate
+? Bot2.Mana = {U}
+
+[Expect]
+Bot1.Graveyard = Lord of Atlantis; High Tide
+Bot2.Graveyard = Counterspell

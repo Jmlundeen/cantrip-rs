@@ -1,0 +1,31 @@
+# High Tide reads the land type, not the name (its rulings: "any land with the land type Island"; CR 305.6): Bot1's
+# Tropical Island, an Island Forest, tapped for {G} still adds the additional {U}, while a Forest adds nothing more. Each
+# additional {U} is added at once with the stack empty (CR 605.4a).
+
+[Bot1 Deck]
+Island
+High Tide
+Tropical Island
+Forest
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Tropical Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.High Tide.Cast
+Bot1.Pass
+Bot1.Battlefield.Tropical Island.Activate(Ability: {G})
+? Stack.Count = 0
+? Bot1.Mana = {U}{G}
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {U}{G}{G}
+
+[Expect]
+Bot1.Graveyard = High Tide
