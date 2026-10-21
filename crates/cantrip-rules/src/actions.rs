@@ -1840,20 +1840,31 @@ fn finish(
     targets: &[Target],
     covered: &mut dyn FnMut(ManaCost, u8) -> bool,
 ) -> bool {
-    let mut life = if cost.phyrexian.iter().any(|&n| n > 0) { payable_life(cx, player) } else { 0 };
+    cost = phyrexian_with_life(cx, player, cost, 0);
+    // A face cast from the hand (an Adventure, an Omen, a half, a back face) is judged as that face (CR 715.4, 720.3a,
+    // 709.3, 712.8a).
+    change_any(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets, covered)
+}
+
+/// `cost` with as many of its Phyrexian symbols paid with 2 life each as `player`'s life total allows beside `other_life`
+/// the rest of the cost pays (CR 107.4f, 119.4: a payment of life the life total covers, down to 0), and the others paid
+/// with their color: the least mana it could be announced to cost (advice; `announce_life` asks the real choice).
+fn phyrexian_with_life(cx: &Cx, player: PlayerId, mut cost: ManaCost, other_life: u32) -> ManaCost {
+    if cost.phyrexian == [0; 5] {
+        return cost;
+    }
+    let mut life = i64::from(payable_life(cx, player)) - i64::from(other_life);
     for (i, n) in cost.phyrexian.into_iter().enumerate() {
         for _ in 0..n {
-            if life > 2 {
+            if life >= 2 {
                 life -= 2;
             } else {
-                cost.symbols[Color::ALL[i].mana() as usize] += 1;
+                cost.symbols[Color::ALL[i].mana() as usize] = cost.symbols[Color::ALL[i].mana() as usize].saturating_add(1);
             }
         }
     }
     cost.phyrexian = [0; 5];
-    // A face cast from the hand (an Adventure, an Omen, a half, a back face) is judged as that face (CR 715.4, 720.3a,
-    // 709.3, 712.8a).
-    change_any(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets, covered)
+    cost
 }
 
 /// Whether `player` could pay `cost` from the mana pool and what the mana abilities they could activate add (advice,
@@ -3250,7 +3261,12 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 // pays. A cost of nothing is judged too: an increase still applies to it (CR 118.9d, 601.2f).
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
                 let any_color = static_rules::spend_any_color_for(cx, player, id, !def.special_action);
-                let judge = |cost: ManaCost| a.covers_for(&if any_color { cost.paid_with_any_color() } else { cost }, &payment);
+                // Its Phyrexian symbols paid with life where the life total allows, beside the life the cost pays
+                // (CR 107.4f, 601.2b by way of 602.2b, 116.2b), as the activation announces them (`announce_life`).
+                let judge = |cost: ManaCost| {
+                    let cost = phyrexian_with_life(cx, player, cost, u32::from(def.cost.life));
+                    a.covers_for(&if any_color { cost.paid_with_any_color() } else { cost }, &payment)
+                };
                 if def.special_action {
                     // Its own cost changes, each way a reduction by hybrid mana could be split (CR 118.7e) and the hybrid
                     // symbols it meets announced (CR 601.2b), as `special_action` asks them.
@@ -6804,12 +6820,23 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     // Its cost changes applied as the payer announces and splits them (CR 601.2b, 118.7e), as a cast's are.
     let costed = Costed::SpecialAction(source, ability);
     let mut printed = special_action_printed_cost(cx, source, ability, def);
+    // How each {2/C} and each Phyrexian symbol is paid is announced first, as for a cast or an activation (CR 601.2b, 107.4f,
+    // 116.2b: a face-down Phyrexian Metamorph turned face up for {3}{U/P} may pay the {U/P} with 2 life).
+    announce_twobrids(cx, player, source, &mut printed, false)?;
+    let life = announce_life(cx, player, source, &mut printed, false)?;
     announce_hybrids(cx, player, source, costed, &mut printed, &[], false)?;
     let split = announce_reduction(cx, player, source, costed, &printed, &[])?;
     let (mana, _, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, printed, None, &[], &split);
     let mana = at_least(mana, least);
     if mana != ManaCost::ZERO {
         pay_mana(cx, player, source, mana)?;
+    }
+    // The life, judged again once the mana is paid (CR 601.2g-h, 119.4): a mana ability may have spent it.
+    if !rest_payable(cx, player, 0, u32::from(life)) {
+        return Err(Stop::Cancel);
+    }
+    if life > 0 {
+        ops::change_life(cx, player, -i32::from(life));
     }
     let item = stack_item(StackKind::Activated, source, ability, player, &[]);
     // A special action's effect is done at once; a question it asked would have nowhere to be answered.

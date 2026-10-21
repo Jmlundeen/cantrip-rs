@@ -1,0 +1,44 @@
+# Turning a cloaked creature face up is a special action for its card's mana cost (CR 701.58b, 116.2b), and a Phyrexian
+# symbol in that cost may be paid with 2 life (CR 107.4f), announced as it is for a cast or an activation (CR 601.2b).
+# Cryptic Coat cloaks Phyrexian Metamorph ({3}{U/P}); with only Sol Ring's {2} and Mox Sapphire's {U} - {3} - the action is
+# offered, and Bot1 pays the {U/P} with 2 life: 20 - 2 = 18. Face up, the Metamorph is a 0/0 that copies nothing (it did not
+# enter, CR 708.8), so it is put into the graveyard, and the Coat stays.
+#
+# Black Lotus pays the Coat; the Island casts Sol Ring.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Island
+Sol Ring
+Mox Sapphire
+Island x2
+Phyrexian Metamorph
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield..FaceDownName = Phyrexian Metamorph
+Bot1.Hand.Island.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.#1.Activate
+Bot1.Modes(1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Graveyard = Phyrexian Metamorph; Black Lotus
+Bot1.Battlefield.Cryptic Coat.AttachedTo = (absent)

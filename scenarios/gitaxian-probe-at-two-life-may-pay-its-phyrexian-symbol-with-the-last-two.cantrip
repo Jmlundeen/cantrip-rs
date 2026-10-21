@@ -1,0 +1,21 @@
+# A player may pay life equal to their whole life total (CR 119.4: a life total at least the payment pays it): with 2 life
+# and no mana, Gitaxian Probe is offered and its {U/P} paid with 2 life (CR 107.4f). Bot1 is at 0 and loses as the
+# state-based actions are checked, before the Probe resolves (CR 704.5a).
+
+[Life]
+Bot1: 2
+
+[Bot1 Deck]
+Gitaxian Probe
+Plains x19
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Modes(1)
+
+[Expect]
+Bot1.Life = 0
+Result = Bot2 won
