@@ -56,10 +56,11 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
 | [KI-111](#ki-111-a-rooms-unlock-is-an-ability-and-its-doors-name-overwrite-a-copys-exceptions) | A Room's unlock is an ability, and its doors' name overwrite a copy's exceptions | Pri-1 | Fix queued |
 | [KI-112](#ki-112-a-creature-cast-with-suspend-does-not-gain-haste) | A creature cast with suspend does not gain haste | Pri-1 | Fix queued |
+| [KI-115](#ki-115-a-fuse-card-cannot-be-cast-fused-while-a-spell-or-ability-resolves) | A fuse card cannot be cast fused while a spell or ability resolves | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
-| [KI-114](#ki-114-the-web-client-cannot-send-three-answers-the-engine-asks-for) | The web client cannot send three answers the engine asks for | Pri-2 | Open |
+| [KI-114](#ki-114-the-web-client-cannot-name-colorless-mana-for-a-sacrificed-land-that-could-also-produce-a-color) | The web client cannot name colorless mana for a sacrificed land that could also produce a color | Pri-2 | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Pri-3 | Fix queued |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Pri-3 | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Pri-3 | Open |
@@ -69,15 +70,17 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 
 ## Issues
 
-### KI-114: The web client cannot send three answers the engine asks for
+### KI-114: The web client cannot name colorless mana for a sacrificed land that could also produce a color
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Pri-2 | Open | client | 2026-10-21, moved from `docs/engine-design.md`'s known gaps |
 
-**Notes.** Naming colorless mana (Squandered Resources), choosing which kind of counter to remove (`Label::Counter`, Glen
-Elendra Guardian), and turning a face-down permanent face up (`TurnFaceUp`): the engine asks them, and the page offers no
-way to answer.
+**Notes.** Squandered Resources adds a type the land it sacrifices could produce (CR 106.7). The page offers {C} only where
+colorless is the land's only type (`CardActions.ChoosesColorless`); a land that could produce {C} and a color is offered
+its colors alone. No one is stuck: the ability is offered, as a mana ability is, and its other types answer it. Choosing
+which kind of counter to remove (`Label::Counter`, Glen Elendra Guardian) is a modes question the page's modes dock answers,
+and turning a face-down permanent face up is a card action it offers (`MainPage.Prompts.cs`, `TurnFaceUp`).
 
 **Scenarios.** None.
 
@@ -343,6 +346,18 @@ creature with suspend is in content yet, but the rule is the keyword's.
 
 **Scenarios.** None yet.
 
+### KI-115: A fuse card cannot be cast fused while a spell or ability resolves
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine | 2026-10-21, a comment that pointed here with no entry |
+
+**Notes.** A split card with fuse in its owner's hand may be cast fused (CR 702.102a), and a resolving effect that lets its
+controller cast a card from their hand offers the ways it could be cast (`Game::cast_ways_during_resolution`, CR 608.2g).
+The fused cast is not among them, so it is not offered there.
+
+**Scenarios.** None yet.
+
 ### KI-113: The engine panics on costs it has not built
 
 | Priority | Status | Area | Found |
@@ -383,6 +398,7 @@ content has such a static. A fix counts layer-1 copy statics in the set.
 wrong. A mana ability whose yield is not stated (Sunken Ruins, X costs, Phyrexian or {2/W} symbols in its cost) makes
 every cost count as payable. Life, energy and sacrifices that several mana abilities would share are judged for each
 alone: three Mana Confluences at 1 or 2 life count as three mana, so Raffine is offered. And the search's time budget
-falls back to offering the cast on rare heavy boards.
+falls back to offering the cast on rare heavy boards. A permanent Urza, Lord High Artificer could tap that also has a mana ability
+without {T} counts Urza's tap apart from its own abilities, as if both could be used (`available_without`, `Repeat::Tap`).
 
 **Scenarios.** None yet.

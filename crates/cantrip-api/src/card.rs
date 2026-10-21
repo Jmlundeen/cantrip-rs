@@ -155,8 +155,9 @@ pub enum Layer {
 }
 
 /// What a static ability's functions may read while the layers are being applied: the state, the event history, and
-/// other objects' characteristics as the layers before the one being applied leave them (CR 613.8 is not modelled;
-/// reading only earlier layers is what keeps it finite).
+/// other objects' characteristics as the layers before the one being applied leave them. Reading only earlier layers keeps
+/// one function finite; the order effects apply in, dependencies included (CR 613.8), is the layer pass's
+/// (`cantrip_rules::layers`), not the function's.
 pub trait LayerQuery {
     fn state(&self) -> &GameState;
     fn cards(&self) -> &CardTable;

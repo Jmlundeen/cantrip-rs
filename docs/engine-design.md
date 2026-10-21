@@ -1458,7 +1458,7 @@ abilities that could sacrifice it (Ashnod's Altar, Phyrexian Altar: one or the o
 activation (Cryptic Trilobite); the permanent's own mana abilities are counted apart, since it may be tapped for mana and
 then sacrificed. An ability that taps an untapped permanent instead (Urza, Lord High Artificer's "Tap an untapped artifact
 you control: Add {U}") joins the alternatives of each permanent it could tap: that permanent's own {T} mana abilities or
-it, never both. One with a mana ability without {T} as well keeps the tap apart, which may over-offer.
+it, never both (where it falls short, KI-108).
 
 ### Mana spent as though it were of any color
 
@@ -1868,7 +1868,7 @@ Known gaps:
 - Power-up abilities are not yet a class other cards can name ("power-up abilities of other creatures you control cost
   {3} less", "whenever you activate a power-up ability", "can be activated an additional time"): Hulk, Gamma Goliath,
   Marvel Boy, Wonder Man, Kang, Advancing the Spirit and Quinjet Technician wait on it.
-- The web client cannot yet send three answers the engine asks for (KI-114).
+- The web client cannot name colorless mana for a sacrificed land that could also produce a color (KI-114).
 - Serving a scenario's handed-over position to the web client, to look at or play on from, went with the C# engine
   and is not rebuilt.
 - Web-slinging cards that wait: Spider-UK ("if two or more creatures entered the battlefield under your control this

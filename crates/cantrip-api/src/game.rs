@@ -866,7 +866,7 @@ pub trait Game: Query {
     /// Each way the resolving effect's controller could cast `card` now (CR 608.2g), the faces it offers judged one at a time
     /// (CR 709.3a, 715.3a): a split card's halves, an aftermath half only from a graveyard (CR 702.127a); an Adventurer or omen card as itself
     /// and as its Adventure or Omen; a modal double-faced card's two faces. A fused cast of a fuse card in a hand (CR 702.102a,
-    /// mana value the sum of both halves) is a way too, but is not built yet (docs/known-issues.md). Empty when `could_cast_during_resolution` is false.
+    /// mana value the sum of both halves) is a way too, but is not offered yet (KI-115). Empty when `could_cast_during_resolution` is false.
     fn cast_ways_during_resolution(&self, card: ObjectId) -> Vec<CastWay>;
     /// `player` may play or cast `card` from where it is (CR 601.3, 305.1) under `grant`: a card in exile or a
     /// graveyard, a new object after a move (CR 400.7), so the permission is for this object only.
