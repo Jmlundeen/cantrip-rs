@@ -112,11 +112,9 @@ the line goes.
 
 | Path | Covered instead by | Why no scenario |
 | --- | --- | --- |
-| A granted static ability that affects other objects taken by a later "loses all abilities" (`layers::granted_to_others`: the `LoseAllAbilities` clear and the `has.abilities` filter) | The Irencrag's own "loses all other abilities" before its grants | No implemented card makes a noncreature artifact lose all abilities while it stays an Equipment (Oko's +1 makes Everflame an Elk creature, which unattaches it). |
 | A granted cast of a back face (`WAY_BACK_FACE` by a way a permanent gives, `faces_to_cast`) | nothing | No implemented double-faced card has a castable back face. |
 | A flash grant judged for an MDFC back face or a bestowed Aura through `actions::Speed::face`, beyond Sigarda's Aid's bestow | nothing | No implemented double-faced card has a castable noncreature back face; no flash grant names creatures. |
 | The transformed cast's `cast_only_if_met` check (`could_cast_transformed_during_resolution`) | nothing | Only Berserk has a "cast only" condition, and it has no back face. |
-| A "loses all abilities" effect older than an ability granted later (CR 613.1f, 613.7) | Rust test | No implemented card does both. |
 | Gift of an extra turn; a copied permanent spell keeping its gift; "whenever you give a gift" | Rust tests, `crates/cantrip-script/tests/gift.rs` | Perch Protection needs phasing; no implemented card copies a gift permanent or has the trigger. |
 | Lost abilities at the flash-rules, instant-activation, damage-by-toughness and ascend sites | nothing | No implemented card loses its abilities while using one. |
 | The late-targets / divide and MDFC back-face sites of the minimum-targets offering check (CR 601.2c) | nothing | No implemented card reaches them. |

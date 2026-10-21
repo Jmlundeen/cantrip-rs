@@ -1,0 +1,55 @@
+# "Loses all abilities" takes only the abilities an object has when it applies (CR 613.1f, 613.7): an ability granted by a
+# later effect is had. Bot1's Tishana's Tidebinder counters Thraben Inspector's own enters trigger, so the Inspector loses
+# all abilities while the Tidebinder stays (no Clue). Two turns later Banishing Knack gives the Inspector "{T}: Return
+# target nonland permanent to its owner's hand" - an effect with a later timestamp - and the Inspector uses it on Bot2's Mox
+# Jet.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thraben Inspector
+Tishana's Tidebinder
+Banishing Knack
+Mox Sapphire
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mox Jet
+Swamp x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = Thraben Inspector
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tishana's Tidebinder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Stack.Thraben Inspector)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield = Plains; Mox Sapphire; Thraben Inspector; Tishana's Tidebinder
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Banishing Knack.Cast(Bot1.Battlefield.Thraben Inspector)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Thraben Inspector.Activate(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Hand = Mox Jet; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot1.Battlefield.Thraben Inspector.Tapped = true
+Bot1.Graveyard = Banishing Knack; Black Lotus
