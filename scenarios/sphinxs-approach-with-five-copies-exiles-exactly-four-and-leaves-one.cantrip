@@ -1,0 +1,59 @@
+# Sphinx's Approach with five copies in the graveyard when it resolves: Emry mills four copies on turn one, and the
+# first Approach is cast and resolves (putting the fifth in the graveyard); the second, cast on turn three, may exile
+# itself and four of the five, leaving one copy in the graveyard. The two draws are Islands, so Sphinx of the Guildpact
+# is still in the library to be searched for. The sacrificed Black Lotus and the exiled spell are the only other cards
+# that leave.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Emry, Lurker of the Loch
+Sphinx's Approach
+Sphinx's Approach
+Island
+Island
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Island
+Island
+Island
+Island
+Island
+Sphinx of the Guildpact
+Island x8
+
+[Bot2 Deck]
+Opt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sphinx's Approach.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sphinx's Approach.Cast
+Bot1.Pass
+Bot1.Accept
+Bot1.Search(Sphinx of the Guildpact)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sphinx of the Guildpact.Power = 5
+Bot1.Battlefield.Count = 5
+Bot1.Graveyard.Count = 2
+Exile.Count = 5
