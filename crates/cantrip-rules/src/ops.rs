@@ -1580,7 +1580,7 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
                 .iter()
                 .map(|&slot| {
                     let text = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot).map_or("", |(spec, _)| spec.label);
-                    Label::TargetSlot(if text.is_empty() { NTH.get(slot).copied().unwrap_or("Another of its targets") } else { text })
+                    Label::TargetSlot(if text.is_empty() { NTH.get(slot).copied().unwrap_or("Another of its targets") } else { text }, item.targets[slot])
                 })
                 .collect();
             let eligible = (0..modes.len() as u8).collect();

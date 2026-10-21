@@ -594,6 +594,15 @@ fn modal_of(game: &Game, modes: &[Label]) -> Option<&'static ModalDef> {
 /// What a choice of modes says beyond its heading, and whether choosing more of them than the fewest costs something: a
 /// modal's extra modes cost their escalate cost or their own cost (spree, CR 702.172a), the faces of a card are not modes
 /// at all, and the labels of a pile or a plain choice are chosen without a target.
+/// What a target holds, in words: an object's name, or the seat of a player.
+fn target_words(game: &Game, target: Target) -> String {
+    match target {
+        Target::Object(id) => game.cards.get(game.chars(id).card).name.to_string(),
+        Target::Player(p) => format!("Player {}", seat(p)),
+        _ => String::new(),
+    }
+}
+
 fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
     if faces {
         return ("Only the face you choose is cast, with its own cost and mana value".into(), false);
@@ -924,7 +933,10 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::ChooseModes { source, modes, eligible, count, at_most, affordable, additional_cost, repeat } => {
             // The faces a card may be cast as (CR 709.3): not modes, so each is its name and its cost, and the question says so.
             let faces = !modes.is_empty() && modes.iter().all(|l| matches!(l, Label::Face(_)));
-            let (detail, extra_modes_cost) = modes_detail(game, modes, faces);
+            let (mut detail, extra_modes_cost) = modes_detail(game, modes, faces);
+            if matches!(modes.first(), Some(Label::TargetSlot(..))) {
+                detail = format!("That target becomes {}", game.cards.get(game.chars(*source).card).name);
+            }
             PromptPayload::ChooseModesPromptMessage(ChooseModesPrompt {
                 player,
                 source: source_handle(game, handles, *source),
@@ -933,6 +945,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .map(|l| match l {
                         Label::Face(face) => face_text(game, *face),
                         Label::Miracle(m) => miracle_label(game, *m),
+                        // The slot's text and what it holds now, so two slots worded alike are told apart.
+                        Label::TargetSlot(text, held) => format!("{text}: {}", target_words(game, *held)),
                         other => label_text(other).to_string(),
                     })
                     .collect(),

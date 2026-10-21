@@ -1109,7 +1109,7 @@ mod tests {
     }
 
     /// CR 732: a question asked in the middle of a run that goes on past it (a replacement's) is registered with the loop watch,
-    /// and winding the run back to where it was asked (`Cx::asked_at`) keeps that registration (KI-74's fix).
+    /// and winding the run back to where it was asked (`Cx::asked_at`) keeps that registration.
     #[test]
     fn a_question_a_run_goes_on_past_is_still_watched_once_the_run_is_wound_back() {
         // A step busy enough to be watched for loops of choices (`BUSY_STEP`), with a frame running.

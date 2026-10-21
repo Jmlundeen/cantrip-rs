@@ -859,9 +859,9 @@ pub enum Label {
     AlternativeCost(CardId, u8),
     /// The `u8`th of a card's own alternative ways to be cast (`CardDef::ways`, CR 118.9): evoke, Force of Will's.
     Way(CardId, u8),
-    /// One instance of the word "target" on a spell or ability (CR 115.3), named by its slot's text: which of the instances
-    /// that hold the same object a "change a target" effect changes (CR 115.7b, Spellskite).
-    TargetSlot(&'static str),
+    /// One instance of the word "target" on a spell or ability (CR 115.3), named by its slot's text, with what it holds:
+    /// which of the instances that hold the same object a "change a target" effect changes (CR 115.7b, Spellskite).
+    TargetSlot(&'static str, Target),
 }
 
 /// One miracle ability of a card (CR 702.94a), named without the object, which a question asked as the card is drawn may not
