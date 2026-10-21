@@ -1,0 +1,6 @@
+{
+  "name": "Bubbling Muck",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Until end of turn, whenever a player taps a Swamp for mana, that player adds an additional {B}."
+}

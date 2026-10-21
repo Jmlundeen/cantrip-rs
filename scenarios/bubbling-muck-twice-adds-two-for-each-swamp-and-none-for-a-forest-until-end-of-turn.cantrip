@@ -1,0 +1,45 @@
+# Bubbling Muck: "Until end of turn, whenever a player taps a Swamp for mana, that player adds an additional {B}." Two of
+# them are two delayed triggered mana abilities (CR 603.7b, 605.1b), each adding its {B} at once (CR 605.4a): turn 5's
+# Swamp makes {B}{B}{B} with the stack empty. Bayou, a Swamp Forest, tapped for {G} still adds {B}{B} (the land type
+# counts, not the name or the mana it made - its rulings); a Forest adds only its {G}. The abilities end with the turn
+# (CR 603.7b): on turn 7 the Swamp makes {B} alone.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Bubbling Muck
+Bubbling Muck
+Bayou
+Forest
+Swamp x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bubbling Muck.Cast
+Bot1.Pass
+Bot1.Hand.Bubbling Muck.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+? Stack.Count = 0
+? Bot1.Mana = {B}{B}{B}{B}
+? Delayed = Bubbling Muck; Bubbling Muck
+Bot1.Battlefield.Bayou.Activate(Ability: {G})
+? Bot1.Mana = {B}{B}{B}{B}{B}{B}{G}
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {B}{B}{B}{B}{B}{B}{G}{G}
+[T7 Bot1.Main1]
+? Delayed.Count = 0
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Graveyard = Bubbling Muck; Bubbling Muck; Black Lotus
