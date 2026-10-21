@@ -1,0 +1,43 @@
+# Solve for Disappointment twice: the first makes the Jace token with one loyalty counter, the second finds it and puts its
+# counter there instead of making another (CR 701.71a: a Jace token you control is chosen). At the end there is one Jace
+# token with two loyalty counters, so the battlefield holds two Swamps, the Mox Jet and that token.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Solve for Disappointment
+Swamp
+Solve for Disappointment
+Swamp
+Swamp
+Swamp x8
+
+[Bot2 Deck]
+Llanowar Elves
+Llanowar Elves
+Llanowar Elves
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Solve for Disappointment.Cast(Bot2)
+Bot1.Pass
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Solve for Disappointment.Cast(Bot2)
+Bot1.Pass
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Count = 4
+Bot2.Graveyard = Llanowar Elves; Llanowar Elves
