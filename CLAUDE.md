@@ -27,11 +27,12 @@ build (sub-games, stickers), or when it affects only cards banned in every forma
 human allows is written in `docs/rules-exceptions.md`, with its rule, its reason and who decided; those decisions may be
 applied to later cases of the same kind, and nothing outside that file is an exception.
 
-**Scale is the one standing exception.** Where following a rule perfectly is only a question of scale - a count, a
-size, a depth - and the engine stops being exact only at a scale beyond any practical game (players perform every
-action by hand) and beyond what any card needs, that case may be left unhandled. Judge the scale by how fast play can
-reach it, not by the number alone: doubling counters or damage each round reaches 2^16 in sixteen manual rounds, so a
-16-bit count is within reach where a 64-bit one is not. Each such limit is an entry in `docs/known-issues.md` marked
+**Scale is the one standing exception.** The engine does not simulate everything to infinity. Where following a rule
+perfectly is only a question of scale - a count, a size, a depth - it has to be exact up to two practical bounds: what
+can actually happen in a game where human players perform every action by hand on a time limit, and what a card could
+practically print. Combinations of cards can explode exponentially, and that is fine as long as the engine is exact to
+a practical scale: a 32-bit count, say, where a combo can push past 255 or 32,767 within a timed game, but no need for
+unbounded storage. Beyond those bounds a case may be left unhandled, as an entry in `docs/known-issues.md` marked
 "Won't fix: beyond practical scale", naming the limit, what happens past it, and why play cannot reach it; it is fixed
 when a practical reason appears.
 
