@@ -1567,11 +1567,30 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
             legal(cx, &changed, slot) && (slot + 1..count).all(|k| item.targets[k] == Target::None || !legal(cx, &item, k) || legal(cx, &changed, k))
         })
         .collect();
+    let candidates: Vec<Target> = changeable.iter().map(|&s| item.targets[s]).collect();
+    // The same object held by two instances of "target" (CR 115.3) is two different targets to change, which may do different
+    // things (Spellskite's ruling, 2020-08-07): the choice is then of the instance, each named by its slot's text.
+    let shared = candidates.iter().enumerate().any(|(i, t)| candidates[..i].contains(t));
     let slot = match changeable.as_slice() {
         [] => return Ok(()),
         [only] => *only,
+        _ if shared => {
+            const NTH: [&str; 6] = ["Its first target", "Its second target", "Its third target", "Its fourth target", "Its fifth target", "Its sixth target"];
+            let modes: Vec<Label> = changeable
+                .iter()
+                .map(|&slot| {
+                    let text = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot).map_or("", |(spec, _)| spec.label);
+                    Label::TargetSlot(if text.is_empty() { NTH.get(slot).copied().unwrap_or("Another of its targets") } else { text })
+                })
+                .collect();
+            let eligible = (0..modes.len() as u8).collect();
+            let ask = RequestKind::ChooseModes { source: to, modes, eligible, count: 1, at_most: 0, affordable: Vec::new(), additional_cost: false, repeat: false };
+            match cx.ask_core(chooser, ask, false)? {
+                Answer::Modes(chosen) => changeable[chosen.first().map_or(0, |&m| m as usize).min(changeable.len() - 1)],
+                _ => changeable[0],
+            }
+        }
         _ => {
-            let candidates: Vec<Target> = changeable.iter().map(|&s| item.targets[s]).collect();
             let ask = RequestKind::ChooseTarget {
                 label: "The target to change to this creature",
                 slot_player: None,

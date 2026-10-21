@@ -1,0 +1,51 @@
+# Spellskite's "change a target" (CR 115.7b) when two instances of "target" hold the same object (CR 115.3): the two are
+# different targets, and its controller chooses which to change (the 2020-08-07 ruling). Bot1's Dissection Practice gives its
+# Misshapen Fiend both +1/+1 and -1/-1; Bot2 answers with Spellskite and changes the -1/-1 one to Spellskite. The Fiend
+# gets only +1/+1 and is a 2/2, and Spellskite (0/4) gets -1/-1. Changing the first instance instead would have killed the
+# Fiend and made Spellskite a 1/5.
+
+[Bot1 Deck]
+Black Lotus
+Misshapen Fiend
+Dissection Practice
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Spellskite
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Misshapen Fiend.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Spellskite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dissection Practice.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Misshapen Fiend)
+Bot1.Target(Misshapen Fiend)
+Bot1.Pass
+Bot2.Battlefield.Spellskite.Activate(Stack.Dissection Practice)
+Bot2.Modes()
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Modes(-1/-1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Misshapen Fiend.Power = 2
+Bot1.Battlefield.Misshapen Fiend.Toughness = 2
+Bot2.Battlefield.Spellskite.Power = -1
+Bot2.Battlefield.Spellskite.Toughness = 3
+Bot1.Graveyard = Dissection Practice; Black Lotus

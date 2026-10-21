@@ -49,7 +49,6 @@ keeps it).
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
-| [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
@@ -337,21 +336,6 @@ then the player CR 732.3 names must choose otherwise; one whose players only pas
   [`scenarios/worldgorger-dragon-loop-whose-player-keeps-choosing-the-dragon-must-choose-the-other-creature-card.cantrip`](../scenarios/worldgorger-dragon-loop-whose-player-keeps-choosing-the-dragon-must-choose-the-other-creature-card.cantrip)
   and [`scenarios/worldgorger-dragon-loop-whose-player-always-declines-fecundity-is-a-draw.cantrip`](../scenarios/worldgorger-dragon-loop-whose-player-always-declines-fecundity-is-a-draw.cantrip):
   the fixed count at work (not marked: they show rules-correct outcomes).
-
-### KI-55: Spellskite can't choose between two instances of "target" that hold the same object
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, Spellskite |
-
-**Notes.** "Change a target of target spell or ability to [this]" (CR 115.7b, `ops::change_a_target_to`) asks which target to
-change as a choice among the targets. When the same object is the target of two different instances of "target" on the spell
-(CR 115.3) and both could be changed, the choice names that object once, and the first instance is the one changed; the rules
-let Spellskite's controller choose either (the 2020-08-07 ruling), and the results differ when the instances do different
-things. A fix asks the choice by instance (each labelled with its slot's text). No spell in content with two instances of
-"target" that may share an object has been put under a Spellskite.
-
-**Scenarios.** none yet.
 
 ### KI-56: A counter ban judges an entering permanent as the object it was before it moved
 

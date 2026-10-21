@@ -948,6 +948,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose which type of mana to add".into()
                 } else if matches!(modes.first(), Some(Label::ManaCost)) {
                     "Choose how to pay for it".into()
+                } else if matches!(modes.first(), Some(Label::TargetSlot(..))) {
+                    // Two instances of "target" hold the same object (CR 115.3): which one changes to the source (CR 115.7b).
+                    format!("Choose which target to change to {}", game.cards.get(game.chars(*source).card).name)
                 } else if let Some(heading) = options_heading(game, modes) {
                     heading
                 } else {
