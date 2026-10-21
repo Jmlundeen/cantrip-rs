@@ -52,7 +52,7 @@ fn first_instant_or_sorcery_costs_less(q: &dyn Query, source: ObjectId, player: 
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[characteristic_defining(Layer::PtDefine, islands_you_control, "Eluge's power and toughness are each equal to the number of Islands you control.")],
+    statics: &[characteristic_defining(Layer::PtDefine, islands_you_control, "Eluge's power and toughness are each equal to the number of Islands you control.").lost_pt(0, 0)],
     abilities: &[triggered(
         triggers::THIS_ENTERS_OR_ATTACKS,
         flood,
