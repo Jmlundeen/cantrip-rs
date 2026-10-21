@@ -35,8 +35,10 @@ static BEAR: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+static FILLER: CardDef = CardDef { name: "Inherent Test Filler", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
+
 fn table() -> &'static CardTable {
-    Box::leak(Box::new(CardTable::new([&HUSH, &BEAR])))
+    Box::leak(Box::new(CardTable::new([&HUSH, &BEAR, &FILLER])))
 }
 
 /// A game of `players` with nothing in it, the first seat active.
@@ -199,3 +201,37 @@ fn a_win_passes_the_monarch_once_every_opponent_has_lost() {
     assert!(!g.log.iter().any(|r| matches!(r.event, Event::BecameMonarch { player } if player == C)), "a losing opponent became the monarch");
 }
 
+/// A player conceding in a game of three while another is asked at the opening priority (CR 104.3a, 800.4a): they leave at
+/// once - their permanent leaves, and the monarch and the initiative they held pass to the active player (CR 725.4, 726.4) -
+/// and the game goes on without them; answering on does not wind the concession back.
+#[test]
+fn a_concession_leaves_the_game_at_once_and_stays() {
+    let table = table();
+    let filler = table.id_of(&FILLER);
+    let mut g = Game::new(table, &Setup { decks: vec![vec![filler; 20]; 3], ..Default::default() });
+    g.state.update_player(B, |p| {
+        p.monarch = true;
+        p.initiative = true;
+    });
+    let bear = put(&mut g, &BEAR, B);
+    g.run();
+    let asked = g.pending().cloned().expect("a question");
+    assert_ne!(asked.player, B, "the test wants another player asked");
+    g.concede(B);
+    assert!(g.state.player(B).lost, "the concession did not take");
+    assert!(!g.state.battlefield().contains(&bear), "the conceding player's permanent stayed");
+    assert!(g.state.player(A).monarch && g.state.player(A).initiative, "the active player did not take the designations");
+    assert!(g.log.iter().any(|r| matches!(r.event, Event::GameLost { player, reason: LossReason::Conceded } if player == B)));
+    for _ in 0..20 {
+        let Some(request) = g.pending().cloned() else { break };
+        assert_ne!(request.player, B, "the conceding player was asked");
+        let answer = match request.kind {
+            RequestKind::Priority { .. } => Answer::Pass,
+            _ => break,
+        };
+        g.answer(request.id, request.player, answer).unwrap();
+        g.run();
+    }
+    assert!(g.state.player(B).lost && g.state.player(A).monarch, "answering wound the concession back");
+    assert!(!g.state.is_over(), "two players are left");
+}

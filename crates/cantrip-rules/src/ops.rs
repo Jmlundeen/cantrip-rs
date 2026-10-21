@@ -2972,10 +2972,24 @@ pub fn lose_game(cx: &mut Cx, player: PlayerId) {
     if cx.s().player(player).lost || cx.s().is_over() || crate::static_rules::doesnt_lose(&*cx, cx.cards(), player, LossReason::Effect) {
         return;
     }
+    leaves_having_lost(cx, player, LossReason::Effect);
+}
+
+/// A player concedes (CR 104.3a): they lose and leave the game at once, which nothing prevents ("can't lose the game" does not
+/// stop it); the monarch and the initiative pass on (CR 725.4, 726.4) and their objects leave (CR 800.4a).
+pub fn concede(cx: &mut Cx, player: PlayerId) {
+    if cx.s().player(player).lost || cx.s().is_over() {
+        return;
+    }
+    leaves_having_lost(cx, player, LossReason::Conceded);
+}
+
+/// `player` has lost for `reason` and leaves the game; the game ends if one or no player is left (CR 104.2a, 104.4a).
+fn leaves_having_lost(cx: &mut Cx, player: PlayerId, reason: LossReason) {
     cx.st().update_player(player, |pl| pl.lost = true);
     crate::designations::monarch_left(cx);
     crate::designations::initiative_left(cx);
-    cx.record(Event::GameLost { player, reason: LossReason::Effect });
+    cx.record(Event::GameLost { player, reason });
     leave_game(cx, player);
     let left: Vec<PlayerId> = cx.s().apnap().collect();
     match left.len() {

@@ -553,14 +553,10 @@ impl Session {
         }
         self.conceded[p.index()] = true;
         self.undoable.clear();
-        self.game.state.update_player(p, |pl| pl.lost = true);
-        let standing: Vec<PlayerId> = self.game.state.apnap().collect();
-        match standing.as_slice() {
-            [] => self.game.state.set_outcome(Outcome::Draw),
-            [only] => self.game.state.set_outcome(Outcome::Won(*only)),
-            _ => {}
-        }
+        // The engine's own leaving (CR 104.3a, 800.4a): the monarch and the initiative pass on, the seat's objects leave, and the
+        // game ends with one player left.
         self.told.extend(self.tracker.conceded(p));
+        self.game.concede(p);
         Ok(self.step())
     }
 }

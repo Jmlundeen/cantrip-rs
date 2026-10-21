@@ -7626,7 +7626,7 @@ mod tests {
         assert_eq!(modes, vec![Label::ManaCost, Label::AlternativeCost(genesis, 0)]);
         cx.st().update_frame(frame, |f| {
             f.pending = None;
-            f.answers = vec![Answer::Modes(vec![1])];
+            f.answers = vec![(None, Answer::Modes(vec![1]))];
         });
         let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).ok(), Some(true));

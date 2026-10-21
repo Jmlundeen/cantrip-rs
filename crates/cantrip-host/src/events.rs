@@ -214,6 +214,7 @@ impl Tracker {
                     LossReason::EmptyLibrary => LossReasonView::EmptyLibrary,
                     LossReason::Poison => LossReasonView::Poison,
                     LossReason::Effect => LossReasonView::Effect,
+                    LossReason::Conceded => LossReasonView::Conceded,
                 };
                 out.push(Proto::Lost { player, reason });
             }

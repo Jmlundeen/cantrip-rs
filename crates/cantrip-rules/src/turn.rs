@@ -1323,7 +1323,7 @@ pub fn priority(cx: &mut Cx) -> R<Flow> {
     match cx.ask_core(player, RequestKind::Priority { options }, false)? {
         Answer::Act(action) => {
             let mut frame = Frame::new(FrameKind::Act { player });
-            frame.answers.push(Answer::Act(action));
+            frame.answers.push((Some(player), Answer::Act(action)));
             cx.st().frame_push(frame);
             Ok(Flow::Again)
         }

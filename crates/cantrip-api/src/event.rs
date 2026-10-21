@@ -207,6 +207,8 @@ pub enum LossReason {
     Poison,
     /// An effect states that the player loses the game (CR 104.3e), or an opponent wins it (CR 104.2b).
     Effect,
+    /// The player conceded (CR 104.3a).
+    Conceded,
 }
 
 /// Why a game is a draw (CR 104.4).

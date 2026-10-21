@@ -805,7 +805,7 @@ mod tests {
         }
         game.state.frame_push(Frame::new(FrameKind::Settle));
         let at = game.state.agenda.len() - 1;
-        game.state.update_frame(at, |f| f.answers = answers);
+        game.state.update_frame(at, |f| f.answers = answers.into_iter().map(|a| (None, a)).collect());
         game
     }
 

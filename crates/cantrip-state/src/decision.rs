@@ -13,8 +13,16 @@ use crate::vocab::*;
 #[derive(Clone, Debug)]
 pub struct Frame {
     pub kind: FrameKind,
-    /// The answers this run of the frame has been given, in the order it asked.
-    pub answers: Vec<Answer>,
+    /// The answers this run of the frame has been given, in the order it asked, each with the player who gave it where the
+    /// engine knows it (a test may give answers with none): a replayed answer is only ever the answer of the player it is
+    /// asked of.
+    pub answers: Vec<(Option<PlayerId>, Answer)>,
+    /// Players who conceded while this run was waiting (CR 104.3a), each with the number of answers it had been given then:
+    /// every replay of the run leaves the game for them at that point, after the work done before it (`Game::concede`).
+    pub conceded: Vec<(u32, PlayerId)>,
+    /// For a staged frame whose question was asked of a player who has left the game, while the controller of the object it
+    /// is for chooses who makes it instead (CR 800.4g): the stage the question continues at, and the question.
+    pub stand_in: Option<Box<(u16, RequestKind)>>,
     /// The question it is waiting on.
     pub pending: Option<Request>,
     /// Where the journal stood when this run of the frame began: what an answer rolls back to before the re-run.
@@ -36,6 +44,8 @@ impl Frame {
         Frame {
             kind,
             answers: Vec::new(),
+            conceded: Vec::new(),
+            stand_in: None,
             pending: None,
             mark: 0,
             log_mark: 0,
@@ -46,10 +56,13 @@ impl Frame {
         }
     }
 
-    fn position(&self) -> (&FrameKind, &Vec<Answer>, Option<(&PlayerId, &RequestKind)>, u16, u16, bool, &[u32; 4]) {
+    #[allow(clippy::type_complexity)]
+    fn position(
+        &self,
+    ) -> (&FrameKind, (&Vec<(Option<PlayerId>, Answer)>, &Vec<(u32, PlayerId)>, &Option<Box<(u16, RequestKind)>>), Option<(&PlayerId, &RequestKind)>, u16, u16, bool, &[u32; 4]) {
         (
             &self.kind,
-            &self.answers,
+            (&self.answers, &self.conceded, &self.stand_in),
             self.pending.as_ref().map(|r| (&r.player, &r.kind)),
             self.stage,
             self.next_stage,
@@ -262,6 +275,18 @@ impl NameKind {
     }
 }
 
+/// Who makes a choice asked of a player who has left the game (CR 800.4f-h): `RequestKind::stand_in`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum StandIn {
+    /// A cost, or whether to pay one: it is not paid (CR 800.4f).
+    Unpaid,
+    /// This player makes the choice: the one another object's controller is left to choose among, or the next player in turn
+    /// order for a choice a rule asks (CR 800.4g-h).
+    By(PlayerId),
+    /// The controller of the object the choice is for chooses which of these players makes it (CR 800.4g).
+    Chosen { controller: PlayerId, source: ObjectId, candidates: Vec<PlayerId> },
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RequestKind {
     /// Act or pass (CR 117). Passing is always legal.
@@ -434,6 +459,83 @@ pub enum RequestKind {
         counters: Vec<(CounterKind, i16)>,
         draw: bool,
     },
+}
+
+impl RequestKind {
+    /// The object a question is for: the spell, ability or permanent whose text asks it. None for a choice the rules
+    /// themselves ask (CR 800.4h): attacks, blocks, combat damage, the discard to hand size, mulligans, who goes first, the
+    /// order of triggers, which replacement effect applies first.
+    pub fn source(&self) -> Option<ObjectId> {
+        use RequestKind as K;
+        match self {
+            K::PayCosts { source, .. }
+            | K::UnlessPays { source, .. }
+            | K::ChooseCards { source, .. }
+            | K::ChooseTarget { source, .. }
+            | K::ChooseModes { source, .. }
+            | K::ChooseColors { source, .. }
+            | K::ChooseName { source, .. }
+            | K::ChooseSubtype { source, .. }
+            | K::May { source, .. }
+            | K::ChoosePlayer { source, .. }
+            | K::TapForPower { source, .. }
+            | K::CollectEvidence { source, .. }
+            | K::Craft { source, .. }
+            | K::RemoveCounters { source, .. }
+            | K::ChooseDividedTargets { source, .. }
+            | K::DistributeCards { source, .. }
+            | K::SearchLibrary { source, .. } => Some(*source),
+            K::Priority { .. }
+            | K::DeclareAttackers { .. }
+            | K::AssignCombatDamage { .. }
+            | K::DeclareBlockers { .. }
+            | K::DiscardToHandSize { .. }
+            | K::Mulligan { .. }
+            | K::ChooseStartingPlayer { .. }
+            | K::OrderTriggers { .. }
+            | K::ChooseReplacement { .. } => None,
+        }
+    }
+
+    /// Whether the question is the paying of a cost, or whether to pay one (CR 118, 800.4f): the costs of a spell or ability
+    /// being paid, a cost paid as one resolves ("unless [a player] pays", "[a player] may pay"), and a cost's tapping for
+    /// power, collecting evidence and crafting.
+    pub fn is_cost(&self) -> bool {
+        matches!(
+            self,
+            RequestKind::PayCosts { .. }
+                | RequestKind::UnlessPays { .. }
+                | RequestKind::TapForPower { .. }
+                | RequestKind::CollectEvidence { .. }
+                | RequestKind::Craft { .. }
+        )
+    }
+}
+
+/// Who makes a choice the rules or an object ask of `player`, who has left the game (CR 800.4f-h): no one, for a cost
+/// (800.4f); for another choice an object asks, another player its controller chooses - another opponent where an opponent
+/// was to choose, if there is one (800.4g); for a choice a rule asks, or one whose object's controller has left too, the
+/// next player in turn order (800.4h).
+pub fn stand_in(state: &crate::GameState, kind: &RequestKind, player: PlayerId) -> StandIn {
+    if kind.is_cost() {
+        return StandIn::Unpaid;
+    }
+    let next = || state.turn_order_from(player).next().unwrap_or(player);
+    let Some(source) = kind.source().filter(|&s| s != ObjectId::NONE && s.index() < state.objects.len()) else {
+        return StandIn::By(next());
+    };
+    let controller = state.obj(source).controller;
+    if state.player(controller).lost {
+        return StandIn::By(next());
+    }
+    let in_game: Vec<PlayerId> = state.apnap().collect();
+    let opponents: Vec<PlayerId> = in_game.iter().copied().filter(|&p| p != controller).collect();
+    let candidates = if player != controller && !opponents.is_empty() { opponents } else { in_game };
+    match candidates.as_slice() {
+        [] => StandIn::Unpaid,
+        [only] => StandIn::By(*only),
+        _ => StandIn::Chosen { controller, source, candidates },
+    }
 }
 
 /// The counters of one kind on one permanent that a `RequestKind::RemoveCounters` may take from, and how many it has.

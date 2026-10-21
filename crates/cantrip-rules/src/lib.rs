@@ -36,6 +36,8 @@ mod land_text_tests;
 #[cfg(test)]
 mod leave_game_tests;
 #[cfg(test)]
+mod left_player_choice_tests;
+#[cfg(test)]
 mod look_back_tests;
 #[cfg(test)]
 mod play_permission_tests;
@@ -317,8 +319,12 @@ impl Game {
                     self.state.frame_remove(at);
                 }
                 Ok(Flow::Again) => {
-                    if !self.state.agenda[at].answers.is_empty() {
-                        self.state.update_frame(at, |f| f.answers.clear());
+                    let f = &self.state.agenda[at];
+                    if !f.answers.is_empty() || !f.conceded.is_empty() {
+                        self.state.update_frame(at, |f| {
+                            f.answers.clear();
+                            f.conceded.clear();
+                        });
                     }
                 }
                 Err(Stop::Suspend) => {
@@ -327,6 +333,11 @@ impl Game {
                         let mut probe = self.state.clone_with_journal();
                         probe.rollback(mark);
                         assert!(probe == before, "a rollback did not restore the state: some write was not journalled");
+                    }
+                    // A staged run that stopped with nothing to ask (a cost a player who left would have paid, CR 800.4f)
+                    // goes on at its next stage.
+                    if self.state.agenda.get(at).is_some_and(|f| f.staged && f.pending.is_none()) {
+                        continue;
                     }
                     return;
                 }
@@ -375,18 +386,31 @@ impl Game {
         let child = self.tree.add(self.at, (request, player, answer.clone()), child_start);
 
         let frame = &self.state.agenda[at];
-        if frame.staged {
+        if frame.staged && let Some(waiting) = frame.stand_in.clone() {
+            // The controller has chosen who makes the choice a player who left was asked (CR 800.4g): it is asked of them.
+            let (next, kind) = *waiting;
+            let chosen = match answer {
+                Answer::Player(p) => p,
+                _ => pending.player,
+            };
+            let id = self.state.request_id();
+            self.state.update_frame(at, |f| {
+                f.stand_in = None;
+                f.next_stage = next;
+                f.pending = Some(Request { id, player: chosen, kind, may_cancel: false });
+            });
+        } else if frame.staged {
             let next = frame.next_stage;
             self.state.update_frame(at, |f| {
                 f.pending = None;
-                f.answers = vec![answer];
+                f.answers = vec![(Some(player), answer)];
                 f.stage = next;
             });
         } else {
             let mark = Mark(frame.mark);
             let log_mark = frame.log_mark as usize;
             let mut answers = frame.answers.clone();
-            answers.push(answer);
+            answers.push((Some(player), answer));
             self.state.revert(mark);
             self.log.truncate(log_mark);
             self.state.update_frame(at, |f| f.answers = answers);
@@ -448,6 +472,76 @@ impl Game {
             self.log.extend(events);
         }
         self.at = target;
+    }
+
+    /// `player` concedes (CR 104.3a), whatever is being asked of whom: they leave the game at once (`ops::concede`), after
+    /// everything that has already happened. A run waiting on a question keeps the concession at the point it came
+    /// (`Frame::conceded`): its replays redo the work done before it exactly and leave the game for the player there, and the
+    /// question is asked again if it still is. The conceding player's own announcement is not wound back: what it has done
+    /// stands (mana abilities activated, their triggers) and leaving the game takes their objects (CR 800.4a). A run written
+    /// in stages is not replayed: the player leaves at once, and a question it was asking them is made by another player,
+    /// or not at all for a cost (CR 800.4f-h, `cantrip_state::stand_in`).
+    pub fn concede(&mut self, player: PlayerId) {
+        if self.state.player(player).lost || self.state.is_over() {
+            return;
+        }
+        let mut now = true;
+        let mut staged_at = None;
+        if let Some(at) = self.state.agenda.len().checked_sub(1)
+            && self.state.agenda[at].pending.is_some()
+        {
+            let frame = self.state.agenda[at].clone();
+            if frame.kind == (FrameKind::Act { player }) {
+                self.state.frame_remove(at);
+            } else if frame.staged {
+                staged_at = Some(at);
+            } else {
+                // Wound back as an answer winds it, the concession kept where it came: the replay does the rest.
+                self.state.revert(Mark(frame.mark));
+                self.log.truncate(frame.log_mark as usize);
+                let cursor = frame.answers.len() as u32;
+                self.state.update_frame(at, |f| {
+                    f.pending = None;
+                    f.conceded.push((cursor, player));
+                });
+                now = false;
+            }
+        }
+        if now {
+            let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+            ops::concede(&mut cx, player);
+        }
+        // A staged run's question to the player who left is made by another, or not at all (CR 800.4f-h).
+        if let Some(at) = staged_at
+            && let Some(pending) = self.state.agenda[at].pending.clone()
+            && self.state.player(pending.player).lost
+        {
+            match cantrip_state::stand_in(&self.state, &pending.kind, pending.player) {
+                cantrip_state::StandIn::Unpaid => {
+                    let next = self.state.agenda[at].next_stage;
+                    self.state.update_frame(at, |f| {
+                        f.pending = None;
+                        f.answers = vec![(None, Answer::Pass)];
+                        f.stage = next;
+                    });
+                }
+                cantrip_state::StandIn::By(other) => {
+                    let id = self.state.request_id();
+                    self.state.update_frame(at, |f| f.pending = Some(Request { id, player: other, ..pending }));
+                }
+                cantrip_state::StandIn::Chosen { controller, source, candidates } => {
+                    let id = self.state.request_id();
+                    let next = self.state.agenda[at].next_stage;
+                    let ask = RequestKind::ChoosePlayer { source, candidates, verb: "makes the choice", amount: 0 };
+                    self.state.update_frame(at, |f| {
+                        f.stand_in = Some(Box::new((next, pending.kind)));
+                        f.pending = Some(Request { id, player: controller, kind: ask, may_cancel: false });
+                    });
+                }
+            }
+        }
+        self.forget();
+        self.run();
     }
 
     /// Drops journal entries nothing can roll back to: everything before the oldest run still waiting, when no
@@ -597,14 +691,56 @@ impl<'a> Cx<'a> {
     pub fn ask_core(&mut self, player: PlayerId, kind: RequestKind, may_cancel: bool) -> R<Answer> {
         // A real choice, asked or answered on a re-run, means no loop through here is a mandatory one (CR 104.4b); and a loop
         // of choices is watched, and a player who must stop it made to choose otherwise (CR 732.3).
-        let replaying = self.cursor < self.g.state.agenda[self.frame].answers.len();
-        let (kind, key) = loops::asked(self, player, kind, replaying);
-        let frame = &self.g.state.agenda[self.frame];
-        if self.cursor < frame.answers.len() {
-            let answer = frame.answers[self.cursor].clone();
+        // A player who conceded at this point of the run leaves the game here, on every replay (`Game::concede`).
+        let any_conceded = !self.g.state.agenda[self.frame].conceded.is_empty();
+        if any_conceded {
+            let concessions: Vec<PlayerId> =
+                self.g.state.agenda[self.frame].conceded.iter().filter(|&&(at, _)| at as usize == self.cursor).map(|&(_, p)| p).collect();
+            for p in concessions {
+                ops::concede(self, p);
+            }
+        }
+        // A player who has left the game makes no choice: a cost is not paid, and anything else is chosen by another player
+        // (CR 800.4f-h). Any question this asks is one of the run's, replayed as the others are.
+        if self.g.state.player(player).lost {
+            return match cantrip_state::stand_in(&self.g.state, &kind, player) {
+                cantrip_state::StandIn::Unpaid => Ok(Answer::Pass),
+                cantrip_state::StandIn::By(other) => self.ask_core(other, kind, may_cancel),
+                cantrip_state::StandIn::Chosen { controller, source, candidates } => {
+                    let ask = RequestKind::ChoosePlayer { source, candidates: candidates.clone(), verb: "makes the choice", amount: 0 };
+                    let chosen = match self.ask_core(controller, ask, may_cancel)? {
+                        Answer::Player(p) if candidates.contains(&p) => p,
+                        _ => candidates[0],
+                    };
+                    self.ask_core(chosen, kind, may_cancel)
+                }
+            };
+        }
+        // The answer given here before, replayed: only ever the answer of the player asked, and after a concession earlier in the
+        // run only one that still answers the question (the game may have changed under it).
+        let replay = {
+            let frame = &self.g.state.agenda[self.frame];
+            let changed = any_conceded && frame.conceded.iter().any(|&(at, _)| at as usize <= self.cursor);
+            frame
+                .answers
+                .get(self.cursor)
+                .filter(|(by, _)| by.is_none_or(|by| by == player))
+                .map(|(_, answer)| answer)
+                .filter(|answer| !changed || validate::check(&*self.g, &Request { id: 0, player, kind: kind.clone(), may_cancel }, answer).is_ok())
+                .cloned()
+        };
+        if replay.is_none() && self.cursor < self.g.state.agenda[self.frame].answers.len() {
+            let (at, cursor) = (self.frame, self.cursor);
+            self.g.state.update_frame(at, |f| {
+                f.answers.truncate(cursor);
+            });
+        }
+        let (kind, key) = loops::asked(self, player, kind, replay.is_some());
+        if let Some(answer) = replay {
             self.cursor += 1;
             return Ok(answer);
         }
+        let frame = &self.g.state.agenda[self.frame];
         // A question is already waiting: an operation that cannot carry the suspension out (a zone change asking
         // which replacement applies first) went on with the first, and the run is abandoned and replayed once the
         // answer is in (see `Game::run`). No second question replaces it.
@@ -843,7 +979,7 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn staged_answer(&self) -> Option<Answer> {
         let frame = &self.g.state.agenda[self.frame];
-        if frame.staged { frame.answers.first().cloned() } else { None }
+        if frame.staged { frame.answers.first().map(|(_, answer)| answer.clone()) } else { None }
     }
 
     fn scratch(&self) -> [u32; 4] {
@@ -856,6 +992,36 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn ask_then(&mut self, next: u16, player: PlayerId, kind: RequestKind) -> Suspend {
+        // A question asked of a player who has left the game (CR 800.4f-h), as `ask_core` treats it: a cost is not paid - the
+        // run goes on at the next stage with nothing given - and anything else is asked of the player who makes it instead,
+        // once the object's controller has chosen them where they choose.
+        let mut player = player;
+        if self.g.state.player(player).lost {
+            match cantrip_state::stand_in(&self.g.state, &kind, player) {
+                cantrip_state::StandIn::Unpaid => {
+                    let at = self.frame;
+                    self.g.state.update_frame(at, |f| {
+                        f.staged = true;
+                        f.pending = None;
+                        f.answers = vec![(None, Answer::Pass)];
+                        f.stage = next;
+                    });
+                    return Suspend;
+                }
+                cantrip_state::StandIn::By(other) => player = other,
+                cantrip_state::StandIn::Chosen { controller, source, candidates } => {
+                    let id = self.g.state.request_id();
+                    let at = self.frame;
+                    let ask = RequestKind::ChoosePlayer { source, candidates, verb: "makes the choice", amount: 0 };
+                    self.g.state.update_frame(at, |f| {
+                        f.staged = true;
+                        f.stand_in = Some(Box::new((next, kind)));
+                        f.pending = Some(Request { id, player: controller, kind: ask, may_cancel: false });
+                    });
+                    return Suspend;
+                }
+            }
+        }
         let (kind, key) = loops::asked(self, player, kind, false);
         let id = self.g.state.request_id();
         let at = self.frame;
