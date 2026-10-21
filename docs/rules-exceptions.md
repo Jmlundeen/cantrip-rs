@@ -78,3 +78,29 @@ effect outside the loop - stays in place, so the order is a DAG. Dependencies ar
 step (CR 613.8c). Example: Life and Limb, Arcane Adaptation naming Saproling, Blood Moon (in that order), Taiga and
 Llanowar Elves: Arcane Adaptation, then Life and Limb, then Blood Moon.
 
+### RX-4: Loops are left to the players, the clock and draw offers; only a loop of passes is drawn by the engine
+
+| Rule | Category | Decided by | Date |
+| --- | --- | --- | --- |
+| CR 104.4b, 732.3-5 | niche and complex | jschibel | 2026-10-21 |
+
+**What the rules say.** A loop of mandatory actions is a draw (CR 104.4b, 732.4). In a loop of optional actions taken by
+several players, the active player (or the first player in turn order involved) must make a different choice (CR 732.3).
+No player can be made to take an action outside the loop to end it (CR 732.5).
+
+**What the engine does instead, and why.** The engine detects one kind of loop only: the same exact position comes round
+again with every player having only passed priority and nothing having read the game's history in between. It lets
+such a loop go round a few times - a player holding an answer outside the loop (a Disenchant in hand) may still choose to
+end it - and then ends the game in a draw. Every other loop is played by hand: no player is made to choose otherwise
+(CR 732.3 is not applied), and the loop goes on while each player's clock runs, until someone runs out of time or the
+players agree to a draw. Any player may offer a draw while they have priority (the game menu's "Offer Draw"): the offer
+passes priority, and while it stands each of the offering player's later priorities runs no clock for its first three
+seconds (a courtesy, so an offer can't be used to run an opponent's clock down); anything other than passing withdraws
+it. Each other player is asked to accept or decline when it is made, and may accept later at any priority (the same
+menu entry, then "Accept Draw"); the game is a draw when every other player still in it has accepted. A game that
+reaches the event cap is a draw (RX-1). A loop detector for the rest would have to catch far too many cases to be
+tractable; this is the closest to the spirit of the paper rules.
+
+**Cards and cases it covers.** Fragmented loops (CR 732.3); loops whose players keep choosing to go on; a loop of
+mandatory actions while a player holds an unused response outside it (drawn after a few rounds of passes).
+
