@@ -134,3 +134,97 @@ fn a_panicking_instruction_does_not_leave_settling_held() {
     assert!(caught.is_err());
     assert_eq!(cx.s().settle_held.get(), 0);
 }
+
+// --- Layer 2's order (CR 613.1b, 613.8): control-changing effects that decide one another.
+
+fn creature_an_opponent_controls(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, c: &Chars) -> bool {
+    c.is(CardType::Creature) && q.controller(affected) != q.controller(source)
+}
+
+/// "You control each creature an opponent controls."
+static USURPER: CardDef = CardDef {
+    name: "Control Test Usurper",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[control_changing(creature_an_opponent_controls, "")],
+    ..CardDef::BLANK
+};
+
+fn attached_permanent(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    q.state().obj(source).attached_to == Some(affected)
+}
+
+/// "You control enchanted permanent."
+static LEASH: CardDef = CardDef {
+    name: "Control Test Leash",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura]),
+    statics: &[control_changing(attached_permanent, "")],
+    ..CardDef::BLANK
+};
+
+fn creatures(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+    c.is(CardType::Creature)
+}
+
+/// "You control all creatures."
+static TYRANT: CardDef = CardDef {
+    name: "Control Test Tyrant",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[control_changing(creatures, "")],
+    ..CardDef::BLANK
+};
+
+static FIELD: CardDef = CardDef { name: "Control Test Field", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
+
+fn layer_two_game() -> (Game, &'static CardTable) {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&USURPER, &LEASH, &TYRANT, &FIELD, &BEAR])));
+    (Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() }), table)
+}
+
+/// CR 613.8a: their Leash takes your Bear; your older Usurper takes each creature an opponent controls. Applying the Leash
+/// changes what the Usurper applies to (the Bear becomes an opponent's), so the Usurper depends on it and applies after it:
+/// the Bear is yours. In timestamp order the Leash would win.
+#[test]
+fn a_control_effect_whose_reach_another_changes_waits_for_it() {
+    let (mut game, table) = layer_two_game();
+    put(&mut game, table, &USURPER, YOU);
+    let bear = put(&mut game, table, &BEAR, YOU);
+    let leash = put(&mut game, table, &LEASH, THEM);
+    game.state.update_obj(leash, |o| o.attached_to = Some(bear));
+    let mut cx = cx(&mut game);
+    crate::ops::settle_control(&mut cx);
+    assert_eq!(cx.s().obj(bear).controller, YOU);
+}
+
+/// CR 613.8b: two Leashes, each on the other. Each gives control to its own controller, which the other decides: a loop,
+/// applied in timestamp order. The earlier Leash's controller takes the later; then the later, now that player's, gives
+/// them the earlier: both go to the earlier Leash's controller.
+#[test]
+fn a_control_dependency_loop_applies_in_timestamp_order() {
+    for (first, second) in [(YOU, THEM), (THEM, YOU)] {
+        let (mut game, table) = layer_two_game();
+        let a = put(&mut game, table, &LEASH, first);
+        let b = put(&mut game, table, &LEASH, second);
+        game.state.update_obj(a, |o| o.attached_to = Some(b));
+        game.state.update_obj(b, |o| o.attached_to = Some(a));
+        let mut cx = cx(&mut game);
+        crate::ops::settle_control(&mut cx);
+        assert_eq!((cx.s().obj(a).controller, cx.s().obj(b).controller), (first, first));
+    }
+}
+
+/// CR 613.1b, 613.1d: "you control all creatures" applies in layer 2, to what layer 1 made each permanent: a land an effect
+/// makes a creature in layer 4 is no creature there, and stays yours; your Bear is theirs.
+#[test]
+fn a_control_effect_does_not_reach_a_land_animated_in_layer_four() {
+    let (mut game, table) = layer_two_game();
+    put(&mut game, table, &TYRANT, THEM);
+    let field = put(&mut game, table, &FIELD, YOU);
+    let bear = put(&mut game, table, &BEAR, YOU);
+    let mut cx = cx(&mut game);
+    cantrip_api::Game::add_effect(&mut cx, field, field, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::EndOfTurn);
+    crate::ops::settle_control(&mut cx);
+    assert!(cx.chars(field).is(CardType::Creature));
+    assert_eq!(cx.s().obj(field).controller, YOU);
+    assert_eq!(cx.s().obj(bear).controller, THEM);
+}

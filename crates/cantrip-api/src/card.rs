@@ -182,6 +182,12 @@ pub trait LayerQuery {
     fn words(&self, id: ObjectId) -> Words {
         crate::words(self.state(), id)
     }
+    /// Who controls an object as the layers stand (CR 613.1b): in layer 2, as the control-changing effects applied so far
+    /// leave it - what a control-changing ability whose reach depends on control reads ("each creature an opponent
+    /// controls") - and after it, the controller the state holds, which layer 2 settled.
+    fn controller(&self, id: ObjectId) -> PlayerId {
+        self.state().obj(id).controller
+    }
 }
 
 /// Whether a static ability applies to `affected`, given what the earlier layers made it (`so_far`).

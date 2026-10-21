@@ -186,11 +186,13 @@ struct View<'a> {
     reads: Option<&'a std::cell::RefCell<Vec<ObjectId>>>,
     /// The pass a `stage` is of, if the one asking has it at hand.
     pass: Option<&'a Pass>,
+    /// In layer 2, who controls each object as the control-changing effects applied so far leave it (`control_order`).
+    controllers: Option<&'a std::collections::HashMap<ObjectId, PlayerId, Quick>>,
 }
 
 impl<'a> View<'a> {
     fn new(cards: &'a CardTable, state: &'a GameState, log: &'a [Record], stop: Layer) -> View<'a> {
-        View { cards, state, log, stop, stage: None, reads: None, pass: None }
+        View { cards, state, log, stop, stage: None, reads: None, pass: None, controllers: None }
     }
 
     /// An object with the layers before `stop` done, in the pass at hand or the position's.
@@ -260,6 +262,13 @@ impl LayerQuery for View<'_> {
                 self.at(id, &start)
             }
             (_, None) => self.before(id, self.stop),
+        }
+    }
+
+    fn controller(&self, id: ObjectId) -> PlayerId {
+        match self.controllers.and_then(|c| c.get(&id)) {
+            Some(&who) => who,
+            None => self.state.obj(id).controller,
         }
     }
 
@@ -2289,37 +2298,117 @@ pub fn ability_granting_present(cards: &CardTable, state: &GameState) -> bool {
     }
 }
 
-/// The permanents with a control-changing static ability (CR 613.1b), in timestamp order.
-pub fn static_control_sources(cards: &CardTable, state: &GameState) -> Vec<ObjectId> {
-    static_sources(cards, state).controllers.clone()
+
+
+/// One control-changing effect of layer 2 (CR 613.1b).
+#[derive(Clone, Copy)]
+enum Control {
+    /// A static ability of `source` ("you control enchanted creature"): its source's controller controls what it affects.
+    Static { source: ObjectId, st: &'static StaticDef },
+    /// A resolved effect: `to` controls `affected`.
+    Effect { affected: ObjectId, to: PlayerId },
 }
 
-
-/// The control-changing static abilities that apply to `id` (CR 613.1b, layer 2), as (timestamp, the player who gains
-/// control): each source's controller, at its source's timestamp (CR 613.7; an Aura's is when it became attached, 613.7e),
-/// judged on what layer 1 made `id`. A source whose controller has left the game gives them nothing: a player who leaves
-/// stops controlling what such an ability gave them (CR 800.4a), and nothing changes to a player who has left (CR 800.4b).
-/// Empty, and free, while no such ability is on the battlefield.
-pub fn static_control(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> Vec<(u32, PlayerId)> {
-    if !state.statics_seen {
-        return Vec::new();
-    }
-    let sources = static_control_sources(cards, state);
-    if sources.is_empty() {
-        return Vec::new();
-    }
-    let view = View::new(cards, state, log, Layer::Control);
-    let so_far = chars_before(cards, state, log, id, Layer::Control);
-    let mut found = Vec::new();
-    for source in sources {
-        let sobj = state.obj(source);
-        for st in cards.get(cards.current(sobj)).statics.iter().filter(|s| s.layer == Layer::Control) {
-            if source != id && state.in_game(sobj.controller) && (st.affects)(&view, source, id, &so_far) {
-                found.push((sobj.timestamp, sobj.controller));
+/// Layer 2 (CR 613.1b): who controls each permanent, on the battlefield or phased out, as the control-changing effects leave
+/// it, and whether any applied to it. The effects - control-changing static abilities and resolved control effects - apply
+/// in the layer's order (CR 613.7, 613.8): one depends on another if applying the other changes what it applies to or whom
+/// it gives control to (its source's controller), each judged on the objects as layer 1 made them and the controllers the
+/// effects applied so far leave (`LayerQuery::controller`), so "you control all creatures" does not reach a land a layer-4
+/// effect animates. A dependency loop is broken by timestamp order among its members, every other dependency kept
+/// (`docs/rules-exceptions.md`, RX-3). Each permanent starts from whoever controlled it before any effect did
+/// (`Marks::control_base`). A source whose controller has left the game gives them nothing (CR 800.4a), and none applies to
+/// its own source.
+pub fn control_order(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<(ObjectId, PlayerId, bool)> {
+    let objects: Vec<ObjectId> =
+        state.battlefield().iter().chain(state.zone(Zone::PHASED_OUT)).copied().filter(|&id| live(state, id)).collect();
+    let base = |id: ObjectId| {
+        let o = state.obj(id);
+        o.marks.control_base.unwrap_or(o.controller)
+    };
+    let mut entries: Vec<(u32, u8, Control)> = Vec::new();
+    if state.statics_seen {
+        for source in static_sources(cards, state).controllers.clone() {
+            for st in cards.get(cards.current(state.obj(source))).statics.iter().filter(|s| s.layer == Layer::Control) {
+                entries.push((state.obj(source).timestamp, 0, Control::Static { source, st }));
             }
         }
     }
-    found
+    for e in &state.effects {
+        if let EffectKind::Control(to) = e.kind
+            && objects.contains(&e.affected)
+        {
+            entries.push((e.timestamp, 2, Control::Effect { affected: e.affected, to }));
+        }
+    }
+    entries.sort_by_key(|&(timestamp, seq, _)| (timestamp, seq));
+    let mut controllers: std::collections::HashMap<ObjectId, PlayerId, Quick> = objects.iter().map(|&id| (id, base(id))).collect();
+    let mut affected: Vec<ObjectId> = Vec::new();
+    // Each object as layer 1 made it, asked once.
+    let firsts: std::collections::HashMap<ObjectId, Chars, Quick> = if entries.iter().any(|(_, _, c)| matches!(c, Control::Static { .. })) {
+        objects.iter().map(|&id| (id, chars_before(cards, state, log, id, Layer::Control))).collect()
+    } else {
+        Default::default()
+    };
+    // What an effect does with the controllers as they stand: each object it applies to, and who gets it.
+    let reach = |c: &Control, controllers: &std::collections::HashMap<ObjectId, PlayerId, Quick>| -> Vec<(ObjectId, PlayerId)> {
+        match *c {
+            Control::Effect { affected, to } => vec![(affected, to)],
+            Control::Static { source, st } => {
+                let who = controllers.get(&source).copied().unwrap_or(state.obj(source).controller);
+                if !state.in_game(who) {
+                    return Vec::new();
+                }
+                let view = View { controllers: Some(controllers), ..View::new(cards, state, log, Layer::Control) };
+                objects
+                    .iter()
+                    .copied()
+                    .filter(|&id| id != source && firsts.get(&id).is_some_and(|first| (st.affects)(&view, source, id, first)))
+                    .map(|id| (id, who))
+                    .collect()
+            }
+        }
+    };
+    let mut remaining: Vec<usize> = (0..entries.len()).collect();
+    while !remaining.is_empty() {
+        let m = remaining.len();
+        let now: Vec<Vec<(ObjectId, PlayerId)>> = remaining.iter().map(|&k| reach(&entries[k].2, &controllers)).collect();
+        // direct[a][b]: applying b changes what a applies to or whom it gives control to.
+        let mut direct = vec![vec![false; m]; m];
+        for b in 0..m {
+            if now[b].iter().all(|&(id, who)| controllers.get(&id) == Some(&who)) {
+                continue;
+            }
+            let mut after = controllers.clone();
+            for &(id, who) in &now[b] {
+                after.insert(id, who);
+            }
+            for a in 0..m {
+                if a != b && matches!(entries[remaining[a]].2, Control::Static { .. }) {
+                    direct[a][b] = reach(&entries[remaining[a]].2, &after) != now[a];
+                }
+            }
+        }
+        let mut through = direct.clone();
+        for k in 0..m {
+            let via = through[k].clone();
+            for row in through.iter_mut() {
+                if row[k] {
+                    for (cell, &on) in row.iter_mut().zip(&via) {
+                        *cell |= on;
+                    }
+                }
+            }
+        }
+        let next = (0..m).find(|&a| (0..m).all(|b| !direct[a][b] || through[b][a])).unwrap_or(0);
+        for &(id, who) in &now[next] {
+            controllers.insert(id, who);
+            if !affected.contains(&id) {
+                affected.push(id);
+            }
+        }
+        remaining.remove(next);
+    }
+    objects.iter().map(|&id| (id, controllers[&id], affected.contains(&id))).collect()
 }
 
 /// The layer a resolved effect of this kind applies in (CR 613.1), as `apply_effect` applies it; none for an effect that
@@ -3256,9 +3345,12 @@ mod tests {
         });
         state.update_obj(ids[3], |o| o.attached_to = Some(ids[0]));
         state.see_statics();
-        assert_eq!(static_control(&cards, &state, &[], ids[0]), [(3, PlayerId(1)), (4, PlayerId(0))]);
-        assert!(static_control(&cards, &state, &[], ids[1]).is_empty());
-        assert!(static_control(&cards, &state, &[], ids[2]).is_empty());
+        let order = control_order(&cards, &state, &[]);
+        let of = |id| order.iter().find(|&&(o, _, _)| o == id).map(|&(_, p, by)| (p, by));
+        // Both apply to the first Bear; the later, of the second Controller, decides.
+        assert_eq!(of(ids[0]), Some((PlayerId(0), true)));
+        assert_eq!(of(ids[1]), Some((PlayerId(0), false)));
+        assert_eq!(of(ids[2]), Some((PlayerId(1), false)));
     }
 
     /// CR 613.1: layer 2 applies before layer 6 could take the ability away, so a source that has lost all its abilities to
@@ -3273,7 +3365,8 @@ mod tests {
         });
         state.effect_push(ContinuousEffect { affected: ids[1], ..effect(9, EffectKind::LoseAllAbilities) });
         state.see_statics();
-        assert_eq!(static_control(&cards, &state, &[], ids[0]), [(2, PlayerId(1))]);
+        let order = control_order(&cards, &state, &[]);
+        assert!(order.contains(&(ids[0], PlayerId(1), true)));
     }
 
     /// CR 612.2: the land type of a printed landwalk and the color of a printed protection are words of the text, which a

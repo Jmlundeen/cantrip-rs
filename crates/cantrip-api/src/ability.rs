@@ -798,8 +798,9 @@ pub const fn sets_land_subtypes(affects: StaticAffects, apply: StaticApply, text
 /// "You control [what it affects]" (CR 613.1b, layer 2): a static ability by which its source's controller controls every
 /// permanent `affects` accepts, judged on what layer 1 made it. Mind Control, Treachery, Control Magic and Persuasion print
 /// "You control enchanted creature." It applies at its source's timestamp (CR 613.7; an Aura's is when it became attached,
-/// 613.7e), among the resolved control-changing effects on the permanent, and the latest wins. Losing its abilities in layer 6
-/// does not stop it, as it has applied by then (CR 613.1, 613.6).
+/// 613.7e), among the resolved control-changing effects, in layer 2's order (CR 613.7, 613.8: a reach that depends on control
+/// reads it through `LayerQuery::controller`). Losing its abilities in layer 6 does not stop it, as it has applied by then
+/// (CR 613.1, 613.6).
 pub const fn control_changing(affects: StaticAffects, text: &'static str) -> StaticDef {
     StaticDef { text, layer: Layer::Control, affects, ..StaticDef::BLANK }
 }

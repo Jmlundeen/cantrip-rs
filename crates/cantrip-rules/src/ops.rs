@@ -2756,10 +2756,9 @@ fn attackable(cx: &Cx, attacking: PlayerId, defender: Target) -> bool {
     }
 }
 
-/// Settles who controls a permanent from the control-changing effects that apply to it (CR 613.1b, layer 2): resolved
-/// ones and static abilities ("you control enchanted creature") alike, the one with the latest timestamp (CR 613.7),
-/// else whoever controlled it before any of them did. Control that is new is new for summoning sickness (CR 302.6) and
-/// takes the permanent out of combat (CR 506.4). Whether its controller changed.
+/// Settles who controls a permanent from the control-changing effects (CR 613.1b, layer 2): what layer 2's order makes of
+/// it (`layers::control_order`), else whoever controlled it before any of them did. Control that is new is new for summoning
+/// sickness (CR 302.6) and takes the permanent out of combat (CR 506.4). Whether its controller changed.
 pub fn refresh_control(cx: &mut Cx, id: ObjectId) -> bool {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         return false;
@@ -2770,23 +2769,19 @@ pub fn refresh_control(cx: &mut Cx, id: ObjectId) -> bool {
 /// `refresh_control` of a permanent on the battlefield or phased out: a phased-out one is settled only where the rules ask
 /// who controls it though it is treated as not existing (CR 800.4a, 702.26n: a player leaving).
 fn settle_controller(cx: &mut Cx, id: ObjectId) -> bool {
+    let order = layers::control_order(cx.cards(), cx.s(), &cx.g.log);
+    match order.into_iter().find(|&(of, _, _)| of == id) {
+        Some((_, controller, by_effect)) => write_controller(cx, id, controller, by_effect),
+        None => false,
+    }
+}
+
+/// Writes what layer 2 made of a permanent's controller: `controller`, given by a control-changing effect or not. The
+/// controller it had before any did is kept beside it (`Marks::control_base`). Whether its controller changed.
+fn write_controller(cx: &mut Cx, id: ObjectId, controller: PlayerId, by_effect: bool) -> bool {
     let obj = *cx.s().obj(id);
-    let statics = layers::static_control(cx.cards(), cx.s(), &cx.g.log, id);
-    let latest = cx
-        .s()
-        .effects
-        .iter()
-        .filter(|e| e.affected == id)
-        .filter_map(|e| match e.kind {
-            EffectKind::Control(p) => Some((e.timestamp, p)),
-            _ => None,
-        })
-        .chain(statics)
-        .max_by_key(|&(timestamp, _)| timestamp)
-        .map(|(_, p)| p);
     let base = obj.marks.control_base.unwrap_or(obj.controller);
-    let controller = latest.unwrap_or(base);
-    let control_base = latest.map(|_| base);
+    let control_base = by_effect.then_some(base);
     if controller == obj.controller && control_base == obj.marks.control_base {
         return false;
     }
@@ -2907,25 +2902,19 @@ pub fn end_lapsed_conditions(cx: &mut Cx) -> bool {
     true
 }
 
-/// Settles the controller of every permanent (CR 613.1b, layer 2) as the control-changing effects that apply now say: a
-/// static ability's reach changes as Auras move and their sources come and go, and a resolved effect may have ended
-/// ("for as long as ...", CR 611.2b). One permanent's controller can decide another's (an Aura's controller is whom it
-/// gives control to), so it is worked out again while anything changes. Whether any controller changed. Free while
-/// no control-changing effect applies and no permanent's control was ever changed.
+/// Settles the controller of every permanent (CR 613.1b, layer 2) as layer 2's order says (`layers::control_order`): the
+/// control-changing effects in timestamp order unless one depends on another (CR 613.8) - one permanent's controller can
+/// decide whom another's effect gives control to (an Aura's controller), and that is a dependency, not a repetition. Whether
+/// any controller changed. Free while no control-changing effect applies and no permanent's control was ever changed.
 pub fn settle_control(cx: &mut Cx) -> bool {
     if !control_may_change(cx) {
         return false;
     }
+    let order = layers::control_order(cx.cards(), cx.s(), &cx.g.log);
     let mut changed = false;
-    // Each pass settles at least one permanent for good unless two decide each other; the battlefield bounds the chain.
-    for _ in 0..=cx.s().battlefield().len() {
-        let mut again = false;
-        for id in cx.s().battlefield().to_vec() {
-            again |= refresh_control(cx, id);
-        }
-        changed |= again;
-        if !again {
-            break;
+    for (id, controller, by_effect) in order {
+        if cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+            changed |= write_controller(cx, id, controller, by_effect);
         }
     }
     changed

@@ -54,8 +54,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Fix queued |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
-| [KI-63](#ki-63-control-layer-2-is-not-ordered-by-the-layer-pass) | Control (layer 2) is not ordered by the layer pass | Pri-1 | Fix queued |
-| [KI-64](#ki-64-control-changing-effects-that-decide-one-another-are-settled-by-a-capped-fixpoint) | Control-changing effects that decide one another are settled by a capped fixpoint | Pri-1 | Fix queued |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
@@ -206,36 +204,6 @@ blocker's damage among the band (702.22k) or its attacker's damage among banding
 divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's sparing suggestion).
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
-
-### KI-63: Control (layer 2) is not ordered by the layer pass
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine | 2026-10-17, review of the control-changing static abilities; restated 2026-10-21 with the layer pass |
-
-**Notes.** When control is settled is right: at every event and added effect and at the end of each instruction
-(`ops::settle_at_once`, 0e36d26bc). How it is settled is not CR 613.8's: `ops::settle_controller` gives each permanent to the
-latest control-changing effect that applies to it, judging a control effect's reach on the object as layer 1 left it, and
-`ops::settle_control` repeats that until nothing changes. The rules order layer 2's effects like any layer's: one control
-effect depending on another (applying the other changes what it applies to, or whom it gives control to) waits for it, a
-dependency loop applies in timestamp order (613.8b; RX-3), and a control effect's reach is judged on the characteristics
-as they stand at layer 2. The fix: layer 2 in the layer pass, its order writing the stored controller.
-
-**Scenarios.** None that reach the difference.
-
-### KI-64: Control-changing effects that decide one another are settled by a capped fixpoint
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine | 2026-10-17, review of the control-changing static abilities |
-
-**Notes.** `ops::settle_control` works the controllers out again while any changes, at most once per permanent, since an
-Aura's controller is whom it gives control to (gain control of a Mind Control, and the creature it enchants follows). That is
-a fixpoint, not CR 613.8's order: where two control-changing effects each decide the other (a dependency loop, 613.8b), the
-rounds can alternate until the bound stops them on an arbitrary answer, where the rules apply the loop in timestamp order.
-No card in content can take control of an Aura that gives control. Fixed with KI-63, by layer 2 in the layer pass.
-
-**Scenarios.** None.
 
 ### KI-78: The tactical bot attacks a player whom protection keeps from being dealt damage
 

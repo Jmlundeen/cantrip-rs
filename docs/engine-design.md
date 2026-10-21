@@ -207,11 +207,15 @@ would go over unclickable.
   `marks.control_base` the one it had before any applied). They are resolved `EffectKind::Control(player)` effects
   (`Game::gain_control`, `exchange_control`) and static abilities of `Layer::Control` made with `control_changing(affects,
   text)` ("You control enchanted creature": Mind Control, Treachery), whose source's controller gains what they affect,
-  judged on what layer 1 made it, at the source's timestamp (an Aura's is when it became attached, 613.7e). The latest
-  applying effect decides (`ops::refresh_control`, 613.7); new control is new for summoning sickness and takes the
-  permanent out of combat. `ops::settle_control` works every permanent out again as the state-based actions are checked
-  (and after effects end with their sources), repeating while one controller decides another; it costs a scan of the
-  effects and the battlefield, free while nothing has ever changed control. A layer-2 ability applies though its source
+  judged on what layer 1 made it, at the source's timestamp (an Aura's is when it became attached, 613.7e). Layer 2 is
+  ordered as every layer is (`layers::control_order`): one control-changing effect depends on another if applying the other
+  changes what it applies to (a reach that reads control through `LayerQuery::controller`, which in layer 2 is the
+  controller the effects applied so far leave) or whom it gives control to (its source's controller), a dependency loop is
+  broken by timestamp order (RX-3), and each permanent starts from whoever controlled it before any effect did. Its result
+  is written to the stored controller (`ops::write_controller`); new control is new for summoning sickness and takes the
+  permanent out of combat. `ops::settle_control` writes it at every event and added effect and at the end of each
+  instruction (`ops::settle_at_once`), and as the state-based actions are checked; free while nothing has ever changed
+  control. Every reader of a controller reads the stored one, which layer 2 settled, so layers 3 to 7 see it. A layer-2 ability applies though its source
   loses its abilities in layer 6 (CR 613.1). Durations end it as they end any effect: end of turn (`turn.rs`), a source
   leaving, a permanent untapping (`ops::end_lapsed_durations`), or a card's own "for as long as" condition
   (`Duration::AsLongAs(card, index)` naming one of `CardDef::lasting`, asked by `ops::end_lapsed_conditions` at each check
@@ -347,7 +351,7 @@ would go over unclickable.
 - **No strings at runtime:** keywords, types, subtypes and colors are enums or bitsets, card behavior is reached by
   function index, and nothing about a card is read from JSON while a game runs.
 
-### The layer pass (built, but for layer 2; the design as reviewed)
+### The layer pass (built; the design as reviewed)
 
 **Why.** CR 613.8 orders *effects*, not objects. An effect depends on another if applying the other "would change the text
 or the existence of the first effect, what it applies to, or what it does to any of the things it applies to"
@@ -497,9 +501,11 @@ and Arcane Adaptation on turn 5.
   effect's values are fixed when it begins (707.2b, 707.2c), so layer 1 has no cross-object dependency left to judge.
   305.7's removal of what a copy effect gave a land is recorded by the layer-4 pass: per land, the point in the order at
   which its text abilities, including copied ones, went. Layer 6 reads that record.
-- **Layer 2 (control):** in the pass. An entry's reach may read control ("creatures you control"), and control from a
-  static ability or a lapsed condition is then judged continuously, in the layer, rather than settled only as
-  state-based actions are checked. That closes KI-63 and KI-64 properly. `static_control` and its settling go.
+- **Layer 2 (control):** ordered by the same rules (`layers::control_order`): its effects - control-changing static
+  abilities and resolved control effects - in timestamp order unless one depends on another, a reach judged on what layer 1
+  made each object and the controllers the effects applied so far leave (`LayerQuery::controller`), a loop broken by
+  timestamp order (RX-3). Its result is written to the stored controller where control is settled (at every event, added
+  effect and instruction's end), and every reader keeps reading the stored controller.
 
 **Fixed eagerly, applied lazily.** Building a layer fixes its order and each entry's recorded set, nothing more.
 - An object's characteristics through a layer are applied on demand: the entries of the order that reach it, in order,
