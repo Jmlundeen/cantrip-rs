@@ -1160,16 +1160,16 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .iter()
                     .map(|&(blocker, attacker)| BlockMessage { blocker: handles.handle(blocker), attacker: handles.handle(attacker) })
                     .collect(),
-                minimum_blockers: attackers.iter().map(|&a| i32::from(game.chars(a).minimum_blockers())).collect(),
+                minimum_blockers: attackers.iter().map(|&a| wire(count_u32(game.chars(a).minimum_blockers()))).collect(),
                 maximum_blockers: attackers
                     .iter()
                     .map(|&a| match game.chars(a).maximum_blockers() {
-                        u8::MAX => 0,
-                        most => i32::from(most),
+                        usize::MAX => 0,
+                        most => wire(count_u32(most)),
                     })
                     .collect(),
                 requirements: blocks(handles, &requirements.pairs),
-                most_requirements: i32::from(requirements.most),
+                most_requirements: wire(requirements.most),
                 suggested: blocks(handles, &requirements.suggested),
                 bands: attackers
                     .iter()

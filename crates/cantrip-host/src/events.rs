@@ -225,8 +225,8 @@ impl Tracker {
                     DrawReason::EventLimit => DrawReasonView::EventLimit,
                 };
             }
-            Event::Scried { player, count, .. } => out.push(Proto::Scried { player, count: i32::from(count) }),
-            Event::Surveilled { player, count, .. } => out.push(Proto::Surveilled { player, count: i32::from(count) }),
+            Event::Scried { player, count, .. } => out.push(Proto::Scried { player, count: crate::prompt::wire(count) }),
+            Event::Surveilled { player, count, .. } => out.push(Proto::Surveilled { player, count: crate::prompt::wire(count) }),
             _ => {}
         }
     }

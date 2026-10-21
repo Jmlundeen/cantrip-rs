@@ -622,7 +622,7 @@ impl AttackCost {
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct BlockRequirements {
     pub pairs: Vec<(ObjectId, ObjectId)>,
-    pub most: u8,
+    pub most: u32,
     pub suggested: Vec<(ObjectId, ObjectId)>,
     /// The attacking bands (CR 702.22h), each attacker in one with its band's number; empty where no attacker is banded.
     pub bands: Vec<(ObjectId, u32)>,
@@ -638,8 +638,8 @@ impl BlockRequirements {
 
     /// How many of the requirements a declaration obeys (CR 509.1c): each one whose blocker blocks its attacker, as declared or
     /// through the attacker's band - so one block of a band may obey two.
-    pub fn obeyed(&self, blocks: &[(ObjectId, ObjectId)]) -> u8 {
-        self.pairs.iter().filter(|&&(b, a)| blocks.iter().any(|&(bb, x)| bb == b && self.blocks_through(x, a))).count() as u8
+    pub fn obeyed(&self, blocks: &[(ObjectId, ObjectId)]) -> u32 {
+        crate::count_u32(self.pairs.iter().filter(|&&(b, a)| blocks.iter().any(|&(bb, x)| bb == b && self.blocks_through(x, a))).count())
     }
 }
 

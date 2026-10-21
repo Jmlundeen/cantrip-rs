@@ -230,13 +230,13 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             let once: Vec<ObjectId> = blocks
                 .iter()
                 .map(|b| b.1)
-                .filter(|&a| (blocks.iter().filter(|b| b.1 == a).count() as u8) < game.chars(a).minimum_blockers())
+                .filter(|&a| blocks.iter().filter(|b| b.1 == a).count() < game.chars(a).minimum_blockers())
                 .collect();
             blocks.retain(|b| !once.contains(&b.1));
             // "Can't be blocked by more than one creature": the blockers past the most it allows are left out.
             let mut kept: Vec<(ObjectId, ObjectId)> = Vec::new();
             for b in blocks {
-                if kept.iter().filter(|k| k.1 == b.1).count() < usize::from(game.chars(b.1).maximum_blockers()) {
+                if kept.iter().filter(|k| k.1 == b.1).count() < game.chars(b.1).maximum_blockers() {
                     kept.push(b);
                 }
             }

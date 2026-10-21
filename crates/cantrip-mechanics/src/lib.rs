@@ -719,7 +719,7 @@ pub fn scry(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) 
             g.arrange_library(player, &placements[0], &placements[1]);
         }
     }
-    g.scried(player, count.min(u16::MAX as usize) as u16, looked.len() as u16);
+    g.scried(player, count_u32(count), count_u32(looked.len()));
     Ok(())
 }
 
@@ -765,7 +765,7 @@ pub fn surveil_into_graveyard(
             g.arrange_library(player, &placements[0], &[]);
         }
     }
-    g.surveilled(player, count.min(u16::MAX as usize) as u16, looked.len() as u16);
+    g.surveilled(player, count_u32(count), count_u32(looked.len()));
     Ok(binned)
 }
 

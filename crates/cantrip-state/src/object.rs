@@ -49,7 +49,7 @@ pub struct Obj {
     /// How many times its `optional_cost` (an additional cost that is not kicker: bargain, teamwork, behold, blight,
     /// CR 601.2b) was paid as it was cast, carried from the spell to the permanent it becomes. Kept apart from `kicked`
     /// so a card with kicker and another optional cost is not ambiguous.
-    pub paid: u8,
+    pub paid: u32,
     /// The opponent its gift was promised to as it was cast (CR 702.174k), carried from the spell to the permanent it
     /// becomes: "if its gift cost was paid" (CR 702.174b). A copy of the spell has it too (CR 707.10); a permanent
     /// that enters as a copy of one does not (CR 707.9).
@@ -568,7 +568,7 @@ pub struct StackItem {
     /// How many times it was kicked (CR 702.33).
     pub kicked: u8,
     /// How many times its `optional_cost` was paid (CR 601.2b, 707.10: a copy has the same).
-    pub paid: u8,
+    pub paid: u32,
     /// Which way it was cast (0 for the mana cost, n for the nth alternative cost), or activated.
     pub way: u8,
     /// The modes chosen as it was put on the stack (CR 700.2): a bit for each mode of its modal definition.
@@ -1707,7 +1707,7 @@ pub struct Attacker {
     pub first_strike: bool,
     /// The attacking band it is in (CR 702.22c), numbered from 1 in the order they were announced; 0 for none. It lasts the
     /// rest of combat whatever happens to banding (CR 702.22e), and a member removed from combat leaves it (CR 702.22f).
-    pub band: u8,
+    pub band: u32,
 }
 
 impl Attacker {

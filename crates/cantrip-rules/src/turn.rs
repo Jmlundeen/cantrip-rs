@@ -620,7 +620,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     // creatures' own abilities (CR 508.1m).
     let mut events: Vec<Event> = attackers.iter().map(|a| Event::Attacks { attacker: a.id, defender: a.target }).collect();
     if attacked {
-        events.push(Event::AttackersDeclared { player: active, count: attackers.len() as u8 });
+        events.push(Event::AttackersDeclared { player: active, count: count_u32(attackers.len()) });
     }
     cx.emit_batch(&events, None);
     Ok(())
@@ -631,8 +631,8 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
 /// attacking what it attacks (CR 702.22d) and in no band yet (each creature is in one band at most), any number with banding
 /// and at most one without (the core refuses more, `validate`). Choosing none forms no band with it. Nothing is asked where no
 /// attacker has banding, or one has no other attacker beside it.
-fn declare_bands(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) -> R<Vec<u8>> {
-    let mut band = vec![0u8; attacks.len()];
+fn declare_bands(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) -> R<Vec<u32>> {
+    let mut band = vec![0u32; attacks.len()];
     let mut next = 1;
     for i in 0..attacks.len() {
         let (source, target) = attacks[i];
@@ -665,7 +665,7 @@ fn declare_bands(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) 
                 band[j] = next;
             }
         }
-        next += 1;
+        next = next.saturating_add(1);
     }
     Ok(band)
 }
@@ -770,7 +770,7 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         .copied()
         .filter(|&a| {
             let c = cx.chars(a);
-            allowed.iter().filter(|p| p.1 == a).count() < c.minimum_blockers() as usize || c.minimum_blockers() > c.maximum_blockers()
+            allowed.iter().filter(|p| p.1 == a).count() < c.minimum_blockers() || c.minimum_blockers() > c.maximum_blockers()
         })
         .collect();
     allowed.retain(|p| !menace.contains(&p.1));
@@ -845,7 +845,7 @@ fn deals_now(cx: &Cx, id: ObjectId, had_first_strike: bool, first_strike_step: b
 fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(ObjectId, ObjectId)>) -> BlockRequirements {
     // A creature blocking one member of an attacking band blocks every member (CR 702.22h), so blocking any member obeys a
     // requirement to block another, and one block may obey two.
-    let bands: Vec<(ObjectId, u32)> = cx.s().attackers.iter().filter(|a| a.band != 0).map(|a| (a.id, u32::from(a.band))).collect();
+    let bands: Vec<(ObjectId, u32)> = cx.s().attackers.iter().filter(|a| a.band != 0).map(|a| (a.id, a.band)).collect();
     let mut req = BlockRequirements { pairs, most: 0, suggested: Vec::new(), bands };
     let mut targets: Vec<ObjectId> = Vec::new();
     for &(_, a) in &req.pairs {
@@ -859,7 +859,7 @@ fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(Obje
         .iter()
         .map(|&a| {
             let c = cx.chars(a);
-            (c.minimum_blockers() as usize, usize::from(c.maximum_blockers()))
+            (c.minimum_blockers(), c.maximum_blockers())
         })
         .collect();
     // Each blocker that could block one of `targets`, with the attackers it may block and how many requirements each block
@@ -926,7 +926,7 @@ fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(Obje
     search.go(0, 0);
     let (most, chosen) = search.best.unwrap_or_default();
     req.suggested = blockers.iter().zip(chosen).filter_map(|((b, _), t)| t.map(|t| (*b, targets[t]))).collect();
-    req.most = most as u8;
+    req.most = count_u32(most);
     req
 }
 

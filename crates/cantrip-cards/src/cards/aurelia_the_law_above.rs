@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Whenever a player attacks with `N` or more creatures" (CR 508.1m, 603.2): any player's declaration of attackers, the
 /// Angel's controller's included, judged on the creatures declared as attackers. It does not matter what happens to them
 /// afterwards (the ruling).
-fn a_player_attacks_with_at_least<const N: u8>(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+fn a_player_attacks_with_at_least<const N: u32>(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::AttackersDeclared { count, .. } if *count >= N => Fired::PLAIN,
         _ => None,

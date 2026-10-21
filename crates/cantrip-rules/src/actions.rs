@@ -5064,7 +5064,7 @@ fn cast(
     // An optional cost that sacrifices one or more: how many were is how many times it was paid (Plumb the Forbidden's
     // linked trigger reads it).
     if matches!(extra.variable, Some(VariableCost::SacrificeOneOrMore(_))) {
-        let n = extra_sacrifices.len().min(255) as u8;
+        let n = count_u32(extra_sacrifices.len());
         let at = cx.s().stack.len() - 1;
         let mut with = cx.s().stack[at];
         with.paid = n;
@@ -5177,7 +5177,7 @@ fn cast(
             cx.state_changed();
         }
     }
-    let nth = cx.history().casts_by(player).count().min(255) as u8;
+    let nth = count_u32(cx.history().casts_by(player).count());
     cx.emit(Event::SpellCast { spell, player, nth });
     ops::became_targets(cx, targets.iter().copied(), spell, player);
     ops::commit_crime(cx, player, spell, targets);
@@ -5999,11 +5999,11 @@ fn activate(
             .targets
             .iter()
             .filter(|spec| spec.min == TargetSpec::COUNTED)
-            .map(|spec| target_candidates(cx, &asker, spec).len().min(1000) as u16)
+            .map(|spec| u16::try_from(target_candidates(cx, &asker, spec).len()).unwrap_or(u16::MAX))
             .min()
-            .unwrap_or(1000);
+            .unwrap_or(u16::MAX);
         let n = announce(cx, player, source, mana, None, mana.x, cap)?;
-        mana.generic += n as u8 * mana.x;
+        mana.generic = mana.generic.saturating_add((u32::from(n) * u32::from(mana.x)).min(255) as u8);
         item.x = n;
     }
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).

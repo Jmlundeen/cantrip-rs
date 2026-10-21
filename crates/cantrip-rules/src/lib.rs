@@ -1319,7 +1319,7 @@ impl cantrip_api::Game for Cx<'_> {
             return 0;
         }
         let index = if count <= 20 { self.g.state.roll_die(count as u32) as usize - 1 } else { self.g.state.random(count as u32) as usize };
-        self.emit(Event::ChosenAtRandom { count: count as u16, index: index as u16 });
+        self.emit(Event::ChosenAtRandom { count: count_u32(count), index: count_u32(index) });
         index
     }
 
@@ -1437,11 +1437,11 @@ impl cantrip_api::Game for Cx<'_> {
         self.emit(Event::Searched { player, library });
     }
 
-    fn scried(&mut self, player: PlayerId, count: u16, looked: u16) {
+    fn scried(&mut self, player: PlayerId, count: u32, looked: u32) {
         self.emit(Event::Scried { player, count, looked });
     }
 
-    fn surveilled(&mut self, player: PlayerId, count: u16, looked: u16) {
+    fn surveilled(&mut self, player: PlayerId, count: u32, looked: u32) {
         self.emit(Event::Surveilled { player, count, looked });
     }
 

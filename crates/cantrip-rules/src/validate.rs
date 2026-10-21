@@ -301,12 +301,12 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 no("not a legal declaration of blockers")
             } else if blocks.iter().any(|&(_, a)| {
                 // Menace (CR 702.110b), "except by three or more creatures": blocked by that many or not at all.
-                (blocks.iter().filter(|b| b.1 == a).count() as u8) < game.chars(a).minimum_blockers()
+                blocks.iter().filter(|b| b.1 == a).count() < game.chars(a).minimum_blockers()
             }) {
                 no("a creature can't be blocked by fewer creatures than it requires (CR 509.1b, 702.110b)")
             } else if blocks.iter().any(|&(_, a)| {
                 // "Can't be blocked by more than one creature" (CR 509.1b).
-                blocks.iter().filter(|b| b.1 == a).count() > usize::from(game.chars(a).maximum_blockers())
+                blocks.iter().filter(|b| b.1 == a).count() > game.chars(a).maximum_blockers()
             }) {
                 no("a creature can't be blocked by more creatures than it allows (CR 509.1b)")
             } else if requirements.obeyed(blocks) < requirements.most {

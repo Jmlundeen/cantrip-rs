@@ -905,7 +905,7 @@ impl<'a> Projector<'a> {
                 target_player,
                 target_permanent,
                 was_blocked: a.blocked,
-                band: i32::from(a.band),
+                band: crate::prompt::wire(a.band),
             });
         }
         for a in &s.attackers {
@@ -1223,7 +1223,7 @@ impl<'a> Projector<'a> {
             exerted: obj.marks.exerted_by.is_some(),
             saddled: game.is_saddled(id),
             goaded: effect(EffectKind::Goaded),
-            band: s.attackers.iter().find(|a| a.id == id).map_or(0, |a| i32::from(a.band)),
+            band: s.attackers.iter().find(|a| a.id == id).map_or(0, |a| crate::prompt::wire(a.band)),
             harnessed: effect(EffectKind::Harnessed),
             choices,
             class_level: if on_battlefield { i32::from(obj.class_level) } else { 0 },

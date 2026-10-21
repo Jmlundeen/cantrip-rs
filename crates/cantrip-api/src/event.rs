@@ -20,7 +20,7 @@ pub enum CoinFlip {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Event {
     /// A spell became cast (CR 601.2i), with how many spells its caster has cast this turn, this one included.
-    SpellCast { spell: ObjectId, player: PlayerId, nth: u8 },
+    SpellCast { spell: ObjectId, player: PlayerId, nth: u32 },
     /// An object or player became the target of a spell or ability (CR 115.10).
     BecameTarget { target: Target, by: ObjectId, controller: PlayerId },
     /// An object moved between zones. A token's creation comes from no zone (`Zone::GONE`).
@@ -77,7 +77,7 @@ pub enum Event {
     TookInitiative { player: PlayerId },
     /// Creatures were declared as attackers (CR 508.1): "whenever you attack" (CR 508.1m). Not for creatures put onto
     /// the battlefield attacking (CR 508.4).
-    AttackersDeclared { player: PlayerId, count: u8 },
+    AttackersDeclared { player: PlayerId, count: u32 },
     /// A creature blocks an attacker (CR 509.1, 509.1g): one event for each blocker and each attacker it blocks, so an
     /// attacker blocked by two sees both. `declared` is the attacker it was declared to block; the other members of that
     /// attacker's band, which it blocks too (CR 702.22h), come as `declared: false`. "Whenever this creature blocks" (CR 509.3a)
@@ -157,7 +157,7 @@ pub enum Event {
     DieRolled { player: PlayerId, sides: u8, natural: u8, result: i16 },
     /// One of `count` things was chosen at random (CR 701.9c): the one at `index`. A scenario fixes it like a die of `count`
     /// sides (face `index + 1`).
-    ChosenAtRandom { count: u16, index: u16 },
+    ChosenAtRandom { count: u32, index: u32 },
     /// An activated or triggered ability of this object finished resolving (CR 608.2m), or, with `AbilityRef::spell`, this
     /// spell did (CR 608.2, 608.3): a copy too, and a permanent spell once it is on the battlefield; a spell that was countered
     /// or had no legal target did not resolve (CR 608.2b). Paradigm's "the first time a spell you control with this spell's
@@ -182,10 +182,10 @@ pub enum Event {
     /// `player` scried `count` (CR 701.22a), recorded once the process is complete, even if some or all of it was
     /// impossible (CR 701.22d): `looked` is how many cards they looked at, fewer than `count` from a short library. Never
     /// for "scry 0", which is no scry (CR 701.22b).
-    Scried { player: PlayerId, count: u16, looked: u16 },
+    Scried { player: PlayerId, count: u32, looked: u32 },
     /// `player` surveilled `count` (CR 701.25a), recorded once the process is complete, even if some or all of it was
     /// impossible (CR 701.25d); `looked` as for `Scried`. Never for "surveil 0" (CR 701.25c).
-    Surveilled { player: PlayerId, count: u16, looked: u16 },
+    Surveilled { player: PlayerId, count: u32, looked: u32 },
     /// `player`'s speed became `speed` (CR 702.179): set to 1 by the state-based action (CR 704.5aa), or increased
     /// (CR 702.179c-d). Never for an increase that changed nothing.
     SpeedChanged { player: PlayerId, speed: u8 },
