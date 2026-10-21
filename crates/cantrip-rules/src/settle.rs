@@ -316,8 +316,10 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         }
         let protector = if candidates.len() > 1 {
             let ask = RequestKind::ChoosePlayer { source: id, candidates: candidates.clone(), verb: "Protect", amount: 0 };
-            match cx.ask_core(controller, ask, false)? {
-                Answer::Player(p) if candidates.contains(&p) => p,
+            match cx.ask_rule(controller, ask)? {
+                Some(Answer::Player(p)) if candidates.contains(&p) => p,
+                // A controller who has left has taken the battle with them (CR 800.4a).
+                None => continue,
                 _ => candidates[0],
             }
         } else {
@@ -353,8 +355,10 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                     eligible: group.clone(),
                     count: 1,
                     up_to: false, kind: "", total: None };
-                let keep = match cx.ask_core(p, ask, false)? {
-                    Answer::Cards(cards) => cards.first().copied().unwrap_or(group[0]),
+                let keep = match cx.ask_rule(p, ask)? {
+                    Some(Answer::Cards(cards)) => cards.first().copied().unwrap_or(group[0]),
+                    // A player who has left has taken their legends with them (CR 800.4a).
+                    None => break,
                     _ => group[0],
                 };
                 surplus.extend(group.into_iter().filter(|&id| id != keep));
@@ -458,20 +462,27 @@ fn triggered(cx: &Cx, ability: AbilityRef) -> &'static TriggeredDef {
 /// in turn order; a player with more than one chooses their order, and each ability's targets are chosen as it goes
 /// on (CR 603.3d).
 fn put_triggers_on_stack(cx: &mut Cx) -> R<()> {
-    let pending: Vec<PendingTrigger> = cx.s().triggers.clone();
+    let mut waiting: Vec<PendingTrigger> = cx.s().triggers.clone();
     while !cx.s().triggers.is_empty() {
         let last = cx.s().triggers.len() - 1;
         cx.st().trigger_remove(last);
     }
-    for p in cx.s().apnap().collect::<Vec<_>>() {
-        let mut theirs: Vec<PendingTrigger> = pending.iter().copied().filter(|t| t.controller == p).collect();
+    // The players still in the game, read afresh after each one's triggers: a player may leave as any of them is asked, and a
+    // triggered ability a player who has left would control is not put on the stack (CR 800.4d).
+    let mut done: Vec<PlayerId> = Vec::new();
+    while let Some(p) = cx.s().apnap().find(|p| !done.contains(p)) {
+        done.push(p);
+        let mut theirs: Vec<PendingTrigger> = waiting.iter().copied().filter(|t| t.controller == p).collect();
+        waiting.retain(|t| t.controller != p);
         if theirs.len() > 1 {
             let ask = RequestKind::OrderTriggers {
                 sources: theirs.iter().map(|t| t.source).collect(),
                 abilities: theirs.iter().map(|t| t.ability).collect(),
             };
-            if let Answer::Order(order) = cx.ask_core(p, ask, false)? {
-                theirs = order.iter().map(|&i| theirs[i as usize]).collect();
+            match cx.ask_rule(p, ask)? {
+                None => continue,
+                Some(Answer::Order(order)) => theirs = order.iter().map(|&i| theirs[i as usize]).collect(),
+                Some(_) => {}
             }
         }
         for trigger in theirs {
@@ -541,6 +552,9 @@ fn choose_trigger_targets(
             }
             // No more than there are candidates to choose (CR 601.2c: each target is a different object or player).
             let count = most.min(cantrip_state::count_u32(candidates.len()));
+            if left_the_game(cx, trigger.controller) {
+                return Ok(false);
+            }
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
                 source: trigger.source,
                 purpose: Purpose::Targets,
@@ -575,7 +589,17 @@ fn choose_trigger_targets(
     Ok(true)
 }
 
+/// Whether `player` has left the game, by a concession made at this point of the run too (`Game::concede`): a triggered
+/// ability they would control is not put on the stack (CR 800.4d).
+fn left_the_game(cx: &mut Cx, player: PlayerId) -> bool {
+    cx.concessions_here();
+    cx.s().player(player).lost
+}
+
 fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
+    if left_the_game(cx, trigger.controller) {
+        return Ok(());
+    }
     let def = triggered(cx, trigger.ability);
     let asker = Asker { source: trigger.source, controller: trigger.controller };
     let mut targets = Vec::new();
@@ -593,6 +617,9 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         let chosen = if modal.max == modal.min && eligible.len() == modal.min as usize {
             eligible
         } else {
+            if left_the_game(cx, trigger.controller) {
+                return Ok(());
+            }
             let ask = RequestKind::ChooseModes {
                 source: trigger.source,
                 modes: (0..modal.modes.len() as u8).map(|i| Label::Mode(trigger.ability, i)).collect(),
@@ -632,6 +659,9 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
             None if divide.total == TargetSpec::COUNTED => u32::from(x),
             None => divide.total,
         };
+        if left_the_game(cx, trigger.controller) {
+            return Ok(());
+        }
         match crate::actions::ask_divided(cx, trigger.controller, trigger.source, spec, total, false)? {
             crate::actions::Divided::Chosen(chosen, given) => {
                 targets = chosen;
@@ -673,6 +703,10 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         copied: false,
         cast_known: u32::MAX,
     };
+    // Its controller left as one of its choices was asked (CR 800.4d).
+    if cx.s().player(trigger.controller).lost {
+        return Ok(());
+    }
     cx.st().set_item_targets(&mut item, &targets, &of, &shares);
     cx.st().stack_push(item);
     ops::became_targets(cx, targets.iter().copied(), trigger.source, trigger.controller);

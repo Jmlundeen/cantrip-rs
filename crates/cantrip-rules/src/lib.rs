@@ -36,6 +36,8 @@ mod land_text_tests;
 #[cfg(test)]
 mod leave_game_tests;
 #[cfg(test)]
+mod concession_tests;
+#[cfg(test)]
 mod left_player_choice_tests;
 #[cfg(test)]
 mod look_back_tests;
@@ -517,7 +519,7 @@ impl Game {
             && self.state.player(pending.player).lost
         {
             match cantrip_state::stand_in(&self.state, &pending.kind, pending.player) {
-                cantrip_state::StandIn::Unpaid => {
+                cantrip_state::StandIn::Unpaid | cantrip_state::StandIn::NotAsked => {
                     let next = self.state.agenda[at].next_stage;
                     self.state.update_frame(at, |f| {
                         f.pending = None;
@@ -688,23 +690,43 @@ impl<'a> Cx<'a> {
         self.g.cards
     }
 
+    /// A player who conceded at this point of the run leaves the game here, on every replay (`Game::concede`). Again at the
+    /// same point does nothing more: a player who has left does not leave again.
+    pub(crate) fn concessions_here(&mut self) {
+        if self.g.state.agenda[self.frame].conceded.is_empty() {
+            return;
+        }
+        let here: Vec<PlayerId> =
+            self.g.state.agenda[self.frame].conceded.iter().filter(|&&(at, _)| at as usize == self.cursor).map(|&(_, p)| p).collect();
+        for p in here {
+            ops::concede(self, p);
+        }
+    }
+
+    /// A question a rule procedure asks a player about their own game action - priority, attacks, blocks, the discard to hand
+    /// size, a mulligan, the order of their triggers, a choice of the rules about their own objects: None when the player has
+    /// left the game, whether before or as it is asked (a concession at this point of the run), for the action ends with them
+    /// and no one makes it (CR 800.4a, 800.4d, 800.4j). The procedure goes on as the player's leaving requires.
+    pub(crate) fn ask_rule(&mut self, player: PlayerId, kind: RequestKind) -> R<Option<Answer>> {
+        self.concessions_here();
+        if self.g.state.player(player).lost {
+            return Ok(None);
+        }
+        self.ask_core(player, kind, false).map(Some)
+    }
+
     pub fn ask_core(&mut self, player: PlayerId, kind: RequestKind, may_cancel: bool) -> R<Answer> {
         // A real choice, asked or answered on a re-run, means no loop through here is a mandatory one (CR 104.4b); and a loop
         // of choices is watched, and a player who must stop it made to choose otherwise (CR 732.3).
         // A player who conceded at this point of the run leaves the game here, on every replay (`Game::concede`).
         let any_conceded = !self.g.state.agenda[self.frame].conceded.is_empty();
-        if any_conceded {
-            let concessions: Vec<PlayerId> =
-                self.g.state.agenda[self.frame].conceded.iter().filter(|&&(at, _)| at as usize == self.cursor).map(|&(_, p)| p).collect();
-            for p in concessions {
-                ops::concede(self, p);
-            }
-        }
+        self.concessions_here();
         // A player who has left the game makes no choice: a cost is not paid, and anything else is chosen by another player
         // (CR 800.4f-h). Any question this asks is one of the run's, replayed as the others are.
         if self.g.state.player(player).lost {
             return match cantrip_state::stand_in(&self.g.state, &kind, player) {
-                cantrip_state::StandIn::Unpaid => Ok(Answer::Pass),
+                // No one is asked: a procedure that can tell asks through `ask_rule`.
+                cantrip_state::StandIn::Unpaid | cantrip_state::StandIn::NotAsked => Ok(Answer::Pass),
                 cantrip_state::StandIn::By(other) => self.ask_core(other, kind, may_cancel),
                 cantrip_state::StandIn::Chosen { controller, source, candidates } => {
                     let ask = RequestKind::ChoosePlayer { source, candidates: candidates.clone(), verb: "makes the choice", amount: 0 };
@@ -998,7 +1020,7 @@ impl cantrip_api::Game for Cx<'_> {
         let mut player = player;
         if self.g.state.player(player).lost {
             match cantrip_state::stand_in(&self.g.state, &kind, player) {
-                cantrip_state::StandIn::Unpaid => {
+                cantrip_state::StandIn::Unpaid | cantrip_state::StandIn::NotAsked => {
                     let at = self.frame;
                     self.g.state.update_frame(at, |f| {
                         f.staged = true;

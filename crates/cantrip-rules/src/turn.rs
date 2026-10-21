@@ -183,7 +183,8 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
     // The London mulligan (CR 103.5): undecided players decide in turn order, those who mulligan redraw together,
     // and the round repeats.
     loop {
-        let undecided: Vec<PlayerId> = order.iter().copied().filter(|&p| !cx.s().player(p).kept).collect();
+        // A player who has left decides nothing (CR 800.4a).
+        let undecided: Vec<PlayerId> = order.iter().copied().filter(|&p| !cx.s().player(p).kept && !cx.s().player(p).lost).collect();
         if undecided.is_empty() {
             break;
         }
@@ -194,13 +195,14 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
                 cx.st().update_player(p, |pl| pl.kept = true);
                 continue;
             }
-            match cx.ask_core(p, RequestKind::Mulligan { mulligans }, false)? {
-                Answer::Yes => redraw.push(p),
-                _ => {
+            match cx.ask_rule(p, RequestKind::Mulligan { mulligans })? {
+                None => continue,
+                Some(Answer::Yes) => redraw.push(p),
+                Some(_) => {
                     cx.st().update_player(p, |pl| pl.kept = true);
                     if mulligans > 0 {
                         let hand = cx.s().zone(Zone::hand(p)).to_vec();
-                        let answer = cx.ask_core(
+                        let answer = cx.ask_rule(
                             p,
                             RequestKind::ChooseCards { any_number: false,
                                 source: hand[0],
@@ -209,9 +211,8 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
                                 eligible: hand,
                                 count: u32::from(mulligans),
                                 up_to: false, kind: "", total: None },
-                            false,
                         )?;
-                        if let Answer::Cards(bottom) = answer {
+                        if let Some(Answer::Cards(bottom)) = answer {
                             for card in bottom {
                                 let library = Zone::library(p);
                                 let new = ops::move_to(cx, card, library);
@@ -240,11 +241,15 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
     // of their opening hand on the battlefield.
     for &p in &order {
         for card in cx.s().zone(Zone::hand(p)).to_vec() {
+            // A player who has left begins the game with nothing (CR 800.4a): their cards have left with them.
+            if cx.s().player(p).lost {
+                break;
+            }
             let Some(action) = cx.card(cx.s().obj(card).card).opening_hand else { continue };
             if !(action.condition)(cx, &Asker { source: card, controller: p }) {
                 continue;
             }
-            if !matches!(cx.ask_core(p, RequestKind::May { source: card, purpose: Purpose::Ask(&BEGIN_ON_BATTLEFIELD) }, false)?, Answer::Yes) {
+            if !matches!(cx.ask_rule(p, RequestKind::May { source: card, purpose: Purpose::Ask(&BEGIN_ON_BATTLEFIELD) })?, Some(Answer::Yes)) {
                 continue;
             }
             let with: Vec<(CounterKind, i16)> = action.counter.map(|(k, n)| (k, n as i16)).into_iter().collect();
@@ -253,7 +258,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
             if action.exile_from_hand > 0 && !hand.is_empty() {
                 let count = u32::from(action.exile_from_hand).min(u32::try_from(hand.len()).unwrap_or(u32::MAX));
                 let ask = RequestKind::ChooseCards { any_number: false, source: card, purpose: Purpose::Exile, cards: hand.clone(), eligible: hand, count, up_to: false, kind: "", total: None };
-                if let Answer::Cards(cards) = cx.ask_core(p, ask, false)? {
+                if let Some(Answer::Cards(cards)) = cx.ask_rule(p, ask)? {
                     for c in cards {
                         ops::move_to_for(cx, c, Zone::exile(p), ZoneReason::Exile);
                     }
@@ -378,7 +383,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
     }
     let Some(at) = pending else {
         for (id, rule) in optional {
-            if cx.ask_core(player, RequestKind::May { source: id, purpose: Purpose::Ask(rule.question) }, false)? == Answer::Yes {
+            if cx.ask_rule(player, RequestKind::May { source: id, purpose: Purpose::Ask(rule.question) })? == Some(Answer::Yes) {
                 // A replacement effect's own doing, its controller's (CR 609.1, 614.10).
                 cx.acting_as(player, |cx| (rule.on_skip)(cx, &Asker { source: id, controller: player }))?;
                 return Ok(true);
@@ -394,7 +399,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
             hints.push(rule.hint);
         }
         let ask = RequestKind::ChooseReplacement { subject: None, life: None, sources, hints, damage: None, turn: true, counters: Vec::new(), draw: false };
-        if let Answer::Index(i) = cx.ask_core(player, ask, false)?
+        if let Some(Answer::Index(i)) = cx.ask_rule(player, ask)?
             && i > 0
             && let Some(&(id, rule)) = optional.get(i as usize - 1)
         {
@@ -434,7 +439,7 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
         }
         if cx.card(cx.cards().current(obj)).may_not_untap && !cx.lost_all_abilities(id) {
             let ask = RequestKind::May { source: id, purpose: Purpose::Ask(&UNTAP_IT) };
-            if cx.ask_core(active, ask, false)? != Answer::Yes {
+            if cx.ask_rule(active, ask)? != Some(Answer::Yes) {
                 continue;
             }
         }
@@ -570,8 +575,8 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
         // the mana abilities activated while paying undone, and the attackers are declared again.
         let mark = cx.s().mark();
         let log_mark = cx.g.log.len();
-        let answer = cx.ask_core(active, kind.clone(), false)?;
-        let Answer::Attack(attacks) = answer else { return Ok(()) };
+        // An active player who has left declares nothing, and the turn goes on without them (CR 800.4j).
+        let Some(Answer::Attack(attacks)) = cx.ask_rule(active, kind.clone())? else { return Ok(()) };
         // CR 508.1e: the bands among them, announced before they tap.
         let bands = declare_bands(cx, active, &attacks)?;
         // CR 508.1f: the chosen creatures become tapped, which is no cost, before any cost is paid (CR 508.1g-j).
@@ -651,7 +656,7 @@ fn declare_bands(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) 
             kind: "attacking creature",
             total: None,
         };
-        let Answer::Cards(chosen) = cx.ask_core(active, ask, false)? else { continue };
+        let Some(Answer::Cards(chosen)) = cx.ask_rule(active, ask)? else { continue };
         if chosen.is_empty() {
             continue;
         }
@@ -774,8 +779,9 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         // CR 509.1c: the blocks effects require if able, and the most of them a declaration can obey.
         let pairs = crate::static_rules::block_requirements(cx, &allowed);
         let requirements = if pairs.is_empty() { BlockRequirements::default() } else { most_requirements(cx, &allowed, pairs) };
-        let answer = cx.ask_core(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements }, false)?;
-        if let Answer::Block(blocks) = answer {
+        // A defending player who has left blocks with nothing (CR 800.4a): no one else declares their blocks.
+        let answer = cx.ask_rule(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements })?;
+        if let Some(Answer::Block(blocks)) = answer {
             // CR 509.1g: the blockers are declared together, a "blocks" event for each attacker each blocks, those of a band it
             // blocks through banding marked as not declared, so "whenever this creature blocks" triggers once (CR 509.3a).
             let mut events: Vec<Event> = Vec::with_capacity(blocks.len());
@@ -986,7 +992,7 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
     for player in players {
         let mine: Vec<DamageDivision> = divisions.iter().filter(|(by, _)| *by == player).map(|(_, d)| d.clone()).collect();
         if !mine.is_empty()
-            && let Answer::Shares(shares) = cx.ask_core(player, RequestKind::AssignCombatDamage { divisions: mine }, false)?
+            && let Some(Answer::Shares(shares)) = cx.ask_rule(player, RequestKind::AssignCombatDamage { divisions: mine })?
         {
             chosen.extend(shares);
         }
@@ -1179,7 +1185,7 @@ fn cleanup(cx: &mut Cx) -> R<()> {
     let hand = cx.s().zone(Zone::hand(active)).to_vec();
     if hand.len() > 7 && !crate::actions::no_maximum_hand_size(cx, active) {
         let count = (hand.len() - 7) as u8;
-        if let Answer::Cards(cards) = cx.ask_core(active, RequestKind::DiscardToHandSize { count, hand }, false)? {
+        if let Some(Answer::Cards(cards)) = cx.ask_rule(active, RequestKind::DiscardToHandSize { count, hand })? {
             ops::discard_together(cx, &cards);
         }
     }
@@ -1320,7 +1326,14 @@ pub fn priority(cx: &mut Cx) -> R<Flow> {
     let Some(options) = crate::loops::at_priority(cx, player, options) else {
         return Ok(Flow::Done);
     };
-    match cx.ask_core(player, RequestKind::Priority { options }, false)? {
+    let Some(answer) = cx.ask_rule(player, RequestKind::Priority { options })? else {
+        // The player left the game as they held priority: it passes to the next player in turn order still in, as their own
+        // priority, no pass counted for the one who left (CR 800.4a, 800.4j).
+        let next = next_in_game(cx.s(), player);
+        cx.st().update_turn(|t| t.priority = next);
+        return Ok(Flow::Again);
+    };
+    match answer {
         Answer::Act(action) => {
             let mut frame = Frame::new(FrameKind::Act { player });
             frame.answers.push((Some(player), Answer::Act(action)));

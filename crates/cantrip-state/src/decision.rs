@@ -280,6 +280,10 @@ impl NameKind {
 pub enum StandIn {
     /// A cost, or whether to pay one: it is not paid (CR 800.4f).
     Unpaid,
+    /// One of the player's own game actions (priority, attacks, blocks, the discard to hand size, a mulligan, the order of
+    /// their triggers, combat damage): it ends with them, and no one makes it (CR 800.4a, 800.4d, 800.4j). The procedure
+    /// asking it reads the player as gone (`Cx::ask_rule`).
+    NotAsked,
     /// This player makes the choice: the one another object's controller is left to choose among, or the next player in turn
     /// order for a choice a rule asks (CR 800.4g-h).
     By(PlayerId),
@@ -463,8 +467,8 @@ pub enum RequestKind {
 
 impl RequestKind {
     /// The object a question is for: the spell, ability or permanent whose text asks it. None for a choice the rules
-    /// themselves ask (CR 800.4h): attacks, blocks, combat damage, the discard to hand size, mulligans, who goes first, the
-    /// order of triggers, which replacement effect applies first.
+    /// themselves ask: attacks, blocks, combat damage, the discard to hand size, mulligans, who goes first, the order of
+    /// triggers, which replacement effect applies first.
     pub fn source(&self) -> Option<ObjectId> {
         use RequestKind as K;
         match self {
@@ -514,15 +518,19 @@ impl RequestKind {
 
 /// Who makes a choice the rules or an object ask of `player`, who has left the game (CR 800.4f-h): no one, for a cost
 /// (800.4f); for another choice an object asks, another player its controller chooses - another opponent where an opponent
-/// was to choose, if there is one (800.4g); for a choice a rule asks, or one whose object's controller has left too, the
-/// next player in turn order (800.4h).
+/// was to choose, if there is one (800.4g); for who goes first, or which replacement effect applies first to an event that
+/// is still to happen, the next player in turn order (800.4h), as for an object's choice whose controller has left too; and
+/// for the player's own game actions, no one (800.4a, 800.4j: `StandIn::NotAsked`).
 pub fn stand_in(state: &crate::GameState, kind: &RequestKind, player: PlayerId) -> StandIn {
     if kind.is_cost() {
         return StandIn::Unpaid;
     }
     let next = || state.turn_order_from(player).next().unwrap_or(player);
-    let Some(source) = kind.source().filter(|&s| s != ObjectId::NONE && s.index() < state.objects.len()) else {
+    if matches!(kind, RequestKind::ChooseStartingPlayer { .. } | RequestKind::ChooseReplacement { .. }) {
         return StandIn::By(next());
+    }
+    let Some(source) = kind.source().filter(|&s| s != ObjectId::NONE && s.index() < state.objects.len()) else {
+        return StandIn::NotAsked;
     };
     let controller = state.obj(source).controller;
     if state.player(controller).lost {

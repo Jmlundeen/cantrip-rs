@@ -1,6 +1,7 @@
 //! A choice asked of a player who has left the game (CR 800.4f-h), over a test card: a cost is not paid (800.4f); a choice
 //! an object asks is made by another player its controller chooses, another opponent where an opponent was to choose
-//! (800.4g); a choice a rule asks is made by the next player in turn order (800.4h). Both for a run that replays its answers
+//! (800.4g); which replacement effect applies first is chosen by the next player in turn order (800.4h); and the player's
+//! own game actions end with them (800.4a). Both for a run that replays its answers
 //! (`Cx::ask_core`) and for one written in stages (`ask_then`).
 
 use crate::{Cx, Game, Setup};
@@ -75,14 +76,35 @@ fn an_objects_choice_of_a_player_who_left_is_made_by_the_opponent_its_controller
     assert_eq!(pending(&g, at), (D, choose(trinket)));
 }
 
-/// CR 800.4h: a choice a rule asks of the player who left (the order of their triggers) is made by the next player in turn
-/// order.
+/// CR 800.4h: which replacement effect applies first to an event still to happen, a choice a rule asks of the player who
+/// left, is made by the next player in turn order.
 #[test]
 fn a_rules_choice_of_a_player_who_left_is_made_by_the_next_player_in_turn_order() {
     let (mut g, trinket, at) = game(3);
+    let which = RequestKind::ChooseReplacement {
+        subject: None,
+        life: Some(-1),
+        sources: vec![trinket, trinket],
+        hints: vec!["", ""],
+        damage: None,
+        turn: false,
+        counters: Vec::new(),
+        draw: false,
+    };
+    assert!(cx(&mut g, at).ask_core(B, which.clone(), false).is_err());
+    assert_eq!(pending(&g, at), (C, which));
+}
+
+/// The player's own game actions end with them (CR 800.4a, 800.4d, 800.4j): the order of their triggers is asked of no one,
+/// and a rule procedure asking through `ask_rule` is told they have gone.
+#[test]
+fn a_players_own_game_action_is_asked_of_no_one_once_they_have_left() {
+    let (mut g, trinket, at) = game(3);
     let order = RequestKind::OrderTriggers { sources: vec![trinket, trinket], abilities: Vec::new() };
-    assert!(cx(&mut g, at).ask_core(B, order.clone(), false).is_err());
-    assert_eq!(pending(&g, at), (C, order));
+    assert_eq!(cx(&mut g, at).ask_core(B, order.clone(), false).ok(), Some(Answer::Pass));
+    assert!(g.state.agenda[at].pending.is_none(), "someone else was asked");
+    assert_eq!(cx(&mut g, at).ask_rule(B, order).ok(), Some(None));
+    assert!(g.state.agenda[at].pending.is_none(), "someone else was asked");
 }
 
 /// A run written in stages asks the player who left (Duress's `ask_then`): with four players the controller chooses who makes
