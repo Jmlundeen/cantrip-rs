@@ -304,8 +304,9 @@ impl StateDump {
                 let label = label_text(&Label::Card(dungeon, player.room - 1));
                 d.set(format!("{b}.Dungeon"), format!("Undercity: {}", label.split(" \u{2014} ").next().unwrap_or(label)));
             }
-            if player.dungeons_completed > 0 {
-                d.set(format!("{b}.DungeonsCompleted"), player.dungeons_completed);
+            let completed = game.log.iter().filter(|r| r.event == Event::DungeonCompleted { player: p }).count();
+            if completed > 0 {
+                d.set(format!("{b}.DungeonsCompleted"), completed);
             }
             // The designations a keyword gives for the rest of the game (CR 702.131c, 702.195b): only once had.
             if player.citys_blessing {

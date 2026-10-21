@@ -295,9 +295,10 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
             let number = turn.number;
             cx.st().update_player(active, |p| {
                 p.turn_began = number;
-                p.turns_taken = p.turns_taken.saturating_add(1);
                 p.lands_played = 0;
             });
+            // How many turns a player has taken is asked of the history (`cantrip_mechanics::history::in_your_first_turns`).
+            cx.record(Event::TurnBegan { player: active });
             // CR 502.1: first, the active player's phased-out permanents phase in.
             crate::phasing::untap_step(cx, active);
             // CR 502.2: the untap step's second turn-based action reads what the previous turn's active player cast,

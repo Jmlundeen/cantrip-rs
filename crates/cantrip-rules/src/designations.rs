@@ -161,7 +161,7 @@ pub fn venture(cx: &mut Cx, player: PlayerId) -> R<()> {
         match arrows.len() {
             0 => {
                 // Out of the bottommost room: completed, and entered again from the top.
-                cx.st().update_player(player, |p| p.dungeons_completed = p.dungeons_completed.saturating_add(1));
+                cx.record(Event::DungeonCompleted { player });
             }
             1 => room = arrows[0],
             _ => {
@@ -196,10 +196,8 @@ pub fn complete_dungeons(cx: &mut Cx) -> bool {
         if cx.s().stack.iter().any(|i| i.kind == StackKind::Triggered && i.ability.card == dungeon && i.controller == p) {
             continue;
         }
-        cx.st().update_player(p, |pl| {
-            pl.room = 0;
-            pl.dungeons_completed = pl.dungeons_completed.saturating_add(1);
-        });
+        cx.st().update_player(p, |pl| pl.room = 0);
+        cx.record(Event::DungeonCompleted { player: p });
         any = true;
     }
     any

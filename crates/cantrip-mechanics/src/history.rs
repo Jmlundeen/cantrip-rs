@@ -212,7 +212,14 @@ pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
 /// turns, an extra turn counting as one. Starting Town's enters-tapped clause and Jace Reawakened's casting restriction print it
 /// (with `n` = 3).
 pub fn in_your_first_turns(q: &dyn Query, player: PlayerId, n: u32) -> bool {
-    q.state().turn.active == player && q.state().player(player).turns_taken <= n
+    q.state().turn.active == player
+        && q.history().select(EventQuery::kind(EventMask::TURN_BEGAN).player(player)).nth(n as usize).is_none()
+}
+
+/// "If you've completed a dungeon" (CR 309.7): whether `player` has completed one this game. Caves of Chaos Adventurer,
+/// Undermountain Adventurer and White Plume Adventurer print it.
+pub fn completed_a_dungeon(q: &dyn Query, player: PlayerId) -> bool {
+    q.history().any(EventQuery::kind(EventMask::DUNGEON_COMPLETED).player(player))
 }
 
 /// The first noncreature spell a player casts this turn (CR 603.2), including spells cast before

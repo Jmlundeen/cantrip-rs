@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let creatures: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    let chosen = if g.state().player(you).dungeons_completed > 0 {
+    let chosen = if cantrip_mechanics::history::completed_a_dungeon(g, you) {
         creatures
     } else {
         choose::card(g, you, item.object, Purpose::Untap, creatures)?.into_iter().collect()

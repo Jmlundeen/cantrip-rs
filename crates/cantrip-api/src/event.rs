@@ -172,6 +172,12 @@ pub enum Event {
     Done { source: ObjectId, ability: AbilityRef, player: PlayerId },
     /// An effect ended the turn (CR 724.1) of `player`, the player whose turn it was: recorded as the stack is exiled.
     TurnEnded { player: PlayerId },
+    /// `player`'s turn began (CR 500.1, 502): recorded only, as its untap step starts. A turn skipped (CR 614.10) never
+    /// begins and has none.
+    TurnBegan { player: PlayerId },
+    /// `player` completed a dungeon (CR 309.7): their venture marker left its bottommost room, by the state-based action
+    /// (CR 704.5t) or by venturing on from it (CR 701.49c). Recorded only.
+    DungeonCompleted { player: PlayerId },
     /// `player` committed a crime (CR 700.13): as they cast a spell, activated an ability or put a triggered ability on
     /// the stack, it targeted at least one opponent; at least one permanent, spell or ability an opponent controls; and/or
     /// at least one card in an opponent's graveyard. One event for the spell or ability however many of its targets are
@@ -248,6 +254,8 @@ impl Event {
             | Event::DieRolled { player, .. }
             | Event::Done { player, .. }
             | Event::TurnEnded { player }
+            | Event::TurnBegan { player }
+            | Event::DungeonCompleted { player }
             | Event::Scried { player, .. }
             | Event::Surveilled { player, .. }
             | Event::SpeedChanged { player, .. }
@@ -300,7 +308,7 @@ impl Event {
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } => false,
         }
     }
 }
@@ -366,6 +374,10 @@ impl EventMask {
     /// A land was played (CR 305.1): recorded only, for the history.
     pub const LAND_PLAYED: EventMask = EventMask(1 << 49);
     pub const TOOK_INITIATIVE: EventMask = EventMask(1 << 50);
+    /// A turn began (CR 502): recorded only, for the history.
+    pub const TURN_BEGAN: EventMask = EventMask(1 << 51);
+    /// A dungeon was completed (CR 309.7): recorded only, for the history.
+    pub const DUNGEON_COMPLETED: EventMask = EventMask(1 << 52);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -384,6 +396,8 @@ impl EventMask {
             Event::ModesChosen { .. } => EventMask::MODES_CHOSEN,
             Event::Done { .. } => EventMask::DONE,
             Event::TurnEnded { .. } => EventMask::TURN_ENDED,
+            Event::TurnBegan { .. } => EventMask::TURN_BEGAN,
+            Event::DungeonCompleted { .. } => EventMask::DUNGEON_COMPLETED,
             Event::GameLost { .. } | Event::GameDrawn { .. } => EventMask::GAME_OVER,
             Event::ManaSpent { .. } => EventMask::MANA_SPENT,
             other => EventMask::of(other),

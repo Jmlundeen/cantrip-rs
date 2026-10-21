@@ -1122,6 +1122,8 @@ pub struct Player {
     /// last, since the ordinary mana of a kind is spent first, which is never worse for the player; a count above
     /// what the pool holds is stale, and `lasting_mana` clamps it.
     pub lasting: ManaPool,
+    /// Lands played this turn (CR 305.2): the rules' own count, which "may play an additional land" is checked against at
+    /// every priority and the loop watch fingerprints with the player, so it is kept here rather than asked of the history.
     pub lands_played: u32,
     /// Drew from an empty library since the last state-based action check (CR 704.5b).
     pub drew_from_empty: bool,
@@ -1130,8 +1132,6 @@ pub struct Player {
     pub kept: bool,
     /// The number of the turn this player's most recent turn was.
     pub turn_began: u32,
-    /// Turns this player has begun (CR 500): "your first three turns of the game".
-    pub turns_taken: u32,
     /// Poison counters (CR 122.1f): ten lose the game (CR 704.5c). Private, as an object's counters are (`Obj::counters`):
     /// read through `poison`, put on only by the put path.
     poison: u8,
@@ -1150,8 +1150,6 @@ pub struct Player {
     /// The room of the Undercity this player's venture marker is on (CR 309.4, 701.49): 0 for none, else the room's
     /// index plus one.
     pub room: u8,
-    /// Dungeons this player has completed (CR 309.7).
-    pub dungeons_completed: u32,
     /// The player's speed (CR 702.179): none until a rule or effect sets it (CR 702.179b), 1 once they control a
     /// permanent with start your engines! (CR 704.5aa), and up from there to 4. Nothing decreases it.
     pub speed: Option<u8>,

@@ -571,7 +571,8 @@ impl<'a> Projector<'a> {
             has_enduring_story: player.enduring_story,
             speed: player.speed.map(i32::from),
             energy: i32::from(player.energy()),
-            dungeons_completed: crate::prompt::wire(player.dungeons_completed),
+            // Asked of the history: every completion is recorded (CR 309.7).
+            dungeons_completed: crate::prompt::wire(count_u32(game.log.iter().filter(|r| r.event == Event::DungeonCompleted { player: p }).count())),
             ..Default::default()
         };
         for mana in Mana::ALL {

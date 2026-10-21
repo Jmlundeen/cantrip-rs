@@ -9,7 +9,7 @@ fn exile_top_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     let Some(&top) = g.state().zone(Zone::library(player)).first() else { return Ok(()) };
     let exiled = g.exile(top);
     if g.obj(exiled).zone.is(ZoneKind::Exile) {
-        let free = g.state().player(player).dungeons_completed > 0;
+        let free = cantrip_mechanics::history::completed_a_dungeon(g, player);
         g.allow_play(
             exiled,
             player,

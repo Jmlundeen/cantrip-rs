@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// {T}: Add {G}{G}. If you've completed a dungeon, add six {G} instead (CR 309.7, 605.1a): one mana ability, whose
 /// yield is read as it is activated.
 fn add_green(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    let completed = g.state().player(asker.controller).dungeons_completed > 0;
+    let completed = cantrip_mechanics::history::completed_a_dungeon(g, asker.controller);
     g.add_mana(asker.controller, Mana::G, if completed { 6 } else { 2 });
     Ok(())
 }
