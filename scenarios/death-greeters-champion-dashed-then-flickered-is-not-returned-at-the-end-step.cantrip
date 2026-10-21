@@ -1,0 +1,35 @@
+# Dash (CR 702.109a) returns "it" - the permanent the dashed spell became - at the beginning of the next end step. Ephemerate
+# exiles that permanent and returns it: the card comes back as a new object (CR 400.7), which the delayed ability no longer
+# finds, so the Champion stays on the battlefield through the end step. Black Lotus and Mox Ruby pay for the dash, Plains for
+# Ephemerate, which waits in exile for its rebound.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Ruby
+Death-Greeter's Champion
+Ephemerate
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Death-Greeter's Champion.Cast(Ability: Dash)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Death-Greeter's Champion)
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Hand = Island; Island
+Bot1.Battlefield = Death-Greeter's Champion; Mox Ruby; Plains
+Exile = Ephemerate

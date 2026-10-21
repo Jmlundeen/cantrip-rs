@@ -27,10 +27,9 @@ pub const HASTE: StaticDef = static_ability(Layer::Ability, dashed, crate::stati
 /// Return it to its owner's hand: the permanent the dashed spell became (CR 702.109a, 608.3g), if it is still there.
 fn return_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(spell) = item.subject else { return Ok(()) };
-    let mut now = spell;
-    while let Some(next) = g.obj(now).became {
-        now = next;
-    }
+    // Only the permanent the spell became, one move on: once that permanent leaves, what it becomes is a new object
+    // (CR 400.7) the ability no longer finds, even back on the battlefield.
+    let Some(now) = g.obj(spell).became else { return Ok(()) };
     if g.obj(now).zone.is(ZoneKind::Battlefield) {
         g.return_to_hand(&[now]);
     }
