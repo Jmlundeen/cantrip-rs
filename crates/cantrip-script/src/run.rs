@@ -1591,20 +1591,23 @@ impl<'s> Run<'s> {
                     }
                 }
             }
-            RequestKind::ChooseModes { modes, .. } => {
+            RequestKind::ChooseModes { modes, source, .. } => {
                 let mut chosen = Vec::new();
                 // A mode named by its text that the question does not have at all is not offered, which is what the line
-                // says (a fused cast over a mana-value limit, `! Bot1.Modes(Fuse)`): pair it with the line where it is.
+                // says (a fused cast over a mana-value limit, `! Bot1.Modes(Fuse)`) - but only a mode the source could
+                // offer somewhere (`modes_the_source_could_offer`): a name it never could is a typo, and fails.
                 let mut absent = false;
+                let could = modes_the_source_could_offer(&self.game, *source);
                 for spec in action.positional() {
                     let index = match spec.trim().parse::<usize>() {
                         Ok(n) if n >= 1 => n - 1,
                         _ => match modes.iter().position(|m| label_text(m).to_lowercase().contains(&spec.trim().to_lowercase())) {
                             Some(i) => i,
-                            None => {
+                            None if could.iter().any(|m| m.to_lowercase().contains(&spec.trim().to_lowercase())) => {
                                 absent = true;
                                 continue;
                             }
+                            None => return fail(format!("line {line}: no mode reads \"{spec}\", and {} could offer none that does", self.game.known_name(*source))),
                         },
                     };
                     if index >= modes.len() {
@@ -2322,3 +2325,30 @@ fn spend_of(step: &ActionStep) -> R<VecDeque<Spend>> {
     Ok(out)
 }
 
+/// The text of every mode a choice of modes asked by `source` could have, wherever it is offered: its card's faces and
+/// halves by name, the fused cast of a fuse card, its modes, its own ways of being cast and alternative costs, and the
+/// labels its card names. What a refusal of an absent mode (`! Bot1.Modes(Fuse)`) is checked against, so that a mode
+/// the source never could offer is a typo, not a refusal that holds.
+fn modes_the_source_could_offer(game: &Game, source: ObjectId) -> Vec<&'static str> {
+    if source.0 as usize >= game.state.objects.len() {
+        return Vec::new();
+    }
+    let def = game.cards.get(game.state.obj(source).card);
+    let mut out = vec![def.name];
+    if let Some((left, right)) = def.split {
+        out.extend([left.name, right.name]);
+    }
+    if def.fuse {
+        out.push(label_text(&Label::Fused(game.state.obj(source).card)));
+    }
+    out.extend(def.inset_faces().map(|(_, f)| f.name));
+    out.extend(def.back.map(|b| b.name));
+    let faces = std::iter::once(def).chain(def.split.into_iter().flat_map(|(l, r)| [l, r])).chain(def.inset_faces().map(|(_, f)| f)).chain(def.back);
+    for face in faces {
+        out.extend(face.modal.iter().flat_map(|m| m.modes.iter().map(|mode| mode.text)));
+        out.extend(face.ways.iter().map(|w| w.text));
+        out.extend(face.spell_alternatives.iter().map(|a| a.text));
+        out.extend(face.labels.iter().copied());
+    }
+    out
+}

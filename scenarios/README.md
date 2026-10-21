@@ -328,7 +328,9 @@ that; `Count: 0` is choosing none, which no answer naming targets can say. It sh
 A mode choice, `! Bot1.Modes(1; 2)`, is checked at that player's next modes question and fails if the question would accept exactly
 those modes (too many for "choose one", a mode that is not eligible): the way to show a spell offers fewer modes than another case
 does ("choose one, or both if ..."). A mode named by text that the question does not have at all holds too: it is not offered
-(`! Bot1.Modes(Fuse)`, a fused cast over a mana-value limit). Pair it with the same line where the condition holds.
+(`! Bot1.Modes(Fuse)`, a fused cast over a mana-value limit) - but only when it is a mode the question's source could offer
+somewhere (its faces and halves, a fuse card's fused cast, its modes, ways, alternative costs and labels); any other text
+is a typo, and fails. Pair it with the same line where the condition holds.
 
 A card choice, `! Bot1.Choose(Thopter)`, is checked at that player's next choice of cards (a sacrifice or discard cost, a card
 chosen from a revealed hand) and fails if the named card is among those it may take; it fails as proving nothing when no such
