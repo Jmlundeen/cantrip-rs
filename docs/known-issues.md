@@ -47,7 +47,6 @@ keeps it).
 | [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
-| [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
 | [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
@@ -264,21 +263,6 @@ client shows poison on the player rail and the language-model client in its text
 affected.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome; a bot-lab duel with infect decks would show it.
-
-### KI-50: An animation that replaces creature types is unexercised
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | mechanics | 2026-10-17, review of Inkmoth Nexus |
-
-**Notes.** An effect that makes an object "a [creature types] artifact creature" without saying it is still what it was
-keeps its card types and other subtypes but replaces its creature types with those named (CR 205.1b). `Animation` in
-`cantrip-mechanics` has `replaces_creature_types` for it (a `LoseAllCreatureTypes` effect before the named types), set by
-Iron Man Armor ("a 0/0 Construct Hero artifact creature"). The line runs in the Armor's scenarios, but the Armor has no
-creature types of its own to lose, so no scenario shows a creature type being replaced. It would need the Armor to have a
-creature type before it animates (an effect that gives every permanent a creature type), which no card in content does.
-
-**Scenarios.** none yet: Iron Man Armor could reach it with such an effect.
 
 ### KI-51: A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it
 
