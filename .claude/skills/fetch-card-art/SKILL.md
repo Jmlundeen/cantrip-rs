@@ -10,11 +10,9 @@ Art is a file per face in `content/<dataset>/images/<slug>.jpg` (`CardArt.Slug`:
 
 ## Steps
 
-1. **List what is missing.** `python tools/maintenance/missing-art.py` (faces, one a line) and `--tokens`. Both take
-   `--list <Cube>` or `--file <path>`.
+1. **List what is missing.** `python tools/maintenance/missing-art.py` (faces, one a line) and `--tokens`: every card
+   with a card file under `content/*/cards/`. `--list <Cube>` or `--file <path>` narrows to one list's cards.
 2. **Drop what has no art to find.**
-   - Adventure halves (Petty Theft, Stomp, All Aboard, Battle Display): mtgpics has no picture of them, the creature's
-     art serves the card.
    - Tokens: not covered here. mtgpics rarely has them; ask before spending time.
 3. **Check for misnamed files first.** `ls content/mtg/images | grep -v '^[a-z0-9-]*\.[a-z]*$'` - art the user dropped
    in under a display name (`Appa, Steadfast Guardian.jpg`) is already art: rename it to its slug instead of fetching.
@@ -31,9 +29,6 @@ Art is a file per face in `content/<dataset>/images/<slug>.jpg` (`CardArt.Slug`:
 mtgpics has no art-only picture for most recent sets (Torch the Tower, the Marvel and Hobbit cards). `NOART` faces go to
 `python tools/maintenance/scryfall-art/fetch_art.py <stage> < noart.txt`: the earliest regular printing's `art_crop`, ~600x450 -
 low resolution, but better than none. Run mtgpics first; Scryfall only for what it lacks. It never replaces a file.
-
-`missing-art.py` only checks the cube lists. A card added outside them is missed, so audit every file under
-`content/mtg/cards/` (a face name with no `<slug>.*` in `images/`) before reporting nothing is missing.
 
 ## Why it chooses as it does (the user's rules)
 

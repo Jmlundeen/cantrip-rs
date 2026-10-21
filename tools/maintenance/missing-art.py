@@ -1,11 +1,11 @@
-"""Which card faces and tokens have no art, for the cube lists in docs/cube-lists.
+"""Which card faces and tokens have no art, for every card the engine has (a card file under content/*/cards/).
 
-    python tools/maintenance/missing-art.py [--list <Cube>]           every face name of a card on the lists (front, back,
-                                                                       adventure, prepare face, split halves) with no
-                                                                       picture, one a line and nothing else
-    python tools/maintenance/missing-art.py --tokens [--list <Cube>]  the same for the tokens those cards make
+    python tools/maintenance/missing-art.py            every face name of every card (front, back face, split halves)
+                                                        with no picture, one a line and nothing else
+    python tools/maintenance/missing-art.py --tokens   the same for the tokens those cards make
 
-Either takes --file <path> in place of --list, for any list of names (what card-list.py writes: a decklist, a set).
+Either narrows to the cards of one list: --list <Cube> (docs/cube-lists/<Cube>.txt) or --file <path> (any list of
+names, what card-list.py writes: a decklist, a set).
 
 Art is matched the way the client does it (CardArt.Slug): the slug of a face or token name against the file names
 under content/*/images/, a predefined token's without its " Token" (CR 111.4: the Treasure token is "Treasure Token",
@@ -45,7 +45,7 @@ def read(path):
         return handle.read()
 
 
-def cube_names(only, path=None):
+def listed_names(only, path=None):
     if path:
         if not os.path.isfile(path):
             sys.exit("no file " + path)
@@ -56,15 +56,13 @@ def cube_names(only, path=None):
                 names[name] = True
         return list(names)
     folder = os.path.join(ROOT, "docs", "cube-lists")
-    if only and not os.path.isfile(os.path.join(folder, only + ".txt")):
+    if not os.path.isfile(os.path.join(folder, only + ".txt")):
         sys.exit("no cube list " + os.path.join(folder, only + ".txt"))
     names = collections.OrderedDict()
-    for entry in sorted(os.listdir(folder)):
-        if entry.endswith(".txt") and (not only or entry == only + ".txt"):
-            for line in read(os.path.join(folder, entry)).splitlines():
-                name = re.sub(r"^\d+x?\s+", "", line.strip())
-                if name and not name.startswith("#"):
-                    names[name] = True
+    for line in read(os.path.join(folder, only + ".txt")).splitlines():
+        name = re.sub(r"^\d+x?\s+", "", line.strip())
+        if name and not name.startswith("#"):
+            names[name] = True
     return list(names)
 
 
@@ -84,10 +82,10 @@ def art_slugs():
 def card_files():
     by_name = {}
     content = os.path.join(ROOT, "content")
-    for dataset in os.listdir(content):
+    for dataset in sorted(os.listdir(content)):
         folder = os.path.join(content, dataset, "cards")
         if os.path.isdir(folder):
-            for entry in os.listdir(folder):
+            for entry in sorted(os.listdir(folder)):
                 if entry.endswith(".json"):
                     card = json.loads(read(os.path.join(folder, entry)))
                     by_name[slug(card["name"])] = card
@@ -95,12 +93,12 @@ def card_files():
 
 
 def faces(card):
-    # A split card is drawn as its halves, each with its own art (CardFace.ArtNames).
+    # A split card is drawn as its halves, each with its own art (CardFace.ArtNames). An adventure, omen or prepare
+    # face has no art of its own: it is drawn with the card's.
     halves = card.get("halves") or []
     names = [half["name"] for half in halves] if halves else [card["name"]]
-    for key in ("backFace", "adventure", "omen", "prepare"):
-        if isinstance(card.get(key), dict) and card[key].get("name"):
-            names.append(card[key]["name"])
+    if isinstance(card.get("backFace"), dict) and card["backFace"].get("name"):
+        names.append(card["backFace"]["name"])
     return names
 
 
@@ -140,16 +138,16 @@ def main():
     cards = card_files()
     shared = token_names(read(SHARED_TOKENS))
     missing = []
-    for name in cube_names(only, path):
-        card = cards.get(slug(name))
-        if card is None:
-            continue
+    if only or path:
+        chosen = [cards[slug(name)] for name in listed_names(only, path) if slug(name) in cards]
+    else:
+        chosen = list(cards.values())
+    for card in chosen:
         for face in (tokens_of(card, shared) if want_tokens else faces(card)):
             drawn = face[: -len(" Token")] if want_tokens and face.endswith(" Token") else face
             if slug(drawn) not in art and face not in missing:
                 missing.append(face)
-    if want_tokens:
-        missing.sort(key=lambda n: (slug(n), n))
+    missing.sort(key=lambda n: (slug(n), n))
     for name in missing:
         print(name)
 
