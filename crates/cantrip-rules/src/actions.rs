@@ -2479,8 +2479,10 @@ impl<T> Given<T> {
     }
 }
 
-/// Every one of a kind of listed static ability the permanents on the battlefield have now, those of a permanent that has
-/// lost its abilities left out (CR 613.1f). Nothing is allocated while no permanent has one.
+/// Every one of a kind of listed static ability the permanents on the battlefield and the emblems in the command zone have
+/// now (CR 114.4: an emblem's abilities function there, Tamiyo, Field Researcher's "You may cast spells from your hand
+/// without paying their mana costs"), those of a permanent that has lost its abilities left out (CR 613.1f). Nothing is
+/// allocated while nothing has one.
 fn given<T>(
     cards: &CardTable,
     s: &GameState,
@@ -2489,7 +2491,7 @@ fn given<T>(
     name: fn(CardId, usize) -> AbilityRef,
 ) -> Vec<Given<T>> {
     let mut all = Vec::new();
-    for &id in s.battlefield() {
+    for &id in s.battlefield().iter().chain(s.zone(Zone::COMMAND)) {
         let obj = s.obj(id);
         let card = cards.current(obj);
         let items = list(cards.get(card));

@@ -186,6 +186,12 @@ static FREE_ALTERNATIVE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// An emblem (CR 114) that gives the spells its owner casts an alternative cost, as Tamiyo, Field Researcher's does.
+static FREE_EMBLEM: CardDef = CardDef { name: "Route Free Emblem", types: TypeSet::NONE, ..FREE_ALTERNATIVE };
+
+/// An emblem that gives cards in its owner's graveyard a way to be cast.
+static GRANTOR_EMBLEM: CardDef = CardDef { name: "Route Grantor Emblem", types: TypeSet::NONE, ..GRANTOR_0 };
+
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
 static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
@@ -221,6 +227,8 @@ fn table() -> &'static CardTable {
             &GRANTOR_8,
             &EXILE_PERMISSION,
             &FREE_ALTERNATIVE,
+            &FREE_EMBLEM,
+            &GRANTOR_EMBLEM,
             &LAND,
         ])
     })
@@ -580,6 +588,42 @@ fn a_cast_as_an_effect_resolves_uses_no_way_a_permanent_gives() {
     take(&mut game, &option);
     resolve(&mut game);
     assert_eq!(game.state.obj(target).zone, Zone::graveyard(PlayerId(1)));
+}
+
+fn emblem(game: &mut RulesGame, name: &str, player: PlayerId) -> ObjectId {
+    let card = game.cards.find(name).unwrap();
+    let id = game.state.push_obj(Obj::new(card, player, Zone::COMMAND));
+    game.state.zone_push(Zone::COMMAND, id);
+    id
+}
+
+/// CR 114.4, 118.9: an emblem's static abilities function in the command zone, so one that gives spells an alternative
+/// cost (Tamiyo, Field Researcher's "You may cast spells from your hand without paying their mana costs") or cards a way
+/// to be cast (CR 604) offers that cast, made by the emblem; another player's emblem gives nothing to its owner's opponent.
+#[test]
+fn an_emblem_gives_an_alternative_cost_and_a_way() {
+    let (mut game, spell) = game_with("Route Probe", Zone::hand, 0);
+    assert!(casts_of(&{ game.run(); game.clone() }, spell).is_empty(), "with no mana and no emblem, nothing casts it");
+    let (mut game, spell) = game_with("Route Probe", Zone::hand, 0);
+    emblem(&mut game, "Route Free Emblem", PlayerId(1));
+    game.run();
+    assert!(casts_of(&game, spell).is_empty(), "the opponent's emblem gives its owner's spells alone");
+    let (mut game, spell) = game_with("Route Probe", Zone::hand, 0);
+    let free = emblem(&mut game, "Route Free Emblem", ME);
+    game.run();
+    let option = casts_of(&game, spell).into_iter().find(|o| o.paid_by.is_some_and(|g| g.object == free)).expect("the emblem's free cast");
+    take(&mut game, &option);
+    resolve(&mut game);
+    assert!(game.log.iter().any(|r| matches!(r.event, Event::SpellCast { player: ME, .. })));
+
+    let (mut game, spell) = game_with("Route Probe", Zone::graveyard, 0);
+    game.state.update_player(ME, |p| p.life = 20);
+    let way = emblem(&mut game, "Route Grantor Emblem", ME);
+    game.run();
+    let option = casts_of(&game, spell).into_iter().find(|o| by(o) == Some(way)).expect("the emblem's way");
+    take(&mut game, &option);
+    resolve(&mut game);
+    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by().is_some_and(|g| g.object == way))));
 }
 
 /// CR 601.3, 118.9: a permanent's permission to cast from exile and another's alternative cost compose; a permission that
