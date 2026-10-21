@@ -274,6 +274,19 @@ static GIVER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn gain_energy(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    g.change_energy(item.controller, 1);
+    Ok(())
+}
+
+/// "You get {E}" for nothing, so a test has energy the way a game gives it (CR 107.14).
+static ENERGY_GAIN: CardDef = CardDef {
+    name: "Route Energy Gain",
+    cost: ManaCost::ZERO,
+    spell: Some(SpellDef { targets: &[], effect: gain_energy }),
+    ..PROBE_SPELL
+};
+
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
 static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
@@ -316,6 +329,7 @@ fn table() -> &'static CardTable {
             &GIVER,
             &ENERGY_SOURCE,
             &ENERGY_SPELL,
+            &ENERGY_GAIN,
             &SUSPEND_NEVER,
             &SUSPEND_FORBIDDER,
             &SPLIT_SECOND_PROBE,
@@ -735,10 +749,21 @@ fn suspend_is_taken_only_when_the_card_could_be_cast() {
 /// spare it is cast.
 #[test]
 fn an_energy_cost_is_judged_again_after_the_mana_abilities() {
-    for energy in [1u16, 2] {
-        let (mut game, spell) = game_with("Route Energy Spell", Zone::hand, 0);
+    let cards = table();
+    let (spell_card, gain, filler) = (cards.find("Route Energy Spell").unwrap(), cards.find("Route Energy Gain").unwrap(), cards.find("Route Filler").unwrap());
+    for energy in [1usize, 2] {
+        let mut game = RulesGame::new(cards, &Setup { decks: vec![vec![spell_card, gain, gain, filler, filler, filler, filler], vec![filler; 7]], seed: 1, ..Setup::default() });
+        let spell = game.state.zone(Zone::hand(ME))[0];
+        let gains: Vec<ObjectId> = game.state.zone(Zone::hand(ME))[1..1 + energy].to_vec();
+        begin(&mut game, 0);
         let source = put(&mut game, "Route Energy Source", ME);
-        game.state.update_player(ME, |p| p.put_path_add(0, energy, 0));
+        for g in gains {
+            game.run();
+            let cast = casts_of(&game, g).into_iter().next().expect("the energy for nothing");
+            take(&mut game, &cast);
+            resolve(&mut game);
+        }
+        assert_eq!(game.state.player(ME).energy() as usize, energy);
         game.run();
         let cast = casts_of(&game, spell).into_iter().next().expect("offered: the energy and the mana are each there");
         take(&mut game, &cast);
@@ -754,7 +779,7 @@ fn an_energy_cost_is_judged_again_after_the_mana_abilities() {
                 .unwrap_or_else(|| panic!("unexpected payment options: {options:?}"));
             game.answer(request.id, request.player, Answer::Act(Action::of(pick))).unwrap();
         }
-        let cast_made = game.log.iter().any(|r| matches!(r.event, Event::SpellCast { player: ME, .. }));
+        let cast_made = game.state.stack.iter().any(|i| game.state.obj(i.object).card == spell_card);
         if energy == 1 {
             assert!(!cast_made, "the mana ability spent the energy the spell needs");
             assert!(game.state.zone(Zone::hand(ME)).contains(&spell), "taken back to the hand");
