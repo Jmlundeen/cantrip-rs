@@ -72,7 +72,6 @@ keeps it).
 | [KI-66](#ki-66-phasing-in-a-multiplayer-game-after-a-player-leaves-is-unbuilt) | Phasing in a multiplayer game after a player leaves is unbuilt | Low | Unexercised |
 | [KI-67](#ki-67-a-spell-cast-by-a-resolving-ability-under-split-second-is-unexercised) | A spell cast by a resolving ability under split second is unexercised | Low | Unexercised |
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
-| [KI-69](#ki-69-a-bestowed-spell-has-the-mana-value-of-its-bestow-cost) | A bestowed spell has the mana value of its bestow cost | Low | Open |
 | [KI-70](#ki-70-a-block-requirement-is-counted-on-the-declared-block-only-not-through-the-blocked-creatures-band) | A block requirement is counted on the declared block only, not through the blocked creature's band | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-72](#ki-72-a-face-down-permanent-may-be-unable-to-turn-face-up-under-humility) | A face-down permanent may be unable to turn face up under Humility | Low | Suspected |
@@ -753,19 +752,6 @@ permission's additions, then the least.
 
 **Scenarios.** none yet (Trinisphere with Wild Ride, Winternight Stories, Crabomination, Rottenmouth Viper or a permission
 with a tax would show it).
-
-### KI-69: A bestowed spell has the mana value of its bestow cost
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-17, review of Chalice of the Void and Gaddock Teeg |
-
-**Notes.** `bestow::bestowed` makes the bestowed face with the bestow cost as its `cost` where the two differ (Detective's
-Phoenix: `{R}`), and the spell's mana value on the stack is read from that face, so a bestowed Detective's Phoenix is mana
-value 1 rather than 3. Bestow is an alternative cost (CR 702.103a, 118.9c): the mana value is the card's mana cost's.
-Chalice of the Void with one counter would counter it (and with three would not), and a `CardDef::spell_rules` ban judges it
-by the bestow cost too (no implemented bestow card's mana value reaches Gaddock Teeg's 4). A fix keeps the mana cost on the
-face and the bestow cost apart.
 
 ### KI-73: Older "you may draw" cards offer a draw a can't-draw rule forbids
 

@@ -1,0 +1,53 @@
+# Bestow is an alternative cost (CR 702.103a, 118.9): the bestowed Aura spell keeps the card's mana cost (CR 702.103b), so
+# a Detective's Phoenix cast for its bestow cost {R} has mana value 3, its {2}{R}'s (CR 202.3). Bot2's Chalice of the Void
+# with one charge counter ("counter a spell with mana value equal to the number of charge counters") lets it resolve,
+# and the Aura on Bot1's Ornithopter is mana value 3 on the battlefield too.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Faithless Looting
+Detective's Phoenix
+Mountain
+Island
+Griselbrand
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Chalice of the Void
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Mountain)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Chalice of the Void.Cast(X: 1)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Chalice of the Void.Counters.Charge = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Detective's Phoenix.Cast(Bot1.Battlefield.Ornithopter; Ability: Bestow)
+Bot1.Choose(Griselbrand)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Detective's Phoenix.AttachedTo = Ornithopter
+Bot1.Battlefield.Detective's Phoenix.ManaValue = 3
+Bot1.Battlefield.Ornithopter.Power = 2

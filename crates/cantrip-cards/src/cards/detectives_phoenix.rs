@@ -12,9 +12,9 @@ const STATICS: &[StaticDef] = &[
 ];
 
 /// Bestow—{R}, Collect evidence 6 (CR 702.103, 701.59): while it is bestowed it is an Aura enchantment with "enchant
-/// creature", not a creature, whose cost is the bestow cost. The evidence is an additional cost of casting it that way.
+/// creature", not a creature, with the card's mana cost (CR 702.103b); the bestow cost is the card's `bestow_cost`. The
+/// evidence is an additional cost of casting it that way.
 pub static BESTOWED: CardDef = bestow::bestowed(CardDef {
-        cost: mana("{R}"),
         keywords: Keywords::of(&[]),
         additional_cost: Some(Cost { collect_evidence: 6, ..Cost::NONE }),
         statics: STATICS,
@@ -25,6 +25,7 @@ pub static BESTOWED: CardDef = bestow::bestowed(CardDef {
 pub static CARD: CardDef = CardDef {
     statics: STATICS,
     bestow: Some(&BESTOWED),
+    bestow_cost: mana("{R}"),
     bestow_from_graveyard: true,
     ..oracle::DETECTIVES_PHOENIX
 };

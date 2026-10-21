@@ -60,6 +60,7 @@ pub static CARD: CardDef = CardDef {
     abilities: ABILITIES,
     statics: STATICS,
     bestow: Some(&BESTOWED),
+    bestow_cost: mana("{1}{G}"),
     ..oracle::SPRINGHEART_NANTUKO
 };
 

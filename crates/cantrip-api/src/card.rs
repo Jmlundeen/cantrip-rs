@@ -2126,11 +2126,15 @@ pub struct CardDef {
     /// 720.3), the only ones it has on the stack (CR 720.3b), and shuffled into its owner's library as it resolves (CR
     /// 720.3d). The definition must be in the card table (listed in the card's `EXTRA`).
     pub omen: Option<&'static CardDef>,
-    /// Bestow (CR 702.103): the Aura it is while it is bestowed, an Aura enchantment with "enchant creature" and the bestow
-    /// cost as its mana cost, which it is on the stack and on the battlefield until it ceases to be bestowed (CR 702.103e-f).
-    /// The definition must be in the card table (listed in the card's `EXTRA`), and gives the Aura everything it has that the
-    /// creature does: its other abilities as well as "enchanted creature gets ...".
+    /// Bestow (CR 702.103): the Aura it is while it is bestowed, an Aura enchantment with "enchant creature" and the card's
+    /// own mana cost (CR 702.103b: it keeps its other characteristics), which it is on the stack and on the battlefield until
+    /// it ceases to be bestowed (CR 702.103e-f). The definition must be in the card table (listed in the card's `EXTRA`),
+    /// and gives the Aura everything it has that the creature does: its other abilities as well as "enchanted creature gets
+    /// ...". It is cast for `bestow_cost`.
     pub bestow: Option<&'static CardDef>,
+    /// The bestow cost (CR 702.103a), with `bestow`: an alternative cost (CR 118.9), paid rather than the mana cost, so the
+    /// bestowed spell's mana value is still its mana cost's (CR 202.3).
+    pub bestow_cost: ManaCost,
     /// Rebound (CR 702.88a): cast from its caster's hand and resolving, it is exiled instead of put into the
     /// graveyard, and its controller may cast it from exile at the beginning of their next upkeep (`REBOUND_ABILITY`).
     pub rebound: bool,
@@ -2406,6 +2410,7 @@ impl CardDef {
         adventure: None,
         omen: None,
         bestow: None,
+        bestow_cost: ManaCost::ZERO,
         rebound: false,
         paradigm: None,
         play_rules: &[],

@@ -1327,6 +1327,7 @@ pub fn cast_total(game: &crate::Game, player: PlayerId, option: &ActionOption) -
     }
     let base = match index {
         WAY_OVERLOAD => whole.overload?,
+        WAY_BESTOW => whole.bestow_cost,
         n if n > 0 && (n as usize) <= whole.ways.len() => whole.ways[n as usize - 1].cost.mana,
         _ => face.cost,
     };
@@ -3128,7 +3129,7 @@ impl<'a> Offer<'a> {
         }
         let a = self.available();
         let mut option = ActionOption::on(ActionKind::CastSpell, card, WAY_BESTOW);
-        if a.covers_for(&least_cost(cx, a, player, card, bestow, bestow.cost, &[]), &spell_kind(cx, a, card, bestow))
+        if a.covers_for(&least_cost(cx, a, player, card, bestow, def.bestow_cost, &[]), &spell_kind(cx, a, card, bestow))
             && offer_spell(cx, &self.asker(card), bestow, &mut option)
         {
             options.push(option);
@@ -3857,7 +3858,9 @@ fn cast(
             }
         }
         (0, _) => Cost::mana(def.cost),
-        (WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_BESTOW | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT, _) => Cost::mana(def.cost),
+        (WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT, _) => Cost::mana(def.cost),
+        // Bestow is an alternative cost (CR 702.103a, 118.9): the Aura keeps the card's mana cost.
+        (WAY_BESTOW, _) => Cost::mana(whole.bestow_cost),
         (WAY_OVERLOAD, _) => Cost::mana(whole.overload.unwrap_or(def.cost)),
         _ => whole.ways[way as usize - 1].cost,
     };
