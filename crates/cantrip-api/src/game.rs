@@ -449,6 +449,9 @@ pub trait Game: Query {
     /// The same, each with whether it enters tapped: Winds of Abandon puts the basic lands it found onto the battlefield
     /// tapped, together.
     fn put_all_onto_battlefield_as(&mut self, objects: &[(ObjectId, PlayerId, bool)]) -> Result<Vec<ObjectId>, Suspend>;
+    /// `put_all_onto_battlefield_as`, each entering with these counters as well (CR 122.6, 614.1c): Ghost Vacuum puts each
+    /// creature card exiled with it onto the battlefield together, each with a flying counter.
+    fn put_all_onto_battlefield_with_counters(&mut self, objects: &[(ObjectId, PlayerId, bool)], counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend>;
     /// Sacrifices permanents and puts cards onto the battlefield at the same moment (CR 101.4): Goblin Welder.
     fn sacrifice_and_return(&mut self, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend>;
     /// Puts an object onto the battlefield transformed, its back face up (CR 712.14a): "exile it, then return it to

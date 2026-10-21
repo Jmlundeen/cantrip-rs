@@ -11,13 +11,13 @@ fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// Put each creature card exiled with this artifact onto the battlefield under your control with a flying counter on it
-/// (CR 614.1c); each of them is a 1/1 Spirit in addition to its other types (CR 611.2c, 613.4b). The artifact was
-/// sacrificed as a cost, and the exile link outlives it (CR 113.7a).
+/// (CR 614.1c), all at once (CR 110.2a: so each sees the others enter, CR 603.6a); each of them is a 1/1 Spirit in addition to
+/// its other types (CR 611.2c, 613.4b). The artifact was sacrificed as a cost, and the exile link outlives it (CR 113.7a).
 fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let cards: Vec<ObjectId> = g.exiled_with(item.object).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    let cards: Vec<(ObjectId, PlayerId, bool)> =
+        g.exiled_with(item.object).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).map(|id| (id, item.controller, false)).collect();
     let spirit = g.words(item.object).subtype(Subtype::Spirit);
-    for card in cards {
-        let arrived = g.put_onto_battlefield_with_counters(card, item.controller, false, &[(CounterKind::Flying, 1)])?;
+    for arrived in g.put_all_onto_battlefield_with_counters(&cards, &[(CounterKind::Flying, 1)])? {
         if targets::permanent(g, arrived) {
             g.add_effect(item.object, arrived, EffectKind::SetPt(1, 1), Duration::Indefinite);
             g.add_effect(item.object, arrived, EffectKind::AddSubtype(spirit), Duration::Indefinite);

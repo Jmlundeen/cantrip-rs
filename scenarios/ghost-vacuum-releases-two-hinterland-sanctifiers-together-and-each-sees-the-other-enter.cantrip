@@ -1,0 +1,56 @@
+# Ghost Vacuum puts each creature card exiled with it onto the battlefield at once (CR 110.2a, 603.6a): permanents that
+# enter at the same time see each other enter. Bot1 discards two Hinterland Sanctifiers to Faithless Looting, exiles one with
+# the Vacuum on turn 1 and the other on turn 3, and on turn 5 releases them together: each one's "Whenever another creature
+# you control enters, you gain 1 life" triggers for the other, so Bot1 gains 2 (one at a time, only the first would see the
+# second, for 1).
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Jet
+Ghost Vacuum
+Faithless Looting
+Hinterland Sanctifier
+Hinterland Sanctifier
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ghost Vacuum.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Hinterland Sanctifier; Hinterland Sanctifier)
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Hinterland Sanctifier#1)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Hinterland Sanctifier)
+[T5 Bot1.Main1]
+? Exile = Hinterland Sanctifier; Hinterland Sanctifier
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Put each)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Hinterland Sanctifier#2.Power = 1
+Exile.Count = 0
+Stack.Count = 0

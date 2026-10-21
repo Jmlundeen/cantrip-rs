@@ -1621,8 +1621,10 @@ Known gaps:
   (Norn's Annex), tapping or sacrificing, and optional costs to attack (CR 508.1g: exert, enlist, which the engine has
   as other things) are not built, nor anything that changes a cost to attack. No card in content needs them.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
-- Suspend does not give a creature cast that way haste (no card in content needs it), and several creatures put onto
-  the battlefield one after another by an effect (Ghost Vacuum) enter one at a time rather than together.
+- Suspend does not give a creature cast that way haste (no card in content needs it). Several permanents one effect puts
+  onto the battlefield enter together (`ops::put_onto_battlefield`, `Game::put_all_onto_battlefield*`: Show and Tell,
+  Redshift's exhaust, Ghost Vacuum), each judged by its entering replacements against the battlefield as it was (CR 614.12)
+  and each seeing the others enter (CR 603.6a); cloaking several cards is one at a time, as the rules say (CR 701.58e).
 - Rooms (CR 709.5) are built: `Marks::doors` holds the unlocked designations, `layers::doors` gives a Room on the
   battlefield the name, mana cost and abilities of its unlocked doors, the unlock special action is an intrinsic ability
   per locked door (`intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, cost read off the door), `Event::DoorUnlocked` is what

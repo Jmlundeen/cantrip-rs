@@ -953,6 +953,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield(self, objects, ZoneReason::Other).map_err(|_| Suspend)
     }
 
+    fn put_all_onto_battlefield_with_counters(&mut self, objects: &[(ObjectId, PlayerId, bool)], counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend> {
+        ops::put_onto_battlefield_with(self, objects, ZoneReason::Other, counters).map_err(|_| Suspend)
+    }
+
     fn put_all_onto_battlefield(&mut self, objects: &[(ObjectId, PlayerId)]) -> Result<Vec<ObjectId>, Suspend> {
         let all: Vec<(ObjectId, PlayerId, bool)> = objects.iter().map(|&(id, p)| (id, p, false)).collect();
         ops::put_onto_battlefield(self, &all, ZoneReason::Other).map_err(|_| Suspend)
