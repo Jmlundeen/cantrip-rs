@@ -1123,14 +1123,9 @@ fn face_of(cx: &Cx, card: ObjectId, def: &CardDef) -> Option<CardId> {
 }
 
 /// A cost with the static abilities that change it applied (CR 601.2f, 118.7): increases first, then reductions, a
-/// reduction taking nothing below zero generic mana (CR 118.7c). `targets` are those announced for the spell or ability
-/// (CR 601.2c), which the total cost is determined after.
-pub fn apply_cost_changes(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target]) -> ManaCost {
-    change_with(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
-}
-
-/// `apply_cost_changes`, and the life the changes add to the total cost as additional costs (CR 118.8, 601.2f: "cost an
-/// additional 3 life to cast").
+/// reduction taking nothing below zero generic mana (CR 118.7c), and the life the changes add to the total cost as
+/// additional costs (CR 118.8, 601.2f: "cost an additional 3 life to cast"). A reduction by hybrid mana is taken at its
+/// first halves: what is paid announces and splits them first (`announce_hybrids`, `announce_reduction`).
 pub fn apply_cost_changes_total(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target]) -> (ManaCost, u32) {
     change_total(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
 }
@@ -3201,7 +3196,10 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 let any_color = static_rules::spend_any_color_for(cx, player, id, !def.special_action);
                 let judge = |cost: ManaCost| a.covers_for(&if any_color { cost.paid_with_any_color() } else { cost }, &payment);
                 if def.special_action {
-                    judge(owed)
+                    // Its own cost changes, each way a reduction by hybrid mana could be split (CR 118.7e) and the hybrid
+                    // symbols it meets announced (CR 601.2b), as `special_action` asks them.
+                    let printed = special_action_printed_cost(cx, id, ability, def);
+                    change_any(cx, &a.changers, player, Costed::SpecialAction(id, ability), printed, None, &[], &mut |c, least| judge(at_least(c, least)))
                 } else {
                     // Each way the hybrid symbols a reduction meets could be announced (CR 601.2b): covered if any is.
                     change_any(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets, &mut |c, least| judge(at_least(c, least)))
@@ -4549,7 +4547,13 @@ fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) 
         return Ok(None);
     }
     // Before any target is chosen (CR 601.2b), so a change that reads the targets is not in it.
-    let generic = apply_cost_changes(cx, player, Costed::Spell(source), cost.mana, &[]).generic;
+    // The most it could be, however a reduction by hybrid mana is split and hybrid symbols announced (CR 118.7e, 601.2b):
+    // asked before either.
+    let mut generic = 0u8;
+    change_any(cx, &cost_change_sources(cx), player, Costed::Spell(source), cost.mana, None, &[], &mut |c, least| {
+        generic = generic.max(at_least(c, least).generic);
+        false
+    });
     let powers = eligible.iter().map(|&c| i16::from(reduction_of(cx, c).min(generic))).collect();
     let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToReduce, cards: eligible, powers, minimum: 0 };
     match cx.ask_core(player, ask, true)? {
@@ -6735,7 +6739,13 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
 /// effect asks no questions and has no targets.
 fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef) -> R<()> {
     let def = activated(cx, ability).expect("activated");
-    let mana = special_action_cost(cx, player, source, ability, def);
+    // Its cost changes applied as the payer announces and splits them (CR 601.2b, 118.7e), as a cast's are.
+    let costed = Costed::SpecialAction(source, ability);
+    let mut printed = special_action_printed_cost(cx, source, ability, def);
+    announce_hybrids(cx, player, source, costed, &mut printed, &[], false)?;
+    let split = announce_reduction(cx, player, source, costed, &printed, &[])?;
+    let (mana, _, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, printed, None, &[], &split);
+    let mana = at_least(mana, least);
     if mana != ManaCost::ZERO {
         pay_mana(cx, player, source, mana)?;
     }
