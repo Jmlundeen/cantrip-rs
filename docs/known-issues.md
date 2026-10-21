@@ -45,7 +45,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 
 | ID | Issue | Severity | Status |
 | --- | --- | --- | --- |
-| [KI-2](#ki-2-a-harmonize-cost-reduction-cannot-be-checked-in-the-browser) | A harmonize cost reduction cannot be checked in the browser | Low | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
@@ -66,21 +65,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 
 ## Issues
-
-### KI-2: A harmonize cost reduction cannot be checked in the browser
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | harness | 2026-10-15, Wild Ride's browser scenario |
-
-**Notes.** When the mana pool already covers a spell's cost, no payment prompt appears, so a browser scenario has
-nothing on the page to read the reduced total from. The engine side is proven by the headless scenarios; the client
-shows the harmonize cost on the graveyard pile's note. A fix is a `Client.` key for the cost a pending cast will pay,
-or a scenario arranged so the payment prompt appears.
-
-**Scenarios.**
-- [`scenarios/wild-ride-in-the-browser-offers-harmonize-from-the-graveyard-and-the-creature-to-tap.cantrip`](../scenarios/wild-ride-in-the-browser-offers-harmonize-from-the-graveyard-and-the-creature-to-tap.cantrip) - the browser
-  scenario that plays it, without the reduced total.
 
 ### KI-3: Engine paths no scenario runs
 
