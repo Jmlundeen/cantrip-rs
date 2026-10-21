@@ -48,7 +48,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
-| [KI-113](#ki-113-the-engine-panics-on-costs-it-has-not-built) | The engine panics on costs it has not built | Pri-0 | Fix queued |
 | [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Fix queued |
 | [KI-103](#ki-103-mana-costs-x-kicker-and-the-mana-a-cast-records-are-narrower-than-play-reaches) | Mana costs, X, kicker and the mana a cast records are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
@@ -346,22 +345,6 @@ controller cast a card from their hand offers the ways it could be cast (`Game::
 The fused cast is not among them, so it is not offered there.
 
 **Scenarios.** None yet.
-
-### KI-113: The engine panics on costs it has not built
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-0 | Fix queued | engine | 2026-10-21, the sweep for known gaps |
-
-**Notes.** Asserts that stop the engine where a cost part is not built, each kept from a game only by what cards there are:
-- an activated ability's behold (`actions.rs`, `activate`: "an activated ability's behold is not built"), and a mana
-  ability whose cost names tapped permanents - refused for every card in the table by
-  `every_activated_ability_has_a_cost_activation_can_pay` (cantrip-engine);
-- a cost paid during a resolution with parts other than mana and life (`actions::may_pay` and `may_pay_x`: "a cost paid
-  during resolution is mana and life; its other parts are not built").
-A fix builds each, or refuses the cost gracefully (the cast or payment taken back) where it is reached.
-
-**Scenarios.** None.
 
 ### KI-107: A layer-1 copy static ability is not counted among what could give a look-back ability
 

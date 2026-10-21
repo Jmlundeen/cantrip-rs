@@ -32,6 +32,8 @@ mod copy_card_tests;
 #[cfg(test)]
 mod copy_spell_tests;
 #[cfg(test)]
+mod cost_parts_tests;
+#[cfg(test)]
 mod entering_judged_tests;
 #[cfg(test)]
 mod land_text_tests;

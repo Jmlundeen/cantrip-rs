@@ -750,8 +750,13 @@ do", "counter it unless its controller pays {3}", a shockland's "you may pay 2 l
 `Game::may_pay` (`actions::may_pay`, asked as `RequestKind::UnlessPays` with its `life` and the card's `Question`): the
 payer is not asked without the life (`actions::can_pay_life`), may activate mana abilities while there is mana to pay (CR
 605.3a), and may pay once the pool covers the mana and the life total still covers the life, so a mana ability that costs
-life (Mana Confluence) can leave only declining. The mana and the life are paid together, and "if they do" asks whether
-they paid (CR 118.12). "You may pay {X}" where the text leaves X to the payer (CR 107.3f) is `Game::may_pay_x`
+life (Mana Confluence) can leave only declining. A cost with other parts - "sacrifice a creature", "discard a card",
+"return a tapped creature you control", energy, counters - is paid the same way: paying is offered only while every part
+can be paid now (`resolution_rest_payable`, judged as an activated ability's is), the permanents and cards are chosen once
+the payer chooses to pay, after the mana abilities (CR 601.2g-h), with the questions a spell's or an ability's cost asks,
+and a choice given up is undone and the payer asked again. The parts only a spell or an activation has (loyalty, emerge,
+craft's materials, a granted ability's "sacrifice the permanent that gives it") are never paid. The whole is paid together,
+and "if they do" asks whether they paid (CR 118.12). "You may pay {X}" where the text leaves X to the payer (CR 107.3f) is `Game::may_pay_x`
 (`actions::may_pay_x`): the same question with its `x`, raised and lowered (`IncreaseX`, `DecreaseX`) while mana is made, any
 X from 0 up, and the X paid is what it returns, for "when you do" to carry (Fire Lord Sozin). Not built, because no card in content has one: exchanges of life totals, costs
 that gain life, and an effect a spell or ability makes that a player can't lose life (CR 119.8: "can't lose life this turn").
