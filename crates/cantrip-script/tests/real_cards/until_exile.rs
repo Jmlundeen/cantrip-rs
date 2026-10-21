@@ -2,7 +2,8 @@
 //! second one-shot effect the rules create immediately after the event - no triggered ability, so nothing that stops abilities
 //! triggering stops it (`DelayedWhen::UntilEvent` in `settle::collect_batch`). The only "until" event in the engine is becoming
 //! the monarch, which no printed card stops, so a test card that stops every triggered ability, and one that makes its caster
-//! the monarch, do here, beside the printed Palace Jailer.
+//! the monarch, do here, beside the printed Palace Jailer. The same rule stops the monarch's end-step draw, an inherent
+//! triggered ability (CR 725.2, `designations::inherent_triggers`).
 
 use std::sync::OnceLock;
 
@@ -53,10 +54,9 @@ fn table() -> &'static CardTable {
 }
 
 /// Turn 2: Bot2 casts Ornithopter. Turn 3: Bot1 casts Palace Jailer (Black Lotus and Mox Pearl), becomes the monarch and exiles
-/// the Ornithopter until an opponent becomes the monarch, then casts Probe Hush and a Probe Herald, whose enters ability the
-/// Hush stops. Turn 4: Bot2 casts Probe Crown, and the Ornithopter comes back.
-#[test]
-fn an_until_exile_ends_under_a_rule_that_stops_triggered_abilities() {
+/// the Ornithopter until an opponent becomes the monarch, then casts Probe Hush if `hush` and a Probe Herald. Turn 4: Bot2 casts
+/// Probe Crown. The game afterwards, and Bot1's hand as turn 4 begins (after the monarch's end-step draw, if it happened).
+fn play(hush: bool) -> (Game, usize) {
     let names = |list: &[&str]| -> Vec<CardId> { list.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))).collect() };
     let mut first = names(&["Black Lotus", "Mox Pearl", "Palace Jailer", "Probe Hush", "Probe Herald"]);
     first.extend(names(&["Plains"; 25]));
@@ -64,15 +64,22 @@ fn an_until_exile_ends_under_a_rule_that_stops_triggered_abilities() {
     second.extend(names(&["Island"; 28]));
     let mut game = Game::new(table(), &Setup { decks: vec![first, second], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
     game.verify = true;
-    let plan: [(u32, usize, &str); 7] =
-        [(1, 0, "Black Lotus"), (1, 0, "Mox Pearl"), (2, 1, "Ornithopter"), (3, 0, "Palace Jailer"), (3, 0, "Probe Hush"), (3, 0, "Probe Herald"), (4, 1, "Probe Crown")];
+    let plan: Vec<(u32, usize, &str)> =
+        [(1, 0, "Black Lotus"), (1, 0, "Mox Pearl"), (2, 1, "Ornithopter"), (3, 0, "Palace Jailer"), (3, 0, "Probe Hush"), (3, 0, "Probe Herald"), (4, 1, "Probe Crown")]
+            .into_iter()
+            .filter(|&(_, _, name)| hush || name != "Probe Hush")
+            .collect();
     let mut steps = plan.iter().peekable();
+    let mut hand_on_four = None;
     for _ in 0..2000 {
         game.run();
         if steps.peek().is_none() && game.state.stack.is_empty() && game.state.triggers.is_empty() {
             break;
         }
         let request = game.pending().cloned().expect("the game goes on");
+        if game.state.turn.number == 4 && hand_on_four.is_none() {
+            hand_on_four = Some(game.state.zone(Zone::hand(PlayerId(0))).len());
+        }
         let answer = match &request.kind {
             RequestKind::Priority { options } if game.state.stack.is_empty() => match steps.peek() {
                 Some(&&(turn, seat, name)) if game.state.turn.number >= turn && request.player.0 as usize == seat => {
@@ -107,9 +114,26 @@ fn an_until_exile_ends_under_a_rule_that_stops_triggered_abilities() {
         game.answer(request.id, request.player, answer).unwrap();
     }
     assert!(steps.peek().is_none(), "the plan was not played out");
-    // The positive control: the Herald, entering after the Hush, gained Bot1 nothing.
-    assert_eq!(game.state.player(PlayerId(0)).life, 20, "the Hush stopped no triggered ability");
+    (game, hand_on_four.expect("turn 4 began"))
+}
+
+/// Under the Hush the Herald's enters ability gains Bot1 nothing, and the monarch's end-step draw (CR 725.2) - an inherent
+/// triggered ability, stopped like any other - does not happen; when Bot2 becomes the monarch, the Ornithopter comes back all the
+/// same. Without the Hush (the positive control) the Herald gains 1 and Bot1 draws at its end step: its hand on turn 4 is the
+/// seven it began with, less the cards cast, plus turn 3's draw, plus the monarch's.
+#[test]
+fn an_until_exile_ends_under_a_rule_that_stops_triggered_abilities() {
+    let (game, hand) = play(true);
+    assert_eq!(game.state.player(PlayerId(0)).life, 20, "the Hush stopped no enters ability");
+    assert_eq!(hand, 7 - 5 + 1, "the Hush stopped no monarch's draw");
     assert!(game.state.player(PlayerId(1)).monarch, "Bot2 is not the monarch");
     let thopter = game.state.battlefield().iter().copied().find(|&id| game.name(id) == "Ornithopter");
     assert!(thopter.is_some_and(|id| game.state.obj(id).controller == PlayerId(1)), "the Ornithopter did not come back when Bot2 became the monarch");
+}
+
+#[test]
+fn without_the_hush_the_herald_gains_and_the_monarch_draws() {
+    let (game, hand) = play(false);
+    assert_eq!(game.state.player(PlayerId(0)).life, 21, "the Herald gained nothing");
+    assert_eq!(hand, 7 - 4 + 1 + 1, "the monarch did not draw at its end step");
 }

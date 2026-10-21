@@ -2043,9 +2043,6 @@ pub fn deal_damage_with(
                 change_life(cx, p, -(amount as i32));
             }
             lifelink(cx, source, &source_chars, amount, batch);
-            if combat {
-                crate::designations::combat_damage(cx, source, p, amount);
-            }
             Some(Event::Damage { source, target, amount, combat, controller: cx.s().obj(source).controller, colors: source_chars.colors })
         }
         Target::Object(id) => {
@@ -2182,11 +2179,9 @@ pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
         return;
     }
     cx.st().update_player(player, |p| p.life = p.life.saturating_add(delta));
+    // CR 702.179d: an opponent losing life during the turn of a player with speed triggers its inherent ability
+    // (`designations::inherent_triggers`).
     cx.emit(Event::LifeChange { player, delta });
-    // CR 702.179d: an opponent losing life during the turn of a player with speed.
-    if delta < 0 {
-        crate::speed::life_lost(cx, player);
-    }
 }
 
 /// Whether `player` can't have this change of life: a gain while they can't gain life (CR 119.7), a loss while they can't lose

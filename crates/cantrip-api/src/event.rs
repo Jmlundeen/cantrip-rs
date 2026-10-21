@@ -72,6 +72,9 @@ pub enum Event {
     ManaSpent { player: PlayerId, source: ObjectId, on: ObjectId, cast: bool, mana: ManaTally },
     /// A player became the monarch (CR 725.1, 725.4): it was not theirs before.
     BecameMonarch { player: PlayerId },
+    /// A player took the initiative (CR 726.1), even one who had it (CR 726.5): what makes them venture into Undercity
+    /// (CR 726.2).
+    TookInitiative { player: PlayerId },
     /// Creatures were declared as attackers (CR 508.1): "whenever you attack" (CR 508.1m). Not for creatures put onto
     /// the battlefield attacking (CR 508.4).
     AttackersDeclared { player: PlayerId, count: u8 },
@@ -232,6 +235,7 @@ impl Event {
             | Event::TappedForMana { player, .. }
             | Event::ManaSpent { player, .. }
             | Event::BecameMonarch { player }
+            | Event::TookInitiative { player }
             | Event::GaveGift { player, .. }
             | Event::Copied { player, .. }
             | Event::DoorUnlocked { player, .. }
@@ -292,7 +296,7 @@ impl Event {
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } => false,
         }
     }
 }
@@ -357,6 +361,7 @@ impl EventMask {
     pub const ATTACHED: EventMask = EventMask(1 << 48);
     /// A land was played (CR 305.1): recorded only, for the history.
     pub const LAND_PLAYED: EventMask = EventMask(1 << 49);
+    pub const TOOK_INITIATIVE: EventMask = EventMask(1 << 50);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -408,6 +413,7 @@ impl EventMask {
             Event::Attached { .. } => EventMask::ATTACHED,
             Event::Tapped { .. } => EventMask::TAPPED,
             Event::BecameMonarch { .. } => EventMask::BECAME_MONARCH,
+            Event::TookInitiative { .. } => EventMask::TOOK_INITIATIVE,
             Event::CoinFlipped { .. } => EventMask::COIN_FLIPPED,
             Event::DieRolled { .. } => EventMask::DIE_ROLLED,
             Event::ChosenAtRandom { .. } => EventMask::CHOSEN_AT_RANDOM,

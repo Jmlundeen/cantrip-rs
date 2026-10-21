@@ -60,17 +60,15 @@ pub fn engines_start(cx: &mut Cx) -> bool {
 /// player whose turn it is, which they have only while they have speed. It has no source and is controlled by that
 /// player; it triggers once for losses that happen together (CR 603.2c) and once in the turn at all, which the history
 /// is asked: it records each triggering. The intervening "if" is asked here and again as it resolves (CR 603.4).
-pub fn life_lost(cx: &mut Cx, player: PlayerId) {
+pub(crate) fn life_lost(cx: &Cx, player: PlayerId) -> Option<(u8, PlayerId, Target)> {
     let active = cx.s().turn.active;
     let you = cx.s().player(active);
     if !cx.s().opponents(active).any(|o| o == player) || you.lost || !you.speed.is_some_and(|s| s < MAX) {
-        return;
+        return None;
     }
-    let intrinsic = cx.cards().intrinsic;
-    let ability = AbilityRef { card: intrinsic, index: SPEED_UP };
+    let ability = AbilityRef { card: cx.cards().intrinsic, index: SPEED_UP };
     if crate::loops::settled_read(cx, |h| h.this_turn().iter().any(|r| matches!(r.event, Event::Triggered { ability: a, .. } if a == ability)), |&once| once) {
-        return;
+        return None;
     }
-    let source = crate::designations::queue(cx, intrinsic, SPEED_UP, active, Target::None);
-    cx.record(Event::Triggered { source, ability });
+    Some((SPEED_UP, active, Target::None))
 }

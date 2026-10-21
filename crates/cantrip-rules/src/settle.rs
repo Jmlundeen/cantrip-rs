@@ -750,6 +750,35 @@ fn consider(
     }
 }
 
+/// One of the players' inherent triggered abilities (`designations::inherent_triggers`) that `event` triggered: from an object of
+/// the rules' own in no zone (`designations::queue`), controlled by `controller` and about `subject`, unless something stops it
+/// triggering (CR 603.2), and once more for each static ability that makes it trigger again (CR 603.2d). The initiative's "one
+/// or more creatures a player controls" triggers once for that player in a batch, and not again while it waits (CR 603.2c);
+/// speed's once each turn, its triggering noted in the history.
+fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event: &Event, statics: &mut TriggerStatics, found: &mut Found) {
+    let card = cx.cards().intrinsic;
+    let ability = AbilityRef { card, index };
+    let AbilityDef::Triggered(t) = cx.cards().ability(ability) else { return };
+    let same = |p: &PendingTrigger| p.ability == ability && p.subject == subject;
+    if index == cantrip_api::intrinsic::INITIATIVE_TAKEN && (found.iter().any(|(p, _, _)| same(p)) || cx.s().triggers.iter().any(same)) {
+        return;
+    }
+    if index == cantrip_api::intrinsic::SPEED_UP && found.iter().any(|(p, _, _)| p.ability == ability) {
+        return;
+    }
+    let source = cx.st().push_obj(Obj::new(card, controller, Zone::GONE));
+    let triggering = Triggering { source, controller, def: t, permanent: false };
+    if statics.stop(cx, event, &triggering) {
+        return;
+    }
+    let mut again = Again::new();
+    statics.additional(cx, event, &triggering, &mut again);
+    if index == cantrip_api::intrinsic::SPEED_UP {
+        cx.record(Event::Triggered { source, ability });
+    }
+    found.push((PendingTrigger { source, ability, controller, subject, data: [0; 2], members: Span::default(), count: None, since: None }, t, again));
+}
+
 /// The triggering of a state trigger (CR 603.8): about no event, so nothing is its subject.
 fn state_trigger(source: ObjectId, ability: AbilityRef, controller: PlayerId) -> PendingTrigger {
     PendingTrigger { source, ability, controller, subject: Target::None, data: [0; 2], members: Span::default(), count: None, since: None }
@@ -889,6 +918,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>,
             let mask = EventMask::of(event);
             if mask.0 == 0 {
                 continue;
+            }
+            // The players' inherent triggered abilities (CR 725.2, 726.2, 702.179d), which no object has.
+            for (index, controller, subject) in crate::designations::inherent_triggers(cx, event) {
+                inherent(cx, index, controller, subject, event, &mut statics, &mut found);
             }
             let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
             if let Some(before) = before {
@@ -1124,8 +1157,8 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             at += 1;
         }
     }
+    // The monarch's and the initiative's step triggers are found from the event (`designations::inherent_triggers`).
     cx.emit(Event::StepBegan { step });
-    crate::designations::step_began(cx, step);
     if step == Step::Upkeep {
         suspended_cards(cx, active);
     }

@@ -58,25 +58,44 @@ pub fn monarch_left(cx: &mut Cx) {
     set_monarch(cx, heir);
 }
 
-/// The monarch's two inherent triggers (CR 725.2), checked as a step begins: "at the beginning of the monarch's end
-/// step, that player draws a card".
-pub fn step_began(cx: &mut Cx, step: Step) {
+/// The inherent triggered abilities of the monarch and the initiative (CR 725.2, 726.2) and of a player with speed (CR
+/// 702.179d) that `event` triggers: each the intrinsic ability's index, its controller and what it is about. No object has
+/// them, so the rules put them on their way to the stack from an object of their own (`queue`) - but they are triggered
+/// abilities like any other (CR 603.2), looked for over the events as `settle::collect_batch` looks for the others, so what
+/// stops abilities triggering or makes them trigger again applies to them (CR 603.2d) and they see the history as it was before
+/// the event.
+pub(crate) fn inherent_triggers(cx: &Cx, event: &Event) -> Vec<(u8, PlayerId, Target)> {
+    let mut found = Vec::new();
     let active = cx.s().turn.active;
-    let intrinsic = cx.cards().intrinsic;
-    if step == Step::End && cx.s().player(active).monarch {
-        queue(cx, intrinsic, MONARCH_DRAW, active, Target::None);
+    match *event {
+        // "At the beginning of the monarch's end step, that player draws a card."
+        Event::StepBegan { step: Step::End } if cx.s().player(active).monarch && in_game(cx, active) => {
+            found.push((MONARCH_DRAW, active, Target::None));
+        }
+        // "At the beginning of the upkeep of the player who has the initiative, that player ventures into Undercity."
+        Event::StepBegan { step: Step::Upkeep } if cx.s().player(active).initiative && in_game(cx, active) => {
+            found.push((INITIATIVE_VENTURE, active, Target::None));
+        }
+        // Taking the initiative ventures into Undercity (CR 726.2), even for one who had it (CR 726.5).
+        Event::TookInitiative { player } if in_game(cx, player) => found.push((INITIATIVE_VENTURE, player, Target::None)),
+        Event::Damage { source, target: Target::Player(victim), amount, combat: true, .. } => {
+            combat_damage(cx, source, victim, amount, &mut found);
+        }
+        Event::LifeChange { player, delta } if delta < 0 => {
+            if let Some(found_speed) = crate::speed::life_lost(cx, player) {
+                found.push(found_speed);
+            }
+        }
+        _ => {}
     }
-    // "At the beginning of the upkeep of the player who has the initiative, that player ventures into Undercity."
-    if step == Step::Upkeep && cx.s().player(active).initiative {
-        queue(cx, intrinsic, INITIATIVE_VENTURE, active, Target::None);
-    }
+    found
 }
 
 /// Combat damage dealt to the monarch or to the player with the initiative (CR 725.2, 726.2): "whenever a creature
 /// deals combat damage to the monarch, its controller becomes the monarch"; "whenever one or more creatures a player
 /// controls deal combat damage to the player who has the initiative, the controller of those creatures takes the
 /// initiative", once for each such player however many creatures that was.
-pub fn combat_damage(cx: &mut Cx, source: ObjectId, victim: PlayerId, amount: u16) {
+fn combat_damage(cx: &Cx, source: ObjectId, victim: PlayerId, amount: u16, found: &mut Vec<(u8, PlayerId, Target)>) {
     let player = *cx.s().player(victim);
     if amount == 0 || !(player.monarch || player.initiative) {
         return;
@@ -91,18 +110,13 @@ pub fn combat_damage(cx: &mut Cx, source: ObjectId, victim: PlayerId, amount: u1
         return;
     }
     let controller = cx.s().obj(source).controller;
-    let intrinsic = cx.cards().intrinsic;
     let subject = Target::Player(controller);
     if player.monarch {
-        queue(cx, intrinsic, MONARCH_TAKEN, victim, subject);
+        found.push((MONARCH_TAKEN, victim, subject));
     }
+    // Once for each player whose creatures dealt it, however many (CR 603.2c): `settle::collect_batch` keeps one per subject.
     if player.initiative {
-        let waiting = cx.s().triggers.iter().any(|t| {
-            t.ability == AbilityRef { card: intrinsic, index: INITIATIVE_TAKEN } && t.subject == subject
-        });
-        if !waiting {
-            queue(cx, intrinsic, INITIATIVE_TAKEN, victim, subject);
-        }
+        found.push((INITIATIVE_TAKEN, victim, subject));
     }
 }
 
@@ -116,8 +130,8 @@ pub fn take_initiative(cx: &mut Cx, player: PlayerId) {
         let is = p == player;
         cx.st().update_player(p, |pl| pl.initiative = is);
     }
-    let intrinsic = cx.cards().intrinsic;
-    queue(cx, intrinsic, INITIATIVE_VENTURE, player, Target::None);
+    // What watches a player taking it (their venture, CR 726.2) sees it.
+    cx.emit(Event::TookInitiative { player });
 }
 
 /// Venturing into the Undercity (CR 701.49): enter it at its first room; or from a room move on along an arrow, the
