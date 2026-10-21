@@ -1,0 +1,46 @@
+# Buster Sword's "a spell from your hand with mana value less than or equal to that damage": Ornithopter (0/2, +3/+2)
+# deals 3. Turn // Burn has fuse, and in Bot1's hand it could be cast fused (CR 702.102a), but the fused spell's mana value
+# is both halves' together, 3 + 2 = 5 (CR 702.102c, 709.4b), over 3: only the halves are offered, judged one at a time
+# (CR 709.3a). Bot1 casts Burn at Bot2: 20 - 3 - 2 = 15. The fused cast at 5 damage is
+# buster-sword-casts-turn-burn-fused-for-five-damage.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Turn // Burn
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Choose(Turn // Burn)
+! Bot1.Modes(Fuse)
+Bot1.Modes(Burn)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Turn // Burn
+Stack.Count = 0

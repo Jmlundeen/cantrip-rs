@@ -53,7 +53,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
 | [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
-| [KI-115](#ki-115-a-fuse-card-cannot-be-cast-fused-while-a-spell-or-ability-resolves) | A fuse card cannot be cast fused while a spell or ability resolves | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
@@ -318,18 +317,6 @@ a creature.
   its unlock).
 A fix gives each a capacity past practical play, handled gracefully at its bound; a check of every card's lists at table
 construction for the bands; and the modes kept as the chosen indices in order.
-
-**Scenarios.** None yet.
-
-### KI-115: A fuse card cannot be cast fused while a spell or ability resolves
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine | 2026-10-21, a comment that pointed here with no entry |
-
-**Notes.** A split card with fuse in its owner's hand may be cast fused (CR 702.102a), and a resolving effect that lets its
-controller cast a card from their hand offers the ways it could be cast (`Game::cast_ways_during_resolution`, CR 608.2g).
-The fused cast is not among them, so it is not offered there.
 
 **Scenarios.** None yet.
 

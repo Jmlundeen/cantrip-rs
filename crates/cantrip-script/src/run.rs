@@ -1593,12 +1593,18 @@ impl<'s> Run<'s> {
             }
             RequestKind::ChooseModes { modes, .. } => {
                 let mut chosen = Vec::new();
+                // A mode named by its text that the question does not have at all is not offered, which is what the line
+                // says (a fused cast over a mana-value limit, `! Bot1.Modes(Fuse)`): pair it with the line where it is.
+                let mut absent = false;
                 for spec in action.positional() {
                     let index = match spec.trim().parse::<usize>() {
                         Ok(n) if n >= 1 => n - 1,
                         _ => match modes.iter().position(|m| label_text(m).to_lowercase().contains(&spec.trim().to_lowercase())) {
                             Some(i) => i,
-                            None => return fail(format!("line {line}: no mode reads \"{spec}\"")),
+                            None => {
+                                absent = true;
+                                continue;
+                            }
                         },
                     };
                     if index >= modes.len() {
@@ -1607,7 +1613,7 @@ impl<'s> Run<'s> {
                     chosen.push(index as u8);
                 }
                 // The rules' own check of the answer (a mode twice is refused unless the question lets a mode repeat).
-                if check_answer(&self.game, request, &Answer::Modes(chosen)).is_ok() {
+                if !absent && check_answer(&self.game, request, &Answer::Modes(chosen)).is_ok() {
                     return fail(format!("line {line} says {text} must not be a choice the question allows, but it is"));
                 }
             }
