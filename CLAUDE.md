@@ -34,7 +34,11 @@ practically print. Combinations of cards can explode exponentially, and that is 
 a practical scale: a 32-bit count, say, where a combo can push past 255 or 32,767 within a timed game, but no need for
 unbounded storage. Beyond those bounds a case may be left unhandled, as an entry in `docs/known-issues.md` marked
 "Won't fix: beyond practical scale", naming the limit, what happens past it, and why play cannot reach it; it is fixed
-when a practical reason appears.
+when a practical reason appears. Reaching such a bound is handled gracefully: it never crashes (no panic, no `expect`,
+no overflow - release builds wrap silently, so use saturating or checked arithmetic), and it does what makes the most
+sense for the situation. A mana pool or a counter stops growing rather than wrapping; an object with as many abilities
+as it can hold is granted no more; a list that is full takes no more entries. It never turns into a different, wrong
+value.
 
 **Bug priority.** Pri-0 is a crash, a hang, a desync or a game that cannot go on. Pri-1 is any rules violation, however
 rare the interaction and whether or not a printed card reaches it today. Both are blockers: one found is fixed before
