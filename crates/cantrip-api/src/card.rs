@@ -1144,6 +1144,39 @@ pub enum TriggeredMana {
     ChosenColor,
 }
 
+/// What a half of a fuse card has that the core's fused split spell (CR 702.102) does not make - each a choice or cost of
+/// its own as a spell is cast (CR 601.2b-f), or text the core runs otherwise - named for the refusal; none for a half the
+/// fused spell plays exactly. No printed fuse card has any of these.
+pub fn fused_half_unbuilt(half: &CardDef) -> Option<&'static str> {
+    [
+        (half.spell.is_none(), "no spell"),
+        (half.modal.is_some(), "modes"),
+        (half.modes_up_to.is_some(), "a number of modes"),
+        (half.cost.x > 0, "an {X}"),
+        (half.kicker.is_some(), "a kicker"),
+        (half.optional_cost.is_some(), "an optional additional cost"),
+        (half.additional_cost.is_some(), "an additional cost"),
+        (!half.additional_choice.is_empty(), "a choice of additional costs"),
+        (half.gift.is_some(), "a gift"),
+        (half.divide.is_some(), "a divided total"),
+        (half.late_targets, "targets chosen late"),
+        (half.cost_of_targets.is_some(), "a cost read from its targets"),
+        (half.cast_fact.is_some(), "a fact kept as it is cast"),
+        (!half.end_step_riders.is_empty(), "an end step rider"),
+        (!half.ways.is_empty(), "ways of its own to be cast"),
+        (half.overload.is_some(), "overload"),
+        (half.cast_only_if.is_some(), "a condition on casting it"),
+        (!half.own_cost_changes.is_empty(), "its own cost changes"),
+        (half.pay_with.any(), "convoke, delve or improvise"),
+        (half.cast_as_though_flash, "a cast as though it had flash"),
+        (half.paradigm.is_some(), "paradigm"),
+        (half.rebound, "rebound"),
+        (half.splice.is_some(), "splice"),
+    ]
+    .into_iter()
+    .find_map(|(has, what)| has.then_some(what))
+}
+
 /// A triggered ability (CR 603).
 #[derive(Clone, Copy)]
 pub struct TriggeredDef {
@@ -2704,6 +2737,17 @@ impl CardTable {
             // battlefield.
             for s in card.statics.iter().filter(|s| s.layer == Layer::Control) {
                 assert!(!s.everywhere && !s.own && !s.continues, "{}: a control-changing static ability affects other permanents", card.name);
+            }
+            // A fused split spell is made by the core from its halves' targets and instructions alone (CR 702.102b-d): a half
+            // with a choice or cost of its own as it is cast (CR 601.2b-f), or text the core would have to run another way,
+            // would be cast fused without it, so such a card is refused rather than played wrong.
+            if card.fuse {
+                assert!(card.spell.is_none(), "{}: a fuse card's fused spell is made from its halves; it has no spell of its own", card.name);
+                let Some((left, right)) = card.split else { panic!("{}: fuse is a split card's (CR 702.102a)", card.name) };
+                for half in [left, right] {
+                    let unbuilt = fused_half_unbuilt(half);
+                    assert!(unbuilt.is_none(), "{}: its half {} has {}, which a fused cast does not make (CR 702.102)", card.name, half.name, unbuilt.unwrap_or(""));
+                }
             }
             // And what one that sets land subtypes took (`layers::land_text_lost`): it affects lands on the battlefield.
             for s in card.statics.iter().filter(|s| s.sets_land_subtypes) {

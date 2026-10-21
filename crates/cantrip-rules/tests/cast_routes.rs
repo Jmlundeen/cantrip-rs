@@ -1041,3 +1041,26 @@ fn every_way_a_permanent_gives_is_a_cast_of_its_own_with_its_own_terms() {
     assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by().is_some_and(|g| g.object == grantors[8]))));
 }
 
+
+static FUSED_PLAIN_HALF: CardDef = CardDef { name: "Route Fused Plain Half", ..PROBE_SPELL };
+static FUSED_X_HALF: CardDef = CardDef { name: "Route Fused X Half", cost: ManaCost { x: 1, ..ManaCost::ZERO }, ..PROBE_SPELL };
+static FUSED_MODAL_HALF: CardDef = CardDef { name: "Route Fused Modal Half", modal: Some(&FUSED_MODES), ..PROBE_SPELL };
+static FUSED_MODES: ModalDef = ModalDef { modes: &[], min: 1, max: 1, escalate: None, repeat: false, allowed: None, when_paid: None };
+static FUSE_WITH_X: CardDef =
+    CardDef { name: "Route Fuse With X", oracle: true, split: Some((&FUSED_X_HALF, &FUSED_PLAIN_HALF)), fuse: true, ..CardDef::BLANK };
+static FUSE_WITH_MODES: CardDef =
+    CardDef { name: "Route Fuse With Modes", oracle: true, split: Some((&FUSED_PLAIN_HALF, &FUSED_MODAL_HALF)), fuse: true, ..CardDef::BLANK };
+
+/// CR 702.102, 601.2b: a fused split spell is made from its halves' targets and instructions alone, so a fuse card whose half
+/// has a choice of its own as it is cast (an {X}, modes) would be cast fused without it: the table refuses to be built.
+#[test]
+#[should_panic(expected = "Route Fuse With X: its half Route Fused X Half has an {X}")]
+fn a_fuse_card_with_an_x_half_is_refused() {
+    let _ = CardTable::new([&FUSE_WITH_X, &FUSED_X_HALF, &FUSED_PLAIN_HALF]);
+}
+
+#[test]
+#[should_panic(expected = "Route Fuse With Modes: its half Route Fused Modal Half has modes")]
+fn a_fuse_card_with_a_modal_half_is_refused() {
+    let _ = CardTable::new([&FUSE_WITH_MODES, &FUSED_MODAL_HALF, &FUSED_PLAIN_HALF]);
+}
