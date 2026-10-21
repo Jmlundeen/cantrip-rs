@@ -880,7 +880,9 @@ cast (CR 118.9a); additional costs and cost increases still apply to it (CR 118.
 cost the way names (CR 107.3a-b): a cost that is or includes the mana cost has its {X}; `Cost::NONE`, "without paying its
 mana cost", leaves X 0. A card with no mana cost may be cast that way (CR 118.6a). The host marks a cast for nothing
 `WithoutPayingManaCost`, with the cost it comes to as its `CostText`, and the tactical bot takes it over the card's ordinary
-cast. Not built: emblems that give one (Tamiyo, Field Researcher's): KI-44.
+cast. An emblem gives ways and alternative costs as a permanent does (CR 114.4: its abilities function in the command
+zone), so Tamiyo, Field Researcher's "You may cast spells from your hand without paying their mana costs" is a
+`SpellAlternative` on its emblem; nothing else in the command zone gives any (CR 113.6).
 
 ### Alternative costs a permanent gives the spells a player casts
 

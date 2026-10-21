@@ -682,7 +682,8 @@ fn emblem(game: &mut RulesGame, name: &str, player: PlayerId) -> ObjectId {
 
 /// CR 114.4, 118.9: an emblem's static abilities function in the command zone, so one that gives spells an alternative
 /// cost (Tamiyo, Field Researcher's "You may cast spells from your hand without paying their mana costs") or cards a way
-/// to be cast (CR 604) offers that cast, made by the emblem; another player's emblem gives nothing to its owner's opponent.
+/// to be cast (CR 604) offers that cast, made by the emblem; another player's emblem gives nothing to its owner's opponent,
+/// and a card in the command zone (a commander) gives nothing.
 #[test]
 fn an_emblem_gives_an_alternative_cost_and_a_way() {
     let (mut game, spell) = game_with("Route Probe", Zone::hand, 0);
@@ -691,6 +692,10 @@ fn an_emblem_gives_an_alternative_cost_and_a_way() {
     emblem(&mut game, "Route Free Emblem", PlayerId(1));
     game.run();
     assert!(casts_of(&game, spell).is_empty(), "the opponent's emblem gives its owner's spells alone");
+    let (mut game, spell) = game_with("Route Probe", Zone::hand, 0);
+    emblem(&mut game, "Route Free Alternative", ME);
+    game.run();
+    assert!(casts_of(&game, spell).is_empty(), "a card in the command zone, no emblem, gives nothing (CR 113.6)");
     let (mut game, spell) = game_with("Route Probe", Zone::hand, 0);
     let free = emblem(&mut game, "Route Free Emblem", ME);
     game.run();

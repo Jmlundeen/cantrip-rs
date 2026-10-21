@@ -2494,7 +2494,10 @@ fn given<T>(
     name: fn(CardId, usize) -> AbilityRef,
 ) -> Vec<Given<T>> {
     let mut all = Vec::new();
-    for &id in s.battlefield().iter().chain(s.zone(Zone::COMMAND)) {
+    // Of the command zone, the emblems alone: an emblem has no types (CR 114.3), and anything else there (a commander) has
+    // its abilities function on the battlefield only (CR 113.6).
+    let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| cards.get(cards.current(s.obj(id))).types == TypeSet::NONE);
+    for &id in s.battlefield().iter().chain(emblems) {
         let obj = s.obj(id);
         let card = cards.current(obj);
         let items = list(cards.get(card));
