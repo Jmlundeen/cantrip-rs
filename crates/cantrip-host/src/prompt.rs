@@ -1563,8 +1563,9 @@ fn subtype_heading(source: &str, choices: &[Subtype], purpose: WordUse) -> Strin
 }
 
 /// A count or mana value as the protocol's `int`: exactly, or past its range the most it holds. A count of things that
-/// happen never reaches it - the event cap bounds them at 2^21 (`MAX_GAME_EVENTS`; `docs/rules-exceptions.md`, RX-1) - and
-/// a mana value is made of a cost's symbols and its X, far inside it; the bound is there so that nothing sent wraps negative.
+/// happen is bounded between frames by the event cap, 2^21 (`MAX_GAME_EVENTS`; `docs/rules-exceptions.md`, RX-1), and within
+/// one frame only by memory; a mana value is made of a cost's symbols and its X. The bound is there so that nothing sent
+/// wraps negative.
 pub(crate) fn wire(n: u32) -> i32 {
     i32::try_from(n).unwrap_or(i32::MAX)
 }

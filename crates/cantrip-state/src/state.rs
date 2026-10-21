@@ -307,7 +307,8 @@ impl std::hash::Hash for Journal {
 }
 
 /// How to undo one write. A position in a list is a `u32`: every list is of objects or entries the game's events made,
-/// which the event cap bounds (`docs/rules-exceptions.md`, RX-1) far inside it.
+/// which the event cap bounds between frames (`docs/rules-exceptions.md`, RX-1) far inside it; within one frame, memory
+/// bounds them first (2^32 entries are tens of gigabytes).
 #[derive(Clone, Debug)]
 pub enum Undo {
     Object(ObjectId, Box<Obj>),

@@ -141,8 +141,7 @@ round, is refused. Every other loop goes on for as long as its players choose (n
 - (c) A mana ability whose whole cost is {T} is treated as no choice when nothing more mana could pay for is castable, even
   when its effect does more than add mana (a painland's damage).
 - (d) The watch begins only in a step with `BUSY_STEP` events, so a loop is found at its first round after that - some tens
-  of rounds in - rather than at its second round. Past `KEPT` questions in one step the watch starts over, and finds the
-  loop again within two rounds.
+  of rounds in - rather than at its second round. From then on it keeps every question of the step.
 - (e) State triggers (CR 603.8): a card's text is one instruction unless it marks a sentence's end with `end_sentence`,
   which only some cards do (every Oracle sentence needs one), and a staged frame (`Game::ask_then`) drops a pending
   `state_check_due` when it suspends.
