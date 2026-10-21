@@ -12,8 +12,8 @@ Mox Sapphire
 Redshift, Rocketeer Chief
 Black Lotus
 Black Lotus
-Dedicated Commons
 Chandra, Chill of Compliance
+Dedicated Commons
 Island x10
 
 [Bot2 Deck]
@@ -44,7 +44,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Exhaust)
 Bot1.Pass
 Bot2.Pass
-Bot1.Choose(Dedicated Commons; Chandra, Chill of Compliance)
+Bot1.Choose(Chandra, Chill of Compliance; Dedicated Commons)
 [T7 Bot1.Main2]
 
 [Expect]
