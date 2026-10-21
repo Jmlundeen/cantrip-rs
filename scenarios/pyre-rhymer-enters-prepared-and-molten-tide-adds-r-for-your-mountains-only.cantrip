@@ -1,0 +1,57 @@
+# Pyre Rhymer has prowess and enters prepared (CR 722.3a), a copy of Molten Tide waiting in exile. Turn 7 Bot1 casts that
+# copy, an instant: prowess makes the Rhymer 4/4 (its trigger resolves first, then Molten Tide). "Until end of turn, whenever you tap a Mountain for mana, add an
+# additional {R}": a delayed triggered mana ability (CR 603.7b, 605.1b) that resolves at once with the tap (CR 605.4a), the
+# stack empty. Volcanic Island, an Island Mountain, tapped for {U} adds the additional {R} too; an Island adds nothing more.
+# "You" is Molten Tide's controller (CR 603.7d): Bot2 tapping its own Mountain in Bot1's end step gets {R} alone. It ends
+# with the turn: on turn 9 a Mountain makes {R} alone.
+
+[Bot1 Deck]
+Mountain
+Pyre Rhymer
+Mountain
+Mountain
+Volcanic Island
+Island
+Mountain x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Pyre Rhymer.Cast
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Pyre Rhymer.Prepared = true
+? Exile = Molten Tide
+[T7 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Exile.Molten Tide.Cast
+? Bot1.Battlefield.Pyre Rhymer.Prepared = (absent)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mountain#2.Activate
+? Stack.Count = 0
+? Bot1.Battlefield.Pyre Rhymer.Power = 4
+? Bot1.Mana = {R}{R}
+? Bot1.ManaFrom = {R} Molten Tide; {R} Mountain
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {U})
+? Bot1.Mana = {U}{R}{R}{R}
+[T7 Bot1.End]
+Bot2.Battlefield.Mountain.Activate
+? Bot2.Mana = {R}
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mountain#3.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Pyre Rhymer.Power = 3
