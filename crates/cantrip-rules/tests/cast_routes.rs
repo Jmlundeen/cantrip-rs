@@ -174,6 +174,8 @@ static FREE_ALTERNATIVE: CardDef = CardDef {
 
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
+static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
     TABLE.get_or_init(|| {
@@ -204,6 +206,7 @@ fn table() -> &'static CardTable {
             &GRANTOR_8,
             &EXILE_PERMISSION,
             &FREE_ALTERNATIVE,
+            &LAND,
         ])
     })
 }
@@ -454,6 +457,55 @@ fn a_cast_by_a_permission_not_offered_is_refused() {
     forged.granted_by = None;
     assert!(game.answer(request.id, request.player, Answer::Act(forged)).is_err());
     assert!(game.pending().is_some());
+}
+
+/// An action naming an alternative cost the question did not offer it for is refused too: by a permanent that gives none,
+/// or beside a permission that names its own cost (CR 118.9a).
+#[test]
+fn a_cast_for_an_alternative_cost_not_offered_is_refused() {
+    let (mut game, spell) = game_with("Route Probe", Zone::graveyard, 1);
+    let source = put(&mut game, "Route Permission Source", ME);
+    let payer = put(&mut game, "Route Free Alternative", ME);
+    game.state.permission_push(permission(spell, source, PlayGrant { instead: Some(ManaCost { generic: 1, ..ManaCost::ZERO }), ..PlayGrant::CAST }));
+    game.run();
+    let request = game.pending().unwrap().clone();
+    let option = casts_of(&game, spell).into_iter().find(|o| by(o) == Some(source)).expect("the permission's cast");
+    assert!(option.paid_by.is_none());
+    for paid_by in [
+        Grant { object: payer, ability: AbilityRef::spell_alternative(game.state.obj(payer).card, 0) },
+        Grant { object: source, ability: AbilityRef::spell_alternative(game.state.obj(source).card, 0) },
+    ] {
+        let mut forged = Action::of(&option);
+        forged.paid_by = Some(paid_by);
+        assert!(game.answer(request.id, request.player, Answer::Act(forged)).is_err());
+    }
+    assert!(game.pending().is_some());
+}
+
+/// CR 305.1, 614.1c: a land two permissions would each let be played is two land plays; the one chosen is the one it is
+/// played by, so it enters tapped only by the permission that says so, and the history records which it was.
+#[test]
+fn a_land_two_permissions_let_be_played_is_played_by_the_one_chosen() {
+    for tapped in [true, false] {
+        let (mut game, land) = game_with("Route Land", Zone::exile, 0);
+        let (slow, fast) = (put(&mut game, "Route Permission Source", ME), put(&mut game, "Route Permission Source", ME));
+        let lands = |enters_tapped| PlayGrant { lands: true, enters_tapped, ..PlayGrant::CAST };
+        game.state.permission_push(permission(land, slow, lands(true)));
+        game.state.permission_push(permission(land, fast, lands(false)));
+        game.run();
+        let request = game.pending().unwrap().clone();
+        let RequestKind::Priority { options } = &request.kind else { panic!("priority") };
+        let plays: Vec<ActionOption> = options.iter().filter(|o| o.kind == ActionKind::PlayLand && o.source == Some(land)).cloned().collect();
+        assert_eq!(plays.len(), 2, "{plays:?}");
+        let want = if tapped { slow } else { fast };
+        let play = plays.iter().find(|o| by(o) == Some(want)).expect("each permission's play");
+        game.answer(request.id, request.player, Answer::Act(Action::of(play))).unwrap();
+        game.run();
+        let card = table().find("Route Land").unwrap();
+        let on = game.state.battlefield().iter().copied().find(|&id| game.state.obj(id).card == card).expect("on the battlefield");
+        assert_eq!(game.state.obj(on).tapped, tapped);
+        assert!(game.log.iter().any(|r| matches!(r.event, Event::LandPlayed { land, granted_by, .. } if land == on && granted_by.some().map(|g| g.object) == Some(want))));
+    }
 }
 
 /// CR 118.9a: by a permission that names its own cost, the card's zone-free alternative cost is not offered; by one that

@@ -130,8 +130,9 @@ pub fn translate(
             {
                 let alike = |o: &&ActionOption| o.kind == action.kind && o.source == action.source && o.index == action.index;
                 let taken = if a.option_id != 0 {
-                    usize::try_from(a.option_id - 1)
-                        .ok()
+                    a.option_id
+                        .checked_sub(1)
+                        .and_then(|i| usize::try_from(i).ok())
                         .and_then(|i| options.get(i))
                         .filter(alike)
                         .ok_or_else(|| Untranslatable::Illegal("that option is not one this question offers".into()))?

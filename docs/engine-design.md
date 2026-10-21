@@ -835,7 +835,11 @@ Forge's, Case of the Locked Hothouse's) - and by each route, each face it allows
 mana cost or what the route names instead, for each alternative cost another object gives where the route names none (CR
 118.9a), and for the card's own ways that name no zone (CR 118.9: evoke from exile by a permission; not warp, CR 702.185a).
 A way a permanent gives that is its cost too (escape, mayhem, Iroh's flashback) is offered beside them. Nothing is
-first-found: Citadel and Mystic Forge both out offer both casts of the top card, and the player chooses (CR 601.2b). The
+first-found: Citadel and Mystic Forge both out offer both casts of the top card, two Yawgmoth's Wills two casts of a card in
+the graveyard, and the player chooses (CR 601.2b). Land plays are offered the same way (`land_plays`): by the rules from a
+hand, and by each rule for the graveyard or the library's top (Crucible-like rules, Yawgmoth's Will, Bolas's Citadel, Case of
+the Locked Hothouse), each way a permanent gives (Serra Paragon) and each permission, every one its own option. Additional
+land plays (CR 305.2) are counted together, as no card cares which allowed a play. The
 common case pays as before: a card in hand has the one route, and the rest is looked for only where a card is in another
 zone, each list built lazily once per pass, and a face other than the card itself judged through a view of it only where
 there is a face to judge. The records keep a grant in eight bytes (`Grant::NONE` for none) rather than an `Option`'s twelve.
@@ -852,7 +856,8 @@ each cast and land play was made by, so "once during each of your turns" is a hi
 (`cantrip_mechanics::history::permission_used_this_turn`, which Lurrus and Serra Paragon share) and "if you cast it this
 way" can be one. Riders that outlive the cast are attached at cast from the action's grant (Serra Paragon's "it gains", a
 way's flashback). The activation side has no grants yet: an ability another permanent gives (Cryptolith Rite's mana
-ability) is offered as an entry of the creature's computed ability list, and `AbilityActivated` does not record its giver.
+ability) is offered as an entry of the creature's computed ability list, and `AbilityActivated` does not record its giver;
+an ability's alternative cost is still found first and asked as it is announced (KI-92).
 
 **Cost changes are one list** matched against what is costed (`Costed`: a spell, an ability, a special action, CR 116.1),
 asked once the targets and X are announced (CR 601.2f): "can't reduce the mana in that cost to less than one mana"
@@ -862,7 +867,7 @@ applies to it.
 **On the wire** the host numbers each option of a question (`ActionOptionMessage::OptionId`, from 1) and the client echoes
 it (`TakeActionAnswer::OptionId`): the grants stay engine-side, so no hidden object leaks, and an answer naming an option by
 kind, source and index alone is refused where two options share them. A cast another object makes possible says which on
-its menu row where its cost does not (`describe`): "Mystic Forge", "Retrace", "Yawgmoth's Will", "Pay {E} rather than its
+its menu row where its cost does not (`describe`), and so does a land play: "Mystic Forge", "Retrace", "Yawgmoth's Will", "Pay {E} rather than its
 mana cost (Lurrus of the Dream-Den)"; an ordinary cast reads as it always has.
 
 ### Ways a permanent gives: from a graveyard or from a hand

@@ -93,6 +93,9 @@ keeps it).
 | [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
 | [KI-87](#ki-87-screaming-nemesis-judges-a-player-is-dealt-damage-this-way-on-the-target-not-the-recipient) | Screaming Nemesis judges "a player is dealt damage this way" on the target, not the recipient | Low | Suspected |
+| [KI-90](#ki-90-a-land-played-somewhere-other-than-the-battlefield-or-by-an-effect-records-no-land-play) | A land played somewhere other than the battlefield, or by an effect, records no land play | Low | Unexercised |
+| [KI-91](#ki-91-an-energy-cost-is-not-judged-again-once-mana-abilities-have-been-activated) | An energy cost is not judged again once mana abilities have been activated | Low | Unexercised |
+| [KI-92](#ki-92-an-activation-records-nothing-of-what-gave-it-and-its-alternative-cost-is-found-first) | An activation records nothing of what gave it, and its alternative cost is found first | Low | Open |
 
 ## Issues
 
@@ -141,7 +144,7 @@ the line goes.
 | --- | --- | --- |
 | Retargeting a copy (`ops::retarget`): "up to" slots of a modal spell, each-opponent slots, spliced text (CR 702.47c) and kicked-spell targets | nothing | No modal spell in content has an "up to" mode target, no copyable spell has an each-opponent target, and no scenario copies a spliced or kicked spell. |
 | A granted static ability that affects other objects taken by a later "loses all abilities" (`layers::granted_to_others`: the `LoseAllAbilities` clear and the `has.abilities` filter) | The Irencrag's own "loses all other abilities" before its grants | No implemented card makes a noncreature artifact lose all abilities while it stays an Equipment (Oko's +1 makes Everflame an Elk creature, which unattaches it). |
-| A granted cast of a back face (`GRANTED_FACE_BACK`, `faces_to_cast`) | nothing | No implemented double-faced card has a castable back face. |
+| A granted cast of a back face (`WAY_BACK_FACE` by a way a permanent gives, `faces_to_cast`) | nothing | No implemented double-faced card has a castable back face. |
 | A flash grant judged for an MDFC back face or a bestowed Aura through `actions::Speed::face`, beyond Sigarda's Aid's bestow | nothing | No implemented double-faced card has a castable noncreature back face; no flash grant names creatures. |
 | The transformed cast's `cast_only_if_met` check (`could_cast_transformed_during_resolution`) | nothing | Only Berserk has a "cast only" condition, and it has no back face. |
 | A "loses all abilities" effect older than an ability granted later (CR 613.1f, 613.7) | Rust test | No implemented card does both. |
@@ -466,22 +469,22 @@ at the cost of their characteristics part-way through the layer.
 
 **Scenarios.** None: no pair of implemented cards reaches it.
 
-### KI-42: A permission's "enters tapped" is judged from where the land is, not from the way it was played
+### KI-42: A land a resolving effect plays is judged entering tapped by any permission on it
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | engine | 2026-10-16, review of Lightstall Inquisitor |
 
 **Notes.** "Each land played this way enters tapped" (CR 305.1, 614.1c; `PlayGrant::enters_tapped`) is the core's replacement
-`replace::Origin::PlayedTapped`, which works out from the land's zone and the permissions on it (`actions::land_play_permission`)
-whether the land play was made by the permission: the action does not carry the way it was played. Two paths would get it wrong,
-and no printed card in the engine reaches either: a land with such a permission played by a resolving effect instead
-(`actions::play_land_during_resolution`, which would enter tapped though it was not "played this way"), and a land in a graveyard
-with such a permission played by a way a permanent grants (`granted_slot`), which `played_by_permission_from` does not know of.
-Of several ways that could play the same land, the engine also takes the one that lets it enter untapped rather than asking. A fix
-carries the permission used on the PlayLand move into the entry's `ZoneChange`.
+`replace::Origin::PlayedTapped`, which applies while a permission that says so stands on the land as it enters. A land play
+with priority keeps only the permission its action names (`ActionOption::granted_by`; `actions::act` drops the card's
+others as it moves), so a land played by another way enters untapped. A land a resolving effect plays
+(`actions::play_land_during_resolution`) keeps every permission on it, so one that has such a permission enters tapped though
+it was not "played this way". A fix drops the card's permissions there too, before it moves. No printed card in the engine
+both plays a land by an effect and could face a Lightstall Inquisitor's card.
 
-**Scenarios.** None yet: no card in the engine both plays a land by an effect and could face a Lightstall Inquisitor's card.
+**Scenarios.** None yet. The choice of permission with priority is `crates/cantrip-rules/tests/cast_routes.rs`
+(`a_land_two_permissions_let_be_played_is_played_by_the_one_chosen`).
 
 ### KI-43: A modal double-faced card's back face cast by a permission is not exercised
 
@@ -491,7 +494,7 @@ carries the permission used on the PlayLand move into the entry's `ZoneChange`.
 
 **Notes.** A permission to cast a card from where it is (CR 601.3) now lets a modal double-faced card be cast as its back face
 (CR 712.11b) and a split card as either half (CR 709.3, an aftermath half only from a graveyard), for what the permission says
-to pay (`actions::castable`, `face_cast`). The split halves are proven (Inside Information with Life // Death); no card in
+to pay (`actions::castable`, `cast_face`). The split halves are proven (Inside Information with Life // Death); no card in
 content is a modal double-faced card whose back face is a spell rather than a land, so the back-face cast from exile runs in no
 scenario. (Two transforming cards, Jennifer Walters and Norman Osborn, give their back faces a mana cost in content, which makes
 `back.has_cost` true for them; whether that offers a back-face cast it should not is worth a look.) A scenario is owed when a
@@ -1076,3 +1079,48 @@ nothing misbehaves; a worded token that enters attacking but untapped would. Fix
 `create_tokens_attacking` now does, with the mobilize caller passing `true`.
 
 **Scenarios.** None (no card reaches it).
+
+### KI-90: A land played somewhere other than the battlefield, or by an effect, records no land play
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-20, review of the action model |
+
+**Notes.** A land play records `Event::LandPlayed` with the face played and what made it possible (`actions::act`), which
+"once during each of your turns" asks (`history::permission_used_this_turn`: Serra Paragon). It is recorded only once the land
+is on the battlefield: a land a replacement sends elsewhere as it is played (CR 614.1) records none, though it was played and
+the permission used. Nor does `actions::play_land_during_resolution` record one (CR 305.1, 608.2g: "you may play that card").
+Neither reaches a once-per-turn permission with a printed card in the engine. A fix records the play as the land moves, with
+the object it became, wherever that is.
+
+**Scenarios.** None (no card reaches it).
+
+### KI-91: An energy cost is not judged again once mana abilities have been activated
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-20, review of the action model |
+
+**Notes.** An energy cost (`Cost::energy`, CR 107.14: Primal Prayers' {E}) is judged payable as the cast or activation is
+offered and paid with the rest of the cost (`actions::pay_life_and_counters`). A mana ability activated while the cost is paid
+(CR 601.2g) that cost energy would leave too few to pay it, and the payment would be made from what remains, never below none,
+rather than the cast being taken back (CR 601.2h). No mana ability in content costs energy (Aether Hub is not built).
+
+**Scenarios.** None (no card reaches it).
+
+### KI-92: An activation records nothing of what gave it, and its alternative cost is found first
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-20, the action model |
+
+**Notes.** A cast or a land play is offered by every permission that would allow it, each with what made it possible
+(`ActionOption::granted_by`), and is recorded with it. An activation is not: an ability another permanent gives (Cryptolith
+Rite's mana ability, a static's granted activated ability) is an entry of the object's computed ability list, the layers
+knowing the giving card and not the giving object, so `Event::AbilityActivated` records nothing of it and two such givers are
+one option. And `actions::activate` asks for an alternative cost of the ability (`static_rules::activation_alternative`, CR
+118.9, 602.2b: Forge Anew's {0} equip) as a "you may" while it is announced, found first among the permanents that give one,
+rather than offering each as an option of its own. To be brought onto the cast's model (`granted_by`, `paid_by`) when a
+printed card needs it: two givers of one ability, or a history question about one.
+
+**Scenarios.** None.

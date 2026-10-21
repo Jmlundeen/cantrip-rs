@@ -2195,14 +2195,16 @@ fn play_condition_holds(cx: &Cx, player: PlayerId, when: PlayCondition) -> bool 
     }
 }
 
-/// The effect that lets `player` play lands and cast spells from their graveyard now (`EffectKind::PlayFromGraveyard`:
-/// Yawgmoth's Will), as the `Grant` a play or cast by it is made by: the spell whose effect it is.
-fn graveyard_play(cx: &Cx, player: PlayerId) -> Option<Grant> {
+/// The effects that let `player` play lands and cast spells from their graveyard now (`EffectKind::PlayFromGraveyard`:
+/// Yawgmoth's Will), each as the `Grant` a play or cast by it is made by: the spell whose effect it is. Two are two
+/// permissions, each its own option. Nothing is allocated while there is none.
+fn graveyard_play(cx: &Cx, player: PlayerId) -> Vec<Grant> {
     cx.s()
         .effects
         .iter()
-        .find(|e| e.kind == EffectKind::PlayFromGraveyard && e.controller == player)
+        .filter(|e| e.kind == EffectKind::PlayFromGraveyard && e.controller == player)
         .map(|e| Grant { object: e.source, ability: AbilityRef::spell(cx.s().obj(e.source).card) })
+        .collect()
 }
 
 /// The play rules that apply to `player` now (`CardDef::play_rules`), each with the permanent whose rule it is: those of the
@@ -2281,17 +2283,17 @@ fn play_rule_at(cards: &CardTable, ability: AbilityRef) -> Option<&'static PlayR
 }
 
 /// What `player`'s permanents let them do about land plays (CR 305.2) and the top of their library (CR 305.1, 601.3).
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Default)]
 struct LandRules {
     /// The land plays beyond the one.
     extra: u32,
     /// No limit to the land plays.
     unlimited: bool,
-    /// Lands may be played from the graveyard: what lets them (Icetill Explorer's rule, Yawgmoth's Will).
-    graveyard: Option<Grant>,
-    /// Lands may be played from the top of the library: what lets them (Bolas's Citadel; Case of the Locked Hothouse,
+    /// What lets lands be played from the graveyard, each its own permission (Icetill Explorer's rule, Yawgmoth's Will).
+    graveyard: Vec<Grant>,
+    /// What lets lands be played from the top of the library, each its own (Bolas's Citadel; Case of the Locked Hothouse,
     /// solved).
-    top_lands: Option<Grant>,
+    top_lands: Vec<Grant>,
 }
 
 fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
@@ -2301,10 +2303,10 @@ fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
         PlayRule::ExtraLandPlays(n) => rules.extra += *n as u32,
         PlayRule::AnyNumberOfLandPlays => rules.unlimited = true,
         PlayRule::LandsFromGraveyard => {
-            rules.graveyard.get_or_insert(Grant { object: source, ability });
+            rules.graveyard.push(Grant { object: source, ability });
         }
         PlayRule::LibraryTop | PlayRule::LibraryTopLands => {
-            rules.top_lands.get_or_insert(Grant { object: source, ability });
+            rules.top_lands.push(Grant { object: source, ability });
         }
         PlayRule::LibraryTopSpells(_) | PlayRule::NoMaximumHandSize | PlayRule::LookAtLibraryTop | PlayRule::While(..) => {}
     });
@@ -2352,15 +2354,15 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
             options.push(ActionOption { granted_by: by, ..ActionOption::on(ActionKind::PlayLand, id, WAY_BACK_FACE) });
         }
     };
-    if let Some(by) = top_lands
-        && let Some(&top) = cx.s().zone(Zone::library(player)).first()
-    {
-        offer(top, Some(by), options);
+    if let Some(&top) = cx.s().zone(Zone::library(player)).first() {
+        for &by in &top_lands {
+            offer(top, Some(by), options);
+        }
     }
     for &id in cx.s().zone(Zone::hand(player)) {
         offer(id, None, options);
     }
-    if let Some(by) = graveyard {
+    for &by in &graveyard {
         for &id in cx.s().zone(Zone::graveyard(player)) {
             offer(id, Some(by), options);
         }
@@ -2817,8 +2819,8 @@ struct Offer<'a> {
     flash: TypeSet,
     /// Permanents whose static ability lets a kind of spell be cast as though it had flash (Sigarda's Aid).
     flash_granters: Vec<(ObjectId, PlayerId, &'static CardDef)>,
-    /// What lets the player cast spells from their graveyard (Yawgmoth's Will).
-    graveyard: Option<Grant>,
+    /// What lets the player cast spells from their graveyard (Yawgmoth's Will), each its own permission.
+    graveyard: Vec<Grant>,
     granted: std::cell::OnceCell<Vec<Given<GrantedWay>>>,
     exile_casts: std::cell::OnceCell<Vec<Given<ExileCast>>>,
     alternatives: std::cell::OnceCell<Vec<Given<SpellAlternative>>>,
@@ -3037,11 +3039,11 @@ impl<'a> Offer<'a> {
             ZoneKind::Graveyard if own => {
                 // The card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard"; or a
                 // rule that lets its owner cast spells from their graveyard (Yawgmoth's Will), which says nothing more.
+                // Each is a permission of its own (two Yawgmoth's Wills are two).
                 if def.keywords.has(Keyword::CastFromYourGraveyard) {
                     routes.push(Route::RULES);
-                } else if let Some(by) = self.graveyard {
-                    routes.push(Route::permission(Some(by), PlayGrant::CAST));
                 }
+                routes.extend(self.graveyard.iter().map(|&by| Route::permission(Some(by), PlayGrant::CAST)));
                 // Retrace (CR 702.81a), printed or given: a permission of the card's own, for a land card discarded. Its
                 // characteristics are read only on a pass that could cast it.
                 if !def.is(CardType::Land)
@@ -3493,10 +3495,38 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
             let _face_up = layers::judged_face_up(state, source);
             describe_cast(cards, state, log, option, source)
         }
-        // A land a way a permanent gives lets be played says the way (Serra Paragon's).
-        ActionKind::PlayLand if let Some(way) = option.granted_by.and_then(|g| named_way(state, cards, g)) => way.what.text.into(),
+        // A land a way a permanent gives lets be played says the way (Serra Paragon's); one a rule or an effect lets be played
+        // names it (Bolas's Citadel, Yawgmoth's Will), as a cast does, and so does a permission where another one would let
+        // the land be played too.
+        ActionKind::PlayLand => {
+            let printed = describe_way(cards, state, log, option, source);
+            match option.granted_by {
+                Some(g) if let Some(way) = named_way(state, cards, g) => way.what.text.into(),
+                Some(g) if permission_named(state, source, g) => match printed {
+                    "" => permission_name(cards, state, g).into(),
+                    printed => format!("{printed} ({})", permission_name(cards, state, g)).into(),
+                },
+                _ => printed.into(),
+            }
+        }
         _ => describe_way(cards, state, log, option, source).into(),
     }
+}
+
+/// What made an action possible, as the player knows it: the permanent, the spell, retrace.
+fn permission_name(cards: &CardTable, state: &GameState, g: Grant) -> String {
+    if g.ability.is_retrace() { "Retrace".to_string() } else { cards.get(state.obj(g.object).card).name.to_string() }
+}
+
+/// Whether a menu row names what made it possible: always a rule of a permanent's, a way it gives, retrace or an effect's
+/// say-so (Yawgmoth's Will); a play permission an effect gave only where another permission for the card would let it be
+/// played or cast too, so the rows read apart.
+fn permission_named(state: &GameState, source: ObjectId, g: Grant) -> bool {
+    g.ability.as_play_rule().is_some()
+        || g.ability.as_granted_way().is_some()
+        || g.ability.is_retrace()
+        || !state.permissions.iter().any(|p| p.card == source && p.by == g)
+        || state.permissions.iter().filter(|p| p.card == source).count() > 1
 }
 
 fn describe_cast(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption, source: ObjectId) -> std::borrow::Cow<'static, str> {
@@ -3516,10 +3546,7 @@ fn describe_cast(cards: &CardTable, state: &GameState, log: &[Record], option: &
     let reader = crate::resolve::Reader { cards, state, events: log };
     let player = asked_player(state);
     let through = option.granted_by.and_then(|_| through(&reader, cards, player, source, option.granted_by));
-    // What another object lets the cast be made by, as the player knows it: the permanent, the spell, retrace.
-    let permission = |g: Grant| -> String {
-        if g.ability.is_retrace() { "Retrace".to_string() } else { cards.get(state.obj(g.object).card).name.to_string() }
-    };
+    let permission = |g: Grant| permission_name(cards, state, g);
     // An alternative cost another object gives (CR 118.9): its own words, then the permission it is cast by, if any.
     if let Some(alternative) = option.paid_by.and_then(|g| named_alternative(state, cards, g)) {
         let text = of_face(alternative.what.text);
@@ -3567,14 +3594,7 @@ fn describe_cast(cards: &CardTable, state: &GameState, log: &[Record], option: &
                 return of_way(way.text);
             }
             // A play permission an effect gave names its source only where another one would let the card be cast too.
-            let named = match g.ability.as_play_rule().or(g.ability.as_granted_way()) {
-                Some(_) => true,
-                None => {
-                    g.ability.is_retrace()
-                        || !state.permissions.iter().any(|p| p.card == source && p.by == g)
-                        || state.permissions.iter().filter(|p| p.card == source).count() > 1
-                }
-            };
+            let named = permission_named(state, source, g);
             match (printed.is_empty(), named) {
                 (_, false) => printed.into(),
                 (true, true) => permission(g).into(),
@@ -3668,6 +3688,8 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 Through::Route(route) => (route, None),
                 Through::Way(way) => (Route { by: action.granted_by, ..Route::RULES }, Some(way)),
             };
+            // Another object's alternative cost is offered only where the cast pays no other (CR 118.9a).
+            debug_assert!(action.paid_by.is_none() || (!route.imposes() && way.is_none()), "an alternative cost beside another");
             let terms = CastTerms {
                 instead: if route.life() { Some(ManaCost::ZERO) } else { route.terms.instead },
                 any_type: route.terms.any_type,
