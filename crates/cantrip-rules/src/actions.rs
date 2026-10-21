@@ -2049,10 +2049,17 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 Timing::OwnTurn if cx.s().turn.active != player => continue,
                 // Suspend (CR 702.62a): whenever the card could be cast.
                 // "Could begin to cast this card by putting it onto the stack from your hand" (CR 702.62a): from the zone
-                // the ability works from, which is the zone the card would be cast from.
+                // the ability works from, which is the zone the card would be cast from, and only where nothing would stop
+                // that cast - a spell limit already reached (Archon of Emeria), the card's own "cast this spell only", a
+                // ban on spells like it (the suspend rulings: "any other effects that could stop you from casting it").
                 Timing::AsCast
                     if !(chars.is(CardType::Instant) || chars.has(Keyword::Flash) || sorcery_timing(cx, player))
-                        || cast_barred(cx, player).contains(zone) =>
+                        || cast_barred(cx, player).contains(zone)
+                        || !cast_only_if_met(cx, cx.card(cx.s().obj(id).card), &Asker { source: id, controller: player })
+                        || {
+                            let forbidders = static_rules::spell_forbidders(cx);
+                            !forbidders.is_empty() && static_rules::spell_forbidden(cx, &forbidders, player, id)
+                        } =>
                 {
                     continue;
                 }

@@ -36,7 +36,6 @@ keeps it).
 
 | ID | Issue | Severity | Status |
 | --- | --- | --- | --- |
-| [KI-1](#ki-1-suspend-ignores-a-spell-limit-already-reached) | Suspend ignores a spell limit already reached | Low | Suspected |
 | [KI-2](#ki-2-a-harmonize-cost-reduction-cannot-be-checked-in-the-browser) | A harmonize cost reduction cannot be checked in the browser | Low | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
@@ -102,22 +101,6 @@ keeps it).
 | [KI-97](#ki-97-a-leaving-players-objects-are-recorded-one-at-a-time-not-as-they-were-together) | A leaving player's objects are recorded one at a time, not as they were together | Low | Open |
 
 ## Issues
-
-### KI-1: Suspend ignores a spell limit already reached
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | engine | 2026-10-16, review of the cast-limit fix (`d9509b633`) |
-
-**Notes.** Suspend may be used "if you could begin to cast this card by putting it onto the stack from your hand"
-(CR 702.62a). The suspend action's `Timing::AsCast` gate in `crates/cantrip-rules/src/actions.rs` checks
-`static_rules::may_cast`, but not the spell limit of Archon of Emeria ("each player can't cast more than one spell each
-turn", CR 101.2) or the card's own "cast this spell only" condition, which casting checks through `may_begin_cast` and
-`cast_only_if_met`. So a player who has cast a spell this turn under Archon may still suspend Lotus Bloom. Confirm the
-reading against the suspend rulings first; if it holds, the gate calls `may_begin_cast` like every cast.
-
-**Scenarios.** None yet. Lotus Bloom (suspend 3, {0}) and Archon of Emeria are both implemented and can reach it,
-with a positive control that suspends it as the turn's first action.
 
 ### KI-2: A harmonize cost reduction cannot be checked in the browser
 

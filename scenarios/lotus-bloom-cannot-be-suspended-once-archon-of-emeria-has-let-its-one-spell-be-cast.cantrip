@@ -1,0 +1,40 @@
+# Suspend is a special action taken only when the card could begin to be cast (CR 702.62a; the rulings: consider "any
+# other effects that could stop you from casting it"). Under Archon of Emeria ("Each player can't cast more than one spell
+# each turn", CR 101.2) a player who has cast a spell this turn could not cast Lotus Bloom, so may not suspend it.
+# Turn 5: Bot1 suspends one Bloom (suspending is no cast, so the Archon may still be cast after it), casts the Archon, and
+# may not suspend the second. Turn 7 (the positive control): no spell cast yet, and the second Bloom is suspended.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Archon of Emeria
+Lotus Bloom
+Lotus Bloom
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Lotus Bloom.Suspend
+Bot1.Hand.Archon of Emeria.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Archon of Emeria.Tapped = false
+! Bot1.Hand.Lotus Bloom.Suspend
+[T7 Bot1.Main1]
+Bot1.Hand.Lotus Bloom.Suspend
+? Exile.Count = 2
+
+[Expect]
+Exile.Count = 2
