@@ -1,7 +1,8 @@
 //! "For as long as it has a [kind] counter on it" (CR 611.2b, `Duration::WhileCounter`) ended by the last such counter coming off
 //! in the ways no printed card in the engine pairs with the duration: a stun counter removed in place of an untap (CR 122.1d),
-//! ending a control-changing effect (`ops::end_counter_durations`, `refresh_control`), and counters removed as a cost (CR 118.3:
-//! Loch Mare's). Test cards make the effects, beside the printed cards and every other card the engine has.
+//! ending a control-changing effect (`ops::end_counter_durations`, `refresh_control`), counters removed as a cost (CR 118.3:
+//! Loch Mare's), and damage removing a planeswalker's last loyalty counters (CR 120.3c). Test cards make the effects, beside the
+//! printed cards and every other card the engine has.
 
 use std::sync::OnceLock;
 
@@ -37,9 +38,60 @@ fn mark(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
 static SEIZE: CardDef = CardDef { name: "Probe Seize", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[target(creature)], seize), ..CardDef::BLANK };
 static MARK: CardDef = CardDef { name: "Probe Mark", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[target(creature)], mark), ..CardDef::BLANK };
 
+fn planeswalker(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.is_on_battlefield(id) && q.chars(id).is(CardType::Planeswalker))
+}
+
+/// "Gain control of target planeswalker for as long as it has a loyalty counter on it."
+fn borrow(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(walker) = item.target(0) {
+        g.gain_control(item.object, walker, item.controller, Duration::WhileCounter(CounterKind::Loyalty));
+    }
+    Ok(())
+}
+
+/// "Probe Bolt deals 3 damage to target planeswalker."
+fn bolt_walker(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    g.damage(item.object, item.target(0), 3);
+    Ok(())
+}
+
+/// "Whenever a planeswalker you control is put into a graveyard from the battlefield": judged as it last was (CR 603.10a),
+/// "you" its controller then.
+fn your_planeswalker_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, from, to, .. }
+            if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) && q.state().obj(*old).controller == q.controller(source) =>
+        {
+            Some(Fired { subject: Target::None, data: [0, 0] })
+        }
+        _ => None,
+    }
+}
+
+fn gain_one(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    g.gain_life(item.controller, 1);
+    Ok(())
+}
+
+/// A zero-cost planeswalker of loyalty 3, with no abilities.
+static WALKER: CardDef = CardDef { name: "Probe Walker", types: TypeSet::of(&[CardType::Planeswalker]), loyalty: Some(3), ..CardDef::BLANK };
+static BORROW: CardDef =
+    CardDef { name: "Probe Borrow", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[target(planeswalker)], borrow), ..CardDef::BLANK };
+static BOLT_WALKER: CardDef =
+    CardDef { name: "Probe Bolt", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[target(planeswalker)], bolt_walker), ..CardDef::BLANK };
+/// A zero-cost enchantment: "Whenever a planeswalker you control is put into a graveyard from the battlefield, you gain 1 life."
+static MOURNER: CardDef = CardDef {
+    name: "Probe Mourner",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, your_planeswalker_dies), gain_one, "Whenever a planeswalker you control is put into a graveyard from the battlefield, you gain 1 life.")
+        .look_back()],
+    ..CardDef::BLANK
+};
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&SEIZE, &MARK])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&SEIZE, &MARK, &WALKER, &BORROW, &BOLT_WALKER, &MOURNER])))
 }
 
 /// What a seat does, in order, each as soon as it is offered and its turn has come: cast a card or activate an ability
@@ -177,4 +229,25 @@ fn counters_removed_as_a_cost_end_an_effect_for_as_long_as_it_has_one() {
     );
     assert_eq!(power(&game), (4, 5, 0));
     assert!(seen.contains(&(4, 2, 3)) && seen.contains(&(6, 4, 1)), "Loch Mare was not 4/2 and then 6/4 on the way: {seen:?}");
+}
+
+/// Bot2 gains control of Bot1's Probe Walker for as long as it has a loyalty counter on it; Bot1's Probe Bolt then deals it 3,
+/// removing its last 3 loyalty counters (CR 120.3c). The control effect ends with them, before the state-based actions, so the
+/// Walker is Bot1's again as it is put into its owner's graveyard (CR 704.5i): Bot1's Mourner triggers, not Bot2's.
+#[test]
+fn damage_removing_the_last_loyalty_counter_ends_control_for_as_long_as_it_has_one() {
+    let game = play(
+        [&["Probe Walker", "Probe Mourner", "Probe Bolt"], &["Probe Mourner", "Probe Borrow"]],
+        vec![
+            Step::Cast(0, 1, "Probe Walker", None),
+            Step::Cast(0, 1, "Probe Mourner", None),
+            Step::Cast(1, 2, "Probe Mourner", None),
+            Step::Cast(1, 2, "Probe Borrow", Some("Probe Walker")),
+            Step::Cast(0, 3, "Probe Bolt", Some("Probe Walker")),
+        ],
+        3,
+        |_| {},
+    );
+    assert!(game.state.zone(Zone::graveyard(PlayerId(0))).iter().any(|&id| game.name(id) == "Probe Walker"), "the Walker did not die");
+    assert_eq!((game.state.player(PlayerId(0)).life, game.state.player(PlayerId(1)).life), (21, 20), "the Walker died under the wrong control");
 }
