@@ -33,7 +33,7 @@ Bot1.Attack(Voice of Victory > Bot2)
 Bot1.Pass
 Bot2.Pass
 ? Client.Bot1.Prompt.Title = Choice for Voice of Victory
-? Client.Bot1.Prompt.Detail = Choose what it attacks as it enters tapped and attacking: a player, a planeswalker or a battle.  ·  2 possible choices
+? Client.Bot1.Prompt.Detail = Choose what it attacks as it enters attacking: a player, a planeswalker or a battle.  ·  2 possible choices
 Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
 Bot1.Target(Bot2)
 ? Combat.Attackers = Voice of Victory > Bot2; Warrior > Liliana of the Veil; Warrior > Bot2
