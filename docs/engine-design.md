@@ -1891,7 +1891,7 @@ Known gaps:
   (Norn's Annex), tapping or sacrificing, and optional costs to attack (CR 508.1g: exert, enlist, which the engine has
   as other things) are not built, nor anything that changes a cost to attack. No card in content needs them.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
-- Suspend does not give a creature cast that way haste (KI-112). Several permanents one effect puts
+- Several permanents one effect puts
   onto the battlefield enter together (`ops::put_onto_battlefield`, `Game::put_all_onto_battlefield*`: Show and Tell,
   Redshift's exhaust, Ghost Vacuum), each judged by its entering replacements against the battlefield as it was (CR 614.12)
   and each seeing the others enter (CR 603.6a). Cloaking or manifesting several cards from a single library is one at a time,

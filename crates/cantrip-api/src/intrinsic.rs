@@ -144,10 +144,29 @@ fn suspend_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !crate::game::is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Exile) || !g.could_cast_during_resolution(card) {
         return Ok(());
     }
-    if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastFree })? == Answer::Yes {
-        g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
+    if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastFree })? == Answer::Yes
+        && g.cast_during_resolution(card, Some(ManaCost::ZERO))?
+        && let Some(spell) = g.obj(card).became
+        && g.obj(spell).zone.is(ZoneKind::Stack)
+        && g.chars(spell).is(CardType::Creature)
+    {
+        // "If you cast a creature spell this way, it gains haste until you lose control of the spell or the permanent it
+        // becomes" (CR 702.62a): an effect on the spell, which goes on applying to the permanent it becomes (CR 400.7a,
+        // `ops::carry_effects`), for as long as its caster controls it (`SUSPEND_HASTE`).
+        let lasting = Duration::AsLongAs(g.card_id(&INTRINSIC), SUSPEND_HASTE);
+        g.add_effect(spell, spell, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), lasting);
     }
     Ok(())
+}
+
+/// The `lasting` condition of suspend's haste (CR 702.62a): the effect's controller - the spell's caster - still controls
+/// the spell or the permanent it became. Once they don't, it is over for good, though control come back (CR 611.2b). The
+/// spell becoming the permanent is no loss of control: the effect is carried to it as it resolves (`carry_effects`), and an
+/// effect on an object that has left for anywhere else applies to nothing (CR 400.7).
+pub const SUSPEND_HASTE: u8 = 0;
+
+fn caster_controls(q: &dyn Query, e: &ContinuousEffect) -> bool {
+    q.obj(e.affected).controller == e.controller
 }
 
 /// "When the last defense counter is removed from this permanent, exile it, then you may cast it transformed without
@@ -197,6 +216,7 @@ pub static INTRINSIC: CardDef = CardDef {
         )
         .condition(speed_below_max),
     ],
+    lasting: &[Lasting { text: "you control {source}", holds: caster_controls }],
     ..CardDef::BLANK
 };
 

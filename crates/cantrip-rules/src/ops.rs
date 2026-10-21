@@ -1111,11 +1111,14 @@ pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
 }
 
 /// Creates tokens (CR 111.2): each a new object on the battlefield, from no zone.
-/// The effects of resolved spells and abilities that change a permanent spell's characteristics go on applying to the
-/// permanent it becomes (CR 400.7a): a spell whose text was changed is a permanent with that text. Only text changes
-/// are carried, the one such effect a spell can have now.
+/// The effects of spells and abilities that change a permanent spell's characteristics or controller go on applying to the
+/// permanent it becomes (CR 400.7a): a spell whose text was changed is a permanent with that text, and a creature spell cast
+/// with suspend that gained haste is a creature with haste (CR 702.62a). Each is an effect of a layer (`layers::effect_layer`)
+/// or a change of control; it keeps its timestamp and duration.
 pub fn carry_effects(cx: &mut Cx, spell: ObjectId, permanent: ObjectId) {
-    let carries = |e: &cantrip_state::ContinuousEffect| e.affected == spell && matches!(e.kind, EffectKind::ChangeText { .. });
+    let carries = |e: &cantrip_state::ContinuousEffect| {
+        e.affected == spell && (layers::effect_layer(e.kind).is_some() || matches!(e.kind, EffectKind::Control(_)))
+    };
     let carried: Vec<cantrip_state::ContinuousEffect> = cx.s().effects.iter().filter(|e| carries(e)).copied().collect();
     if carried.is_empty() {
         return;

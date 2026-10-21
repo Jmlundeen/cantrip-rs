@@ -4,7 +4,8 @@
 //!
 //! A card with suspend sets `suspend: Some(SuspendDef { count, cost })` and lists `ability(cost, text)`: the special
 //! action (CR 116.2) of exiling it from the hand whenever it could be cast. The two triggered abilities are the rules'
-//! own (`cantrip_api::intrinsic`).
+//! own (`cantrip_api::intrinsic`), and so is the haste a creature spell cast by the second gains until its caster loses
+//! control of it (`intrinsic::SUSPEND_HASTE`, carried to the permanent it becomes, CR 400.7a).
 
 use cantrip_api::*;
 

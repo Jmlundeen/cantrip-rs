@@ -2485,7 +2485,7 @@ pub fn control_order(cards: &CardTable, state: &GameState, log: &[Record]) -> Ve
 
 /// The layer a resolved effect of this kind applies in (CR 613.1), as `apply_effect` applies it; none for an effect that
 /// is not a characteristic's.
-fn effect_layer(kind: EffectKind) -> Option<Layer> {
+pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
     Some(match kind {
         EffectKind::ChangeText { .. } | EffectKind::SetName(_) => Layer::Text,
         EffectKind::AddTypes(_)
