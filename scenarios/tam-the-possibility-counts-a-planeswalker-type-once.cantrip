@@ -1,0 +1,58 @@
+# Tam, the Possibility counts planeswalker TYPES, not planeswalkers: Ajani Resolute and Ajani, Outland Chaperone are both
+# Ajani, so X is one and the ability asks once (the second refusal fails if a second proliferate is asked). The one choice
+# goes to Ajani Resolute, whose two loyalty counters become three; the Chaperone is never chosen and stays at three. Tam's
+# reduction paid for both: {1}{W} became {W}, and {1}{W}{W} became {W}{W} from two Plains.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Tam, the Possibility
+Ajani, Outland Chaperone
+Plains
+Ajani Resolute
+Plains
+Plains x10
+
+[Bot2 Deck]
+Opt x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tam, the Possibility.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Ajani, Outland Chaperone.Cast
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Tam, the Possibility.Activate
+Bot1.Target(Bot1.Battlefield.Ajani Resolute)
+! Bot1.Target
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 3
+Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 3

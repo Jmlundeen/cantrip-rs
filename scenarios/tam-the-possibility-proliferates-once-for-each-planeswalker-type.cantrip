@@ -1,0 +1,63 @@
+# Tam, the Possibility: "{W}{U}{B}{R}{G}, {T}: Proliferate X times, where X is the number of planeswalker types among
+# planeswalkers you control." Wrenn and Six (type Wrenn) and Oko, Thief of Crowns (type Oko) are two types, so X is two:
+# the ability asks twice, and both choices go to Wrenn and Six, whose three loyalty counters become five (CR 701.34a).
+# Oko is not chosen, so it stays at four. Tam's own cost reduction paid for Oko's {1}{G}{U} with just {G}{U}. Bot2's
+# Island is a permanent somebody else controls, so it is no planeswalker type of yours.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Tam, the Possibility
+Wrenn and Six
+Oko, Thief of Crowns
+Island
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Island
+Opt x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tam, the Possibility.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Tam, the Possibility.Activate
+Bot1.Target(Bot1.Battlefield.Wrenn and Six)
+Bot1.Target(Bot1.Battlefield.Wrenn and Six)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Wrenn and Six.Counters.Loyalty = 5
+Bot1.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 4

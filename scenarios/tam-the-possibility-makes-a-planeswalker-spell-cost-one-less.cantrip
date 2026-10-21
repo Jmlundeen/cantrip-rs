@@ -1,0 +1,42 @@
+# Tam, the Possibility: "Planeswalker spells you cast cost {1} less to cast" (CR 601.2f). Jace, the Mind Sculptor costs
+# {2}{U}{U}; with Tam on the battlefield it costs {1}{U}{U}, and Bot1 has exactly three mana on turn three (an Island, a
+# Mox Sapphire and a Mox Emerald). The cast is paid in full and the pool is empty (a second `?` line one off would fail);
+# without the reduction four mana would be needed and the cast could not be paid at all.
+
+[Bot1 Deck]
+Forest
+Island
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Jet
+Tam, the Possibility
+Jace, the Mind Sculptor
+Island x11
+
+[Bot2 Deck]
+Opt x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tam, the Possibility.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
