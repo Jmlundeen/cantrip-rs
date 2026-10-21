@@ -77,6 +77,22 @@ pub struct Grant {
     pub ability: AbilityRef,
 }
 
+impl Grant {
+    /// No grant, where a record keeps one in eight bytes rather than an `Option`'s twelve (`Cast::by`,
+    /// `Event::LandPlayed`): the history is the engine's largest buffer, and its records are read on every question.
+    pub const NONE: Grant = Grant { object: ObjectId::NONE, ability: AbilityRef { card: CardId(0), index: 0 } };
+
+    /// The grant, or none where this is `Grant::NONE`.
+    pub fn some(self) -> Option<Grant> {
+        (self.object != ObjectId::NONE).then_some(self)
+    }
+
+    /// `Grant::NONE` for none.
+    pub fn of(grant: Option<Grant>) -> Grant {
+        grant.unwrap_or(Grant::NONE)
+    }
+}
+
 /// One ability of one card: the card's definition and the ability's index in it. A copy of a card has the copied
 /// card's abilities, so a computed ability list is a list of these, never of the object's own card alone.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]

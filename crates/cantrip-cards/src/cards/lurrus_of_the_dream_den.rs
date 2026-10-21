@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from your graveyard": a way
 /// a permanent gives (CR 604, 601.3), a permission for the card's own mana cost (`GrantedWay::permission`), so an
 /// alternative cost may be paid instead. It is used up by a cast by it this turn, which the history records as made by this
-/// permanent (`Cast::granted_by`).
+/// permanent (`Cast::by`).
 fn cast_cheap_permanent(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> {
     if player != asker.controller || q.state().turn.active != player {
         return None;

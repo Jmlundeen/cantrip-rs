@@ -348,7 +348,7 @@ fn each_permission_for_the_top_of_the_library_offers_each_split_half_at_its_own_
     let four = (*by_mana.iter().find(|o| o.index == WAY_SPLIT_RIGHT).expect("the four-mana half")).clone();
     take(&mut game, &four);
     resolve(&mut game);
-    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.from == ZoneKind::Library && c.value == 4 && c.granted_by.is_some_and(|g| g.object == mana))));
+    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.from == ZoneKind::Library && c.value == 4 && c.granted_by().is_some_and(|g| g.object == mana))));
     assert_eq!(game.state.player(ME).life, 20);
 }
 
@@ -435,7 +435,7 @@ fn a_rule_or_the_cards_own_permission_stays_beside_a_permission_that_names_a_cos
         resolve(&mut game);
         let card = game.state.obj(spell).card;
         assert!(in_zone(&game, Zone::graveyard(ME), card) && !in_zone(&game, Zone::exile(ME), card), "case {case}");
-        assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by == ordinary.granted_by && c.way == 0)), "case {case}");
+        assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by() == ordinary.granted_by && c.way == 0)), "case {case}");
     }
 }
 
@@ -504,7 +504,7 @@ fn a_permission_and_another_objects_alternative_cost_compose() {
     assert!(!options.iter().any(|o| o.paid_by.is_some() && by(o) != Some(permitter)));
     take(&mut game, &combined);
     resolve(&mut game);
-    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by.is_some_and(|g| g.object == permitter))));
+    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by().is_some_and(|g| g.object == permitter))));
 
     let (mut game, spell) = game_with("Route Probe", Zone::exile, 0);
     let source = put(&mut game, "Route Permission Source", ME);
@@ -533,6 +533,6 @@ fn every_way_a_permanent_gives_is_a_cast_of_its_own_with_its_own_terms() {
     resolve(&mut game);
     assert_eq!(game.state.player(ME).life, 20);
     assert!(in_zone(&game, Zone::exile(ME), table().find("Route Probe").unwrap()), "the way's flashback exiles it");
-    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by.is_some_and(|g| g.object == grantors[8]))));
+    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by().is_some_and(|g| g.object == grantors[8]))));
 }
 

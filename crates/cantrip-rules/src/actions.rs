@@ -2420,18 +2420,18 @@ fn cast_limit(cx: &Cx) -> Option<u8> {
 /// The faces a card may be cast as (CR 709.3, 715.3, 720.3, 712.8a), each with the way number a cast of it has: a split
 /// card's two halves (the card itself is never cast), otherwise the card and its Adventure or Omen and its back face, if it
 /// has them.
-fn faces_to_cast(def: &'static CardDef) -> Vec<(u8, &'static CardDef)> {
-    if let Some((left, right)) = def.split {
-        return vec![(WAY_SPLIT_LEFT, left), (WAY_SPLIT_RIGHT, right)];
-    }
-    let mut faces = vec![(0, def)];
-    faces.extend(def.inset_faces());
-    if let Some(back) = def.back
-        && back.has_cost
-    {
-        faces.push((WAY_BACK_FACE, back));
-    }
-    faces
+fn faces_to_cast(def: &'static CardDef) -> impl Iterator<Item = (u8, &'static CardDef)> {
+    let (split, whole) = (def.split, def.split.is_none());
+    [
+        split.map(|(left, _)| (WAY_SPLIT_LEFT, left)),
+        split.map(|(_, right)| (WAY_SPLIT_RIGHT, right)),
+        whole.then_some((0, def)),
+        def.adventure.filter(|_| whole).map(|a| (WAY_ADVENTURE, a)),
+        def.omen.filter(|_| whole).map(|o| (WAY_OMEN, o)),
+        def.back.filter(|b| whole && b.has_cost).map(|b| (WAY_BACK_FACE, b)),
+    ]
+    .into_iter()
+    .flatten()
 }
 
 /// The kinds of zone from which anything forbids `player` to cast a spell now, whatever the spell is (CR 101.2, 601.3): a
@@ -2696,8 +2696,11 @@ fn alternatives_for(
     if all.is_empty() {
         return Vec::new();
     }
-    let view = QueryAsFace { q, cards, spell: card, face: cards.id_of(face) };
-    let judged: &dyn Query = if whole { q } else { &view };
+    let view = (!whole).then(|| QueryAsFace { q, cards, spell: card, face: cards.id_of(face) });
+    let judged: &dyn Query = match &view {
+        Some(view) => view,
+        None => q,
+    };
     let mut applying: Vec<Given<SpellAlternative>> = Vec::new();
     for given in all {
         if applying.iter().any(|a| a.controller == given.controller && std::ptr::eq(a.what, given.what)) {
@@ -2955,9 +2958,13 @@ impl<'a> Offer<'a> {
             if route.terms.adventure_only && way != WAY_ADVENTURE {
                 continue;
             }
-            let view = AsFace { cx, spell: card, face: cx.card_id(face) };
-            let q: &dyn Query = if way == 0 { cx } else { &view };
-            if !route.allows.face(q, card, player) {
+            // Judged as the face cast (CR 601.3e); the card itself is read as it is.
+            let allowed = if way == 0 || matches!(route.allows, Allows::Any) {
+                route.allows.face(cx, card, player)
+            } else {
+                route.allows.face(&AsFace { cx, spell: card, face: cx.card_id(face) }, card, player)
+            };
+            if !allowed {
                 continue;
             }
             whole_allowed |= way == 0;
@@ -3142,12 +3149,15 @@ impl<'a> Offer<'a> {
         }
         let land = def.is(CardType::Land);
         let speed = self.speed(card);
-        for (way_number, face) in faces_to_cast(def).into_iter().filter(|&(w, _)| !(land && w == 0)) {
+        for (way_number, face) in faces_to_cast(def).filter(|&(w, _)| !(land && w == 0)) {
             if speed.of(def, way_number, face) != self.instants {
                 continue;
             }
-            let view = AsFace { cx, spell: card, face: cx.card_id(face) };
-            let q: &dyn Query = if way_number == 0 { cx } else { &view };
+            let view = (way_number != 0).then(|| AsFace { cx, spell: card, face: cx.card_id(face) });
+            let q: &dyn Query = match &view {
+                Some(view) => view,
+                None => cx,
+            };
             for way in ways {
                 if way.what.permission || way.what.from != zone.kind() {
                     continue;
@@ -3638,7 +3648,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             };
             if let Some(land) = land.filter(|&land| cx.s().obj(land).zone.is(ZoneKind::Battlefield)) {
                 // What it was played by is recorded with it: "once during each of your turns" asks (Serra Paragon).
-                cx.record(Event::LandPlayed { land, player, way: action.index, granted_by: action.granted_by });
+                cx.record(Event::LandPlayed { land, player, way: action.index, granted_by: Grant::of(action.granted_by) });
                 // "If you do, it gains ...": what the way grants is the land's from the moment it is on the battlefield.
                 if let Some(way) = way
                     && let Some(n) = way.what.gains
@@ -4274,7 +4284,7 @@ fn cast(
         value,
         from: cast_from,
         way,
-        granted_by: by.by,
+        by: Grant::of(by.by),
         fact,
     }));
     // "Until this card is cast from exile" (CR 611.2a, 400.7) ends now, as the card that was in exile becomes cast: the

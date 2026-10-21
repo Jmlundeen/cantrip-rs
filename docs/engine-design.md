@@ -837,14 +837,17 @@ mana cost or what the route names instead, for each alternative cost another obj
 A way a permanent gives that is its cost too (escape, mayhem, Iroh's flashback) is offered beside them. Nothing is
 first-found: Citadel and Mystic Forge both out offer both casts of the top card, and the player chooses (CR 601.2b). The
 common case pays as before: a card in hand has the one route, and the rest is looked for only where a card is in another
-zone, each list built lazily once per pass.
+zone, each list built lazily once per pass, and a face other than the card itself judged through a view of it only where
+there is a face to judge. The records keep a grant in eight bytes (`Grant::NONE` for none) rather than an `Option`'s twelve.
+The benchmark measured 8.15 us per decision against 8.21 us on main, six runs each alternating the two builds (2026-10-20);
+before the faces were judged lazily it was 9.2 us, nearly all of it `CardTable::id_of`'s search for each face's id.
 
 **The executor makes exactly the action offered.** The answer is checked against the options (`validate::fits`: the
 grants are part of the option), and `act` reads back what the `Grant` names - the route's terms (`through`) - and hands them
 to `cast` (`CastBy`: the grant, a way's cost and riders, what the permission adds, life for mana value, the alternative's
 cost). Nothing is re-derived and no permission is searched for again, so what the menu said is what is paid.
 
-**The history records provenance.** `Cast::granted_by` and `Event::LandPlayed { land, player, way, granted_by }` keep what
+**The history records provenance.** `Cast::by` (read with `Cast::granted_by()`) and `Event::LandPlayed { land, player, way, granted_by }` keep what
 each cast and land play was made by, so "once during each of your turns" is a history question
 (`cantrip_mechanics::history::permission_used_this_turn`, which Lurrus and Serra Paragon share) and "if you cast it this
 way" can be one. Riders that outlive the cast are attached at cast from the action's grant (Serra Paragon's "it gains", a

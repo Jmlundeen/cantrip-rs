@@ -38,8 +38,8 @@ pub struct Cast {
     /// What let it be cast from where it was, beyond the rules every player has (`ActionOption::granted_by`, CR 601.3): the
     /// permanent whose permission it was (Lurrus of the Dream-Den, Mystic Forge), the spell or ability that gave one
     /// (Snapcaster Mage's), or the card's own retrace. "Once during each of your turns" and "if you cast a spell this way"
-    /// ask it.
-    pub granted_by: Option<Grant>,
+    /// ask it, through `granted_by`. `Grant::NONE` where nothing did.
+    pub by: Grant,
     /// What its card's `CardDef::cast_fact` said of the board as it became cast ("if you controlled a Faerie as you cast this
     /// spell"); 0 for a card with none. A copy of a spell is not cast (CR 707.10) and has no `Cast`, so `fact_as_cast` is 0
     /// for it.
@@ -47,6 +47,11 @@ pub struct Cast {
 }
 
 impl Cast {
+    /// What let it be cast from where it was (`by`), if anything beyond the rules did.
+    pub fn granted_by(&self) -> Option<Grant> {
+        self.by.some()
+    }
+
     pub fn is(&self, t: CardType) -> bool {
         self.types.has(t)
     }

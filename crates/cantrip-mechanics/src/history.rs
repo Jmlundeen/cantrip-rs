@@ -237,8 +237,8 @@ pub fn scried_or_surveilled_this_turn(q: &dyn Query, player: PlayerId) -> bool {
 /// new object (CR 400.7).
 pub fn permission_used_this_turn(q: &dyn Query, source: ObjectId) -> bool {
     q.history().this_turn().iter().any(|r| match r.event {
-        Event::Cast(c) => c.granted_by.is_some_and(|g| g.object == source),
-        Event::LandPlayed { granted_by, .. } => granted_by.is_some_and(|g| g.object == source),
+        Event::Cast(c) => c.granted_by().is_some_and(|g| g.object == source),
+        Event::LandPlayed { granted_by, .. } => granted_by.some().is_some_and(|g| g.object == source),
         _ => false,
     })
 }
