@@ -1,0 +1,33 @@
+# Mana Flare adds one mana of any type the tapped land produced (CR 106.12a), with no restriction (its ruling): Cavern of
+# Souls (naming Merfolk) tapped for its restricted {U} makes {U}{U} for a Merfolk spell. With only the Cavern untapped,
+# Lord of Atlantis's {U}{U} is offered and paid by the one tap. A second Mana Flare's {2}{R} is not: the Cavern's {C}{C} has
+# no red, and its {R} pays only for a Merfolk, leaving the Flare's one {R} (with Black Lotus gone).
+
+[Bot1 Deck]
+Cavern of Souls
+Black Lotus
+Mana Flare
+Lord of Atlantis
+Mana Flare
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Cavern of Souls.Play
+Bot1.Modes(Merfolk)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mana Flare.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Mana Flare.Cast
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Blue)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Cavern of Souls; Lord of Atlantis; Mana Flare

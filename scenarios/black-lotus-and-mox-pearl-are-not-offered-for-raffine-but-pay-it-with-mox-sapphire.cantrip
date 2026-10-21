@@ -1,0 +1,30 @@
+# Black Lotus adds "three mana of any one color" (CR 106.1b): {B}{B}{B}, never {U}{B} and another. With only the Lotus and
+# Mox Pearl untapped, Bot1 can't pay Raffine, Scheming Seer's {W}{U}{B}, so it is not offered (CR 601.2g-h). With Mox
+# Sapphire too it is, and the Lotus's black pays the {B}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Raffine, Scheming Seer
+Mox Sapphire
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+! Bot1.Hand.Raffine, Scheming Seer.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Raffine, Scheming Seer.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Raffine, Scheming Seer
+Bot1.Graveyard = Black Lotus

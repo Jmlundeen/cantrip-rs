@@ -1,0 +1,41 @@
+# Thespian's Stage becomes a copy of Sunken Citadel without entering, so it has no chosen color: its "one mana of the
+# chosen color" abilities add no mana, and judging what Bot1 could pay must not fail on a choice of no type. Turn 7, Lord of
+# Atlantis is offered and cast with the Island and the real Citadel's blue.
+
+[Bot1 Deck]
+Sunken Citadel
+Thespian's Stage
+Sol Ring
+Lord of Atlantis
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sunken Citadel.Play
+Bot1.Colors(Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Ability: {C})
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Sunken Citadel; Ability: copy of target)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sunken Citadel#1.Activate(Ability: one; Color: Blue)
+Bot1.Pass
+Bot2.Pass
+[T8 Bot2.Main1]
+
+[Expect]
+Turn = 8
+Bot1.Battlefield = Island; Lord of Atlantis; Sol Ring; Sunken Citadel; Sunken Citadel

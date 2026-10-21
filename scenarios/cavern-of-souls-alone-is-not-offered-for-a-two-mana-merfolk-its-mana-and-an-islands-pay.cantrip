@@ -1,0 +1,28 @@
+# Cavern of Souls taps for {C} or for one mana of any color spent only on a creature spell of the chosen type - one or the
+# other, one mana (CR 605.3b). With only the Cavern (naming Merfolk) untapped, Floodpits Drowner's {1}{U} is not offered
+# (CR 601.2g-h). On turn 3, with an Island too, it is: the Cavern's {U} and the Island's.
+
+[Bot1 Deck]
+Cavern of Souls
+Floodpits Drowner
+Island
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Cavern of Souls.Play
+Bot1.Modes(Merfolk)
+! Bot1.Hand.Floodpits Drowner.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Floodpits Drowner.Cast
+Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Cavern of Souls; Floodpits Drowner; Island

@@ -1645,9 +1645,6 @@ pub struct Available {
     flex: [u32; 64],
     /// Some mana ability's yield is not stated: anything may be payable.
     unknown: bool,
-    /// Mana that the mana abilities with a mana cost of their own (Chromatic Star's {1}) must be paid first: it is
-    /// spent on them, so it is not there to pay for the cost they are for.
-    consume: u32,
     /// The permanents that change what things cost.
     changers: Vec<ObjectId>,
     /// The permanents that give spells convoke, delve or improvise (`CardDef::grants_pay_with`).
@@ -1662,6 +1659,48 @@ pub struct Available {
     /// player chooses (Shivan Reef's {U} or {R}) and the "one mana of any type that land produced" it triggers (Mana Flare)
     /// are one choice, {U}{U} or {R}{R} and never {U}{R} (CR 106.12a, 605.1b). Empty unless such a trigger waits.
     linked: Vec<(u8, u32)>,
+    /// The mana sources whose yield is a choice the independent counts above can't say exactly - a choice between abilities
+    /// that make different amounts or kinds (Shivan Reef's {C} or {U}/{R} with Mana Flare out; a land with a restricted
+    /// and an unrestricted ability), "three mana of any one color" (Black Lotus), an ability with a mana cost of its own
+    /// (Chromatic Star's {1}, paid before what it adds is there) - each with how many alike: whether a cost is covered is
+    /// then found by trying each one's choices (`Available::exact`). Empty on most boards.
+    complex: Vec<(Vec<Alternative>, u32)>,
+}
+
+/// One mana ability a source could be activated for, as the advice counts it: what it adds - fixed mana, and `k` mana of
+/// one type chosen from `types` - and what restricts it, the mana it costs (paid as activating an ability of `source`,
+/// CR 602.2b, 605.3a), and what the triggered mana abilities its tap would trigger add (`extra`, and `produced` mana of one
+/// of the types the activation produced, CR 106.12a).
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct Alternative {
+    fixed: [u32; 6],
+    k: u32,
+    types: u8,
+    restriction: Option<ManaRestriction>,
+    cost: ManaCost,
+    source: ManaPayment,
+    extra: [u32; 6],
+    produced: u32,
+}
+
+impl Alternative {
+    /// The mana it adds (before what its tap triggers) with `chosen` the type of its `k`.
+    fn made(&self, chosen: Option<usize>) -> [u32; 6] {
+        let mut made = self.fixed;
+        if let Some(m) = chosen {
+            made[m] = made[m].saturating_add(self.k);
+        }
+        made
+    }
+
+    /// The mana types it adds with `chosen` the type of its `k`.
+    fn produces(&self, chosen: Option<usize>) -> u8 {
+        let mut types = (0..6).filter(|&m| self.fixed[m] > 0).fold(0u8, |t, m| t | 1 << m);
+        if let Some(m) = chosen.filter(|_| self.k > 0) {
+            types |= 1 << m;
+        }
+        types
+    }
 }
 
 /// Adds restricted mana to the entry of its restriction in `Available::restricted`.
@@ -1676,7 +1715,7 @@ fn add_available(list: &mut Vec<(ManaRestriction, [u32; 6], u32)>, restriction: 
     for m in 0..6 {
         list[at].1[m] = list[at].1[m].saturating_add(fixed[m]);
     }
-    list[at].2 += flex;
+    list[at].2 = list[at].2.saturating_add(flex);
 }
 
 pub fn available(cx: &Cx, player: PlayerId) -> Available {
@@ -1699,7 +1738,6 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         }
     }
     let mut flex = [0u32; 64];
-    let mut consume: u32 = 0;
     // Mana abilities of the player's own (CR 605.1a): paid with life, as often as the life total allows (CR 119.4), and never
     // while the player can't lose life (CR 119.8).
     for effect in cx.s().effects.iter().filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player) {
@@ -1707,7 +1745,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         if let Some(def) = activated(cx, ability)
             && def.cost.life > 0
         {
-            let times = (payable_life(cx, player).max(0) as u32 / def.cost.life as u32).min(100);
+            let times = payable_life(cx, player).max(0) as u32 / def.cost.life as u32;
             for m in 0..6 {
                 fixed[m] = fixed[m].saturating_add(def.adds.0[m].saturating_mul(times));
             }
@@ -1717,31 +1755,16 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     // The triggered mana abilities waiting on a tap (CR 605.1b): nearly always none, and then nothing more is asked.
     let waiting = waiting_mana_triggers(cx);
     let mut linked: Vec<(u8, u32)> = Vec::new();
+    let mut complex: Vec<(Vec<Alternative>, u32)> = Vec::new();
+    // Each source's mana abilities, one list kept for all of them.
+    let mut alternatives: Vec<Alternative> = Vec::new();
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player || skip == Some(id) {
             continue;
         }
         let chars = cx.chars(id);
-        // The mana types its mana abilities could produce, for the triggered mana abilities its tap would trigger.
-        let mut tapped_types = 0u8;
-        // How many of its mana abilities tap it, and whether one of them lets the player choose the type of what it adds: a
-        // tap that adds one chosen type is one choice with the "one mana of any type that land produced" it triggers.
-        let (mut taps, mut tap_chooses) = (0u32, false);
-        // Whether every mana ability it has taps it for one unrestricted mana: then a tap is one mana of a type chosen from
-        // `tapped_types`, which a "one mana of any type that land produced" doubles as one choice (`Available::linked`).
-        let mut single_taps = true;
-        let mut only: Option<&ActivatedDef> = None;
-        let mut count = 0;
-        // The most any one ability adds, for the abilities that are not restricted and for each kind of restriction: they
-        // are alternatives (each taps the permanent), so only the widest of each counts (CR 605.3b).
-        let mut widest_free = 0u32;
-        let mut widest: Vec<(ManaRestriction, u32)> = Vec::new();
-        let mut spent = 0u32;
-        // The one ability that is not restricted, when there is exactly one: its yield is stated, not any color.
-        let mut unrestricted: Option<&ActivatedDef> = None;
-        let mut unrestricted_count = 0;
-        // The mana types the abilities that are not restricted could add between them.
-        let mut types = 0u8;
+        // Each mana ability the source could be activated for now: alternatives, of which one is (CR 605.3b).
+        alternatives.clear();
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
             if !def.is_mana_ability()
@@ -1758,105 +1781,115 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             {
                 continue;
             }
-            count += 1;
-            only = Some(def);
-            // Only a mana ability with {T} in its cost taps the permanent for mana (CR 106.12).
-            if !waiting.is_empty() && def.cost.tap {
-                tapped_types |= yield_types(cx, id, player, def);
-                taps += 1;
-                tap_chooses |= def.adds_any > 0;
-            }
-            single_taps &= def.cost.tap
-                && matches!(def.restricted, None | Some(ManaRestriction::GainsHaste))
-                && def.adds.0.iter().sum::<u32>() + def.adds_any as u32 == 1;
-            spent = spent.max(def.cost.mana.mana_value());
-            let adds = def.adds.0.iter().map(|&n| n as u32).sum::<u32>() + def.adds_any as u32;
-            match def.restricted {
-                Some(ManaRestriction::GainsHaste) | None => {
-                    unrestricted = Some(def);
-                    unrestricted_count += 1;
-                    widest_free = widest_free.max(adds);
-                    types |= yield_types(cx, id, player, def);
-                }
-                Some(kind) => {
-                    let kind = restriction_from(cx, id, kind);
-                    match widest.iter_mut().find(|(r, _)| *r == kind) {
-                        Some((_, n)) => *n = (*n).max(adds),
-                        None => widest.push((kind, adds)),
-                    }
-                }
-            }
-            if def.adds.0.iter().all(|&n| n == 0) && def.adds_any == 0 {
+            // A yield not stated, or a cost in mana paid in a way announced (Phyrexian, {2/W}), is not judged.
+            if def.adds.0.iter().all(|&n| n == 0) && def.adds_any == 0 || def.cost.mana.phyrexian != [0; 5] || def.cost.mana.twobrid != [0; 5] {
                 return Available {
                     fixed,
                     flex,
-                    consume: 0,
                     unknown: true,
                     changers: cost_change_sources(cx),
                     grantors: pay_with_grantors(cx),
                     restricted,
                     any_color: false,
                     linked,
+                    complex: Vec::new(),
                 };
             }
-        }
-        // Of the triggered mana that adds one of the types the tap produced, how much goes with a tap whose type is chosen.
-        let mut chosen_with_tap = 0u32;
-        if count > 0 {
-            consume += spent;
-            if !waiting.is_empty() && tapped_types != 0 {
-                chosen_with_tap = tap_triggers(cx, &waiting, id, player, tapped_types, taps > 1 || tap_chooses, &mut fixed, &mut flex);
+            let mut alternative = Alternative {
+                fixed: def.adds.0,
+                k: u32::from(def.adds_any),
+                types: if def.adds_any > 0 { any_types(cx, id, player, def) } else { 0 },
+                restriction: def.restricted.filter(|&r| r != ManaRestriction::GainsHaste).map(|r| restriction_from(cx, id, r)),
+                cost: ManaCost { x: 0, ..def.cost.mana },
+                source: ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes },
+                extra: [0; 6],
+                produced: 0,
+            };
+            // Mana of a type chosen from none is no mana (Thespian's Stage copying Sunken Citadel has no chosen color).
+            if alternative.types == 0 {
+                alternative.k = 0;
             }
-        }
-        match (count, only) {
-            (0, _) => {}
-            (1, Some(def)) if def.restricted == Some(ManaRestriction::GainsHaste) => {
-                for m in 0..6 {
-                    fixed[m] += def.adds.0[m];
+            // Only a mana ability with {T} in its cost taps the permanent for mana (CR 106.12), and so triggers what waits on
+            // a tap.
+            if !waiting.is_empty() && def.cost.tap {
+                let types = alternative.produces(None) | alternative.types;
+                if types != 0 {
+                    (alternative.extra, alternative.produced) = tap_triggers(cx, &waiting, id, player, types);
                 }
-                flex[any_types(cx, id, player, def) as usize] += def.adds_any as u32;
             }
-            (1, Some(def)) if let Some(kind) = def.restricted => {
-                add_available(&mut restricted, restriction_from(cx, id, kind), def.adds.0, def.adds_any as u32);
-            }
-            (1, Some(def)) => {
-                for m in 0..6 {
-                    fixed[m] += def.adds.0[m];
-                }
-                flex[any_types(cx, id, player, def) as usize] += def.adds_any as u32;
-            }
-            _ => {
-                match unrestricted {
-                    Some(def) if unrestricted_count == 1 => {
+            alternatives.push(alternative);
+        }
+        match alternatives.as_slice() {
+            [] => {}
+            // One ability: its fixed mana, and one mana of a chosen type, are independent of anything else; its triggered
+            // mana of a type it produced is too where that type is fixed, and one choice with it where the type is chosen.
+            [one]
+                if one.cost.is_zero()
+                    && one.k <= 1
+                    && !(one.k == 1 && one.restriction.is_some() && one.types != ANY_COLOR)
+                    && !(one.k == 1 && one.produced > 0 && (one.restriction.is_some() || one.produces(None) != 0)) =>
+            {
+                match one.restriction {
+                    Some(kind) => add_available(&mut restricted, kind, one.fixed, one.k),
+                    None => {
                         for m in 0..6 {
-                            fixed[m] += def.adds.0[m];
+                            fixed[m] = fixed[m].saturating_add(one.fixed[m]);
                         }
-                        flex[any_types(cx, id, player, def) as usize] += def.adds_any as u32;
+                        if one.k == 1 && one.produced == 0 {
+                            flex[one.types as usize] += 1;
+                        }
                     }
-                    _ => flex[types as usize] += widest_free,
                 }
-                for (kind, n) in widest {
-                    add_available(&mut restricted, kind, [0; 6], n);
+                for m in 0..6 {
+                    fixed[m] = fixed[m].saturating_add(one.extra[m]);
+                }
+                if one.produced > 0 {
+                    if one.k == 1 {
+                        linked.push((one.types, 1 + one.produced));
+                    } else {
+                        flex[one.produces(None) as usize] += one.produced;
+                    }
                 }
             }
-        }
-        // The tap's one mana of a chosen type, counted above as mana of any of its types, and the triggered mana of the same
-        // type, are one group of one type (`Available::linked`).
-        if chosen_with_tap > 0 && single_taps && flex[tapped_types as usize] > 0 {
-            flex[tapped_types as usize] -= 1;
-            linked.push((tapped_types, 1 + chosen_with_tap));
+            // Several abilities each making one unrestricted mana for nothing: one mana of a type chosen among theirs
+            // (a dual land), and triggered mana of that type one choice with it.
+            several
+                if several.len() > 1
+                    && several.iter().all(|a| {
+                        a.restriction.is_none()
+                            && a.cost.is_zero()
+                            && a.fixed.iter().sum::<u32>() + a.k == 1
+                            && a.extra == several[0].extra
+                            && a.produced == several[0].produced
+                    }) =>
+            {
+                let types = several.iter().fold(0u8, |t, a| t | a.produces(None) | a.types);
+                for m in 0..6 {
+                    fixed[m] = fixed[m].saturating_add(several[0].extra[m]);
+                }
+                if several[0].produced > 0 {
+                    linked.push((types, 1 + several[0].produced));
+                } else {
+                    flex[types as usize] += 1;
+                }
+            }
+            // Anything else is a choice the counts can't say: tried exactly (`Available::exact`).
+            _ => match complex.iter_mut().find(|(alike, _)| *alike == alternatives) {
+                Some((_, n)) => *n += 1,
+                None => complex.push((alternatives.clone(), 1)),
+            },
         }
     }
     Available {
         fixed,
         flex,
-        consume,
         unknown: false,
         changers: cost_change_sources(cx),
         grantors: pay_with_grantors(cx),
         restricted,
         any_color: static_rules::spend_any_color_always(cx, player),
         linked,
+        complex,
     }
 }
 
@@ -1892,24 +1925,10 @@ fn waiting_mana_triggers(cx: &Cx) -> Vec<(Asker, &'static TriggeredDef)> {
 /// What the triggered mana abilities `waiting` would add to `player` as `id` is tapped for mana of one of `types` (CR 605.1b,
 /// 605.4a: they resolve at once, as part of the mana ability): advice, added to what the permanent itself adds, so a cast
 /// High Tide's extra {U} pays for is offered before the Islands are tapped. Each one that would trigger on the tap counts
-/// once, by what it says it adds (`TriggeredMana`).
-///
-/// "One mana of any type that land produced" is the type the tap made: where the player chose it (two abilities, or "any
-/// color"), the tap's mana and the trigger's are one choice, both of one type - Mana Flare and Shivan Reef make {U}{U} or
-/// {R}{R}, never {U}{R} - so that mana is returned, for the caller to count with the tap's own as one group
-/// (`Available::linked`).
-#[allow(clippy::too_many_arguments)]
-fn tap_triggers(
-    cx: &Cx,
-    waiting: &[(Asker, &'static TriggeredDef)],
-    id: ObjectId,
-    player: PlayerId,
-    types: u8,
-    chosen: bool,
-    fixed: &mut [u32; 6],
-    flex: &mut [u32; 64],
-) -> u32 {
-    let mut with_tap = 0u32;
+/// once, by what it says it adds (`TriggeredMana`): fixed mana, and how many add "one mana of any type that land produced",
+/// which is a type the activation produced (CR 106.12a) - the type it chose, where it chose one.
+fn tap_triggers(cx: &Cx, waiting: &[(Asker, &'static TriggeredDef)], id: ObjectId, player: PlayerId, types: u8) -> ([u32; 6], u32) {
+    let (mut extra, mut produced_count) = ([0u32; 6], 0u32);
     let first = (0..6).find(|&m| types & (1 << m) != 0).unwrap_or(5);
     let mut produced = ManaTally([0; 6]);
     produced.0[first] = 1;
@@ -1919,20 +1938,18 @@ fn tap_triggers(
             continue;
         }
         match t.mana_yield {
-            TriggeredMana::One(mana) => fixed[mana as usize] = fixed[mana as usize].saturating_add(1),
-            TriggeredMana::OneOfProduced if !chosen || types.count_ones() == 1 => flex[types as usize] += 1,
-            // One of the type the player chose for the tap: counted with the tap's own mana (`Available::linked`).
-            TriggeredMana::OneOfProduced => with_tap += 1,
+            TriggeredMana::One(mana) => extra[mana as usize] = extra[mana as usize].saturating_add(1),
+            TriggeredMana::OneOfProduced => produced_count = produced_count.saturating_add(1),
             TriggeredMana::ChosenColor => {
                 if let Some(color) = cx.s().obj(asker.source).chosen_color {
                     let mana = color.mana() as usize;
-                    fixed[mana] = fixed[mana].saturating_add(1);
+                    extra[mana] = extra[mana].saturating_add(1);
                 }
             }
             TriggeredMana::Unstated => {}
         }
     }
-    with_tap
+    (extra, produced_count)
 }
 
 /// The spell a card or face is when cast, as far as the mana limited to some spells is concerned (CR 106.6): advice,
@@ -1968,6 +1985,7 @@ impl Available {
     /// Whether some of its restricted mana is limited by the spell's subtypes.
     fn names_subtypes(&self) -> bool {
         self.restricted.iter().any(|(r, ..)| r.names_subtypes())
+            || self.complex.iter().flat_map(|(alternatives, _)| alternatives).any(|a| a.restriction.is_some_and(|r| r.names_subtypes()))
     }
 
     pub fn covers_for(&self, cost: &ManaCost, payment: &ManaPayment) -> bool {
@@ -1995,7 +2013,8 @@ impl Available {
         // mana for spells of a mana value or greater may pay for it at an X that brings it there (Ashling, Rimebound's
         // mana and a {X}{R} spell), each X costing its {X} symbols more.
         let ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from } = *payment else { return false };
-        let Some(most) = self.restricted.iter().filter_map(|(r, ..)| r.least_mana_value()).max() else { return false };
+        let complex = self.complex.iter().flat_map(|(alternatives, _)| alternatives).filter_map(|a| a.restriction);
+        let Some(most) = self.restricted.iter().map(|&(r, ..)| r).chain(complex).filter_map(|r| r.least_mana_value()).max() else { return false };
         if cost.x == 0 || mana_value >= most as u32 {
             return false;
         }
@@ -2009,19 +2028,22 @@ impl Available {
 
     /// `covers_for` at the cost as it is.
     fn covers_as(&self, cost: &ManaCost, payment: &ManaPayment) -> bool {
+        if !self.complex.is_empty() {
+            return self.exact(cost, Some(payment));
+        }
         if !self.restricted.iter().any(|(r, ..)| r.may_pay(payment)) {
             return self.covers(cost);
         }
         let mut with = Available {
             fixed: self.fixed,
             flex: self.flex,
-            consume: self.consume,
             unknown: self.unknown,
             changers: Vec::new(),
             grantors: Vec::new(),
             restricted: Vec::new(),
             any_color: false,
             linked: self.linked.clone(),
+            complex: Vec::new(),
         };
         for (r, fixed, flex) in &self.restricted {
             if r.may_pay(payment) {
@@ -2040,14 +2062,132 @@ impl Available {
         if self.unknown {
             return u16::MAX;
         }
-        let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex.iter().sum::<u32>() + self.linked.iter().map(|&(_, n)| n).sum::<u32>();
-        total.saturating_sub(self.consume).min(u16::MAX as u32) as u16
+        let complex: u32 = self
+            .complex
+            .iter()
+            .map(|(alternatives, n)| {
+                let most = alternatives
+                    .iter()
+                    .filter(|a| a.restriction.is_none())
+                    .map(|a| (a.fixed.iter().sum::<u32>() + a.k + a.extra.iter().sum::<u32>() + a.produced).saturating_sub(a.cost.mana_value()))
+                    .max()
+                    .unwrap_or(0);
+                most.saturating_mul(*n)
+            })
+            .fold(0u32, u32::saturating_add);
+        let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex.iter().sum::<u32>() + self.linked.iter().map(|&(_, n)| n).sum::<u32>() + complex;
+        total.min(u16::MAX as u32) as u16
+    }
+
+    /// Whether `cost` could be paid (for `payment`, or with unrestricted mana alone) by some choice of the `complex` sources:
+    /// each one an ability of its own, or none where an ability costs mana, and the type of each "one type chosen" it makes;
+    /// sources alike are tried by how many make each choice. The rest is judged as it is.
+    fn exact(&self, cost: &ManaCost, payment: Option<&ManaPayment>) -> bool {
+        // The types some symbol asks for by name: mana of any other type pays only generic mana, so of the types a source
+        // may choose that none asks for, one stands for them all.
+        let mut named = cost.hybrid.iter().flatten().fold(0u8, |t, &(a, b)| t | 1 << a as usize | 1 << b as usize);
+        for (alternatives, _) in &self.complex {
+            for a in alternatives {
+                named |= a.cost.hybrid.iter().flatten().fold(0u8, |t, &(a, b)| t | 1 << a as usize | 1 << b as usize);
+                named |= (0..6).filter(|&m| a.cost.symbols[m] > 0).fold(0u8, |t, m| t | 1 << m);
+            }
+        }
+        named |= (0..6).filter(|&m| cost.symbols[m] > 0).fold(0u8, |t, m| t | 1 << m);
+        // Each source's choices: the ability, and the type of its chosen mana; `None` for leaving it unactivated.
+        let choices: Vec<Vec<Option<(Alternative, Option<usize>)>>> = self
+            .complex
+            .iter()
+            .map(|(alternatives, _)| {
+                let mut out = Vec::new();
+                if alternatives.iter().any(|a| !a.cost.is_zero()) {
+                    out.push(None);
+                }
+                for a in alternatives {
+                    if a.k > 0 {
+                        let other = (0..6).find(|&m| a.types & !named & (1 << m) != 0);
+                        out.extend((0..6).filter(|&m| a.types & named & (1 << m) != 0 || Some(m) == other).map(|m| Some((*a, Some(m)))));
+                    } else {
+                        out.push(Some((*a, None)));
+                    }
+                }
+                if out.is_empty() {
+                    out.push(None);
+                }
+                out
+            })
+            .collect();
+        // The activations some choice pays for with mana: restricted mana that may not pay the cost might pay for them.
+        let mut costed: Vec<ManaPayment> = Vec::new();
+        for a in self.complex.iter().flat_map(|(alternatives, _)| alternatives).filter(|a| !a.cost.is_zero()) {
+            if !costed.contains(&a.source) {
+                costed.push(a.source);
+            }
+        }
+        let mut search = Search {
+            cost,
+            payment,
+            choices: &choices,
+            counts: &[],
+            demand: demand_by_types(cost),
+            costed,
+            later: Vec::new(),
+            each: Vec::new(),
+            budget: std::cell::Cell::new(SEARCH_BUDGET),
+        };
+        // At most what a source of each group could make of each set of types, its best choice for that set; and the sum
+        // over the groups after each.
+        // The first 64: of each set of types; the next 64: of each set and of all types, added (one choice makes both, so a
+        // choice that makes the most of one may not of the other - Cavern of Souls under Mana Flare: {C}{C}, or one colored).
+        search.each = choices
+            .iter()
+            .map(|options| {
+                let mut most = [0u32; 128];
+                for option in options {
+                    let all = search.within(*option, 63);
+                    for types in 0..64 {
+                        let n = search.within(*option, types as u8);
+                        most[types] = most[types].max(n);
+                        most[64 + types] = most[64 + types].max(n.saturating_add(all));
+                    }
+                }
+                most
+            })
+            .collect();
+        let counts: Vec<u32> = self.complex.iter().map(|&(_, n)| n).collect();
+        search.later = vec![[0u32; 128]; choices.len() + 1];
+        for g in (0..choices.len()).rev() {
+            for i in 0..128 {
+                search.later[g][i] = search.later[g + 1][i].saturating_add(search.each[g][i].saturating_mul(counts[g]));
+            }
+        }
+        search.counts = &counts;
+        let with = self.without_complex();
+        let held = search.held(&with);
+        search.group(0, &Leaf { with, costed: Vec::new(), held })
+    }
+
+    /// A copy with no `complex` sources (nor the permanents that change costs, which the copy doesn't judge).
+    fn without_complex(&self) -> Available {
+        Available {
+            fixed: self.fixed,
+            flex: self.flex,
+            unknown: self.unknown,
+            changers: Vec::new(),
+            grantors: Vec::new(),
+            restricted: self.restricted.clone(),
+            any_color: self.any_color,
+            linked: self.linked.clone(),
+            complex: Vec::new(),
+        }
     }
 
     /// Whether `cost` could be paid with it (advice, CR 601.2g).
     pub fn covers(&self, cost: &ManaCost) -> bool {
         if self.unknown || cost.mana_value() == 0 {
             return true;
+        }
+        if !self.complex.is_empty() {
+            return self.exact(cost, None);
         }
         if self.linked.is_empty() {
             return self.covers_with(cost, self.fixed);
@@ -2085,11 +2225,18 @@ impl Available {
 
     /// `covers` with this mana of fixed types.
     fn covers_with(&self, cost: &ManaCost, fixed: [u32; 6]) -> bool {
-        let flex: u32 = self.flex.iter().sum();
-        // What a mana ability costs is paid from what is already there.
-        if flex > 0 && fixed.iter().sum::<u32>() < self.consume {
-            return false;
+        // A hybrid symbol may be paid by either of two types: which mana pays which symbol is found as a flow (a symbol paid
+        // greedily may take the mana another needed - Leyline of the Guildpact off a Forest, Plains, Island and Mountain).
+        if cost.hybrid.iter().any(Option::is_some) {
+            let mut supply: Vec<Supply> = (0..6).map(|m| Supply { stage: 0, types: 1 << m, restriction: None, n: fixed[m] }).collect();
+            supply.extend(self.flex.iter().enumerate().filter(|&(_, &n)| n > 0).map(|(types, &n)| Supply { stage: 0, types: types as u8, restriction: None, n }));
+            let mut demand = Vec::new();
+            Demand::of(cost, 1, None, &mut demand);
+            supply.retain(|s| s.n > 0 && s.types != 0);
+            demand.retain(|d| d.n > 0);
+            return transports(&supply, &demand);
         }
+        let flex: u32 = self.flex.iter().sum();
         let mut left = fixed;
         // The symbols the fixed mana leaves unpaid, by the mana types that could pay each.
         let mut unpaid = [0u32; 64];
@@ -2117,8 +2264,385 @@ impl Available {
         if flex_needed > 0 && !flex_pays(&unpaid, &self.flex) {
             return false;
         }
-        let spare: u32 = (left.iter().map(|&n| n as u32).sum::<u32>() + (flex - flex_needed)).saturating_sub(self.consume);
+        let spare: u32 = left.iter().map(|&n| n as u32).sum::<u32>() + (flex - flex_needed);
         spare >= cost.generic as u32
+    }
+}
+
+/// One choice of the `complex` sources, made so far: the mana of those that cost nothing to activate, added to `with`, and
+/// the activations that cost mana, each how many times.
+struct Leaf {
+    with: Available,
+    costed: Vec<(Alternative, Option<usize>, u32)>,
+    /// What it could make at most of each set of types (`Search::held`, `Search::within`).
+    held: [u32; 64],
+}
+
+/// How many steps `Available::exact` takes at most - choices weighed and payments tried - before it stops and answers that
+/// the cost might be covered: advice that offers a cast whose payment then fails, and is taken back (CR 733.1), never one
+/// that withholds a cast that could be made. Rare heavy boards reach it (about 1 ms of search: several Caverns of Souls and
+/// Chromatic Stars under two Mana Flares with a Black Lotus), and get that over-offer.
+const SEARCH_BUDGET: u32 = 768;
+
+/// How many symbols of `cost` only mana of the types in each set (a bit for each `Mana`) may pay: a colored symbol its
+/// type, a hybrid one either, the generic mana every type.
+fn demand_by_types(cost: &ManaCost) -> [u32; 64] {
+    let mut demand = [0u32; 64];
+    for (types, demand) in demand.iter_mut().enumerate() {
+        let mut n: u32 = (0..6).filter(|&m| types & (1 << m) != 0).map(|m| u32::from(cost.symbols[m])).sum();
+        n += cost.hybrid.iter().flatten().filter(|&&(a, b)| types & (1 << a as usize) != 0 && types & (1 << b as usize) != 0).count() as u32;
+        if types == 63 {
+            n += u32::from(cost.generic);
+        }
+        *demand = n;
+    }
+    demand
+}
+
+/// `Available::exact`'s search over the choices of the complex sources, group by group.
+struct Search<'a> {
+    cost: &'a ManaCost,
+    payment: Option<&'a ManaPayment>,
+    choices: &'a [Vec<Option<(Alternative, Option<usize>)>>],
+    counts: &'a [u32],
+    /// `demand_by_types` of the cost.
+    demand: [u32; 64],
+    /// What the activations some choice pays mana for are paid as (`Alternative::source`).
+    costed: Vec<ManaPayment>,
+    /// For each group, what one of its sources could make at most of each set of types (`Search::within`).
+    each: Vec<[u32; 128]>,
+    /// For each group, what all the groups from it on could make at most of each set of types.
+    later: Vec<[u32; 128]>,
+    /// The steps left (`SEARCH_BUDGET`).
+    budget: std::cell::Cell<u32>,
+}
+
+impl Search<'_> {
+    /// Takes `n` steps of the budget: false once it is spent.
+    fn spend(&self, n: u32) -> bool {
+        let left = self.budget.get();
+        self.budget.set(left.saturating_sub(n));
+        left > 0
+    }
+
+    /// Whether mana restricted to `kind` may pay for some activation a choice costs mana for.
+    fn pays_activation(&self, kind: ManaRestriction) -> bool {
+        self.costed.iter().any(|p| kind.may_pay(p))
+    }
+
+    /// Whether mana restricted to `kind` may pay the cost.
+    fn may_pay(&self, kind: ManaRestriction) -> bool {
+        self.payment.is_some_and(|p| kind.may_pay(p))
+    }
+
+    /// How much mana `choice` could make that is one of `types` and could pay the cost: for every type, what it makes less
+    /// what its activation costs; restricted mana that may not pay the cost only where some activation costs mana it might
+    /// pay instead.
+    fn within(&self, choice: Option<(Alternative, Option<usize>)>, types: u8) -> u32 {
+        let Some((a, chosen)) = choice else { return 0 };
+        let made = a.made(chosen);
+        let own = if a.restriction.is_none_or(|r| self.may_pay(r) || (types == 63 && self.pays_activation(r))) {
+            (0..6).filter(|&m| types & (1 << m) != 0).map(|m| made[m]).fold(0u32, u32::saturating_add)
+        } else {
+            0
+        };
+        let extra = (0..6).filter(|&m| types & (1 << m) != 0).map(|m| a.extra[m]).fold(0u32, u32::saturating_add);
+        let produced = if a.produces(chosen) & types != 0 { a.produced } else { 0 };
+        let n = own.saturating_add(extra).saturating_add(produced);
+        if types == 63 { n.saturating_sub(a.cost.mana_value()) } else { n }
+    }
+
+    /// What `with` holds of each set of types that could pay the cost (Hall's condition, as `flex_pays`).
+    fn held(&self, with: &Available) -> [u32; 64] {
+        let mut held = [0u32; 64];
+        let flex: Vec<(usize, u32)> = with.flex.iter().enumerate().filter(|&(_, &k)| k > 0).map(|(mask, &k)| (mask, k)).collect();
+        for (types, held) in held.iter_mut().enumerate() {
+            let mut n: u32 = (0..6).filter(|&m| types & (1 << m) != 0).map(|m| with.fixed[m]).fold(0, u32::saturating_add);
+            n = flex.iter().filter(|&&(mask, _)| mask & types != 0).fold(n, |n, &(_, k)| n.saturating_add(k));
+            for &(kind, fixed, k) in &with.restricted {
+                if self.may_pay(kind) || (types == 63 && self.pays_activation(kind)) {
+                    n = (0..6).filter(|&m| types & (1 << m) != 0).fold(n, |n, m| n.saturating_add(fixed[m]));
+                    if types & ANY_COLOR as usize != 0 {
+                        n = n.saturating_add(k);
+                    }
+                }
+            }
+            n = with.linked.iter().filter(|&&(mask, _)| mask as usize & types != 0).fold(n, |n, &(_, k)| n.saturating_add(k));
+            *held = n;
+        }
+        held
+    }
+
+    /// Whether some choice for the groups from `at` on covers the cost.
+    fn group(&self, at: usize, leaf: &Leaf) -> bool {
+        if at == self.choices.len() {
+            return self.judge(leaf);
+        }
+        self.spread(at, 0, self.counts[at], leaf)
+    }
+
+    /// Whether some spread of `left` sources of group `at` over its choices from `option` on covers the cost.
+    fn spread(&self, at: usize, option: usize, left: u32, leaf: &Leaf) -> bool {
+        if !self.spend(1) {
+            return true;
+        }
+        if !self.might(at, left, leaf) {
+            return false;
+        }
+        let options = &self.choices[at];
+        if option + 1 >= options.len() {
+            return match left {
+                0 => self.group(at + 1, leaf),
+                _ => self.group(at + 1, &self.take(leaf, options[option], left)),
+            };
+        }
+        (0..=left).rev().any(|here| match here {
+            0 => self.spread(at, option + 1, left, leaf),
+            _ => self.spread(at, option + 1, left - here, &self.take(leaf, options[option], here)),
+        })
+    }
+
+    /// Whether the cost might still be covered with `leaf`, `left` sources of group `at` and those of the groups after it to
+    /// be chosen for: for every set of types, the symbols only those types may pay are no more than the mana of them there
+    /// could be if each source made the most of them it could (Hall's condition on a bound), and those symbols and all the
+    /// cost no more than the most a source could make of both together - a choice that fails it fails.
+    fn might(&self, at: usize, left: u32, leaf: &Leaf) -> bool {
+        let could = |i: usize, held: u32| held.saturating_add(self.each[at][i].saturating_mul(left)).saturating_add(self.later[at + 1][i]);
+        (1..64).all(|types| {
+            self.demand[types] <= could(types, leaf.held[types])
+                && self.demand[types].saturating_add(self.demand[63]) <= could(64 + types, leaf.held[types].saturating_add(leaf.held[63]))
+        })
+    }
+
+    /// `leaf` with `n` sources more making `choice`.
+    fn take(&self, leaf: &Leaf, choice: Option<(Alternative, Option<usize>)>, n: u32) -> Leaf {
+        let mut next = Leaf { with: leaf.with.without_complex(), costed: leaf.costed.clone(), held: leaf.held };
+        let Some((a, chosen)) = choice.filter(|_| n > 0) else { return next };
+        for (types, held) in next.held.iter_mut().enumerate() {
+            *held = held.saturating_add(self.within(choice, types as u8).saturating_mul(n));
+        }
+        if !a.cost.is_zero() {
+            next.costed.push((a, chosen, n));
+            return next;
+        }
+        let with = &mut next.with;
+        let made = a.made(chosen).map(|x| x.saturating_mul(n));
+        match a.restriction {
+            Some(kind) => add_available(&mut with.restricted, kind, made, 0),
+            None => {
+                for m in 0..6 {
+                    with.fixed[m] = with.fixed[m].saturating_add(made[m]);
+                }
+            }
+        }
+        for m in 0..6 {
+            with.fixed[m] = with.fixed[m].saturating_add(a.extra[m].saturating_mul(n));
+        }
+        if a.produced > 0 {
+            let types = a.produces(chosen) as usize;
+            with.flex[types] = with.flex[types].saturating_add(a.produced.saturating_mul(n));
+        }
+        next
+    }
+
+    /// Whether the mana of one full choice covers the cost: as it is where no activation costs mana, and otherwise in some
+    /// order of the activations, each paid with mana there before it (CR 605.3a: a mana ability's cost is paid as it is
+    /// activated, never with its own mana).
+    fn judge(&self, leaf: &Leaf) -> bool {
+        if leaf.costed.is_empty() || leaf.with.unknown {
+            return match self.payment {
+                Some(payment) => leaf.with.covers_as(self.cost, payment),
+                None => leaf.with.covers(self.cost),
+            };
+        }
+        let with = &leaf.with;
+        let mut supply: Vec<Supply> = Vec::new();
+        for m in 0..6 {
+            supply.push(Supply { stage: 0, types: 1 << m, restriction: None, n: with.fixed[m] });
+        }
+        for (types, &n) in with.flex.iter().enumerate().filter(|(_, n)| **n > 0) {
+            supply.push(Supply { stage: 0, types: types as u8, restriction: None, n });
+        }
+        for &(kind, fixed, n) in &with.restricted {
+            for m in 0..6 {
+                supply.push(Supply { stage: 0, types: 1 << m, restriction: Some(kind), n: fixed[m] });
+            }
+            supply.push(Supply { stage: 0, types: ANY_COLOR, restriction: Some(kind), n });
+        }
+        let mut linked = with.linked.clone();
+        linked.sort_unstable();
+        let mut left: Vec<u32> = leaf.costed.iter().map(|&(_, _, n)| n).collect();
+        self.linked_types(leaf, &mut supply, &linked, 0, 0, &mut Vec::new(), &mut left)
+    }
+
+    /// `judge`, with a type chosen for each group of `linked` from `at` on (groups alike in a type order no lower than the
+    /// one before, the same choices in another order being the same mana).
+    #[allow(clippy::too_many_arguments)]
+    fn linked_types(&self, leaf: &Leaf, supply: &mut Vec<Supply>, linked: &[(u8, u32)], at: usize, least: usize, order: &mut Vec<usize>, left: &mut [u32]) -> bool {
+        let Some(&(types, n)) = linked.get(at) else {
+            return self.orders(leaf, supply, order, left);
+        };
+        let floor = if at > 0 && linked[at - 1] == linked[at] { least } else { 0 };
+        (floor..6).filter(|&m| types & (1 << m) != 0).any(|m| {
+            supply.push(Supply { stage: 0, types: 1 << m, restriction: None, n });
+            let covered = self.linked_types(leaf, supply, linked, at + 1, m, order, left);
+            supply.pop();
+            covered
+        })
+    }
+
+    /// Whether, in some order of the activations that cost mana (those alike interchangeable), each is paid with mana there
+    /// before it and the cost with what is left.
+    fn orders(&self, leaf: &Leaf, supply: &[Supply], order: &mut Vec<usize>, left: &mut [u32]) -> bool {
+        if order.is_empty() {
+            // With every activation's mana there before any is paid for, no order can do better: tried first, and the
+            // orders only where it pays.
+            let all: Vec<usize> = left.iter().enumerate().flat_map(|(i, &n)| std::iter::repeat_n(i, n as usize)).collect();
+            if !self.staged(leaf, supply, &all, true) {
+                return false;
+            }
+        }
+        if left.iter().all(|&n| n == 0) {
+            return self.staged(leaf, supply, order, false);
+        }
+        for i in 0..left.len() {
+            if left[i] == 0 {
+                continue;
+            }
+            left[i] -= 1;
+            order.push(i);
+            let covered = self.orders(leaf, supply, order, left);
+            order.pop();
+            left[i] += 1;
+            if covered {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Whether the activations in `order` and then the cost can all be paid, each with mana made before it: each mana sent
+    /// to a symbol it may pay (CR 106.6, 601.2h), found as a maximum flow.
+    /// `at_once`: every activation's mana there before any is paid for (its own too) - a bound no order passes if it fails.
+    fn staged(&self, leaf: &Leaf, base: &[Supply], order: &[usize], at_once: bool) -> bool {
+        if !self.spend(4) {
+            return true;
+        }
+        let mut supply: Vec<Supply> = base.to_vec();
+        let mut demand: Vec<Demand> = Vec::new();
+        for (step, &i) in order.iter().enumerate() {
+            let stage = if at_once { 0 } else { step as u32 + 1 };
+            let (a, chosen, _) = leaf.costed[i];
+            let cost = if leaf.with.any_color { a.cost.paid_with_any_color() } else { a.cost };
+            Demand::of(&cost, if at_once { 1 } else { stage }, Some(a.source), &mut demand);
+            let made = a.made(chosen);
+            for m in 0..6 {
+                supply.push(Supply { stage, types: 1 << m, restriction: a.restriction, n: made[m] });
+                supply.push(Supply { stage, types: 1 << m, restriction: None, n: a.extra[m] });
+            }
+            supply.push(Supply { stage, types: a.produces(chosen), restriction: None, n: a.produced });
+        }
+        Demand::of(self.cost, u32::MAX, self.payment.copied(), &mut demand);
+        supply.retain(|s| s.n > 0 && s.types != 0);
+        demand.retain(|d| d.n > 0);
+        transports(&supply, &demand)
+    }
+}
+
+/// Mana, for `Search::staged`: made at a `stage` (0 for what is there before any activation that costs mana), of one of
+/// `types`, how much.
+#[derive(Clone, Copy)]
+struct Supply {
+    stage: u32,
+    types: u8,
+    restriction: Option<ManaRestriction>,
+    n: u32,
+}
+
+/// Symbols to pay, for `Search::staged`: paid at a `stage` with mana made before it, by mana of one of `types`, for
+/// `payment` (none: unrestricted mana only), how many.
+struct Demand {
+    stage: u32,
+    types: u8,
+    payment: Option<ManaPayment>,
+    n: u32,
+}
+
+impl Demand {
+    /// The symbols of `cost` (its X at 0): each colored one paid by its type, a hybrid one by either, the generic by any.
+    fn of(cost: &ManaCost, stage: u32, payment: Option<ManaPayment>, out: &mut Vec<Demand>) {
+        for m in 0..6 {
+            out.push(Demand { stage, types: 1 << m, payment, n: u32::from(cost.symbols[m]) });
+        }
+        for (a, b) in cost.hybrid.iter().flatten() {
+            out.push(Demand { stage, types: (1 << *a as usize) | (1 << *b as usize), payment, n: 1 });
+        }
+        out.push(Demand { stage, types: 0b11_1111, payment, n: u32::from(cost.generic) });
+    }
+
+    /// Whether `supply` may pay it.
+    fn takes(&self, supply: &Supply) -> bool {
+        supply.stage < self.stage && supply.types & self.types != 0 && supply.restriction.is_none_or(|r| self.payment.is_some_and(|p| r.may_pay(&p)))
+    }
+}
+
+/// Whether all of `demand` can be paid from `supply`: a maximum flow from the mana to the symbols (Edmonds-Karp).
+fn transports(supply: &[Supply], demand: &[Demand]) -> bool {
+    let need: u64 = demand.iter().map(|d| u64::from(d.n)).sum();
+    if need == 0 {
+        return true;
+    }
+    if supply.iter().map(|s| u64::from(s.n)).sum::<u64>() < need {
+        return false;
+    }
+    // Nodes: the source, each supply, each demand, the sink.
+    let size = supply.len() + demand.len() + 2;
+    let (source, sink, first_demand) = (0, size - 1, 1 + supply.len());
+    let mut capacity = vec![vec![0u64; size]; size];
+    for (i, s) in supply.iter().enumerate() {
+        capacity[source][1 + i] = u64::from(s.n);
+        for (j, d) in demand.iter().enumerate() {
+            if d.takes(s) {
+                capacity[1 + i][first_demand + j] = u64::from(s.n);
+            }
+        }
+    }
+    for (j, d) in demand.iter().enumerate() {
+        capacity[first_demand + j][sink] = u64::from(d.n);
+    }
+    let mut flow = 0u64;
+    loop {
+        let mut parent = vec![usize::MAX; size];
+        parent[source] = source;
+        let mut queue = std::collections::VecDeque::from([source]);
+        while let Some(u) = queue.pop_front() {
+            for v in 0..size {
+                if parent[v] == usize::MAX && capacity[u][v] > 0 {
+                    parent[v] = u;
+                    queue.push_back(v);
+                }
+            }
+        }
+        if parent[sink] == usize::MAX {
+            return false;
+        }
+        let mut push = u64::MAX;
+        let mut v = sink;
+        while v != source {
+            push = push.min(capacity[parent[v]][v]);
+            v = parent[v];
+        }
+        let mut v = sink;
+        while v != source {
+            let u = parent[v];
+            capacity[u][v] -= push;
+            capacity[v][u] += push;
+            v = u;
+        }
+        flow += push;
+        if flow >= need {
+            return true;
+        }
     }
 }
 
@@ -2140,20 +2664,6 @@ fn flex_pays(unpaid: &[u32; 64], flex: &[u32; 64]) -> bool {
     true
 }
 
-/// The mana types a mana ability could add (a bit for each `Mana`).
-fn yield_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u8 {
-    let mut types = 0u8;
-    for m in 0..6 {
-        if def.adds.0[m] > 0 {
-            types |= 1 << m;
-        }
-    }
-    if def.adds_any > 0 {
-        types |= any_types(cx, id, player, def);
-    }
-    types
-}
-
 /// The colors a mana ability's "mana of any color" may be: those it names, or all five.
 fn any_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u8 {
     match def.colors_from {
@@ -2172,6 +2682,23 @@ pub fn could_act_with_more_mana(cx: &Cx, player: PlayerId) -> bool {
     for (types, _) in std::mem::take(&mut more.linked) {
         more.flex[types as usize] += 1;
     }
+    // So does a source with a choice of abilities, each of them in turn.
+    for (alternatives, _) in std::mem::take(&mut more.complex) {
+        for a in alternatives {
+            let extra = (0..6).filter(|&m| a.extra[m] > 0).fold(0u8, |t, m| t | 1 << m);
+            let made = a.produces(None) | a.types;
+            match a.restriction {
+                Some(kind) => {
+                    let fixed = std::array::from_fn(|m| u32::from(made & (1 << m) != 0));
+                    add_available(&mut more.restricted, kind, fixed, 0);
+                }
+                None => more.flex[made as usize] += 1,
+            }
+            if extra != 0 {
+                more.flex[extra as usize] += 1;
+            }
+        }
+    }
     for n in more.fixed.iter_mut().filter(|n| **n > 0) {
         *n = u16::MAX as u32;
     }
@@ -2186,7 +2713,6 @@ pub fn could_act_with_more_mana(cx: &Cx, player: PlayerId) -> bool {
             *flex = u16::MAX as u32;
         }
     }
-    more.consume = 0;
     let unlimited = std::cell::OnceCell::new();
     let _ = unlimited.set(more);
     let mut options = Vec::new();
@@ -7189,5 +7715,137 @@ mod tests {
         assert_eq!(at_least(mana("{W}{U}{B}"), 3), mana("{W}{U}{B}"));
         assert_eq!(at_least(mana("{5}{R}"), 3), mana("{5}{R}"));
         assert_eq!(at_least(mana("{U}"), 0), mana("{U}"));
+    }
+
+    /// What `fixed` mana and the choosing sources `complex` could pay, as the advice counts it.
+    fn pool(fixed: [u32; 6], complex: Vec<(Vec<Alternative>, u32)>) -> Available {
+        Available {
+            fixed,
+            flex: [0; 64],
+            unknown: false,
+            changers: Vec::new(),
+            grantors: Vec::new(),
+            restricted: Vec::new(),
+            any_color: false,
+            linked: Vec::new(),
+            complex,
+        }
+    }
+    fn adds(fixed: [u32; 6]) -> Alternative {
+        Alternative { fixed, k: 0, types: 0, restriction: None, cost: ManaCost::ZERO, source: ManaPayment::Other, extra: [0; 6], produced: 0 }
+    }
+    fn one(mana: Mana, n: u32) -> [u32; 6] {
+        let mut out = [0; 6];
+        out[mana as usize] = n;
+        out
+    }
+    const CREATURE_SPELL: ManaPayment = ManaPayment::Spell {
+        types: TypeSet::of(&[CardType::Creature]),
+        subtypes: SubtypeSet::NONE,
+        legendary: false,
+        mana_value: 2,
+        x: false,
+        from: ZoneKind::Hand,
+    };
+
+    #[test]
+    fn three_mana_of_one_color_is_never_three_colors() {
+        // Black Lotus: "Add three mana of any one color" - {B}{B}{B}, never {W}{U}{B} (CR 106.1b).
+        let lotus = Alternative { k: 3, types: ANY_COLOR, ..adds([0; 6]) };
+        let alone = pool([0; 6], vec![(vec![lotus], 1)]);
+        assert!(alone.covers(&mana("{B}{B}{B}")));
+        assert!(alone.covers(&mana("{1}{U}{U}")));
+        assert!(!alone.covers(&mana("{W}{U}{B}")));
+        assert!(!alone.covers(&mana("{4}")));
+        // A Mox Pearl beside it is the {W}; a second Lotus, two colors of three each.
+        assert!(!pool(one(Mana::W, 1), vec![(vec![lotus], 1)]).covers(&mana("{W}{U}{B}")));
+        assert!(pool(one(Mana::W, 1), vec![(vec![lotus], 1)]).covers(&mana("{W}{B}{B}{B}")));
+        let two = pool([0; 6], vec![(vec![lotus], 2)]);
+        assert!(two.covers(&mana("{U}{U}{U}{B}{B}{B}")));
+        assert!(!two.covers(&mana("{W}{U}{B}")));
+    }
+
+    #[test]
+    fn a_choice_of_abilities_makes_one_of_them() {
+        // A land with "{T}: Add {C}" and "{T}: Add {U}{U}" (a Shivan Reef under Mana Flare for {C}{C} or {U}{U}): one of
+        // the two, never {C} and {U} from the one tap.
+        let land = vec![adds(one(Mana::C, 1)), adds(one(Mana::U, 2))];
+        let alone = pool([0; 6], vec![(land.clone(), 1)]);
+        assert!(alone.covers(&mana("{U}{U}")));
+        assert!(alone.covers(&mana("{C}")));
+        assert!(!alone.covers(&mana("{C}{U}")));
+        assert!(!alone.covers(&mana("{3}")));
+        let two = pool([0; 6], vec![(land, 2)]);
+        assert!(two.covers(&mana("{C}{U}{U}")));
+        assert!(!two.covers(&mana("{C}{C}{U}")));
+    }
+
+    #[test]
+    fn a_restricted_and_an_unrestricted_ability_of_one_land_make_one_mana() {
+        // Cavern of Souls: "{T}: Add {C}" or one mana of any color only for creature spells of the chosen type - one or the
+        // other, so {1}{U} for such a creature is not paid by the Cavern alone.
+        let creatures = ManaRestriction::Spells(TypeSet::of(&[CardType::Creature]));
+        let cavern = vec![adds(one(Mana::C, 1)), Alternative { k: 1, types: ANY_COLOR, restriction: Some(creatures), ..adds([0; 6]) }];
+        let alone = pool([0; 6], vec![(cavern.clone(), 1)]);
+        assert!(alone.covers_as(&mana("{U}"), &CREATURE_SPELL));
+        assert!(!alone.covers_as(&mana("{1}{U}"), &CREATURE_SPELL));
+        assert!(!alone.covers(&mana("{U}")));
+        assert!(alone.covers(&mana("{1}")));
+        let island = pool(one(Mana::U, 1), vec![(cavern.clone(), 1)]);
+        assert!(island.covers_as(&mana("{1}{U}"), &CREATURE_SPELL));
+        assert!(island.covers_as(&mana("{U}{U}"), &CREATURE_SPELL));
+        assert!(!island.covers(&mana("{U}{U}")));
+        // Under Mana Flare, each tap adds another mana of the type it produced, unrestricted (CR 106.12a): the creature's
+        // {U}{U} from the colored tap, and the colorless tap's {C}{C} pays {2} for anything.
+        let flared: Vec<Alternative> = cavern.iter().map(|a| Alternative { produced: 1, ..*a }).collect();
+        let flared = pool([0; 6], vec![(flared, 1)]);
+        assert!(flared.covers_as(&mana("{U}{U}"), &CREATURE_SPELL));
+        assert!(flared.covers(&mana("{2}")));
+        assert!(flared.covers(&mana("{U}")));
+        assert!(!flared.covers(&mana("{U}{U}")));
+        assert!(!flared.covers_as(&mana("{2}{U}"), &CREATURE_SPELL));
+    }
+
+    #[test]
+    fn an_ability_that_costs_mana_is_paid_with_mana_there_before_it() {
+        // "{1}, {T}: Add {B}{B}" beside "{T}: Add {C}" - and a Swamp: {B}{B} (the Swamp pays the {1}), or the Swamp's {B}
+        // and the {C}; never three from the two (CR 605.3a).
+        let filter = vec![adds(one(Mana::C, 1)), Alternative { cost: mana("{1}"), ..adds(one(Mana::B, 2)) }];
+        let with_swamp = pool(one(Mana::B, 1), vec![(filter.clone(), 1)]);
+        assert!(with_swamp.covers(&mana("{B}{B}")));
+        assert!(with_swamp.covers(&mana("{C}{B}")));
+        assert!(!with_swamp.covers(&mana("{B}{B}{B}")));
+        assert_eq!(with_swamp.most_unrestricted(), 2);
+        // Alone, it can't pay its own {1}: only its {C}.
+        let alone = pool([0; 6], vec![(filter, 1)]);
+        assert!(alone.covers(&mana("{1}")));
+        assert!(!alone.covers(&mana("{B}")));
+        // A colored cost is paid with that color (Arena of Glory's "{R}, {T}, Exert: Add {R}{R}" beside "{T}: Add {R}"): an
+        // Island can't pay it, a Mountain can.
+        let arena = vec![adds(one(Mana::R, 1)), Alternative { cost: mana("{R}"), ..adds(one(Mana::R, 2)) }];
+        assert!(!pool(one(Mana::U, 1), vec![(arena.clone(), 1)]).covers(&mana("{R}{R}")));
+        assert!(pool(one(Mana::U, 1), vec![(arena.clone(), 1)]).covers(&mana("{U}{R}")));
+        assert!(pool(one(Mana::R, 1), vec![(arena.clone(), 1)]).covers(&mana("{R}{R}")));
+        assert!(!pool(one(Mana::R, 1), vec![(arena, 1)]).covers(&mana("{R}{R}{R}")));
+        // Two Signet-like sources ("{1}, {T}: Add {W}{U}") and one land: the land pays the first, the first's {W} the
+        // second's {1}, leaving {U}{W}{U} - never {W}{W}{U}{U}.
+        let signet = vec![Alternative { cost: mana("{1}"), ..adds([1, 1, 0, 0, 0, 0]) }];
+        let two = pool(one(Mana::C, 1), vec![(signet, 2)]);
+        assert!(two.covers(&mana("{W}{U}{U}")));
+        assert!(!two.covers(&mana("{W}{W}{U}{U}")));
+        assert!(!two.covers(&mana("{4}")));
+    }
+
+    #[test]
+    fn hybrid_symbols_are_matched_to_the_mana_that_pays_them_all() {
+        // Leyline of the Guildpact's {G/W}{G/U}{B/G}{R/G} off a Forest, a Plains, an Island and a Mountain: the Forest must
+        // pay the {B/G}, not the {G/W} it could pay first (CR 107.4e).
+        let lands = pool([1, 1, 0, 1, 1, 0], Vec::new());
+        assert!(lands.covers(&mana("{G/W}{G/U}{B/G}{R/G}")));
+        assert!(!lands.covers(&mana("{G/W}{G/U}{B/G}{B/G}")));
+        // A Black Lotus for three of one color beside them: still one choice.
+        let lotus = Alternative { k: 3, types: ANY_COLOR, ..adds([0; 6]) };
+        assert!(pool([1, 1, 0, 1, 1, 0], vec![(vec![lotus], 1)]).covers(&mana("{G/W}{G/U}{B/G}{R/G}{B}{B}{B}")));
+        assert!(!pool([1, 1, 0, 1, 1, 0], vec![(vec![lotus], 1)]).covers(&mana("{G/W}{G/U}{B/G}{R/G}{B}{B}{W}{W}")));
     }
 }
