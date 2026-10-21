@@ -881,140 +881,148 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>,
     // has been: "the first time each turn" is not this event.
     let outer = cx.g.history_end;
     cx.g.history_end = Some(start);
-    let mut found: Found = Vec::new();
-    let mut statics = TriggerStatics::new(before);
-    for event in events {
-        let mask = EventMask::of(event);
-        if mask.0 == 0 {
-            continue;
-        }
-        let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
-        if let Some(before) = before {
-            for &id in before {
-                consider(cx, id, true, true, event, mask, &mut statics, &mut found, None);
+    // The cut is lifted however the look ends: a host that catches a panic goes on with the game (`cantrip_host::host`).
+    let looked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let mut found: Found = Vec::new();
+        let mut statics = TriggerStatics::new(before);
+        for event in events {
+            let mask = EventMask::of(event);
+            if mask.0 == 0 {
+                continue;
             }
-            for &id in &now {
-                consider(cx, id, false, true, event, mask, &mut statics, &mut found, None);
+            let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
+            if let Some(before) = before {
+                for &id in before {
+                    consider(cx, id, true, true, event, mask, &mut statics, &mut found, None);
+                }
+                for &id in &now {
+                    consider(cx, id, false, true, event, mask, &mut statics, &mut found, None);
+                }
+            } else {
+                // The same permanents for both: each one's characteristics are found once, and the abilities that don't look
+                // back come after every one that does, as they would from two passes.
+                let mut later: Found = Vec::new();
+                for &id in &now {
+                    consider(cx, id, true, true, event, mask, &mut statics, &mut found, Some(&mut later));
+                }
+                found.append(&mut later);
             }
-        } else {
-            // The same permanents for both: each one's characteristics are found once, and the abilities that don't look
-            // back come after every one that does, as they would from two passes.
-            let mut later: Found = Vec::new();
-            for &id in &now {
-                consider(cx, id, true, true, event, mask, &mut statics, &mut found, Some(&mut later));
+            // An emblem's triggered abilities function in the command zone (CR 114.4), which it never leaves, so it is there
+            // both before the event and after it: its look-back abilities (a "whenever a creature dies"; CR 603.10a) and the
+            // others alike are asked of it, each once, the look-back ones judged by what stopped or multiplied triggering
+            // before the event (`TriggerStatics`), as any other's are.
+            if !cx.s().zone(Zone::COMMAND).is_empty() {
+                let mut later: Found = Vec::new();
+                for id in cx.s().zone(Zone::COMMAND).to_vec() {
+                    consider(cx, id, true, false, event, mask, &mut statics, &mut found, Some(&mut later));
+                }
+                found.append(&mut later);
             }
-            found.append(&mut later);
-        }
-        // An emblem's triggered abilities function in the command zone (CR 114.4), which it never leaves, so it is there
-        // both before the event and after it: its look-back abilities (a "whenever a creature dies"; CR 603.10a) and the
-        // others alike are asked of it, each once, the look-back ones judged by what stopped or multiplied triggering
-        // before the event (`TriggerStatics`), as any other's are.
-        if !cx.s().zone(Zone::COMMAND).is_empty() {
-            let mut later: Found = Vec::new();
-            for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                consider(cx, id, true, false, event, mask, &mut statics, &mut found, Some(&mut later));
-            }
-            found.append(&mut later);
-        }
-        // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
-        if cx.s().delayed.iter().any(|d| d.when.is_event()) {
-            for d in cx.s().delayed.clone() {
-                // "You" in its trigger event is its own controller, the player who controlled the spell or ability that
-                // created it (CR 603.7d-e), whoever controls its source now and wherever the source has gone. So is "you"
-                // in an intervening "if" (CR 603.4).
-                let asker = Asker { source: d.source, controller: d.controller };
-                if d.when.is_event()
-                    && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
-                    // A delayed triggered mana ability never goes on the stack: it resolves as the mana ability that
-                    // triggered it does (CR 605.1b, 605.4a), in `tapped_for_mana`.
-                    && !t.mana_ability
-                    && t.listens.intersects(mask)
-                    && let Some(fired) = t.fires(cx, &asker, event)
-                    && t.condition.is_none_or(|condition| condition(cx, &asker))
-                    // The end of an "until" exile is no triggered ability but the second one-shot effect the rules create
-                    // immediately after the event (CR 610.3), so nothing that stops abilities triggering stops it, and the
-                    // event that ends the wait always uses it up below. A "this turn" delayed ability is a triggered ability
-                    // (CR 603.7b) and is stopped like any other. It is no ability of a permanent, and nothing makes it trigger an
-                    // additional time (CR 603.2d).
-                    && (d.when == DelayedWhen::UntilEvent
-                        || !statics.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t, permanent: false }))
-                {
-                    found.push((
-                        PendingTrigger {
-                            source: d.source,
-                            ability: d.ability,
-                            controller: d.controller,
-                            subject: if d.when == DelayedWhen::UntilEvent { d.subject } else { fired.subject },
-                            data: fired.data,
-                            members: Span::default(),
-                            count: None,
-                            // A delayed ability goes on the stack with the moment it was created (CR 701.27f).
-                            since: Some(d.since),
-                        },
-                        t,
-                        Again::new(),
-                    ));
-                    // "Until" is used up by the event that ends the wait (CR 603.7b), and "when you next" by the event it
-                    // triggers on (CR 603.7b).
-                    if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::NextThisTurn)
-                        && let Some(at) = cx.s().delayed.iter().position(|x| *x == d)
+            // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
+            if cx.s().delayed.iter().any(|d| d.when.is_event()) {
+                for d in cx.s().delayed.clone() {
+                    // "You" in its trigger event is its own controller, the player who controlled the spell or ability that
+                    // created it (CR 603.7d-e), whoever controls its source now and wherever the source has gone. So is "you"
+                    // in an intervening "if" (CR 603.4).
+                    let asker = Asker { source: d.source, controller: d.controller };
+                    if d.when.is_event()
+                        && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
+                        // A delayed triggered mana ability never goes on the stack: it resolves as the mana ability that
+                        // triggered it does (CR 605.1b, 605.4a), in `tapped_for_mana`.
+                        && !t.mana_ability
+                        && t.listens.intersects(mask)
+                        && let Some(fired) = t.fires(cx, &asker, event)
+                        && t.condition.is_none_or(|condition| condition(cx, &asker))
+                        // The end of an "until" exile is no triggered ability but the second one-shot effect the rules create
+                        // immediately after the event (CR 610.3), so nothing that stops abilities triggering stops it, and the
+                        // event that ends the wait always uses it up below. A "this turn" delayed ability is a triggered ability
+                        // (CR 603.7b) and is stopped like any other. It is no ability of a permanent, and nothing makes it trigger an
+                        // additional time (CR 603.2d).
+                        && (d.when == DelayedWhen::UntilEvent
+                            || !statics.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t, permanent: false }))
                     {
-                        cx.st().delayed_remove(at);
+                        found.push((
+                            PendingTrigger {
+                                source: d.source,
+                                ability: d.ability,
+                                controller: d.controller,
+                                subject: if d.when == DelayedWhen::UntilEvent { d.subject } else { fired.subject },
+                                data: fired.data,
+                                members: Span::default(),
+                                count: None,
+                                // A delayed ability goes on the stack with the moment it was created (CR 701.27f).
+                                since: Some(d.since),
+                            },
+                            t,
+                            Again::new(),
+                        ));
+                        // "Until" is used up by the event that ends the wait (CR 603.7b), and "when you next" by the event it
+                        // triggers on (CR 603.7b).
+                        if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::NextThisTurn)
+                            && let Some(at) = cx.s().delayed.iter().position(|x| *x == d)
+                        {
+                            cx.st().delayed_remove(at);
+                        }
+                    }
+                }
+            }
+            // Abilities that function in other zones (they say where themselves): only cards that have one are looked at.
+            // A spell on the stack is among them: "when you cast this spell" (storm, replicate; CR 702.40a, 702.56a)
+            // triggers from the stack.
+            // A spell may also be given such an ability by a static ability (Thrumming Stone's ripple, CR 613.1f), which only
+            // a game that has had static abilities in play can have done.
+            let cards = cx.cards();
+            let granted = mask.intersects(EventMask::SPELL_CAST) && cx.s().statics_seen;
+            let elsewhere: Vec<ObjectId> = cx
+                .s()
+                .seats()
+                .flat_map(|p| [Zone::hand(p), Zone::graveyard(p), Zone::exile(p)])
+                .chain(std::iter::once(Zone::STACK))
+                .flat_map(|z| cx.s().zone(z).iter().copied())
+                .filter(|&id| cards.anywhere[cx.s().obj(id).card.0 as usize] || (granted && cx.s().obj(id).zone.is(ZoneKind::Stack)))
+                .collect();
+            for id in elsewhere {
+                let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
+                for ability in chars.abilities() {
+                    if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
+                        && t.anywhere
+                        && t.listens.intersects(mask)
+                        && let Some(fired) = t.fires(cx, &Asker { source: id, controller: cx.s().obj(id).controller }, event)
+                    {
+                        // A spell is controlled by whoever cast it; a card in another zone answers to its owner.
+                        let controller = if cx.s().obj(id).zone.is(ZoneKind::Stack) {
+                            cx.s().obj(id).controller
+                        } else {
+                            cx.s().obj(id).owner
+                        };
+                        if let Some(condition) = t.condition
+                            && !condition(cx, &Asker { source: id, controller })
+                        {
+                            continue;
+                        }
+                        let triggering = Triggering { source: id, controller, def: t, permanent: false };
+                        if statics.stop(cx, event, &triggering) {
+                            continue;
+                        }
+                        let mut again = Again::new();
+                        statics.additional(cx, event, &triggering, &mut again);
+                        found.push((
+                            PendingTrigger { source: id, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None, since: None },
+                            t,
+                            again,
+                        ));
                     }
                 }
             }
         }
-        // Abilities that function in other zones (they say where themselves): only cards that have one are looked at.
-        // A spell on the stack is among them: "when you cast this spell" (storm, replicate; CR 702.40a, 702.56a)
-        // triggers from the stack.
-        // A spell may also be given such an ability by a static ability (Thrumming Stone's ripple, CR 613.1f), which only
-        // a game that has had static abilities in play can have done.
-        let cards = cx.cards();
-        let granted = mask.intersects(EventMask::SPELL_CAST) && cx.s().statics_seen;
-        let elsewhere: Vec<ObjectId> = cx
-            .s()
-            .seats()
-            .flat_map(|p| [Zone::hand(p), Zone::graveyard(p), Zone::exile(p)])
-            .chain(std::iter::once(Zone::STACK))
-            .flat_map(|z| cx.s().zone(z).iter().copied())
-            .filter(|&id| cards.anywhere[cx.s().obj(id).card.0 as usize] || (granted && cx.s().obj(id).zone.is(ZoneKind::Stack)))
-            .collect();
-        for id in elsewhere {
-            let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
-            for ability in chars.abilities() {
-                if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
-                    && t.anywhere
-                    && t.listens.intersects(mask)
-                    && let Some(fired) = t.fires(cx, &Asker { source: id, controller: cx.s().obj(id).controller }, event)
-                {
-                    // A spell is controlled by whoever cast it; a card in another zone answers to its owner.
-                    let controller = if cx.s().obj(id).zone.is(ZoneKind::Stack) {
-                        cx.s().obj(id).controller
-                    } else {
-                        cx.s().obj(id).owner
-                    };
-                    if let Some(condition) = t.condition
-                        && !condition(cx, &Asker { source: id, controller })
-                    {
-                        continue;
-                    }
-                    let triggering = Triggering { source: id, controller, def: t, permanent: false };
-                    if statics.stop(cx, event, &triggering) {
-                        continue;
-                    }
-                    let mut again = Again::new();
-                    statics.additional(cx, event, &triggering, &mut again);
-                    found.push((
-                        PendingTrigger { source: id, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None, since: None },
-                        t,
-                        again,
-                    ));
-                }
-            }
-        }
-    }
+        found
+    }));
     // The triggerings are counted in the history as it now is (`Event::Triggered`).
     cx.g.history_end = outer;
+    let found = match looked {
+        Ok(found) => found,
+        Err(panic) => std::panic::resume_unwind(panic),
+    };
     if found.is_empty() {
         return;
     }
