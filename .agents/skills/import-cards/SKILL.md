@@ -130,7 +130,8 @@ python tools/maintenance/missing-art.py --tokens <the list>
 
 The first prints, one per line, every face of a card on the list that has a card file and no art under
 `content/*/images/`. That means the front face, and also a back face or split half under its own name on its own
-line (an adventure, omen or prepare face is drawn with the card's art). It covers the whole list, not only this run's cards, because what matters is everything the
+line, and a prepare spell printed as a card of its own (Regrowth). An adventure or omen face is drawn with the card's art,
+and a prepare spell printed only on its card has none. It covers the whole list, not only this run's cards, because what matters is everything the
 list still needs. `--tokens` does the same for the tokens those cards make.
 
 End the final report with the art, after everything `add-cards` reports:

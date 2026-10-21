@@ -1,7 +1,7 @@
 """Which card faces and tokens have no art, for every card the engine has (a card file under content/*/cards/).
 
-    python tools/maintenance/missing-art.py            every face name of every card (front, back face, split halves)
-                                                        with no picture, one a line and nothing else
+    python tools/maintenance/missing-art.py            every face name of every card (front, back face, split halves, a
+                                                        prepare spell that is a card of its own) with no picture, one a line and nothing else
     python tools/maintenance/missing-art.py --tokens   the same for the tokens those cards make
 
 Either narrows to the cards of one list: --list <Cube> (docs/cube-lists/<Cube>.txt) or --file <path> (any list of
@@ -19,7 +19,9 @@ import json
 import os
 import re
 import sys
+import time
 import unicodedata
+import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CARD_CODE = os.path.join(ROOT, "crates", "cantrip-cards", "src", "cards")
@@ -92,13 +94,34 @@ def card_files():
     return by_name
 
 
-def faces(card):
-    # A split card is drawn as its halves, each with its own art (CardFace.ArtNames). An adventure, omen or prepare
-    # face has no art of its own: it is drawn with the card's.
+def printed_alone(names):
+    """Which of `names` Scryfall knows as a card of its own, not only as a face of another card (Regrowth, which
+    Emeritus of Abundance prepares, but not Ancestral Craving, printed only on Bloodline Recollector)."""
+    found = set()
+    names = sorted(set(names))
+    for start in range(0, len(names), 75):
+        body = json.dumps({"identifiers": [{"name": n} for n in names[start:start + 75]]}).encode()
+        request = urllib.request.Request("https://api.scryfall.com/cards/collection", data=body, headers={
+            "User-Agent": "cantrip-missing-art/1.0", "Accept": "application/json", "Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                found.update(card["name"] for card in json.load(response)["data"])
+        except OSError as error:
+            sys.exit("Scryfall did not answer which prepare spells are cards of their own: " + str(error))
+        time.sleep(0.1)
+    return found
+
+
+def faces(card, alone):
+    # A split card is drawn as its halves, each with its own art (CardFace.ArtNames). An adventure or omen face has no
+    # art of its own: it is drawn with the card's. A prepare spell is shown beside its card with its own name's art,
+    # which there is only when it was printed as a card of its own.
     halves = card.get("halves") or []
     names = [half["name"] for half in halves] if halves else [card["name"]]
-    if isinstance(card.get("backFace"), dict) and card["backFace"].get("name"):
-        names.append(card["backFace"]["name"])
+    for key in ("backFace", "prepare"):
+        face = card.get(key)
+        if isinstance(face, dict) and face.get("name") and (key == "backFace" or face["name"] in alone):
+            names.append(face["name"])
     return names
 
 
@@ -142,8 +165,10 @@ def main():
         chosen = [cards[slug(name)] for name in listed_names(only, path) if slug(name) in cards]
     else:
         chosen = list(cards.values())
+    prepared = [card["prepare"]["name"] for card in chosen if isinstance(card.get("prepare"), dict)]
+    alone = printed_alone(prepared) if prepared and not want_tokens else set()
     for card in chosen:
-        for face in (tokens_of(card, shared) if want_tokens else faces(card)):
+        for face in (tokens_of(card, shared) if want_tokens else faces(card, alone)):
             drawn = face[: -len(" Token")] if want_tokens and face.endswith(" Token") else face
             if slug(drawn) not in art and face not in missing:
                 missing.append(face)
