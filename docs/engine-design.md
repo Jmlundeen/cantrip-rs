@@ -1456,7 +1456,9 @@ one permanent sacrificed or counters removed from its source (`actions::Repeat`)
 it can spend. Each permanent it could sacrifice is a source of its own for `Available`, whose alternatives are the
 abilities that could sacrifice it (Ashnod's Altar, Phyrexian Altar: one or the other, never both), and each counter one
 activation (Cryptic Trilobite); the permanent's own mana abilities are counted apart, since it may be tapped for mana and
-then sacrificed.
+then sacrificed. An ability that taps an untapped permanent instead (Urza, Lord High Artificer's "Tap an untapped artifact
+you control: Add {U}") joins the alternatives of each permanent it could tap: that permanent's own {T} mana abilities or
+it, never both. One with a mana ability without {T} as well keeps the tap apart, which may over-offer.
 
 ### Mana spent as though it were of any color
 

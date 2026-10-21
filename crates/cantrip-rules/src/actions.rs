@@ -1872,6 +1872,8 @@ struct Alternative {
     source: ManaPayment,
     extra: [u32; 6],
     produced: u32,
+    /// Its cost has {T} (CR 107.5): it taps its source, as an ability that taps an untapped permanent would.
+    tapped: bool,
 }
 
 impl Alternative {
@@ -1952,6 +1954,8 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     // The mana abilities without {T} that may be activated again for as long as their cost can be paid (CR 602.2, 605):
     // each with the source and what one activation spends (`Repeat`).
     let mut repeatable: Vec<(Alternative, ObjectId, Repeat)> = Vec::new();
+    // Each source's own mana abilities, kept until the repeatable ones that could tap it are known (`Repeat::Tap`).
+    let mut own: Vec<(ObjectId, Vec<Alternative>)> = Vec::new();
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player || skip == Some(id) {
             continue;
@@ -1998,6 +2002,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 source: ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes },
                 extra: [0; 6],
                 produced: 0,
+                tapped: false,
             };
             // Mana of a type chosen from none is no mana (Thespian's Stage copying Sunken Citadel has no chosen color).
             if alternative.types == 0 {
@@ -2011,13 +2016,53 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                     (alternative.extra, alternative.produced) = tap_triggers(cx, &waiting, id, player, types);
                 }
             }
+            alternative.tapped = def.cost.tap;
             if let Some(repeat) = Repeat::of(&def.cost) {
                 repeatable.push((alternative, id, repeat));
                 continue;
             }
             alternatives.push(alternative);
         }
+        if !alternatives.is_empty() {
+            own.push((id, alternatives.clone()));
+        }
+    }
+    // An ability that taps an untapped permanent of its controller's (Urza, Lord High Artificer's "Tap an untapped artifact
+    // you control: Add {U}") is activated once for each such permanent, and taps it as the permanent's own {T} would: each
+    // is a source whose alternatives are its own {T} mana abilities and those that could tap it - one of them, never both. A
+    // permanent with a mana ability without {T} keeps that apart, the tap counted on its own.
+    let taps: Vec<(Alternative, ObjectId, Cost, PermanentCost)> = repeatable
+        .iter()
+        .filter_map(|&(a, source, repeat)| match repeat {
+            Repeat::Tap(cost, p) => Some((a, source, cost, p)),
+            _ => None,
+        })
+        .collect();
+    let tapping = |target: ObjectId| -> Vec<Alternative> {
+        if cx.s().obj(target).tapped {
+            return Vec::new();
+        }
+        taps.iter()
+            .filter(|(_, source, cost, p)| pays_permanents(cx, cost, p, &Asker { source: *source, controller: player }, target))
+            .map(|&(a, ..)| a)
+            .collect()
+    };
+    for (id, mut alternatives) in own.iter().cloned() {
+        if !taps.is_empty() && alternatives.iter().all(|a| a.tapped) {
+            alternatives.extend(tapping(id));
+        }
         account(&alternatives, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
+    }
+    if !taps.is_empty() {
+        for target in cx.permanents_of(player) {
+            if skip == Some(target) || own.iter().any(|(id, alternatives)| *id == target && alternatives.iter().all(|a| a.tapped)) {
+                continue;
+            }
+            let outlets = tapping(target);
+            if !outlets.is_empty() {
+                account(&outlets, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
+            }
+        }
     }
     // A repeatable ability is activated once for each thing its cost spends: each permanent it could sacrifice is a source of
     // its own, whose alternatives are the abilities that could sacrifice it - so one sacrificed to one is not to another -
@@ -2030,7 +2075,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 .iter()
                 .filter(|(_, source, repeat)| match *repeat {
                     Repeat::Sacrifice(cost, p) => pays_permanents(cx, &cost, &p, &Asker { source: *source, controller: player }, target),
-                    Repeat::Counters(..) => false,
+                    Repeat::Tap(..) | Repeat::Counters(..) => false,
                 })
                 .map(|&(a, ..)| a)
                 .collect();
@@ -2069,10 +2114,11 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
 
 /// What one activation of a mana ability without {T} spends, where its cost is that alone and so may be paid again for as
 /// long as there is more of it (CR 602.2): a permanent sacrificed (Ashnod's Altar, Phyrexian Altar, Krark-Clan Ironworks),
-/// or counters removed from its source (Cryptic Trilobite).
+/// an untapped permanent tapped (Urza, Lord High Artificer), or counters removed from its source (Cryptic Trilobite).
 #[derive(Clone, Copy)]
 enum Repeat {
     Sacrifice(Cost, PermanentCost),
+    Tap(Cost, PermanentCost),
     Counters(CounterKind, u8),
 }
 
@@ -2084,6 +2130,14 @@ impl Repeat {
         match (cost.permanents, cost.remove_counters) {
             (Some(p), None) if p.count == 1 && p.action == PermanentAction::Sacrifice && !p.tapped && Cost { permanents: None, tap: true, ..*cost }.is_tap_only() => {
                 Some(Repeat::Sacrifice(*cost, p))
+            }
+            (Some(p), None)
+                if p.count == 1
+                    && cost.tap_permanents
+                    && !p.tapped
+                    && Cost { permanents: None, tap_permanents: false, tap: true, ..*cost }.is_tap_only() =>
+            {
+                Some(Repeat::Tap(*cost, p))
             }
             (None, Some((kind, n))) if n > 0 && Cost { remove_counters: None, tap: true, ..*cost }.is_tap_only() => Some(Repeat::Counters(kind, n)),
             _ => None,
@@ -8162,7 +8216,7 @@ mod tests {
         }
     }
     fn adds(fixed: [u32; 6]) -> Alternative {
-        Alternative { fixed, k: 0, types: 0, restriction: None, cost: ManaCost::ZERO, source: ManaPayment::Other, extra: [0; 6], produced: 0 }
+        Alternative { fixed, k: 0, types: 0, restriction: None, cost: ManaCost::ZERO, source: ManaPayment::Other, extra: [0; 6], produced: 0, tapped: false }
     }
     fn one(mana: Mana, n: u32) -> [u32; 6] {
         let mut out = [0; 6];

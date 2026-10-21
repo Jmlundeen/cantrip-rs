@@ -6,11 +6,28 @@ use std::sync::OnceLock;
 
 use cantrip_engine::*;
 
+/// An instant costing {U}{U}{U}{U}.
+static FOUR_BLUE: CardDef = CardDef {
+    name: "Probe Four Blue",
+    cost: ManaCost { symbols: [0, 4, 0, 0, 0, 0], ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], |_, _| Ok(())),
+    ..CardDef::BLANK
+};
+/// An instant costing {3}{U}.
+static THREE_AND_BLUE: CardDef = CardDef {
+    name: "Probe Three And Blue",
+    cost: ManaCost { generic: 3, symbols: [0, 1, 0, 0, 0, 0], ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], |_, _| Ok(())),
+    ..CardDef::BLANK
+};
+
 static BEAR: CardDef = CardDef { name: "Probe Bear", types: TypeSet::of(&[CardType::Creature]), power: Some(2), toughness: Some(2), ..CardDef::BLANK };
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BEAR])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BEAR, &FOUR_BLUE, &THREE_AND_BLUE])))
 }
 
 /// Whether, with `permanents` on Bot1's battlefield and `card` in hand, `card` is offered at Bot1's first main phase.
@@ -49,4 +66,16 @@ fn ashnods_altar_with_four_creatures_offers_myr_battlesphere() {
 fn a_creature_two_altars_could_sacrifice_is_counted_once() {
     assert!(!offered(&["Ashnod's Altar", "Phyrexian Altar", "Probe Bear", "Probe Bear", "Probe Bear"], "Myr Battlesphere"));
     assert!(offered(&["Ashnod's Altar", "Phyrexian Altar", "Probe Bear", "Probe Bear", "Probe Bear", "Probe Bear"], "Myr Battlesphere"));
+}
+
+/// Urza, Lord High Artificer's "Tap an untapped artifact you control: Add {U}" is activated once for each untapped artifact,
+/// which it taps as the artifact's own {T} would: four Moxen make {U}{U}{U}{U} through Urza, and three make three mana, not
+/// four - each Mox tapped once, for its own color or for Urza's blue.
+#[test]
+fn urza_taps_each_untapped_artifact_once_for_blue() {
+    let moxen = ["Mox Ruby", "Mox Jet", "Mox Pearl", "Mox Sapphire"];
+    let board = |n: usize| std::iter::once("Urza, Lord High Artificer").chain(moxen.iter().copied().take(n)).collect::<Vec<_>>();
+    assert!(offered(&board(4), "Probe Four Blue"));
+    assert!(!offered(&board(3), "Probe Three And Blue"));
+    assert!(offered(&board(4), "Probe Three And Blue"));
 }
