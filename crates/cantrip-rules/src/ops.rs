@@ -3090,7 +3090,7 @@ mod tests {
     /// A game with Bot1's hand holding `on_battlefield`'s cards, put onto the battlefield in that order, and then Grown and
     /// Grown Relic, left in the hand (returned).
     fn game_with(on_battlefield: &[&'static CardDef]) -> (Game, Vec<ObjectId>) {
-        let cards: &'static CardTable = Box::leak(Box::new(CardTable::new([&HUMBLER, &ANIMATOR, &GROWN, &GROWN_RELIC])));
+        let cards: &'static CardTable = Box::leak(Box::new(CardTable::new([&HUMBLER, &ANIMATOR, &GROWN, &GROWN_RELIC, &BAN])));
         let mut deck: Vec<CardId> = on_battlefield.iter().map(|&d| cards.id_of(d)).collect();
         deck.extend([cards.id_of(&GROWN), cards.id_of(&GROWN_RELIC)]);
         let mut game = Game::new(cards, &Setup { decks: vec![deck, Vec::new()], ..Setup::default() });
@@ -3178,5 +3178,42 @@ mod tests {
         assert_eq!(cx.chars(animator).name, "Everflame");
         assert!(cx.chars(animator).name_set);
         assert_eq!(cx.chars(card).name, "Animator");
+    }
+
+    /// Melira's "creatures you control can't have -1/-1 counters put on them" (CR 122.6, 101.2).
+    fn no_minus_counters_on_your_creatures(q: &dyn Query, asker: &Asker, object: ObjectId, controller: PlayerId, kind: CounterKind) -> bool {
+        kind == CounterKind::MinusOne && controller == asker.controller && q.chars(object).is(CardType::Creature)
+    }
+
+    static BAN: CardDef = CardDef {
+        name: "Minus Ban",
+        types: TypeSet::of(&[CardType::Creature]),
+        power: Some(2),
+        toughness: Some(2),
+        counter_bans: &[no_minus_counters_on_your_creatures],
+        ..CardDef::BLANK
+    };
+
+    /// The -1/-1 counters each of Grown and Grown Relic has, put onto the battlefield from the hand "with a -1/-1 counter on
+    /// it" (persist's words, CR 702.79a), `on_battlefield` there first.
+    fn minus_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i16)> {
+        let (mut game, held) = game_with(on_battlefield);
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let mut out = Vec::new();
+        for &id in &held {
+            let new = put_onto_battlefield_with(&mut cx, &[(id, PlayerId(0), false)], ZoneReason::Other, &[(CounterKind::MinusOne, 1)]).expect("nothing is asked")[0];
+            out.push((cx.cards().get(cx.s().obj(new).card).name, cx.s().obj(new).counters(CounterKind::MinusOne)));
+        }
+        out
+    }
+
+    /// CR 614.12, 122.6: a counter ban is asked of the permanent as it would exist on the battlefield. Under the Ban, the
+    /// creature card gets no -1/-1 counter and the artifact card does; with the Animator making every noncreature artifact a
+    /// creature there, neither does - the artifact is judged as the creature it enters as, not the card it was.
+    #[test]
+    fn a_counter_ban_judges_an_entering_permanent_as_it_would_exist() {
+        assert_eq!(minus_counters(&[]), [("Grown", 1), ("Grown Relic", 1)]);
+        assert_eq!(minus_counters(&[&BAN]), [("Grown", 0), ("Grown Relic", 1)]);
+        assert_eq!(minus_counters(&[&BAN, &ANIMATOR]), [("Grown", 0), ("Grown Relic", 0)]);
     }
 }
