@@ -1,0 +1,48 @@
+# Lure: "All creatures able to block enchanted creature do so" (CR 509.1c), and a creature blocking a member of an attacking
+# band blocks every member (CR 702.22h). Bot2's Lured Guerrilla Gorilla attacks banded with Benalish Hero; Bot1's Llanowar
+# Elves blocking the Hero blocks the Gorilla too, which obeys the requirement - a declaration of no blocks is still refused.
+# Both attackers are blocked, so Bot1 takes no damage.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Benalish Hero
+Guerrilla Gorilla
+Lure
+Forest
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Benalish Hero.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lure.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Benalish Hero > Bot1; Guerrilla Gorilla > Bot1)
+Bot2.Choose(Guerrilla Gorilla)
+! Bot1.Block(Count: 0)
+Bot1.Block(Llanowar Elves > Benalish Hero)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20

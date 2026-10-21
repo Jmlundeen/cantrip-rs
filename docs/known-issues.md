@@ -54,7 +54,7 @@ keeps it).
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
-| [KI-70](#ki-70-a-block-requirement-is-counted-on-the-declared-block-only-not-through-the-blocked-creatures-band) | A block requirement is counted on the declared block only, not through the blocked creature's band | Low | Open |
+| [KI-70](#ki-70-a-creature-blocking-a-band-records-a-block-of-the-declared-member-only) | A creature blocking a band records a block of the declared member only | Low | Unexercised |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-74](#ki-74-a-question-a-replacement-asks-mid-run-is-not-watched-for-loops) | A question a replacement asks mid-run is not watched for loops | Low | Suspected |
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
@@ -456,21 +456,19 @@ replacements is the only way to meet it.
 
 **Scenarios.** none yet.
 
-### KI-70: A block requirement is counted on the declared block only, not through the blocked creature's band
+### KI-70: A creature blocking a band records a block of the declared member only
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-17, review of Lure and banding |
+| Low | Unexercised | engine | 2026-10-17, review of Lure and banding |
 
-**Notes.** Lure's requirement (CR 509.1c) is obeyed by blocking the Lured creature. If it is in an attacking band, a creature
-blocking another member of the band blocks it too (CR 702.22h), which obeys the requirement; `BlockRequirements::obeyed`,
-`turn::most_requirements` and `validate` count only the declared (blocker, attacker) pairs, so they refuse that legal
-declaration (the blocker must be declared on the Lured creature itself, which is also legal and has the same result). A fix
-expands each declared block through its band before counting, in the search and in the check. Relatedly, the band members a
-blocker blocks only by 702.22h get no `Event::Blocks` (CR 509.3a's "whenever this creature blocks" correctly triggers once);
-no card in content triggers on "blocks a creature" or "becomes blocked by a creature" per pair (CR 509.3b, 509.3d).
+**Notes.** A creature blocking a member of an attacking band blocks every member (CR 702.22h), and the declaration records
+one `Event::Blocks` per blocker as declared, so "whenever this creature blocks" triggers once (CR 509.3a, right). The band
+members it blocks only by 702.22h get no `Event::Blocks` pair of their own, so an ability that triggers on "blocks a
+creature" or "becomes blocked by a creature" once per pair (CR 509.3b, 509.3d) would not see them. No card in content
+triggers per pair. (Block requirements are counted through the band: Lure is obeyed by blocking another member.)
 
-**Scenarios.** none yet: no card in content puts Lure on a creature with banding or bands with a Lured creature.
+**Scenarios.** none yet: no card in content triggers on each creature a blocker blocks.
 
 ### KI-71: The tactical bot's combat planning ignores bands
 

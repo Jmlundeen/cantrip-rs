@@ -772,7 +772,7 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
     allowed.retain(|p| !menace.contains(&p.1));
     if !allowed.is_empty() {
         // CR 509.1c: the blocks effects require if able, and the most of them a declaration can obey.
-        let pairs = crate::static_rules::block_requirements(cx, &allowed);
+        let pairs = through_bands(cx, crate::static_rules::block_requirements(cx, &allowed), &allowed);
         let requirements = if pairs.is_empty() { BlockRequirements::default() } else { most_requirements(cx, &allowed, pairs) };
         let answer = cx.ask_core(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements }, false)?;
         if let Answer::Block(blocks) = answer {
@@ -827,6 +827,29 @@ fn strikes_first(cx: &Cx, id: ObjectId) -> bool {
 /// With no first-strike step, every creature does.
 fn deals_now(cx: &Cx, id: ObjectId, had_first_strike: bool, first_strike_step: bool) -> bool {
     if first_strike_step { strikes_first(cx, id) } else { !had_first_strike || cx.chars(id).has(Keyword::DoubleStrike) }
+}
+
+/// The required blocks `pairs` (CR 509.1c) with each obeyed another way too: a creature blocking a member of an attacking band
+/// blocks every member (CR 702.22h), so blocking any member of the required attacker's band, where the restrictions allow it,
+/// obeys "blocks [it] if able". Counted a block at a time, as the declaration's check counts them.
+fn through_bands(cx: &Cx, mut pairs: Vec<(ObjectId, ObjectId)>, allowed: &[(ObjectId, ObjectId)]) -> Vec<(ObjectId, ObjectId)> {
+    let attackers = &cx.s().attackers;
+    if !attackers.iter().any(|a| a.band != 0) {
+        return pairs;
+    }
+    for (blocker, attacker) in pairs.clone() {
+        let band = attackers.iter().find(|a| a.id == attacker).map_or(0, |a| a.band);
+        if band == 0 {
+            continue;
+        }
+        for mate in attackers.iter().filter(|a| a.band == band && a.id != attacker) {
+            let pair = (blocker, mate.id);
+            if allowed.contains(&pair) && !pairs.contains(&pair) {
+                pairs.push(pair);
+            }
+        }
+    }
+    pairs
 }
 
 /// The most of the required blocks `pairs` (CR 509.1c) any declaration of blockers obeys without disobeying a restriction,
