@@ -304,7 +304,7 @@ impl StateDump {
                 let label = label_text(&Label::Card(dungeon, player.room - 1));
                 d.set(format!("{b}.Dungeon"), format!("Undercity: {}", label.split(" \u{2014} ").next().unwrap_or(label)));
             }
-            let completed = game.log.iter().filter(|r| r.event == Event::DungeonCompleted { player: p }).count();
+            let completed = game.history().select(EventQuery::kind(EventMask::DUNGEON_COMPLETED).player(p)).count();
             if completed > 0 {
                 d.set(format!("{b}.DungeonsCompleted"), completed);
             }
