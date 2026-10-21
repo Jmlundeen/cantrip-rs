@@ -11,6 +11,6 @@ fn from_your_hand(q: &dyn Query, asker: &Asker, spell: ObjectId, player: PlayerI
 }
 
 pub static CARD: CardDef = CardDef {
-    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: from_your_hand, cost: InsteadOfManaCost::WithoutPaying }],
+    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: from_your_hand, cost: InsteadOfManaCost::WithoutPaying, flash: false }],
     ..oracle::OMNISCIENCE
 };

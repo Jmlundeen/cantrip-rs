@@ -2078,7 +2078,9 @@ impl<'s> Run<'s> {
                 });
             }
         } else if kind == ActionKind::CastSpell && !every_cost {
-            offered.retain(|o| o.index == 0);
+            // A cast named without its way is the card's for its mana cost: by the rules or a permission, not for an
+            // alternative cost another object gives nor by a way a permanent gives (which say themselves).
+            offered.retain(|o| o.index == 0 && o.paid_by.is_none() && !o.granted_by.is_some_and(|g| g.ability.as_granted_way().is_some()));
         }
         // A refused `Activate(Color: Green)` is offered only where green is among the colors the ability may add; a
         // refused `Activate(Color: Colorless)`, only where colorless is among the mana it may add.

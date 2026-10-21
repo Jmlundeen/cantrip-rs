@@ -30,6 +30,11 @@ impl ObjectId {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct CardId(pub u16);
 
+/// A cast's way number (`ActionOption::index`) names which of the card's own options it is - the face it casts and the
+/// cost of its own it is cast for - and never anything another object gives: 0 is the card itself for its mana cost, n
+/// the card's nth printed alternative way (`CardDef::ways`), and the constants below its other faces and casts. What
+/// another object adds (a permission, an alternative cost) is the action's `Grant`.
+///
 /// How a spell cast as its Adventure is cast (CR 715.3), as a way number: after every alternative cost.
 pub const WAY_ADVENTURE: u8 = 254;
 
@@ -43,94 +48,6 @@ pub const WAY_BACK_FACE: u8 = 253;
 /// How a card with bestow is cast bestowed (CR 702.103a), as a way number: beside the other casts, after every alternative
 /// cost.
 pub const WAY_BESTOW: u8 = 251;
-
-/// How a card in a graveyard is cast by a way a permanent on the battlefield gives it (CR 113.6, 118.9), as a way number:
-/// `WAY_GRANTED + k * WAY_GRANTED_STRIDE + face` for the kth way the battlefield grants, in the order the permanents and
-/// their rules are listed, and the face of the card it is cast as (`GRANTED_FACE_*`): a way is judged on the face it
-/// casts, never on the card as a whole (CR 709.3, 715.3, 712.8a). The band lies below the special ways and above any a card
-/// prints; a cast decodes it and goes on as that face's way (0, a split half, the Adventure, the back face, the Omen).
-pub const WAY_GRANTED: u8 = 128;
-/// How many ways a battlefield may grant at once, and how many numbers each takes.
-pub const WAY_GRANTED_SLOTS: u8 = 8;
-pub const WAY_GRANTED_STRIDE: u8 = 6;
-/// The faces a granted cast names: the card itself, a split card's left half and right half, the Adventure, the back face,
-/// the Omen.
-pub const GRANTED_FACE_WHOLE: u8 = 0;
-pub const GRANTED_FACE_LEFT: u8 = 1;
-pub const GRANTED_FACE_RIGHT: u8 = 2;
-pub const GRANTED_FACE_ADVENTURE: u8 = 3;
-pub const GRANTED_FACE_BACK: u8 = 4;
-pub const GRANTED_FACE_OMEN: u8 = 5;
-
-/// The way number of the kth granted way cast as `face`.
-pub fn granted_way(k: usize, face: u8) -> u8 {
-    WAY_GRANTED + k as u8 * WAY_GRANTED_STRIDE + face
-}
-
-/// The granted way (its index among them) and the face a way number names, or `None` for a way that is not granted.
-pub fn granted_slot(way: u8) -> Option<(usize, u8)> {
-    let n = way.checked_sub(WAY_GRANTED)?;
-    (n < WAY_GRANTED_SLOTS * WAY_GRANTED_STRIDE).then(|| ((n / WAY_GRANTED_STRIDE) as usize, n % WAY_GRANTED_STRIDE))
-}
-
-/// The way number a cast of a face goes on as once it has left its granted way behind.
-pub fn granted_face_way(face: u8) -> u8 {
-    match face {
-        GRANTED_FACE_LEFT => WAY_SPLIT_LEFT,
-        GRANTED_FACE_RIGHT => WAY_SPLIT_RIGHT,
-        GRANTED_FACE_ADVENTURE => WAY_ADVENTURE,
-        GRANTED_FACE_BACK => WAY_BACK_FACE,
-        GRANTED_FACE_OMEN => WAY_OMEN,
-        _ => 0,
-    }
-}
-
-/// How a spell is cast for an alternative cost a static ability of a permanent on the battlefield gives the spells a player
-/// casts (CR 118.9, 601.2b: `CardDef::spell_alternatives`), as a way number: `WAY_ALTERNATIVE + k * WAY_GRANTED_STRIDE +
-/// face` for the kth such cost that applies to this cast, in the order the permanents and their rules are listed, one that
-/// two permanents of a player give counted once, and the face of the card it is cast as (`GRANTED_FACE_*`). It is a way of paying, not a permission: it stands beside a cast the
-/// player may already make for the face's mana cost, from wherever that cast is made, and goes on as that cast
-/// (`face_way`) with this cost paid rather than the mana cost. The band lies above the granted ways' and below the
-/// split halves'.
-pub const WAY_ALTERNATIVE: u8 = WAY_GRANTED + WAY_GRANTED_SLOTS * WAY_GRANTED_STRIDE;
-/// How many such costs may apply to one cast at once.
-pub const WAY_ALTERNATIVE_SLOTS: u8 = 4;
-
-/// The way number of the kth alternative cost that applies to a cast, cast as `face`.
-pub fn alternative_way(k: usize, face: u8) -> u8 {
-    WAY_ALTERNATIVE + k as u8 * WAY_GRANTED_STRIDE + face
-}
-
-/// The alternative cost (its index among those that apply to the cast) and the face a way number names, or `None` for a
-/// way that is not one.
-pub fn alternative_slot(way: u8) -> Option<(usize, u8)> {
-    let n = way.checked_sub(WAY_ALTERNATIVE)?;
-    (n < WAY_ALTERNATIVE_SLOTS * WAY_GRANTED_STRIDE).then(|| ((n / WAY_GRANTED_STRIDE) as usize, n % WAY_GRANTED_STRIDE))
-}
-
-/// The face (`GRANTED_FACE_*`) a cast for the face's own mana cost names by its way number (0, a split half, the
-/// Adventure, the back face, the Omen), or `None` for a way that is not one: an alternative cost of the card's own,
-/// bestow, overload, a granted way.
-pub fn face_of_way(way: u8) -> Option<u8> {
-    match way {
-        0 => Some(GRANTED_FACE_WHOLE),
-        WAY_SPLIT_LEFT => Some(GRANTED_FACE_LEFT),
-        WAY_SPLIT_RIGHT => Some(GRANTED_FACE_RIGHT),
-        WAY_ADVENTURE => Some(GRANTED_FACE_ADVENTURE),
-        WAY_BACK_FACE => Some(GRANTED_FACE_BACK),
-        WAY_OMEN => Some(GRANTED_FACE_OMEN),
-        _ => None,
-    }
-}
-
-/// The way a cast goes on as once a granted way or an alternative cost the battlefield gives is decoded: that face's own
-/// (`granted_face_way`); any other way is itself.
-pub fn face_way(way: u8) -> u8 {
-    match granted_slot(way).or(alternative_slot(way)) {
-        Some((_, face)) => granted_face_way(face),
-        None => way,
-    }
-}
 
 /// How a card with overload is cast overloaded (CR 702.96a), as a way number: for its overload cost, with "each" where it
 /// says "target", so with no targets at all.
@@ -146,6 +63,19 @@ pub const DOOR_RIGHT: u8 = 2;
 
 /// How a card is cast transformed (CR 712.11a): a Siege's "cast it transformed", as a way number.
 pub const WAY_TRANSFORMED: u8 = 252;
+
+/// What made an action possible beyond the rules every player has (CR 601.3, 305.1, 118.9, 113.6): the object, and
+/// which of its abilities. A permanent's static ability (Lurrus of the Dream-Den's way from the graveyard, Bolas's Citadel's
+/// and Mystic Forge's rules for the top of the library, Primal Prayers' alternative cost), the spell or ability whose effect
+/// gave a permission (Snapcaster Mage's trigger, Yawgmoth's Will), or a card's own keyword that lets it be cast from where it
+/// is (retrace). An object, not a card: two Lurruses are two permissions, and a permanent that changes zones is a new
+/// object whose permission is a new one (CR 400.7). The static abilities a card lists apart from `abilities` are named by
+/// the `AbilityRef` bands below (`AbilityRef::granted_way` and the rest).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Grant {
+    pub object: ObjectId,
+    pub ability: AbilityRef,
+}
 
 /// One ability of one card: the card's definition and the ability's index in it. A copy of a card has the copied
 /// card's abilities, so a computed ability list is a list of these, never of the object's own card alone.
@@ -1341,12 +1271,70 @@ impl AbilityRef {
     pub const REBOUND: u8 = 126;
     /// Miracle's linked triggered ability (CR 702.94a): the core's own.
     pub const MIRACLE: u8 = 125;
-    /// The history's marker of a granted way having been used (`cantrip_api::GRANTED_WAY_USED`).
-    pub const GRANTED_WAY_USED: u8 = 124;
+    /// A card's retrace (CR 702.81a), printed or given, as the ability a cast from the graveyard by it is made by (`Grant`).
+    pub const RETRACE: u8 = 124;
+    /// The bands a `Grant` names a card's listed static abilities by: the kth of its `granted_ways`, `exile_casts`,
+    /// `spell_alternatives`, and the kth play rule its `play_rules` hold (counted through every `PlayRule::While`), each
+    /// past any ability a card prints.
+    pub const GRANTED_WAY: u8 = 64;
+    pub const EXILE_CAST: u8 = 72;
+    pub const SPELL_ALTERNATIVE: u8 = 80;
+    pub const PLAY_RULE: u8 = 88;
+    const BAND: u8 = 8;
+    const PLAY_RULES: u8 = 16;
     /// The history's marker of extra loyalty activations allowed this turn (`actions::EXTRA_LOYALTY_ALLOWED`).
     pub const EXTRA_LOYALTY_ALLOWED: u8 = 123;
     /// A spell itself, in the history's record that it resolved (`Event::Resolved`, CR 608.2): no ability of the card.
     pub const SPELL: u8 = 122;
+
+    pub fn granted_way(card: CardId, k: usize) -> AbilityRef {
+        debug_assert!(k < Self::BAND as usize);
+        AbilityRef { card, index: Self::GRANTED_WAY + k as u8 }
+    }
+
+    pub fn exile_cast(card: CardId, k: usize) -> AbilityRef {
+        debug_assert!(k < Self::BAND as usize);
+        AbilityRef { card, index: Self::EXILE_CAST + k as u8 }
+    }
+
+    pub fn spell_alternative(card: CardId, k: usize) -> AbilityRef {
+        debug_assert!(k < Self::BAND as usize);
+        AbilityRef { card, index: Self::SPELL_ALTERNATIVE + k as u8 }
+    }
+
+    pub fn play_rule(card: CardId, k: usize) -> AbilityRef {
+        debug_assert!(k < Self::PLAY_RULES as usize);
+        AbilityRef { card, index: Self::PLAY_RULE + k as u8 }
+    }
+
+    pub fn retrace(card: CardId) -> AbilityRef {
+        AbilityRef { card, index: Self::RETRACE }
+    }
+
+    fn band(self, start: u8, len: u8) -> Option<usize> {
+        self.index.checked_sub(start).filter(|&k| k < len).map(usize::from)
+    }
+
+    /// Which of its card's `granted_ways` this names, if it names one.
+    pub fn as_granted_way(self) -> Option<usize> {
+        self.band(Self::GRANTED_WAY, Self::BAND)
+    }
+
+    pub fn as_exile_cast(self) -> Option<usize> {
+        self.band(Self::EXILE_CAST, Self::BAND)
+    }
+
+    pub fn as_spell_alternative(self) -> Option<usize> {
+        self.band(Self::SPELL_ALTERNATIVE, Self::BAND)
+    }
+
+    pub fn as_play_rule(self) -> Option<usize> {
+        self.band(Self::PLAY_RULE, Self::PLAY_RULES)
+    }
+
+    pub fn is_retrace(self) -> bool {
+        self.index == Self::RETRACE
+    }
 
     pub fn spell(card: CardId) -> AbilityRef {
         AbilityRef { card, index: AbilityRef::SPELL }

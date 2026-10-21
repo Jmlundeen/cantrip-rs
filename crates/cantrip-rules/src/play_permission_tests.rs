@@ -1,7 +1,7 @@
 //! "You may play that card for as long as you control [this permanent]" (`Expiry::WhileControls`, CR 611.2b): Gwen Stacy's
 //! and Lightning, Security Sergeant's permission, over test cards, since neither printed card is built yet.
 
-use crate::actions::{permission_for, priority_options};
+use crate::actions::{permissions_for, priority_options};
 use crate::layers::live;
 use crate::{Cx, Game, Setup, ops, phasing};
 use cantrip_api::*;
@@ -74,15 +74,15 @@ fn a_land_is_played_and_a_spell_cast_from_exile_while_you_control_it_and_transfo
     allow(&mut cx, spider, &[land, spell]);
     // "Play": the land is a land play from exile (CR 305.1), the sorcery may be cast (CR 601.3).
     assert!(land_playable(&cx, land));
-    assert!(permission_for(&cx, spell, YOU).is_some());
+    assert!(permissions_for(&cx, spell, YOU).next().is_some());
     // The opponent holds no permission.
-    assert!(permission_for(&cx, spell, THEM).is_none());
+    assert!(permissions_for(&cx, spell, THEM).next().is_none());
     // CR 712.18: it transforms into a face without the text, and is the same object, so the permission goes on.
     ops::turn_over(&mut cx, spider).unwrap();
     assert!(cx.s().obj(spider).transformed && live(cx.s(), spider));
     crate::settle::state_based_actions_alone(&mut cx).unwrap();
     assert!(land_playable(&cx, land));
-    assert!(permission_for(&cx, spell, YOU).is_some());
+    assert!(permissions_for(&cx, spell, YOU).next().is_some());
     assert_eq!(cx.s().permissions.len(), 2);
 }
 
@@ -94,7 +94,7 @@ fn it_ends_when_the_permanent_leaves_and_does_not_come_back_with_it() {
     ops::move_to(&mut cx, spider, Zone::graveyard(YOU));
     // Over at once, before the state-based check drops it (CR 611.2b).
     assert!(!land_playable(&cx, land));
-    assert!(permission_for(&cx, spell, YOU).is_none());
+    assert!(permissions_for(&cx, spell, YOU).next().is_none());
     crate::settle::state_based_actions_alone(&mut cx).unwrap();
     assert!(cx.s().permissions.is_empty());
     // Returned, it is a new object (CR 400.7): the permission is not the new one's.
@@ -102,7 +102,7 @@ fn it_ends_when_the_permanent_leaves_and_does_not_come_back_with_it() {
     let back = ops::move_to(&mut cx, dead, Zone::BATTLEFIELD);
     assert!(live(cx.s(), back) && cx.s().obj(back).controller == YOU);
     assert!(!land_playable(&cx, land));
-    assert!(permission_for(&cx, spell, YOU).is_none());
+    assert!(permissions_for(&cx, spell, YOU).next().is_none());
 }
 
 #[test]
@@ -120,7 +120,7 @@ fn it_ends_when_control_changes_and_stays_ended_once_control_comes_back() {
     ops::settle_control(&mut cx);
     assert_eq!(cx.s().obj(spider).controller, YOU);
     assert!(!land_playable(&cx, land));
-    assert!(permission_for(&cx, spell, YOU).is_none());
+    assert!(permissions_for(&cx, spell, YOU).next().is_none());
 }
 
 #[test]
@@ -150,5 +150,5 @@ fn it_ends_when_the_permanent_phases_out_and_stays_ended_once_it_phases_in() {
     phasing::untap_step(&mut cx, YOU);
     assert!(cx.s().obj(spider).zone.is(ZoneKind::Battlefield) && live(cx.s(), spider));
     assert!(!land_playable(&cx, land));
-    assert!(permission_for(&cx, spell, YOU).is_none());
+    assert!(permissions_for(&cx, spell, YOU).next().is_none());
 }

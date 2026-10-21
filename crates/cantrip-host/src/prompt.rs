@@ -272,16 +272,11 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
         ActionKind::CastSpell => {
             // Cast as its Adventure or its Omen (CR 715.3, 720.3), it is that spell: its name, and its own mana cost.
             let inset = def.inset_face(o.index);
-            // A cast a permanent grants names the face it casts (a Room's door, an Adventure): its name and its cost.
-            // So does a cast for an alternative cost a static ability gives (CR 118.9: Dracogenesis), of a face it casts.
-            let granted_face = granted_slot(o.index).or(alternative_slot(o.index)).and_then(|(_, face)| match face {
-                GRANTED_FACE_LEFT => def.split.map(|h| h.0),
-                GRANTED_FACE_RIGHT => def.split.map(|h| h.1),
-                GRANTED_FACE_ADVENTURE => def.adventure,
-                GRANTED_FACE_OMEN => def.omen,
-                GRANTED_FACE_BACK => def.back,
-                _ => None,
-            });
+            // A cast another object makes possible names the face it casts (a Room's door, an Adventure): its name and its cost.
+            // So does a cast for an alternative cost another object gives (CR 118.9: Dracogenesis), of a face it casts.
+            let granted_face = (o.granted_by.is_some() || o.paid_by.is_some())
+                .then(|| cast_face_of(game, src, o.index))
+                .filter(|&face| !std::ptr::eq(face, def));
             if let Some(face) = granted_face.or(inset) {
                 m.spell_name = face.name.to_string();
             }
@@ -293,9 +288,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             // itself, beside the way's text, unless that text already names a cost ("Flashback {1}").
             // Whoever is asked casts it: a card in an opponent's exile cast under a permission is not its owner's cast.
             let asked = game.pending().map_or(game.state.turn.priority, |r| r.player);
-            if granted_slot(o.index).is_some()
-                && let Some(cost) = granted_cast_cost(game, asked, src, o.index)
-            {
+            if let Some(cost) = granted_cast_cost(game, asked, o) {
                 let text = cost_text_of(&cost, def.name);
                 if granted_face.is_some() {
                     m.cost_text = text;
@@ -306,16 +299,23 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             let player = asked;
             // A way that casts without paying the mana cost (CR 118.9), whose X is 0 (CR 107.3b), is marked so,
             // and its row says what it comes to with the cost changes in play before any target ({0}, or {1} under Thalia).
-            let granted = granted_slot(o.index).and_then(|_| granted_cast_total(game, player, src, o.index));
+            let granted = granted_cast_total(game, player, o);
             // An alternative cost a static ability gives (CR 118.9): "without paying its mana cost" (Omniscience, Dracogenesis) is
             // marked so; one in mana ({W}{U}{B}{R}{G} rather than the mana cost) is its cost. Either says what it comes to.
-            let alternative = alternative_cast_total(game, player, src, o.index);
-            let cost = if let Some((mana, total)) = alternative {
-                // Rooftop Storm's {0} is nothing paid as well; a face whose own cost is {0} is cast the same either way.
+            let alternative = alternative_cast_total(game, player, o);
+            let cost = if let Some((paid, total)) = alternative {
+                // Rooftop Storm's {0} is nothing paid as well; a face whose own cost is {0} is cast the same either way. Energy
+                // paid instead (Primal Prayers' {E}) is a cost, so no cast for nothing: the row's cost says it.
                 let face = granted_face.unwrap_or(def);
-                m.without_paying_mana_cost = mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
-                m.cost_text = total.to_string();
-                mana
+                m.without_paying_mana_cost =
+                    paid.energy == 0 && paid.mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
+                m.cost_text = if paid.energy > 0 {
+                    let energy = "{E}".repeat(paid.energy as usize);
+                    if total == ManaCost::ZERO { energy } else { format!("{total}{energy}") }
+                } else {
+                    total.to_string()
+                };
+                paid.mana
             } else if let Some((way, total)) = granted {
                 let face = granted_face.unwrap_or(def);
                 m.without_paying_mana_cost = way.mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
@@ -340,7 +340,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             m.tapped_after_mana = way.is_some_and(|c| c.permanents.is_some_and(|p| p.tapped));
             // Paid in life rather than its mana cost (CR 118.9, 119.4: Inside Information, Bolas's Citadel): the life is the
             // cost the row shows and the seats weigh, and no mana cost, which is not paid; an X in it is 0 (CR 107.3).
-            if let Some(life) = life_for_cast(game, game.cards, asked, src, o.index) {
+            if let Some(life) = life_for_cast(game, game.cards, asked, o) {
                 m.life_cost = i32::from(life);
                 m.cost_text = format!("for {life} life");
                 m.has_x = false;
@@ -349,7 +349,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             // each candidate, where that is not what it costs otherwise - mana, and life a change adds (CR 118.8).
             let mut by_target = false;
             if (o.index == 0 || granted.is_some() || alternative.is_some()) && o.targets_required == 1 && !o.target_candidates.is_empty() {
-                let costs = cast_costs(game, player, src, o.index, &o.target_candidates);
+                let costs = cast_costs(game, player, o, &o.target_candidates);
                 if costs.iter().any(|&(c, life)| c != cost || life > 0) {
                     let each = costs_by_target(game, &o.target_candidates, &costs);
                     m.description = if m.description.is_empty() { format!("costs {each}") } else { format!("{} (costs {each})", m.description) };
@@ -360,7 +360,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             // Awakening's discount, Trinisphere's three): the row says it, so the cast says what it costs before it is paid.
             if !by_target
                 && m.life_cost == 0
-                && let Some((base, total, life)) = cast_total(game, player, src, o.index)
+                && let Some((base, total, life)) = cast_total(game, player, o)
                 && (total != base || life > 0)
             {
                 let total = if life > 0 { format!("{total} and {life} life") } else { total.to_string() };
@@ -437,7 +437,11 @@ fn costs_by_target(game: &Game, candidates: &[Target], costs: &[(ManaCost, u32)]
 }
 
 fn options_messages(game: &Game, handles: &mut HandleSpace, options: &[ActionOption]) -> Vec<ActionOptionMessage> {
-    options.iter().map(|o| option_message(game, handles, o)).collect()
+    options
+        .iter()
+        .enumerate()
+        .map(|(i, o)| ActionOptionMessage { option_id: i as i32 + 1, ..option_message(game, handles, o) })
+        .collect()
 }
 
 fn remaining_colored(cost: &ManaCost) -> Vec<ColorView> {

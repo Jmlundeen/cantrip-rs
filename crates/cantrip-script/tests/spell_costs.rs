@@ -193,9 +193,9 @@ fn a_reduction_this_turn_outlives_its_source_and_changes_only_its_players_spells
     assert!(!offered(&game, &options, "Probe Rock"), "a sorcery is no artifact spell");
     // The menu row says what it costs now; the other player's artifact still costs {1}.
     let trinket = in_hand(&game, PlayerId(0), "Probe Trinket");
-    assert_eq!(cast_total(&game, PlayerId(0), trinket, 0), Some((ONE, ManaCost::ZERO, 0)));
+    assert_eq!(cast_total(&game, PlayerId(0), &ActionOption::on(ActionKind::CastSpell, trinket, 0)), Some((ONE, ManaCost::ZERO, 0)));
     let theirs = in_hand(&game, PlayerId(1), "Probe Trinket");
-    assert_eq!(cast_total(&game, PlayerId(1), theirs, 0), Some((ONE, ONE, 0)));
+    assert_eq!(cast_total(&game, PlayerId(1), &ActionOption::on(ActionKind::CastSpell, theirs, 0)), Some((ONE, ONE, 0)));
     // Every artifact spell this turn, not only the next.
     let options = cast(&mut game, &options, "Probe Trinket");
     assert!(on_battlefield(&game, "Probe Trinket").is_some());
@@ -214,7 +214,7 @@ fn an_increase_this_turn_is_applied_before_a_reduction() {
     let options = main_phase(&mut game, 1);
     let options = cast(&mut game, &options, "Probe Tax");
     let trinket = in_hand(&game, PlayerId(0), "Probe Trinket");
-    assert_eq!(cast_total(&game, PlayerId(0), trinket, 0), Some((ONE, ManaCost { generic: 2, ..ManaCost::ZERO }, 0)));
+    assert_eq!(cast_total(&game, PlayerId(0), &ActionOption::on(ActionKind::CastSpell, trinket, 0)), Some((ONE, ManaCost { generic: 2, ..ManaCost::ZERO }, 0)));
     // Probe Wars costs {0} + {1} now, which nothing pays.
     assert!(!offered(&game, &options, "Probe Wars"));
 }

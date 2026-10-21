@@ -16,6 +16,7 @@ pub static CARD: CardDef = CardDef {
         text: "Without paying its mana cost",
         applies: free_spells_from_hand,
         cost: InsteadOfManaCost::WithoutPaying,
+        flash: false,
     }],
     ..oracle::OMNIPRESENCE
 };

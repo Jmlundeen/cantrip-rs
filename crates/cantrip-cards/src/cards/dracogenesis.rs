@@ -10,6 +10,6 @@ fn dragon_spells_you_cast(q: &dyn Query, asker: &Asker, spell: ObjectId, player:
 }
 
 pub static CARD: CardDef = CardDef {
-    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: dragon_spells_you_cast, cost: InsteadOfManaCost::WithoutPaying }],
+    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: dragon_spells_you_cast, cost: InsteadOfManaCost::WithoutPaying, flash: false }],
     ..oracle::DRACOGENESIS
 };

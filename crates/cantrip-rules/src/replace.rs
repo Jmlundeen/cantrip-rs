@@ -58,15 +58,14 @@ const PROTECTION_HINT: &str = "protection prevents the damage";
 /// What a permission's "enters tapped" says it does, for the player who orders it with others (CR 616.1).
 const PLAYED_TAPPED_HINT: &str = "a land played this way enters tapped";
 
-/// "Each land played this way enters tapped" (CR 305.1, 614.1c): a land played by a permission that says so
-/// (`actions::land_play_permission`), entering untapped as the proposal stands. Judged before the land moves, while it is
-/// still where it was played from and the permission is there to read.
+/// "Each land played this way enters tapped" (CR 305.1, 614.1c): a land played by a permission that says so, entering
+/// untapped as the proposal stands. Judged before the land moves, while it is still where it was played from and the
+/// permission is there to read: the land play keeps only the permission it was made by (`actions::act`).
 fn played_tapped_applies(cx: &Cx, z: &ZoneChange) -> bool {
     z.reason == ZoneReason::PlayLand
         && z.to.is(ZoneKind::Battlefield)
         && !z.tapped
         && cx.s().permissions.iter().any(|p| p.card == z.object && p.grant.enters_tapped)
-        && crate::actions::land_play_permission(cx, z.object, z.controller).is_some_and(|p| p.grant.enters_tapped)
 }
 
 /// Madness (CR 702.35a): "If a player would discard this card, that player discards it, but exiles it instead of putting

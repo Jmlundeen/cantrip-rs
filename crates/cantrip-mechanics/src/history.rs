@@ -229,3 +229,16 @@ pub fn scried_or_surveilled_this_turn(q: &dyn Query, player: PlayerId) -> bool {
         .iter()
         .any(|r| matches!(r.event, Event::Scried { player: p, .. } | Event::Surveilled { player: p, .. } if p == player))
 }
+
+/// Whether the permission `source` gives has been used this turn: a spell cast or a land played by it, as the history
+/// records what each was made by (`Cast::granted_by`, `Event::LandPlayed`). "Once during each of your turns, you may cast
+/// ... from your graveyard" (CR 601.3): Lurrus of the Dream-Den, and Serra Paragon, whose land plays share the once. It is
+/// that object's own: another permanent with the same ability is another permission, and one that left and came back is a
+/// new object (CR 400.7).
+pub fn permission_used_this_turn(q: &dyn Query, source: ObjectId) -> bool {
+    q.history().this_turn().iter().any(|r| match r.event {
+        Event::Cast(c) => c.granted_by.is_some_and(|g| g.object == source),
+        Event::LandPlayed { granted_by, .. } => granted_by.is_some_and(|g| g.object == source),
+        _ => false,
+    })
+}

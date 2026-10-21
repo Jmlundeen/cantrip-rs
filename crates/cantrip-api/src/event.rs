@@ -124,6 +124,12 @@ pub enum Event {
     /// A spell's characteristics as it became cast (CR 601.2i), recorded just before its `SpellCast`: what "the second
     /// creature spell you cast this turn" reads.
     Cast(Cast),
+    /// A land was played (CR 305.1, a special action, CR 116.2a): `land` is the permanent it became, `player` who played it,
+    /// `way` the face it was played as (0 the card itself, `WAY_BACK_FACE` a modal double-faced card's back face, CR
+    /// 712.12), and `granted_by` what let it be played from where it was, if anything beyond the rules did
+    /// (`ActionOption::granted_by`: Serra Paragon's "once during each of your turns, you may play a land from your
+    /// graveyard", Crucible of Worlds' rule). Recorded only, as it entered; its zone change says where it came from.
+    LandPlayed { land: ObjectId, player: PlayerId, way: u8, granted_by: Option<Grant> },
     /// A door of a Room was unlocked (CR 709.5f, 709.5h): the permanent was given the unlocked designation of that half
     /// (`DOOR_LEFT` or `DOOR_RIGHT`) by `player`, whether as it entered because the half was cast (CR 709.5d), by the
     /// special action (CR 709.5e) or by an instruction to unlock.
@@ -231,6 +237,7 @@ impl Event {
             | Event::CrimeCommitted { player, .. }
             | Event::GameLost { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
+            Event::LandPlayed { player, .. } => Some(player),
             Event::BecameTarget { controller, .. } | Event::EnteredFaceDown { controller, .. } => Some(controller),
             Event::Damage { target: Target::Player(p), .. } | Event::DamagePrevented { target: Target::Player(p), .. } => Some(p),
             _ => None,
@@ -243,6 +250,7 @@ impl Event {
         match *self {
             Event::SpellCast { spell, .. } | Event::Countered { spell } => spell == object,
             Event::Cast(c) => c.spell == object,
+            Event::LandPlayed { land, .. } => land == object,
             Event::Copied { copy, original, .. } => copy == object || original == object,
             Event::BecameTarget { target, by, .. } => by == object || target == Target::Object(object),
             Event::ZoneChange { old, new, .. } => old == object || new == object,
@@ -338,6 +346,8 @@ impl EventMask {
     pub const GAME_OVER: EventMask = EventMask(1 << 47);
     /// An Aura, Equipment or Fortification became attached to something (CR 701.3a).
     pub const ATTACHED: EventMask = EventMask(1 << 48);
+    /// A land was played (CR 305.1): recorded only, for the history.
+    pub const LAND_PLAYED: EventMask = EventMask(1 << 49);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -350,6 +360,7 @@ impl EventMask {
             Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
             Event::CountersPut { .. } => EventMask::COUNTERS,
             Event::Cast(_) => EventMask::CAST,
+            Event::LandPlayed { .. } => EventMask::LAND_PLAYED,
             Event::Resolved { .. } => EventMask::RESOLVED,
             Event::Triggered { .. } => EventMask::TRIGGERED,
             Event::ModesChosen { .. } => EventMask::MODES_CHOSEN,
@@ -399,8 +410,8 @@ impl EventMask {
             // trigger on, so they go on the stack above it and resolve first. Only activations of abilities that use the stack
             // are emitted. A mana ability's activation (CR 605.3) is only recorded: no card here triggers on one yet (those
             // that would, "whenever you activate an ability of a creature" - Elrond, Moon-Reader, Ceaseless Searblades - wait
-            // for it to be emitted too). The markers kept for the history (an extra loyalty activation allowed, a way a
-            // permanent gave used) are only recorded, and a special action (CR 116.2) or a copy of an ability (CR 707.10) is
+            // for it to be emitted too). The marker kept for the history (an extra loyalty activation allowed) is only
+            // recorded, and a special action (CR 116.2) or a copy of an ability (CR 707.10) is
             // no activation.
             Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
             Event::DoorUnlocked { .. } => EventMask::DOOR_UNLOCKED,

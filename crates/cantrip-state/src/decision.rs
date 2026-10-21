@@ -143,9 +143,20 @@ pub const PAY_WATERBEND: u8 = 3;
 pub struct ActionOption {
     pub kind: ActionKind,
     pub source: Option<ObjectId>,
-    /// For a cast, which way (0 its mana cost, n its nth alternative cost); for an activation, which ability of the
-    /// source's computed ability list.
+    /// Which of the source's own options it is: for a cast or a land play, its way number (the face it casts and the cost
+    /// of the card's own it is cast for: 0 its mana cost, n its nth printed alternative way, `WAY_ADVENTURE` and the rest);
+    /// for an activation, which ability of the source's computed ability list. Never a position in a list another object
+    /// makes: what another object adds is `granted_by` and `paid_by`.
     pub index: u8,
+    /// What made the action possible, where the rules every player has do not (CR 601.3, 305.1): the permission a cast or a
+    /// land play is made by, from a zone other than the hand (Lurrus of the Dream-Den, Mystic Forge, Snapcaster Mage's
+    /// grant, Yawgmoth's Will, retrace). Each permission that would allow a cast is an option of its own, so the player
+    /// chooses which one is used (CR 601.2b), and the cast is made by that one, on its terms, and recorded with it.
+    pub granted_by: Option<Grant>,
+    /// The alternative cost another object gives that the cast pays rather than its mana cost (CR 118.9, 601.2b): Jodah,
+    /// Archmage Eternal's, Omniscience's, Primal Prayers'. None for a cost of the card's own (its mana cost, evoke) or one
+    /// the permission names.
+    pub paid_by: Option<Grant>,
     /// Targets the action is announced with, and who may be chosen for them (CR 601.2c): the candidates of every
     /// target slot together.
     pub targets_required: u8,
@@ -172,6 +183,8 @@ impl ActionOption {
             kind,
             source: None,
             index: 0,
+            granted_by: None,
+            paid_by: None,
             targets_required: 0,
             targets_optional: false,
             target_candidates: Vec::new(),
@@ -194,6 +207,8 @@ pub struct Action {
     pub kind: ActionKind,
     pub source: Option<ObjectId>,
     pub index: u8,
+    pub granted_by: Option<Grant>,
+    pub paid_by: Option<Grant>,
     pub targets: Vec<Target>,
     pub color: Option<Color>,
     pub mana: Option<Mana>,
@@ -206,6 +221,8 @@ impl Action {
             kind: option.kind,
             source: option.source,
             index: option.index,
+            granted_by: option.granted_by,
+            paid_by: option.paid_by,
             targets: Vec::new(),
             color: None,
             mana: option.mana,
@@ -829,6 +846,8 @@ pub enum Label {
     /// The `u8`th alternative cost a permanent of this card gives the spells a player casts (CR 118.9:
     /// `CardDef::spell_alternatives`), to pay rather than the mana cost.
     AlternativeCost(CardId, u8),
+    /// The `u8`th of a card's own alternative ways to be cast (`CardDef::ways`, CR 118.9): evoke, Force of Will's.
+    Way(CardId, u8),
 }
 
 /// One miracle ability of a card (CR 702.94a), named without the object, which a question asked as the card is drawn may not

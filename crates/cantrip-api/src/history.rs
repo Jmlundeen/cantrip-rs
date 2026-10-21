@@ -32,8 +32,14 @@ pub struct Cast {
     pub value: u8,
     /// The zone it was cast from (CR 601.2a).
     pub from: ZoneKind,
-    /// Which way it was cast (0 its mana cost).
+    /// Which of the card's own options it was cast by (`ActionOption::index`): 0 its mana cost, n its nth printed way, or
+    /// another face's way number.
     pub way: u8,
+    /// What let it be cast from where it was, beyond the rules every player has (`ActionOption::granted_by`, CR 601.3): the
+    /// permanent whose permission it was (Lurrus of the Dream-Den, Mystic Forge), the spell or ability that gave one
+    /// (Snapcaster Mage's), or the card's own retrace. "Once during each of your turns" and "if you cast a spell this way"
+    /// ask it.
+    pub granted_by: Option<Grant>,
     /// What its card's `CardDef::cast_fact` said of the board as it became cast ("if you controlled a Faerie as you cast this
     /// spell"); 0 for a card with none. A copy of a spell is not cast (CR 707.10) and has no `Cast`, so `fact_as_cast` is 0
     /// for it.

@@ -332,7 +332,7 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
         ops::move_to_for(cx, item.object, Zone::exile(obj.owner), reason);
         return;
     }
-    let exiled = (item.way > 0 && item.way < WAY_GRANTED && def.ways[item.way as usize - 1].exile_after)
+    let exiled = (item.way > 0 && def.ways.get(item.way as usize - 1).is_some_and(|w| w.exile_after))
         || item.flashback
         || (item.exile_after && {
         // The spell it was cast as (CR 709.3b, 715.3b): a half or an Adventure is judged by its own types.
@@ -530,7 +530,7 @@ fn send_spell(cx: &mut Cx, at: usize, to: CounterTo, reason: ZoneReason) {
     // Flashback (CR 702.34a): exiled instead of going anywhere else as it leaves the stack, so a flashed-back spell sent to
     // a hand or a library by the effect that removes it is exiled instead (CR 614.1: the replacement applies to the
     // move whichever zone it was headed for).
-    let flashback = item.flashback || (item.way > 0 && item.way < WAY_GRANTED && cx.card(obj.card).ways[item.way as usize - 1].exile_after);
+    let flashback = item.flashback || (item.way > 0 && cx.card(obj.card).ways.get(item.way as usize - 1).is_some_and(|w| w.exile_after));
     let zone = match to {
         _ if flashback => Zone::exile(obj.owner),
         CounterTo::Hand => Zone::hand(obj.owner),

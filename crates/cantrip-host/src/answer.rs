@@ -93,6 +93,8 @@ pub fn translate(
                 kind,
                 source: if a.source.is_none() { None } else { Some(object(handles, game, a.source)?) },
                 index: a.ability_index.clamp(0, 255) as u8,
+                granted_by: None,
+                paid_by: None,
                 targets: a.targets.iter().map(|t| target(handles, game, t)).collect::<Result<_, _>>()?,
                 color: a.color.map(color_of),
                 mana: a.mana.map(mana_of),
@@ -119,6 +121,32 @@ pub fn translate(
             {
                 action.source = o.source;
                 action.index = o.index;
+            }
+            // What the option is made by (`granted_by`, `paid_by`) stays the engine's: the answer names the option it takes
+            // by its place in the question (`option_id`), or, without one, by kind, source and index where only one option
+            // has them.
+            if let RequestKind::PayCosts { options, .. } | RequestKind::UnlessPays { options, .. } | RequestKind::Priority { options } =
+                &request.kind
+            {
+                let alike = |o: &&ActionOption| o.kind == action.kind && o.source == action.source && o.index == action.index;
+                let taken = if a.option_id != 0 {
+                    usize::try_from(a.option_id - 1)
+                        .ok()
+                        .and_then(|i| options.get(i))
+                        .filter(alike)
+                        .ok_or_else(|| Untranslatable::Illegal("that option is not one this question offers".into()))?
+                } else {
+                    let mut matching = options.iter().filter(alike);
+                    match (matching.next(), matching.next()) {
+                        (Some(first), Some(second)) if (first.granted_by, first.paid_by) != (second.granted_by, second.paid_by) => {
+                            return Err(Untranslatable::Illegal("several options are alike: say which with its OptionId".into()));
+                        }
+                        (Some(first), _) => first,
+                        (None, _) => return Ok(Answer::Act(action)),
+                    }
+                };
+                action.granted_by = taken.granted_by;
+                action.paid_by = taken.paid_by;
             }
             Answer::Act(action)
         }
@@ -225,6 +253,19 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
             let source = action.source.map_or(ViewHandle::NONE, |s| handles.handle(s));
             let mut a = TakeActionAnswer::new(crate::prompt::action_kind_view(action.kind), source);
             a.ability_index = i32::from(action.index);
+            // The option it takes, by its place in the question (`ActionOptionMessage::option_id`).
+            if let RequestKind::PayCosts { options, .. } | RequestKind::UnlessPays { options, .. } | RequestKind::Priority { options } =
+                &request.kind
+                && let Some(i) = options.iter().position(|o| {
+                    o.kind == action.kind
+                        && o.source == action.source
+                        && o.index == action.index
+                        && o.granted_by == action.granted_by
+                        && o.paid_by == action.paid_by
+                })
+            {
+                a.option_id = i as i32 + 1;
+            }
             a.color = action.color.map(color_view);
             a.mana = action.mana.map(mana_view);
             if let Some(restriction) = action.restriction {

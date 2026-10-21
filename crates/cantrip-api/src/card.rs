@@ -1379,10 +1379,6 @@ pub type TargetedCost = fn(&dyn Query, &Asker, &[Target]) -> Cost;
 /// one that is neither the mana cost nor includes X ("without paying its mana cost") leaves 0 the only legal choice for X.
 pub type GrantedCost = fn(&dyn Query, &Asker, ObjectId, PlayerId) -> Option<Cost>;
 
-/// The ability index of the marker the history keeps of a granted way having been used: an activation, by the permanent that
-/// gave the way, of this index (past any ability a card prints). "Once during each of your turns" reads it (CR 601.3).
-pub const GRANTED_WAY_USED: u8 = AbilityRef::GRANTED_WAY_USED;
-
 /// A way of casting cards from graveyards, or from a hand, that a permanent gives (CR 604, 118.9).
 #[derive(Clone, Copy)]
 pub struct GrantedWay {
@@ -1405,11 +1401,17 @@ pub struct GrantedWay {
     /// it resolves, is countered or is returned to a hand, and whether or not the permanent is still there. Iroh, Grand
     /// Lotus; Lier, Disciple of the Drowned and Kess's kin that give flashback as a static ability would use it.
     pub flashback: bool,
+    /// The way is a permission and no alternative cost (CR 601.3): "you may cast a permanent spell with mana value 2 or less
+    /// from your graveyard" (Lurrus of the Dream-Den, Serra Paragon), its `cost` the face's own mana cost. The card is cast
+    /// by it as it would be by any permission - for its mana cost or an alternative cost another object gives or the card
+    /// has (CR 118.9: Primal Prayers' energy, evoke), every additional cost owed - rather than only for `cost`.
+    pub permission: bool,
 }
 
 impl GrantedWay {
     /// A way that casts only and grants nothing, for a card's file to start from.
-    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, from: ZoneKind::Graveyard, lands: false, gains: None, flashback: false };
+    pub const CAST: GrantedWay =
+        GrantedWay { text: "", cost: |_, _, _, _| None, from: ZoneKind::Graveyard, lands: false, gains: None, flashback: false, permission: false };
 }
 
 /// What a static ability lets a spell be cast for rather than its mana cost (CR 118.9, `SpellAlternative::cost`).
@@ -1420,14 +1422,25 @@ pub enum InsteadOfManaCost {
     /// "You may pay [cost] rather than pay the mana cost" (Jodah, Archmage Eternal's and Fist of Suns' {W}{U}{B}{R}{G},
     /// Rooftop Storm's {0}): that mana, and X is 0, as it is not the mana cost (CR 107.3b).
     Mana(ManaCost),
+    /// "By paying {E} rather than paying their mana costs" (Primal Prayers): energy counters (CR 107.14), no mana, and X is 0
+    /// (CR 107.3b).
+    Energy(u8),
 }
 
 impl InsteadOfManaCost {
     /// The mana paid rather than the mana cost.
     pub const fn mana(self) -> ManaCost {
         match self {
-            InsteadOfManaCost::WithoutPaying => ManaCost::ZERO,
+            InsteadOfManaCost::WithoutPaying | InsteadOfManaCost::Energy(_) => ManaCost::ZERO,
             InsteadOfManaCost::Mana(mana) => mana,
+        }
+    }
+
+    /// The whole of what is paid rather than the mana cost: its mana and its energy.
+    pub const fn cost(self) -> Cost {
+        match self {
+            InsteadOfManaCost::Energy(n) => Cost { energy: n, ..Cost::NONE },
+            other => Cost::mana(other.mana()),
         }
     }
 }
@@ -1458,6 +1471,10 @@ pub struct SpellAlternative {
     pub applies: fn(&dyn Query, &Asker, ObjectId, PlayerId) -> bool,
     /// What is paid rather than the mana cost.
     pub cost: InsteadOfManaCost,
+    /// "If you cast a spell this way, you may cast it as though it had flash" (Primal Prayers, CR 307.5, 702.8a): a cast for
+    /// this cost may be made whenever its caster could cast an instant, by whatever lets the card be cast from where it is;
+    /// what forbids casting at such a time (Teferi, Time Raveler) still does (CR 101.2).
+    pub flash: bool,
 }
 
 /// A static ability of a permanent that lets a player cast cards in exile (CR 601.3, 604.1): "you may cast spells from among
@@ -2469,19 +2486,14 @@ impl CardDef {
     }
 
     /// The spells printed in an inset frame that it may be cast as instead of itself (CR 715.2, 720.2): its Adventure, cast
-    /// with `WAY_ADVENTURE`, and its Omen, cast with `WAY_OMEN`, each with the face a granted way names it by.
-    pub fn inset_faces(&self) -> impl Iterator<Item = (u8, u8, &'static CardDef)> {
-        [
-            self.adventure.map(|a| (crate::WAY_ADVENTURE, crate::GRANTED_FACE_ADVENTURE, a)),
-            self.omen.map(|o| (crate::WAY_OMEN, crate::GRANTED_FACE_OMEN, o)),
-        ]
-        .into_iter()
-        .flatten()
+    /// with `WAY_ADVENTURE`, and its Omen, cast with `WAY_OMEN`.
+    pub fn inset_faces(&self) -> impl Iterator<Item = (u8, &'static CardDef)> {
+        [self.adventure.map(|a| (crate::WAY_ADVENTURE, a)), self.omen.map(|o| (crate::WAY_OMEN, o))].into_iter().flatten()
     }
 
     /// The face it is cast as by an inset way (`WAY_ADVENTURE` or `WAY_OMEN`), if it has one.
     pub fn inset_face(&self, way: u8) -> Option<&'static CardDef> {
-        self.inset_faces().find(|&(w, _, _)| w == way).map(|(_, _, f)| f)
+        self.inset_faces().find(|&(w, _)| w == way).map(|(_, f)| f)
     }
 
     /// A Room (CR 709.5): a split card whose halves share a type line, each half a door.

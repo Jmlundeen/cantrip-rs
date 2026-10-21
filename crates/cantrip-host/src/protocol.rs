@@ -668,6 +668,11 @@ pub struct ActionOptionMessage {
     /// For an activation, which of the source's abilities. For a cast, 0 for the mana cost and n for
     /// the card's nth alternative cost (CR 118.9).
     pub ability_index: i32,
+    /// Which option of its question this is, from 1: the answer that takes it echoes it (`TakeActionAnswer::option_id`), so
+    /// two options alike in kind, source and ability index - a card two permanents' permissions would each let be cast -
+    /// are told apart. Opaque: it means nothing outside its question, and says nothing of what makes the option possible.
+    #[serde(default)]
+    pub option_id: i32,
     pub targets_required: i32,
     pub target_candidates: Vec<TargetMessage>,
     /// For a mana ability: the mana it would add.
@@ -716,6 +721,7 @@ impl ActionOptionMessage {
             kind,
             source,
             ability_index: 0,
+            option_id: 0,
             targets_required: 0,
             target_candidates: Vec::new(),
             produces: Vec::new(),
@@ -1311,6 +1317,10 @@ pub struct TakeActionAnswer {
     pub kind: ActionKindView,
     pub source: ViewHandle,
     pub ability_index: i32,
+    /// The option taken (`ActionOptionMessage::option_id`), or 0 to name it by kind, source and ability index alone, which
+    /// is refused where two options of the question share them.
+    #[serde(default)]
+    pub option_id: i32,
     pub targets: Vec<TargetMessage>,
     pub color: Option<ColorView>,
     pub colors: Vec<ColorView>,
@@ -1331,6 +1341,7 @@ impl TakeActionAnswer {
             kind,
             source,
             ability_index: 0,
+            option_id: 0,
             targets: Vec::new(),
             color: None,
             colors: Vec::new(),
@@ -1348,6 +1359,7 @@ impl TakeActionAnswer {
     pub fn take(option: &ActionOptionMessage) -> Self {
         let mut answer = Self::new(option.kind, option.source);
         answer.ability_index = option.ability_index;
+        answer.option_id = option.option_id;
         answer.tap = option.tap;
         answer.filter = option.filter;
         answer.effect = option.effect;

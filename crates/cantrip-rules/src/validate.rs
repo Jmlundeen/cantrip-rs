@@ -17,6 +17,10 @@ fn fits(option: &ActionOption, action: &Action) -> bool {
     if option.kind != action.kind || option.source != action.source || option.index != action.index {
         return false;
     }
+    // The permission and the alternative cost are the option's own (CR 601.2b): an action may not name others.
+    if option.granted_by != action.granted_by || option.paid_by != action.paid_by {
+        return false;
+    }
     // Restricted mana is a kind of its own (CR 106.6): spending it is answered with its restriction.
     if option.kind == ActionKind::AssignMana && (option.mana != action.mana || option.restriction != action.restriction) {
         return false;

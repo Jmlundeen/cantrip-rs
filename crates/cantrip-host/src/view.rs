@@ -368,7 +368,7 @@ pub fn printed(def: &CardDef) -> ObjectView {
 /// The Adventure or Omen printed in a card's inset frame (CR 715.2, 720.2), as printed, for a player to read beside the
 /// card: it is part of the card in every zone, though the card has only its normal characteristics there (CR 715.4, 720.4).
 fn inset_spell(def: &CardDef) -> Option<Box<ObjectView>> {
-    def.inset_faces().next().map(|(_, _, face)| Box::new(printed(face)))
+    def.inset_faces().next().map(|(_, face)| Box::new(printed(face)))
 }
 
 /// One entry of the stack, bottom first.

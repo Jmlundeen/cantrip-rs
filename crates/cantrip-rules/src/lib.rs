@@ -34,7 +34,7 @@ mod validate;
 use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Rng};
 
-pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction};
+pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_face_of, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction};
 pub use validate::{check as check_answer, distribution_problem, name_problem};
 pub use layers::{chars, live, summoning_sick};
 
@@ -1397,7 +1397,13 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant) {
         let turn = self.g.state.turn.number;
-        let permission = PlayPermission { card, player, grant, turn };
+        // What gave it (CR 601.3): the spell or ability resolving, which a cast or land play by it is recorded as made by.
+        let by = match self.cause() {
+            Cause::Spell(spell) => Grant { object: spell, ability: AbilityRef::spell(self.g.state.obj(spell).card) },
+            Cause::Ability { source, ability } => Grant { object: source, ability },
+            _ => Grant { object: card, ability: AbilityRef::spell(self.g.state.obj(card).card) },
+        };
+        let permission = PlayPermission { card, player, grant, by, turn };
         // A "for as long as you control" duration that is already over as it would begin does nothing (CR 611.2b).
         if self.g.state.permission_lasts(&permission) {
             self.g.state.permission_push(permission);

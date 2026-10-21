@@ -906,6 +906,9 @@ pub struct PlayPermission {
     pub card: ObjectId,
     pub player: PlayerId,
     pub grant: PlayGrant,
+    /// The spell or ability whose effect gave it (CR 601.3): what a cast or land play by it is recorded as made by, and
+    /// how an action names it among several permissions for the same card.
+    pub by: Grant,
     /// The turn it was granted on, for `Expiry::EndOfYourNextTurn`.
     pub turn: u32,
 }

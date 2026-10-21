@@ -300,30 +300,6 @@ pub fn activation_alternative(cx: &Cx, player: PlayerId, permanent: ObjectId, de
     None
 }
 
-/// The alternative costs the permanents on the battlefield give the spells players cast (CR 118.9, 601.2b:
-/// `CardDef::spell_alternatives`), each with the permanent and its controller, in the order an alternative way number counts
-/// them (`alternative_way`): empty, so unallocated, in nearly every game.
-pub fn spell_alternatives(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static SpellAlternative)> {
-    spell_alternatives_in(cx.cards(), cx.s(), &cx.g.log)
-}
-
-/// `spell_alternatives`, read from a position alone (for the menu row's words).
-pub fn spell_alternatives_in(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<(ObjectId, PlayerId, &'static SpellAlternative)> {
-    let mut all = Vec::new();
-    for &id in s.battlefield() {
-        let obj = s.obj(id);
-        let def = cards.get(cards.current(obj));
-        // A permanent that has lost all its abilities gives none (CR 613.1f).
-        if def.spell_alternatives.is_empty() || crate::layers::lost_all_abilities(cards, s, log, id) {
-            continue;
-        }
-        for alternative in def.spell_alternatives {
-            all.push((id, obj.controller, alternative));
-        }
-    }
-    all
-}
-
 /// Whether a static ability lets `player` activate this sorcery-speed ability whenever they could cast an instant.
 pub fn instant_activation(cx: &Cx, player: PlayerId, source: ObjectId, index: u8) -> bool {
     for (id, controller, def) in sources(cx, |d| !d.instant_activation.is_empty()) {
