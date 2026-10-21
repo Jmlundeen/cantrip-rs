@@ -432,7 +432,10 @@ impl Undo {
 pub struct Mark(pub u32);
 
 impl GameState {
+    /// A game of `players` seats: at most `MAX_SEATS`, which every way a game is dealt refuses past (the host's
+    /// `Session::new`), since a set of seats is a bit each in eight bits.
     pub fn new(players: usize, seed: u64) -> GameState {
+        debug_assert!(players <= MAX_SEATS, "a game of {players} seats: at most {MAX_SEATS} are dealt");
         GameState {
             players: vec![Player::starting(20); players],
             restricted_mana: Vec::new(),
