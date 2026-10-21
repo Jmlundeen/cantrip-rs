@@ -60,7 +60,14 @@ public sealed class WebSlingingTests
     {
         GameClient client = Seated([SpiderMan(ZoneKindView.Stack), Elves(tapped: true)]);
 
-        CardChoicePresentation shown = CardChoicePresentation.Describe(client, Return(11), []);
+        // A cost's choice is asked cancellable, which the server words as a cost (PromptPresentation): a return to hand alone
+        // could as well be an effect's (Words of Wind).
+        var cost = new PromptPresentationContext
+        {
+            Action = PromptActionView.ReturnToHand, Cause = PromptCauseView.Cost, Chooser = Me, Owner = Me, Source = Handle(90),
+            Minimum = 1, Maximum = 1,
+        };
+        CardChoicePresentation shown = CardChoicePresentation.Describe(client, Return(11), [], cost);
         Assert.Equal("Spider-Man, Web-Slinger: choose a tapped creature to return to its owner's hand to pay for it", shown.Title);
     }
 
