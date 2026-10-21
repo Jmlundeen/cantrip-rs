@@ -40,12 +40,10 @@ keeps it).
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
-| [KI-24](#ki-24-under-bolass-citadel-the-top-of-a-library-is-cast-only-for-life) | Under Bolas's Citadel the top of a library is cast only for life | Medium | Open |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
 | [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
 | [KI-30](#ki-30-a-permanents-name-is-not-part-of-its-last-known-information) | A permanent's name is not part of its last-known information | Low | Open |
-| [KI-31](#ki-31-an-adventure-is-never-cast-from-the-top-of-a-library) | An Adventure is never cast from the top of a library | Medium | Open |
 | [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
@@ -250,21 +248,6 @@ entry is deleted.
 
 **Scenarios.** none yet.
 
-### KI-24: Under Bolas's Citadel the top of a library is cast only for life
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-16, review of the Cases |
-
-**Notes.** A player who controls Bolas's Citadel (`PlayRule::LibraryTop`) and also Mystic Forge or a solved Case of the Locked
-Hothouse (`PlayRule::LibraryTopSpells`) may cast the top card either way: for life by the Citadel, or for its mana cost by the
-other permission (CR 601.3, 118.9; the Citadel's life payment is only for a spell cast "this way"). `castable` in
-`crates/cantrip-rules/src/actions.rs` offers the mana-cost cast only when no permanent gives `LibraryTop`, and the cast decides
-life or mana from `land_rules(..).top_for_life` alone, so only the life cast is offered. A fix offers both, each as its own way,
-and has the cast pay what that way says.
-
-**Scenarios.** None yet: Bolas's Citadel with Mystic Forge, or with a solved Case of the Locked Hothouse, and a creature on top.
-
 ### KI-26: An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins
 
 | Severity | Status | Area | Found |
@@ -315,22 +298,6 @@ The same holds for a name an effect set (`EffectKind::SetName`, CR 612.8): The I
 Legacy reads as The Irencrag afterwards.
 
 **Scenarios.** None yet.
-
-### KI-31: An Adventure is never cast from the top of a library
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-16, review of the land-with-an-Adventure change |
-
-**Notes.** A card may be cast as its Adventure wherever the card itself may be cast (CR 715.3), the top of a library
-included: Bolas's Citadel could cast Stomp or Mage Siege off the top for life, and Mystic Forge an Adventure that is an
-artifact or colorless spell. `actions::castable`'s two library-top passes (`PlayRule::LibraryTopSpells`, and
-`top_for_life`) offer only the card itself, never `inset_faces` (also noted in `docs/engine-design.md`, "Spells in an
-inset frame"). Traveling Chocobo's ruling (Lindblum on top: the land may be played, the Adventure not cast) holds today
-only because no face is offered; a fix judges each inset face with the filter, as `Speed::face` does for flash.
-
-**Scenarios.**
-- [`scenarios/traveling-chocobo-plays-lindblum-off-the-top-but-not-its-adventure.cantrip`](../scenarios/traveling-chocobo-plays-lindblum-off-the-top-but-not-its-adventure.cantrip) - the case that must stay refused; none yet for one that must be offered (Bolas's Citadel with Bonecrusher Giant on top).
 
 ### KI-33: Chain Lightning's payer copies without being asked whether to
 

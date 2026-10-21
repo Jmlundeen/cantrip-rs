@@ -1,0 +1,37 @@
+# A card may be cast as its Adventure wherever the card itself may be cast (CR 715.3), the top of a library included.
+# Under Bolas's Citadel Bonecrusher Giant on top of Bot1's library is cast as Stomp, for life equal to Stomp's mana value
+# (CR 715.3b: the spell has only the Adventure's characteristics; CR 118.9): 2 life, and Stomp deals 2 damage to Bot2.
+# The card then goes on an adventure in exile (CR 715.4).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Sol Ring
+Bolas's Citadel
+Swamp
+Swamp
+Bonecrusher Giant
+Swamp x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Library.Bonecrusher Giant.Cast(Bot2; Ability: Adventure)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Life = 18
+Bot2.Life = 18
+Exile = Bonecrusher Giant

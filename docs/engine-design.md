@@ -1291,8 +1291,9 @@ library and ceases to exist. Countered, or with every target gone, either goes t
 `ObjectView::inset_spell`, printed beside the card. A land card with an Adventure (Lindblum, Industrial Regency) is cast
 only as the Adventure, never as itself (CR 305.9), and exiled on its adventure it is played from exile as a land play (CR
 715.3d). A static ability about "each X card in your graveyard" (Iroh, Underworld Breach) judges the card, which has only
-its normal characteristics there (CR 715.4), and takes the cost from the face cast. Not built: casting the face from the top of a library
-(`PlayRule::LibraryTopSpells`, which offers only the card itself).
+its normal characteristics there (CR 715.4), and takes the cost from the face cast. From the top of a library a permission offers each face it allows as it offers the
+card (`Offer::by_route`): Bolas's Citadel casts Stomp for Stomp's mana value in life, and a filter
+(`PlayRule::LibraryTopSpells`) judges the face, not the card.
 
 ### Costs to attack
 
