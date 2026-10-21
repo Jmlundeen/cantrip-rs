@@ -393,11 +393,12 @@ below the threshold only, for this reason.
 | --- | --- | --- | --- |
 | Won't fix | Won't fix: beyond practical scale | engine / host | 2026-10-21, widening the target counts past 255 |
 
-**Notes.** A stack item counts its targets in a `u32` (`StackItem::target_count`), and the target arena where an item's
-targets past the first 16 are kept is indexed by a `u32` (`StackItem::spill`); a target question counts its candidates in a
-`u32` (`RequestKind::ChooseTarget::count`), which the host sends as the protocol's `int`. Past 2^32 targets, 2^32 spilled
-targets over a game, or 2^31 candidates in one question, the engine stops with a panic (`expect`) rather than cut the list.
-Play cannot reach it: every target and every candidate is a different object or player (CR 115.3), so each needs an object
-of its own in memory - 2^31 objects is hundreds of gigabytes - and a player chooses each target by hand. Tokens that double
-each round reach 2^16 in sixteen rounds, well within these limits; 2^31 would take thirty-one rounds of doubling and the
-memory above. No card needs it.
+**Notes.** A stack item counts its targets in a `u32` (`StackItem::target_count`), and a target question counts its
+candidates in a `u32` (`RequestKind::ChooseTarget::count`), which the host sends as the protocol's `int`. Each stops at its
+bound rather than wrap (`cantrip_state::count_u32`, the host's `wire`): a list of more than 2^32 targets keeps the first 2^32,
+a question of more candidates asks for at most 2^32, and the host sends a count past 2^31 - 1 as 2^31 - 1, so the client may
+offer fewer than the engine would take. Both are tested at their bounds. Play cannot reach them: every target and every
+candidate is a different object or player (CR 115.3), so each needs an object of its own in memory - 2^31 objects is
+hundreds of gigabytes - and a player chooses each target by hand. Tokens that double each round reach 2^16 in sixteen rounds,
+well within these limits; 2^31 would take thirty-one rounds of doubling in a timed game, and the memory above. No card needs
+it. The target arena where an item's targets past the first 16 are kept is indexed by a `usize`, with no bound of its own.

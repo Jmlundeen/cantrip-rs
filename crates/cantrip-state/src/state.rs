@@ -323,7 +323,7 @@ pub enum Undo {
     MembersPushed(u32),
     MembersPopped(Vec<ObjectId>),
     /// Spilled targets appended since the arena was this long.
-    TargetsSpilled(u32),
+    TargetsSpilled(usize),
     TargetsUnspilled(Vec<Target>, Vec<u8>, Vec<u8>),
     AttackersSet(Vec<Attacker>),
     BlocksSet(Vec<Block>),
@@ -915,7 +915,7 @@ impl GameState {
 
     /// The run of the target arena a stack item with more than `INLINE_TARGETS` targets names.
     fn spilled(item: &StackItem) -> std::ops::Range<usize> {
-        item.spill as usize..item.spill as usize + item.target_count as usize
+        item.spill..item.spill + item.target_count as usize
     }
 
     /// A stack item's targets, in the order chosen (CR 601.2c): those it holds, or all of them from the arena.
@@ -961,8 +961,9 @@ impl GameState {
     /// specs and shares are 0. Past `INLINE_TARGETS` targets the lists are put in the target arena, journaled, and the item
     /// names them (the first ones are in the item too).
     pub fn set_item_targets(&mut self, item: &mut StackItem, targets: &[Target], spec_of: &[u8], shares: &[u8]) {
-        let n = targets.len();
-        item.target_count = u32::try_from(n).expect("a stack item's targets are counted in a u32");
+        // Counted in a u32, past any board's legal targets: a list longer than that takes no more (KI-99).
+        item.target_count = crate::count_u32(targets.len());
+        let n = item.target_count as usize;
         item.inline_targets = [Target::None; INLINE_TARGETS];
         item.inline_spec_of = [0; INLINE_TARGETS];
         item.inline_shares = [0; INLINE_TARGETS];
@@ -978,7 +979,6 @@ impl GameState {
             self.spill_targets.extend_from_slice(&targets[..n]);
             self.spill_specs.extend((0..n).map(|i| spec_of.get(i).copied().unwrap_or(0)));
             self.spill_shares.extend((0..n).map(|i| shares.get(i).copied().unwrap_or(0)));
-            let start = u32::try_from(start).expect("the target arena is indexed by a u32");
             self.log(Undo::TargetsSpilled(start));
             item.spill = start;
         }
@@ -1278,9 +1278,9 @@ impl GameState {
             Undo::MembersPushed(len) => self.members.truncate(len as usize),
             Undo::MembersPopped(objects) => self.members.extend(objects),
             Undo::TargetsSpilled(len) => {
-                self.spill_targets.truncate(len as usize);
-                self.spill_specs.truncate(len as usize);
-                self.spill_shares.truncate(len as usize);
+                self.spill_targets.truncate(len);
+                self.spill_specs.truncate(len);
+                self.spill_shares.truncate(len);
             }
             Undo::TargetsUnspilled(targets, specs, shares) => {
                 self.spill_targets.extend(targets);
@@ -1371,11 +1371,11 @@ impl GameState {
             Undo::MembersPushed(len) => Undo::MembersPopped(self.members[*len as usize..].to_vec()),
             Undo::MembersPopped(_) => Undo::MembersPushed(self.members.len() as u32),
             Undo::TargetsSpilled(len) => Undo::TargetsUnspilled(
-                self.spill_targets[*len as usize..].to_vec(),
-                self.spill_specs[*len as usize..].to_vec(),
-                self.spill_shares[*len as usize..].to_vec(),
+                self.spill_targets[*len..].to_vec(),
+                self.spill_specs[*len..].to_vec(),
+                self.spill_shares[*len..].to_vec(),
             ),
-            Undo::TargetsUnspilled(..) => Undo::TargetsSpilled(self.spill_targets.len() as u32),
+            Undo::TargetsUnspilled(..) => Undo::TargetsSpilled(self.spill_targets.len()),
             Undo::AttackersSet(_) => Undo::AttackersSet(self.attackers.clone()),
             Undo::BlocksSet(_) => Undo::BlocksSet(self.blocks.clone()),
             Undo::ExtraTurnsSet(_) => Undo::ExtraTurnsSet(self.extra_turns.clone()),

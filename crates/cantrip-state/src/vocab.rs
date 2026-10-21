@@ -1507,3 +1507,18 @@ mod tests {
         assert_eq!(colorless_white.to_string(), "{C/W}");
     }
 }
+
+/// A length as a `u32` count: exactly, or past `u32::MAX` - beyond any practical game (KI-99) - that many and no more.
+pub fn count_u32(n: usize) -> u32 {
+    u32::try_from(n).unwrap_or(u32::MAX)
+}
+
+#[cfg(test)]
+mod count_tests {
+    #[test]
+    fn a_count_past_u32_stops_at_its_bound() {
+        assert_eq!(super::count_u32(300), 300);
+        assert_eq!(super::count_u32(u32::MAX as usize), u32::MAX);
+        assert_eq!(super::count_u32(usize::MAX), u32::MAX);
+    }
+}

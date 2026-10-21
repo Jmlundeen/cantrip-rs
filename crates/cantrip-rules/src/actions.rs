@@ -1025,7 +1025,7 @@ fn with_targets(cx: &Cx, asker: &Asker, specs: &[TargetSpec], option: &mut Actio
         if candidates.is_empty() && spec.required() {
             return false;
         }
-        option.targets_required += spec.max;
+        option.targets_required = option.targets_required.saturating_add(spec.max);
         option.targets_optional |= spec.min == 0;
         for c in candidates {
             if !option.target_candidates.contains(&c) {
@@ -4288,7 +4288,7 @@ fn cast(
         let total = match divide.of_x {
             Some(of_x) => of_x(item.x),
             None if divide.total == TargetSpec::COUNTED => item.x,
-            None => u16::try_from(divide.total).expect("a printed total to divide fits the shares asked"),
+            None => u16::try_from(divide.total).unwrap_or(u16::MAX),
         };
         match ask_divided(cx, player, spell, spec, total, true)? {
             Divided::Chosen(chosen, shares) => {
@@ -4889,7 +4889,7 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
                 break 'slot;
             }
             // No more than there are candidates to choose (CR 601.2c: each target is a different object or player).
-            let count = most.min(u32::try_from(candidates.len()).expect("candidates are counted in a u32"));
+            let count = most.min(cantrip_state::count_u32(candidates.len()));
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
                 source,
                 purpose: Purpose::Targets,

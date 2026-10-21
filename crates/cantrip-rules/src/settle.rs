@@ -536,7 +536,7 @@ fn choose_trigger_targets(
                 break 'slot;
             }
             // No more than there are candidates to choose (CR 601.2c: each target is a different object or player).
-            let count = most.min(u32::try_from(candidates.len()).expect("candidates are counted in a u32"));
+            let count = most.min(cantrip_state::count_u32(candidates.len()));
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
                 source: trigger.source,
                 purpose: Purpose::Targets,
@@ -626,7 +626,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         let total = match divide.of_x {
             Some(of_x) => of_x(x),
             None if divide.total == TargetSpec::COUNTED => x,
-            None => u16::try_from(divide.total).expect("a printed total to divide fits the shares asked"),
+            None => u16::try_from(divide.total).unwrap_or(u16::MAX),
         };
         match crate::actions::ask_divided(cx, trigger.controller, trigger.source, spec, total, false)? {
             crate::actions::Divided::Chosen(chosen, given) => {

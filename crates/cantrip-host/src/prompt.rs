@@ -1556,7 +1556,18 @@ fn subtype_heading(source: &str, choices: &[Subtype], purpose: WordUse) -> Strin
     }
 }
 
-/// A count or mana value as the protocol's `int`: exactly, or not at all.
+/// A count or mana value as the protocol's `int`: exactly, or past its range the most it holds (KI-99).
 fn wire(n: u32) -> i32 {
-    i32::try_from(n).expect("a count or mana value past the protocol's int")
+    i32::try_from(n).unwrap_or(i32::MAX)
+}
+
+#[cfg(test)]
+mod wire_tests {
+    /// A count past the protocol's `int` is sent as the most it holds, never wrapped to a negative.
+    #[test]
+    fn a_count_past_the_protocols_int_stops_at_its_bound() {
+        assert_eq!(super::wire(300), 300);
+        assert_eq!(super::wire(i32::MAX as u32), i32::MAX);
+        assert_eq!(super::wire(u32::MAX), i32::MAX);
+    }
 }

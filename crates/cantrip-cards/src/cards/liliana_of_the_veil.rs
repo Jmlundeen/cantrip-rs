@@ -24,7 +24,7 @@ fn minus_six(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         Vec::new()
     } else {
         let candidates: Vec<Target> = permanents.iter().map(|&id| Target::Object(id)).collect();
-        let count = u32::try_from(candidates.len()).expect("permanents are counted in a u32");
+        let count = u32::try_from(candidates.len()).unwrap_or(u32::MAX);
         let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
             source: item.object,
             purpose: Purpose::SeparatePiles,

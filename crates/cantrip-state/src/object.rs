@@ -594,7 +594,7 @@ pub struct StackItem {
     pub inline_shares: [u8; INLINE_TARGETS],
     /// For an item with more than `INLINE_TARGETS` targets, where all `target_count` of them, their slots and shares start in
     /// the game's target arena (`GameState::targets`); 0 otherwise.
-    pub spill: u32,
+    pub spill: usize,
     /// For an instant or sorcery spell: if it would be put into a graveyard as it leaves the stack, it is exiled
     /// instead (Bilbo's "cast this way").
     pub exile_after: bool,

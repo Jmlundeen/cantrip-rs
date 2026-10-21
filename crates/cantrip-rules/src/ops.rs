@@ -2445,7 +2445,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
         source,
         purpose: Purpose::Targets,
-        count: u32::try_from(candidates.len()).expect("candidates are counted in a u32"),
+        count: cantrip_state::count_u32(candidates.len()),
         candidates,
         optional: true,
             least: 0,
