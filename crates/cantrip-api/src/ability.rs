@@ -586,9 +586,13 @@ impl AbilityDef {
         AbilityDef::Triggered(TriggeredDef { batch_by_data: true, ..triggered_def(self, "only a triggered ability triggers per batch") })
     }
 
-    /// A triggered mana ability (CR 605.1b).
-    pub const fn mana_ability(self) -> AbilityDef {
-        AbilityDef::Triggered(TriggeredDef { mana_ability: true, ..triggered_def(self, "an activated mana ability is written with mana_ability()") })
+    /// A triggered mana ability (CR 605.1b), with what it adds to the player who tapped the permanent (`TriggeredMana`).
+    pub const fn mana_ability(self, adds: TriggeredMana) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef {
+            mana_ability: true,
+            mana_yield: adds,
+            ..triggered_def(self, "an activated mana ability is written with mana_ability()")
+        })
     }
 
     /// Events of one batch about the same subject trigger it once, their amounts added up (CR 120.2, 603.2c).

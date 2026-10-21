@@ -1696,11 +1696,15 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         }
     }
     let forbidders = static_rules::activation_forbidders(cx);
+    // The triggered mana abilities waiting on a tap (CR 605.1b): nearly always none, and then nothing more is asked.
+    let waiting = waiting_mana_triggers(cx);
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player || skip == Some(id) {
             continue;
         }
         let chars = cx.chars(id);
+        // The mana types its mana abilities could produce, for the triggered mana abilities its tap would trigger.
+        let mut tapped_types = 0u8;
         let mut only: Option<&ActivatedDef> = None;
         let mut count = 0;
         // The most any one ability adds, for the abilities that are not restricted and for each kind of restriction: they
@@ -1731,6 +1735,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             }
             count += 1;
             only = Some(def);
+            if !waiting.is_empty() {
+                tapped_types |= yield_types(cx, id, player, def);
+            }
             spent = spent.max(def.cost.mana.mana_value());
             let adds = def.adds.0.iter().map(|&n| n as u32).sum::<u32>() + def.adds_any as u32;
             match def.restricted {
@@ -1754,6 +1761,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         }
         if count > 0 {
             consume += spent;
+            if !waiting.is_empty() && tapped_types != 0 {
+                tap_triggers(cx, &waiting, id, player, tapped_types, &mut fixed, &mut flex);
+            }
         }
         match (count, only) {
             (0, _) => {}
@@ -1797,6 +1807,62 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         grantors: pay_with_grantors(cx),
         restricted,
         any_color: static_rules::spend_any_color_always(cx, player),
+    }
+}
+
+/// The triggered mana abilities that a permanent's being tapped for mana could trigger (CR 605.1b): those of the permanents
+/// whose cards have one, and the delayed ones (High Tide's). Empty, and unallocated, while there are none.
+fn waiting_mana_triggers(cx: &Cx) -> Vec<(Asker, &'static TriggeredDef)> {
+    let mut waiting = Vec::new();
+    let cards = cx.cards();
+    for &id in cx.s().battlefield() {
+        let obj = cx.s().obj(id);
+        if !cards.mana_triggers[obj.copy.map_or(obj.card, |c| c.card).0 as usize] {
+            continue;
+        }
+        let asker = Asker { source: id, controller: obj.controller };
+        for ability in cx.chars(id).abilities() {
+            if let AbilityDef::Triggered(t) = cards.ability(ability)
+                && t.mana_ability
+            {
+                waiting.push((asker, t));
+            }
+        }
+    }
+    for d in cx.s().delayed.iter().filter(|d| d.when.is_event()) {
+        if let AbilityDef::Triggered(t) = cards.ability(d.ability)
+            && t.mana_ability
+        {
+            waiting.push((Asker { source: d.source, controller: d.controller }, t));
+        }
+    }
+    waiting
+}
+
+/// What the triggered mana abilities `waiting` would add to `player` as `id` is tapped for mana of one of `types` (CR 605.1b,
+/// 605.4a: they resolve at once, as part of the mana ability): advice, added to what the permanent itself adds, so a cast
+/// High Tide's extra {U} pays for is offered before the Islands are tapped. Each one that would trigger on the tap counts
+/// once, by what it says it adds (`TriggeredMana`).
+fn tap_triggers(cx: &Cx, waiting: &[(Asker, &'static TriggeredDef)], id: ObjectId, player: PlayerId, types: u8, fixed: &mut [u8; 6], flex: &mut [u32; 64]) {
+    let first = (0..6).find(|&m| types & (1 << m) != 0).unwrap_or(5);
+    let mut produced = ManaPool([0; 6]);
+    produced.0[first] = 1;
+    let event = Event::TappedForMana { permanent: id, player, produced };
+    for (asker, t) in waiting {
+        if t.fires(cx, asker, &event).is_none() || t.condition.is_some_and(|condition| !condition(cx, asker)) {
+            continue;
+        }
+        match t.mana_yield {
+            TriggeredMana::One(mana) => fixed[mana as usize] = fixed[mana as usize].saturating_add(1),
+            TriggeredMana::OneOfProduced => flex[types as usize] += 1,
+            TriggeredMana::ChosenColor => {
+                if let Some(color) = cx.s().obj(asker.source).chosen_color {
+                    let mana = color.mana() as usize;
+                    fixed[mana] = fixed[mana].saturating_add(1);
+                }
+            }
+            TriggeredMana::Unstated => {}
+        }
     }
 }
 

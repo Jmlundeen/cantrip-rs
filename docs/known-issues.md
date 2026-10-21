@@ -63,7 +63,6 @@ keeps it).
 | [KI-92](#ki-92-an-activation-records-nothing-of-what-gave-it-and-its-alternative-cost-is-found-first) | An activation records nothing of what gave it, and its alternative cost is found first | Low | Open |
 | [KI-93](#ki-93-the-browser-shows-no-phased-out-permanents) | The browser shows no phased-out permanents | Medium | Open |
 | [KI-94](#ki-94-a-browser-scenarios-clientmenu-check-reads-a-menu-of-a-card-long-gone) | A browser scenario's `Client.Menu` check reads a menu of a card long gone | Low | Open |
-| [KI-96](#ki-96-a-cast-whose-cost-needs-a-triggered-mana-abilitys-mana-is-not-offered-until-the-player-taps-first) | A cast whose cost needs a triggered mana ability's mana is not offered until the player taps first | Medium | Open |
 
 ## Issues
 
@@ -564,21 +563,3 @@ the engine side of the cast passes.
 
 **Scenarios.** `trinisphere-cost-of-force-of-wills-alternative-cost-shown-in-the-browser` (browser suite; fails at
 line 46).
-
-### KI-96: A cast whose cost needs a triggered mana ability's mana is not offered until the player taps first
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-20, review of High Tide, Bubbling Muck and Pyre Rhymer |
-
-**Notes.** Whether a spell or ability can be paid for, and so whether it is offered, is judged by `covers_total`
-(`crates/cantrip-rules/src/actions.rs`; its callers are the cast and activation offers at about lines 2873, 3110, 3174
-and 3348) from what `available_without` (~line 1660) counts: the pool, a player's own mana abilities, and each
-permanent's activated mana abilities. The mana a triggered mana ability adds when a source is tapped (CR 605.1b,
-605.4a) is not counted: neither a permanent's (Nissa, Who Shakes the World; Badgermole Cub; Utopia Sprawl; Mana Flare)
-nor a delayed one's (High Tide, Bubbling Muck, Molten Tide). So with High Tide resolved, two untapped Islands and an
-empty pool, a {U}{U}{U}{U} spell is legal to cast (CR 601.2g-h) but not offered; the player has to tap the Islands at
-priority first, and then it is. A fix counts, for each mana source, the additional mana the triggered mana abilities
-waiting on its tap would add, cheaply and only while one exists.
-
-**Scenarios.** None.

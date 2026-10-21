@@ -61,7 +61,7 @@ pub static CARD: CardDef = CardDef {
             mana::that_player_adds_an_additional::<{ Mana::G as u8 }>,
             "Whenever you tap a Forest for mana, add an additional {G}.",
         )
-            .mana_ability(),
+            .mana_ability(TriggeredMana::One(Mana::G)),
         ability(loyalty(1), animate_land, "+1: Put three +1/+1 counters on up to one target noncreature land you control. Untap it. It becomes a 0/0 Elemental creature with vigilance and haste that's still a land.")
             .targets(&[up_to_one(noncreature_land_you_control)]),
         ability(loyalty(-8), emblem_and_forests, "\u{2212}8: You get an emblem with \"Lands you control have indestructible.\" Search your library for any number of Forest cards, put them onto the battlefield tapped, then shuffle."),

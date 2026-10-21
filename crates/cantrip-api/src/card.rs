@@ -1108,6 +1108,7 @@ impl TriggeredDef {
         once_per_batch: false,
         batch_by_data: false,
         mana_ability: false,
+        mana_yield: TriggeredMana::Unstated,
         sums_per_subject: false,
         triggers_each_turn: 0,
         chapter: 0,
@@ -1118,6 +1119,20 @@ impl TriggeredDef {
         ward: false,
         on_sacrifice: false,
     };
+}
+
+/// What a triggered mana ability (CR 605.1b) adds when a permanent is tapped for mana, to the player who tapped it: stated
+/// so the advice of what a player can pay counts it before anything is tapped (CR 601.2g), as the effect itself is code.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum TriggeredMana {
+    /// Not stated: the advice counts nothing for it.
+    Unstated,
+    /// One mana of this type: "add an additional {G}" (Nissa, Who Shakes the World; High Tide; Badgermole Cub).
+    One(Mana),
+    /// One mana of any type that permanent produced (Mana Flare, Lavaleaper).
+    OneOfProduced,
+    /// One mana of the color its source chose as it entered (Utopia Sprawl).
+    ChosenColor,
 }
 
 /// A triggered ability (CR 603).
@@ -1154,6 +1169,9 @@ pub struct TriggeredDef {
     /// once, not on the stack, as part of the mana ability that triggered it (CR 605.4a). `matches` is asked of every permanent that has
     /// one; `effect` adds the mana.
     pub mana_ability: bool,
+    /// What a triggered mana ability adds to the player who tapped the permanent each time it triggers (`TriggeredMana`): what
+    /// the advice of whether a cost can be paid counts for each mana source it would trigger on (CR 601.2g, 605.1b).
+    pub mana_yield: TriggeredMana,
     /// Events of one batch that are about the same subject trigger it once, with their `data[0]` added up (CR 120.2,
     /// 603.2c): damage dealt to one creature at once is one event, however many sources dealt it. "Whenever a creature
     /// you control is dealt damage ... that much damage" (The Sensational She-Hulk, Screaming Nemesis).

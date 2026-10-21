@@ -1,0 +1,59 @@
+# The mana a permanent's triggered mana ability adds when a land is tapped (CR 605.1b, 605.4a) counts towards what a
+# player can pay (CR 601.2g-h), before anything is tapped. Turn 3: Utopia Sprawl (Red chosen) on Bot1's first Forest, with
+# the pool empty and only that Forest untapped: Stomp ({1}{R}) is offered, and the Forest's {G} and Utopia Sprawl's {R} pay
+# for it. Turn 4: Bot2 casts Mana Flare with its first Mountain and two Moxes, and then, with only its second Mountain
+# untapped, its own Stomp, paid by the Mountain's {R} and Mana Flare's additional {R}.
+
+[Bot1 Deck]
+Forest
+Forest
+Utopia Sprawl
+Bonecrusher Giant
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mana Flare
+Mountain
+Bonecrusher Giant
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Utopia Sprawl.Cast(Forest#1)
+Bot1.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Adventure)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Mana Flare.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Mana =
+Bot2.Hand.Bonecrusher Giant.Cast(Bot1; Ability: Adventure)
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Exile = Bonecrusher Giant; Bonecrusher Giant

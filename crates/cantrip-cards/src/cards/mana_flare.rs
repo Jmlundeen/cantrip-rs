@@ -8,6 +8,6 @@ pub static CARD: CardDef = CardDef {
         mana::add_one_mana_of_any_type_that_land_produced,
         "Whenever a player taps a land for mana, that player adds one mana of any type that land produced.",
     )
-    .mana_ability()],
+    .mana_ability(TriggeredMana::OneOfProduced)],
     ..oracle::MANA_FLARE
 };

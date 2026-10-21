@@ -19,6 +19,6 @@ pub static CARD: CardDef = CardDef {
         mana::that_player_adds_an_additional::<{ Mana::B as u8 }>,
         "Until end of turn, whenever a player taps a Swamp for mana, that player adds an additional {B}.",
     )
-    .mana_ability()],
+    .mana_ability(TriggeredMana::One(Mana::B))],
     ..oracle::BUBBLING_MUCK
 };

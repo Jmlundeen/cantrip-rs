@@ -19,6 +19,6 @@ pub static CARD: CardDef = CardDef {
         mana::that_player_adds_an_additional::<{ Mana::U as u8 }>,
         "Until end of turn, whenever a player taps an Island for mana, that player adds an additional {U}.",
     )
-    .mana_ability()],
+    .mana_ability(TriggeredMana::One(Mana::U))],
     ..oracle::HIGH_TIDE
 };

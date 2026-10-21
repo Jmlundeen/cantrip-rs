@@ -1224,13 +1224,21 @@ Dictate of Karametra, Zendikar Resurgent, Mirari's Wake and Vorinclex, Voice of 
 
 A delayed triggered ability can be a mana ability too (CR 603.7, 605.1b): "until end of turn, whenever you tap a Mountain
 for mana, add an additional {R}" (Molten Tide, High Tide, Bubbling Muck) is a `DelayedWhen::ThisTurn` ability whose def
-is `.mana_ability()`. `tapped_for_mana` runs the waiting ones whose matcher accepts the tap right after the permanents'
+is `.mana_ability(TriggeredMana::One(Mana::R))`. `tapped_for_mana` runs the waiting ones whose matcher accepts the tap right after the permanents'
 (`delayed_mana_abilities`, looked for only while some delayed ability waits on an event), each at once with its own
 controller as "you" (CR 603.7d-e), stopped as any delayed ability is but never made to trigger again, its mana produced by
 its source, the spell that made it, wherever that has gone (CR 106.3); settle's delayed abilities skip a mana ability, so
 it never goes on the stack (CR 605.4a). "Whenever [you tap / a player taps] a [land type] for mana, [that player] add[s]
 an additional [mana]" is `mana::you_tap_a_land_type_for_mana` or `a_player_taps_a_land_type_for_mana` with
-`mana::that_player_adds_an_additional`, the type read through the source's words (Nissa, Who Shakes the World too). Every
+`mana::that_player_adds_an_additional`, the type read through the source's words (Nissa, Who Shakes the World too).
+
+Every triggered mana ability states what it adds (`TriggeredDef::mana_yield`, a `TriggeredMana`: one mana of a type, one
+of a type the permanent produced, one of its source's chosen color), since its effect is code. The advice of what a
+player can pay (`actions::available_without`) counts it: while some permanent's or delayed triggered mana ability waits
+(`waiting_mana_triggers`, empty and unallocated otherwise), each mana source the player could tap is asked whether its
+tap would trigger it (`tap_triggers`, the ability's own matcher on a `TappedForMana` of that source), and what it states
+it adds is counted with the source's mana - so with High Tide resolved a {2}{U}{U} spell is offered from two untapped
+Islands before either is tapped (CR 601.2g-h). Every
 object leaves last-known information as it ceases to be that object (CR 400.7, 608.2h, 113.7a) - a move out of any
 zone (`move_together`) or ceasing to exist (`ops::cease_to_exist`: a token or a copy of a spell, CR 111.7, 707.10a, a
 player's objects as the player leaves, CR 800.4a) - a row of `GameState::last_known` that the old object names

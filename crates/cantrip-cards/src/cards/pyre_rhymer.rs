@@ -21,7 +21,7 @@ pub static MOLTEN_TIDE: CardDef = CardDef {
         mana::that_player_adds_an_additional::<{ Mana::R as u8 }>,
         "Until end of turn, whenever you tap a Mountain for mana, add an additional {R}.",
     )
-    .mana_ability()],
+    .mana_ability(TriggeredMana::One(Mana::R))],
     text: "Until end of turn, whenever you tap a Mountain for mana, add an additional {R}.",
     ..CardDef::BLANK
 };

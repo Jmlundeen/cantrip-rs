@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         earthbend::enters::<1>("When Badgermole Cub enters, earthbend 1."),
         triggered(when(EventMask::TAPPED, creature_tapped_for_mana), add_green, "Whenever you tap a creature for mana, add an additional {G}.")
-            .mana_ability(),
+            .mana_ability(TriggeredMana::One(Mana::G)),
     ],
     delayed: &[earthbend::RETURN],
     ..oracle::BADGERMOLE_CUB

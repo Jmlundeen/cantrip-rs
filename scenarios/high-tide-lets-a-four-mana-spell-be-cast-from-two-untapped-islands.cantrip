@@ -1,0 +1,40 @@
+# A cast is legal when its cost could be paid with the mana abilities the player may activate while paying (CR 601.2g-h),
+# the triggered mana abilities those trigger included (CR 605.1b, 605.4a). Turn 5: Bot1 taps one Island for High Tide;
+# with an empty pool and two untapped Islands, each of which now makes {U}{U}, Enduring Curiosity ({2}{U}{U}) is offered
+# before anything is tapped, and paid by tapping the two Islands. Mind Control ({3}{U}{U}), one more than they make, is not.
+
+[Bot1 Deck]
+Island
+High Tide
+Island
+Enduring Curiosity
+Mind Control
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.High Tide.Cast
+Bot1.Pass
+Bot2.Pass
+? Delayed = High Tide
+? Bot1.Mana =
+! Bot1.Hand.Mind Control.Cast
+Bot1.Hand.Enduring Curiosity.Cast
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Enduring Curiosity.Power = 4
+Bot1.Mana =

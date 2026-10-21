@@ -393,7 +393,8 @@ shapes have an example:
   wire (`restriction_view`). "N mana in any combination of colors" is `cantrip_mechanics::choose_colors`. "Whenever a player taps a land
   for mana, that player adds one mana of any type that land produced" is `mana::a_player_taps_a_land_for_mana` (or a matcher
   of the card's own over `mana::land_tapped_for_mana`) with `mana::add_one_mana_of_any_type_that_land_produced`, as a
-  `.mana_ability()` trigger. "You may activate abilities of creatures you control as though those creatures had haste" is
+  `.mana_ability(TriggeredMana::OneOfProduced)` trigger: every triggered mana ability says what it adds (`TriggeredMana`), which
+  is what the advice of whether a cost can be paid counts before anything is tapped. "You may activate abilities of creatures you control as though those creatures had haste" is
   `CardDef::activate_as_though_haste`.
 - **Gift** (CR 702.174) is `CardDef.gift`, one of `cantrip_mechanics::gift`'s constants (a card, a Food, a tapped Fish, a
   Treasure, an Octopus, an extra turn); the promise and the opponent are asked before the targets, the spell's effect reads

@@ -43,6 +43,6 @@ pub static CARD: CardDef = CardDef {
         add_chosen_color,
         "Whenever enchanted Forest is tapped for mana, its controller adds an additional one mana of the chosen color.",
     )
-    .mana_ability()],
+    .mana_ability(TriggeredMana::ChosenColor)],
     ..oracle::UTOPIA_SPRAWL
 };
