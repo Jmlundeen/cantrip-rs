@@ -1512,11 +1512,15 @@ mod tests {
         assert_eq!(ask(&game, me).source_names, vec!["Llanowar Elves".to_string()]);
         assert_eq!(ask(&game, them).source_names, vec![String::new()], "a card in another's hand is not named");
 
-        // Gone to its owner's graveyard and become a new object there (CR 400.7): no handle in a fresh view, but its name.
+        // A card that left a hand (discarded, CR 400.7) is a new object; its old record stays in the zone it left, as the
+        // engine leaves it (`ops::move_together`), and that zone is still hidden from the other seat.
         let new = ObjectId(game.state.objects.len() as u32 - 1);
-        let obj = &mut game.state.objects[elves.index()];
-        obj.zone = Zone::graveyard(me);
-        obj.became = Some(new);
+        game.state.objects[elves.index()].became = Some(new);
+        assert_eq!(ask(&game, them).source_names, vec![String::new()], "a card that left another's hand is not named");
+
+        // A permanent that left the battlefield - Ral Zarek put into the graveyard - stays recorded there: no handle in a
+        // fresh view, but its last-known name.
+        game.state.objects[elves.index()].zone = Zone::BATTLEFIELD;
         let asked = ask(&game, them);
         assert!(asked.sources[0].is_none(), "a gone source has no handle in a fresh view");
         assert_eq!(asked.source_names, vec!["Llanowar Elves".to_string()]);
