@@ -63,6 +63,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
+| [KI-99](#ki-99-a-spell-or-ability-with-more-than-232-targets-or-a-question-of-more-than-231-candidates) | A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates | Won't fix | Won't fix: beyond practical scale |
 
 ## Issues
 
@@ -385,3 +386,18 @@ permanent's own reached striation prints.
 
 **Scenarios.** `wurmwall-sweeper-shows-its-striation-power-and-toughness-in-the-browser` (browser) checks the face in hand and
 below the threshold only, for this reason.
+
+### KI-99: A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Won't fix | Won't fix: beyond practical scale | engine / host | 2026-10-21, widening the target counts past 255 |
+
+**Notes.** A stack item counts its targets in a `u32` (`StackItem::target_count`), and the target arena where an item's
+targets past the first 16 are kept is indexed by a `u32` (`StackItem::spill`); a target question counts its candidates in a
+`u32` (`RequestKind::ChooseTarget::count`), which the host sends as the protocol's `int`. Past 2^32 targets, 2^32 spilled
+targets over a game, or 2^31 candidates in one question, the engine stops with a panic (`expect`) rather than cut the list.
+Play cannot reach it: every target and every candidate is a different object or player (CR 115.3), so each needs an object
+of its own in memory - 2^31 objects is hundreds of gigabytes - and a player chooses each target by hand. Tokens that double
+each round reach 2^16 in sixteen rounds, well within these limits; 2^31 would take thirty-one rounds of doubling and the
+memory above. No card needs it.
