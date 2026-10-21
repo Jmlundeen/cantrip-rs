@@ -1,0 +1,48 @@
+# Damage redirected away from a planeswalker (CR 614.1a, 614.6): "All damage that would be dealt to you and other permanents
+# you control is dealt to this creature instead." Bot2's Lightning Bolt at Bot1's Chandra, Chill of Compliance is dealt to
+# Ancient Adamantoise instead, so it is judged against the Adamantoise: it is marked with 3 damage, and Chandra loses no
+# loyalty (CR 120.3c) - the damage is not dealt to her.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Chandra, Chill of Compliance
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chandra, Chill of Compliance.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Chandra, Chill of Compliance)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ancient Adamantoise.Damage = 3
+Bot1.Battlefield.Chandra, Chill of Compliance.Counters.Loyalty = 3
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
