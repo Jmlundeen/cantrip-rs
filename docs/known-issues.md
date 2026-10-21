@@ -141,14 +141,17 @@ once when a position comes round with nothing asking the history in between, and
 shape with no amount heading for an end; a loop its players keep going by choice goes round `ROUNDS_TO_CHOOSE` times and
 then the player CR 732.3 names must choose otherwise; one whose players only pass or decline is a draw after `ROUNDS`
 (CR 732.5, 732.4). What is still not the rules' procedure:
-- No shortcut is proposed (CR 732.2a-c): no player names a number of iterations, and none can shorten one. The engine takes
-  `ROUNDS_TO_CHOOSE` as the number every player chose; a human who wants more rounds (mana past 32 rounds of an infinite
-  mana loop) can't have them, and one who wants fewer stops by choosing otherwise, as the rules allow. A fix needs three things the engine has none of: a question that asks a player for a number of
-  iterations (a new `RequestKind`, host prompt and C# message, a control in the web client, and answers from the
-  language-model client and the random and auto players), asked of the acting players in turn order with each other
-  player's acceptance or shorter number (CR 732.2a-b); the engine then going round that many times by itself, giving each
-  question the answer it was given in the round proposed (kept by the watch's question keys, `GameState::loop_keys`); and the
-  player whose number ends it made to choose otherwise at that point (CR 732.2c, 732.3).
+- No shortcut is proposed (CR 732.2a-c): the player with priority describes a sequence of choices for all players and how
+  many times it repeats, and each other player in turn order accepts it or shortens it by naming where they will choose
+  differently (CR 732.2b). The engine takes `ROUNDS_TO_CHOOSE` as the number every player chose; a human who wants more
+  rounds (mana past 32 rounds of an infinite mana loop) can't have them, and one who wants fewer stops by choosing
+  otherwise, as the rules allow. A fix needs: a question that asks a player for a number of iterations and one that asks
+  each other player to accept it or name a shorter one (a new `RequestKind` each, host prompts and C# messages, controls in
+  the web client, and answers from the language-model client and the random and auto players); the engine then playing
+  the sequence that many times by itself, which needs the answers themselves - `LoopKey` keeps only hashes of the answers
+  given to each question, unordered, so the round to repeat would have to be recorded answer by answer; and, only where the
+  proposal was shortened, the player who then has priority made to choose differently from what was proposed for them
+  (CR 732.2c). The engine's present rule for a loop that goes on (CR 732.3, below) is a different rule from the shortcut's.
 - The player made to choose otherwise is chosen as CR 732.3 chooses, but the engine applies it to every loop of choices
   going nowhere - also one whose amounts rise each round (mana floated), where no position is "reached multiple times" - and
   for the rest of the step. What is made to differ is every answer they gave to the same question in the same shape (a
