@@ -141,18 +141,28 @@ fn phase_in(cx: &mut Cx, permanents: &[ObjectId]) {
 }
 
 /// The untap step's first turn-based action (CR 502.1, 703.4a): every permanent that phased out directly under the active
-/// player's control phases in, but not one phased out "until" an event (CR 610.4a). (Permanents with the phasing keyword
-/// would phase out at the same time; no card here has it.)
+/// player's control phases in, but not one phased out "until" an event (CR 610.4a). One that phased out under a player who
+/// has since left the game phases in during the next untap step after that player's next turn would have begun (CR
+/// 702.26n): the untap step of the first player still in the game after them in turn order, unless the turn just ended
+/// was their own (they left during it, and their next turn is a round away). (Permanents with the phasing keyword would
+/// phase out at the same time; no card here has it.)
 pub fn untap_step(cx: &mut Cx, active: PlayerId) {
     let s = cx.s();
     if s.zone(Zone::PHASED_OUT).is_empty() {
         return;
     }
+    let would_have_begun = |left: PlayerId| {
+        !s.in_game(left)
+            && s.turn_order_from(s.next_player(left)).next() == Some(active)
+            && s.turn.number.saturating_sub(1) != s.player(left).turn_began
+    };
     let due: Vec<ObjectId> = s
         .zone(Zone::PHASED_OUT)
         .iter()
         .copied()
-        .filter(|&id| s.obj(id).marks.phased.is_some_and(|p| !p.indirect && p.under == active && p.until_leaves.is_none()))
+        .filter(|&id| {
+            s.obj(id).marks.phased.is_some_and(|p| !p.indirect && p.until_leaves.is_none() && (p.under == active || would_have_begun(p.under)))
+        })
         .collect();
     phase_in(cx, &due);
 }
@@ -291,5 +301,70 @@ mod tests {
         let s = cx.s();
         assert!(s.obj(aura).zone.is(ZoneKind::Battlefield));
         assert_eq!(s.obj(aura).attached_to, None);
+    }
+
+    /// A game of three: player 0's turn `number`, player 2 (who leaves) last began a turn on `began`. Player 2 controls two
+    /// of player 0's Bears, one by a control-changing effect and one with none, and both have phased out under player 2.
+    fn three_players(number: u32, active: PlayerId, began: u32) -> (Game, ObjectId, ObjectId) {
+        let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&BEAR])));
+        let mut game = Game::new(table, &crate::Setup { decks: vec![Vec::new(), Vec::new(), Vec::new()], ..Default::default() });
+        let put = |game: &mut Game| {
+            let id = game.state.push_obj(Obj::new(table.id_of(&BEAR), PlayerId(0), Zone::BATTLEFIELD));
+            game.state.zone_push(Zone::BATTLEFIELD, id);
+            id
+        };
+        let stolen = put(&mut game);
+        let kept = put(&mut game);
+        game.state.update_obj(kept, |o| o.controller = PlayerId(2));
+        game.state.update_turn(|t| {
+            t.number = number;
+            t.active = active;
+        });
+        game.state.update_player(PlayerId(2), |p| p.turn_began = began);
+        let mut cx = cx(&mut game);
+        cantrip_api::Game::add_effect(&mut cx, stolen, stolen, EffectKind::Control(PlayerId(2)), Duration::Indefinite);
+        assert_eq!(cx.s().obj(stolen).controller, PlayerId(2));
+        phase_out(&mut cx, &[stolen, kept], None, false);
+        (game, stolen, kept)
+    }
+
+    fn untap_step_of(game: &mut Game, number: u32, active: PlayerId) {
+        game.state.update_turn(|t| {
+            t.number = number;
+            t.active = active;
+        });
+        untap_step(&mut cx(game), active);
+    }
+
+    /// CR 800.4a, 702.26n: player 2 leaves during player 1's turn 5. The Bear they controlled with no effect is exiled though
+    /// phased out; the one an effect gave them goes back to player 0 and phases in during the next untap step after player
+    /// 2's next turn would have begun: player 0's, turn 7.
+    #[test]
+    fn a_permanent_phased_out_under_a_player_who_left_phases_in_after_their_next_turn_would_have_begun() {
+        let (mut game, stolen, kept) = three_players(5, PlayerId(1), 3);
+        game.state.update_player(PlayerId(2), |p| p.lost = true);
+        crate::ops::leave_game(&mut cx(&mut game), PlayerId(2));
+        assert!(game.state.zone(Zone::exile(PlayerId(0))).len() == 1 && !game.state.zone(Zone::PHASED_OUT).contains(&kept));
+        assert_eq!(game.state.zone(Zone::PHASED_OUT), &[stolen]);
+        assert_eq!(game.state.obj(stolen).controller, PlayerId(0));
+        untap_step_of(&mut game, 6, PlayerId(1));
+        assert_eq!(game.state.zone(Zone::PHASED_OUT), &[stolen]);
+        untap_step_of(&mut game, 7, PlayerId(0));
+        assert!(game.state.zone(Zone::PHASED_OUT).is_empty());
+        assert!(game.state.battlefield().contains(&stolen));
+        assert_eq!(game.state.obj(stolen).controller, PlayerId(0));
+    }
+
+    /// Player 2 leaves during their own turn 6: their next turn would have begun a round later, so the Bear is still phased
+    /// out after player 0's untap step on turn 7 and phases in on turn 10.
+    #[test]
+    fn a_player_who_left_during_their_own_turn_has_their_next_turn_a_round_later() {
+        let (mut game, stolen, _) = three_players(6, PlayerId(2), 6);
+        game.state.update_player(PlayerId(2), |p| p.lost = true);
+        crate::ops::leave_game(&mut cx(&mut game), PlayerId(2));
+        untap_step_of(&mut game, 7, PlayerId(0));
+        assert_eq!(game.state.zone(Zone::PHASED_OUT), &[stolen]);
+        untap_step_of(&mut game, 10, PlayerId(0));
+        assert!(game.state.zone(Zone::PHASED_OUT).is_empty());
     }
 }

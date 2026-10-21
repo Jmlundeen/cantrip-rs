@@ -58,7 +58,6 @@ keeps it).
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
 | [KI-65](#ki-65-a-prepared-permanent-that-phases-out-loses-its-preparation-copy-for-good) | A prepared permanent that phases out loses its preparation copy for good | Low | Unexercised |
-| [KI-66](#ki-66-phasing-in-a-multiplayer-game-after-a-player-leaves-is-unbuilt) | Phasing in a multiplayer game after a player leaves is unbuilt | Low | Unexercised |
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
 | [KI-70](#ki-70-a-block-requirement-is-counted-on-the-declared-block-only-not-through-the-blocked-creatures-band) | A block requirement is counted on the declared block only, not through the blocked creature's band | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
@@ -509,21 +508,6 @@ prepared, its controller creates a copy" again; `phasing::phase_in` makes none. 
 phases in (`ops::become_prepared`'s copy-making, without the event of becoming prepared).
 
 **Scenarios.** none yet: a prepare card under Teferi's Protection would show it.
-
-### KI-66: Phasing in a multiplayer game after a player leaves is unbuilt
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, Teferi's Protection |
-
-**Notes.** A phased-out permanent its owner owns leaves the game with them (CR 702.26k: `ops::leave_game` walks every zone list,
-the phased-out one included). But one that phased out under the control of a player who has left phases in "during the next
-untap step after that player's next turn would have begun" (CR 702.26n), and `phasing::untap_step` phases in only what phased
-out under the active player, so it never phases in; and a permanent another player owns that the leaving player controlled
-while it was phased out is not exiled with what they control (CR 800.4a reads the battlefield). No scenario has a third player
-with phased-out permanents.
-
-**Scenarios.** none yet.
 
 ### KI-68: The advice applies a total cost's least before a cast's own reductions and a permission's additions
 

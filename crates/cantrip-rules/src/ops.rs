@@ -2623,6 +2623,12 @@ pub fn refresh_control(cx: &mut Cx, id: ObjectId) -> bool {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         return false;
     }
+    settle_controller(cx, id)
+}
+
+/// `refresh_control` of a permanent on the battlefield or phased out: a phased-out one is settled only where the rules ask
+/// who controls it though it is treated as not existing (CR 800.4a, 702.26n: a player leaving).
+fn settle_controller(cx: &mut Cx, id: ObjectId) -> bool {
     let obj = *cx.s().obj(id);
     let statics = layers::static_control(cx.cards(), cx.s(), &cx.g.log, id);
     let latest = cx
@@ -2890,8 +2896,14 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
         let blocks = cx.s().blocks.iter().copied().filter(|b| !gone(cx, b.blocker) && !gone(cx, b.attacker)).collect();
         cx.st().set_blocks(blocks);
     }
-    // What they still control is exiled (CR 800.4a).
+    // What they still control is exiled (CR 800.4a), a phased-out permanent included (CR 702.26n) once the effects that
+    // gave them control of it have ended; one that goes back to another player phases in later (`phasing::untap_step`).
+    let phased: Vec<ObjectId> = cx.s().zone(Zone::PHASED_OUT).iter().copied().filter(|&id| cx.s().obj(id).controller == player).collect();
+    for &id in &phased {
+        settle_controller(cx, id);
+    }
     exiled.extend(cx.s().battlefield().iter().copied().filter(|&id| cx.s().obj(id).controller == player));
+    exiled.extend(phased.into_iter().filter(|&id| cx.s().obj(id).controller == player));
     let moves: Vec<Moving> = exiled.into_iter().map(|id| Moving::to(id, Zone::exile(cx.s().obj(id).owner))).collect();
     if !moves.is_empty() {
         move_together(cx, &moves, ZoneReason::Exile);
