@@ -51,12 +51,20 @@ public sealed class LoopGuard : IAutoPlayer
             _answers = 0;
         }
 
-        if (++_answers <= AnswersPerStep || _inner.Thinking)
+        // Counted no further than past the limit: the count stops there, and never wraps back below it.
+        if (_answers <= AnswersPerStep)
+        {
+            _answers++;
+        }
+
+        if (_answers <= AnswersPerStep || _inner.Thinking)
         {
             return _inner.Act(client);
         }
 
-        client.Answer(Passive(client.Prompt!.Prompt, _turn++));
+        client.Answer(Passive(client.Prompt!.Prompt, _turn));
+        // Which candidate comes next: only ever read modulo the number of candidates, so it goes back to 0 rather than overflow.
+        _turn = _turn == int.MaxValue ? 0 : _turn + 1;
         return true;
     }
 
