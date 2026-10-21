@@ -1,0 +1,59 @@
+# Thespian's Stage becomes a copy of itself "except it has this ability" (CR 707.9b): its copiable values are its card and
+# every instance of the ability earlier copies added, so each copy adds one more instance (CR 113.2c). Bot1 copies the
+# Stage onto itself on each of its turns, each time with the newest instance: {T}: Add {C} is its first ability, the
+# printed copy ability the second, and the fifth copy's instance is the seventh, which the sixth copy activates - there
+# are as many instances as copies made, none dropped.
+
+[Bot1 Deck]
+Thespian's Stage
+Sol Ring
+Forest x13
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Thespian's Stage.Activate(Ability: Add)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Thespian's Stage; Ability: #2)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Thespian's Stage; Ability: #3)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Thespian's Stage; Ability: #4)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Thespian's Stage; Ability: #5)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Thespian's Stage; Ability: #6)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Thespian's Stage; Ability: #7)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Thespian's Stage.Tapped = true
+Bot1.Battlefield.Sol Ring.Tapped = true

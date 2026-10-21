@@ -287,6 +287,23 @@ impl Obj {
     }
 }
 
+/// An ability an exception of a copy effect adds (CR 707.9b), and how many instances of it the copy has (CR 113.2c). An
+/// empty slot has none.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct ExtraAbility {
+    pub card: CardId,
+    pub index: u8,
+    pub instances: u8,
+}
+
+impl ExtraAbility {
+    pub const NONE: ExtraAbility = ExtraAbility { card: CardId(0), index: 0, instances: 0 };
+
+    pub fn ability(&self) -> AbilityRef {
+        AbilityRef { card: self.card, index: self.index }
+    }
+}
+
 /// Copiable values (CR 707.2): a card's printed values, and the exceptions copy effects have added to them
 /// (CR 707.9b-d). A copy of a copy copies these, exceptions included.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -302,8 +319,9 @@ pub struct Copiable {
     /// subtypes are `extra_types` and `extra_subtypes` instead of the copied card's, and a characteristic-defining
     /// ability that defines them (Changeling) is not copied (CR 707.9d). See `Copiable::typed`.
     pub types_stated: bool,
-    /// Abilities added by exceptions, in order.
-    pub extra_abilities: [Option<AbilityRef>; 4],
+    /// Abilities added by exceptions, in order, each distinct ability once with the number of its instances (CR 113.2c):
+    /// a Thespian's Stage that copies a Stage-copy, or itself, has one more instance of the Stage's ability each time.
+    pub extra_abilities: [ExtraAbility; Copiable::EXTRA_ABILITIES],
     /// Keywords added by exceptions: "except it has haste".
     pub extra_keywords: Keywords,
     /// "Except it's black" (CR 707.9b): these are its colors, and a color-defining ability it copies is left behind
@@ -330,7 +348,7 @@ impl Copiable {
             extra_types: TypeSet::NONE,
             extra_subtypes: SubtypeSet::NONE,
             types_stated: false,
-            extra_abilities: [None; 4],
+            extra_abilities: [ExtraAbility::NONE; Copiable::EXTRA_ABILITIES],
             extra_keywords: Keywords::NONE,
             colors: None,
             pt: None,
@@ -352,7 +370,7 @@ impl Copiable {
         self.extra_types.0 != 0
             || !self.extra_subtypes.is_empty()
             || self.types_stated
-            || self.extra_abilities.iter().any(|a| a.is_some())
+            || self.extra_abilities[0].instances > 0
             || self.extra_keywords.0 != 0
             || self.colors.is_some()
             || self.pt.is_some()
@@ -391,12 +409,33 @@ impl Copiable {
         self
     }
 
-    /// "Except it has [this ability]."
+    /// The most distinct abilities exceptions add to one copy. Each card that prints such an exception adds its own one
+    /// ability (Thespian's Stage, Phantasmal Image, Evil Twin, Likeness Looter), so a copy gathers one per such card in its
+    /// chain of copies; past this the game cannot go on rightly, and stops loudly rather than drop one.
+    pub const EXTRA_ABILITIES: usize = 6;
+
+    /// "Except it has [this ability]." Another instance of an ability the exceptions already add is counted in its slot
+    /// (CR 113.2c), up to 255 of them, which is past what any object holds (`MAX_ABILITIES`).
     pub fn with_ability(mut self, ability: AbilityRef) -> Copiable {
-        if let Some(slot) = self.extra_abilities.iter().position(|a| a.is_none()) {
-            self.extra_abilities[slot] = Some(ability);
-        }
+        let slot = self
+            .extra_abilities
+            .iter()
+            .position(|e| e.instances > 0 && e.ability() == ability)
+            .or_else(|| self.extra_abilities.iter().position(|e| e.instances == 0))
+            .expect("a copy holds at most Copiable::EXTRA_ABILITIES distinct abilities added by exceptions");
+        let e = &mut self.extra_abilities[slot];
+        *e = ExtraAbility { card: ability.card, index: ability.index, instances: e.instances.saturating_add(1) };
         self
+    }
+
+    /// Every instance of the abilities the exceptions add, in order (CR 707.9b, 113.2c).
+    pub fn extra_instances(&self) -> impl Iterator<Item = AbilityRef> + '_ {
+        self.extra_abilities.iter().take_while(|e| e.instances > 0).flat_map(|e| std::iter::repeat_n(e.ability(), usize::from(e.instances)))
+    }
+
+    /// Whether an exception adds `ability`.
+    pub fn adds_ability(&self, ability: AbilityRef) -> bool {
+        self.extra_abilities.iter().any(|e| e.instances > 0 && e.ability() == ability)
     }
 
     /// "Except it has [keyword]."

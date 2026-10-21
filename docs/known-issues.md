@@ -53,7 +53,6 @@ keeps it).
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
-| [KI-53](#ki-53-a-copy-holds-at-most-four-abilities-added-by-exceptions) | A copy holds at most four abilities added by exceptions | Low | Unexercised |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
 | [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
@@ -380,19 +379,6 @@ entirely would start the land's characteristics from its own card when `layers::
 **Scenarios.** vesuva-copying-dark-depths-under-blood-moon-is-a-legendary-mountain-named-dark-depths-with-no-abilities,
 thespians-stage-copying-urborg-under-blood-moon-keeps-the-name-and-loses-the-ability-it-kept,
 clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: they assert this reading and pass.
-
-### KI-53: A copy holds at most four abilities added by exceptions
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, Thespian's Stage |
-
-**Notes.** `Copiable::extra_abilities` (`crates/cantrip-state/src/object.rs`) is a fixed array of four; adding a fifth
-"except it has [ability]" (CR 707.9b) is silently dropped. Each Thespian's Stage copying a Stage-copy adds one more instance of the
-Stage ability (CR 113.2c), so a chain of five Stages copying one another loses one. No other card in content adds more than one.
-A fix grows the array or refuses the copy loudly; instances beyond the second of the same ability change no play.
-
-**Scenarios.** none: no scenario builds the chain.
 
 ### KI-54: A loop a player could stop is shortcut after a fixed number of rounds, not one the players name
 

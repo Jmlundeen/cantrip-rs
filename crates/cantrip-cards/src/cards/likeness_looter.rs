@@ -26,10 +26,9 @@ fn creature_card_with_mana_value_x(q: &dyn Query, asker: &Asker, t: Target) -> b
 /// (CR 608.2b: the core doesn't resolve it).
 fn become_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
-    let mut values = g.copiable_values(card);
-    values.extra_keywords = values.extra_keywords.with(Keyword::Flying);
     // A card in a graveyard is no copy, so its copiable values carry no exceptions of their own yet.
-    values.extra_abilities[0] = Some(item.ability);
+    let mut values = g.copiable_values(card).with_ability(item.ability);
+    values.extra_keywords = values.extra_keywords.with(Keyword::Flying);
     g.become_copy(item.object, item.object, values, Duration::Indefinite);
     Ok(())
 }

@@ -415,9 +415,9 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
 /// (`copy`), with the abilities the card prints.
 fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     let def = cards.get(card);
-    let (extra_types, extra_subtypes, extra_abilities, extra_keywords, colors, pt, no_cost, copy_name, words) = match copy {
-        Some(c) => (c.extra_types, c.extra_subtypes, c.extra_abilities, c.extra_keywords, c.colors, c.pt, c.no_cost, c.name, c.words),
-        None => (TypeSet::NONE, SubtypeSet::NONE, [None; 4], Keywords::NONE, None, None, false, None, Words::NONE),
+    let (extra_types, extra_subtypes, extra_keywords, colors, pt, no_cost, copy_name, words) = match copy {
+        Some(c) => (c.extra_types, c.extra_subtypes, c.extra_keywords, c.colors, c.pt, c.no_cost, c.name, c.words),
+        None => (TypeSet::NONE, SubtypeSet::NONE, Keywords::NONE, None, None, false, None, Words::NONE),
     };
     // "Except it's legendary" (CR 707.9b).
     let legendary = copy.is_some_and(|c| c.legendary);
@@ -443,7 +443,7 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         abilities[n] = Some(AbilityRef { card, index: index as u8 });
         n += 1;
     }
-    for extra in extra_abilities.into_iter().flatten() {
+    for extra in copy.iter().flat_map(|c| c.extra_instances()).take(MAX_ABILITIES - n) {
         abilities[n] = Some(extra);
         n += 1;
     }

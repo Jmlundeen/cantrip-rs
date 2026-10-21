@@ -1010,7 +1010,7 @@ impl<'a> Projector<'a> {
             (ability.card == c.card && usize::from(ability.index) < def.abilities.len())
                 // A Room's abilities are its doors' (CR 709.5): the layers give the unlocked ones.
                 || cards.halves[c.card.0 as usize].is_some_and(|(left, right)| ability.card == left || ability.card == right)
-                || copy.is_some_and(|copy| copy.extra_abilities.contains(&Some(ability)))
+                || copy.is_some_and(|copy| copy.adds_ability(ability))
         };
         for ability in c.abilities.iter().flatten().copied() {
             if ability.card != cards.intrinsic && !printed(ability) {
