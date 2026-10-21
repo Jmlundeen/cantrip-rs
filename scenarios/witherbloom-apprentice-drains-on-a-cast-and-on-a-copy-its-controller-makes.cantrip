@@ -28,6 +28,7 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Chain Lightning.Cast(Bot1)
 Bot1.Pass
 Bot1.PayCost
+Bot1.Accept
 Bot1.Target(Bot2)
 [T3 Bot1.Main2]
 [Expect]

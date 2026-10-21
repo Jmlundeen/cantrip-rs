@@ -1,0 +1,36 @@
+# "Then that player ... may pay {R}{R}. If the player does, they may copy this spell": paying and copying are two choices
+# (CR 707.10). Bot1 casts Chain Lightning at Bot2 on turn 5; Bot2 taps both its Mountains and pays {R}{R}, then declines to
+# copy it. The {R}{R} is spent, no copy is made, and nobody but Bot2 is dealt damage.
+
+[Bot1 Deck]
+Chain Lightning
+Mountain x6
+Mountain x10
+
+[Bot2 Deck]
+Mountain x7
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.PayCost
+? Bot2.Mana = 
+Bot2.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 20
+Bot2.Life = 17
+Bot2.Mana = 
+Bot1.Graveyard = Chain Lightning
+Stack.Count = 0

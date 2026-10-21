@@ -44,7 +44,6 @@ keeps it).
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
 | [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
 | [KI-30](#ki-30-a-permanents-name-is-not-part-of-its-last-known-information) | A permanent's name is not part of its last-known information | Low | Open |
-| [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 | [KI-37](#ki-37-a-sideboard-card-the-engine-does-not-have-is-left-out-of-the-game) | A sideboard card the engine does not have is left out of the game | Low | Open |
@@ -289,19 +288,6 @@ read `library::object_names` before moving the object (The End, Deadly Cover-Up)
 after the move needs the name kept in `LastKnown`.
 The same holds for a name an effect set (`EffectKind::SetName`, CR 612.8): The Irencrag that left as Everflame, Heroes'
 Legacy reads as The Irencrag afterwards.
-
-**Scenarios.** None yet.
-
-### KI-33: Chain Lightning's payer copies without being asked whether to
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | card | 2026-10-16, review of the payment prompt (`Game::may_pay`) |
-
-**Notes.** Chain Lightning: "that player or that permanent's controller may pay {R}{R}. If the player does, they may copy this
-spell and may choose a new target for that copy." Paying is one choice and copying a second (CR 118.12, 707.10c), but
-`chain_lightning.rs` copies as soon as the payment is made. Only a player who pays {R}{R} and then would rather not copy is
-affected. A fix asks a "may copy" (`effects::ask_may`) after a paid `may_pay`, and a scenario pays and declines the copy.
 
 **Scenarios.** None yet.
 

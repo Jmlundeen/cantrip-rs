@@ -30,6 +30,7 @@ Bot1.Pass
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Gleemox.Activate(Color: Red)
 Bot2.PayCost
+Bot2.Accept
 Bot2.Target(Bot1)
 Bot1.Decline
 [T3 Bot1.Main2]
