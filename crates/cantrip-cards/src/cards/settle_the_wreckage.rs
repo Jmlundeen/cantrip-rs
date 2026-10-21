@@ -11,7 +11,7 @@ const ASK: Question = Question::new("SearchLibrary", "search your library for th
 /// creatures exiled by the spell, those a replacement sent elsewhere included (CR 608.2c). A spell whose only target
 /// is illegal is not resolved at all (CR 608.2b). The "may" is asked of that player; declining skips search and shuffle.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = item.targets[0].player() else { return Ok(()) };
+    let Some(player) = item.target(0).player() else { return Ok(()) };
     let attackers: Vec<ObjectId> = g
         .state()
         .battlefield()

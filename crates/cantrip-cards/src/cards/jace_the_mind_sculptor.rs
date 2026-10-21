@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// "+2: Look at the top card of target player's library. You may put that card on the bottom of that player's library."
 /// The one looking is Jace's controller, asked whether to; an empty library shows nothing and asks nothing.
 fn look_at_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = item.targets[0].player() else { return Ok(()) };
+    let Some(player) = item.target(0).player() else { return Ok(()) };
     let Some(&top) = g.state().zone(Zone::library(player)).first() else { return Ok(()) };
     if cantrip_mechanics::effects::ask_may(g, item.controller, top, Purpose::PutOnBottom)? {
         g.arrange_library(player, &[], &[top]);
@@ -38,7 +38,7 @@ fn bounce(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "\u{2212}12: Exile all cards from target player's library, then that player shuffles their hand into their library."
 fn exile_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = item.targets[0].player() else { return Ok(()) };
+    let Some(player) = item.target(0).player() else { return Ok(()) };
     let library = g.state().zone(Zone::library(player)).to_vec();
     g.exile_all(&library);
     let hand = g.state().zone(Zone::hand(player)).to_vec();

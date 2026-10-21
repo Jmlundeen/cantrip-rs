@@ -12,7 +12,7 @@ fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
     if g.target_legal(item, 0)
-        && let Some(player) = item.targets[0].player()
+        && let Some(player) = item.target(0).player()
     {
         g.draw(player, 1);
     }

@@ -16,7 +16,7 @@ fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Target creature you control explores." (CR 701.44) Its one target illegal, the ability does not resolve at all (CR
 /// 608.2b), so the target is the creature.
 fn target_explores(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Object(creature) = item.targets[0] else { return Ok(()) };
+    let Target::Object(creature) = item.target(0) else { return Ok(()) };
     explore(g, creature)
 }
 

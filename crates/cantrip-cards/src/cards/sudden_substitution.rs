@@ -13,7 +13,7 @@ fn spell_controller(q: &dyn Query, id: ObjectId) -> Option<PlayerId> {
 /// of control with no end (CR 613.1b). Whoever controls the spell afterwards, the creature's old controller after an
 /// exchange, its caster when none happened, may then choose new targets for it (CR 115.7d).
 fn exchange(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let (Target::Object(spell), Target::Object(creature)) = (item.targets[0], item.targets[1]) else { return Ok(()) };
+    let (Target::Object(spell), Target::Object(creature)) = (item.target(0), item.target(1)) else { return Ok(()) };
     if g.target_legal(item, 0) && g.target_legal(item, 1) {
         let spell_by = spell_controller(g, spell);
         let creature_by = g.controller(creature);

@@ -24,7 +24,7 @@ fn artifact_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Event) ->
 /// The targeted opponent chooses whether this enchantment deals 3 damage to them (CR 608.2d); if not, that card
 /// returns to its owner's hand, provided it is still in the graveyard. The choice is theirs either way.
 fn return_unless_damaged(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let Target::Player(opponent) = item.target(0) else { return Ok(()) };
     if effects::ask_may(g, opponent, item.object, Purpose::Ask(&ASK))? {
         g.damage(item.object, Target::Player(opponent), 3);
         return Ok(());

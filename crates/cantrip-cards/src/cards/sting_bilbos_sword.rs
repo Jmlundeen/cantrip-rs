@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// 400.7, 701.3b): the verbs see to both. Each hone counter gives the equipped creature +1/+0 (CR 122.1j, the layers).
 fn hone_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // None for an opponent who is no longer a legal target, or who controls no creature: then no counter is put.
-    let creatures = item.targets[0].player().filter(|_| g.target_legal(item, 0)).map_or(0, |opponent| {
+    let creatures = item.target(0).player().filter(|_| g.target_legal(item, 0)).map_or(0, |opponent| {
         g.permanents_of(opponent).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).count()
     });
     g.add_counters(item.object, CounterKind::Hone, creatures.min(i16::MAX as usize) as i16);

@@ -16,7 +16,7 @@ fn target_trigger_or_colorless_spell(q: &dyn Query, _: &Asker, target: Target) -
 /// "Counter target triggered ability or colorless spell." (CR 701.6a, 701.6b) Nothing if the target is no longer legal
 /// (CR 608.2b).
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    match item.targets[0] {
+    match item.target(0) {
         Target::Ability(_) => { cantrip_mechanics::counter_target_ability(g, item, 0); }
         _ => { cantrip_mechanics::counter_target(g, item, 0); }
     }

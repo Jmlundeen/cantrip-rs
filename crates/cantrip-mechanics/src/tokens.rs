@@ -158,7 +158,7 @@ pub static MUTAGEN: CardDef = CardDef {
 
 fn explore_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Object(creature) = item.targets[0]
+        && let Target::Object(creature) = item.target(0)
     {
         crate::explore(g, creature)?;
     }

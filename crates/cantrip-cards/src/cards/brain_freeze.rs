@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// Target player mills three cards (CR 701.17).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Player(player) = item.targets[0]
+        && let Target::Player(player) = item.target(0)
     {
         g.mill(player, 3);
     }

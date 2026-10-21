@@ -19,7 +19,7 @@ fn creature_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -
 /// the ability resolves (CR 608.2h): a creature that has left is read as it last was. No power or toughness reads 0
 /// (CR 208.3), and a difference of zero loses no life.
 fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let (Target::Player(opponent), Target::Object(creature)) = (item.targets[0], item.subject) else { return Ok(()) };
+    let (Target::Player(opponent), Target::Object(creature)) = (item.target(0), item.subject) else { return Ok(()) };
     let chars = g.chars(creature);
     let difference = (chars.power.unwrap_or(0) as i32 - chars.toughness.unwrap_or(0) as i32).abs();
     if difference > 0 {

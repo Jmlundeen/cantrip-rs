@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// counts, and "red" through the spell's words (CR 612). The land is the controller's choice (CR 701.21a).
 fn melee(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let before = g.history().head() as usize;
-    g.damage(item.object, item.targets[0], 4);
+    g.damage(item.object, item.target(0), 4);
     let red = g.words(item.object).color(Color::Red);
     // Damage to a player, or from another source, names no permanent this spell dealt damage to.
     let dealt_to = |r: &Record| match r.event { Event::Damage { source, target: Target::Object(id), amount, .. } if source == item.object && amount > 0 => Some(id), _ => None };

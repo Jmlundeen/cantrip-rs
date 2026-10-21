@@ -229,13 +229,13 @@ pub fn controlled_by_slot_opponent(q: &dyn Query, id: ObjectId) -> bool {
 /// player). Every effect that acts on "target [thing]" begins here rather than pairing `target_legal` with a pattern
 /// match. Used by `destroy_target`, `exile_target` and by most of the cards that act on one target.
 pub fn object(g: &dyn Game, item: &StackItem, slot: usize) -> Option<ObjectId> {
-    if slot < item.target_count as usize && g.target_legal(item, slot) { item.targets[slot].object() } else { None }
+    if slot < item.target_count as usize && g.target_legal(item, slot) { item.target(slot).object() } else { None }
 }
 
 /// The player a resolving item targeted in `slot`, if the target is still legal (CR 608.2b) and is a player: `object`'s twin
 /// for "target player". Used by `effects::target_player_draws`.
 pub fn player(g: &dyn Game, item: &StackItem, slot: usize) -> Option<PlayerId> {
-    if slot < item.target_count as usize && g.target_legal(item, slot) { item.targets[slot].player() } else { None }
+    if slot < item.target_count as usize && g.target_legal(item, slot) { item.target(slot).player() } else { None }
 }
 
 /// Every player target of the item that is still legal (CR 608.2b), in the order they were chosen: "any number of target

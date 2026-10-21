@@ -21,7 +21,7 @@ fn ally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, airbend_them, "When Appa enters, airbend any number of other target nonland permanents you control.")
-            .targets(&[up_to(16, other_nonland_permanent_you_control)]),
+            .targets(&[up_to(TargetSpec::ANY_NUMBER, other_nonland_permanent_you_control)]),
         triggered(YOU_CAST_A_SPELL_FROM_EXILE, ally, "Whenever you cast a spell from exile, create a 1/1 white Ally creature token."),
     ],
     ..oracle::APPA_STEADFAST_GUARDIAN

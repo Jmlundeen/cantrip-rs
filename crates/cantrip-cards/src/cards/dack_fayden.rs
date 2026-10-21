@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// +1: target player draws two cards, then discards two cards (their choice, asked unless the hand is empty).
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = item.targets[0].player() else { return Ok(()) };
+    let Some(player) = item.target(0).player() else { return Ok(()) };
     g.draw(player, 2);
     discard_chosen(g, player, item.object, 2)?;
     Ok(())
@@ -32,7 +32,7 @@ fn permanents_targeted(q: &dyn Query, spell: ObjectId) -> Vec<ObjectId> {
     let Some(item) = state.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell).or_else(|| state.left_stack(spell)) else {
         return Vec::new();
     };
-    item.targets[..item.target_count as usize]
+    item.targets()
         .iter()
         .filter_map(|t| t.object())
         .filter(|&id| targets::permanent(q, id))

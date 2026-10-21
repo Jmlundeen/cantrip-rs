@@ -16,7 +16,7 @@ pub fn target(g: &mut dyn Game, item: &StackItem, slot: usize) {
     if !g.target_legal(item, slot) {
         return;
     }
-    if let Target::Object(permanent) = item.targets[slot] {
+    if let Target::Object(permanent) = item.target(slot) {
         g.add_effect(item.object, permanent, EffectKind::RegenerationShield, Duration::EndOfTurn);
     }
 }

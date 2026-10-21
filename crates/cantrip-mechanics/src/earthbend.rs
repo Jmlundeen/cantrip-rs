@@ -18,7 +18,7 @@ pub fn effect<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
     if !g.target_legal(item, 0) {
         return Ok(());
     }
-    let Target::Object(land) = item.targets[0] else { return Ok(()) };
+    let Target::Object(land) = item.target(0) else { return Ok(()) };
     let o = *g.obj(item.object);
     let card = o.copied_card().unwrap_or(o.card);
     g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);

@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// before this resolves still exiles the card, but no Summoner's ability can cast it. Looking at the hand is part of the
 /// ability, so it is revealed even with nothing eligible in it (`choose_from_revealed_hand_of_kind`).
 fn exile_a_nonland_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let chosen = choose_from_revealed_hand_of_kind(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))?;
     g.exile_with(&chosen, item.object, false);
     Ok(())

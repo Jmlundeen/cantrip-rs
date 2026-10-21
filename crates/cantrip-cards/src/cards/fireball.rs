@@ -16,7 +16,7 @@ fn more_per_extra_target(_: &dyn Query, _: ObjectId, _: PlayerId, costed: Costed
 /// targets still legal then (CR 608.2b; its rulings), each dealt X divided by how many those are, rounded down, all at once
 /// (CR 120.3). With no legal target it deals none.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let legal: Vec<Target> = (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).map(|slot| item.targets[slot]).collect();
+    let legal: Vec<Target> = (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).map(|slot| item.target(slot)).collect();
     if legal.is_empty() {
         return Ok(());
     }

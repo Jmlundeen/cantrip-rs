@@ -20,7 +20,7 @@ fn instant_sorcery_or_trigger(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// "Counter target instant spell, sorcery spell, or triggered ability." (CR 701.6a, 701.6b) Its one target is still legal
 /// as it resolves, or it would not resolve at all (CR 608.2b): still on the stack.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    match item.targets[0] {
+    match item.target(0) {
         Target::Ability(serial) => {
             let at = g.state().stack.iter().position(|i| i.serial == serial).expect("a legal target is on the stack");
             let countered = g.state().stack[at];

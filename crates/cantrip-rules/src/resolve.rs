@@ -60,7 +60,7 @@ pub(crate) fn expand_specs(state: &GameState, controller: PlayerId, specs: &[Tar
 /// wherever in the list a slot of several targets stands. The nth target of a `TargetSpec::EACH_OPPONENT` is a slot of at
 /// most one target for the nth opponent in seat order (`expand_specs`).
 fn recorded_spec(state: &GameState, item: &StackItem, specs: &[TargetSpec], slot: usize) -> Option<(TargetSpec, Option<PlayerId>)> {
-    let at = item.spec_of[slot] as usize;
+    let at = item.spec(slot) as usize;
     let spec = specs.get(at)?;
     if spec.max != TargetSpec::EACH_OPPONENT {
         return Some((*spec, None));
@@ -83,7 +83,7 @@ pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, 
     let specs = target_specs(cards, state, item);
     // CR 702.47c: the slots of spliced text follow the spell's own, in the order the cards were spliced, and are numbered on
     // from them (`StackItem::spec_of`).
-    if item.kind == StackKind::Spell && item.spec_of[slot] as usize >= specs.len() && item.data.iter().any(|&d| d != 0) {
+    if item.kind == StackKind::Spell && item.spec(slot) as usize >= specs.len() && item.data.iter().any(|&d| d != 0) {
         let mut all = specs.to_vec();
         for &spliced in item.data.iter().filter(|&&d| d != 0) {
             all.extend_from_slice(cards.get(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets));
@@ -126,16 +126,11 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
         for _ in 0..modal.times(item.modes, i) {
             // The targets recorded for this instance's slots (`StackItem::spec_of`), their slots renumbered from its first.
             let ends = spec_at + mode.targets.len();
-            let n = (next..item.target_count as usize).take_while(|&t| (item.spec_of[t] as usize) < ends).count();
+            let n = (next..item.target_count as usize).take_while(|&t| (item.spec(t) as usize) < ends).count();
             let mut sub = *item;
             sub.modes = modal.once(i);
-            sub.targets = [Target::None; cantrip_state::MAX_TARGETS];
-            sub.targets[..n].copy_from_slice(&item.targets[next..next + n]);
-            sub.spec_of = [0; cantrip_state::MAX_TARGETS];
-            for t in 0..n {
-                sub.spec_of[t] = item.spec_of[next + t] - spec_at as u8;
-            }
-            sub.target_count = n as u8;
+            let of: Vec<u8> = (0..n).map(|t| item.spec(next + t) - spec_at as u8).collect();
+            sub.set_targets(&item.targets()[next..next + n], &of, &item.shares()[next..next + n]);
             spec_at = ends;
             next += n;
             if sub.targets().iter().any(|&t| t != Target::None) && (0..n).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &sub, slot)) {
@@ -150,7 +145,7 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
 /// Whether target `slot` of an item is still legal (CR 608.2b): the target is still what it was, the slot's filter
 /// still takes it, and nothing forbids the source to target it.
 pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], item: &StackItem, slot: usize) -> bool {
-    let target = item.targets[slot];
+    let target = item.target(slot);
     // A slot that chose no target (an "up to" slot) has nothing to be legal (CR 601.2c).
     if target == Target::None {
         return false;
@@ -166,7 +161,7 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     }
     let q = Reader { cards, state, events };
     // A slot of its own sees what the slots before it chose (CR 601.2c).
-    let earlier = if item.target_count > 1 { &item.targets[..slot] } else { &[][..] };
+    let earlier = if item.target_count > 1 { &item.targets()[..slot] } else { &[][..] };
     (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false }, &asker, target) && layers::can_target(cards, state, events, &asker, target)
 }
 
@@ -420,8 +415,8 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     chosen_card: None,
                     chosen_option: None,
                     // An Aura spell enters attached to what it targeted (CR 303.4f, 608.3b).
-                    attach: if def.enchant.is_some() { item.targets[0].object() } else { None },
-                    attach_player: if def.enchant.is_some() { item.targets[0].player() } else { None },
+                    attach: if def.enchant.is_some() { item.target(0).object() } else { None },
+                    attach_player: if def.enchant.is_some() { item.target(0).player() } else { None },
                     x: item.x,
                     // Cast as its back face, it enters back face up (CR 712.8b).
                     transformed: item.way == WAY_BACK_FACE || item.way == WAY_TRANSFORMED,
@@ -615,7 +610,7 @@ mod tests {
         let t = |n: u32| Target::Object(ObjectId(n));
         let item_of = |targets: &[Target], of: &[u8]| {
             let mut item = crate::actions::stack_item(StackKind::Triggered, ObjectId(0), ability, PlayerId(0), targets);
-            item.spec_of[..of.len()].copy_from_slice(of);
+            item.set_spec_of(of);
             item
         };
 

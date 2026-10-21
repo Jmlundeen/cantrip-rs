@@ -11,7 +11,7 @@ const COPY: Question = Question::new("CopySpell", "copy this spell?", "You may c
 /// whole spell fizzle (CR 608.2b), so nobody is offered the chain.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     damage_target(g, item, 0, 3);
-    let target = item.targets[0];
+    let target = item.target(0);
     let Some(copier) = target.player().or_else(|| target.object().map(|id| g.controller(id))) else { return Ok(()) };
     if g.may_pay(copier, item.object, item.object, cost("{R}{R}"), &PAY)? && effects::ask_may(g, copier, item.object, Purpose::Ask(&COPY))? {
         g.copy_spell(item.object, copier, true)?;

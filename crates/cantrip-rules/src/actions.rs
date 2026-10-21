@@ -3925,9 +3925,9 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         object,
         ability,
         controller,
-        targets: [Target::None; cantrip_state::MAX_TARGETS],
-        target_count: targets.len() as u8,
-        spec_of: [0; cantrip_state::MAX_TARGETS],
+        inline_targets: [Target::None; cantrip_state::INLINE_TARGETS],
+        target_count: 0,
+        inline_spec_of: [0; cantrip_state::INLINE_TARGETS],
         x: 0,
         kicked: 0,
         paid: 0,
@@ -3939,14 +3939,15 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         members: Span::default(),
         serial: 0,
         gift: None,
-        shares: [0; cantrip_state::MAX_TARGETS],
+        inline_shares: [0; cantrip_state::INLINE_TARGETS],
+        spill: None,
         exile_after: false,
         flashback: false,
         since: 0,
         copied: false,
         cast_known: u32::MAX,
     };
-    item.targets[..targets.len()].copy_from_slice(targets);
+    item.set_targets(targets, &[], &[]);
     item
 }
 
@@ -4875,7 +4876,8 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
             if most == 0 {
                 break 'slot;
             }
-            // A stack item holds at most MAX_TARGETS targets: a count past what is left of them is cut to it (known-issues KI-3).
+            // A stack item holds at most MAX_TARGETS targets, more than any board has legal targets for: a count past what is left
+            // of them is cut to it.
             let room = cantrip_state::MAX_TARGETS.saturating_sub(targets.len());
             let count = (most as usize).min(candidates.len()).min(room) as u8;
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
@@ -4944,7 +4946,7 @@ pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec:
 fn set_item_shares(cx: &mut Cx, shares: &[u8]) {
     let at = cx.s().stack.len() - 1;
     let mut with = cx.s().stack[at];
-    with.shares[..shares.len()].copy_from_slice(shares);
+    with.set_shares(shares);
     cx.st().stack_set(at, with);
 }
 
@@ -4965,10 +4967,8 @@ fn add_cost(a: ManaCost, b: ManaCost) -> ManaCost {
 fn set_item_targets(cx: &mut Cx, targets: &[Target], of: &[u8]) {
     let at = cx.s().stack.len() - 1;
     let mut with = cx.s().stack[at];
-    with.target_count = targets.len() as u8;
-    with.targets[..targets.len()].copy_from_slice(targets);
-    with.spec_of = [0; cantrip_state::MAX_TARGETS];
-    with.spec_of[..of.len()].copy_from_slice(of);
+    let shares = with.shares().to_vec();
+    with.set_targets(targets, of, &shares);
     cx.st().stack_set(at, with);
 }
 

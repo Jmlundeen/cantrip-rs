@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// of +1/+1 counters on it instead (CR 701.10e, 608.2m). Earlier resolutions are this source's, counted in the turn's
 /// history even when the Cub has left the battlefield.
 fn landfall(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(creature) = item.targets[0] {
+    if let Target::Object(creature) = item.target(0) {
         if g.history().resolutions(item.object, item.ability) == 1 {
             double::counters(g, &[creature], CounterKind::PlusOne);
         } else {

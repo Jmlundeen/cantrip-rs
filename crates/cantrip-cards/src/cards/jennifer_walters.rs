@@ -49,7 +49,7 @@ fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     g.note_done(item.object, item.ability);
-    g.damage(item.object, item.targets[0], amount);
+    g.damage(item.object, item.target(0), amount);
     Ok(())
 }
 

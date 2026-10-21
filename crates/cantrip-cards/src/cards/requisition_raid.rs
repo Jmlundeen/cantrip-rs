@@ -12,7 +12,7 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Put a +1/+1 counter on each creature target player controls: which creatures is read as the mode resolves
 /// (CR 608.2c).
 fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = item.targets[0].player() else { return Ok(()) };
+    let Some(player) = item.target(0).player() else { return Ok(()) };
     let creatures: Vec<ObjectId> =
         g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     for creature in creatures {

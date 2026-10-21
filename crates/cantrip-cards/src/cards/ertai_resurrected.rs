@@ -14,7 +14,7 @@ fn another_creature_or_planeswalker(q: &dyn Query, asker: &Asker, t: Target) -> 
 /// Mode 0: counter the target, then its controller draws a card. The draw is a separate instruction (CR 701.5) and
 /// still happens when the spell can't be countered; the controller is read before the counter.
 fn counter_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let controller = match item.targets[0] {
+    let controller = match item.target(0) {
         Target::Object(spell) => {
             let controller = g.controller(spell);
             g.counter(spell);

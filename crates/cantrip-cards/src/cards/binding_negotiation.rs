@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// and the choice from it may be no card. Only when no card was chosen is the exile looked at: any face-up card the
 /// opponent owns there, whoever exiled it (CR 406.3: a face-down exiled card is not one), and again the choice may be none.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let you = item.controller;
     let hand = g.state().zone(Zone::hand(opponent)).to_vec();
     if !hand.is_empty() {

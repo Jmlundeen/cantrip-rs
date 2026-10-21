@@ -362,7 +362,7 @@ pub const TAP_AN_UNTAPPED_CREATURE: Cost = Cost::tap_untapped(1, untapped_creatu
 /// instead of going anywhere else as it leaves the stack. Snapcaster Mage and Flashback print it.
 pub fn grant_flashback(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Object(card) = item.targets[0]
+        && let Target::Object(card) = item.target(0)
     {
         g.allow_play(card, item.controller, PlayGrant { expiry: Expiry::EndOfTurn, exile_after: true, ..PlayGrant::CAST });
     }
@@ -425,7 +425,7 @@ pub fn exile_target(g: &mut dyn Game, item: &StackItem, slot: usize) -> bool {
     if !g.target_legal(item, slot) {
         return false;
     }
-    if let Target::Object(id) = item.targets[slot] {
+    if let Target::Object(id) = item.target(slot) {
         g.exile(id);
         return true;
     }
@@ -462,7 +462,7 @@ pub fn counter_target_ability(g: &mut dyn Game, item: &StackItem, slot: usize) -
     if slot >= item.target_count as usize || !g.target_legal(item, slot) {
         return None;
     }
-    let Target::Ability(serial) = item.targets[slot] else { return None };
+    let Target::Ability(serial) = item.target(slot) else { return None };
     let at = g.state().stack.iter().position(|i| i.serial == serial)?;
     let countered = g.state().stack[at];
     g.counter_item(countered.object, at);
@@ -506,7 +506,7 @@ pub fn exile_target_until_leaves_effect(g: &mut dyn Game, item: &StackItem) -> R
 /// and Aang, Swift Savior print it.
 pub fn airbend(g: &mut dyn Game, item: &StackItem) {
     let targets: Vec<ObjectId> =
-        (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).filter_map(|slot| item.targets[slot].object()).collect();
+        (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).filter_map(|slot| item.target(slot).object()).collect();
     airbend_all(g, &targets);
 }
 
@@ -551,7 +551,7 @@ pub fn lands_you_control(q: &dyn Query, player: PlayerId) -> usize {
 /// Deals damage to the target in `slot`, if it is still legal.
 pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u16) {
     if g.target_legal(item, slot) {
-        g.damage(item.object, item.targets[slot], amount);
+        g.damage(item.object, item.target(slot), amount);
     }
 }
 
@@ -560,7 +560,7 @@ pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u1
 /// illegal is left out. Prismari Charm and Batroc the Leaper print it.
 pub fn damage_each_target(g: &mut dyn Game, item: &StackItem, amount: u16) {
     let hits: Vec<(ObjectId, Target, u16)> =
-        (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).map(|slot| (item.object, item.targets[slot], amount)).collect();
+        (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).map(|slot| (item.object, item.target(slot), amount)).collect();
     g.damage_together(&hits);
 }
 
@@ -571,7 +571,7 @@ pub fn damage_each_target(g: &mut dyn Game, item: &StackItem, amount: u16) {
 pub fn damage_divided(g: &mut dyn Game, item: &StackItem) {
     let hits: Vec<(ObjectId, Target, u16)> = (0..item.target_count as usize)
         .filter(|&slot| g.target_legal(item, slot) && item.share(slot) > 0)
-        .map(|slot| (item.object, item.targets[slot], item.share(slot)))
+        .map(|slot| (item.object, item.target(slot), item.share(slot)))
         .collect();
     g.damage_together(&hits);
 }

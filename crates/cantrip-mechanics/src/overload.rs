@@ -13,7 +13,7 @@ pub fn affected(g: &mut dyn Game, item: &StackItem, fits: impl Fn(&Chars, Player
         let all: Vec<ObjectId> = g.state().battlefield().iter().copied().collect();
         all.into_iter().filter(|&id| fits(&g.chars(id), g.controller(id))).collect()
     } else if g.target_legal(item, 0)
-        && let Target::Object(permanent) = item.targets[0]
+        && let Target::Object(permanent) = item.target(0)
     {
         vec![permanent]
     } else {

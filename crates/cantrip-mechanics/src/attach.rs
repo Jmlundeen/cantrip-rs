@@ -7,7 +7,7 @@ use crate::targets;
 /// "Attach this to target creature you control": the effect of equip, and of an attach ability at any speed.
 pub fn attach_to_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Object(creature) = item.targets[0]
+        && let Target::Object(creature) = item.target(0)
     {
         g.attach(item.object, creature);
     }
@@ -57,7 +57,7 @@ pub fn may_attach_that_equipment(g: &mut dyn Game, item: &StackItem) -> Result<(
     if !targets::permanent(g, that) {
         return Ok(());
     }
-    let Target::Object(creature) = item.targets[0] else { return Ok(()) };
+    let Target::Object(creature) = item.target(0) else { return Ok(()) };
     if crate::effects::ask_may(g, item.controller, that, Purpose::Attach)? {
         g.attach(that, creature);
     }

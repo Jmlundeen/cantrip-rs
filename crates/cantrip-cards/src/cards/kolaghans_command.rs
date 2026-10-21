@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// Mode 1: target player discards a card.
 fn discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Player(player) = item.targets[0]
+        && let Target::Player(player) = item.target(0)
     {
         discard_chosen(g, player, item.object, 1)?;
     }

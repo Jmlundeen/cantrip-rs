@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// creature or planeswalker nothing is sacrificed, and the life is still gained; if the opponent is no longer a legal target
 /// the spell doesn't resolve (CR 608.2b) and nothing happens.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let Target::Player(opponent) = item.target(0) else { return Ok(()) };
     let tied = effects::greatest_mana_value_creature_or_planeswalker(g, opponent);
     sacrifice_one_of(g, opponent, item.object, 1, tied)?;
     g.gain_life(item.controller, 2);

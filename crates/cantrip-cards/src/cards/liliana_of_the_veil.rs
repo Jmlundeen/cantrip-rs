@@ -11,14 +11,14 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// -2: target player sacrifices a creature, their choice when they have more than one.
 fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(victim) = item.targets[0].player() else { return Ok(()) };
+    let Some(victim) = item.target(0).player() else { return Ok(()) };
     cantrip_mechanics::sacrifice_chosen(g, victim, item.object, 1, |c| c.is(CardType::Creature)).map(drop)
 }
 
 /// -6: separate all permanents target player controls into two piles (the ability's controller chooses the first;
 /// the rest are the second, CR 700.3), and that player sacrifices the pile of their choice.
 fn minus_six(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(victim) = item.targets[0].player() else { return Ok(()) };
+    let Some(victim) = item.target(0).player() else { return Ok(()) };
     let permanents = g.permanents_of(victim);
     let first: Vec<ObjectId> = if permanents.is_empty() {
         Vec::new()

@@ -15,7 +15,7 @@ fn instant_or_sorcery_targeting_only_one_creature_you_control(q: &dyn Query, sou
     }
     let state = q.state();
     let item = state.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == *spell).or_else(|| state.left_stack(*spell))?;
-    let mut chosen = item.targets[..item.target_count as usize].iter();
+    let mut chosen = item.targets().iter();
     let first = chosen.next()?.object()?;
     if chosen.any(|t| t.object() != Some(first)) || !targets::permanent(q, first) || !q.chars(first).is(CardType::Creature) || q.controller(first) != you {
         return None;

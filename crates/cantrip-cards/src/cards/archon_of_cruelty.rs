@@ -9,7 +9,7 @@ fn creature_or_planeswalker(chars: &Chars) -> bool {
 /// Target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a
 /// card and gain 3 life.
 fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let Target::Player(opponent) = item.target(0) else { return Ok(()) };
     sacrifice_chosen(g, opponent, item.object, 1, creature_or_planeswalker)?;
     discard_chosen(g, opponent, item.object, 1)?;
     g.lose_life(opponent, 3);

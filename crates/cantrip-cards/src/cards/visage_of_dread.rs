@@ -8,7 +8,7 @@ const ASK: Question = Question::new("Mill", "mill two cards?", "The top two card
 /// "Target opponent reveals their hand. You choose an artifact or creature card from it. That player discards that card."
 /// The whole hand is revealed (CR 701.20a), and nothing is asked when it holds no artifact or creature card.
 fn reveal_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let Target::Player(opponent) = item.target(0) else { return Ok(()) };
     let hand = g.state().zone(Zone::hand(opponent)).to_vec();
     g.reveal(opponent, &hand);
     let eligible: Vec<ObjectId> = hand

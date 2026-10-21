@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// caster chooses double strike or lifelink for the target creature (CR 608.2d), which gains it until end of turn.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Player(player) = item.targets[0]
+        && let Target::Player(player) = item.target(0)
     {
         let creatures: Vec<ObjectId> =
             g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();

@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// reaches creatures that arrive under their control later (CR 611.2c) and grants none of them an ability (CR 113.12).
 fn cant_block(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Player(p) = item.targets[0]
+        && let Target::Player(p) = item.target(0)
     {
         g.add_effect(item.object, item.object, EffectKind::CreaturesCantBlock(p), Duration::EndOfTurn);
     }

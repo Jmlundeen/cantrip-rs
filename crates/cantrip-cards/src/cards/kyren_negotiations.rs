@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// This enchantment deals 1 damage to target player or planeswalker.
 fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0) {
-        g.damage(item.object, item.targets[0], 1);
+        g.damage(item.object, item.target(0), 1);
     }
     Ok(())
 }

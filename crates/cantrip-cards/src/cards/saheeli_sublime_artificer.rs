@@ -28,7 +28,7 @@ fn become_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.target_legal(item, 0) || !g.target_legal(item, 1) {
         return Ok(());
     }
-    let (Target::Object(artifact), Target::Object(copied)) = (item.targets[0], item.targets[1]) else { return Ok(()) };
+    let (Target::Object(artifact), Target::Object(copied)) = (item.target(0), item.target(1)) else { return Ok(()) };
     let values = g.copiable_values(copied).with_type(CardType::Artifact);
     g.become_copy(item.object, artifact, values, Duration::EndOfTurn);
     Ok(())

@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// controller chooses which. Activating it needs neither (the Spellskite rulings): a spell or ability with no target, or none
 /// this creature could be, is still a legal target, and nothing changes.
 fn redirect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.change_a_target_to(item.targets[0], item.object, item.controller)
+    g.change_a_target_to(item.target(0), item.object, item.controller)
 }
 
 pub static CARD: CardDef = CardDef {

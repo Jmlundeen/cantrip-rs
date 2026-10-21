@@ -13,7 +13,7 @@ fn any_other_target(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// redirection sent it to.
 fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let before = g.history().head() as usize;
-    g.damage(item.object, item.targets[0], item.data[0] as u16);
+    g.damage(item.object, item.target(0), item.data[0] as u16);
     let dealt_to = |r: &Record| match r.event {
         Event::Damage { source, target: Target::Player(p), amount, .. } if source == item.object && amount > 0 => Some(p),
         _ => None,

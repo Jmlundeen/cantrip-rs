@@ -841,7 +841,8 @@ fn position(s: &GameState, canon: &Canon) -> Position {
         let mut i = *item;
         let refs = (canon.id(i.object), i.targets().iter().map(|&t| canon.target(t)).collect::<Vec<_>>(), canon.target(i.subject), canon.members(i.members));
         i.object = ObjectId::NONE;
-        i.targets = [Target::None; cantrip_state::MAX_TARGETS];
+        let (of, shares) = (i.spec_of().to_vec(), i.shares().to_vec());
+        i.set_targets(&vec![Target::None; i.targets().len()], &of, &shares);
         i.subject = Target::None;
         i.members = cantrip_state::Span::default();
         i.serial = 0;

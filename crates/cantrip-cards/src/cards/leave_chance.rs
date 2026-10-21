@@ -27,7 +27,7 @@ fn chance(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static LEAVE: CardDef = CardDef {
-    spell: spell(&[up_to(16, permanent_you_own)], leave),
+    spell: spell(&[up_to(TargetSpec::ANY_NUMBER, permanent_you_own)], leave),
     ..oracle::LEAVE
 };
 

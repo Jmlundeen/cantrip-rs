@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// milled: a pass with fewer than two cannot share a color, and colorless cards share none (CR 105.2a). The pass that
 /// does not shorten the library stops the loop rather than spinning.
 fn grind(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(who) = item.targets[0].player() else { return Ok(()) };
+    let Some(who) = item.target(0).player() else { return Ok(()) };
     loop {
         let library = g.state().zone(Zone::library(who)).to_vec();
         if library.is_empty() {

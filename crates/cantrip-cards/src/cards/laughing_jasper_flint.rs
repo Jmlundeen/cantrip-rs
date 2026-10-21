@@ -16,7 +16,7 @@ fn creatures_you_control_but_dont_own(q: &dyn LayerQuery, source: ObjectId, affe
 /// counted as the ability resolves; a land among the cards cannot be cast, so it is not played; the permission ends at the
 /// cleanup step (CR 514.2) and the cards stay in exile.
 fn exile_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let x = outlaw::outlaws_controlled_by(g, item.controller);
     exile_top_may_play(g, opponent, x, item.controller, PlayGrant { any_type: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST });
     Ok(())

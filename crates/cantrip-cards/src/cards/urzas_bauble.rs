@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// upkeep, set up even when the hand was empty or the target is gone (CR 609.3).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0) {
-        if let Some(player) = item.targets[0].player() {
+        if let Some(player) = item.target(0).player() {
             let hand = g.state().zone(Zone::hand(player)).to_vec();
             if !hand.is_empty() {
                 let card = hand[g.choose_at_random(hand.len())];

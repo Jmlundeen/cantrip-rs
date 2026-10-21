@@ -9,7 +9,7 @@ fn cease(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cards: Vec<ObjectId> = (0..2).filter_map(|slot| targets::object(g, item, slot)).collect();
     g.exile_all(&cards);
     if g.target_legal(item, 2)
-        && let Target::Player(player) = item.targets[2]
+        && let Target::Player(player) = item.target(2)
     {
         g.gain_life(player, 2);
         g.draw(player, 1);

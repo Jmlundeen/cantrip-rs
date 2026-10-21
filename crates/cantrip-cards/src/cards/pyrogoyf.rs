@@ -27,7 +27,7 @@ fn damage_by_the_entered_creature(g: &mut dyn Game, item: &StackItem) -> Result<
     let Target::Object(dealer) = item.subject else { return Ok(()) };
     let power = g.chars(dealer).power.unwrap_or(0);
     if power > 0 {
-        g.damage(dealer, item.targets[0], power as u16);
+        g.damage(dealer, item.target(0), power as u16);
     }
     Ok(())
 }

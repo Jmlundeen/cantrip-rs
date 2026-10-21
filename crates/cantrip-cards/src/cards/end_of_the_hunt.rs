@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// creature or planeswalker nothing is exiled; if the opponent is no longer a legal target the spell doesn't resolve
 /// (CR 608.2b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let tied = effects::greatest_mana_value_creature_or_planeswalker(g, opponent);
     if let Some(chosen) = choose::card(g, opponent, item.object, Purpose::Exile, tied)? {
         g.exile(chosen);

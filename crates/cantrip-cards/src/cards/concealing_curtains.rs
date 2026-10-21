@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// card, then draws a card." The whole hand is revealed and the card is chosen by the controller, up to one, among the
 /// nonland cards; choosing none ends the ability.
 fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let Target::Player(opponent) = item.target(0) else { return Ok(()) };
     let hand = g.state().zone(Zone::hand(opponent)).to_vec();
     if hand.is_empty() {
         return Ok(());

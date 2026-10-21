@@ -14,7 +14,7 @@ fn nonland_nontoken_permanent_you_control(q: &dyn Query, asker: &Asker, t: Targe
 fn return_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let returning: Vec<ObjectId> =
-        (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).filter_map(|slot| item.targets[slot].object()).collect();
+        (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).filter_map(|slot| item.target(slot).object()).collect();
     let returned = g.return_to_hand(&returning).into_iter().filter(|&new| g.obj(new).zone == Zone::hand(you)).count();
     if returned > 0 {
         g.draw(you, returned as u32);
@@ -23,6 +23,6 @@ fn return_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[up_to(16, nonland_nontoken_permanent_you_control)], return_and_draw),
+    spell: spell(&[up_to(TargetSpec::ANY_NUMBER, nonland_nontoken_permanent_you_control)], return_and_draw),
     ..oracle::PARADOXICAL_OUTCOME
 };

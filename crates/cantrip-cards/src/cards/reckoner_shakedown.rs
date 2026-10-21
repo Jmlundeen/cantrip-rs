@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// don't (no nonland card, an empty hand or a choice declined), put two +1/+1 counters on a creature or Vehicle you
 /// control, chosen as the spell resolves (CR 608.2d): a lone one is taken without asking.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let hand = g.state().zone(Zone::hand(opponent)).to_vec();
     let mut chosen: Vec<ObjectId> = Vec::new();
     if !hand.is_empty() {

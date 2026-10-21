@@ -22,7 +22,7 @@ fn question(g: &dyn Query, item: &StackItem, hand: Vec<ObjectId>) -> RequestKind
 /// when nothing in the hand is eligible: looking at the hand is part of the spell.
 #[cfg(not(feature = "staged"))]
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let hand = g.state().zone(Zone::hand(opponent)).to_vec();
     if hand.is_empty() {
         return Ok(());
@@ -38,7 +38,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// The same, as explicit stages: stage 0 reveals and asks, stage 1 discards what was chosen.
 #[cfg(feature = "staged")]
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     match g.stage() {
         0 => {
             let hand = g.state().zone(Zone::hand(opponent)).to_vec();

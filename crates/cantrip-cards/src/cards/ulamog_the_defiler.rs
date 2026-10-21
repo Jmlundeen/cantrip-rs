@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// "When you cast this spell, target opponent exiles the top half of their library, rounded up." It resolves before
 /// Ulamog does, whatever becomes of the spell (the ruling); the half is of the library as the ability resolves.
 fn exile_half(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let half = g.state().zone(Zone::library(opponent)).len().div_ceil(2);
     let top = top_of_library(g, opponent, half);
     g.exile_all(&top);

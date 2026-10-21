@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// "Target player reveals their hand. You choose a nonland card from it. That player discards that card." Asked
 /// whenever the hand is not empty, even when nothing in it is a nonland card: looking at the hand is part of the spell.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = item.targets[0].player() else { return Ok(()) };
+    let Some(player) = item.target(0).player() else { return Ok(()) };
     hand::discard_chosen_nonland_from_revealed_hand(g, item, player)?;
     Ok(())
 }

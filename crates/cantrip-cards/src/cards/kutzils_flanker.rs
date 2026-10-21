@@ -33,7 +33,7 @@ fn life_and_scry(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// longer a legal target (CR 608.2b).
 fn exile_graveyard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Player(player) = item.targets[0]
+        && let Target::Player(player) = item.target(0)
     {
         let cards = g.state().zone(Zone::graveyard(player)).to_vec();
         g.exile_all(&cards);

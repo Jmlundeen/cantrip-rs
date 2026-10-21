@@ -10,7 +10,7 @@ pub static EXTRA: &[&CardDef] = &[&tokens::GOBLIN_ARMY];
 /// I - "Target opponent reveals their hand. You choose a nonland card from it. That player discards that card." With its
 /// target illegal the chapter does not resolve at all (CR 608.2b).
 fn reveal_and_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     discard_chosen_nonland_from_revealed_hand(g, item, opponent)?;
     Ok(())
 }

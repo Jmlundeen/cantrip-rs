@@ -8,7 +8,7 @@ fn converge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let spent = g.obj(item.object).spent;
     let x = Color::ALL.iter().filter(|c| spent.get(c.mana()) > 0).count() as u32;
     if g.target_legal(item, 0)
-        && let Some(player) = item.targets[0].player()
+        && let Some(player) = item.target(0).player()
     {
         g.draw(player, x);
     }

@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Target player discards X cards at random.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = item.targets[0].player() else { return Ok(()) };
+    let Some(player) = item.target(0).player() else { return Ok(()) };
     discard_at_random(g, player, item.x as usize);
     Ok(())
 }

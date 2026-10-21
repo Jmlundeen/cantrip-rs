@@ -534,7 +534,8 @@ fn choose_trigger_targets(
             if most == 0 {
                 break 'slot;
             }
-            // A stack item holds at most MAX_TARGETS targets: a count past what is left of them is cut to it (known-issues KI-3).
+            // A stack item holds at most MAX_TARGETS targets, more than any board has legal targets for: a count past what is left
+            // of them is cut to it.
             let room = cantrip_state::MAX_TARGETS.saturating_sub(targets.len());
             let count = (most as usize).min(candidates.len()).min(room) as u8;
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
@@ -644,9 +645,9 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         object: trigger.source,
         ability: trigger.ability,
         controller: trigger.controller,
-        targets: [Target::None; cantrip_state::MAX_TARGETS],
-        target_count: targets.len() as u8,
-        spec_of: [0; cantrip_state::MAX_TARGETS],
+        inline_targets: [Target::None; cantrip_state::INLINE_TARGETS],
+        target_count: 0,
+        inline_spec_of: [0; cantrip_state::INLINE_TARGETS],
         x: trigger.count.unwrap_or(0),
         kicked: 0,
         paid: 0,
@@ -660,7 +661,8 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         // CR 603.10, 702.174b: what was true of the source as the ability triggered, for a gift triggered ability to
         // give its gift after the permanent has left.
         gift: cx.s().obj(trigger.source).gift,
-        shares: [0; cantrip_state::MAX_TARGETS],
+        inline_shares: [0; cantrip_state::INLINE_TARGETS],
+        spill: None,
         exile_after: false,
         flashback: false,
         // Put on the stack now, or, a delayed triggered ability, created when its `Delayed` was (CR 701.27f).
@@ -668,9 +670,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         copied: false,
         cast_known: u32::MAX,
     };
-    item.targets[..targets.len()].copy_from_slice(&targets);
-    item.spec_of[..of.len()].copy_from_slice(&of);
-    item.shares[..shares.len()].copy_from_slice(&shares);
+    item.set_targets(&targets, &of, &shares);
     cx.st().stack_push(item);
     ops::became_targets(cx, targets.iter().copied(), trigger.source, trigger.controller);
     // The controller of a triggered ability puts it on the stack (CR 603.3a) and is who commits its crime (CR 700.13).

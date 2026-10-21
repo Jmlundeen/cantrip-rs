@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// part of the ability, so the choice is asked even with nothing eligible. The card is remembered as exiled with this
 /// creature (CR 607.2a) and is not tied to its staying on the battlefield: the second ability brings it back.
 fn reveal_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let chosen = choose_from_revealed_hand_of_kind(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))?;
     if !chosen.is_empty() {
         g.exile_with(&chosen, item.object, false);

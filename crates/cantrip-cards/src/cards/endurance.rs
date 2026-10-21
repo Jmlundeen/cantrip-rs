@@ -13,7 +13,7 @@ fn graveyard_to_bottom(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     if item.target_count == 0 || !g.target_legal(item, 0) {
         return Ok(());
     }
-    let Target::Player(player) = item.targets[0] else { return Ok(()) };
+    let Target::Player(player) = item.target(0) else { return Ok(()) };
     let cards: Vec<ObjectId> = g.state().zone(Zone::graveyard(player)).to_vec();
     g.put_into_library(&cards, LibraryPlace::BottomInRandomOrder);
     Ok(())

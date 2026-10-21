@@ -34,7 +34,7 @@ fn exchange(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.target_legal(item, 0) || !g.target_legal(item, 1) {
         return Ok(());
     }
-    let (Target::Object(yours), Target::Object(theirs)) = (item.targets[0], item.targets[1]) else { return Ok(()) };
+    let (Target::Object(yours), Target::Object(theirs)) = (item.target(0), item.target(1)) else { return Ok(()) };
     g.exchange_control(item.object, yours, theirs);
     Ok(())
 }

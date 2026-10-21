@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// Return all artifacts target player owns to their hand (CR 108.3): every artifact on the battlefield whose owner is the
 /// target player, whoever controls it now, in one simultaneous move. The set is taken as the spell resolves.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(owner) = item.targets[0].player() else { return Ok(()) };
+    let Some(owner) = item.target(0).player() else { return Ok(()) };
     let artifacts: Vec<ObjectId> = g
         .state()
         .battlefield()

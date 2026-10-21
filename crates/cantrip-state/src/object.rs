@@ -530,8 +530,39 @@ impl Target {
     }
 }
 
-/// The most targets one spell or ability can have: "any number of target ..." (Appa) is bounded by what a board holds.
-pub const MAX_TARGETS: usize = 16;
+/// How many targets a stack item holds in itself; past that, all of them are held in a `TargetSpill` it points to, so an
+/// ordinary item stays small to copy and the rules set no limit (CR 115.1d: "any number of target ...", Appa; X targets).
+pub const INLINE_TARGETS: usize = 16;
+
+/// The most targets one spell or ability can have: more than any board holds legal targets for, and below the bounds a target
+/// slot reserves for "X", "each opponent" and the like (`TargetSpec`), which are counted in a `u8`.
+pub const MAX_TARGETS: usize = 250;
+
+/// The targets of a stack item with more than `INLINE_TARGETS` of them, with the slot each was chosen for and its share of a
+/// divided total, parallel. Interned and never freed (`TargetSpill::intern`): a stack item is `Copy`, and such lists are
+/// rare and few.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct TargetSpill {
+    pub targets: Vec<Target>,
+    pub spec_of: Vec<u8>,
+    pub shares: Vec<u8>,
+}
+
+impl TargetSpill {
+    /// The one shared copy of this list: the same list asked for again (a position revisited by search) is the same allocation.
+    fn intern(spill: TargetSpill) -> &'static TargetSpill {
+        use std::collections::HashSet;
+        use std::sync::{Mutex, OnceLock};
+        static POOL: OnceLock<Mutex<HashSet<&'static TargetSpill>>> = OnceLock::new();
+        let mut pool = POOL.get_or_init(Default::default).lock().unwrap_or_else(|e| e.into_inner());
+        if let Some(&found) = pool.get(&spill) {
+            return found;
+        }
+        let leaked: &'static TargetSpill = Box::leak(Box::new(spill));
+        pool.insert(leaked);
+        leaked
+    }
+}
 
 /// What kind of thing is on the stack (CR 405).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -550,13 +581,15 @@ pub struct StackItem {
     /// The ability: for a spell, its card's spell ability.
     pub ability: AbilityRef,
     pub controller: PlayerId,
-    pub targets: [Target; MAX_TARGETS],
+    /// The first `INLINE_TARGETS` targets; read them through `targets()` and `target()`, and write them through the setters,
+    /// which keep the spill of a longer list.
+    pub inline_targets: [Target; INLINE_TARGETS],
     pub target_count: u8,
     /// For each target, parallel to `targets`, the target slot it was chosen for (CR 601.2c): the index of its spec in the
     /// spell's or ability's printed list (a modal item's: in the list of its chosen modes' specs, in printed order, CR
     /// 700.2c). So a slot that takes a variable number of targets ("attach any number of target Equipment you control to
     /// target creature you control") can stand anywhere in the list, and each target is judged by its own slot.
-    pub spec_of: [u8; MAX_TARGETS],
+    pub inline_spec_of: [u8; INLINE_TARGETS],
     /// The X announced for it (CR 107.3); for a reflexive triggered ability, the number its "that many" counts
     /// (CR 603.12, `PendingTrigger::count`).
     pub x: u16,
@@ -586,7 +619,9 @@ pub struct StackItem {
     pub gift: Option<PlayerId>,
     /// For a spell or ability that divides a total among its targets (CR 601.2d): each target's share, parallel to
     /// `targets`.
-    pub shares: [u8; MAX_TARGETS],
+    pub inline_shares: [u8; INLINE_TARGETS],
+    /// All the targets, slots and shares of an item with more than `INLINE_TARGETS` targets; none otherwise.
+    pub spill: Option<&'static TargetSpill>,
     /// For an instant or sorcery spell: if it would be put into a graveyard as it leaves the stack, it is exiled
     /// instead (Bilbo's "cast this way").
     pub exile_after: bool,
@@ -608,14 +643,44 @@ pub struct StackItem {
 }
 
 impl StackItem {
+    /// Its targets, in the order chosen (CR 601.2c).
     pub fn targets(&self) -> &[Target] {
-        &self.targets[..self.target_count as usize]
+        match self.spill {
+            Some(spill) => &spill.targets,
+            None => &self.inline_targets[..self.target_count as usize],
+        }
+    }
+
+    /// Target `slot`, or `Target::None` past the targets announced.
+    pub fn target(&self, slot: usize) -> Target {
+        self.targets().get(slot).copied().unwrap_or(Target::None)
+    }
+
+    /// For each target, the slot (spec) it was chosen for, parallel to `targets()`.
+    pub fn spec_of(&self) -> &[u8] {
+        match self.spill {
+            Some(spill) => &spill.spec_of,
+            None => &self.inline_spec_of[..self.target_count as usize],
+        }
+    }
+
+    /// The spec target `slot` was chosen for, or 0 past the targets announced.
+    pub fn spec(&self, slot: usize) -> u8 {
+        self.spec_of().get(slot).copied().unwrap_or(0)
+    }
+
+    /// Each target's share of a divided total, parallel to `targets()`.
+    pub fn shares(&self) -> &[u8] {
+        match self.spill {
+            Some(spill) => &spill.shares,
+            None => &self.inline_shares[..self.target_count as usize],
+        }
     }
 
     /// Where in `targets` the targets chosen for the spec at `spec` are (CR 601.2c): one run, in the order chosen. Empty when
     /// that slot chose none, or it is past the targets announced (an unchosen "up to one" at the end of the list).
     pub fn spec_targets(&self, spec: usize) -> std::ops::Range<usize> {
-        let of = &self.spec_of[..self.target_count as usize];
+        let of = self.spec_of();
         let start = of.iter().position(|&s| s as usize >= spec).unwrap_or(of.len());
         let end = start + of[start..].iter().take_while(|&&s| s as usize == spec).count();
         start..end
@@ -623,7 +688,65 @@ impl StackItem {
 
     /// What target `slot` was announced to receive of a divided total (CR 601.2d).
     pub fn share(&self, slot: usize) -> u16 {
-        self.shares.get(slot).copied().unwrap_or(0) as u16
+        self.shares().get(slot).copied().unwrap_or(0) as u16
+    }
+
+    /// Sets its targets, the spec each was chosen for and each one's share of a divided total, all parallel: missing slots and
+    /// shares are 0. Past `INLINE_TARGETS` targets the lists are held in a spill (the first ones inline too).
+    pub fn set_targets(&mut self, targets: &[Target], spec_of: &[u8], shares: &[u8]) {
+        let n = targets.len().min(MAX_TARGETS);
+        self.target_count = n as u8;
+        self.inline_targets = [Target::None; INLINE_TARGETS];
+        self.inline_spec_of = [0; INLINE_TARGETS];
+        self.inline_shares = [0; INLINE_TARGETS];
+        let inline = n.min(INLINE_TARGETS);
+        self.inline_targets[..inline].copy_from_slice(&targets[..inline]);
+        for i in 0..inline {
+            self.inline_spec_of[i] = spec_of.get(i).copied().unwrap_or(0);
+            self.inline_shares[i] = shares.get(i).copied().unwrap_or(0);
+        }
+        self.spill = (n > INLINE_TARGETS).then(|| {
+            let pad = |of: &[u8]| (0..n).map(|i| of.get(i).copied().unwrap_or(0)).collect();
+            TargetSpill::intern(TargetSpill { targets: targets[..n].to_vec(), spec_of: pad(spec_of), shares: pad(shares) })
+        });
+    }
+
+    /// Changes target `slot` to `to`, keeping the rest.
+    pub fn set_target(&mut self, slot: usize, to: Target) {
+        if self.spill.is_none() && slot < self.target_count as usize {
+            self.inline_targets[slot] = to;
+            return;
+        }
+        let mut targets = self.targets().to_vec();
+        if slot < targets.len() {
+            targets[slot] = to;
+            let (of, shares) = (self.spec_of().to_vec(), self.shares().to_vec());
+            self.set_targets(&targets, &of, &shares);
+        }
+    }
+
+    /// Sets the spec each target was chosen for, keeping the targets and shares.
+    pub fn set_spec_of(&mut self, spec_of: &[u8]) {
+        if self.spill.is_none() {
+            self.inline_spec_of = [0; INLINE_TARGETS];
+            let n = spec_of.len().min(self.target_count as usize);
+            self.inline_spec_of[..n].copy_from_slice(&spec_of[..n]);
+            return;
+        }
+        let (targets, shares) = (self.targets().to_vec(), self.shares().to_vec());
+        self.set_targets(&targets, spec_of, &shares);
+    }
+
+    /// Sets each target's share of a divided total, keeping the targets and specs.
+    pub fn set_shares(&mut self, shares: &[u8]) {
+        if self.spill.is_none() {
+            self.inline_shares = [0; INLINE_TARGETS];
+            let n = shares.len().min(self.target_count as usize);
+            self.inline_shares[..n].copy_from_slice(&shares[..n]);
+            return;
+        }
+        let (targets, of) = (self.targets().to_vec(), self.spec_of().to_vec());
+        self.set_targets(&targets, &of, shares);
     }
 }
 
@@ -1783,6 +1906,64 @@ impl Rng {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn item() -> StackItem {
+        StackItem {
+            kind: StackKind::Spell,
+            object: ObjectId(1),
+            ability: AbilityRef { card: CardId(0), index: 0 },
+            controller: PlayerId(0),
+            inline_targets: [Target::None; INLINE_TARGETS],
+            target_count: 0,
+            inline_spec_of: [0; INLINE_TARGETS],
+            x: 0,
+            kicked: 0,
+            paid: 0,
+            way: 0,
+            modes: 0,
+            choice: 0,
+            subject: Target::None,
+            data: [0; 2],
+            members: Span::default(),
+            serial: 0,
+            gift: None,
+            inline_shares: [0; INLINE_TARGETS],
+            spill: None,
+            exile_after: false,
+            flashback: false,
+            since: 0,
+            copied: false,
+            cast_known: u32::MAX,
+        }
+    }
+
+    /// Past `INLINE_TARGETS` the targets, specs and shares are all held in the spill and read back whole; changing one keeps the
+    /// rest; the same list twice is one spill; and a list short again holds nothing past it.
+    #[test]
+    fn a_stack_item_holds_more_targets_than_it_holds_in_itself() {
+        let n = INLINE_TARGETS + 4;
+        let targets: Vec<Target> = (0..n as u32).map(|i| Target::Object(ObjectId(i + 10))).collect();
+        let of: Vec<u8> = (0..n).map(|i| (i / 10) as u8).collect();
+        let shares: Vec<u8> = (0..n).map(|i| i as u8).collect();
+        let mut a = item();
+        a.set_targets(&targets, &of, &shares);
+        assert_eq!(a.targets(), &targets[..]);
+        assert_eq!(a.spec_of(), &of[..]);
+        assert_eq!(a.share(n - 1), (n - 1) as u16);
+        assert_eq!(a.spec_targets(1), 10..n);
+        assert_eq!(a.inline_targets[0], targets[0], "the first targets are inline too");
+        let mut b = item();
+        b.set_targets(&targets, &of, &shares);
+        assert!(std::ptr::eq(a.spill.unwrap(), b.spill.unwrap()), "the same list is spilled twice");
+        a.set_target(n - 1, Target::Player(PlayerId(1)));
+        assert_eq!(a.target(n - 1), Target::Player(PlayerId(1)));
+        assert_eq!(a.target(0), targets[0]);
+        assert_eq!(a.spec(n - 1), of[n - 1]);
+        a.set_targets(&targets[..2], &[0, 0], &[]);
+        assert!(a.spill.is_none());
+        assert_eq!(a.targets(), &targets[..2]);
+        assert_eq!(a.target(5), Target::None);
+    }
 
     /// A subtype restriction's name reads back as the same restriction, whatever its subtypes hold: "or" inside a name
     /// (Orc, Warrior, Horror) and spaces (Time Lord) included.

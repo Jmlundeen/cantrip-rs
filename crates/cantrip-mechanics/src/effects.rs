@@ -274,7 +274,7 @@ pub fn each_opponent_loses_1_life(g: &mut dyn Game, item: &StackItem) -> Result<
 /// its slot allows; with it gone the ability does not resolve (CR 608.2b), so nothing is gained. Blood Artist prints it of a
 /// player; Blood Hustler and Down, Down to Goblin-town of an opponent.
 pub fn target_player_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(player) = item.targets[0] else { return Ok(()) };
+    let Target::Player(player) = item.target(0) else { return Ok(()) };
     g.lose_life(player, 1);
     g.gain_life(item.controller, 1);
     Ok(())
@@ -532,7 +532,7 @@ pub fn return_first_target_to_battlefield(g: &mut dyn Game, item: &StackItem) ->
 /// controller gains the life. Lightning Helix, Phlage, Titan of Fire's Fury and Demonic Pact print it.
 pub fn damage_target_and_gain_life(g: &mut dyn Game, item: &StackItem, n: u16) -> Result<(), Suspend> {
     if g.target_legal(item, 0) {
-        g.damage(item.object, item.targets[0], n);
+        g.damage(item.object, item.target(0), n);
         g.gain_life(item.controller, i32::from(n));
     }
     Ok(())
@@ -543,7 +543,7 @@ pub fn damage_target_and_gain_life(g: &mut dyn Game, item: &StackItem, n: u16) -
 /// the target is not changed if there is no other legal choice. An item whose only target is no longer legal is never
 /// resolved (CR 608.2b), so nothing is checked here. Untimely Malfunction and Bolt Bend print it.
 pub fn change_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.change_target(item.targets[0], item.controller)
+    g.change_target(item.target(0), item.controller)
 }
 
 /// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event

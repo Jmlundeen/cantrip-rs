@@ -44,5 +44,5 @@ pub fn next_damage_to_target(g: &mut dyn Game, item: &StackItem, slot: usize, in
     if !g.target_legal(item, slot) {
         return;
     }
-    this_turn(g, item, item.targets[slot], index, Shield::Next(n));
+    this_turn(g, item, item.target(slot), index, Shield::Next(n));
 }

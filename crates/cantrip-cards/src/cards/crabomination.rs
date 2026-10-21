@@ -15,7 +15,7 @@ fn at_random(g: &mut dyn Game, zone: Zone) -> Option<ObjectId> {
 /// cards leave together; a zone with nothing in it contributes nothing; only a card that could be cast at all (not a
 /// land, a target to be found for it) is a choice.
 fn plunder(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let Target::Player(opponent) = item.target(0) else { return Ok(()) };
     let mut taken: Vec<ObjectId> = Vec::new();
     taken.extend(g.state().zone(Zone::library(opponent)).first().copied());
     taken.extend(at_random(g, Zone::graveyard(opponent)));

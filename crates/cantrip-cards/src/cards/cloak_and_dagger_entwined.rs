@@ -14,7 +14,7 @@ fn creature_they_control(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// choice over both, since the card takes one of them or nothing; it is exiled until this leaves the battlefield
 /// (CR 610.3) and returns the moment it has.
 fn reveal_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let hand = g.state().zone(Zone::hand(opponent)).to_vec();
     if !hand.is_empty() {
         g.reveal(opponent, &hand);

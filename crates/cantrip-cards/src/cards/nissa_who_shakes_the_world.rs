@@ -17,7 +17,7 @@ fn animate_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if item.target_count == 0 || !g.target_legal(item, 0) {
         return Ok(());
     }
-    let Target::Object(land) = item.targets[0] else { return Ok(()) };
+    let Target::Object(land) = item.target(0) else { return Ok(()) };
     g.add_counters(land, CounterKind::PlusOne, 3);
     g.untap(land);
     g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);

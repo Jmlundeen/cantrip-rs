@@ -17,7 +17,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.target_legal(item, slot) {
         return Ok(());
     }
-    let Target::Object(card) = item.targets[slot] else { return Ok(()) };
+    let Target::Object(card) = item.target(slot) else { return Ok(()) };
     let controller = item.controller;
     let creature = g.put_onto_battlefield(card, controller, false)?;
     if creature != card || g.obj(creature).zone.is(ZoneKind::Battlefield) {

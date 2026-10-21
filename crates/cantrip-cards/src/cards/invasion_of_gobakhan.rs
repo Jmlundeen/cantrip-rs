@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// owner may play it. A spell cast this way costs {2} more to cast." Looking at someone else's hand is worth doing even
 /// with nothing eligible, so the choice is asked of any hand that is not empty.
 fn take_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let Target::Player(opponent) = item.target(0) else { return Ok(()) };
     let Some(card) = hand::look_and_may_choose(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))? else { return Ok(()) };
     hand::exile_owner_may_play_for_two_more(g, card);
     Ok(())

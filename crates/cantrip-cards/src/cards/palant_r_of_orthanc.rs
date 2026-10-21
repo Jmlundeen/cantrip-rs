@@ -11,7 +11,7 @@ const ASK: Question = Question::new("HaveControllerDraw", "have its controller d
 /// X cards, X being the influence counters on this (as it last was if it has gone, CR 608.2h), and they lose life equal
 /// to the total mana value of those cards (wherever they went, CR 701.17c).
 fn offer(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(them) = item.targets[0] else { return Ok(()) };
+    let Target::Player(them) = item.target(0) else { return Ok(()) };
     let you = item.controller;
     let this = item.object;
     if targets::permanent(g, this) {

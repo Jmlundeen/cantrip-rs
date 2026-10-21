@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// the looking, so nothing is asked when no card in the hand is an artifact or a creature. The card is exiled, not
 /// discarded (CR 701.13).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let chosen = choose_from_revealed_hand_of_kind(g, item, opponent, Purpose::Exile, "artifact or creature", |q, c| {
         let chars = q.chars(c);
         chars.is(CardType::Artifact) || chars.is(CardType::Creature)

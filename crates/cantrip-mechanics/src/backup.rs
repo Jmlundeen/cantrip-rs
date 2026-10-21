@@ -20,7 +20,7 @@ pub const fn trigger(text: &'static str, effect: fn(&mut dyn Game, &StackItem) -
 /// ability the card lists as its delayed ability `ability`, until end of turn.
 pub fn resolve(g: &mut dyn Game, item: &StackItem, n: i16, keywords: &[Keyword], ability: Option<u8>) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Object(creature) = item.targets[0]
+        && let Target::Object(creature) = item.target(0)
     {
         g.add_counters(creature, CounterKind::PlusOne, n);
         if creature != item.object {

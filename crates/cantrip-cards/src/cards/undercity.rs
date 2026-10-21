@@ -32,7 +32,7 @@ fn lost_well(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Room 3, Trap!
 fn trap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Target::Player(p) = item.targets[0]
+        && let Target::Player(p) = item.target(0)
     {
         g.lose_life(p, 5);
     }

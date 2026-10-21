@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// of the spell, so the choice is asked even with nothing eligible. The permission is to cast, for the card's own costs and
 /// timing, for as long as that exiled card stays there (CR 400.7); it is given only to the card exiled (the new object).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let chosen = choose_from_revealed_hand_of_kind(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))?;
     let exiled = g.exile_all(&chosen);
     if item.gift.is_some() {

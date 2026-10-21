@@ -41,7 +41,7 @@ fn sacrifice_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// without paying their mana costs." (CR 608.2g, 118.9) The cards leave together, face up; those that reached exile are
 /// offered, and the rest stay in exile.
 fn exile_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let Target::Player(opponent) = item.target(0) else { return Ok(()) };
     let top = top_of_library(g, opponent, 5);
     let exiled: Vec<ObjectId> = g.exile_all(&top).into_iter().filter(|&card| g.obj(card).zone.is(ZoneKind::Exile)).collect();
     choose::cast_up_to_free(g, item.controller, item.object, &exiled, 2)

@@ -12,7 +12,7 @@ fn terror_from_the_deep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
     if item.target_count == 0 || !g.target_legal(item, 0) {
         return Ok(());
     }
-    let Target::Object(prey) = item.targets[0] else { return Ok(()) };
+    let Target::Object(prey) = item.target(0) else { return Ok(()) };
     exile_if_it_would_die(g, item.object, 0, prey);
     g.fight(item.object, prey);
     Ok(())

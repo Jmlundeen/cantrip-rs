@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// +1/+1 counter on a creature you control, chosen as the spell resolves rather than targeted (CR 608.2d): a lone
 /// creature is taken without asking, and with none the sentence does nothing.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(opponent) = item.targets[0].player() {
+    if let Some(opponent) = item.target(0).player() {
         discard_chosen_nonland_from_revealed_hand(g, item, opponent)?;
     }
     let creatures: Vec<ObjectId> =

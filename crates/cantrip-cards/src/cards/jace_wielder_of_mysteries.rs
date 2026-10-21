@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// +1: "Target player mills two cards. Draw a card."
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
-        && let Some(player) = item.targets[0].player()
+        && let Some(player) = item.target(0).player()
     {
         g.mill(player, 2);
     }
