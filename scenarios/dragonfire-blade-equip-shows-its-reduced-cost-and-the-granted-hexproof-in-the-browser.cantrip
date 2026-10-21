@@ -4,8 +4,9 @@
 # it could target: {0} with Dwarven Mauler ("equip abilities you activate that target this creature cost {2} less"),
 # {2} with the Ornithopter. Dragonfire Blade's Equip {4} targeting the red Mauler costs {4} - {1} (one color) - {2} (the
 # Mauler) = {1}. The Blade has one thing to do, so a click goes straight to its targets, whose caption says what the equip
-# costs with each; the payment then asks for that total, paid with Mox Jet. Then the Mauler's face lists "Hexproof from
-# monocolored" after its own text and the Shadowspear's trample and lifelink, granted by the Blade.
+# costs with each, and no menu was opened for it (not the Shadowspear's, KI-94); the payment then asks for that total, paid
+# with Mox Jet. Then the Mauler's face lists "Hexproof from monocolored" after its own text and the Shadowspear's trample
+# and lifelink, granted by the Blade.
 
 [Bot1 Deck]
 Mountain
@@ -37,6 +38,7 @@ Bot1.Battlefield.Shadowspear.Activate(Ability: Equip; Dwarven Mauler)
 Bot1.Pass
 Bot1.Battlefield.Dragonfire Blade.Activate(Dwarven Mauler)
 ? Client.Bot1.Targeting = Target for Dragonfire Blade / Costs {1} targeting Dwarven Mauler  ·  1 possible target
+? Client.Bot1.Menu =
 ? Client.Bot1.Prompt.Title = Pay for Dragonfire Blade
 ? Client.Bot1.Prompt.Detail = {1} of {1} still to pay  ·  tap a land
 Bot1.Battlefield.Mox Jet.Activate
