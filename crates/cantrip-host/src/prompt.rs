@@ -762,7 +762,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 remaining_hybrid: remaining_hybrid(remaining),
                 options: options_messages(game, handles, options),
                 has_x: total.x > 0 || (*announcing && kicker.is_some()),
-                x: i32::from(*x),
+                x: wire(*x),
                 kicker: kicker.map_or(String::new(), |k| k.cost.to_string()),
                 multikicker: kicker.is_some_and(|k| k.multi),
                 kicker_paid: kicker.is_some() && *x > 0,
@@ -805,7 +805,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             choosing_x: x.is_some(),
             x: x.map_or(0, i32::from),
         }),
-        RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to, kind, total } => {
+        RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to, any_number, kind, total } => {
             let owner = if *purpose == Purpose::TakeFromHand {
                 cards.first().map_or(request.player, |c| game.state.obj(*c).owner)
             } else {
@@ -818,8 +818,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 purpose: purpose_view(*purpose, opening),
                 cards: handles_of(handles, cards),
                 eligible: handles_of(handles, eligible),
-                count: i32::from(*count),
+                count: wire(*count),
                 up_to: *up_to,
+                any_number: *any_number,
                 // Blight (CR 701.68a) is a creature you control; behold (CR 701.4a) names its quality ("Dragon"): the
                 // client says so in its caption. Any other choice is worded as the asking card words it ("nonland"), if it does.
                 kind: match purpose {
@@ -907,9 +908,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 purpose: CardChoicePurposeView::Craft,
                 cards: handles_of(handles, cards),
                 eligible: handles_of(handles, cards),
-                count: i32::from(*maximum),
+                count: wire(*maximum),
                 up_to: minimum < maximum,
-                minimum: if minimum < maximum { i32::from(*minimum) } else { 0 },
+                minimum: if minimum < maximum { wire(*minimum) } else { 0 },
                 kind: (*quality).to_string(),
                 ..Default::default()
             })
@@ -1233,7 +1234,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             let owner = library.first().map_or(request.player, |c| game.state.obj(*c).owner);
             PromptPayload::SearchLibraryPromptMessage(SearchLibraryPrompt {
                 player,
-                count: i32::from(*count),
+                count: wire(*count),
                 optional: *optional,
                 library: handles_of(handles, library),
                 eligible: handles_of(handles, eligible),
@@ -1305,7 +1306,7 @@ mod tests {
             let request = Request {
                 id: 1,
                 player: seat,
-                kind: RequestKind::ChooseCards {
+                kind: RequestKind::ChooseCards { any_number: false,
                     source: hand[0],
                     purpose: Purpose::Exile,
                     cards: hand.clone(),
@@ -1338,7 +1339,7 @@ mod tests {
             let request = Request {
                 id: 1,
                 player: seat,
-                kind: RequestKind::ChooseCards {
+                kind: RequestKind::ChooseCards { any_number: false,
                     source: hand[0],
                     purpose: Purpose::PutOntoBattlefield,
                     cards: hand.clone(),

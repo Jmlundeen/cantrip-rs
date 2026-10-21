@@ -16,7 +16,7 @@ pub fn cards_from(
     purpose: Purpose,
     shown: Vec<ObjectId>,
     eligible: Vec<ObjectId>,
-    count: u8,
+    count: u32,
     up_to: bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     cards_from_kind(g, player, source, purpose, "", shown, eligible, count, up_to)
@@ -32,13 +32,31 @@ pub fn cards_from_kind(
     kind: &'static str,
     shown: Vec<ObjectId>,
     eligible: Vec<ObjectId>,
-    count: u8,
+    count: u32,
     up_to: bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     if eligible.is_empty() || count == 0 {
         return Ok(Vec::new());
     }
-    ask_cards(g, player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to, kind, total: None })
+    ask_cards(g, player, RequestKind::ChooseCards { any_number: false, source, purpose, cards: shown, eligible, count, up_to, kind, total: None })
+}
+
+/// "Any number of" `eligible` (CR 608.2d: none, some or all), chosen from among `shown`, every one of which the player sees,
+/// the choice worded as the card words it (`kind`, empty for "card"). Nothing is asked when nothing is eligible.
+pub fn any_number_of(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Purpose,
+    kind: &'static str,
+    shown: Vec<ObjectId>,
+    eligible: Vec<ObjectId>,
+) -> Result<Vec<ObjectId>, Suspend> {
+    if eligible.is_empty() {
+        return Ok(Vec::new());
+    }
+    let count = u32::try_from(eligible.len()).unwrap_or(u32::MAX);
+    ask_cards(g, player, RequestKind::ChooseCards { any_number: true, source, purpose, cards: shown, eligible, count, up_to: true, kind, total: None })
 }
 
 /// Up to `count` of `eligible` "with total mana value `most` or less" (CR 202.3), chosen from among `shown`: the mana values
@@ -54,7 +72,7 @@ pub fn cards_within_total(
     kind: &'static str,
     shown: Vec<ObjectId>,
     eligible: Vec<ObjectId>,
-    count: u8,
+    count: u32,
     most: u32,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let (eligible, values): (Vec<ObjectId>, Vec<u32>) =
@@ -63,17 +81,13 @@ pub fn cards_within_total(
         return Ok(Vec::new());
     }
     let total = Some(TotalAtMost { values, most });
-    ask_cards(g, player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to: true, kind, total })
+    ask_cards(g, player, RequestKind::ChooseCards { any_number: false, source, purpose, cards: shown, eligible, count, up_to: true, kind, total })
 }
 
-/// Asks a `ChooseCards` question, its count no more than there are eligible cards (but "any number", `u8::MAX` up to, stays the
-/// number the question was asked with, so it can say "any number of": a client told "up to 2" of two cards could not tell it
-/// from "up to two").
+/// Asks a `ChooseCards` question, its count no more than there are eligible cards ("any number" says so apart, `any_number`).
 fn ask_cards(g: &mut dyn Game, player: PlayerId, mut ask: RequestKind) -> Result<Vec<ObjectId>, Suspend> {
-    if let RequestKind::ChooseCards { eligible, count, up_to, .. } = &mut ask {
-        if !(*up_to && *count == u8::MAX) {
-            *count = (*count).min(eligible.len().min(u8::MAX as usize) as u8);
-        }
+    if let RequestKind::ChooseCards { eligible, count, .. } = &mut ask {
+        *count = (*count).min(u32::try_from(eligible.len()).unwrap_or(u32::MAX));
     }
     match g.ask(player, ask)? {
         Answer::Cards(chosen) => Ok(chosen),
@@ -83,7 +97,7 @@ fn ask_cards(g: &mut dyn Game, player: PlayerId, mut ask: RequestKind) -> Result
 
 /// `count` of `among` (or up to `count` with `up_to`), all of them shown: `cards_from` with nothing shown but what may be
 /// chosen.
-pub fn cards(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, among: Vec<ObjectId>, count: u8, up_to: bool) -> Result<Vec<ObjectId>, Suspend> {
+pub fn cards(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, among: Vec<ObjectId>, count: u32, up_to: bool) -> Result<Vec<ObjectId>, Suspend> {
     cards_from(g, player, source, purpose, among.clone(), among, count, up_to)
 }
 

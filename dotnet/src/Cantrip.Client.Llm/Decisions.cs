@@ -1387,7 +1387,7 @@ public sealed class Decisions
         string source = GameText.Named(client, prompt.Source);
         string whose = GameText.Whose(client, prompt.Owner);
         string kind = prompt.Kind.Length > 0 ? $" {prompt.Kind}" : string.Empty;
-        string many = prompt.UpTo && prompt.Count >= 255 ? "any number of"
+        string many = prompt.AnyNumber ? "any number of"
             : prompt.UpTo ? $"up to {prompt.Count}" : prompt.Count.ToString(CultureInfo.InvariantCulture);
         string where = Where(client, prompt);
         string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFree

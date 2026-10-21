@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// the ability resolves, and connive 0 is no connive at all (CR 701.50e). A target that is no longer legal is not
 /// conniving.
 fn connive_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = history::creatures_died_this_turn(g, None).min(255) as u8;
+    let x = u32::try_from(history::creatures_died_this_turn(g, None)).unwrap_or(u32::MAX);
     if x == 0 {
         return Ok(());
     }

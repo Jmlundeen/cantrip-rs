@@ -27,7 +27,7 @@ fn equalize(g: &mut dyn Game, source: ObjectId, from_hand: bool, kind: Option<Ca
             continue;
         }
         let purpose = if from_hand { Purpose::Discard } else { Purpose::Sacrifice };
-        let cards = choose::cards(g, who, source, purpose, mine.clone(), count as u8, false)?;
+        let cards = choose::cards(g, who, source, purpose, mine.clone(), u32::try_from(count).unwrap_or(u32::MAX), false)?;
         going.extend(mine.iter().copied().filter(|c| cards.contains(c)));
     }
     if from_hand {

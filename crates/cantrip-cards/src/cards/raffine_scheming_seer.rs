@@ -11,7 +11,7 @@ fn connive_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if attacking < 1 {
         return Ok(());
     }
-    connive_n(g, creature, item.object, attacking.min(u8::MAX as usize) as u8)
+    connive_n(g, creature, item.object, u32::try_from(attacking).unwrap_or(u32::MAX))
 }
 
 pub static CARD: CardDef = CardDef {

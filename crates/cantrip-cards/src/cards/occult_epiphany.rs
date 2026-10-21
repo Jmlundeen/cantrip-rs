@@ -13,7 +13,7 @@ fn epiphany(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let you = item.controller;
     g.draw(you, x as u32);
-    let chosen = choose_from_hand(g, you, item.object, x.min(255) as u8)?;
+    let chosen = choose_from_hand(g, you, item.object, u32::from(x))?;
     let mut types = 0;
     for kind in CardType::ALL {
         if chosen.iter().any(|&c| g.chars(c).is(kind)) {

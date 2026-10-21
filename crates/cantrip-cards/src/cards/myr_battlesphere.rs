@@ -33,7 +33,7 @@ fn tap_myr(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .into_iter()
         .filter(|&id| !g.obj(id).tapped && g.chars(id).subtypes.has(myr))
         .collect();
-    let chosen = choose::cards(g, player, item.object, Purpose::TapToPay, untapped_myr, u8::MAX, true)?;
+    let chosen = choose::any_number_of(g, player, item.object, Purpose::TapToPay, "", untapped_myr.clone(), untapped_myr)?;
     if chosen.is_empty() {
         return Ok(());
     }

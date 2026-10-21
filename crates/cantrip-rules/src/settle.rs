@@ -346,7 +346,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                 if group.len() < 2 {
                     continue;
                 }
-                let ask = RequestKind::ChooseCards {
+                let ask = RequestKind::ChooseCards { any_number: false,
                     source: group[0],
                     purpose: Purpose::KeepLegend,
                     cards: group.clone(),
@@ -546,7 +546,7 @@ fn choose_trigger_targets(
                 purpose: Purpose::Targets,
                 candidates,
                 optional: least == 0,
-                least: least.min(count),
+                least: u32::from(least).min(count),
                 count,
                 // "Any number of targets" (CR 115.1d) is said so, not as "up to" the candidates there are.
                 any_number: spec.is_any_number(),

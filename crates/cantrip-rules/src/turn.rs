@@ -202,12 +202,12 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
                         let hand = cx.s().zone(Zone::hand(p)).to_vec();
                         let answer = cx.ask_core(
                             p,
-                            RequestKind::ChooseCards {
+                            RequestKind::ChooseCards { any_number: false,
                                 source: hand[0],
                                 purpose: Purpose::Discard,
                                 cards: hand.clone(),
                                 eligible: hand,
-                                count: mulligans,
+                                count: u32::from(mulligans),
                                 up_to: false, kind: "", total: None },
                             false,
                         )?;
@@ -251,8 +251,8 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
             ops::put_onto_battlefield_with(cx, &[(card, p, false)], ZoneReason::Other, &with)?;
             let hand = cx.s().zone(Zone::hand(p)).to_vec();
             if action.exile_from_hand > 0 && !hand.is_empty() {
-                let count = action.exile_from_hand.min(hand.len() as u8);
-                let ask = RequestKind::ChooseCards { source: card, purpose: Purpose::Exile, cards: hand.clone(), eligible: hand, count, up_to: false, kind: "", total: None };
+                let count = u32::from(action.exile_from_hand).min(u32::try_from(hand.len()).unwrap_or(u32::MAX));
+                let ask = RequestKind::ChooseCards { any_number: false, source: card, purpose: Purpose::Exile, cards: hand.clone(), eligible: hand, count, up_to: false, kind: "", total: None };
                 if let Answer::Cards(cards) = cx.ask_core(p, ask, false)? {
                     for c in cards {
                         ops::move_to_for(cx, c, Zone::exile(p), ZoneReason::Exile);
@@ -640,8 +640,8 @@ fn declare_bands(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) 
         if eligible.is_empty() {
             continue;
         }
-        let count = eligible.len() as u8;
-        let ask = RequestKind::ChooseCards {
+        let count = u32::try_from(eligible.len()).unwrap_or(u32::MAX);
+        let ask = RequestKind::ChooseCards { any_number: false,
             source,
             purpose: Purpose::Band,
             cards: eligible.clone(),

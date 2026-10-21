@@ -16,8 +16,8 @@ fn power_in_mana(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Resul
 fn put_permanents(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let eligible: Vec<ObjectId> =
         g.state().zone(Zone::hand(item.controller)).iter().copied().filter(|&c| targets::is_permanent_card(&g.chars(c))).collect();
-    // "Any number of" (`u8::MAX`, up to); nothing is asked with no permanent card in the hand.
-    let chosen = choose::cards(g, item.controller, item.object, Purpose::PutOntoBattlefield, eligible, u8::MAX, true)?;
+    // "Any number of"; nothing is asked with no permanent card in the hand.
+    let chosen = choose::any_number_of(g, item.controller, item.object, Purpose::PutOntoBattlefield, "", eligible.clone(), eligible)?;
     let moves: Vec<(ObjectId, PlayerId)> = chosen.into_iter().map(|c| (c, item.controller)).collect();
     g.put_all_onto_battlefield(&moves)?;
     Ok(())

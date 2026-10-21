@@ -61,12 +61,12 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         // that is not the battlefield; the quality a behold names and the creature a blight takes are said as they are.
         bool said = prompt.Purpose is CardChoicePurposeView.Behold or CardChoicePurposeView.Blight;
         string kind = prompt.Kind.Length > 0 ? (said || permanents || table == ZoneKindView.Battlefield ? prompt.Kind : prompt.Kind + " card") : one;
-        string many = prompt.Count == 1 ? kind : kind.EndsWith('y') ? kind[..^1] + "ies" : kind + "s";
+        string many = prompt.Count == 1 && !prompt.AnyNumber ? kind : kind.EndsWith('y') ? kind[..^1] + "ies" : kind + "s";
         // "Up to two creature cards with total mana value 6 or less" (CR 202.3): the cards chosen together, not each one.
         if (prompt.MaximumTotalManaValue is { } within) many += $" with total mana value {within} or less";
         string article = "aeiou".Contains(kind[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a";
         // "Any number of": every one of several that may be chosen, as the rules text says when it does not name a count.
-        bool anyNumber = prompt.UpTo && prompt.Count >= 255;
+        bool anyNumber = prompt.AnyNumber;
         string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFree ? $" (total mana value {prompt.MaximumManaValue} or less left to spend)" : string.Empty;
         // Cards brought into the game from outside it (CR 400.11b: North Wind Avatar) are the chooser's sideboard, which only they
         // may look at: the caption says where they come from, since nothing on the table shows it.

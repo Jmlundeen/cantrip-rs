@@ -2233,17 +2233,17 @@ public static class PromptFixtures
                 // Battlefield Improvisation's "you may attach any number of Equipment you control to it": choosing
                 // nothing attaches nothing.
                 Equipment(view);
-                return Choose(
+                return AnyNumber(Choose(
                     CardChoicePurposeView.Attach,
                     Viewer,
                     [new ViewHandle(MyKey), new ViewHandle(MyKeyTwo)],
-                    count: byte.MaxValue,
-                    upTo: true);
+                    count: 2,
+                    upTo: true));
 
             case "choose-attach-one":
                 // The same question with a single Equipment that could move: still "any number of", as the rules text says.
                 Equipment(view);
-                return Choose(CardChoicePurposeView.Attach, Viewer, [new ViewHandle(MyKey)], count: byte.MaxValue, upTo: true);
+                return AnyNumber(Choose(CardChoicePurposeView.Attach, Viewer, [new ViewHandle(MyKey)], count: 1, upTo: true));
 
             case "choose-tap-to-pay":
             {
@@ -3264,6 +3264,13 @@ public static class PromptFixtures
         }
 
         battlefield.Count = battlefield.Contents.Count;
+    }
+
+    /// <summary>"Any number of" (the host's <c>AnyNumber</c>): every eligible card may be chosen, and the question says so.</summary>
+    private static ChooseCardsPromptMessage AnyNumber(ChooseCardsPromptMessage choose)
+    {
+        choose.AnyNumber = true;
+        return choose;
     }
 
     private static ChooseCardsPromptMessage Choose(

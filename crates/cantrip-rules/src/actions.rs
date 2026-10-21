@@ -250,8 +250,8 @@ fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost
         }
         return Ok(chosen);
     }
-    let maximum = if m.or_more { cards.len().min(255) as u8 } else { m.count };
-    let ask = RequestKind::Craft { source, cards, minimum: m.count, maximum, quality: m.quality };
+    let maximum = if m.or_more { u32::try_from(cards.len()).unwrap_or(u32::MAX) } else { u32::from(m.count) };
+    let ask = RequestKind::Craft { source, cards, minimum: u32::from(m.count), maximum, quality: m.quality };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -286,7 +286,7 @@ fn behold_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
 fn choose_behold(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     let Some((n, _, _)) = cost.behold else { return Ok(Vec::new()) };
     let eligible = behold_candidates(cx, source, player, cost);
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Behold, cards: eligible.clone(), eligible, count: n, up_to: false, kind: "", total: None };
+    let ask = RequestKind::ChooseCards { any_number: false, source, purpose: Purpose::Behold, cards: eligible.clone(), eligible, count: u32::from(n), up_to: false, kind: "", total: None };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -318,7 +318,7 @@ fn choose_blight(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
         return Ok(None);
     }
     let eligible = blight_candidates(cx, player);
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Blight, cards: eligible.clone(), eligible, count: 1, up_to: false, kind: "", total: None };
+    let ask = RequestKind::ChooseCards { any_number: false, source, purpose: Purpose::Blight, cards: eligible.clone(), eligible, count: 1, up_to: false, kind: "", total: None };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => cards.first().copied().map(Some).ok_or(Stop::Cancel),
         _ => Err(Stop::Cancel),
@@ -497,7 +497,7 @@ fn choose_discards(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost)
     let asker = Asker { source, controller: player };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Discard, cards: hand, eligible, count: n, up_to: false, kind: "", total: None };
+    let ask = RequestKind::ChooseCards { any_number: false, source, purpose: Purpose::Discard, cards: hand, eligible, count: u32::from(n), up_to: false, kind: "", total: None };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -511,7 +511,7 @@ fn choose_hand_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Co
     let asker = Asker { source, controller: player };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::ExileToPay, cards: hand, eligible, count: n, up_to: false, kind: "", total: None };
+    let ask = RequestKind::ChooseCards { any_number: false, source, purpose: Purpose::ExileToPay, cards: hand, eligible, count: u32::from(n), up_to: false, kind: "", total: None };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -550,12 +550,12 @@ fn choose_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
         return choose_evidence(cx, player, source, cost);
     }
     let eligible = graveyard_exiles(cx, player, source, cost);
-    let ask = RequestKind::ChooseCards {
+    let ask = RequestKind::ChooseCards { any_number: false,
         source,
         purpose: Purpose::ExileToPay,
         cards: cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect(),
         eligible,
-        count: cost.exile_from_graveyard,
+        count: u32::from(cost.exile_from_graveyard),
         up_to: false, kind: "", total: None };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
@@ -634,7 +634,7 @@ fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cos
         (false, PermanentAction::Exile) => "permanent",
         (false, _) => "",
     };
-    let ask = RequestKind::ChooseCards { source, purpose, cards: eligible.clone(), eligible, count: p.count, up_to: false, kind, total: None };
+    let ask = RequestKind::ChooseCards { any_number: false, source, purpose, cards: eligible.clone(), eligible, count: u32::from(p.count), up_to: false, kind, total: None };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -736,7 +736,7 @@ fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: Varia
 }
 
 fn ask_cards(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, count: usize, up_to: bool) -> R<Vec<ObjectId>> {
-    let ask = RequestKind::ChooseCards { source, purpose, cards: cards.clone(), eligible: cards, count: count.min(255) as u8, up_to, kind: "", total: None };
+    let ask = RequestKind::ChooseCards { any_number: false, source, purpose, cards: cards.clone(), eligible: cards, count: u32::try_from(count).unwrap_or(u32::MAX), up_to, kind: "", total: None };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -745,7 +745,7 @@ fn ask_cards(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Purpose, 
 
 /// What a variable cost takes, chosen as the cost is chosen (CR 601.2h): the permanents to sacrifice, or the cards to
 /// exile. `x` is the X announced for `SacrificeX`.
-fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u16) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
+fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u32) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
     let Some(variable) = cost.variable else { return Ok((Vec::new(), Vec::new())) };
     let candidates = variable_candidates(cx, source, player, variable);
     match variable {
@@ -4252,20 +4252,25 @@ fn cast(
         Some(VariableCost::SacrificeAnyNumber { less_each, .. }) => less_each,
         _ => 0,
     };
+    // How many permanents "sacrifice any number of" announces (Rottenmouth Viper): no X (its mana cost has none, CR
+    // 107.3), up to every permanent that could be sacrificed (CR 601.2b), kept here for the reduction and the sacrifice.
+    let mut sacrificed_any_number: u32 = 0;
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
         let base = cost.mana;
         // X paid in life is announced up to the life there is (CR 119.4), and X creatures sacrificed up to the creatures
         // there are (CR 601.2b).
-        let cap = if extra.pay_x_life {
-            payable_life(cx, player).clamp(0, 1000) as u16
+        let cap: u32 = if extra.pay_x_life {
+            payable_life(cx, player).clamp(0, 1000) as u32
         } else if let Some(variable) = extra.variable.filter(|_| sacrifices_x) {
-            // How many Rottenmouth Viper sacrifices is kept as how many times its additional cost was paid, at most 255.
-            let most = if less_each > 0 { u8::MAX as usize } else { usize::MAX };
-            variable_candidates(cx, spell, player, variable).len().min(most).min(u16::MAX as usize) as u16
+            let there = u32::try_from(variable_candidates(cx, spell, player, variable).len()).unwrap_or(u32::MAX);
+            // An X ("sacrifice X creatures") is a u16 (`StackItem::x`); the number "any number" announces is not.
+            if less_each > 0 { there } else { there.min(u32::from(u16::MAX)) }
         } else {
             1000
         };
-        let n = announce_x(cx, player, spell, base, def.kicker, x_symbols, cap, false, less_each)?;
+        let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, cap, false, less_each)?;
+        // Every announcement but "any number"'s is within an X's u16 (`cap`).
+        let n = announced.min(u32::from(u16::MAX)) as u16;
         if let Some(k) = def.kicker {
             if k.cost.x > 0 {
                 // Kicker {X} (CR 702.33a, 107.3): X is the number announced, and kicked when it is not 0.
@@ -4283,11 +4288,8 @@ fn cast(
             }
         } else if less_each > 0 {
             // "Sacrifice any number of permanents" (Rottenmouth Viper) announces how many, which is no X: the spell's mana
-            // cost has no {X} and nothing reads it as the value of X (CR 107.3, 601.2b). The number is how many times the
-            // additional cost was paid.
-            let count = n.min(u8::MAX as u16) as u8;
-            item.paid = count;
-            cx.st().update_obj(spell, |o| o.paid = count);
+            // cost has no {X} and nothing reads it as the value of X (CR 107.3, 601.2b).
+            sacrificed_any_number = announced;
         } else {
             // What a cost paid instead was reduced by that its own generic mana could not take, off X's (CR 118.7a).
             let xs = (n as u32 * x_symbols as u32).min(255);
@@ -4314,8 +4316,8 @@ fn cast(
             .filter(|&c| cx.card(cx.s().obj(c).card).splice.is_some())
             .collect();
         if !eligible.is_empty() {
-            let count = eligible.len().min(2) as u8;
-            let ask = RequestKind::ChooseCards {
+            let count = eligible.len().min(2) as u32;
+            let ask = RequestKind::ChooseCards { any_number: false,
                 source: spell,
                 purpose: Purpose::Splice,
                 cards: hand,
@@ -4458,13 +4460,13 @@ fn cast(
     // "This spell costs {1} less to cast for each permanent sacrificed this way" (CR 601.2f, 118.7a): a reduction by the
     // number announced, after what raises the cost.
     if less_each > 0 {
-        cost.mana.generic = cost.mana.generic.saturating_sub((item.paid as u32 * less_each as u32).min(255) as u8);
+        cost.mana.generic = cost.mana.generic.saturating_sub(sacrificed_any_number.saturating_mul(u32::from(less_each)).min(255) as u8);
     }
     // How many a variable sacrifice takes: X announced for "sacrifice X" (Immoral Bargain), or the number announced for
     // "sacrifice any number" (Rottenmouth Viper), kept apart from X.
     let variable_n = |c: &Cost, item: &StackItem| match c.variable {
-        Some(VariableCost::SacrificeAnyNumber { .. }) => item.paid as u16,
-        _ => item.x,
+        Some(VariableCost::SacrificeAnyNumber { .. }) => sacrificed_any_number,
+        _ => u32::from(item.x),
     };
 
     // CR 601.2f-h: permanents the cost names are chosen, the mana paid, then the rest of the cost; an additional
@@ -4989,7 +4991,7 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
                 purpose: Purpose::Targets,
                 candidates,
                 optional: least == 0,
-                least: least.min(count),
+                least: u32::from(least).min(count),
                 count,
                 // "Any number of targets" (CR 115.1d) is said so, not as "up to" the candidates there are.
                 any_number: spec.is_any_number(),
@@ -5369,24 +5371,26 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 /// Announcing X or the number of times a spell is kicked (CR 601.2b), as the C# engine asks it: a pay-costs
 /// question that raises and lowers the value until confirmed.
 fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16) -> R<u16> {
-    announce_x(cx, player, spell, base, kicker, x_symbols, cap, false, 0)
+    // X itself is a u16 (`StackItem::x`), and `cap` keeps the number within it.
+    announce_x(cx, player, spell, base, kicker, x_symbols, u32::from(cap), false, 0).map(|n| n as u16)
 }
 
 /// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`), and how much generic mana
 /// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`).
 #[allow(clippy::too_many_arguments)]
-fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16, loyalty: bool, less_each: u8) -> R<u16> {
-    let most: u16 = match kicker {
+fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u32, loyalty: bool, less_each: u8) -> R<u32> {
+    let most: u32 = match kicker {
         Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
         _ => cap,
     };
-    let mut n: u16 = 0;
+    let mut n: u32 = 0;
     loop {
         let mut total = base;
         match kicker {
-            Some(k) => total = kicker_total(total, k, n),
-            None if x_symbols > 0 => total.generic = total.generic.saturating_add((n as u32 * x_symbols as u32).min(255) as u8),
-            None => total.generic = total.generic.saturating_sub((n as u32 * less_each as u32).min(255) as u8),
+            Some(k) => total = kicker_total(total, k, n as u16),
+            None if x_symbols > 0 => total.generic = total.generic.saturating_add((n.saturating_mul(u32::from(x_symbols))).min(255) as u8),
+            // A reduction past the generic mana there is takes it all, so the most it is matters, never the rest (CR 118.7a).
+            None => total.generic = total.generic.saturating_sub(n.saturating_mul(u32::from(less_each)).min(255) as u8),
         }
         let mut options = Vec::new();
         if n < most {
@@ -5469,7 +5473,7 @@ fn activate(
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
     if def.cost.loyalty == Some(LOYALTY_MINUS_X) {
         let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
-        item.x = announce_x(cx, player, source, mana, None, 0, cap, true, 0)?;
+        item.x = announce_x(cx, player, source, mana, None, 0, u32::from(cap), true, 0)? as u16;
     }
     announce_twobrids(cx, player, source, &mut mana, false)?;
     let life = announce_life(cx, player, source, &mut mana, false)?;

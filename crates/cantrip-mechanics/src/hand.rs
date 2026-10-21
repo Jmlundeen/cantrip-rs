@@ -88,7 +88,7 @@ pub fn look_and_may_choose(
         return Ok(None);
     }
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(&*g, c)).collect();
-    let ask = RequestKind::ChooseCards { source: item.object, purpose, cards: hand, count: eligible.len().min(1) as u8, eligible, up_to: true, kind, total: None };
+    let ask = RequestKind::ChooseCards { any_number: false, source: item.object, purpose, cards: hand, count: u32::from(!eligible.is_empty()), eligible, up_to: true, kind, total: None };
     Ok(match g.ask(item.controller, ask)? {
         Answer::Cards(chosen) => chosen.first().copied(),
         _ => None,

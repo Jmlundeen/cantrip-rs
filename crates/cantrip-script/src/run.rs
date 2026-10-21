@@ -553,7 +553,7 @@ impl<'s> Run<'s> {
                 && request.player == player_of(action.bot)
                 && let RequestKind::PayCosts { announcing: true, source, x, options, .. } = &request.kind
             {
-                let Ok(wanted) = wanted.trim().parse::<u16>() else { return fail(format!("line {line}: {wanted} is not a number")) };
+                let Ok(wanted) = wanted.trim().parse::<u32>() else { return fail(format!("line {line}: {wanted} is not a number")) };
                 if !action.card.as_deref().is_some_and(|card| self.game.known_name(*source).eq_ignore_ascii_case(card)) {
                     return fail(format!("line {line}: {text} proves nothing: {} is the one announcing X", self.game.known_name(*source)));
                 }
@@ -922,7 +922,7 @@ impl<'s> Run<'s> {
         let offers = |kind: ActionKind| options.iter().find(|o| o.kind == kind);
         if *announcing {
             // X, or how many times it is kicked, raised or lowered to what the line said, then confirmed.
-            let want = self.casting.as_ref().and_then(|c| c.x).unwrap_or(0);
+            let want = u32::from(self.casting.as_ref().and_then(|c| c.x).unwrap_or(0));
             if *x < want && let Some(o) = offers(ActionKind::IncreaseX) {
                 return Ok(Some(Answer::Act(Action::of(o))));
             }
@@ -1153,12 +1153,12 @@ impl<'s> Run<'s> {
                 options.iter().find(|o| o.kind == ActionKind::CancelCasting).map(|o| Answer::Act(Action::of(o)))
             }
             (V::Cancel, _) if request.may_cancel => Some(Answer::Cancel),
-            (V::Choose, RequestKind::ChooseCards { eligible, count, up_to, .. }) => Some(self.pick(step, eligible, *count, !up_to)?),
+            (V::Choose, RequestKind::ChooseCards { eligible, count, up_to, .. }) => Some(self.pick(step, eligible, *count as usize, !up_to)?),
             // Harmonize's creature is up to one (CR 702.180a): unless the script taps one, none is.
             (V::Choose, RequestKind::TapForPower { purpose: Purpose::TapToReduce, cards, .. }) => Some(self.pick(step, cards, 1, false)?),
-            (V::Choose, RequestKind::TapForPower { cards, .. }) => Some(self.pick(step, cards, cards.len() as u8, false)?),
-            (V::Choose, RequestKind::CollectEvidence { cards, .. }) => Some(self.pick(step, cards, cards.len() as u8, false)?),
-            (V::Choose, RequestKind::Craft { cards, maximum, .. }) => Some(self.pick(step, cards, *maximum, false)?),
+            (V::Choose, RequestKind::TapForPower { cards, .. }) => Some(self.pick(step, cards, cards.len(), false)?),
+            (V::Choose, RequestKind::CollectEvidence { cards, .. }) => Some(self.pick(step, cards, cards.len(), false)?),
+            (V::Choose, RequestKind::Craft { cards, maximum, .. }) => Some(self.pick(step, cards, *maximum as usize, false)?),
             (V::ChoosePlayer, RequestKind::ChoosePlayer { candidates, .. }) => {
                 let Some(spec) = step.positional().next() else {
                     return fail(format!("line {}: ChoosePlayer needs a player", step.line));
@@ -1168,7 +1168,7 @@ impl<'s> Run<'s> {
                     _ => return fail(format!("line {}: {spec} is not a player who may be chosen", step.line)),
                 }
             }
-            (V::Discard, RequestKind::DiscardToHandSize { hand, count }) => Some(self.pick(step, hand, *count, true)?),
+            (V::Discard, RequestKind::DiscardToHandSize { hand, count }) => Some(self.pick(step, hand, usize::from(*count), true)?),
             (V::Attack, RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, .. }) => {
                 let both: Vec<ObjectId> = planeswalkers.iter().chain(battles.iter()).copied().collect();
                 self.attack(step, eligible, players, &both)?
@@ -1208,7 +1208,7 @@ impl<'s> Run<'s> {
                 Some(self.arrange(step, cards, destinations, *may_shuffle)?)
             }
             (V::Search, RequestKind::SearchLibrary { eligible, count, optional, .. }) => {
-                Some(self.pick(step, eligible, *count, !*optional)?)
+                Some(self.pick(step, eligible, *count as usize, !*optional)?)
             }
             // "Choose a creature type" is a modes question in the C# engine: `Modes(Elf)`.
             (V::Modes, RequestKind::ChooseSubtype { choices, .. }) => {
@@ -1379,7 +1379,7 @@ impl<'s> Run<'s> {
         Ok(Some(Target::Object(first)))
     }
 
-    fn pick(&self, step: &ActionStep, pool: &[ObjectId], count: u8, exactly: bool) -> R<Answer> {
+    fn pick(&self, step: &ActionStep, pool: &[ObjectId], count: usize, exactly: bool) -> R<Answer> {
         let mut chosen: Vec<ObjectId> = Vec::new();
         for spec in step.positional() {
             let found = self.objects(step, spec, pool)?;

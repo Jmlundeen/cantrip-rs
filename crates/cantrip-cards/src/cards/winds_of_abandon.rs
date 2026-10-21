@@ -15,7 +15,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let order: Vec<PlayerId> = g.state().apnap().filter(|p| controllers.contains(p)).collect();
     let mut lands: Vec<(ObjectId, PlayerId, bool)> = Vec::new();
     for &player in &order {
-        let count = controllers.iter().filter(|&&p| p == player).count() as u8;
+        let count = u32::try_from(controllers.iter().filter(|&&p| p == player).count()).unwrap_or(u32::MAX);
         let found = search_library(g, player, player, item.object, SearchDestination::BattlefieldTapped, count, true, |q, c| {
             let chars = q.chars(c);
             chars.is(CardType::Land) && chars.supertypes.basic

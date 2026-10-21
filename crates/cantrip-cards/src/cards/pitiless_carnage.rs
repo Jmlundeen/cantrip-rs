@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn sacrifice_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let yours = g.permanents_of(you);
-    let chosen = choose::cards(g, you, item.object, Purpose::Sacrifice, yours.clone(), u8::MAX, true)?;
+    let chosen = choose::any_number_of(g, you, item.object, Purpose::Sacrifice, "", yours.clone(), yours.clone())?;
     let chosen: Vec<ObjectId> = yours.into_iter().filter(|c| chosen.contains(c)).collect();
     if chosen.is_empty() {
         return Ok(());

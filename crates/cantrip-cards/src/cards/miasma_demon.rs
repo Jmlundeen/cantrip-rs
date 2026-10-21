@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 fn discard_any(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let hand = g.state().zone(Zone::hand(you)).to_vec();
-    let chosen = choose::cards(g, you, item.object, Purpose::Discard, hand, u8::MAX, true)?;
+    let chosen = choose::any_number_of(g, you, item.object, Purpose::Discard, "", hand.clone(), hand)?;
     let discarded = g.discard_together(&chosen);
     if !discarded.is_empty() {
         let this = g.card_id(&CARD);

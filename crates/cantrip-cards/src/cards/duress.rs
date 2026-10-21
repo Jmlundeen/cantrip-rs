@@ -14,8 +14,8 @@ fn eligible(g: &dyn Query, hand: &[ObjectId]) -> Vec<ObjectId> {
 
 fn question(g: &dyn Query, item: &StackItem, hand: Vec<ObjectId>) -> RequestKind {
     let eligible = eligible(g, &hand);
-    let count = eligible.len().min(1) as u8;
-    RequestKind::ChooseCards { source: item.object, purpose: Purpose::Discard, cards: hand, eligible, count, up_to: false, kind: "", total: None }
+    let count = u32::from(!eligible.is_empty());
+    RequestKind::ChooseCards { any_number: false, source: item.object, purpose: Purpose::Discard, cards: hand, eligible, count, up_to: false, kind: "", total: None }
 }
 
 /// Target opponent reveals their hand; you choose a noncreature, nonland card from it; they discard it. Asked even

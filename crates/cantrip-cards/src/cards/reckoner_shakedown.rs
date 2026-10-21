@@ -12,8 +12,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !hand.is_empty() {
         g.reveal(opponent, &hand);
         let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !g.chars(c).is(CardType::Land)).collect();
-        let count = eligible.len().min(1) as u8;
-        let ask = RequestKind::ChooseCards {
+        let count = u32::from(!eligible.is_empty());
+        let ask = RequestKind::ChooseCards { any_number: false,
             source: item.object,
             purpose: Purpose::Discard,
             cards: hand,

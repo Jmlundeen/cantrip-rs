@@ -1021,6 +1021,8 @@ pub struct PayCostsPrompt {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ChooseCardsPrompt {
+    /// "Any number of" (CR 608.2d): `count` is then every eligible card, and the choice may be none, some or all.
+    pub any_number: bool,
     pub player: i32,
     pub owner: i32,
     pub source: ViewHandle,

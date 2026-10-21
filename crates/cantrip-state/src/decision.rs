@@ -275,7 +275,7 @@ pub enum RequestKind {
         options: Vec<ActionOption>,
         /// Announcing X or how many times it is kicked (CR 601.2b), with the value so far, rather than paying.
         announcing: bool,
-        x: u16,
+        x: u32,
         /// The X being announced is a "−X" loyalty cost's (CR 606.4, 107.3): it removes that many loyalty counters from
         /// `source`, up to the loyalty it has, and costs no mana.
         loyalty: bool,
@@ -311,8 +311,19 @@ pub enum RequestKind {
     /// `kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or creature",
     /// "nonland"), empty otherwise: the dock words the choice as the card does. `total`, when the cards chosen together are
     /// limited to a total mana value ("up to two creature cards with total mana value 6 or less"), is that limit: the core
-    /// refuses a choice whose mana values add up to more.
-    ChooseCards { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, up_to: bool, kind: &'static str, total: Option<TotalAtMost> },
+    /// refuses a choice whose mana values add up to more. `any_number` says the choice is of "any number" (up to all of
+    /// `eligible`, which `count` then is): the dock words it so, where "up to two" of two cards would read otherwise.
+    ChooseCards {
+        source: ObjectId,
+        purpose: Purpose,
+        cards: Vec<ObjectId>,
+        eligible: Vec<ObjectId>,
+        count: u32,
+        up_to: bool,
+        any_number: bool,
+        kind: &'static str,
+        total: Option<TotalAtMost>,
+    },
     /// `least` to `count` targets are chosen (a range, "one or two target creatures", CR 601.2c); `optional` is `least == 0`.
     /// Targets for an ability as it goes on the stack, or any other "choose a [thing]" the C# engine asks as targets.
     /// `label` is what the slot is for as its card words it (`TargetSpec::label`, empty when it has nothing to add), and
@@ -352,7 +363,7 @@ pub enum RequestKind {
     /// Craft's materials (CR 702.167a): exile `minimum` to `maximum` of `cards`, which are permanents the player controls
     /// and cards in their graveyard, each one of what `quality` names ("artifact", "creature"). An exact number of
     /// materials has `minimum == maximum`; "one or more" has `maximum` of every card offered.
-    Craft { source: ObjectId, cards: Vec<ObjectId>, minimum: u8, maximum: u8, quality: &'static str },
+    Craft { source: ObjectId, cards: Vec<ObjectId>, minimum: u32, maximum: u32, quality: &'static str },
     /// Remove `total` counters from among permanents (CR 118.3, 122.1): "remove three counters from among creatures you
     /// control" (Dawnhand Dissident; Tayam, Luminous Enigma). Each of `pools` is the counters of one kind on one permanent,
     /// with how many there are; any of them may be taken, of any kind and from any of the permanents, adding up to `total`.
@@ -404,7 +415,7 @@ pub enum RequestKind {
     /// `optional`, finding nothing is allowed (CR 701.23b).
     /// `destination` is where the searcher is told the cards found are going; whose library it is, is the owner of the
     /// cards in `library`.
-    SearchLibrary { source: ObjectId, library: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, optional: bool, destination: SearchDestination },
+    SearchLibrary { source: ObjectId, library: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u32, optional: bool, destination: SearchDestination },
     /// Which of several replacement effects applies to an event first (CR 616.1), asked of the affected player:
     /// `sources` are the objects whose effects apply and `hints` say what each does, in the order they are offered.
     /// `subject` is the object the event is about, if it is about one; `life`, for an event that changes the affected

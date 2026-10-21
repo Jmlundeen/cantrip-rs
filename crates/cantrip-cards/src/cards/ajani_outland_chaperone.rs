@@ -41,7 +41,7 @@ fn minus_eight(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.look_at(you, &looked);
     let eligible: Vec<ObjectId> =
         looked.iter().copied().filter(|&c| is_nonland_permanent_card(&g.chars(c)) && g.mana_value(c) <= 3).collect();
-    let chosen = choose::cards_from_kind(
+    let chosen = choose::any_number_of(
         g,
         you,
         item.object,
@@ -49,8 +49,6 @@ fn minus_eight(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         "nonland mana-value-3-or-less permanent",
         looked,
         eligible,
-        u8::MAX,
-        true,
     )?;
     if !chosen.is_empty() {
         let entering: Vec<(ObjectId, PlayerId)> = chosen.into_iter().map(|c| (c, you)).collect();

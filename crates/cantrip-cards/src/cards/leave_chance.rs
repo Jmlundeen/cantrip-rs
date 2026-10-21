@@ -17,7 +17,7 @@ fn leave(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn chance(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let hand: Vec<ObjectId> = g.state().zone(Zone::hand(you)).to_vec();
-    let cards = choose::cards(g, you, item.object, Purpose::Discard, hand, u8::MAX, true)?;
+    let cards = choose::any_number_of(g, you, item.object, Purpose::Discard, "", hand.clone(), hand)?;
     if cards.is_empty() {
         return Ok(());
     }

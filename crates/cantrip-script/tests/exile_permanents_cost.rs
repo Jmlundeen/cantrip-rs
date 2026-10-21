@@ -59,7 +59,7 @@ fn table() -> &'static CardTable {
 struct Asked {
     purpose: Purpose,
     kind: &'static str,
-    count: u8,
+    count: u32,
     among: Vec<String>,
 }
 

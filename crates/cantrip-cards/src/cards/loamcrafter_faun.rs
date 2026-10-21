@@ -9,7 +9,7 @@ fn discard_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let hand = g.state().zone(Zone::hand(you)).to_vec();
     let lands: Vec<ObjectId> = hand.iter().copied().filter(|&card| g.chars(card).is(CardType::Land)).collect();
-    let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Discard, "land", hand, lands, u8::MAX, true)?;
+    let chosen = choose::any_number_of(g, you, item.object, Purpose::Discard, "land", hand, lands)?;
     let discarded = g.discard_together(&chosen);
     if !discarded.is_empty() {
         let this = g.card_id(&CARD);

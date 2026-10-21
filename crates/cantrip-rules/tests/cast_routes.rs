@@ -343,6 +343,32 @@ static SACRIFICING_GIVER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn your_artifact(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).is(CardType::Artifact) && q.controller(id) == asker.controller
+}
+
+/// "As an additional cost to cast this spell, you may sacrifice any number of artifacts. This spell costs {1} less to cast
+/// for each permanent sacrificed this way" (Rottenmouth Viper's kind, CR 601.2b, 601.2f), {5}.
+static SACRIFICE_ANY_NUMBER: CardDef = CardDef {
+    name: "Route Sacrifice Any Number",
+    cost: ManaCost { generic: 5, ..ManaCost::ZERO },
+    additional_cost: Some(Cost { variable: Some(VariableCost::SacrificeAnyNumber { filter: your_artifact, less_each: 1 }), ..Cost::NONE }),
+    spell: Some(SpellDef { targets: &[], effect: nothing_happens }),
+    ..PROBE_SPELL
+};
+
+static ROUTE_ARTIFACT: CardDef = CardDef { name: "Route Artifact", types: TypeSet::of(&[CardType::Artifact]), ..CardDef::BLANK };
+
+fn choose_one_card_of_hand(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
+    let ask = RequestKind::ChooseCards { any_number: false, source: item.object, purpose: Purpose::Discard, cards: hand.clone(), eligible: hand, count: 1, up_to: false, kind: "", total: None };
+    let _ = g.ask(item.controller, ask)?;
+    Ok(())
+}
+
+/// "Choose a card in your hand", for nothing: a question of one card among many.
+static CHOOSE_ONE: CardDef = CardDef { name: "Route Choose One", cost: ManaCost::ZERO, spell: Some(SpellDef { targets: &[], effect: choose_one_card_of_hand }), ..PROBE_SPELL };
+
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
 static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
@@ -383,6 +409,9 @@ fn table() -> &'static CardTable {
             &ABILITY_PROBE,
             &ABILITY_FREE,
             &GIVER,
+            &SACRIFICE_ANY_NUMBER,
+            &ROUTE_ARTIFACT,
+            &CHOOSE_ONE,
             &SACRIFICING_GIVER,
             &ENERGY_SOURCE,
             &ENERGY_SPELL,
@@ -932,6 +961,77 @@ fn an_ability_that_sacrifices_what_gave_it_sacrifices_its_own_giver() {
         })
         .collect();
     assert_eq!(recorded, [Some(second)]);
+}
+
+/// CR 601.2b, 601.2f: "sacrifice any number of" is any number, past 255: 300 artifacts announced and sacrificed take {300}
+/// off a {5} spell, and every one is sacrificed.
+#[test]
+fn any_number_sacrificed_is_any_number_past_255() {
+    let (mut game, spell) = game_with("Route Sacrifice Any Number", Zone::hand, 0);
+    let artifacts: Vec<ObjectId> = (0..300).map(|_| put(&mut game, "Route Artifact", ME)).collect();
+    game.run();
+    let cast = casts_of(&game, spell).into_iter().next().expect("offered: 300 artifacts take all of {5} off");
+    take(&mut game, &cast);
+    let mut chose = 0;
+    for _ in 0..2000 {
+        game.run();
+        let Some(request) = game.pending().cloned() else { break };
+        let answer = match &request.kind {
+            RequestKind::PayCosts { announcing: true, options, x, .. } => {
+                let kind = if *x < 300 { ActionKind::IncreaseX } else { ActionKind::ConfirmCasting };
+                Answer::Act(Action::of(options.iter().find(|o| o.kind == kind).unwrap_or_else(|| panic!("{kind:?} at {x}"))))
+            }
+            RequestKind::ChooseCards { eligible, count, .. } => {
+                chose = *count;
+                Answer::Cards(eligible.clone())
+            }
+            RequestKind::PayCosts { options, .. } => Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).expect("nothing left to pay"))),
+            RequestKind::Priority { .. } => break,
+            other => panic!("unexpected request: {other:?}"),
+        };
+        game.answer(request.id, request.player, answer).unwrap();
+    }
+    assert_eq!(chose, 300);
+    assert!(artifacts.iter().all(|&a| !game.state.battlefield().contains(&a)), "every one sacrificed");
+    assert!(game.state.stack.iter().any(|i| i.object != spell), "cast, for nothing");
+}
+
+/// The core refuses an answer of the wrong number of cards however many it is: 257 cards answering "choose one" is 257,
+/// never 1 (as a count narrowed to a byte would read it).
+#[test]
+fn an_answer_of_257_cards_to_choose_one_is_refused() {
+    let cards = table();
+    let (choose, filler) = (cards.find("Route Choose One").unwrap(), cards.find("Route Filler").unwrap());
+    let mut deck = vec![choose];
+    deck.extend(std::iter::repeat_n(filler, 299));
+    let mut game = RulesGame::new(cards, &Setup { decks: vec![deck, vec![filler; 7]], seed: 1, ..Setup::default() });
+    let spell = game.state.zone(Zone::hand(ME))[0];
+    for id in game.state.zone(Zone::library(ME)).to_vec() {
+        move_to(&mut game, id, Zone::hand(ME));
+    }
+    begin(&mut game, 0);
+    game.run();
+    let cast = casts_of(&game, spell).into_iter().next().expect("castable");
+    take(&mut game, &cast);
+    for _ in 0..8 {
+        game.run();
+        let request = game.pending().cloned().expect("asked");
+        match &request.kind {
+            RequestKind::ChooseCards { eligible, count: 1, .. } => {
+                assert!(eligible.len() >= 257);
+                let rejected = game.answer(request.id, request.player, Answer::Cards(eligible[..257].to_vec()));
+                assert!(rejected.is_err(), "257 cards are not one");
+                game.answer(request.id, request.player, Answer::Cards(vec![eligible[0]])).unwrap();
+                return;
+            }
+            RequestKind::PayCosts { options, .. } => {
+                let confirm = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap();
+                game.answer(request.id, request.player, Answer::Act(Action::of(confirm))).unwrap();
+            }
+            _ => game.answer(request.id, request.player, Answer::Pass).unwrap(),
+        }
+    }
+    panic!("never asked to choose");
 }
 
 fn describe(game: &RulesGame, option: &ActionOption) -> String {

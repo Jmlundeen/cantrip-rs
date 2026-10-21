@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn harvest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let eligible: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    let chosen = choose::cards(g, you, item.object, Purpose::Sacrifice, eligible, u8::MAX, true)?;
+    let chosen = choose::any_number_of(g, you, item.object, Purpose::Sacrifice, "", eligible.clone(), eligible)?;
     if chosen.is_empty() {
         return Ok(());
     }

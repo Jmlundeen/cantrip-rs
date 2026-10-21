@@ -1258,6 +1258,13 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     public List<ViewHandle> WithoutBanding { get; set; } = [];
 
     /// <summary>
+    /// "Any number of" (CR 608.2d): none, some or all of <see cref="Eligible"/>, which <see cref="Count"/> then is, worded so
+    /// rather than as "up to" that many.
+    /// </summary>
+    [Key(21)]
+    public bool AnyNumber { get; set; }
+
+    /// <summary>
     /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
     /// offered "up to" every candidate, so taking every one with positive power meets it whenever anything can (a negative
     /// power takes from the total, CR 107.1b); one with a <see cref="Minimum"/> takes that many; one limited to a total mana

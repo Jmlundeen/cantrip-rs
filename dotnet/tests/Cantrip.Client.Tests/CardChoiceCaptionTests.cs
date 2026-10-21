@@ -77,9 +77,12 @@ public sealed class CardChoiceCaptionTests
         ObjectView two = Card(4, "Ornithopter", ZoneKindView.Graveyard, Them, CardTypeView.Artifact);
         GameClient client = Seated([Spell(), one, two]);
 
+        // "Any number of" is said so by the host (`AnyNumber`), its count every eligible card.
+        ChooseCardsPromptMessage anyNumber = Choice(CardChoicePurposeView.Exile, 2, true, one, two);
+        anyNumber.AnyNumber = true;
         Assert.Equal(
             "Strategic Betrayal: choose any number of cards to exile",
-            CardChoicePresentation.Describe(client, Choice(CardChoicePurposeView.Exile, byte.MaxValue, true, one, two), []).Title);
+            CardChoicePresentation.Describe(client, anyNumber, []).Title);
 
         // A count the rules text gave is "up to" that many, even when every card shown could be chosen.
         Assert.Equal(

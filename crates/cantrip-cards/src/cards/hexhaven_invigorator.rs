@@ -14,7 +14,7 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !ask_may_search(g, item.controller, item.object, &ASK)? {
         return Ok(());
     }
-    let count = item.data[0].min(u8::MAX as u32) as u8;
+    let count = item.data[0];
     search_to_battlefield(g, item.controller, item.object, Find::ONE.up_to(count), true, |q, c| q.chars(c).is(CardType::Land))?;
     Ok(())
 }

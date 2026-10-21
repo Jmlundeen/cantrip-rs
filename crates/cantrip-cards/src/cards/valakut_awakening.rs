@@ -12,8 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let hand = g.state().zone(Zone::hand(who)).to_vec();
     let mut bottomed = 0;
     if !hand.is_empty() {
-        let count = hand.len().min(u8::MAX as usize) as u8;
-        let cards = choose::cards(g, who, item.object, Purpose::PutOnBottom, hand, count, true)?;
+        let cards = choose::any_number_of(g, who, item.object, Purpose::PutOnBottom, "", hand.clone(), hand)?;
         let order = ask_library_order(g, who, item.object, &cards, DestinationKind::LibraryBottom)?;
         bottomed = g.put_into_library(&order, LibraryPlace::Bottom).len() as u32;
     }

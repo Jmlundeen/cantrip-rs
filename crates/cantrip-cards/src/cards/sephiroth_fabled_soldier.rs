@@ -70,8 +70,7 @@ fn super_nova(g: &mut dyn Game, asker: &Asker) -> Result<(), Suspend> {
 fn sacrifice_any_number_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let eligible = other_creatures(g, you, item.object);
-    let count = eligible.len() as u8;
-    let chosen = choose::cards(g, you, item.object, Purpose::Sacrifice, eligible, count, true)?;
+    let chosen = choose::any_number_of(g, you, item.object, Purpose::Sacrifice, "", eligible.clone(), eligible)?;
     let sacrificed = g.sacrifice(&chosen).len() as u32;
     if sacrificed > 0 {
         g.draw(you, sacrificed);

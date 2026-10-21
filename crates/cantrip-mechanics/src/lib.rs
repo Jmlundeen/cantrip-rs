@@ -125,14 +125,14 @@ pub fn your_turn(q: &dyn Query, asker: &Asker) -> bool {
 
 /// A player chooses `count` cards of their hand (all of it if they have fewer) and discards them together
 /// (CR 701.9). Asked even when the choice is forced, except of an empty hand.
-pub fn discard_chosen(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8) -> Result<Vec<ObjectId>, Suspend> {
+pub fn discard_chosen(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u32) -> Result<Vec<ObjectId>, Suspend> {
     let chosen = choose_from_hand(g, player, source, count)?;
     g.discard_together(&chosen);
     Ok(chosen)
 }
 
 /// The cards a player chooses from their own hand for a discard, without discarding them yet.
-pub fn choose_from_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8) -> Result<Vec<ObjectId>, Suspend> {
+pub fn choose_from_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u32) -> Result<Vec<ObjectId>, Suspend> {
     let hand = g.state().zone(Zone::hand(player)).to_vec();
     choose::cards(g, player, source, Purpose::Discard, hand, count, false)
 }
@@ -307,7 +307,7 @@ fn chosen_to_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, cou
     if eligible.len() <= count as usize {
         return Ok(eligible);
     }
-    choose::cards(g, player, source, Purpose::Sacrifice, eligible, count, false)
+    choose::cards(g, player, source, Purpose::Sacrifice, eligible, u32::from(count), false)
 }
 
 fn untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
@@ -378,9 +378,9 @@ pub fn connive(g: &mut dyn Game, creature: ObjectId, source: ObjectId) -> Result
 
 /// Connive N (CR 701.50): draw N cards, then discard N (as many as the hand holds), together, and a +1/+1 counter
 /// goes on the creature for each nonland card discarded. Raffine, Scheming Seer connives X; Ledger Shredder, 1.
-pub fn connive_n(g: &mut dyn Game, creature: ObjectId, source: ObjectId, count: u8) -> Result<(), Suspend> {
+pub fn connive_n(g: &mut dyn Game, creature: ObjectId, source: ObjectId, count: u32) -> Result<(), Suspend> {
     let player = g.obj(creature).controller;
-    g.draw(player, count as u32);
+    g.draw(player, count);
     let chosen = choose_from_hand(g, player, source, count)?;
     let nonland = chosen.iter().filter(|&&c| !g.chars(c).is(CardType::Land)).count() as i16;
     g.discard_together(&chosen);
@@ -631,7 +631,7 @@ pub fn search_library(
     owner: PlayerId,
     source: ObjectId,
     destination: SearchDestination,
-    count: u8,
+    count: u32,
     optional: bool,
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
@@ -644,7 +644,7 @@ pub fn search_library(
         Vec::new()
     } else {
         let can: Vec<ObjectId> = library.iter().copied().filter(|&c| eligible(g, c)).collect();
-        let count = if optional { count.max(1) } else { count.max(1).min(can.len() as u8) };
+        let count = if optional { count.max(1) } else { count.max(1).min(u32::try_from(can.len()).unwrap_or(u32::MAX)) };
         match g.ask(searcher, RequestKind::SearchLibrary { source, library, eligible: can, count, optional, destination })? {
             Answer::Cards(cards) => cards,
             _ => Vec::new(),

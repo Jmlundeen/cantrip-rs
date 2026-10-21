@@ -8,7 +8,7 @@ use cantrip_api::*;
 /// "a card" with nothing to fail at, so the searcher must take one.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Find {
-    pub count: u8,
+    pub count: u32,
     pub optional: bool,
     pub reveal: bool,
 }
@@ -23,7 +23,7 @@ impl Find {
         Find { reveal: true, ..self }
     }
     /// Up to `count` cards instead of one.
-    pub const fn up_to(self, count: u8) -> Find {
+    pub const fn up_to(self, count: u32) -> Find {
         Find { count, ..self }
     }
 }
@@ -88,13 +88,13 @@ pub fn search_to_exile(
 pub fn exile_same_name_from_graveyard_hand_and_library(g: &mut dyn Game, searcher: PlayerId, owner: PlayerId, source: ObjectId, names: &[&'static str]) -> Result<(), Suspend> {
     let has_name = |q: &dyn Query, c: ObjectId| object_names(q, c).iter().any(|n| names.contains(n));
     let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner)).iter().copied().filter(|&c| has_name(g, c)).collect();
-    let mut found = crate::choose::cards(g, searcher, source, Purpose::Exile, graveyard, u8::MAX, true)?;
+    let mut found = crate::choose::any_number_of(g, searcher, source, Purpose::Exile, "", graveyard.clone(), graveyard)?;
     let in_graveyard = found.len();
     let hand: Vec<ObjectId> = g.state().zone(Zone::hand(owner)).iter().copied().filter(|&c| has_name(g, c)).collect();
-    found.extend(crate::choose::cards(g, searcher, source, Purpose::Exile, hand, u8::MAX, true)?);
+    found.extend(crate::choose::any_number_of(g, searcher, source, Purpose::Exile, "", hand.clone(), hand)?);
     let cards_found = found.len();
     // The library is searched and everything found goes to exile together; the owner shuffles (CR 701.23, 406.2).
-    let moved = search_to_exile(g, searcher, owner, source, Find::ONE.up_to(u8::MAX), &found, |q, c| has_name(q, c))?;
+    let moved = search_to_exile(g, searcher, owner, source, Find::ONE.up_to(u32::MAX), &found, |q, c| has_name(q, c))?;
     // A card for each one that actually reached exile from the hand: a replacement may have sent one elsewhere.
     let from_hand = moved[in_graveyard..cards_found].iter().filter(|&&c| g.obj(c).zone.is(ZoneKind::Exile)).count();
     g.draw(owner, from_hand as u32);
@@ -117,12 +117,12 @@ pub fn exile_up_to_four_named_from_graveyard_hand_and_library(g: &mut dyn Game, 
     // A card has "that name" when it is the card name chosen; with no name chosen nothing has it.
     let named = |q: &dyn Query, c: ObjectId| matches!(name, Answer::Name(Some(wanted)) if object_has_name(q, c, wanted));
     let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner)).iter().copied().filter(|&c| named(g, c)).collect();
-    let mut found = crate::choose::cards(g, you, item.object, Purpose::Exile, graveyard, MOST, true)?;
+    let mut found = crate::choose::cards(g, you, item.object, Purpose::Exile, graveyard, u32::from(MOST), true)?;
     let hand: Vec<ObjectId> = g.state().zone(Zone::hand(owner)).iter().copied().filter(|&c| named(g, c)).collect();
     let remaining = MOST - found.len() as u8;
-    found.extend(crate::choose::cards(g, you, item.object, Purpose::Exile, hand, remaining, true)?);
+    found.extend(crate::choose::cards(g, you, item.object, Purpose::Exile, hand, u32::from(remaining), true)?);
     let remaining = MOST - found.len() as u8;
-    search_to_exile(g, you, owner, item.object, Find::ONE.up_to(remaining), &found, named)?;
+    search_to_exile(g, you, owner, item.object, Find::ONE.up_to(u32::from(remaining)), &found, named)?;
     Ok(())
 }
 
@@ -316,8 +316,8 @@ pub fn look_at_top_onto_battlefield(
     g.look_at(player, &looked);
     let permitted: Vec<ObjectId> = looked.iter().copied().filter(|&c| wanted(g, c)).collect();
     let chosen = match total {
-        Some(total) => crate::choose::cards_within_total(g, player, source, Purpose::PutOntoBattlefield, kind, looked.clone(), permitted, most, total)?,
-        None => crate::choose::cards_from_kind(g, player, source, Purpose::PutOntoBattlefield, kind, looked.clone(), permitted, most, true)?,
+        Some(total) => crate::choose::cards_within_total(g, player, source, Purpose::PutOntoBattlefield, kind, looked.clone(), permitted, u32::from(most), total)?,
+        None => crate::choose::cards_from_kind(g, player, source, Purpose::PutOntoBattlefield, kind, looked.clone(), permitted, u32::from(most), true)?,
     };
     let arrived = if chosen.is_empty() {
         Vec::new()

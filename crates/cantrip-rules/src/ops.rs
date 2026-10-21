@@ -1510,8 +1510,8 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
                 purpose: Purpose::Targets,
                 candidates: candidates.clone(),
                 optional: false,
-                least: current.len() as u32,
-                count: current.len() as u32,
+                least: cantrip_state::count_u32(current.len()),
+                count: cantrip_state::count_u32(current.len()),
                 any_number: false,
                 total: total.clone(),
             };
@@ -1991,7 +1991,7 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
             if sources.len() < 2 {
                 break;
             }
-            let ask = RequestKind::ChooseCards {
+            let ask = RequestKind::ChooseCards { any_number: false,
                 source: by,
                 purpose: Purpose::PreventDamageFrom(left),
                 cards: sources.clone(),

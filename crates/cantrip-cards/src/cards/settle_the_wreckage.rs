@@ -19,7 +19,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .copied()
         .filter(|&id| g.controller(id) == player && g.is_attacking(id) && g.chars(id).is(CardType::Creature))
         .collect();
-    let count = g.exile_all(&attackers).len().min(u8::MAX as usize) as u8;
+    let count = u32::try_from(g.exile_all(&attackers).len()).unwrap_or(u32::MAX);
     // With "that many" zero the player is still asked, and a search for zero cards is still a search and a shuffle.
     if !ask_may_search(g, player, item.object, &ASK)? {
         return Ok(());

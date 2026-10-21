@@ -15,7 +15,7 @@ fn treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn sacrifice_treasures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let treasures: Vec<ObjectId> = cantrip_mechanics::tokens::treasures_controlled(g, you);
-    let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Sacrifice, "Treasure", treasures.clone(), treasures, u8::MAX, true)?;
+    let chosen = choose::any_number_of(g, you, item.object, Purpose::Sacrifice, "Treasure", treasures.clone(), treasures)?;
     let sacrificed = g.sacrifice(&chosen);
     if !sacrificed.is_empty() {
         let this = g.card_id(&CARD);

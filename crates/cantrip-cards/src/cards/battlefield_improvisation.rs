@@ -17,7 +17,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     let equipment = equipment_controlled(g, item.controller);
-    for attachment in choose::cards(g, item.controller, item.object, Purpose::Attach, equipment, u8::MAX, true)? {
+    for attachment in choose::any_number_of(g, item.controller, item.object, Purpose::Attach, "", equipment.clone(), equipment)? {
         g.attach(attachment, creature);
     }
     Ok(())

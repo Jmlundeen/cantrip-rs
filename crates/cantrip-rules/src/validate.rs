@@ -115,10 +115,12 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             if options.iter().any(|o| fits(o, action)) { Ok(()) } else { no("that action is not one of the options") }
         }
         (RequestKind::ChooseCards { eligible, count, up_to, total, purpose, .. }, Answer::Cards(cards)) => {
-            let n = cards.len() as u8;
+            // Counted as wide as the answer is: a count narrowed to the question's width would wrap, and pass a wrong answer.
+            let n = cards.len();
+            let wanted = *count as usize;
             if !distinct(cards) || !cards.iter().all(|c| eligible.contains(c)) {
                 no("not among the cards that may be chosen")
-            } else if n > *count || (!up_to && n != *count) {
+            } else if n > wanted || (!up_to && n != wanted) {
                 no(format!("{n} chosen, {count} wanted"))
             } else if *purpose == Purpose::Band && cards.iter().filter(|&&c| !game.chars(c).has(Keyword::Banding)).count() > 1 {
                 // CR 702.22c: one or more creatures with banding and up to one without.
