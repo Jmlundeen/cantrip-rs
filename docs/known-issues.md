@@ -59,7 +59,6 @@ keeps it).
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
 | [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
-| [KI-60](#ki-60-infects--1-1-counters-are-counters-an-effect-puts) | Infect's -1/-1 counters are counters an effect puts | Low | Suspected |
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
@@ -550,19 +549,6 @@ one. A fix reads islandwalk into `Keywords` and makes a landwalker unblockable i
 seat controls a land of its type. The web client shows the keyword on the card, and the language-model client reads it.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
-
-### KI-60: Infect's -1/-1 counters are counters an effect puts
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | engine | 2026-10-17, Doubling Season |
-
-**Notes.** Doubling Season doubles counters "an effect" puts (`CounterPlacement::effect`), and not those a cost or a turn-based
-action puts (CR 118.3, 714.3c). The -1/-1 counters damage from a source with infect puts on a creature (CR 120.3d, 702.90c) are
-put as an effect's (`counters::How::Effect`, by the source's controller, CR 120.3d), combat damage's included, though combat damage is dealt by a turn-based action
-(CR 510.2). No ruling says which they are; a wither source would ask the same (none is in content).
-
-**Scenarios.** none yet: an infect creature dealing combat damage to a creature whose controller has a Doubling Season.
 
 ### KI-61: Limits of judging a permanent as it would exist, and a land as layer 4 leaves it
 
