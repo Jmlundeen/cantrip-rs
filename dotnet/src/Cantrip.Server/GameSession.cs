@@ -128,15 +128,23 @@ public sealed class GameSession : IDisposable
     /// <summary>Any seat's view of the last position published: what every seat sees of the turn and step.</summary>
     private PlayerView? AnyView => _latestStep?.Views.Values.FirstOrDefault();
 
-    /// <summary>Ended from outside the rules - a match clock run out - rather than by the game itself.</summary>
+    /// <summary>
+    /// Ended from outside the rules - a match clock run out, a draw the players agreed to - rather than by the game itself.
+    /// The engine's own draw of a loop of passes (<c>docs/rules-exceptions.md</c>, RX-4) is the rules', and not one of these.
+    /// </summary>
     private bool _forfeited;
+
+    /// <summary>How a game ended from outside its rules came out, for a seat brought back up to date after.</summary>
+    private GameOverMessage? _forfeit;
 
     /// <summary>The seats the game is waiting on: every seat with a question published and not yet answered.</summary>
     public IReadOnlyCollection<int> WaitingOn => [.. _published.Values.Select(published => published.Seat.Value).Distinct()];
 
     /// <summary>
     /// Ends the game from outside the rules, as a match clock that has run out does: the seats named win - one seat's
-    /// team, or nobody for a draw - every seat is told the game is over, and nothing more is asked.
+    /// team, or nobody for a draw, which is also how a draw the players agree to ends the game (<see cref="DrawByAgreement"/>;
+    /// <c>docs/rules-exceptions.md</c>, RX-4) - every seat is told the game is over, and nothing more is asked. The engine's
+    /// own draw of a loop of passes (RX-4) ends the game through its rules instead.
     /// </summary>
     public void Forfeit(IReadOnlyList<int> winners)
     {
@@ -145,9 +153,10 @@ public sealed class GameSession : IDisposable
         _published.Clear();
         bool won = winners.Count > 0;
         int team = won ? _rules.Team(winners[0]) : 0;
+        _forfeit = new GameOverMessage { Outcome = won ? GameOutcomeView.TeamWon : GameOutcomeView.Draw, WinningTeam = team };
         foreach (PlayerId id in Seats)
         {
-            _outbox[id].Enqueue(new GameOverMessage { Outcome = won ? GameOutcomeView.TeamWon : GameOutcomeView.Draw, WinningTeam = team });
+            _outbox[id].Enqueue(new GameOverMessage { Outcome = _forfeit.Outcome, WinningTeam = _forfeit.WinningTeam });
         }
     }
 
@@ -188,19 +197,34 @@ public sealed class GameSession : IDisposable
             return;
         }
 
-        foreach (int seat in seats.Order())
+        // Every seat out of time leaves before a draw offered is judged, so what comes of it never turns on which seat's
+        // number is lower: an offerer out of time withdraws its offer, and never draws the game by running out.
+        _judgingHeld = true;
+        try
         {
-            if (IsOver)
+            foreach (int seat in seats.Order())
             {
-                return;
-            }
+                if (IsOver)
+                {
+                    return;
+                }
 
-            if (standing.Contains(seat))
-            {
-                Leave(new PlayerId(seat));
+                if (standing.Contains(seat))
+                {
+                    Leave(new PlayerId(seat));
+                }
             }
         }
+        finally
+        {
+            _judgingHeld = false;
+        }
+
+        JudgeOffer();
     }
+
+    /// <summary>Whether a draw offered waits to be judged until the seats leaving together have all left (<see cref="TimeOut"/>).</summary>
+    private bool _judgingHeld;
 
     /// <summary>A seat loses and leaves the game from outside it (<see cref="IRulesHost.Leave"/>); the rest play on.</summary>
     public void Leave(PlayerId seat)
@@ -229,6 +253,196 @@ public sealed class GameSession : IDisposable
         _published.Clear();
         Publish(step);
     }
+
+    /// <summary>The draw offered at the table, while one stands (docs/rules-exceptions.md, RX-4).</summary>
+    private DrawOffer? _offer;
+
+    private sealed class DrawOffer(int offerer)
+    {
+        public int Offerer { get; } = offerer;
+        public SortedSet<int> Accepted { get; } = [];
+        public SortedSet<int> Declined { get; } = [];
+    }
+
+    /// <summary>The seat whose draw offer stands, or zero for none. Withdrawn by any answer of its offerer's but a pass (<see cref="Passes"/>).</summary>
+    public int DrawOfferedBy => _offer?.Offerer ?? 0;
+
+    /// <summary>Whether the game ended as a draw its players agreed to (<see cref="AnswerDraw"/>).</summary>
+    public bool DrawnByAgreement { get; private set; }
+
+    /// <summary>
+    /// The waits that run no clock for their first moments (<see cref="MatchClocks.Tick"/>): the priority the offering seat
+    /// is asked for while its draw offer stands, by the request's id, so each of its later priorities is given the courtesy
+    /// once. Empty with no offer standing, or while the offering seat is asked anything but priority.
+    /// </summary>
+    public IReadOnlyDictionary<int, int> Courtesies =>
+        _offer is { } offer && PriorityAsked(offer.Offerer) is { } asked
+            ? new Dictionary<int, int> { [offer.Offerer] = asked }
+            : new Dictionary<int, int>();
+
+    /// <summary>The request a seat is asked priority by, if that is what it is being asked.</summary>
+    private int? PriorityAsked(int seat) =>
+        _published.Where(published => published.Value.Seat.Value == seat && published.Value.Message.Prompt is PriorityPromptMessage)
+            .Select(published => (int?)published.Key)
+            .FirstOrDefault();
+
+    /// <summary>
+    /// Why a seat may not offer a draw now, or null when it may: only a seat still in the game, while it has priority, and
+    /// while no offer stands - one made by another is accepted instead (<see cref="AnswerDraw"/>).
+    /// </summary>
+    public string? CannotOfferDraw(PlayerId seat)
+    {
+        if (IsOver || _latestStep is null)
+        {
+            return "the game is over.";
+        }
+
+        if (!InGame.Contains(seat.Value))
+        {
+            return "you are no longer in the game.";
+        }
+
+        if (_offer is { } offer)
+        {
+            return offer.Offerer == seat.Value ? "your offer of a draw already stands." : "a draw is already offered; accept it instead.";
+        }
+
+        return PriorityAsked(seat.Value) is null ? "a draw is offered only while you have priority." : null;
+    }
+
+    /// <summary>
+    /// A seat offers a draw (docs/rules-exceptions.md, RX-4): every seat is told, each other player is to accept or decline,
+    /// and the offer passes the seat's priority - an answer like any other, so a resumed game replays it.
+    /// </summary>
+    public void OfferDraw(PlayerId seat)
+    {
+        if (CannotOfferDraw(seat) is { } why)
+        {
+            throw new InvalidOperationException($"Seat {seat.Value} cannot offer a draw now: {why}");
+        }
+
+        int asked = PriorityAsked(seat.Value)!.Value;
+        _offer = new DrawOffer(seat.Value);
+        TellOffer();
+        Answer(seat, new AnswerMessage { RequestId = asked, Answer = new PassAnswer() });
+    }
+
+    /// <summary>
+    /// Why a seat may not answer the draw offered as it asks, or null when it may: a player other than the one who offered,
+    /// still in the game, answers once when the offer is made; one that declined may accept later while it has priority.
+    /// </summary>
+    public string? CannotAnswerDraw(PlayerId seat, bool accept)
+    {
+        if (IsOver || _offer is not { } offer)
+        {
+            return "no draw is offered.";
+        }
+
+        if (offer.Offerer == seat.Value || !InGame.Contains(seat.Value))
+        {
+            return "you are not asked about this draw.";
+        }
+
+        if (offer.Accepted.Contains(seat.Value))
+        {
+            return "you have already accepted the draw.";
+        }
+
+        if (offer.Declined.Contains(seat.Value))
+        {
+            return !accept ? "you have already declined the draw."
+                : PriorityAsked(seat.Value) is null ? "a draw you declined is accepted only while you have priority." : null;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// A seat accepts or declines the draw offered. Once every other player still in the game has accepted, the game is a
+    /// draw (<see cref="DrawByAgreement"/>).
+    /// </summary>
+    public void AnswerDraw(PlayerId seat, bool accept)
+    {
+        if (CannotAnswerDraw(seat, accept) is { } why)
+        {
+            throw new InvalidOperationException($"Seat {seat.Value} cannot answer the draw: {why}");
+        }
+
+        DrawOffer offer = _offer!;
+        if (accept)
+        {
+            offer.Declined.Remove(seat.Value);
+            offer.Accepted.Add(seat.Value);
+        }
+        else
+        {
+            offer.Declined.Add(seat.Value);
+        }
+
+        if (!JudgeOffer())
+        {
+            TellOffer();
+        }
+    }
+
+    /// <summary>
+    /// Judges the draw offered as the game stands, whenever a seat may have left it - an answer, a concession, a clock - or
+    /// accepted: an offer whose offerer is out of the game is withdrawn, and one every player still in the game but its
+    /// offerer has accepted ends the game a draw. Says whether it did.
+    /// </summary>
+    private bool JudgeOffer()
+    {
+        if (_offer is not { } offer || IsOver || _judgingHeld)
+        {
+            return false;
+        }
+
+        List<int> standing = [.. InGame];
+        if (!standing.Contains(offer.Offerer))
+        {
+            WithdrawDraw();
+            return false;
+        }
+
+        if (!standing.Where(seat => seat != offer.Offerer).All(offer.Accepted.Contains))
+        {
+            return false;
+        }
+
+        DrawByAgreement();
+        return true;
+    }
+
+    /// <summary>
+    /// Ends the game as a draw its players agreed to, from outside its rules as a match clock ends one (<see cref="Forfeit"/>):
+    /// nobody wins, every seat is told, and nothing more is asked.
+    /// </summary>
+    private void DrawByAgreement()
+    {
+        _offer = null;
+        DrawnByAgreement = true;
+        Forfeit([]);
+    }
+
+    /// <summary>The draw offered is withdrawn, and every seat told so.</summary>
+    private void WithdrawDraw()
+    {
+        _offer = null;
+        TellOffer();
+    }
+
+    /// <summary>Tells every seat the draw offered as it stands.</summary>
+    private void TellOffer()
+    {
+        foreach (PlayerId id in Seats)
+        {
+            _outbox[id].Enqueue(OfferMessage());
+        }
+    }
+
+    private DrawOfferMessage OfferMessage() => _offer is { } offer
+        ? new DrawOfferMessage { Offerer = offer.Offerer, Accepted = [.. offer.Accepted], Declined = [.. offer.Declined] }
+        : new DrawOfferMessage();
 
     /// <summary>Seats everyone, starts the game, and publishes the opening position.</summary>
     public void Start()
@@ -288,9 +502,16 @@ public sealed class GameSession : IDisposable
             }
         }
 
+        if (_offer is not null && !IsOver)
+        {
+            queue.Enqueue(OfferMessage());
+        }
+
         if (IsOver)
         {
-            queue.Enqueue(new GameOverMessage { Outcome = _rules.Outcome, WinningTeam = _rules.WinningTeam });
+            queue.Enqueue(_forfeit is { } forfeit
+                ? new GameOverMessage { Outcome = forfeit.Outcome, WinningTeam = forfeit.WinningTeam }
+                : new GameOverMessage { Outcome = _rules.Outcome, WinningTeam = _rules.WinningTeam });
         }
     }
 
@@ -326,6 +547,29 @@ public sealed class GameSession : IDisposable
 
             case ConcedeMessage:
                 Reject(from, ErrorCode.IllegalAnswer, "a concession is taken only when it ends the game.");
+                break;
+
+            case OfferDrawMessage when CannotOfferDraw(from) is { } why:
+                Reject(from, ErrorCode.IllegalAnswer, why);
+
+                // The client let go of its question as it offered, as an answer does: whatever it is asked is asked again.
+                foreach ((PlayerId owner, PromptMessage prompt) in _published.Values.Where(published => published.Seat == from))
+                {
+                    Reprompt(owner, prompt);
+                }
+
+                break;
+
+            case OfferDrawMessage:
+                OfferDraw(from);
+                break;
+
+            case AnswerDrawMessage answer when CannotAnswerDraw(from, answer.Accept) is { } why:
+                Reject(from, ErrorCode.IllegalAnswer, why);
+                break;
+
+            case AnswerDrawMessage answer:
+                AnswerDraw(from, answer.Accept);
                 break;
 
             default:
@@ -380,8 +624,33 @@ public sealed class GameSession : IDisposable
         }
 
         _published.Remove(message.RequestId);
+
+        // The offerer did anything other than pass: its draw offer is withdrawn (RX-4). Any answer counts, those the game
+        // forces included - a target, a mode, attackers - but for one that declares nothing (no attackers, no blockers).
+        bool withdrawn = _offer is { } offer && offer.Offerer == from.Value && !Passes(outstanding.Message.Prompt, message.Answer);
+        if (withdrawn)
+        {
+            _offer = null;
+        }
+
         Publish(step);
+        if (withdrawn)
+        {
+            TellOffer();
+        }
     }
+
+    /// <summary>
+    /// Whether an answer is a pass, as a standing draw offer judges it (RX-4): passing priority, or declaring no attackers or
+    /// no blockers. Anything else withdraws the offer - a target, a mode, an optional choice declined.
+    /// </summary>
+    private static bool Passes(PromptPayload asked, AnswerPayload answer) => (asked, answer) switch
+    {
+        (PriorityPromptMessage, PassAnswer) => true,
+        (DeclareAttackersPromptMessage, AttackersDeclaredAnswer { Attacks.Count: 0 }) => true,
+        (DeclareBlockersPromptMessage, BlockersDeclaredAnswer { Blocks.Count: 0 }) => true,
+        _ => false,
+    };
 
     /// <summary>
     /// Asks again after refusing an answer.
@@ -485,6 +754,9 @@ public sealed class GameSession : IDisposable
                 });
             }
         }
+
+        // A seat the rules took out may have been the offerer, or the last one yet to accept.
+        JudgeOffer();
     }
 
     private void Reject(PlayerId seat, ErrorCode code, string detail)

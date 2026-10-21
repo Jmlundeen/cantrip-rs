@@ -179,3 +179,48 @@ public sealed class DropMessage : ClientMessage
 {
     public override string Describe() => "drop";
 }
+
+/// <summary>
+/// This seat offers the other players a draw (docs/rules-exceptions.md, RX-4). Taken only while the seat has priority, and
+/// it passes that priority: the offer stands until the seat answers anything but a pass (declaring no attackers or no
+/// blockers is one), or the game is a draw because every other player still in it has accepted (<see cref="AnswerDrawMessage"/>).
+/// </summary>
+[MessagePackObject]
+public sealed class OfferDrawMessage : ClientMessage
+{
+    public override string Describe() => "offer a draw";
+}
+
+/// <summary>
+/// This seat's answer to the draw offered (<see cref="DrawOfferMessage"/>): accepting, or declining. A seat answers once when
+/// the offer is made, whatever it is being asked; a seat that declined may still accept later, at any priority of its own.
+/// </summary>
+[MessagePackObject]
+public sealed class AnswerDrawMessage : ClientMessage
+{
+    [Key(0)] public bool Accept { get; set; }
+    public override string Describe() => Accept ? "accept the draw" : "decline the draw";
+}
+
+/// <summary>
+/// The draw offered at the table, as it stands (docs/rules-exceptions.md, RX-4): who offered it, and who has accepted and
+/// who declined. Sent to every seat whenever it changes - made, answered, withdrawn - and on taking a seat while one stands;
+/// an <see cref="Offerer"/> of zero says there is none any more. The game ends as a draw once every other player still in
+/// it has accepted.
+/// </summary>
+[MessagePackObject]
+public sealed class DrawOfferMessage : ServerMessage
+{
+    /// <summary>The seat that offered the draw, or zero for no offer standing.</summary>
+    [Key(0)] public int Offerer { get; set; }
+
+    /// <summary>The seats that have accepted it, in seat order.</summary>
+    [Key(1)] public List<int> Accepted { get; set; } = [];
+
+    /// <summary>The seats that have declined it and not accepted since, in seat order.</summary>
+    [Key(2)] public List<int> Declined { get; set; } = [];
+
+    public override string Describe() => Offerer == 0
+        ? "no draw offered"
+        : $"seat {Offerer} offers a draw; accepted by [{string.Join(", ", Accepted)}], declined by [{string.Join(", ", Declined)}]";
+}

@@ -25,6 +25,7 @@ namespace Cantrip.Protocol;
 [Union(12, typeof(TableMoveMessage))]
 [Union(13, typeof(PairingsMessage))]
 [Union(14, typeof(ClockMessage))]
+[Union(15, typeof(DrawOfferMessage))]
 public abstract class ServerMessage
 {
     public abstract string Describe();
@@ -835,6 +836,8 @@ public enum ErrorCode
 [Union(8, typeof(BuildDeckMessage))]
 [Union(9, typeof(ConcedeMessage))]
 [Union(10, typeof(DropMessage))]
+[Union(11, typeof(OfferDrawMessage))]
+[Union(12, typeof(AnswerDrawMessage))]
 public abstract class ClientMessage
 {
     public abstract string Describe();

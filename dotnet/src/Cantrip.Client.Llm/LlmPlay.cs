@@ -110,6 +110,55 @@ public sealed class LlmPlay : IAutoPlayer
 
     public bool Retrying => _attempts < Attempts;
 
+    /// <summary>
+    /// Whether the model is asked about a draw another player offers (docs/rules-exceptions.md, RX-4). Off, so this seat
+    /// declines as every automated seat does for now; on, the model is asked to accept or decline, and a reply that names
+    /// neither declines.
+    /// </summary>
+    public bool AsksAboutDraws { get; init; }
+
+    /// <summary>How many draws offered the model has been asked about.</summary>
+    public int DrawsAsked { get; private set; }
+
+    public bool AcceptsDraw(GameClient client)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        if (!AsksAboutDraws || client.DrawOffer is not { } offer)
+        {
+            return false;
+        }
+
+        Record(client);
+        Ready(client);
+        _chooser!.Position = Preamble(client);
+        DrawsAsked++;
+        int before = _model.Usage.Calls;
+        try
+        {
+            return _chooser.Choose(DrawQuestion(client, offer)) is [0];
+        }
+        catch (NoChoiceException)
+        {
+            return false;
+        }
+        finally
+        {
+            Questions += _model.Usage.Calls - before;
+        }
+    }
+
+    /// <summary>The question a draw offered is put as: accept it, or play on.</summary>
+    public static Question DrawQuestion(GameClient client, DrawOfferMessage offer)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(offer);
+        return new Question
+        {
+            Heading = string.Create(CultureInfo.InvariantCulture, $"The Opponent in seat {offer.Offerer} offers a draw. Do you accept?"),
+            Choices = ["Accept the draw: the game ends with nobody winning, once every other player has accepted too.", "Decline, and play on."],
+        };
+    }
+
     public bool Thinking => _deciding is { IsCompleted: false };
 
     public bool Act(GameClient client)

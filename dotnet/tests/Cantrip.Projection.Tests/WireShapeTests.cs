@@ -28,7 +28,7 @@ public sealed class WireShapeTests
     /// The wire as it stands. Written as version and digest together so the two are updated in one edit rather than
     /// one of them being remembered — and so this line never names a version it has drifted away from.
     /// </summary>
-    private const string Recorded = "200:140F13449BE1418B";
+    private const string Recorded = "201:FDE0259D74A6D672";
 
     [Fact]
     public void The_wire_has_not_changed_without_the_protocol_version_moving()

@@ -146,7 +146,7 @@ public sealed class HostedGame : IDisposable
             return;
         }
 
-        ClockTick tick = Clocks.Tick(_clocking.Time.GetUtcNow(), _session.WaitingOn);
+        ClockTick tick = Clocks.Tick(_clocking.Time.GetUtcNow(), _session.WaitingOn, _session.Courtesies);
         if (tick.RanOut.Count > 0)
         {
             _session.TimeOut(tick.RanOut);

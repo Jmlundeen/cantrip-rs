@@ -274,6 +274,44 @@ public sealed class TableClockTests(ITestOutputHelper output)
         Assert.Equal("Player 1 ran out of time.", result.Detail);
     }
 
+    /// <summary>
+    /// A game its players agree to draw (docs/rules-exceptions.md, RX-4) at an event's table: seat one offers at its priority,
+    /// seat two accepts, and the table ends with nobody winning, saying why, and the event is told it was a draw - as it is
+    /// told of any other draw - and every seat that the game is over, drawn.
+    /// </summary>
+    [Fact]
+    public async Task A_draw_agreed_at_an_events_table_is_a_draw_for_the_event()
+    {
+        var clock = new Clock();
+        var hosted = new Event();
+        await using GameServer server = await GameServer.StartAsync(new GameServerOptions
+        {
+            Port = 0, Players = 2, ContentRoot = RepoRoot.ContentRoot, Event = hosted, TimeProvider = clock, Rules = new JumpingRules(clock, TimeSpan.Zero),
+        });
+        var address = new Uri($"ws://127.0.0.1:{server.Port}/game");
+        List<GameClient> clients = [];
+        for (int seat = 1; seat <= 2; seat++)
+        {
+            var client = new GameClient(await WebSocketTransport.ConnectAsync(address));
+            client.Join($"Player {seat}", seat, $"seat-{seat}");
+            clients.Add(client);
+        }
+
+        await Until(() => clients[0].CanOfferDraw, [.. clients]);
+        clients[0].OfferDraw();
+        await Until(() => clients[1].DrawAskedOfMe && clients[1].CanAcceptDraw, [.. clients]);
+        clients[1].AnswerDraw(accept: true);
+
+        TableResult result = await FinishedAsync(server);
+        Assert.Equal(TablePhase.Finished, result.Phase);
+        Assert.Empty(result.WinningSeats);
+        Assert.Equal("The players agreed to a draw.", result.Detail);
+        Assert.False(hosted.Ended!.Value.Abandoned);
+        Assert.Empty(hosted.Ended.Value.Winners);
+        await Until(() => clients.TrueForAll(client => client.Outcome?.Outcome == GameOutcomeView.Draw), [.. clients]);
+        Leave(clients);
+    }
+
     /// <summary>Scripted rules (<see cref="ScriptedHost"/>) whose concession moves the fake time on as it is made.</summary>
     private sealed class JumpingRules(Clock clock, TimeSpan jump) : IRulesHostFactory
     {
@@ -320,7 +358,7 @@ public sealed class TableClockTests(ITestOutputHelper output)
 
         public bool ReadyToDeal => Ended is null;
 
-        public int SeatFor(string ticket) => 0;
+        public int SeatFor(string ticket) => ticket.StartsWith("seat-", StringComparison.Ordinal) && int.TryParse(ticket[5..], out int seat) ? seat : 0;
 
         public string NameAt(int seat) => $"Player {seat}";
 

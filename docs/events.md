@@ -223,11 +223,27 @@ the match as a whole, only each player's.
   every player still in runs out at the same look nobody is left to win, and the game is a draw; in an event's match both
   players out together draw the match as well, neither preferred, with nothing more dealt (`ITableEvent.ClocksRanOut`,
   `IMatchHost.TimedOutTogether`).
+- **Players may agree to a draw** (`docs/rules-exceptions.md`, RX-4): any player may offer one while they have priority
+  (`OfferDrawMessage`), which passes it; every other player is asked to accept or decline (`DrawOfferMessage`,
+  `AnswerDrawMessage`), and one who declined may accept later at any priority of theirs. The game is a draw once every
+  other player still in it has accepted - the last one missing may leave, out of time or taken out by the rules - and the
+  event counts it as it counts any other draw (`ITableEvent.GameEnded` with no winners). The offer is the session's
+  (`GameSession.OfferDraw`, `AnswerDraw`), judged again whenever a seat may have left (`JudgeOffer`; seats out of time at
+  the same look all leave first), and withdrawn the moment its player does anything but pass - any answer, those the game
+  forces included (a target, attackers, an optional choice declined), but for passing priority and declaring no attackers
+  or no blockers - or leaves the game: an offerer never draws a game by running out of time.
+  Every automated seat declines (`IAutoPlayer.AcceptsDraw`, answered through `LoopGuard`); a language model's seat can be
+  put the question instead, and accepts or declines as the model says (`LlmPlay.AsksAboutDraws`), off for now.
+- **A draw offer is no way to run a clock down.** While a player's offer stands, each of their later priorities runs no
+  clock for its first three seconds (`MatchClocks.DrawOfferCourtesy`): the session names those waits
+  (`GameSession.Courtesies`, the offerer's priority by its request), the clocks give each the courtesy once from the first
+  look that sees it, and charge the offerer from the third second on, not from the next look. Nobody else's clock runs for
+  it, and the seats are told the offerer's clock is not running until it does.
 
 `cantrip-server` sets the clock for its lobby's table with `--clock MINUTES` (`play-game.ps1 -Clock`; `play-vs-llm` gives
 each player 90 minutes, a model being slower than a person). A scenario's table (`ScenarioTable.StartAsync`) and a game in
 one process (`HostAndPlay.StartTable`) take the `TimeProvider` their clocks run on, so a test moves the time itself
-(`TableClockTests`, `TimeOutTests`).
+(`TableClockTests`, `TimeOutTests`, `DrawOfferTests`).
 
 `BoosterPod` is the pod's event and `PodHost` (`Cantrip.Server.Host`) hosts it: the pod's table, and a table for each
 game it asks for (`TablesToOpen`), closed once its players have gone on (`TablesDone`). Where tables are is the host's

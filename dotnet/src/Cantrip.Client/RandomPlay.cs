@@ -36,6 +36,12 @@ public interface IAutoPlayer
     /// </para>
     /// </summary>
     bool Thinking => false;
+
+    /// <summary>
+    /// Whether this seat accepts the draw another player offered (docs/rules-exceptions.md, RX-4), asked once as the offer
+    /// is made. Every automated seat declines for now.
+    /// </summary>
+    bool AcceptsDraw(GameClient client) => false;
 }
 
 /// <summary>The deterministic seat, <see cref="AutoPlay"/>, as an <see cref="IAutoPlayer"/>.</summary>

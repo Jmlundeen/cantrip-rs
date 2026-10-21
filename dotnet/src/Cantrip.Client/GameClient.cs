@@ -303,6 +303,64 @@ public sealed class GameClient
     /// <summary>Concedes the game being played: this seat loses it, and it is over.</summary>
     public void Concede() => _transport.Send(new ConcedeMessage());
 
+    /// <summary>
+    /// The draw offered at the table, as last sent (docs/rules-exceptions.md, RX-4), or null while none stands.
+    /// </summary>
+    public DrawOfferMessage? DrawOffer { get; private set; }
+
+    /// <summary>Whether this seat is still in the game being played.</summary>
+    private bool InGame => !IsOver && View?.Players.FirstOrDefault(player => player.Seat == Seat) is { Status: PlayerStatusView.Active };
+
+    /// <summary>Whether this seat holds priority now: what it is asked is a priority prompt.</summary>
+    public bool HasPriority => Prompt?.Prompt is PriorityPromptMessage;
+
+    /// <summary>Whether this seat may offer a draw now: it is in the game, it has priority, and no offer stands.</summary>
+    public bool CanOfferDraw => InGame && HasPriority && DrawOffer is null;
+
+    /// <summary>
+    /// Whether another player's draw offer is waiting on this seat's first answer: it has neither accepted nor declined it.
+    /// </summary>
+    public bool DrawAskedOfMe => InGame && !_drawAnswerSent && DrawOffer is { } offer && offer.Offerer != Seat
+        && !offer.Accepted.Contains(Seat) && !offer.Declined.Contains(Seat);
+
+    /// <summary>
+    /// This seat has answered the draw offered and the server's word on it - the offer with this seat among those who
+    /// answered, or gone - has not come back yet, so it is not answered twice: another seat's answer may come back first.
+    /// </summary>
+    private bool _drawAnswerSent;
+
+    /// <summary>The answer sent is an acceptance of an offer this seat had declined: landed once it is among those who accepted.</summary>
+    private bool _acceptAfterDecline;
+
+    /// <summary>
+    /// Whether this seat may accept the draw offered now: when it is first asked, or, having declined, at any priority.
+    /// </summary>
+    public bool CanAcceptDraw => DrawAskedOfMe
+        || (InGame && !_drawAnswerSent && DrawOffer is { } offer && offer.Offerer != Seat && offer.Declined.Contains(Seat) && HasPriority);
+
+    /// <summary>
+    /// Offers the other players a draw, passing this seat's priority: the offer stands until this seat answers anything but a
+    /// pass (declaring no attackers or no blockers is one). The prompt it answers is cleared, as an answer clears it.
+    /// </summary>
+    public void OfferDraw()
+    {
+        if (Prompt is { } asked)
+        {
+            LastAnswered = asked.RequestId;
+        }
+
+        Prompt = null;
+        _transport.Send(new OfferDrawMessage());
+    }
+
+    /// <summary>Accepts or declines the draw another player offered.</summary>
+    public void AnswerDraw(bool accept)
+    {
+        _drawAnswerSent = true;
+        _acceptAfterDecline = accept && DrawOffer?.Declined.Contains(Seat) == true;
+        _transport.Send(new AnswerDrawMessage { Accept = accept });
+    }
+
     /// <summary>Drops from the event this table is part of: this seat is paired no more.</summary>
     public void Drop() => _transport.Send(new DropMessage());
 
@@ -601,10 +659,15 @@ public sealed class GameClient
             case GameOverMessage over:
                 Outcome = over;
                 Prompt = null;
+                DrawOffer = null;
                 break;
 
             case ErrorMessage error:
                 _errors.Add(error);
+
+                // An answer to a draw refused leaves the seat free to answer again.
+                _drawAnswerSent = false;
+                _acceptAfterDecline = false;
                 break;
 
             case LogMessage log:
@@ -636,6 +699,19 @@ public sealed class GameClient
             case ClockMessage clock:
                 Clock = clock;
                 ClockReceived = DateTime.UtcNow;
+                break;
+
+            case DrawOfferMessage offer:
+                DrawOffer = offer.Offerer == 0 ? null : offer;
+
+                // The answer sent has landed when this seat is among those who answered, or there is no offer any more.
+                // A seat that declined and then accepts is among them already, so it waits for the acceptance itself.
+                if (offer.Offerer == 0 || offer.Accepted.Contains(Seat) || (offer.Declined.Contains(Seat) && !_acceptAfterDecline))
+                {
+                    _drawAnswerSent = false;
+                    _acceptAfterDecline = false;
+                }
+
                 break;
 
             default:

@@ -319,6 +319,13 @@ public sealed class GameServer : IAsyncDisposable
                 _step = "checking whether the game is over";
                 if (_session is { IsOver: true } && _phase == TablePhase.Playing)
                 {
+                    // However it came - an answer to it, an answer that took a seat out, a seat out of time - a draw the
+                    // players agreed to says so.
+                    if (_session.DrawnByAgreement)
+                    {
+                        _detail = "The players agreed to a draw.";
+                    }
+
                     _phase = TablePhase.Finished;
                     BroadcastTable();
                     Finish();
@@ -456,6 +463,9 @@ public sealed class GameServer : IAsyncDisposable
             case ConcedeMessage when _phase == TablePhase.Playing:
                 Concede(connection, member);
                 break;
+            case OfferDrawMessage or AnswerDrawMessage when _phase == TablePhase.Playing:
+                Draw(member, message);
+                break;
             case DropMessage when _options.Event is { } hosted && _phase == TablePhase.Pairings:
                 if (hosted.Receive(member.Seat, message) is { } cannot)
                 {
@@ -492,6 +502,17 @@ public sealed class GameServer : IAsyncDisposable
         Note($"seat {member.Seat} conceded");
         _detail = $"{member.Name} conceded.";
         _session.Concede(seat);
+    }
+
+    /// <summary>
+    /// A seat offers a draw, or answers one (docs/rules-exceptions.md, RX-4). The session keeps the offer and refuses what is
+    /// not allowed; a game its players agree to draw ends as a draw, which the pump finishes as it finishes any game over,
+    /// saying why.
+    /// </summary>
+    private void Draw(Member member, ClientMessage message)
+    {
+        Note($"seat {member.Seat}: {message.Describe()}");
+        _session!.Submit(new PlayerId(member.Seat), message);
     }
 
     private void ConfigureSets(Connection connection, Member member, ConfigureTableMessage configure)
@@ -974,7 +995,7 @@ public sealed class GameServer : IAsyncDisposable
     private void TickClocks()
     {
         if (_clocks is null || _session is null || _session.IsOver || _phase != TablePhase.Playing) return;
-        ClockTick tick = _clocks.Tick(_options.TimeProvider.GetUtcNow(), _session.WaitingOn);
+        ClockTick tick = _clocks.Tick(_options.TimeProvider.GetUtcNow(), _session.WaitingOn, _session.Courtesies);
         if (tick.RanOut.Count > 0)
         {
             TimeOut(tick.RanOut);
@@ -1030,7 +1051,8 @@ public sealed class GameServer : IAsyncDisposable
             return;
         }
 
-        _detail = $"{names} ran out of time.";
+        // The last player yet to accept a draw offered may be the one out of time: the rest have agreed to it.
+        _detail = _session.DrawnByAgreement ? $"{names} ran out of time, and the players left agreed to a draw." : $"{names} ran out of time.";
         _phase = TablePhase.Finished;
         _clocks!.Stop(_options.TimeProvider.GetUtcNow());
         SendClocks();

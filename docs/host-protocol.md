@@ -62,6 +62,12 @@ Diamond shows the hand), and one that triggered anything (Chromatic Star draws).
 included - a concession, or anything else happening clears what can be taken back. An undo is an answer like any other,
 so a resumed game replays it.
 
+A draw the players agree to (`docs/rules-exceptions.md`, RX-4) is not a request of the host's: the offer and the answers to it
+are the server's (`GameSession.OfferDraw`, `AnswerDraw`, over the C# protocol's `OfferDrawMessage`, `AnswerDrawMessage` and
+`DrawOfferMessage`, version 201). Offering passes the offerer's priority, which the host is sent as any `PassAnswer`; once
+every other player still in the game has accepted, the session ends the game as a draw from outside the host, as a match
+clock running out does (`GameSession.Forfeit`), and nothing more is asked of it.
+
 The cards a host knows are the ones the native engine has ported (`docs/adding-cards.md`); a deck naming any other
 is refused at the deal. The decks under `decks/demo` and `decks/spike` are kept to ported cards, and
 `NativeHostGameTests` deals them through the real binary.

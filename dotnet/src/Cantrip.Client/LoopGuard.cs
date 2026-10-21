@@ -14,6 +14,11 @@ namespace Cantrip.Client;
 /// after a few rounds (RX-4); one with a decline or a pick in it, or a run that never repeats, ends in a draw once the game
 /// reaches the most events the engine records (RX-1), so no table of automated seats goes on for ever.
 /// </para>
+/// <para>
+/// A loop a person plays against is ended by the clock or a draw they agree to (RX-4). Every automated seat is wrapped in
+/// one of these, so this is also where each answers a draw another player offers, once as it is made: as its player says
+/// (<see cref="IAutoPlayer.AcceptsDraw"/>), which for every automated seat is to decline, for now.
+/// </para>
 /// </summary>
 public sealed class LoopGuard : IAutoPlayer
 {
@@ -46,9 +51,20 @@ public sealed class LoopGuard : IAutoPlayer
 
     public bool Thinking => _inner.Thinking;
 
+    public bool AcceptsDraw(GameClient client) => _inner.AcceptsDraw(client);
+
     public bool Act(GameClient client)
     {
         ArgumentNullException.ThrowIfNull(client);
+
+        // A draw another player offered is answered once as it is made, whatever else is being asked (RX-4). Every
+        // automated seat goes through here, and each declines for now (IAutoPlayer.AcceptsDraw).
+        // The client says it is asked only until it has answered (GameClient.DrawAskedOfMe).
+        if (!_inner.Thinking && client.DrawAskedOfMe)
+        {
+            client.AnswerDraw(_inner.AcceptsDraw(client));
+            return true;
+        }
 
         if (client.IsOver || !client.IsWaitingOnMe || client.View is not { } view)
         {
