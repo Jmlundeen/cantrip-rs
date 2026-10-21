@@ -112,7 +112,6 @@ the line goes.
 
 | Path | Covered instead by | Why no scenario |
 | --- | --- | --- |
-| The transformed cast's `cast_only_if_met` check (`could_cast_transformed_during_resolution`) | nothing | Only Berserk has a "cast only" condition, and it has no back face. |
 | Gift of an extra turn; a copied permanent spell keeping its gift; "whenever you give a gift" | Rust tests, `crates/cantrip-script/tests/gift.rs` | Perch Protection needs phasing; no implemented card copies a gift permanent or has the trigger. |
 | Lost abilities at the instant-activation, damage-by-toughness and ascend sites | The flash-rules site: Valley Floodcaller silenced by Tishana's Tidebinder (`valley-floodcaller-silenced-by-tishanas-tidebinder-flashes-nothing-more`) | No implemented card loses its abilities while using one: Tishana's Tidebinder silences only artifacts, creatures and planeswalkers with an activated or triggered ability, and Humility's 1/1 hides toughness damage. |
 | The MDFC back-face sites of the minimum-targets offering check (CR 601.2c) refusing a back face for want of a target | A back face judged there with no target (Jennifer Walters by Underworld Breach's escape and by discover) | No implemented castable back face has a target: Jennifer Walters', Gwen Stacy's, King T'Challa's and Norman Osborn's are creatures with none. |

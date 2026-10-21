@@ -26,6 +26,8 @@ mod resolve;
 mod settle;
 mod speed;
 mod static_rules;
+#[cfg(test)]
+mod transformed_cast_tests;
 mod turn;
 #[cfg(test)]
 mod untap_others_tests;
