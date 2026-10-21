@@ -58,6 +58,17 @@ pub fn monarch_left(cx: &mut Cx) {
     set_monarch(cx, heir);
 }
 
+/// The player with the initiative who has left the game hands it to the active player, or if that is who left, the next
+/// player in turn order still in the game, who takes it (CR 726.4) - so ventures into Undercity as any taker does (CR 726.2).
+pub fn initiative_left(cx: &mut Cx) {
+    let Some(leaver) = cx.s().seats().find(|&p| cx.s().player(p).initiative && cx.s().player(p).lost) else { return };
+    let order: Vec<PlayerId> = cx.s().apnap().collect();
+    match order.into_iter().find(|&p| p != leaver && in_game(cx, p)) {
+        Some(heir) => take_initiative(cx, heir),
+        None => cx.st().update_player(leaver, |pl| pl.initiative = false),
+    }
+}
+
 /// The inherent triggered abilities of the monarch and the initiative (CR 725.2, 726.2) and of a player with speed (CR
 /// 702.179d) that `event` triggers: each the intrinsic ability's index, its controller and what it is about. No object has
 /// them, so the rules put them on their way to the stack from an object of their own (`queue`) - but they are triggered

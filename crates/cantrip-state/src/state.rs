@@ -487,6 +487,14 @@ impl GameState {
         id
     }
 
+    /// Takes back `id`, the last object pushed, before anything has come to refer to it: an object made only to be asked
+    /// about, which turned out not to be needed.
+    pub fn pop_obj(&mut self, id: ObjectId) {
+        assert_eq!(id.index() + 1, self.objects.len(), "only the last object pushed is taken back");
+        let obj = self.objects.pop().expect("an object");
+        self.log(Undo::ObjectPopped(Box::new(obj)));
+    }
+
     pub fn update_player(&mut self, p: PlayerId, f: impl FnOnce(&mut Player)) {
         let old = self.players[p.index()];
         f(&mut self.players[p.index()]);

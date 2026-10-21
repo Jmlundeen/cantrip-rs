@@ -2821,6 +2821,7 @@ pub fn lose_game(cx: &mut Cx, player: PlayerId) {
     }
     cx.st().update_player(player, |pl| pl.lost = true);
     crate::designations::monarch_left(cx);
+    crate::designations::initiative_left(cx);
     cx.record(Event::GameLost { player, reason: LossReason::Effect });
     leave_game(cx, player);
     let left: Vec<PlayerId> = cx.s().apnap().collect();
@@ -2869,6 +2870,7 @@ pub fn win_game(cx: &mut Cx, player: PlayerId) {
     for o in opponents {
         cx.st().update_player(o, |pl| pl.lost = true);
         crate::designations::monarch_left(cx);
+        crate::designations::initiative_left(cx);
         cx.record(Event::GameLost { player: o, reason: LossReason::Effect });
     }
     cx.st().set_outcome(Outcome::Won(player));

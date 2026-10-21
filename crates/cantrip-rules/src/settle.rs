@@ -88,6 +88,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                 pl.drew_from_empty = false;
             });
             crate::designations::monarch_left(cx);
+            crate::designations::initiative_left(cx);
             leavers.push((p, reason));
             acted = true;
         } else if player.drew_from_empty {
@@ -753,22 +754,25 @@ fn consider(
 /// One of the players' inherent triggered abilities (`designations::inherent_triggers`) that `event` triggered: from an object of
 /// the rules' own in no zone (`designations::queue`), controlled by `controller` and about `subject`, unless something stops it
 /// triggering (CR 603.2), and once more for each static ability that makes it trigger again (CR 603.2d). The initiative's "one
-/// or more creatures a player controls" triggers once for that player in a batch, and not again while it waits (CR 603.2c);
-/// speed's once each turn, its triggering noted in the history.
+/// or more creatures a player controls" triggers once for that player in a batch (CR 603.2c); speed's once each turn, its
+/// triggering noted in the history - an ability stopped from triggering has not triggered.
 fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event: &Event, statics: &mut TriggerStatics, found: &mut Found) {
     let card = cx.cards().intrinsic;
     let ability = AbilityRef { card, index };
     let AbilityDef::Triggered(t) = cx.cards().ability(ability) else { return };
     let same = |p: &PendingTrigger| p.ability == ability && p.subject == subject;
-    if index == cantrip_api::intrinsic::INITIATIVE_TAKEN && (found.iter().any(|(p, _, _)| same(p)) || cx.s().triggers.iter().any(same)) {
+    // Once for each player whose creatures dealt the damage in this batch (CR 726.2, 603.2c).
+    if index == cantrip_api::intrinsic::INITIATIVE_TAKEN && found.iter().any(|(p, _, _)| same(p)) {
         return;
     }
     if index == cantrip_api::intrinsic::SPEED_UP && found.iter().any(|(p, _, _)| p.ability == ability) {
         return;
     }
+    // Its source, in no zone: what stops abilities triggering asks about it (CR 603.2d), and is given it back if it does.
     let source = cx.st().push_obj(Obj::new(card, controller, Zone::GONE));
     let triggering = Triggering { source, controller, def: t, permanent: false };
     if statics.stop(cx, event, &triggering) {
+        cx.st().pop_obj(source);
         return;
     }
     let mut again = Again::new();
