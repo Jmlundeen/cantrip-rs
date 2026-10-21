@@ -873,7 +873,7 @@ fn each_alternative_cost_of_an_ability_is_an_activation_of_its_own() {
         game.answer(request.id, request.player, Answer::Act(Action::of(&chosen))).unwrap();
         game.run();
         assert!(game.state.stack.iter().any(|i| i.object == ability), "activated without being asked anything more");
-        assert_eq!(game.state.player(ME).pool.0[Mana::C as usize], pool, "for nothing");
+        assert_eq!(game.state.player(ME).pool.0[Mana::C as usize], u32::from(pool), "for nothing");
     }
 }
 

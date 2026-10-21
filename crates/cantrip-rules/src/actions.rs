@@ -1870,11 +1870,11 @@ fn tap_triggers(
     player: PlayerId,
     types: u8,
     chosen: bool,
-    fixed: &mut [u8; 6],
+    fixed: &mut [u32; 6],
     flex: &mut [u32; 64],
 ) {
     let first = (0..6).find(|&m| types & (1 << m) != 0).unwrap_or(5);
-    let mut produced = ManaPool([0; 6]);
+    let mut produced = ManaTally([0; 6]);
     produced.0[first] = 1;
     let event = Event::TappedForMana { permanent: id, player, produced };
     for (asker, t) in waiting {
