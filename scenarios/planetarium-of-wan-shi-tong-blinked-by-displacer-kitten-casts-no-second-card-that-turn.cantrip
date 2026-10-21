@@ -1,0 +1,71 @@
+# Planetarium of Wan Shi Tong: "... You may cast that card without paying its mana cost. Do this only once each turn."
+# "This ability triggers only if its source's controller has not yet taken the indicated action that turn" (CR 603.2h), and
+# the ruling: once you cast the top card, the ability won't trigger again that turn. Bot1 scries with the Planetarium and
+# casts the Mox Jet on top for free; Displacer Kitten, seeing a noncreature spell cast, blinks the Planetarium, which comes
+# back a new, untapped object (CR 400.7). Bot1 scries with it again: the top card is a castable Mox Ruby, but the
+# Planetarium does not trigger - Bot1 has already cast a card with its ability this turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Black Lotus
+Planetarium of Wan Shi Tong
+Displacer Kitten
+Mox Jet
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Displacer Kitten.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mox Jet; Mox Ruby |)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Planetarium of Wan Shi Tong)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Planetarium of Wan Shi Tong.Tapped = false
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mox Ruby; Island |)
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Mox Jet
+Bot1.Library.Count = 11
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Tapped = true
+Bot1.Hand.Count = 0
