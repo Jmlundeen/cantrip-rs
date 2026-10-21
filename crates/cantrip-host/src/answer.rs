@@ -205,7 +205,7 @@ pub fn translate(
             }
         }
         AnswerPayload::ReplacementChosenAnswer(a) => Answer::Index(a.index.clamp(0, 255) as u8),
-        AnswerPayload::TriggersOrderedAnswer(a) => Answer::Order(a.order.iter().map(|&m| m.clamp(0, 255) as u8).collect()),
+        AnswerPayload::TriggersOrderedAnswer(a) => Answer::Order(a.order.iter().map(|&m| u32::try_from(m).unwrap_or(u32::MAX)).collect()),
         AnswerPayload::CardNamedAnswer(a) => {
             Answer::Name(Some(card(&a.name).ok_or_else(|| Untranslatable::Illegal(format!("no card is named \"{}\"", a.name)))?))
         }
@@ -319,7 +319,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
         }),
         Answer::Player(p) => AnswerPayload::PlayerChosenAnswer(PlayerChosenAnswer { player: seat(*p) }),
         Answer::Name(id) => AnswerPayload::CardNamedAnswer(CardNamedAnswer { name: id.map_or(String::new(), |c| game.cards.get(c).name.to_string()) }),
-        Answer::Order(order) => AnswerPayload::TriggersOrderedAnswer(TriggersOrderedAnswer { order: order.iter().map(|&o| i32::from(o)).collect() }),
+        Answer::Order(order) => AnswerPayload::TriggersOrderedAnswer(TriggersOrderedAnswer { order: order.iter().map(|&o| crate::prompt::wire(o)).collect() }),
         Answer::Index(i) => AnswerPayload::ReplacementChosenAnswer(ReplacementChosenAnswer { index: i32::from(*i) }),
         Answer::Shares(shares) => AnswerPayload::CombatDamageAssignedAnswer(CombatDamageAssignedAnswer {
             shares: shares

@@ -1105,7 +1105,7 @@ impl<'s> Run<'s> {
             },
             RequestKind::ChooseStartingPlayer { .. } => Answer::Player(request.player),
             RequestKind::Mulligan { .. } => Answer::No,
-            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..sources.len() as u8).collect()),
+            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..count_u32(sources.len())).collect()),
             RequestKind::ChooseReplacement { .. } => Answer::Index(0),
             RequestKind::ChooseName { suggestion, .. } => Answer::Name(*suggestion),
             RequestKind::ChooseSubtype { choices, .. } => Answer::Subtype(choices[0]),
@@ -2038,16 +2038,16 @@ impl<'s> Run<'s> {
     }
 
     fn order_triggers(&self, step: &ActionStep, sources: &[ObjectId], abilities: &[AbilityRef]) -> R<Answer> {
-        let mut order: Vec<u8> = Vec::new();
+        let mut order: Vec<u32> = Vec::new();
         for spec in step.positional() {
             let wanted = spec.trim().to_lowercase();
             let found = (0..sources.len()).find(|&i| {
-                !order.contains(&(i as u8))
+                !order.contains(&count_u32(i))
                     && (self.game.known_name(sources[i]).to_lowercase() == wanted
                         || self.game.cards.ability(abilities[i]).text().to_lowercase().contains(&wanted))
             });
             match found {
-                Some(i) => order.push(i as u8),
+                Some(i) => order.push(count_u32(i)),
                 None => return fail(format!("line {}: \"{spec}\" is not one of the triggers to order", step.line)),
             }
         }

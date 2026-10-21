@@ -86,7 +86,7 @@ fn cloaked_with(cloaker: &str) -> (usize, i32) {
                 }
             }
             RequestKind::Priority { .. } => Answer::Pass,
-            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..sources.len() as u8).collect()),
+            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..count_u32(sources.len())).collect()),
             other => panic!("unexpected question {other:?}"),
         };
         game.answer(request.id, request.player, answer).unwrap();

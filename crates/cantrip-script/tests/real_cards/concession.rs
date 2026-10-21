@@ -127,7 +127,7 @@ fn a_concession_during_a_resolution_comes_after_what_it_had_done() {
             surveils += 1;
             (Some(Answer::Placements { placements: vec![Vec::new(), cards.clone()], shuffle: false }), surveils == 1)
         }
-        RequestKind::OrderTriggers { sources, .. } => (Some(Answer::Order((0..sources.len() as u8).collect())), false),
+        RequestKind::OrderTriggers { sources, .. } => (Some(Answer::Order((0..count_u32(sources.len())).collect())), false),
         _ => (None, false),
     });
     assert!(!game.state.battlefield().contains(&ids[1]), "the Ornithopter is still there");

@@ -279,7 +279,7 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             Answer::Cards(random.some(eligible, n))
         }
         RequestKind::OrderTriggers { sources, .. } => {
-            let all: Vec<u8> = (0..sources.len() as u8).collect();
+            let all: Vec<u32> = (0..count_u32(sources.len())).collect();
             Answer::Order(random.some(&all, all.len()))
         }
         RequestKind::ChooseReplacement { sources, .. } => Answer::Index(random.below(sources.len()) as u8),

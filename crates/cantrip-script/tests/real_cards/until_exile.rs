@@ -105,7 +105,7 @@ fn play(hush: bool) -> (Game, usize) {
                 Answer::Act(action)
             }
             RequestKind::ChooseTarget { candidates, .. } => Answer::Targets(vec![candidates[0]]),
-            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..sources.len() as u8).collect()),
+            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..count_u32(sources.len())).collect()),
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand.iter().copied().take(*count as usize).collect()),
             RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
             RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),

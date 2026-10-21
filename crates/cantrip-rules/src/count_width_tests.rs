@@ -110,3 +110,19 @@ fn a_discard_to_hand_size_of_263_cards_is_asked_and_made() {
     assert_eq!(asked, Some((263, 270)));
     assert_eq!(g.state.zone(Zone::hand(P0)).len(), 7);
 }
+
+/// An answer is judged at its whole length: 300 triggers are put in order by an order of 300 (CR 603.3b), and 257 colors
+/// are no answer to a choice of one, as an order of 256 is none of 300.
+#[test]
+fn an_answer_past_255_is_judged_at_its_whole_length() {
+    let g = game(&FILLER, 0);
+    let ask = |kind: RequestKind| Request { id: 1, player: P0, kind, may_cancel: false };
+    let sources: Vec<ObjectId> = (0..300).map(ObjectId).collect();
+    let abilities = vec![AbilityRef { card: CardId(0), index: 0 }; 300];
+    let order = ask(RequestKind::OrderTriggers { sources, abilities });
+    assert!(crate::check_answer(&g, &order, &Answer::Order((0..300).rev().collect())).is_ok());
+    assert!(crate::check_answer(&g, &order, &Answer::Order((0..256).collect())).is_err());
+    let colors = ask(RequestKind::ChooseColors { source: ObjectId(0), choices: ColorSet::NONE.with(Color::Red), count: 1, purpose: ColorUse::AddMana });
+    assert!(crate::check_answer(&g, &colors, &Answer::Colors(vec![Color::Red])).is_ok());
+    assert!(crate::check_answer(&g, &colors, &Answer::Colors(vec![Color::Red; 257])).is_err());
+}

@@ -1026,7 +1026,7 @@ pub enum Answer {
     /// A subtype chosen.
     Subtype(Subtype),
     /// Indices in order: the order to put triggered abilities on the stack.
-    Order(Vec<u8>),
+    Order(Vec<u32>),
     /// Combat damage shares: (source, the creature it is dealt to, or `None` for the defender, amount).
     Shares(Vec<(ObjectId, Option<ObjectId>, u16)>),
     /// Where each looked-at card goes: one list per destination, in placing order (for a library top, the first is

@@ -156,7 +156,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             }
         }
         (RequestKind::ChooseColors { choices, count, .. }, Answer::Colors(colors)) => {
-            if colors.len() as u8 == *count && colors.iter().all(|c| choices.has(*c)) {
+            if colors.len() == usize::from(*count) && colors.iter().all(|c| choices.has(*c)) {
                 Ok(())
             } else {
                 no("not a choice of the colors offered")
@@ -346,7 +346,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         (RequestKind::OrderTriggers { sources, .. }, Answer::Order(order)) => {
             let mut seen = order.clone();
             seen.sort();
-            if seen == (0..sources.len() as u8).collect::<Vec<_>>() { Ok(()) } else { no("not an order of every trigger") }
+            if seen == (0..count_u32(sources.len())).collect::<Vec<_>>() { Ok(()) } else { no("not an order of every trigger") }
         }
         (RequestKind::ChooseReplacement { sources, .. }, Answer::Index(i)) => {
             if (*i as usize) < sources.len() { Ok(()) } else { no("not one of the replacement effects offered") }

@@ -140,7 +140,7 @@ fn play(card: &str) -> (Option<u32>, usize) {
                 asked = Some(*count);
                 Answer::Targets(vec![candidates[0]])
             }
-            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..sources.len() as u8).collect()),
+            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..count_u32(sources.len())).collect()),
             other => panic!("unexpected question {other:?}"),
         };
         game.answer(request.id, request.player, answer).unwrap();

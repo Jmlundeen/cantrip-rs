@@ -159,7 +159,7 @@ fn play(hands: [&[&str]; 2], steps: Vec<Step>, until: u32, mut watch: impl FnMut
                 Answer::Act(Action::of(confirm.or(mox).or(land).expect("mana to pay with, or the payment to confirm")))
             }
             RequestKind::ChooseTarget { candidates, .. } => Answer::Targets(vec![candidates[0]]),
-            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..sources.len() as u8).collect()),
+            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..count_u32(sources.len())).collect()),
             // The newest cards, so a card planned for a later turn stays.
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand.iter().rev().copied().take(*count as usize).collect()),
             RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
