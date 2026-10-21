@@ -295,7 +295,7 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
             let number = turn.number;
             cx.st().update_player(active, |p| {
                 p.turn_began = number;
-                p.turns_taken += 1;
+                p.turns_taken = p.turns_taken.saturating_add(1);
                 p.lands_played = 0;
             });
             // CR 502.1: first, the active player's phased-out permanents phase in.

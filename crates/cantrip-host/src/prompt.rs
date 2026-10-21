@@ -1563,7 +1563,7 @@ fn subtype_heading(source: &str, choices: &[Subtype], purpose: WordUse) -> Strin
 }
 
 /// A count or mana value as the protocol's `int`: exactly, or past its range the most it holds (KI-99).
-fn wire(n: u32) -> i32 {
+pub(crate) fn wire(n: u32) -> i32 {
     i32::try_from(n).unwrap_or(i32::MAX)
 }
 

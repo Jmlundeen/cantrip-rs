@@ -3110,7 +3110,7 @@ pub fn may_look_at_library_top(q: &dyn Query, cards: &CardTable, player: PlayerI
 /// "it gains").
 fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     let LandRules { extra, unlimited, graveyard, top_lands, .. } = land_rules(cx, player);
-    if !unlimited && cx.s().player(player).lands_played as u32 >= 1 + extra {
+    if !unlimited && cx.s().player(player).lands_played >= 1 + extra {
         return;
     }
     // A land card is played as itself; a modal double-faced card whose back face is a land may be played as that
@@ -4465,7 +4465,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
         ActionKind::PlayLand => {
             // The land play is counted as the land is played (CR 305.1), before anything that watches it triggers:
             // Fastbond's "if it wasn't the first land you played this turn" counts this one.
-            cx.st().update_player(player, |p| p.lands_played += 1);
+            cx.st().update_player(player, |p| p.lands_played = p.lands_played.saturating_add(1));
             // CR 406.3a: a card exiled face down is turned face up just before it is played.
             ops::turn_up_to_play(cx, source);
             // The land is played by what the action names (CR 305.1): a permission that says it enters tapped makes it, and
@@ -5276,7 +5276,7 @@ pub fn could_play_land_during_resolution(cx: &Cx, card: ObjectId) -> bool {
         return false;
     }
     let LandRules { extra, unlimited, .. } = land_rules(cx, player);
-    unlimited || (cx.s().player(player).lands_played as u32) < 1 + extra
+    unlimited || cx.s().player(player).lands_played < 1 + extra
 }
 
 /// Plays `card` as a land as an effect resolves (CR 305.1, 608.2g): put onto the battlefield as a land play, counted
@@ -5286,7 +5286,7 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
         return Ok(None);
     }
     let player = cx.s().stack.last().expect("a resolving item").controller;
-    cx.st().update_player(player, |p| p.lands_played += 1);
+    cx.st().update_player(player, |p| p.lands_played = p.lands_played.saturating_add(1));
     ops::turn_up_to_play(cx, card);
     // Played by the effect, not by any permission on the card (CR 305.1, 608.2g): "each land played this way enters
     // tapped" (Lightstall Inquisitor's) has no say, and every permission for the card ends as it leaves (CR 400.7).

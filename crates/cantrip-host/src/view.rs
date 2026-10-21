@@ -564,14 +564,14 @@ impl<'a> Projector<'a> {
             poison_counters: i32::from(player.poison()),
             hand_count: s.zone(Zone::hand(p)).len() as i32,
             library_count: s.zone(Zone::library(p)).len() as i32,
-            lands_played_this_turn: i32::from(player.lands_played),
+            lands_played_this_turn: crate::prompt::wire(player.lands_played),
             is_monarch: player.monarch,
             has_initiative: player.initiative,
             has_citys_blessing: player.citys_blessing,
             has_enduring_story: player.enduring_story,
             speed: player.speed.map(i32::from),
             energy: i32::from(player.energy()),
-            dungeons_completed: i32::from(player.dungeons_completed),
+            dungeons_completed: crate::prompt::wire(player.dungeons_completed),
             ..Default::default()
         };
         for mana in Mana::ALL {

@@ -211,7 +211,7 @@ pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
 /// "Your first, second, or third turn of the game" (CR 500, 102.1): it is `player`'s own turn and they have begun at most `n`
 /// turns, an extra turn counting as one. Starting Town's enters-tapped clause and Jace Reawakened's casting restriction print it
 /// (with `n` = 3).
-pub fn in_your_first_turns(q: &dyn Query, player: PlayerId, n: u16) -> bool {
+pub fn in_your_first_turns(q: &dyn Query, player: PlayerId, n: u32) -> bool {
     q.state().turn.active == player && q.state().player(player).turns_taken <= n
 }
 
