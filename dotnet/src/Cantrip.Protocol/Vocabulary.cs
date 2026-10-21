@@ -136,7 +136,7 @@ public enum DrawReasonView
     /// <summary>Every player left in the game lost at once (CR 104.4a).</summary>
     AllLost = 1,
 
-    /// <summary>The game entered a loop of mandatory actions that no player could stop (CR 104.4b).</summary>
+    /// <summary>The game went round a loop in which every player only passed (CR 104.4b; docs/rules-exceptions.md, RX-4).</summary>
     MandatoryLoop = 2,
 
     /// <summary>The game reached the most events the engine records (<c>docs/rules-exceptions.md</c>, RX-1).</summary>

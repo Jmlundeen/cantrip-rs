@@ -7,7 +7,7 @@
 # the Ferocidon's ability, Bot2's alone (APNAP, CR 101.4), deals 1 damage to Bot1. Every round comes back to the same
 # board, but with Bot1 a life lower, so the position never repeats: the twentieth time the Dragon enters Bot1 is at 0 life
 # and loses the game (CR 704.5a), and Bot2 wins. Had the life total been left out of what makes a position, the loop would
-# have been found a draw at its second round.
+# have been drawn as a loop of passes after its third round (docs/rules-exceptions.md, RX-4).
 
 [Bot1 Deck]
 Swamp

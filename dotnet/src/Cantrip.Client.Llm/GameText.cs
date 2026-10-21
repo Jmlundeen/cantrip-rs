@@ -366,7 +366,7 @@ public static class GameText
             GameEndedEvent ended => ended.Outcome == GameOutcomeView.Draw
                 ? ended.DrawReason switch
                 {
-                    DrawReasonView.MandatoryLoop => "The game ended in a draw: a loop of mandatory actions no player could stop (CR 104.4b).",
+                    DrawReasonView.MandatoryLoop => "The game ended in a draw: it went round a loop in which every player only passed (CR 104.4b).",
                     DrawReasonView.AllLost => "The game ended in a draw: every player lost at once.",
                     DrawReasonView.EventLimit => "The game ended in a draw: it reached the most events the engine records.",
                     _ => "The game ended in a draw.",

@@ -1313,12 +1313,14 @@ pub fn priority(cx: &mut Cx) -> R<Flow> {
         player = next_in_game(cx.s(), player);
         cx.st().update_turn(|t| t.priority = player);
     }
-    let options = actions::priority_options(cx, player);
-    // CR 104.4b: the game has come round a loop of mandatory actions, and is a draw; and a player who must make a different
-    // choice round a loop is not offered what they did here before (CR 732.3).
-    let Some(options) = crate::loops::at_priority(cx, player, options) else {
+    // RX-4: the game has come round a loop of passes for the last time, and is a draw.
+    if crate::loops::at_priority(cx) {
         return Ok(Flow::Done);
-    };
+    }
+    let options = actions::priority_options(cx, player);
+    // What working out the options asked of the history is no read that tells rounds of a loop of passes apart: while every
+    // player passes, what they could have done changes nothing (`loops`).
+    cantrip_api::history::take_reads();
     let Some(answer) = cx.ask_rule(player, RequestKind::Priority { options })? else {
         // The player left the game as they held priority: it passes to the next player in turn order still in, as their own
         // priority, no pass counted for the one who left (CR 800.4a, 800.4j).
@@ -1328,6 +1330,7 @@ pub fn priority(cx: &mut Cx) -> R<Flow> {
     };
     match answer {
         Answer::Act(action) => {
+            crate::loops::acted(cx);
             let mut frame = Frame::new(FrameKind::Act { player });
             frame.answers.push((Some(player), Answer::Act(action)));
             cx.st().frame_push(frame);

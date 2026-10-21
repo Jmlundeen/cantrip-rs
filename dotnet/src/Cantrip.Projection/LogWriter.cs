@@ -347,7 +347,7 @@ public static class LogWriter
                 return ended.DrawReason switch
                 {
                     DrawReasonView.MandatoryLoop =>
-                        "The game is a draw: it is in a loop of mandatory actions that no player can stop (CR 104.4b).",
+                        "The game is a draw: it went round a loop in which every player only passed (CR 104.4b).",
                     DrawReasonView.AllLost => "The game is a draw: every player lost at once (CR 104.4a).",
                     DrawReasonView.EventLimit => "The game is a draw: it reached the most events the engine records.",
                     _ => "The game is a draw.",

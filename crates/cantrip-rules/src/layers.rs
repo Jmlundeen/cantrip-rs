@@ -605,6 +605,11 @@ fn pass(cards: &CardTable, state: &GameState, log: &[Record]) -> std::rc::Rc<Pas
                 && found.key == key
                 && found.log.get().is_none_or(|len| len == log.len())
             {
+                // What the pass holds was worked out asking the past: using it again asks the past again, though nothing
+                // reads the history this time - which the rules that find a loop of passes count (`note_read`, `loops`).
+                if found.log.get().is_some() {
+                    cantrip_api::history::note_read();
+                }
                 return found;
             }
         }
@@ -3604,5 +3609,28 @@ mod player_keyword_tests {
         state.zone_remove(Zone::BATTLEFIELD, ward);
         assert!(can_target(&cards, &state, &[], &theirs, Target::Player(PlayerId(0))));
         assert!(can_target(&cards, &state, &[], &mine, Target::Player(PlayerId(1))));
+    }
+}
+
+#[cfg(test)]
+mod pass_read_tests {
+    use super::*;
+
+    /// A pass whose work asked the past, used again for the same history, asks it again as far as the rules that find a
+    /// loop of passes are concerned (`loops`): what it holds depends on the history, though nothing reads it this time. A
+    /// pass that never asked the past is used again without a read.
+    #[test]
+    fn a_kept_pass_that_asked_the_past_notes_a_read_when_used_again() {
+        let cards = CardTable::new([]);
+        let state = GameState::new(2, 0);
+        let first = pass(&cards, &state, &[]);
+        cantrip_api::history::take_reads();
+        let again = pass(&cards, &state, &[]);
+        assert!(std::rc::Rc::ptr_eq(&first, &again));
+        assert_eq!(cantrip_api::history::take_reads(), 0, "it never asked the past");
+        first.log.set(Some(0));
+        let again = pass(&cards, &state, &[]);
+        assert!(std::rc::Rc::ptr_eq(&first, &again));
+        assert_eq!(cantrip_api::history::take_reads(), 1, "what it holds was worked out asking the past");
     }
 }

@@ -310,7 +310,7 @@ impl Game {
                 (flow, cx.asked_at)
             };
 
-            loops::after_frame(&mut self.state, self.log.len());
+            loops::after_frame(&mut self.state);
             // A question was asked and the run went on regardless: its work is thrown away and redone when it is answered.
             let flow = match flow {
                 Ok(_) if self.state.agenda.get(at).is_some_and(|f| f.pending.is_some()) => {
@@ -380,18 +380,12 @@ impl Game {
         if pending.player != player {
             return Err(Rejected(format!("request {request} is not for {player:?}")));
         }
-        // A player who must stop a loop (CR 732.3) asked a "may" where taking it would end their round as the last one ended.
-        if loops::refuses(&self.state, request, &pending, &answer) {
-            return Err(Rejected("a player who must stop a loop may not give that answer there again (CR 732.3)".into()));
-        }
         // An answer given here before leads to the node it made: the working state goes there, nothing is replayed.
         if let Some(child) = self.tree.child(self.at, request, player, &answer) {
             self.goto(child);
             return Ok(());
         }
         validate::check(self, &pending, &answer)?;
-        // A loop being watched keeps the answers given to its questions (`loops`), as they were asked.
-        let watched = loops::answering(&self.state, request, &pending, &answer);
         let here = self.marks();
         self.tree.close(self.at, here);
         // A run answered without stages is redone from its start, so the events it had recorded are thrown away and
@@ -407,6 +401,7 @@ impl Game {
                 Answer::Player(p) => p,
                 _ => pending.player,
             };
+            loops::asked(&mut self.state, &kind);
             let id = self.state.request_id();
             self.state.update_frame(at, |f| {
                 f.stand_in = None;
@@ -428,9 +423,6 @@ impl Game {
             self.state.revert(mark);
             self.log.truncate(log_mark);
             self.state.update_frame(at, |f| f.answers = answers);
-        }
-        if let Some(watched) = watched {
-            loops::answered(&mut self.state, player, watched);
         }
         self.run();
         self.at = child;
@@ -728,8 +720,7 @@ impl<'a> Cx<'a> {
     }
 
     pub fn ask_core(&mut self, player: PlayerId, kind: RequestKind, may_cancel: bool) -> R<Answer> {
-        // A real choice, asked or answered on a re-run, means no loop through here is a mandatory one (CR 104.4b); and a loop
-        // of choices is watched, and a player who must stop it made to choose otherwise (CR 732.3).
+        // A real choice, asked or answered on a re-run, ends a run of passes (`loops`; RX-4).
         // A player who conceded at this point of the run leaves the game here, on every replay (`Game::concede`).
         let any_conceded = !self.g.state.agenda[self.frame].conceded.is_empty();
         self.concessions_here();
@@ -769,7 +760,7 @@ impl<'a> Cx<'a> {
                 f.answers.truncate(cursor);
             });
         }
-        let (kind, key) = loops::asked(self, player, kind, replay.is_some());
+        loops::asked(&mut self.g.state, &kind);
         if let Some(answer) = replay {
             self.cursor += 1;
             return Ok(answer);
@@ -785,9 +776,7 @@ impl<'a> Cx<'a> {
         let id = self.g.state.request_id();
         let at = self.frame;
         self.g.state.update_frame(at, |f| f.pending = Some(Request { id, player, kind, may_cancel }));
-        loops::waiting(&mut self.g.state, id, key);
-        // The position the question is asked in, taken once the loop watch knows the question: a run that goes on past it is
-        // wound back to here (`Game::run`), and the watch must still be waiting for its answer (CR 732).
+        // The position the question is asked in: a run that goes on past it is wound back to here (`Game::run`).
         self.asked_at = Some((self.g.state.mark(), self.g.log.len()));
         Err(Stop::Suspend)
     }
@@ -1053,6 +1042,7 @@ impl cantrip_api::Game for Cx<'_> {
                     let id = self.g.state.request_id();
                     let at = self.frame;
                     let ask = RequestKind::ChoosePlayer { source, candidates, verb: "makes the choice", amount: 0 };
+                    loops::asked(&mut self.g.state, &ask);
                     self.g.state.update_frame(at, |f| {
                         f.staged = true;
                         f.stand_in = Some(Box::new((next, kind)));
@@ -1063,7 +1053,7 @@ impl cantrip_api::Game for Cx<'_> {
             }
         }
         settle::verify_control(self);
-        let (kind, key) = loops::asked(self, player, kind, false);
+        loops::asked(&mut self.g.state, &kind);
         let id = self.g.state.request_id();
         let at = self.frame;
         self.g.state.update_frame(at, |f| {
@@ -1071,7 +1061,6 @@ impl cantrip_api::Game for Cx<'_> {
             f.next_stage = next;
             f.pending = Some(Request { id, player, kind, may_cancel: false });
         });
-        loops::waiting(&mut self.g.state, id, key);
         Suspend
     }
 

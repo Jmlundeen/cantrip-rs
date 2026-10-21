@@ -6,7 +6,8 @@
 # one, so it enchants the Dragon without anyone choosing; its enters ability returns the Dragon, and round it goes. Each
 # trigger has no target or one, the Dragon's two abilities never trigger together, and at every priority neither player
 # can do anything but pass or tap a Swamp for mana (their hands are only basic lands; no spell is castable with a trigger
-# on the stack), and tapping a land only fills a pool that buys nothing: no player can stop it, so the game is a draw.
+# on the stack), and tapping a land only fills a pool that buys nothing: no player can stop it. Both only pass, and once it
+# has come round three times the game is a draw (docs/rules-exceptions.md, RX-4).
 
 [Bot1 Deck]
 Swamp

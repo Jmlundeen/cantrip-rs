@@ -1,12 +1,12 @@
-# The three-Oblivion-Ring loop again (CR 104.4b), but Bot2 holds Disenchant with two untapped Plains: at every priority
-# Bot2 could cast it, so the loop contains an optional action and is no draw (CR 104.4b: "Loops that contain an optional
-# action don't result in a draw"). Bot2 passes thirty times, letting the loop go round five times (two passes for each
-# Ring that leaves, three Rings to a round), far past where a loop of mandatory actions is found; the game must still be
-# going. Then Bot2 breaks it. After the thirtieth pass, as after the sixth, Ring A has just been exiled with Ring B and
-# A's leaves ability (which will return C) is on the stack, B alone on the battlefield; Disenchant destroys B. B's leaves
+# The three-Oblivion-Ring loop again (CR 104.4b), but Bot2 holds Disenchant with two untapped Plains. The Rings are alike,
+# so the game comes back to the same position each time a Ring leaves (two passes of Bot2's). A loop every player only
+# passes in is let go round before the game is a draw (docs/rules-exceptions.md, RX-4), so that a player holding an answer
+# outside it may still end it. Bot2 passes twelve times, and the game goes on; then it breaks the loop, at its last
+# priority before the draw. After the twelfth pass, as after the sixth, Ring A has just been exiled with Ring B and A's
+# leaves ability (which will return C) is on the stack, B alone on the battlefield; Disenchant destroys B. B's leaves
 # ability returns A, whose enters ability has no other nonland permanent to target and is removed (CR 603.3d); then the
-# old A's leaves ability returns C, whose enters ability exiles A, whose leaves ability returns nothing (it is a new A,
-# CR 400.7, that exiled nothing). One Ring is left on the battlefield holding one in exile, and the game goes on.
+# old A's leaves ability returns C, whose enters ability exiles A, whose leaves ability returns nothing (it is a new A, CR
+# 400.7, that exiled nothing). One Ring is left on the battlefield holding one in exile, and the game goes on.
 
 [Bot1 Deck]
 Oblivion Ring
@@ -67,24 +67,7 @@ Bot2.Pass
 Bot2.Pass
 Bot2.Pass
 Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
-Bot2.Pass
+? Result = InProgress
 ? Bot1.Battlefield.Oblivion Ring.Tapped = false
 ? Exile.Count = 2
 Bot2.Battlefield.Plains.Activate

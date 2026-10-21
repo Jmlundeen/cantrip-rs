@@ -1,7 +1,8 @@
 # Browser
 # The three-Oblivion-Ring loop (CR 104.4b) at a table, Bot1 a browser page: the game is a draw, and the page says why - the
-# game log, which the game-over panel reads its detail from, says the game is in a loop of mandatory actions that no player
-# can stop. The headless scenario of the same loop says why each Ring's ability has one target and why no one can stop it.
+# game log, which the game-over panel reads its detail from, says the game went round a loop in which every player only
+# passed (docs/rules-exceptions.md, RX-4). The headless scenario of the same loop says why each Ring's ability has one target
+# and why no one can stop it.
 
 [Bot1 Deck]
 Oblivion Ring
@@ -54,4 +55,4 @@ Bot1.Hand = Plains; Plains; Plains
 Bot1.Status = (absent)
 Bot2.Status = (absent)
 Client.Bot1.Over = true
-Client.Bot1.Log.Has = The game is a draw: it is in a loop of mandatory actions that no player can stop (CR 104.4b).
+Client.Bot1.Log.Has = The game is a draw: it went round a loop in which every player only passed (CR 104.4b).

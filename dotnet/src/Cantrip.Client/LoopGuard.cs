@@ -6,13 +6,13 @@ namespace Cantrip.Client;
 /// Keeps an automated seat from going round a loop for ever.
 /// <para>
 /// The rules engine never cuts off a loop its players keep going by choice (a combination may need hundreds of rounds to
-/// win), so a seat nobody is driving must stop by itself. This one lets the seat it wraps answer the first
-/// <see cref="AnswersPerStep"/> questions of a step as it likes; past that it answers each one passively itself: it passes,
-/// declines, and takes each question's default, but for a question that picks one thing among several, where it picks
-/// each in turn - a different answer each time round, so that a choice that would end the loop is tried. A loop that goes on
-/// whatever is picked is then one of passes and declines, which the engine makes a draw (CR 732.4-5). A run the passive
-/// answers cannot end, which the engine does not judge a loop, ends in a draw once the game reaches the most events the
-/// engine records (<c>docs/rules-exceptions.md</c>, RX-1), so no table of automated seats goes on for ever.
+/// win), nor makes any player choose otherwise (<c>docs/rules-exceptions.md</c>, RX-4), so a seat nobody is driving must
+/// stop by itself. This one lets the seat it wraps answer the first <see cref="AnswersPerStep"/> questions of a step as it
+/// likes; past that it answers each one passively itself: it passes, declines, and takes each question's default, but for
+/// a question that picks one thing among several, where it picks each in turn - a different answer each time round, so
+/// that a choice that would end the loop is tried. A loop in which every seat then only passes is drawn by the engine
+/// after a few rounds (RX-4); one with a decline or a pick in it, or a run that never repeats, ends in a draw once the game
+/// reaches the most events the engine records (RX-1), so no table of automated seats goes on for ever.
 /// </para>
 /// </summary>
 public sealed class LoopGuard : IAutoPlayer

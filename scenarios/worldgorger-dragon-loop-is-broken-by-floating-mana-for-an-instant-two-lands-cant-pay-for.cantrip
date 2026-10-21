@@ -1,10 +1,11 @@
-# The Worldgorger Dragon loop is no draw when tapping lands can buy something (CR 104.4b's last sentence, CR 106.4): Bot1
-# holds Withering Torment ({2}{B}), which its two Swamps can't pay for at once - so it is never offered at priority - but
-# the Swamps come back untapped each time round the loop and mana stays in the pool until the step ends. Bot1 lets the
-# loop go round ten times without tapping them - far past where a loop of mandatory actions is found, and no draw: tapping
-# them is a choice that could pay for the Torment - then taps them two times round in a row, floating four black mana, and with the Dragon's third enters ability on the stack
-# casts Withering Torment on the Dragon: Bot1 loses 2 life, the Dragon's leaves ability returns nothing (nothing is exiled
-# with it yet), Animate Dead goes to the graveyard enchanting nothing (CR 704.5m), and the enters ability then exiles both
+# The Worldgorger Dragon loop broken by floating mana (CR 106.4): Bot1 holds Withering Torment ({2}{B}), which its two
+# Swamps can't pay for at once - so it is never offered at priority - but the Swamps come back untapped each time round the
+# loop and mana stays in the pool until the step ends. A loop every player only passes in is let go round and is then a
+# draw (docs/rules-exceptions.md, RX-4), and tapping the Swamps is an action that ends that run of passes. Bot1 lets the
+# loop go round without tapping them for seventeen passes (its twentieth priority would be the draw), then taps them
+# two times round in a row, floating four black mana, and with the Dragon's third enters ability on the stack casts
+# Withering Torment on the Dragon: Bot1 loses 2 life, the Dragon's leaves ability returns nothing (nothing is exiled with
+# it yet), Animate Dead goes to the graveyard enchanting nothing (CR 704.5m), and the enters ability then exiles both
 # Swamps for good. One black mana is left floating.
 
 [Bot1 Deck]
@@ -48,34 +49,7 @@ Bot1.Pass
 Bot1.Pass
 Bot1.Pass
 Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
-Bot1.Pass
+? Result = InProgress
 Bot1.Battlefield.Swamp#1.Activate
 Bot1.Battlefield.Swamp#2.Activate
 Bot1.Pass

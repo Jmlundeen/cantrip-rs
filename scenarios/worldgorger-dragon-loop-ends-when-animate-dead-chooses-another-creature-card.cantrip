@@ -4,7 +4,8 @@
 # ability returns them all, new objects (CR 400.7), the Swamps untapped. Animate Dead, put onto the battlefield without
 # being cast, chooses what it enchants (CR 303.4f, the Worldgorger Dragon ruling): a creature card in a graveyard, which is
 # now the Dragon or Bot2's Ornithopter, and not targeting. Bot1 chooses the Dragon ten times, going round the loop ten
-# times - far past where a loop of mandatory actions is found, and still no draw, for each of those was a choice - and
+# times - far past the three rounds after which a loop of passes is a draw (RX-4), and still no draw, for each of those
+# was a choice - and
 # then the Ornithopter, so Animate Dead's enters ability
 # returns it under Bot1's control (CR 110.2) and the loop is over: the Dragon stays in the graveyard, and Bot1 has two
 # untapped Swamps again (mana made in the loop would have stayed in the pool all along, CR 106.4).

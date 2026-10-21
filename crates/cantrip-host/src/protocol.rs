@@ -165,7 +165,7 @@ pub enum DrawReasonView {
     None,
     /// Every player left lost at once (CR 104.4a).
     AllLost,
-    /// A loop of mandatory actions no player could stop (CR 104.4b).
+    /// A loop every player only passed in (CR 104.4b; `docs/rules-exceptions.md`, RX-4).
     MandatoryLoop,
     /// The game reached the most events the engine records (`docs/rules-exceptions.md`, RX-1).
     EventLimit,

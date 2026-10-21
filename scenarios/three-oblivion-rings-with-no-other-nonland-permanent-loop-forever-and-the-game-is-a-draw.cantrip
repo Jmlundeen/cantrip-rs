@@ -10,7 +10,8 @@
 # target is the lone legal one; and at every priority neither player can do anything but pass or tap a land for mana
 # (Bot1's hand is only Plains, Bot2's only Islands, nothing is castable with a trigger on the stack). The position -
 # two Rings on the battlefield, one holding the third in exile, the next trigger on the stack - comes round again with
-# no player having made a choice: a loop of mandatory actions with no way to stop it, so the game is a draw.
+# no player having made a choice: a loop of mandatory actions with no way to stop it. Once it has come round three times
+# with every player only passing, the game is a draw (docs/rules-exceptions.md, RX-4).
 
 [Bot1 Deck]
 Oblivion Ring

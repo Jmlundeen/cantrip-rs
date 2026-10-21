@@ -1,8 +1,8 @@
 # A loop its player keeps going by choice goes on for as long as they choose (CR 104.4b's last sentence): the engine supports
 # no shortcut (CR 732.2), the player goes round by hand, and nothing cuts the loop off however many times it comes round. The
 # Worldgorger Dragon loop with Bot2's Entombed Ornithopter in a graveyard too: each time Animate Dead enters it chooses what
-# it enchants (CR 303.4f), a real choice. Bot1 chooses the Dragon forty times - past the thirty-two rounds after which the
-# engine once made a player choose otherwise - and then the Ornithopter, which Animate Dead returns under Bot1's control
+# it enchants (CR 303.4f), a real choice, and no player is ever made to choose otherwise (docs/rules-exceptions.md, RX-4).
+# Bot1 chooses the Dragon forty times and then the Ornithopter, which Animate Dead returns under Bot1's control
 # (CR 110.2), and the loop is over. The Dragon stays in Bot1's graveyard; the Swamps are untapped, as the loop returned them.
 
 [Bot1 Deck]

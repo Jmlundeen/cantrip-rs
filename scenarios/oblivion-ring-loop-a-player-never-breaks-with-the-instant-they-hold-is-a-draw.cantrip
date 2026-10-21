@@ -1,9 +1,11 @@
 # The three-Oblivion-Ring loop with Bot2 holding Disenchant and two untapped Plains, as in
 # oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw - but Bot2 never casts it. Disenchant is no part of the
-# loop: no object of the loop calls for casting it, and no player can be made to take an action that would end a loop but
-# those its objects call for (CR 732.5). The loop's own actions are all mandatory, and all Bot2 does in it is pass: it is a
-# loop of mandatory actions (CR 732.4, 104.4b). Once the step is watched for loops, the position comes round again with
-# every player only passing since, and the game is a draw, Disenchant still in Bot2's hand.
+# loop, and no player can be made to take an action that would end a loop but those its objects call for (CR 732.5). The
+# game comes back to the same position each time a Ring leaves, with every player only passing since: a loop of passes,
+# which is let go round and is then a draw (docs/rules-exceptions.md, RX-4): the engine keeps the position in full the
+# first time it comes round, and draws the game once it has come round three times more, each the same in full. After
+# Bot2's twelfth pass the game is still going, as it is where Bot2 casts Disenchant in the other scenario; after its
+# thirteenth the game is a draw, Disenchant still in Bot2's hand.
 
 [Bot1 Deck]
 Oblivion Ring
@@ -47,6 +49,21 @@ Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Plains.Activate
 Bot1.Hand.Oblivion Ring.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+? Result = InProgress
+? Bot2.Hand = Disenchant; Island; Island; Island; Island; Island; Island
+Bot2.Pass
 
 [Expect]
 Result = Draw

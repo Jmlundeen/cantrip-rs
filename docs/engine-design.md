@@ -924,43 +924,43 @@ who can't win (`CardDef::win_rules`) or who has an opponent who can't lose. A co
 (104.3a). Every loss records `Event::GameLost` with its `LossReason`, and a draw `Event::GameDrawn` with its `DrawReason`,
 which the host tells each seat (`PlayerLostEvent`, `GameEndedEvent.DrawReason`).
 
-Loops are `loops.rs`'s (CR 104.4b, 732), watched in `GameState::loop_watch`, journalled like any other write. A loop of
-mandatory actions is a draw (CR 104.4b, 732.4). A question with more than one legal answer is a real choice and clears the
-watch of mandatory actions; a priority with nothing to do but pass - and tap a mana ability whose whole cost is {T}, when
-nothing more mana could buy is castable - is none. After `WATCH_AFTER` such priorities in a row with something on the
-stack, each priority's position is fingerprinted up to the identity of objects (objects numbered by where they are,
+Loops are `loops.rs`'s (CR 104.4b, 732; `docs/rules-exceptions.md`, RX-4), watched in `GameState::loop_watch` and
+`GameState::loop_keys`, journalled like any other write. The engine finds one kind of loop only: a run of passes that
+comes back to the same exact position. Any choice ends a run - an action at priority, or an answer to any other question
+with more than one legal answer (a "may" declined is one, RX-2, and so is every question a player who left was asked and
+the choice of who makes it, CR 800.4g); a question with one legal answer is none. Every priority given with something on
+the stack in a run but its first two is fingerprinted up to the identity of objects (objects numbered by where they are,
 references to objects that left followed one move to what they became - no rule follows `became` further - and named
-past that by what they still say, timestamps by their order), every amount in it (life, poison, counters, damage, mana,
-libraries), and a position seen again is the loop going round: the game is a draw. The
+past that by what they still say, timestamps by their order), with every amount in it (life, poison, counters, damage,
+mana, libraries). A fingerprint seen again is the loop come round once more, but no round rests on a hash: the first
+time a position comes round, it is written out in full (`loops::words`, every word the fingerprint is made of) and kept;
+each time after, a round is counted only if its words are the same. When one has come round `LOOP_ROUNDS` (three) times
+so confirmed, the game is a draw (`DrawReason::MandatoryLoop`). The rounds are let go by because a player holding an
+answer outside the loop (a Disenchant in hand) may still choose to end it, and no player can be made to (CR 732.5). The
 event history is not in the fingerprint; every read of it is counted instead (`cantrip_api::history::note_read`, made by
-`History::new`), and a read clears the positions seen, so a loop that "the third time this turn" or "only once each turn"
-could end is never found by its positions (`loops::settled_read` asks a question whose answer the rest of the turn can't
-change without counting it). Once a step has `BUSY_STEP` events in it, every question is kept by its exact position, every
-answer to a kept question is kept in order, and each player's choices to act are counted (an action at priority, a "may"
-taken, anything chosen but passing, declining or choosing nothing). A priority asked again in the same position with nothing
-reading the history between is a round of a loop. If every answer of the round was a pass at priority, it is a loop of
-mandatory actions (CR 732.4-5: no player can be made to cast an instant no loop object calls for), a draw; a round with a
-"may" declined in it is not (RX-2). If two or more players acted in it, it is a fragmented loop (CR 732.3): the active
-player, or the first involved in turn order, is designated and chooses where to differ - their answers of the last round
-are followed in order, and only at their last action of it, every answer before it the same, is that answer refused (not
-offered at priority or among single picks; a "may" taken is turned down and asked again). Any different answer ends it;
-passing and declining are never refused, and nothing is answered for them. Any other loop its players keep
-going by choice - one player's, or one whose players decline what its objects offer (`docs/rules-exceptions.md`, RX-2) - is never cut
-off, capped or made to change: the engine supports no loop shortcuts (CR 732.2), players perform every loop action by hand,
-and a combination may go round as many times as it needs; a person is held to the match clock, and a seat nobody drives
-stops itself (`LoopGuard`, C#: past 4096 questions in one step it passes, declines and picks each answer in turn). A game
-whose history reaches `MAX_GAME_EVENTS` (2,097,152 events) is a draw, checked between two frames (`Game::run`; RX-1): a
-run of play that never repeats exactly is neither a loop the rules can find nor ever ended by them, and an automated seat
-whose passive answers cannot end a run reaches that draw rather than conceding. The cap bounds every count of things
-that happen - objects, effects, grants, rounds, questions, the history, arena entries - at 2^21 between frames, where it
-is checked (within one frame, only memory bounds them), so such a count is a
-`u32` (a length made one by `count_u32`, which saturates rather than wrap, and sent as the host's `int` by `wire`), and one
-kept narrower is a bug; a game deals at most `MAX_SEATS` (eight) seats, which a set of seats holds a bit each. It bounds no amount:
-counters, damage, mana, life, power and toughness can double in one event. The watch keeps each question of a busy
-step once (`GameState::loop_keys`, found through a hashed index, journalled an entry at a time: a round of a priority and
-an answer given are small undo entries), so a loop played by hand costs the watch nothing more per round; nothing bounds
-what it keeps but `MAX_GAME_EVENTS`, which bounds the questions a step can ask. A normal game pays a comparison per
-priority and a count per read of the history.
+`History::new`), and a read clears the positions seen, so a loop that "the third time this turn" or "only once each
+turn" could end is never found by its positions (`loops::settled_read` asks a question whose answer the rest of the turn
+can't change without counting it; what working out a priority's options reads is not counted, as it changes nothing
+while every player passes; a layer pass kept on the state that was worked out asking the past notes a read each time it
+is used again, as its characteristics depend on the history). Every other loop - a fragmented one (CR 732.3 is not
+applied), one player's, one whose players decline what its objects offer - is played by hand and never cut off, capped
+or made to change: the engine supports no loop shortcuts (CR 732.2), players perform every loop action by hand, and a
+combination may go round as many times as it needs; a person is held to the match clock (RX-4's draw offers come with
+the server's support for them), and a seat nobody drives stops itself (`LoopGuard`, C#: past 4096 questions in one step
+it passes, declines and picks each answer in turn). A game whose history reaches `MAX_GAME_EVENTS` (2,097,152 events) is
+a draw, checked between two frames (`Game::run`; RX-1): a run of play that never repeats exactly is neither a loop the
+rules can find nor ever ended by them, a loop of mandatory actions that never gives anyone priority is drawn there, and
+an automated seat whose passive answers cannot end a run reaches that draw rather than conceding. The cap bounds every
+count of things that happen - objects, effects, grants, rounds, questions, the history, arena entries - at 2^21 between
+frames, where it is checked (within one frame, only memory bounds them), so such a count is a `u32` (a length made one
+by `count_u32`, which saturates rather than wrap, and sent as the host's `int` by `wire`), and one kept narrower is a
+bug; a game deals at most `MAX_SEATS` (eight) seats, which a set of seats holds a bit each. It bounds no amount:
+counters, damage, mana, life, power and toughness can double in one event. The watch keeps each position of a run once
+(found through an index keyed by the fingerprint itself, journalled an entry at a time), and the words of those that
+have come round, so a run of any length costs a fingerprint and a lookup per priority, and a position seen again its
+words besides; nothing bounds what it keeps but `MAX_GAME_EVENTS`. The fingerprint is a folded-multiply hash, and an
+object's row hash is kept from one priority to the next while the row is the same (`loops::row`). A normal game pays a
+fingerprint per priority with something on the stack but the first two of each run, and a count per read of the history.
 
 ### Casting: when a cost's choices are made
 

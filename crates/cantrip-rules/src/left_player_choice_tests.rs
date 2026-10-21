@@ -125,3 +125,19 @@ fn a_staged_question_of_a_player_who_left_follows_the_same_rules() {
     let f = &g.state.agenda[at];
     assert!(f.pending.is_none() && f.stage == 5 && f.answers == vec![(None, Answer::Pass)], "the cost was not left unpaid");
 }
+
+/// RX-4: a question a player who left was asked is still a choice for the loop watch, both the controller's choice of who
+/// makes it (CR 800.4g) and the question then put to that player, so a run of passes through it is no loop of passes.
+#[test]
+fn a_staged_question_of_a_player_who_left_ends_a_run_of_passes() {
+    let (mut g, trinket, at) = game(4);
+    let may = RequestKind::May { source: trinket, purpose: Purpose::Optional };
+    g.state.loop_key_entry(1);
+    let _ = cantrip_api::Game::ask_then(&mut cx(&mut g, at), 7, B, may.clone());
+    assert!(g.state.loop_keys.is_empty(), "the controller's choice of who makes it is a choice, and ends the run");
+    g.state.loop_key_entry(2);
+    let request = g.state.agenda[at].pending.clone().expect("a question");
+    g.answer(request.id, A, Answer::Player(C)).unwrap();
+    assert_eq!(pending(&g, at), (C, may));
+    assert!(g.state.loop_keys.is_empty(), "the question put to the player chosen is a choice, and ends the run");
+}

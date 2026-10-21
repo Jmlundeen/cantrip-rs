@@ -5,7 +5,8 @@
 # and it goes to its owner's graveyard, Bot2's. The Dragon's leaves ability returns the exiled cards under their owner's
 # control, Bot1's. Necromancy enters again and its enters ability must target a creature card in a graveyard: the
 # Dragon in Bot2's graveyard is the only one, so it is chosen without asking (CR 603.3d), and round it goes. Nobody can
-# do anything at any priority but pass or tap a land: the game is a draw.
+# do anything at any priority but pass or tap a land: both pass, and once the loop has come round three times the game is
+# a draw (docs/rules-exceptions.md, RX-4).
 
 [Bot1 Deck]
 Swamp

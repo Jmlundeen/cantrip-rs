@@ -48,7 +48,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
-| [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Fix queued |
+| [KI-54](#ki-54-state-triggers-are-judged-only-where-a-cards-text-marks-a-sentences-end) | State triggers are judged only where a card's text marks a sentence's end | Pri-1 | Fix queued |
 | [KI-103](#ki-103-mana-costs-x-kicker-and-the-mana-a-cast-records-are-narrower-than-play-reaches) | Mana costs, X, kicker and the mana a cast records are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
@@ -131,44 +131,22 @@ affected.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome; a bot-lab duel with infect decks would show it.
 
-### KI-54: Where the loop watch's judgement is not the rules'
+### KI-54: State triggers are judged only where a card's text marks a sentence's end
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine | 2026-10-17, CR 104.4b loop detection; narrowed by the loop hardening and CR 732.3 |
+| Pri-1 | Fix queued | engine | 2026-10-17, CR 104.4b loop detection; narrowed by RX-4 to what is left |
 
-**Notes.** `loops.rs` finds the loops the rules make a draw and applies CR 732.3 (its module comment is the design). A
-loop of mandatory actions is a draw when a position comes round with nothing asking the history in between - through
-forced priorities, or, in a busy step, with every player only passing at priority since (CR 732.4-5: an instant no loop
-object calls for can't be required). A priority asked again in the same exact position in a busy step, with two or more
-players having chosen to act since, is a fragmented loop: the active player (or the first involved) must choose otherwise,
-and chooses where - only their last action of the round, once every answer of theirs before it was the same as last
-round, is refused. Every other loop goes on for as long as its players choose (no shortcuts, CR 732.2; RX-2), up to
-`MAX_GAME_EVENTS` (RX-1). What is still not the rules' procedure, each a pri-1 fix queued after the layer redesign:
-- (a) CR 732.3 is found only by the exact position: a fragmented loop whose rounds differ only in what the rules' "game
-  state" leaves out is not found - continuous effects that pile up or are superseded round after round (the rule's own
-  example: "gains flying" and "loses flying" until end of turn each make an effect, so the effects list grows), or a
-  history read between the rounds whose answer is the same each time. Its players can go on with it.
-- (b) A player made to choose otherwise is refused only an action at priority, a single target, card, mode or player, and
-  a "may" taken; a choice of several targets or cards at once, an order of triggers or a number repeated at their last
-  action is still accepted.
-- (c) A mana ability whose whole cost is {T} is treated as no choice when nothing more mana could pay for is castable, even
-  when its effect does more than add mana (a painland's damage).
-- (d) The watch begins only in a step with `BUSY_STEP` events, so a loop is found at its first round after that - some tens
-  of rounds in - rather than at its second round. From then on it keeps every question of the step.
-- (e) State triggers (CR 603.8): a card's text is one instruction unless it marks a sentence's end with `end_sentence`,
-  which only some cards do (every Oracle sentence needs one), and a staged frame (`Game::ask_then`) drops a pending
-  `state_check_due` when it suspends.
+**Notes.** What this entry once listed of the loop watch's judgement - CR 732.3's fragmented loops, the choices a
+designated player was refused, a {T} mana ability counted as no choice, the busy-step watch - is settled by
+`docs/rules-exceptions.md`, RX-4: the engine draws only a loop every player only passes in, after three confirmed rounds,
+and every other loop is the players' and the clock's (draw offers come with the server's support for them; `loops.rs`'s
+module comment is the design). What is left is a
+gap in when state triggers are judged (CR 603.8), which a loop or any other run can reach: a card's text is one
+instruction unless it marks a sentence's end with `end_sentence`, which only some cards do (every Oracle sentence needs
+one), and a staged frame (`Game::ask_then`) drops a pending `state_check_due` when it suspends.
 
-**Scenarios.**
-- [`scenarios/oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw.cantrip`](../scenarios/oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw.cantrip),
-  [`scenarios/worldgorger-dragon-loop-ends-when-animate-dead-chooses-another-creature-card.cantrip`](../scenarios/worldgorger-dragon-loop-ends-when-animate-dead-chooses-another-creature-card.cantrip)
-  and [`scenarios/worldgorger-dragon-loop-chosen-forty-times-goes-on-until-its-player-chooses-otherwise.cantrip`](../scenarios/worldgorger-dragon-loop-chosen-forty-times-goes-on-until-its-player-chooses-otherwise.cantrip):
-  loops with a choice, played round by hand until the script breaks them.
-- [`scenarios/oblivion-ring-loop-a-player-never-breaks-with-the-instant-they-hold-is-a-draw.cantrip`](../scenarios/oblivion-ring-loop-a-player-never-breaks-with-the-instant-they-hold-is-a-draw.cantrip)
-  and [`scenarios/worldgorger-dragon-loop-whose-player-always-declines-fecundity-is-a-draw.cantrip`](../scenarios/worldgorger-dragon-loop-whose-player-always-declines-fecundity-is-a-draw.cantrip):
-  a loop of passes, a draw as a loop of mandatory actions, and one of a "may" declined, drawn at a low event limit (RX-1, RX-2).
-- `crates/cantrip-script/tests/fragmented_loop.rs`: CR 732.3 with test-only cards (tap and untap an artifact in turn).
+**Scenarios.** None yet.
 
 ### KI-57: The tactical bot does not know islandwalk
 

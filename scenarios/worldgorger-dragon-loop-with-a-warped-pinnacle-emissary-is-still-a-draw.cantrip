@@ -3,7 +3,7 @@
 # permanent the warped spell became (CR 702.185a); the Dragon exiles the Emissary each round and it returns a new object
 # (CR 400.7), one move further from that spell every round. No rule follows it past the first move, so the loop watch
 # names that far-gone reference by what it still says (`Obj::became`), and the positions come round again: the game is
-# drawn as a loop of mandatory actions, long before the event limit.
+# drawn as a loop of passes (docs/rules-exceptions.md, RX-4), long before the event limit.
 
 [Bot1 Deck]
 Swamp
