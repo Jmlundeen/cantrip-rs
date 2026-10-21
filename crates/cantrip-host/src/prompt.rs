@@ -1140,6 +1140,10 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 requirements: blocks(handles, &requirements.pairs),
                 most_requirements: i32::from(requirements.most),
                 suggested: blocks(handles, &requirements.suggested),
+                bands: attackers
+                    .iter()
+                    .map(|a| requirements.bands.iter().find(|b| b.0 == *a).map_or(0, |b| b.1 as i32))
+                    .collect(),
             })
         }
         RequestKind::DiscardToHandSize { count, hand } => PromptPayload::DiscardPromptMessage(DiscardPrompt {

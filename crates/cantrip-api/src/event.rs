@@ -72,9 +72,12 @@ pub enum Event {
     /// Creatures were declared as attackers (CR 508.1): "whenever you attack" (CR 508.1m). Not for creatures put onto
     /// the battlefield attacking (CR 508.4).
     AttackersDeclared { player: PlayerId, count: u8 },
-    /// A creature was declared as a blocker of an attacker (CR 509.1, 509.1g): one event for each blocker and the
-    /// attacker it blocks, so a creature that blocks "this blocks" and an attacker blocked by two sees both.
-    Blocks { blocker: ObjectId, attacker: ObjectId },
+    /// A creature blocks an attacker (CR 509.1, 509.1g): one event for each blocker and each attacker it blocks, so an
+    /// attacker blocked by two sees both. `declared` is the attacker it was declared to block; the other members of that
+    /// attacker's band, which it blocks too (CR 702.22h), come as `declared: false`. "Whenever this creature blocks" (CR 509.3a)
+    /// reads the declared one alone, triggering once; "whenever it blocks a creature" (CR 509.3b) and "becomes blocked by a
+    /// creature" (CR 509.3d) read each.
+    Blocks { blocker: ObjectId, attacker: ObjectId, declared: bool },
     /// An attacking creature was not blocked (CR 509.1h): decided as the declare blockers step's blocks are made.
     Unblocked { attacker: ObjectId, defender: Target },
     /// A permanent became monstrous (CR 701.37a).
@@ -269,7 +272,7 @@ impl Event {
             | Event::Done { source, .. } => source == object,
             Event::CrimeCommitted { by, .. } => by == object,
             Event::Attacks { attacker, .. } | Event::Unblocked { attacker, .. } => attacker == object,
-            Event::Blocks { blocker, attacker } => blocker == object || attacker == object,
+            Event::Blocks { blocker, attacker, .. } => blocker == object || attacker == object,
             Event::ClassLevel { object: o, .. }
             | Event::CountersPut { object: o, .. }
             | Event::Transformed { object: o } => o == object,

@@ -277,4 +277,18 @@ public sealed class ProtocolJsonTests
             Assert.True(sampled.Contains(union.SubType.Name), $"{union.SubType.Name} has no JSON sample in {nameof(ProtocolJsonTests)}.");
         }
     }
+
+    [Fact]
+    public void A_block_of_a_band_obeys_the_requirement_of_each_member()
+    {
+        // Lure on banded attackers 3 and 4 and on attacker 5 alone (CR 509.1c, 702.22h): blocker 9 blocking 3 blocks 4 too and
+        // obeys two requirements; blocking 5 obeys one.
+        var prompt = ProtocolJson.Deserialize<PromptPayload>(
+            """{"$type":"DeclareBlockersPromptMessage","Player":2,"Eligible":[9],"Attackers":[3,4,5],"Allowed":[{"Blocker":9,"Attacker":3},{"Blocker":9,"Attacker":4},{"Blocker":9,"Attacker":5}],"MinimumBlockers":[1,1,1],"Requirements":[{"Blocker":9,"Attacker":3},{"Blocker":9,"Attacker":4},{"Blocker":9,"Attacker":5}],"MostRequirements":2,"Bands":[1,1,0]}""") as DeclareBlockersPromptMessage;
+        Assert.NotNull(prompt);
+        BlockMessage Block(int attacker) => new() { Blocker = new ViewHandle(9), Attacker = new ViewHandle(attacker) };
+        Assert.Equal(2, prompt.Obeyed([Block(4)]));
+        Assert.True(prompt.ObeysRequirements([Block(3)]));
+        Assert.False(prompt.ObeysRequirements([Block(5)]));
+    }
 }

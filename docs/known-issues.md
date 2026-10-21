@@ -53,7 +53,6 @@ keeps it).
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
-| [KI-70](#ki-70-a-creature-blocking-a-band-records-a-block-of-the-declared-member-only) | A creature blocking a band records a block of the declared member only | Low | Unexercised |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
@@ -425,20 +424,6 @@ permission's additions, then the least.
 
 **Scenarios.** none yet (Trinisphere with Wild Ride, Winternight Stories, Crabomination, Rottenmouth Viper or a permission
 with a tax would show it).
-
-### KI-70: A creature blocking a band records a block of the declared member only
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, review of Lure and banding |
-
-**Notes.** A creature blocking a member of an attacking band blocks every member (CR 702.22h), and the declaration records
-one `Event::Blocks` per blocker as declared, so "whenever this creature blocks" triggers once (CR 509.3a, right). The band
-members it blocks only by 702.22h get no `Event::Blocks` pair of their own, so an ability that triggers on "blocks a
-creature" or "becomes blocked by a creature" once per pair (CR 509.3b, 509.3d) would not see them. No card in content
-triggers per pair. (Block requirements are counted through the band: Lure is obeyed by blocking another member.)
-
-**Scenarios.** none yet: no card in content triggers on each creature a blocker blocks.
 
 ### KI-71: The tactical bot's combat planning ignores bands
 

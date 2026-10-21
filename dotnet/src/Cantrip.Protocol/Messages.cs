@@ -2554,9 +2554,39 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     [Key(8)]
     public List<BlockMessage> Suggested { get; set; } = [];
 
-    /// <summary>How many of <see cref="Requirements"/> <paramref name="blocks"/> obeys: each required block it makes.</summary>
-    public int Obeyed(IEnumerable<BlockMessage> blocks) =>
-        blocks.Count(block => Requirements.Exists(r => r.Blocker == block.Blocker && r.Attacker == block.Attacker));
+    /// <summary>
+    /// The attacking band each of <see cref="Attackers"/> is in, index for index, 0 for none (CR 702.22h): a creature blocking
+    /// one member of a band blocks every member, so it obeys a requirement to block any of them.
+    /// </summary>
+    [Key(9)]
+    public List<int> Bands { get; set; } = [];
+
+    /// <summary>Whether a creature blocking <paramref name="declared"/> blocks <paramref name="attacker"/>: the same creature, or a member of its band.</summary>
+    public bool BlocksThrough(ViewHandle declared, ViewHandle attacker)
+    {
+        if (declared == attacker)
+        {
+            return true;
+        }
+
+        int Band(ViewHandle a)
+        {
+            int at = Attackers.IndexOf(a);
+            return at >= 0 && at < Bands.Count ? Bands[at] : 0;
+        }
+
+        return Band(declared) != 0 && Band(declared) == Band(attacker);
+    }
+
+    /// <summary>
+    /// How many of <see cref="Requirements"/> <paramref name="blocks"/> obeys (CR 509.1c): each one whose blocker blocks its
+    /// attacker, as declared or through the attacker's band - so one block of a band may obey two.
+    /// </summary>
+    public int Obeyed(IEnumerable<BlockMessage> blocks)
+    {
+        List<BlockMessage> declared = [.. blocks];
+        return Requirements.Count(r => declared.Exists(block => block.Blocker == r.Blocker && BlocksThrough(block.Attacker, r.Attacker)));
+    }
 
     /// <summary>Whether <paramref name="blocks"/> obeys as many of the requirements as the declaration must (CR 509.1c).</summary>
     public bool ObeysRequirements(IEnumerable<BlockMessage> blocks) => Obeyed(blocks) >= MostRequirements;
@@ -2568,7 +2598,7 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     public BlockMessage? UnmetRequirement(IReadOnlyCollection<BlockMessage> blocks) =>
         ObeysRequirements(blocks)
             ? null
-            : Requirements.FirstOrDefault(r => !blocks.Any(b => b.Blocker == r.Blocker && Requirements.Exists(q => q.Blocker == b.Blocker && q.Attacker == b.Attacker)))
+            : Requirements.FirstOrDefault(r => !blocks.Any(b => b.Blocker == r.Blocker && Requirements.Exists(q => q.Blocker == b.Blocker && BlocksThrough(b.Attacker, q.Attacker))))
               ?? Requirements.FirstOrDefault();
 
     /// <summary>The fewest creatures that may block the attacker at <paramref name="index"/>, at least 1.</summary>

@@ -24,7 +24,7 @@ fn legendary_soldier_too(view: &dyn LayerQuery, source: ObjectId, chars: &mut Ch
 /// as an attacker, or as a blocker. The creature is the trigger's subject, which "it" is.
 fn enchanted_creature_attacks_or_blocks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker: creature, .. } | Event::Blocks { blocker: creature, .. } if q.attached_to(source) == Some(*creature) => {
+        Event::Attacks { attacker: creature, .. } | Event::Blocks { blocker: creature, declared: true, .. } if q.attached_to(source) == Some(*creature) => {
             Fired::about(Target::Object(*creature))
         }
         _ => None,

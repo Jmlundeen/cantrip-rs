@@ -950,6 +950,10 @@ pub struct DeclareBlockersPrompt {
     /// A declaration that obeys that many, the engine's own; empty where nothing is required.
     #[serde(default)]
     pub suggested: Vec<BlockMessage>,
+    /// The attacking band each of `attackers` is in, index for index, 0 for none (CR 702.22h): a creature blocking one member
+    /// of a band blocks every member, so it obeys a requirement to block any of them.
+    #[serde(default)]
+    pub bands: Vec<i32>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

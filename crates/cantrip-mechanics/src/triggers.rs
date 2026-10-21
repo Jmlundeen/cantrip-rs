@@ -253,7 +253,8 @@ pub fn sacrificed_by(q: &dyn Query, player: PlayerId, event: &Event) -> Option<O
 pub fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::Attacks { attacker, .. } if *attacker == source => Fired::PLAIN,
-        Event::Blocks { blocker, .. } if *blocker == source => Fired::PLAIN,
+        // Once, however many attackers it blocks (CR 509.3a): the attacker it was declared to block.
+        Event::Blocks { blocker, declared: true, .. } if *blocker == source => Fired::PLAIN,
         _ => None,
     }
 }

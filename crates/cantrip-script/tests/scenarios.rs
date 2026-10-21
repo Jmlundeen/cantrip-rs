@@ -117,3 +117,25 @@ fn a_slot_that_chose_nothing_makes_no_became_target_event() {
     assert_eq!(became.len(), 1, "{became:?}");
     assert!(matches!(became[0], Target::Object(_)), "{became:?}");
 }
+
+/// CR 702.22h, 509.3a-b: Smuggler's Copter declared to block Benalish Hero blocks the Hero's band-mate Guerrilla Gorilla too.
+/// The history holds a block of each - the Hero's declared, the Gorilla's through the band - so an ability that triggers on
+/// each creature it blocks sees both, while "whenever this blocks" (the declared one) triggered once (the scenario's loot).
+#[test]
+fn a_creature_blocking_a_band_blocks_each_member() {
+    use cantrip_engine::*;
+    let path = scripts().join("a-creature-blocking-a-band-triggers-its-blocks-ability-once.cantrip");
+    let script = GameScript::load(&path).unwrap();
+    let result = run(&script).unwrap_or_else(|f| panic!("\n{}", f.report));
+    let game = &result.game;
+    let blocks: Vec<(&str, &str, bool)> = game
+        .history()
+        .all()
+        .iter()
+        .filter_map(|r| match r.event {
+            Event::Blocks { blocker, attacker, declared } => Some((game.name(blocker), game.name(attacker), declared)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(blocks, vec![("Smuggler's Copter", "Benalish Hero", true), ("Smuggler's Copter", "Guerrilla Gorilla", false)]);
+}

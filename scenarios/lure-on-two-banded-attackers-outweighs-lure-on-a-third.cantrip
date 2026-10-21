@@ -1,0 +1,60 @@
+# Lure's requirement (CR 509.1c) counted through a band (CR 702.22h): Bot1 attacks with Benalish Hero and Guerrilla Gorilla
+# banded, each wearing a Lure, and Llanowar Elves alone, also Lured. Bot2's one creature, Ornithopter, can obey two
+# requirements by blocking either member of the band - it blocks both - or one by blocking the Elves, so the declaration must
+# be a block of the band: blocking the Elves is refused, blocking the Hero is taken, and only the Elves' 1 damage gets through.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Benalish Hero
+Guerrilla Gorilla
+Llanowar Elves
+Lure
+Lure
+Lure
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lure.Cast(Bot1.Battlefield.Benalish Hero)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lure.Cast(Bot1.Battlefield.Guerrilla Gorilla)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lure.Cast(Bot1.Battlefield.Llanowar Elves)
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Benalish Hero > Bot2; Guerrilla Gorilla > Bot2; Llanowar Elves > Bot2)
+Bot1.Choose(Guerrilla Gorilla)
+! Bot2.Block(Ornithopter > Llanowar Elves)
+Bot2.Block(Ornithopter > Benalish Hero)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19

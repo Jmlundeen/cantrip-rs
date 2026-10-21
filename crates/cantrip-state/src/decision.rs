@@ -503,12 +503,22 @@ pub struct BlockRequirements {
     pub pairs: Vec<(ObjectId, ObjectId)>,
     pub most: u8,
     pub suggested: Vec<(ObjectId, ObjectId)>,
+    /// The attacking bands (CR 702.22h), each attacker in one with its band's number; empty where no attacker is banded.
+    pub bands: Vec<(ObjectId, u32)>,
 }
 
 impl BlockRequirements {
-    /// How many of the requirements a declaration obeys: each required block it makes.
+    /// Whether a creature blocking `declared` blocks `attacker` too: the same creature, or one in the same attacking band (a
+    /// creature blocking one member of a band blocks every member, CR 702.22h).
+    pub fn blocks_through(&self, declared: ObjectId, attacker: ObjectId) -> bool {
+        let band = |a: ObjectId| self.bands.iter().find(|b| b.0 == a).map_or(0, |b| b.1);
+        declared == attacker || (band(declared) != 0 && band(declared) == band(attacker))
+    }
+
+    /// How many of the requirements a declaration obeys (CR 509.1c): each one whose blocker blocks its attacker, as declared or
+    /// through the attacker's band - so one block of a band may obey two.
     pub fn obeyed(&self, blocks: &[(ObjectId, ObjectId)]) -> u8 {
-        blocks.iter().filter(|b| self.pairs.contains(b)).count() as u8
+        self.pairs.iter().filter(|&&(b, a)| blocks.iter().any(|&(bb, x)| bb == b && self.blocks_through(x, a))).count() as u8
     }
 }
 

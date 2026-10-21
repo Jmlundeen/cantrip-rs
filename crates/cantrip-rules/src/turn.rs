@@ -772,20 +772,22 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
     allowed.retain(|p| !menace.contains(&p.1));
     if !allowed.is_empty() {
         // CR 509.1c: the blocks effects require if able, and the most of them a declaration can obey.
-        let pairs = through_bands(cx, crate::static_rules::block_requirements(cx, &allowed), &allowed);
+        let pairs = crate::static_rules::block_requirements(cx, &allowed);
         let requirements = if pairs.is_empty() { BlockRequirements::default() } else { most_requirements(cx, &allowed, pairs) };
         let answer = cx.ask_core(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements }, false)?;
         if let Answer::Block(blocks) = answer {
-            // CR 509.1g: the blockers are declared together, each declared block a "blocks" event for abilities that watch it -
-            // one per blocker as declared, so "whenever this creature blocks" triggers once (CR 509.3a) though it blocks a band.
-            let events: Vec<Event> = blocks.iter().map(|&(blocker, attacker)| Event::Blocks { blocker, attacker }).collect();
+            // CR 509.1g: the blockers are declared together, a "blocks" event for each attacker each blocks, those of a band it
+            // blocks through banding marked as not declared, so "whenever this creature blocks" triggers once (CR 509.3a).
+            let mut events: Vec<Event> = Vec::with_capacity(blocks.len());
             let mut list = Vec::new();
             let mut attackers = cx.s().attackers.clone();
             for (blocker, attacker) in blocks {
-                // CR 702.22h: a creature blocking a member of an attacking band blocks each other member of it too.
+                // CR 702.22h: a creature blocking a member of an attacking band blocks each other member of it too, a block of
+                // each (CR 509.3b, 509.3d) though only the declared one is its "blocks" (CR 509.3a).
                 let band = attackers.iter().find(|a| a.id == attacker).map_or(0, |a| a.band);
                 let mut blocked = vec![attacker];
                 blocked.extend(attackers.iter().filter(|a| band != 0 && a.band == band && a.id != attacker).map(|a| a.id));
+                events.extend(blocked.iter().map(|&a| Event::Blocks { blocker, attacker: a, declared: a == attacker }));
                 for attacker in blocked {
                     list.push(Block { blocker, attacker, first_strike: false });
                     if let Some(a) = attackers.iter_mut().find(|a| a.id == attacker) {
@@ -829,29 +831,6 @@ fn deals_now(cx: &Cx, id: ObjectId, had_first_strike: bool, first_strike_step: b
     if first_strike_step { strikes_first(cx, id) } else { !had_first_strike || cx.chars(id).has(Keyword::DoubleStrike) }
 }
 
-/// The required blocks `pairs` (CR 509.1c) with each obeyed another way too: a creature blocking a member of an attacking band
-/// blocks every member (CR 702.22h), so blocking any member of the required attacker's band, where the restrictions allow it,
-/// obeys "blocks [it] if able". Counted a block at a time, as the declaration's check counts them.
-fn through_bands(cx: &Cx, mut pairs: Vec<(ObjectId, ObjectId)>, allowed: &[(ObjectId, ObjectId)]) -> Vec<(ObjectId, ObjectId)> {
-    let attackers = &cx.s().attackers;
-    if !attackers.iter().any(|a| a.band != 0) {
-        return pairs;
-    }
-    for (blocker, attacker) in pairs.clone() {
-        let band = attackers.iter().find(|a| a.id == attacker).map_or(0, |a| a.band);
-        if band == 0 {
-            continue;
-        }
-        for mate in attackers.iter().filter(|a| a.band == band && a.id != attacker) {
-            let pair = (blocker, mate.id);
-            if allowed.contains(&pair) && !pairs.contains(&pair) {
-                pairs.push(pair);
-            }
-        }
-    }
-    pairs
-}
-
 /// The most of the required blocks `pairs` (CR 509.1c) any declaration of blockers obeys without disobeying a restriction,
 /// with one declaration that does. A declaration is legal in its restrictions where each blocker blocks at most one attacker,
 /// each block is among `allowed` (CR 509.1b), and each attacker blocked has at least as many blockers as it requires and no
@@ -859,10 +838,16 @@ fn through_bands(cx: &Cx, mut pairs: Vec<(ObjectId, ObjectId)>, allowed: &[(Obje
 /// requirement names can obey one or help another be obeyed (by making up a minimum), so only those are searched, the
 /// blockers with a requirement first and their required blocks tried first; a branch that cannot beat the best found is cut.
 fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(ObjectId, ObjectId)>) -> BlockRequirements {
+    // A creature blocking one member of an attacking band blocks every member (CR 702.22h), so blocking any member obeys a
+    // requirement to block another, and one block may obey two.
+    let bands: Vec<(ObjectId, u32)> = cx.s().attackers.iter().filter(|a| a.band != 0).map(|a| (a.id, u32::from(a.band))).collect();
+    let mut req = BlockRequirements { pairs, most: 0, suggested: Vec::new(), bands };
     let mut targets: Vec<ObjectId> = Vec::new();
-    for &(_, a) in &pairs {
-        if !targets.contains(&a) {
-            targets.push(a);
+    for &(_, a) in &req.pairs {
+        for x in std::iter::once(a).chain(req.bands.iter().map(|b| b.0).filter(|&x| req.blocks_through(x, a))) {
+            if !targets.contains(&x) {
+                targets.push(x);
+            }
         }
     }
     let limits: Vec<(usize, usize)> = targets
@@ -872,28 +857,28 @@ fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(Obje
             (c.minimum_blockers() as usize, usize::from(c.maximum_blockers()))
         })
         .collect();
-    // Each blocker that could block one of `targets`, with the attackers it may block, required ones first.
-    let mut blockers: Vec<(ObjectId, Vec<usize>)> = Vec::new();
+    // Each blocker that could block one of `targets`, with the attackers it may block and how many requirements each block
+    // obeys, the most first.
+    let mut blockers: Vec<(ObjectId, Vec<(usize, usize)>)> = Vec::new();
     for &(b, a) in allowed {
         let Some(t) = targets.iter().position(|&x| x == a) else { continue };
+        let gain = req.pairs.iter().filter(|&&(pb, ra)| pb == b && req.blocks_through(a, ra)).count();
         match blockers.iter_mut().find(|e| e.0 == b) {
-            Some(e) => e.1.push(t),
-            None => blockers.push((b, vec![t])),
+            Some(e) => e.1.push((t, gain)),
+            None => blockers.push((b, vec![(t, gain)])),
         }
     }
-    for (b, options) in &mut blockers {
-        options.sort_by_key(|&t| !pairs.contains(&(*b, targets[t])));
+    for (_, options) in &mut blockers {
+        options.sort_by_key(|&(_, gain)| std::cmp::Reverse(gain));
     }
-    blockers.sort_by_key(|(b, _)| !pairs.iter().any(|p| p.0 == *b));
-    let required_after: Vec<usize> = (0..=blockers.len())
-        .map(|i| blockers[i..].iter().filter(|(b, _)| pairs.iter().any(|p| p.0 == *b)).count())
-        .collect();
+    blockers.sort_by_key(|(_, options)| std::cmp::Reverse(options.first().map_or(0, |o| o.1)));
+    // The most the blockers from each point on could still obey: each its best block.
+    let required_after: Vec<usize> =
+        (0..=blockers.len()).map(|i| blockers[i..].iter().map(|(_, options)| options.first().map_or(0, |o| o.1)).sum()).collect();
 
     struct Search<'a> {
-        blockers: &'a [(ObjectId, Vec<usize>)],
-        targets: &'a [ObjectId],
+        blockers: &'a [(ObjectId, Vec<(usize, usize)>)],
         limits: &'a [(usize, usize)],
-        pairs: &'a [(ObjectId, ObjectId)],
         required_after: &'a [usize],
         counts: Vec<usize>,
         chosen: Vec<Option<usize>>,
@@ -911,14 +896,13 @@ fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(Obje
                 }
                 return;
             }
-            let (b, options) = &self.blockers[i];
-            for &t in options {
+            let options = &self.blockers[i].1;
+            for &(t, gain) in options {
                 if self.counts[t] == self.limits[t].1 {
                     continue;
                 }
                 self.counts[t] += 1;
                 self.chosen[i] = Some(t);
-                let gain = usize::from(self.pairs.contains(&(*b, self.targets[t])));
                 self.go(i + 1, obeyed + gain);
                 self.counts[t] -= 1;
             }
@@ -928,9 +912,7 @@ fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(Obje
     }
     let mut search = Search {
         blockers: &blockers,
-        targets: &targets,
         limits: &limits,
-        pairs: &pairs,
         required_after: &required_after,
         counts: vec![0; targets.len()],
         chosen: vec![None; blockers.len()],
@@ -938,8 +920,9 @@ fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(Obje
     };
     search.go(0, 0);
     let (most, chosen) = search.best.unwrap_or_default();
-    let suggested = blockers.iter().zip(chosen).filter_map(|((b, _), t)| t.map(|t| (*b, targets[t]))).collect();
-    BlockRequirements { pairs, most: most as u8, suggested }
+    req.suggested = blockers.iter().zip(chosen).filter_map(|((b, _), t)| t.map(|t| (*b, targets[t]))).collect();
+    req.most = most as u8;
+    req
 }
 
 /// Combat damage (CR 510): every attacker and blocker deals its damage at once. A creature with a choice in where its damage
