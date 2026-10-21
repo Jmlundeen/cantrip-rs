@@ -353,81 +353,219 @@ would go over unclickable.
 - **No strings at runtime:** keywords, types, subtypes and colors are enums or bitsets, card behavior is reached by
   function index, and nothing about a card is read from JSON while a game runs.
 
-### The layer pass (planned for KI-41; under review, not built)
+### The layer pass (planned for KI-41; revised after review, not built)
 
-**Why.** CR 613.8 orders *effects*, not objects: an effect depends on another if applying the other would change "the
-existence of the first effect, what it applies to, or what it does to any of the things it applies to" (613.8a(b)). Today
-`layers::chars_before` works an object out alone and orders a layer's effects by what that one object shows (`in_order`,
-`by_dependency`, `ready`); a dependency visible only through another object is missed (KI-41). The pass computes a
-layer's order once per position, over every object the layer's effects could apply to, the same for every object.
+**Why.** CR 613.8 orders *effects*, not objects. An effect depends on another if applying the other "would change the text
+or the existence of the first effect, what it applies to, or what it does to any of the things it applies to"
+(613.8a(b)). Today `layers::chars_before` works out each object alone, and orders a layer's effects by what that one
+object shows (`in_order`, `by_dependency`, `ready`). A dependency visible only through another object is missed (KI-41).
+The pass fixes one application order per layer per position, over every object the layer's effects could reach. That
+order is the same whichever object is asked about.
 
-**What is cached, and when it goes.** A `LayerPass` beside `static_sources`, `lost_to_statics` and `land_text_lost` on
-`GameState` (a `RefCell`, no part of the position or the journal), keyed on `(epoch, log.len())` - every write moves the
-epoch, and a static's condition may read the history. It is built lazily, a layer at a time, the first time any object's
-characteristics need that layer in that position. For each layer it was built for it holds the application order (the
-effects by `Entry` key, in the order 613.8b-c applies them) and the characteristics of every object of the layer's set
-(below) as the layer leaves them, with which effects applied to each (what `ability_givers` and `lost_all_abilities`
-report). `chars_before(id, stop)` reads the last built layer before `stop` for an object in the set; an object outside
-every set is reached by no effect of those layers and is worked out alone, as now (copiable values, CDAs, counters).
+**Entries and what each declares.** An *entry* is one part of one effect, in one layer or sublayer:
+- a static ability's part (its own, or one granted to an object; 613.7a);
+- a resolved effect's part;
+- the continued part of an effect begun in an earlier layer (613.6);
+- a keyword counter (613.7c).
 
-**Which layers need a pass.** One whose effects could depend on one another: two or more effects in it, one of which has
-a reach that can change (a static's `affects`, a condition, a text change found only where its word is, "all creature
-types"), sets what another adds, or strips a source ("loses all abilities", 613.1f; a land-subtype setter taking a land's
-rules-text abilities, 305.7), or reads characteristics in `apply`. Every other layer applies its effects in timestamp
-order per object, as today, and builds nothing - most positions build no pass at all. The test is on the effects present
-in the position, never on the card table.
+Each entry declares, at table construction (for statics and granted statics) or when the effect is made (for resolved
+effects):
+- its *write set*: which characteristics its `apply` changes. Types, subtypes, colour, abilities, P/T, control, text and
+  name are separate bits.
+- its *read set*: which characteristics its reach (`affects`), its condition and its `eval` read; whether it reads the
+  history; and which zones it reaches (battlefield; stack; hand, graveyard, library and exile for `everywhere` statics and
+  `affects` over those zones).
+- an `eval` beside `apply`, described next.
 
-**The layer's set of objects.** Every permanent; every object on the stack; every object a resolved effect of the layer
-names; and, for a static ability that functions or reaches outside the battlefield (`StaticDef::everywhere`, an `affects`
-over a hand, graveyard, library or exile), every object of the zones it reaches. The reviewer's off-field probe
-(`probe_offfield.rs`: an `everywhere` static whose dependency is visible only on a card in a graveyard) becomes a test.
+**`eval` and `apply`.** `eval(view, object)` works out the effect's instruction for one object it applies to:
+- the N of "+N/+N" with N counted;
+- the colour set;
+- the ability list granted or removed;
+- the P/T set;
+- the types set or added;
+- the controller.
 
-**Building one layer (CR 613.7-613.8).**
-1. The effects: each static ability of `static_sources` with a part in the layer, the abilities effects granted to
-   objects (613.7a, at the granting effect's timestamp), the resolved effects of the layer, the parts of effects begun in
-   an earlier layer that go on here (613.6, `Begun`), and keyword counters (613.7c); each with its timestamp and key.
-   Characteristic-defining abilities are a group of their own, applied first and depending only on one another (613.3,
-   613.8a(c)).
-2. The working copy: each object of the set with the characteristics the layers before left it (the passes below, already
-   built). While the layer is built, every characteristic a static ability, a condition or an `apply` reads - of any
-   object - is read from the working copy as it stands at that point of the layer, so a reach or a result is judged as
-   the rules judge it, on the whole board part-way through the layer, not on one object.
-3. The procedure: of the unapplied effects, A depends on B (613.8a) when both are in the layer and both or neither are
-   CDAs, and applying B to the working copy (on a scratch copy, discarded) would change
-   - A's existence: B takes A's source's abilities ("loses all abilities", or a land-subtype setter's 305.7 on a land
-     whose printed ability A is - KI-61's loop of a land's own layer-4 ability beside Blood Moon is then 613.8b exactly);
-   - A's text: B is a text change to A's source (layer 3; read from the words the source then has);
-   - what A applies to: the set of objects A's `affects` reaches, before and after B;
-   - what A does to an object in both sets: its result on that object, before and after B.
-   An effect is ready when every unapplied effect it depends on is in a dependency loop with it - the sink components of
-   the "depends on" graph among the unapplied effects (613.8b: a loop is ignored, its members in timestamp order). The
-   earliest-timestamped ready effect is applied to every object of the working copy it reaches, appended to the order, and
-   the dependencies are worked out again (613.8c). The order is a function of the position alone.
+`apply(instruction, chars)` carries the instruction out. The "what it does" criterion compares instructions, never
+resulting characteristics. Take "has flying" and "loses flying" on a creature with printed flying (613.9). Applying
+either one changes neither the other's reach nor its instruction ("add flying" and "remove flying" stay what they are),
+so they are independent and go in timestamp order. Comparing results would make each "depend" on the other, through
+whether flying is already there. Akroma's Memorial and Turn to Frog behave the same way: the Frog's "loses all abilities"
+in layer 6 does not change what the Memorial's grant does.
 
-**Where the special cases fit.** Copy effects and face-down values (layer 1, 613.2, 707, 708) stay the copiable values
-the pipeline starts from: a copy effect depends only on copy effects of the same object, ordered by timestamp. Text
-changes are entries of layer 3's pass, and the "text" criterion for any later layer. "Loses all abilities" and the
-305.7 land-subtype setter are entries like any other; what `lost_to_statics` and `land_text_lost` compute today becomes
-what the layer-4 and layer-6 passes record (which objects were stripped, at which point of the order), and an effect that
-had begun to apply before its source lost it goes on in later layers (613.6). Counters (+1/+1 and -1/-1 in 7c, 613.4c)
-and P/T switching (7d) apply per object as today.
+**When a layer builds a pass.** A layer builds a pass only when some entry B in it could change another entry A of the
+same layer. That means B's write set meets A's read set, or B strips A's source (existence; see below). Otherwise the
+layer applies in timestamp order per object, as today, and nothing is built.
 
-**What goes.** `in_order`'s snapshots and its waiting, `by_dependency` and `ready` (and KI-41's held per-pair judgement,
-`through_others` and its `layer_dependencies` cache, is not landed). `View` keeps answering reads, from the working copy
-while a pass is built and from the passes after.
+So an anthem plus Giant Growth never builds a pass: both write P/T in 7c and neither reads P/T, colour or anything the
+other writes. A plain board builds none. The gate is on the entries present in the position, never on the card table.
 
-**Tests carried over.** The layer-dependency scenarios and Rust tests as they are (Life and Limb before Blood Moon,
-Artificial Evolution, Ygra on a crewed Vehicle, Kaito's Ninja form, an impending Overlord); KI-41's held work - the
-Arcane Adaptation scenario (`blood-moon-life-and-limb-and-arcane-adaptation-making-a-saproling-depend-through-the-layer`),
-`layer_dependency.rs`, the reviewer's order probe (`probe_order.rs`: the same order whichever object is asked first) and
-off-field probe; and a test that two objects asked in either order in one position get the same characteristics.
+**The set of objects.**
+- Every permanent except phased-out ones (702.26b: a phased-out permanent is treated as though it doesn't exist, so it is
+  outside every set, and its own static abilities do nothing).
+- Every object on the stack.
+- Every object a resolved effect names.
+- Every object in a zone that an entry's declared zones reach.
 
-**Cost.** A position with no layer needing a pass pays what it pays now less the per-object dependency checks. A layer
-with a pass pays, once per position, about E^2 dependency judgements per step over its set (E its effects), each a scratch
-application and a reach comparison, instead of judging dependencies again for every object asked and, with KI-41's held
-fix, for every pair. To be measured with the bench (normal decks, and the layers deck - Life and Limb, Blood Moon, Arcane
-Adaptation x4) against main and against the per-pair judgement (8b841db84: about 5,100 us per decision on that deck, main
-about 395 us).
+Cards outside the game (sideboards) take characteristic-defining abilities only (604.3). Effects don't reach them, so
+they are worked out alone. Abilities on the stack are outside the set, as now: their text is their source's.
+
+**Existence.** An entry exists while:
+- its source has the ability that generates it;
+- its condition holds (an "as long as" that turns false makes the entry not exist);
+- its source is where the ability functions (the battlefield, or any zone for `everywhere`).
+
+Applying B changes A's existence when B removes A's ability from A's source, makes A's condition false or true, or (in
+layers 1-4) changes whether A's source is a permanent whose ability functions. Examples of B: "loses all abilities"
+(613.1f), a land-subtype setter under 305.7, a type change that turns a condition.
+
+For 305.7, the abilities lost are those from the land's text, including text a copy effect gave it (KI-51: a land whose
+subtype is set loses the abilities a copy effect gave it and keeps the other copiable values).
+
+Entries also appear part-way through a layer. A static ability granted in layer 6 whose own part is in layer 6 (Rune of
+Flight grants Colossus Hammer "Equipped creature has flying"; the Hammer's own "loses flying") enters the layer-6 order
+as soon as its grant has applied. Its timestamp is the later of its object's and the granting effect's (613.7a). It is
+re-stamped with the object, keeping the relative order (613.7e). Here the Rune's grant stamps it after the Hammer's
+"loses flying", so the creature has flying.
+
+An entry is dropped when its source loses the ability part-way through the layer, unless the entry began in an earlier
+layer (613.6: it goes on). A granted static with parts in layers 4-6 joins those layers once it is granted. A layer-6
+grant of a static that has a layer-4 or layer-5 part cannot apply that part, because those layers are done. Its parts in
+layer 6 and later apply. Today's code ignores granted statics whose parts are earlier than 7a, and refuses them at table
+construction. The pass keeps that refusal for parts in layers already done, and applies a granted static's parts in
+every layer from the grant's own onward.
+
+**613.6: the set is fixed when an effect first applies.** The first time an effect applies, in any layer, the set of
+objects it applies to is recorded. Every later part of that effect applies to the same set, even if the ability is gone.
+A begun effect therefore cannot depend on anything through "applies to" or through "existence"; it can still depend
+through "what it does" (its later parts' `eval`).
+
+This settles Humility and Opalescence in both orders:
+- Opalescence's type change begins in layer 4, so its layer-7b part keeps its set (Humility among them, as a creature).
+- Humility's 6 and 7b parts begin in layer 6, on the creatures of then.
+- Their order in 7b is then by timestamp, as the rulings give.
+
+**Building one layer (613.7-613.8).** The working copy holds each object of the set with what the earlier layers left it.
+While a layer is being built, every characteristic a reach, condition or `eval` reads, of any object, is read from the
+working copy as it stands at that point in the layer.
+
+A depends on B when all of these hold (613.8a):
+- both are in the same layer and sublayer;
+- both or neither are characteristic-defining abilities (CDAs go first, among themselves; 613.3);
+- applying B to the working copy would change A's text (B is a text change to A's source), A's existence, A's reach, or
+  A's instruction (`eval`) on an object in both reaches.
+
+These are judged only over reach(B), restricted to where A's declared zones meet B's. An object B doesn't reach is
+unchanged by B, so A's reach and instruction there are unchanged.
+
+Ready, the earliest-timestamped ready entry applies, and then dependencies are judged again (613.8c). The judging is
+incremental. After B applies, only the pairs whose read set meets B's write set are judged again, over the objects B
+changed. Trial applications go into a copy-on-write overlay of the working copy (only the objects touched are copied),
+which is then dropped.
+
+**Open decision, put to the user: which reading of "ready" (613.8b).** 613.8b says a dependent effect waits for all of
+the effects it depends on, and that "if several dependent effects form a dependency loop, then this rule is ignored and
+the effects in the dependency loop are applied in timestamp order". When a member of the loop also depends on an effect
+outside the loop, the rule can be read three ways:
+- **(i) The loop waits as a unit.** It applies, in timestamp order, once every effect any of its members depends on
+  outside the loop has applied. These are the sink components of the "depends on" graph.
+- **(ii) The rule is ignored for the loop's members entirely.** They are as good as independent, and take their place in
+  timestamp order among everything ready.
+- **(iii) Only the dependencies inside the loop are ignored.** Each member still waits for its own dependencies outside
+  the loop.
+
+The Arcane Adaptation board (`blood-moon-life-and-limb-and-arcane-adaptation-making-a-saproling-depend-through-the-layer`,
+held with KI-41) has Life and Limb (turn 1), Arcane Adaptation naming Saproling (turn 3) and Blood Moon (turn 5), all in
+layer 4:
+- Life and Limb and Blood Moon depend on each other, so they are a loop.
+- Life and Limb also depends on Arcane Adaptation, which makes the Elves a Saproling.
+- Arcane Adaptation depends on nothing.
+
+Results under each reading:
+- **(i):** Arcane Adaptation, then Life and Limb, then Blood Moon.
+  - Llanowar Elves: Creature Land, Elf Druid Saproling Mountain, green 1/1, without its {G} ability (305.7).
+  - Taiga: Land Creature, Mountain Saproling, green 1/1.
+  - This is what the held scenario expects.
+- **(ii):** timestamp order, Life and Limb, then Arcane Adaptation, then Blood Moon.
+  - Life and Limb finds no Saproling Elves.
+  - The Elves: Creature, Elf Druid Saproling, green 1/1, keeping {G}, no land.
+  - Taiga: as in (i).
+- **(iii):** Arcane Adaptation and Blood Moon are ready first (Blood Moon's only dependency is inside the loop). Arcane
+  Adaptation goes first by timestamp, then Life and Limb (now ready, and earlier than Blood Moon), then Blood Moon. Same
+  result as (i).
+  - Readings (i) and (iii) part when the outside effect is later than a member that depends only inside the loop. Had
+    Blood Moon been cast on turn 3 and Arcane Adaptation on turn 5, (iii) gives Blood Moon, then Arcane Adaptation, then
+    Life and Limb: Taiga is a Mountain land and not a creature, and the Elves are a Creature Land, Elf Druid Saproling
+    Forest, keeping {G}.
+  - (i) still gives Arcane Adaptation, Life and Limb, Blood Moon, so the board is as above.
+
+The pass is built so that "ready" is one function, and nothing is built on it until the user decides.
+
+**Layers 1 and 2.**
+- **Layer 1:** copy effects and face-down values stay the copiable values the per-object pipeline starts from. A copy
+  effect's values are fixed when it begins (707.2b, 707.2c), so layer 1 has no cross-object dependency left to judge.
+  305.7's removal of what a copy effect gave a land is recorded by the layer-4 pass: per land, the point in the order at
+  which its text abilities, including copied ones, went. Layer 6 reads that record.
+- **Layer 2 (control):** in the pass. An entry's reach may read control ("creatures you control"), and control from a
+  static ability or a lapsed condition is then judged continuously, in the layer, rather than settled only as
+  state-based actions are checked. That closes KI-63 and KI-64 properly. `static_control` and its settling go.
+
+**Fixed eagerly, applied lazily.** Building a layer fixes its order and each entry's recorded set, nothing more.
+- An object's characteristics through a layer are applied on demand: the entries of the order that reach it, in order,
+  with their instructions.
+- They are memoised per (object, layer, point in the order).
+- An object asked about outside every set is worked out alone, and nothing it computes mid-layer is ever cached.
+
+**Re-entrancy.**
+- A pass is built into a local value and installed only when it is complete.
+- While layer L is being built, a read of a later layer's characteristics answers from the working copy as it stands in
+  L, plus the earlier layers' passes. Layers after L are not yet applied to anyone, which is what the rules see at that
+  point.
+- A request to build or read a pass while one is being built for the same position is a bug. Under CANTRIP_VERIFY it
+  panics; otherwise it is answered from the working copy.
+- The pass is never built or read while any of these is set:
+  - `judged_face_up`;
+  - the `GIVERS`, `WATCHED` or `WATCHING` ability-giver tracking;
+  - the 305.7 and "loses all" `finding` flags.
+
+  Those paths work their object out alone, uncached. The same holds for `as_it_would_exist` (a permanent about to enter,
+  614.12), and for last-known information and look-back snapshots: each builds its own pass on its own state, in a local
+  value, and never writes the live cache.
+
+**The cache and its key.**
+- A `RefCell<Option<Rc<LayerPass>>>` on `GameState`, no part of the position or the journal. A clone of the state shares
+  the `Rc` or drops it; it never copies a large pass.
+- The key is a *characteristics epoch*. It moves only on writes to layer inputs: objects' zones, timestamps, status,
+  counters, attachments and face, effects, permissions that grant abilities, and control.
+- `log.len()` is in the key only for a layer with an entry that reads the history.
+- Re-stamps (613.7e-g: attaching, turning face up or down, transforming) move the epoch through the timestamp write.
+
+**CANTRIP_VERIFY cross-check.** For each object asked about, the characteristics from the pass are compared with the
+object worked out alone wherever the two must agree: a layer with no pass, or an object no entry with a dependency
+reaches. A mismatch panics.
+
+**What goes.** `in_order`'s snapshots and its waiting, `by_dependency`, `ready`, and `lost_to_statics` and
+`land_text_lost` as separate fixpoints (their answers become the pass's records). KI-41's held per-pair judgement
+(`through_others`, `layer_dependencies`) is not landed.
+
+**Performance acceptance.**
+- The normal bench must be within noise of main.
+- The layers deck (Life and Limb, Blood Moon, Arcane Adaptation x4) must be at or below main's ~395 us per decision.
+- Measured against main and against 8b841db84 (the per-pair judgement, ~5,100 us on that deck).
+
+**Tests.** Kept: the existing layer-dependency scenarios and Rust tests, and KI-41's held tests (the Arcane Adaptation
+scenario, `layer_dependency.rs`, the reviewer's order and off-field probes). New:
+- the 613.9 pair: "has flying" and "loses flying" on a creature with printed flying, in both timestamp orders;
+- Akroma's Memorial with Turn to Frog;
+- Rune of Flight on Colossus Hammer, the creature equipped;
+- Humility and Opalescence, in both orders;
+- Blood Moon and Urborg, Tomb of Yawgmoth, in both orders;
+- the 613.6 examples (Act of Treason; the "become 2/2 artifact creatures" set kept into 7b; Svogthos);
+- Conspiracy with Arcane Adaptation, reaching cards in hand and library;
+- a phased-out Changeling;
+- a face-down card judged face up under Painter's Servant;
+- Vesuva copying Urborg under Blood Moon;
+- KI-61's loop (a land's own layer-4 ability beside Blood Moon);
+- the same characteristics for two objects asked in either order.
 
 ### Card data: three sources
 
