@@ -1,0 +1,41 @@
+# Tam, the Possibility reduces only "Planeswalker spells you cast": Brain Freeze ({1}{U}) pays its full two mana with Tam
+# on the battlefield (an Island and a Mox Emerald), so the pool is empty after the cast (a reduction to {U} would leave
+# one mana). Storm counts the spells cast before it this turn - none, since the Moxen and Tam were cast on turn one - so
+# Bot2 mills three cards (CR 702.40a). Bot2 also discarded one card down to hand size on turn two.
+
+[Bot1 Deck]
+Forest
+Island
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Jet
+Tam, the Possibility
+Brain Freeze
+Island x11
+
+[Bot2 Deck]
+Opt x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tam, the Possibility.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot2)
+Bot1.Pass
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 4
