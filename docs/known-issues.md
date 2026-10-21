@@ -58,7 +58,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
-| [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
@@ -316,17 +315,6 @@ static control-changing ability that starts or stops applying (`control_changing
 `ops::end_lapsed_conditions` only when the state-based actions are next checked (CR 613.1b and 611.2b say at once). Anything
 read in between - later in the same resolution, or a trigger looking at the controller at the event - sees the old
 controller. No card in content reads a controller in that window that a scenario reaches.
-
-### KI-64: No card in content lets one control-changing effect decide another
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, review of the control-changing static abilities |
-
-**Notes.** `ops::settle_control` works the controllers out again while any changes, since an Aura's controller is whom it
-gives control to (gain control of a Mind Control, and the creature it enchants follows). No card in content can take control
-of an Aura that gives control: Opalescence leaves Auras alone, and the stealing cards target creatures. The repeat has no
-scenario.
 
 ### KI-71: The tactical bot's combat planning ignores bands
 
