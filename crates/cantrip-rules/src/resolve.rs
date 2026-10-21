@@ -164,7 +164,10 @@ fn run_fused(cx: &mut Cx, item: &StackItem, left: &'static CardDef, right: &'sta
         let mut sub = *item;
         sub.way = way;
         let of: Vec<u8> = (from..to).map(|t| cx.s().spec(item, t) - base as u8).collect();
-        let (targets, shares) = (cx.s().targets(item)[from..to].to_vec(), cx.s().shares(item)[from..to].to_vec());
+        // Shares are kept only where a divided total was announced.
+        let shares = cx.s().shares(item);
+        let shares = if shares.is_empty() { Vec::new() } else { shares[from..to].to_vec() };
+        let targets = cx.s().targets(item)[from..to].to_vec();
         cx.st().set_item_targets(&mut sub, &targets, &of, &shares);
         (spell.effect)(cx, &sub)?;
     }
