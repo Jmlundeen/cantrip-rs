@@ -38,7 +38,6 @@ keeps it).
 | --- | --- | --- | --- |
 | [KI-2](#ki-2-a-harmonize-cost-reduction-cannot-be-checked-in-the-browser) | A harmonize cost reduction cannot be checked in the browser | Low | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
-| [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
@@ -159,21 +158,6 @@ the line goes.
 | A spell no longer allowed once its proposal is complete (CR 601.6: `actions::cast` asks `CardDef::spell_rules` again of the spell on the stack, its X announced, and takes the cast back): a fused split spell's combined mana value, or a back face cast transformed, whose mana value is its front face's (CR 202.3b) where the card it is judged as before the cast reads the back face alone | the check before the cast (every Gaddock Teeg scenario) | No implemented spell's qualities that a rule judges change between the offer and the proposal: Gaddock Teeg's {X} clause already forbids every noncreature spell with {X}, no implemented card has fuse, and the one implemented Siege's back face (Lightshield Array) is mana value 2. |
 
 **Scenarios.** None, by definition.
-
-### KI-4: Scenarios waiting on cards
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | cards | `corpus` reports them as "need cards" |
-
-**Notes.** These scenarios name a card no file defines, so they cannot run. Each tests an interaction already
-written into the engine that is unproven until the card exists: Diabolic Edict, Quest for Ancient Secrets, Doomed
-Traveler, Innocent Blood.
-
-**Scenarios.**
-- [`scenarios/quest-for-ancient-secrets-sees-a-spell-that-paused-for-its-opponents-choice-land-in-the-graveyard.cantrip`](../scenarios/quest-for-ancient-secrets-sees-a-spell-that-paused-for-its-opponents-choice-land-in-the-graveyard.cantrip)
-- [`scenarios/quest-for-ancient-secrets-counts-both-an-innocent-blood-sacrifice-and-the-spell-itself.cantrip`](../scenarios/quest-for-ancient-secrets-counts-both-an-innocent-blood-sacrifice-and-the-spell-itself.cantrip)
-- [`scenarios/dying-pest-tokens-hand-over-their-trigger-order.cantrip`](../scenarios/dying-pest-tokens-hand-over-their-trigger-order.cantrip)
 
 ### KI-5: A spell that has left the stack is judged by its printed keywords
 
