@@ -98,7 +98,13 @@ struct Run<'s> {
 }
 
 pub fn run(script: &GameScript) -> Result<ScriptResult, ScriptFailure> {
-    let mut run = Run::deal(script)?;
+    run_on(script, cards())
+}
+
+/// `run` on a card table of the caller's (`cantrip_engine::deal_on`): every card and some test-only ones, for a Rust test
+/// that plays a scenario with a card no printed card is.
+pub fn run_on(script: &GameScript, table: &'static CardTable) -> Result<ScriptResult, ScriptFailure> {
+    let mut run = Run::deal_on(script, table)?;
     match run.play() {
         Ok(()) => {
             let dump = run.judge()?;
@@ -192,10 +198,14 @@ impl Scripted {
 
 impl<'s> Run<'s> {
     fn deal(script: &'s GameScript) -> Result<Run<'s>, ScriptFailure> {
+        Run::deal_on(script, cards())
+    }
+
+    fn deal_on(script: &'s GameScript, table: &'static CardTable) -> Result<Run<'s>, ScriptFailure> {
         let decks: Vec<Vec<String>> = (0..script.decks.len()).map(|i| script.decklist(i)).collect();
         let sideboards: Vec<Vec<String>> = (0..script.sideboards.len()).map(|i| script.sideboard(i)).collect();
         let chooser = if script.opening { Some(PlayerId((script.chooser.max(1) - 1) as u8)) } else { None };
-        let mut game = deal_with(&decks, &sideboards, &script.basic_lands_outside, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
+        let mut game = deal_on(table, &decks, &sideboards, &script.basic_lands_outside, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
         // CANTRIP_VERIFY=1: every rollback is checked to restore the state exactly.
         game.verify = std::env::var_os("CANTRIP_VERIFY").is_some();
         game.state.force_rolls(&script.dice);
@@ -1210,7 +1220,7 @@ impl<'s> Run<'s> {
             }
             (V::Name, RequestKind::ChooseName { .. }) => {
                 let spec = step.positional().next().unwrap_or("").trim();
-                match cards().find(spec) {
+                match self.game.cards.find(spec) {
                     Some(card) => Some(Answer::Name(Some(card))),
                     None => return fail(format!("line {}: no card is named {spec}", step.line)),
                 }
@@ -1313,7 +1323,7 @@ impl<'s> Run<'s> {
             name = base;
             copy = Some(n);
         }
-        let known = card(&name).is_some() || self.game.state.objects.iter().enumerate().any(|(i, _)| self.game.known_name(ObjectId(i as u32)).eq_ignore_ascii_case(&name));
+        let known = self.game.cards.find(&name).is_some() || self.game.state.objects.iter().enumerate().any(|(i, _)| self.game.known_name(ObjectId(i as u32)).eq_ignore_ascii_case(&name));
         if !known {
             return fail(format!("line {}: no card is named \"{name}\"", step.line));
         }
@@ -1709,8 +1719,8 @@ impl<'s> Run<'s> {
             // `! Bot1.Name(Lightning Bolt)`: the name may not be chosen (CR 201.4a), checked as the engine checks an answer.
             RequestKind::ChooseName { kind, .. } => {
                 for spec in action.positional() {
-                    let Some(card) = cards().find(spec.trim()) else { return fail(format!("line {line}: no card is named {spec}")) };
-                    if name_problem(cards(), *kind, card).is_none() {
+                    let Some(card) = self.game.cards.find(spec.trim()) else { return fail(format!("line {line}: no card is named {spec}")) };
+                    if name_problem(self.game.cards, *kind, card).is_none() {
                         return fail(format!("line {line} says {text} must not be a name the question allows, but it is"));
                     }
                 }

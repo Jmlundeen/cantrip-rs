@@ -56,13 +56,27 @@ pub fn deal_with(
     shuffle: bool,
     opening_chooser: Option<PlayerId>,
 ) -> Result<Game, String> {
+    deal_on(cards(), decks, sideboards, basic_lands_outside, seed, shuffle, opening_chooser)
+}
+
+/// `deal_with` on a card table of the caller's: every card and some test-only ones, for a Rust test that plays a scenario
+/// with a card no printed card is (`cantrip_script::run_on`).
+pub fn deal_on(
+    table: &'static CardTable,
+    decks: &[Vec<String>],
+    sideboards: &[Vec<String>],
+    basic_lands_outside: &[String],
+    seed: u64,
+    shuffle: bool,
+    opening_chooser: Option<PlayerId>,
+) -> Result<Game, String> {
     let ids = |names: &[String]| -> Result<Vec<CardId>, String> {
         names
             .iter()
             .map(|name| {
                 // Either face of a double-faced card names it (CR 711.1); a deck holds the front.
-                let id = card(name).ok_or_else(|| format!("no card is named \"{name}\""))?;
-                Ok(cards().fronts[id.0 as usize].unwrap_or(id))
+                let id = table.find(name).ok_or_else(|| format!("no card is named \"{name}\""))?;
+                Ok(table.fronts[id.0 as usize].unwrap_or(id))
             })
             .collect()
     };
@@ -74,7 +88,7 @@ pub fn deal_with(
         shuffle,
         opening_chooser,
     };
-    let mut game = Game::new(cards(), &setup);
+    let mut game = Game::new(table, &setup);
     game.run();
     Ok(game)
 }
