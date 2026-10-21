@@ -1366,7 +1366,9 @@ public sealed partial class MainPage
             $"{subject}: which applies first?",
             $"{prompt.Sources.Count} effects want to change this  ·  then each other one that still applies does, once");
 
-        List<string> names = [.. prompt.Sources.Select(source => client.Object(source)?.Name ?? "An effect")];
+        // A source this seat holds no handle to - one that has left, seen by a page reloaded since - is named by the prompt.
+        List<string> names = [.. prompt.Sources.Select((source, i) => client.Object(source)?.Name
+            ?? (i < prompt.SourceNames.Count && prompt.SourceNames[i].Length > 0 ? prompt.SourceNames[i] : "An effect"))];
         for (int i = 0; i < prompt.Sources.Count; i++)
         {
             int index = i;

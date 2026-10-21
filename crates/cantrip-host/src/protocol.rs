@@ -1163,6 +1163,9 @@ pub struct ChooseReplacementPrompt {
     pub event: String,
     pub sources: Vec<ViewHandle>,
     pub hints: Vec<String>,
+    /// Each source's name, in step with `sources`: a source that has left (Ral Zarek's skip, CR 704.5i) may have no handle
+    /// in a seat's view, and is named by this. Empty for one in a zone the seat may not look into.
+    pub source_names: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

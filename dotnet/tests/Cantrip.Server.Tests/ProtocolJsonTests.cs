@@ -31,7 +31,7 @@ public sealed class ProtocolJsonTests
         """{"$type":"ChooseTargetPromptMessage","Player":1,"Ability":8,"Source":3,"Text":"destroy target creature","Candidates":[{"Player":2,"Object":0},{"Player":0,"Object":5}],"Optional":false,"Count":1,"Targeted":true,"Minimum":0,"AnyNumber":false}""",
         """{"$type":"MayPromptMessage","Player":1,"Source":7,"Verb":"SearchLibrary","Amount":0}""",
         """{"$type":"ChooseModesPromptMessage","Player":1,"Source":4,"Modes":["a","b"],"Eligible":[0,1],"Count":1,"MayRepeat":false,"AdditionalCost":false,"Heading":"","AtMost":0,"Affordable":[0]}""",
-        """{"$type":"ChooseReplacementPromptMessage","Player":1,"Subject":3,"Event":"enters the battlefield","Sources":[4,5],"Hints":["tapped","with a counter"]}""",
+        """{"$type":"ChooseReplacementPromptMessage","Player":1,"Subject":3,"Event":"enters the battlefield","Sources":[4,5],"Hints":["tapped","with a counter"],"SourceNames":["Hardened Scales","Corpsejack Menace"]}""",
         """{"$type":"OrderTriggersPromptMessage","Player":1,"Sources":[4,5],"Texts":["draw a card","gain 1 life"]}""",
         """{"$type":"NameCardPromptMessage","Player":1,"Source":4,"Owner":2,"Hand":[6,7],"Names":["Island","Lightning Bolt"],"Suggestion":"Lightning Bolt","Kind":""}""",
         """{"$type":"ChoosePlayerPromptMessage","Player":1,"Source":4,"Candidates":[2,3],"Verb":"Draw","Amount":1}""",

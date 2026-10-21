@@ -48,7 +48,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
-| [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 | [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
@@ -115,23 +114,6 @@ battlefield transformed only a card that reached exile ("exile it, then put it o
 replaces an exile from the stack. The day such a card exists each card needs a scenario, and this entry is deleted.
 
 **Scenarios.** None yet.
-
-### KI-34: A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | client | 2026-10-16, review of Ral Zarek, Guest Lecturer |
-
-**Notes.** When an effect that makes a player skip a turn (`EffectKind::SkipNextTurn`) and a "you may skip that turn" (Time
-Vault) both apply, the player chooses which applies (CR 616.1, `turn.rs::skip_turn`), and the prompt names each effect by its
-source. The skip effect's source is usually gone by then (Ral Zarek's −7 from 7 loyalty puts Ral into the graveyard,
-CR 704.5i), and `prompt.rs::source_handle` names a gone object only through a handle the seat's view already has. A seat
-that never saw the source (a reconnect with a fresh handle space) gets no handle, and its button reads "An effect: you
-skip this turn". The choice is still right; only the name is missing. A fix carries the source's name with the prompt.
-
-**Scenarios.**
-- [`scenarios/ral-zarek-guest-lecturer-skipped-turn-and-time-vault-in-the-browser.cantrip`](../scenarios/ral-zarek-guest-lecturer-skipped-turn-and-time-vault-in-the-browser.cantrip) -
-  the named case, the page having seen Ral; the unnamed one needs a reconnect, which no scenario does.
 
 ### KI-35: The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi
 

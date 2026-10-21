@@ -43,6 +43,8 @@ public static class PromptFixtures
     private const int HandSwamp = 13;
     private const int MyGrave = 14;
     private const int TheirGrave = 15;
+    /// <summary>A handle no object in the fixtures' view has: a source that has left, which the view never held.</summary>
+    private const int UnseenSource = 999;
     /// <summary>Every creature type (CR 205.3m), the longest list of named options a card offers.</summary>
     public static readonly IReadOnlyList<string> CreatureTypes =
     [
@@ -288,6 +290,7 @@ public static class PromptFixtures
         "modes-many",
         "modes-range",
         "choose-replacement",
+        "choose-replacement-unseen-source",
         "name-card",
         "name-card-empty-hand",
         "choose-starting-player",
@@ -1950,6 +1953,19 @@ public static class PromptFixtures
                     Event = "Hallowed Fountain enters the battlefield",
                     Sources = [new ViewHandle(HandSwamp), new ViewHandle(TheirSentinel)],
                     Hints = ["enters tapped unless you pay 2 life", "your opponents' nonbasic lands enter tapped"],
+                };
+
+            case "choose-replacement-unseen-source":
+                // Ral Zarek's -7 made this player skip a turn and Ral went to the graveyard (CR 704.5i); a page reloaded since
+                // holds no handle to Ral, so the prompt names it (SourceNames), beside Time Vault's "skip that turn instead".
+                Object(view, MyLurker).Name = "Time Vault";
+                return new ChooseReplacementPromptMessage
+                {
+                    Player = Viewer,
+                    Event = "Your turn would begin",
+                    Sources = [new ViewHandle(UnseenSource), new ViewHandle(MyLurker)],
+                    Hints = ["you skip this turn", "skip this turn instead of untapping Time Vault"],
+                    SourceNames = ["Ral Zarek, Guest Lecturer", "Time Vault"],
                 };
 
             case "name-card":

@@ -156,6 +156,17 @@ fn source_handle(game: &Game, handles: &mut HandleSpace, id: ObjectId) -> ViewHa
     }
 }
 
+/// A replacement effect's source by name, for a seat that may hold no handle to it: one that has left - its last-known
+/// name (CR 608.2h) - and was seen where it was. Nothing for an object in a zone the seat may not look into (a hand, a
+/// library); a face-down one has no name (CR 708.2).
+fn source_name(game: &Game, viewer: PlayerId, id: ObjectId) -> String {
+    if id.index() >= game.state.objects.len() {
+        return String::new();
+    }
+    let zone = game.state.obj(id).zone;
+    if zone.is(ZoneKind::Gone) || crate::view::looks_into(viewer, zone) { game.name(id).to_string() } else { String::new() }
+}
+
 fn target_message(handles: &mut HandleSpace, target: Target) -> Option<TargetMessage> {
     match target {
         Target::Player(p) => Some(TargetMessage::player(seat(p))),
@@ -1257,6 +1268,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 },
                 sources: sources.iter().map(|&s| source_handle(game, handles, s)).collect(),
                 hints: hints.iter().map(|h| (*h).to_string()).collect(),
+                source_names: sources.iter().map(|&s| source_name(game, request.player, s)).collect(),
             })
         }
     };
@@ -1466,6 +1478,48 @@ mod tests {
         assert_eq!((cast.verb.as_str(), cast.question.as_str()), ("CastForMiracleCost", "Cast {source} for its miracle {2}?"));
         assert!(cast.detail.starts_with("You pay its miracle {2} instead of its mana cost"), "{}", cast.detail);
         assert!(!cast.no_default);
+    }
+
+    /// A replacement's source is named with the prompt (KI-34): one that has left - Ral Zarek's skip, Ral in the graveyard -
+    /// is named to a seat that holds no handle to it, by its last-known name; one in a hand only to the hand's player.
+    #[test]
+    fn a_replacements_source_is_named_with_the_prompt_even_without_a_handle() {
+        let (mut game, hand) = game_with(&["Llanowar Elves"]);
+        let mut seats = game.state.seats();
+        let (me, them) = (seats.next().expect("a seat"), seats.next().expect("a seat"));
+        let elves = hand[0];
+        let ask = |game: &Game, player: PlayerId| {
+            let request = Request {
+                id: 1,
+                player,
+                kind: RequestKind::ChooseReplacement {
+                    subject: None,
+                    life: None,
+                    sources: vec![elves],
+                    hints: vec!["you skip this turn"],
+                    damage: None,
+                    turn: true,
+                    counters: Vec::new(),
+                    draw: false,
+                },
+                may_cancel: false,
+            };
+            match prompt(game, &request, &mut HandleSpace::new()).expect("a prompt").0 {
+                PromptPayload::ChooseReplacementPromptMessage(p) => p,
+                other => panic!("{other:?}"),
+            }
+        };
+        assert_eq!(ask(&game, me).source_names, vec!["Llanowar Elves".to_string()]);
+        assert_eq!(ask(&game, them).source_names, vec![String::new()], "a card in another's hand is not named");
+
+        // Gone to its owner's graveyard and become a new object there (CR 400.7): no handle in a fresh view, but its name.
+        let new = ObjectId(game.state.objects.len() as u32 - 1);
+        let obj = &mut game.state.objects[elves.index()];
+        obj.zone = Zone::graveyard(me);
+        obj.became = Some(new);
+        let asked = ask(&game, them);
+        assert!(asked.sources[0].is_none(), "a gone source has no handle in a fresh view");
+        assert_eq!(asked.source_names, vec!["Llanowar Elves".to_string()]);
     }
 }
 

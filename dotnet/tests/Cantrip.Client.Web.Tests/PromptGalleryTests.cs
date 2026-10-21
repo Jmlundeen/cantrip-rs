@@ -69,6 +69,25 @@ public sealed class PromptGalleryTests(WebClient web)
     }
 
     /// <summary>
+    /// A replacement's source the page holds no handle to - Ral Zarek, gone to the graveyard as its skip was made, seen by a
+    /// page reloaded since - is named by the prompt (KI-34), not "An effect".
+    /// </summary>
+    [Fact]
+    public async Task A_replacements_source_the_page_never_saw_is_named_by_the_prompt()
+    {
+        const string Fixture = "choose-replacement-unseen-source";
+        await using TablePage table = await TablePage.OpenAsync(
+            web, $"prompt={Fixture}", WebClient.Pictures(nameof(PromptGalleryTests)));
+
+        TableState opened = await table.SettledAsync(state => state.Fixture == Fixture);
+        Assert.Equal("Your turn would begin: which applies first?", opened.Title);
+        Assert.Equal(
+            ["Ral Zarek, Guest Lecturer: you skip this turn", "Time Vault: skip this turn instead of untapping Time Vault"],
+            (opened.Dock ?? []).Select(button => button.Label));
+        Assert.Empty(table.Errors);
+    }
+
+    /// <summary>
     /// Heartless Act's "remove up to three counters from target creature" (CR 608.2d, 122.1): captioned as up to three, its
     /// button removing what is chosen - none at first, then the -1/-1 counters taken - and no more than three can be taken.
     /// </summary>

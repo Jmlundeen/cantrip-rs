@@ -1744,6 +1744,13 @@ public sealed class ChooseReplacementPromptMessage : PromptPayload
     [Key(4)]
     public List<string> Hints { get; set; } = [];
 
+    /// <summary>
+    /// Each source's name, in step with <see cref="Sources"/>: a source that has left (Ral Zarek, gone to the graveyard as
+    /// its skip was made) may have no handle in this seat's view, and is named by this. Empty for one the seat may not see.
+    /// </summary>
+    [Key(5)]
+    public List<string> SourceNames { get; set; } = [];
+
     /// <summary>The first offered effect. Any choice is legal, so the first is as good an automatic answer as any.</summary>
     public override AnswerPayload Default() => new ReplacementChosenAnswer { Index = 0 };
 }
