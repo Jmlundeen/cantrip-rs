@@ -400,7 +400,7 @@ pub fn grant_activated_abilities_of(view: &dyn LayerQuery, cards: &[CardId], cha
 /// grant theirs this way.
 pub fn grant_delayed_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let card = o.copied_card().unwrap_or(o.card);
     if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
         chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
     }

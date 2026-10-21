@@ -314,7 +314,11 @@ would go over unclickable.
   such a land other than abilities stay (KI-51).
 - **A face-down permanent is what the rule that put it there lists (708.2)**: `Game::put_onto_battlefield_face_down` takes
   `FaceDown::Manifested` (701.40a, a 2/2) or `FaceDown::Cloaked` (701.58a, a 2/2 with ward {2}), and gives the card those
-  copiable values (`intrinsic::FACE_DOWN`, `intrinsic::CLOAKED`) before it enters (708.3). The core recognises them as data,
+  copiable values (`intrinsic::FACE_DOWN`, `intrinsic::CLOAKED`) before it enters (708.3). On the battlefield they are its
+  face-down status, layer 1b over its copy effects (613.2b): `Marks::face_down_as` names them and `Obj::copiable` lays them
+  over `Obj::copy`, which holds only the copy effects, so a face-down permanent that becomes a copy is still a nameless
+  2/2 and the copy once turned face up (708.10); every reader of what an object is goes through `Obj::copiable` or
+  `CardTable::current`. The core recognises them as data,
   `CardDef::face_down`, never by comparing card ids, and the special action that turns either face up is each one's ability
   `intrinsic::TURN_FACE_UP` (`CardTable::turns_face_up`), paid with its card's mana cost (701.40b, 701.58b). Ward {N}
   (`intrinsic::ward`) is defined with them, since a cloaked permanent has it by the rules; cards reach it as

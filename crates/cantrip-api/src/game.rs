@@ -87,7 +87,7 @@ pub struct CastWay {
 pub fn may_cause(q: &dyn Query, causer: PlayerId, player: PlayerId, kind: CauseKind) -> bool {
     for &id in q.state().battlefield() {
         let o = q.obj(id);
-        let def = q.card(o.copy.map_or(o.card, |c| c.card));
+        let def = q.card(o.copied_card().unwrap_or(o.card));
         // A permanent that has lost all its abilities has no such rule (CR 613.1f).
         if def.cause_rules.is_empty() || q.lost_all_abilities(id) {
             continue;
@@ -117,7 +117,7 @@ pub fn mana_value_of(card: &dyn Fn(CardId) -> &'static CardDef, state: &GameStat
     let obj = state.obj(id);
     let front = card(obj.card);
     let cost = match front.back {
-        Some(back) if obj.transformed && obj.copy.is_none() && !back.has_cost && !front.back_land && !c.no_cost => front.cost,
+        Some(back) if obj.transformed && obj.copied_card().is_none() && !back.has_cost && !front.back_land && !c.no_cost => front.cost,
         _ => mana_cost_of(card, obj, c),
     };
     let x = if obj.zone.is(ZoneKind::Stack) { obj.x } else { state.left_stack(id).map_or(0, |item| item.x) };
@@ -236,7 +236,7 @@ pub trait Query {
     /// included, and the face that is up for a double-faced permanent (CR 707.8).
     fn copiable_values(&self, id: ObjectId) -> Copiable {
         let obj = self.obj(id);
-        obj.copy.unwrap_or_else(|| Copiable::of(self.chars(id).card))
+        obj.copiable().unwrap_or_else(|| Copiable::of(self.chars(id).card))
     }
 
     /// The cards `player` owns outside the game (CR 400.11, 108.3b) - in a match, their sideboard (CR 100.4, 400.11a) - in

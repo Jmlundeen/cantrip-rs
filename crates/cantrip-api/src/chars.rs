@@ -54,7 +54,7 @@ pub fn words(state: &GameState, id: ObjectId) -> Words {
     if let Some(last) = state.last_known(id) {
         return last.words;
     }
-    let mut words = obj.copy.map_or(Words::NONE, |c| c.words);
+    let mut words = if obj.face_down_values().is_some() { Words::NONE } else { obj.copy.as_ref().map_or(Words::NONE, |c| c.words) };
     for e in &state.effects {
         if let EffectKind::ChangeText { from, to } = e.kind
             && e.affected == id

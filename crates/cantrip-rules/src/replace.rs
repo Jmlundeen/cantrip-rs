@@ -83,7 +83,7 @@ fn madness_applies(cx: &Cx, z: &ZoneChange) -> bool {
 /// (CR 712.8d-f: a double-faced permanent with its back face up has only that face's abilities).
 fn card_of(cx: &Cx, id: ObjectId) -> CardId {
     let obj = cx.s().obj(id);
-    obj.copy.map_or_else(|| cx.cards().face(obj.card, obj.transformed), |c| c.card)
+    obj.copied_card().unwrap_or_else(|| cx.cards().face(obj.card, obj.transformed))
 }
 
 /// Whether any effect could apply to an event about `subject`: a permanent with replacements, or the subject's own

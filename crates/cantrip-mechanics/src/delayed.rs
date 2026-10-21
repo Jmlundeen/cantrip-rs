@@ -7,7 +7,7 @@ use cantrip_api::*;
 /// else its own.
 fn ability_card(g: &dyn Game, item: &StackItem) -> CardId {
     let o = g.obj(item.object);
-    o.copy.map(|c| c.card).unwrap_or(o.card)
+    o.copied_card().unwrap_or(o.card)
 }
 
 /// Sets up the card's delayed ability number `ability` (an index into its `delayed` list) to trigger at the beginning of

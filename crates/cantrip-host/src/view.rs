@@ -1226,7 +1226,7 @@ impl<'a> Projector<'a> {
             choices,
             class_level: if on_battlefield { i32::from(obj.class_level) } else { 0 },
             // A token whose text was changed as it was made has copiable values of its own and is no copy (CR 612.4).
-            is_copy: obj.copy.is_some_and(|c| Copiable { words: Words::NONE, ..c } != Copiable::of(obj.card)) || obj.card_copy,
+            is_copy: obj.copiable().is_some_and(|c| Copiable { words: Words::NONE, ..c } != Copiable::of(obj.card)) || obj.card_copy,
             starting_counter: if on_battlefield { None } else { def.loyalty.map(i32::from) },
             other_face: def.back.map(|back| Box::new(printed(back))),
             // A split card as it is printed, its halves side by side (CR 709.1); on the stack only the half cast exists (CR 709.3b).
@@ -1237,7 +1237,7 @@ impl<'a> Projector<'a> {
         };
 
         // A name an effect set (CR 612.8) or a copy effect states (CR 707.9b) is the name it has.
-        if c.name_set || obj.copy.is_some_and(|copy| copy.name.is_some()) {
+        if c.name_set || obj.copiable().is_some_and(|copy| copy.name.is_some()) {
             view.name = c.name.to_string();
         }
         if def.is_room() && on_battlefield && !c.name_set {

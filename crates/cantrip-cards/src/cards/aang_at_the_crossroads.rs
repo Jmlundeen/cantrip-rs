@@ -34,7 +34,7 @@ fn another_creature_you_control_leaves(q: &dyn Query, me: &Asker, event: &Event)
 /// (CR 701.27f, the 2025-10-02 ruling), which the transform instruction itself asks.
 fn transform_at_the_next_upkeep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let o = *g.obj(item.object);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let card = o.copied_card().unwrap_or(o.card);
     g.delayed_trigger(DelayedWhen::Step { step: Step::Upkeep, on_turn_of: None }, item.object, item.controller, AbilityRef::delayed(card, 1), Target::None);
     Ok(())
 }

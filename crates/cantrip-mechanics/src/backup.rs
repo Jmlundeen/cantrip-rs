@@ -28,7 +28,7 @@ pub fn resolve(g: &mut dyn Game, item: &StackItem, n: i16, keywords: &[Keyword],
             if let Some(index) = ability {
                 // A copy's ability is the one of the card it copies (CR 707.2).
                 let o = g.obj(item.object);
-                let this = o.copy.map(|c| c.card).unwrap_or(o.card);
+                let this = o.copied_card().unwrap_or(o.card);
                 g.add_effect(item.object, creature, EffectKind::AddAbility(AbilityRef::delayed(this, index)), Duration::EndOfTurn);
             }
         }

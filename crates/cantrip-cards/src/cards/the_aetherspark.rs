@@ -19,7 +19,7 @@ fn while_attached_to_a_creature(view: &dyn LayerQuery, source: ObjectId, affecte
 fn grant(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::CantBeAttacked);
     let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let card = o.copied_card().unwrap_or(o.card);
     if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
         chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
     }

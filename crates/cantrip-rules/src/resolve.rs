@@ -9,7 +9,7 @@ use crate::{Cx, Flow, R, ops};
 /// 720.3b).
 fn face(state: &GameState, spell: ObjectId) -> CardId {
     let obj = state.obj(spell);
-    obj.copy.map_or(obj.card, |c| c.card)
+    obj.copied_card().unwrap_or(obj.card)
 }
 
 fn target_specs(cards: &CardTable, state: &GameState, item: &StackItem) -> &'static [TargetSpec] {

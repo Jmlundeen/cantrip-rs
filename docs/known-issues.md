@@ -65,7 +65,6 @@ keeps it).
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
-| [KI-81](#ki-81-a-face-down-permanent-that-becomes-a-copy-is-the-copy-while-still-face-down) | A face-down permanent that becomes a copy is the copy while still face down | Medium | Open |
 | [KI-83](#ki-83-teferis-protection-in-the-browser-shows-an-empty-battlefield) | Teferi's Protection in the browser shows an empty battlefield | Low | Open |
 | [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
@@ -614,22 +613,6 @@ may attack into a protected player for nothing and leave itself open. A fix tell
 protected from (a field on `PlayerSummaryView` rather than the text), and has the attack plan count no damage to them.
 
 **Scenarios.** none yet.
-
-### KI-81: A face-down permanent that becomes a copy is the copy while still face down
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-19, review of copy effects ending |
-
-**Notes.** A face-down permanent's face-down status applies after copy effects (CR 613.2b, layer 1b): one that becomes
-a copy of something is still a nameless 2/2 while face down, and the copy once turned face up (CR 708.10). The engine
-keeps face-down status as a copy of the face-down card (`Obj::copy`, `put_onto_battlefield_face_down`), so `become_copy`
-(Mirrorweave on a manifested creature) overwrites it: the permanent shows the copied card's name and characteristics
-while face down, and loses the face-down card's turn-face-up action, so it can't be turned face up until the copy
-ends. `turn_face_up` already keeps the copy effects over a turned-up card (CR 708.8, 708.10). A fix makes face-down
-status a layer 1b over `Obj::copy` (in `layers::chars_before` and every reader of `Obj::copy`) rather than a copy.
-
-**Scenarios.** `mirrorweave-copy-of-a-manifested-creature-stays-as-it-is-turned-face-up` (marked `# Known bug`).
 
 ### KI-83: Teferi's Protection in the browser shows an empty battlefield
 

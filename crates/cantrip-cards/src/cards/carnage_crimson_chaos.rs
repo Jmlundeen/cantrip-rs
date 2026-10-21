@@ -13,7 +13,7 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     g.add_effect(item.object, returned, EffectKind::MustAttack, Duration::Indefinite);
     let o = g.obj(item.object);
-    let this = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let this = o.copied_card().unwrap_or(o.card);
     g.add_effect(item.object, returned, EffectKind::AddAbility(AbilityRef::delayed(this, 0)), Duration::Indefinite);
     Ok(())
 }

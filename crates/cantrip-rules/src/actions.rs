@@ -53,7 +53,7 @@ fn split_second(cx: &Cx) -> bool {
 /// Whether the spell `spell` has split second, by its printed card or the card it copies.
 fn has_split_second(cx: &Cx, spell: ObjectId) -> bool {
     let obj = cx.s().obj(spell);
-    cx.card(obj.copy.map_or(obj.card, |c| c.card)).keywords.has(Keyword::SplitSecond)
+    cx.card(obj.copied_card().unwrap_or(obj.card)).keywords.has(Keyword::SplitSecond)
 }
 
 fn activated(cx: &Cx, ability: AbilityRef) -> Option<&'static ActivatedDef> {
@@ -1240,7 +1240,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
         game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
     });
     let obj = game.state.obj(source);
-    let own = !game.cards.get(obj.copy.map_or(obj.card, |c| c.card)).own_cost_changes.is_empty();
+    let own = !game.cards.get(obj.copied_card().unwrap_or(obj.card)).own_cost_changes.is_empty();
     if def.special_action || def.cost.mana.x > 0 || !(changers || own || def.cost_change.is_some()) {
         return Vec::new();
     }
@@ -1301,7 +1301,7 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, option: &ActionOption, c
 /// announcement's prompt. None for any other spell.
 pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: PlayerId) -> Option<(u8, usize)> {
     let obj = game.state.obj(spell);
-    let def = game.cards.get(obj.copy.map_or(obj.card, |c| c.card));
+    let def = game.cards.get(obj.copied_card().unwrap_or(obj.card));
     let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) else { return None };
     let mut copy = advice_game(game);
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
@@ -1394,7 +1394,7 @@ pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, option: &ActionOp
 /// The cost changes the object `id` carries itself (CR 601.2f): its card's, or a copy's.
 fn own_cost_changes(cx: &Cx, id: ObjectId) -> &'static [CostChange] {
     let obj = cx.s().obj(id);
-    cx.card(obj.copy.map_or(obj.card, |c| c.card)).own_cost_changes
+    cx.card(obj.copied_card().unwrap_or(obj.card)).own_cost_changes
 }
 
 fn change_with(
@@ -2426,7 +2426,7 @@ fn cast_limit(cx: &Cx) -> Option<u8> {
         .map(|&id| {
             let obj = cx.s().obj(id);
             // A permanent that has lost all its abilities limits nothing (CR 613.1f).
-            let limit = cx.card(obj.copy.map_or(obj.card, |c| c.card)).cast_limit;
+            let limit = cx.card(obj.copied_card().unwrap_or(obj.card)).cast_limit;
             if limit > 0 && cx.lost_all_abilities(id) { 0 } else { limit }
         })
         .filter(|&n| n > 0)
@@ -5561,7 +5561,7 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().mana_triggers[obj.copy.map_or(obj.card, |c| c.card).0 as usize]
+            cx.cards().mana_triggers[obj.copied_card().unwrap_or(obj.card).0 as usize]
         })
         .collect();
     let mut statics = crate::settle::TriggerStatics::new(None);

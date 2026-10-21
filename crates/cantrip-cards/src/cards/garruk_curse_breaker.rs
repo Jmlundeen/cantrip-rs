@@ -53,7 +53,7 @@ fn create_beast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// −4: Until your next turn (CR 611.2b), the delayed ability watches every attack on your opponents.
 fn minus_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let o = g.obj(item.object);
-    let this = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let this = o.copied_card().unwrap_or(o.card);
     g.delayed_trigger(DelayedWhen::UntilNextTurnOf(item.controller), item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
     Ok(())
 }

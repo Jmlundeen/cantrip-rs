@@ -131,23 +131,28 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
         return *printed(cards, cards.no_characteristics, false);
     }
     let spell = obj.zone.is(ZoneKind::Stack);
-    // The copiable values (CR 707.2): a copy effect's, or the face of the card that is up (CR 711.2).
-    let card = match &obj.copy {
-        Some(c) => c.card,
-        None => cards.face(obj.card, obj.transformed),
+    // The copiable values (CR 707.2): a copy effect's (layer 1a) under a face-down permanent's face-down values (layer 1b,
+    // CR 613.2b), or the face of the card that is up (CR 711.2).
+    // The face-down values are a card's own printed values (no exceptions), so a face-down permanent starts from that card
+    // as an object with no copy effect does.
+    let copy: Option<&Copiable> = if obj.marks.face_down_as.is_some() { None } else { obj.copy.as_ref() };
+    let card = match (obj.marks.face_down_as, copy) {
+        (Some(values), _) => values,
+        (None, Some(c)) => c.card,
+        (None, None) => cards.face(obj.card, obj.transformed),
     };
     let def = cards.get(card);
     // A Room on the battlefield (CR 709.5): the name, mana cost and abilities of its unlocked doors alone, which no
     // card-only cache can hold, as they are the object's. In every other zone the card has both halves (CR 709.4).
     let room = def.is_room() && obj.zone.is(ZoneKind::Battlefield);
     let start = || {
-        let mut chars = match &obj.copy {
+        let mut chars = match copy {
             Some(c) => initial(cards, card, Some(c)),
             None => *printed(cards, card, false),
         };
         chars.spell = spell;
         if room {
-            doors(cards, card, obj.marks.doors, obj.copy.is_some_and(|c| c.colors.is_some()), &mut chars);
+            doors(cards, card, obj.marks.doors, copy.is_some_and(|c| c.colors.is_some()), &mut chars);
         }
         chars
     };
@@ -181,12 +186,12 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
     let text_lost: Vec<ObjectId> =
         if stop > Layer::Type && found.as_ref().is_some_and(|f| !f.setters.is_empty()) { land_text_lost(cards, state, log) } else { Vec::new() };
     if !has_effects && !has_counters && !has_own && sources.is_empty() && others.is_empty() && !has_hone {
-        if obj.copy.is_none() && !spell && !room {
+        if copy.is_none() && !spell && !room {
             // Nothing acts on it: the card's own values, made once.
             return *printed(cards, card, stop > Layer::Ability);
         }
         let mut chars = start();
-        if stop > Layer::Ability && obj.copy.is_none() && !room {
+        if stop > Layer::Ability && copy.is_none() && !room {
             let mut full = *printed(cards, card, true);
             full.spell = spell;
             return full;
@@ -203,8 +208,8 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
         return chars;
     }
     let mut chars = start();
-    let colors = obj.copy.and_then(|c| c.colors);
-    let pt = obj.copy.and_then(|c| c.pt);
+    let colors = copy.and_then(|c| c.colors);
+    let pt = copy.and_then(|c| c.pt);
     // The continuous effects on it, oldest first.
     let mut fx: Vec<ContinuousEffect> =
         if has_effects { state.effects.iter().filter(|e| e.affected == id).copied().collect() } else { Vec::new() };
@@ -334,7 +339,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         // none (CR 613.1f, 613.8a).
         let note = |list: &mut Vec<(ObjectId, ZoneKind, bool)>, source: ObjectId, from: ZoneKind| {
             let sobj = state.obj(source);
-            let scard = sobj.copy.map(|c| c.card).unwrap_or_else(|| cards.face(sobj.card, sobj.transformed));
+            let scard = cards.current(sobj);
             if cards.statics[scard.0 as usize] && list.len() < MAX_STATIC_SOURCES && live(state, source) {
                 list.push((source, from, state.lost_all_abilities_to_an_effect(source)));
             }
@@ -989,7 +994,7 @@ impl<'a> Merge<'a> {
 
     fn source_statics(&self, source: ObjectId) -> &'static [StaticDef] {
         let sobj = self.state.obj(source);
-        let scard = sobj.copy.map(|c| c.card).unwrap_or_else(|| self.cards.face(sobj.card, sobj.transformed));
+        let scard = self.cards.current(sobj);
         self.cards.get(scard).statics
     }
 

@@ -21,7 +21,7 @@ fn has_counters(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: 
 
 fn grant_ward(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let card = o.copied_card().unwrap_or(o.card);
     let ward = AbilityRef::delayed(card, 0);
     if !chars.abilities().any(|a| a == ward)
         && let Some(slot) = chars.abilities.iter().position(|a| a.is_none())

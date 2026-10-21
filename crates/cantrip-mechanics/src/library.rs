@@ -571,7 +571,7 @@ pub fn card_has_name(q: &dyn Query, card: CardId, wanted: CardId) -> bool {
 pub fn object_names(q: &dyn Query, id: ObjectId) -> Vec<&'static str> {
     let c = q.chars(id);
     let obj = q.obj(id);
-    if c.name_set || obj.copy.is_some_and(|copy| copy.name.is_some()) {
+    if c.name_set || (obj.face_down_values().is_none() && obj.copy.as_ref().is_some_and(|copy| copy.name.is_some())) {
         return vec![c.name];
     }
     let def = q.card(c.card);

@@ -29,7 +29,9 @@ pub struct Obj {
     counters: [i16; CounterKind::COUNT],
     /// When it entered its zone (CR 613.7d), for ordering and for layer timestamps.
     pub timestamp: u32,
-    /// The copy effect it entered with (CR 707.2, 613.2): the values it copied, which are its own copiable values.
+    /// The copy effects on it (CR 707.2, 613.2, layer 1a): the values it copied, which are its copiable values unless it
+    /// is face down (`copiable`, layer 1b). An object about to be put onto the battlefield face down holds the face-down
+    /// values here until it enters (`put_onto_battlefield_face_down`).
     pub copy: Option<Copiable>,
     /// The turn a loyalty ability of it was last activated (CR 606.3), zero for never.
     pub loyalty_turn: u32,
@@ -100,8 +102,9 @@ pub struct Obj {
     /// For a card in exile: the permanent whose ability exiled it, which a linked ability finds it by (CR 607.2a).
     /// A new object (CR 400.7) has none.
     pub exiled: Option<ExileLink>,
-    /// Face down (CR 708): a permanent is a nameless 2/2 creature, its card's real values kept in `card` (its `copy` is the
-    /// face-down values, CR 708.2a); a card in exile has no characteristics at all (CR 406.3a), and only those who may look
+    /// Face down (CR 708): a permanent is a nameless 2/2 creature, its card's real values kept in `card` and any copy
+    /// effects in `copy` (the face-down values apply over them, `Marks::face_down_as`, CR 708.2a, 613.2b); a card in exile
+    /// has no characteristics at all (CR 406.3a), and only those who may look
     /// at it know what card it is (`seen_by`, CR 406.3).
     pub face_down: bool,
     /// For a face-down card in exile: the seats that may look at it, a bit each (CR 406.3). Those who could see where it
@@ -155,6 +158,10 @@ pub struct Marks {
     /// Phased out (CR 110.5, 702.26b), and how: what says when it phases in. `None` while it is phased in. The object is in
     /// `Zone::PHASED_OUT` exactly while this is set.
     pub phased: Option<Phased>,
+    /// The face-down values of a face-down permanent (CR 708.2a; a cloaked one's ward {2}, CR 701.58a): the intrinsic card
+    /// whose values its face-down status gives it in layer 1b, over its copy effects (CR 613.2b). Set as it enters face
+    /// down, gone as it is turned face up.
+    pub face_down_as: Option<CardId>,
 }
 
 /// One of the words a card's text offers to choose between, words that otherwise have no rules meaning (CR 607.2f): the
@@ -250,6 +257,33 @@ impl Obj {
     /// characteristics (CR 406.3a). A face-down permanent, phased out or not, and a face-down spell have those of CR 708.2a.
     pub fn face_down_card(&self) -> bool {
         self.face_down && !matches!(self.zone.kind(), ZoneKind::Battlefield | ZoneKind::PhasedOut | ZoneKind::Stack)
+    }
+
+    /// Its copiable values (CR 707.2) where they are not its card's own: its copy effects' (`copy`, layer 1a), and over
+    /// them, while it is a face-down permanent, the face-down values (layer 1b, CR 613.2b, 708.2a) - so a face-down
+    /// permanent that becomes a copy is still a nameless 2/2, and the copy once turned face up (CR 708.10). What every
+    /// reader of what an object is reads; `copy` alone is what it is once turned face up.
+    pub fn copiable(&self) -> Option<Copiable> {
+        match self.face_down_values() {
+            Some(card) => Some(Copiable::of(card)),
+            None => self.copy,
+        }
+    }
+
+    /// The face-down values a face-down permanent has in layer 1b (`Marks::face_down_as`): set only as a permanent enters
+    /// face down and cleared as it is turned face up, and a new object starts with none, so a card exiled face down
+    /// (which has no characteristics at all) never has them.
+    pub fn face_down_values(&self) -> Option<CardId> {
+        self.marks.face_down_as
+    }
+
+    /// The card whose values it has from its copy effects and face-down status (layers 1a and 1b), if not its own card:
+    /// `copiable().map(|c| c.card)` without copying the values.
+    pub fn copied_card(&self) -> Option<CardId> {
+        match self.marks.face_down_as {
+            Some(card) => Some(card),
+            None => self.copy.as_ref().map(|c| c.card),
+        }
     }
 
     /// Whether it has any counter on it.

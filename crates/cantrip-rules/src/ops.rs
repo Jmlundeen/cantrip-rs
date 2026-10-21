@@ -236,9 +236,11 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         }
         // CR 708.3: an object turned face down before it entered is a face-down permanent as it arrives; its card's own
         // values are what it is turned face up as (CR 708.2a).
-        if entering && !from.is(ZoneKind::Battlefield) && old.copy.is_some_and(|c| cx.card(c.card).face_down) {
-            new.copy = old.copy;
+        // It has the face-down values in layer 1b (CR 613.2b), over no copy effect yet.
+        if entering && !from.is(ZoneKind::Battlefield) && let Some(c) = old.copy.filter(|c| cx.card(c.card).face_down) {
+            new.copy = None;
             new.face_down = true;
+            new.marks.face_down_as = Some(c.card);
         }
         if entering {
             counters::intrinsic(cx.cards(), &new, &mut counts);
@@ -515,27 +517,12 @@ pub fn turn_face_up(cx: &mut Cx, id: ObjectId, player: PlayerId) {
         cx.emit(Event::Revealed { player: controller, card: id });
         return;
     }
-    // Turned up it is its own card under whatever copy effects are on it (CR 708.8, 613.2b): with any, the earliest one now
-    // applies over the card's own values instead of the face-down 2/2's, and the copy it makes stays.
-    let earliest = cx
-        .s()
-        .effects
-        .iter()
-        .enumerate()
-        .filter(|(_, e)| e.affected == id && matches!(e.kind, EffectKind::RestoreCopy(_)))
-        .min_by_key(|(_, e)| e.timestamp)
-        .map(|(at, _)| at);
-    match earliest {
-        Some(at) => {
-            let e = cx.s().effects[at];
-            cx.st().effect_set(at, cantrip_state::ContinuousEffect { kind: EffectKind::RestoreCopy(None), ..e });
-            cx.st().update_obj(id, |o| o.face_down = false);
-        }
-        None => cx.st().update_obj(id, |o| {
-            o.face_down = false;
-            o.copy = None;
-        }),
-    }
+    // Turned up it is its own card under whatever copy effects are on it (CR 708.8, 613.2b): the face-down values of layer
+    // 1b no longer apply over them.
+    cx.st().update_obj(id, |o| {
+        o.face_down = false;
+        o.marks.face_down_as = None;
+    });
     note_statics(cx, id);
     cx.emit(Event::TurnedFaceUp { permanent: id, player });
 }
@@ -940,7 +927,7 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<()> {
         return Ok(());
     }
     let obj = cx.s().obj(id);
-    if !obj.zone.is(ZoneKind::Battlefield) || obj.copy.is_some() || cx.cards().backs[obj.card.0 as usize].is_none() {
+    if !obj.zone.is(ZoneKind::Battlefield) || obj.copied_card().is_some() || cx.cards().backs[obj.card.0 as usize].is_none() {
         return Ok(());
     }
     let face = cx.cards().face(obj.card, !obj.transformed);
@@ -2466,7 +2453,7 @@ fn note_statics(cx: &mut Cx, id: ObjectId) {
         return;
     }
     let obj = cx.s().obj(id);
-    let card = obj.copy.map(|c| c.card).unwrap_or_else(|| cx.cards().face(obj.card, obj.transformed));
+    let card = cx.cards().current(&obj);
     if cx.cards().statics[card.0 as usize] || obj.counters(CounterKind::Hone) > 0 {
         cx.st().see_statics();
     }

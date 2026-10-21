@@ -1602,7 +1602,7 @@ pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
     let mut all: Vec<Miracle> = q.card(q.obj(card).card).miracle.map(|cost| Miracle { granter: None, cost: Some(cost) }).into_iter().collect();
     for &id in q.state().battlefield() {
         let o = q.obj(id);
-        let granter = o.copy.map_or(o.card, |c| c.card);
+        let granter = o.copied_card().unwrap_or(o.card);
         let def = q.card(granter);
         // A permanent that has lost all its abilities gives nothing (CR 613.1f).
         if def.granted_miracles.is_empty() || q.lost_all_abilities(id) {
@@ -1627,8 +1627,8 @@ pub fn cant_draw(q: &dyn Query, player: PlayerId, n: u32) -> bool {
     q.state().battlefield().iter().any(|&id| {
         let o = q.obj(id);
         // The definition its abilities come from: the card it copies, or the face that is up (CR 712.8d-f).
-        let def = match o.copy {
-            Some(c) => q.card(c.card),
+        let def = match o.copied_card() {
+            Some(c) => q.card(c),
             None => {
                 let front = q.card(o.card);
                 match front.back {
@@ -2788,10 +2788,10 @@ impl CardTable {
         self.get(ability.card).face_down && ability.index == crate::intrinsic::TURN_FACE_UP
     }
 
-    /// The definition an object currently has: a copy's, else the face showing (CR 707.2, 712.3). The printed card of a
-    /// transformed permanent is its front.
+    /// The definition an object currently has: a face-down permanent's face-down values, a copy's, else the face showing
+    /// (CR 707.2, 708.2a, 712.3). The printed card of a transformed permanent is its front.
     pub fn current(&self, obj: &Obj) -> CardId {
-        obj.copy.map(|c| c.card).unwrap_or_else(|| self.face(obj.card, obj.transformed))
+        obj.copied_card().unwrap_or_else(|| self.face(obj.card, obj.transformed))
     }
 
     /// The face of a card that shows when it is transformed (CR 712.3), or the card itself when it has no back.

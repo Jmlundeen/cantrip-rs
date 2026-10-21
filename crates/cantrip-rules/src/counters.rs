@@ -152,7 +152,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
 /// (CR 310.4b), a Saga a lore counter (CR 714.3a). Added to the counters the replacements give it, before the replacements
 /// of counters being put apply to them all (`entering`).
 pub fn intrinsic(cards: &CardTable, obj: &Obj, counts: &mut [i16; CounterKind::COUNT]) {
-    let card = obj.copy.map(|c| c.card).unwrap_or_else(|| cards.face(obj.card, obj.transformed));
+    let card = obj.copied_card().unwrap_or_else(|| cards.face(obj.card, obj.transformed));
     let def = cards.get(card);
     if let Some(loyalty) = def.loyalty {
         counts[CounterKind::Loyalty as usize] += loyalty;

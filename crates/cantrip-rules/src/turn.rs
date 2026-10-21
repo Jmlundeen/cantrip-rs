@@ -364,7 +364,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
         if obj.controller != player {
             continue;
         }
-        let card = obj.copy.map_or(obj.card, |c| c.card);
+        let card = obj.copied_card().unwrap_or(obj.card);
         let asker = Asker { source: id, controller: player };
         // A scan once a turn of what is on the battlefield, for a card that has such a rule.
         if !cx.card(card).turn_begin.is_empty() && cx.lost_all_abilities(id) {
@@ -705,7 +705,7 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
     // ("creatures you control with power 2 or less can't be blocked by ...", Delney, Streetwise Lookout).
     for &id in rule_sources {
         let obj = cx.s().obj(id);
-        let card = obj.copy.map_or(obj.card, |c| c.card);
+        let card = obj.copied_card().unwrap_or(obj.card);
         if !cx.card(card).block_rules.iter().all(|rule| rule(cx, id, blocker, attacker)) {
             return false;
         }
@@ -747,7 +747,7 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().block_rules[obj.copy.map_or(obj.card, |c| c.card).0 as usize] && !cx.lost_all_abilities(id)
+            cx.cards().block_rules[obj.copied_card().unwrap_or(obj.card).0 as usize] && !cx.lost_all_abilities(id)
         })
         .collect();
     let mut allowed = Vec::new();
@@ -1164,7 +1164,7 @@ fn cleanup(cx: &mut Cx) -> R<()> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.card(obj.copy.map_or(obj.card, |c| c.card)).sacrifice_at_cleanup.is_some_and(|rule| rule(&*cx, id))
+            cx.card(obj.copied_card().unwrap_or(obj.card)).sacrifice_at_cleanup.is_some_and(|rule| rule(&*cx, id))
         })
         .collect();
     if !doomed.is_empty() {
