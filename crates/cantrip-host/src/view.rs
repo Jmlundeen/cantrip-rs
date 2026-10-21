@@ -1231,8 +1231,9 @@ impl<'a> Projector<'a> {
             is_copy: obj.copiable().is_some_and(|c| Copiable { words: Words::NONE, ..c } != Copiable::of(obj.card)) || obj.card_copy,
             starting_counter: if on_battlefield { None } else { def.loyalty.map(i32::from) },
             other_face: def.back.map(|back| Box::new(printed(back))),
-            // A split card as it is printed, its halves side by side (CR 709.1); on the stack only the half cast exists (CR 709.3b).
-            halves: if zone.is(ZoneKind::Stack) { Vec::new() } else { def.split.map_or_else(Vec::new, |(left, right)| vec![printed(left), printed(right)]) },
+            // A split card as it is printed, its halves side by side (CR 709.1). On the stack a half cast alone is that half
+            // only, whose definition has no halves (CR 709.3b), and a fused split spell is both (CR 702.102b).
+            halves: def.split.map_or_else(Vec::new, |(left, right)| vec![printed(left), printed(right)]),
             // Cast as its Adventure or Omen, it is that face alone (CR 715.3b, 720.3b), whose definition has no inset.
             inset_spell: inset_spell(def),
             ..Default::default()
@@ -1405,12 +1406,21 @@ impl<'a> Projector<'a> {
             view.exiled_with = handles.handle(link.by);
         }
         if let Some(item) = item {
-            for t in s.targets(&item) {
+            // A fused split spell's targets each say whose half they are (CR 702.102b): its left half's specs come first.
+            let half_of = |slot: usize| -> &'static str {
+                match def.split {
+                    Some((left, right)) if item.way == WAY_FUSED => {
+                        if (s.spec(&item, slot) as usize) < left.spell_targets().len() { left.name } else { right.name }
+                    }
+                    _ => "",
+                }
+            };
+            for (slot, t) in s.targets(&item).iter().enumerate() {
                 if let Some(message) = target_view(game, handles, *t) {
                     view.targets.push(SpellTargetView {
                         player: message.player,
                         object: message.object,
-                        text: String::new(),
+                        text: half_of(slot).to_string(),
                         still_legal: true,
                     });
                 }

@@ -2137,6 +2137,12 @@ pub struct CardDef {
     /// (CR 709.3). The card itself has both halves' characteristics together in every other zone (CR 709.4). The
     /// definitions must be in the card table (listed in the card's `EXTRA`).
     pub split: Option<(&'static CardDef, &'static CardDef)>,
+    /// Fuse (CR 702.102): a split card that may be cast from its owner's hand as both halves at once (`WAY_FUSED`), the
+    /// fused split spell, with the card's combined characteristics (CR 702.102b, 709.4) and both halves' mana costs (CR
+    /// 702.102c). The core makes it from `split`: the left half's targets and then the right half's
+    /// (`CardTable::spell_targets_of`), and as it resolves the left half's instructions and then the right half's (CR
+    /// 702.102d). A fuse card needs nothing else.
+    pub fuse: bool,
     /// Aftermath (CR 702.127a): this half may be cast only from its owner's graveyard, and is exiled when it leaves the
     /// stack.
     pub aftermath: bool,
@@ -2430,6 +2436,7 @@ impl CardDef {
         bestow_from_graveyard: false,
         cast_only_if: None,
         split: None,
+        fuse: false,
         aftermath: false,
         reconfigure: false,
         foretell: None,
@@ -2601,6 +2608,9 @@ pub struct CardTable {
     pub player_keywords: Vec<bool>,
     /// Which cards have a triggered mana ability: looked for among the permanents only when a permanent is tapped for mana.
     pub mana_triggers: Vec<bool>,
+    /// Per card: the fused split spell's target specs of a split card with fuse (CR 702.102b: the left half's, then the right
+    /// half's), made once as the table is.
+    pub fused_targets: Vec<Option<&'static [TargetSpec]>>,
     /// Which cards have cost changes (CR 601.2f): the board is looked at for their sources, never for the card table's
     /// sake (a table holds every card, so "does any card" is always true).
     pub cost_changes: Vec<bool>,
@@ -2751,6 +2761,17 @@ impl CardTable {
         let mut card_names: Vec<&'static str> = cards.iter().filter(|c| c.oracle || !c.dungeon.is_empty()).map(|c| c.name).collect();
         card_names.sort_unstable();
         let card_named = cards.iter().map(|c| card_names.binary_search(&c.name).is_ok()).collect();
+        // A fused split spell's targets are its halves' together (CR 702.102b), one list for the table's life.
+        let fused_targets = cards
+            .iter()
+            .map(|c| match c.split {
+                Some((left, right)) if c.fuse => {
+                    let both: Vec<TargetSpec> = left.spell_targets().iter().chain(right.spell_targets()).copied().collect();
+                    Some(&*Vec::leak(both))
+                }
+                _ => None,
+            })
+            .collect();
         let mut table = CardTable {
             card_named,
             cards,
@@ -2771,6 +2792,7 @@ impl CardTable {
             targeting_rules,
             player_keywords,
             mana_triggers,
+            fused_targets,
             cost_changes,
             pay_with_grants,
             activation_rules,
@@ -2880,6 +2902,15 @@ impl CardTable {
     }
 
     /// The id a definition has in this table: for token definitions and other cards' own references.
+    /// The target specs a spell cast as `def` has (`CardDef::spell_targets`): a split card with fuse is cast as itself only
+    /// fused, and then has both halves' (CR 702.102b).
+    pub fn spell_targets_of(&self, def: &'static CardDef) -> &'static [TargetSpec] {
+        if def.fuse && def.split.is_some() {
+            return self.fused_targets[self.id_of(def).0 as usize].unwrap_or(&[]);
+        }
+        def.spell_targets()
+    }
+
     pub fn id_of(&self, def: &'static CardDef) -> CardId {
         CardId(self.cards.iter().position(|c| std::ptr::eq(*c, def)).expect("a definition in the table") as u16)
     }
@@ -2948,7 +2979,7 @@ fn miracle_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     } else {
         let ask = RequestKind::ChooseModes {
             source: card,
-            modes: ways.iter().map(|(w, _)| Label::Face(w.face)).collect(),
+            modes: ways.iter().map(|(w, _)| if w.way == WAY_FUSED { Label::Fused(w.face) } else { Label::Face(w.face) }).collect(),
             eligible: (0..ways.len() as u8).collect(),
             count: 1,
             at_most: 0,

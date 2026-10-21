@@ -57,6 +57,10 @@ pub const WAY_OVERLOAD: u8 = 250;
 pub const WAY_SPLIT_LEFT: u8 = 239;
 pub const WAY_SPLIT_RIGHT: u8 = 238;
 
+/// How a split card with fuse is cast as both halves at once from its owner's hand (CR 702.102a), as a way number: the
+/// fused split spell, which is the whole card on the stack.
+pub const WAY_FUSED: u8 = 237;
+
 /// The doors of a Room (CR 709.5, 709.5j), as the bits of `Marks::doors`: the left half and the right.
 pub const DOOR_LEFT: u8 = 1;
 pub const DOOR_RIGHT: u8 = 2;

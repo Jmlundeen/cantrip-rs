@@ -128,7 +128,7 @@ pub fn cast_way(g: &mut dyn Game, player: PlayerId, card: ObjectId, ways: Vec<Ca
         0 => Ok(None),
         1 => Ok(Some(ways[0])),
         _ => {
-            let faces = ways.iter().map(|w| Label::Face(w.face)).collect();
+            let faces = ways.iter().map(|w| if w.way == WAY_FUSED { Label::Fused(w.face) } else { Label::Face(w.face) }).collect();
             Ok(Some(ways[one_of(g, player, card, faces)? as usize]))
         }
     }

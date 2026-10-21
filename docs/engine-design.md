@@ -822,7 +822,13 @@ play a land (CR 116.2a, 305.1) - and an offered action (`ActionOption`) names fo
 - **source**: the card cast or played, or the object whose ability is activated.
 - **entry** (`index`): which of the source's *own* options it is. For a cast or a land play, the way number: 0 the card for
   its mana cost, n its nth printed alternative way (`CardDef::ways`: evoke, flashback, sneak), `WAY_ADVENTURE`, `WAY_OMEN`,
-  `WAY_SPLIT_LEFT`/`RIGHT`, `WAY_BACK_FACE` (a modal double-faced card's spell or land back face), `WAY_BESTOW`,
+  `WAY_SPLIT_LEFT`/`RIGHT`, `WAY_FUSED` (a split card with fuse cast as both halves from its owner's hand, CR 702.102a:
+  the core makes the fused split spell from the card's halves - the left half's targets then the right half's
+  (`CardTable::spell_targets_of`), and as it resolves the left half's instructions then the right half's, each on a view of
+  the item that is that half cast alone (`resolve::run_fused`, CR 702.102d), so a fuse card is `fuse: true` and its halves;
+  with the card's combined cost and characteristics on the stack, CR 702.102b-c, drawn as both halves with each target
+  naming its half; offered by the rules from a hand, for its mana cost or an alternative cost, and to a cast an effect makes
+  from a hand (`Label::Fused`), never by a permission from elsewhere), `WAY_BACK_FACE` (a modal double-faced card's spell or land back face), `WAY_BESTOW`,
   `WAY_OVERLOAD`; for an activation, the ability's place in the computed ability list. It names the face the action casts or
   plays and the cost of the card's own it is made for, and never a position in a list another object makes.
 - **granted_by** (`Option<Grant>`): what made the action possible where the rules every player has do not (CR 601.3,

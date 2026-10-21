@@ -1055,13 +1055,9 @@ fn modes_possible(cx: &Cx, asker: &Asker, modal: &ModalDef) -> bool {
 
 /// Whether a spell's targets are announced with the action: one slot of one target, on a spell that is not modal and
 /// does not choose its target after its kicker or X (CR 601.2b-c), nor how many by its kicker.
-fn targets_with_cast(def: &'static CardDef) -> bool {
-    def.modal.is_none()
-        && !def.late_targets
-        && def.gift.is_none()
-        && def.divide.is_none()
-        && targets_with_action(def.spell_targets())
-        && def.spell_targets()[0].if_kicked.is_none()
+fn targets_with_cast(cards: &CardTable, def: &'static CardDef) -> bool {
+    let specs = cards.spell_targets_of(def);
+    def.modal.is_none() && !def.late_targets && def.gift.is_none() && def.divide.is_none() && targets_with_action(specs) && specs[0].if_kicked.is_none()
 }
 
 /// Fills in a spell option's targets, or checks that its modes and targets could be announced: a modal spell needs
@@ -1070,7 +1066,7 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
     if let Some(modal) = def.modal {
         return modes_possible(cx, asker, modal);
     }
-    let specs = def.spell_targets();
+    let specs = cx.cards().spell_targets_of(def);
     // A gift is promised before the targets (CR 601.2b-c, 702.174m), so what may be targeted can depend on it: it is
     // offered if every required slot has a target without the gift, or with it.
     if def.late_targets || def.gift.is_some() || def.divide.is_some() {
@@ -1095,7 +1091,7 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
 /// cost, the cast is judged for each candidate (`covered`), and only those it could be paid for are offered; otherwise it is
 /// judged once, with no target.
 fn offer_costed(cx: &Cx, a: &Available, asker: &Asker, def: &'static CardDef, option: &mut ActionOption, covered: impl Fn(&[Target]) -> bool) -> bool {
-    if targets_with_cast(def) && (!a.changers.is_empty() || !def.own_cost_changes.is_empty() || lasting_changes(cx)) {
+    if targets_with_cast(cx.cards(), def) && (!a.changers.is_empty() || !def.own_cost_changes.is_empty() || lasting_changes(cx)) {
         if !offer_spell(cx, asker, def, option) {
             return false;
         }
@@ -3188,6 +3184,7 @@ impl<'a> Offer<'a> {
             ZoneKind::Hand if own => {
                 // From the hand, the card and its faces for their costs and the ways that name the hand (CR 601.3).
                 self.by_route(card, def, &Route::RULES, |way| way.from == ZoneKind::Hand, options);
+                self.fused(card, def, options);
                 self.overload(card, def, options);
                 self.bestow(card, def, options);
             }
@@ -3293,6 +3290,18 @@ impl<'a> Offer<'a> {
         if covers_total(cx, a, player, card, def, cost, 0, false) {
             options.push(ActionOption::on(ActionKind::CastSpell, card, WAY_OVERLOAD));
         }
+    }
+
+    /// Fuse (CR 702.102a): a split card with fuse in its owner's hand cast as both halves at once, the fused split spell -
+    /// the card itself, with its combined characteristics (CR 702.102b, 709.4) - for its combined mana cost (CR 702.102c) or
+    /// an alternative cost another object gives (the ruling: Omniscience casts it fused for nothing), at the card's speed.
+    /// Only by the rules from a hand: a permission to cast it from elsewhere casts one half (the ruling).
+    fn fused(&self, card: ObjectId, def: &'static CardDef, options: &mut Vec<ActionOption>) {
+        if !def.fuse || !def.split.is_some_and(|(left, right)| left.spell.is_some() && right.spell.is_some()) {
+            return;
+        }
+        let instant = self.speed(card).whole(def);
+        self.offer_costs(card, def, WAY_FUSED, &Route::RULES, instant, options);
     }
 
     /// Bestow (CR 702.103a): as the Aura it becomes, which needs a creature to enchant (CR 601.2c), at the Aura's speed.
@@ -3678,7 +3687,12 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
         ActionKind::CastSpell => {
             // A card exiled face down is described as the spell it would be (CR 406.3a).
             let _face_up = layers::judged_face_up(state, source);
-            describe_cast(cards, state, log, option, source)
+            let text = describe_cast(cards, state, log, option, source);
+            // A fused cast says so whatever it is paid with (CR 702.102a): "Fuse: both halves - Without paying its mana cost".
+            match option.index {
+                WAY_FUSED if !text.starts_with("Fuse") => format!("Fuse: both halves - {text}").into(),
+                _ => text,
+            }
         }
         // A land a way a permanent gives lets be played says the way (Serra Paragon's); one a rule or an effect lets be played
         // names it (Bolas's Citadel, Yawgmoth's Will), as a cast does, and so does a permission where another one would let
@@ -3819,6 +3833,7 @@ fn describe_way(cards: &CardTable, state: &GameState, log: &[Record], option: &A
         ActionKind::CastSpell if option.index == WAY_SPLIT_LEFT => cards.get(state.obj(source).card).split.map_or("", |h| h.0.name),
         ActionKind::CastSpell if option.index == WAY_SPLIT_RIGHT => cards.get(state.obj(source).card).split.map_or("", |h| h.1.name),
         ActionKind::CastSpell if option.index == WAY_OVERLOAD => "Overload",
+        ActionKind::CastSpell if option.index == WAY_FUSED => "Fuse: both halves",
         ActionKind::CastSpell if option.index > 0 => {
             cards.get(state.obj(source).card).ways.get(option.index as usize - 1).map_or("", |w| w.text)
         }
@@ -4056,6 +4071,8 @@ fn cast(
         }
         (0, _) => Cost::mana(def.cost),
         (WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT, _) => Cost::mana(def.cost),
+        // Both halves' mana costs (CR 702.102c), which the whole card's combined cost is (CR 709.4b).
+        (WAY_FUSED, _) => Cost::mana(def.cost),
         // Bestow is an alternative cost (CR 702.103a, 118.9): the Aura keeps the card's mana cost.
         (WAY_BESTOW, _) => Cost::mana(whole.bestow_cost),
         (WAY_OVERLOAD, _) => Cost::mana(whole.overload.unwrap_or(def.cost)),
@@ -4103,7 +4120,7 @@ fn cast(
     item.exile_after = exile_after;
     item.flashback = flashback;
     // Overload (CR 702.96a): "each" for "target", so nothing is targeted.
-    let specs: &[TargetSpec] = if way == WAY_OVERLOAD { &[] } else { def.spell_targets() };
+    let specs: &[TargetSpec] = if way == WAY_OVERLOAD { &[] } else { cx.cards().spell_targets_of(def) };
     // CR 118.8: an additional cost is owed with every way of casting it; its mana joins the total.
     // What the permission adds (CR 118.8): a permanent's permission's, retrace's discard (CR 702.81a).
     let mut extra = def.additional_cost.unwrap_or(Cost::NONE).and(by.additional);
@@ -4153,7 +4170,7 @@ fn cast(
     let x_symbols = match (instead, granted_x) {
         (Some(instead), _) => instead.x,
         (None, Some(x)) => x,
-        (None, None) if way == 0 || matches!(way, WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT) => def.cost.x,
+        (None, None) if way == 0 || matches!(way, WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_FUSED) => def.cost.x,
         (None, None) => 0,
     };
     let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. }));
@@ -4300,7 +4317,7 @@ fn cast(
             // A total that needs a target and has none to give it is not a legal announcement.
             Divided::Impossible => return Err(Stop::Cancel),
         }
-    } else if (resolving || !targets_with_cast(def)) && !specs.is_empty() {
+    } else if (resolving || !targets_with_cast(cx.cards(), def)) && !specs.is_empty() {
         (targets, of) = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
         set_item_targets(cx, &targets, &of);
     }
@@ -4566,8 +4583,9 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 /// 712.8a): the card itself unless it is a land or a split card (whose halves are what is cast, CR 709.3), a split card's two
 /// halves (an aftermath half only from a graveyard, CR 702.127a), an Adventurer's Adventure, an omen card's Omen (CR 720.3a),
 /// and a modal double-faced card's
-/// back face. A fused cast (CR 702.102a: a fuse split card cast from a hand, both halves at once, its mana value the sum of
-/// theirs) is a way too, from a hand only; it is not built yet (docs/known-issues.md).
+/// back face. A fused cast (CR 702.102a: a fuse split card cast from its owner's hand, both halves at once, its mana value the
+/// sum of theirs, CR 702.102c, 709.4b) is a way too, from a hand only: the ruling has a fuse card cast from a hand without
+/// paying its mana cost cast fused.
 pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
     let obj = cx.s().obj(card);
@@ -4602,7 +4620,7 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
             && !forbidden(face)
             && match face.modal {
                 Some(modal) => modes_possible(cx, &asker, modal),
-                None => slots_satisfiable(cx, &asker, face.spell_targets()),
+                None => slots_satisfiable(cx, &asker, cx.cards().spell_targets_of(face)),
             }
     };
     let mut ways = Vec::new();
@@ -4611,6 +4629,9 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
             if (!half.aftermath || obj.zone.is(ZoneKind::Graveyard)) && castable(half) {
                 ways.push(CastWay { way, face: cx.card_id(half), mana_value: half.cost.mana_value() });
             }
+        }
+        if def.fuse && obj.zone == Zone::hand(obj.owner) && obj.owner == player && castable(def) {
+            ways.push(CastWay { way: WAY_FUSED, face: obj.card, mana_value: def.cost.mana_value() });
         }
         return ways;
     }
@@ -4680,7 +4701,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
         (Some(_), _) => return Ok(false),
         (None, 1) => ways[0].way,
         (None, _) => {
-            let modes = ways.iter().map(|w| Label::Face(w.face)).collect();
+            let modes = ways.iter().map(|w| if w.way == WAY_FUSED { Label::Fused(w.face) } else { Label::Face(w.face) }).collect();
             let ask = RequestKind::ChooseModes {
                 source: card,
                 modes,

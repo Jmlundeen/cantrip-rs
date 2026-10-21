@@ -848,6 +848,8 @@ pub enum Label {
     Counter(CounterKind),
     /// One of the faces a card may be cast as (CR 709.3, 715.3, 712.8a), named by the face's name.
     Face(CardId),
+    /// A split card with fuse cast as both halves at once (CR 702.102a), beside its halves.
+    Fused(CardId),
     /// One of a card's miracle abilities, to reveal it with (CR 702.94a, 607.5).
     Miracle(MiracleOf),
     /// A type of mana to add (CR 106.1b: white, blue, black, red, green or colorless): "one mana of any type that land

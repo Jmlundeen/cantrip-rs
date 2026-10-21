@@ -14,7 +14,16 @@ fn face(state: &GameState, spell: ObjectId) -> CardId {
 
 fn target_specs(cards: &CardTable, state: &GameState, item: &StackItem) -> &'static [TargetSpec] {
     match item.kind {
-        StackKind::Spell => cards.get(face(state, item.object)).spell_targets(),
+        StackKind::Spell => {
+            let def = cards.get(face(state, item.object));
+            // A fused split spell's (CR 702.102b), and as it resolves each half's own, on the view of the item that half's
+            // instructions are followed with (`run_fused`).
+            match (def.split, item.way) {
+                (Some((left, _)), WAY_SPLIT_LEFT) if def.fuse => left.spell_targets(),
+                (Some((_, right)), WAY_SPLIT_RIGHT) if def.fuse => right.spell_targets(),
+                _ => cards.spell_targets_of(def),
+            }
+        }
         _ => match cards.ability(item.ability) {
             AbilityDef::Activated(a) => a.targets,
             AbilityDef::Triggered(t) => t.targets,
@@ -137,6 +146,27 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
             }
             (mode.effect)(cx, &sub)?;
         }
+    }
+    Ok(())
+}
+
+/// Follows a fused split spell's instructions (CR 702.102d): the left half's, then the right half's, each on a view of the
+/// item that is that half cast alone - its own targets in slot 0 onward, read by its own specs (`target_specs`, the item's
+/// way naming the half). A half whose target has become illegal does nothing to it, as for any spell (CR 608.2b, the
+/// ruling: "an illegal target can't perform any actions or have any actions performed on it").
+fn run_fused(cx: &mut Cx, item: &StackItem, left: &'static CardDef, right: &'static CardDef) -> Result<(), Suspend> {
+    let split = left.spell_targets().len();
+    let count = item.target_count as usize;
+    // The targets recorded for the left half's specs come first (`StackItem::spec_of`), then the right half's.
+    let first = (0..count).take_while(|&t| (cx.s().spec(item, t) as usize) < split).count();
+    for (way, half, from, to, base) in [(WAY_SPLIT_LEFT, left, 0, first, 0), (WAY_SPLIT_RIGHT, right, first, count, split)] {
+        let Some(spell) = half.spell else { continue };
+        let mut sub = *item;
+        sub.way = way;
+        let of: Vec<u8> = (from..to).map(|t| cx.s().spec(item, t) - base as u8).collect();
+        let (targets, shares) = (cx.s().targets(item)[from..to].to_vec(), cx.s().shares(item)[from..to].to_vec());
+        cx.st().set_item_targets(&mut sub, &targets, &of, &shares);
+        (spell.effect)(cx, &sub)?;
     }
     Ok(())
 }
@@ -369,10 +399,13 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                 }
                 cx.emit(Event::GaveGift { player: item.controller, to, gift: gift.kind });
             }
-            if let Some(spell) = def.spell {
-                match def.modal {
-                    Some(modal) => run_modes(cx, &item, modal)?,
-                    None => (spell.effect)(cx, &item)?,
+            let fused = if item.way == WAY_FUSED && def.fuse { def.split } else { None };
+            if def.spell.is_some() || fused.is_some() {
+                match (def.modal, def.spell, fused) {
+                    (_, _, Some((left, right))) => run_fused(cx, &item, left, right)?,
+                    (Some(modal), _, None) => run_modes(cx, &item, modal)?,
+                    (None, Some(spell), None) => (spell.effect)(cx, &item)?,
+                    (None, None, None) => {}
                 };
                 // Paradigm's spell ability that makes its delayed trigger follows the card's own text (CR 702.192a); "exile
                 // this spell" is `leave_stack`'s.

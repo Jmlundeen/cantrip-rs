@@ -615,6 +615,9 @@ fn target_words(game: &Game, target: Target) -> String {
 }
 
 fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
+    if faces && modes.iter().any(|l| matches!(l, Label::Fused(_))) {
+        return ("Only the face you choose is cast, with its own cost and mana value; fused, both halves are, for both costs".into(), false);
+    }
     if faces {
         return ("Only the face you choose is cast, with its own cost and mana value".into(), false);
     }
@@ -943,7 +946,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         }
         RequestKind::ChooseModes { source, modes, eligible, count, at_most, affordable, additional_cost, repeat } => {
             // The faces a card may be cast as (CR 709.3): not modes, so each is its name and its cost, and the question says so.
-            let faces = !modes.is_empty() && modes.iter().all(|l| matches!(l, Label::Face(_)));
+            let faces = !modes.is_empty() && modes.iter().all(|l| matches!(l, Label::Face(_) | Label::Fused(_)));
             let (mut detail, extra_modes_cost) = modes_detail(game, modes, faces);
             if matches!(modes.first(), Some(Label::TargetSlot(..))) {
                 detail = format!("That target becomes {}", game.cards.get(game.chars(*source).card).name);
@@ -955,6 +958,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .iter()
                     .map(|l| match l {
                         Label::Face(face) => face_text(game, *face),
+                        // Both halves at once, for both mana costs (CR 702.102a, 702.102c).
+                        Label::Fused(card) => format!("Fuse: both halves {}", game.cards.get(*card).cost),
                         Label::Miracle(m) => miracle_label(game, *m),
                         // The slot's text and what it holds now, so two slots worded alike are told apart.
                         Label::TargetSlot(text, held) => format!("{text}: {}", target_words(game, *held)),
@@ -989,7 +994,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 texts: modes
                     .iter()
                     .filter_map(|l| match l {
-                        Label::Face(face) => Some(game.cards.get(*face).text.to_string()),
+                        Label::Face(face) | Label::Fused(face) => Some(game.cards.get(*face).text.to_string()),
                         _ => None,
                     })
                     .collect(),
