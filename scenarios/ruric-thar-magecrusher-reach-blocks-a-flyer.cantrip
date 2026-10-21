@@ -1,0 +1,46 @@
+# Reach (CR 702.17) lets Ruric Thar, Magecrusher block a creature with flying: Bot2's Ornithopter attacks on turn four and
+# is blocked, dying to the seven damage. Ruric Thar takes none and stays untapped.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Sapphire
+Ruric Thar, Magecrusher
+Forest x14
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ruric Thar, Magecrusher.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Block(Ruric Thar, Magecrusher > Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ruric Thar, Magecrusher.Damage = 0
+Bot1.Battlefield.Ruric Thar, Magecrusher.Tapped = false
+Bot2.Graveyard = Ornithopter
