@@ -769,6 +769,7 @@ impl<'a> Cx<'a> {
         if frame.pending.is_some() {
             return Err(Stop::Suspend);
         }
+        settle::verify_control(self);
         let id = self.g.state.request_id();
         let at = self.frame;
         self.g.state.update_frame(at, |f| f.pending = Some(Request { id, player, kind, may_cancel }));
@@ -1049,6 +1050,7 @@ impl cantrip_api::Game for Cx<'_> {
                 }
             }
         }
+        settle::verify_control(self);
         let (kind, key) = loops::asked(self, player, kind, false);
         let id = self.g.state.request_id();
         let at = self.frame;

@@ -476,3 +476,31 @@ fn a_control_changing_reach_that_reads_the_stored_controller_is_found() {
 "));
     assert!(breaches[0].starts_with("Probe Bad Usurper"));
 }
+
+fn creature_while_you_store_another(q: &dyn LayerQuery, source: ObjectId, id: ObjectId, c: &Chars) -> bool {
+    // Against the contract: "as long as you control another permanent", that permanent's control read from the state.
+    let you = q.controller(source);
+    c.is(CardType::Creature)
+        && q.state().zone(Zone::BATTLEFIELD).iter().any(|&o| o != source && o != id && q.state().obj(o).controller == you)
+}
+
+/// "As long as you control another permanent, you control each creature", a third permanent's control read from the
+/// state: the check flips every permanent of its scene, so it finds it.
+static BAD_KEEPER: CardDef = CardDef {
+    name: "Probe Bad Keeper",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[control_changing(
+        creature_while_you_store_another,
+        "As long as you control another permanent, you control each creature.",
+    )],
+    ..CardDef::BLANK
+};
+
+#[test]
+fn a_control_changing_reach_that_reads_a_third_permanents_stored_controller_is_found() {
+    static TABLE: OnceLock<CardTable> = OnceLock::new();
+    let table = TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BAD_KEEPER])));
+    let breaches = apply_contract_check(table).breaches;
+    assert_eq!(breaches.len(), 1, "{}", breaches.join("\n"));
+    assert!(breaches[0].starts_with("Probe Bad Keeper"));
+}

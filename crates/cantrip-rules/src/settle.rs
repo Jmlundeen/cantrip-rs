@@ -65,6 +65,7 @@ pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
 
 /// Checks every state-based action at once and performs those that apply, simultaneously (CR 704.3). Whether any did.
 fn state_based_actions(cx: &mut Cx) -> R<bool> {
+    verify_control(cx);
     let mut acted = false;
     let mut leavers = Vec::new();
     // CR 611.2b: an effect "for as long as" a condition ends once it is false; then, CR 613.1b: who controls each permanent
@@ -1037,9 +1038,10 @@ pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<Before>, star
 /// that function everywhere wherever they are. A "one or more" ability (CR 603.2c) triggers once for the batch, its
 /// members the subjects of the events it matched; a limited one ("triggers only N times each turn", no numbered rule; CR 603.2h is "do this only once each turn") stops triggering once it has used up its
 /// turn, a triggering that happens being noted in the history.
-pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, start: usize) {
-    // With `CANTRIP_VERIFY`: every permanent's stored controller is what layer 2 says (`layers::control_order`), outside an
-    // instruction that holds settling - a write path that skipped a settle is found here.
+/// With `CANTRIP_VERIFY`: every permanent's stored controller is what layer 2 says (`layers::control_order`), outside an
+/// instruction that holds settling - a write path that skipped a settle is found here. Checked where triggers are looked
+/// for, where state-based actions are checked, and before each question put to a player.
+pub(crate) fn verify_control(cx: &Cx) {
     if crate::layers::verifying() && cx.s().settle_held.get() == 0 && crate::ops::control_may_change(cx) {
         for (id, controller, _) in crate::layers::control_order(cx.cards(), cx.s(), &cx.g.log) {
             if cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
@@ -1047,6 +1049,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             }
         }
     }
+}
+
+pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, start: usize) {
+    verify_control(cx);
     // A designation the events gave is had before anything they trigger is looked for, and the continuous effects that
     // read it apply to that look (CR 702.131d, 702.195c): Bifur, Melodic Rider entering for the third storied permanent
     // makes its own enters ability trigger an additional time.

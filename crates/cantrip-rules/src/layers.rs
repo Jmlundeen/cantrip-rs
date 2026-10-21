@@ -2255,8 +2255,16 @@ pub fn apply_contract_check(cards: &'static CardTable) -> ApplyContract {
                 for scene in 0..SCENES {
                     let (mut state, source, object) = contract_scene(cards, card, objects.first().copied().unwrap_or(card), scene);
                     let first = chars_before(cards, &state, &[], object, Layer::Control);
-                    let held: std::collections::HashMap<ObjectId, PlayerId, Quick> =
-                        [(source, PlayerId(0)), (object, PlayerId(1))].into_iter().collect();
+                    // Every permanent of the scene is in the held map - the source and the object
+                    // under different players, any other under its own - and each one's stored
+                    // controller is flipped in turn: a reach that reads a third permanent's
+                    // controller ("as long as you control a Wizard") must read it from the map too.
+                    let permanents: Vec<ObjectId> = state.zone(Zone::BATTLEFIELD).to_vec();
+                    let held: std::collections::HashMap<ObjectId, PlayerId, Quick> = permanents
+                        .iter()
+                        .map(|&id| (id, if id == object { PlayerId(1) } else if id == source { PlayerId(0) } else { state.obj(id).controller }))
+                        .chain([(source, PlayerId(0)), (object, PlayerId(1))])
+                        .collect();
                     let ask = |state: &GameState| {
                         let view = View { controllers: Some(&held), ..View::new(cards, state, &[], Layer::Control) };
                         (st.affects)(&view, source, object, &first)
@@ -2264,10 +2272,21 @@ pub fn apply_contract_check(cards: &'static CardTable) -> ApplyContract {
                     let before = ask(&state);
                     let flip = |p: PlayerId| PlayerId(1 - p.0.min(1));
                     let mut moved = false;
-                    for id in [source, object] {
+                    for &id in permanents.iter().chain([source, object].iter()) {
                         let was = state.obj(id).controller;
                         state.update_obj(id, |x| x.controller = flip(was));
                         moved |= ask(&state) != before;
+                        state.update_obj(id, |x| x.controller = was);
+                    }
+                    // Then every one at once: a reach that asks whether any of several permanents is
+                    // controlled by someone changes with none of them alone.
+                    let all: Vec<ObjectId> = permanents.iter().chain([source, object].iter()).copied().collect();
+                    let stored: Vec<PlayerId> = all.iter().map(|&id| state.obj(id).controller).collect();
+                    for (&id, &was) in all.iter().zip(&stored) {
+                        state.update_obj(id, |x| x.controller = flip(was));
+                    }
+                    moved |= ask(&state) != before;
+                    for (&id, &was) in all.iter().zip(&stored) {
                         state.update_obj(id, |x| x.controller = was);
                     }
                     if moved {
