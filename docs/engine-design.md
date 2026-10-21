@@ -773,8 +773,9 @@ applies once the total is otherwise determined: after the mana cost or alternati
 (the cast's own too - harmonize's tapped power, a sacrifice for each, emerge's sacrificed mana value), generic mana making up
 the difference, before the total is locked in and paid. A spell cast without paying its mana cost (Omniscience) or for an
 alternative cost of no mana (Force of Will's) comes to three like any other. A cast takes it apart from the rest
-(`apply_cost_changes_before_least`) and applies it last, after its own reductions; the advice applies it with the rest
-(`change_total`), before those reductions and a permission's additions (known issue KI-68). The host's row for a cast says what the total comes to whenever the changes in play make it other than the
+(`apply_cost_changes_before_least`) and applies it last, after its own reductions; the advice does the same
+(`least_cost_parts`, `finish_parts`): a permission's "costs {N} more" and additional mana are in the base the changes apply
+to, and the least comes after a sacrifice for each and `way_covered`'s emerge and harmonize reductions. The host's row for a cast says what the total comes to whenever the changes in play make it other than the
 cost it is cast for (`cast_total`: "(costs {3})", for a card cast from a hand), as it does for a cost that depends on
 the target.
 

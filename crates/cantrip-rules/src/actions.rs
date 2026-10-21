@@ -649,13 +649,13 @@ fn pay_discards(cx: &mut Cx, chosen: &[ObjectId]) {
     ops::discard_together(cx, chosen);
 }
 
-/// Pays the life and counters parts of a cost.
 /// Whether `player` can still pay this much energy (CR 107.14) and life (CR 119.4) once the mana of the cost is paid: the
 /// mana abilities activated while paying it (CR 601.2g) may have spent energy or life the rest of the cost needs.
 fn rest_payable(cx: &Cx, player: PlayerId, energy: u32, life: u32) -> bool {
     u32::from(cx.s().player(player).energy()) >= energy && (life == 0 || payable_life(cx, player) >= life.min(i32::MAX as u32) as i32)
 }
 
+/// Pays the life and counters parts of a cost.
 fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) {
     if cost.energy > 0 {
         ops::change_energy(cx, player, -i32::from(cost.energy), player);
