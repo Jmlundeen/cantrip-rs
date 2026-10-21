@@ -43,6 +43,15 @@ prompt and the seat's view. Seats are numbered from one. A game is resumed the w
 the same seed and decks, `Start`, and the recorded answers sent again in order, so the host is deterministic for a seed
 and nothing in it is a snapshot.
 
+Each option of a priority, pay-costs or unless-pays prompt carries an `OptionId`, its place among the question's options
+from 1, and a `TakeActionAnswer` echoes it. Two options may be alike in `Kind`, `Source` and `AbilityIndex` - a card two
+permanents' permissions would each let be cast, or one cast for its mana cost and for an alternative cost another permanent
+gives - and the id says which is taken; what makes each possible (the engine's `granted_by` and `paid_by`) stays engine-side,
+so nothing about hidden objects goes to the client. An id the question does not have, or one of an option with another kind,
+source or index, is refused with `IllegalAnswer`; an answer without one (0) is taken where only one option has its kind,
+source and index, and refused where several do. The rows themselves say what tells them apart (`Description`: "Pay {E} rather
+than its mana cost (Lurrus of the Dream-Den)", "Mystic Forge"). The C# protocol is version 194 for this.
+
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed
 counters, added mana or cost life (a land, Black Lotus, Lotus Petal, Pentad Prism, a Treasure), that seat's next priority

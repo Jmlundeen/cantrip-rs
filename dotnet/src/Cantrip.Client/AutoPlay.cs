@@ -362,6 +362,7 @@ public static class AutoPlay
                     Kind = option.Kind,
                     Source = option.Source,
                     AbilityIndex = option.AbilityIndex,
+                    OptionId = option.OptionId,
                     Tap = option.Tap,
                     Targets = targets,
                 });
@@ -871,6 +872,7 @@ public static class AutoPlay
         Kind = option.Kind,
         Source = option.Source,
         AbilityIndex = option.AbilityIndex,
+        OptionId = option.OptionId,
         Tap = option.Tap,
         // An ability that leaves one color to the answer needs one named whether or not this came looking for a
         // particular one: a source that adds stated mana *and* one of any color is chosen for the mana it states, and

@@ -87,8 +87,6 @@ keeps it).
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
-| [KI-79](#ki-79-an-alternative-cost-a-permanent-gives-is-not-offered-beside-a-granted-way-that-casts-for-the-mana-cost) | An alternative cost a permanent gives is not offered beside a granted way that casts for the mana cost | Low | Open |
-| [KI-80](#ki-80-a-cast-made-as-an-effect-resolves-never-uses-the-cards-own-alternative-costs) | A cast made as an effect resolves never uses the card's own alternative costs | Low | Open |
 | [KI-81](#ki-81-a-face-down-permanent-that-becomes-a-copy-is-the-copy-while-still-face-down) | A face-down permanent that becomes a copy is the copy while still face down | Medium | Open |
 | [KI-82](#ki-82-a-creature-with-negative-power-counts-as-0-towards-a-crew-saddle-or-teamwork-total) | A creature with negative power counts as 0 towards a crew, saddle or teamwork total | Medium | Open |
 | [KI-83](#ki-83-teferis-protection-in-the-browser-shows-an-empty-battlefield) | Teferi's Protection in the browser shows an empty battlefield | Low | Open |
@@ -978,36 +976,6 @@ is prevented (CR 702.16e, 702.16j, 702.16k: Absolute Virtue, Teferi's Protection
 planning (`TacticalPlay.Combat.cs`, `Combat`) scores the damage an unblocked attacker would deal that player as life lost, so it
 may attack into a protected player for nothing and leave itself open. A fix tells the bot, in the view, whom each player is
 protected from (a field on `PlayerSummaryView` rather than the text), and has the attack plan count no damage to them.
-
-**Scenarios.** none yet.
-
-### KI-79: An alternative cost a permanent gives is not offered beside a granted way that casts for the mana cost
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-18, alternative costs for spells cast (Dracogenesis) |
-
-**Notes.** An alternative cost a static ability gives the spells a player casts (`CardDef::spell_alternatives`, CR 118.9:
-Dracogenesis, Jodah) is offered beside every cast for a face's mana cost, by any permission, but not beside a cast by a
-`GrantedWay` that is itself a permission to cast for the mana cost (Lurrus of the Dream-Den's, Serra Paragon's): the way
-number names one granted way or one alternative cost, not both. Dracogenesis with Lurrus could not cast a Dragon of mana
-value 2 or less from the graveyard without paying its mana cost. A fix tells such a way apart from one that is an
-alternative cost itself (escape, mayhem, Iroh's flashback), and numbers the pair.
-
-**Scenarios.** none yet.
-
-### KI-80: A cast made as an effect resolves never uses the card's own alternative costs
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-19, review of alternative costs for spells cast |
-
-**Notes.** An effect that has a card cast paying its costs as it resolves (CR 608.2g: Chandra, Torch of Defiance's "you may
-cast that card") lets its caster pay any alternative cost the spell has (CR 601.2b, 118.9). `cast_during_resolution` offers
-the face's mana cost and the alternative costs a static ability gives (`CardDef::spell_alternatives`), but never the card's
-own printed ones (`CardDef::ways`): Force of Will exiled by Chandra can't be cast by exiling a blue card and paying 1 life,
-nor evoke, nor web-slinging. A fix announces those with the others in the cost question (`Label::ManaCost`,
-`Label::AlternativeCost`), each judged as the priority offer judges it (`from_elsewhere`, a way's `condition`).
 
 **Scenarios.** none yet.
 

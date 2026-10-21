@@ -659,6 +659,17 @@ public sealed class ScenarioPlayer
                 await ClickHandleAsync(action.Source.Value);
                 TableState after = await _page.SettledAsync();
 
+                // A known library top is also drawn on its pile. Clicking the pile opens the pane;
+                // act on the actual card inside that newly opened pane, as a player does.
+                if (after.RequestId == state.RequestId && !after.Controls.Any(c => c.Kind == "item")
+                    && !state.Cards.Any(c => c.Visible && c.Handle == action.Source.Value && c.Place == "choice")
+                    && after.Cards.FirstOrDefault(c => c.Visible && c.Handle == action.Source.Value && c.Place == "choice") is { } inPane)
+                {
+                    (float x, float y) = ClickPoint(after, inPane);
+                    await _page.Page.Mouse.ClickAsync(x, y);
+                    after = await _page.SettledAsync();
+                }
+
                 // A card with more than one thing to do opens a menu: the row the answer is.
                 if (after.Controls.Any(c => c.Kind == "item"))
                 {
@@ -703,6 +714,10 @@ public sealed class ScenarioPlayer
         if (rows.Any(r => r.Ability == action.AbilityIndex))
         {
             rows = [.. rows.Where(r => r.Ability == action.AbilityIndex)];
+        }
+        if (action.OptionId != 0)
+        {
+            rows = [.. rows.Where(r => r.OptionId == action.OptionId)];
         }
 
         ControlState? row = action.Color is { } color

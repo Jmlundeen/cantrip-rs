@@ -2096,6 +2096,9 @@ public sealed class ActionOptionMessage
     /// </summary>
     [Key(31)]
     public bool TappedAfterMana { get; set; }
+    /// <summary>Opaque option identity in this question; echo it when choosing this option.</summary>
+    [Key(32)]
+    public int OptionId { get; set; }
 }
 
 /// <summary>
@@ -2885,6 +2888,10 @@ public sealed class TakeActionAnswer : AnswerPayload
 
     [Key(2)]
     public int AbilityIndex { get; set; }
+
+    /// <summary>The option taken (its OptionId); zero names it by kind, source and ability index, refused where two options share them.</summary>
+    [Key(15)]
+    public int OptionId { get; set; }
 
     /// <summary>Targets chosen as the spell is announced (CR 601.2c).</summary>
     [Key(3)]

@@ -305,16 +305,11 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             let alternative = alternative_cast_total(game, player, o);
             let cost = if let Some((paid, total)) = alternative {
                 // Rooftop Storm's {0} is nothing paid as well; a face whose own cost is {0} is cast the same either way. Energy
-                // paid instead (Primal Prayers' {E}) is a cost, so no cast for nothing: the row's cost says it.
+                // paid instead (Primal Prayers' {E}) is a cost, so no cast for nothing: the row's words say it.
                 let face = granted_face.unwrap_or(def);
                 m.without_paying_mana_cost =
                     paid.energy == 0 && paid.mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
-                m.cost_text = if paid.energy > 0 {
-                    let energy = "{E}".repeat(paid.energy as usize);
-                    if total == ManaCost::ZERO { energy } else { format!("{total}{energy}") }
-                } else {
-                    total.to_string()
-                };
+                m.cost_text = total.to_string();
                 paid.mana
             } else if let Some((way, total)) = granted {
                 let face = granted_face.unwrap_or(def);

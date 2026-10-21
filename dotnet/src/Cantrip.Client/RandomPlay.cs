@@ -240,6 +240,7 @@ public sealed class RandomPlay : IAutoPlayer
             Kind = option.Kind,
             Source = option.Source,
             AbilityIndex = option.AbilityIndex,
+            OptionId = option.OptionId,
             Targets = Targets(option),
         };
     }

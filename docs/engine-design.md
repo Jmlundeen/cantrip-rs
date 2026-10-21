@@ -585,8 +585,9 @@ A permission to play a card may say what becomes of a land played by it (CR 305.
 played this way enters tapped", `PlayGrant::enters_tapped`). That is a replacement effect of the permission, the core's own
 (`replace::Origin::PlayedTapped`), ordered with the others that would change the same entry by the land's controller (CR
 616.1): Archon of Emeria's "nonbasic lands your opponents control enter tapped" is a second, and once either has applied the
-other has nothing left to change (CR 616.1f). Which permission a land play is made by is `actions::land_play_permission`: none
-from the hand, or from a graveyard or a library's top a rule lets lands be played from, the same test the offer makes.
+other has nothing left to change (CR 616.1f). Which permission a land play is made by is the one its action names
+(`ActionOption::granted_by`, "Actions" below): the play keeps that permission alone as the land moves, so the replacement
+finds it, and none for a play from the hand or by a rule for a graveyard or a library's top.
 A permission may stand under a condition (`PlayCondition`, CR 611.2): "during any turn you attacked with a Rogue" (Robber of the
 Rich), "if you control a Wizard" (`ControlsSubtype`, Flameshape), asked whenever the card would be played - a land play by the
 permission as much as a cast - and so are its other terms (`actions::permission_stands`: a warp card's later turn).
@@ -801,42 +802,103 @@ targets", Urgent Necropsy) is `CardDef::cost_of_targets`, asked once the targets
 however many times it is named (`move_together`), by the first of its moves (a later one to another zone is dropped): a
 permanent a spell targets in two slots is destroyed once.
 
+### Actions: the source's own option, and what made it possible
+
+An action is what a player does with priority or while paying - cast a spell, activate an ability, take a special action,
+play a land (CR 116.2a, 305.1) - and an offered action (`ActionOption`) names four things:
+
+- **kind**: `ActionKind` (cast, activate, play a land, and the payment steps).
+- **source**: the card cast or played, or the object whose ability is activated.
+- **entry** (`index`): which of the source's *own* options it is. For a cast or a land play, the way number: 0 the card for
+  its mana cost, n its nth printed alternative way (`CardDef::ways`: evoke, flashback, sneak), `WAY_ADVENTURE`, `WAY_OMEN`,
+  `WAY_SPLIT_LEFT`/`RIGHT`, `WAY_BACK_FACE` (a modal double-faced card's spell or land back face), `WAY_BESTOW`,
+  `WAY_OVERLOAD`; for an activation, the ability's place in the computed ability list. It names the face the action casts or
+  plays and the cost of the card's own it is made for, and never a position in a list another object makes.
+- **granted_by** (`Option<Grant>`): what made the action possible where the rules every player has do not (CR 601.3,
+  305.1) - the object and which of its abilities. `Grant { object, ability }` is an object, not a card: two Serra Paragons
+  are two permissions, and a permanent that changes zones is a new object (CR 400.7). Its `AbilityRef` names an entry of the
+  card's `abilities` as anywhere else, or one of the static abilities a card lists apart, by band: `AbilityRef::granted_way`,
+  `exile_cast`, `spell_alternative`, `play_rule` (the kth play rule, those under a `While` counted), and `retrace` (the
+  card's own keyword, printed or given). A play permission an effect gave keeps the spell or ability that gave it
+  (`PlayPermission::by`, from the cause as `allow_play` runs); Yawgmoth's Will's is the spell whose effect it is. None for a
+  card cast or played from its owner's hand, a card on an Adventure (CR 715.3d), a prepare spell's copy (CR 722.3) and a
+  card's own "you may cast this card from your graveyard".
+- **paid_by** (`Option<Grant>`): the alternative cost another object gives that a cast pays rather than its mana cost (CR
+  118.9: Omniscience, Jodah, Primal Prayers' energy). A permission and a cost are two things (CR 601.2b, 601.3), so a cast by
+  Lurrus's permission for Primal Prayers' {E} names both.
+
+**Every open combination is its own option.** `castable_ways` (`Offer`) offers each card by each `Route` that lets it be
+cast from where it is - the rules for the hand; each play permission; each permanent's permission to cast from exile; the
+card's own say-so or Yawgmoth's Will for the graveyard, retrace beside them; each way a permanent gives that is a permission
+(`GrantedWay::permission`: Lurrus, Serra Paragon); each rule for the top of the library (Bolas's Citadel's for life, Mystic
+Forge's, Case of the Locked Hothouse's) - and by each route, each face it allows (judged as that face, CR 601.3e), for the
+mana cost or what the route names instead, for each alternative cost another object gives where the route names none (CR
+118.9a), and for the card's own ways that name no zone (CR 118.9: evoke from exile by a permission; not warp, CR 702.185a).
+A way a permanent gives that is its cost too (escape, mayhem, Iroh's flashback) is offered beside them. Nothing is
+first-found: Citadel and Mystic Forge both out offer both casts of the top card, and the player chooses (CR 601.2b). The
+common case pays as before: a card in hand has the one route, and the rest is looked for only where a card is in another
+zone, each list built lazily once per pass.
+
+**The executor makes exactly the action offered.** The answer is checked against the options (`validate::fits`: the
+grants are part of the option), and `act` reads back what the `Grant` names - the route's terms (`through`) - and hands them
+to `cast` (`CastBy`: the grant, a way's cost and riders, what the permission adds, life for mana value, the alternative's
+cost). Nothing is re-derived and no permission is searched for again, so what the menu said is what is paid.
+
+**The history records provenance.** `Cast::granted_by` and `Event::LandPlayed { land, player, way, granted_by }` keep what
+each cast and land play was made by, so "once during each of your turns" is a history question
+(`cantrip_mechanics::history::permission_used_this_turn`, which Lurrus and Serra Paragon share) and "if you cast it this
+way" can be one. Riders that outlive the cast are attached at cast from the action's grant (Serra Paragon's "it gains", a
+way's flashback). The activation side has no grants yet: an ability another permanent gives (Cryptolith Rite's mana
+ability) is offered as an entry of the creature's computed ability list, and `AbilityActivated` does not record its giver.
+
+**Cost changes are one list** matched against what is costed (`Costed`: a spell, an ability, a special action, CR 116.1),
+asked once the targets and X are announced (CR 601.2f): "can't reduce the mana in that cost to less than one mana"
+(`CostDelta::less_to_one`, Forensic Gadgeteer, Zirda) is a change like any other. A land play has no cost and no change
+applies to it.
+
+**On the wire** the host numbers each option of a question (`ActionOptionMessage::OptionId`, from 1) and the client echoes
+it (`TakeActionAnswer::OptionId`): the grants stay engine-side, so no hidden object leaks, and an answer naming an option by
+kind, source and index alone is refused where two options share them. A cast another object makes possible says which on
+its menu row where its cost does not (`describe`): "Mystic Forge", "Retrace", "Yawgmoth's Will", "Pay {E} rather than its
+mana cost (Lurrus of the Dream-Den)"; an ordinary cast reads as it always has.
+
 ### Ways a permanent gives: from a graveyard or from a hand
 
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra
-Paragon, Underworld Breach's escape, mayhem) or the hand. Each is judged on the face being cast, offered beside the card's
-other casts with its own way number, and is the one alternative cost of that cast (CR 118.9a); additional costs and cost
-increases still apply to it (CR 118.9d). Whether X is announced follows from the cost the way names (CR 107.3a-b): a cost
-that is or includes the mana cost has its {X}; `Cost::NONE`, "without paying its mana cost", leaves X 0. A card with no mana
-cost may be cast that way (CR 118.6a). The host marks a cast for nothing `WithoutPayingManaCost`, with the cost it comes to
-as its `CostText`, and the tactical bot takes it over the card's ordinary cast. Not built: emblems that give one (Tamiyo,
-Field Researcher's): KI-44.
+Paragon, Underworld Breach's escape, mayhem) or the hand. Each is judged on the face being cast and offered as that face's
+cast with the way's `Grant`. One that is a permission (`GrantedWay::permission`: Lurrus, Serra Paragon) is a route: the card
+is cast by it for its mana cost or any alternative cost, as by any permission. Any other is the one alternative cost of that
+cast (CR 118.9a); additional costs and cost increases still apply to it (CR 118.9d). Whether X is announced follows from the
+cost the way names (CR 107.3a-b): a cost that is or includes the mana cost has its {X}; `Cost::NONE`, "without paying its
+mana cost", leaves X 0. A card with no mana cost may be cast that way (CR 118.6a). The host marks a cast for nothing
+`WithoutPayingManaCost`, with the cost it comes to as its `CostText`, and the tactical bot takes it over the card's ordinary
+cast. Not built: emblems that give one (Tamiyo, Field Researcher's): KI-44.
 
 ### Alternative costs a permanent gives the spells a player casts
 
 "You may cast Dragon spells without paying their mana costs" (Dracogenesis), "you may pay {W}{U}{B}{R}{G} rather than pay the
 mana cost for spells that you cast" (Jodah, Archmage Eternal; Fist of Suns), "you may pay {0} rather than pay the mana cost for
-Zombie creature spells you cast" (Rooftop Storm) and "you may cast spells from your hand without paying their mana costs"
-(Omniscience) are `CardDef::spell_alternatives` (`SpellAlternative`: `applies(q, asker, spell, player)` and `cost`, an
-`InsteadOfManaCost`, CR 118.9, 601.2b). Such an ability is a way of paying, not a permission (CR 601.3): it stands beside
-every cast the player may already make of a face for that face's mana cost - from a hand, a graveyard (Yawgmoth's Will, the
-card's own say-so, aftermath, retrace), exile (an Adventure, `ExileCast`, a `PlayPermission`), a library's top
-(`PlayRule::LibraryTopSpells`) - as a way number of its own (`WAY_ALTERNATIVE + k * 6 + face`, `alternative_way`: k counts only those that apply to this cast, and one two permanents
-of a player give once, so an opponent's take no slot and two copies are one choice; the cast reads it back by the same count,
-`alternative_at`), so the
-client sees it as its own cast with its cost (`alternative_cast_total`) and the cast goes on as that face's own
-(`face_way`), with that mana as `instead`. Each face is judged alone (CR 709.3a, 715.3a, 712.8a), in the zone it is cast
-from. It is offered whether or not the mana cost could be paid, and for a card with no mana cost (CR 118.6a). It is the one
-alternative cost of the cast (CR 118.9a), so it is not offered beside a cast that already is for one: a permission's
-"without paying" or "rather than" (`PlayGrant::instead`), flashback a permission gives, life for its mana value, Bolas's
-Citadel's top of the library, a card's own ways (evoke, bestow, overload) or a `GrantedWay`. Additional costs (kicker, a
-permission's `more`, an `ExileCast`'s, retrace's discard) are still paid (CR 118.9d), what changes the total applies to it
-(CR 601.2f: Thalia, Trinisphere, Terror of the Peaks), and X is 0 (CR 107.3b). A cast an effect makes as it resolves paying
-its costs (`cast_during_resolution` with no `instead`, CR 608.2g: Chandra, Torch of Defiance's "you may cast that card")
-announces the cost as it is cast (CR 601.2b): its caster chooses between `Label::ManaCost` and each `Label::AlternativeCost`
-that applies. The battlefield is searched for these once per offer, and only once something could be cast.
-Not built: one beside a `GrantedWay` that is itself a permission for the mana cost (Lurrus's, Serra Paragon's), which the way
-number cannot carry both of (KI-79).
+Zombie creature spells you cast" (Rooftop Storm), "you may cast spells from your hand without paying their mana costs"
+(Omniscience) and "you may cast creature spells with mana value 3 or less by paying {E} rather than paying their mana costs. If
+you cast a spell this way, you may cast it as though it had flash" (Primal Prayers) are `CardDef::spell_alternatives`
+(`SpellAlternative`: `applies(q, asker, spell, player)`, `cost`, an `InsteadOfManaCost` of nothing, mana or energy (CR
+107.14), and `flash`, CR 118.9, 601.2b). Such an ability is a way of paying, not a permission (CR 601.3): it stands beside every
+cast the player may already make of a face for that face's mana cost - from a hand, a graveyard (Yawgmoth's Will, the card's
+own say-so, aftermath, retrace, Lurrus), exile (an Adventure, `ExileCast`, a `PlayPermission`), a library's top - as an
+option of its own (`paid_by`), and the cast goes on as that face's own with that cost as `instead`. A `flash` one's casts are
+offered whenever an instant could be cast, by a permission that does not say when (CR 601.3: not plot's), and what forbids
+casting at such a time (Teferi, Time Raveler) still does (CR 101.2). Each face is judged alone (CR 709.3a, 715.3a, 712.8a), in
+the zone it is cast from; one that two permanents of a player give is one choice. It is offered whether or not the mana cost
+could be paid, and for a card with no mana cost (CR 118.6a). It is the one alternative cost of the cast (CR 118.9a), so it is
+not offered with a route that names one: a permission's "without paying" or "rather than" (`PlayGrant::instead`), flashback a
+permission gives, life for its mana value (Inside Information, Bolas's Citadel), a card's own ways, or a way a permanent gives
+that is its cost. Additional costs (kicker, a permission's `more`, an `ExileCast`'s, retrace's discard) are still paid (CR
+118.9d), what changes the total applies to it (CR 601.2f: Thalia, Trinisphere, Terror of the Peaks), and X is 0 (CR 107.3b).
+A cast an effect makes as it resolves paying its costs (`cast_during_resolution` with no `instead`, CR 608.2g: Chandra, Torch
+of Defiance's "you may cast that card") announces the cost as it is cast (CR 601.2b): its caster chooses between
+`Label::ManaCost`, each of the card's own ways open from where it is (`Label::Way`: evoke from exile; flashback from its
+owner's graveyard only, CR 702.34a) and each `Label::AlternativeCost` that applies. The battlefield is searched for these once
+per offer, and only once something could be cast.
 
 ### Hexproof from a quality
 
@@ -940,7 +1002,7 @@ is asked there too, since a static ability is never locked in, CR 611.3a), an ad
 601.2f), and whether mana of any type can be spent on that spell (`any_type`, CR 609.4b, read with the permission as the cast
 begins). It is a permission, not a way of paying: `castable` treats the card as permitted, so it is cast for its mana cost or any
 alternative cost it has (Solitude's evoke), at the speed its type gives (a flash creature at instant speed, the rulings), and the
-additional cost joins `extra` in `actions::cast`, which finds the permission as the cast begins (`exile_cast_permission`), so the
+additional cost joins `extra` in `actions::cast`, read from the permission the action names as the cast begins (`CastBy`), so the
 permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling). A permanent that has lost its abilities gives
 none, and "cards exiled with this" are those its own ability linked (`Query::exiled_with`, CR 607.2a), so a flickered one finds
 none (CR 400.7). A card that a play permission of its own lets be cast, or a card on an Adventure, is cast by that instead; two
@@ -1060,7 +1122,7 @@ put back without a new effect; an effect begun without a counter) are `crates/ca
 ### Permissions to play under a condition
 
 A standing permission to play a card (`PlayPermission`, CR 601.3, 305.1) may hold only while a condition does
-(`PlayGrant::when`, CR 611.2), worked out each time the permission is asked (`actions::permission_for`), so it is
+(`PlayGrant::when`, CR 611.2), worked out each time the permission is asked (`actions::permissions_for`), so it is
 offered, or not, as the game is then: `PlayCondition::AttackedWithThisTurn(subtype)` ("during any turn you attacked with
 a Rogue", Robber of the Rich) asks this turn's history; `PlayCondition::ControlsSubtype(subtype)` ("you may play them if
 you control a Wizard", Gandalf, Goblins' Bane's Flameshape; Possibility Technician's Kavu) asks whether the holder controls
@@ -1494,13 +1556,12 @@ Known gaps:
   event records a change of control); Arachne, Psionic Weaver needs a card type chosen as it enters (`Entering` has a
   color, a subtype, a player, a name, odd or even, no card type) and a prompt for it; Peter Parker // Amazing
   Spider-Man's back face grants web-slinging to the legendary spells its controller casts, a way a permanent gives to
-  cards in hand, which only exists for cards in graveyards (`granted_ways_of`).
+  cards in hand (`GrantedWay::from` the hand), which no card in content gives yet.
 - `web_slinging::way` is a way from the hand (`ZoneKind::Hand`), like every printed alternative cost. Cast from
   elsewhere at priority by a permission or the card's own say-so, a hand way is offered too (`castable`'s `elsewhere`;
   Spider-Sense from the graveyard under Yawgmoth's Will is a scenario, and sneak's instant-speed way likewise), unless its
-  text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost), but a cast made while an effect resolves
-  (`cast_ways_during_resolution`) is offered for the card's mana cost and faces only: an effect that lets a spell be cast
-  paying its costs ("cast it from exile this turn") as it resolves can't use web-slinging or any other alternative cost.
+  text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost); a cast
+  made while an effect resolves paying its costs is offered the card's own ways open from where it is too (`Label::Way`).
 - Costs to attack are mana only: one that asks for life (Sivitri, Dragon Master's +1), a Phyrexian symbol paid with life
   (Norn's Annex), tapping or sacrificing, and optional costs to attack (CR 508.1g: exert, enlist, which the engine has
   as other things) are not built, nor anything that changes a cost to attack. No card in content needs them.
