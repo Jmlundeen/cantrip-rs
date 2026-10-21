@@ -1,0 +1,53 @@
+# A Case's "To solve" is an intervening-if trigger (CR 603.4, 719.3a): "if this Case is not solved" is asked again as it
+# resolves. Bot1 gains 5 life from five Ornithopters entering under Case of the Uneaten Feast, and at its end step copies the
+# "To solve" trigger with Return the Favor. The copy resolves first and solves the Case; the trigger itself then finds the
+# Case solved and does nothing. The Case is solved, once.
+
+[Bot1 Deck]
+Mox Pearl
+Case of the Uneaten Feast
+Black Lotus
+Return the Favor
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Case of the Uneaten Feast.Cast
+Bot1.Hand.Black Lotus.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.End]
+? Bot1.Life = 25
+? Stack = Case of the Uneaten Feast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target)
+Bot1.Target(Stack.Case of the Uneaten Feast)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Case of the Uneaten Feast.Solved = true
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Case of the Uneaten Feast.Solved = true
+Bot1.Graveyard = Return the Favor; Black Lotus
