@@ -1866,9 +1866,7 @@ Known gaps:
 - Power-up abilities are not yet a class other cards can name ("power-up abilities of other creatures you control cost
   {3} less", "whenever you activate a power-up ability", "can be activated an additional time"): Hulk, Gamma Goliath,
   Marvel Boy, Wonder Man, Kang, Advancing the Spirit and Quinjet Technician wait on it.
-- The web client cannot yet send three answers the engine asks for: naming colorless mana (Squandered Resources),
-  choosing which kind of counter to remove (`Label::Counter`, Glen Elendra Guardian), and turning a face-down
-  permanent face up (`TurnFaceUp`).
+- The web client cannot yet send three answers the engine asks for (KI-114).
 - Serving a scenario's handed-over position to the web client, to look at or play on from, went with the C# engine
   and is not rebuilt.
 - Web-slinging cards that wait: Spider-UK ("if two or more creatures entered the battlefield under your control this
@@ -1886,7 +1884,7 @@ Known gaps:
   (Norn's Annex), tapping or sacrificing, and optional costs to attack (CR 508.1g: exert, enlist, which the engine has
   as other things) are not built, nor anything that changes a cost to attack. No card in content needs them.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
-- Suspend does not give a creature cast that way haste (no card in content needs it). Several permanents one effect puts
+- Suspend does not give a creature cast that way haste (KI-112). Several permanents one effect puts
   onto the battlefield enter together (`ops::put_onto_battlefield`, `Game::put_all_onto_battlefield*`: Show and Tell,
   Redshift's exhaust, Ghost Vacuum), each judged by its entering replacements against the battlefield as it was (CR 614.12)
   and each seeing the others enter (CR 603.6a). Cloaking or manifesting several cards from a single library is one at a time,
@@ -1900,11 +1898,7 @@ Known gaps:
   rule (the card table refuses one), instructions to unlock or lock a door (`Game::unlock_door` exists for the first,
   nothing locks), "fully unlocks", and a copy of a Room spell (`resolve_copy_as_token` gives the token its door, but
   no card in content can copy a Room spell to prove it).
-  Known deviations from the rules: the unlock is an intrinsic ability entry, so an effect that removes abilities
-  (Humility) would remove it, though CR 709.5e says the unlock is not an ability; a copy effect's "except its name is X"
-  is overwritten by `layers::doors`, which names a Room by its unlocked doors; `resolve_copy_as_token` drops the copy
-  exceptions of a Room spell's copy; a granted cast from a graveyard (Serra Paragon) is judged on the whole Room card, mana
-  value 8, never on a door (Known bug scenario `serra-paragon-casts-either-door-of-a-room-in-the-graveyard`).
+  Where the Rooms are not yet the rules' is KI-111.
 
 ## Open questions
 

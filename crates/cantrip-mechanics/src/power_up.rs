@@ -7,8 +7,8 @@
 //! Synthezoid, Thanos, the Mad Titan and the rest of Marvel Super Heroes. A card lists `power_up::ability(cost, effect,
 //! text)` among its `abilities`.
 //!
-//! Not built: a power-up permanent whose mana cost has a hybrid symbol (She-Hulk, Attorney-at-Law; Brawn, Amadeus Cho;
-//! Abomination, Terrifying Titan), whose reduction the player splits as it is applied (CR 118.7e).
+//! A power-up permanent whose mana cost has a hybrid symbol (She-Hulk, Attorney-at-Law; Brawn, Amadeus Cho; Abomination,
+//! Terrifying Titan) reduces by that symbol as the player splits it (CR 118.7e, the core's `announce_reduction`).
 
 use cantrip_api::*;
 

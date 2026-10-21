@@ -48,14 +48,18 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
+| [KI-113](#ki-113-the-engine-panics-on-costs-it-has-not-built) | The engine panics on costs it has not built | Pri-0 | Fix queued |
 | [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Fix queued |
 | [KI-103](#ki-103-mana-costs-x-kicker-and-the-mana-a-cast-records-are-narrower-than-play-reaches) | Mana costs, X, kicker and the mana a cast records are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
 | [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
+| [KI-111](#ki-111-a-rooms-unlock-is-an-ability-and-its-doors-name-overwrite-a-copys-exceptions) | A Room's unlock is an ability, and its doors' name overwrite a copy's exceptions | Pri-1 | Fix queued |
+| [KI-112](#ki-112-a-creature-cast-with-suspend-does-not-gain-haste) | A creature cast with suspend does not gain haste | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
+| [KI-114](#ki-114-the-web-client-cannot-send-three-answers-the-engine-asks-for) | The web client cannot send three answers the engine asks for | Pri-2 | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Pri-3 | Fix queued |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Pri-3 | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Pri-3 | Open |
@@ -64,6 +68,18 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Pri-3 | Open |
 
 ## Issues
+
+### KI-114: The web client cannot send three answers the engine asks for
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client | 2026-10-21, moved from `docs/engine-design.md`'s known gaps |
+
+**Notes.** Naming colorless mana (Squandered Resources), choosing which kind of counter to remove (`Label::Counter`, Glen
+Elendra Guardian), and turning a face-down permanent face up (`TurnFaceUp`): the engine asks them, and the page offers no
+way to answer.
+
+**Scenarios.** None.
 
 ### KI-3: Engine paths no scenario runs
 
@@ -299,6 +315,49 @@ A fix gives each a capacity past practical play, handled gracefully at its bound
 construction for the bands; and the modes kept as the chosen indices in order.
 
 **Scenarios.** None yet.
+
+### KI-111: A Room's unlock is an ability, and its doors' name overwrite a copy's exceptions
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine | 2026-10-21, moved from `docs/engine-design.md`'s known gaps |
+
+**Notes.**
+- The unlock special action is an intrinsic ability entry per locked door (`intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, given
+  by `layers::doors`), so an effect that removes abilities (Humility) removes it, though CR 709.5e says unlocking a door
+  is a special action, not an ability.
+- A copy effect's "except its name is X" is overwritten by `layers::doors`, which names a Room by its unlocked doors.
+- `resolve_copy_as_token` drops the copy exceptions of a Room spell's copy.
+
+**Scenarios.** None yet.
+
+### KI-112: A creature cast with suspend does not gain haste
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | mechanics | 2026-10-21, moved from `docs/engine-design.md`'s known gaps |
+
+**Notes.** CR 702.62a: a creature spell cast by suspend's last-counter trigger gains haste until its controller loses
+control of the spell or the permanent it becomes. `cantrip_mechanics::suspend` casts the card and gives it nothing. No
+creature with suspend is in content yet, but the rule is the keyword's.
+
+**Scenarios.** None yet.
+
+### KI-113: The engine panics on costs it has not built
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-0 | Fix queued | engine | 2026-10-21, the sweep for known gaps |
+
+**Notes.** Asserts that stop the engine where a cost part is not built, each kept from a game only by what cards there are:
+- an activated ability's behold (`actions.rs`, `activate`: "an activated ability's behold is not built"), and a mana
+  ability whose cost names tapped permanents - refused for every card in the table by
+  `every_activated_ability_has_a_cost_activation_can_pay` (cantrip-engine);
+- a cost paid during a resolution with parts other than mana and life (`actions::may_pay` and `may_pay_x`: "a cost paid
+  during resolution is mana and life; its other parts are not built").
+A fix builds each, or refuses the cost gracefully (the cast or payment taken back) where it is reached.
+
+**Scenarios.** None.
 
 ### KI-107: A layer-1 copy static ability is not counted among what could give a look-back ability
 
