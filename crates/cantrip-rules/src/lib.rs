@@ -7,6 +7,8 @@ pub mod tree;
 mod actions;
 #[cfg(test)]
 mod as_transforms_tests;
+#[cfg(test)]
+mod attacking_tokens_tests;
 mod attach;
 mod counters;
 mod day_night;
@@ -1215,7 +1217,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn create_tokens_worded(&mut self, tokens: &[(CardId, PlayerId)], tapped: bool, attacking: Option<Target>, words: Words) -> Result<Vec<ObjectId>, Suspend> {
-        let created = ops::create_tokens_worded(self, tokens, tapped || attacking.is_some(), None, &[], words, None).map_err(|_| Suspend)?;
+        let created = ops::create_tokens_worded(self, tokens, tapped, None, &[], words, None).map_err(|_| Suspend)?;
         if let Some(defender) = attacking {
             ops::attack_with_tokens(self, &created, defender);
         }
