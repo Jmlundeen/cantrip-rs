@@ -62,7 +62,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
-| [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 
@@ -407,19 +406,6 @@ blocker's damage among the band (702.22k) or its attacker's damage among banding
 divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's sparing suggestion).
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
-
-### KI-75: Words of Wind's "return a permanent" question may be captioned as a cost
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | client | 2026-10-17, draw-replacement batch |
-
-**Notes.** Words of Wind's replacement ("each player returns a permanent they control to its owner's hand instead") asks with
-`Purpose::ReturnToHand`, which the server's prompt captioning treats as a cost (the karoo lands' "return a land you control ...
-to pay for it"). The caption would then say the return pays for something, which it does not. A fix gives the effect's return its
-own purpose or caption. Not checked in the browser.
-
-**Scenarios.** none yet.
 
 ### KI-76: A fused cast is not among the ways an effect can cast a split card from a hand
 

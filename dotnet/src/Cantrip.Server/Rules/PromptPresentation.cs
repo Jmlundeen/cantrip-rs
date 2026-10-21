@@ -52,11 +52,13 @@ internal static class PromptPresentation
 
     /// <summary>
     /// The purposes that pay something, which the engine's prompt says of itself and the wire's does not: those whose
-    /// own description is a cost.
+    /// own description is a cost. A sacrifice or a return to hand is not among them: an effect asks those too (an edict;
+    /// Words of Wind's "each player returns a permanent", a karoo land's trigger), and nothing pays for anything there. A
+    /// cost's choice of them is told by being one the player may back out of, as every choice made while casting or
+    /// activating is (CR 601.2h, 602.2b).
     /// </summary>
     private static bool IsCost(CardChoicePurposeView purpose) => purpose is
-        CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay
-        or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand or CardChoicePurposeView.TapToReduce
+        CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.TapToReduce
         or CardChoicePurposeView.Craft;
 
     /// <summary>The zones the cards are in, as the view the seat holds places them; a card not in it says nothing.</summary>
