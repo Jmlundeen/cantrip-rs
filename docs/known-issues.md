@@ -40,7 +40,6 @@ keeps it).
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
-| [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 | [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
@@ -169,24 +168,6 @@ battlefield transformed only a card that reached exile ("exile it, then put it o
 replaces an exile from the stack. The day such a card exists each card needs a scenario, and this entry is deleted.
 
 **Scenarios.** None yet.
-
-### KI-28: Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | mechanics | 2026-10-16, review of Tomik, Izzet Sparkmage |
-
-**Notes.** `replacements::noncombat_damage_you_deal_to_an_opponent_or_their_permanent` (Tomik, Izzet Sparkmage; Artist's Talent
-at level 3) asks `q.controller(d.source)` for "a source you control". A damage source that is a card outside the battlefield and the
-stack has no controller (CR 108.4a); for an ability of such a card the controller is the player who controls the ability
-(CR 110.2, 113.8), and for the damage of a spell it is the spell's controller. `q.controller` of such a card answers its owner, so
-damage dealt by an ability a card has in a graveyard or exile (an activated ability that works from there, a Cycling-style
-trigger) is judged by its owner rather than by the player who activated or controls the ability. No card in the engine deals
-noncombat damage from such an ability while an opponent controls Tomik or a level 3 Artist's Talent, so nothing shows it. A fix
-reads the controller of the stack item that is dealing the damage (the `DamageEvent` would have to carry it) and keeps
-`q.controller` for permanents.
-
-**Scenarios.** none yet.
 
 ### KI-34: A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt
 

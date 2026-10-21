@@ -1,0 +1,47 @@
+# The source of an ability's damage is the object that has the ability (CR 113.7); once that object has left the
+# battlefield, the ability uses its last-known information (CR 113.7a, 608.2h), its controller then included. Phlage, Titan
+# of Fire's Fury, cast from hand, is sacrificed by its own enters trigger, put on the stack last, before its other one
+# resolves: the 3 damage that one deals is from Phlage as it last existed on the battlefield, under Bot1's control - "a
+# source you control" for Bot1's Tomik, Izzet Sparkmage, which adds 1: Bot2 goes to 16.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Tomik, Izzet Sparkmage
+Mox Pearl
+Mountain
+Phlage, Titan of Fire's Fury
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Tomik, Izzet Sparkmage.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Phlage, Titan of Fire's Fury.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(deals 3 damage; sacrifice it)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Phlage, Titan of Fire's Fury
+? Stack.Count = 1
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 23
+Bot1.Graveyard = Phlage, Titan of Fire's Fury
