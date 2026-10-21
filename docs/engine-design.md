@@ -459,23 +459,19 @@ hold (613.8a):
 These are judged only over reach(B), restricted to where A's declared zones meet B's. An object B doesn't reach is
 unchanged by B, so A's reach and instruction there are unchanged.
 
-Ready, the earliest-timestamped ready entry applies, and then dependencies are judged again (613.8c). The judging is
+Of the ready entries (below), the earliest-timestamped applies, and then dependencies are judged again (613.8c). The judging is
 incremental. After B applies, only the pairs whose read set meets B's write set are judged again, over the objects B
 changed. Trial applications go into a copy-on-write overlay of the working copy (only the objects touched are copied),
 which is then dropped.
 
-**Open decision, put to the user: which reading of "ready" (613.8b). Undecided; nothing is built on it.** 613.8b says a
-dependent effect waits for all of the effects it depends on, and that "if several dependent effects form a dependency
-loop, then this rule is ignored and the effects in the dependency loop are applied in timestamp order". When a member of
-the loop also depends on an effect outside the loop, the rule can be read three ways:
-- **(A) The loop waits as a unit.** It applies, in timestamp order, once every effect any of its members depends on
-  outside the loop has applied. These are the sink components of the "depends on" graph.
-- **(B) The rule is ignored for the loop's members entirely.** They are as good as independent, and take their place in
-  timestamp order among everything ready.
-- **(C) Only the dependencies inside the loop are ignored.** Each member still waits for its own dependencies outside
-  the loop. This is what main does today.
-
-The coordinator recommends (C).
+**"Ready" (613.8b), decided: reading (C), `docs/rules-exceptions.md` RX-3.** 613.8b says a dependent effect waits for
+all of the effects it depends on, and that "if several dependent effects form a dependency loop, then this rule is
+ignored and the effects in the dependency loop are applied in timestamp order". Where a member of a loop also depends on an
+effect outside it, only the dependencies inside the loop are ignored: the loop is broken by timestamp order among its
+members, and every other dependency is kept, so the graph is a DAG. An entry is ready when every unapplied entry it depends
+on is in a loop with it. Of the ready entries the earliest-timestamped applies. The two readings not chosen were:
+- (A) the loop waits as a unit for every outside dependency of its members;
+- (B) the rule is ignored for the loop's members entirely.
 
 Every dependency is judged on the working copy as it stands at that step: the whole board with the effects applied so
 far, re-judged after each application (613.8c). It is never judged on one pair of effects against all the rest; the
@@ -488,7 +484,7 @@ layer 4. Its starting graph, judged on the working copy:
 - Life and Limb also depends on Blood Moon.
 - Blood Moon depends on nothing.
 
-Results under each reading:
+Results under each reading (C, decided, is the engine's):
 - **(A):** Blood Moon, then Arcane Adaptation, then Life and Limb.
   - Taiga is a plain Mountain, tapping for {R}.
   - Llanowar Elves are a Creature Land, Elf Druid Saproling Forest, keeping {G}.
@@ -499,7 +495,8 @@ Results under each reading:
   - Taiga is a Land Creature, Mountain Saproling, 1/1.
   - The Elves are a Creature Land, Elf Druid Saproling Mountain, tapping for {R} (305.7).
 
-The pass keeps "ready" as one function. The Arcane Adaptation scenario's expectation is settled by the reading chosen.
+The held scenario expects (C). Tests pin the other two timestamp orderings of the same board, among them Blood Moon on turn 3
+and Arcane Adaptation on turn 5.
 
 **Layers 1 and 2.**
 - **Layer 1:** copy effects and face-down values stay the copiable values the per-object pipeline starts from. A copy
