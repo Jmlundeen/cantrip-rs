@@ -1250,7 +1250,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
         return Vec::new();
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, history_end: None, instruction_depth: 0, state_check_due: false };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, instruction_depth: 0, state_check_due: false };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
     candidates.iter().map(|&t| apply_cost_changes_total(&cx, player, Costed::Ability(source, ability), def.cost.mana, &[t])).collect()
 }
@@ -1262,7 +1262,7 @@ pub fn cast_face_of(game: &crate::Game, card: ObjectId, index: u8) -> &'static C
 
 /// A copy of the position (no tree) to ask the rules of, through a frame's view, for a menu row's advice.
 fn advice_game(game: &crate::Game) -> crate::Game {
-    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, history_end: None, instruction_depth: 0, state_check_due: false }
+    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, instruction_depth: 0, state_check_due: false }
 }
 
 /// The face a cast option casts, as the card id the cost changes judge it by where it is not the card itself (CR 715.4,
@@ -6208,7 +6208,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
     if !changers {
         return None;
     }
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, history_end: None, instruction_depth: 0, state_check_due: false };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, instruction_depth: 0, state_check_due: false };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);

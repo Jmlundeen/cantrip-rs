@@ -115,41 +115,42 @@ pub struct GameState {
 /// A run of mandatory actions: `forced` counts the priorities given, with something on the stack, since a player last had a
 /// real choice (a question with more than one legal answer); once it is high enough, each such priority's position is
 /// fingerprinted into `seen`, and a position seen again with no real choice made and the history not asked in between is a
-/// loop no player can stop: the game is a draw. Any real choice clears them, and a question asked of the history clears
-/// `seen`. `far` is what the players' life totals, poison and libraries were halfway to the longest such run the rules let
-/// go on.
+/// loop no player can stop: the game is a draw (CR 104.4b). Any real choice clears them, and a question asked of the history
+/// clears `seen`.
 ///
-/// A step with a great deal in it: from `step_log` (the history's length as the step `step` began) on, each question's
-/// position is kept in `GameState::loop_keys` with the answers given to it, and each priority's entry follows that position
-/// as it comes round again. `acts` counts the times a player chose to act in the step, so that a position come round with
-/// the count unchanged was gone round with nobody acting. `asking` is the request waiting and its key, `priority_key` the key
-/// of the priority about to be asked, and `acted` the players who chose to act at the priority being played out with its
-/// answer, not yet counted in `acts`.
+/// A step with a great deal in it: from `step_log` (the history's length as the step `step` began) on, each question is
+/// kept in `GameState::loop_keys` by its exact position, with the answers given to it there and, for a priority, the round
+/// it was last asked in. `reads` counts the frames of the step that asked the history; `acts` counts, per seat, the times a
+/// player chose to act in the step; `designated` is the players CR 732.3 has made choose differently; `asking` is the
+/// request waiting and its key.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LoopWatch {
     pub forced: u32,
     pub seen: Vec<u64>,
-    pub far: Vec<i32>,
     pub step: u32,
     pub step_log: u32,
-    pub acts: u64,
+    pub reads: u64,
+    pub acts: [u64; 8],
+    pub designated: u8,
     pub asking: Option<(u32, u64)>,
-    pub priority_key: Option<u64>,
-    pub acted: u8,
 }
 
-/// A question asked in a position (its shape, by `cantrip_rules::loops`): how many times, and the answers given to it there.
-/// For a priority, the round it follows, should the game come back to it: the players' count of actions (`LoopWatch::acts`)
-/// and the amounts of things as it last came round, and how many times in a row it has come round with the amounts gone
-/// nowhere and nobody acting (`passes`).
+/// When a priority was last asked in a watched step: how many frames had asked the history by then (`LoopWatch::reads`) and
+/// how many times each player had acted (`LoopWatch::acts`). `asked` says whether it has been.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct LoopRound {
+    pub asked: bool,
+    pub reads: u64,
+    pub acts: [u64; 8],
+}
+
+/// A question asked in a position (by `cantrip_rules::loops`'s fingerprint of it): the answers given to it there, and for a
+/// priority the round it was last asked in.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LoopKey {
     pub key: u64,
-    pub asked: u16,
     pub given: Vec<u64>,
-    pub acts: u64,
-    pub passes: u16,
-    pub amounts: Vec<(u32, i32)>,
+    pub round: LoopRound,
 }
 
 /// The layers' list of the permanents a "loses all abilities" static ability took everything from, made for one epoch
@@ -341,7 +342,9 @@ pub enum Undo {
     LoopWatchSet(LoopWatch),
     LoopKeyPushed,
     LoopKeyPopped(LoopKey),
-    LoopKeySet(u32, LoopKey),
+    LoopKeyRound(u32, LoopRound),
+    LoopKeyGiven(u32),
+    LoopKeyUngiven(u32, u64),
     LoopKeysSet(Vec<LoopKey>),
     StaticsSeen(bool),
     FramePushed,
@@ -1116,12 +1119,19 @@ impl GameState {
         Some(self.loop_keys.len() - 1)
     }
 
-    /// Changes the kept question at `at`, journalling that entry alone.
-    pub fn update_loop_key(&mut self, at: usize, f: impl FnOnce(&mut LoopKey)) {
-        let old = self.loop_keys[at].clone();
-        f(&mut self.loop_keys[at]);
-        if self.loop_keys[at] != old {
-            self.log(Undo::LoopKeySet(at as u32, old));
+    /// Sets the round the kept question at `at` was last asked in, journalling that alone.
+    pub fn set_loop_round(&mut self, at: usize, round: LoopRound) {
+        let old = std::mem::replace(&mut self.loop_keys[at].round, round);
+        if old != round {
+            self.log(Undo::LoopKeyRound(at as u32, old));
+        }
+    }
+
+    /// Notes an answer given to the kept question at `at`, journalling that alone.
+    pub fn give_loop_answer(&mut self, at: usize, answer: u64) {
+        if !self.loop_keys[at].given.contains(&answer) {
+            self.loop_keys[at].given.push(answer);
+            self.log(Undo::LoopKeyGiven(at as u32));
         }
     }
 
@@ -1362,7 +1372,11 @@ impl GameState {
                 self.loop_index.insert(key.key, self.loop_keys.len() as u32);
                 self.loop_keys.push(key);
             }
-            Undo::LoopKeySet(at, old) => self.loop_keys[at as usize] = old,
+            Undo::LoopKeyRound(at, old) => self.loop_keys[at as usize].round = old,
+            Undo::LoopKeyGiven(at) => {
+                self.loop_keys[at as usize].given.pop();
+            }
+            Undo::LoopKeyUngiven(at, answer) => self.loop_keys[at as usize].given.push(answer),
             Undo::LoopKeysSet(old) => {
                 self.loop_index = old.iter().enumerate().map(|(at, k)| (k.key, at as u32)).collect();
                 self.loop_keys = old;
@@ -1459,7 +1473,9 @@ impl GameState {
             Undo::LoopWatchSet(_) => Undo::LoopWatchSet(self.loop_watch.clone()),
             Undo::LoopKeyPushed => Undo::LoopKeyPopped(self.loop_keys.last().expect("a key").clone()),
             Undo::LoopKeyPopped(_) => Undo::LoopKeyPushed,
-            Undo::LoopKeySet(at, _) => Undo::LoopKeySet(*at, self.loop_keys[*at as usize].clone()),
+            Undo::LoopKeyRound(at, _) => Undo::LoopKeyRound(*at, self.loop_keys[*at as usize].round),
+            Undo::LoopKeyGiven(at) => Undo::LoopKeyUngiven(*at, *self.loop_keys[*at as usize].given.last().expect("an answer")),
+            Undo::LoopKeyUngiven(at, _) => Undo::LoopKeyGiven(*at),
             Undo::LoopKeysSet(_) => Undo::LoopKeysSet(self.loop_keys.clone()),
             Undo::StaticsSeen(_) => Undo::StaticsSeen(self.statics_seen),
             Undo::FramePushed => Undo::FramePopped(self.agenda.last().expect("a frame").clone()),

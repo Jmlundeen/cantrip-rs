@@ -368,6 +368,7 @@ public static class GameText
                 {
                     DrawReasonView.MandatoryLoop => "The game ended in a draw: a loop of mandatory actions no player could stop (CR 104.4b).",
                     DrawReasonView.AllLost => "The game ended in a draw: every player lost at once.",
+                    DrawReasonView.EventLimit => "The game ended in a draw: it reached the most events the engine records.",
                     _ => "The game ended in a draw.",
                 }
                 : $"The game is over; team {ended.WinningTeam} won.",

@@ -1,13 +1,13 @@
 # A loop of mandatory actions that puts a counter on a permanent each time round never comes back to the same position, and
-# still has no way to stop: the game is a draw (CR 104.4b). Bot2 has Chainsaw ("Whenever one or more creatures die, put a rev
-# counter on this Equipment"), cast on turn 4 with no creature for its enters ability to damage. On turn 5 Bot1 animates
-# its Entombed Worldgorger Dragon and the loop of the draw scenarios begins, every step of it forced; each time Animate
-# Dead's leaves ability sacrifices the Dragon, Chainsaw's ability, Bot2's alone, puts a rev counter on it. The counters only
-# grow: nothing reads them but Chainsaw's own "+X/+0" for a creature it equips, and it equips none, and no rule ends anything
-# by them. So round after round the board is the same but for one more counter, no player can do anything but pass, and
-# nothing will ever be different: the loop goes round until the rules judge it endless, and the game is a draw - not a game
-# that never ends. (How many counters Chainsaw has then is the engine's to say, not the rules': the rules only make it a
-# draw.)
+# has no way to stop. Bot2 has Chainsaw ("Whenever one or more creatures die, put a rev counter on this Equipment"), cast
+# on turn 4 with no creature for its enters ability to damage. On turn 5 Bot1 animates its Entombed Worldgorger Dragon and
+# the loop of the draw scenarios begins, every step of it forced; each time Animate Dead's leaves ability sacrifices the
+# Dragon, Chainsaw's ability, Bot2's alone, puts a rev counter on it. Round after round the board is the same but for one
+# more counter and no player can do anything but pass: the game goes on until its history reaches the engine's limit, and
+# is a draw (docs/rules-exceptions.md, RX-1), here a low limit - not a game that never ends.
+
+[Event Limit]
+10000
 
 [Bot1 Deck]
 Swamp
@@ -53,11 +53,10 @@ Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
 
 [Expect]
 Result = Draw
-DrawReason = MandatoryLoop
+DrawReason = EventLimit
 Bot1.Status = (absent)
 Bot2.Status = (absent)
 Bot1.Life = 20
 Bot2.Life = 20
 Turn = 5
 Step = Main1
-Stack.Count = 1

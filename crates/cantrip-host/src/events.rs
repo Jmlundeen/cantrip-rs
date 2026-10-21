@@ -221,6 +221,7 @@ impl Tracker {
                 self.draw_reason = match reason {
                     DrawReason::AllLost => DrawReasonView::AllLost,
                     DrawReason::MandatoryLoop => DrawReasonView::MandatoryLoop,
+                    DrawReason::EventLimit => DrawReasonView::EventLimit,
                 };
             }
             Event::Scried { player, count, .. } => out.push(Proto::Scried { player, count: i32::from(count) }),

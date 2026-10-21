@@ -35,6 +35,9 @@ pub struct GameScript {
     pub dice: Vec<u8>,
     /// Life totals the players begin with when not 20 (a `[Life]` section: `Bot1: 3`), as (seat index, life).
     pub life: Vec<(usize, i32)>,
+    /// The most events the game records before it is a draw, when not the engine's (an `[Event Limit]` section: `5000`;
+    /// `cantrip_rules::MAX_GAME_EVENTS`).
+    pub event_limit: Option<usize>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -610,6 +613,7 @@ enum Section {
     Opening,
     Dice,
     Life,
+    EventLimit,
 }
 
 impl GameScript {
@@ -665,6 +669,10 @@ impl GameScript {
                             _ => return Err(ParseError("a [Life] section gives a starting life total per player, as Bot1: 3".into())),
                         }
                     }
+                    Section::EventLimit => match line.parse::<usize>() {
+                        Ok(limit) if script.event_limit.is_none() => script.event_limit = Some(limit),
+                        _ => return Err(ParseError("an [Event Limit] section gives one number of events, as 5000".into())),
+                    },
                     Section::Dice => {
                         for face in line.split(';') {
                             match face.trim().parse::<u8>() {
@@ -711,6 +719,7 @@ fn section_header(line: &str) -> Option<Section> {
         "[OPENING]" => Some(Section::Opening),
         "[DICE]" => Some(Section::Dice),
         "[LIFE]" => Some(Section::Life),
+        "[EVENT LIMIT]" => Some(Section::EventLimit),
         "[BASIC LANDS OUTSIDE]" => Some(Section::BasicLandsOutside),
         other => {
             let rest = other.strip_prefix("[BOT")?;

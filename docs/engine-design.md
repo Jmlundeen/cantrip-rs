@@ -713,23 +713,22 @@ poison, counters, damage, mana, libraries), and a position seen again is the loo
 event history is not in the fingerprint; every read of it is counted instead (`cantrip_api::history::note_read`, made by
 `History::new`), and a read clears the positions seen, so a loop that "the third time this turn" or "only once each turn"
 could end is never found by its positions (`loops::settled_read` asks a question whose answer the rest of the turn can't
-change without counting it). A loop that never comes back to a position, or only with the history read between, is
-followed by the shape of its positions (the fingerprint less its amounts) once a step has `BUSY_STEP` events in it: a
-priority whose shape comes round `ROUNDS` times with no player choosing to act and every amount gone only the way no rule
-ends anything by (life gained, counters added) is an endless loop of mandatory actions, a draw; one whose amounts go down is
-left to run out. In such a step every question is kept with its shape and the answers given there, to tell a player
-choosing to act (an action at priority, a "may" taken, a pick with another answer still untried in that shape) from one
-passing or declining. A loop its players keep going by choice is never cut off, capped or made to change: the engine
-supports no loop shortcuts (CR 732.2), players perform every loop action by hand, and a combination may go round as many
-times as it needs; a seat nobody drives stops itself (`LoopGuard`, C#: past 4096 questions in one step it passes,
-declines and picks each answer in turn, so a loop that goes on whatever it picks becomes one of passes, and past a million
-it concedes, CR 104.3a, so no table of automated seats goes on for ever). A loop whose
-players only pass or decline can't be stopped by making them act (CR 732.5) and is a draw after `ROUNDS` (CR 732.4).
-`FORCED_LIMIT` ends a run of mandatory actions that long with no life, poison or library moving towards its end: a draw.
-The watch keeps each question of a busy step once (`GameState::loop_keys`, found through a hashed index, journalled an
-entry at a time), and every priority position follows its own round, so a loop is found however many questions a round
-asks and whichever position it comes back to, and a loop played by hand costs the watch nothing more per round. Past
-`KEPT` (a million) questions it stops growing and forgets nothing. A normal game
+change without counting it). Once a step has `BUSY_STEP` events in it, every question is kept by its exact position with
+the answers given there, and each player's choices to act are counted (an action at priority, a "may" taken, anything chosen
+but passing, declining or choosing nothing). A priority asked again in the same position with nothing reading the history
+between is a round of a loop; if two or more players acted in it, it is a fragmented loop (CR 732.3): the active player, or
+the first involved in turn order, is designated, and is no longer offered, at a question in a position they answered before,
+what they answered there (an action at priority, a single target, card, mode or player; a "may" they took is declined for
+them), until they answer such a question otherwise. A pass or a decline is never refused. Any other loop its players keep
+going by choice - one player's, or one whose players only pass and decline (`docs/rules-exceptions.md`, RX-2) - is never cut
+off, capped or made to change: the engine supports no loop shortcuts (CR 732.2), players perform every loop action by hand,
+and a combination may go round as many times as it needs; a person is held to the match clock, and a seat nobody drives
+stops itself (`LoopGuard`, C#: past 4096 questions in one step it passes, declines and picks each answer in turn, and past a
+million it concedes, CR 104.3a). A game whose history reaches `MAX_GAME_EVENTS` (2,097,152 events) is a draw, checked
+between two frames (`Game::run`; RX-1): a run of play that never repeats exactly is neither a loop the rules can find nor
+ever ended by them. The watch keeps each question of a busy step once (`GameState::loop_keys`, found through a hashed
+index, journalled an entry at a time: a round of a priority and an answer given are small undo entries), so a loop played
+by hand costs the watch nothing more per round; past `KEPT` questions it starts over. A normal game
 pays a comparison per priority and a count per read of the history.
 
 ### Casting: when a cost's choices are made

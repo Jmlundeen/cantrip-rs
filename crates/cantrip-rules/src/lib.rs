@@ -74,6 +74,8 @@ pub struct Game {
     pub cards: &'static CardTable,
     /// Check that every rollback restores the state exactly (slow; for tests). See [`Game::verifying`].
     pub verify: bool,
+    /// The most events the game records: one that reaches it is a draw (`MAX_GAME_EVENTS`). Smaller in a test.
+    pub max_events: usize,
     /// While the triggers of an event are looked for, where the history ends for the triggers' own questions: before the
     /// event, which is already recorded so that the continuous effects that read the history see it (CR 603.10). None
     /// otherwise.
@@ -83,6 +85,12 @@ pub struct Game {
     pub(crate) instruction_depth: u8,
     pub(crate) state_check_due: bool,
 }
+
+/// The most events a game records before it is a draw (`docs/rules-exceptions.md`, RX-1): a run of play that never repeats
+/// exactly and that nobody ends - a token more each time round while the other players only pass - is neither a loop the
+/// rules can tell nor ever ended by them. 2,097,152 records (about 110 MB of history) is more than a thousand times the
+/// longest game the bench plays (about 1,600 events), and some 40,000 rounds of a fifty-event loop played by hand.
+pub const MAX_GAME_EVENTS: usize = 1 << 21;
 
 /// With `verify`, every rollback is checked while a game has no more objects than this: twice the most any scenario but
 /// a loop played out reaches (about 300).
@@ -103,6 +111,7 @@ impl Clone for Game {
             at: self.at,
             cards: self.cards,
             verify: self.verify,
+            max_events: self.max_events,
             history_end: self.history_end,
             instruction_depth: 0,
             state_check_due: false,
@@ -190,7 +199,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, history_end: None, instruction_depth: 0, state_check_due: false };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, instruction_depth: 0, state_check_due: false };
         if real {
             game.state.frame_push(Frame::new(FrameKind::Opening));
         } else {
@@ -243,6 +252,13 @@ impl Game {
             if self.state.agenda[at].pending.is_some() {
                 return;
             }
+            // RX-1: a game as long as the engine records is a draw, between two frames, so that no frame is left half done.
+            if self.log.len() >= self.max_events {
+                let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+                cx.st().set_outcome(Outcome::Draw);
+                cx.record(Event::GameDrawn { reason: DrawReason::EventLimit });
+                return;
+            }
 
             let mark = self.state.mark();
             let log_mark = self.log.len() as u32;
@@ -278,7 +294,7 @@ impl Game {
                 (flow, cx.asked_at)
             };
 
-            loops::after_frame(&mut self.state);
+            loops::after_frame(&mut self.state, self.log.len());
             // A question was asked and the run went on regardless: its work is thrown away and redone when it is answered.
             let flow = match flow {
                 Ok(_) if self.state.agenda.get(at).is_some_and(|f| f.pending.is_some()) => {
@@ -372,7 +388,7 @@ impl Game {
             self.state.update_frame(at, |f| f.answers = answers);
         }
         if let Some(watched) = watched {
-            loops::answered(&mut self.state, player, matches!(pending.kind, RequestKind::Priority { .. }), watched);
+            loops::answered(&mut self.state, player, watched);
         }
         self.run();
         self.at = child;
@@ -576,8 +592,18 @@ impl<'a> Cx<'a> {
 
     pub fn ask_core(&mut self, player: PlayerId, kind: RequestKind, may_cancel: bool) -> R<Answer> {
         // A real choice, asked or answered on a re-run, means no loop through here is a mandatory one (CR 104.4b); and a loop
-        // of choices is watched, for whether its players only pass and decline (CR 732.4-5).
-        let key = loops::asked(self, player, &kind);
+        // of choices is watched, and a player who must stop it made to choose otherwise (CR 732.3).
+        let replayed = self.g.state.agenda[self.frame].answers.get(self.cursor).cloned();
+        let (kind, key) = match loops::asked(self, player, kind, true, replayed.as_ref()) {
+            loops::Asked::Ask { kind, key } => (kind, key),
+            loops::Asked::Answered(answer) => {
+                // Given as an answer is, so the frame played out again gives it again, and the questions after it theirs.
+                let at = self.frame;
+                self.g.state.update_frame(at, |f| f.answers.push(answer.clone()));
+                self.cursor += 1;
+                return Ok(answer);
+            }
+        };
         let frame = &self.g.state.agenda[self.frame];
         if self.cursor < frame.answers.len() {
             let answer = frame.answers[self.cursor].clone();
@@ -835,7 +861,10 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn ask_then(&mut self, next: u16, player: PlayerId, kind: RequestKind) -> Suspend {
-        let key = loops::asked(self, player, &kind);
+        let (kind, key) = match loops::asked(self, player, kind, false, None) {
+            loops::Asked::Ask { kind, key } => (kind, key),
+            loops::Asked::Answered(_) => unreachable!("a staged question is always asked"),
+        };
         let id = self.g.state.request_id();
         let at = self.frame;
         self.g.state.update_frame(at, |f| {

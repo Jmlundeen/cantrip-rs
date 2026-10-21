@@ -167,6 +167,8 @@ pub enum DrawReasonView {
     AllLost,
     /// A loop of mandatory actions no player could stop (CR 104.4b).
     MandatoryLoop,
+    /// The game reached the most events the engine records (`docs/rules-exceptions.md`, RX-1).
+    EventLimit,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]

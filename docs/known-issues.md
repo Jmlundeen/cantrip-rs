@@ -53,7 +53,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
-| [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Low | Open |
+| [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Reported to a human |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
@@ -162,31 +162,25 @@ clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: t
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-17, CR 104.4b loop detection; narrowed by the loop hardening |
+| Pri-1 | Reported to a human | engine | 2026-10-17, CR 104.4b loop detection; narrowed by the loop hardening and CR 732.3 |
 
-**Notes.** `loops.rs` finds the loops the rules make a draw (its module comment is the design): a loop of mandatory actions
-is a draw at once when a position comes round with nothing asking the history in between, and otherwise after `ROUNDS`
-rounds of its shape with no amount heading for an end; one whose players only pass or decline is a draw after `ROUNDS`
-(CR 732.4-5). A loop its players keep going by choice is never cut off, capped or made to change (no shortcuts, CR 732.2:
-every round is played by hand); a seat nobody drives stops itself (`LoopGuard` in the C# client). What is still not the
-rules' procedure:
-- CR 732.3 (a fragmented loop: the active player, or the first involved, must make a different game choice) is not applied:
-  by the user's decision a loop is never made to change by the engine.
-- A pass or a decline is never refused: a loop whose only choice is a "may" a loop object offers, declined each time round
-  (Fecundity's draw), is a draw after `ROUNDS`, where CR 732.5 would let the player be held to it.
-- A choice of several targets or cards at once, an order of triggers, a number, and a "may" asked in a staged ability
-  (`Game::ask_then`) count as no choice to act, and neither does a single pick once every other answer to it has been given
-  in that shape; a loop going round through only those is a draw after `ROUNDS`. Where another order or choice would have
-  ended the loop, that is a draw the rules don't make (CR 104.4b's last sentence).
-- A loop whose rounds read the history (a card's "this turn" question each time round) is found only by its shape, after
-  `BUSY_STEP` events and `ROUNDS` rounds, not at its second round: the right result, later. `ROUNDS` (256) is taken to be past
-  any number a card counts the history or an amount to.
-- A run of mandatory actions that never comes back to a shape - its zones growing, a token or an effect more each time
-  round - is ended by `FORCED_LIMIT`: a draw if no life total, poison, library, the stack or the board moved towards an end in
-  its second half, by the engine's judgement and no rule's. An amount going down from far away (a million life lost one at
-  a time) is played out to its end.
-- A mana ability whose whole cost is {T} is treated as no choice when nothing more mana could pay for is castable, even when
-  its effect does more than add mana (a painland's damage).
+**Notes.** `loops.rs` finds the loops the rules make a draw and applies CR 732.3 (its module comment is the design): a loop
+of mandatory actions is a draw when a position comes round with nothing asking the history in between; a priority asked
+again in the same exact position in a busy step, with two or more players having chosen to act since, is a fragmented loop,
+and the active player (or the first involved) is made to choose otherwise. Every other loop goes on for as long as its
+players choose (no shortcuts, CR 732.2; RX-2), up to `MAX_GAME_EVENTS` (RX-1). What is still not the rules' procedure:
+- **Pri-1, reported to a human.** CR 732.3 is found only by the exact position: a fragmented loop whose rounds differ in
+  what the rules' "game state" leaves out is not found - continuous effects that pile up round after round (the rule's own
+  example: "gains flying" and "loses flying" until end of turn each make an effect, so the effects list grows), or a history
+  read between the rounds whose answer is the same each time. Its players can go on with it.
+- **Pri-1, reported to a human.** A player made to choose otherwise is refused only an action at priority, a single
+  target, card, mode or player, and a "may" they took; a choice of several targets or cards at once, an order of triggers
+  or a number they gave before is still offered.
+- **Pri-1, existing, reported to a human.** A mana ability whose whole cost is {T} is treated as no choice when nothing more
+  mana could pay for is castable, even when its effect does more than add mana (a painland's damage).
+- The watch begins only in a step with `BUSY_STEP` events, and a fragmented loop is found at its first round after that:
+  the rule applies once the loop has gone round some tens of times rather than at its second round. Past `KEPT` questions
+  in one step the watch starts over, and finds the loop again within two rounds.
 
 **Scenarios.**
 - [`scenarios/oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw.cantrip`](../scenarios/oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw.cantrip),
@@ -195,7 +189,8 @@ rules' procedure:
   loops with a choice, played round by hand until the script breaks them.
 - [`scenarios/oblivion-ring-loop-a-player-never-breaks-with-the-instant-they-hold-is-a-draw.cantrip`](../scenarios/oblivion-ring-loop-a-player-never-breaks-with-the-instant-they-hold-is-a-draw.cantrip)
   and [`scenarios/worldgorger-dragon-loop-whose-player-always-declines-fecundity-is-a-draw.cantrip`](../scenarios/worldgorger-dragon-loop-whose-player-always-declines-fecundity-is-a-draw.cantrip):
-  loops of passes and declines, drawn (not marked: they show rules-correct outcomes).
+  loops of passes and declines, drawn at a low event limit (RX-1, RX-2).
+- `crates/cantrip-script/tests/fragmented_loop.rs`: CR 732.3 with test-only cards (tap and untap an artifact in turn).
 
 ### KI-57: The tactical bot does not know islandwalk
 

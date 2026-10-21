@@ -214,6 +214,9 @@ impl<'s> Run<'s> {
                 player.life = life;
             }
         }
+        if let Some(limit) = script.event_limit {
+            game.max_events = limit;
+        }
         Ok(Run {
             script,
             game,

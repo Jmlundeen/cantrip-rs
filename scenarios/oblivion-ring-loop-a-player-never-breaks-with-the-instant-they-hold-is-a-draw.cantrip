@@ -1,11 +1,12 @@
 # The three-Oblivion-Ring loop with Bot2 holding Disenchant and two untapped Plains, as in
 # oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw - but Bot2 never casts it. At every priority Bot2 could
-# stop the loop, so it is no draw while Bot2 still may (CR 104.4b's last sentence: the loop goes round as long as Bot2
-# passes, each round a chance to break it). But Disenchant is no part of the loop: no object of the loop calls for casting
-# it, and no player can be made to take an action that would end a loop but those its objects call for (CR 732.5). The only
-# thing Bot2 does in the loop is pass; the loop's own actions are all mandatory. Round after round Bot2 passes, the position
-# coming back the same each time, until the loop has gone round far more often than anyone could mean to let it go round
-# and then stop: it is a loop of mandatory actions (CR 732.4), and the game is a draw, Disenchant still in Bot2's hand.
+# stop the loop, so it is no loop of mandatory actions and no draw by the rules (CR 104.4b's last sentence); and Disenchant
+# is no part of the loop, so Bot2 can't be made to cast it (CR 732.5). The loop goes round for as long as Bot2 passes: a
+# person is held to the match clock, and the engine ends a game whose history reaches its limit in a draw
+# (docs/rules-exceptions.md, RX-1). The scenario sets that limit low; the game is a draw there, Disenchant still in Bot2's hand.
+
+[Event Limit]
+10000
 
 [Bot1 Deck]
 Oblivion Ring
@@ -52,7 +53,7 @@ Bot1.Hand.Oblivion Ring.Cast
 
 [Expect]
 Result = Draw
-DrawReason = MandatoryLoop
+DrawReason = EventLimit
 Turn = 9
 Step = Main1
 Stack.Count = 1

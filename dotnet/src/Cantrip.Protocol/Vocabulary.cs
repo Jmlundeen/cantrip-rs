@@ -138,6 +138,9 @@ public enum DrawReasonView
 
     /// <summary>The game entered a loop of mandatory actions that no player could stop (CR 104.4b).</summary>
     MandatoryLoop = 2,
+
+    /// <summary>The game reached the most events the engine records (<c>docs/rules-exceptions.md</c>, RX-1).</summary>
+    EventLimit = 3,
 }
 
 /// <summary>Why a player is no longer in the game (CR 104.3).</summary>

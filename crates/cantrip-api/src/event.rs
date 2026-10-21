@@ -216,6 +216,8 @@ pub enum DrawReason {
     AllLost,
     /// A loop of mandatory actions no player can stop (CR 104.4b, 732.4).
     MandatoryLoop,
+    /// The game reached the most events the engine records (`MAX_GAME_EVENTS`; `docs/rules-exceptions.md`, RX-1).
+    EventLimit,
 }
 
 impl Event {

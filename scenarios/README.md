@@ -145,6 +145,12 @@ A scenario that needs a player near death says so instead of playing the life aw
 total (not the starting life of the format, so "half your starting life total" is unchanged), one player per line, `Bot1: 1`.
 A player it does not name starts at 20.
 
+## The event limit: `[Event Limit]`
+
+A game that reaches the most events the engine records (`MAX_GAME_EVENTS`) is a draw (`docs/rules-exceptions.md`, RX-1),
+which only a loop played for a very long time reaches. A scenario of such a loop sets a small limit instead, one number,
+`5000`: the game is drawn between two frames once its history is that long, with `DrawReason = EventLimit`.
+
 ## Starting conditions and the board
 
 A scenario may set its starting conditions - life totals (`[Life]`) and dice (`[Dice]`) - but every counter and every
