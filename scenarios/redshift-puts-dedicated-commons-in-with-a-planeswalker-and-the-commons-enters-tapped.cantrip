@@ -1,0 +1,53 @@
+# Dedicated Commons: "This land enters tapped unless you control a planeswalker." A replacement effect judged as the land
+# would enter (CR 614.12), against the battlefield as it is: the ruling, "If Dedicated Commons enters at the same time as a
+# planeswalker, that planeswalker isn't considered." Redshift's exhaust puts the Commons and Chandra, Chill of Compliance
+# onto the battlefield together, so the Commons enters tapped.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Redshift, Rocketeer Chief
+Black Lotus
+Black Lotus
+Dedicated Commons
+Chandra, Chill of Compliance
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Redshift, Rocketeer Chief.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Add X mana; Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Exhaust)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Dedicated Commons; Chandra, Chill of Compliance)
+[T7 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Dedicated Commons.Tapped = true
+Bot1.Battlefield.Chandra, Chill of Compliance.Counters.Loyalty = 3

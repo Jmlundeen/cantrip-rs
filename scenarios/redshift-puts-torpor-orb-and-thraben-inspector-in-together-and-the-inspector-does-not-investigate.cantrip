@@ -1,0 +1,54 @@
+# Torpor Orb: "Creatures entering don't cause abilities to trigger" - and the ruling: "If Torpor Orb and a creature enter
+# at the same time, the creature's enters ability won't trigger." Redshift's exhaust puts Torpor Orb and Thraben Inspector
+# from Bot1's hand onto the battlefield at once (CR 110.2a); the trigger is looked for once both are there (CR 603.2, 603.6a),
+# and the Orb stops it: no Clue.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Redshift, Rocketeer Chief
+Black Lotus
+Black Lotus
+Torpor Orb
+Thraben Inspector
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Redshift, Rocketeer Chief.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Add X mana; Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Exhaust)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Torpor Orb; Thraben Inspector)
+[T7 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Thraben Inspector.Power = 1
+Bot1.Battlefield.Torpor Orb.Types = Artifact
+Bot1.Battlefield.Count = 8
