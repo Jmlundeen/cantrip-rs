@@ -716,7 +716,7 @@ followed by the shape of its positions (the fingerprint less its amounts) once a
 priority whose shape comes round `ROUNDS` times with no player choosing to act and every amount gone only the way no rule
 ends anything by (life gained, counters added) is an endless loop of mandatory actions, a draw; one whose amounts go down is
 left to run out. In such a step every question is kept with its shape and the answers given there; a loop its players keep
-going by choice goes round `ROUNDS_TO_CHOOSE` times (the engine's count, as no shortcut is proposed) and then the player
+going by choice goes round `ROUNDS_TO_CHOOSE` times (a cap of the engine's: no loop shortcuts are supported, CR 732.2, and players perform every loop action by hand) and then the player
 chosen as CR 732.3 chooses must choose otherwise for the rest of the step - the answers
 they gave that question there are taken out of it (a target, card, player or mode chosen, a priority action, a "may" taken;
 never a pass or a decline). A loop whose players only pass or decline can't be stopped by making them act (CR 732.5) and is a

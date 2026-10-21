@@ -52,7 +52,12 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
-| [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
+| [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
+| [KI-54](#ki-54-a-loop-a-player-could-stop-is-cut-off-after-a-fixed-number-of-rounds) | A loop a player could stop is cut off after a fixed number of rounds | Low | Open |
+| [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
+| [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
+| [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
+| [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-61](#ki-61-a-land-whose-own-layer-4-ability-and-a-subtype-setting-ability-depend-on-each-other-is-judged-by-a-capped-fixpoint) | A land whose own layer-4 ability and a subtype-setting ability depend on each other is judged by a capped fixpoint | Pri-1 | Fix under way |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
@@ -130,7 +135,30 @@ affected.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome; a bot-lab duel with infect decks would show it.
 
-### KI-54: A loop a player could stop is shortcut after a fixed number of rounds, not one the players name
+### KI-51: A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Exercised; the reading is the CR's grammar, no ruling | engine | 2026-10-17, Magus of the Moon |
+
+**Notes.** CR 305.7: a land whose subtype an effect sets "loses all abilities generated from its rules text, its old land types,
+and any copiable effects affecting that land". The engine reads the sentence as naming the three sources of the abilities the land
+loses - its rules text, its old land types (their mana abilities, CR 305.6) and any copiable effects (a copied card's abilities
+and keywords, a copy's "except it has ...") - so `Chars::set_land_subtypes` takes, in layer 4, every ability the land has by
+then, and what else a copy effect made of it (the name, supertypes, card types, colors, power and toughness of what it copies,
+CR 707.2) stays, as layer 1 applied it. The sentence's first clause already says the land "no longer has its old land type", so
+"loses ... its old land types" read as a list of things lost would repeat it; read as sources of abilities it does not. The
+other reading - the copy effect itself is lost - has the land stop being what made it a land at all in the case of a Clone
+copying a Dryad Arbor, and no ruling of Blood Moon, Magus of the Moon, Vesuva or Thespian's Stage says so; the judges' articles
+consulted (Blood Moon, Progenitor of Dependency; a 2013 Judge Forum thread on Thespian's Stage under Blood Moon, which predates
+the "copiable effects" wording and kept the Stage's ability) settle nothing either way. A ruling that the copy effect goes
+entirely would start the land's characteristics from its own card when `layers::land_text_lost` holds it.
+
+**Scenarios.** vesuva-copying-dark-depths-under-blood-moon-is-a-legendary-mountain-named-dark-depths-with-no-abilities,
+thespians-stage-copying-urborg-under-blood-moon-keeps-the-name-and-loses-the-ability-it-kept,
+clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: they assert this reading and pass.
+
+### KI-54: A loop a player could stop is cut off after a fixed number of rounds
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
@@ -141,17 +169,9 @@ once when a position comes round with nothing asking the history in between, and
 shape with no amount heading for an end; a loop its players keep going by choice goes round `ROUNDS_TO_CHOOSE` times and
 then the player CR 732.3 names must choose otherwise; one whose players only pass or decline is a draw after `ROUNDS`
 (CR 732.5, 732.4). What is still not the rules' procedure:
-- No shortcut is proposed (CR 732.2a-c): the player with priority describes a sequence of choices for all players and how
-  many times it repeats, and each other player in turn order accepts it or shortens it by naming where they will choose
-  differently (CR 732.2b). The engine takes `ROUNDS_TO_CHOOSE` as the number every player chose; a human who wants more
-  rounds (mana past 32 rounds of an infinite mana loop) can't have them, and one who wants fewer stops by choosing
-  otherwise, as the rules allow. A fix needs: a question that asks a player for a number of iterations and one that asks
-  each other player to accept it or name a shorter one (a new `RequestKind` each, host prompts and C# messages, controls in
-  the web client, and answers from the language-model client and the random and auto players); the engine then playing
-  the sequence that many times by itself, which needs the answers themselves - `LoopKey` keeps only hashes of the answers
-  given to each question, unordered, so the round to repeat would have to be recorded answer by answer; and, only where the
-  proposal was shortened, the player who then has priority made to choose differently from what was proposed for them
-  (CR 732.2c). The engine's present rule for a loop that goes on (CR 732.3, below) is a different rule from the shortcut's.
+- A loop its players keep going by choice is cut off after `ROUNDS_TO_CHOOSE` (32) rounds: a player who wants more rounds
+  (mana past 32 rounds of an infinite mana loop) can't have them. The engine supports no shortcuts (CR 732.2); every loop
+  action is played by hand.
 - The player made to choose otherwise is chosen as CR 732.3 chooses, but the engine applies it to every loop of choices
   going nowhere - also one whose amounts rise each round (mana floated), where no position is "reached multiple times" - and
   for the rest of the step. What is made to differ is every answer they gave to the same question in the same shape (a
