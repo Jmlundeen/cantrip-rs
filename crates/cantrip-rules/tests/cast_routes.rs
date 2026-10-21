@@ -94,6 +94,20 @@ static FLASHBACK_INSTRUCTION: CardDef = CardDef {
     ..PROBE_SPELL
 };
 
+fn play_own_exiled_land(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(&card) = g.state().zone(Zone::exile(item.controller)).first() {
+        g.play_land_during_resolution(card)?;
+    }
+    Ok(())
+}
+
+static PLAY_LAND_INSTRUCTION: CardDef = CardDef {
+    name: "Route Play Land Instruction Probe",
+    cost: ManaCost::ZERO,
+    spell: Some(SpellDef { targets: &[], effect: play_own_exiled_land }),
+    ..PROBE_SPELL
+};
+
 static SPLIT_LEFT: CardDef = CardDef { name: "Route Split Left", ..PROBE_SPELL };
 static SPLIT_RIGHT: CardDef = CardDef { name: "Route Split Right", cost: ManaCost { generic: 4, ..ManaCost::ZERO }, ..PROBE_SPELL };
 static SPLIT: CardDef = CardDef { name: "Route Split Probe", oracle: true, split: Some((&SPLIT_LEFT, &SPLIT_RIGHT)), ..CardDef::BLANK };
@@ -188,6 +202,7 @@ fn table() -> &'static CardTable {
             &RESOLUTION_PROBE,
             &FLASHBACK_SPELL,
             &FLASHBACK_INSTRUCTION,
+            &PLAY_LAND_INSTRUCTION,
             &SPLIT_LEFT,
             &SPLIT_RIGHT,
             &SPLIT,
@@ -506,6 +521,30 @@ fn a_land_two_permissions_let_be_played_is_played_by_the_one_chosen() {
         assert_eq!(game.state.obj(on).tapped, tapped);
         assert!(game.log.iter().any(|r| matches!(r.event, Event::LandPlayed { land, granted_by, .. } if land == on && granted_by.some().map(|g| g.object) == Some(want))));
     }
+}
+
+/// CR 305.1, 608.2g: a land a resolving effect plays is played by that effect, not "this way" by a permission that stands
+/// on the card, so the permission's "each land played this way enters tapped" has no say (CR 614.1c); and the play is
+/// recorded, with nothing beyond the effect named as what made it possible.
+#[test]
+fn a_land_a_resolving_effect_plays_ignores_a_permissions_enters_tapped_and_is_recorded() {
+    let cards = table();
+    let (instruction, land_card, filler) =
+        (cards.find("Route Play Land Instruction Probe").unwrap(), cards.find("Route Land").unwrap(), cards.find("Route Filler").unwrap());
+    let mut game = RulesGame::new(cards, &Setup { decks: vec![vec![instruction, land_card, filler, filler, filler, filler, filler], vec![filler; 7]], seed: 1, ..Setup::default() });
+    let (instruction_id, land) = (game.state.zone(Zone::hand(ME))[0], game.state.zone(Zone::hand(ME))[1]);
+    move_to(&mut game, land, Zone::exile(ME));
+    begin(&mut game, 0);
+    let source = put(&mut game, "Route Permission Source", ME);
+    game.state.permission_push(permission(land, source, PlayGrant { lands: true, enters_tapped: true, ..PlayGrant::CAST }));
+    game.run();
+    let option = casts_of(&game, instruction_id).into_iter().next().expect("the instruction is castable");
+    take(&mut game, &option);
+    resolve(&mut game);
+    let on = game.state.battlefield().iter().copied().find(|&id| game.state.obj(id).card == land_card).expect("the land was played");
+    assert!(!game.state.obj(on).tapped, "not played by the permission, so not tapped by it");
+    assert_eq!(game.state.player(ME).lands_played, 1);
+    assert!(game.log.iter().any(|r| matches!(r.event, Event::LandPlayed { land, granted_by, .. } if land == on && granted_by.some().is_none())));
 }
 
 /// CR 118.9a: by a permission that names its own cost, the card's zone-free alternative cost is not offered; by one that

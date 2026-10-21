@@ -54,7 +54,6 @@ keeps it).
 | [KI-23](#ki-23-a-creature-fighting-itself-cr-70114c-is-implemented-but-no-scenario-can-reach-it) | A creature fighting itself (CR 701.14c) is implemented but no scenario can reach it | Low | Unexercised |
 | [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
-| [KI-42](#ki-42-a-permissions-enters-tapped-is-judged-from-where-the-land-is-not-from-the-way-it-was-played) | A permission's "enters tapped" is judged from where the land is, not from the way it was played | Low | Unexercised |
 | [KI-43](#ki-43-a-modal-double-faced-cards-back-face-cast-by-a-permission-is-not-exercised) | A modal double-faced card's back face cast by a permission is not exercised | Low | Unexercised |
 | [KI-44](#ki-44-no-emblem-gives-a-way) | No emblem gives a way | Low | Open |
 | [KI-45](#ki-45-the-number-a-cost-sacrifices-is-kept-as-the-spells-x) | The number a cost sacrifices is kept as the spell's X | Low | Suspected |
@@ -90,7 +89,6 @@ keeps it).
 | [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
 | [KI-87](#ki-87-screaming-nemesis-judges-a-player-is-dealt-damage-this-way-on-the-target-not-the-recipient) | Screaming Nemesis judges "a player is dealt damage this way" on the target, not the recipient | Low | Suspected |
-| [KI-90](#ki-90-a-land-played-somewhere-other-than-the-battlefield-or-by-an-effect-records-no-land-play) | A land played somewhere other than the battlefield, or by an effect, records no land play | Low | Unexercised |
 | [KI-91](#ki-91-an-energy-cost-is-not-judged-again-once-mana-abilities-have-been-activated) | An energy cost is not judged again once mana abilities have been activated | Low | Unexercised |
 | [KI-92](#ki-92-an-activation-records-nothing-of-what-gave-it-and-its-alternative-cost-is-found-first) | An activation records nothing of what gave it, and its alternative cost is found first | Low | Open |
 | [KI-93](#ki-93-the-browser-shows-no-phased-out-permanents) | The browser shows no phased-out permanents | Medium | Open |
@@ -422,23 +420,6 @@ effects that set types (Oko's Elk) name their object. A fix asks the question ov
 at the cost of their characteristics part-way through the layer.
 
 **Scenarios.** None: no pair of implemented cards reaches it.
-
-### KI-42: A land a resolving effect plays is judged entering tapped by any permission on it
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-16, review of Lightstall Inquisitor |
-
-**Notes.** "Each land played this way enters tapped" (CR 305.1, 614.1c; `PlayGrant::enters_tapped`) is the core's replacement
-`replace::Origin::PlayedTapped`, which applies while a permission that says so stands on the land as it enters. A land play
-with priority keeps only the permission its action names (`ActionOption::granted_by`; `actions::act` drops the card's
-others as it moves), so a land played by another way enters untapped. A land a resolving effect plays
-(`actions::play_land_during_resolution`) keeps every permission on it, so one that has such a permission enters tapped though
-it was not "played this way". A fix drops the card's permissions there too, before it moves. No printed card in the engine
-both plays a land by an effect and could face a Lightstall Inquisitor's card.
-
-**Scenarios.** None yet. The choice of permission with priority is `crates/cantrip-rules/tests/cast_routes.rs`
-(`a_land_two_permissions_let_be_played_is_played_by_the_one_chosen`).
 
 ### KI-43: A modal double-faced card's back face cast by a permission is not exercised
 
@@ -1031,21 +1012,6 @@ when the effect says so; Parhelion II's change made `create_tokens_attacking` fo
 cannot make an untapped attacking token. Its only attacking caller today is mobilize, which is "tapped and attacking", so
 nothing misbehaves; a worded token that enters attacking but untapped would. Fix: take `tapped` as given, as
 `create_tokens_attacking` now does, with the mobilize caller passing `true`.
-
-**Scenarios.** None (no card reaches it).
-
-### KI-90: A land played somewhere other than the battlefield, or by an effect, records no land play
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-20, review of the action model |
-
-**Notes.** A land play records `Event::LandPlayed` with the face played and what made it possible (`actions::act`), which
-"once during each of your turns" asks (`history::permission_used_this_turn`: Serra Paragon). It is recorded only once the land
-is on the battlefield: a land a replacement sends elsewhere as it is played (CR 614.1) records none, though it was played and
-the permission used. Nor does `actions::play_land_during_resolution` record one (CR 305.1, 608.2g: "you may play that card").
-Neither reaches a once-per-turn permission with a printed card in the engine. A fix records the play as the land moves, with
-the object it became, wherever that is.
 
 **Scenarios.** None (no card reaches it).
 

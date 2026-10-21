@@ -3673,9 +3673,13 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             } else {
                 ops::put_onto_battlefield(cx, &[(source, player, false)], ZoneReason::PlayLand)?.first().copied()
             };
-            if let Some(land) = land.filter(|&land| cx.s().obj(land).zone.is(ZoneKind::Battlefield)) {
-                // What it was played by is recorded with it: "once during each of your turns" asks (Serra Paragon).
+            // What it was played by is recorded with it, as the object it became wherever that is (a replacement may have
+            // sent it elsewhere, CR 614.1; it was still played and the permission used): "once during each of your turns"
+            // asks (Serra Paragon).
+            if let Some(land) = land.filter(|&land| land != source) {
                 cx.record(Event::LandPlayed { land, player, way: action.index, granted_by: Grant::of(action.granted_by) });
+            }
+            if let Some(land) = land.filter(|&land| cx.s().obj(land).zone.is(ZoneKind::Battlefield)) {
                 // "If you do, it gains ...": what the way grants is the land's from the moment it is on the battlefield.
                 if let Some(way) = way
                     && let Some(n) = way.what.gains
@@ -4428,8 +4432,17 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
     let player = cx.s().stack.last().expect("a resolving item").controller;
     cx.st().update_player(player, |p| p.lands_played += 1);
     ops::turn_up_to_play(cx, card);
+    // Played by the effect, not by any permission on the card (CR 305.1, 608.2g): "each land played this way enters
+    // tapped" (Lightstall Inquisitor's) has no say, and every permission for the card ends as it leaves (CR 400.7).
+    if !cx.s().permissions.is_empty() {
+        cx.st().permissions_retain(|p| p.card != card);
+    }
     let moved = ops::put_onto_battlefield(cx, &[(card, player, false)], ZoneReason::PlayLand)?;
-    Ok(moved.first().copied())
+    let land = moved.first().copied().filter(|&land| land != card);
+    if let Some(land) = land {
+        cx.record(Event::LandPlayed { land, player, way: 0, granted_by: Grant::NONE });
+    }
+    Ok(land)
 }
 
 /// Casts `card` as an effect resolves (CR 608.2g). A cast given up (CR 733.1) is undone, and nothing happens.

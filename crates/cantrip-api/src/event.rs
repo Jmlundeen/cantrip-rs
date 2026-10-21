@@ -128,8 +128,10 @@ pub enum Event {
     /// `way` the face it was played as (0 the card itself, `WAY_BACK_FACE` a modal double-faced card's back face, CR
     /// 712.12), and `granted_by` what let it be played from where it was, if anything beyond the rules did
     /// (`ActionOption::granted_by`: Serra Paragon's "once during each of your turns, you may play a land from your
-    /// graveyard", Crucible of Worlds' rule; `Grant::NONE` for nothing, `Grant::some` reads it). Recorded only, as it
-    /// entered; its zone change says where it came from.
+    /// graveyard", Crucible of Worlds' rule; `Grant::NONE` for nothing, and for a land a resolving effect plays, CR 608.2g;
+    /// `Grant::some` reads it). Recorded only, as it moved: `land` may be elsewhere than the battlefield where a
+    /// replacement sent it (CR 614.1: Containment Priest's exile), still a land played; its zone change says where it
+    /// came from.
     LandPlayed { land: ObjectId, player: PlayerId, way: u8, granted_by: Grant },
     /// A door of a Room was unlocked (CR 709.5f, 709.5h): the permanent was given the unlocked designation of that half
     /// (`DOOR_LEFT` or `DOOR_RIGHT`) by `player`, whether as it entered because the half was cast (CR 709.5d), by the

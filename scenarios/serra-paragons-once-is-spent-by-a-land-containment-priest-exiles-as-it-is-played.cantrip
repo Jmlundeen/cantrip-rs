@@ -1,0 +1,53 @@
+# A land play that a replacement sends elsewhere is still a land play (CR 305.1, 614.1): Bot1 plays Dryad Arbor from the
+# graveyard by Serra Paragon's "once during each of your turns" permission, and Containment Priest ("If a nontoken
+# creature would enter the battlefield and it wasn't cast, exile it instead") exiles it as it is played. The once is
+# spent: Ornithopter can't then be cast from the graveyard that turn. On turn 5 it is (the control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Sol Ring
+Faithless Looting
+Serra Paragon
+Containment Priest
+Plains
+Dryad Arbor
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Dryad Arbor; Ornithopter)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Containment Priest.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+Bot1.Graveyard.Dryad Arbor.Play(Ability: Once during each of your turns)
+? Exile = Dryad Arbor
+! Bot1.Graveyard.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+
+[Expect]
+Exile = Dryad Arbor
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Sol Ring; Containment Priest; Serra Paragon; Ornithopter
