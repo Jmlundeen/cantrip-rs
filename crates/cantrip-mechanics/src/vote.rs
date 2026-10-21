@@ -14,6 +14,10 @@ pub fn for_permanents(g: &mut dyn Game, source: ObjectId, first: PlayerId, candi
         return Ok(votes);
     }
     for voter in voters {
+        // A voter who has left the game by their turn to vote is no longer one of "each player" (CR 800.4a): no vote.
+        if !crate::players::reached(g, voter) {
+            continue;
+        }
         if let Some(card) = crate::choose::card(g, voter, source, Purpose::Vote, candidates.to_vec())?
             && let Some(i) = candidates.iter().position(|&c| c == card)
         {

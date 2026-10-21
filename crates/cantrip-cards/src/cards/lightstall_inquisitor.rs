@@ -14,6 +14,9 @@ fn each_opponent_exiles(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
     let mut chosen = Vec::new();
     for opponent in opponents {
+        if !cantrip_mechanics::players::reached(g, opponent) {
+            continue;
+        }
         let hand = g.state().zone(Zone::hand(opponent)).to_vec();
         chosen.extend(choose::card(g, opponent, item.object, Purpose::Exile, hand)?);
     }

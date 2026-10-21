@@ -22,6 +22,9 @@ fn each_returns(g: &mut dyn Game, asker: &Asker, _: ObjectId, _: &Proposal, _: &
 fn each_player_returns_a_permanent(g: &mut dyn Game, source: ObjectId) -> Result<(), Suspend> {
     let mut chosen = Vec::new();
     for player in g.state().apnap().collect::<Vec<_>>() {
+        if !cantrip_mechanics::players::reached(g, player) {
+            continue;
+        }
         let theirs = g.permanents_of(player);
         chosen.extend(choose::card(g, player, source, Purpose::ReturnToHand, theirs)?);
     }

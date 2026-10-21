@@ -67,6 +67,9 @@ fn sacrifice_greatest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
     let mut doomed: Vec<ObjectId> = Vec::new();
     for who in opponents {
+        if !cantrip_mechanics::players::reached(g, who) {
+            continue;
+        }
         let mine: Vec<(ObjectId, i16)> = g
             .permanents_of(who)
             .into_iter()

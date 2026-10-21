@@ -27,6 +27,9 @@ fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     for opponent in opponents {
         let asker = Asker { source: item.object, controller: opponent };
         for _ in 0..counters {
+            if !cantrip_mechanics::players::reached(g, opponent) {
+                break;
+            }
             let permanents: Vec<ObjectId> =
                 g.permanents_of(opponent).into_iter().filter(|&id| nonland(g, &asker, id) && !sacrificed.contains(&id)).collect();
             let hand = g.state().zone(Zone::hand(opponent)).to_vec();

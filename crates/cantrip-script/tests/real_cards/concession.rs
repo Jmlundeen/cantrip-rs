@@ -40,17 +40,30 @@ static COUNCIL: CardDef = CardDef { name: "Probe Council", types: TypeSet::of(&[
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&FAME, &COUNCIL])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&FAME, &COUNCIL, &EDICT])))
 }
 
 /// A game of three, Bot1 holding `card` on turn 1, with `permanents` on the battlefield. Bot1 casts `card` in its main phase;
 /// `answer` answers every other question (None for a pass), and may make P1 concede instead (`true`), once.
-fn play(card: &str, permanents: &[(&str, PlayerId)], mut answer: impl FnMut(&Game, &Request) -> (Option<Answer>, bool)) -> (Game, Vec<ObjectId>) {
+fn play(card: &str, permanents: &[(&str, PlayerId)], answer: impl FnMut(&Game, &Request) -> (Option<Answer>, bool)) -> (Game, Vec<ObjectId>) {
+    play_among(3, P1, card, permanents, answer)
+}
+
+/// `play` in a game of `players`, `conceder` the one who concedes.
+fn play_among(
+    players: usize,
+    conceder: PlayerId,
+    card: &str,
+    permanents: &[(&str, PlayerId)],
+    mut answer: impl FnMut(&Game, &Request) -> (Option<Answer>, bool),
+) -> (Game, Vec<ObjectId>) {
     let names = |list: &[&str]| -> Vec<CardId> { list.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))).collect() };
     let mut first = names(&[card]);
     first.extend(names(&["Plains"; 29]));
     let deck = || names(&["Plains"; 30]);
-    let mut game = Game::new(table(), &Setup { decks: vec![first, deck(), deck()], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
+    let mut decks = vec![first];
+    decks.extend((1..players).map(|_| deck()));
+    let mut game = Game::new(table(), &Setup { decks, seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
     game.verify = true;
     let ids: Vec<ObjectId> = permanents
         .iter()
@@ -84,7 +97,7 @@ fn play(card: &str, permanents: &[(&str, PlayerId)], mut answer: impl FnMut(&Gam
                 let (reply, concede) = answer(&game, &request);
                 if concede && !conceded {
                     conceded = true;
-                    game.concede(P1);
+                    game.concede(conceder);
                     continue;
                 }
                 reply
@@ -157,4 +170,67 @@ fn a_concession_keeps_the_answers_given_before_it_with_the_players_who_gave_them
     assert!(game.state.player(P1).lost, "P1 did not leave");
     assert!(game.state.battlefield().contains(&ids[0]), "the first Ornithopter was exiled: the votes tied");
     assert!(!game.state.battlefield().contains(&ids[1]), "the second Ornithopter, with two votes, stayed");
+}
+
+const P3: PlayerId = PlayerId(3);
+
+fn edict(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    cantrip_mechanics::each_player_sacrifices(g, item.object, 1, |q, id| q.chars(id).is(CardType::Creature)).map(drop)
+}
+
+/// A zero-cost sorcery: "Each player sacrifices a creature."
+static EDICT: CardDef = CardDef { name: "Probe Edict", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], edict), ..CardDef::BLANK };
+
+/// Four players vote on Probe Council between two of P3's Ornithopters; P2 concedes while P1 is voting, before their own
+/// vote. P2 is no longer one of "each player" (CR 701.38a, 800.4a): no one votes in their place, and the totals are P0's,
+/// P1's and P3's alone - the second Ornithopter, with two of three, is exiled. Were P2's vote handed to another player (CR
+/// 800.4g), that player would have voted twice.
+#[test]
+fn a_voter_who_leaves_before_voting_has_no_vote_and_no_one_votes_for_them() {
+    let mut asked: Vec<PlayerId> = Vec::new();
+    let (game, ids) = play_among(4, P2, "Probe Council", &[("Ornithopter", P3), ("Ornithopter", P3)], |_, request| match &request.kind {
+        RequestKind::ChooseCards { eligible, .. } => {
+            asked.push(request.player);
+            let (first, second) = (*eligible.iter().min().unwrap(), *eligible.iter().max().unwrap());
+            match request.player {
+                P0 => (Some(Answer::Cards(vec![first])), false),
+                // P2 concedes while P1 votes, the first time P1 is asked.
+                P1 => (Some(Answer::Cards(vec![second])), asked.iter().filter(|&&p| p == P1).count() == 1),
+                _ => (Some(Answer::Cards(vec![second])), false),
+            }
+        }
+        RequestKind::ChoosePlayer { .. } => panic!("someone was chosen to vote for the player who left"),
+        _ => (None, false),
+    });
+    assert!(game.state.player(P2).lost, "P2 did not leave");
+    assert!(!asked.contains(&P2), "P2 voted");
+    assert_eq!(asked.iter().filter(|&&p| p == P3).count(), 1, "P3 did not vote once");
+    assert!(game.state.battlefield().contains(&ids[0]), "the first Ornithopter was exiled");
+    assert!(!game.state.battlefield().contains(&ids[1]), "the second Ornithopter, with two votes, stayed");
+}
+
+/// Four players each sacrifice a creature to Probe Edict, each with two to choose from; P2 concedes while P1 is choosing,
+/// before their own choice. No one chooses for P2 (CR 800.4a), P3 chooses for themselves, and P0, P1 and P3 each lose one
+/// creature.
+#[test]
+fn a_player_who_leaves_before_sacrificing_chooses_nothing_and_no_one_chooses_for_them() {
+    let mut asked: Vec<PlayerId> = Vec::new();
+    let (game, _) = play_among(
+        4,
+        P2,
+        "Probe Edict",
+        &[("Ornithopter", P0), ("Ornithopter", P0), ("Ornithopter", P1), ("Ornithopter", P1), ("Ornithopter", P2), ("Ornithopter", P2), ("Ornithopter", P3), ("Ornithopter", P3)],
+        |_, request| match &request.kind {
+            RequestKind::ChooseCards { eligible, .. } => {
+                asked.push(request.player);
+                (Some(Answer::Cards(vec![eligible[0]])), request.player == P1 && asked.iter().filter(|&&p| p == P1).count() == 1)
+            }
+            RequestKind::ChoosePlayer { .. } => panic!("someone was chosen to sacrifice for the player who left"),
+            _ => (None, false),
+        },
+    );
+    assert!(game.state.player(P2).lost, "P2 did not leave");
+    assert!(!asked.contains(&P2), "P2 was asked");
+    let left = |p: PlayerId| game.state.battlefield().iter().filter(|&&id| game.state.obj(id).controller == p).count();
+    assert_eq!((left(P0), left(P1), left(P3)), (1, 1, 1), "each player still in did not sacrifice one creature");
 }

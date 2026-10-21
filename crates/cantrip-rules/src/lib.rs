@@ -1013,6 +1013,11 @@ impl cantrip_api::Game for Cx<'_> {
         self.g.state.update_frame(at, |f| f.scratch = scratch);
     }
 
+    fn still_in_game(&mut self, player: PlayerId) -> bool {
+        self.concessions_here();
+        !self.g.state.player(player).lost
+    }
+
     fn ask_then(&mut self, next: u16, player: PlayerId, kind: RequestKind) -> Suspend {
         // A question asked of a player who has left the game (CR 800.4f-h), as `ask_core` treats it: a cost is not paid - the
         // run goes on at the next stage with nothing given - and anything else is asked of the player who makes it instead,

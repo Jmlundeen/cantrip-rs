@@ -23,6 +23,7 @@ pub mod choose;
 pub mod cipher;
 pub mod chosen_type;
 pub mod hand;
+pub mod players;
 pub mod history;
 pub mod library;
 pub mod impending;
@@ -144,6 +145,9 @@ pub fn choose_from_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId, co
 pub fn each_discards_a_card(g: &mut dyn Game, players: &[PlayerId], source: ObjectId) -> Result<Vec<ObjectId>, Suspend> {
     let mut chosen = Vec::new();
     for &player in players {
+        if !crate::players::reached(g, player) {
+            continue;
+        }
         chosen.extend(choose_from_hand(g, player, source, 1)?);
     }
     Ok(g.discard_together(&chosen))
@@ -244,7 +248,7 @@ pub fn each_opponent_keeps_one_of_each_type(
 ) -> Result<(), Suspend> {
     let mut doomed = Vec::new();
     for who in g.state().apnap().collect::<Vec<_>>() {
-        if who == controller {
+        if who == controller || !crate::players::reached(g, who) {
             continue;
         }
         let theirs: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| among(&g.chars(id))).collect();
@@ -284,6 +288,9 @@ fn sacrifice_together(
 ) -> Result<Vec<(PlayerId, ObjectId)>, Suspend> {
     let mut chosen = Vec::new();
     for &who in players {
+        if !crate::players::reached(g, who) {
+            continue;
+        }
         let eligible: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| kind(&*g, id)).collect();
         chosen.extend(chosen_to_sacrifice(g, who, source, count, eligible)?.into_iter().map(|id| (who, id)));
     }

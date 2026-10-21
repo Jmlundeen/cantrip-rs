@@ -17,6 +17,9 @@ fn equalize(g: &mut dyn Game, source: ObjectId, from_hand: bool, kind: Option<Ca
     let Some(fewest) = players.iter().map(|&who| theirs(g, who).len()).min() else { return Ok(()) };
     let mut going: Vec<ObjectId> = Vec::new();
     for &who in &players {
+        if !cantrip_mechanics::players::reached(g, who) {
+            continue;
+        }
         let mine = theirs(g, who);
         if mine.len() <= fewest {
             continue;

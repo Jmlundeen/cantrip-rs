@@ -36,6 +36,9 @@ fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != you).collect();
     let mut chosen: Vec<ObjectId> = Vec::new();
     for &who in &opponents {
+        if !cantrip_mechanics::players::reached(g, who) {
+            continue;
+        }
         chosen.extend(choose_from_hand(g, who, item.object, 2)?);
     }
     let discarded = g.discard_together(&chosen);

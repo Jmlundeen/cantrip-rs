@@ -365,6 +365,9 @@ pub trait Game: Query {
     fn set_scratch(&mut self, scratch: [u32; 4]);
     /// Asks, and continues at `next` once answered, without running the stages before it again.
     fn ask_then(&mut self, next: u16, player: PlayerId, kind: RequestKind) -> Suspend;
+    /// Whether `player` is still in the game at this point of the resolution: false once they have left (CR 800.4a), a
+    /// concession made as they were about to be asked included (`cantrip_mechanics::players::reached`).
+    fn still_in_game(&mut self, player: PlayerId) -> bool;
 
     fn draw(&mut self, player: PlayerId, count: u32);
     fn discard(&mut self, card: ObjectId);

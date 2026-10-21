@@ -7,6 +7,9 @@ use cantrip_oracle as oracle;
 fn discard_and_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut chosen = Vec::new();
     for opponent in g.state().opponents(item.controller).collect::<Vec<_>>() {
+        if !cantrip_mechanics::players::reached(g, opponent) {
+            continue;
+        }
         chosen.extend(choose_from_hand(g, opponent, item.object, 1)?);
     }
     g.discard_together(&chosen);

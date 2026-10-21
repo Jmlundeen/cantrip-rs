@@ -13,6 +13,9 @@ fn eligible(q: &dyn Query, card: ObjectId) -> bool {
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut entering = Vec::new();
     for player in g.state().apnap().collect::<Vec<_>>() {
+        if !cantrip_mechanics::players::reached(g, player) {
+            continue;
+        }
         let hand = g.state().zone(Zone::hand(player)).to_vec();
         let can: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(g, c)).collect();
         if let Some(&card) = choose::cards_from(g, player, item.object, Purpose::PutOntoBattlefield, hand, can, 1, true)?.first() {

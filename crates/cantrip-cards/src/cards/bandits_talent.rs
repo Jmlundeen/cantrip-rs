@@ -10,6 +10,9 @@ fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
     let mut discarded = Vec::new();
     for opponent in opponents {
+        if !cantrip_mechanics::players::reached(g, opponent) {
+            continue;
+        }
         discarded.extend(choose_discard_two_unless_discarding(g, opponent, item.object, |chars| !chars.is(CardType::Land))?);
     }
     g.discard_together(&discarded);

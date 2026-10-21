@@ -355,7 +355,14 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
     }
     // The answer this priority had, when it is played out again with it (`Game::answer`): what the watch notes of it is
     // noted here, where it stays.
-    let replayed = cx.s().agenda.get(cx.frame).and_then(|f| f.answers.get(cx.cursor)).map(|(_, answer)| answer.clone());
+    // Only ever the answer of the player asked, as `Cx::ask_core` replays it.
+    let replayed = cx
+        .s()
+        .agenda
+        .get(cx.frame)
+        .and_then(|f| f.answers.get(cx.cursor))
+        .filter(|(by, _)| by.is_none_or(|by| by == player))
+        .map(|(_, answer)| answer.clone());
     let canon = Canon::new(cx.s());
     let here = seen_position.unwrap_or_else(|| position(cx.s(), &canon));
     let key = question_key(&canon, here, player, cx.frame, cx.cursor, &RequestKind::Priority { options: Vec::new() });

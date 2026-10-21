@@ -16,6 +16,9 @@ fn owner_manifests_dread(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
     let owners: Vec<PlayerId> = g.exiled_with(item.object).into_iter().map(|card| g.obj(card).owner).collect();
     let players: Vec<PlayerId> = g.state().apnap().filter(|p| owners.contains(p)).collect();
     for player in players {
+        if !cantrip_mechanics::players::reached(g, player) {
+            continue;
+        }
         manifest_dread(g, player, item.object)?;
     }
     Ok(())
