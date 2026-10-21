@@ -206,6 +206,14 @@ impl EventQuery {
 thread_local! {
     /// How many times the history has been read since `take_reads` was last asked (`History::new`, `note_read`).
     static READS: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+    /// How many times the history has been read on this thread, never started again (`reads_total`).
+    static TOTAL: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// How many times the history has been read on this thread: what the layers compare to know whether working something out
+/// asked the past.
+pub fn reads_total() -> u64 {
+    TOTAL.with(|t| t.get())
 }
 
 /// The history is being read: a question about the past is being asked, whose answer may differ as the history grows.
@@ -214,6 +222,7 @@ thread_local! {
 /// made by `History::new`, which notes it; a rule that reads the records some other way notes it itself.
 pub fn note_read() {
     READS.with(|r| r.set(r.get().wrapping_add(1)));
+    TOTAL.with(|t| t.set(t.get().wrapping_add(1)));
 }
 
 /// How many times the history has been read on this thread since this was last asked, and starts the count again.

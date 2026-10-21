@@ -188,10 +188,17 @@ pub trait LayerQuery {
 pub type StaticAffects = fn(&dyn LayerQuery, ObjectId, ObjectId, &Chars) -> bool;
 
 /// A static ability's effect on one affected object's characteristics.
+///
+/// The contract of every `apply` and `apply_each`: the `Chars` it is given is only written, and read only to guard (a land's
+/// subtypes set only if it is a land, `Chars::set_land_subtypes`; an ability given only if not there yet). A value the
+/// effect works out from its own object - "+X/+0, where X is its power", "its mana value" - is read through the view
+/// (`LayerQuery::chars`, `LayerQuery::mana_value`), as the layer stands. The dependency system judges what an effect
+/// does on the object as it is (CR 613.8a, 613.9), and only a read through the view shows it what changed it; a value
+/// taken from `Chars` would hide the dependency. `CANTRIP_VERIFY` checks the contract (`layers::takes_from_its_object`).
 pub type StaticApply = fn(&dyn LayerQuery, ObjectId, &mut Chars);
 
 /// A static ability's effect on one affected object's characteristics that reads that object (`StaticDef::apply_each`):
-/// the view, the source, the affected object, and its characteristics so far.
+/// the view, the source, the affected object, and its characteristics so far. The contract of `StaticApply` holds.
 pub type StaticApplyEach = fn(&dyn LayerQuery, ObjectId, ObjectId, &mut Chars);
 
 /// A static ability (CR 604) that generates a continuous effect on characteristics (CR 611.3, 613): "lands are
@@ -2716,12 +2723,12 @@ impl CardTable {
         // Only the same definition twice is merged: two tokens of one name (a Germ, a Golem) are two definitions,
         // and the registry already leaves out a characteristics-only card that has a file of its own.
         cards.dedup_by(|a, b| std::ptr::eq(*a, *b));
-        // A granted static ability's effect is applied in the layers from 7a on, after the layer-6 pass that decides which
-        // abilities an object has (`layers.rs`): one for an earlier layer would be quietly absent, so it is refused.
+        // A static ability given in layer 6 applies from there on (CR 613.1f): once given, in layer 6 itself, and from 7a on.
+        // One of an earlier layer would come into being after its layer was done, and would be quietly absent: refused.
         for card in &cards {
             for ability in card.abilities.iter().chain(card.delayed) {
                 if let AbilityDef::Static(s) = ability {
-                    assert!(s.layer >= Layer::PtDefine, "{}: a granted static ability applies in layer 7 only (CR 613.1f)", card.name);
+                    assert!(s.layer >= Layer::Ability, "{}: a granted static ability applies in layer 6 or later (CR 613.1f)", card.name);
                 }
             }
             // The layers find what a "loses all abilities" static took from among the permanents

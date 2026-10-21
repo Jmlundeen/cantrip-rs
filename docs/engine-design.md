@@ -232,36 +232,32 @@ would go over unclickable.
   effect that sets a name (612.8, "named Everflame, Heroes' Legacy") is `EffectKind::SetName`, in layer 3: the object
   has that name alone (`Chars::name_set`), for the legend rule and every "same name" or chosen-name question
   (`library::object_names`).
-- **Dependency (613.8)**: within each layer and sublayer, the effects that may apply to the object are merged in timestamp
-  order (`layers::Merge`: a source's static abilities, those granted to others, resolved effects, the object's own granted
-  abilities). An effect whose reach can change - a static ability's "affects", a text change (only where its word is) and
-  "all creature types" (only to a creature or Kindred) - applies at once unless a later effect would change its reach or
-  another such effect is still to come (`layers::waits`, so an anthem followed by resolved pumps costs a look at each);
-  otherwise the rest go through `layers::by_dependency`. An effect depends on another if applying the other changes whether
-  it applies to the object or does something to it (613.8a(b): Ygra's "other creatures are Food artifacts" on a Vehicle
-  crewed later, Kaito's Ninja form, an impending Overlord's "isn't a creature", Artificial Evolution's Goblin to Dragon
-  before a later Elf to Goblin), and waits for it; free effects go in timestamp order, as do the members of a loop among
-  themselves (613.8b), and the order is worked out again after each (613.8c). Judged on the object being worked out, an
-  effect that would change what another applies to once its own prerequisites have applied counts too (a chain:
-  "creatures are artifacts" after "lands are creatures" after the effect that makes it a land), and an earlier effect that
-  applied is asked again of the object as it found it with the later one applied, so its own application cannot hide the
-  dependency (`in_order`'s snapshots: Life and Limb making a nonbasic Forest a Saproling before Blood Moon takes the Forest
-  type - Blood Moon applies first and Life and Limb not at all); a dependency through
-  another object alone is not seen (known issue KI-41). Of 613.8a(b)'s four criteria, "what it applies to" and "what it
-  does" are judged here; "existence" is a static ability's taken away by "loses all abilities", ordered by
-  `lost_to_statics`; no text change the engine has rewrites another effect's text. The words of rules text follow the
-  same order (`Words::word`: the earliest change of the word as it is now, again and again). Characteristic-defining
-  abilities apply first and apart (613.3, 613.8a(c)).
+- **Dependency (613.8): the layer pass.** Each layer's application order is fixed once per position over the whole game
+  (`layers.rs`, "The layer pass" below for the design): every entry of the layer - each static ability of each source, each
+  ability an object was given, each resolved effect and keyword counter - in timestamp order (613.7), then ordered by the
+  dependency system, judged on the game as the entries applied so far leave it (613.8c). An entry depends on another if
+  applying the other would change whether it exists (its source losing it: `Chars::lost_all`, `Chars::text_lost`), what it
+  applies to, or what it does to an object it applies to - judged on what it does to the object as it stands, so that two
+  effects that set the same thing do not depend on each other through it (613.9: "has flying" and "loses flying") - over
+  the objects the other applies to and any object the question read (`Judge`). A dependency loop is broken by timestamp
+  order among its members, every other dependency kept (`docs/rules-exceptions.md`, RX-3). An object's characteristics are
+  then its entries applied in that order (`at`, `through`), each read by the static abilities applied at the same step:
+  a static ability applied at step `k` reads every other object at step `k` (`View::stage`). What is worked out is kept for
+  the position (`GameState::layer_pass`, keyed on `GameState::chars_epoch`, which only writes that could change a
+  characteristic move, and on the history's length once a static ability asked about the past); a layer with nothing that
+  could depend on anything is in timestamp order and judges nothing. Characteristic-defining abilities apply first and apart
+  (613.3, 613.8a(c)). The words of rules text follow the same order (`Words::word`). With `CANTRIP_VERIFY` one answer in
+  sixteen is worked out again in a pass of its own and must agree.
 - **Type-changing effects (613.1d, layer 4)**: `AddTypes`, `SetTypes`, `AddSubtype`,
   `SetCreatureType`, `AddAllCreatureTypes` ("with all creature types", only to a creature or Kindred, 205.3d) and
   `LoseAllCreatureTypes`. Changeling's every creature type is a characteristic-defining ability applied first (613.3).
-- **Static abilities granted by effects (613.1f, 613.7a)** are `granted_static` entries (`AbilityDef::Static`) of a card's
-  `delayed` list, given with `EffectKind::AddAbility`. Once layer 6 has settled an object's abilities, those it still has
-  (so "loses all abilities" later in timestamp order takes them) apply to it alone, with it as their source, in their own
-  layer (7a onward, refused at table construction for an earlier one) at the timestamp of the granting effect, merged in
-  timestamp order with the effects and other statics of that layer. One that affects other objects
-  (`granted_static_ability`, The Irencrag's "Equipped creature gets +3/+3") makes the permanent a static source
-  (`StaticSources::granted`) while it still has the ability, applied among the other sources' abilities at its timestamp.
+- **Static abilities given to objects (613.1f, 613.7a)** are `granted_static` entries (`AbilityDef::Static`) of a card's
+  `delayed` list, given with `EffectKind::AddAbility` or by a static ability that gives abilities (Rune of Flight's shape).
+  One of layer 6 comes into being in layer 6 itself, once the entry that gives it has applied, and joins the entries still
+  to apply; from 7a on the ones an object still has once layer 6 is done apply (so "loses all abilities" later in timestamp
+  order takes them) - to it alone, with it as their source, or to what they affect (`granted_static_ability`, The Irencrag's
+  "Equipped creature gets +3/+3") - each at the later of its object's timestamp and its giver's. One of an earlier layer is
+  refused at table construction: it would come into being after its layer was done.
 - **"Loses all abilities" (613.1f)** comes from a resolved effect (`EffectKind::LoseAllAbilities`: Oko's Elk, The Wondrous
   Wasp) or a static ability (`loses_all_abilities(affects, text)`, a `StaticDef` with `loses_all`: Eaten by Piranhas; Darksteel
   Mutation, Kenrith's Transformation, Frogify and Humility print the same; `loses_all_abilities_except_mana_abilities` keeps
@@ -269,9 +265,9 @@ would go over unclickable.
   ability gained after it stays (613.7). A permanent about to enter that such a static ability would strip is judged as it
   would be on the battlefield (614.12, below): its own `enters` replacements do not apply. Every rule read off a card - its static abilities from layer 6 on, cost changes,
   replacement effects, play rules, trigger, block and activation rules, granted ways, miracles - asks the one answer,
-  `Query::lost_all_abilities` (`layers::lost_all_abilities`): the effects, then `layers::lost_to_statics`, the permanents such
-  static abilities took everything from, worked out once per position and history length (an `affects` may read the past) and
-  free while no such ability is on the battlefield. A source's static abilities of layers 1 to 5 have applied by the time
+  `Query::lost_all_abilities` (`layers::lost_all_abilities`): the effects, then what the layer pass left the object
+  (`Chars::lost_all`, set where the "loses all abilities" applied in layer 6's order), free while no such ability is on the
+  battlefield. A source's static abilities of layers 1 to 5 have applied by the time
   layer 6 takes them (613.6: Painter's Servant enchanted by Eaten by Piranhas, or turned into an Elk, still paints everything),
   so the static-source list keeps such a source and leaves it out from layer 6 on - all but the effects that had begun by
   then. **An effect in parts (613.6)** is one `StaticDef` per layer, each later part marked `.continues()` (Opalescence:
@@ -279,23 +275,21 @@ would go over unclickable.
   worked out, the layers note the static abilities that applied to it (`Begun`, only while a source has an effect in parts); a
   later part applies to it exactly when its first part did - "the same set of objects", whatever its words say by then - and
   goes on applying though its source loses its abilities in a layer between, if the first part was of layers 1 to 5 or is the
-  "loses all abilities" ability that took its own source's (Humility made a creature: `Stripped::applying`). A layer-6 part
-  of a source that loses its abilities in layer 6 never begins (613.8a: it depends on the effect that removes it). One "loses all abilities" ability that
-  would take another's source's applies first (613.8a dependency), each taking the other's in timestamp order (613.8b); no
-  card in content can make two of them meet (an Aura is no creature), so that order has no scenario. The host lists every
+  "loses all abilities" ability that took its own source's (Humility made a creature). A layer-6 part of a source that
+  loses its abilities in layer 6 never begins (613.8a: its existence depends on the effect that removes it). One "loses all
+  abilities" ability that would take another's source's applies first (613.8a dependency), each taking the other's in
+  timestamp order (613.8b). The host lists every
   rules line of an object that lost all abilities as lost, not only its keywords and activated and triggered abilities.
 - **Setting a land's subtype (305.7, layer 4)** is a static ability made with `sets_land_subtypes(affects, apply, text)`
   (`StaticDef::sets_land_subtypes`: Magus of the Moon, Multiversal Passage; Blood Moon, Spreading Seas and Evil Presence print
   the same), whose `apply` calls `Chars::set_land_subtypes`: the land's land types are replaced (its other subtypes, an animated
   land's creature types, stay) and every ability it has in layer 4 - its rules text's and its copy effects' - is taken; the
-  basic land type's mana ability follows in layer 6 (305.6), and what other effects grant it after. `layers::land_text_lost`
-  finds, once per position and history, the lands such abilities took the rules text of, judged on each as layer 4 leaves it
-  with every effect but the setting abilities themselves (every effect that makes it a land or stops it being one is one the
-  setting ability depends on, 613.8a; a land loses its text if any of them applies, so "All Mountains are Plains" takes the
-  text of the Mountains it applied to), and
-  orders the abilities whose sources are lands as `lost_to_statics` does. Such a land's static abilities apply in no layer from
-  4 on - each depends on the setting effect, which applies first whatever the timestamps (613.8a: Urborg under Magus makes
-  nothing a Swamp, either order) - and `Query::lost_all_abilities` answers for it, so every rule its card prints is gone. The
+  basic land type's mana ability follows in layer 6 (305.6), and what other effects grant it after. Where in layer 4's order
+  it applies, the land is marked (`Chars::text_lost`): its static abilities that have not begun to apply exist no more, and
+  each depends on the setting effect (613.8a: existence), which applies first unless they are in a loop with it (Urborg
+  under Magus makes nothing a Swamp, either order; a land whose own ability makes lands what another setting ability sets
+  applies in timestamp order with it, 613.8b) - and `Query::lost_all_abilities` answers for it, so every rule its card
+  prints is gone. The
   setting ability itself applies whatever its source loses in layer 6 (613.6: Magus under Eaten by Piranhas), and a land's own
   ability that sets its own subtype (Multiversal Passage) goes on applying and does not count it as having lost its text. A land
   about to enter is judged as it would be on the battlefield (614.12, below): under such an effect its own `enters`
@@ -353,7 +347,7 @@ would go over unclickable.
 - **No strings at runtime:** keywords, types, subtypes and colors are enums or bitsets, card behavior is reached by
   function index, and nothing about a card is read from JSON while a game runs.
 
-### The layer pass (planned for KI-41; revised after review, not built)
+### The layer pass (built, but for layer 2; the design as reviewed)
 
 **Why.** CR 613.8 orders *effects*, not objects. An effect depends on another if applying the other "would change the text
 or the existence of the first effect, what it applies to, or what it does to any of the things it applies to"

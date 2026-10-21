@@ -1,0 +1,77 @@
+# Life and Limb (turn 1), Woodland Changeling (turn 3), then Blood Moon (turn 5); both enchantments apply in layer 4
+# (CR 613.1d). Whether one effect depends on another is a question about the game, not about one object (CR 613.8a: what an
+# effect applies to is a set):
+# - Taiga and Dryad Arbor are nonbasic Forests. Applying Blood Moon makes them Mountains and not Forests, which changes what
+#   Life and Limb applies to: Life and Limb depends on Blood Moon.
+# - Woodland Changeling is a Saproling (Changeling, CR 702.73a) and no land. Applying Life and Limb makes it a Forest land,
+#   which Blood Moon then applies to: Blood Moon depends on Life and Limb.
+# The two are a dependency loop, and apply in timestamp order (CR 613.8b): Life and Limb, then Blood Moon. Taiga and Dryad
+# Arbor become 1/1 green Saproling creatures and Forest lands, and then Mountains and no Forests: Saproling creatures still.
+# Woodland Changeling is a 1/1 green Land Creature, every creature type and Mountain, that taps for {R} and not {G} (CR
+# 305.6, 305.7). Without the Changeling, Blood Moon would apply first and neither land would be a Saproling
+# (blood-moon-after-life-and-limb-applies-first-and-a-nonbasic-forest-is-no-saproling).
+
+[Bot1 Deck]
+Taiga
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Life and Limb
+Woodland Changeling
+Dryad Arbor
+Blood Moon
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Taiga.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Life and Limb.Cast
+Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Taiga.Subtypes = Forest; Mountain; Saproling
+[T3 Bot1.Main1]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Forest; Saproling
+[T5 Bot1.Main1]
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Taiga.Subtypes = Mountain; Saproling
+! Bot1.Battlefield.Woodland Changeling.Activate(Ability: Add {G})
+Bot1.Battlefield.Woodland Changeling.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Taiga.Types = Land; Creature
+Bot1.Battlefield.Taiga.Subtypes = Mountain; Saproling
+Bot1.Battlefield.Taiga.Colors = Green
+Bot1.Battlefield.Taiga.Power = 1
+Bot1.Battlefield.Taiga.Toughness = 1
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Mountain; Saproling
+Bot1.Battlefield.Dryad Arbor.Colors = Green
+Bot1.Battlefield.Dryad Arbor.Power = 1
+Bot1.Battlefield.Woodland Changeling.Types = Creature; Land
+Bot1.Battlefield.Woodland Changeling.Subtypes = (every creature type); Mountain
+Bot1.Battlefield.Woodland Changeling.Colors = Green
+Bot1.Battlefield.Woodland Changeling.Power = 1
+Bot1.Battlefield.Woodland Changeling.Toughness = 1

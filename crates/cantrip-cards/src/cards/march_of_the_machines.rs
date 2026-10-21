@@ -26,7 +26,7 @@ fn creature_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// "... with power and toughness each equal to its mana value" (CR 613.4b, layer 7b; CR 202.3: a token or a card with no
 /// mana cost has mana value 0).
 fn mana_value_size(q: &dyn LayerQuery, _: ObjectId, affected: ObjectId, chars: &mut Chars) {
-    let value = q.mana_value(affected, chars) as i16;
+    let value = q.mana_value(affected, &q.chars(affected)) as i16;
     chars.power = Some(value);
     chars.toughness = Some(value);
 }

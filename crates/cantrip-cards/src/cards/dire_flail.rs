@@ -27,9 +27,11 @@ fn blunderbusses_on(q: &dyn Query, creature: ObjectId) -> Vec<ObjectId> {
 /// "... and has 'Whenever this creature attacks, ...'" (CR 613.1f): the equipped creature gets the next of the
 /// Blunderbuss's attack abilities that it does not have yet, so a second Blunderbuss gives a second instance, which is its
 /// own.
-fn grant_attack_ability(view: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+/// How many it has is read of the creature as the layer stands (`LayerQuery::chars`), the contract of a static ability's
+/// effect (`StaticApply`).
+fn grant_attack_ability(view: &dyn LayerQuery, _: ObjectId, creature: ObjectId, chars: &mut Chars) {
     let back = view.cards().id_of(&BACK);
-    let has = chars.abilities.iter().filter(|a| a.is_some_and(|a| a.card == back && a.is_delayed())).count();
+    let has = view.chars(creature).abilities.iter().filter(|a| a.is_some_and(|a| a.card == back && a.is_delayed())).count();
     if has < INSTANCES
         && let Some(slot) = chars.abilities.iter().position(|a| a.is_none())
     {
@@ -92,7 +94,7 @@ pub static BACK: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::PtModify, attached_object, plus_pt::<3, 0>, "Equipped creature gets +3/+0."),
-        static_ability(Layer::Ability, attached_object, grant_attack_ability, "Equipped creature has \"Whenever this creature attacks, you may sacrifice an artifact other than Dire Blunderbuss. When you do, this creature deals damage equal to its power to target creature.\""),
+        static_ability_for_each(Layer::Ability, attached_object, grant_attack_ability, "Equipped creature has \"Whenever this creature attacks, you may sacrifice an artifact other than Dire Blunderbuss. When you do, this creature deals damage equal to its power to target creature.\""),
     ],
     ..oracle::DIRE_BLUNDERBUSS
 };

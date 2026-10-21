@@ -1,0 +1,63 @@
+# Arcane Adaptation naming Saproling (turn 1), Blood Moon (turn 3), then Life and Limb (turn 5), all layer 4 (CR 613.1d).
+# Judged on the whole game (CR 613.8a, 613.8c): Arcane Adaptation and Life and Limb depend on each other, Life and Limb also
+# depends on Blood Moon, and Blood Moon on nothing. Ready are Adaptation and Blood Moon; Adaptation is the earliest and
+# applies first (CR 613.8b; docs/rules-exceptions.md, RX-3): Llanowar Elves are a Saproling. Now Life and Limb and Blood
+# Moon depend on each other - Life and Limb would make the Elves a land for Blood Moon, and Blood Moon makes Taiga no Forest
+# - and the loop goes in timestamp order: Blood Moon, then Life and Limb. Taiga is a plain Mountain, no creature, tapping
+# for {R}; the Elves, made a Forest land after Blood Moon applied, are a 1/1 green Creature Land, Elf Druid Saproling
+# Forest, tapping for {G}.
+
+[Bot1 Deck]
+Taiga
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Sol Ring
+Llanowar Elves
+Arcane Adaptation
+Blood Moon
+Life and Limb
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Taiga.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot1.Modes(Saproling)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blood Moon.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Life and Limb.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+Bot1.Battlefield.Llanowar Elves.Activate(Ability: #1)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Types = Creature; Land
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Forest; Saproling
+Bot1.Battlefield.Llanowar Elves.Colors = Green
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Taiga.Types = Land
+Bot1.Battlefield.Taiga.Subtypes = Mountain

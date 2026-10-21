@@ -1,0 +1,71 @@
+# Blood Moon, Life and Limb and Arcane Adaptation (naming Saproling), all layer 4 (CR 613.1d). Whether one effect depends on
+# another is judged on the whole game as the effects applied so far leave it (CR 613.8a: what an effect applies to is a set;
+# 613.8c: judged again after each):
+# - Arcane Adaptation and Life and Limb depend on each other: Adaptation makes Llanowar Elves a Saproling, which Life and
+#   Limb then applies to; Life and Limb makes Taiga a creature, which Adaptation then applies to. A loop.
+# - Life and Limb also depends on Blood Moon, which makes Taiga no Forest. Blood Moon depends on nothing yet: no Saproling is
+#   a nonland for Life and Limb to make a land.
+# A loop is broken by timestamp order among its members, every other dependency kept (CR 613.8b; docs/rules-exceptions.md,
+# RX-3): Arcane Adaptation (turn 3) is ready, Life and Limb waits for Blood Moon, and Arcane Adaptation is earlier than
+# Blood Moon (turn 5), so it applies first. Then the Elves are a Saproling, and Life and Limb and Blood Moon depend on each
+# other (Life and Limb would make the Elves a land): a loop, in timestamp order - Life and Limb (turn 1), then Blood Moon.
+# The Elves: a Saproling, then a 1/1 green Saproling creature and Forest land, then a Mountain - Creature Land, Elf Druid
+# Saproling Mountain, losing the {G} its rules text gave it for the Mountain's {R} (CR 305.7). Taiga: a Saproling creature
+# and Forest land, then a Mountain - Land Creature, Mountain Saproling, green 1/1.
+# With Blood Moon the earlier of the two (blood-moon-before-arcane-adaptation-leaves-taiga-a-mountain-and-life-and-limb-makes-
+# the-elves-a-forest), or Arcane Adaptation first and Life and Limb last
+# (arcane-adaptation-then-blood-moon-then-life-and-limb-apply-in-that-order-around-their-loop), the result differs.
+
+[Bot1 Deck]
+Taiga
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Sol Ring
+Llanowar Elves
+Life and Limb
+Arcane Adaptation
+Blood Moon
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Taiga.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Life and Limb.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot1.Modes(Saproling)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blood Moon.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Llanowar Elves.Activate(Ability: Add {G})
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Types = Creature; Land
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Mountain; Saproling
+Bot1.Battlefield.Llanowar Elves.Colors = Green
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Taiga.Types = Land; Creature
+Bot1.Battlefield.Taiga.Subtypes = Mountain; Saproling
+Bot1.Battlefield.Taiga.Colors = Green
+Bot1.Battlefield.Taiga.Power = 1

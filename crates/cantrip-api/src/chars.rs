@@ -42,6 +42,12 @@ pub struct Chars {
     /// A continuous effect set its name (CR 612.8): it has `name` alone, and none of the names it had (a split card's halves,
     /// a Room's doors).
     pub name_set: bool,
+    /// It lost all its abilities in layer 6 (CR 613.1f): its own static abilities apply no more, from the point the loss
+    /// applied, and none of the rules its card prints (`Query::lost_all_abilities`). Abilities granted after keep it.
+    pub lost_all: bool,
+    /// Another's effect set its land subtypes (CR 305.7): it lost the abilities its rules text and copy effects give it,
+    /// from the point the effect applied in layer 4 (`set_land_subtypes`).
+    pub text_lost: bool,
 }
 
 /// The words `id`'s text has now (CR 612): the ones its copiable values changed (a token made by changed text), then
@@ -110,6 +116,11 @@ impl Chars {
     /// "Loses all abilities" (CR 613.1f): every ability it has now goes, keywords, protections and "hexproof from"
     /// included. What is granted after it, in timestamp order, it keeps (CR 613.7).
     pub fn lose_all_abilities(&mut self) {
+        self.clear_abilities();
+        self.lost_all = true;
+    }
+
+    fn clear_abilities(&mut self) {
         self.keywords = Keywords::NONE;
         self.protection = ColorSet::NONE;
         self.protection_colorless = false;
@@ -136,7 +147,8 @@ impl Chars {
             return;
         }
         self.subtypes = self.subtypes.minus(SubtypeSet::LAND_TYPES).union(types);
-        self.lose_all_abilities();
+        self.clear_abilities();
+        self.text_lost = true;
     }
 
     /// The most creatures that may block it (CR 509.1b): one for "can't be blocked by more than one creature", otherwise

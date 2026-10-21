@@ -50,16 +50,13 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 | [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
-| [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Fix queued |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
-| [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
-| [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
-| [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
+| [KI-63](#ki-63-control-layer-2-is-settled-by-the-core-not-by-the-layer-pass) | Control (layer 2) is settled by the core, not by the layer pass | Pri-1 | Fix queued |
+| [KI-64](#ki-64-control-changing-effects-that-decide-one-another-are-settled-by-a-capped-fixpoint) | Control-changing effects that decide one another are settled by a capped fixpoint | Pri-1 | Fix queued |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
-| [KI-61](#ki-61-a-land-whose-own-layer-4-ability-and-a-subtype-setting-ability-depend-on-each-other-is-judged-by-a-capped-fixpoint) | A land whose own layer-4 ability and a subtype-setting ability depend on each other is judged by a capped fixpoint | Pri-1 | Fix under way |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-99](#ki-99-a-spell-or-ability-with-more-than-232-targets-or-a-question-of-more-than-231-candidates) | A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates | Won't fix | Won't fix: beyond practical scale |
@@ -100,24 +97,6 @@ them out, so it plans with less mana than it has. The view has no word for the p
 a source when the actions offered for it include a mana ability, or the view says its {T} abilities may be activated.
 
 **Scenarios.** none: a bot's plan is not scenario'd. Shang-Chi's scenarios show the engine side.
-
-### KI-41: A dependency through another object is judged on the object being worked out
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | core (layers) | 2026-10-16, the dependency system (`layers::by_dependency`, CR 613.8) |
-
-**Notes.** CR 613.8a asks whether applying one effect would change what another applies to, which is a set of objects.
-The layers work out one object at a time, so `layers::ready` asks it of that object: whether applying the other changes
-whether the first applies to it, now or once the other's own prerequisites have applied (which covers a chain such as
-"creatures are artifacts" after "lands are creatures"). An effect that depends on another only through some other object
-- the other changes the first's reach on that object and not on this one - is applied to this one in timestamp order. The
-result differs only where the two do not commute on this object (one sets what the other adds), and no two cards the
-engine has meet that way: every multi-object static ability it has adds types, abilities or power, and the resolved
-effects that set types (Oko's Elk) name their object. A fix asks the question over every object the first could affect,
-at the cost of their characteristics part-way through the layer.
-
-**Scenarios.** None: no pair of implemented cards reaches it.
 
 ### KI-49: The tactical bot does not know infect or poison
 
@@ -228,24 +207,37 @@ divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's spari
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
 
-### KI-61: A land whose own layer-4 ability and a subtype-setting ability depend on each other is judged by a capped fixpoint
+### KI-63: Control (layer 2) is settled by the core, not by the layer pass
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Pri-1 | Fix under way | engine | 2026-10-17, review of the CR 614.12 change; narrowed 2026-10-21 |
+| Pri-1 | Fix queued | engine | 2026-10-17, review of the control-changing static abilities; restated 2026-10-21 with the layer pass |
 
-**Notes.** `layers::land_text_lost` finds the lands whose rules text a land-subtype-setting ability takes (CR 305.7) by
-judging each land with every layer-4 effect but the setting abilities, then again with the layer-4 abilities of the lands
-found so far removed, until the set stops changing - capped at four rounds. That is exact whenever the set settles. It is
-not in a dependency loop (CR 613.8b) between a land's own layer-4 ability and a setting ability keyed on what it adds: a
-land L with "each land is an X in addition" and an ability "All Xs are Ys" depend on each other (each changes the other's
-existence or what it applies to, CR 613.8a), so they apply in timestamp order - L's ability may apply before the setting
-ability takes L's text, which the fixpoint never models, and the rounds may alternate until the cap stops on a wrong set.
-No printed card in content reaches it. The fix under way decides layer 4's order once, on the pair-based dependency
-judgment of KI-41 (`layers::through_others`, the `layer_dependencies` cache), with loops applied in timestamp order, and
-has a test card for each loop case; the cap goes with it.
+**Notes.** A controller is stored state (`Obj::controller`), settled by the core: a resolved control effect as it is created,
+and static control-changing abilities and "for as long as" conditions by `ops::settle_control` and
+`ops::end_lapsed_conditions` as each event happens (`ops::settle_at_once`) and as state-based actions are checked. The layer
+pass orders layers 3 to 7 by CR 613.8 over the whole game, but layer 2 is not in it: control is read from the state, not
+through the layers (static abilities read `obj.controller`, not a characteristic at a stage), so a control effect whose reach
+or effect another control effect changes is not ordered by 613.8 (CR 613.1b, 613.8a), and what is read between an event and
+the settling sees the old controller. The fix (the layer-pass design, `docs/engine-design.md`, "Layers 1 and 2"): a
+`controller` characteristic computed in layer 2 in the pass, read through `LayerQuery` by every "you control" reach and
+effect, and the core's settling written from it. Waits on the user's sequencing decision.
 
-**Scenarios.** None; a Rust test with test cards comes with the fix.
+**Scenarios.** None that reach the difference.
+
+### KI-64: Control-changing effects that decide one another are settled by a capped fixpoint
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine | 2026-10-17, review of the control-changing static abilities |
+
+**Notes.** `ops::settle_control` works the controllers out again while any changes, at most once per permanent, since an
+Aura's controller is whom it gives control to (gain control of a Mind Control, and the creature it enchants follows). That is
+a fixpoint, not CR 613.8's order: where two control-changing effects each decide the other (a dependency loop, 613.8b), the
+rounds can alternate until the bound stops them on an arbitrary answer, where the rules apply the loop in timestamp order.
+No card in content can take control of an Aura that gives control. Fixed with KI-63, by layer 2 in the layer pass.
+
+**Scenarios.** None.
 
 ### KI-78: The tactical bot attacks a player whom protection keeps from being dealt damage
 

@@ -1,0 +1,51 @@
+# Vesuva enters as a copy of Bot2's Urborg, Tomb of Yawgmoth (CR 707.2): the copy has Urborg's name, legendary supertype and
+# "Each land is a Swamp in addition to its other land types". Before Blood Moon every land is a Swamp. Then Blood Moon:
+# both Urborgs are nonbasic lands it makes Mountains, and each loses the abilities its rules text and its copy effect gave it
+# (CR 305.7: "any copiable effects affecting that land"; KI-51), so the Swamp-making abilities are gone - they depend on
+# Blood Moon, which changes their existence, and wait for it (CR 613.8a-b) - and no land is a Swamp. The copy effect
+# itself stays: Vesuva is still a legendary Land - Mountain named Urborg, Tomb of Yawgmoth.
+
+[Bot1 Deck]
+Mountain
+Vesuva
+Mox Ruby
+Mox Jet
+Mox Pearl
+Blood Moon
+Plains x15
+
+[Bot2 Deck]
+Island
+Urborg, Tomb of Yawgmoth
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Urborg, Tomb of Yawgmoth.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Urborg, Tomb of Yawgmoth)
+? Bot1.Battlefield.Mountain.Subtypes = Mountain; Swamp
+? Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Swamp
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Bot2.Battlefield.Island.Subtypes = Island; Swamp
+[T5 Bot1.Main1]
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate(Ability: Add {R})
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Mountain
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Supertypes = Legendary
+Bot2.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Mountain
+Bot1.Battlefield.Mountain.Subtypes = Mountain
+Bot2.Battlefield.Island.Subtypes = Island

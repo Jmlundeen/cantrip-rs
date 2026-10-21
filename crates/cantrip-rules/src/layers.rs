@@ -46,7 +46,8 @@ pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: 
     GIVERS.with(|g| g.set([ObjectId::NONE; cantrip_state::MAX_ABILITIES]));
     let watch = Watch(WATCHED.with(|w| w.replace(id)));
     WATCHING.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-    let _ = chars(cards, state, log, id);
+    // Abilities are settled by layer 6: the layers after it give and take none.
+    let _ = chars_before(cards, state, log, id, Layer::PtDefine);
     drop(watch);
     GIVERS.with(|g| g.get())
 }
@@ -128,9 +129,8 @@ pub fn token_chars(cards: &CardTable, card: CardId, copy: Option<Copiable>) -> C
 /// play it. The card is turned face up only as it is played (`ops::turn_up_to_play`); until then it has no characteristics
 /// for every other purpose. Nothing for any other object.
 ///
-/// The caches the layers keep on the epoch (`static_sources`, `lost_to_statics`, `land_text_lost`) are not keyed on it: they
-/// are about permanents, and a face-down card in exile is never a static-ability source, judged or not, so what they hold is
-/// the same either way. A judgment that would make them depend on the card would have to key them on it.
+/// The layers' pass is kept apart while a card is judged (`PassKey::judged`); the static-ability sources (`static_sources`)
+/// are not keyed on it: a face-down card in exile is never one, judged or not.
 ///
 /// It does not ask whether the player may look at the card (`seen_by`): every permission that lets a face-down card be played
 /// today comes from the effect that exiled it and let its player look. A permission to cast "spells with certain qualities
@@ -153,13 +153,41 @@ impl Drop for JudgedFaceUp<'_> {
     }
 }
 
-/// What a static ability's functions read: other objects through the layers before the one being applied.
+/// What a static ability's functions read: other objects through the layers before the one being applied, or, while a
+/// layer is being applied (`stage`), as that layer's entries applied so far leave them (CR 613.8: the order of a layer's
+/// effects is judged on the whole game as it stands at each step). A static ability applied at step `k` of a layer reads
+/// every other object at step `k`, so the reads go to strictly earlier steps and end.
 struct View<'a> {
     cards: &'a CardTable,
     state: &'a GameState,
     /// The event history (`cantrip_api::history`), which a static ability's condition may ask about the past.
     log: &'a [Record],
     stop: Layer,
+    stage: Option<Stage<'a>>,
+    /// The objects read through `chars` while a dependency is judged (CR 613.8a: applying one effect changes what another
+    /// does when it changes an object the other reads).
+    reads: Option<&'a std::cell::RefCell<Vec<ObjectId>>>,
+    /// The pass a `stage` is of, if the one asking has it at hand.
+    pass: Option<&'a Pass>,
+}
+
+impl<'a> View<'a> {
+    fn new(cards: &'a CardTable, state: &'a GameState, log: &'a [Record], stop: Layer) -> View<'a> {
+        View { cards, state, log, stop, stage: None, reads: None, pass: None }
+    }
+
+    /// An object at `stage`, in the pass at hand or the position's.
+    fn at(&self, id: ObjectId, stage: &Stage) -> Chars {
+        let owned;
+        let pass = match self.pass {
+            Some(pass) => pass,
+            None => {
+                owned = pass(self.cards, self.state, self.log);
+                &owned
+            }
+        };
+        chars_at(&Ctx { cards: self.cards, state: self.state, log: self.log, pass }, id, stage, false).chars
+    }
 }
 
 impl LayerQuery for View<'_> {
@@ -176,11 +204,38 @@ impl LayerQuery for View<'_> {
     }
 
     fn chars(&self, id: ObjectId) -> Chars {
-        chars_before(self.cards, self.state, self.log, id, self.stop)
+        if let Some(reads) = self.reads {
+            reads.borrow_mut().push(id);
+        }
+        match &self.stage {
+            Some(stage) => self.at(id, stage),
+            None => chars_before(self.cards, self.state, self.log, id, self.stop),
+        }
     }
 
+    /// Another object with its own characteristic-defining abilities of power and toughness applied (layer 7a): read at the
+    /// stage where the layer being applied is 7a or earlier - what 7a makes of an object is not yet made in an earlier layer,
+    /// and in 7a an object's own such abilities are its layer's start - and as 7a left it after.
     fn chars_with_defined_pt(&self, id: ObjectId) -> Chars {
-        chars_before(self.cards, self.state, self.log, id, Layer::PtSet)
+        if let Some(reads) = self.reads {
+            reads.borrow_mut().push(id);
+        }
+        let seventh = LAYERS.iter().position(|&l| l == Layer::PtDefine).unwrap_or(0);
+        match (self.stop.cmp(&Layer::PtDefine), &self.stage) {
+            (std::cmp::Ordering::Greater, _) => chars_before(self.cards, self.state, self.log, id, Layer::PtSet),
+            (_, Some(stage)) => self.at(id, stage),
+            (std::cmp::Ordering::Equal, None) => {
+                let start = Stage { li: seventh, entries: &[], order: &[], len: 0, extra: None, keep: true };
+                self.at(id, &start)
+            }
+            (_, None) => chars_before(self.cards, self.state, self.log, id, self.stop),
+        }
+    }
+
+    /// The words of an object's text (CR 612), a read of the object like any other.
+    fn words(&self, id: ObjectId) -> Words {
+        let _ = self.chars(id);
+        cantrip_api::words(self.state, id)
     }
 }
 
@@ -188,13 +243,108 @@ const LAYERS: [Layer; 8] =
     [Layer::Text, Layer::Type, Layer::Color, Layer::Ability, Layer::PtDefine, Layer::PtSet, Layer::PtModify, Layer::PtSwitch];
 
 /// The characteristics with every layer before `stop` applied (CR 613.1): the copiable values, then each layer's
-/// static abilities and other continuous effects in turn, in timestamp order unless one depends on another (CR 613.7, 613.8).
+/// static abilities and other continuous effects in turn, in the order the layer's pass gives them (CR 613.7, 613.8).
 pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, stop: Layer) -> Chars {
+    let layers = LAYERS.iter().take_while(|&&l| l < stop).count();
+    match object(cards, state, id) {
+        Object::Fixed(chars) => *chars,
+        Object::Bare(card, spell) => bare(cards, card, spell, stop),
+        Object::Full(o) => {
+            if layers == 0 {
+                return o.start(cards);
+            }
+            let pass = pass(cards, state, log);
+            let cx = Ctx { cards, state, log, pass: &pass };
+            // While its abilities' givers are being worked out (`ability_givers`), the object is worked out afresh, watched.
+            let watch = watched_givers(id).is_some();
+            let reads = cantrip_api::history::reads_total();
+            let chars = before(&cx, &o, layers, watch).chars;
+            // A static ability asked about the past: what the pass holds is for this history.
+            if cantrip_api::history::reads_total() != reads && pass.log.get().is_none() {
+                pass.log.set(Some(log.len()));
+            }
+            if verifying() && !watch {
+                cross_check(cards, state, log, &o, layers, &chars, pass.built_at != state.epoch);
+            }
+            chars
+        }
+    }
+}
+
+/// With `CANTRIP_VERIFY`, one answer in `CROSS_CHECK_STRIDE`, and every answer from a pass made at another `epoch`, is worked
+/// out again in a pass of its own, from nothing kept: the characteristics an object has are a function of the position,
+/// whatever was asked of the pass before.
+fn cross_check(cards: &CardTable, state: &GameState, log: &[Record], o: &ObjCtx, layers: usize, kept: &Chars, reused: bool) {
+    const CROSS_CHECK_STRIDE: u32 = 16;
+    thread_local! {
+        static COUNT: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+        static CHECKING: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+    }
+    // Every answer from a pass made at another `epoch` - kept across writes `Undo::layered` calls no change to a
+    // characteristic - is checked, so a write misclassified there is found.
+    if CHECKING.with(|c| c.get()) || (!reused && !COUNT.with(|c| c.replace(c.get().wrapping_add(1))).is_multiple_of(CROSS_CHECK_STRIDE)) {
+        return;
+    }
+    CHECKING.with(|c| c.set(true));
+    let fresh = Pass::new(PassKey { epoch: state.chars_epoch, judged: state.judged_face_up.get() }, state.epoch);
+    let again = before(&Ctx { cards, state, log, pass: &fresh }, o, layers, false).chars;
+    CHECKING.with(|c| c.set(false));
+    assert!(again == *kept, "the layers' pass kept other characteristics for {:?} than a pass of its own works out", o.id);
+}
+
+/// An object no continuous effect, counter or static ability could act on: the card's own values, made once (as
+/// `chars_before` gives them before `stop`).
+fn bare(cards: &CardTable, card: CardId, spell: bool, stop: Layer) -> Chars {
+    let mut chars = *printed(cards, card, stop > Layer::Ability);
+    chars.spell = spell;
+    chars
+}
+
+/// What an object is to the layers.
+enum Object<'a> {
+    /// Characteristics nothing changes: a card exiled face down (none, CR 406.3a), or an object that has ceased to be
+    /// itself (as it last was, CR 400.7, 608.2h, 603.10).
+    Fixed(Box<Chars>),
+    /// Nothing acts on it: its card's own values (`bare`).
+    Bare(CardId, bool),
+    Full(ObjCtx<'a>),
+}
+
+/// The object being worked out, and what about it the layers read again and again.
+struct ObjCtx<'a> {
+    id: ObjectId,
+    obj: &'a Obj,
+    card: CardId,
+    def: &'static CardDef,
+    copy: Option<&'a Copiable>,
+    room: bool,
+    spell: bool,
+    on_battlefield: bool,
+    has_counters: bool,
+    has_hone: bool,
+}
+
+impl ObjCtx<'_> {
+    /// The copiable values (CR 707.2), with the Room's doors (CR 709.5).
+    fn start(&self, cards: &CardTable) -> Chars {
+        let mut chars = match self.copy {
+            Some(c) => initial(cards, self.card, Some(c)),
+            None => *printed(cards, self.card, false),
+        };
+        chars.spell = self.spell;
+        if self.room {
+            doors(cards, self.card, self.obj.marks.doors, self.copy.is_some_and(|c| c.colors.is_some()), &mut chars);
+        }
+        chars
+    }
+}
+
+fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'a> {
     let obj = state.obj(id);
     // CR 406.3a: a card exiled face down has no characteristics, unless a player who may play it is being asked whether
     // they could (`judged_face_up`).
     if obj.face_down_card() && state.judged_face_up.get() != Some(id) {
-        return *printed(cards, cards.no_characteristics, false);
+        return Object::Fixed(Box::new(*printed(cards, cards.no_characteristics, false)));
     }
     let spell = obj.zone.is(ZoneKind::Stack);
     // The copiable values (CR 707.2): a copy effect's (layer 1a) under a face-down permanent's face-down values (layer 1b,
@@ -211,24 +361,12 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
     // A Room on the battlefield (CR 709.5): the name, mana cost and abilities of its unlocked doors alone, which no
     // card-only cache can hold, as they are the object's. In every other zone the card has both halves (CR 709.4).
     let room = def.is_room() && obj.zone.is(ZoneKind::Battlefield);
-    let start = || {
-        let mut chars = match copy {
-            Some(c) => initial(cards, card, Some(c)),
-            None => *printed(cards, card, false),
-        };
-        chars.spell = spell;
-        if room {
-            doors(cards, card, obj.marks.doors, copy.is_some_and(|c| c.colors.is_some()), &mut chars);
-        }
-        chars
-    };
-
+    let o = ObjCtx { id, obj, card, def, copy, room, spell, on_battlefield: false, has_counters: false, has_hone: false };
     // An object that has ceased to be itself - changed zones or ceased to exist - is as it last was (CR 400.7, 608.2h,
     // 603.10).
     if let Some(last) = state.last_known(id) {
-        return start().as_known(last);
+        return Object::Fixed(Box::new(o.start(cards).as_known(last)));
     }
-
     // A phased-out permanent keeps its counters and the effects on it (CR 702.26d, 702.26f), so it is worked out as it is on
     // the battlefield, though no rule asks while it is phased out: what it shows, and what it is again as it phases in.
     let on_battlefield = (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) && obj.became.is_none();
@@ -237,92 +375,375 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
     let has_effects = (on_battlefield || spell) && state.effects.iter().any(|e| e.affected == id);
     let has_counters = on_battlefield && obj.has_counters();
     let has_own = !def.statics.is_empty();
-    // The permanents (and graveyard cards) whose static abilities could apply, found once for every layer: most games
-    // look at a flag and find none.
     // `statics_seen` is set by hone counters as well (CR 122.1j), which need no card with a static ability.
-    let found = state.statics_seen.then(|| static_sources(cards, state));
-    let sources: &[(ObjectId, ZoneKind, bool)] = found.as_ref().map_or(&[], |f| &f.list);
-    // The permanents with hone counters attached to it, if any are.
-    let honed: &[ObjectId] = found.as_ref().map_or(&[], |f| &f.honed);
-    // The permanents given a static ability that affects other objects.
-    let others: &[ObjectId] = found.as_ref().map_or(&[], |f| &f.granted);
-    let has_hone = on_battlefield && honed.iter().any(|&e| state.obj(e).attached_to == Some(id));
-    // The lands an effect that sets their subtype took the abilities of their rules text from (CR 305.7), which layers 4
-    // on read: found once for every layer, and only where such an effect could be in play.
-    let text_lost: Vec<ObjectId> =
-        if stop > Layer::Type && found.as_ref().is_some_and(|f| !f.setters.is_empty()) { land_text_lost(cards, state, log) } else { Vec::new() };
-    if !has_effects && !has_counters && !has_own && sources.is_empty() && others.is_empty() && !has_hone {
+    let (any_sources, has_hone) = if state.statics_seen {
+        let found = static_sources(cards, state);
+        let has_hone = on_battlefield && found.honed.iter().any(|&e| state.obj(e).attached_to == Some(id));
+        (!found.list.is_empty() || !found.granted.is_empty(), has_hone)
+    } else {
+        (false, false)
+    };
+    if !has_effects && !has_counters && !has_own && !any_sources && !has_hone {
         if copy.is_none() && !spell && !room {
-            // Nothing acts on it: the card's own values, made once.
-            return *printed(cards, card, stop > Layer::Ability);
+            return Object::Bare(card, false);
         }
-        let mut chars = start();
-        if stop > Layer::Ability && copy.is_none() && !room {
-            let mut full = *printed(cards, card, true);
-            full.spell = spell;
-            return full;
+        if copy.is_none() && !room {
+            return Object::Bare(card, true);
         }
-        if stop > Layer::Ability && chars.is(CardType::Land) {
-            intrinsic_mana(cards, def, &mut chars);
-        }
-        if stop > Layer::Ability && chars.is(CardType::Battle) {
-            intrinsic_siege(cards, &mut chars);
-        }
-        if stop > Layer::Ability {
-            intrinsic_keyword_abilities(cards, &mut chars);
-        }
-        return chars;
     }
-    let mut chars = start();
-    let colors = copy.and_then(|c| c.colors);
-    let pt = copy.and_then(|c| c.pt);
-    // The continuous effects on it, oldest first.
-    let mut fx: Vec<ContinuousEffect> =
-        if has_effects { state.effects.iter().filter(|e| e.affected == id).copied().collect() } else { Vec::new() };
-    // CR 122.1b, 613.1f, 613.7c: the ability a keyword counter gives applies in layer 6 at the timestamp of its counters, in
-    // timestamp order with the effects there, so "loses all abilities" takes it from counters put on before it and not
-    // from those put on after.
-    if has_counters {
-        keyword_counters(state, id, obj, &mut fx);
+    Object::Full(ObjCtx { on_battlefield, has_counters, has_hone, ..o })
+}
+
+// --- The layer pass (CR 613.7, 613.8) ------------------------------------------------------------------------------------
+
+/// The layers' work for one position and history: each layer's application order, fixed once over every object (CR 613.8:
+/// "an effect is said to depend on another if ... applying the other would change ... what it applies to, or what it does
+/// to any of the things it applies to"; that is a question about the game, not about one object), and the characteristics
+/// worked out with it. Made when first needed, kept on the state (`GameState::layer_pass`) for as long as the position and
+/// history are the same, and shared by a clone until either moves on.
+struct Pass {
+    key: PassKey,
+    /// The state's `epoch` the pass was made at: a pass used at another is checked under `CANTRIP_VERIFY` (`chars_before`).
+    built_at: u64,
+    /// The length of the history it is for, once anything worked out in it has asked the past: until then it is for any.
+    log: std::cell::Cell<Option<usize>>,
+    plans: std::cell::RefCell<[Option<std::rc::Rc<Plan>>; LAYERS.len()]>,
+    /// The layers whose plans are being made, by index.
+    building: std::cell::Cell<u16>,
+    /// The layers some entry could be in, by index, once found (`layers_with_entries`).
+    occupied: std::cell::Cell<Option<u16>>,
+    /// Whether anything could take an object's abilities, once found (`strips`).
+    strips: std::cell::Cell<Option<bool>>,
+    /// A layer's order was asked for while it was being made, and answered by timestamp alone (`plan`): what is kept here
+    /// may rest on that answer, so the pass is used no more.
+    poisoned: std::cell::Cell<bool>,
+    /// Characteristics worked out: (object, layer index, step, entry applied beyond the step) to what they are there, and
+    /// (object, LAYERS.len() + layers done, 0, 0) to what they are once that many layers are done.
+    memo: std::cell::RefCell<Memo>,
+    /// For each object and layer index, the furthest step kept in `memo`.
+    furthest: std::cell::RefCell<std::collections::HashMap<(ObjectId, u8), u16, Quick>>,
+}
+
+/// A quick hash for the pass's small keys (the default one guards against inputs chosen to collide, which these are not).
+#[derive(Clone, Copy, Default)]
+struct Quick;
+
+impl std::hash::BuildHasher for Quick {
+    type Hasher = QuickHasher;
+    fn build_hasher(&self) -> QuickHasher {
+        QuickHasher(0)
     }
-    // The static abilities effects have granted it that it still has once layer 6 is done, each with its timestamp.
-    let mut granted: Vec<(u32, &'static StaticDef)> = Vec::new();
-    // The effects in parts that began to apply to it in the layers done so far (CR 613.6).
-    let mut begun = Begun { noting: found.as_ref().is_some_and(|f| f.continuing), parts: Vec::new() };
-    for layer in LAYERS {
-        if layer >= stop {
-            break;
+}
+
+struct QuickHasher(u64);
+
+impl std::hash::Hasher for QuickHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.write_u64(b as u64);
         }
-        if layer == Layer::PtDefine && has_effects {
-            granted = granted_statics(cards, obj.timestamp, &fx, &chars);
+    }
+    fn write_u8(&mut self, n: u8) {
+        self.write_u64(n as u64);
+    }
+    fn write_u16(&mut self, n: u16) {
+        self.write_u64(n as u64);
+    }
+    fn write_u32(&mut self, n: u32) {
+        self.write_u64(n as u64);
+    }
+    fn write_u64(&mut self, n: u64) {
+        self.0 = (self.0.rotate_left(5) ^ n).wrapping_mul(0x51_7c_c1_b7_27_22_0a_95);
+    }
+}
+
+impl Pass {
+    fn new(key: PassKey, built_at: u64) -> Pass {
+        Pass {
+            key,
+            built_at,
+            log: std::cell::Cell::new(None),
+            plans: std::cell::RefCell::new(Default::default()),
+            building: std::cell::Cell::new(0),
+            occupied: std::cell::Cell::new(None),
+            strips: std::cell::Cell::new(None),
+            poisoned: std::cell::Cell::new(false),
+            memo: std::cell::RefCell::new(std::collections::HashMap::default()),
+            furthest: std::cell::RefCell::new(std::collections::HashMap::default()),
         }
-        // CR 305.6: the abilities a basic land type carries follow from the types layer 4 settled, as the object's
-        // own from the start of layer 6.
-        if layer == Layer::Ability && chars.is(CardType::Land) {
-            intrinsic_mana(cards, def, &mut chars);
-        }
-        if layer == Layer::Ability && chars.is(CardType::Battle) {
-            intrinsic_siege(cards, &mut chars);
-        }
-        if has_counters && layer == Layer::PtModify {
-            counters(obj, &mut chars);
-        }
-        if has_hone && layer == Layer::PtModify {
-            hone(cards, state, log, id, honed, &mut chars);
-        }
-        // CR 613.7, 613.8: within a layer, static abilities and other continuous effects apply in timestamp order,
-        // interleaved, unless one depends on another.
-        let givers = (sources, others);
-        statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), givers, on_battlefield, layer, &fx, &granted, &text_lost, &mut begun, &mut chars);
-        if layer == Layer::Ability {
-            intrinsic_keyword_abilities(cards, &mut chars);
-            if obj.face_down && !obj.face_down_card() {
-                turn_face_up_action(cards, obj, &mut chars);
+    }
+}
+
+/// The pass's characteristics worked out, by (object, layer, step, entry beyond the step).
+type Memo = std::collections::HashMap<(ObjectId, u8, u16, u16), std::rc::Rc<Snap>, Quick>;
+
+/// What a pass is made for: the position as the layers read it (`GameState::chars_epoch`, which every write and undo that
+/// could change a characteristic moves), and the face-down card being judged as the card it is, if one is
+/// (`judged_face_up`): what is worked out while it is judged is kept apart. The history is the pass's `log`.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+struct PassKey {
+    epoch: u64,
+    judged: Option<ObjectId>,
+}
+
+/// An object's characteristics at a point of the layers, with the parts of effects (CR 613.6) that began to apply to it.
+#[derive(Clone, PartialEq)]
+struct Snap {
+    chars: Chars,
+    parts: Vec<(ObjectId, *const StaticDef)>,
+}
+
+/// One layer's entries, in timestamp order (CR 613.7), and the order the layer applies them in (CR 613.8).
+struct Plan {
+    entries: Vec<GEntry>,
+    order: Vec<u16>,
+}
+
+/// The work under way: the state, the history, and the pass for them.
+struct Ctx<'a> {
+    cards: &'a CardTable,
+    state: &'a GameState,
+    log: &'a [Record],
+    pass: &'a Pass,
+}
+
+/// A point of a layer: `len` entries of `order` applied, and then `extra` (an entry a dependency is judged with) if any.
+#[derive(Clone, Copy)]
+struct Stage<'a> {
+    li: usize,
+    entries: &'a [GEntry],
+    order: &'a [u16],
+    len: usize,
+    extra: Option<u16>,
+    /// Whether what is worked out here may be kept: not in a plan made only for a question asked while the layer's own plan
+    /// was being made.
+    keep: bool,
+}
+
+/// Whether `CANTRIP_VERIFY` is set: the layers check themselves.
+fn verifying() -> bool {
+    static VERIFY: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *VERIFY.get_or_init(|| std::env::var_os("CANTRIP_VERIFY").is_some())
+}
+
+/// The pass for this position and history, made if there is none.
+fn pass(cards: &CardTable, state: &GameState, log: &[Record]) -> std::rc::Rc<Pass> {
+    let _ = cards;
+    let key = PassKey { epoch: state.chars_epoch, judged: state.judged_face_up.get() };
+    {
+        let cache = state.layer_pass.0.borrow();
+        for kept in cache.iter() {
+            if let Ok(found) = std::rc::Rc::downcast::<Pass>(kept.clone())
+                && found.key == key
+                && !found.poisoned.get()
+                && found.log.get().is_none_or(|len| len == log.len())
+            {
+                return found;
             }
         }
     }
-    chars
+    let made = std::rc::Rc::new(Pass::new(key, state.epoch));
+    let mut cache = state.layer_pass.0.borrow_mut();
+    // Passes for other positions are of no more use; those for other lengths of the history are kept beside this one.
+    cache.retain(|kept| std::rc::Rc::downcast::<Pass>(kept.clone()).is_ok_and(|p| p.key.epoch == key.epoch));
+    // A handful at most: one per history length the layers were asked about at this position.
+    if cache.len() >= 8 {
+        cache.remove(0);
+    }
+    cache.push(made.clone());
+    made
 }
+
+/// The object with its first `layers` layers done (`chars_before` of the layer after them): from the furthest layer kept,
+/// each layer in turn, and only the last kept.
+fn before(cx: &Ctx, o: &ObjCtx, layers: usize, watch: bool) -> std::rc::Rc<Snap> {
+    let done = |layers: usize| (o.id, (LAYERS.len() + layers) as u8, 0u16, 0u16);
+    let mut from = 0;
+    let mut snap = None;
+    if !watch {
+        let memo = cx.pass.memo.borrow();
+        for k in (1..=layers).rev() {
+            if let Some(found) = memo.get(&done(k)) {
+                from = k;
+                snap = Some(found.clone());
+                break;
+            }
+        }
+    }
+    if from == layers
+        && let Some(snap) = snap
+    {
+        return snap;
+    }
+    let mut snap = snap.map_or_else(|| Snap { chars: o.start(cx.cards), parts: Vec::new() }, |s| (*s).clone());
+    for li in from..layers {
+        snap = through(cx, o, li, snap, watch);
+    }
+    let snap = std::rc::Rc::new(snap);
+    if !watch && layers > 0 {
+        cx.pass.memo.borrow_mut().insert(done(layers), snap.clone());
+    }
+    snap
+}
+
+/// The object through layer `li`, from `snap`, what the layers before it left it.
+fn through(cx: &Ctx, o: &ObjCtx, li: usize, snap: Snap, watch: bool) -> Snap {
+    let mut snap = starting(cx, o, li, snap);
+    let plan = plan(cx, li);
+    if !plan.order.is_empty() {
+        let stage = Stage { li, entries: &plan.entries, order: &plan.order, len: plan.order.len(), extra: None, keep: true };
+        apply_steps(cx, o, &stage, 0, &mut snap, watch);
+    }
+    // CR 702.147a, 116.2b: what the rules give an object for what layer 6 left it.
+    if LAYERS[li] == Layer::Ability {
+        intrinsic_keyword_abilities(cx.cards, &mut snap.chars);
+        if o.obj.face_down && !o.obj.face_down_card() {
+            turn_face_up_action(cx.cards, o.obj, &mut snap.chars);
+        }
+    }
+    snap
+}
+
+/// Any object at `stage` of its layer (what `View::chars` reads while the layer is applied or judged).
+fn chars_at(cx: &Ctx, id: ObjectId, stage: &Stage, watch: bool) -> std::rc::Rc<Snap> {
+    match object(cx.cards, cx.state, id) {
+        Object::Fixed(chars) => std::rc::Rc::new(Snap { chars: *chars, parts: Vec::new() }),
+        Object::Bare(card, spell) => std::rc::Rc::new(Snap { chars: bare(cx.cards, card, spell, LAYERS[stage.li]), parts: Vec::new() }),
+        Object::Full(o) => at(cx, &o, stage, watch),
+    }
+}
+
+/// The object at `stage`: as the layers before left it, with what the rules give it at the layer's start and its own
+/// characteristic-defining abilities (CR 613.3), and then the entries of the stage that apply to it, each as it stands.
+fn at(cx: &Ctx, o: &ObjCtx, stage: &Stage, watch: bool) -> std::rc::Rc<Snap> {
+    let keep = stage.keep && !watch;
+    let key = |len: usize, extra: Option<u16>| (o.id, stage.li as u8, len as u16, extra.map_or(0, |e| e + 1));
+    if keep && let Some(found) = cx.pass.memo.borrow().get(&key(stage.len, stage.extra)) {
+        return found.clone();
+    }
+    // From the furthest step kept no further than the stage, or the layer's start.
+    let mut from = 0;
+    let mut snap = None;
+    if keep {
+        let furthest = cx.pass.furthest.borrow().get(&(o.id, stage.li as u8)).copied();
+        if let Some(len) = furthest {
+            let len = (len as usize).min(stage.len);
+            if let Some(found) = cx.pass.memo.borrow().get(&key(len, None)) {
+                from = len;
+                snap = Some((**found).clone());
+            }
+        }
+    }
+    let mut snap = match snap {
+        Some(snap) => snap,
+        None => {
+            let start = starting(cx, o, stage.li, (*before(cx, o, stage.li, watch)).clone());
+            if keep {
+                cx.pass.memo.borrow_mut().insert(key(0, None), std::rc::Rc::new(start.clone()));
+                cx.pass.furthest.borrow_mut().entry((o.id, stage.li as u8)).or_insert(0);
+            }
+            start
+        }
+    };
+    // Every step on the way is kept, so a later stage starts where this one ends.
+    if keep && stage.extra.is_none() {
+        for j in from..stage.len {
+            let here = Stage { len: j + 1, ..*stage };
+            apply_steps(cx, o, &Stage { len: j + 1, ..*stage }, j, &mut snap, watch);
+            let _ = here;
+            cx.pass.memo.borrow_mut().insert(key(j + 1, None), std::rc::Rc::new(snap.clone()));
+        }
+        let mut furthest = cx.pass.furthest.borrow_mut();
+        let kept = furthest.entry((o.id, stage.li as u8)).or_insert(0);
+        *kept = (*kept).max(stage.len as u16);
+        drop(furthest);
+        return cx.pass.memo.borrow().get(&key(stage.len, None)).cloned().unwrap_or_else(|| std::rc::Rc::new(snap));
+    }
+    apply_steps(cx, o, stage, from, &mut snap, watch);
+    let snap = std::rc::Rc::new(snap);
+    if keep {
+        cx.pass.memo.borrow_mut().insert(key(stage.len, stage.extra), snap.clone());
+    }
+    snap
+}
+/// Applies the entries of `stage` from step `from` on, and its extra entry, to the object.
+fn apply_steps(cx: &Ctx, o: &ObjCtx, stage: &Stage, from: usize, snap: &mut Snap, watch: bool) {
+    // A card outside the game is affected by nothing but its own characteristic-defining abilities (CR 400.11c).
+    if o.obj.zone.is(ZoneKind::Sideboard) {
+        return;
+    }
+    let noting = cx.state.statics_seen && static_sources(cx.cards, cx.state).continuing;
+    for j in from..stage.len {
+        let entry = &stage.entries[stage.order[j] as usize];
+        let here = Stage { len: j, extra: None, ..*stage };
+        apply_entry(cx, o, entry, &here, snap, noting, watch);
+    }
+    if let Some(extra) = stage.extra {
+        let here = Stage { extra: None, ..*stage };
+        apply_entry(cx, o, &stage.entries[extra as usize], &here, snap, noting, false);
+    }
+}
+
+/// The object as the layers before `li` leave it (`snap`), with what the rules give it as layer `li` begins (a basic land type's
+/// mana ability and a Siege's defeat ability in layer 6, counters in 7c) and its own characteristic-defining abilities of the
+/// layer, which apply first (CR 613.3).
+fn starting(cx: &Ctx, o: &ObjCtx, li: usize, mut snap: Snap) -> Snap {
+    let layer = LAYERS[li];
+    let chars = &mut snap.chars;
+    // CR 305.6: the abilities a basic land type carries follow from the types layer 4 settled, as the object's
+    // own from the start of layer 6.
+    if layer == Layer::Ability && chars.is(CardType::Land) {
+        intrinsic_mana(cx.cards, o.def, chars);
+    }
+    if layer == Layer::Ability && chars.is(CardType::Battle) {
+        intrinsic_siege(cx.cards, chars);
+    }
+    if o.has_counters && layer == Layer::PtModify {
+        counters(o.obj, chars);
+    }
+    if o.has_hone && layer == Layer::PtModify {
+        let honed = static_sources(cx.cards, cx.state).honed.clone();
+        hone(cx.cards, cx.state, cx.log, o.id, &honed, chars);
+    }
+    own_statics(cx, o, layer, chars);
+    snap
+}
+
+/// The object's own characteristic-defining abilities of `layer` (CR 604.3, 613.3): they apply first, and depend only on
+/// one another (CR 613.8a(c)).
+fn own_statics(cx: &Ctx, o: &ObjCtx, layer: Layer, chars: &mut Chars) {
+    let mut own = o.def.statics.iter().filter(|s| s.own && s.layer == layer).peekable();
+    if own.peek().is_none() {
+        return;
+    }
+    // CR 707.9d: a copy that states its colors or its power and toughness does not copy a characteristic-defining
+    // ability that would define them.
+    let colors = o.copy.and_then(|c| c.colors).is_some();
+    let pt = o.copy.and_then(|c| c.pt).is_some();
+    if (layer == Layer::Color && colors) || (layer == Layer::PtDefine && pt) {
+        return;
+    }
+    let view = View::new(cx.cards, cx.state, cx.log, layer);
+    // CR 604.3, 613.1f: its own characteristic-defining abilities are static abilities, so layer 6 takes them away, and the layers
+    // after it (a power and toughness one, 613.4a) find them gone. Those of layers 4 and 5 were applied before, and stay (CR 613.6).
+    // CR 305.7: a land whose subtype an effect sets has lost them in layer 4, after its own characteristic-defining
+    // abilities of layer 4 applied first (CR 613.3).
+    let lost = (layer >= Layer::Ability && chars.lost_all) || (layer > Layer::Type && chars.text_lost);
+    for st in own {
+        if lost {
+            if let Some((power, toughness)) = st.lost_pt {
+                chars.power = Some(power);
+                chars.toughness = Some(toughness);
+            }
+        } else {
+            (st.apply)(&view, o.id, chars);
+        }
+    }
+}
+
 
 /// Each kind of keyword counter on the object (CR 122.1b) as the layer-6 effect it is, "gains [keyword]", at the timestamp
 /// of its counters (CR 613.7c), put among the effects in timestamp order.
@@ -561,6 +982,8 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         abilities,
         no_cost,
         name_set: false,
+        lost_all: false,
+        text_lost: false,
     };
     changeling(&mut chars);
     chars
@@ -661,111 +1084,13 @@ fn printed(cards: &CardTable, card: CardId, rules: bool) -> &Chars {
     })
 }
 
-/// Applies the continuous effects of `layer` to `id` (CR 613.1): its own characteristic-defining abilities first (CR
-/// 613.3), then the effects of resolved spells and abilities, the static abilities effects granted it, those of
-/// permanents (and cards that function elsewhere) and those effects granted permanents to give others, in timestamp order
-/// (CR 613.7) unless one depends on another (CR 613.8, `by_dependency`).
-fn statics(
-    cards: &CardTable,
-    state: &GameState,
-    log: &[Record],
-    id: ObjectId,
-    def: &CardDef,
-    overrides: (bool, bool),
-    (sources, others): (&[(ObjectId, ZoneKind, bool)], &[ObjectId]),
-    on_battlefield: bool,
-    layer: Layer,
-    fx: &[ContinuousEffect],
-    granted: &[(u32, &'static StaticDef)],
-    text_lost: &[ObjectId],
-    begun: &mut Begun,
-    chars: &mut Chars,
-) {
-    let view = View { cards, state, log, stop: layer };
-    // From layer 6 on, the permanents a "loses all abilities" static ability has taken everything from (CR 613.1f).
-    let stripped = if layer >= Layer::Ability { lost_to_statics(cards, state, log) } else { Stripped::default() };
-    // From layer 4 on, the lands an effect that sets their subtype took the abilities of their rules text from (CR 305.7).
-    let text_lost = if layer >= Layer::Type { text_lost } else { &[] };
-    // CR 707.9d: a copy that states its colors or its power and toughness does not copy a characteristic-defining
-    // ability that would define them.
-    let overridden = (layer == Layer::Color && overrides.0) || (layer == Layer::PtDefine && overrides.1);
-    // CR 604.3, 613.1f: its own characteristic-defining abilities are static abilities, so layer 6 takes them away, and the layers
-    // after it (a power and toughness one, 613.4a) find them gone. Those of layers 4 and 5 were applied before, and stay (CR 613.6).
-    // CR 613.8a(c): one never depends on an effect that is not from a characteristic-defining ability, nor that on it.
-    for st in def.statics.iter().filter(|s| s.own && s.layer == layer) {
-        if overridden {
-            continue;
-        }
-        // CR 305.7: a land whose subtype an effect sets has lost them in layer 4, after its own characteristic-defining
-        // abilities of layer 4 applied first (CR 613.3).
-        if (layer >= Layer::Ability && (state.lost_all_abilities_to_an_effect(id) || stripped.lost.contains(&id)))
-            || (layer > Layer::Type && text_lost.contains(&id))
-        {
-            if let Some((power, toughness)) = st.lost_pt {
-                chars.power = Some(power);
-                chars.toughness = Some(toughness);
-            }
-        } else {
-            (st.apply)(&view, id, chars);
-        }
-    }
-    // A card outside the game is affected by nothing but its own characteristic-defining abilities (CR 400.11c).
-    if state.obj(id).zone.is(ZoneKind::Sideboard) {
-        return;
-    }
-    // The static abilities effects gave permanents that affect other objects, in their timestamp order (CR 613.7a).
-    let mut given: Vec<(u32, ObjectId, &'static StaticDef)> =
-        if on_battlefield { others.iter().flat_map(|&holder| granted_to_others(cards, state, log, holder, layer)).collect() } else { Vec::new() };
-    given.sort_by_key(|&(timestamp, _, _)| timestamp);
-    let merge = Merge::new(cards, state, layer, on_battlefield, fx, granted, &given, sources, &stripped, &begun.parts, text_lost);
-    let mut noted = Noted { on: begun.noting, parts: Vec::new() };
-    in_order(&view, id, merge, &mut noted, chars);
-    begun.parts.append(&mut noted.parts);
-}
-
-/// The parts of effects in parts (`StaticDef::continues`, CR 613.6) that began to apply to the object being worked out, in
-/// the layers done so far: each static ability's source and the part that applied. "If an effect starts to apply in one
-/// layer ..., it will continue to be applied to the same set of objects in each other applicable layer": a later part
-/// applies to the object exactly when its first part did, as this object's characteristics were being worked out - after
-/// the effects before it in that layer and as the dependency system ordered them - and so to the objects that part's
-/// words named then, though they no longer fit those words ("all noncreature artifacts become 2/2 artifact creatures",
-/// CR 613.6's third example). Noted only while some static-ability source has an effect in parts (`noting`).
-struct Begun {
-    noting: bool,
-    parts: Vec<(ObjectId, *const StaticDef)>,
-}
-
-/// What one layer notes for `Begun`: the static abilities that applied to the object in it.
-struct Noted {
-    on: bool,
-    parts: Vec<(ObjectId, *const StaticDef)>,
-}
-
-impl Noted {
-    /// Applies `entry` to the object, noting a static ability that applied to it.
-    fn apply(&mut self, entry: &Entry, view: &View, id: ObjectId, chars: &mut Chars) {
-        match *entry {
-            Entry::Static(source, st) if self.on => {
-                if (st.affects)(view, source, id, chars) {
-                    watching_givers(id, source, chars, |chars| apply_static(st, view, source, id, chars));
-                    self.parts.push((source, st));
-                }
-            }
-            _ => entry.apply(view, id, chars),
-        }
-    }
-
-    /// Applies `entry`, which `Entry::reach` has said applies to the object.
-    fn apply_reached(&mut self, entry: &Entry, view: &View, id: ObjectId, chars: &mut Chars) {
-        entry.apply_reached(view, id, chars);
-        if let Entry::Static(source, st) = *entry
-            && self.on
-        {
-            self.parts.push((source, st));
-        }
-    }
-}
-
+/// The parts of effects in parts (`StaticDef::continues`, CR 613.6) that began to apply to an object are kept with it
+/// (`Snap::parts`): each static ability's source and the part that applied. "If an effect starts to apply in one layer ...,
+/// it will continue to be applied to the same set of objects in each other applicable layer": a later part applies to the
+/// object exactly when its first part did, and so to the objects that part's words named then, though they no longer fit
+/// those words ("all noncreature artifacts become 2/2 artifact creatures", CR 613.6's third example). Noted only while some
+/// static-ability source has an effect in parts (`StaticSources::continuing`).
+///
 /// A static ability of `source` applied to `id`: its effect, or its effect on that object (`StaticDef::apply_each`).
 fn apply_static(st: &StaticDef, view: &View, source: ObjectId, id: ObjectId, chars: &mut Chars) {
     match st.apply_each {
@@ -782,451 +1107,849 @@ fn first_part(statics: &[StaticDef], mut i: usize) -> usize {
     i
 }
 
-thread_local! {
-    /// Lists of a layer's entries to reuse: working out one object's layer asks for others' (`View::chars`), each with its
-    /// own list, so they are taken and given back rather than shared.
-    static ENTRIES: std::cell::RefCell<Vec<Vec<Entry>>> = const { std::cell::RefCell::new(Vec::new()) };
-    /// Lists of `in_order`'s snapshots to reuse, as `ENTRIES`.
-    static SNAPSHOTS: std::cell::RefCell<Vec<Vec<(usize, Chars)>>> = const { std::cell::RefCell::new(Vec::new()) };
+/// One continuous effect of a layer, over the whole game.
+#[derive(Clone, Copy)]
+struct GEntry {
+    kind: GKind,
+    /// Its timestamp (CR 613.7), and which kind of entry it is at that timestamp: a permanent's static abilities, then
+    /// those effects granted others, then resolved effects, then abilities granted an object itself (CR 613.7n: an object's
+    /// own static ability is earlier than an effect created with it).
+    timestamp: u32,
+    seq: u8,
 }
 
-/// Applies a layer's effects (`merge`) to the object in timestamp order (CR 613.7), watching for a dependency (CR 613.8a):
-/// each time an effect does something to the object, the earlier effects whose reach can change are asked again whether they
-/// apply to it. If one's answer changed, it depends on the later effect, and the layer is worked out again from the start
-/// by the dependency system (`by_dependency`). An earlier effect that applied is asked twice: of the object as it is now,
-/// and of the object as it found it with the later effect applied - its own application can hide the change, as Life and
-/// Limb's making a Forest a Saproling hides that Blood Moon's makes it no Forest (CR 613.8a(b): "applying the other would
-/// change ... what it applies to"). A layer with no effect whose reach can change before one that does something costs
-/// what timestamp order costs; an anthem with the pumps after it, a look at the anthem after each.
-fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, chars: &mut Chars) {
-    // None, or one: nothing to order.
-    let Some(first) = merge.next() else { return };
-    let Some(second) = merge.next() else {
-        noted.apply(&first, view, id, chars);
-        return;
-    };
-    let mut entries = ENTRIES.with(|pool| pool.borrow_mut().pop()).unwrap_or_default();
-    entries.clear();
-    entries.push(first);
-    entries.push(second);
-    while let Some(e) = merge.next() {
-        entries.push(e);
-    }
-    // Nothing whose reach can change: timestamp order.
-    if !entries.iter().any(Entry::conditional) {
-        for entry in &entries {
-            entry.apply(view, id, chars);
+#[derive(Clone, Copy)]
+enum GKind {
+    /// A static ability of `source` (its own, or one an effect granted it) that applies to the objects it says; `first` is
+    /// the first part of its effect (CR 613.6), itself unless it `continues` one, and then it applies to the objects that
+    /// part applied to (`Snap::parts`), whatever its words say of them by now.
+    Static { source: ObjectId, st: &'static StaticDef, first: *const StaticDef, continues: bool },
+    /// A static ability `holder` was given that affects other objects (CR 613.1f, 613.7a). `ability` is the ability, where
+    /// it was given in this very layer (layer 6): it applies only once `holder` has it.
+    Given { holder: ObjectId, st: &'static StaticDef, ability: Option<AbilityRef> },
+    /// A resolved spell's or ability's (CR 611.2), which names the object; a keyword counter's (CR 122.1b, 613.7c).
+    Effect(ContinuousEffect),
+    /// A static ability `holder` was granted that applies to it alone (CR 613.7a), with it as its source; `ability` as for
+    /// `Given`.
+    Granted { holder: ObjectId, st: &'static StaticDef, ability: Option<AbilityRef> },
+}
+
+impl GEntry {
+    /// What it says, for a message.
+    fn text(&self) -> &'static str {
+        match self.kind {
+            GKind::Static { st, .. } | GKind::Given { st, .. } | GKind::Granted { st, .. } => st.text,
+            GKind::Effect(_) => "a resolved effect",
         }
-        ENTRIES.with(|pool| pool.borrow_mut().push(entries));
+    }
+
+    /// The object whose effect it is, for the abilities' givers (`ability_givers`).
+    fn giver(&self) -> ObjectId {
+        match self.kind {
+            GKind::Static { source, .. } => source,
+            GKind::Given { holder, .. } | GKind::Granted { holder, .. } => holder,
+            GKind::Effect(e) => e.source,
+        }
+    }
+
+    /// Whether another effect could change whether it applies to an object or what it does there (CR 613.8a(b)), which is
+    /// what the dependency system judges: a static ability's reach and effect ("other creatures", "each land", "+1/+1 for
+    /// each artifact"), and the resolved effects that do something only to an object that has something - a text change,
+    /// only where its word is (CR 612.1); "all creature types" and a creature type set, only to a creature or Kindred (CR
+    /// 205.3d). Every other resolved effect names the objects it applies to (CR 611.2c) and does the same to each whatever
+    /// was done before it. Every static ability is judged - a later part of an effect too, which applies to the set its first
+    /// part did (CR 613.6) but may do what other objects decide, and an ability granted an object, to it alone.
+    fn dependent(&self) -> bool {
+        match self.kind {
+            // A later part applies to the set its first part did (CR 613.6), but what it does may still depend on others.
+            GKind::Static { .. } | GKind::Given { .. } | GKind::Granted { .. } => true,
+            GKind::Effect(e) => matches!(e.kind, EffectKind::ChangeText { .. } | EffectKind::AddAllCreatureTypes | EffectKind::SetCreatureType(_)),
+        }
+    }
+}
+
+/// The plan of layer `li`, made if there is none. A layer is made once per pass; a question that needs the very layer
+/// being made (an ability's effect reading what that layer makes of an object) is a bug: `CANTRIP_VERIFY` stops at it, and
+/// otherwise the layer is made again in a pass of its own, and the pass that asked is used no more.
+fn plan(cx: &Ctx, li: usize) -> std::rc::Rc<Plan> {
+    if let Some(plan) = cx.pass.plans.borrow()[li].clone() {
+        return plan;
+    }
+    let bit = 1u16 << li;
+    if cx.pass.building.get() & bit != 0 {
+        assert!(!verifying(), "the layers asked for layer {:?} while making its order", LAYERS[li]);
+        // Made again, exactly, in a pass of its own; this one may rest on what was asked in the middle, and is used no more.
+        cx.pass.poisoned.set(true);
+        thread_local! {
+            static AGAIN: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+        }
+        assert!(!AGAIN.with(|a| a.replace(true)), "the layers asked for layer {:?} while making its order, twice", LAYERS[li]);
+        let fresh = Pass::new(cx.pass.key, cx.state.epoch);
+        let plan = plan(&Ctx { pass: &fresh, ..*cx }, li);
+        AGAIN.with(|a| a.set(false));
+        return plan;
+    }
+    if layers_with_entries(cx) & bit == 0 {
+        let plan = std::rc::Rc::new(Plan { entries: Vec::new(), order: Vec::new() });
+        cx.pass.plans.borrow_mut()[li] = Some(plan.clone());
+        return plan;
+    }
+    cx.pass.building.set(cx.pass.building.get() | bit);
+    let mut entries = collect_entries(cx, li);
+    let order = order_entries(cx, li, &mut entries);
+    cx.pass.building.set(cx.pass.building.get() & !bit);
+    let plan = std::rc::Rc::new(Plan { entries, order });
+    cx.pass.plans.borrow_mut()[li] = Some(plan.clone());
+    plan
+}
+
+/// The layers some entry could be in, by index: those of the static abilities of every source, of the resolved effects, of
+/// keyword counters (layer 6), and of granted static abilities (layers 7a on, where they are worked out). Found once a pass.
+fn layers_with_entries(cx: &Ctx) -> u16 {
+    if let Some(mask) = cx.pass.occupied.get() {
+        return mask;
+    }
+    let (cards, state) = (cx.cards, cx.state);
+    let bit = |layer: Layer| LAYERS.iter().position(|&l| l == layer).map_or(0, |i| 1u16 << i);
+    let mut mask = 0u16;
+    let mut granting = false;
+    if state.statics_seen {
+        let found = static_sources(cards, state);
+        for &(source, _, _) in &found.list {
+            for st in cards.get(cards.current(state.obj(source))).statics {
+                mask |= bit(st.layer);
+            }
+        }
+        granting = !found.granted.is_empty();
+    }
+    // Static abilities a static ability gives (CR 613.1f) apply from layer 6 on.
+    granting |= state.statics_seen && static_grants_present(cards, state);
+    if granting {
+        mask |= bit(Layer::Ability);
+    }
+    for e in &state.effects {
+        if let Some(layer) = effect_layer(e.kind) {
+            mask |= bit(layer);
+        }
+        granting |= matches!(e.kind, EffectKind::AddAbility(_));
+    }
+    if granting {
+        for layer in [Layer::PtDefine, Layer::PtSet, Layer::PtModify, Layer::PtSwitch] {
+            mask |= bit(layer);
+        }
+    }
+    if state.battlefield().iter().chain(state.zone(Zone::PHASED_OUT)).any(|&id| state.obj(id).has_counters()) {
+        mask |= bit(Layer::Ability);
+    }
+    cx.pass.occupied.set(Some(mask));
+    mask
+}
+
+/// Every continuous effect of layer `li` over the whole game, in timestamp order (CR 613.7): the static abilities of the
+/// permanents (and cards that function elsewhere) that have them still, those effects granted permanents to give others,
+/// resolved effects and keyword counters, and those effects granted objects themselves.
+fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
+    let layer = LAYERS[li];
+    let (cards, state) = (cx.cards, cx.state);
+    let mut entries = Vec::new();
+    if state.statics_seen {
+        let (list, granted_holders) = {
+            let found = static_sources(cards, state);
+            (found.list.clone(), found.granted.clone())
+        };
+        // Whether each still exists - its source has not lost it - is judged as the layer applies (`exists`).
+        for (source, from, _) in list {
+            let statics = cards.get(cards.current(state.obj(source))).statics;
+            for (i, st) in statics.iter().enumerate() {
+                if st.own || st.layer != layer || st.from != from {
+                    continue;
+                }
+                let first = &statics[first_part(statics, i)];
+                let kind = GKind::Static { source, st, first, continues: st.continues };
+                entries.push(GEntry { kind, timestamp: state.obj(source).timestamp, seq: 0 });
+            }
+        }
+        // The static abilities effects gave permanents that affect other objects, in their timestamp order (CR 613.7a).
+        for holder in granted_holders {
+            for (timestamp, holder, st) in granted_to_others(cards, state, cx.log, holder, layer) {
+                entries.push(GEntry { kind: GKind::Given { holder, st, ability: None }, timestamp, seq: 1 });
+            }
+        }
+    }
+    for e in state.effects.iter().filter(|e| effect_layer(e.kind) == Some(layer)) {
+        entries.push(GEntry { kind: GKind::Effect(*e), timestamp: e.timestamp, seq: 2 });
+    }
+    // CR 122.1b, 613.1f, 613.7c: the ability a keyword counter gives applies in layer 6 at the timestamp of its counters, in
+    // timestamp order with the effects there, so "loses all abilities" takes it from counters put on before it and not from
+    // those put on after.
+    if layer == Layer::Ability {
+        for zone in [Zone::BATTLEFIELD, Zone::PHASED_OUT] {
+            for &id in state.zone(zone) {
+                let obj = state.obj(id);
+                if obj.became.is_none() && obj.has_counters() {
+                    let mut fx = Vec::new();
+                    keyword_counters(state, id, obj, &mut fx);
+                    for e in fx {
+                        entries.push(GEntry { kind: GKind::Effect(e), timestamp: e.timestamp, seq: 2 });
+                    }
+                }
+            }
+        }
+    }
+    // The static abilities effects have granted objects that they still have once layer 6 is done, each with its timestamp
+    // (CR 613.7a), applying to the object alone.
+    if layer >= Layer::PtDefine {
+        let mut holders: Vec<ObjectId> = Vec::new();
+        for e in &state.effects {
+            if let EffectKind::AddAbility(ability) = e.kind
+                && matches!(cards.ability(ability), AbilityDef::Static(s) if s.own && s.layer == layer)
+                && !holders.contains(&e.affected)
+            {
+                holders.push(e.affected);
+            }
+        }
+        for holder in holders {
+            let obj = state.obj(holder);
+            let on_battlefield = (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) && obj.became.is_none();
+            if !(on_battlefield || obj.zone.is(ZoneKind::Stack)) || state.last_known(holder).is_some() {
+                continue;
+            }
+            let fx: Vec<ContinuousEffect> = state.effects.iter().filter(|e| e.affected == holder).copied().collect();
+            let chars = chars_before(cards, state, cx.log, holder, Layer::PtDefine);
+            for (timestamp, st) in granted_statics(cards, obj.timestamp, &fx, &chars) {
+                if st.layer == layer {
+                    entries.push(GEntry { kind: GKind::Granted { holder, st, ability: None }, timestamp, seq: 3 });
+                }
+            }
+        }
+        // The static abilities a static ability gave a permanent (CR 613.1f), each at the later of the permanent's
+        // timestamp and its giver's (CR 613.7a): found among the abilities each permanent has once layer 6 is done, where
+        // some static ability could give abilities.
+        if static_grants_present(cards, state) {
+            for &holder in state.battlefield() {
+                let chars = chars_before(cards, state, cx.log, holder, Layer::PtDefine);
+                let statics: Vec<(usize, AbilityRef, &'static StaticDef)> = chars
+                    .abilities
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(slot, a)| match a.map(|a| (a, cards.ability(a))) {
+                        Some((a, AbilityDef::Static(st))) if st.layer == layer => Some((slot, a, st)),
+                        _ => None,
+                    })
+                    .collect();
+                if statics.is_empty() {
+                    continue;
+                }
+                let by_effect =
+                    |a: AbilityRef| state.effects.iter().any(|e| e.affected == holder && e.kind == EffectKind::AddAbility(a));
+                let mut givers = None;
+                for (slot, ability, st) in statics {
+                    if by_effect(ability) {
+                        continue;
+                    }
+                    let givers = *givers.get_or_insert_with(|| ability_givers(cards, state, cx.log, holder));
+                    if givers[slot] == ObjectId::NONE {
+                        continue;
+                    }
+                    let timestamp = state.obj(holder).timestamp.max(state.obj(givers[slot]).timestamp);
+                    let kind = if st.own { GKind::Granted { holder, st, ability: None } } else { GKind::Given { holder, st, ability: None } };
+                    entries.push(GEntry { kind, timestamp, seq: if st.own { 3 } else { 1 } });
+                }
+            }
+        }
+    }
+    entries.sort_by_key(|e| (e.timestamp, e.seq));
+    entries
+}
+
+/// Whether `entry`, at `stage`, applies to the object as `snap` has it.
+fn applies(view: &View, o: &ObjCtx, entry: &GEntry, snap: &Snap) -> bool {
+    let id = o.id;
+    match entry.kind {
+        GKind::Static { source, st, first, continues } => {
+            (o.on_battlefield || st.everywhere)
+                && if continues {
+                    snap.parts.iter().any(|&(s, part)| s == source && std::ptr::eq(part, first))
+                } else {
+                    exists(view, source, id, snap) && (st.affects)(view, source, id, &snap.chars)
+                }
+        }
+        GKind::Given { holder, st, ability } => {
+            o.on_battlefield
+                && ability.is_none_or(|a| view.chars(holder).abilities.contains(&Some(a)))
+                && (st.affects)(view, holder, id, &snap.chars)
+        }
+        GKind::Effect(e) => {
+            e.affected == id
+                && (o.on_battlefield || o.spell)
+                && match e.kind {
+                    EffectKind::ChangeText { from: Word::Subtype(from), .. } => {
+                        let chars = &snap.chars;
+                        (chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling)))
+                            || Keyword::landwalk(from).is_some_and(|walk| chars.keywords.has(walk))
+                    }
+                    EffectKind::ChangeText { from: Word::Color(from), .. } => {
+                        snap.chars.hexproof_from.colors().has(from) || snap.chars.protection.has(from)
+                    }
+                    EffectKind::AddAllCreatureTypes | EffectKind::SetCreatureType(_) => {
+                        snap.chars.is(CardType::Creature) || snap.chars.is(CardType::Kindred)
+                    }
+                    _ => true,
+                }
+        }
+        GKind::Granted { holder, ability, .. } => holder == id && ability.is_none_or(|a| snap.chars.abilities.contains(&Some(a))),
+    }
+}
+
+/// Whether a static ability of `source` that has not begun to apply (CR 613.6) exists at this stage: its source has not lost
+/// it, to "loses all abilities" in layer 6 (CR 613.1f), or with the rest of its rules text to another's effect setting its
+/// land subtypes in layer 4 (CR 305.7, including what a copy effect gave it). Each of those changes the existence of the
+/// abilities it takes (CR 613.8a), so it is judged where the layer stands: one that applies first takes them, one that
+/// applies after them does not undo what they did. Asked of the source as it stands at the stage (a read, for the
+/// dependency system); free where nothing on the battlefield or among the effects takes abilities.
+fn exists(view: &View, source: ObjectId, id: ObjectId, snap: &Snap) -> bool {
+    if view.stop < Layer::Type || !strips(view) {
+        return true;
+    }
+    let chars = if source == id { snap.chars } else { view.chars(source) };
+    !(chars.text_lost || (view.stop >= Layer::Ability && chars.lost_all))
+}
+
+/// Whether anything in the game could take an object's abilities: a "loses all abilities" static ability or one that sets
+/// land subtypes among the static-ability sources, or a resolved "loses all abilities".
+fn strips(view: &View) -> bool {
+    match view.pass {
+        Some(pass) => {
+            if let Some(found) = pass.strips.get() {
+                return found;
+            }
+            let found = strippers_present(view.cards, view.state);
+            pass.strips.set(Some(found));
+            found
+        }
+        None => strippers_present(view.cards, view.state),
+    }
+}
+
+fn strippers_present(cards: &CardTable, state: &GameState) -> bool {
+    state.effects.iter().any(|e| e.kind == EffectKind::LoseAllAbilities) || (state.statics_seen && abilities_may_be_lost(cards, state))
+}
+
+/// What `entry` does to the object, which it applies to.
+fn apply_raw(view: &View, layer: Layer, id: ObjectId, entry: &GEntry, chars: &mut Chars) {
+    match entry.kind {
+        GKind::Static { source, st, .. } => apply_static(st, view, source, id, chars),
+        GKind::Given { holder, st, .. } => apply_static(st, view, holder, id, chars),
+        GKind::Effect(e) => apply_effect(&e, layer, chars),
+        GKind::Granted { st, .. } => (st.apply)(view, id, chars),
+    }
+}
+
+/// Applies `entry` at `stage` to the object, if it applies to it, noting a static ability that began to apply, and its
+/// giver while the object's abilities' givers are being worked out (`watch`).
+fn apply_entry(cx: &Ctx, o: &ObjCtx, entry: &GEntry, stage: &Stage, snap: &mut Snap, noting: bool, watch: bool) {
+    let view = View { stage: Some(*stage), pass: Some(cx.pass), ..View::new(cx.cards, cx.state, cx.log, LAYERS[stage.li]) };
+    if !applies(&view, o, entry, snap) {
         return;
     }
-    let before = *chars;
-    let givers_before = watched_givers(id);
-    let noted_before = noted.parts.len();
-    // Bit `k` of `conditional`: the `k`th entry's reach can change; of `reached`: it applied when its turn came.
-    let mut conditional = 0u64;
-    let mut reached = 0u64;
-    // The object as each conditional entry that applied found it.
-    let mut found = SNAPSHOTS.with(|pool| pool.borrow_mut().pop()).unwrap_or_default();
-    found.clear();
-    let depends = 'apply: {
-        for (k, entry) in entries.iter().enumerate() {
-            if k == 64 {
-                break 'apply true;
-            }
-            let reach = entry.reach(view, id, chars);
-            if entry.conditional() {
-                conditional |= 1 << k;
-                reached |= u64::from(reach) << k;
-            }
-            if reach {
-                // And those that applied, of the object as they found it with this one applied.
-                for &(a, as_found) in found.iter() {
-                    let mut then = as_found;
-                    entry.apply_raw(view, id, &mut then);
-                    if !entries[a].reach(view, id, &then) {
-                        break 'apply true;
+    let layer = LAYERS[stage.li];
+    let text_lost = snap.chars.text_lost;
+    if watch {
+        watching_givers(o.id, entry.giver(), &mut snap.chars, |chars| apply_raw(&view, layer, o.id, entry, chars));
+    } else {
+        apply_raw(&view, layer, o.id, entry, &mut snap.chars);
+    }
+    // A land whose own ability sets its own land subtypes ("this land is the chosen type": Multiversal Passage) keeps that
+    // ability applying, and loses no rules text to it: it is another's effect that takes a land's text (CR 305.7).
+    if let GKind::Static { source, st, .. } = entry.kind
+        && st.sets_land_subtypes
+        && source == o.id
+    {
+        snap.chars.text_lost = text_lost;
+    }
+    if noting && let GKind::Static { source, st, continues: false, .. } = entry.kind {
+        snap.parts.push((source, st));
+    }
+}
+
+/// The objects an entry could apply to: a static ability's, every permanent (a phased-out one is treated as though it
+/// doesn't exist, CR 702.26b), and for one that functions everywhere, every object in a zone of the game; a resolved
+/// effect's, the object it names; a granted ability's, its holder.
+fn candidates(cx: &Ctx, entry: &GEntry) -> Vec<ObjectId> {
+    let state = cx.state;
+    match entry.kind {
+        GKind::Static { st, .. } if st.everywhere => state
+            .zones
+            .iter()
+            .flatten()
+            .copied()
+            .filter(|&id| {
+                let obj = state.obj(id);
+                !obj.zone.is(ZoneKind::Sideboard) && !obj.zone.is(ZoneKind::PhasedOut) && obj.became.is_none()
+            })
+            .collect(),
+        GKind::Static { .. } | GKind::Given { .. } => state.battlefield().to_vec(),
+        GKind::Effect(e) => vec![e.affected],
+        GKind::Granted { holder, .. } => vec![holder],
+    }
+}
+
+/// The order layer `li` applies `entries` in (CR 613.8): an entry depends on another if applying the other would change
+/// whether it applies to an object, or what it does to one it applies to (613.8a(b)), judged on the whole game as the
+/// entries applied so far leave it (613.8c); it waits until everything it depends on has applied (613.8b). A dependency
+/// loop is broken by timestamp order among its members, and every other dependency is kept (`docs/rules-exceptions.md`,
+/// RX-3): an entry is ready once every entry it depends on that has not applied is in a loop with it, and the earliest
+/// ready entry applies next. With nothing that could depend on anything, the order is the timestamp order.
+///
+/// Within layer 6 an entry can come into being: a static ability one entry gives an object (Rune of Flight's "equipped
+/// creature has flying", given to an Equipment) exists once that entry has applied (CR 613.1f, 613.7a), and joins the
+/// entries still to apply at the later of its holder's timestamp and its giver's.
+fn order_entries(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>) -> Vec<u16> {
+    let n = entries.len();
+    let grants = LAYERS[li] == Layer::Ability && grants_in_layer_six(cx);
+    if !grants && (n < 2 || !entries.iter().any(GEntry::dependent)) {
+        return (0..n as u16).collect();
+    }
+    let mut remaining: Vec<u16> = (0..n as u16).collect();
+    let mut order: Vec<u16> = Vec::with_capacity(n);
+    while !remaining.is_empty() {
+        // The judge follows the layer step by step, asking again only of the objects each step changes (613.8c); made anew
+        // when entries come into being (`appear`).
+        let mut judge = Judge::new(cx, li, &entries[..], std::mem::take(&mut order));
+        // What depends on what among `remaining`, once judged: kept while the entries applied since changed nothing.
+        let mut judged: Option<Vec<Vec<bool>>> = None;
+        let mut given = None;
+        while !remaining.is_empty() {
+            let m = remaining.len();
+            // The earliest entry is ready if nothing could make it wait.
+            // The earliest entry is ready if nothing could make it wait, or if it waits for nothing.
+            let earliest_free = || (1..m).all(|b| !judge.depends(remaining[0], remaining[b]));
+            let next = if !judge.entries[remaining[0] as usize].dependent() || (judged.is_none() && earliest_free()) {
+                0
+            } else {
+                let direct = match judged.take() {
+                    Some(direct) => direct,
+                    None => {
+                        let mut direct = vec![vec![false; m]; m];
+                        for a in 0..m {
+                            if !judge.entries[remaining[a] as usize].dependent() {
+                                continue;
+                            }
+                            for b in 0..m {
+                                if a != b {
+                                    direct[a][b] = judge.depends(remaining[a], remaining[b]);
+                                }
+                            }
+                        }
+                        direct
+                    }
+                };
+                // Which each depends on through others: a loop is a set of entries that each depend on the others this way.
+                let mut through = direct.clone();
+                for k in 0..m {
+                    let via = through[k].clone();
+                    for row in through.iter_mut() {
+                        if row[k] {
+                            for (cell, &on) in row.iter_mut().zip(&via) {
+                                *cell |= on;
+                            }
+                        }
                     }
                 }
-                if entry.conditional() {
-                    found.push((k, *chars));
-                }
-                noted.apply_reached(entry, view, id, chars);
-                // The earlier effects whose reach can change, asked again.
-                let mut earlier = conditional & ((1 << k) - 1);
-                while earlier != 0 {
-                    let a = earlier.trailing_zeros() as usize;
-                    earlier &= earlier - 1;
-                    if entries[a].reach(view, id, chars) != (reached & (1 << a) != 0) {
-                        break 'apply true;
+                let next = (0..m).find(|&a| (0..m).all(|b| !direct[a][b] || through[b][a])).unwrap_or(0);
+                judged = Some(direct);
+                next
+            };
+            let chosen = remaining.remove(next);
+            // CR 613.8c: worked out again after each, unless applying it changed nothing.
+            let changed = judge.advance(chosen);
+            judged = match judged.take() {
+                Some(mut direct) if !changed => {
+                    direct.remove(next);
+                    for row in direct.iter_mut() {
+                        row.remove(next);
                     }
+                    Some(direct)
+                }
+                _ => None,
+            };
+            if grants && changed {
+                given = Some(chosen);
+                break;
+            }
+        }
+        order = judge.order;
+        if let Some(e) = given {
+            appear(cx, li, entries, &order[..order.len() - 1], e, &mut remaining);
+        }
+    }
+    order
+}
+/// Whether a static ability could give an object a static ability (CR 613.1f): a source on the battlefield whose card has a
+/// static ability to give (Rune of Flight's "equipped creature has flying", in its `delayed` list).
+fn static_grants_present(cards: &CardTable, state: &GameState) -> bool {
+    state.statics_seen
+        && static_sources(cards, state).list.iter().any(|&(source, _, _)| {
+            let card = cards.get(cards.current(state.obj(source)));
+            card.statics.iter().any(|s| !s.own && s.layer == Layer::Ability) && card.delayed.iter().any(|a| matches!(a, AbilityDef::Static(_)))
+        })
+}
+
+/// Whether a static ability could be given in layer 6 an object that applies in layer 6: an effect gives one, or a static
+/// ability that gives abilities functions.
+fn grants_in_layer_six(cx: &Ctx) -> bool {
+    let (cards, state) = (cx.cards, cx.state);
+    state.effects.iter().any(|e| matches!(e.kind, EffectKind::AddAbility(a) if matches!(cards.ability(a), AbilityDef::Static(st) if st.layer == Layer::Ability)))
+        || static_grants_present(cards, state)
+}
+
+/// Entry `e` applies after `order`: the static abilities of layer 6 it gave objects come into being (CR 613.1f), each an
+/// entry at the later of its holder's timestamp and `e`'s (CR 613.7a), put among `remaining` in timestamp order. Whether
+/// any did.
+fn appear(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>, order: &[u16], e: u16, remaining: &mut Vec<u16>) -> bool {
+    let found: Vec<GEntry> = {
+        let judge = Judge::new(cx, li, entries, order.to_vec());
+        let stage = judge.stage();
+        let after = Stage { extra: Some(e), ..stage };
+        let mut found = Vec::new();
+        for &holder in judge.reach(e).iter() {
+            let Object::Full(o) = object(cx.cards, cx.state, holder) else { continue };
+            let snap = at(cx, &o, &after, false);
+            for ability in snap.chars.abilities.into_iter().flatten() {
+                let AbilityDef::Static(st) = cx.cards.ability(ability) else { continue };
+                let known = |g: &GEntry| match g.kind {
+                    GKind::Given { holder: h, ability: a, .. } | GKind::Granted { holder: h, ability: a, .. } => h == holder && a == Some(ability),
+                    _ => false,
+                };
+                if st.layer != Layer::Ability || entries.iter().any(known) || found.iter().any(known) {
+                    continue;
+                }
+                let timestamp = cx.state.obj(holder).timestamp.max(entries[e as usize].timestamp);
+                let (kind, seq) = if st.own {
+                    (GKind::Granted { holder, st, ability: Some(ability) }, 3)
+                } else {
+                    (GKind::Given { holder, st, ability: Some(ability) }, 1)
+                };
+                found.push(GEntry { kind, timestamp, seq });
+            }
+        }
+        found
+    };
+    let any = !found.is_empty();
+    for entry in found {
+        let index = entries.len() as u16;
+        entries.push(entry);
+        let at = remaining.partition_point(|&r| {
+            let g = &entries[r as usize];
+            (g.timestamp, g.seq) <= (entry.timestamp, entry.seq)
+        });
+        remaining.insert(at, index);
+    }
+    any
+}
+
+/// What an entry does at a stage to one object it could apply to: whether it applies, what it makes of the object as it
+/// is, and which other objects the question read (sorted).
+#[derive(Clone)]
+struct Eval {
+    id: ObjectId,
+    here: std::rc::Rc<Snap>,
+    applies: bool,
+    did: Chars,
+    reads: Vec<ObjectId>,
+}
+
+/// An entry asked of every object it could apply to, by object, with the objects whose question read each other object.
+struct EvalSet {
+    /// Sorted by object.
+    list: Vec<Eval>,
+    readers: std::collections::HashMap<ObjectId, Vec<u32>, Quick>,
+}
+
+impl EvalSet {
+    fn new(mut list: Vec<Eval>) -> EvalSet {
+        list.sort_unstable_by_key(|v| v.id);
+        let mut readers: std::collections::HashMap<ObjectId, Vec<u32>, Quick> = Default::default();
+        for (i, v) in list.iter().enumerate() {
+            for &r in v.reads.iter().filter(|&&r| r != v.id) {
+                readers.entry(r).or_default().push(i as u32);
+            }
+        }
+        EvalSet { list, readers }
+    }
+
+    fn index(&self, id: ObjectId) -> Option<usize> {
+        self.list.binary_search_by_key(&id, |v| v.id).ok()
+    }
+}
+
+/// The dependency system's questions as a layer is ordered (CR 613.8a): what each entry applies to at the stage reached
+/// (`order`, the entries applied so far), and whether applying one would change whether another applies to an object or
+/// what it does there. What it has asked is kept from step to step, and asked again only of the objects a step changed and
+/// of those whose question read one of them (613.8c).
+struct Judge<'a> {
+    cx: &'a Ctx<'a>,
+    li: usize,
+    entries: &'a [GEntry],
+    order: Vec<u16>,
+    reaches: std::cell::RefCell<std::collections::HashMap<u16, std::rc::Rc<Vec<ObjectId>>>>,
+    evals: std::cell::RefCell<std::collections::HashMap<u16, (usize, std::rc::Rc<EvalSet>)>>,
+    /// The objects each step changed, in order: what an entry asked at an earlier step must be asked again of.
+    steps: Vec<Vec<ObjectId>>,
+}
+
+impl<'a> Judge<'a> {
+    fn new(cx: &'a Ctx<'a>, li: usize, entries: &'a [GEntry], order: Vec<u16>) -> Judge<'a> {
+        Judge { cx, li, entries, order, reaches: Default::default(), evals: Default::default(), steps: Vec::new() }
+    }
+
+    fn stage(&self) -> Stage<'_> {
+        Stage { li: self.li, entries: self.entries, order: &self.order, len: self.order.len(), extra: None, keep: true }
+    }
+
+    fn view<'v>(&'v self, stage: Stage<'v>, reads: Option<&'v std::cell::RefCell<Vec<ObjectId>>>) -> View<'v> {
+        View { stage: Some(stage), reads, pass: Some(self.cx.pass), ..View::new(self.cx.cards, self.cx.state, self.cx.log, LAYERS[self.li]) }
+    }
+
+    /// Entry `entry` asked of the object `o` at this stage.
+    fn eval_one(&self, entry: &GEntry, o: &ObjCtx) -> Eval {
+        let stage = self.stage();
+        let reads = std::cell::RefCell::new(Vec::new());
+        let here = at(self.cx, o, &stage, false);
+        let (applies, did) = {
+            let view = self.view(stage, Some(&reads));
+            let applies = applies(&view, o, entry, &here);
+            let mut did = here.chars;
+            if applies {
+                apply_raw(&view, LAYERS[self.li], o.id, entry, &mut did);
+            }
+            (applies, did)
+        };
+        let mut reads = reads.into_inner();
+        reads.sort_unstable();
+        reads.dedup();
+        Eval { id: o.id, here, applies, did, reads }
+    }
+
+    /// Entry `e` asked of every object it could apply to at this stage.
+    fn eval(&self, e: u16) -> std::rc::Rc<EvalSet> {
+        let entry = &self.entries[e as usize];
+        let kept = self.evals.borrow().get(&e).cloned();
+        if let Some((at_step, found)) = kept {
+            if at_step == self.steps.len() {
+                return found;
+            }
+            // Asked again of the objects changed since, and of those whose question read one of them.
+            let mut touched: Vec<ObjectId> = self.steps[at_step..].iter().flatten().copied().collect();
+            touched.sort_unstable();
+            touched.dedup();
+            let again: Vec<Eval> = found
+                .list
+                .iter()
+                .map(|v| {
+                    let stale = touched.binary_search(&v.id).is_ok() || v.reads.iter().any(|r| touched.binary_search(r).is_ok());
+                    match (stale, object(self.cx.cards, self.cx.state, v.id)) {
+                        (true, Object::Full(o)) => self.eval_one(entry, &o),
+                        _ => v.clone(),
+                    }
+                })
+                .collect();
+            let found = std::rc::Rc::new(EvalSet::new(again));
+            self.evals.borrow_mut().insert(e, (self.steps.len(), found.clone()));
+            return found;
+        }
+        let found: Vec<Eval> = candidates(self.cx, entry)
+            .into_iter()
+            .filter_map(|id| match object(self.cx.cards, self.cx.state, id) {
+                Object::Full(o) => Some(self.eval_one(entry, &o)),
+                _ => None,
+            })
+            .collect();
+        let found = std::rc::Rc::new(EvalSet::new(found));
+        self.evals.borrow_mut().insert(e, (self.steps.len(), found.clone()));
+        found
+    }
+
+    /// The objects entry `e` applies to at this stage, sorted: asked of each object whether it applies, no more.
+    fn reach(&self, e: u16) -> std::rc::Rc<Vec<ObjectId>> {
+        if let Some(found) = self.reaches.borrow().get(&e) {
+            return found.clone();
+        }
+        let entry = &self.entries[e as usize];
+        let stage = self.stage();
+        let view = self.view(stage, None);
+        let mut found: Vec<ObjectId> = candidates(self.cx, entry)
+            .into_iter()
+            .filter(|&id| match object(self.cx.cards, self.cx.state, id) {
+                Object::Full(o) => applies(&view, &o, entry, &at(self.cx, &o, &stage, false)),
+                _ => false,
+            })
+            .collect();
+        found.sort_unstable();
+        let found = std::rc::Rc::new(found);
+        self.reaches.borrow_mut().insert(e, found.clone());
+        found
+    }
+
+    /// Entry `e` applies: the stage moves on. What was asked is asked again of the objects `e` changed and of those whose
+    /// question read one of them; the rest stands. Whether `e` changed anything.
+    fn advance(&mut self, e: u16) -> bool {
+        let touched: Vec<ObjectId> = {
+            let stage = self.stage();
+            let after = Stage { extra: Some(e), ..stage };
+            self.reach(e)
+                .iter()
+                .copied()
+                .filter(|&id| match object(self.cx.cards, self.cx.state, id) {
+                    Object::Full(o) => {
+                        let (was, is) = (at(self.cx, &o, &stage, false), at(self.cx, &o, &after, false));
+                        was.chars != is.chars || was.parts != is.parts
+                    }
+                    _ => false,
+                })
+                .collect()
+        };
+        self.order.push(e);
+        // An entry applied is asked nothing more; the rest are asked again when next asked (`eval`).
+        self.evals.borrow_mut().remove(&e);
+        let changed = !touched.is_empty();
+        if changed {
+            self.reaches.borrow_mut().clear();
+            let mut touched = touched;
+            touched.sort_unstable();
+            self.steps.push(touched);
+        }
+        changed
+    }
+
+    /// Whether entry `a` depends on entry `b` (CR 613.8a): applying `b` would change, for some object, whether `a` applies
+    /// to it, or - judged on what `a` would do to the object as it is, so that two effects that each set the same thing do
+    /// not depend on each other through it (CR 613.9's flying and "loses flying") - what `a` does there. Only the objects
+    /// `b` applies to can be changed by it: `a` is asked of those, and of any object whose question read one of them.
+    fn depends(&self, a: u16, b: u16) -> bool {
+        let changed = self.reach(b);
+        if changed.is_empty() {
+            return false;
+        }
+        let entry = &self.entries[a as usize];
+        let stage = self.stage();
+        let other = Stage { extra: Some(b), ..stage };
+        let layer = LAYERS[self.li];
+        let set = self.eval(a);
+        // The objects `b` applies to, and those whose question read one of them.
+        let mut asked: Vec<usize> = changed.iter().filter_map(|&id| set.index(id)).collect();
+        for id in changed.iter() {
+            if let Some(readers) = set.readers.get(id) {
+                asked.extend(readers.iter().map(|&i| i as usize));
+            }
+        }
+        asked.sort_unstable();
+        asked.dedup();
+        for v in asked.into_iter().map(|i| &set.list[i]) {
+            let on_it = changed.binary_search(&v.id).is_ok();
+            let read_changed = v.reads.iter().any(|r| *r != v.id && changed.binary_search(r).is_ok());
+            if !on_it && !read_changed {
+                continue;
+            }
+            let Object::Full(o) = object(self.cx.cards, self.cx.state, v.id) else { continue };
+            let there = if on_it { at(self.cx, &o, &other, false) } else { v.here.clone() };
+            // `b` changes nothing of this object, and nothing else the question read.
+            if there.chars == v.here.chars && !read_changed {
+                continue;
+            }
+            let view_b = self.view(other, None);
+            let is = applies(&view_b, &o, entry, &there);
+            if v.applies != is {
+                return true;
+            }
+            if is {
+                let mut does = v.here.chars;
+                apply_raw(&view_b, layer, v.id, entry, &mut does);
+                // The contract of a static ability's `apply` (`StaticApply`): it reads no value from the object it is given
+                // except to guard, so what it does is judged on the object as it stands. Checked on a scratch copy, never
+                // kept: applied to the object as `b` left it too, each field must come out the same, or change the same
+                // way, or be untouched.
+                if verifying() && on_it && there.chars != v.here.chars {
+                    let mut after = there.chars;
+                    apply_raw(&view_b, layer, v.id, entry, &mut after);
+                    if let Some(field) = takes_from_its_object(&v.here.chars, &does, &there.chars, &after) {
+                        panic!(
+                            "an effect of layer {:?} ({}) read its object's {field} through its `chars` and not `view.chars(id)`",
+                            LAYERS[self.li],
+                            entry.text()
+                        );
+                    }
+                }
+                if does != v.did {
+                    return true;
                 }
             }
         }
         false
-    };
-    SNAPSHOTS.with(|pool| pool.borrow_mut().push(found));
-    if depends {
-        *chars = before;
-        if let Some(givers) = givers_before {
-            GIVERS.with(|g| g.set(givers));
-        }
-        noted.parts.truncate(noted_before);
-        by_dependency(view, id, entries.clone(), noted, chars);
-    }
-    ENTRIES.with(|pool| pool.borrow_mut().push(entries));
-}
-
-/// One continuous effect of a layer that may apply to the object being worked out.
-#[derive(Clone, Copy)]
-enum Entry {
-    /// A resolved spell's or ability's (CR 611.2), which names the object.
-    Effect(ContinuousEffect),
-    /// A static ability an effect granted the object that applies to it alone (CR 613.7a), with it as its source.
-    Granted(&'static StaticDef),
-    /// A static ability of `ObjectId` (its own, or one an effect granted it) that applies to the objects it says.
-    Static(ObjectId, &'static StaticDef),
-    /// A later part of the effect of a static ability of `ObjectId` whose first part applied to the object in an earlier
-    /// layer (CR 613.6, `Begun`): it applies to it, whatever its words say of it by now.
-    Continued(ObjectId, &'static StaticDef),
-}
-
-impl Entry {
-    /// Whether another effect could change what it applies to or what it does (CR 613.8a(b)), which is all the dependency
-    /// system judges: a static ability's reach ("other creatures", "each land"), and the resolved effects that do
-    /// something only to an object that has something - a text change, only where its word is (CR 612.1); "all creature
-    /// types" and a creature type set, only to a creature or Kindred (CR 205.3d). Every other resolved effect names the objects it applies to
-    /// (CR 611.2c) and does the same to each whatever was done before it, so nothing changes what it applies to or does.
-    /// A change to an effect's text or existence is not judged here: the only existence the layers can take away is a
-    /// static ability's, to "loses all abilities", which `lost_to_statics` orders (CR 613.8a), and no text-changing effect
-    /// the engine has changes another effect's words.
-    fn conditional(&self) -> bool {
-        match self {
-            Entry::Static(..) => true,
-            Entry::Granted(_) | Entry::Continued(..) => false,
-            Entry::Effect(e) => matches!(e.kind, EffectKind::ChangeText { .. } | EffectKind::AddAllCreatureTypes | EffectKind::SetCreatureType(_)),
-        }
-    }
-
-    /// Whether it applies to the object as `chars` is now, and so does something to it (CR 613.8a(b)).
-    fn reach(&self, view: &View, id: ObjectId, chars: &Chars) -> bool {
-        match *self {
-            Entry::Static(source, st) => (st.affects)(view, source, id, chars),
-            Entry::Granted(_) | Entry::Continued(..) => true,
-            Entry::Effect(e) => match e.kind {
-                EffectKind::ChangeText { from: Word::Subtype(from), .. } => {
-                    (chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling)))
-                        || Keyword::landwalk(from).is_some_and(|walk| chars.keywords.has(walk))
-                }
-                EffectKind::ChangeText { from: Word::Color(from), .. } => chars.hexproof_from.colors().has(from) || chars.protection.has(from),
-                EffectKind::AddAllCreatureTypes | EffectKind::SetCreatureType(_) => chars.is(CardType::Creature) || chars.is(CardType::Kindred),
-                _ => true,
-            },
-        }
-    }
-
-    /// Applies it to the object, which `reach` has said it applies to.
-    fn apply_reached(&self, view: &View, id: ObjectId, chars: &mut Chars) {
-        match *self {
-            Entry::Effect(e) => watching_givers(id, e.source, chars, |chars| apply_effect(&e, view.stop, chars)),
-            Entry::Granted(st) => watching_givers(id, id, chars, |chars| (st.apply)(view, id, chars)),
-            Entry::Static(source, st) | Entry::Continued(source, st) => watching_givers(id, source, chars, |chars| apply_static(st, view, source, id, chars)),
-        }
-    }
-
-    /// Applies it to a trial copy of the object (the dependency system's question of what applying it would change): the
-    /// abilities' givers are not watched.
-    fn apply_raw(&self, view: &View, id: ObjectId, chars: &mut Chars) {
-        match *self {
-            Entry::Effect(e) => apply_effect(&e, view.stop, chars),
-            Entry::Granted(st) => (st.apply)(view, id, chars),
-            Entry::Continued(source, st) => apply_static(st, view, source, id, chars),
-            Entry::Static(source, st) => {
-                if (st.affects)(view, source, id, chars) {
-                    apply_static(st, view, source, id, chars);
-                }
-            }
-        }
-    }
-
-    /// Applies it to the object being worked out.
-    fn apply(&self, view: &View, id: ObjectId, chars: &mut Chars) {
-        match *self {
-            Entry::Effect(e) => watching_givers(id, e.source, chars, |chars| apply_effect(&e, view.stop, chars)),
-            Entry::Granted(st) => watching_givers(id, id, chars, |chars| (st.apply)(view, id, chars)),
-            Entry::Continued(source, st) => watching_givers(id, source, chars, |chars| apply_static(st, view, source, id, chars)),
-            Entry::Static(source, st) => {
-                if (st.affects)(view, source, id, chars) {
-                    watching_givers(id, source, chars, |chars| apply_static(st, view, source, id, chars));
-                }
-            }
-        }
     }
 }
 
-/// The effects of one layer that may apply to the object, in timestamp order (CR 613.7): four sequences, each in its own
-/// order, merged. At one timestamp a permanent's static abilities come first, then those effects granted others, then
-/// resolved effects, then abilities granted the object itself (CR 613.7n: an object's own static ability is earlier than
-/// an effect created with it).
-#[derive(Clone)]
-struct Merge<'a> {
-    cards: &'a CardTable,
-    state: &'a GameState,
-    layer: Layer,
-    on_battlefield: bool,
-    fx: &'a [ContinuousEffect],
-    granted: &'a [(u32, &'static StaticDef)],
-    given: &'a [(u32, ObjectId, &'static StaticDef)],
-    sources: &'a [(ObjectId, ZoneKind, bool)],
-    /// From layer 6 on, the permanents a "loses all abilities" static ability has stripped, and those whose such
-    /// abilities apply.
-    stripped: &'a Stripped,
-    /// The parts of effects that began to apply to the object in the layers before this one (`Begun`).
-    begun: &'a [(ObjectId, *const StaticDef)],
-    /// From layer 4 on, the lands that have lost the abilities of their rules text to an effect that sets their subtype.
-    text_lost: &'a [ObjectId],
-    /// The next of each: source, given, effect, granted.
-    next: [usize; 4],
-    /// The current source's static abilities, and the next of them.
-    statics: Option<&'static [StaticDef]>,
-    within: usize,
-    /// Whether the current source has lost all its abilities by this layer, and whether it is to its own "loses all
-    /// abilities" ability, which applies (`Stripped::applying`).
-    lost: (bool, bool),
-    /// Each sequence's next entry's timestamp, worked out once it was last moved past (`settled`).
-    head: [Option<u32>; 4],
-    settled: [bool; 4],
-}
-
-impl<'a> Merge<'a> {
-    #[allow(clippy::too_many_arguments)]
-    fn new(
-        cards: &'a CardTable,
-        state: &'a GameState,
-        layer: Layer,
-        on_battlefield: bool,
-        fx: &'a [ContinuousEffect],
-        granted: &'a [(u32, &'static StaticDef)],
-        given: &'a [(u32, ObjectId, &'static StaticDef)],
-        sources: &'a [(ObjectId, ZoneKind, bool)],
-        stripped: &'a Stripped,
-        begun: &'a [(ObjectId, *const StaticDef)],
-        text_lost: &'a [ObjectId],
-    ) -> Merge<'a> {
-        Merge {
-            cards,
-            state,
-            layer,
-            on_battlefield,
-            fx,
-            granted,
-            given,
-            sources,
-            stripped,
-            begun,
-            text_lost,
-            next: [0; 4],
-            statics: None,
-            within: 0,
-            lost: (false, false),
-            head: [None; 4],
-            settled: [false; 4],
-        }
+/// Whether an effect applied to `x` (making `ax`) and to `y` (making `ay`) did, field by field, what one instruction does to
+/// any object: the same result, or the same change, or nothing on one side. The field that breaks it, if one does: the
+/// effect took a value from the object it was applied to.
+fn takes_from_its_object(x: &Chars, ax: &Chars, y: &Chars, ay: &Chars) -> Option<&'static str> {
+    fn bits(x: &[u64], ax: &[u64], y: &[u64], ay: &[u64]) -> bool {
+        ax == ay || ax == x || ay == y || x.iter().zip(ax).zip(y.iter().zip(ay)).all(|((x, ax), (y, ay))| (x ^ ax) == (y ^ ay))
     }
-
-    /// Moves sequence `i` past what is not of this layer, and notes its next entry's timestamp.
-    fn settle(&mut self, i: usize) {
-        let layer = self.layer;
-        self.head[i] = match i {
-            0 => {
-                let mut found = None;
-                while let Some(&(source, from, lost)) = self.sources.get(self.next[0]) {
-                    let statics = match self.statics {
-                        Some(statics) => statics,
-                        None => {
-                            let gone = layer >= Layer::Ability && (lost || self.stripped.lost.contains(&source));
-                            self.lost = (gone, gone && self.stripped.applying.contains(&source));
-                            // CR 305.7, 613.8a: a land another effect sets the subtype of has none of its rules text's
-                            // static abilities from layer 4 on, the layer that effect applies in: each of them depends
-                            // on it (applying it changes their existence), so it applies first, and they are gone.
-                            let text_gone = layer >= Layer::Type && self.text_lost.contains(&source);
-                            let statics: &'static [StaticDef] = if text_gone { &[] } else { self.source_statics(source) };
-                            self.statics = Some(statics);
-                            statics
-                        }
-                    };
-                    let on_battlefield = self.on_battlefield;
-                    let (gone, applying) = self.lost;
-                    let begun = self.begun;
-                    // While the lands that lose their rules text are being found (`land_text_lost`), each object is judged
-                    // as the effects that set land subtypes leave it before any of them applies.
-                    let no_setters = layer == Layer::Type && self.state.land_text_lost.borrow().finding;
-                    // CR 613.1f, 613.8a: a permanent that has lost all its abilities has no static abilities from layer 6
-                    // on. CR 613.6: an effect that started to apply before then goes on applying in the layers after -
-                    // one whose first part is of layers 1 to 5, or the "loses all abilities" ability that took its own
-                    // source's (Humility made a creature) and its later parts - and a later part applies only to what its
-                    // first part applied to (`Begun`).
-                    let skip = |i: usize, st: &StaticDef| {
-                        if st.own || st.layer != layer || st.from != from || !(on_battlefield || st.everywhere) || (no_setters && st.sets_land_subtypes) {
-                            return true;
-                        }
-                        let first = &statics[first_part(statics, i)];
-                        if gone && !(first.layer < Layer::Ability || (applying && first.loses_all)) {
-                            return true;
-                        }
-                        st.continues && !begun.iter().any(|&(s, part)| s == source && std::ptr::eq(part, first))
-                    };
-                    while statics.get(self.within).is_some_and(|st| skip(self.within, st)) {
-                        self.within += 1;
+    fn plain<T: PartialEq>(x: &T, ax: &T, y: &T, ay: &T) -> bool {
+        ax == ay || ax == x || ay == y
+    }
+    fn number(x: Option<i16>, ax: Option<i16>, y: Option<i16>, ay: Option<i16>) -> bool {
+        plain(&x, &ax, &y, &ay)
+            || matches!((x, ax, y, ay), (Some(x), Some(ax), Some(y), Some(ay)) if i32::from(ax) - i32::from(x) == i32::from(ay) - i32::from(y))
+    }
+    fn abilities(x: &[Option<AbilityRef>], ax: &[Option<AbilityRef>], y: &[Option<AbilityRef>], ay: &[Option<AbilityRef>]) -> bool {
+        let change = |from: &[Option<AbilityRef>], to: &[Option<AbilityRef>]| {
+            // As multisets: an ability given twice is two instances (CR 113.2c).
+            let (mut added, mut removed): (Vec<AbilityRef>, Vec<AbilityRef>) = (to.iter().flatten().copied().collect(), Vec::new());
+            for a in from.iter().flatten() {
+                match added.iter().position(|b| b == a) {
+                    Some(at) => {
+                        added.remove(at);
                     }
-                    if self.within < statics.len() {
-                        found = Some(self.state.obj(source).timestamp);
-                        break;
-                    }
-                    self.next[0] += 1;
-                    self.within = 0;
-                    self.statics = None;
+                    None => removed.push(*a),
                 }
-                found
             }
-            1 => self.given.get(self.next[1]).map(|&(t, _, _)| t),
-            2 => {
-                while self.fx.get(self.next[2]).is_some_and(|e| effect_layer(e.kind) != Some(layer)) {
-                    self.next[2] += 1;
-                }
-                self.fx.get(self.next[2]).map(|e| e.timestamp)
-            }
-            _ => {
-                while self.granted.get(self.next[3]).is_some_and(|(_, st)| st.layer != layer) {
-                    self.next[3] += 1;
-                }
-                self.granted.get(self.next[3]).map(|&(t, _)| t)
-            }
+            added.sort_by_key(|a| (a.card.0, a.index));
+            removed.sort_by_key(|a| (a.card.0, a.index));
+            (added, removed)
         };
-        self.settled[i] = true;
+        plain(&x, &ax, &y, &ay) || change(x, ax) == change(y, ay)
     }
-
-    fn source_statics(&self, source: ObjectId) -> &'static [StaticDef] {
-        let sobj = self.state.obj(source);
-        let scard = self.cards.current(sobj);
-        self.cards.get(scard).statics
-    }
-
-    fn next(&mut self) -> Option<Entry> {
-        let mut which: Option<usize> = None;
-        for i in 0..4 {
-            if !self.settled[i] {
-                self.settle(i);
-            }
-            if let Some(t) = self.head[i]
-                && which.is_none_or(|w| self.head[w].is_some_and(|best| t < best))
-            {
-                which = Some(i);
-            }
-        }
-        let which = which?;
-        self.settled[which] = false;
-        Some(match which {
-            0 => {
-                let (source, _, _) = self.sources[self.next[0]];
-                let st = &self.statics.unwrap_or(&[])[self.within];
-                self.within += 1;
-                if st.continues { Entry::Continued(source, st) } else { Entry::Static(source, st) }
-            }
-            1 => {
-                let (_, holder, st) = self.given[self.next[1]];
-                self.next[1] += 1;
-                Entry::Static(holder, st)
-            }
-            2 => {
-                self.next[2] += 1;
-                Entry::Effect(self.fx[self.next[2] - 1])
-            }
-            _ => {
-                self.next[3] += 1;
-                Entry::Granted(self.granted[self.next[3] - 1].1)
-            }
-        })
-    }
-}
-
-/// The dependency system (CR 613.8): `pending`, in timestamp order, applied one at a time. An effect depends on another of
-/// the layer if applying the other would change what it applies to or what it does to it (613.8a(b), `Entry::reach`), and
-/// waits until just after everything it depends on has applied; effects free to apply go in timestamp order, and so do the
-/// effects of a dependency loop among themselves (613.8b). After each, what depends on what is worked out again (613.8c).
-///
-/// What depends on what is judged on this object, the one being worked out. Another effect's reach is the set of every
-/// object it applies to, which this object's question cannot see; so an effect that would change what the first applies to
-/// only once what it waits for has applied ("lands are creatures", waiting for the effect that makes this a land, before
-/// "creatures are artifacts") counts as changing it, as it does for the lands already on the battlefield. A dependency
-/// through another object alone is not seen (known issue KI-41).
-fn by_dependency(view: &View, id: ObjectId, mut pending: Vec<Entry>, noted: &mut Noted, chars: &mut Chars) {
-    while !pending.is_empty() {
-        let i = ready(view, id, &pending, chars);
-        let entry = pending.remove(i);
-        noted.apply(&entry, view, id, chars);
-    }
-}
-
-/// The earliest of `pending` that depends on nothing still to apply but what is in a loop with it (CR 613.8b).
-fn ready(view: &View, id: ObjectId, pending: &[Entry], chars: &Chars) -> usize {
-    let n = pending.len();
-    // Whether `a` depends on `b` with the object as `before`: applying `b` changes whether `a` applies to it.
-    let changes = |a: usize, b: usize, before: &Chars| {
-        let mut after = *before;
-        pending[b].apply_raw(view, id, &mut after);
-        pending[a].reach(view, id, before) != pending[a].reach(view, id, &after)
-    };
-    let mut direct: Vec<Vec<bool>> =
-        (0..n).map(|a| (0..n).map(|b| a != b && pending[a].conditional() && changes(a, b, chars)).collect()).collect();
-    // Most often nothing depends on anything: the earliest applies.
-    if direct.iter().all(|row| row.iter().all(|&d| !d)) {
-        return 0;
-    }
-    // Which each depends on through others (a loop is an effect that depends on itself this way).
-    let closure = |direct: &Vec<Vec<bool>>| {
-        let mut through = direct.clone();
-        for k in 0..n {
-            for a in 0..n {
-                if through[a][k] {
-                    for b in 0..n {
-                        if through[k][b] {
-                            through[a][b] = true;
-                        }
-                    }
-                }
-            }
-        }
-        through
-    };
-    let mut through = closure(&direct);
-    // `b` that waits for others changes what `a` applies to if it would once they have applied.
-    loop {
-        let mut more = false;
-        for a in (0..n).filter(|&a| pending[a].conditional()) {
-            for b in 0..n {
-                if b == a || direct[a][b] || !through[b].iter().any(|&w| w) {
-                    continue;
-                }
-                let mut first = *chars;
-                for (c, entry) in pending.iter().enumerate() {
-                    if through[b][c] && c != a && c != b {
-                        entry.apply_raw(view, id, &mut first);
-                    }
-                }
-                if changes(a, b, &first) {
-                    direct[a][b] = true;
-                    more = true;
-                }
-            }
-        }
-        if !more {
-            break;
-        }
-        through = closure(&direct);
-    }
-    // A loop has a member that waits on nothing outside it, so one is always ready.
-    (0..n).find(|&a| (0..n).all(|b| !direct[a][b] || through[b][a])).unwrap_or(0)
+    let w = |v: u64| [v];
+    let supers = |s: &Supertypes| [u64::from(s.basic) | u64::from(s.legendary) << 1 | u64::from(s.snow) << 2];
+    let checks: [(&'static str, bool); 16] = [
+        ("types", bits(&w(x.types.0.into()), &w(ax.types.0.into()), &w(y.types.0.into()), &w(ay.types.0.into()))),
+        ("supertypes", bits(&supers(&x.supertypes), &supers(&ax.supertypes), &supers(&y.supertypes), &supers(&ay.supertypes))),
+        ("subtypes", bits(&x.subtypes.0, &ax.subtypes.0, &y.subtypes.0, &ay.subtypes.0)),
+        ("colors", bits(&w(x.colors.0.into()), &w(ax.colors.0.into()), &w(y.colors.0.into()), &w(ay.colors.0.into()))),
+        ("power", number(x.power, ax.power, y.power, ay.power)),
+        ("toughness", number(x.toughness, ax.toughness, y.toughness, ay.toughness)),
+        ("keywords", bits(&w(x.keywords.0), &w(ax.keywords.0), &w(y.keywords.0), &w(ay.keywords.0))),
+        ("protection", bits(&w(x.protection.0.into()), &w(ax.protection.0.into()), &w(y.protection.0.into()), &w(ay.protection.0.into()))),
+        ("protection from types", bits(&w(x.protection_types.0.into()), &w(ax.protection_types.0.into()), &w(y.protection_types.0.into()), &w(ay.protection_types.0.into()))),
+        ("protection from players", bits(&w(x.protection_players.into()), &w(ax.protection_players.into()), &w(y.protection_players.into()), &w(ay.protection_players.into()))),
+        ("hexproof from", bits(&w(x.hexproof_from.0.into()), &w(ax.hexproof_from.0.into()), &w(y.hexproof_from.0.into()), &w(ay.hexproof_from.0.into()))),
+        ("abilities", abilities(&x.abilities, &ax.abilities, &y.abilities, &ay.abilities)),
+        ("name", plain(&x.name, &ax.name, &y.name, &ay.name)),
+        (
+            "protections",
+            plain(
+                &(x.protection_colorless, x.protection_colored_spells, x.protection_everything, x.must_attack),
+                &(ax.protection_colorless, ax.protection_colored_spells, ax.protection_everything, ax.must_attack),
+                &(y.protection_colorless, y.protection_colored_spells, y.protection_everything, y.must_attack),
+                &(ay.protection_colorless, ay.protection_colored_spells, ay.protection_everything, ay.must_attack),
+            ),
+        ),
+        ("losses", plain(&(x.lost_all, x.text_lost), &(ax.lost_all, ax.text_lost), &(y.lost_all, y.text_lost), &(ay.lost_all, ay.text_lost))),
+        ("the rest", plain(&(x.card, x.spell, x.no_cost, x.name_set), &(ax.card, ax.spell, ax.no_cost, ax.name_set), &(y.card, y.spell, y.no_cost, y.name_set), &(ay.card, ay.spell, ay.no_cost, ay.name_set))),
+    ];
+    checks.into_iter().find(|&(_, fine)| !fine).map(|(field, _)| field)
 }
 
 /// Whether a static ability that could give an object an ability functions anywhere now (CR 613.1f): one of layer 6 that
@@ -1257,7 +1980,7 @@ pub fn static_control(cards: &CardTable, state: &GameState, log: &[Record], id: 
     if sources.is_empty() {
         return Vec::new();
     }
-    let view = View { cards, state, log, stop: Layer::Control };
+    let view = View::new(cards, state, log, Layer::Control);
     let so_far = chars_before(cards, state, log, id, Layer::Control);
     let mut found = Vec::new();
     for source in sources {
@@ -1594,104 +2317,21 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
     }
 }
 
-/// Whether `id` has lost all its abilities (CR 613.1f): to a resolved effect, or to a static ability
-/// (`StaticDef::loses_all`, which `lost_to_statics` works out). `Query::lost_all_abilities` is this.
+/// Whether `id` has lost all its abilities (CR 613.1f): to a resolved effect, or to a static ability (`StaticDef::loses_all`)
+/// where the layers' order applied it (`Chars::lost_all`). `Query::lost_all_abilities` is this.
 ///
-/// A land an effect sets the subtype of has lost every ability its rules text gives it (CR 305.7): every rule read off its
-/// card is gone as it is for a loss of all abilities, though abilities other effects grant it stay.
+/// A land another's effect sets the subtype of has lost every ability its rules text gives it (CR 305.7, `Chars::text_lost`):
+/// every rule read off its card is gone as it is for a loss of all abilities, though abilities other effects grant it stay.
 pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> bool {
     if state.lost_all_abilities_to_an_effect(id) {
         return true;
     }
-    if !state.statics_seen {
+    // Most positions have neither kind of ability in play: one look at the sources says so.
+    if !abilities_may_be_lost(cards, state) {
         return false;
     }
-    // Most positions have neither kind of ability in play: one look at the sources says so.
-    let (strippers, setters) = {
-        let found = static_sources(cards, state);
-        (!found.strippers.is_empty(), !found.setters.is_empty())
-    };
-    (strippers && lost_to_statics(cards, state, log).lost.contains(&id)) || (setters && land_text_lost(cards, state, log).contains(&id))
-}
-
-/// The lands on the battlefield that have lost the abilities of their rules text (CR 305.7) to a static ability that
-/// sets land subtypes (`StaticDef::sets_land_subtypes`), found once per position and history, and empty, at the cost of a
-/// look at the source list, while no such ability is on the battlefield.
-///
-/// Each such ability applies in layer 4 to what its `affects` accepts (CR 613.1d). Every other layer-4 effect that would
-/// change whether it applies to an object - one that makes the object a land (Life and Limb's Saprolings, Hydro-Man) or
-/// stops it being one - is one it depends on, and applies before it (CR 613.8a). A land loses its rules text if any such
-/// ability applies to it, so it is judged on the object as layer 4 leaves it with every effect but these (the layers skip
-/// them while `finding`): the first of them to apply, in whatever order dependencies and timestamps give, sees the land so,
-/// and one that applies only after another has changed the land's subtypes finds its text lost already. So a Firdoch Core
-/// that Life and Limb makes a Forest land is a nonbasic land Blood Moon makes a Mountain, and loses its rules text with it,
-/// and an ability keyed on the subtype it overwrites ("All Mountains are Plains") takes the text of the Mountains it
-/// applied to. The layer-4 abilities of the lands that lose their text depend on the setting abilities too, so they are
-/// found again with those of the lands found so far no longer applying, until the answer stands: Urborg under Blood Moon
-/// makes no land a Swamp that "All Swamps are Plains" could reach. It applies
-/// whatever its source loses in layer 6 (CR 613.6: Magus of the Moon's ruling). One that would
-/// take the abilities of another such ability's source - a land - is applied first, since the other's existence depends
-/// on it (CR 613.8a), and the abilities it takes no longer apply; where each would take the other's, the earlier timestamp
-/// goes first (CR 613.8b). A land whose own ability sets its own subtype (Multiversal Passage's "this land is the chosen
-/// type") keeps that ability applying (CR 613.6), and is not counted here for it: it has no other rules text.
-fn land_text_lost(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<ObjectId> {
-    if !state.statics_seen || static_sources(cards, state).setters.is_empty() {
-        return Vec::new();
-    }
-    let key = (state.epoch, log.len());
-    {
-        let have = state.land_text_lost.borrow();
-        // While they are being found, the lands found so far: their own layer-4 abilities no longer apply.
-        if have.finding {
-            return have.objects.clone();
-        }
-        if have.key == key {
-            return have.objects.clone();
-        }
-    }
-    let setters = static_sources(cards, state).setters.clone();
-    {
-        let mut have = state.land_text_lost.borrow_mut();
-        have.finding = true;
-        have.objects.clear();
-    }
-    let view = View { cards, state, log, stop: Layer::Type };
-    let strips = |(source, from): (ObjectId, ZoneKind), id: ObjectId| -> bool {
-        let obj = state.obj(id);
-        if !obj.zone.is(ZoneKind::Battlefield) || obj.became.is_some() {
-            return false;
-        }
-        let so_far = chars_before(cards, state, log, id, Layer::Color);
-        so_far.is(CardType::Land)
-            && cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.sets_land_subtypes && s.from == from && (s.affects)(&view, source, id, &so_far))
-    };
-    // Found again with the lands found so far having lost their own layer-4 abilities (CR 613.8a: those depend on the
-    // setting abilities, which apply first), until the answer stands; a land's ability that would decide the answer
-    // both ways (a dependency loop, CR 613.8b) stops it after a few rounds.
-    let mut objects: Vec<ObjectId> = Vec::new();
-    for _ in 0..4 {
-        let mut pending = setters.clone();
-        let mut applied: Vec<(ObjectId, ZoneKind)> = Vec::new();
-        while !pending.is_empty() {
-            // The first, in timestamp order, that no other one still waiting would take away; failing that, the first.
-            let next = (0..pending.len()).find(|&i| !pending.iter().any(|&other| other.0 != pending[i].0 && strips(other, pending[i].0))).unwrap_or(0);
-            let ability = pending.remove(next);
-            pending.retain(|&other| !strips(ability, other.0));
-            applied.push(ability);
-        }
-        let found: Vec<ObjectId> =
-            state.battlefield().iter().copied().filter(|&id| applied.iter().any(|&ability| ability.0 != id && strips(ability, id))).collect();
-        if found == objects {
-            break;
-        }
-        objects = found;
-        state.land_text_lost.borrow_mut().objects = objects.clone();
-    }
-    let mut have = state.land_text_lost.borrow_mut();
-    have.key = key;
-    have.objects = objects.clone();
-    have.finding = false;
-    objects
+    let c = chars(cards, state, log, id);
+    c.lost_all || c.text_lost
 }
 
 /// Whether any static ability could apply to an object on the battlefield: a permanent, emblem or card whose card has static
@@ -1715,77 +2355,10 @@ pub fn abilities_may_be_lost(cards: &CardTable, state: &GameState) -> bool {
     }
 }
 
-/// What `lost_to_statics` found: the permanents that lost all their abilities to a static ability, and the sources whose
-/// such abilities apply.
-#[derive(Default)]
-struct Stripped {
-    lost: Vec<ObjectId>,
-    applying: Vec<ObjectId>,
-}
-
-/// The permanents that have lost all their abilities to a "loses all abilities" static ability (CR 613.1f), found once
-/// per position and history, and empty, at the cost of a look at the source list, while no such ability is on the
-/// battlefield.
-///
-/// Each such ability applies in layer 6 to what its `affects` accepts, judged on the characteristics layers 1 to 5 made
-/// (CR 613.1). One that would take the abilities of another such ability's source is applied first, since the other's
-/// existence depends on it (CR 613.8a), and the abilities it takes no longer apply; where each would take the other's,
-/// the earlier timestamp goes first (CR 613.8b). The source of one a resolved effect took away is left out already: its
-/// ability depends on that effect, which comes first.
-fn lost_to_statics(cards: &CardTable, state: &GameState, log: &[Record]) -> Stripped {
-    if !state.statics_seen {
-        return Stripped::default();
-    }
-    let strippers = static_sources(cards, state).strippers.clone();
-    if strippers.is_empty() {
-        return Stripped::default();
-    }
-    let key = (state.epoch, log.len());
-    {
-        let have = state.lost_to_statics.borrow();
-        // An `affects` that asked for characteristics past layer 6 would come back here: it is answered as layer 6
-        // began, before any ability was taken.
-        if have.finding {
-            return Stripped::default();
-        }
-        if have.key == key {
-            return Stripped { lost: have.objects.clone(), applying: have.applying.clone() };
-        }
-    }
-    state.lost_to_statics.borrow_mut().finding = true;
-    let view = View { cards, state, log, stop: Layer::Ability };
-    let strips = |(source, from): (ObjectId, ZoneKind), id: ObjectId| -> bool {
-        let obj = state.obj(id);
-        if !obj.zone.is(ZoneKind::Battlefield) || obj.became.is_some() {
-            return false;
-        }
-        let so_far = chars_before(cards, state, log, id, Layer::Ability);
-        cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.loses_all && s.from == from && (s.affects)(&view, source, id, &so_far))
-    };
-    let mut pending = strippers;
-    let mut applied: Vec<(ObjectId, ZoneKind)> = Vec::new();
-    while !pending.is_empty() {
-        // The first, in timestamp order, that no other one still waiting would take away; failing that, the first.
-        let next = (0..pending.len()).find(|&i| !pending.iter().any(|&other| other.0 != pending[i].0 && strips(other, pending[i].0))).unwrap_or(0);
-        let ability = pending.remove(next);
-        pending.retain(|&other| !strips(ability, other.0));
-        applied.push(ability);
-    }
-    let objects: Vec<ObjectId> =
-        state.battlefield().iter().copied().filter(|&id| applied.iter().any(|&ability| strips(ability, id))).collect();
-    let applying: Vec<ObjectId> = applied.iter().map(|&(source, _)| source).collect();
-    let mut have = state.lost_to_statics.borrow_mut();
-    have.key = key;
-    have.objects = objects.clone();
-    have.applying = applying.clone();
-    have.finding = false;
-    Stripped { lost: objects, applying }
-}
-
 /// Whether a targeting rule of `kind` (CR 609.4, 702.11, 702.21) applies to `subject`: some permanent on the battlefield has a static
 /// ability that names it. Found from the board, so asked only when it would change the answer (a hexproof target, a ward trigger).
 pub fn targeting_rule(cards: &CardTable, state: &GameState, log: &[Record], kind: TargetingRuleKind, subject: ObjectId) -> bool {
-    let view = View { cards, state, log, stop: Layer::Ability };
+    let view = View::new(cards, state, log, Layer::Ability);
     state.battlefield().iter().any(|&source| {
         let obj = state.obj(source);
         let card = cards.current(obj);
@@ -1800,7 +2373,7 @@ pub fn targeting_rule(cards: &CardTable, state: &GameState, log: &[Record], kind
 /// (`CardDef::player_keywords`: True Believer's "You have shroud", CR 702.18a). A board with no such permanent costs a
 /// table lookup per permanent.
 pub fn player_has(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, keyword: Keyword) -> bool {
-    let view = View { cards, state, log, stop: Layer::Ability };
+    let view = View::new(cards, state, log, Layer::Ability);
     state.battlefield().iter().any(|&source| {
         let card = cards.current(state.obj(source));
         // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
@@ -1814,7 +2387,7 @@ pub fn player_has(cards: &CardTable, state: &GameState, log: &[Record], player: 
 /// one look at the battlefield: shroud (CR 702.18a), hexproof against an opponent (CR 702.11c), or protection from `asker`
 /// (CR 702.16b, 702.16k) - what `player_has` and `player_protected_by_static` each say.
 fn player_statics_forbid_targeting(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, asker: PlayerId) -> bool {
-    let view = View { cards, state, log, stop: Layer::Ability };
+    let view = View::new(cards, state, log, Layer::Ability);
     let opponent = player != asker;
     state.battlefield().iter().any(|&source| {
         let card = cards.current(state.obj(source));
@@ -1833,7 +2406,7 @@ fn player_statics_forbid_targeting(cards: &CardTable, state: &GameState, log: &[
 /// The permanent on the battlefield with its abilities whose static ability gives `player` protection from `from`
 /// (`CardDef::player_protection`: Absolute Virtue's "You have protection from each of your opponents", CR 702.16k), if any.
 pub fn player_protected_by_static(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, from: PlayerId) -> Option<ObjectId> {
-    let view = View { cards, state, log, stop: Layer::Ability };
+    let view = View::new(cards, state, log, Layer::Ability);
     state.battlefield().iter().copied().find(|&source| {
         let card = cards.current(state.obj(source));
         cards.player_keywords[card.0 as usize]
@@ -1925,6 +2498,8 @@ mod tests {
             abilities,
             no_cost: false,
             name_set: false,
+            lost_all: false,
+            text_lost: false,
         };
         let grant = |t| effect(t, EffectKind::AddAbility(ability));
         let strip = |t| effect(t, EffectKind::LoseAllAbilities);
@@ -1943,12 +2518,6 @@ mod tests {
     fn land(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
         c.is(CardType::Land)
     }
-    fn not_artifact(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
-        !c.is(CardType::Artifact)
-    }
-    fn not_enchantment(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
-        !c.is(CardType::Enchantment)
-    }
     fn add_artifact(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
         c.types = c.types.with(CardType::Artifact);
     }
@@ -1959,22 +2528,62 @@ mod tests {
         c.types = c.types.with(CardType::Enchantment);
     }
 
-    /// "Creatures are artifacts" (Ygra's shape).
-    static CREATURES_ARE_ARTIFACTS: StaticDef = static_ability(Layer::Type, creature, add_artifact, "");
-    /// "Lands are creatures" (Life and Limb's shape).
-    static LANDS_ARE_CREATURES: StaticDef = static_ability(Layer::Type, land, add_creature, "");
-    static NONARTIFACTS_ARE_ENCHANTMENTS: StaticDef = static_ability(Layer::Type, not_artifact, add_enchantment, "");
-    static NONENCHANTMENTS_ARE_ARTIFACTS: StaticDef = static_ability(Layer::Type, not_enchantment, add_artifact, "");
+    fn other_creature(_: &dyn LayerQuery, source: ObjectId, id: ObjectId, c: &Chars) -> bool {
+        id != source && c.is(CardType::Creature)
+    }
+    fn other_land(_: &dyn LayerQuery, source: ObjectId, id: ObjectId, c: &Chars) -> bool {
+        id != source && c.is(CardType::Land)
+    }
+    fn other_nonartifact(_: &dyn LayerQuery, source: ObjectId, id: ObjectId, c: &Chars) -> bool {
+        id != source && !c.is(CardType::Artifact)
+    }
+    fn other_nonenchantment(_: &dyn LayerQuery, source: ObjectId, id: ObjectId, c: &Chars) -> bool {
+        id != source && !c.is(CardType::Enchantment)
+    }
 
-    /// The types `pending` (in timestamp order) leave an object with no types, through the dependency system.
-    fn types_after(pending: &[Entry], start: TypeSet) -> TypeSet {
-        let cards = CardTable::new([&HOLDER]);
-        let state = GameState::new(2, 0);
-        let view = View { cards: &cards, state: &state, log: &[], stop: Layer::Type };
-        let mut chars = *printed(&cards, cards.find("Holder").unwrap(), false);
-        chars.types = start;
-        by_dependency(&view, ObjectId(1), pending.to_vec(), &mut Noted { on: false, parts: Vec::new() }, &mut chars);
-        chars.types
+    /// "Creatures are artifacts" (Ygra's shape).
+    static CREATURES_ARE_ARTIFACTS: CardDef =
+        CardDef { name: "Creatures Are Artifacts", statics: &[static_ability(Layer::Type, other_creature, add_artifact, "")], ..CardDef::BLANK };
+    /// "Lands are creatures" (Life and Limb's shape).
+    static LANDS_ARE_CREATURES: CardDef =
+        CardDef { name: "Lands Are Creatures", statics: &[static_ability(Layer::Type, other_land, add_creature, "")], ..CardDef::BLANK };
+    static NONARTIFACTS_ARE_ENCHANTMENTS: CardDef = CardDef {
+        name: "Nonartifacts Are Enchantments",
+        statics: &[static_ability(Layer::Type, other_nonartifact, add_enchantment, "")],
+        ..CardDef::BLANK
+    };
+    static NONENCHANTMENTS_ARE_ARTIFACTS: CardDef = CardDef {
+        name: "Nonenchantments Are Artifacts",
+        statics: &[static_ability(Layer::Type, other_nonenchantment, add_artifact, "")],
+        ..CardDef::BLANK
+    };
+    static THING: CardDef = CardDef { name: "Thing", ..CardDef::BLANK };
+    static CREATURE_THING: CardDef = CardDef { name: "Creature Thing", types: TypeSet::of(&[CardType::Creature]), ..CardDef::BLANK };
+    static LAND_THING: CardDef = CardDef { name: "Land Thing", types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
+
+    /// The types of the first `things` named, put onto the battlefield after the static abilities' sources in `sources` (in
+    /// that timestamp order), once each resolved effect of `effects` (later than all of them) applies to the first.
+    fn types_after(sources: &[&str], things: &[&str], effects: &[EffectKind]) -> TypeSet {
+        let cards = CardTable::new([
+            &CREATURES_ARE_ARTIFACTS,
+            &LANDS_ARE_CREATURES,
+            &NONARTIFACTS_ARE_ENCHANTMENTS,
+            &NONENCHANTMENTS_ARE_ARTIFACTS,
+            &THING,
+            &CREATURE_THING,
+            &LAND_THING,
+        ]);
+        let names: Vec<&str> = things.iter().chain(sources).copied().collect();
+        let (mut state, ids) = battlefield(&cards, &names);
+        // The sources after the things: renumber the timestamps so that the sources are the earlier.
+        for (k, &id) in ids.iter().enumerate() {
+            let timestamp = if k < things.len() { (sources.len() + k + 1) as u32 } else { (k - things.len() + 1) as u32 };
+            state.update_obj(id, |o| o.timestamp = timestamp);
+        }
+        for (k, &kind) in effects.iter().enumerate() {
+            state.effect_push(ContinuousEffect { affected: ids[0], timestamp: 100 + k as u32, ..effect(0, kind) });
+        }
+        chars(&cards, &state, &[], ids[0]).types
     }
 
     fn types(of: &[CardType]) -> TypeSet {
@@ -1984,57 +2593,50 @@ mod tests {
     /// CR 613.8a: "creatures are artifacts" depends on a later effect that makes the object a creature, and waits for it.
     #[test]
     fn a_static_ability_waits_for_the_later_effect_that_changes_what_it_applies_to() {
-        let source = ObjectId(2);
-        let pending = [Entry::Static(source, &CREATURES_ARE_ARTIFACTS), Entry::Effect(effect(9, EffectKind::AddTypes(types(&[CardType::Creature]))))];
-        assert_eq!(types_after(&pending, TypeSet::NONE), types(&[CardType::Creature, CardType::Artifact]));
+        let made = types_after(&["Creatures Are Artifacts"], &["Thing"], &[EffectKind::AddTypes(types(&[CardType::Creature]))]);
+        assert_eq!(made, types(&[CardType::Creature, CardType::Artifact]));
     }
 
     /// CR 613.7, 613.9: an effect that changes nothing about what the other applies to leaves them in timestamp order, and
     /// the later type-setting effect replaces what the earlier one added (Oko's Elk on a creature).
     #[test]
     fn independent_effects_keep_their_timestamp_order() {
-        let pending = [
-            Entry::Static(ObjectId(2), &CREATURES_ARE_ARTIFACTS),
-            Entry::Effect(effect(9, EffectKind::SetTypes(types(&[CardType::Creature])))),
-        ];
-        assert_eq!(types_after(&pending, types(&[CardType::Creature])), types(&[CardType::Creature]));
+        let made = types_after(&["Creatures Are Artifacts"], &["Creature Thing"], &[EffectKind::SetTypes(types(&[CardType::Creature]))]);
+        assert_eq!(made, types(&[CardType::Creature]));
     }
 
     /// CR 613.8b: two effects that each change what the other applies to form a loop, and apply in timestamp order: the
     /// earlier applies, and then the later no longer applies to the object.
     #[test]
     fn a_dependency_loop_applies_in_timestamp_order() {
-        let one = Entry::Static(ObjectId(2), &NONARTIFACTS_ARE_ENCHANTMENTS);
-        let other = Entry::Static(ObjectId(3), &NONENCHANTMENTS_ARE_ARTIFACTS);
-        assert_eq!(types_after(&[one, other], TypeSet::NONE), types(&[CardType::Enchantment]));
-        assert_eq!(types_after(&[other, one], TypeSet::NONE), types(&[CardType::Artifact]));
+        let (one, other) = ("Nonartifacts Are Enchantments", "Nonenchantments Are Artifacts");
+        assert_eq!(types_after(&[one, other], &["Thing"], &[]), types(&[CardType::Enchantment]));
+        assert_eq!(types_after(&[other, one], &["Thing"], &[]), types(&[CardType::Artifact]));
     }
 
-    /// CR 613.8b, 613.8c: a chain of dependencies, latest first: "creatures are artifacts" waits for "lands are creatures",
-    /// which waits for the effect that makes the object a land; after each, the order is worked out again.
+    /// CR 613.8a, 613.8c: whether one effect depends on another is judged on the game as it stands at each step. "Creatures
+    /// are artifacts" depends on "lands are creatures" while there is a land for it to make a creature; with none, applying
+    /// it changes nothing about what "creatures are artifacts" applies to, so the earlier applies first - before the later
+    /// effect that makes the object a land, which "lands are creatures" waits for.
     #[test]
-    fn a_chain_of_dependencies_applies_from_its_end() {
-        let pending = [
-            Entry::Static(ObjectId(2), &CREATURES_ARE_ARTIFACTS),
-            Entry::Static(ObjectId(3), &LANDS_ARE_CREATURES),
-            Entry::Effect(effect(9, EffectKind::AddTypes(types(&[CardType::Land])))),
-        ];
-        assert_eq!(types_after(&pending, TypeSet::NONE), types(&[CardType::Land, CardType::Creature, CardType::Artifact]));
+    fn a_chain_of_dependencies_is_judged_on_the_game_at_each_step() {
+        let sources = ["Creatures Are Artifacts", "Lands Are Creatures"];
+        let land = [EffectKind::AddTypes(types(&[CardType::Land]))];
+        assert_eq!(types_after(&sources, &["Thing"], &land), types(&[CardType::Land, CardType::Creature]));
+        // A land on the battlefield already: "creatures are artifacts" waits for "lands are creatures", which waits for the
+        // effect, and every one applies to the object.
+        assert_eq!(types_after(&sources, &["Thing", "Land Thing"], &land), types(&[CardType::Land, CardType::Creature, CardType::Artifact]));
     }
 
-    /// CR 613.8b: an effect in a loop that also depends on one outside it waits for that one; the loop's other member, which
-    /// depends only on it, goes first though it is the later.
+    /// CR 613.8b (`docs/rules-exceptions.md`, RX-3): an effect in a loop that also depends on one outside it waits for that
+    /// one; the loop's other member, which depends only on it, goes first though it is the later.
     #[test]
     fn a_loop_member_still_waits_for_what_it_depends_on_outside_the_loop() {
         // "Nonartifacts are enchantments" and "nonenchantments are artifacts" depend on each other; the first also depends on
         // the latest, an effect that makes the object an artifact. So "nonenchantments are artifacts" applies first, and
         // then the first no longer applies.
-        let pending = [
-            Entry::Static(ObjectId(2), &NONARTIFACTS_ARE_ENCHANTMENTS),
-            Entry::Static(ObjectId(3), &NONENCHANTMENTS_ARE_ARTIFACTS),
-            Entry::Effect(effect(9, EffectKind::AddTypes(types(&[CardType::Artifact])))),
-        ];
-        assert_eq!(types_after(&pending, TypeSet::NONE), types(&[CardType::Artifact]));
+        let sources = ["Nonartifacts Are Enchantments", "Nonenchantments Are Artifacts"];
+        assert_eq!(types_after(&sources, &["Thing"], &[EffectKind::AddTypes(types(&[CardType::Artifact]))]), types(&[CardType::Artifact]));
     }
 
     // --- Effects in parts (CR 613.6), with static abilities made for the purpose on permanents of a real state.
@@ -2212,6 +2814,86 @@ mod tests {
             let woods = chars(&cards, &state, &[], ids[2]);
             assert!(!woods.is(CardType::Creature) && !woods.has_subtype(Subtype::Saproling), "{names:?}");
         }
+    }
+
+    // --- The contract of `apply` (what it does is judged on the object as it stands), and its check.
+
+    fn creature_chars(power: i16, flying: bool) -> Chars {
+        let cards = CardTable::new([&SPROUT]);
+        let mut c = *printed(&cards, cards.find("Sprout").unwrap(), false);
+        c.power = Some(power);
+        c.toughness = Some(power);
+        if flying {
+            c.keywords = c.keywords.with(Keyword::Flying);
+        }
+        c
+    }
+
+    /// The check of `apply`'s contract (`takes_from_its_object`): "has flying" on a creature with flying and on one without
+    /// (CR 613.9's pair) and "+1/+1" on two powers keep it; "+X/+0 where X is its power" read from the object it was given
+    /// breaks it.
+    #[test]
+    fn an_effect_that_takes_a_value_from_its_object_is_found() {
+        let flying = |mut c: Chars| {
+            c.keywords = c.keywords.with(Keyword::Flying);
+            c
+        };
+        let (x, y) = (creature_chars(2, true), creature_chars(2, false));
+        assert_eq!(takes_from_its_object(&x, &flying(x), &y, &flying(y)), None, "has flying");
+        let pump = |mut c: Chars| {
+            c.power = c.power.map(|p| p + 1);
+            c
+        };
+        let (x, y) = (creature_chars(2, false), creature_chars(5, false));
+        assert_eq!(takes_from_its_object(&x, &pump(x), &y, &pump(y)), None, "+1/+1");
+        let its_power = |mut c: Chars| {
+            c.power = c.power.map(|p| p + p);
+            c
+        };
+        assert_eq!(takes_from_its_object(&x, &its_power(x), &y, &its_power(y)), Some("power"), "+X/+0, X its power");
+    }
+
+    // --- A face-down card judged as the card it is (CR 406.3a-b): what is worked out then is kept apart.
+
+    fn any(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, _: &Chars) -> bool {
+        true
+    }
+    fn blue(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+        c.colors = ColorSet::of(Color::Blue);
+    }
+
+    /// Painter's Servant's shape: "All cards that aren't on the battlefield, spells, and permanents are blue", everywhere.
+    static PAINTER: CardDef = CardDef {
+        name: "Painter",
+        types: TypeSet::of(&[CardType::Artifact]),
+        statics: &[static_ability(Layer::Color, any, blue, "").everywhere()],
+        ..CardDef::BLANK
+    };
+    static SPROUT: CardDef =
+        CardDef { name: "Sprout", types: TypeSet::of(&[CardType::Creature]), colors: Some(ColorSet::of(Color::Green)), ..CardDef::BLANK };
+
+    /// CR 406.3a: a card exiled face down has no characteristics; judged as the card it is (`judged_face_up`), it is the
+    /// card with what applies to it (blue, under the Painter). Asked again once the judgment is over, it has none: what was
+    /// worked out while it was judged is not what the position's pass keeps.
+    #[test]
+    fn a_face_down_card_judged_as_the_card_it_is_poisons_nothing() {
+        let cards = CardTable::new([&PAINTER, &SPROUT]);
+        let (mut state, ids) = battlefield(&cards, &["Painter"]);
+        let mut obj = Obj::new(cards.find("Sprout").unwrap(), PlayerId(0), Zone::exile(PlayerId(0)));
+        obj.face_down = true;
+        obj.timestamp = 9;
+        let card = state.push_obj(obj);
+        state.zone_push(Zone::exile(PlayerId(0)), card);
+        let _ = ids;
+        assert_eq!(chars(&cards, &state, &[], card).colors, ColorSet::NONE, "no characteristics");
+        {
+            let _judged = judged_face_up(&state, card);
+            let judged = chars(&cards, &state, &[], card);
+            assert_eq!(judged.colors, ColorSet::of(Color::Blue), "the card, made blue");
+            assert!(judged.is(CardType::Creature));
+        }
+        assert_eq!(chars(&cards, &state, &[], card).colors, ColorSet::NONE, "no characteristics again");
+        assert!(!chars(&cards, &state, &[], card).is(CardType::Creature));
     }
 
     // --- Control-changing static abilities (CR 613.1b, layer 2).

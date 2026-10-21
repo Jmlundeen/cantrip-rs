@@ -1,14 +1,13 @@
 # Life and Limb (turn 1), then Blood Moon (turn 5); both apply in layer 4 (CR 613.1d).
 # - Taiga and Dryad Arbor are nonbasic Forests. Applying Blood Moon makes them Mountains and not Forests, which changes
 #   what Life and Limb applies to, so Life and Limb's effect depends on Blood Moon's (CR 613.8a) and waits until after it
-#   (CR 613.8b), though it is older. After the Moon neither is a Forest or a Saproling, so Life and Limb does not apply to
-#   them at all: Taiga is a plain Land - Mountain, no creature; Dryad Arbor is a Land Creature - Dryad Mountain, 1/1 and
-#   green by its own card, and no Saproling. (Applied in timestamp order, Life and Limb would first make them Saprolings,
-#   and they would stay Saproling creatures under the Moon.) Before the Moon both are 1/1 green Saproling Forests.
-# - Woodland Changeling is a Saproling (Changeling, CR 702.73a). Life and Limb makes it a Forest land; Blood Moon applies to
-#   it only once it is a land, so here Blood Moon's effect depends on Life and Limb's and applies after it: it is a
-#   Mountain, no longer a Forest, but still a Saproling, so Life and Limb still applies - a 1/1 green Land Creature, every
-#   creature type and Mountain, that taps for {R} and not {G} (CR 305.6, 305.7).
+#   (CR 613.8b), though it is older. Applying Life and Limb changes nothing Blood Moon applies to - every Forest and Saproling
+#   here is a land already - so Blood Moon does not depend on it. After the Moon neither land is a Forest or a Saproling, so
+#   Life and Limb does not apply to them at all: Taiga is a plain Land - Mountain, no creature, tapping for {R}; Dryad Arbor
+#   is a Land Creature - Dryad Mountain, 1/1 and green by its own card, and no Saproling. (Applied in timestamp order, Life
+#   and Limb would first make them Saprolings, and they would stay Saproling creatures under the Moon.) Before the Moon both
+#   are 1/1 green Saproling Forests. With a Saproling that is no land on the battlefield, the two depend on each other
+#   (blood-moon-and-life-and-limb-made-to-depend-on-each-other-by-a-woodland-changeling-apply-in-timestamp-order).
 
 [Bot1 Deck]
 Taiga
@@ -16,7 +15,6 @@ Mox Emerald
 Mox Ruby
 Mox Pearl
 Life and Limb
-Woodland Changeling
 Dryad Arbor
 Blood Moon
 Plains
@@ -40,11 +38,6 @@ Bot2.Pass
 ? Bot1.Battlefield.Taiga.Subtypes = Forest; Mountain; Saproling
 [T3 Bot1.Main1]
 Bot1.Hand.Dryad Arbor.Play
-Bot1.Hand.Woodland Changeling.Cast
-Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Pass
-Bot2.Pass
 ? Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Forest; Saproling
 [T5 Bot1.Main1]
 Bot1.Hand.Blood Moon.Cast
@@ -54,8 +47,8 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Taiga.Subtypes = Mountain
-! Bot1.Battlefield.Woodland Changeling.Activate(Ability: Add {G})
-Bot1.Battlefield.Woodland Changeling.Activate(Ability: Add {R})
+! Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+Bot1.Battlefield.Taiga.Activate(Ability: Add {R})
 ? Bot1.Mana = {R}
 
 [Expect]
@@ -67,8 +60,3 @@ Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
 Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Mountain
 Bot1.Battlefield.Dryad Arbor.Colors = Green
 Bot1.Battlefield.Dryad Arbor.Power = 1
-Bot1.Battlefield.Woodland Changeling.Types = Creature; Land
-Bot1.Battlefield.Woodland Changeling.Subtypes = (every creature type); Mountain
-Bot1.Battlefield.Woodland Changeling.Colors = Green
-Bot1.Battlefield.Woodland Changeling.Power = 1
-Bot1.Battlefield.Woodland Changeling.Toughness = 1
