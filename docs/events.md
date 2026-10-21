@@ -176,7 +176,9 @@ next game's table, where they sideboard first (three minutes, the same deck view
 where the match stands), or back to the pod's table when the match is decided. Every page is a fresh one, so nothing of
 one game is carried into the next. Each game is dealt with the player's sideboard as the cards they own outside the game
 (CR 100.4b, 400.11a) - the rest of their pool, and any number of each basic land (`RulesGameOptions.BasicLandsOutside`) -
-for a card that brings one in (North Wind Avatar). The pod's table shows the pairings and how each match stands (`PairingsMessage`)
+for a card that brings one in (North Wind Avatar). The host refuses a sideboard naming a card the engine does not have, as
+it refuses such a deck, so a saved pool holding a card since removed from content can no longer be dealt - not even with
+that card left in the sideboard - until the pool is fixed. The pod's table shows the pairings and how each match stands (`PairingsMessage`)
 whenever a player is there, and the final standings at the end.
 
 Every match has a **match clock**, a chess clock for each player across all its games: 25 minutes each by default

@@ -1583,6 +1583,11 @@ impl PromptPayload {
                 cards: match p.maximum_total_mana_value {
                     // "With total mana value N or less": the first cards that fit together, in order.
                     Some(most) => first_fitting(&p.eligible, &p.mana_values, p.count, most),
+                    // "Total power N or more" (crew, saddle): every creature with positive power, enough whenever anything is;
+                    // a negative power would take from the total (CR 107.1b).
+                    None if p.minimum_power > 0 => {
+                        p.eligible.iter().enumerate().filter(|&(i, _)| p.powers.get(i).is_none_or(|&power| power > 0)).map(|(_, &c)| c).collect()
+                    }
                     None => p.eligible.iter().take(p.count.max(0) as usize).copied().collect(),
                 },
             }),
@@ -2007,5 +2012,24 @@ mod tests {
             AnswerPayload::TargetsChosenAnswer(t) => assert_eq!(t.targets, vec![TargetMessage::player(2)]),
             other => panic!("{other:?}"),
         }
+    }
+
+    /// Crew 1 with a -4/1 and a 2/1 (CR 107.1b: a negative power takes from the total): the default answer takes only the
+    /// creature with positive power, whose total meets the minimum, as the C# `Default()` does.
+    #[test]
+    fn the_default_crew_answer_leaves_out_a_negative_power() {
+        let prompt = PromptPayload::ChooseCardsPromptMessage(ChooseCardsPrompt {
+            player: 1,
+            eligible: vec![ViewHandle(3), ViewHandle(4)],
+            count: 2,
+            up_to: true,
+            minimum_power: 1,
+            powers: vec![-4, 2],
+            ..Default::default()
+        });
+        let AnswerPayload::CardsChosenAnswer(chosen) = prompt.default_answer() else { panic!("cards") };
+        assert_eq!(chosen.cards, vec![ViewHandle(4)]);
+        let total: i32 = chosen.cards.iter().map(|c| [-4, 2][if *c == ViewHandle(3) { 0 } else { 1 }]).sum();
+        assert!(total >= 1);
     }
 }

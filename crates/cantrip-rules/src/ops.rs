@@ -1992,7 +1992,9 @@ pub fn deal_damage_with(
                 if source_chars.has(Keyword::Infect) {
                     // Damage from a source with infect is dealt to a creature as that many -1/-1 counters (CR 702.90c,
                     // 120.3d), which "that source's controller" puts on it, whoever's turn or spell it is; it is still
-                    // damage dealt, so deathtouch counts (CR 702.2b). Put as an effect's (KI-60).
+                    // damage dealt, so deathtouch counts (CR 702.2b). Put as an effect's: infect is a static ability (CR 702.90a),
+                    // static abilities create effects (CR 609.1), and it is infect's effect, not the turn-based action dealing
+                    // combat damage, that puts the counters (CR 120.3d) - so "if an effect would put counters" applies.
                     let amount = amount.min(i16::MAX as u16) as i16;
                     counters::put(cx, id, CounterKind::MinusOne, amount, source_controller, counters::How::Effect);
                     cx.st().update_obj(id, |o| o.deathtouched |= deathtouch);

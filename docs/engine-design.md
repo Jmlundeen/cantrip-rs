@@ -1040,9 +1040,10 @@ Crew and saddle (CR 702.122a, 702.171a) are the core's `Cost::tap_creatures`, a 
 `Keyword::CrewsAsThoughPowerTwoGreater` for crew (`mechanics::crew`), `SaddlesAsThoughPowerTwoGreater` for saddle
 (`mechanics::saddle`), none for teamwork. "This creature saddles Mounts and crews Vehicles as though its power were 2
 greater" is both keywords (`tokens::PILOT_SADDLES_AND_CREWS`); a printed one is a JSON `keywords` entry, a granted one a
-layer-6 grant. Every printed amount is 2. The power counted is the creature's plus 2, a negative power too; the rules
-use a negative total as it is (CR 107.1b), but the prompt's powers are unsigned and each is floored at 0, a known deviation
-([KI-82](known-issues.md#ki-82-a-creature-with-negative-power-counts-as-0-towards-a-crew-saddle-or-teamwork-total)).
+layer-6 grant. Every printed amount is 2. The power counted is the creature's plus 2, a negative power too, and the
+prompt's powers are signed: a creature whose power is still negative takes from the total (CR 107.1b: "If a calculation
+or comparison needs to use a negative value, it does so"), so the validation sums them as they are and the cost is
+payable while the creatures with positive power are enough.
 
 ### What the board was as a spell was cast
 

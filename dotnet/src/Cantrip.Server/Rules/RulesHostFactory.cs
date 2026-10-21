@@ -4,7 +4,7 @@ namespace Cantrip.Server.Rules;
 /// <param name="Deck">The deck, one entry per copy, top first when dealt unshuffled.</param>
 /// <param name="Sideboard">
 /// The cards the seat owns outside the game (CR 100.4, 400.11a): what "a card you own from outside the game" chooses among
-/// (North Wind Avatar). A card the host does not know is left out of the game here (KI-37), where in the deck it is refused.
+/// (North Wind Avatar). A card the host does not know is refused here, as in the deck.
 /// </param>
 public sealed record RulesSeat(string Name, IReadOnlyList<string> Deck, IReadOnlyList<string> Sideboard)
 {
