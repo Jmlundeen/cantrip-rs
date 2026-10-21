@@ -1038,7 +1038,7 @@ mod tests {
     fn an_object_twenty_moves_on_is_named_by_where_it_is_now() {
         let mut game = game();
         let card = game.state.obj(game.state.battlefield()[0]).card;
-        let mut chain = |game: &mut Game| {
+        let chain = |game: &mut Game| {
             let first = game.state.push_obj(Obj::new(card, PlayerId(0), Zone::BATTLEFIELD));
             game.state.zone_push(Zone::BATTLEFIELD, first);
             let mut now = first;
