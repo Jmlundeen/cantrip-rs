@@ -428,7 +428,7 @@ def find_or_open(repo, issues, name):
     made = gh("api", "-X", "POST", f"repos/{repo}/issues", "--input", "-",
               body={"title": title(name), "body": card_issue_body(name, card, entries), "labels": sorted(labels)})
     print(f"opened #{made['number']} for {name}")
-    made.update(state="OPEN", labels=labels, events=[])
+    made.update(state="OPEN", labels=labels, events=[], from_comments=0)
     issues[made["number"]] = made
     return made
 
