@@ -1,6 +1,6 @@
 //! Counts of things that happen, played past the widths they were once kept in (255): more than 255 additional combat
 //! phases in a turn (CR 500.8), and more than 255 spells cast by one player in a turn, each recorded as the nth it is
-//! (`Event::SpellCast::nth`). Over test cards.
+//! (`Event::SpellCast::nth`), and a discard to hand size of more than 255 cards (CR 514.1). Over test cards.
 
 use crate::{Game, Setup};
 use cantrip_api::*;
@@ -82,4 +82,31 @@ fn the_300th_spell_cast_in_a_turn_is_recorded_as_the_300th() {
     let nth: Vec<u32> = g.log.iter().filter_map(|r| match r.event { Event::SpellCast { player: P0, nth, .. } => Some(nth), _ => None }).collect();
     assert_eq!(nth.len(), N);
     assert_eq!(nth, (1..=N as u32).collect::<Vec<_>>());
+}
+
+/// A hand of 270 at the cleanup step (CR 514.1): 263 cards are discarded, and seven are left.
+#[test]
+fn a_discard_to_hand_size_of_263_cards_is_asked_and_made() {
+    let mut g = game(&FILLER, 263);
+    let mut asked = None;
+    for _ in 0..1000 {
+        g.run();
+        let request = g.pending().cloned().expect("a question");
+        if g.state.turn.number > 1 {
+            break;
+        }
+        let answer = match &request.kind {
+            RequestKind::DiscardToHandSize { count, hand } => {
+                asked = Some((*count, hand.len()));
+                Answer::Cards(hand.iter().copied().take(*count as usize).collect())
+            }
+            RequestKind::Priority { .. } => Answer::Pass,
+            RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
+            RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),
+            other => panic!("unexpected question {other:?}"),
+        };
+        g.answer(request.id, request.player, answer).unwrap();
+    }
+    assert_eq!(asked, Some((263, 270)));
+    assert_eq!(g.state.zone(Zone::hand(P0)).len(), 7);
 }

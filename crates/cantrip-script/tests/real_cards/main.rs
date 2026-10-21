@@ -7,6 +7,7 @@ mod counter_duration_ends;
 mod demonic_pact;
 mod eluge;
 mod floodpits_drowner_self;
+mod look_counts;
 mod lost_abilities;
 mod mana_ability_guards;
 mod turn_face_up_by_effect;
