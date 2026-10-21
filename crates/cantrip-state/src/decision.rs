@@ -430,7 +430,7 @@ pub enum RequestKind {
     /// blocks effects require if able (CR 509.1c).
     DeclareBlockers { eligible: Vec<ObjectId>, attackers: Vec<ObjectId>, allowed: Vec<(ObjectId, ObjectId)>, requirements: BlockRequirements },
     /// Discard down to maximum hand size (CR 514.1).
-    DiscardToHandSize { count: u8, hand: Vec<ObjectId> },
+    DiscardToHandSize { count: u32, hand: Vec<ObjectId> },
     /// Keep the opening hand or take a mulligan (CR 103.5).
     Mulligan { mulligans: u8 },
     /// Who takes the first turn (CR 103.1).

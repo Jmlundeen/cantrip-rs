@@ -11,7 +11,7 @@ fn discard_any(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let discarded = g.discard_together(&chosen);
     if !discarded.is_empty() {
         let this = g.card_id(&CARD);
-        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, discarded.len() as u16);
+        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, u16::try_from(discarded.len()).unwrap_or(u16::MAX));
     }
     Ok(())
 }

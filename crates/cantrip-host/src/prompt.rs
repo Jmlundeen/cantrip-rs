@@ -1179,7 +1179,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         }
         RequestKind::DiscardToHandSize { count, hand } => PromptPayload::DiscardPromptMessage(DiscardPrompt {
             player,
-            count: i32::from(*count),
+            count: wire(*count),
             maximum_hand_size: 7,
             hand: handles_of(handles, hand),
         }),

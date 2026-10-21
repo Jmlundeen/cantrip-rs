@@ -45,9 +45,10 @@ fn first_instant_or_sorcery_costs_less(q: &dyn Query, source: ObjectId, player: 
         .battlefield()
         .iter()
         .filter(|&&id| s.obj(id).controller == player && s.obj(id).counters(CounterKind::Flood) > 0 && q.chars(id).is(CardType::Land))
-        .count() as u8;
+        .count();
     let mut less = ManaCost::ZERO;
-    less.symbols[Mana::U as usize] = flooded;
+    // A cost holds at most 255 {U} (KI-103), so a reduction of more takes them all: saturated, never wrapped.
+    less.symbols[Mana::U as usize] = u8::try_from(flooded).unwrap_or(u8::MAX);
     CostDelta::less_mana(less)
 }
 

@@ -15,7 +15,7 @@ fn burn_each_player(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
                 let c = g.chars(id);
                 c.is(CardType::Land) && !c.supertypes.basic
             });
-            (item.object, Target::Player(p), nonbasic.count() as u16)
+            (item.object, Target::Player(p), u16::try_from(nonbasic.count()).unwrap_or(u16::MAX))
         })
         .filter(|&(_, _, n)| n > 0)
         .collect();

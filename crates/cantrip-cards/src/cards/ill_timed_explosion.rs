@@ -30,7 +30,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // Nothing discarded (nothing a discard can't be made of, CR 101.2) is not doing it: the reflexive ability does not trigger.
     let Some(x) = g.discard_together(&chosen).iter().map(|&card| g.mana_value(card)).max() else { return Ok(()) };
     let this = g.card_id(&CARD);
-    g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, x as u16);
+    g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, u16::try_from(x).unwrap_or(u16::MAX));
     Ok(())
 }
 

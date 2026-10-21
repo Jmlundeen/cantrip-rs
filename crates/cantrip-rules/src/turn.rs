@@ -1183,7 +1183,7 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
     }
     let hand = cx.s().zone(Zone::hand(active)).to_vec();
     if hand.len() > 7 && !crate::actions::no_maximum_hand_size(cx, active) {
-        let count = (hand.len() - 7) as u8;
+        let count = count_u32(hand.len() - 7);
         if let Some(Answer::Cards(cards)) = cx.ask_rule(active, RequestKind::DiscardToHandSize { count, hand })? {
             ops::discard_together(cx, &cards);
         }

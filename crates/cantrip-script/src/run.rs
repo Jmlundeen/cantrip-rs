@@ -1171,7 +1171,7 @@ impl<'s> Run<'s> {
                     _ => return fail(format!("line {}: {spec} is not a player who may be chosen", step.line)),
                 }
             }
-            (V::Discard, RequestKind::DiscardToHandSize { hand, count }) => Some(self.pick(step, hand, usize::from(*count), true)?),
+            (V::Discard, RequestKind::DiscardToHandSize { hand, count }) => Some(self.pick(step, hand, *count as usize, true)?),
             (V::Attack, RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, .. }) => {
                 let both: Vec<ObjectId> = planeswalkers.iter().chain(battles.iter()).copied().collect();
                 self.attack(step, eligible, players, &both)?

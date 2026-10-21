@@ -317,7 +317,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             }
         }
         (RequestKind::DiscardToHandSize { count, hand }, Answer::Cards(cards)) => {
-            if cards.len() as u8 == *count && distinct(cards) && cards.iter().all(|c| hand.contains(c)) {
+            if cards.len() == *count as usize && distinct(cards) && cards.iter().all(|c| hand.contains(c)) {
                 Ok(())
             } else {
                 no("not a discard of the right cards")

@@ -259,8 +259,10 @@ pub fn look_at_top(
         return Ok(Vec::new());
     }
     let takeable: Vec<ObjectId> = looked.iter().copied().filter(|&c| wanted(&g.chars(c))).collect();
-    let min = min.min(takeable.len() as u8);
-    let max = max.min(takeable.len() as u8);
+    // At most the cards that qualify, saturating: past 255 of them a bound of 255 (`u8::MAX`, "any number") stays one.
+    let qualifying = u8::try_from(takeable.len()).unwrap_or(u8::MAX);
+    let min = min.min(qualifying);
+    let max = max.min(qualifying);
     let ask = RequestKind::DistributeCards {
         source,
         cards: looked.clone(),

@@ -6923,7 +6923,7 @@ fn convoked(cost: &ManaCost, creatures: &[ColorSet]) -> ManaCost {
     let paid_by = convoke_match(&pips, creatures);
     let matched = paid_by.iter().flatten().count();
     let mut left = *cost;
-    left.generic = left.generic.saturating_sub((creatures.len() - matched) as u8);
+    left.generic = left.generic.saturating_sub(u8::try_from(creatures.len() - matched).unwrap_or(u8::MAX));
     // The pips come in the cost's order, colored symbols first and hybrid symbols after.
     let mut at = 0;
     for mana in Mana::ALL {

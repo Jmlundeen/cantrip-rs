@@ -14,7 +14,7 @@ fn enter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let nonlands = discarded.iter().filter(|&&card| !g.chars(card).is(CardType::Land)).count();
     if nonlands > 0 {
         let this = g.card_id(&CARD);
-        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, nonlands as u16);
+        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, u16::try_from(nonlands).unwrap_or(u16::MAX));
     }
     Ok(())
 }
