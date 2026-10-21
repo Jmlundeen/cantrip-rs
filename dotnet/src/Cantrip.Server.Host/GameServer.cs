@@ -1171,8 +1171,9 @@ public sealed class GameServer : IAsyncDisposable
     internal sealed class Connection(WebSocket socket, DateTimeOffset createdAt)
     {
         private readonly Channel<byte[]> _outbound = Channel.CreateBounded<byte[]>(256);
+        // Cancelled to drop the connection. Never disposed: it has no timer, and an abort may come after the request.
+        private readonly CancellationTokenSource _aborted = new();
         private volatile bool _completed;
-        private volatile bool _detached;
         public Member? Member { get; set; }
         public DateTimeOffset CreatedAt { get; } = createdAt;
 
@@ -1195,34 +1196,37 @@ public sealed class GameServer : IAsyncDisposable
         public void Complete() { _completed = true; _outbound.Writer.TryComplete(); }
 
         /// <summary>
-        /// The request that accepted the socket has finished with it and is about to dispose it. After this the
-        /// socket must not be touched from any other thread.
+        /// The request that accepted the socket has finished with it and is about to dispose it. Nothing from any other
+        /// thread touches the socket, so there is nothing left to do but stop taking frames.
         /// </summary>
-        public void Detach() { _detached = true; Complete(); }
+        public void Detach() => Complete();
 
         /// <summary>
         /// Drops the connection. Called from the pump and from shutdown — never from inside the request that owns
         /// the socket.
         /// <para>
-        /// The socket forwards <c>Abort()</c> to the <see cref="HttpContext"/> that accepted it, so an abort that
-        /// lands after that request has ended reaches a torn-down feature collection. Once the connection is
-        /// detached there is nothing left to abort — and, more to the point, nothing of ours to abort: the request
-        /// is over and its context belongs to whatever ASP.NET Core does with it next.
-        /// </para>
-        /// <para>
-        /// The catch is for the sliver between reading that flag and the call landing, in which the request can
-        /// still end. A socket whose request has ended is already closed, so there is nothing to lose by it.
+        /// It never touches the socket itself. The socket forwards <c>Abort()</c> to the <see cref="HttpContext"/>
+        /// that accepted it, and that request can end on its own thread at any moment: an abort that lands just after
+        /// it has reaches a torn-down feature collection and throws a <see cref="NullReferenceException"/> (KI-85, a
+        /// client closing as the table was disposed). So the abort is a cancellation, which the read and write loops -
+        /// the request's own - wait on: the receive in progress is abandoned, the socket aborted by the request's
+        /// thread in the write loop's <c>finally</c>, and the request ends. A cancellation after the request is over
+        /// reaches nothing, since the loops' registrations are gone with them.
         /// </para>
         /// </summary>
         public void Abort()
         {
             Complete();
-            if (_detached) return;
-            try { socket.Abort(); }
-            catch (ObjectDisposedException) { }
+            _aborted.Cancel();
         }
-        public async Task ReadLoopAsync(Action<ClientMessage> receive, CancellationToken cancellation)
+
+        /// <summary>Whether <see cref="Abort"/> has been called.</summary>
+        public bool Aborted => _aborted.IsCancellationRequested;
+
+        public async Task ReadLoopAsync(Action<ClientMessage> receive, CancellationToken shutdown)
         {
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(shutdown, _aborted.Token);
+            CancellationToken cancellation = linked.Token;
             var buffer = new byte[16 * 1024];
             try
             {
@@ -1243,8 +1247,10 @@ public sealed class GameServer : IAsyncDisposable
             catch (WebSocketException) { }
             catch (MessagePackSerializationException) { }
         }
-        public async Task WriteLoopAsync(CancellationToken cancellation)
+        public async Task WriteLoopAsync(CancellationToken shutdown)
         {
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(shutdown, _aborted.Token);
+            CancellationToken cancellation = linked.Token;
             try
             {
                 await foreach (byte[] payload in _outbound.Reader.ReadAllAsync(cancellation).ConfigureAwait(false))

@@ -65,7 +65,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
-| [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
 
 ## Issues
 
@@ -451,15 +450,3 @@ may attack into a protected player for nothing and leave itself open. A fix tell
 protected from (a field on `PlayerSummaryView` rather than the text), and has the attack plan count no damage to them.
 
 **Scenarios.** none yet.
-
-### KI-85: A scenario table test sometimes fails closing a connection
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | server, tests | 2026-10-19, a `tools	est.cmd /noweb` run during the site overhaul |
-
-**Notes.** `ScenarioTableTests.A_client_answering_otherwise_fails_the_scenario_at_the_line` once threw a
-NullReferenceException in `GameServer` while a connection was closing, then passed three reruns and the next full run.
-A race in closing a table's connections, in code the change being tested did not touch. Not investigated.
-
-**Scenarios.** none; the .NET test above.
