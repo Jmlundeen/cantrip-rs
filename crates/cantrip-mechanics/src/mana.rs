@@ -179,3 +179,37 @@ pub fn a_player_taps_a_land_for_mana(q: &dyn Query, _: ObjectId, event: &Event) 
     let (land, player, produced) = land_tapped_for_mana(q, event)?;
     that_land_produced(land, player, produced)
 }
+
+/// "Whenever you tap a [land type] for mana" (CR 106.12, 605.1b): a permanent of that land type (`TYPE`, `lands::sub(..)`),
+/// read through the words of the ability's source (CR 612.2) and through the layers - a nonbasic land with the type counts,
+/// a land named for it without the type doesn't - tapped for mana by the ability's controller. A delayed ability's
+/// controller is the player who controlled the spell or ability that created it (CR 603.7d-e). About the permanent, the
+/// player who tapped it in `data[0]` for `that_player_adds_an_additional`. Nissa, Who Shakes the World (Forest) and Pyre
+/// Rhymer's Molten Tide (Mountain) print it.
+pub fn you_tap_a_land_type_for_mana<const TYPE: u16>(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::TappedForMana { player, .. } if player == asker.controller => a_player_taps_a_land_type_for_mana::<TYPE>(q, asker, event),
+        _ => None,
+    }
+}
+
+/// "Whenever a player taps a [land type] for mana" (CR 106.12, 605.1b): `you_tap_a_land_type_for_mana` for any player's
+/// tap, the one who tapped it in `data[0]`. High Tide (Island) and Bubbling Muck (Swamp) print it.
+pub fn a_player_taps_a_land_type_for_mana<const TYPE: u16>(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::TappedForMana { permanent, player, .. } if q.chars(permanent).has_subtype(crate::lands::word(q, asker.source, TYPE)) => {
+            Some(Fired { subject: Target::Object(permanent), data: [player.0 as u32, 0] })
+        }
+        _ => None,
+    }
+}
+
+/// "[That player] add[s] an additional [mana]" (CR 605.1b, 605.4a): one mana of the kind `M` (`Mana::R as u8`), added by the
+/// player who tapped the permanent (`data[0]`, from `you_tap_a_land_type_for_mana` or `a_player_taps_a_land_type_for_mana`),
+/// whoever controls the ability - "that player" (High Tide), or "you" when only your tap triggers it (Nissa, Who Shakes the
+/// World; Molten Tide). A triggered mana ability's effect, it resolves as the mana ability that triggered it does. A mana
+/// symbol is no word (CR 612.2), so a text change leaves it.
+pub fn that_player_adds_an_additional<const M: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_mana(PlayerId(item.data[0] as u8), Mana::ALL[M as usize], 1);
+    Ok(())
+}
