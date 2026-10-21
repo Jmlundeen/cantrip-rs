@@ -13,5 +13,6 @@ staged = ["cantrip-engine/staged"]
 cantrip-engine.workspace = true
 
 [dev-dependencies]
+cantrip-cards.workspace = true
 cantrip-mechanics.workspace = true
 cantrip-api.workspace = true

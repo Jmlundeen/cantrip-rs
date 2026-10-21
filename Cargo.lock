@@ -75,6 +75,7 @@ name = "cantrip-script"
 version = "0.1.0"
 dependencies = [
  "cantrip-api",
+ "cantrip-cards",
  "cantrip-engine",
  "cantrip-mechanics",
 ]
