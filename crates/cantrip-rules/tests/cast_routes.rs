@@ -192,6 +192,36 @@ static FREE_EMBLEM: CardDef = CardDef { name: "Route Free Emblem", types: TypeSe
 /// An emblem that gives cards in its owner's graveyard a way to be cast.
 static GRANTOR_EMBLEM: CardDef = CardDef { name: "Route Grantor Emblem", types: TypeSet::NONE, ..GRANTOR_0 };
 
+fn exile_it(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    g.exile(item.object);
+    Ok(())
+}
+
+/// A suspend-like special action (CR 702.62a, 116.2): taken from the hand whenever the card could be cast.
+static SUSPEND_ABILITY: [AbilityDef; 1] =
+    [cantrip_api::ability(Cost::mana(ManaCost::ZERO), exile_it, "Suspend probe").timing(Timing::AsCast).from(ZoneKind::Hand).special_action()];
+
+static SUSPEND_PROBE: CardDef = CardDef { name: "Route Suspend Probe", abilities: &SUSPEND_ABILITY, ..PROBE_SPELL };
+
+fn never(_: &dyn Query, _: &Asker) -> bool {
+    false
+}
+
+/// One that may be cast only when it can't ("cast this spell only ...", CR 601.3).
+static SUSPEND_NEVER: CardDef = CardDef { name: "Route Suspend Never Probe", cast_only_if: Some(never), ..SUSPEND_PROBE };
+
+fn no_suspend_probe(q: &dyn Query, _: &Asker, _: PlayerId, spell: ObjectId) -> bool {
+    q.card(q.state().obj(spell).card).name != "Route Suspend Probe"
+}
+
+/// "Spells named Route Suspend Probe can't be cast" (CR 101.2, `CardDef::spell_rules`: Meddling Mage's kind).
+static SUSPEND_FORBIDDER: CardDef =
+    CardDef { name: "Route Suspend Forbidder", types: TypeSet::of(&[CardType::Artifact]), spell_rules: &[no_suspend_probe], ..CardDef::BLANK };
+
+/// A spell with split second (CR 702.61a), for nothing.
+static SPLIT_SECOND_PROBE: CardDef =
+    CardDef { name: "Route Split Second Probe", cost: ManaCost::ZERO, keywords: Keywords::of(&[Keyword::SplitSecond]), ..PROBE_SPELL };
+
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
 static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
@@ -228,6 +258,10 @@ fn table() -> &'static CardTable {
             &EXILE_PERMISSION,
             &FREE_ALTERNATIVE,
             &FREE_EMBLEM,
+            &SUSPEND_PROBE,
+            &SUSPEND_NEVER,
+            &SUSPEND_FORBIDDER,
+            &SPLIT_SECOND_PROBE,
             &GRANTOR_EMBLEM,
             &LAND,
         ])
@@ -588,6 +622,55 @@ fn a_cast_as_an_effect_resolves_uses_no_way_a_permanent_gives() {
     take(&mut game, &option);
     resolve(&mut game);
     assert_eq!(game.state.obj(target).zone, Zone::graveyard(PlayerId(1)));
+}
+
+fn activations_of(game: &RulesGame, card: ObjectId) -> Vec<ActionOption> {
+    match &game.pending().expect("a priority request").kind {
+        RequestKind::Priority { options } => options.iter().filter(|o| o.kind == ActionKind::ActivateAbility && o.source == Some(card)).cloned().collect(),
+        other => panic!("expected priority, got {other:?}"),
+    }
+}
+
+/// CR 702.62a: suspend is taken only when the card could begin to be cast - not when its own "cast this spell only" fails,
+/// not when a static ability forbids casting it (the rulings: "any other effects that could stop you from casting it"), and
+/// not while a spell with split second is on the stack (CR 702.61a), though split second lets special actions be taken.
+#[test]
+fn suspend_is_taken_only_when_the_card_could_be_cast() {
+    let (mut game, card) = game_with("Route Suspend Probe", Zone::hand, 0);
+    game.run();
+    assert_eq!(activations_of(&game, card).len(), 1, "with nothing in the way, it is suspended");
+
+    let (mut game, card) = game_with("Route Suspend Never Probe", Zone::hand, 0);
+    game.run();
+    assert!(activations_of(&game, card).is_empty(), "its own condition is not met");
+
+    let (mut game, card) = game_with("Route Suspend Probe", Zone::hand, 0);
+    put(&mut game, "Route Suspend Forbidder", PlayerId(1));
+    game.run();
+    assert!(activations_of(&game, card).is_empty(), "a ban on casting it");
+
+    let cards = table();
+    let (probe, split, filler) = (cards.find("Route Suspend Probe").unwrap(), cards.find("Route Split Second Probe").unwrap(), cards.find("Route Filler").unwrap());
+    let mut game = RulesGame::new(cards, &Setup { decks: vec![vec![probe, split, filler, filler, filler, filler, filler], vec![filler; 7]], seed: 1, ..Setup::default() });
+    let (card, split_id) = (game.state.zone(Zone::hand(ME))[0], game.state.zone(Zone::hand(ME))[1]);
+    begin(&mut game, 0);
+    game.run();
+    let cast = casts_of(&game, split_id).into_iter().next().expect("the split-second spell is castable");
+    take(&mut game, &cast);
+    for _ in 0..8 {
+        game.run();
+        let request = game.pending().cloned().expect("asked");
+        match request.kind {
+            RequestKind::Priority { .. } => break,
+            RequestKind::PayCosts { options, .. } => {
+                let confirm = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).expect("confirm");
+                game.answer(request.id, request.player, Answer::Act(Action::of(confirm))).unwrap();
+            }
+            other => panic!("unexpected request: {other:?}"),
+        }
+    }
+    assert!(game.state.stack.iter().any(|i| i.object != card), "the split-second spell is on the stack");
+    assert!(activations_of(&game, card).is_empty(), "split second: the card could not be cast");
 }
 
 fn emblem(game: &mut RulesGame, name: &str, player: PlayerId) -> ObjectId {

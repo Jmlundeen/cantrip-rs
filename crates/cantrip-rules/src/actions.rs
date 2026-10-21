@@ -2052,9 +2052,12 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 // "Could begin to cast this card by putting it onto the stack from your hand" (CR 702.62a): from the zone
                 // the ability works from, which is the zone the card would be cast from, and only where nothing would stop
                 // that cast - a spell limit already reached (Archon of Emeria), the card's own "cast this spell only", a
-                // ban on spells like it (the suspend rulings: "any other effects that could stop you from casting it").
+                // ban on spells like it (the suspend rulings: "any other effects that could stop you from casting it"), a
+                // spell with split second on the stack (CR 702.61a: suspend is a special action, which split second lets be
+                // taken, but the card could not be cast).
                 Timing::AsCast
                     if !(chars.is(CardType::Instant) || chars.has(Keyword::Flash) || sorcery_timing(cx, player))
+                        || split
                         || cast_barred(cx, player).contains(zone)
                         || !cast_only_if_met(cx, cx.card(cx.s().obj(id).card), &Asker { source: id, controller: player })
                         || {
