@@ -65,10 +65,8 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
-| [KI-83](#ki-83-teferis-protection-in-the-browser-shows-an-empty-battlefield) | Teferi's Protection in the browser shows an empty battlefield | Low | Open |
 | [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
-| [KI-93](#ki-93-the-browser-shows-no-phased-out-permanents) | The browser shows no phased-out permanents | Medium | Open |
 | [KI-94](#ki-94-a-browser-scenarios-clientmenu-check-reads-a-menu-of-a-card-long-gone) | A browser scenario's `Client.Menu` check reads a menu of a card long gone | Low | Open |
 
 ## Issues
@@ -456,19 +454,6 @@ protected from (a field on `PlayerSummaryView` rather than the text), and has th
 
 **Scenarios.** none yet.
 
-### KI-83: Teferi's Protection in the browser shows an empty battlefield
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | client, browser scenario | 2026-10-19, a full run of ScenarioInBrowserTests |
-
-**Notes.** The browser scenario fails: the page shows an empty battlefield where the phased-out permanents and the
-player's facts should be. It failed before the declare-blockers test-driver change of 2026-10-19 too (it fails with that
-change switched off), so it is older. Not investigated: it may be the client's drawing of phased-out permanents or the
-scenario driver.
-
-**Scenarios.** `teferis-protection-shows-phased-out-permanents-and-its-player-facts-in-the-browser` (browser).
-
 ### KI-84: Trinisphere and Force of Will's alternative cost in the browser show the wrong menu
 
 | Priority | Status | Area | Found |
@@ -492,21 +477,6 @@ NullReferenceException in `GameServer` while a connection was closing, then pass
 A race in closing a table's connections, in code the change being tested did not touch. Not investigated.
 
 **Scenarios.** none; the .NET test above.
-
-### KI-93: The browser shows no phased-out permanents
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | client | 2026-10-20, review of PR #147 (fails the same on a clean main) |
-
-**Notes.** After Teferi's Protection resolves, Bot1's Plains, Mox Pearl, Mox Jet and Ornithopter are phased out
-(`Bot1.PhasedOut` passes in the engine), but Bot1's page draws none of them: `Client.Bot1.Battlefield` reads "" where
-"Plains; Mox Pearl; Mox Jet; Ornithopter" is expected. Phased-out permanents are treated as though they don't exist
-(CR 702.26b) but are not hidden; the players know of them, and the client is meant to keep them in sight with PHASED OUT
-at their foot. Either the projection stopped sending them or the table stopped drawing them; not yet bisected.
-
-**Scenarios.** `teferis-protection-shows-phased-out-permanents-and-its-player-facts-in-the-browser` (browser suite;
-fails at line 35).
 
 ### KI-94: A browser scenario's `Client.Menu` check reads a menu of a card long gone
 

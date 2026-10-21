@@ -54,7 +54,7 @@ public static class GameText
             Pile(
                 text,
                 $"\n{Owner(client, player.Seat)} battlefield",
-                [.. client.BattlefieldOf(player.Seat).Select(card => Card(client, card))]);
+                [.. client.BattlefieldShownOf(player.Seat).Select(card => Card(client, card))]);
         }
 
         Pile(text, $"\n{Owner(client, client.Seat)} hand", [.. client.MyHand().Select(card => Card(client, card))]);

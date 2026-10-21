@@ -1557,8 +1557,8 @@ public sealed partial class MainPage : Page
         for (int attempt = 0; ; attempt++)
         {
             FillCombat(client, view, cardWidth);
-            theirs = [.. (opponent is null ? [] : client.BattlefieldOf(opponent.Seat)).Where(card => !_inCombat.Contains(card.Handle) && !Nested(client, card))];
-            mine = [.. client.BattlefieldOf(client.Seat).Where(card => !_inCombat.Contains(card.Handle) && !Nested(client, card))];
+            theirs = [.. (opponent is null ? [] : client.BattlefieldShownOf(opponent.Seat)).Where(card => !_inCombat.Contains(card.Handle) && !Nested(client, card))];
+            mine = [.. client.BattlefieldShownOf(client.Seat).Where(card => !_inCombat.Contains(card.Handle) && !Nested(client, card))];
             aligned = _myCombat.Count + _opponentCombat.Count == 0
                 ? 0f
                 : MathF.Max(BoardRows.CreaturesWidth(theirs, cardWidth, Look), BoardRows.CreaturesWidth(mine, cardWidth, Look));

@@ -497,6 +497,13 @@ public sealed class GameClient
         Battlefield().Where(o => o.Controller == seat && !o.PhasedOut);
 
     /// <summary>
+    /// The permanents a player controls as a player sees them: <see cref="BattlefieldOf"/> and the phased-out ones too, which
+    /// the game treats as though they don't exist but does not hide (CR 702.26b) - what a table draws and a narration names.
+    /// </summary>
+    public IEnumerable<ObjectView> BattlefieldShownOf(int seat) =>
+        Battlefield().Where(o => o.Controller == seat);
+
+    /// <summary>
     /// The game log as the server has written it for this seat, oldest first. The server keeps it and sends all of it
     /// again when this client is seated or resumed, so it is complete however long this client was away.
     /// </summary>
