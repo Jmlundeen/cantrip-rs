@@ -111,7 +111,7 @@ public static class Match
             IGameTransport transport = hosted.TransportFor(seat);
             var client = new GameClient(players[seat - 1] is ISeatTransport own ? own.Wrap(transport) : transport);
             client.Join($"Bot {seat}");
-            seats.Add((client, players[seat - 1]));
+            seats.Add((client, new LoopGuard(players[seat - 1])));
         }
 
         hosted.Start();
@@ -188,7 +188,7 @@ public static class Match
                 // A seat telling its game is told the end, which no question of its own followed.
                 foreach ((GameClient client, IAutoPlayer bot) in seats)
                 {
-                    if (bot is TacticalPlay { Narrator: not null } narrator)
+                    if ((bot as LoopGuard)?.Inner is TacticalPlay { Narrator: not null } narrator)
                     {
                         narrator.NarrateEnd(client);
                     }

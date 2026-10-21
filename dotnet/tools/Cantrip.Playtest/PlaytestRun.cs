@@ -150,13 +150,13 @@ public sealed class PlaytestRun
 
         using HostedGame hosted = HostAndPlay.StartTable(RulesHostFactory.Native, order, seed, names);
 
-        List<(GameClient Client, RandomPlay Bot)> seats = [];
+        List<(GameClient Client, LoopGuard Bot)> seats = [];
         foreach (int seat in hosted.Seats)
         {
             // A seed per seat, so two bots offered the same shape of choice do not make the same choice as each other.
             var client = new GameClient(hosted.TransportFor(seat));
             client.Join($"Bot {seat}");
-            seats.Add((client, new RandomPlay(botSeed + seat)));
+            seats.Add((client, new LoopGuard(new RandomPlay(botSeed + seat))));
         }
 
         hosted.Start();
@@ -171,7 +171,7 @@ public sealed class PlaytestRun
             // Every seat drains its mailbox before anyone is asked whether it is over: an answer runs the session
             // inside the send, so the message that ends the game lands in one seat's mailbox while another has not
             // looked yet, and a seat that has not looked has neither a prompt nor an outcome.
-            foreach ((GameClient client, RandomPlay _) in seats)
+            foreach ((GameClient client, LoopGuard _) in seats)
             {
                 client.Pump();
 
@@ -190,7 +190,7 @@ public sealed class PlaytestRun
 
             bool moved = false;
 
-            foreach ((GameClient client, RandomPlay bot) in seats)
+            foreach ((GameClient client, LoopGuard bot) in seats)
             {
                 // The client lets go of its prompt as it answers, so what was asked is read before the answer.
                 string? asked = client.Prompt?.Prompt?.GetType().Name;
@@ -277,7 +277,7 @@ public sealed class PlaytestRun
     private GameReport Stuck(
         ulong seed,
         int botSeed,
-        List<(GameClient Client, RandomPlay Bot)> seats,
+        List<(GameClient Client, LoopGuard Bot)> seats,
         int answers,
         string why,
         IReadOnlyList<string> decks)

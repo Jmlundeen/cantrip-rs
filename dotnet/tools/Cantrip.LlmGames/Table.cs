@@ -97,7 +97,7 @@ public sealed class Table
                 bot = new RandomPlay(botSeed + seat);
             }
 
-            seats.Add((client, bot));
+            seats.Add((client, new LoopGuard(bot)));
         }
 
         hosted.Start();

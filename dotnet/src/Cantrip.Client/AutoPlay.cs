@@ -1021,7 +1021,8 @@ public sealed class AutoSeat
     public AutoSeat(GameClient client, IAutoPlayer? player = null)
     {
         _client = client;
-        _player = player ?? new AutoPlayer();
+        // The engine never cuts a loop off: a seat nobody drives stops going round by itself (`LoopGuard`).
+        _player = new LoopGuard(player ?? new AutoPlayer());
         _drafting = new DraftPlay { Narrator = (player as Tactics.TacticalPlay)?.Narrator };
     }
 

@@ -43,7 +43,7 @@ public sealed partial class MainPage
             return;
         }
 
-        _selfPlayer ??= ClientConfig.NewBot(self: true);
+        _selfPlayer ??= new LoopGuard(ClientConfig.NewBot(self: true));
         if (_selfPlayer.Act(client))
         {
             _needsRedraw = true;
