@@ -1,0 +1,42 @@
+# Krark-Clan Ironworks removes the Heartwood token and itself, leaving the Puppetbeast as the only artifact with mana available; the companion scenario proves the legal sacrifice of another artifact.
+
+[Bot1 Deck]
+Black Lotus x4
+Hungering Puppetbeast
+Krark-Clan Ironworks
+Forest x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Hungering Puppetbeast.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Krark-Clan Ironworks.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Heartwood Token)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Krark-Clan Ironworks)
+? Bot1.Mana = {C}{C}{C}{C}
+! Bot1.Battlefield.Hungering Puppetbeast.Activate
+
+[Expect]
+Bot1.Battlefield.Hungering Puppetbeast.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Count = 1
+Bot1.Mana = {C}{C}{C}{C}

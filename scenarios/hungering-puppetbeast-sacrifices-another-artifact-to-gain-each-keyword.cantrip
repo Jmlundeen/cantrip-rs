@@ -1,0 +1,75 @@
+# Pay {1} and sacrifice an artifact other than the Puppetbeast to get a +1/+1 counter and one chosen keyword.
+# The Heartwood, Black Lotuses, and untapped Forest provide three legal sacrifices and three activations; separate turns
+# prove each keyword choice expires at cleanup before the next choice is made.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Hungering Puppetbeast
+Forest
+Forest x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Hungering Puppetbeast.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Heartwood Token.Token = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hungering Puppetbeast.Activate(Sacrifice: Heartwood Token)
+? Bot1.Mana = {G}
+Bot1.Choose(Heartwood Token)
+Bot1.Pass
+Bot1.Modes(Trample)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Hungering Puppetbeast.Keywords = Trample
+[T3 Bot1.End]
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Hungering Puppetbeast.Keywords = (absent)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hungering Puppetbeast.Activate(Sacrifice: Black Lotus)
+Bot1.Pass
+Bot1.Modes(Hexproof)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Hungering Puppetbeast.Keywords = Hexproof
+[T5 Bot1.End]
+Bot1.Pass
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Hungering Puppetbeast.Keywords = (absent)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hungering Puppetbeast.Activate(Sacrifice: Black Lotus)
+Bot1.Pass
+Bot1.Modes(Haste)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Hungering Puppetbeast.Keywords = Haste
+[T7 Bot1.End]
+Bot1.Pass
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Hungering Puppetbeast.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Hungering Puppetbeast.Power = 8
+Bot1.Battlefield.Hungering Puppetbeast.Toughness = 8
+Bot1.Battlefield.Hungering Puppetbeast.Keywords = (absent)
+Bot1.Battlefield.Count = 2
+Bot1.Graveyard.Count = 4
+Bot1.Graveyard.Black Lotus#1 = (absent)
+Bot1.Battlefield.Heartwood Token = (absent)
