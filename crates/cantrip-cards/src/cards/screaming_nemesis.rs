@@ -8,13 +8,21 @@ fn any_other_target(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 }
 
 /// It deals that much damage to any other target. If a player is dealt damage this way, they can't gain life for the rest of
-/// the game (CR 119.7): only a player the damage actually reached, not one it was prevented for.
+/// the game (CR 119.7): each player the damage actually reached, read from the damage events this resolution recorded
+/// (CR 120.3) - not a target a redirection (CR 614.1a, Ancient Adamantoise) or a prevention kept it from, and whoever a
+/// redirection sent it to.
 fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let dealt = g.damage(item.object, item.targets[0], item.data[0] as u16);
-    if dealt > 0
-        && let Target::Player(p) = item.targets[0]
-    {
-        g.add_effect(item.object, item.object, EffectKind::CantGainLife(p), Duration::Indefinite);
+    let before = g.history().head() as usize;
+    g.damage(item.object, item.targets[0], item.data[0] as u16);
+    let dealt_to = |r: &Record| match r.event {
+        Event::Damage { source, target: Target::Player(p), amount, .. } if source == item.object && amount > 0 => Some(p),
+        _ => None,
+    };
+    let players: Vec<PlayerId> = g.history().all()[before..].iter().filter_map(dealt_to).collect();
+    for (i, &p) in players.iter().enumerate() {
+        if !players[..i].contains(&p) {
+            g.add_effect(item.object, item.object, EffectKind::CantGainLife(p), Duration::Indefinite);
+        }
     }
     Ok(())
 }

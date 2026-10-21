@@ -1,0 +1,51 @@
+# "If a player is dealt damage this way" is the player the damage reached (CR 120.3), not the target. Bot1's Show and Tell
+# puts Screaming Nemesis onto the battlefield and Bot2 Ancient Adamantoise. Bot2's Lightning Bolt kills the Nemesis, whose
+# trigger targets Bot2: the 3 damage is dealt to the Adamantoise instead (CR 614.1a), so Bot2 was dealt none, stays on 20 and
+# can still gain life - Swords to Plowshares on its own Llanowar Elves gives it 1.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Black Lotus
+Show and Tell
+Screaming Nemesis
+Forest x10
+
+[Bot2 Deck]
+Ancient Adamantoise
+Mountain
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Lightning Bolt
+Swords to Plowshares
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Screaming Nemesis)
+Bot2.Choose(Ancient Adamantoise)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Screaming Nemesis)
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+? Bot2.Life = 20
+? Bot2.Battlefield.Ancient Adamantoise.Damage = 3
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Life = 21
+Bot1.Graveyard = Screaming Nemesis; Show and Tell; Black Lotus
+Exile = Llanowar Elves
