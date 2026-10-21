@@ -305,4 +305,7 @@ offer fewer than the engine would take. Both are tested at their bounds. Play ca
 candidate is a different object or player (CR 115.3), so each needs an object of its own in memory - 2^31 objects is
 hundreds of gigabytes - and a player chooses each target by hand. Tokens that double each round reach 2^16 in sixteen rounds,
 well within these limits; 2^31 would take thirty-one rounds of doubling in a timed game, and the memory above. No card needs
-it. The target arena where an item's targets past the first 16 are kept is indexed by a `usize`, with no bound of its own.
+it. The target arena where an item's targets past the first 16 are kept is indexed by a `usize`, with no bound of its own; the
+share arena where the shares of a divided total are kept (`GameState::share_arena`) is named by a `u32`, and past 2^32 shares
+recorded in one game an item keeps none, so its targets are dealt or given nothing - 2^32 shares is 16 gigabytes of them,
+each chosen by hand.

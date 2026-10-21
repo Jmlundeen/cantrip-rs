@@ -87,13 +87,17 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                 pl.lost = true;
                 pl.drew_from_empty = false;
             });
-            crate::designations::monarch_left(cx);
-            crate::designations::initiative_left(cx);
             leavers.push((p, reason));
             acted = true;
         } else if player.drew_from_empty {
             cx.st().update_player(p, |pl| pl.drew_from_empty = false);
         }
+    }
+    // The monarch and the initiative pass on once every loser of this check has left, so none of them is passed one on
+    // the way (CR 725.4, 726.4, 800.4a).
+    if !leavers.is_empty() {
+        crate::designations::monarch_left(cx);
+        crate::designations::initiative_left(cx);
     }
     // They all lost at once; the game goes on without them, or ends with the one left (CR 800.4a, 104.2a).
     for (p, reason) in leavers {
@@ -479,7 +483,7 @@ fn put_triggers_on_stack(cx: &mut Cx) -> R<()> {
 
 /// Chooses the targets of a triggered ability's slots as it is put on the stack (CR 603.3d). Whether it can be put
 /// there at all: a required slot with no legal target removes it. `all_of_few` takes every candidate of a required
-/// slot without asking when there are no more than it takes, as a mode's target is (CR 601.2c).
+/// slot without asking when there are no more than its fewest, so no choice is left (CR 601.2c).
 fn choose_trigger_targets(
     cx: &mut Cx,
     trigger: &PendingTrigger,
@@ -528,7 +532,7 @@ fn choose_trigger_targets(
                 targets.push(candidates[0]);
                 break 'slot;
             }
-            if all_of_few && least > 0 && candidates.len() <= most as usize && total.is_none() {
+            if all_of_few && least > 0 && candidates.len() <= least as usize && total.is_none() {
                 targets.extend(candidates);
                 break 'slot;
             }
@@ -576,7 +580,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
     let asker = Asker { source: trigger.source, controller: trigger.controller };
     let mut targets = Vec::new();
     let mut of: Vec<u8> = Vec::new();
-    let mut shares: Vec<u8> = Vec::new();
+    let mut shares: Vec<u32> = Vec::new();
     let mut mask = 0u8;
     if let Some(modal) = def.modal {
         // A modal ability's modes are chosen as it is put on the stack (CR 603.3c, 700.2), then each chosen mode's
@@ -624,9 +628,9 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         // CR 601.2d, 603.3d: a divided slot's targets and shares are chosen as the ability goes on the stack.
         let x = trigger.count.unwrap_or(cx.s().obj(trigger.source).x);
         let total = match divide.of_x {
-            Some(of_x) => of_x(x),
-            None if divide.total == TargetSpec::COUNTED => x,
-            None => u16::try_from(divide.total).unwrap_or(u16::MAX),
+            Some(of_x) => u32::from(of_x(x)),
+            None if divide.total == TargetSpec::COUNTED => u32::from(x),
+            None => divide.total,
         };
         match crate::actions::ask_divided(cx, trigger.controller, trigger.source, spec, total, false)? {
             crate::actions::Divided::Chosen(chosen, given) => {
@@ -660,7 +664,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         // CR 603.10, 702.174b: what was true of the source as the ability triggered, for a gift triggered ability to
         // give its gift after the permanent has left.
         gift: cx.s().obj(trigger.source).gift,
-        inline_shares: [0; cantrip_state::INLINE_TARGETS],
+        shares: StackItem::NO_SHARES,
         spill: 0,
         exile_after: false,
         flashback: false,

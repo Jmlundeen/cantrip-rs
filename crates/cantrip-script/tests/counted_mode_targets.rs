@@ -1,6 +1,6 @@
-//! A modal triggered ability's "X target creatures" (CR 700.2, 603.3d, 601.2c): a mode's required slot is filled without
-//! asking only when it takes every candidate there is, and an X slot takes X - so with X 1 and two creatures, one is chosen,
-//! not both. The X is the source's, cast with it (CR 107.3m). No printed card in the engine has a modal triggered ability with
+//! A modal triggered ability's target slots (CR 700.2, 603.3d, 601.2c): a mode's required slot is filled without
+//! asking only when its fewest takes every candidate there is, and an X slot takes X - so with X 1 and two creatures, one is
+//! chosen, not both, and "one or two" of two creatures is still asked. The X is the source's, cast with it (CR 107.3m). No printed card in the engine has a modal triggered ability with
 //! X targets, so a test card does here.
 
 use std::sync::OnceLock;
@@ -41,6 +41,11 @@ static MODES: ModalDef = modes(&[
     mode(gain_one, "You gain 1 life."),
 ]);
 
+static RANGE_MODES: ModalDef = modes(&[
+    mode(tap_them, "Tap one or two target creatures.").targets(&[target(creature).between(1, 2)]),
+    mode(gain_one, "You gain 1 life."),
+]);
+
 /// An {X} 1/1: "When this creature enters, choose one - Tap X target creatures; or you gain 1 life."
 static RANGER: CardDef = CardDef {
     name: "Probe Ranger",
@@ -49,6 +54,17 @@ static RANGER: CardDef = CardDef {
     power: Some(1),
     toughness: Some(1),
     abilities: &[modal_triggered(when(EventMask::ZONE_CHANGE, this_enters), &MODES, "When this creature enters, choose one \u{2014} Tap X target creatures; or you gain 1 life.")],
+    ..CardDef::BLANK
+};
+
+/// An {X} 1/1: "When this creature enters, choose one - Tap one or two target creatures; or you gain 1 life."
+static WARDEN: CardDef = CardDef {
+    name: "Probe Warden",
+    types: TypeSet::of(&[CardType::Creature]),
+    cost: ManaCost { x: 1, ..ManaCost::ZERO },
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[modal_triggered(when(EventMask::ZONE_CHANGE, this_enters), &RANGE_MODES, "When this creature enters, choose one \u{2014} Tap one or two target creatures; or you gain 1 life.")],
     ..CardDef::BLANK
 };
 
@@ -73,14 +89,14 @@ static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeS
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&RANGER, &BEAR, &SPRING, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&RANGER, &WARDEN, &BEAR, &SPRING, &FILLER]))
 }
 
-/// Bot1 casts Probe Ranger with X 1, two of Bot2's Bears on the battlefield, chooses its first mode and the first target it
-/// is offered. How many targets it was asked for (None if it was not asked), and how many Bears end up tapped.
-fn play() -> (Option<u32>, usize) {
+/// Bot1 casts `card` with X 1, two of Bot2's Bears on the battlefield, chooses its first mode and the first target it is
+/// offered. How many targets it was asked for at most (None if it was not asked), and how many Bears end up tapped.
+fn play(card: &str) -> (Option<u32>, usize) {
     let names = |list: &[&str]| -> Vec<CardId> { list.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))).collect() };
-    let mut first = names(&["Probe Ranger"]);
+    let mut first = names(&[card]);
     first.extend(names(&["Filler"; 29]));
     let mut game = Game::new(table(), &Setup { decks: vec![first, names(&["Filler"; 30])], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
     game.verify = true;
@@ -103,8 +119,8 @@ fn play() -> (Option<u32>, usize) {
         let answer = match &request.kind {
             RequestKind::Priority { options } if request.player == PlayerId(0) && !cast && game.state.turn.step() == Step::PrecombatMain => {
                 cast = true;
-                let option = options.iter().find(|o| o.kind == ActionKind::CastSpell && o.source.is_some_and(|s| game.name(s) == "Probe Ranger"));
-                Answer::Act(Action::of(option.expect("the Ranger is offered")))
+                let option = options.iter().find(|o| o.kind == ActionKind::CastSpell && o.source.is_some_and(|s| game.name(s) == card));
+                Answer::Act(Action::of(option.expect("the card is offered")))
             }
             RequestKind::Priority { .. } => Answer::Pass,
             RequestKind::PayCosts { announcing: true, x, options, .. } => {
@@ -129,12 +145,18 @@ fn play() -> (Option<u32>, usize) {
         };
         game.answer(request.id, request.player, answer).unwrap();
     }
-    assert!(cast, "the Ranger was not cast");
+    assert!(cast, "the card was not cast");
     let tapped = game.state.battlefield().iter().filter(|&&id| game.name(id) == "Probe Bear" && game.state.obj(id).tapped).count();
     (asked, tapped)
 }
 
 #[test]
 fn x_targets_of_a_mode_with_more_candidates_than_x_are_chosen() {
-    assert_eq!(play(), (Some(1), 1));
+    assert_eq!(play("Probe Ranger"), (Some(1), 1));
+}
+
+/// "One or two target creatures" with two candidates is still a choice (CR 601.2c): the player is asked, and may take one.
+#[test]
+fn one_or_two_targets_of_a_mode_with_two_candidates_are_asked_for() {
+    assert_eq!(play("Probe Warden"), (Some(2), 1));
 }

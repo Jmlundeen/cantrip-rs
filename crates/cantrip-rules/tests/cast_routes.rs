@@ -540,7 +540,7 @@ fn each_permission_for_the_top_of_the_library_offers_each_split_half_at_its_own_
     let four = (*by_mana.iter().find(|o| o.index == WAY_SPLIT_RIGHT).expect("the four-mana half")).clone();
     take(&mut game, &four);
     resolve(&mut game);
-    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.from == ZoneKind::Library && c.value == 4 && c.granted_by().is_some_and(|g| g.object == mana))));
+    assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.from == ZoneKind::Library && c.value(&game) == 4 && c.granted_by().is_some_and(|g| g.object == mana))));
     assert_eq!(game.state.player(ME).life, 20);
 }
 

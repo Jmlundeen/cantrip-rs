@@ -1099,6 +1099,7 @@ pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
         power: c.power,
         toughness: c.toughness,
         keywords: c.keywords,
+        mana_value: cantrip_api::mana_value_of(&|card| cx.cards().get(card), cx.s(), id, c),
         abilities: c.abilities,
         words: cantrip_api::words(cx.s(), id),
     }
@@ -1543,8 +1544,9 @@ fn fits_total(cx: &Cx, item: &StackItem, targets: &[Target], slot: usize, spec: 
         _ => 0,
     };
     let run = cx.s().spec_targets(item, cx.s().spec(item, slot) as usize);
-    let total: u32 = run.map(|i| if i == slot { value(to) } else { value(targets.get(i).copied().unwrap_or(Target::None)) }).sum();
-    total <= u32::from(most)
+    // Added up in a u64, so no number of u32 mana values overflows it.
+    let total: u64 = run.map(|i| u64::from(if i == slot { value(to) } else { value(targets.get(i).copied().unwrap_or(Target::None)) })).sum();
+    total <= u64::from(most)
 }
 
 /// `chooser` may choose new targets for a spell on the stack (CR 115.7d): Sudden Substitution's "then the spell's controller
@@ -2987,10 +2989,13 @@ pub fn win_game(cx: &mut Cx, player: PlayerId) {
     {
         return;
     }
-    for o in opponents {
+    for &o in &opponents {
         cx.st().update_player(o, |pl| pl.lost = true);
-        crate::designations::monarch_left(cx);
-        crate::designations::initiative_left(cx);
+    }
+    // Every opponent has lost before the designations pass, so none of them is passed one on the way (CR 725.4, 726.4).
+    crate::designations::monarch_left(cx);
+    crate::designations::initiative_left(cx);
+    for o in opponents {
         cx.record(Event::GameLost { player: o, reason: LossReason::Effect });
     }
     cx.st().set_outcome(Outcome::Won(player));

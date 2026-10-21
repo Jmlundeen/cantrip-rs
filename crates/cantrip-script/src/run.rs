@@ -1935,7 +1935,7 @@ impl<'s> Run<'s> {
             let Some((who, amount)) = piece.rsplit_once(':') else {
                 return fail(format!("line {}: Divide wants \"target: amount\", not \"{piece}\"", step.line));
             };
-            let Ok(amount) = amount.trim().parse::<u16>() else {
+            let Ok(amount) = amount.trim().parse::<u32>() else {
                 return fail(format!("line {}: {} is not a share", step.line, amount.trim()));
             };
             match self.target(step, who.trim(), candidates)? {

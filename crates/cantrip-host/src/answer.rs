@@ -216,7 +216,7 @@ pub fn translate(
         AnswerPayload::TargetsDividedAnswer(a) => Answer::Divided(
             a.shares
                 .iter()
-                .map(|s| Ok((target(handles, game, &s.target)?, s.amount.clamp(0, 255) as u16)))
+                .map(|s| Ok((target(handles, game, &s.target)?, u32::try_from(s.amount).unwrap_or(0))))
                 .collect::<Result<_, Untranslatable>>()?,
         ),
         AnswerPayload::CountersRemovedAnswer(a) => Answer::Counters(
@@ -336,7 +336,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
             shuffle: *shuffle,
         }),
         Answer::Divided(shares) => AnswerPayload::TargetsDividedAnswer(TargetsDividedAnswer {
-            shares: shares.iter().map(|&(t, amount)| TargetShareMessage { target: wire_target(handles, t), amount: i32::from(amount) }).collect(),
+            shares: shares.iter().map(|&(t, amount)| TargetShareMessage { target: wire_target(handles, t), amount: i32::try_from(amount).unwrap_or(i32::MAX) }).collect(),
         }),
         Answer::Counters(taken) => AnswerPayload::CountersRemovedAnswer(CountersRemovedAnswer {
             removals: taken

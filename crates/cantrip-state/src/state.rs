@@ -44,12 +44,14 @@ pub struct GameState {
     /// What happened this turn (CR 603.2h, 608.2m, 601.2i), for the rules that ask about it.
     /// The objects of the batches "one or more" abilities triggered by (`Span` names a run of it). Append-only.
     pub members: Vec<ObjectId>,
-    /// The targets of stack items with more than `INLINE_TARGETS` of them, each with the spec it was chosen for and its share of a
-    /// divided total (`StackItem::spill` names a run of it). Append-only, journaled.
+    /// The targets of stack items with more than `INLINE_TARGETS` of them, each with the spec it was chosen for
+    /// (`StackItem::spill` names a run of it). Append-only, journaled.
     pub spill_targets: Vec<Target>,
-    /// Parallel to `spill_targets`: the spec each was chosen for, and its share of a divided total.
+    /// Parallel to `spill_targets`: the spec each was chosen for.
     pub spill_specs: Vec<u8>,
-    pub spill_shares: Vec<u8>,
+    /// The shares of a divided total of stack items that divide one (CR 601.2d; `StackItem::shares` names a run of it, one for
+    /// each target). Append-only, journaled.
+    pub share_arena: Vec<u32>,
     pub attackers: Vec<Attacker>,
     pub blocks: Vec<Block>,
     /// Extra turns waiting to be taken (CR 500.7): the most recently created last, and taken first.
@@ -216,7 +218,7 @@ impl GameState {
         (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<PlayPermission>),
         (&Vec<Attacker>, &Vec<Block>, &Vec<ExtraTurn>, &LoopWatch),
         &Vec<Frame>,
-        (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>, (&Vec<Target>, &Vec<u8>, &Vec<u8>)),
+        (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>, (&Vec<Target>, &Vec<u8>, &Vec<u32>)),
     ) {
         (
             (&self.players, &self.restricted_mana, &self.counter_stamps, &self.mana_from),
@@ -228,7 +230,7 @@ impl GameState {
             (&self.triggers, &self.delayed, &self.permissions),
             (&self.attackers, &self.blocks, &self.extra_turns, &self.loop_watch),
             &self.agenda,
-            (&self.rng, self.next_timestamp, &self.outcome, self.unsettled, &self.members, &self.left_stack, (&self.spill_targets, &self.spill_specs, &self.spill_shares)),
+            (&self.rng, self.next_timestamp, &self.outcome, self.unsettled, &self.members, &self.left_stack, (&self.spill_targets, &self.spill_specs, &self.share_arena)),
         )
     }
 }
@@ -332,7 +334,10 @@ pub enum Undo {
     MembersPopped(Vec<ObjectId>),
     /// Spilled targets appended since the arena was this long.
     TargetsSpilled(usize),
-    TargetsUnspilled(Vec<Target>, Vec<u8>, Vec<u8>),
+    TargetsUnspilled(Vec<Target>, Vec<u8>),
+    /// Shares appended since the arena was this long.
+    SharesPushed(usize),
+    SharesPopped(Vec<u32>),
     AttackersSet(Vec<Attacker>),
     BlocksSet(Vec<Block>),
     ExtraTurnsSet(Vec<ExtraTurn>),
@@ -373,7 +378,7 @@ impl GameState {
             members: Vec::new(),
             spill_targets: Vec::new(),
             spill_specs: Vec::new(),
-            spill_shares: Vec::new(),
+            share_arena: Vec::new(),
             attackers: Vec::new(),
             blocks: Vec::new(),
             extra_turns: Vec::new(),
@@ -938,9 +943,13 @@ impl GameState {
         if item.holds_its_targets() { &item.inline_spec_of[..item.target_count as usize] } else { &self.spill_specs[Self::spilled(item)] }
     }
 
-    /// Each of a stack item's targets' share of a divided total, parallel to `targets`.
-    pub fn shares<'a>(&'a self, item: &'a StackItem) -> &'a [u8] {
-        if item.holds_its_targets() { &item.inline_shares[..item.target_count as usize] } else { &self.spill_shares[Self::spilled(item)] }
+    /// Each of a stack item's targets' share of a divided total, parallel to `targets`; empty for an item with none above 0.
+    pub fn shares<'a>(&'a self, item: &'a StackItem) -> &'a [u32] {
+        if item.shares == StackItem::NO_SHARES {
+            return &[];
+        }
+        let start = item.shares as usize;
+        &self.share_arena[start..start + item.target_count as usize]
     }
 
     /// A stack item's target `slot`, or `Target::None` past the targets announced.
@@ -954,8 +963,8 @@ impl GameState {
     }
 
     /// What a stack item's target `slot` was announced to receive of a divided total (CR 601.2d).
-    pub fn share(&self, item: &StackItem, slot: usize) -> u16 {
-        u16::from(self.shares(item).get(slot).copied().unwrap_or(0))
+    pub fn share(&self, item: &StackItem, slot: usize) -> u32 {
+        self.shares(item).get(slot).copied().unwrap_or(0)
     }
 
     /// Where in a stack item's targets the targets chosen for the spec at `spec` are (CR 601.2c): one run, in the order chosen.
@@ -970,27 +979,34 @@ impl GameState {
     /// Sets a stack item's targets, the spec each was chosen for and each one's share of a divided total, all parallel: missing
     /// specs and shares are 0. Past `INLINE_TARGETS` targets the lists are put in the target arena, journaled, and the item
     /// names them (the first ones are in the item too).
-    pub fn set_item_targets(&mut self, item: &mut StackItem, targets: &[Target], spec_of: &[u8], shares: &[u8]) {
+    pub fn set_item_targets(&mut self, item: &mut StackItem, targets: &[Target], spec_of: &[u8], shares: &[u32]) {
         // Counted in a u32, past any board's legal targets: a list longer than that takes no more (KI-99).
         item.target_count = crate::count_u32(targets.len());
         let n = item.target_count as usize;
         item.inline_targets = [Target::None; INLINE_TARGETS];
         item.inline_spec_of = [0; INLINE_TARGETS];
-        item.inline_shares = [0; INLINE_TARGETS];
         let inline = n.min(INLINE_TARGETS);
         item.inline_targets[..inline].copy_from_slice(&targets[..inline]);
         for i in 0..inline {
             item.inline_spec_of[i] = spec_of.get(i).copied().unwrap_or(0);
-            item.inline_shares[i] = shares.get(i).copied().unwrap_or(0);
         }
         item.spill = 0;
         if n > INLINE_TARGETS {
             let start = self.spill_targets.len();
             self.spill_targets.extend_from_slice(&targets[..n]);
             self.spill_specs.extend((0..n).map(|i| spec_of.get(i).copied().unwrap_or(0)));
-            self.spill_shares.extend((0..n).map(|i| shares.get(i).copied().unwrap_or(0)));
             self.log(Undo::TargetsSpilled(start));
             item.spill = start;
+        }
+        // The shares, when any is above 0, in their own arena; past the 2^32 a u32 names, none is kept (KI-99).
+        item.shares = StackItem::NO_SHARES;
+        if shares.iter().take(n).any(|&s| s > 0) {
+            let start = self.share_arena.len();
+            if let Some(at) = u32::try_from(start).ok().filter(|&at| at != StackItem::NO_SHARES) {
+                self.share_arena.extend((0..n).map(|i| shares.get(i).copied().unwrap_or(0)));
+                self.log(Undo::SharesPushed(start));
+                item.shares = at;
+            }
         }
     }
 
@@ -1016,7 +1032,7 @@ impl GameState {
     }
 
     /// Sets each of a stack item's targets' share of a divided total, keeping the targets and specs.
-    pub fn set_item_shares(&mut self, item: &mut StackItem, shares: &[u8]) {
+    pub fn set_item_shares(&mut self, item: &mut StackItem, shares: &[u32]) {
         let (targets, of) = (self.targets(item).to_vec(), self.spec_of(item).to_vec());
         self.set_item_targets(item, &targets, &of, shares);
     }
@@ -1290,12 +1306,12 @@ impl GameState {
             Undo::TargetsSpilled(len) => {
                 self.spill_targets.truncate(len);
                 self.spill_specs.truncate(len);
-                self.spill_shares.truncate(len);
             }
-            Undo::TargetsUnspilled(targets, specs, shares) => {
+            Undo::SharesPushed(len) => self.share_arena.truncate(len),
+            Undo::SharesPopped(shares) => self.share_arena.extend(shares),
+            Undo::TargetsUnspilled(targets, specs) => {
                 self.spill_targets.extend(targets);
                 self.spill_specs.extend(specs);
-                self.spill_shares.extend(shares);
             }
             Undo::AttackersSet(old) => self.attackers = old,
             Undo::BlocksSet(old) => self.blocks = old,
@@ -1383,8 +1399,9 @@ impl GameState {
             Undo::TargetsSpilled(len) => Undo::TargetsUnspilled(
                 self.spill_targets[*len..].to_vec(),
                 self.spill_specs[*len..].to_vec(),
-                self.spill_shares[*len..].to_vec(),
             ),
+            Undo::SharesPushed(len) => Undo::SharesPopped(self.share_arena[*len..].to_vec()),
+            Undo::SharesPopped(_) => Undo::SharesPushed(self.share_arena.len()),
             Undo::TargetsUnspilled(..) => Undo::TargetsSpilled(self.spill_targets.len()),
             Undo::AttackersSet(_) => Undo::AttackersSet(self.attackers.clone()),
             Undo::BlocksSet(_) => Undo::BlocksSet(self.blocks.clone()),
@@ -1435,7 +1452,7 @@ mod tests {
             members: Span::default(),
             serial: 0,
             gift: None,
-            inline_shares: [0; INLINE_TARGETS],
+            shares: StackItem::NO_SHARES,
             spill: 0,
             exile_after: false,
             flashback: false,
@@ -1445,7 +1462,7 @@ mod tests {
         }
     }
 
-    /// Past `INLINE_TARGETS` a stack item's targets, specs and shares are in the game's arena and read back whole; changing one
+    /// Past `INLINE_TARGETS` a stack item's targets and specs are in the game's arena, and its shares in theirs, read back whole; changing one
     /// keeps the rest; a short list again holds nothing past it; and rolling the journal back frees what was spilled.
     #[test]
     fn a_stack_item_holds_more_targets_than_it_holds_in_itself_in_the_games_arena() {
@@ -1454,12 +1471,12 @@ mod tests {
         let n = INLINE_TARGETS + 4;
         let targets: Vec<Target> = (0..n as u32).map(|i| Target::Object(ObjectId(i + 10))).collect();
         let of: Vec<u8> = (0..n).map(|i| (i / 10) as u8).collect();
-        let shares: Vec<u8> = (0..n).map(|i| i as u8).collect();
+        let shares: Vec<u32> = (0..n).map(|i| 300 + i as u32).collect();
         let mut a = item();
         s.set_item_targets(&mut a, &targets, &of, &shares);
         assert_eq!(s.targets(&a), &targets[..]);
         assert_eq!(s.spec_of(&a), &of[..]);
-        assert_eq!(s.share(&a, n - 1), (n - 1) as u16);
+        assert_eq!(s.share(&a, n - 1), 300 + (n - 1) as u32);
         assert_eq!(s.spec_targets(&a, 1), 10..n);
         assert_eq!(a.target(0), targets[0], "the first targets are in the item too");
         s.set_item_target(&mut a, n - 1, Target::Player(PlayerId(1)));
@@ -1473,7 +1490,7 @@ mod tests {
         assert_eq!(s.target(&b, 5), Target::None);
         assert!(!s.spill_targets.is_empty());
         s.rollback(before);
-        assert!(s.spill_targets.is_empty() && s.spill_specs.is_empty() && s.spill_shares.is_empty(), "the arena outlived its journal");
+        assert!(s.spill_targets.is_empty() && s.spill_specs.is_empty() && s.share_arena.is_empty(), "the arena outlived its journal");
     }
 
     /// A pool has no limit (CR 106.4): 300 black mana added one at a time, from 300 sources and from one, is all there,

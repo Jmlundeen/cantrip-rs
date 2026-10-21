@@ -34,6 +34,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[up_to(254, creature_card_in_your_graveyard)], effect),
+    spell: spell(&[up_to(TargetSpec::ANY_NUMBER, creature_card_in_your_graveyard)], effect),
     ..oracle::FOREVER_YOUNG
 };

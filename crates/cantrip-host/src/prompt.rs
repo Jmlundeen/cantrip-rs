@@ -1096,7 +1096,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 source: source_handle,
                 text: String::new(),
                 candidates: candidates.iter().filter_map(|t| target_message(handles, *t)).collect(),
-                total: i32::from(*total),
+                total: wire(*total),
                 max_targets: wire(*max_targets),
                 optional: *optional,
             })

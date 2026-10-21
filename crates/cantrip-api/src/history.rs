@@ -29,8 +29,6 @@ pub struct Cast {
     /// Its card types as it became cast, which its last-known row (`Cast::chars`) holds too: kept here so the many
     /// questions about the types of earlier casts ("noncreature spells you've cast this turn") need no state.
     pub types: TypeSet,
-    /// Its mana value on the stack (CR 202.3e: X counted).
-    pub value: u32,
     /// The zone it was cast from (CR 601.2a).
     pub from: ZoneKind,
     /// Which of the card's own options it was cast by (`ActionOption::index`): 0 its mana cost, n its nth printed way, or
@@ -55,6 +53,16 @@ impl Cast {
 
     pub fn is(&self, t: CardType) -> bool {
         self.types.has(t)
+    }
+
+    /// The spell's mana value as it became cast (CR 202.3e: X counted, 601.2i), from its last-known row.
+    pub fn value(&self, q: &dyn crate::Query) -> u32 {
+        let s = q.state();
+        let item = s.stack.iter().rev().find(|i| i.kind == StackKind::Spell && i.object == self.spell).or_else(|| s.left_stack(self.spell));
+        match item.and_then(|i| s.last_known.get(i.cast_known as usize)) {
+            Some(row) => row.mana_value,
+            None => q.mana_value(self.spell),
+        }
     }
 
     /// The spell's characteristics as it became cast (CR 601.2i): "the first non-Lemur creature spell with flying you

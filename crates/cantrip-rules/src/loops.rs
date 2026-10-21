@@ -851,7 +851,7 @@ fn position(s: &GameState, canon: &Canon) -> Position {
         // The targets, their slots and shares are in `refs`, read through the arena: not where the arena keeps them.
         i.inline_targets = [Target::None; cantrip_state::INLINE_TARGETS];
         i.inline_spec_of = [0; cantrip_state::INLINE_TARGETS];
-        i.inline_shares = [0; cantrip_state::INLINE_TARGETS];
+        i.shares = 0;
         i.spill = 0;
         i.subject = Target::None;
         i.members = cantrip_state::Span::default();

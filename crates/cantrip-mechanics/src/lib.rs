@@ -571,7 +571,8 @@ pub fn damage_each_target(g: &mut dyn Game, item: &StackItem, amount: u16) {
 pub fn damage_divided(g: &mut dyn Game, item: &StackItem) {
     let hits: Vec<(ObjectId, Target, u16)> = (0..item.target_count as usize)
         .filter(|&slot| g.target_legal(item, slot) && g.state().share(item, slot) > 0)
-        .map(|slot| (item.object, g.state().target(item, slot), g.state().share(item, slot)))
+        // Damage is dealt in a u16 for now: a share past it deals as much as that holds (the damage widening is W2's).
+        .map(|slot| (item.object, g.state().target(item, slot), u16::try_from(g.state().share(item, slot)).unwrap_or(u16::MAX)))
         .collect();
     g.damage_together(&hits);
 }
@@ -586,7 +587,7 @@ pub fn counters_divided(g: &mut dyn Game, item: &StackItem, kind: CounterKind) {
         if let Some(object) = targets::object(g, item, slot)
             && g.state().share(item, slot) > 0
         {
-            g.add_counters(object, kind, g.state().share(item, slot) as i16);
+            g.add_counters(object, kind, i16::try_from(g.state().share(item, slot)).unwrap_or(i16::MAX));
         }
     }
 }

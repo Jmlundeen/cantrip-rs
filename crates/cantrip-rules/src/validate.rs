@@ -165,7 +165,8 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             if candidates.contains(p) { Ok(()) } else { no("not a player who may be chosen") }
         }
         (RequestKind::ChooseDividedTargets { candidates, total, max_targets, optional, .. }, Answer::Divided(shares)) => {
-            let sum: u32 = shares.iter().map(|s| s.1 as u32).sum();
+            // Added up in a u64, so no number of u32 shares overflows it.
+            let sum: u64 = shares.iter().map(|s| u64::from(s.1)).sum();
             let targets: Vec<Target> = shares.iter().map(|s| s.0).collect();
             if !distinct(&targets) || !targets.iter().all(|t| candidates.contains(t)) {
                 no("not among the candidates")
@@ -173,7 +174,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 if shares.is_empty() { Ok(()) } else { no("there is nothing to divide") }
             } else if shares.is_empty() {
                 if *optional { Ok(()) } else { no("the total must be divided among at least one target (CR 601.2d)") }
-            } else if (*max_targets > 0 && shares.len() > *max_targets as usize) || shares.iter().any(|s| s.1 < 1) || sum != *total as u32 {
+            } else if (*max_targets > 0 && shares.len() > *max_targets as usize) || shares.iter().any(|s| s.1 < 1) || sum != u64::from(*total) {
                 no(format!("the shares must each be at least 1 and add up to {total}"))
             } else {
                 Ok(())

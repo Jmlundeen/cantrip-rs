@@ -127,7 +127,8 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
             let mut sub = *item;
             sub.modes = modal.once(i);
             let of: Vec<u8> = (0..n).map(|t| cx.s().spec(item, next + t) - spec_at as u8).collect();
-            let (targets, shares) = (cx.s().targets(item)[next..next + n].to_vec(), cx.s().shares(item)[next..next + n].to_vec());
+            let targets = cx.s().targets(item)[next..next + n].to_vec();
+            let shares: Vec<u32> = (next..next + n).map(|t| cx.s().share(item, t)).collect();
             cx.st().set_item_targets(&mut sub, &targets, &of, &shares);
             spec_at = ends;
             next += n;

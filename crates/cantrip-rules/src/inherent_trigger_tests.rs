@@ -155,3 +155,47 @@ fn the_initiative_passes_on_when_its_holder_leaves() {
     assert!(!g.state.player(C).initiative && !g.state.player(A).initiative);
     assert_eq!(waiting(&g), vec![(INITIATIVE_VENTURE, B)], "taking it did not venture");
 }
+
+/// Two players lose in one check of state-based actions on the turn of one of them (CR 704.3, 800.4a): the monarch and the
+/// initiative, held by the other, pass to the next player in turn order still in the game, and never on the way to the
+/// active player who is leaving too - nothing records that player becoming the monarch or taking the initiative, which a
+/// Palace Jailer of an opponent would see (CR 725.4, 726.4).
+#[test]
+fn designations_pass_once_every_loser_of_a_check_has_left() {
+    let mut g = game(4);
+    // The empty libraries were drawn from for the opening hands: that is no loss here.
+    for p in 0..4 {
+        g.state.update_player(PlayerId(p), |p| p.drew_from_empty = false);
+    }
+    g.state.update_turn(|t| t.active = B);
+    g.state.update_player(A, |p| {
+        p.monarch = true;
+        p.initiative = true;
+        p.life = 0;
+    });
+    g.state.update_player(B, |p| p.life = 0);
+    crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap();
+    assert!(g.state.player(A).lost && g.state.player(B).lost);
+    assert!(g.state.player(C).monarch, "the next player in the game did not become the monarch");
+    assert!(g.state.player(C).initiative, "the next player in the game did not take the initiative");
+    let passed_through_b = g.log.iter().any(|r| {
+        matches!(r.event, Event::BecameMonarch { player } | Event::TookInitiative { player } if player == B)
+    });
+    assert!(!passed_through_b, "a player who lost in the same check was passed a designation");
+}
+
+/// A player wins (CR 104.2b) while an opponent is the monarch on another opponent's turn: every opponent has lost before the
+/// designation passes, so it goes to the winner, never on the way to the active opponent (CR 725.4).
+#[test]
+fn a_win_passes_the_monarch_once_every_opponent_has_lost() {
+    let mut g = game(3);
+    for p in 0..3 {
+        g.state.update_player(PlayerId(p), |p| p.drew_from_empty = false);
+    }
+    g.state.update_turn(|t| t.active = C);
+    g.state.update_player(B, |p| p.monarch = true);
+    crate::ops::win_game(&mut cx(&mut g), A);
+    assert!(g.state.player(A).monarch, "the winner did not become the monarch");
+    assert!(!g.log.iter().any(|r| matches!(r.event, Event::BecameMonarch { player } if player == C)), "a losing opponent became the monarch");
+}
+

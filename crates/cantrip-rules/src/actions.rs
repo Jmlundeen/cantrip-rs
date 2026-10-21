@@ -3949,7 +3949,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         members: Span::default(),
         serial: 0,
         gift: None,
-        inline_shares: [0; cantrip_state::INLINE_TARGETS],
+        shares: StackItem::NO_SHARES,
         spill: 0,
         exile_after: false,
         flashback: false,
@@ -4286,9 +4286,9 @@ fn cast(
     {
         // CR 601.2d: the targets and their shares of a total, in one question; the total may be X.
         let total = match divide.of_x {
-            Some(of_x) => of_x(item.x),
-            None if divide.total == TargetSpec::COUNTED => item.x,
-            None => u16::try_from(divide.total).unwrap_or(u16::MAX),
+            Some(of_x) => u32::from(of_x(item.x)),
+            None if divide.total == TargetSpec::COUNTED => u32::from(item.x),
+            None => divide.total,
         };
         match ask_divided(cx, player, spell, spec, total, true)? {
             Divided::Chosen(chosen, shares) => {
@@ -4528,7 +4528,8 @@ fn cast(
     let value = cx.mana_value(spell);
     // "As you cast this spell": the board once the costs are paid (CR 601.2i), asked of the face being cast.
     let fact = def.cast_fact.map_or(0, |f| f(cx, &Asker { source: spell, controller: player }));
-    let known = ops::last_known_from(cx, spell, &as_cast);
+    // The row keeps it, which `Cast::value` reads.
+    let known = LastKnown { mana_value: value, ..ops::last_known_from(cx, spell, &as_cast) };
     let known = cx.st().last_known_push(known);
     if let Some(at) = cx.s().stack.iter().rposition(|i| i.kind == StackKind::Spell && i.object == spell) {
         let item = cx.s().stack[at];
@@ -4538,7 +4539,6 @@ fn cast(
         spell,
         player,
         types: as_cast.types,
-        value,
         from: cast_from,
         way,
         by: Grant::of(by.by),
@@ -4923,7 +4923,7 @@ pub(crate) enum Divided {
     /// Nothing to ask or nothing chosen: a total of nothing, or an optional slot with no candidate or no target chosen.
     Skipped,
     /// The targets, and each one's share of the total.
-    Chosen(Vec<Target>, Vec<u8>),
+    Chosen(Vec<Target>, Vec<u32>),
     /// A required slot with nothing to aim at (CR 601.2c).
     Impossible,
 }
@@ -4931,7 +4931,7 @@ pub(crate) enum Divided {
 /// Asks for the targets of a slot that divides a total among them, and each target's share (CR 601.2d), in one
 /// question, as the C# engine does: a total of nothing is not asked; with no candidate an optional slot takes no
 /// target. `may_cancel` is for a spell or ability still being announced.
-pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec: &TargetSpec, total: u16, may_cancel: bool) -> R<Divided> {
+pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec: &TargetSpec, total: u32, may_cancel: bool) -> R<Divided> {
     if total == 0 {
         return Ok(Divided::Skipped);
     }
@@ -4947,14 +4947,14 @@ pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec:
         Answer::Divided(shares) if shares.is_empty() => Ok(Divided::Skipped),
         Answer::Divided(shares) => Ok(Divided::Chosen(
             shares.iter().map(|s| s.0).collect(),
-            shares.iter().map(|s| s.1.min(255) as u8).collect(),
+            shares.iter().map(|s| s.1).collect(),
         )),
         _ => Err(Stop::Cancel),
     }
 }
 
 /// Records the shares chosen for the item being announced, the top of the stack.
-fn set_item_shares(cx: &mut Cx, shares: &[u8]) {
+fn set_item_shares(cx: &mut Cx, shares: &[u32]) {
     let at = cx.s().stack.len() - 1;
     let mut with = cx.s().stack[at];
     cx.st().set_item_shares(&mut with, shares);

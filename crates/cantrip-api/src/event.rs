@@ -450,10 +450,10 @@ mod tests {
     use super::*;
 
     /// The history holds an `Event` for everything since the game began, so its size is every record's: the mana in one
-    /// is a `ManaTally` (a `u8` a kind), never a pool's `u32` counts. The largest is a spell's `Cast`, whose mana value is
-    /// a `u32` (CR 202.3: no limit).
+    /// is a `ManaTally` (a `u8` a kind), never a pool's `u32` counts, and a cast's mana value is in its last-known row
+    /// (`Cast::value`).
     #[test]
     fn an_event_stays_small() {
-        assert!(std::mem::size_of::<Event>() <= 28, "Event is {} bytes", std::mem::size_of::<Event>());
+        assert!(std::mem::size_of::<Event>() <= 24, "Event is {} bytes", std::mem::size_of::<Event>());
     }
 }

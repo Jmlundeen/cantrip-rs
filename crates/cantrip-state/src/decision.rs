@@ -365,7 +365,7 @@ pub enum RequestKind {
     /// The targets of a slot that divides a total among them, and each one's share (CR 601.2d): "distribute two +1/+1
     /// counters among up to two target creatures". At most `max_targets` of `candidates` (any number when 0), each with a
     /// share of at least 1, adding up to `total`; none at all when the slot is `optional`.
-    ChooseDividedTargets { source: ObjectId, candidates: Vec<Target>, total: u16, max_targets: u32, optional: bool },
+    ChooseDividedTargets { source: ObjectId, candidates: Vec<Target>, total: u32, max_targets: u32, optional: bool },
     /// Declare attackers (CR 508.1): any of `eligible`, each at one of `players`; every one of `requirements` must
     /// attack (CR 508.1d).
     /// Who attacks what (CR 508.1): each attacker names a player, a planeswalker a defending player controls, or a battle a defending player protects (`battles`,
@@ -572,17 +572,18 @@ pub struct TotalAtMost {
 
 impl TotalAtMost {
     /// The total mana value of `chosen`, each read at its index in `eligible` (a card not eligible adds nothing).
-    pub fn of<T: PartialEq>(&self, eligible: &[T], chosen: &[T]) -> u32 {
+    /// Added up in a u64, so no number of u32 values overflows it.
+    pub fn of<T: PartialEq>(&self, eligible: &[T], chosen: &[T]) -> u64 {
         chosen
             .iter()
             .filter_map(|c| eligible.iter().position(|e| e == c))
-            .map(|i| self.values.get(i).copied().unwrap_or(0))
+            .map(|i| u64::from(self.values.get(i).copied().unwrap_or(0)))
             .sum()
     }
 
     /// Whether `chosen` is within the limit.
     pub fn allows<T: PartialEq>(&self, eligible: &[T], chosen: &[T]) -> bool {
-        self.of(eligible, chosen) <= u32::from(self.most)
+        self.of(eligible, chosen) <= u64::from(self.most)
     }
 
     /// The first of `eligible`, in order, that fit together within the limit, at most `count` of them: an answer always
@@ -909,11 +910,25 @@ pub enum Answer {
     /// the top card); or, where allowed, shuffle instead.
     Placements { placements: Vec<Vec<ObjectId>>, shuffle: bool },
     /// A divided slot's targets, each with its share (CR 601.2d).
-    Divided(Vec<(Target, u16)>),
+    Divided(Vec<(Target, u32)>),
     /// Give up the spell or ability being announced (CR 733.1).
     Cancel,
     /// The counters removed for a `RequestKind::RemoveCounters`: how many of each kind from each permanent.
     Counters(Vec<(ObjectId, CounterKind, u16)>),
     /// The index of the option chosen, for a question of one-of-several (which replacement effect applies first).
     Index(u8),
+}
+
+#[cfg(test)]
+mod total_tests {
+    use super::*;
+
+    /// Mana values that add up past `u32::MAX` are not taken as fitting within a limit: the sum does not wrap.
+    #[test]
+    fn a_total_past_u32_does_not_wrap_under_the_limit() {
+        let t = TotalAtMost { values: vec![u32::MAX, 2], most: 5 };
+        assert_eq!(t.of(&[1, 2], &[1, 2]), u64::from(u32::MAX) + 2);
+        assert!(!t.allows(&[1, 2], &[1, 2]));
+        assert!(t.allows(&[1, 2], &[2]));
+    }
 }

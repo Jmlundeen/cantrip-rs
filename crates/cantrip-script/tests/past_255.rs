@@ -1,7 +1,8 @@
 //! Numbers past 255 that the rules set no limit on, over test cards: a spell with "any number of target creatures" chooses
 //! more than 250 of them (CR 115.1d) and every one is its target; "X target creatures" is X targets whatever X is (CR 601.2c);
 //! and a spell of mana value 260 is recorded as cast with mana value 260 (CR 202.3, 601.2i), which what asks about past casts
-//! reads. No printed card in the engine reaches such numbers on today's boards, so test cards do here.
+//! reads; and a share of 300 of a divided total is kept whole (CR 601.2d). No printed card in the engine reaches such numbers
+//! on today's boards, so test cards do here.
 
 use std::sync::OnceLock;
 
@@ -49,6 +50,29 @@ static WELL: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A zero-cost sorcery: "Probe Blast deals 300 damage divided as you choose among one or two target creatures."
+static BLAST: CardDef = CardDef {
+    name: "Probe Blast",
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&[up_to(2, creature).between(1, 2)], blast),
+    divide: Some(Divide { total: 300, of_x: None }),
+    ..CardDef::BLANK
+};
+
+fn blast(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    cantrip_mechanics::damage_divided(g, item);
+    Ok(())
+}
+
+/// A 400/400.
+static GIANT: CardDef = CardDef {
+    name: "Probe Giant",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(400),
+    toughness: Some(400),
+    ..CardDef::BLANK
+};
+
 static BEAR: CardDef = CardDef {
     name: "Probe Bear",
     types: TypeSet::of(&[CardType::Creature]),
@@ -62,7 +86,7 @@ static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeS
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&VOLLEY, &SURGE, &WELL, &BEAR, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&VOLLEY, &SURGE, &WELL, &BLAST, &GIANT, &BEAR, &FILLER]))
 }
 
 /// A game in which Bot1 holds `card` on turn 1.
@@ -154,8 +178,31 @@ fn a_spell_of_mana_value_260_is_cast_with_mana_value_260() {
         _ => None,
     });
     let values: Vec<u32> = game.log.iter().filter_map(|r| match r.event {
-        Event::Cast(c) => Some(c.value),
+        Event::Cast(c) => Some(c.value(&game)),
         _ => None,
     }).collect();
     assert_eq!(values, [260]);
+}
+
+/// Probe Blast divides 300 damage and puts all 300 on one Probe Giant (CR 601.2d): the share is kept whole, and the Giant is
+/// dealt 300.
+#[test]
+fn a_divided_share_of_300_is_dealt_whole() {
+    let mut game = game("Probe Blast");
+    let giant = game.state.push_obj(Obj::new(table().find("Probe Giant").unwrap(), PlayerId(1), Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, giant);
+    let mut held = None;
+    cast(&mut game, "Probe Blast", |game, request| match &request.kind {
+        RequestKind::ChooseDividedTargets { total, .. } => {
+            assert_eq!(*total, 300);
+            Some(Answer::Divided(vec![(Target::Object(giant), 300)]))
+        }
+        RequestKind::Priority { .. } if !game.state.stack.is_empty() => {
+            held = Some(game.state.share(game.state.stack.last().unwrap(), 0));
+            None
+        }
+        _ => None,
+    });
+    assert_eq!(held, Some(300), "the share was not kept whole");
+    assert_eq!(game.state.obj(giant).damage, 300);
 }

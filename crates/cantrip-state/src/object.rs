@@ -589,11 +589,12 @@ pub struct StackItem {
     pub serial: u32,
     /// For a spell cast with gift promised (CR 702.174): the opponent it was promised to.
     pub gift: Option<PlayerId>,
-    /// For a spell or ability that divides a total among its targets (CR 601.2d): each target's share, parallel to
-    /// `targets`.
-    pub inline_shares: [u8; INLINE_TARGETS],
-    /// For an item with more than `INLINE_TARGETS` targets, where all `target_count` of them, their slots and shares start in
-    /// the game's target arena (`GameState::targets`); 0 otherwise.
+    /// For a spell or ability that divides a total among its targets (CR 601.2d): where each target's share, parallel to
+    /// `targets`, starts in the game's share arena (`GameState::shares`); `StackItem::NO_SHARES` for an item with no share
+    /// above 0, which is every other item.
+    pub shares: u32,
+    /// For an item with more than `INLINE_TARGETS` targets, where all `target_count` of them and their slots start in the
+    /// game's target arena (`GameState::targets`); 0 otherwise.
     pub spill: usize,
     /// For an instant or sorcery spell: if it would be put into a graveyard as it leaves the stack, it is exiled
     /// instead (Bilbo's "cast this way").
@@ -616,6 +617,9 @@ pub struct StackItem {
 }
 
 impl StackItem {
+    /// No shares: every target's is 0.
+    pub const NO_SHARES: u32 = u32::MAX;
+
     /// Target `slot` among the first `INLINE_TARGETS`, which the item holds itself, or `Target::None` past the targets
     /// announced. A later one is read through `GameState::target`.
     pub fn target(&self, slot: usize) -> Target {
@@ -1097,6 +1101,9 @@ pub struct LastKnown {
     pub power: Option<i16>,
     pub toughness: Option<i16>,
     pub keywords: Keywords,
+    /// Its mana value as it last had it (CR 202.3; on the stack, X counted, CR 202.3e): a cast's is its mana value as it
+    /// became cast (`history::Cast::value`).
+    pub mana_value: u32,
     /// Its abilities as it last had them, those granted by effects included: a leaves-the-battlefield ability it was given still
     /// triggers (CR 603.10a).
     pub abilities: [Option<AbilityRef>; MAX_ABILITIES],
