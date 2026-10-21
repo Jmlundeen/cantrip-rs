@@ -31,6 +31,20 @@ fn unland(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
+fn creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.is_on_battlefield(id) && q.chars(id).is(CardType::Creature))
+}
+
+/// "Target creature gets +0/+2 and loses all abilities."
+fn mute(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(id) = item.target(0) {
+        g.add_effect(item.object, id, EffectKind::Pump(0, 2), Duration::Indefinite);
+        g.add_effect(item.object, id, EffectKind::LoseAllAbilities, Duration::Indefinite);
+    }
+    Ok(())
+}
+
+static MUTE: CardDef = CardDef { name: "Probe Mute", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[target(creature)], mute), ..CardDef::BLANK };
 static COMMANDEER: CardDef = CardDef { name: "Probe Commandeer", types: TypeSet::of(&[CardType::Instant]), spell: spell(&[target(spell_on_stack)], commandeer), ..CardDef::BLANK };
 static UNLAND: CardDef = CardDef { name: "Probe Unland", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[target(land)], unland), ..CardDef::BLANK };
 /// An instant costing {4}{U} that does nothing: what Eluge's reduction is seen on.
@@ -44,7 +58,7 @@ static OPT: CardDef = CardDef {
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&COMMANDEER, &UNLAND, &OPT])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&COMMANDEER, &UNLAND, &OPT, &MUTE])))
 }
 
 /// What a seat does, in order, each as soon as its turn has come and it is offered: play a land, or cast a card (aimed at a
@@ -196,4 +210,26 @@ fn eluges_reduction_counts_no_flooded_permanent_that_is_no_land() {
         },
     );
     assert_eq!(totals, [4, 5], "the Opt's total before the Island stopped being a land, and after");
+}
+
+/// Eluge's power and toughness are stars, defined by its ability (CR 208.2a); once it has lost all its abilities they are 0
+/// (CR 208.5, 613.1f): with Probe Mute's +0/+2 it is a 0/2, not a creature with no power.
+#[test]
+fn eluge_that_lost_its_abilities_has_power_0() {
+    let game = play(
+        [&["Island", "Mox Sapphire", "Mox Sapphire", "Mox Sapphire", "Eluge, the Shoreless Sea", "Probe Mute"], &[]],
+        vec![
+            Step::Play(0, 1, "Island"),
+            Step::Cast(0, 1, "Mox Sapphire", None),
+            Step::Cast(0, 1, "Mox Sapphire", None),
+            Step::Cast(0, 1, "Mox Sapphire", None),
+            Step::Cast(0, 1, "Eluge, the Shoreless Sea", None),
+            Step::Cast(0, 1, "Probe Mute", Some("Eluge, the Shoreless Sea")),
+        ],
+        1,
+        |_, _| {},
+    );
+    let eluge = *game.state.battlefield().iter().find(|&&id| game.name(id) == "Eluge, the Shoreless Sea").expect("Eluge");
+    let c = game.chars(eluge);
+    assert_eq!((c.power, c.toughness), (Some(0), Some(2)));
 }
