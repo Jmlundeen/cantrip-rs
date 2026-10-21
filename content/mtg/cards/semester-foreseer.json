@@ -1,0 +1,15 @@
+{
+  "name": "Semester Foreseer",
+  "manaCost": "{3}{U}",
+  "type": "Creature — Human Wizard",
+  "oracleText": "This creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)\nWhen this creature enters, surveil 1.",
+  "power": 3,
+  "toughness": 4,
+  "keywords": [],
+  "prepare": {
+    "name": "Peer Review",
+    "manaCost": "{2}{W/U}",
+    "type": "Sorcery",
+    "oracleText": "Create a 2/2 colorless Wizard Soldier creature token named Cadet. Surveil 1."
+  }
+}

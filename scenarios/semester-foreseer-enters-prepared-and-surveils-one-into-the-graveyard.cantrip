@@ -1,0 +1,27 @@
+# Semester Foreseer: "This creature enters prepared" and "When this creature enters, surveil 1" (CR 614.1d, 722.3a,
+# 603.6a, 701.25a). It is a 3/4 Human Wizard; the surveil can put the top card into the graveyard.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Semester Foreseer
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Semester Foreseer.Cast
+Bot1.Arrange(| Island)
+? Stack.Count = 0
+? Bot1.Battlefield.Semester Foreseer.Prepared = true
+
+[Expect]
+Bot1.Battlefield.Semester Foreseer.Power = 3
+Bot1.Battlefield.Semester Foreseer.Toughness = 4
+Bot1.Battlefield.Semester Foreseer.Prepared = true
+Bot1.Graveyard = Island; Black Lotus

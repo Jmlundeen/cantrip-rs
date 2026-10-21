@@ -1,0 +1,31 @@
+# The creature enters prepared with Peer Review (CR 722.3a, the same spell Prudent Fateseer has, CR 722.3c). Casting the
+# copy from exile creates a 2/2 Cadet and surveils, and the creature is no longer prepared (CR 722.3c).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Semester Foreseer
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Semester Foreseer.Cast
+Bot1.Arrange(Island)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Exile.Peer Review.Cast
+Bot1.Arrange(| Island)
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Semester Foreseer.Prepared = (absent)
+Bot1.Battlefield.Cadet.Power = 2
+Bot1.Battlefield.Cadet.Toughness = 2
+Bot1.Graveyard = Island; Black Lotus; Black Lotus
