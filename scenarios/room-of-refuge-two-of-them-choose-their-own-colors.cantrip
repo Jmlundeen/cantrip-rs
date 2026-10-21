@@ -1,0 +1,34 @@
+# Two Rooms of Refuge each choose their own color as each enters (CR 614.1c, 607.2d): the first chose red on turn one, the
+# second blue on turn three, and each adds its own color. The second enters tapped as well. (That a Room makes no other
+# color is the sibling scenario's check.)
+
+[Bot1 Deck]
+Room of Refuge
+Room of Refuge
+Island
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Room of Refuge.Play
+Bot1.Colors(Red)
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+Bot1.Hand.Room of Refuge.Play
+Bot1.Colors(Blue)
+? Bot1.Battlefield.Room of Refuge#1.ChosenColor = Red
+? Bot1.Battlefield.Room of Refuge#2.ChosenColor = Blue
+? Bot1.Battlefield.Room of Refuge#2.Tapped = true
+Bot1.Battlefield.Room of Refuge#1.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Room of Refuge#2.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Room of Refuge#1.ChosenColor = Red
+Bot1.Battlefield.Room of Refuge#2.ChosenColor = Blue
+Bot1.Mana =
