@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "When this enchantment enters, tap X target creatures. Put a stun counter on each of those creatures you don't control."
 /// X is the X the enchantment was cast with and counts the targets (CR 107.3m, 601.2b-c). The creatures still legal as it
-/// resolves are tapped (CR 701.26a, 608.2b); a creature that was already tapped still gets its counter (CR 122.1g). Whom
+/// resolves are tapped (CR 701.26a, 608.2b); a creature that was already tapped still gets its counter (CR 122.1d). Whom
 /// "you don't control" is judged as the ability resolves.
 fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = targets::legal_objects(g, item);

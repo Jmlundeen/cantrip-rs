@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
-/// "When this creature enters, tap target creature an opponent controls and put a stun counter on it" (CR 122.1g): a
+/// "When this creature enters, tap target creature an opponent controls and put a stun counter on it" (CR 122.1d): a
 /// creature already tapped still gets the counter.
 fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
@@ -12,7 +12,7 @@ fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Target creature with a stun counter on it" (CR 115.1, 122.1g).
+/// "Target creature with a stun counter on it" (CR 115.1, 122.1d).
 fn creature_with_a_stun_counter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).counters(CounterKind::Stun) > 0)
 }

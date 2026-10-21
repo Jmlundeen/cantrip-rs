@@ -1,7 +1,7 @@
 # Floodpits Drowner: "Flash. When this creature enters, tap target creature an opponent controls and put a stun counter on
 # it." On Bot2's turn 4 Bot1 flashes it in (Flash, CR 702.8a) after Bot2 has cast Birds of Paradise. The trigger refuses
 # Bot1's own Drowner ("an opponent controls") beside the legal Birds (the positive control); Birds is untapped and ends
-# up tapped with a stun counter (CR 122.1g). On turn 6 Bot2's untap step removes the counter instead of untapping it.
+# up tapped with a stun counter (CR 122.1d). On turn 6 Bot2's untap step removes the counter instead of untapping it.
 
 [Bot1 Deck]
 Island

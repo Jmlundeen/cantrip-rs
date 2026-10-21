@@ -28,9 +28,12 @@ static TITAN: CardDef = CardDef {
 /// A zero-cost instant: target creature (nothing happens to it).
 static POKE: CardDef = CardDef { name: "Probe Poke", types: TypeSet::of(&[CardType::Instant]), spell: spell(&[target(creature)], nothing), ..CardDef::BLANK };
 
+/// A land to fill hands and libraries.
+static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&TITAN, &POKE])))
+    TABLE.get_or_init(|| CardTable::new([&TITAN, &POKE, &FILLER]))
 }
 
 /// Bot1 casts the Titan on turn 1; Bot2, at `life`, pokes it on turn 2 and pays the ward whenever it is asked to. Bot2's life
@@ -39,7 +42,7 @@ fn poke_at(life: i32) -> (i32, bool, bool) {
     let names = |list: &[&str]| -> Vec<CardId> { list.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))).collect() };
     let deck = |first: &str| {
         let mut deck = names(&[first]);
-        deck.extend(names(&["Island"; 29]));
+        deck.extend(names(&["Filler"; 29]));
         deck
     };
     let mut game = Game::new(table(), &Setup { decks: vec![deck("Probe Titan"), deck("Probe Poke")], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });

@@ -1,4 +1,4 @@
-//! A face-down permanent turned face up by an effect (CR 701.58b, 708.8): `Game::turn_face_up` with the effect's controller as
+//! A face-down permanent turned face up by an effect (CR 708.8, 701.58g): `Game::turn_face_up` with the effect's controller as
 //! the player `Event::TurnedFaceUp` records, and a cloaked instant that would turn face up is revealed and stays face down
 //! (CR 701.58g). No printed card in the engine turns a permanent face up as an effect, so a test card does here, beside the
 //! printed Cryptic Coat and every other card the engine has.

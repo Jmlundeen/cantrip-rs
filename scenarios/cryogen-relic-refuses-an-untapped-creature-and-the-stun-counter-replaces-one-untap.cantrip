@@ -1,6 +1,6 @@
 # Cryogen Relic: "Put a stun counter on up to one target tapped creature." The target must be tapped (CR 115.1): on turn 3
 # Bot2's untapped Llanowar Elves are refused, beside the tapped ones the activation takes on turn 5 (the positive control).
-# A stun counter (CR 122.1g): when the stunned permanent would untap, the counter is removed instead - so on turn 6 the
+# A stun counter (CR 122.1d): when the stunned permanent would untap, the counter is removed instead - so on turn 6 the
 # Elves stay tapped and lose the counter, and on turn 8 they untap.
 
 [Bot1 Deck]

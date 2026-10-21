@@ -1,7 +1,7 @@
 # Seasoned Cryomancer: two nonland cards discarded make "up to two target creatures", but the only creature is the
 # Cryomancer itself. The ability still goes on the stack with the targets there are (CR 603.3d: "up to" needs none),
 # and the Cryomancer taps itself and gets the stun counter; on Bot1's next untap step the counter comes off instead
-# (CR 122.1g).
+# (CR 122.1d).
 
 [Bot1 Deck]
 Island

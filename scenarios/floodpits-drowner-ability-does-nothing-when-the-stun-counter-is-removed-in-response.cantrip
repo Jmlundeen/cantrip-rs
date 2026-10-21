@@ -3,7 +3,7 @@
 # enters, untap all creatures."). On turn 5 Bot1 flashes in its Drowner and stuns Bot2's tapped Llanowar Elves (the Alarm's
 # untap resolves first, being on top of Bot1's trigger by APNAP order, so the counter survives: checked). On turn 7 Bot1
 # activates the Drowner targeting the Elves; in response Bot2 flashes in its own Drowner, and the Alarm's untap takes a
-# stun counter off the Elves instead of untapping them (CR 122.1g). The Elves no longer match, so the ability does
+# stun counter off the Elves instead of untapping them (CR 122.1d). The Elves no longer match, so the ability does
 # nothing: Bot1's Drowner is not shuffled away and the Elves stay.
 
 [Bot1 Deck]

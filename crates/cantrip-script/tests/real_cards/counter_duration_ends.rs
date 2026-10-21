@@ -1,5 +1,5 @@
 //! "For as long as it has a [kind] counter on it" (CR 611.2b, `Duration::WhileCounter`) ended by the last such counter coming off
-//! in the ways no printed card in the engine pairs with the duration: a stun counter removed in place of an untap (CR 122.1g),
+//! in the ways no printed card in the engine pairs with the duration: a stun counter removed in place of an untap (CR 122.1d),
 //! ending a control-changing effect (`ops::end_counter_durations`, `refresh_control`), and counters removed as a cost (CR 118.3:
 //! Loch Mare's). Test cards make the effects, beside the printed cards and every other card the engine has.
 
@@ -117,7 +117,7 @@ fn play(hands: [&[&str]; 2], steps: Vec<Step>, until: u32, mut watch: impl FnMut
 }
 
 /// Bot1 takes Bot2's Ornithopter with Probe Seize on turn 3: tapped, stunned, Bot1's for as long as it has the stun counter. At
-/// Bot1's untap step on turn 5 the counter comes off in place of the untap (CR 122.1g), so the control effect ends and the
+/// Bot1's untap step on turn 5 the counter comes off in place of the untap (CR 122.1d), so the control effect ends and the
 /// Ornithopter, still tapped, is Bot2's again.
 #[test]
 fn a_stun_counter_removed_in_place_of_an_untap_ends_control_for_as_long_as_it_has_it() {

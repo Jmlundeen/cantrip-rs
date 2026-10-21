@@ -234,7 +234,7 @@ fn a_ghalta_that_lost_its_abilities_after_the_attack_deals_no_damage_by_toughnes
     assert_eq!(life(true), 20);
 }
 
-/// CR 702.131a, 613.1f: Ocelot Pride's ascend gives Bot1 the city's blessing once it controls ten permanents, and not when the
+/// CR 702.131b, 613.1f: Ocelot Pride's ascend gives Bot1 the city's blessing once it controls ten permanents, and not when the
 /// Pride has lost all its abilities first (`designations`).
 #[test]
 fn an_ocelot_pride_that_lost_its_abilities_gives_no_citys_blessing() {
