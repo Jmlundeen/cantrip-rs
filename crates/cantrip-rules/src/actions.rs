@@ -2017,7 +2017,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 }
             }
             alternative.tapped = def.cost.tap;
-            if let Some(repeat) = Repeat::of(&def.cost) {
+            if let Some(repeat) = Repeat::of(&def.cost, def.colors_from_sacrifice) {
                 repeatable.push((alternative, id, repeat));
                 continue;
             }
@@ -2073,11 +2073,18 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         for target in cx.permanents_of(player) {
             let outlets: Vec<Alternative> = repeatable
                 .iter()
-                .filter(|(_, source, repeat)| match *repeat {
-                    Repeat::Sacrifice(cost, p) => pays_permanents(cx, &cost, &p, &Asker { source: *source, controller: player }, target),
-                    Repeat::Tap(..) | Repeat::Counters(..) => false,
+                .filter_map(|&(a, source, repeat)| match repeat {
+                    Repeat::Sacrifice(cost, p, from_it) if pays_permanents(cx, &cost, &p, &Asker { source, controller: player }, target) => {
+                        if !from_it {
+                            return Some(a);
+                        }
+                        // The types this land could produce (CR 106.7), not every land's.
+                        let (colors, colorless) = producible_types(cx, target);
+                        let types = colors.0 | if colorless { 1 << Mana::C as u8 } else { 0 };
+                        Some(Alternative { types, k: if types == 0 { 0 } else { a.k }, ..a })
+                    }
+                    _ => None,
                 })
-                .map(|&(a, ..)| a)
                 .collect();
             if outlets.is_empty() {
                 continue;
@@ -2117,19 +2124,21 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
 /// an untapped permanent tapped (Urza, Lord High Artificer), or counters removed from its source (Cryptic Trilobite).
 #[derive(Clone, Copy)]
 enum Repeat {
-    Sacrifice(Cost, PermanentCost),
+    /// With whether it adds a type the sacrificed permanent could produce (Squandered Resources, CR 106.7), which is then
+    /// that permanent's own.
+    Sacrifice(Cost, PermanentCost, bool),
     Tap(Cost, PermanentCost),
     Counters(CounterKind, u8),
 }
 
 impl Repeat {
-    fn of(cost: &Cost) -> Option<Repeat> {
+    fn of(cost: &Cost, colors_from_sacrifice: bool) -> Option<Repeat> {
         if cost.tap {
             return None;
         }
         match (cost.permanents, cost.remove_counters) {
             (Some(p), None) if p.count == 1 && p.action == PermanentAction::Sacrifice && !p.tapped && Cost { permanents: None, tap: true, ..*cost }.is_tap_only() => {
-                Some(Repeat::Sacrifice(*cost, p))
+                Some(Repeat::Sacrifice(*cost, p, colors_from_sacrifice))
             }
             (Some(p), None)
                 if p.count == 1

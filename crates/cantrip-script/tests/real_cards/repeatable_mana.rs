@@ -23,11 +23,28 @@ static THREE_AND_BLUE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// An instant costing {W}.
+static ONE_WHITE: CardDef = CardDef {
+    name: "Probe One White",
+    cost: ManaCost { symbols: [1, 0, 0, 0, 0, 0], ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], |_, _| Ok(())),
+    ..CardDef::BLANK
+};
+/// An instant costing {G}{G}.
+static TWO_GREEN: CardDef = CardDef {
+    name: "Probe Two Green",
+    cost: ManaCost { symbols: [0, 0, 0, 0, 2, 0], ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], |_, _| Ok(())),
+    ..CardDef::BLANK
+};
+
 static BEAR: CardDef = CardDef { name: "Probe Bear", types: TypeSet::of(&[CardType::Creature]), power: Some(2), toughness: Some(2), ..CardDef::BLANK };
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BEAR, &FOUR_BLUE, &THREE_AND_BLUE])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BEAR, &FOUR_BLUE, &THREE_AND_BLUE, &ONE_WHITE, &TWO_GREEN])))
 }
 
 /// Whether, with `permanents` on Bot1's battlefield and `card` in hand, `card` is offered at Bot1's first main phase.
@@ -78,4 +95,12 @@ fn urza_taps_each_untapped_artifact_once_for_blue() {
     assert!(offered(&board(4), "Probe Four Blue"));
     assert!(!offered(&board(3), "Probe Three And Blue"));
     assert!(offered(&board(4), "Probe Three And Blue"));
+}
+
+/// Squandered Resources adds a type the land it sacrifices could produce (CR 106.7), that land's own: with a Forest and an
+/// Island, never {W}; and the Forest may be tapped for {G} and then sacrificed for {G}.
+#[test]
+fn squandered_resources_adds_what_each_land_could_produce() {
+    assert!(!offered(&["Squandered Resources", "Forest", "Island"], "Probe One White"));
+    assert!(offered(&["Squandered Resources", "Forest", "Island"], "Probe Two Green"));
 }
