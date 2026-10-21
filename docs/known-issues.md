@@ -264,6 +264,9 @@ as many times as its cost can be paid, sharing the resources it spends with the 
   no longer wraps or panics, but it still stops at 255.
 - X is a `u16` (`StackItem::x`, `Obj::x`), and X paid in life stops at 1000 (`actions.rs`,
   `payable_life(..).clamp(0, 1000)`).
+- A reflexive trigger's "that many" becomes its X, so it is a `u16` too (`PendingTrigger::count`,
+  `Game::reflexive_trigger_counted`): the counts Loamcrafter Faun, Miasma Demon, Swashbuckler Extraordinaire, Seasoned
+  Cryomancer and Ill-Timed Explosion give it saturate at 65,535 rather than wrap, and widen with X.
 - Splice onto an Arcane spell takes at most two cards (`eligible.len().min(2)`, `actions.rs:4850`; CR 702.47 allows any
   number), and twobrid symbols at most eight.
 - The mana a cast records per kind is a `u8` (`ManaTally`, `vocab.rs:250`): Dyadrine counts at most 255 spent.
