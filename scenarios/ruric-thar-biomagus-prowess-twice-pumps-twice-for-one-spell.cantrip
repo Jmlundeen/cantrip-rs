@@ -1,0 +1,47 @@
+# Ruric Thar, Biomagus prints "Prowess, prowess" (CR 702.108a): two instances of the keyword ability, so one noncreature
+# spell puts two separate prowess triggers on the stack and the Ogre Crab gets +1/+1 twice - +2/+2, not +1/+1. Flying is
+# its printed keyword (CR 702.9). It was cast with Black Lotus and the Moxen, leaving the Island for Opt.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Ruric Thar, Biomagus
+Opt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ruric Thar, Biomagus.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ruric Thar, Biomagus.Power = 4
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Triggers(Prowess; Prowess)
+? Stack.Count = 3
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ruric Thar, Biomagus.Power = 6
+Bot1.Battlefield.Ruric Thar, Biomagus.Toughness = 8
+Bot1.Battlefield.Ruric Thar, Biomagus.Keywords = Flying
+Bot1.Graveyard = Opt; Black Lotus
