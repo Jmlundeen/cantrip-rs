@@ -35,12 +35,19 @@ thread_local! {
 /// characteristics are worked out again, watching each entry of layer 6 that applies to it: asked only of an object that has
 /// an ability another card's, which is rare, so nothing is paid for it the rest of the time.
 pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> [ObjectId; cantrip_state::MAX_ABILITIES] {
+    /// Ends the watch however `chars` returns, a panic included, so the layers never go on paying for it.
+    struct Watch(ObjectId);
+    impl Drop for Watch {
+        fn drop(&mut self) {
+            WATCHING.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
+            WATCHED.with(|w| w.set(self.0));
+        }
+    }
     GIVERS.with(|g| g.set([ObjectId::NONE; cantrip_state::MAX_ABILITIES]));
-    let outer = WATCHED.with(|w| w.replace(id));
+    let watch = Watch(WATCHED.with(|w| w.replace(id)));
     WATCHING.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     let _ = chars(cards, state, log, id);
-    WATCHING.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
-    WATCHED.with(|w| w.set(outer));
+    drop(watch);
     GIVERS.with(|g| g.get())
 }
 
