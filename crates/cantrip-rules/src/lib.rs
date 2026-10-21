@@ -28,6 +28,8 @@ mod history_cut_tests;
 #[cfg(test)]
 mod inherent_trigger_tests;
 #[cfg(test)]
+mod copy_card_tests;
+#[cfg(test)]
 mod copy_spell_tests;
 #[cfg(test)]
 mod entering_judged_tests;

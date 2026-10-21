@@ -1335,12 +1335,15 @@ pub fn copy_card(cx: &mut Cx, card: ObjectId, controller: PlayerId) -> ObjectId 
 
 /// A copy of an object (CR 707.12) created in `zone`, owned and controlled by `controller`: `copy_card` for a copy made
 /// somewhere other than where the object is, or of one that has left its zone (paradigm's "create a copy of this object in
-/// exile", CR 702.192a). Its copiable values are the card's, as it last existed (CR 608.2h).
+/// exile", CR 702.192a). It copies the object's copiable values as it last existed (CR 707.2, 608.2h): the exceptions of
+/// the copy effects on it, its face-down values while it is a face-down permanent, and the face that is up (CR 707.8),
+/// as a token copy does (`create_token_copies`).
 pub fn copy_card_into(cx: &mut Cx, card: ObjectId, controller: PlayerId, zone: Zone) -> ObjectId {
-    let def = cx.s().obj(card).card;
+    let values = cantrip_api::Query::copiable_values(&*cx, card);
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
-    let mut obj = Obj::new(def, controller, zone);
+    let mut obj = Obj::new(values.card, controller, zone);
+    obj.copy = values.has_exceptions().then_some(values);
     (obj.card_copy, obj.controlled_since, obj.timestamp) = (true, turn, timestamp);
     let copy = cx.st().push_obj(obj);
     cx.st().zone_push(zone, copy);
