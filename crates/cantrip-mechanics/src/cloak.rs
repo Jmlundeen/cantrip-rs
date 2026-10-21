@@ -8,15 +8,21 @@
 use crate::top_of_library;
 use cantrip_api::*;
 
-/// `player` cloaks `cards`, one at a time (CR 701.58e), each entering under their control (tapped if `tapped`: Become
-/// Anonymous's "They enter tapped"). The cloaked permanents, in that order: a card that did not enter face down (CR
-/// 701.58f, 400.7) is not among them.
+/// `player` cloaks `cards`, each entering under their control (tapped if `tapped`: Become Anonymous's "They enter tapped"):
+/// those from a library one at a time (CR 701.58e: "multiple cards from a single library ... one at a time"), the rest -
+/// cards in a hand, or exiled in a face-down pile (Become Anonymous, Expose the Culprit) - all at once (CR 110.2a), after
+/// them. The cloaked permanents, in the order cloaked: a card that did not enter face down (CR 701.58f, 400.7) is not
+/// among them.
 pub fn cloak(g: &mut dyn Game, player: PlayerId, cards: &[ObjectId], tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
+    let (from_library, rest): (Vec<ObjectId>, Vec<ObjectId>) = cards.iter().copied().partition(|&c| g.obj(c).zone.is(ZoneKind::Library));
     let mut cloaked = Vec::with_capacity(cards.len());
-    for &card in cards {
+    for card in from_library {
         if let Some(permanent) = g.put_onto_battlefield_face_down(card, player, FaceDown::Cloaked, tapped)? {
             cloaked.push(permanent);
         }
+    }
+    if !rest.is_empty() {
+        cloaked.extend(g.put_all_onto_battlefield_face_down(&rest, player, FaceDown::Cloaked, tapped)?.into_iter().flatten());
     }
     Ok(cloaked)
 }

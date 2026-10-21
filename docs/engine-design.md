@@ -1624,7 +1624,9 @@ Known gaps:
 - Suspend does not give a creature cast that way haste (no card in content needs it). Several permanents one effect puts
   onto the battlefield enter together (`ops::put_onto_battlefield`, `Game::put_all_onto_battlefield*`: Show and Tell,
   Redshift's exhaust, Ghost Vacuum), each judged by its entering replacements against the battlefield as it was (CR 614.12)
-  and each seeing the others enter (CR 603.6a); cloaking several cards is one at a time, as the rules say (CR 701.58e).
+  and each seeing the others enter (CR 603.6a). Cloaking or manifesting several cards from a single library is one at a time,
+  as the rules say (CR 701.58e, 701.40e); cloaking cards from anywhere else (a hand, a face-down exile pile) puts them onto
+  the battlefield together (`cloak::cloak`).
 - Rooms (CR 709.5) are built: `Marks::doors` holds the unlocked designations, `layers::doors` gives a Room on the
   battlefield the name, mana cost and abilities of its unlocked doors, the unlock special action is an intrinsic ability
   per locked door (`intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, cost read off the door), `Event::DoorUnlocked` is what
