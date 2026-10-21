@@ -107,8 +107,8 @@ pub struct Obj {
     /// has no characteristics at all (CR 406.3a), and only those who may look
     /// at it know what card it is (`seen_by`, CR 406.3).
     pub face_down: bool,
-    /// For a face-down card in exile: the seats that may look at it, a bit each (CR 406.3). Those who could see where it
-    /// came from, and those it was shown to since.
+    /// For a face-down card in exile: the seats that may look at it, a bit each (CR 406.3), every seat a game deals
+    /// (`MAX_SEATS`). Those who could see where it came from, and those it was shown to since.
     pub seen_by: u8,
 }
 

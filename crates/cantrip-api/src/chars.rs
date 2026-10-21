@@ -20,7 +20,7 @@ pub struct Chars {
     pub protection: ColorSet,
     /// Protection from colorless (CR 702.16a).
     pub protection_colorless: bool,
-    /// Protection from players (CR 702.16a): a bit per seat.
+    /// Protection from players (CR 702.16a): a bit per seat, every seat a game deals (`MAX_SEATS`).
     pub protection_players: u8,
     /// Protection from objects of these card types (CR 702.16a): "protection from creatures", "protection from instants".
     pub protection_types: TypeSet,

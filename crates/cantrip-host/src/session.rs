@@ -106,6 +106,9 @@ impl Session {
         if deal.seats.len() < 2 {
             return Err(Rejection::new("InvalidSetup", "a game needs at least two seats"));
         }
+        if deal.seats.len() > MAX_SEATS {
+            return Err(Rejection::new("InvalidSetup", format!("a game seats at most {MAX_SEATS}")));
+        }
         let cards = cards();
         let known = |name: &str, card_name: &str| {
             card(card_name).ok_or_else(|| Rejection::new("InvalidSetup", format!("{name}'s deck names {card_name}, which is not a card the engine has")))
@@ -630,6 +633,15 @@ mod tests {
     fn deal(first: &[&str], filler: &str, count: usize) -> Deal {
         let deck = |top: &[&str]| top.iter().map(|c| c.to_string()).chain(std::iter::repeat_n(filler.to_string(), count)).collect::<Vec<_>>();
         Deal { seats: vec![("North".into(), deck(first), Vec::new()), ("South".into(), deck(&[]), Vec::new())], basic_lands_outside: Vec::new(), seed: 1, shuffle: false, first_player: Some(1), chooser: None }
+    }
+
+    /// A game deals as many seats as a set of seats holds (`MAX_SEATS`, a bit each in `Obj::seen_by`): eight are dealt,
+    /// nine refused.
+    #[test]
+    fn a_deal_of_more_seats_than_a_game_holds_is_refused() {
+        let seats = |n: usize| Deal { seats: (0..n).map(|i| (format!("Seat {i}"), vec!["Forest".to_string(); 20], Vec::new())).collect(), ..deal(&[], "Forest", 20) };
+        assert!(Session::new(seats(MAX_SEATS)).is_ok());
+        assert!(Session::new(seats(MAX_SEATS + 1)).is_err_and(|r| r.code == "InvalidSetup"));
     }
 
     fn of_type<'a>(events: &'a [Value], kind: &str) -> Vec<&'a Value> {

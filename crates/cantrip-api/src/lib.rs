@@ -9,7 +9,7 @@ pub use cantrip_state::{
     Target, TypeSet, Word, Words, Zone, ZoneKind, ZoneKinds, ZoneReason, DelayedWhen, ChosenOption, ExileLink, Expiry, PlayCondition, PlayGrant, PlayPermission, LastKnown, ManaPayment, ManaRestriction, ManaValueSpells, SubtypeSpells, MANA_GIVES_HASTE, MANA_MAKES_UNCOUNTERABLE, Destination, DestinationKind, TotalAtMost, DamageDivision, DamageAbout, AttackCost, BlockRequirements, CounterPool, SearchDestination, WAY_ADVENTURE, WAY_BACK_FACE, WAY_OMEN, Grant, WAY_BESTOW, WAY_OVERLOAD, WAY_SPLIT_LEFT, WAY_SPLIT_RIGHT, WAY_FUSED, WAY_TRANSFORMED,
 };
 
-pub use cantrip_state::{count_u32, ContinuousEffect, Shield, DOOR_LEFT, DOOR_RIGHT, PAY_CONVOKE, PAY_DELVE, PAY_IMPROVISE, PAY_WATERBEND, PLAYER_MANA_ABILITY, MAX_ABILITIES};
+pub use cantrip_state::{count_u32, ContinuousEffect, Shield, DOOR_LEFT, DOOR_RIGHT, PAY_CONVOKE, PAY_DELVE, PAY_IMPROVISE, PAY_WATERBEND, PLAYER_MANA_ABILITY, MAX_ABILITIES, MAX_SEATS};
 
 mod ability;
 mod card;

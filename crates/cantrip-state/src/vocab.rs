@@ -6,6 +6,11 @@ use std::fmt;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct PlayerId(pub u8);
 
+/// The most seats a game deals: every table the server and the tools deal seats eight at most (a queue's table, a draft
+/// pod's game). A set of seats is a bit each in a `u8` (`Obj::seen_by`, `Chars::protection_players`), which this fills; a
+/// deal of more is refused (the host's `Session::new`).
+pub const MAX_SEATS: usize = 8;
+
 impl PlayerId {
     pub fn index(self) -> usize {
         self.0 as usize
