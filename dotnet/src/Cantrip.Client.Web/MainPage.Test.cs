@@ -177,6 +177,19 @@ public sealed partial class MainPage
 
             json.WriteEndArray();
 
+            // The labels on the arrows from a spell on the stack to its targets, as drawn: which part of the spell each target is
+            // for ("Turn", "Burn" for a fused split spell's halves; a scenario's `Client.Bot1.TargetLabels`).
+            json.WriteStartArray("targetLabels");
+            foreach (UIElement child in _arrowLabels.Children)
+            {
+                if (child is Border { Child: TextBlock text })
+                {
+                    json.WriteStringValue(text.Text);
+                }
+            }
+
+            json.WriteEndArray();
+
             // The combat groups as the attacking side's ground captions them, each with the attackers standing in it, mine first:
             // "Attacking Liliana of the Veil: Leonardo, Cutting Edge" (a scenario's `Client.Bot1.Combat`).
             json.WriteStartArray("combat");

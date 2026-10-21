@@ -1,6 +1,7 @@
 # Browser
 # Turn // Burn with fuse (CR 702.102a): cast from Bot1's hand as both halves - its menu's "Fuse: both halves" row - the fused
-# split spell, shown on the stack as the whole card (CR 702.102b), for both mana costs,
+# split spell, shown on the stack as the whole card drawn as both halves, with each target's arrow labelled with its half
+# (CR 702.102b), for both mana costs,
 # {2}{U} and {1}{R} (CR 702.102c), with Turn's target and Burn's. As it resolves Turn's instructions come first, then
 # Burn's (CR 702.102d): Bot2's Ornithopter loses flying and becomes a red Weird with base power and toughness 0/1 until
 # end of turn, and Burn deals 2 damage to Bot2. Next turn the Ornithopter is a colorless 0/2 Thopter with flying again.
@@ -39,6 +40,8 @@ Bot1.Target(Bot2.Battlefield.Ornithopter)
 Bot1.Target(Bot2)
 ? Bot1.Mana =
 ? Client.Bot1.Stack = Turn // Burn
+? Client.Bot1.Stack.Turn // Burn.Halves = Turn; Burn
+? Client.Bot1.TargetLabels = Turn; Burn
 Bot1.Pass
 Bot2.Pass
 ? Bot2.Life = 18

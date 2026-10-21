@@ -305,7 +305,8 @@ public sealed record TableState(
     bool GraveyardsOpen = false,
     IReadOnlyList<DockButtonState>? Dock = null,
     IReadOnlyList<string>? Combat = null,
-    DeckEditorState? DeckEditor = null);
+    DeckEditorState? DeckEditor = null,
+    IReadOnlyList<string>? TargetLabels = null);
 
 /// <summary>
 /// The deck editor (<c>?decks</c>) as the page publishes it: the deck's id, name and format, whether it has changes not
