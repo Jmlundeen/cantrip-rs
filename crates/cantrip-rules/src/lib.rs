@@ -24,6 +24,8 @@ mod cloak_tests;
 #[cfg(test)]
 mod copy_spell_tests;
 #[cfg(test)]
+mod leave_game_tests;
+#[cfg(test)]
 mod play_permission_tests;
 #[cfg(test)]
 mod remove_up_to_tests;

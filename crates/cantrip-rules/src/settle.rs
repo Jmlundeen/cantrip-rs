@@ -121,8 +121,8 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         })
         .map(|id| (cx.s().obj(id).zone, id))
         .collect();
-    for (zone, id) in stale {
-        ops::cease_to_exist(cx, zone, id);
+    if !stale.is_empty() {
+        ops::cease_together(cx, &stale);
         acted = true;
     }
 
@@ -136,8 +136,8 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         .filter(|&id| cx.s().obj(id).token && !cx.s().obj(id).zone.is(ZoneKind::Battlefield) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut))
         .map(|id| (cx.s().obj(id).zone, id))
         .collect();
-    for (zone, id) in gone {
-        ops::cease_to_exist(cx, zone, id);
+    if !gone.is_empty() {
+        ops::cease_together(cx, &gone);
         acted = true;
     }
 

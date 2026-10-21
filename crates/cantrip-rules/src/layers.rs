@@ -1117,7 +1117,9 @@ pub fn static_control_sources(cards: &CardTable, state: &GameState) -> Vec<Objec
 
 /// The control-changing static abilities that apply to `id` (CR 613.1b, layer 2), as (timestamp, the player who gains
 /// control): each source's controller, at its source's timestamp (CR 613.7; an Aura's is when it became attached, 613.7e),
-/// judged on what layer 1 made `id`. Empty, and free, while no such ability is on the battlefield.
+/// judged on what layer 1 made `id`. A source whose controller has left the game gives them nothing: a player who leaves
+/// stops controlling what such an ability gave them (CR 800.4a), and nothing changes to a player who has left (CR 800.4b).
+/// Empty, and free, while no such ability is on the battlefield.
 pub fn static_control(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> Vec<(u32, PlayerId)> {
     if !state.statics_seen {
         return Vec::new();
@@ -1132,7 +1134,7 @@ pub fn static_control(cards: &CardTable, state: &GameState, log: &[Record], id: 
     for source in sources {
         let sobj = state.obj(source);
         for st in cards.get(cards.current(sobj)).statics.iter().filter(|s| s.layer == Layer::Control) {
-            if source != id && (st.affects)(&view, source, id, &so_far) {
+            if source != id && state.in_game(sobj.controller) && (st.affects)(&view, source, id, &so_far) {
                 found.push((sobj.timestamp, sobj.controller));
             }
         }

@@ -985,13 +985,22 @@ pub fn create_token_copies(cx: &mut Cx, values: Copiable, controller: PlayerId, 
 /// An object that ceases to exist where it is, in no zone it can be in (CR 111.7, 111.8, 707.10a, 704.5d, 800.4a), as it
 /// last existed there (CR 608.2h).
 pub fn cease_to_exist(cx: &mut Cx, zone: Zone, id: ObjectId) {
-    let row = last_known_of(cx, id);
-    let row = cx.st().last_known_push(row);
-    cx.st().zone_remove(zone, id);
-    cx.st().update_obj(id, |o| {
-        o.zone = Zone::GONE;
-        o.last_known = Some(row);
-    });
+    cease_together(cx, &[(zone, id)]);
+}
+
+/// Objects that cease to exist at once (CR 800.4a: a leaving player's; CR 704.3: tokens and copies the state-based actions
+/// end together): each one's last-known information is taken before any of them is gone, so none misses the effects of
+/// another (a Glorious Anthem leaving with the creatures it pumped).
+pub fn cease_together(cx: &mut Cx, objects: &[(Zone, ObjectId)]) {
+    let rows: Vec<LastKnown> = objects.iter().map(|&(_, id)| last_known_of(cx, id)).collect();
+    for (&(zone, id), row) in objects.iter().zip(rows) {
+        let row = cx.st().last_known_push(row);
+        cx.st().zone_remove(zone, id);
+        cx.st().update_obj(id, |o| {
+            o.zone = Zone::GONE;
+            o.last_known = Some(row);
+        });
+    }
 }
 
 /// `id` as it is now, for last-known information once it has ceased to be this object (CR 400.7, 608.2h, 113.7a): it
@@ -2813,30 +2822,51 @@ pub fn win_game(cx: &mut Cx, player: PlayerId) {
     cx.st().set_outcome(Outcome::Won(player));
 }
 
-/// A player has left a game that goes on without them (CR 800.4a): the spells and abilities they control, and every object
-/// they own, leave the game, and what they control but another owns is exiled. The last player standing wins at once
-/// instead (CR 104.2a), and there is nothing left to clear.
+/// A player has left a game that goes on without them (CR 800.4a): every object they own leaves the game, together, and the
+/// effects that gave them control of anything end; then the objects on the stack they control that no card represents
+/// cease to exist; then what they still control is exiled. The last player standing wins at once instead (CR 104.2a), and
+/// there is nothing left to clear.
 pub fn leave_game(cx: &mut Cx, player: PlayerId) {
     if cx.s().apnap().count() < 2 {
         return;
     }
-    // On the stack: a card they own leaves with them, an object not represented by a card they control (an ability, a
-    // copy) ceases to exist, and a card they control but another owns is exiled with the other permanents below.
+    // Everything they own, wherever it is, leaves at once: each as it was before any of them left (`cease_together`).
+    let owned: Vec<(Zone, ObjectId)> = cx
+        .s()
+        .zones
+        .iter()
+        .flatten()
+        .copied()
+        .filter(|&id| cx.s().obj(id).owner == player)
+        .map(|id| (cx.s().obj(id).zone, id))
+        .collect();
+    for at in (0..cx.s().stack.len()).rev() {
+        let item = cx.s().stack[at];
+        if item.kind == StackKind::Spell && cx.s().obj(item.object).owner == player {
+            cx.st().stack_remove(at);
+        }
+    }
+    cease_together(cx, &owned);
+    // The effects that gave them control of objects end (CR 800.4a), and control is settled again (CR 613.1b).
+    if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Control(p) if p == player)) {
+        cx.st().effects_retain(|e| !matches!(e.kind, EffectKind::Control(p) if p == player));
+    }
+    settle_control(cx);
+    // Then the objects on the stack they control that no card represents (an ability, a copy of a spell) cease to exist,
+    // and a spell they control that another owns is exiled with their other objects below.
     let mut exiled: Vec<ObjectId> = Vec::new();
     for at in (0..cx.s().stack.len()).rev() {
         let item = cx.s().stack[at];
-        if item.kind != StackKind::Spell {
-            if item.controller == player {
-                cx.st().stack_remove(at);
-            }
+        if item.controller != player {
             continue;
         }
-        let obj = *cx.s().obj(item.object);
-        if obj.owner == player || (item.controller == player && obj.card_copy) {
-            cx.st().stack_remove(at);
+        cx.st().stack_remove(at);
+        if item.kind != StackKind::Spell {
+            continue;
+        }
+        if cx.s().obj(item.object).card_copy {
             cease_to_exist(cx, Zone::STACK, item.object);
-        } else if item.controller == player {
-            cx.st().stack_remove(at);
+        } else {
             exiled.push(item.object);
         }
     }
@@ -2850,19 +2880,6 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
         if cx.s().delayed[at].controller == player {
             cx.st().delayed_remove(at);
         }
-    }
-    // Everything they own, wherever it is.
-    let owned: Vec<(Zone, ObjectId)> = cx
-        .s()
-        .zones
-        .iter()
-        .flatten()
-        .copied()
-        .filter(|&id| cx.s().obj(id).owner == player)
-        .map(|id| (cx.s().obj(id).zone, id))
-        .collect();
-    for (zone, id) in owned {
-        cease_to_exist(cx, zone, id);
     }
     let gone = |cx: &Cx, id: ObjectId| cx.s().obj(id).zone.is(ZoneKind::Gone);
     if cx.s().attackers.iter().any(|a| gone(cx, a.id)) {
