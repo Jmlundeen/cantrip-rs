@@ -4281,7 +4281,7 @@ fn cast(
         cx.st().stack_set(at, with);
     }
     cx.st().update_obj(spell, |o| {
-        o.spent = spent;
+        o.spent = ManaTally::of(spent);
         o.cast_way = way;
         o.x = item.x;
     });
@@ -5543,7 +5543,7 @@ fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
 /// whose cards have one. One that asks (a type of the mana that land produced) suspends the activation, to be run again
 /// with the answer.
 fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: ManaPool) -> R<()> {
-    let event = Event::TappedForMana { permanent: source, player, produced };
+    let event = Event::TappedForMana { permanent: source, player, produced: ManaTally::of(produced) };
     cx.record(event);
     if produced.is_empty() {
         return Ok(());
@@ -5842,16 +5842,16 @@ fn told_pools(cx: &Cx, player: PlayerId, told: &[ObjectId]) -> Vec<(ObjectId, Ma
 /// Records what a payment for `on` spent, one `Event::ManaSpent` for each source it took mana from, in the order it first
 /// took from each (CR 106.3, 601.2h).
 fn record_spent(cx: &mut Cx, player: PlayerId, on: ObjectId, cast: bool, taken: &[(ObjectId, Mana, u8)]) {
-    let mut by: Vec<(ObjectId, ManaPool)> = Vec::new();
+    let mut by: Vec<(ObjectId, ManaTally)> = Vec::new();
     for &(source, mana, n) in taken {
         let at = match by.iter().position(|(s, _)| *s == source) {
             Some(at) => at,
             None => {
-                by.push((source, ManaPool::default()));
+                by.push((source, ManaTally::default()));
                 by.len() - 1
             }
         };
-        by[at].1 .0[mana as usize] += u32::from(n);
+        by[at].1.add(mana, u32::from(n));
     }
     for (source, mana) in by {
         cx.record(Event::ManaSpent { player, source, on, cast, mana });

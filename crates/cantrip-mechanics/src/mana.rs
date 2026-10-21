@@ -132,7 +132,7 @@ pub const PAY_THREE_LIFE_OR_TAPPED: Question =
 /// the mana its ability produced, for a triggered mana ability's matcher to narrow ("a basic land", "you") and hand to
 /// `that_land_produced`. Only a land as it is once tapped: a land creature counts, a creature that isn't a land doesn't.
 /// Lavaleaper, Mana Flare, Heartbeat of Spring, Dictate of Karametra, Zendikar Resurgent and Mirari's Wake trigger on it.
-pub fn land_tapped_for_mana(q: &dyn Query, event: &Event) -> Option<(ObjectId, PlayerId, ManaPool)> {
+pub fn land_tapped_for_mana(q: &dyn Query, event: &Event) -> Option<(ObjectId, PlayerId, ManaTally)> {
     match *event {
         Event::TappedForMana { permanent, player, produced } if q.chars(permanent).is(CardType::Land) => Some((permanent, player, produced)),
         _ => None,
@@ -143,7 +143,7 @@ pub fn land_tapped_for_mana(q: &dyn Query, event: &Event) -> Option<(ObjectId, P
 /// it (`data[0]`) and the types of mana it produced (`data[1]`, a bit for each `Mana` it produced), which the ability
 /// resolving reads (`add_one_mana_of_any_type_that_land_produced`). None when it produced nothing, which triggers nothing
 /// (CR 106.12a).
-pub fn that_land_produced(land: ObjectId, player: PlayerId, produced: ManaPool) -> Option<Fired> {
+pub fn that_land_produced(land: ObjectId, player: PlayerId, produced: ManaTally) -> Option<Fired> {
     if produced.is_empty() {
         return None;
     }

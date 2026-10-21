@@ -60,13 +60,13 @@ pub enum Event {
     /// abilities it triggers add: "one mana of any type that land produced" reads it. Recorded for the history; the
     /// triggered mana abilities it triggers (`TriggeredDef::mana_ability`) resolve at once, where the tap happens, and only
     /// when it produced some mana (CR 106.12a).
-    TappedForMana { permanent: ObjectId, player: PlayerId, produced: ManaPool },
+    TappedForMana { permanent: ObjectId, player: PlayerId, produced: ManaTally },
     /// `player` spent `mana` that `source` produced (CR 106.3; `ObjectId::NONE` for a player's own mana ability, CR 605.1a)
     /// to pay a cost of `on` (CR 601.2h, 602.2b, 118.3a): to cast it, a spell on the stack, if `cast`; otherwise an ability
     /// of it, or a payment as something resolves. One record for each source a payment took mana from, recorded as the
     /// payment is made, so a spell's come before its `Cast`: "using mana produced by [this]", "mana from a Treasure was spent
     /// to cast it" (`History::mana_spent_to_cast`). Only recorded.
-    ManaSpent { player: PlayerId, source: ObjectId, on: ObjectId, cast: bool, mana: ManaPool },
+    ManaSpent { player: PlayerId, source: ObjectId, on: ObjectId, cast: bool, mana: ManaTally },
     /// A player became the monarch (CR 725.1, 725.4): it was not theirs before.
     BecameMonarch { player: PlayerId },
     /// Creatures were declared as attackers (CR 508.1): "whenever you attack" (CR 508.1m). Not for creatures put onto
@@ -430,5 +430,17 @@ impl EventMask {
 
     pub fn intersects(self, other: EventMask) -> bool {
         self.0 & other.0 != 0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The history holds an `Event` for everything since the game began, so its size is every record's: the mana in one
+    /// is a `ManaTally` (a `u8` a kind), never a pool's `u32` counts.
+    #[test]
+    fn an_event_stays_small() {
+        assert!(std::mem::size_of::<Event>() <= 24, "Event is {} bytes", std::mem::size_of::<Event>());
     }
 }

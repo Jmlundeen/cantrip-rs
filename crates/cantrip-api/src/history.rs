@@ -286,7 +286,7 @@ impl<'a> History<'a> {
     /// source with the mana of it spent, its total cost's whole (additional costs too), once for each part of the payment it
     /// gave to. Nothing for a copy, which was not cast and had no mana spent on it (CR 707.10), or for a spell cast without
     /// spending mana. A spell is cast and paid for in one turn, so this turn's records hold it.
-    pub fn mana_spent_to_cast(&self, spell: ObjectId) -> impl Iterator<Item = (ObjectId, ManaPool)> + 'a {
+    pub fn mana_spent_to_cast(&self, spell: ObjectId) -> impl Iterator<Item = (ObjectId, ManaTally)> + 'a {
         self.this_turn().iter().filter_map(move |r| match r.event {
             Event::ManaSpent { source, on, cast: true, mana, .. } if on == spell => Some((source, mana)),
             _ => None,

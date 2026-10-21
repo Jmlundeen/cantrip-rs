@@ -1286,7 +1286,7 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
     (obj.owner, obj.controller, obj.zone, obj.timestamp, obj.controlled_since) = (copier, copier, Zone::STACK, timestamp, turn);
     // A copy was paid for by no one: no mana spent (CR 707.10), so none of what mana does to the spell it pays for
     // (CR 106.6: Cavern of Souls' "can't be countered", Arena of Glory's haste) is the copy's.
-    obj.spent = ManaPool::default();
+    obj.spent = ManaTally::default();
     // Nor was it cast (CR 707.10): it was cast from no zone (Sevinne's Reclamation's copy, not cast from a graveyard,
     // does not copy itself), at no time (Necromancy's "if you cast it any time a sorcery couldn't have been cast"),
     // and by no way a permanent gave, so it gains nothing such a way gives (Serra Paragon's). What was chosen and

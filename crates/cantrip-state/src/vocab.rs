@@ -238,6 +238,38 @@ impl ManaPool {
     }
 }
 
+/// Mana of each kind, a `u8` each: what one payment spent (`Event::ManaSpent`), what a spell's casting spent (`Obj::spent`)
+/// and what one activation produced (`Event::TappedForMana`). A pool has no limit (`ManaPool`), but one payment spends at most
+/// a cost's worth, and what an activation produced is read only for its kinds, so these stay narrow - the history holds
+/// one of them per such event. Past 255 a kind saturates.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+pub struct ManaTally(pub [u8; 6]);
+
+impl ManaTally {
+    pub fn get(&self, mana: Mana) -> u8 {
+        self.0[mana as usize]
+    }
+
+    pub fn total(&self) -> u32 {
+        self.0.iter().map(|&n| n as u32).sum()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.iter().all(|&n| n == 0)
+    }
+
+    /// `n` more of `mana`, saturating at 255.
+    pub fn add(&mut self, mana: Mana, n: u32) {
+        let at = mana as usize;
+        self.0[at] = (u32::from(self.0[at]) + n).min(u32::from(u8::MAX)) as u8;
+    }
+
+    /// A pool's counts, each saturating at 255.
+    pub fn of(pool: ManaPool) -> ManaTally {
+        ManaTally(pool.0.map(|n| n.min(u32::from(u8::MAX)) as u8))
+    }
+}
+
 /// A mana cost (CR 202): generic, and a count of each colored symbol; hybrid, monocolored hybrid, Phyrexian and {X}
 /// symbols. Snow ({S}) is not built.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]

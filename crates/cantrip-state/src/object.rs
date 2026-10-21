@@ -54,7 +54,7 @@ pub struct Obj {
     pub gift: Option<PlayerId>,
     /// The mana spent to cast it, by kind (CR 601.2h): what converge and "if at least two of a color were spent"
     /// read. Carried from the spell to the permanent; a copy has none.
-    pub spent: ManaPool,
+    pub spent: ManaTally,
     /// Which way it was cast (0 its mana cost, n its nth alternative cost), carried to the permanent: evoke's "if
     /// its evoke cost was paid".
     pub cast_way: u8,
@@ -218,7 +218,7 @@ impl Obj {
             kicked: 0,
             paid: 0,
             gift: None,
-            spent: ManaPool::default(),
+            spent: ManaTally::default(),
             cast_way: 0,
             class_level: 0,
             prepared: false,
