@@ -1,6 +1,7 @@
-//! Ward - pay life equal to this creature's power (CR 702.21a, 118.12, 119.4) for a power above 255, the most life a cost
-//! holds: the payer must have it all, and pays it - 255 as the cost and the rest lost with it (`triggers::ward_pay_life`). No
-//! printed creature in the engine reaches such a power, so a test creature with Raubahn, Bull of Ala Mhigo's ward does here.
+//! Ward - pay life equal to this creature's power (CR 702.21a, 118.12, 119.4) for a power above 255: the payer must have it
+//! all, and pays it in one payment - one loss of life, which "whenever a player loses life" sees once
+//! (`triggers::ward_pay_life`). No printed creature in the engine reaches such a power, so a test creature with Raubahn, Bull
+//! of Ala Mhigo's ward does here.
 
 use std::sync::OnceLock;
 
@@ -28,24 +29,45 @@ static TITAN: CardDef = CardDef {
 /// A zero-cost instant: target creature (nothing happens to it).
 static POKE: CardDef = CardDef { name: "Probe Poke", types: TypeSet::of(&[CardType::Instant]), spell: spell(&[target(creature)], nothing), ..CardDef::BLANK };
 
+fn a_player_loses_life(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::LifeChange { player, delta } if *delta < 0 => Some(Fired { subject: Target::Player(*player), data: [0, 0] }),
+        _ => None,
+    }
+}
+
+fn gain_one(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    g.gain_life(item.controller, 1);
+    Ok(())
+}
+
+/// A zero-cost enchantment: "Whenever a player loses life, you gain 1 life."
+static WITNESS: CardDef = CardDef {
+    name: "Probe Witness",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    abilities: &[triggered(when(EventMask::LIFE_CHANGE, a_player_loses_life), gain_one, "Whenever a player loses life, you gain 1 life.")],
+    ..CardDef::BLANK
+};
+
 /// A land to fill hands and libraries.
 static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&TITAN, &POKE, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&TITAN, &POKE, &WITNESS, &FILLER]))
 }
 
-/// Bot1 casts the Titan on turn 1; Bot2, at `life`, pokes it on turn 2 and pays the ward whenever it is asked to. Bot2's life
-/// afterwards, whether it was asked, and whether the Poke went uncountered.
-fn poke_at(life: i32) -> (i32, bool, bool) {
+/// Bot1 casts the Titan and the Witness on turn 1; Bot2, at `life`, pokes the Titan on turn 2 and pays the ward whenever it is
+/// asked to. Bot2's life afterwards, whether it was asked, whether the Poke went uncountered, and Bot1's life (20 and 1 for each
+/// time the Witness saw a player lose life).
+fn poke_at(life: i32) -> (i32, bool, bool, i32) {
     let names = |list: &[&str]| -> Vec<CardId> { list.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))).collect() };
-    let deck = |first: &str| {
-        let mut deck = names(&[first]);
-        deck.extend(names(&["Filler"; 29]));
+    let deck = |first: &[&str]| {
+        let mut deck = names(first);
+        deck.extend(names(&vec!["Filler"; 30 - first.len()]));
         deck
     };
-    let mut game = Game::new(table(), &Setup { decks: vec![deck("Probe Titan"), deck("Probe Poke")], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
+    let mut game = Game::new(table(), &Setup { decks: vec![deck(&["Probe Titan", "Probe Witness"]), deck(&["Probe Poke"])], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
     game.verify = true;
     game.state.update_player(PlayerId(1), |p| p.life = life);
     let (mut asked, mut poked) = (false, false);
@@ -59,7 +81,7 @@ fn poke_at(life: i32) -> (i32, bool, bool) {
             options.iter().find(|o| o.kind == ActionKind::CastSpell && o.source.is_some_and(|s| game.name(s) == name)).cloned()
         };
         let answer = match &request.kind {
-            RequestKind::Priority { options } if request.player == PlayerId(0) => match named(options, "Probe Titan") {
+            RequestKind::Priority { options } if request.player == PlayerId(0) => match named(options, "Probe Titan").or_else(|| named(options, "Probe Witness")) {
                 Some(option) => Answer::Act(Action::of(&option)),
                 None => Answer::Pass,
             },
@@ -89,17 +111,18 @@ fn poke_at(life: i32) -> (i32, bool, bool) {
     }
     assert!(poked, "Bot2 never poked the Titan");
     let resolved = game.log.iter().any(|r| matches!(r.event, Event::Countered { .. }));
-    (game.state.player(PlayerId(1)).life, asked, !resolved)
+    (game.state.player(PlayerId(1)).life, asked, !resolved, game.state.player(PlayerId(0)).life)
 }
 
-/// At 400 life Bot2 may pay 300: it is asked, pays, is left at 100, and the Poke is not countered.
+/// At 400 life Bot2 may pay 300: it is asked, pays it in one payment - the Witness triggers once - is left at 100, and the
+/// Poke is not countered.
 #[test]
-fn ward_of_more_than_255_life_is_paid_in_full() {
-    assert_eq!(poke_at(400), (100, true, true));
+fn ward_of_more_than_255_life_is_paid_in_full_in_one_payment() {
+    assert_eq!(poke_at(400), (100, true, true, 21));
 }
 
 /// At 299 life Bot2 cannot pay 300 (CR 119.4): it is not asked, keeps its life, and the Poke is countered.
 #[test]
 fn ward_of_more_life_than_the_payer_has_counters_unasked() {
-    assert_eq!(poke_at(299), (299, false, false));
+    assert_eq!(poke_at(299), (299, false, false, 20));
 }

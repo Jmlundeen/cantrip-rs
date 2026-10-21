@@ -436,19 +436,15 @@ use cantrip_api::intrinsic::ward_matches;
 pub use cantrip_api::intrinsic::ward;
 
 /// Ward's life cost, paid or not (CR 702.21a, 118.12a): the payer may pay `amount` life when they have that much (CR
-/// 119.4), and the spell or ability that targeted is countered unless they do. A cost is at most 255 life; beyond that
-/// (a power above 255) the payer must have it all, and the rest is lost with the 255 paid.
+/// 119.4), in one payment, and the spell or ability that targeted is countered unless they do.
 fn ward_pay_life(g: &mut dyn Game, item: &StackItem, amount: i32) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    let life = u8::try_from(amount.max(0)).unwrap_or(u8::MAX);
+    // A power is at most i16::MAX, so the whole of it is one cost.
+    let life = u16::try_from(amount.max(0)).unwrap_or(u16::MAX);
     let paid = g.state().player(payer).life >= amount
         && g.may_pay(payer, item.object, by, Cost { life, ..Cost::NONE }, &crate::COUNTERED_UNLESS_PAID)?;
-    if paid {
-        if amount > i32::from(life) {
-            g.lose_life(payer, amount - i32::from(life));
-        }
-    } else {
+    if !paid {
         g.counter_item(by, item.data[1] as usize);
     }
     Ok(())

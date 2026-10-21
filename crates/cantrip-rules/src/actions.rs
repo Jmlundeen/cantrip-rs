@@ -3479,13 +3479,13 @@ fn through(q: &dyn Query, cards: &CardTable, player: PlayerId, card: ObjectId, b
 pub fn life_for_cast(q: &dyn Query, cards: &CardTable, player: PlayerId, option: &ActionOption) -> Option<u8> {
     let card = option.source?;
     let Some(Through::Route(route)) = through(q, cards, player, card, option.granted_by) else { return None };
-    route.life().then(|| life_for_mana_value(cast_face(cards.get(q.state().obj(card).card), option.index)).life)
+    route.life().then(|| u8::try_from(life_for_mana_value(cast_face(cards.get(q.state().obj(card).card), option.index)).life).unwrap_or(u8::MAX))
 }
 
 /// "Pay life equal to its mana value rather than pay its mana cost" (CR 118.9, 119.4): the life, as a cost, for a card or the
 /// face of it cast, its X counted as 0 (CR 107.3). Bolas's Citadel's rule and Inside Information's permission pay it.
 fn life_for_mana_value(def: &CardDef) -> Cost {
-    Cost { life: def.cost.mana_value().min(255) as u8, ..Cost::NONE }
+    Cost { life: u16::try_from(def.cost.mana_value()).unwrap_or(u16::MAX), ..Cost::NONE }
 }
 
 /// The most an emerge cost could come down by right now (CR 702.119a): the mana values of the richest permanents it could
@@ -4025,7 +4025,7 @@ fn cast(
     let def = cast_face(whole, way);
     let face = cx.card_id(def);
     // Life equal to the face's mana value rather than its mana cost (CR 118.9, 119.4), of the face cast (CR 715.3a).
-    let (instead, life) = if by.life_for_mana_value { (Some(ManaCost::ZERO), life_for_mana_value(def).life) } else { (instead, life) };
+    let (instead, life) = if by.life_for_mana_value { (Some(ManaCost::ZERO), u8::try_from(life_for_mana_value(def).life).unwrap_or(u8::MAX)) } else { (instead, life) };
     // Flashback (CR 702.34a) a permission or a permanent gave, or aftermath (CR 702.127a): exiled instead of put anywhere
     // else as it leaves the stack. The way a permanent gave is read now: the spell keeps it if the permanent leaves.
     let flashback = flashback || def.aftermath || granted.is_some_and(|w| w.what.flashback);
@@ -4050,7 +4050,7 @@ fn cast(
     // The {X} a granted way's cost has: the card's, where the cost is or includes its mana cost; none where it is cast
     // without paying its mana cost (CR 107.3b).
     let granted_x = granted.map(|_| cost.mana.x);
-    cost.life = cost.life.saturating_add(life);
+    cost.life = cost.life.saturating_add(u16::from(life));
     cost.mana.generic = cost.mana.generic.saturating_add(more);
 
     // CR 601.2a: the card moves to the stack first. Casting a prepare spell's copy unprepares its permanent
@@ -4340,7 +4340,7 @@ fn cast(
     let (added_life, least);
     (cost.mana, added_life, least) = apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets);
     if added_life > 0 {
-        cost.life = (cost.life as u32 + added_life).min(255) as u8;
+        cost.life = (u32::from(cost.life) + added_life).min(u32::from(u16::MAX)) as u16;
         let owed = cost.life as i32 + extra.life as i32 + life as i32 + x_life as i32;
         if payable_life(cx, player) < owed {
             return Err(Stop::Cancel);
@@ -6540,7 +6540,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
 
 /// Whether `player` could pay `life` life now (CR 119.4): any amount of 0 (CR 119.4b), otherwise only with a life total
 /// at least that high, and not while they can't lose life or their life total can't change (CR 119.8).
-pub fn can_pay_life(cx: &Cx, player: PlayerId, life: u8) -> bool {
+pub fn can_pay_life(cx: &Cx, player: PlayerId, life: u16) -> bool {
     // CR 119.4b: 0 life can always be paid.
     life == 0 || payable_life(cx, player) >= i32::from(life)
 }

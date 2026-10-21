@@ -301,7 +301,7 @@ pub enum RequestKind {
         subject: ObjectId,
         total: ManaCost,
         remaining: ManaCost,
-        life: u8,
+        life: u16,
         life_payable: bool,
         question: &'static Question,
         options: Vec<ActionOption>,
