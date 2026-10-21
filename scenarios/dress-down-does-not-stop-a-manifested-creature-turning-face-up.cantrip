@@ -1,0 +1,65 @@
+# Turning a manifested creature face up is a special action the rules give (CR 116.2b, 701.40b), not an ability of the
+# face-down permanent, so "creatures lose all abilities" doesn't stop it (Whisperwood Elemental's ruling: a manifested
+# creature card can be turned face up after losing its abilities). The opening is the other manifest scenarios': on Bot2's
+# upkeep Abhorrent Oculus manifests dread and Snapcaster Mage goes onto the battlefield face down. On Bot1's turn 3 Dress
+# Down makes every creature lose all abilities, and Bot1 still turns the Mage face up for {1}{U}.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island x4
+Mox Sapphire
+Sol Ring
+Abhorrent Oculus
+Dress Down
+Mox Pearl
+Island x2
+Snapcaster Mage
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x7
+Forest
+Haywire Mite
+Swamp x11
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Abhorrent Oculus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Island; Island; Island; Island; Black Lotus; Wheel of Fortune)
+[T2 Bot2.Upkeep]
+Bot1.Arrange(Snapcaster Mage | Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield..FaceDown = true
+Bot1.Battlefield.#1.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Battlefield = Abhorrent Oculus; Dress Down; Island; Mountain; Mox Pearl; Mox Sapphire; Snapcaster Mage; Sol Ring
+? Bot1.Battlefield.Snapcaster Mage.FaceDown = (absent)
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Snapcaster Mage.Power = 2
+Bot1.Battlefield.Snapcaster Mage.Toughness = 1

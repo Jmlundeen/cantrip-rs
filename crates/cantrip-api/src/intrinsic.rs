@@ -218,7 +218,11 @@ fn can_turn_face_up(q: &dyn Query, asker: &Asker) -> bool {
 /// The index of "turn this permanent face up" among the abilities of every face-down definition (`CardDef::face_down`).
 pub const TURN_FACE_UP: u8 = 0;
 
-const TURN_UP: AbilityDef = ability(Cost::NONE, turn_face_up, "Turn this permanent face up by paying its mana cost.")
+/// The text of the special action to turn a face-down permanent face up, by which `CardTable::turns_face_up` knows it: a
+/// set of face-down values without it (a permanent an effect turned face down, CR 708.2a) offers no such action.
+pub const TURN_UP_TEXT: &str = "Turn this permanent face up by paying its mana cost.";
+
+const TURN_UP: AbilityDef = ability(Cost::NONE, turn_face_up, TURN_UP_TEXT)
     .condition(can_turn_face_up)
     .special_action();
 

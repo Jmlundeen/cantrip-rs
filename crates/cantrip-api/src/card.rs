@@ -2785,7 +2785,10 @@ impl CardTable {
     /// Whether `ability` is a face-down permanent's own "turn this permanent face up" (CR 701.40b, 701.58b): a special
     /// action that costs its card's mana cost.
     pub fn turns_face_up(&self, ability: AbilityRef) -> bool {
-        self.get(ability.card).face_down && ability.index == crate::intrinsic::TURN_FACE_UP
+        let def = self.get(ability.card);
+        def.face_down
+            && ability.index == crate::intrinsic::TURN_FACE_UP
+            && def.abilities.get(ability.index as usize).is_some_and(|a| a.text() == crate::intrinsic::TURN_UP_TEXT)
     }
 
     /// The definition an object currently has: a face-down permanent's face-down values, a copy's, else the face showing

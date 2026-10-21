@@ -250,6 +250,9 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
         statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), givers, on_battlefield, layer, &fx, &granted, &text_lost, &mut begun, &mut chars);
         if layer == Layer::Ability {
             intrinsic_keyword_abilities(cards, &mut chars);
+            if obj.face_down && !obj.face_down_card() {
+                turn_face_up_action(cards, obj, &mut chars);
+            }
         }
     }
     chars
@@ -287,6 +290,21 @@ fn intrinsic_keyword_abilities(cards: &CardTable, chars: &mut Chars) {
         && let Some(slot) = chars.abilities.iter().position(|a| a.is_none())
     {
         chars.abilities[slot] = Some(AbilityRef { card: cards.intrinsic, index: cantrip_api::intrinsic::DECAYED });
+    }
+}
+
+/// Turning a face-down permanent face up is a special action the rules give it (CR 116.2b, 701.40b, 701.58b), not an
+/// ability it has, so an effect that takes its abilities ("creatures lose all abilities": Humility, Dress Down) does not
+/// take it (Whisperwood Elemental's ruling). Its face-down values carry it as `intrinsic::TURN_FACE_UP`, which layer 6
+/// may have removed: it is given back once layer 6 is done.
+fn turn_face_up_action(cards: &CardTable, obj: &Obj, chars: &mut Chars) {
+    let Some(values) = obj.marks.face_down_as else { return };
+    let action = AbilityRef { card: values, index: cantrip_api::intrinsic::TURN_FACE_UP };
+    if !cards.turns_face_up(action) || chars.abilities.contains(&Some(action)) {
+        return;
+    }
+    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
+        chars.abilities[slot] = Some(action);
     }
 }
 

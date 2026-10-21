@@ -60,7 +60,6 @@ keeps it).
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
 | [KI-70](#ki-70-a-block-requirement-is-counted-on-the-declared-block-only-not-through-the-blocked-creatures-band) | A block requirement is counted on the declared block only, not through the blocked creature's band | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
-| [KI-72](#ki-72-a-face-down-permanent-may-be-unable-to-turn-face-up-under-humility) | A face-down permanent may be unable to turn face up under Humility | Low | Suspected |
 | [KI-74](#ki-74-a-question-a-replacement-asks-mid-run-is-not-watched-for-loops) | A question a replacement asks mid-run is not watched for loops | Low | Suspected |
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
@@ -553,23 +552,6 @@ blocker's damage among the band (702.22k) or its attacker's damage among banding
 divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's sparing suggestion).
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
-
-### KI-72: A face-down permanent may be unable to turn face up under Humility
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | engine | 2026-10-17, card-faces batch |
-
-**Notes.** Turning a face-down permanent face up is a special action (CR 116.2b, 702.37e, 701.40a), allowed by the face-up card's
-morph cost or, for a manifested creature card, its mana cost; it is not an ability of the face-down permanent, so "loses all
-abilities" (Humility, Dress Down) should not stop it (Whisperwood Elemental's ruling: a manifested creature card can still be
-turned face up after losing its abilities). The engine offers it through `intrinsic::TURN_FACE_UP` / `intrinsic::can_turn_face_up`,
-which sit on the face-down values (`intrinsic::FACE_DOWN`, `intrinsic::CLOAKED`) and may be taken by Humility's layer-6 effect
-(which rightly takes a cloaked permanent's ward {2}, CR 701.58a). Separately, there is no verb to turn a
-permanent face down (CR 708.2a) and no "manifested" mark, so a creature an effect turned face down (Ixidron) would wrongly be
-offered turning face up for its mana cost (CR 701.40b, 702.37e). Neither is reachable by a card in content today.
-
-**Scenarios.** none yet: a face-down creature under Humility is the first to write.
 
 ### KI-75: Words of Wind's "return a permanent" question may be captioned as a cost
 

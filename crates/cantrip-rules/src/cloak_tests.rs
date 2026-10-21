@@ -165,3 +165,58 @@ fn nothing_is_cloaked_that_is_no_longer_the_chosen_card_or_is_already_on_the_bat
     assert_eq!(face_down(&mut cx, cloaked, FaceDown::Manifested), None);
     assert!(has_ward(&cx, cloaked));
 }
+
+/// Face-down values with no action to turn the permanent face up: what a permanent an effect turned face down would be
+/// (CR 708.2a; Ixidron's), which can't be turned face up for its mana cost (CR 701.40b, 702.37e).
+static TURNED_DOWN: CardDef = CardDef {
+    name: "",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    face_down: true,
+    ..CardDef::BLANK
+};
+
+fn creature(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+    c.is(CardType::Creature)
+}
+
+/// "All creatures lose all abilities."
+static HUMBLER: CardDef = CardDef {
+    name: "Cloak Test Humbler",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[loses_all_abilities(creature, "")],
+    ..CardDef::BLANK
+};
+
+fn turns_face_up(cx: &Cx, id: ObjectId) -> bool {
+    cx.chars(id).abilities().any(|a| cx.cards().turns_face_up(a))
+}
+
+/// The action to turn a face-down permanent face up is the rules', given back over "loses all abilities" (CR 116.2b), but
+/// only to face-down values that have it: a manifested Beast has it with or without the Humbler; a Beast with face-down
+/// values that lack it has it in neither case.
+#[test]
+fn only_face_down_values_with_the_action_are_turned_face_up_and_losing_abilities_does_not_take_it() {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&BEAST, &TURNED_DOWN, &HUMBLER])));
+    let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    let put = |game: &mut Game, def: &'static CardDef, zone: Zone| {
+        let id = game.state.push_obj(Obj::new(table.id_of(def), YOU, zone));
+        game.state.zone_push(zone, id);
+        id
+    };
+    let manifested = put(&mut game, &BEAST, Zone::library(YOU));
+    let turned = put(&mut game, &BEAST, Zone::library(YOU));
+    let mut cx = cx(&mut game);
+    let manifested = face_down(&mut cx, manifested, FaceDown::Manifested).expect("it enters face down");
+    cx.st().update_obj(turned, |o| o.copy = Some(Copiable::of(table.id_of(&TURNED_DOWN))));
+    let turned = ops::put_onto_battlefield(&mut cx, &[(turned, YOU, false)], ZoneReason::Other).expect("nothing is asked")[0];
+    assert!(cx.s().obj(turned).face_down);
+    assert_eq!((cx.chars(turned).name, cx.chars(turned).power), ("", Some(2)));
+    assert!(turns_face_up(&cx, manifested) && !turns_face_up(&cx, turned));
+    let humbler = cx.st().push_obj(Obj::new(table.id_of(&HUMBLER), YOU, Zone::BATTLEFIELD));
+    cx.st().zone_push(Zone::BATTLEFIELD, humbler);
+    cx.st().see_statics();
+    assert!(turns_face_up(&cx, manifested) && !turns_face_up(&cx, turned));
+}
