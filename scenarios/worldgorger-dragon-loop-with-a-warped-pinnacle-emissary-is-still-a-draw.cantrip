@@ -1,0 +1,43 @@
+# Worldgorger Dragon and Animate Dead, the loop of mandatory actions that is a draw (CR 104.4b, 732.4), with a warped
+# Pinnacle Emissary on the battlefield. Warp's delayed ability waits for the end step to exile "this creature", the
+# permanent the warped spell became (CR 702.185a); the Dragon exiles the Emissary each round and it returns a new object
+# (CR 400.7), one move further from that spell every round. No rule follows it past the first move, so the loop watch
+# names that far-gone reference by what it still says (`Obj::became`), and the positions come round again: the game is
+# drawn as a loop of mandatory actions, long before the event limit.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Mox Sapphire
+Pinnacle Emissary
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Event Limit]
+20000
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Turn = 3
+Step = Main1

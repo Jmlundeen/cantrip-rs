@@ -1520,9 +1520,9 @@ fn change_parts(
 /// A cost reduced by an amount of mana (CR 118.7): its generic part takes generic mana off only (118.7a); each colored
 /// or colorless symbol takes off one mana of that type, and one the cost has none of (118.7b), or has fewer of (118.7c-d),
 /// takes off generic mana instead; a Phyrexian symbol takes off mana of its color (118.7f). Nothing goes below zero
-/// (CR 601.2f). A hybrid, {2/C} or Phyrexian symbol of the cost was announced as one of its halves before the reductions
-/// (CR 601.2b, 601.2f), so a reduction of a type the cost's plain symbols don't absorb meets the symbols that may be paid
-/// with that type (`reduce_announced`).
+/// (CR 601.2f). A hybrid symbol of the cost was announced as one of its halves before the reductions (CR 601.2b, 601.2f),
+/// so a reduction of a type the cost's plain symbols don't absorb meets the hybrid symbols that may be paid with that type
+/// (`reduce_announced`).
 fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
     // A hybrid symbol in a reduction is split by the payer as the reduction is applied (CR 118.7e), a choice not built:
     // refused in every build rather than reduced some other way.
@@ -1549,18 +1549,17 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
 }
 
 /// `n` mana of the type `i` (as `Mana` orders them) that the cost's plain symbols of that type did not absorb, meeting the
-/// hybrid and {2/C} symbols that may be paid with it: each announced as that half (CR 601.2b) is reduced to nothing
+/// two-color hybrid symbols that may be paid with it: each announced as that half (CR 601.2b) is reduced to nothing
 /// (CR 118.7c), which leaves a cost any payment of the other announcement also pays - a symbol of the other half, or the
-/// generic mana the reduction would otherwise take (118.7c), is never cheaper. Taken where those symbols are all of one
-/// kind (only {U/R}, or only {2/U}); where they differ, which to announce is the payer's choice (601.2b), not built, and
-/// the rest takes generic mana as before (KI-110). What is left over is returned.
+/// generic mana the reduction would otherwise take (118.7c), is never cheaper. Taken where those symbols are all one pair
+/// ({U/R}{U/R}); where they differ, which to announce is the payer's choice (601.2b), not built, and the rest takes
+/// generic mana as before (KI-110). {2/C} and Phyrexian symbols are announced before the cost changes
+/// (`announce_twobrids`, `announce_life`), so none is left here. What is left over is returned.
 fn reduce_announced(cost: &mut ManaCost, i: usize, mut n: u32) -> u32 {
     let meets = |h: &Option<(Mana, Mana)>| h.is_some_and(|(a, b)| a as usize == i || b as usize == i);
     let mut pairs = cost.hybrid.iter().filter(|h| meets(h)).copied();
     let first = pairs.next().flatten();
-    let one_pair = pairs.all(|p| p == first);
-    let twobrids = if i < 5 { cost.twobrid[i] as u32 } else { 0 };
-    if first.is_some() && twobrids == 0 && one_pair {
+    if first.is_some() && pairs.all(|p| p == first) {
         let mut kept = [None; 6];
         let mut at = 0;
         for h in cost.hybrid {
@@ -1572,10 +1571,6 @@ fn reduce_announced(cost: &mut ManaCost, i: usize, mut n: u32) -> u32 {
             }
         }
         cost.hybrid = kept;
-    } else if first.is_none() && twobrids > 0 {
-        let off = n.min(twobrids);
-        cost.twobrid[i] -= off as u8;
-        n -= off;
     }
     n
 }
@@ -7048,7 +7043,8 @@ pub(crate) fn pay_mana_with(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 /// `pay_mana_with`, and what the mana spent does to what it paid for (`ManaRestriction::effects`, CR 106.6).
 pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
     // A monocolored hybrid symbol not yet announced (a cost changed after the announcement) is announced now, as the cost
-    // is paid (CR 118.13b).
+    // is paid (CR 118.13b). No Phyrexian symbol reaches here unannounced: `announce_life` runs before the cost changes,
+    // and a change adds only generic mana (`CostDelta::more`).
     if total.twobrid != [0; 5] {
         announce_twobrids(cx, player, source, &mut total, helpers.any_type)?;
     }
@@ -7281,7 +7277,8 @@ fn pay_during_resolution(
     if !can_pay_life(cx, payer, life) {
         return Ok(None);
     }
-    // CR 118.13b: how a monocolored hybrid symbol is paid is chosen immediately before the cost is paid.
+    // CR 118.13b: how a monocolored hybrid symbol is paid is chosen immediately before the cost is paid. No cost paid during
+    // a resolution has a Phyrexian symbol (none is printed), so none is announced here.
     let announced;
     let cost = if cost.mana.twobrid != [0; 5] {
         let mut mana = cost.mana;
@@ -7906,7 +7903,6 @@ mod tests {
         assert_eq!(reduce(cantrip_api::mana("{U/R}{U/R}"), &less(1)), cantrip_api::mana("{U/R}"));
         assert_eq!(reduce(cantrip_api::mana("{1}{U/R}"), &less(2)), ManaCost::ZERO);
         assert_eq!(reduce(cantrip_api::mana("{2}{U}{U/R}"), &less(2)), cantrip_api::mana("{2}"));
-        assert_eq!(reduce(cantrip_api::mana("{2/U}"), &less(1)), ManaCost::ZERO);
         assert_eq!(reduce(cantrip_api::mana("{R}{W/B}"), &less(1)), cantrip_api::mana("{R}{W/B}"), "no symbol a blue half pays");
         assert_eq!(reduce(cantrip_api::mana("{1}{U/R}{U/B}"), &less(1)), cantrip_api::mana("{U/R}{U/B}"), "the payer's choice: generic");
     }
