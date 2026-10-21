@@ -560,9 +560,11 @@ impl<'a> Cx<'a> {
         }
         let id = self.g.state.request_id();
         let at = self.frame;
-        self.asked_at = Some((self.g.state.mark(), self.g.log.len()));
         self.g.state.update_frame(at, |f| f.pending = Some(Request { id, player, kind, may_cancel }));
         loops::waiting(&mut self.g.state, id, key);
+        // The position the question is asked in, taken once the loop watch knows the question: a run that goes on past it is
+        // wound back to here (`Game::run`), and the watch must still be waiting for its answer (CR 732).
+        self.asked_at = Some((self.g.state.mark(), self.g.log.len()));
         Err(Stop::Suspend)
     }
 

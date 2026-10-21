@@ -1108,6 +1108,33 @@ mod tests {
         }
     }
 
+    /// CR 732: a question asked in the middle of a run that goes on past it (a replacement's) is registered with the loop watch,
+    /// and winding the run back to where it was asked (`Cx::asked_at`) keeps that registration (KI-74's fix).
+    #[test]
+    fn a_question_a_run_goes_on_past_is_still_watched_once_the_run_is_wound_back() {
+        // A step busy enough to be watched for loops of choices (`BUSY_STEP`), with a frame running.
+        let mut game = game();
+        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve));
+        let mut watch = game.state.loop_watch.clone();
+        watch.step = step_id(&game.state);
+        watch.step_log = 0;
+        game.state.set_loop_watch(watch);
+        let source = game.state.battlefield()[0];
+        let mut cx = Cx { frame: 0, ..cx(&mut game) };
+        for _ in 0..=BUSY_STEP {
+            cx.record(Event::Drew { player: PlayerId(0), card: source });
+        }
+        // A question asked mid-run (a replacement's "may"), and the run goes on past it before it is wound back (`Game::run`).
+        let asked = cx.ask_core(PlayerId(0), RequestKind::May { source, purpose: Purpose::Optional }, false);
+        assert!(matches!(asked, Err(crate::Stop::Suspend)));
+        let (back_to, _) = cx.asked_at.expect("where it was asked");
+        cx.st().update_player(PlayerId(0), |p| p.life -= 3);
+        cx.g.state.revert(back_to);
+        let id = game.state.agenda[0].pending.as_ref().expect("the question").id;
+        assert_eq!(game.state.player(PlayerId(0)).life, 20, "what the run did after the question is undone");
+        assert!(matches!(game.state.loop_watch.asking, Some((asked, _)) if asked == id), "the watch still waits for its answer");
+    }
+
     /// CR 732.3: a player made to choose otherwise is not offered, at the same question, a card they chose there before -
     /// while there is another to choose - and a "may" they took is declined; one they declined is still asked.
     #[test]

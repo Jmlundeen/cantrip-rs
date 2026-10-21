@@ -55,7 +55,6 @@ keeps it).
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
 | [KI-70](#ki-70-a-creature-blocking-a-band-records-a-block-of-the-declared-member-only) | A creature blocking a band records a block of the declared member only | Low | Unexercised |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
-| [KI-74](#ki-74-a-question-a-replacement-asks-mid-run-is-not-watched-for-loops) | A question a replacement asks mid-run is not watched for loops | Low | Suspected |
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
@@ -426,20 +425,6 @@ permission's additions, then the least.
 
 **Scenarios.** none yet (Trinisphere with Wild Ride, Winternight Stories, Crabomination, Rottenmouth Viper or a permission
 with a tax would show it).
-
-### KI-74: A question a replacement asks mid-run is not watched for loops
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | engine | 2026-10-17, the draw-replacement batch's review |
-
-**Notes.** A run that goes on past a question it could not stop at (a replacement effect's order, a dredge or Abundance "may",
-Chains of Mephistopheles' discard) is wound back to where the question was asked (`Cx::asked_at`). The mark is taken before
-`loops::waiting` registers the question with the loop watch, so the revert undoes the registration, and such a question is
-not watched for a loop of choices (CR 732). The old revert to the run's start did the same. A loop through repeated draw
-replacements is the only way to meet it.
-
-**Scenarios.** none yet.
 
 ### KI-70: A creature blocking a band records a block of the declared member only
 
