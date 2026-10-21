@@ -676,3 +676,22 @@ pub fn may_pay_to_transform(g: &mut dyn Game, item: &StackItem, cost: ManaCost) 
     }
     Ok(())
 }
+
+/// "Until end of turn, target creature loses all abilities and becomes a [color] [creature type] with base power and
+/// toughness [P]/[T]" (Turn to Frog, Turn // Burn's Turn), for the target in `slot`: continuous effects from a resolved
+/// spell (CR 611.2), each in its layer and all at this spell's timestamp (CR 613.7a) - layer 4, its creature types replaced
+/// by the one named, its card types and supertypes kept (CR 205.1a, the rulings: an artifact creature stays one); layer 5,
+/// that color and no other (CR 105.3); layer 6, every ability it has by then lost, and one gained later kept (CR 613.7, the
+/// rulings); layer 7b, the base power and toughness, over every earlier base-setting effect and under a later one, and
+/// under whatever modifies them, counters included (layer 7c). Abilities that already triggered or were activated still
+/// resolve (the rulings). It lasts until the cleanup step (CR 514.2). The color and the creature type are words of the
+/// spell's text (CR 612), read through its words. With the target gone or no longer a creature, nothing happens (CR 608.2b).
+pub fn loses_all_abilities_and_becomes(g: &mut dyn Game, item: &StackItem, slot: usize, color: Color, kind: Subtype, power: i16, toughness: i16) {
+    let Some(creature) = crate::targets::object(g, item, slot) else { return };
+    let words = g.words(item.object);
+    let source = item.object;
+    g.add_effect(source, creature, EffectKind::LoseAllAbilities, Duration::EndOfTurn);
+    g.add_effect(source, creature, EffectKind::SetCreatureType(words.subtype(kind)), Duration::EndOfTurn);
+    g.add_effect(source, creature, EffectKind::SetColors(words.colors(ColorSet::of(color))), Duration::EndOfTurn);
+    g.add_effect(source, creature, EffectKind::SetPt(power, toughness), Duration::EndOfTurn);
+}
