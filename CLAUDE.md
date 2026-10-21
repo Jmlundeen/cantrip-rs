@@ -27,6 +27,11 @@ build (sub-games, stickers), or when it affects only cards banned in every forma
 human allows is written in `docs/rules-exceptions.md`, with its rule, its reason and who decided; those decisions may be
 applied to later cases of the same kind, and nothing outside that file is an exception.
 
+**Bug priority.** Pri-0 is a crash, a hang, a desync or a game that cannot go on. Pri-1 is any rules violation, however
+rare the interaction and whether or not a printed card reaches it today. Both are blockers: one found is fixed before
+any other work is started or landed, and they are never allowed to accumulate. Everything else - the client's display,
+tooling, the harness - is pri-2 or lower and is tracked in `docs/known-issues.md`.
+
 ## Engine and cards: bricks, and what is built with them
 
 The design is `docs/engine-design.md`; the card loop is `docs/adding-cards.md`. Three layers, kept apart

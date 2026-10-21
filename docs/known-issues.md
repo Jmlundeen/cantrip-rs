@@ -11,14 +11,18 @@ appears here only while its fix is under way, marked as such, and is never left 
 path no scenario runs gets a test - a Rust test with test-only cards when no printed card reaches it - rather than an
 entry. The only allowed deviations are the human decisions in `docs/rules-exceptions.md`.
 
-## Severity
+## Priority
 
-| Severity | Meaning |
+| Priority | Meaning |
 | --- | --- |
-| Critical | A crash, a hang, a desync between engine and client, or a game that cannot go on. |
-| High | A wrong game result in ordinary play: a rule misapplied on a common card or interaction. |
-| Medium | A wrong result in a rare interaction, or a choice the client cannot offer or show. |
-| Low | Cosmetic, a harness or tooling gap, a suspected bug not yet confirmed, or a path no scenario runs. |
+| Pri-0 | A crash, a hang, a desync between engine and client, or a game that cannot go on. A blocker. |
+| Pri-1 | Any rules violation, however rare and whether or not a printed card reaches it today. A blocker. |
+| Pri-2 | A choice the client cannot offer or show, or a wrong display of a right game state. |
+| Pri-3 | Cosmetic, a harness or tooling gap, or a path no scenario runs yet. |
+
+Pri-0 and pri-1 are fixed before any other work is started or landed (`CLAUDE.md`, "Bug priority"); one is listed here
+only while its fix is under way, and the list of them is kept at zero. The older entries' Critical / High / Medium /
+Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result is pri-1 whatever it says.
 
 ## Entry template
 
@@ -26,9 +30,9 @@ entry. The only allowed deviations are the human decisions in `docs/rules-except
 
 ### KI-<n>: <one-line description of what is wrong>
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Open / Suspected / Unexercised | engine / mechanics / card / client / harness | YYYY-MM-DD, how |
+| Pri-3 | Open / Suspected / Unexercised | engine / mechanics / card / client / harness | YYYY-MM-DD, how |
 
 **Notes.** What happens, what the rules require (CR numbers, rulings), where in the code, and what a fix needs.
 
@@ -71,7 +75,7 @@ entry. The only allowed deviations are the human decisions in `docs/rules-except
 
 ### KI-2: A harmonize cost reduction cannot be checked in the browser
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | harness | 2026-10-15, Wild Ride's browser scenario |
 
@@ -86,7 +90,7 @@ or a scenario arranged so the payment prompt appears.
 
 ### KI-3: Engine paths no scenario runs
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | engine | 2026-10-15/16, fixes in the U-B-R-G Prowess run and the known-bug fixes |
 
@@ -104,7 +108,7 @@ no printed card can reach it.
 
 ### KI-25: A Spacecraft's power and toughness box is not drawn before it is a creature
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client | 2026-10-16, station (Wurmwall Sweeper) |
 
@@ -120,7 +124,7 @@ presentation (a `stationPt` beside the Oracle text, drawn in the striation), nev
 
 ### KI-10: A lone action whose cost depends on its target shows only the printed cost until the payment
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client | 2026-10-16, review of target-aware costs |
 
@@ -138,7 +142,7 @@ caption, or the cost on each candidate as it is pointed at.
 
 ### KI-26: An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | card | 2026-10-16, review of Hex Magic |
 
@@ -155,7 +159,7 @@ replaces an exile from the stack. The day such a card exists each card needs a s
 
 ### KI-34: A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client | 2026-10-16, review of Ral Zarek, Guest Lecturer |
 
@@ -172,7 +176,7 @@ skip this turn". The choice is still right; only the name is missing. A fix carr
 
 ### KI-35: The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client | 2026-10-16, review of Shang-Chi, Master of Kung Fu |
 
@@ -187,7 +191,7 @@ a source when the actions offered for it include a mana ability, or the view say
 
 ### KI-39: A state that is true only in the middle of a resolution, with no event, misses its state trigger
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | engine | 2026-10-16, review of the state triggers |
 
@@ -203,7 +207,7 @@ an event.
 
 ### KI-41: A dependency through another object is judged on the object being worked out
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | core (layers) | 2026-10-16, the dependency system (`layers::by_dependency`, CR 613.8) |
 
@@ -221,7 +225,7 @@ at the cost of their characteristics part-way through the layer.
 
 ### KI-49: The tactical bot does not know infect or poison
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client | 2026-10-17, review of Inkmoth Nexus |
 
@@ -238,7 +242,7 @@ affected.
 
 ### KI-51: A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Exercised; the reading is the CR's grammar, no ruling | engine | 2026-10-17, Magus of the Moon |
 
@@ -261,7 +265,7 @@ clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: t
 
 ### KI-54: A loop a player could stop is shortcut after a fixed number of rounds, not one the players name
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | engine / client | 2026-10-17, CR 104.4b loop detection; narrowed by the loop hardening |
 
@@ -312,7 +316,7 @@ then the player CR 732.3 names must choose otherwise; one whose players only pas
 
 ### KI-56: A counter ban judges an entering permanent as the object it was before it moved
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | engine | 2026-10-17, Melira, Sylvok Outcast |
 
@@ -330,7 +334,7 @@ Saga, Dark Depths and a planeswalker entering as themselves are judged rightly.
 
 ### KI-57: The tactical bot does not know islandwalk
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client | 2026-10-17, adding Lord of Atlantis |
 
@@ -346,7 +350,7 @@ seat controls a land of its type. The web client shows the keyword on the card, 
 
 ### KI-61: Limits of judging a permanent as it would exist, and a land as layer 4 leaves it
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | engine | 2026-10-17, review of the CR 614.12 change |
 
@@ -373,7 +377,7 @@ implemented card reaches:
 **Scenarios.** none: no implemented card reaches them.
 ### KI-63: Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | engine | 2026-10-17, review of the control-changing static abilities (Mind Control, Old Man of the Sea) |
 
@@ -387,7 +391,7 @@ controller. No card in content reads a controller in that window that a scenario
 
 ### KI-64: No card in content lets one control-changing effect decide another
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | engine | 2026-10-17, review of the control-changing static abilities |
 
@@ -398,7 +402,7 @@ scenario.
 
 ### KI-71: The tactical bot's combat planning ignores bands
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client | 2026-10-17, review of banding |
 
@@ -411,7 +415,7 @@ divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's spari
 
 ### KI-75: Words of Wind's "return a permanent" question may be captioned as a cost
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Suspected | client | 2026-10-17, draw-replacement batch |
 
@@ -424,7 +428,7 @@ own purpose or caption. Not checked in the browser.
 
 ### KI-76: A fused cast is not among the ways an effect can cast a split card from a hand
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Unexercised | engine | 2026-10-18, review of Buster Sword |
 
@@ -439,7 +443,7 @@ content yet.
 
 ### KI-78: The tactical bot attacks a player whom protection keeps from being dealt damage
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client | 2026-10-18, Absolute Virtue |
 
@@ -454,7 +458,7 @@ protected from (a field on `PlayerSummaryView` rather than the text), and has th
 
 ### KI-83: Teferi's Protection in the browser shows an empty battlefield
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client, browser scenario | 2026-10-19, a full run of ScenarioInBrowserTests |
 
@@ -467,7 +471,7 @@ scenario driver.
 
 ### KI-84: Trinisphere and Force of Will's alternative cost in the browser show the wrong menu
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | client, browser scenario | 2026-10-19, a full run of ScenarioInBrowserTests |
 
@@ -479,7 +483,7 @@ Trinisphere, or the driver's reading of the menu.
 
 ### KI-85: A scenario table test sometimes fails closing a connection
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | server, tests | 2026-10-19, a `tools	est.cmd /noweb` run during the site overhaul |
 
@@ -491,7 +495,7 @@ A race in closing a table's connections, in code the change being tested did not
 
 ### KI-93: The browser shows no phased-out permanents
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Medium | Open | client | 2026-10-20, review of PR #147 (fails the same on a clean main) |
 
@@ -506,7 +510,7 @@ fails at line 35).
 
 ### KI-94: A browser scenario's `Client.Menu` check reads a menu of a card long gone
 
-| Severity | Status | Area | Found |
+| Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Low | Open | harness / client | 2026-10-20, review of PR #147 (fails the same on a clean main) |
 
