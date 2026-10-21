@@ -1,0 +1,33 @@
+# A scry counts as well as a surveil: Bot1 casts Preordain, keeps both cards on top, and then attacks with the Phantasm
+# (its controller's scry, so the permission is on, CR 702.3b).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Surveillance Phantasm
+Preordain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Surveillance Phantasm.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Arrange(Island; Island)
+? Stack.Count = 0
+Bot1.Attack(Surveillance Phantasm > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Surveillance Phantasm.Tapped = false
+Bot1.Graveyard = Preordain
