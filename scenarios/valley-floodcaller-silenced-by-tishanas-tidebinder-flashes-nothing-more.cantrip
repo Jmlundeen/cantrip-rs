@@ -1,0 +1,56 @@
+# A rule that lets spells be cast as though they had flash is an ability (CR 702.8, 613.1f): one that has lost all its
+# abilities lets nothing. On Bot2's turn Bot1 casts Faithless Looting by Valley Floodcaller's "You may cast noncreature
+# spells as though they had flash"; Bot2 answers the Floodcaller's cast trigger with Tishana's Tidebinder, which counters
+# it, so the Floodcaller loses all abilities while the Tidebinder stays. With a Mountain still to tap, Bot1 may not cast
+# its second Faithless Looting that turn.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Valley Floodcaller
+Mox Ruby
+Faithless Looting
+Faithless Looting
+Island
+Island x13
+
+[Bot2 Deck]
+Island
+Black Lotus
+Tishana's Tidebinder
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield = Island; Black Lotus
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Tishana's Tidebinder.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Stack.Valley Floodcaller)
+Bot2.Pass
+Bot1.Pass
+? Stack = Faithless Looting
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose(Island; Island)
+! Bot1.Hand.Faithless Looting.Cast
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Faithless Looting; Island; Island; Black Lotus
+Bot1.Hand.Faithless Looting.Colors = Red
