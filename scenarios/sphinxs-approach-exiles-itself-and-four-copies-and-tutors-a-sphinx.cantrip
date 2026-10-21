@@ -1,0 +1,50 @@
+# Sphinx's Approach: "Draw two cards. Then you may exile this spell and four cards named Sphinx's Approach from your
+# graveyard. If you do, search your library for a Sphinx creature card, put it onto the battlefield, then shuffle."
+# Emry mills the four copies at the top of the library on turn one (CR 701.17a), then the Approach is cast for {1}{U}{U}
+# with a Mox Sapphire and a Black Lotus. Accepting exiles the spell and exactly those four cards together (CR 701.13) and
+# finds Sphinx of the Guildpact; the two cards drawn are Islands, so the Sphinx is still in the library for the search.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Black Lotus
+Emry, Lurker of the Loch
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Island
+Island
+Sphinx of the Guildpact
+Island x10
+
+[Bot2 Deck]
+Opt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sphinx's Approach.Cast
+Bot1.Pass
+Bot1.Accept
+Bot1.Search(Sphinx of the Guildpact)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sphinx of the Guildpact.Power = 5
+Bot1.Battlefield.Sphinx of the Guildpact.Toughness = 5
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard = Black Lotus
+Exile.Count = 5
