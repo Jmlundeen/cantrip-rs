@@ -86,17 +86,16 @@ static HEAVY_FRONT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// CR 601.3e, 601.6, 202.3b: before the cast the card is judged as its back face alone, mana value 0, which the Warden allows;
-/// once its proposal is complete the spell on the stack has its front face's mana value, 4, which the Warden forbids, so the
-/// cast is taken back and the card stays in exile.
-#[test]
-fn a_back_face_cast_transformed_is_taken_back_when_its_spell_has_a_forbidden_mana_value() {
+/// The Squire in your exile, a spell of yours resolving, and the Warden on the battlefield if `warden`.
+fn squire_game(warden: bool) -> (Game, ObjectId) {
     let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&HEAVY_FRONT, &HEAVY_BACK, &WARDEN, &CASTER])));
     let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
     let card = game.state.push_obj(Obj::new(table.id_of(&HEAVY_FRONT), YOU, Zone::exile(YOU)));
     game.state.zone_push(Zone::exile(YOU), card);
-    let warden = game.state.push_obj(Obj::new(table.id_of(&WARDEN), PlayerId(1), Zone::BATTLEFIELD));
-    game.state.zone_push(Zone::BATTLEFIELD, warden);
+    if warden {
+        let warden = game.state.push_obj(Obj::new(table.id_of(&WARDEN), PlayerId(1), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, warden);
+    }
     let caster = game.state.push_obj(Obj::new(table.id_of(&CASTER), YOU, Zone::STACK));
     game.state.zone_push(Zone::STACK, caster);
     game.state.stack_push(stack_item(StackKind::Spell, caster, AbilityRef { card: table.id_of(&CASTER), index: 0 }, YOU, &[]));
@@ -105,9 +104,32 @@ fn a_back_face_cast_transformed_is_taken_back_when_its_spell_has_a_forbidden_man
         t.priority = YOU;
         t.set_step(Step::PrecombatMain);
     });
-    assert!(could_cast_transformed_during_resolution(&cx(&mut game), card), "the back face alone is allowed");
+    (game, card)
+}
+
+/// CR 601.3e, 712.8c, 202.3b: the card cast transformed is judged before the cast as the spell it would be - its back face,
+/// with its front face's mana value, 4 - which the Warden forbids, so the cast is not offered at all and the card stays in exile.
+#[test]
+fn a_back_face_cast_transformed_is_judged_by_its_front_faces_mana_value_before_the_cast() {
+    let (mut game, card) = squire_game(true);
+    assert!(!could_cast_transformed_during_resolution(&cx(&mut game), card), "the cast is offered under the Warden");
     let cast = crate::actions::cast_transformed_during_resolution(&mut cx(&mut game), card).ok();
     assert_eq!(cast, Some(false), "the spell of mana value 4 was cast");
     assert!(game.state.obj(card).zone.is(ZoneKind::Exile), "the card left exile");
     assert_eq!(game.state.stack.len(), 1);
+}
+
+/// CR 712.8c, 601.2i: without the Warden it is cast, and its cast is recorded with its front face's mana value, 4, on the stack
+/// too (CR 601.6: the check once its proposal is complete reads the same).
+#[test]
+fn a_back_face_cast_transformed_is_recorded_with_its_front_faces_mana_value() {
+    let (mut game, card) = squire_game(false);
+    assert_eq!(crate::actions::cast_transformed_during_resolution(&mut cx(&mut game), card).ok(), Some(true));
+    let spell = game.state.stack.last().expect("the spell").object;
+    assert_eq!(cantrip_api::Query::mana_value(&game, spell), 4);
+    let recorded: Vec<u8> = game.log.iter().filter_map(|r| match r.event {
+        Event::Cast(c) if c.spell == spell => Some(c.value),
+        _ => None,
+    }).collect();
+    assert_eq!(recorded, [4]);
 }

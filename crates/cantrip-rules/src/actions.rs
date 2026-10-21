@@ -1198,6 +1198,16 @@ impl Query for AsFace<'_> {
         self.cx.s()
     }
 
+    /// A nonmodal double-faced card judged as its back face, as it would be cast transformed, has its front face's mana value
+    /// (CR 712.8c, 202.3b); any other face its own.
+    fn mana_value(&self, id: ObjectId) -> u32 {
+        let front = self.cx.card(self.cx.s().obj(id).card);
+        match front.back {
+            Some(back) if id == self.spell && !back.has_cost && !front.back_land && std::ptr::eq(self.cx.card(self.face), back) => front.cost.mana_value(),
+            _ => cantrip_api::mana_value_of(&|c| self.cx.card(c), self.cx.s(), id, &self.chars(id)),
+        }
+    }
+
     fn card(&self, id: CardId) -> &'static CardDef {
         self.cx.card(id)
     }
@@ -4512,11 +4522,10 @@ fn cast(
 
     // CR 601.2i: it becomes cast.
     let as_cast = cx.chars(spell);
-    let x = cx.s().stack.iter().rev().find(|i| i.object == spell).map_or(0, |i| i.x);
-    // Its mana value on the stack counts X once for each {X} in its mana cost (CR 202.3e): none for an X a cost defined
-    // without one (Immoral Bargain's, a number of permanents sacrificed).
-    let printed = cx.card(as_cast.card).cost;
-    let value = (printed.mana_value() + printed.x as u32 * x as u32).min(255) as u8;
+    // Its mana value on the stack (`Query::mana_value`): X counted once for each {X} in its mana cost (CR 202.3e), none for an
+    // X a cost defined without one (Immoral Bargain's, a number of permanents sacrificed), and a spell cast transformed its front
+    // face's (CR 712.8c).
+    let value = cx.mana_value(spell).min(255) as u8;
     // "As you cast this spell": the board once the costs are paid (CR 601.2i), asked of the face being cast.
     let fact = def.cast_fact.map_or(0, |f| f(cx, &Asker { source: spell, controller: player }));
     let known = ops::last_known_from(cx, spell, &as_cast);
