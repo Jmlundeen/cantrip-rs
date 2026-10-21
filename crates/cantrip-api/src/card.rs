@@ -606,8 +606,8 @@ pub enum VariableCost {
     /// cast for each permanent sacrificed this way" (Rottenmouth Viper): how many is announced as the spell is cast (CR
     /// 601.2b), so the total cost is determined knowing it (CR 601.2f) - `less_each` generic mana off for each, a reduction
     /// applied after any increase, never below {0} (CR 118.7a) - and which ones are chosen as the cost is paid, after the
-    /// mana abilities (CR 601.2g-h). The number is kept as the spell's `x`, though its mana cost has no {X}, so its mana
-    /// value is not changed (CR 202.3e).
+    /// mana abilities (CR 601.2g-h). The number is no X (its mana cost has none, CR 107.3): it is kept as the spell's
+    /// `paid`, how many times the additional cost was paid, and the spell's `x` stays 0.
     SacrificeAnyNumber { filter: ObjectFilter, less_each: u8 },
     /// Exile any number of other cards from your graveyard with this many card types or more among them (CR 205.2a):
     /// Nethergoyf's escape.

@@ -55,7 +55,6 @@ keeps it).
 | [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-44](#ki-44-no-emblem-gives-a-way) | No emblem gives a way | Low | Open |
-| [KI-45](#ki-45-the-number-a-cost-sacrifices-is-kept-as-the-spells-x) | The number a cost sacrifices is kept as the spell's X | Low | Suspected |
 | [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
@@ -432,20 +431,6 @@ so an emblem that gives one - Tamiyo, Field Researcher's "You may cast spells fr
 (CR 114.4) - could not be built.
 
 **Scenarios.** none yet.
-
-### KI-45: The number a cost sacrifices is kept as the spell's X
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | engine | 2026-10-16, review of Rottenmouth Viper |
-
-**Notes.** `VariableCost::SacrificeAnyNumber` (Rottenmouth Viper) and `SacrificeX` (Immoral Bargain) keep the number announced
-as the spell's `x` (`StackItem::x`, `Obj::x`), though Viper's mana cost has no {X}. Its mana value is right (`Query::mana_value`
-and the `Cast` record count X once per {X} in the mana cost, CR 202.3e), but anything that reads `x` as "the value of X" -
-"X is the value of X paid" on a permanent, a copy's X (CR 707.10), the client's X shown on a spell - would see the number
-sacrificed for a spell that has no X. No card in content reads X of a Viper. A fix keeps the number apart from X.
-
-**Scenarios.** none: no card reaches it.
 
 ### KI-48: Emperor of Bones puts its finality counter on after the creature enters
 

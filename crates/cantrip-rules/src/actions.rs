@@ -3969,7 +3969,9 @@ fn cast(
         let cap = if extra.pay_x_life {
             payable_life(cx, player).clamp(0, 1000) as u16
         } else if let Some(variable) = extra.variable.filter(|_| sacrifices_x) {
-            variable_candidates(cx, spell, player, variable).len() as u16
+            // How many Rottenmouth Viper sacrifices is kept as how many times its additional cost was paid, at most 255.
+            let most = if less_each > 0 { u8::MAX as usize } else { usize::MAX };
+            variable_candidates(cx, spell, player, variable).len().min(most).min(u16::MAX as usize) as u16
         } else {
             1000
         };
@@ -3989,6 +3991,13 @@ fn cast(
                 item.kicked = n as u8;
                 cx.st().update_obj(spell, |o| o.kicked = n as u8);
             }
+        } else if less_each > 0 {
+            // "Sacrifice any number of permanents" (Rottenmouth Viper) announces how many, which is no X: the spell's mana
+            // cost has no {X} and nothing reads it as the value of X (CR 107.3, 601.2b). The number is how many times the
+            // additional cost was paid.
+            let count = n.min(u8::MAX as u16) as u8;
+            item.paid = count;
+            cx.st().update_obj(spell, |o| o.paid = count);
         } else {
             // What a cost paid instead was reduced by that its own generic mana could not take, off X's (CR 118.7a).
             let xs = (n as u32 * x_symbols as u32).min(255);
@@ -4159,8 +4168,14 @@ fn cast(
     // "This spell costs {1} less to cast for each permanent sacrificed this way" (CR 601.2f, 118.7a): a reduction by the
     // number announced, after what raises the cost.
     if less_each > 0 {
-        cost.mana.generic = cost.mana.generic.saturating_sub((item.x as u32 * less_each as u32).min(255) as u8);
+        cost.mana.generic = cost.mana.generic.saturating_sub((item.paid as u32 * less_each as u32).min(255) as u8);
     }
+    // How many a variable sacrifice takes: X announced for "sacrifice X" (Immoral Bargain), or the number announced for
+    // "sacrifice any number" (Rottenmouth Viper), kept apart from X.
+    let variable_n = |c: &Cost, item: &StackItem| match c.variable {
+        Some(VariableCost::SacrificeAnyNumber { .. }) => item.paid as u16,
+        _ => item.x,
+    };
 
     // CR 601.2f-h: permanents the cost names are chosen, the mana paid, then the rest of the cost; an additional
     // cost's choices come once the mana is paid (CR 601.2h), as the C# engine asks them, and so do tapped permanents
@@ -4169,7 +4184,7 @@ fn cast(
     let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, spell, &cost)? };
     let discards = choose_discards(cx, player, spell, &cost)?;
     let mut exiles = choose_exiles(cx, player, spell, &cost)?;
-    let (way_sacrifices, way_exiles) = choose_variable(cx, player, spell, &cost, item.x)?;
+    let (way_sacrifices, way_exiles) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item))?;
     exiles.extend(way_exiles);
     let hand_exiles = choose_hand_exiles(cx, player, spell, &cost)?;
     // CR 702.119a: emerge's mana comes down by the mana value of what was just chosen to be sacrificed. Nothing has
@@ -4222,7 +4237,7 @@ fn cast(
     let extra_blighted = choose_blight(cx, player, spell, &extra)?;
     let removed = choose_counters_among(cx, player, spell, &cost)?;
     let extra_removed = choose_counters_among(cx, player, spell, &extra)?;
-    let (extra_sacrifices, extra_exiles) = choose_variable(cx, player, spell, &extra, item.x)?;
+    let (extra_sacrifices, extra_exiles) = choose_variable(cx, player, spell, &extra, variable_n(&extra, &item))?;
     // An optional cost that sacrifices one or more: how many were is how many times it was paid (Plumb the Forbidden's
     // linked trigger reads it).
     if matches!(extra.variable, Some(VariableCost::SacrificeOneOrMore(_))) {

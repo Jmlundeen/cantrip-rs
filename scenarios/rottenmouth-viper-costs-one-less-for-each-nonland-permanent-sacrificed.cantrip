@@ -2,7 +2,8 @@
 # spell costs {1} less to cast for each permanent sacrificed this way." How many is announced as it is cast (CR 601.2b) and
 # the total cost determined with it (CR 601.2f, 118.7a): sacrificing three Ornithopters, its {5}{B} costs {2}{B}, which the
 # three Swamps' {B}{B}{B} pays exactly. A land is not among what may be sacrificed. It enters, a blight counter is put on it,
-# and for its one counter Bot2 (with only cards in hand, no nonland permanent) chooses to lose 4 life.
+# and for its one counter Bot2 (with only cards in hand, no nonland permanent) chooses to lose 4 life. The number sacrificed
+# is no X (its mana cost has none, CR 107.3): the Viper has no X and its mana value is its mana cost's, 6 (CR 202.3).
 
 [Bot1 Deck]
 Swamp
@@ -44,3 +45,5 @@ Bot1.Battlefield = Swamp; Swamp; Swamp; Rottenmouth Viper
 Bot1.Battlefield.Rottenmouth Viper.Counters.Blight = 1
 Bot1.Graveyard = Ornithopter; Ornithopter; Ornithopter
 Bot2.Life = 16
+Bot1.Battlefield.Rottenmouth Viper.X = (absent)
+Bot1.Battlefield.Rottenmouth Viper.ManaValue = 6

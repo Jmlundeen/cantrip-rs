@@ -426,6 +426,7 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Hand.<Name>.Colors`, `BotN.Graveyard.<Name>.Colors` and `BotN.Library.<Name>.Colors` (computed, sorted, empty when colorless), for every card there: an effect that works in every zone may change them (Mycosynth Lattice)
 - `BotN.Battlefield.<Name>.ManaValue` for every permanent (CR 202.3): a transformed permanent's is its front face's
   (CR 202.3b), a copy of a back face's or a melded permanent's is 0 (CR 202.3b-c), a face-down one's 0 (CR 708.2a)
+- `BotN.Battlefield.<Name>.X` for a permanent whose spell was cast with an X above 0 (CR 107.3): absent otherwise
 - `BotN.Battlefield.<Name>.Doors` and `.ManaValue` for a Room (CR 709.5): the names of its unlocked doors, left first
   (empty when both are locked), and the mana value they leave it. The Room is named by its unlocked doors (`Unholy Annex`,
   `Unholy Annex // Ritual Chamber`), and by nothing at all when neither is (`Bot1.Battlefield.#1`). A locked door is

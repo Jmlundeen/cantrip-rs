@@ -471,6 +471,10 @@ impl StateDump {
                     // Its mana value (CR 202.3): a Room's unlocked doors' (CR 709.5), a transformed permanent's front face's
                     // (CR 202.3b), 0 for a copy of a back face or a face-down permanent.
                     d.set(format!("{key}.ManaValue"), game.mana_value(id));
+                    // The X its spell was cast with (CR 107.3m), carried to the permanent: absent where there was none.
+                    if obj.x > 0 {
+                        d.set(format!("{key}.X"), obj.x);
+                    }
                     // A Room (CR 709.5): its unlocked doors by name, whatever the doors are.
                     let room = game.cards.get(c.card);
                     if room.is_room() {
