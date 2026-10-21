@@ -74,6 +74,14 @@ over the records); a question a second printed card asks moves to `cantrip_mecha
 events. **Search moves through the game-log tree, never copies:** `Game::goto` undoes up to the common ancestor and
 redoes down (`cantrip-rules/src/tree.rs`). Both are load-bearing design.
 
+**Use the systems that exist; never build a parallel one.** Before adding a mechanism - a store, a cache, a flag, a
+record, a lookup, an arena, a helper - find the one the engine already has for that job and use or extend it: the event
+history for anything about the past (especially what is rarely asked: read it when asked, don't keep a copy up to
+date), the layers for characteristics, the journal for undoable state, the shared mechanics and `cantrip_state` helpers
+for what they already do. A second system for the same kind of thing - a bespoke record of what happened, a private
+counter, a one-off cache beside the shared one - is a review blocker, however well it works. If the existing system
+truly can't do the job, say why in the change and extend that system rather than routing around it.
+
 **The engine is benchmarked:** `cargo run --release -p cantrip-bench -- --games 128` ("engine answering ... us per
 decision"); measure a core change with it. A guard on the card table ("does any card
 have X") is no guard: the table holds every card; guard on the game state.
