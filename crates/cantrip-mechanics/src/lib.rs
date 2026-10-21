@@ -801,24 +801,29 @@ pub fn animate(g: &mut dyn Game, source: ObjectId, permanent: ObjectId, a: &Anim
     if !g.is_on_battlefield(permanent) || g.obj(permanent).became.is_some() {
         return;
     }
-    g.add_effect(source, permanent, EffectKind::AddTypes(a.types.with(CardType::Creature)), duration);
-    if a.replaces_creature_types {
-        g.add_effect(source, permanent, EffectKind::LoseAllCreatureTypes, duration);
-    }
-    for &subtype in a.subtypes {
-        g.add_effect(source, permanent, EffectKind::AddSubtype(subtype), duration);
-    }
-    if a.all_creature_types {
-        g.add_effect(source, permanent, EffectKind::AddAllCreatureTypes, duration);
-    }
-    if let Some(colors) = a.colors {
-        g.add_effect(source, permanent, EffectKind::SetColors(colors), duration);
-    }
-    g.add_effect(source, permanent, EffectKind::AddKeywords(a.keywords), duration);
-    if let Some(ability) = a.ability {
-        g.add_effect(source, permanent, EffectKind::AddAbility(ability), duration);
-    }
-    g.add_effect(source, permanent, EffectKind::SetPt(a.power, a.toughness), duration);
+    // Each part of "becomes a P/T ... creature with ..." is one instruction (`Game::one_instruction`): the state triggers
+    // judge the permanent animated, not part-way.
+    let _ = g.one_instruction(&mut |g| {
+        g.add_effect(source, permanent, EffectKind::AddTypes(a.types.with(CardType::Creature)), duration);
+        if a.replaces_creature_types {
+            g.add_effect(source, permanent, EffectKind::LoseAllCreatureTypes, duration);
+        }
+        for &subtype in a.subtypes {
+            g.add_effect(source, permanent, EffectKind::AddSubtype(subtype), duration);
+        }
+        if a.all_creature_types {
+            g.add_effect(source, permanent, EffectKind::AddAllCreatureTypes, duration);
+        }
+        if let Some(colors) = a.colors {
+            g.add_effect(source, permanent, EffectKind::SetColors(colors), duration);
+        }
+        g.add_effect(source, permanent, EffectKind::AddKeywords(a.keywords), duration);
+        if let Some(ability) = a.ability {
+            g.add_effect(source, permanent, EffectKind::AddAbility(ability), duration);
+        }
+        g.add_effect(source, permanent, EffectKind::SetPt(a.power, a.toughness), duration);
+        Ok(())
+    });
 }
 
 /// Whether two objects share a name (CR 201.2): an object with two names (a split or double-faced card, "A // B") shares

@@ -2915,6 +2915,12 @@ pub fn become_copy(cx: &mut Cx, source: ObjectId, id: ObjectId, values: Copiable
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         return;
     }
+    become_copy_of(cx, source, id, values, duration);
+    // Its characteristics changed with no event (CR 707.2, 603.8).
+    cx.state_changed();
+}
+
+fn become_copy_of(cx: &mut Cx, source: ObjectId, id: ObjectId, values: Copiable, duration: Duration) {
     let prior = cx.s().obj(id).copy;
     let controller = cx.s().obj(source).controller;
     let timestamp = cx.st().timestamp();

@@ -21,10 +21,14 @@ pub fn effect<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
     let Target::Object(land) = item.target(0) else { return Ok(()) };
     let o = *g.obj(item.object);
     let card = o.copied_card().unwrap_or(o.card);
-    g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
-    crate::effects::gain_haste(g, item.object, land);
-    g.add_effect(item.object, land, EffectKind::SetPt(0, 0), Duration::Indefinite);
-    g.add_effect(item.object, land, EffectKind::AddAbility(AbilityRef::delayed(card, 0)), Duration::Indefinite);
+    // "It becomes a 0/0 creature with haste" and the ability it gains: one instruction (`Game::one_instruction`).
+    g.one_instruction(&mut |g| {
+        g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
+        crate::effects::gain_haste(g, item.object, land);
+        g.add_effect(item.object, land, EffectKind::SetPt(0, 0), Duration::Indefinite);
+        g.add_effect(item.object, land, EffectKind::AddAbility(AbilityRef::delayed(card, 0)), Duration::Indefinite);
+        Ok(())
+    })?;
     g.add_counters(land, CounterKind::PlusOne, N);
     Ok(())
 }

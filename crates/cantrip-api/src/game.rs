@@ -772,16 +772,24 @@ pub trait Game: Query {
         if a == b {
             return false;
         }
-        // One exchange (CR 701.12a): nothing is settled between its halves.
-        self.settle_once(&mut |g| {
-            g.gain_control(source, first, b, Duration::Indefinite);
-            g.gain_control(source, second, a, Duration::Indefinite);
+        // One exchange (CR 701.12a): nothing is settled between its halves, and the state triggers judge it once it is done,
+        // not with one permanent given and the other not yet taken.
+        let _ = self.one_instruction(&mut |g| {
+            g.settle_once(&mut |g| {
+                g.gain_control(source, first, b, Duration::Indefinite);
+                g.gain_control(source, second, a, Duration::Indefinite);
+            });
+            Ok(())
         });
         true
     }
     /// Carries out `instruction` as one instruction (CR 608.2c): what continuous effects say of control and "for as long
     /// as" durations is settled once it has finished, not between its parts (an exchange of control's two halves).
     fn settle_once(&mut self, instruction: &mut dyn FnMut(&mut dyn Game));
+    /// Carries out `f`, several calls that are one instruction of a card's text, as one: what changes the game with no event
+    /// (an effect beginning, an object becoming a copy) is judged by the state triggers once it is all done (CR 603.8), not
+    /// part-way. Animating a permanent (types, power and toughness, abilities) and an exchange of control are each one.
+    fn one_instruction(&mut self, f: &mut dyn FnMut(&mut dyn Game) -> Result<(), Suspend>) -> Result<(), Suspend>;
     /// Counters a spell (CR 701.5): it leaves the stack for its owner's graveyard, or exile if it was flashed back.
     fn counter(&mut self, spell: ObjectId);
     /// Counters a spell and puts it in its owner's hand, on top or bottom of their library, or in exile (CR 701.6a).

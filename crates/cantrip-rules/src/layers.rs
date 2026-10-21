@@ -404,6 +404,13 @@ fn granted_statics(cards: &CardTable, object_timestamp: u32, fx: &[ContinuousEff
 
 /// The permanents (and graveyard cards) whose static abilities could apply to anything, for the state's current epoch:
 /// found once per position, whatever the number of questions asked of it.
+/// Whether a permanent (or other source) whose static abilities function now gives other objects abilities (layer 6):
+/// a source that has not lost its abilities to a resolved effect, whose card - or the card it copies, or its face - has such
+/// a static ability.
+pub(crate) fn ability_grants_present(cards: &CardTable, state: &GameState) -> bool {
+    static_sources(cards, state).list.iter().any(|&(id, _, lost)| !lost && cards.ability_grants[cards.current(state.obj(id)).0 as usize])
+}
+
 fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref<'a, cantrip_state::StaticSources> {
     {
         let have = state.static_sources.borrow();

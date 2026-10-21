@@ -78,6 +78,10 @@ pub struct Game {
     /// event, which is already recorded so that the continuous effects that read the history see it (CR 603.10). None
     /// otherwise.
     pub(crate) history_end: Option<usize>,
+    /// How many `one_instruction` calls are open, and whether a change with no event happened inside one: the state triggers
+    /// are asked once the outermost closes (`Cx::state_changed`). Bookkeeping of a call, not of the game.
+    pub(crate) instruction_depth: u8,
+    pub(crate) state_check_due: bool,
 }
 
 /// With `verify`, every rollback is checked while a game has no more objects than this: twice the most any scenario but
@@ -100,6 +104,8 @@ impl Clone for Game {
             cards: self.cards,
             verify: self.verify,
             history_end: self.history_end,
+            instruction_depth: 0,
+            state_check_due: false,
         }
     }
 }
@@ -184,7 +190,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, history_end: None };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, history_end: None, instruction_depth: 0, state_check_due: false };
         if real {
             game.state.frame_push(Frame::new(FrameKind::Opening));
         } else {
@@ -606,6 +612,17 @@ impl<'a> Cx<'a> {
             count,
             since: None,
         });
+    }
+
+    /// The game state changed with no event to ask the state triggers after (an effect began, an object became a copy): they
+    /// are asked now (CR 603.8), or, inside an instruction the card performs as several calls (`Game::one_instruction`), once
+    /// it is done - an exchange of control is not judged with one permanent given and the other not yet taken.
+    pub(crate) fn state_changed(&mut self) {
+        if self.g.instruction_depth > 0 {
+            self.g.state_check_due = true;
+        } else {
+            settle::state_triggers_now(self);
+        }
     }
 
     /// An event happened: it is recorded, then the triggers it causes are found - the continuous effects that read the
@@ -1357,8 +1374,7 @@ impl cantrip_api::Game for Cx<'_> {
         // What it changes may end a "for as long as" (Old Man of the Sea's "that creature's power remains less than or
         // equal to"), and with it the control it gave, at once (CR 611.2b).
         ops::settle_at_once(self);
-        // The effect may make a state trigger's state true with no event to ask it after (CR 603.8).
-        settle::state_triggers_now(self);
+        self.state_changed();
     }
 
     fn settle_once(&mut self, instruction: &mut dyn FnMut(&mut dyn cantrip_api::Game)) {
@@ -1369,7 +1385,7 @@ impl cantrip_api::Game for Cx<'_> {
         debug_assert!(kind.outlives_affected(), "a player's effect is about the player, not an object");
         let timestamp = self.g.state.timestamp();
         self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected: source, kind, duration });
-        settle::state_triggers_now(self);
+        self.state_changed();
     }
 
     fn counter(&mut self, spell: ObjectId) {
@@ -1521,6 +1537,17 @@ impl cantrip_api::Game for Cx<'_> {
         if self.cards().statics[copy.card.0 as usize] {
             self.g.state.see_statics();
         }
+        self.state_changed();
+    }
+
+    fn one_instruction(&mut self, f: &mut dyn FnMut(&mut dyn cantrip_api::Game) -> Result<(), Suspend>) -> Result<(), Suspend> {
+        self.g.instruction_depth += 1;
+        let done = f(self);
+        self.g.instruction_depth -= 1;
+        if self.g.instruction_depth == 0 && std::mem::take(&mut self.g.state_check_due) {
+            settle::state_triggers_now(self);
+        }
+        done
     }
 }
 

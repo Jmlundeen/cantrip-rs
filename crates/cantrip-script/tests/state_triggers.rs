@@ -69,12 +69,49 @@ static FLICKER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "When you control no artifacts, you gain 3 life."
+fn no_artifacts(q: &dyn Query, asker: &Asker) -> bool {
+    !q.state().battlefield().iter().any(|&id| q.controller(id) == asker.controller && q.chars(id).is(CardType::Artifact))
+}
+
+static HERMIT: CardDef = CardDef {
+    name: "Probe Hermit",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    abilities: &[state_triggered(no_artifacts, gain_three, "When you control no artifacts, you gain 3 life.")],
+    ..CardDef::BLANK
+};
+
+fn opponents_artifact(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.state().battlefield().contains(&id) && q.controller(id) != asker.controller && q.chars(id).is(CardType::Artifact))
+}
+
+/// Exchange control of this artifact and target artifact an opponent controls.
+fn trade(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(theirs) = item.targets()[0] {
+        g.exchange_control(item.object, item.object, theirs);
+    }
+    Ok(())
+}
+
+/// "{T}: Exchange control of this artifact and target artifact an opponent controls." One instruction (CR 701.12a), though
+/// the engine gives each permanent in turn.
+static TRADER: CardDef = CardDef {
+    name: "Probe Trader",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(TAP, trade, "{T}: Exchange control of this artifact and target artifact an opponent controls.")
+        .targets(&[target(opponents_artifact)])],
+    ..CardDef::BLANK
+};
+
+/// An artifact that does nothing.
+static BAUBLE: CardDef = CardDef { name: "Probe Bauble", types: TypeSet::of(&[CardType::Artifact]), ..CardDef::BLANK };
+
 /// A land to fill hands and libraries.
 static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&FRAIL, &SHRINK, &FLICKER, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&FRAIL, &SHRINK, &FLICKER, &HERMIT, &TRADER, &BAUBLE, &FILLER]))
 }
 
 /// CR 603.8, 704.3: the -1/-1 ability resolves and the Frail is a 0/0 with no event to ask its state after; its state trigger has
@@ -134,4 +171,45 @@ fn play(artifact: &'static str) -> Game {
         game.answer(request.id, request.player, answer).unwrap();
     }
     game
+}
+
+/// CR 701.12a, 603.8: an exchange of control is one instruction. Bot1's only artifact, the Trader, is exchanged for Bot2's
+/// Bauble; Bot1 controls an artifact before and after, and its "when you control no artifacts" is not triggered by the
+/// moment between the engine giving the Trader and taking the Bauble.
+#[test]
+fn an_exchange_of_control_is_not_judged_half_done() {
+    let filler = table().find("Filler").unwrap();
+    let mut game = Game::new(table(), &Setup { decks: vec![vec![filler; 30], vec![filler; 30]], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
+    for (name, seat) in [("Probe Trader", 0), ("Probe Hermit", 0), ("Probe Bauble", 1)] {
+        let id = game.state.push_obj(Obj::new(table().find(name).unwrap(), PlayerId(seat), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, id);
+    }
+    game.verify = true;
+    let mut traded = false;
+    for _ in 0..100 {
+        game.run();
+        if traded && game.state.stack.is_empty() && game.state.triggers.is_empty() {
+            break;
+        }
+        let Some(request) = game.pending().cloned() else { panic!("the game ended") };
+        let answer = match &request.kind {
+            RequestKind::Priority { options } if request.player == PlayerId(0) && !traded => {
+                match options.iter().find(|o| o.kind == ActionKind::ActivateAbility && o.source.is_some_and(|s| game.name(s) == "Probe Trader")) {
+                    Some(option) => {
+                        traded = true;
+                        let mut action = Action::of(option);
+                        action.targets = vec![option.target_candidates[0]];
+                        Answer::Act(action)
+                    }
+                    None => Answer::Pass,
+                }
+            }
+            RequestKind::Priority { .. } => Answer::Pass,
+            other => panic!("unexpected question {other:?}"),
+        };
+        game.answer(request.id, request.player, answer).unwrap();
+    }
+    let bauble = game.state.battlefield().iter().copied().find(|&id| game.name(id) == "Probe Bauble").expect("the Bauble");
+    assert_eq!(game.state.obj(bauble).controller, PlayerId(0), "the exchange happened");
+    assert_eq!(game.state.player(PlayerId(0)).life, 20, "no moment without an artifact was judged");
 }

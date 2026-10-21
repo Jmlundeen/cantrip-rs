@@ -2644,9 +2644,12 @@ pub struct CardTable {
     /// Per card: the fused split spell's target specs of a split card with fuse (CR 702.102b: the left half's, then the right
     /// half's), made once as the table is.
     pub fused_targets: Vec<Option<&'static [TargetSpec]>>,
-    /// Which cards have a state trigger (CR 603.8): looked for among the permanents as an effect begins in the middle of a
-    /// resolution, a change that records no event.
+    /// Which cards have a state trigger (CR 603.8), printed or among the abilities they give (`CardDef::delayed`): looked for
+    /// among the permanents as the game changes with no event (an effect beginning in the middle of a resolution).
     pub state_triggers: Vec<bool>,
+    /// Which cards have a static ability that gives other objects abilities (layer 6, CR 613.1f): with one on the board, any
+    /// permanent may have a state trigger its card does not print.
+    pub ability_grants: Vec<bool>,
     /// Which cards have cost changes (CR 601.2f): the board is looked at for their sources, never for the card table's
     /// sake (a table holds every card, so "does any card" is always true).
     pub cost_changes: Vec<bool>,
@@ -2792,8 +2795,11 @@ impl CardTable {
         let player_keywords: Vec<bool> = cards.iter().map(|c| !c.player_keywords.is_empty() || !c.player_protection.is_empty()).collect();
         let mana_triggers: Vec<bool> =
             cards.iter().map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.mana_ability))).collect();
-        let state_triggers: Vec<bool> =
-            cards.iter().map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.state.is_some()))).collect();
+        let state_triggers: Vec<bool> = cards
+            .iter()
+            .map(|c| c.abilities.iter().chain(c.delayed).any(|a| matches!(a, AbilityDef::Triggered(t) if t.state.is_some())))
+            .collect();
+        let ability_grants: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own && s.layer == Layer::Ability)).collect();
         let intrinsic = CardId(
             cards.iter().position(|c| std::ptr::eq(*c, &crate::intrinsic::INTRINSIC)).expect("the intrinsic abilities") as u16,
         );
@@ -2843,6 +2849,7 @@ impl CardTable {
             mana_triggers,
             fused_targets,
             state_triggers,
+            ability_grants,
             cost_changes,
             pay_with_grants,
             activation_rules,
