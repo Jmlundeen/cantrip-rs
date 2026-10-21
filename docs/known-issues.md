@@ -65,9 +65,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
-| [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
-| [KI-94](#ki-94-a-browser-scenarios-clientmenu-check-reads-a-menu-of-a-card-long-gone) | A browser scenario's `Client.Menu` check reads a menu of a card long gone | Low | Open |
 
 ## Issues
 
@@ -454,18 +452,6 @@ protected from (a field on `PlayerSummaryView` rather than the text), and has th
 
 **Scenarios.** none yet.
 
-### KI-84: Trinisphere and Force of Will's alternative cost in the browser show the wrong menu
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | client, browser scenario | 2026-10-19, a full run of ScenarioInBrowserTests |
-
-**Notes.** The browser scenario fails at its line 46 with the wrong menu showing. Like KI-83 it predates the
-declare-blockers test-driver change of 2026-10-19. Not investigated: the cost display of an alternative cost under
-Trinisphere, or the driver's reading of the menu.
-
-**Scenarios.** `trinisphere-cost-of-force-of-wills-alternative-cost-shown-in-the-browser` (browser).
-
 ### KI-85: A scenario table test sometimes fails closing a connection
 
 | Priority | Status | Area | Found |
@@ -477,19 +463,3 @@ NullReferenceException in `GameServer` while a connection was closing, then pass
 A race in closing a table's connections, in code the change being tested did not touch. Not investigated.
 
 **Scenarios.** none; the .NET test above.
-
-### KI-94: A browser scenario's `Client.Menu` check reads a menu of a card long gone
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | harness / client | 2026-10-20, review of PR #147 (fails the same on a clean main) |
-
-**Notes.** Under Trinisphere, Bot1 casts Force of Will for its alternative cost from its card menu, and the check after it
-expects that menu: "Cast Force of Will; Cast Force of Will — Pay 1 life, exile a blue card from your hand (costs {3})".
-The page reports instead the five mana abilities of Black Lotus, which was sacrificed on turn 1 and is no longer on the
-battlefield. So `Client.Bot1.Menu` returns a stale menu (the first one opened in the game) rather than the one just used.
-Whether the page keeps publishing an old menu in `cantripTest` or `ScenarioPlayer` reads the wrong one is not yet known;
-the engine side of the cast passes.
-
-**Scenarios.** `trinisphere-cost-of-force-of-wills-alternative-cost-shown-in-the-browser` (browser suite; fails at
-line 46).

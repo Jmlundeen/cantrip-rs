@@ -68,7 +68,7 @@ A key starting `Client.` is about what the page shows, not the game's state, and
 | `Client.Bot1.Sideboard.Caption`, `.Tooltip` (and `OpponentSideboard.Caption`) | the Sideboard button over a player's piles, into the cards they own outside the game: what it says (`Sideboard  2`) and its tooltip; nothing where there is no button, as on the opponent's rail, whose sideboard is hidden |
 | `Client.Bot1.Graveyard.Lit`, `.Note` | the graveyard pile: lit when a card in it can be cast, and the note its tooltip adds |
 | `Client.Bot1.Dock` | the dock's buttons in order |
-| `Client.Bot1.Menu` | the rows of the card menu the page last opened (a row is judged when the menu opens, not after the click) |
+| `Client.Bot1.Menu` | the rows of the menu the last card action opened, empty when it opened none (a card with one thing to do); a row is judged when the menu opens, not after the click |
 
 Only Bot1 is a page for now, so only `Client.Bot1.` keys can be judged.
 

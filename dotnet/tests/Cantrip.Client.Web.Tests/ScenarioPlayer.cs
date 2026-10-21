@@ -656,6 +656,8 @@ public sealed class ScenarioPlayer
 
             case ActionKindView.PlayLand or ActionKindView.CastSpell or ActionKindView.ActivateAbility or ActionKindView.TurnFaceUp or ActionKindView.UnlockDoor:
             {
+                // `Menu` is the menu this action opens: none, for a card with one thing to do - never one an earlier card opened.
+                _lastMenu = string.Empty;
                 await ClickHandleAsync(action.Source.Value);
                 TableState after = await _page.SettledAsync();
 
@@ -1131,7 +1133,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Sideboard.Caption, .Tooltip, OpponentSideboard.Caption; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Sideboard.Caption, .Tooltip, OpponentSideboard.Caption; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the menu the last card action opened; empty when it opened none), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
 
     private string? Read(string what, TableState state)
     {

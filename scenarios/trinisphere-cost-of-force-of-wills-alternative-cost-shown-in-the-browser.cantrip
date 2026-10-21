@@ -2,7 +2,8 @@
 # What the client shows of a total cost the cost changes in play make (CR 601.2f): under Bot1's Trinisphere, Force of Will's
 # card menu offers its mana cost, {3}{U}{U}, which Trinisphere leaves as it is, and its alternative cost, whose row says it
 # costs {3} now - three mana besides the life and the blue card, which its text does not say. Bot1 casts it that way in
-# response to Bot2's Duress, from four blue floated: one is left.
+# response to Bot2's Duress, from four blue floated: one is left. The untapped Island makes the mana cost payable too, so both
+# casts are offered and the click opens the menu.
 
 [Bot1 Deck]
 Mox Sapphire
@@ -32,6 +33,8 @@ Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Hand.Trinisphere.Cast
 Bot2.Hand.Swamp.Play
 Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
 Bot2.Hand.Swamp.Play
 [T6 Bot2.Main1]
 Bot2.Battlefield.Swamp#1.Activate
@@ -43,7 +46,7 @@ Bot1.Battlefield.Mox Sapphire#2.Activate
 Bot1.Battlefield.Mox Sapphire#3.Activate
 Bot1.Battlefield.Mox Sapphire#4.Activate
 Bot1.Hand.Force of Will.Cast(Duress; Ability: exile a blue card)
-? Client.Bot1.Menu = Cast Force of Will; Cast Force of Will — Pay 1 life, exile a blue card from your hand (costs {3})
+? Client.Bot1.Menu = Cast Force of Will...; Cast Force of Will — Pay 1 life, exile a blue card from your hand (costs {3})...
 Bot1.Choose(Brainstorm)
 ? Bot1.Mana = {U}
 
@@ -54,3 +57,4 @@ Bot1.Mana = {U}
 Bot1.Life = 19
 Exile = Brainstorm
 Bot2.Graveyard = Duress
+Bot1.Battlefield.Island.Tapped = false
