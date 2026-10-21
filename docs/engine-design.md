@@ -715,13 +715,16 @@ change without counting it). A loop that never comes back to a position, or only
 followed by the shape of its positions (the fingerprint less its amounts) once a step has `BUSY_STEP` events in it: a
 priority whose shape comes round `ROUNDS` times with no player choosing to act and every amount gone only the way no rule
 ends anything by (life gained, counters added) is an endless loop of mandatory actions, a draw; one whose amounts go down is
-left to run out. In such a step every question is kept with its shape and the answers given there; a loop its players keep
-going by choice goes round `ROUNDS_TO_CHOOSE` times (a cap of the engine's: no loop shortcuts are supported, CR 732.2, and players perform every loop action by hand) and then the player
-chosen as CR 732.3 chooses must choose otherwise for the rest of the step - the answers
-they gave that question there are taken out of it (a target, card, player or mode chosen, a priority action, a "may" taken;
-never a pass or a decline). A loop whose players only pass or decline can't be stopped by making them act (CR 732.5) and is a
-draw after `ROUNDS`. `FORCED_LIMIT` and `STEP_LIMIT` end what is left: a run of mandatory actions that long with no life,
-poison or library moving towards its end is a draw, and in a step that long players may only pass and decline. A normal game
+left to run out. In such a step every question is kept with its shape and the answers given there, to tell a player
+choosing to act (an action at priority, a "may" taken, a pick with another answer still untried in that shape) from one
+passing or declining. A loop its players keep going by choice is never cut off, capped or made to change: the engine
+supports no loop shortcuts (CR 732.2), players perform every loop action by hand, and a combination may go round as many
+times as it needs; a seat nobody drives stops itself (`LoopGuard`, C#: past a number of questions in one step it passes,
+declines and picks each answer in turn, so a loop that goes on whatever it picks becomes one of passes). A loop whose
+players only pass or decline can't be stopped by making them act (CR 732.5) and is a draw after `ROUNDS` (CR 732.4).
+`FORCED_LIMIT` ends a run of mandatory actions that long with no life, poison or library moving towards its end: a draw.
+The watch keeps at most `KEPT` positions and questions (`GameState::loop_keys`, journalled an entry at a time), so a loop
+played by hand for thousands of rounds costs the watch no more memory than its first `KEPT` questions. A normal game
 pays a comparison per priority and a count per read of the history.
 
 ### Casting: when a cost's choices are made

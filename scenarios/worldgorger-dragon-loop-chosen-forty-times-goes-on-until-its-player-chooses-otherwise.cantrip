@@ -1,12 +1,8 @@
-# A loop its player keeps going by choice must end with that player choosing otherwise (CR 732.2a, 732.3). The Worldgorger
-# Dragon loop with Bot2's Entombed Ornithopter in a graveyard too, as in
-# worldgorger-dragon-loop-ends-when-animate-dead-chooses-another-creature-card - but the script never makes Animate Dead's
-# choice, and Bot1's seat, left to itself, takes the first creature card offered, the Dragon, every time round, as a seat
-# that never stops a loop would. Each time Animate Dead enters it chooses what it enchants (CR 303.4f): a real choice, so
-# the loop is no draw (CR 104.4b). Choosing the Dragon again and again, Bot1 has in effect chosen how many times to go round
-# (CR 732.2a); once the loop has come round many times, the active player, who is the one choosing in it, must make a
-# different choice so that it does not continue (CR 732.3), and the next time Animate Dead chooses, the Dragon - the answer
-# Bot1 gave there before - is not among its choices: it enchants the Ornithopter, which it returns under Bot1's control
+# A loop its player keeps going by choice goes on for as long as they choose (CR 104.4b's last sentence): the engine supports
+# no shortcut (CR 732.2), the player goes round by hand, and nothing cuts the loop off however many times it comes round. The
+# Worldgorger Dragon loop with Bot2's Entombed Ornithopter in a graveyard too: each time Animate Dead enters it chooses what
+# it enchants (CR 303.4f), a real choice. Bot1 chooses the Dragon forty times - past the thirty-two rounds after which the
+# engine once made a player choose otherwise - and then the Ornithopter, which Animate Dead returns under Bot1's control
 # (CR 110.2), and the loop is over. The Dragon stays in Bot1's graveyard; the Swamps are untapped, as the loop returned them.
 
 [Bot1 Deck]
@@ -47,6 +43,47 @@ Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Swamp.Activate
 Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot2.Graveyard.Ornithopter)
 [T3 Bot1.Main2]
 
 [Expect]

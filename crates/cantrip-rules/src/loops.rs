@@ -1,7 +1,6 @@
 //! Loops (CR 104.4b, 732). "If a game ... somehow enters a 'loop' of mandatory actions, repeating a sequence of events with
-//! no way to stop, the game is a draw. Loops that contain an optional action don't result in a draw" (CR 104.4b); and a
-//! loop a player could stop is shortcut (CR 732.2): its players choose how many times it goes round, and then one of them
-//! must make a different choice (CR 732.3). The rules here find both, and see that every loop ends.
+//! no way to stop, the game is a draw. Loops that contain an optional action don't result in a draw" (CR 104.4b; 732.4,
+//! 732.5). The rules here find the loops that are a draw, and leave every loop a player keeps going by choice to go on.
 //!
 //! **A loop of mandatory actions.** A player who is asked a question with more than one legal answer has a real choice (an
 //! optional action, or a different one), and any such question clears the watch of a run of mandatory actions. A question
@@ -37,24 +36,19 @@
 //!
 //! **A loop a player could stop** (CR 732). In such a step every question asked is kept with the shape of its position and
 //! the answers given to it there. A loop whose players choose to act each time round (an ability activated, a "may" taken,
-//! Animate Dead's choice of a creature card made the same way) is not a draw (CR 104.4b's last sentence). No player names
-//! how many times it goes round (CR 732.2a): the engine takes `ROUNDS_TO_CHOOSE` rounds as the number they chose, and then
-//! the player chosen as CR 732.3 chooses one - the active player if they are among those acting, else the next of them in
-//! turn order - must make a different choice for the rest of the step: offered the same question in the same shape of
-//! position, the answers they gave it before are no longer among its answers. Another of them is chosen if it goes on. What
-//! is made to differ is only ever an action taken or a thing chosen; a pass or a decline is never refused (the engine's
-//! policy: CR 732.5 lets a player be held to an action a loop object calls for, but no rule requires it, and taking a "may"
-//! that would not stop the loop - drawing a card each time round - would only harm them). A loop in which the players only
-//! pass or decline - holding an instant that would stop it, or an ability no object of the loop calls for, which no player
-//! can be made to use (CR 732.5) - goes round `ROUNDS` times and is then a loop of mandatory actions (CR 732.4), a draw.
+//! Animate Dead's choice of a creature card made the same way while another is still untried there) is not a draw (CR
+//! 104.4b's last sentence), and it goes on for as long as they choose: the engine supports no shortcut (CR 732.2), every
+//! round is played by hand, and nothing here cuts it off, caps it or makes anyone choose otherwise - a combination may need
+//! hundreds of rounds. A seat nobody drives stops by itself (the C# client's `LoopGuard`). A pass or a decline is never
+//! refused (CR 732.5 lets a player be held to an action a loop object calls for, but no rule requires it). A loop in which
+//! the players only pass or decline - holding an instant that would stop it, or an ability no object of the loop calls for,
+//! which no player can be made to use (CR 732.5) - goes round `ROUNDS` times and is then a loop of mandatory actions (CR
+//! 732.4), a draw.
 //!
-//! **That every loop ends.** A run of mandatory actions `FORCED_LIMIT` priorities long whose life totals, poison and
-//! libraries have gone nowhere for half of it is a loop that never comes back to a position (an amount or a list growing
-//! for ever), a draw, unless the stack or the board shrank in it too (a long chain that ends); and a step with `STEP_LIMIT`
-//! events in it is past any number of times the players could have meant to go round, so its players may only pass, and
-//! decline what they may, from then on, and every answer counts as passing. A step twice that long - a loop through choices
-//! the engine can't refuse that never comes back to a shape - is judged endless, and the game a draw: the engine's last
-//! word, not a rule's.
+//! **That every loop of mandatory actions ends.** A run of mandatory actions `FORCED_LIMIT` priorities long whose life
+//! totals, poison and libraries have gone nowhere for half of it is a loop that never comes back to a position (an amount or
+//! a list growing for ever), a draw, unless the stack or the board shrank in it too (a long chain that ends). The watch keeps
+//! at most `KEPT` positions and questions, so a loop played by hand for any number of rounds costs it no more.
 //!
 //! A normal game pays a comparison per priority and a count per read of the history: the fingerprinting starts only after
 //! a long run of priorities in which nobody could do anything, or in a step far longer than a game outside a loop has.
@@ -80,15 +74,8 @@ pub const FORCED_LIMIT: u32 = 1 << 14;
 /// a draw: more than any number a card counts to (a hundred counters, fifty life, the seventh card drawn this turn).
 pub const ROUNDS: u16 = 256;
 
-/// The times a loop its players choose to go on with comes round before one of them must choose otherwise (CR 732.2a,
-/// 732.3): the number of times they are taken to have chosen.
-pub const ROUNDS_TO_CHOOSE: u16 = 32;
-
 /// Events in a step before its questions are kept with their positions: far more than a step outside a loop has.
 pub const BUSY_STEP: u32 = 1024;
-
-/// Events in a step past which its players may only pass and decline (see the module).
-pub const STEP_LIMIT: u32 = 1 << 18;
 
 /// The most positions or questions the watch keeps: past it, a loop that long is not looked for (it is started over).
 const KEPT: usize = 1024;
@@ -139,87 +126,28 @@ pub fn settled_read<T>(cx: &Cx, ask: impl FnOnce(&History) -> T, settled: impl F
     answer
 }
 
-/// What a question comes to once the watch has seen it.
-pub enum Asked {
-    /// Ask it, as it now is (with the answers a player who must choose otherwise gave before taken out), `key` its place in
-    /// the watch when it is kept.
-    Ask { kind: RequestKind, key: Option<u64> },
-    /// It has one answer left, which is given without asking.
-    Answered(Answer),
-}
-
 /// A question other than priority is about to be asked (or asked again, on a re-run): one with more than one legal answer
-/// clears the watch of mandatory actions; in a step being watched it is kept with its position, and a player who must make
-/// a different choice (CR 732.3) is not offered what they answered it before. Priority is `at_priority`'s. A question
-/// that can be answered without asking (`may_answer`) may be answered here. A question being `replaying` (a frame run again
-/// with the answers it had) is kept but never changed: its answer was given to it as it was first asked.
-pub fn asked(cx: &mut Cx, player: PlayerId, kind: RequestKind, may_answer: bool, replaying: bool) -> Asked {
+/// clears the watch of mandatory actions, and in a step being watched it is kept with its position, the answers given to it
+/// there to be noted (`answered`). Its key in the watch, if it is kept; priority's is `at_priority`'s.
+pub fn asked(cx: &mut Cx, player: PlayerId, kind: &RequestKind) -> Option<u64> {
     if let RequestKind::Priority { .. } = kind {
-        let key = cx.s().loop_watch.priority_key;
-        return Asked::Ask { kind, key };
+        return cx.s().loop_watch.priority_key;
     }
-    if forced(&kind) {
-        return Asked::Ask { kind, key: None };
+    if forced(kind) {
+        return None;
     }
     clear_forced(cx);
-    let Some(records) = busy(cx) else { return Asked::Ask { kind, key: None } };
+    busy(cx)?;
     let key = {
         let canon = Canon::new(cx.s());
-        question_key(&canon, &position(cx.s(), &canon).shape, player, cx.frame, cx.cursor, &kind)
+        question_key(&canon, &position(cx.s(), &canon).shape, player, cx.frame, cx.cursor, kind)
     };
-    let at = keep(cx.st(), key).0;
-    if !replaying && (cx.s().loop_watch.designated & bit(player) != 0 || records >= STEP_LIMIT) {
-        let canon = Canon::new(cx.s());
-        // Past the limit, every "may" is declined (see the module).
-        let given = if records >= STEP_LIMIT { vec![answer_hash(&canon, &Answer::Yes)] } else { cx.s().loop_keys[at].given.clone() };
-        match otherwise(&canon, kind, &given, may_answer) {
-            Asked::Ask { kind, .. } => Asked::Ask { kind, key: Some(key) },
-            answered => answered,
-        }
-    } else {
-        Asked::Ask { kind, key: Some(key) }
-    }
-}
-
-/// The question with the answers in `given` taken out, where what is left is still a question with an answer: a target,
-/// card, mode or player chosen alone (`picks`); and a "may" taken before is declined without asking, if `may_answer`. A
-/// player made to choose otherwise is only ever made to choose less, or another of the same: declining is never refused.
-/// Any other question is asked as it is.
-fn otherwise(canon: &Canon, mut kind: RequestKind, given: &[u64], may_answer: bool) -> Asked {
-    let out = |a: Answer| given.contains(&answer_hash(canon, &a));
-    match &mut kind {
-        RequestKind::ChooseTarget { candidates, least, count: 1, any_number: false, .. } => {
-            let left: Vec<Target> = candidates.iter().copied().filter(|&t| !out(Answer::Targets(vec![t]))).collect();
-            if left.len() >= (*least as usize).max(1) || *least == 0 {
-                *candidates = left;
-            }
-        }
-        RequestKind::ChooseCards { eligible, count: 1, .. } => {
-            let left: Vec<ObjectId> = eligible.iter().copied().filter(|&c| !out(Answer::Cards(vec![c]))).collect();
-            if !left.is_empty() {
-                *eligible = left;
-            }
-        }
-        RequestKind::ChoosePlayer { candidates, .. } => {
-            let left: Vec<PlayerId> = candidates.iter().copied().filter(|&p| !out(Answer::Player(p))).collect();
-            if !left.is_empty() {
-                *candidates = left;
-            }
-        }
-        RequestKind::ChooseModes { eligible, count: 1, at_most: 0, repeat: false, .. } => {
-            let left: Vec<u8> = eligible.iter().copied().filter(|&m| !out(Answer::Modes(vec![m]))).collect();
-            if !left.is_empty() {
-                *eligible = left;
-            }
-        }
-        RequestKind::May { .. } if may_answer && out(Answer::Yes) => return Asked::Answered(Answer::No),
-        _ => {}
-    }
-    Asked::Ask { kind, key: None }
+    keep(cx.st(), key);
+    Some(key)
 }
 
 /// The answers a question offers that choose one thing - a target, card, player or mode chosen alone - as the watch knows
-/// them (`answer_hash`): what `otherwise` can take out. None for any other question.
+/// them (`answer_hash`). None for any other question.
 fn picks(canon: &Canon, kind: &RequestKind) -> Option<Vec<u64>> {
     let hash = |a: Answer| answer_hash(canon, &a);
     Some(match kind {
@@ -247,8 +175,7 @@ pub fn answering(s: &GameState, id: u32, request: &Request, answer: &Answer) -> 
     let acts = !forced(&request.kind)
         && match (&request.kind, answer) {
             (_, Answer::Pass | Answer::No) => false,
-            // A "may" asked in a staged ability can't be declined for its player (`Game::ask_then`): no action, as any
-            // other question `otherwise` can't change.
+            // A "may" asked in a staged ability can't be declined for its player (`Game::ask_then`): no action.
             (RequestKind::May { .. }, _) => !s.agenda.last().is_some_and(|f| f.staged),
             (RequestKind::Priority { .. }, _) => true,
             (_, Answer::Targets(t)) if t.is_empty() => false,
@@ -259,7 +186,7 @@ pub fn answering(s: &GameState, id: u32, request: &Request, answer: &Answer) -> 
 }
 
 /// The answer noted by `answering` is given, by `player`, to a question of this `kind`: it is kept with its question, and a
-/// player who chose to act is among those involved in the loop (CR 732.3). Priority is played out again from the frame's
+/// player who chose to act is among those involved in the loop (CR 732.4-5: a loop nobody acts in is a draw). Priority is played out again from the frame's
 /// start, its watch with it, so a player acting at priority joins `involved` only as that priority is watched again
 /// (`acted`).
 pub fn answered(s: &mut GameState, player: PlayerId, priority: bool, (key, answer, acts): (u64, u64, bool)) {
@@ -353,8 +280,8 @@ fn draw(cx: &mut Cx) {
 
 /// `player` is about to be given priority, with `options` besides passing. `None` if the game has just come round a loop
 /// of mandatory actions and is a draw (CR 104.4b): the draw is then made, and nobody is asked anything. Otherwise the
-/// options to offer: all of them, but for what a player who must make a different choice (CR 732.3) did here before.
-pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>) -> Option<Vec<ActionOption>> {
+/// options to offer, all of them: the engine never refuses a player a choice that keeps a loop going.
+pub fn at_priority(cx: &mut Cx, player: PlayerId, options: Vec<ActionOption>) -> Option<Vec<ActionOption>> {
     // The step being watched for loops of choices begins with its first priority.
     let step = step_id(cx.s());
     if cx.s().loop_watch.step != step {
@@ -363,7 +290,6 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
         watch.step_log = cx.g.log.len() as u32;
         watch.round = None;
         watch.involved = 0;
-        watch.designated = 0;
         watch.asking = None;
         watch.priority_key = None;
         watch.acted = 0;
@@ -374,29 +300,22 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
     if mandatory(cx, player, &options, &mut seen_position) {
         return None;
     }
-    let Some(records) = busy(cx) else {
+    if busy(cx).is_none() {
         if cx.s().loop_watch.priority_key.is_some() {
             let watch = LoopWatch { priority_key: None, ..cx.s().loop_watch.clone() };
             cx.st().set_loop_watch(watch);
         }
         return Some(options);
     };
-    if records >= 2 * STEP_LIMIT {
-        draw(cx);
-        return None;
-    }
-    let active = cx.s().turn.active;
-    let order: Vec<PlayerId> = cx.s().turn_order_from(active).collect();
     let (here, key) = {
         let canon = Canon::new(cx.s());
         let here = seen_position.take().unwrap_or_else(|| position(cx.s(), &canon));
         let key = question_key(&canon, &here.shape, player, cx.frame, cx.cursor, &RequestKind::Priority { options: Vec::new() });
         (here, key)
     };
-    let (at, again) = keep(cx.st(), key);
+    let again = keep(cx.st(), key).1;
     let mut watch = cx.s().loop_watch.clone();
-    let (drawn, options) = {
-        let canon = Canon::new(cx.s());
+    let drawn = {
         watch.priority_key = Some(key);
         // A loop that has gone elsewhere is followed from the next position that comes round.
         if let Some(round) = &mut watch.round
@@ -407,20 +326,9 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
                 watch.round = None;
             }
         }
-        // Past the limit nobody may act any more but by questions nothing can change: what is left is passing.
-        if records >= STEP_LIMIT {
-            watch.involved = 0;
-            watch.acted = 0;
-        }
-        let drawn = again && round_comes(&mut watch, key, here.amounts, &order);
+        let drawn = again && round_comes(&mut watch, key, here.amounts);
         watch.involved |= std::mem::take(&mut watch.acted);
-        if records >= STEP_LIMIT {
-            options.clear();
-        } else if watch.designated & bit(player) != 0 {
-            let given = &cx.s().loop_keys[at].given;
-            options.retain(|o| !given.contains(&option_hash(&canon, o)));
-        }
-        (drawn, options)
+        drawn
     };
     cx.st().set_loop_watch(watch);
     if drawn {
@@ -430,9 +338,9 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
     Some(options)
 }
 
-/// A position at priority, `key`, has come round again in a step being watched, with these `amounts`; `order` is the
-/// players in turn order from the active player. Whether the loop is one of mandatory actions and the game a draw.
-fn round_comes(watch: &mut LoopWatch, key: u64, amounts: Vec<(u32, i32)>, order: &[PlayerId]) -> bool {
+/// A position at priority, `key`, has come round again in a step being watched, with these `amounts`. Whether the loop is one
+/// of mandatory actions and the game a draw.
+fn round_comes(watch: &mut LoopWatch, key: u64, amounts: Vec<(u32, i32)>) -> bool {
     let Some(round) = &mut watch.round else {
         watch.round = Some(LoopRound { key, amounts, ..LoopRound::default() });
         return false;
@@ -447,15 +355,8 @@ fn round_comes(watch: &mut LoopWatch, key: u64, amounts: Vec<(u32, i32)>, order:
         round.passes = if watch.involved == 0 { round.passes.saturating_add(1) } else { 0 };
         // Round and round with nobody choosing to act: no player can be made to stop it (CR 732.5), and it is a loop of
         // mandatory actions (CR 732.4).
+        // A loop a player keeps going by choosing to act goes on for as long as they choose: the engine cuts nothing off.
         drawn = round.passes >= ROUNDS;
-        if watch.involved != 0 && round.rounds >= ROUNDS_TO_CHOOSE {
-            // CR 732.3: the active player, if they are among those acting in the loop, or else the first of them in turn
-            // order, must make a different choice.
-            if let Some(&p) = order.iter().find(|&&p| watch.involved & bit(p) != 0 && watch.designated & bit(p) == 0) {
-                watch.designated |= bit(p);
-            }
-            round.rounds = 0;
-        }
     } else {
         round.rounds = 0;
         round.passes = 0;
@@ -712,11 +613,6 @@ fn answer_hash(canon: &Canon, answer: &Answer) -> u64 {
         other => (0u8, other).hash(&mut h),
     }
     h.finish()
-}
-
-/// The answer that takes a priority option, as `answer_hash` knows it.
-fn option_hash(canon: &Canon, option: &ActionOption) -> u64 {
-    answer_hash(canon, &Answer::Act(Action::of(option)))
 }
 
 /// A question as the watch keeps it: the shape of the position it is asked in, who is asked, where in the rules (the frame,
@@ -996,7 +892,7 @@ mod tests {
             flicker(&mut game);
             // Somebody chooses between two players each time round: never a draw.
             let two = RequestKind::ChoosePlayer { source: ObjectId(0), candidates: vec![PlayerId(0), PlayerId(1)], verb: "", amount: 0 };
-            let _ = asked(&mut cx(&mut game), PlayerId(0), two, true, false);
+            let _ = asked(&mut cx(&mut game), PlayerId(0), &two);
             for p in [PlayerId(0), PlayerId(1)] {
                 game.state.update_turn(|t| t.priority = p);
                 drawn |= at_priority(&mut cx(&mut game), p, Vec::new()).is_none();
@@ -1142,40 +1038,5 @@ mod tests {
         let id = game.state.agenda[0].pending.as_ref().expect("the question").id;
         assert_eq!(game.state.player(PlayerId(0)).life, 20, "what the run did after the question is undone");
         assert!(matches!(game.state.loop_watch.asking, Some((asked, _)) if asked == id), "the watch still waits for its answer");
-    }
-
-    /// CR 732.3: a player made to choose otherwise is not offered, at the same question, a card they chose there before -
-    /// while there is another to choose - and a "may" they took is declined; one they declined is still asked.
-    #[test]
-    fn a_player_made_to_choose_otherwise_is_offered_only_what_they_did_not_choose() {
-        let game = game();
-        let canon = Canon::new(&game.state);
-        let a = game.state.battlefield()[0];
-        let (one, two) = (Target::Object(a), Target::Player(PlayerId(1)));
-        let choose = RequestKind::ChooseTarget {
-            source: a,
-            purpose: Purpose::Targets,
-            candidates: vec![one, two],
-            optional: false,
-            least: 1,
-            count: 1,
-            any_number: false,
-            label: "",
-            slot_player: None,
-            total: None,
-        };
-        let given = [answer_hash(&canon, &Answer::Targets(vec![one]))];
-        match otherwise(&canon, choose.clone(), &given, true) {
-            Asked::Ask { kind: RequestKind::ChooseTarget { candidates, .. }, .. } => assert_eq!(candidates, vec![two]),
-            _ => panic!("still a choice of target"),
-        }
-        let both = [given[0], answer_hash(&canon, &Answer::Targets(vec![two]))];
-        match otherwise(&canon, choose, &both, true) {
-            Asked::Ask { kind: RequestKind::ChooseTarget { candidates, .. }, .. } => assert_eq!(candidates.len(), 2, "nothing left untried"),
-            _ => panic!("still a choice of target"),
-        }
-        let may = RequestKind::May { source: a, purpose: Purpose::Optional };
-        assert!(matches!(otherwise(&canon, may.clone(), &[answer_hash(&canon, &Answer::Yes)], true), Asked::Answered(Answer::No)));
-        assert!(matches!(otherwise(&canon, may, &[answer_hash(&canon, &Answer::No)], true), Asked::Ask { .. }));
     }
 }

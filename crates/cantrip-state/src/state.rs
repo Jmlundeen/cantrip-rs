@@ -119,8 +119,7 @@ pub struct GameState {
 ///
 /// A step with a great deal in it: from `step_log` (the history's length as the step `step` began) on, each question's
 /// position is kept in `GameState::loop_keys` with the answers given to it, and `round` follows a position at priority that comes round
-/// again: `involved` is the players who chose to act since it last did, `designated` those who must now choose otherwise
-/// (CR 732.3). `asking` is the request waiting and its key, `priority_key` the key of the priority about to be asked, and
+/// again: `involved` is the players who chose to act since it last did. `asking` is the request waiting and its key, `priority_key` the key of the priority about to be asked, and
 /// `acted` the players who chose to act at the priority being played out with its answer, not yet among `involved`.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LoopWatch {
@@ -131,7 +130,6 @@ pub struct LoopWatch {
     pub step_log: u32,
     pub round: Option<LoopRound>,
     pub involved: u8,
-    pub designated: u8,
     pub asking: Option<(u32, u64)>,
     pub priority_key: Option<u64>,
     pub acted: u8,

@@ -565,12 +565,8 @@ impl<'a> Cx<'a> {
 
     pub fn ask_core(&mut self, player: PlayerId, kind: RequestKind, may_cancel: bool) -> R<Answer> {
         // A real choice, asked or answered on a re-run, means no loop through here is a mandatory one (CR 104.4b); and a loop
-        // of choices is watched, and its players made to choose otherwise (CR 732.3).
-        let replaying = self.cursor < self.g.state.agenda[self.frame].answers.len();
-        let (kind, key) = match loops::asked(self, player, kind, true, replaying) {
-            loops::Asked::Ask { kind, key } => (kind, key),
-            loops::Asked::Answered(answer) => return Ok(answer),
-        };
+        // of choices is watched, for whether its players only pass and decline (CR 732.4-5).
+        let key = loops::asked(self, player, &kind);
         let frame = &self.g.state.agenda[self.frame];
         if self.cursor < frame.answers.len() {
             let answer = frame.answers[self.cursor].clone();
@@ -828,10 +824,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn ask_then(&mut self, next: u16, player: PlayerId, kind: RequestKind) -> Suspend {
-        let (kind, key) = match loops::asked(self, player, kind, false, false) {
-            loops::Asked::Ask { kind, key } => (kind, key),
-            loops::Asked::Answered(_) => unreachable!("a staged question is always asked"),
-        };
+        let key = loops::asked(self, player, &kind);
         let id = self.g.state.request_id();
         let at = self.frame;
         self.g.state.update_frame(at, |f| {
