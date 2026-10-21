@@ -970,6 +970,10 @@ pub enum Label {
     /// "Pay {U/R} with {R}": the two-color hybrid symbol {a/b} announced as the half `as` (CR 601.2b), where a reduction
     /// meets its other half (`announce_hybrids`).
     PayHybridAs(Mana, Mana, Mana),
+    /// "Reduce by {R} for {U/R}": a hybrid symbol {a/b} of a reduction taken as its half `as` (CR 118.7e).
+    ReduceAs(Mana, Mana, Mana),
+    /// "Reduce by {2} for {2/W}": a {2/C} symbol of a reduction taken as two generic mana (CR 118.7e).
+    ReduceGeneric(Color),
     /// A kind of counter, to remove one of as a cost (CR 118.3).
     Counter(CounterKind),
     /// One of the faces a card may be cast as (CR 709.3, 715.3, 712.8a), named by the face's name.

@@ -1138,8 +1138,9 @@ pub fn apply_cost_changes_total(cx: &Cx, player: PlayerId, costed: Costed, cost:
 /// `apply_cost_changes_total` with the least the total may come to (`CostDelta::at_least`) not yet applied but returned, for
 /// a cast whose own reductions (harmonize, emerge, a sacrifice for each) are still to come: that least is applied once they
 /// are (CR 601.2f).
-fn apply_cost_changes_before_least(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target]) -> (ManaCost, u32, u8) {
-    change_parts(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
+/// `split`: the halves the payer chose of the hybrid symbols the reductions are by (CR 118.7e, `announce_reduction`).
+fn apply_cost_changes_before_least(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target], split: &[bool]) -> (ManaCost, u32, u8) {
+    change_parts_split(cx, &cost_change_sources(cx), player, costed, cost, None, targets, split)
 }
 
 /// The total cost brought up to the least mana an effect says it costs (CR 601.2f, `CostDelta::at_least`): generic mana
@@ -1441,7 +1442,23 @@ fn change_parts(
     face: Option<CardId>,
     targets: &[Target],
 ) -> (ManaCost, u32, u8) {
+    change_parts_split(cx, sources, player, costed, cost, face, targets, &[])
+}
+
+/// `change_parts` with the reductions by hybrid mana split as `split` says (CR 118.7e, `split_reduction`).
+#[allow(clippy::too_many_arguments)]
+fn change_parts_split(
+    cx: &Cx,
+    sources: &[ObjectId],
+    player: PlayerId,
+    costed: Costed,
+    cost: ManaCost,
+    face: Option<CardId>,
+    targets: &[Target],
+    split: &[bool],
+) -> (ManaCost, u32, u8) {
     let (more, less, life, least, discount) = deltas(cx, sources, player, costed, face, targets);
+    let less = split_reduction(&less, split);
     let mut cost = cost;
     cost.generic = (cost.generic as u32 + more).min(255) as u8;
     let mut first = cost;
@@ -1465,10 +1482,64 @@ fn change_any(
     targets: &[Target],
     covered: &mut dyn FnMut(ManaCost, u8) -> bool,
 ) -> bool {
-    let (more, less, _, least, discount) = deltas(cx, sources, player, costed, face, targets);
+    let (more, whole, _, least, discount) = deltas(cx, sources, player, costed, face, targets);
     let mut cost = cost;
     cost.generic = (cost.generic as u32 + more).min(255) as u8;
-    any_announcement(&cost, &less, &mut |c| covered(reduced(c, &less, discount), least))
+    // Each way the payer could split a reduction by hybrid mana (CR 118.7e).
+    let n = reduction_choices(&whole).min(8);
+    (0u32..1 << n).any(|mask| {
+        let split: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
+        let less = split_reduction(&whole, &split);
+        any_announcement(&cost, &less, &mut |c| covered(reduced(c, &less, discount), least))
+    })
+}
+
+/// How many symbols of a reduction the payer splits as it is applied (CR 118.7e): its hybrid symbols, two-color and {2/C}.
+fn reduction_choices(less: &ManaCost) -> usize {
+    less.hybrid.iter().flatten().count() + less.twobrid.iter().map(|&n| n as usize).sum::<usize>()
+}
+
+/// A reduction with each of its hybrid symbols split into the half the payer chose (CR 118.7e): `split[i]`, for the `i`th of
+/// them (`reduction_choices`, two-color symbols first), is the second half - of {U/R} {R}, of {2/R} the {2} of generic
+/// mana - and an unchosen one, or one `split` does not reach, the first ({U}; {R}).
+fn split_reduction(less: &ManaCost, split: &[bool]) -> ManaCost {
+    if reduction_choices(less) == 0 {
+        return *less;
+    }
+    let mut out = ManaCost { hybrid: [None; 6], twobrid: [0; 5], ..*less };
+    let mut at = 0;
+    for (a, b) in less.hybrid.iter().flatten() {
+        let half = if split.get(at).copied().unwrap_or(false) { *b } else { *a };
+        out.symbols[half as usize] = out.symbols[half as usize].saturating_add(1);
+        at += 1;
+    }
+    for (i, &n) in less.twobrid.iter().enumerate() {
+        for _ in 0..n {
+            if split.get(at).copied().unwrap_or(false) {
+                out.generic = out.generic.saturating_add(2);
+            } else {
+                let m = Color::ALL[i].mana() as usize;
+                out.symbols[m] = out.symbols[m].saturating_add(1);
+            }
+            at += 1;
+        }
+    }
+    out
+}
+
+/// What a reduction could take off of each type, its hybrid symbols counted at both halves: the types whose hybrid
+/// symbols in the cost it could meet, however the payer splits it (`announce_hybrids`).
+fn reduction_reach(less: &ManaCost) -> ManaCost {
+    let mut out = ManaCost { hybrid: [None; 6], twobrid: [0; 5], ..*less };
+    for (a, b) in less.hybrid.iter().flatten() {
+        out.symbols[*a as usize] = out.symbols[*a as usize].saturating_add(1);
+        out.symbols[*b as usize] = out.symbols[*b as usize].saturating_add(1);
+    }
+    for (i, &n) in less.twobrid.iter().enumerate() {
+        let m = Color::ALL[i].mana() as usize;
+        out.symbols[m] = out.symbols[m].saturating_add(n);
+    }
+    out
 }
 
 /// Whether `f` holds for some cost of `announcements`, without listing them where no reduction meets a hybrid symbol.
@@ -1626,12 +1697,9 @@ fn announcements(cost: &ManaCost, less: &ManaCost) -> Vec<ManaCost> {
 /// (CR 601.2f). A hybrid symbol of the cost is announced as one of its halves before the reductions (CR 601.2b): one a
 /// reduction meets is announced first (`announce_hybrids`, `announcements`), and one still a hybrid symbol here meets none.
 fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
-    // A hybrid symbol in a reduction is split by the payer as the reduction is applied (CR 118.7e), a choice not built:
-    // refused in every build rather than reduced some other way.
-    assert!(
-        by.hybrid.iter().all(Option::is_none) && by.twobrids() == 0,
-        "a cost reduction by hybrid mana needs the payer's choice of half (CR 118.7e), which is not built"
-    );
+    // A hybrid symbol in a reduction is split by the payer as the reduction is applied (CR 118.7e): the callers split it
+    // (`split_reduction`); one that reaches here unsplit is taken at its first half.
+    let by = &split_reduction(by, &[]);
     let mut excess = by.generic as u32;
     for i in 0..6 {
         let mut n = by.symbols[i] as u32;
@@ -5185,8 +5253,9 @@ fn cast(
         cost.mana = add_cost(cost.mana, added.mana);
     }
     announce_hybrids(cx, player, spell, Costed::Spell(spell), &mut cost.mana, &targets, any_type)?;
+    let split = announce_reduction(cx, player, spell, Costed::Spell(spell), &cost.mana, &targets)?;
     let (added_life, least);
-    (cost.mana, added_life, least) = apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets);
+    (cost.mana, added_life, least) = apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets, &split);
     if added_life > 0 {
         cost.life = (u32::from(cost.life) + added_life).min(u32::from(u16::MAX)) as u16;
         let owed = cost.life as i32 + extra.life as i32 + life as i32 + x_life as i32;
@@ -5981,6 +6050,54 @@ fn announce_twobrids(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut
     Ok(())
 }
 
+/// Splits each hybrid symbol of the reductions that apply to a cost (CR 118.7e): the payer chooses one half of each as the
+/// reduction is applied - of {U/R} {U} or {R}, of {2/R} {R} or {2} of generic mana (`Label::ReduceAs`, `Label::ReduceGeneric`,
+/// each the second half; unchosen, the first). Asked only where a reduction has such a symbol. The halves, for
+/// `split_reduction`.
+fn announce_reduction(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Costed, cost: &ManaCost, targets: &[Target]) -> R<Vec<bool>> {
+    let (more, whole, ..) = deltas(cx, &cost_change_sources(cx), player, costed, None, targets);
+    let n = reduction_choices(&whole);
+    if n == 0 {
+        return Ok(Vec::new());
+    }
+    let mut modes: Vec<Label> = whole.hybrid.iter().flatten().map(|&(a, b)| Label::ReduceAs(a, b, b)).collect();
+    for (i, &k) in whole.twobrid.iter().enumerate() {
+        modes.extend(std::iter::repeat_n(Label::ReduceGeneric(Color::ALL[i]), k as usize));
+    }
+    // Advice: the fewest second halves that leave a total the player could pay.
+    let affordable: Vec<u8> = if n <= 8 {
+        let mut masks: Vec<u32> = (0u32..1 << n).collect();
+        masks.sort_by_key(|m| (m.count_ones(), *m));
+        masks
+            .into_iter()
+            .find(|&mask| {
+                let split: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
+                let mut total = *cost;
+                total.generic = (total.generic as u32 + more).min(255) as u8;
+                can_afford(cx, player, source, &reduce(total, &split_reduction(&whole, &split)))
+            })
+            .map(|mask| (0..n as u8).filter(|&i| mask & (1 << i) != 0).collect())
+            .unwrap_or_default()
+    } else {
+        Vec::new()
+    };
+    let ask = RequestKind::ChooseModes {
+        source,
+        modes,
+        eligible: (0..n as u8).collect(),
+        count: 0,
+        at_most: n as u8,
+        affordable,
+        additional_cost: true,
+        repeat: false,
+    };
+    let chosen = match cx.ask_core(player, ask, true)? {
+        Answer::Modes(chosen) => chosen,
+        _ => return Err(Stop::Cancel),
+    };
+    Ok((0..n as u8).map(|i| chosen.contains(&i)).collect())
+}
+
 /// Announces the half each two-color hybrid symbol of a cost is paid with (CR 601.2b), where a reduction meets it
 /// (`met_hybrids`): announced as a half the reduction takes, the symbol is reduced to nothing (CR 118.7c); as the other, it
 /// is paid with that half and the reduction takes generic mana instead - which a player may want, to spend mana of that
@@ -5993,7 +6110,9 @@ fn announce_hybrids(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Cos
     if cost.hybrid.iter().all(Option::is_none) {
         return Ok(());
     }
-    let (more, less, ..) = deltas(cx, &cost_change_sources(cx), player, costed, None, targets);
+    let (more, whole, ..) = deltas(cx, &cost_change_sources(cx), player, costed, None, targets);
+    // A reduction by hybrid mana is split after this (CR 118.7e): a cost symbol either half could meet is asked about.
+    let less = reduction_reach(&whole);
     let met = met_hybrids(cost, &less);
     if met.is_empty() {
         return Ok(());
@@ -6322,8 +6441,12 @@ fn activate(
     // here, so nothing that happens to a target later changes what is paid. Life a change adds (CR 118.8) is payable only
     // with that much life, the rest of the cost's included (CR 119.4, 118.3), or the activation is taken back.
     announce_hybrids(cx, player, source, Costed::Ability(source, ability), &mut mana, &targets, false)?;
+    let split = announce_reduction(cx, player, source, Costed::Ability(source, ability), &mana, &targets)?;
     let added_life;
-    (mana, added_life) = apply_cost_changes_total(cx, player, Costed::Ability(source, ability), mana, &targets);
+    (mana, added_life) = {
+        let (cost, life, least) = change_parts_split(cx, &cost_change_sources(cx), player, Costed::Ability(source, ability), mana, None, &targets, &split);
+        (at_least(cost, least), life)
+    };
     let life = life as u32 + added_life;
     if added_life > 0 && payable_life(cx, player) < life as i32 + def.cost.life as i32 {
         return Err(Stop::Cancel);
@@ -7993,11 +8116,17 @@ mod tests {
         assert_eq!(owed, mana("{C}"));
     }
 
+    /// CR 118.7e: a reduction by hybrid mana is split by the payer, one half of each symbol: {2}{G/W} off {3}{G}{W} is
+    /// {2}{G} or {2}{W} off, by the half chosen; {2/R} is {R} or {2} of generic mana.
     #[test]
-    #[should_panic(expected = "CR 118.7e")]
-    fn a_reduction_by_hybrid_mana_is_refused() {
-        // CR 118.7e: the payer would choose a half as the reduction is applied; that choice is not built.
-        reduce(mana("{3}{G}{W}"), &mana("{2}{G/W}"));
+    fn a_reduction_by_hybrid_mana_is_split_by_the_payer() {
+        let by = mana("{2}{G/W}");
+        assert_eq!(reduce(mana("{3}{G}{W}"), &split_reduction(&by, &[false])), mana("{1}{W}"));
+        assert_eq!(reduce(mana("{3}{G}{W}"), &split_reduction(&by, &[true])), mana("{1}{G}"));
+        assert_eq!(reduce(mana("{3}{R}"), &split_reduction(&mana("{2/R}"), &[false])), mana("{3}"));
+        assert_eq!(reduce(mana("{3}{R}"), &split_reduction(&mana("{2/R}"), &[true])), mana("{1}{R}"));
+        // Unsplit, the first half: never a panic.
+        assert_eq!(reduce(mana("{3}{G}{W}"), &by), mana("{1}{W}"));
     }
 
     #[test]
