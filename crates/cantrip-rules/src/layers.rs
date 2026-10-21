@@ -155,15 +155,7 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
     // An object that has ceased to be itself - changed zones or ceased to exist - is as it last was (CR 400.7, 608.2h,
     // 603.10).
     if let Some(last) = state.last_known(id) {
-        let mut chars = start();
-        chars.types = last.types;
-        chars.subtypes = last.subtypes;
-        chars.colors = last.colors;
-        chars.power = last.power;
-        chars.toughness = last.toughness;
-        chars.keywords = last.keywords;
-        chars.abilities = last.abilities;
-        return chars;
+        return start().as_known(last);
     }
 
     // A phased-out permanent keeps its counters and the effects on it (CR 702.26d, 702.26f), so it is worked out as it is on

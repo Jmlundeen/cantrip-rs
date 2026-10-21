@@ -666,6 +666,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         // Put on the stack now, or, a delayed triggered ability, created when its `Delayed` was (CR 701.27f).
         since: trigger.since.unwrap_or(cx.g.log.len() as u32),
         copied: false,
+        cast_known: u32::MAX,
     };
     item.targets[..targets.len()].copy_from_slice(&targets);
     item.spec_of[..of.len()].copy_from_slice(&of);

@@ -999,9 +999,17 @@ pub fn cease_to_exist(cx: &mut Cx, zone: Zone, id: ObjectId) {
 /// it, or a delayed ability it created, reads after (High Tide whose "Island" Magical Hack made "Swamp" watches Swamps;
 /// CR 603.7d). Nothing hidden reaches a player through it: it is read only where the rules read the object itself.
 pub fn last_known_of(cx: &Cx, id: ObjectId) -> LastKnown {
-    let c = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
+    last_known_from(cx, id, &layers::chars(cx.cards(), cx.s(), &cx.g.log, id))
+}
+
+/// `last_known_of` with `id`'s characteristics `c` already worked out.
+pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
     LastKnown {
         id,
+        name: c.name,
+        name_set: c.name_set,
+        supertypes: c.supertypes,
+        no_cost: c.no_cost,
         types: c.types,
         subtypes: c.subtypes,
         colors: c.colors,
@@ -1305,6 +1313,8 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
     item.serial = 0;
     // A copy is put onto the stack as it is created (CR 707.10, 701.27f).
     item.since = cx.g.log.len() as u32;
+    // A copy is not cast (CR 707.10a).
+    item.cast_known = u32::MAX;
     cx.st().stack_push(item);
     let top = cx.s().stack.len() - 1;
 
@@ -3017,5 +3027,21 @@ mod tests {
         cx.entering = Some(would);
         assert!(cx.chars(relic).is(CardType::Creature) && cx.lost_all_abilities(relic));
         assert!(!cx.chars(held[0]).is(CardType::Artifact));
+    }
+
+    /// CR 608.2h, 400.7: a permanent's name is part of its last-known information. Animator, named Everflame by an effect
+    /// (CR 612.8, The Irencrag's), is Everflame as it last was once it has gone to the graveyard, where the card it now is
+    /// has its own name.
+    #[test]
+    fn a_name_an_effect_set_is_the_last_known_name_of_a_permanent_that_left() {
+        let (mut game, _) = game_with(&[&ANIMATOR]);
+        let animator = game.state.battlefield()[0];
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        cantrip_api::Game::add_effect(&mut cx, animator, animator, EffectKind::SetName("Everflame"), Duration::Indefinite);
+        assert_eq!(cx.chars(animator).name, "Everflame");
+        let card = move_to(&mut cx, animator, Zone::graveyard(PlayerId(0)));
+        assert_eq!(cx.chars(animator).name, "Everflame");
+        assert!(cx.chars(animator).name_set);
+        assert_eq!(cx.chars(card).name, "Animator");
     }
 }

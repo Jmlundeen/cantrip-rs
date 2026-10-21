@@ -66,6 +66,23 @@ pub fn words(state: &GameState, id: ObjectId) -> Words {
 }
 
 impl Chars {
+    /// These characteristics with what `last` kept of an object (CR 400.7, 608.2h): its last-known information, or a
+    /// spell as it became cast (CR 601.2i). The rest - its card, whether it is a spell now - is this object's.
+    pub fn as_known(mut self, last: &LastKnown) -> Chars {
+        self.name = last.name;
+        self.name_set = last.name_set;
+        self.supertypes = last.supertypes;
+        self.no_cost = last.no_cost;
+        self.types = last.types;
+        self.subtypes = last.subtypes;
+        self.colors = last.colors;
+        self.power = last.power;
+        self.toughness = last.toughness;
+        self.keywords = last.keywords;
+        self.abilities = last.abilities;
+        self
+    }
+
     pub fn is(&self, t: CardType) -> bool {
         self.types.has(t)
     }

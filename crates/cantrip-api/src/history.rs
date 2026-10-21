@@ -26,8 +26,9 @@ pub struct Cast {
     /// The spell's object on the stack.
     pub spell: ObjectId,
     pub player: PlayerId,
+    /// Its card types as it became cast, which its last-known row (`Cast::chars`) holds too: kept here so the many
+    /// questions about the types of earlier casts ("noncreature spells you've cast this turn") need no state.
     pub types: TypeSet,
-    pub colors: ColorSet,
     /// Its mana value on the stack (CR 202.3e: X counted).
     pub value: u8,
     /// The zone it was cast from (CR 601.2a).
@@ -54,6 +55,20 @@ impl Cast {
 
     pub fn is(&self, t: CardType) -> bool {
         self.types.has(t)
+    }
+
+    /// The spell's characteristics as it became cast (CR 601.2i): "the first non-Lemur creature spell with flying you
+    /// cast" asks of an earlier cast what it was then, not what an effect made it on the stack afterwards or what its card
+    /// is once it has left.
+    /// The row is the one its stack item names (`StackItem::cast_known`), on the stack or left it.
+    pub fn chars(&self, q: &dyn crate::Query) -> crate::Chars {
+        let s = q.state();
+        let item = s.stack.iter().rev().find(|i| i.kind == StackKind::Spell && i.object == self.spell).or_else(|| s.left_stack(self.spell));
+        let c = q.chars(self.spell);
+        match item.and_then(|i| s.last_known.get(i.cast_known as usize)) {
+            Some(row) => c.as_known(row),
+            None => c,
+        }
     }
 }
 

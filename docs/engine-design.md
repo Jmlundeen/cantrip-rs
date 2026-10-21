@@ -1232,8 +1232,12 @@ zone (`move_together`) or ceasing to exist (`ops::cease_to_exist`: a token or a 
 player's objects as the player leaves, CR 800.4a) - a row of `GameState::last_known` that the old object names
 (`Obj::last_known`), so `last_known(id)` is one index and no reader needs to know which zone it left. So the delayed
 ability of a High Tide whose "Island" Magical Hack made "Swamp" reads "Swamp" through High Tide's words once the effects
-on the spell are gone (CR 603.7d, 611.2c, 612.1). The rows are compared with the position but not hashed: the objects
-naming them are.
+on the spell are gone (CR 603.7d, 611.2c, 612.1). A row keeps the name (a copy's, one an effect set) and supertypes as
+well as the types, colors, power, toughness, keywords, abilities and words, and `Chars::as_known` lays it over the
+object. A spell is also kept as it became cast (CR 601.2i): a row pushed then, named by its stack item
+(`StackItem::cast_known`), which `Cast::chars` reads, so "the first non-Lemur creature spell with flying you cast" judges
+an earlier cast as it was cast, not as Artificial Evolution made it on the stack. The rows are compared with the position but not hashed: the
+objects naming them are.
 
 "You may activate abilities of creatures you control as though those creatures had haste" (CR 302.6) is
 `CardDef::activate_as_though_haste`, asked (`static_rules::activates_as_though_haste`) only where a summoning-sick

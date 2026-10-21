@@ -578,6 +578,10 @@ pub fn object_names(q: &dyn Query, id: ObjectId) -> Vec<&'static str> {
     if def.is_room() && obj.zone.is(ZoneKind::Battlefield) {
         return def.unlocked_doors(obj.marks.doors).map(|half| half.name).collect();
     }
+    // One that has left is as it last was (CR 608.2h): a Room the names of the doors it had unlocked, "A // B" both.
+    if def.is_room() && q.state().last_known(id).is_some() {
+        return c.name.split(" // ").filter(|name| !name.is_empty()).collect();
+    }
     if let Some((left, right)) = def.split {
         return vec![left.name, right.name];
     }

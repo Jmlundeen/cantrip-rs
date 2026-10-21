@@ -3773,6 +3773,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         flashback: false,
         since: 0,
         copied: false,
+        cast_known: u32::MAX,
     };
     item.targets[..targets.len()].copy_from_slice(targets);
     item
@@ -4338,11 +4339,16 @@ fn cast(
     let value = (printed.mana_value() + printed.x as u32 * x as u32).min(255) as u8;
     // "As you cast this spell": the board once the costs are paid (CR 601.2i), asked of the face being cast.
     let fact = def.cast_fact.map_or(0, |f| f(cx, &Asker { source: spell, controller: player }));
+    let known = ops::last_known_from(cx, spell, &as_cast);
+    let known = cx.st().last_known_push(known);
+    if let Some(at) = cx.s().stack.iter().rposition(|i| i.kind == StackKind::Spell && i.object == spell) {
+        let item = cx.s().stack[at];
+        cx.st().stack_set(at, StackItem { cast_known: known, ..item });
+    }
     cx.record(Event::Cast(Cast {
         spell,
         player,
         types: as_cast.types,
-        colors: as_cast.colors,
         value,
         from: cast_from,
         way,

@@ -1,0 +1,55 @@
+# "The first non-Lemur creature spell with flying you cast" asks of an earlier spell what it was as it became cast
+# (CR 601.2i), not what an effect made it on the stack afterwards nor what it was as it left. Bot1's second Momo, a Lemur Bat
+# Ally, is cast a Lemur; in response Artificial Evolution makes it a Bird Bat Ally (CR 612.1: the type line's creature type),
+# and it resolves a Bird. It was still no non-Lemur spell as cast, so Faerie Mastermind, cast next with Mox Sapphire alone,
+# is the first and costs {U}. The legend rule keeps the first Momo, whose words still say Lemur.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Sapphire
+Momo, Friendly Flier
+Momo, Friendly Flier
+Faerie Mastermind
+Artificial Evolution
+Island x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Momo, Friendly Flier)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Lemur)
+Bot1.Modes(Bird)
+? Stack = Momo, Friendly Flier
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Battlefield.Momo, Friendly Flier#1)
+? Bot1.Battlefield.Momo, Friendly Flier.Subtypes = Ally; Bat; Lemur
+? Bot1.Graveyard = Momo, Friendly Flier; Artificial Evolution
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Faerie Mastermind.Types = Creature

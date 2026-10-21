@@ -2,23 +2,23 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// A non-Lemur creature spell with flying (CR 601.2, 702.9): as the spell's characteristics are, Lemur read through the
+/// A non-Lemur creature spell with flying (CR 601.2, 702.9): as the spell's characteristics `c` are, Lemur read through the
 /// words of Momo's text (CR 612).
-fn non_lemur_flying_creature_spell(q: &dyn Query, source: ObjectId, spell: ObjectId) -> bool {
-    let c = q.chars(spell);
+fn non_lemur_flying_creature_spell(q: &dyn Query, source: ObjectId, c: &Chars) -> bool {
     c.is(CardType::Creature) && c.has(Keyword::Flying) && !c.subtypes.has(q.words(source).subtype(Subtype::Lemur))
 }
 
 /// "The first non-Lemur creature spell with flying you cast during each of your turns costs {1} less to cast"
 /// (CR 601.2f). It is the first such spell whether or not the reduction found generic mana to take (a spell with no
 /// generic mana in its cost uses the "first" up: the official ruling), so it is judged on the history of casts this turn,
-/// and only on the active player's own turn.
+/// each earlier spell as it was cast (CR 601.2i; an effect that changed it on the stack afterwards does not make it one,
+/// nor stop it being one), and only on the active player's own turn.
 fn first_flying_non_lemur_costs_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     let Costed::Spell(spell) = costed else { return CostDelta::NONE };
-    if player != q.controller(source) || q.state().turn.active != player || !non_lemur_flying_creature_spell(q, source, spell) {
+    if player != q.controller(source) || q.state().turn.active != player || !non_lemur_flying_creature_spell(q, source, &q.chars(spell)) {
         return CostDelta::NONE;
     }
-    let earlier = q.history().casts_by(player).any(|c| c.spell != spell && non_lemur_flying_creature_spell(q, source, c.spell));
+    let earlier = q.history().casts_by(player).any(|c| c.spell != spell && non_lemur_flying_creature_spell(q, source, &c.chars(q)));
     if earlier { CostDelta::NONE } else { CostDelta::less(1) }
 }
 

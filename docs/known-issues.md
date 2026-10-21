@@ -38,11 +38,9 @@ keeps it).
 | --- | --- | --- | --- |
 | [KI-2](#ki-2-a-harmonize-cost-reduction-cannot-be-checked-in-the-browser) | A harmonize cost reduction cannot be checked in the browser | Low | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
-| [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
 | [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
-| [KI-30](#ki-30-a-permanents-name-is-not-part-of-its-last-known-information) | A permanent's name is not part of its last-known information | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 | [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
@@ -127,23 +125,6 @@ no printed card can reach it.
 
 **Scenarios.** None, by definition.
 
-### KI-5: A spell that has left the stack is judged by its printed keywords
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | engine | 2026-10-16, review of Momo, Friendly Flier |
-
-**Notes.** `layers::chars_before` computes `spell` from the object's zone being the stack, and applies continuous effects only to
-a spell or a permanent on the battlefield. An earlier cast, read through `q.chars(c.spell)` after the spell resolved, was countered or
-left the stack (its old object is a card row in another zone or `Gone`), therefore has its printed characteristics, not the ones it
-had as it was cast (CR 601.2i, 400.7). Momo, Friendly Flier asks "was an earlier spell this turn a non-Lemur creature spell with
-flying" this way: a creature spell given flying (or stripped of it) while it was on the stack is misjudged afterwards. The history's
-`Cast` record keeps types, colors and mana value but not subtypes or keywords; recording them there, or keeping last-known
-information for a spell that leaves the stack, fixes it. No implemented card grants or removes a keyword on a spell on the stack, so
-no scenario can reach it yet.
-
-**Scenarios.** None yet; the first card that gives a creature spell flying on the stack (then a second flier cast under Momo) reaches it.
-
 ### KI-25: A Spacecraft's power and toughness box is not drawn before it is a creature
 
 | Severity | Status | Area | Found |
@@ -212,22 +193,6 @@ reads the controller of the stack item that is dealing the damage (the `DamageEv
 `q.controller` for permanents.
 
 **Scenarios.** none yet.
-
-### KI-30: A permanent's name is not part of its last-known information
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-16, review of The End |
-
-**Notes.** `LastKnown` (`crates/cantrip-state/src/object.rs`) records types, subtypes, colors, power, toughness, keywords,
-abilities and words but no name, so "the same name as that permanent" asked after it has left the battlefield (CR 608.2h) cannot
-use last-known information: a card, copy effect, face-down or transformed state is gone with the old object (CR 400.7). Cards
-read `library::object_names` before moving the object (The End, Deadly Cover-Up), which is right for them; a card that must ask
-after the move needs the name kept in `LastKnown`.
-The same holds for a name an effect set (`EffectKind::SetName`, CR 612.8): The Irencrag that left as Everflame, Heroes'
-Legacy reads as The Irencrag afterwards.
-
-**Scenarios.** None yet.
 
 ### KI-34: A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt
 

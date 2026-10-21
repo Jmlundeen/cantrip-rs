@@ -222,8 +222,9 @@ impl GameState {
 /// Two states are the same position whatever their journals and request counters hold.
 impl PartialEq for GameState {
     fn eq(&self, other: &GameState) -> bool {
-        // Last-known rows are named by the objects that left (`Obj::last_known`), which the position hashes; the rows
-        // themselves are compared, not hashed, since every move adds one.
+        // Last-known rows are named by the objects that left (`Obj::last_known`), which the position hashes, and by the
+        // stack items of the spells cast (`StackItem::cast_known`); the rows themselves are compared, not hashed, since
+        // every move and every cast adds one.
         self.position() == other.position() && self.last_known == other.last_known
     }
 }
@@ -865,7 +866,8 @@ impl GameState {
         d
     }
 
-    /// Keeps an object's last-known information (CR 608.2h), returning the row its `Obj::last_known` names.
+    /// Keeps last-known information (CR 608.2h): an object's as it ceases to be that object, or a spell's as it becomes
+    /// cast (`StackItem::cast_known`). The row it is kept in.
     pub fn last_known_push(&mut self, row: LastKnown) -> u32 {
         self.last_known.push(row);
         self.log(Undo::LastKnownPushed);

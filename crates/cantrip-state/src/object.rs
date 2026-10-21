@@ -568,6 +568,9 @@ pub struct StackItem {
     /// trigger that has triggered and not yet left the stack (CR 603.8). A copy of a spell is told by its object
     /// (`Obj::card_copy`).
     pub copied: bool,
+    /// For a spell that was cast: the row of `GameState::last_known` that keeps it as it became cast (CR 601.2i), which
+    /// `history::Cast::chars` reads. `u32::MAX` for anything else, a copy of a spell included (CR 707.10).
+    pub cast_known: u32,
 }
 
 impl StackItem {
@@ -1039,12 +1042,19 @@ impl DelayedWhen {
 /// from (CR 702.167c), and the width of `Obj::activated_mask`.
 pub const MAX_ABILITIES: usize = 32;
 
-/// An object's characteristics as it last existed on the battlefield (CR 608.2h, 603.10), kept when it leaves: what the
-/// layers compute, which its row cannot give afterwards. Its last controller needs no copy here: the row keeps it
-/// (`Obj::controller`).
+/// An object's characteristics as it last existed (CR 608.2h, 603.10, 400.7), kept when it ceases to be that object, or
+/// as a spell became cast (`StackItem::cast_known`, CR 601.2i): what the layers compute, which its row cannot give
+/// afterwards. Its last controller needs no copy here: the row keeps it (`Obj::controller`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct LastKnown {
     pub id: ObjectId,
+    /// Its name as it last had it (CR 201.2): a copy's, a face-down permanent's none, or one an effect set (CR 612.8).
+    pub name: &'static str,
+    /// An effect set its name (`Chars::name_set`).
+    pub name_set: bool,
+    pub supertypes: Supertypes,
+    /// It had no mana cost (`Chars::no_cost`).
+    pub no_cost: bool,
     pub types: TypeSet,
     pub subtypes: SubtypeSet,
     pub colors: ColorSet,
