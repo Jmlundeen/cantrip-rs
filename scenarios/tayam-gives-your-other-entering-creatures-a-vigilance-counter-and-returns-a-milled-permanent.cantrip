@@ -1,0 +1,71 @@
+# Tayam, Luminous Enigma. "Each other creature you control enters with an additional vigilance counter on it" (CR 614.1c):
+# Bot1's Ornithopter and Walking Ballista (X=1) get one each, the Ballista beside its +1/+1 counter; Tayam itself gets none,
+# and Bot2's Llanowar Elves, an opponent's creature, none. "{3}, Remove three counters from among creatures you control"
+# (CR 118.3, any kinds, the ruling): the Ornithopter's vigilance counter and both of the Ballista's pay it, and the Ballista,
+# a 0/0 without its +1/+1 counter, dies. "Mill three cards, then return a permanent card with mana value 3 or less from your
+# graveyard to the battlefield": not targeted, so a card just milled may be chosen (the ruling). Argothian Elder (mana value
+# 4) and Lightning Bolt (not a permanent) can't be; Elvish Spirit Guide (exactly 3) is, and enters under Tayam with a
+# vigilance counter of its own.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Ruby
+Tayam, Luminous Enigma
+Ornithopter
+Walking Ballista
+Plains
+Elvish Spirit Guide
+Argothian Elder
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tayam, Luminous Enigma.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Walking Ballista.Counters.Vigilance = 1
+? Bot1.Battlefield.Ornithopter.Counters.Vigilance = 1
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Vigilance
+? Bot1.Battlefield.Tayam, Luminous Enigma.Counters.Vigilance = (absent)
+? Bot2.Battlefield.Llanowar Elves.Counters.Vigilance = (absent)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Tayam, Luminous Enigma.Activate
+Bot1.Pass
+! Bot1.Choose(Argothian Elder)
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Elvish Spirit Guide)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.Vigilance = (absent)
+Bot1.Battlefield.Elvish Spirit Guide.Counters.Vigilance = 1
+Bot1.Graveyard = Lightning Bolt; Argothian Elder; Walking Ballista
+Bot1.Library.Count = 10

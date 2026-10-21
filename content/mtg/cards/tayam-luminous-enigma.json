@@ -1,0 +1,8 @@
+{
+  "name": "Tayam, Luminous Enigma",
+  "manaCost": "{1}{W}{B}{G}",
+  "type": "Legendary Creature — Nightmare Beast",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Each other creature you control enters with an additional vigilance counter on it.\n{3}, Remove three counters from among creatures you control: Mill three cards, then return a permanent card with mana value 3 or less from your graveyard to the battlefield."
+}

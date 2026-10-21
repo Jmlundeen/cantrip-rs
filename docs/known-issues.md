@@ -42,7 +42,6 @@ keeps it).
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
-| [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
 | [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
 | [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
@@ -197,20 +196,6 @@ them out, so it plans with less mana than it has. The view has no word for the p
 a source when the actions offered for it include a mana ability, or the view says its {T} abilities may be activated.
 
 **Scenarios.** none: a bot's plan is not scenario'd. Shang-Chi's scenarios show the engine side.
-
-### KI-38: An activated ability whose cost removes counters from among permanents is unexercised
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-16, building Dawnhand Dissident's casts |
-
-**Notes.** `Cost::remove_counters_among` ("remove N counters from among creatures you control", CR 118.3) is chosen and paid by
-`actions::activate` as well as by `actions::cast`, but only a cast pays it in content (Dawnhand Dissident's permission). Tayam,
-Luminous Enigma's "{3}, Remove three counters from among creatures you control" is the printed activated ability it is built for;
-the activation path chooses the counters after the mana, as blight's, and removes them with the rest of the cost. When a card with
-it is added, its scenarios exercise this path.
-
-**Scenarios.** None yet: no card in content has the cost on an activated ability.
 
 ### KI-39: A state that is true only in the middle of a resolution, with no event, misses its state trigger
 

@@ -1,0 +1,56 @@
+# Tayam, Luminous Enigma's ability mills three cards and then returns a permanent card with mana value 3 or less "from your
+# graveyard" - if there is one. Three vigilance counters (Ornithopter's, Birds of Paradise's, Llanowar Elves', each put by
+# Tayam as they entered) pay its cost; the mill puts Lightning Bolt, Argothian Elder (mana value 4) and Counterspell into an
+# otherwise empty graveyard, none of which qualifies, so nothing is asked and nothing returns.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Ruby
+Tayam, Luminous Enigma
+Ornithopter
+Birds of Paradise
+Plains
+Llanowar Elves
+Lightning Bolt
+Argothian Elder
+Counterspell
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tayam, Luminous Enigma.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Tayam, Luminous Enigma.Activate
+Bot1.Pass
+! Bot1.Choose
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Counterspell; Argothian Elder; Lightning Bolt
+Bot1.Battlefield.Llanowar Elves.Counters.Vigilance = (absent)
+Bot1.Battlefield.Birds of Paradise.Counters.Vigilance = (absent)
+Bot1.Library.Count = 8
