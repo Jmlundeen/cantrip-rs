@@ -61,3 +61,20 @@ by objects in the loop (CR 732.5); a player who declines a "may" each time round
 
 **What the engine does.** It does not end such a loop as a draw after a number of rounds. Every iteration is played by
 hand, and the match clock runs down until the player times out, as for any other loop kept going by choice.
+
+### RX-3 (not a deviation, recorded as an interpretation): a dependency loop with a dependency outside it
+
+| Rule | Category | Decided by | Date |
+| --- | --- | --- | --- |
+| CR 613.8b | - | jschibel | 2026-10-21 |
+
+**What the rules say.** If several dependent effects form a dependency loop, "this rule is ignored and the effects in
+the dependency loop are applied in timestamp order" (CR 613.8b). The rules do not say what happens when a member of
+the loop also depends on an effect outside it, and no ruling settles it.
+
+**How the engine reads it.** Only the dependencies that make up the loop are set aside: the cycle is broken by falling
+back to timestamp order among its members, and every other dependency - including a loop member's dependency on an
+effect outside the loop - stays in place, so the order is a DAG. Dependencies are judged on the working state at each
+step (CR 613.8c). Example: Life and Limb, Arcane Adaptation naming Saproling, Blood Moon (in that order), Taiga and
+Llanowar Elves: Arcane Adaptation, then Life and Limb, then Blood Moon.
+
