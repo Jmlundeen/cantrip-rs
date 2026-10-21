@@ -56,6 +56,18 @@ public sealed class PromptPresentationTests
         Assert.False(CardActions.AsksBeforeActivating(Ability("{Q}, {E}{E}")));
     }
 
+    /// <summary>
+    /// A cost that depends on the target (CR 601.2f, 602.2b) is read out of the action's description for the targeting caption;
+    /// a description with a total that does not, or none, gives nothing.
+    /// </summary>
+    [Theory]
+    [InlineData("Equip {4} (costs {1} targeting Dwarven Mauler, {4} targeting Ornithopter)", "Costs {1} targeting Dwarven Mauler, {4} targeting Ornithopter")]
+    [InlineData("costs {R} targeting Grizzly Bears, {1}{R} targeting a player", "Costs {R} targeting Grizzly Bears, {1}{R} targeting a player")]
+    [InlineData("Pay 1 life, exile a blue card from your hand (costs {3})", "")]
+    [InlineData("", "")]
+    public void A_cost_by_target_is_read_out_of_the_actions_description(string description, string costs) =>
+        Assert.Equal(costs, CardActions.CostsByTarget(new ActionOptionMessage { Description = description }));
+
     [Fact]
     public void Player_aura_board_fixture_names_its_attached_player_through_the_wire()
     {

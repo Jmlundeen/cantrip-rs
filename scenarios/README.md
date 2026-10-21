@@ -69,6 +69,7 @@ A key starting `Client.` is about what the page shows, not the game's state, and
 | `Client.Bot1.Graveyard.Lit`, `.Note` | the graveyard pile: lit when a card in it can be cast, and the note its tooltip adds |
 | `Client.Bot1.Dock` | the dock's buttons in order |
 | `Client.Bot1.Menu` | the rows of the menu the last card action opened, empty when it opened none (a card with one thing to do); a row is judged when the menu opens, not after the click |
+| `Client.Bot1.Targeting` | what the dock said while the last card action's targets were picked, its title and its line: `Target for Dragonfire Blade / Costs {1} targeting Dwarven Mauler  ·  1 possible target`; empty for an action with no targets |
 
 Only Bot1 is a page for now, so only `Client.Bot1.` keys can be judged.
 

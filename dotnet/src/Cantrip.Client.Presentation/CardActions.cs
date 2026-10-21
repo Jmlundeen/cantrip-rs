@@ -391,6 +391,23 @@ public sealed class CardActions
     }
 
     /// <summary>
+    /// What an action costs with each target it could have, as the server words it into the action's description
+    /// ("Equip {4} (costs {1} targeting Dwarven Mauler, {4} targeting Ornithopter)"): "Costs {1} targeting Dwarven Mauler,
+    /// {4} targeting Ornithopter", or empty where its cost does not depend on its target. The total cost is determined
+    /// once the target is announced (CR 601.2f, 602.2b), so the targeting caption says it before the target is chosen.
+    /// </summary>
+    public static string CostsByTarget(ActionOptionMessage option)
+    {
+        ArgumentNullException.ThrowIfNull(option);
+        string description = option.Description;
+        int at = description.LastIndexOf("(costs ", StringComparison.Ordinal);
+        string costs = at >= 0 && description.EndsWith(')')
+            ? description[(at + "(costs ".Length)..^1]
+            : description.StartsWith("costs ", StringComparison.Ordinal) ? description["costs ".Length..] : string.Empty;
+        return costs.Contains(" targeting ", StringComparison.Ordinal) ? "Costs " + costs : string.Empty;
+    }
+
+    /// <summary>
     /// Whether taking this action will ask the player what to aim it at.
     /// <para>
     /// An action that requires a target but carries no candidates is sent as it is: the server only sends

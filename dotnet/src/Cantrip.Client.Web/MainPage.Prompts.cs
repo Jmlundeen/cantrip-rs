@@ -60,9 +60,13 @@ public sealed partial class MainPage
         if (_targeting is { } announced)
         {
             int candidates = announced.TargetCandidates.Count;
+            // A cost that depends on the target (Dragonfire Blade's equip) is said with each, as a menu row says it: a card
+            // with one thing to do comes straight here, with no row to have read it on.
+            string costs = CardActions.CostsByTarget(announced);
             Prompt(
                 $"{(announced.TargetsOptional ? "Up to one target" : "Target")} for {client.Object(announced.Source)?.Name ?? "it"}",
-                (candidates == 1 ? "1 possible target" : $"{candidates} possible targets")
+                (costs.Length > 0 ? costs + "  ·  " : string.Empty)
+                    + (candidates == 1 ? "1 possible target" : $"{candidates} possible targets")
                     + (announced.TargetsOptional ? ", or none" : string.Empty));
 
             // "Up to one target" (CR 601.2c): aiming at nothing is a choice the action offers, not a way out of it.
