@@ -49,7 +49,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | --- | --- | --- | --- |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
-| [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
+| [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
@@ -94,22 +94,6 @@ them out, so it plans with less mana than it has. The view has no word for the p
 a source when the actions offered for it include a mana ability, or the view says its {T} abilities may be activated.
 
 **Scenarios.** none: a bot's plan is not scenario'd. Shang-Chi's scenarios show the engine side.
-
-### KI-39: A state that is true only in the middle of a resolution, with no event, misses its state trigger
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-16, review of the state triggers |
-
-**Notes.** CR 603.8: a state trigger "triggers as soon as the game state matches the condition". The engine asks a state
-trigger's condition after every event (`settle::consider`, inside `collect_batch`) and each time a player would receive
-priority (`settle::state_triggers`). A state that becomes true and false again within one resolution through changes that
-record no event - a continuous effect starting and ending, a characteristic changing in the layers - is never seen, so the
-ability doesn't trigger where the rules say it has. No card in content reaches it: Mazemind Tome's state changes only by
-counters, which are events. A fix asks the conditions after every change to the game state, or makes every such change
-an event.
-
-**Scenarios.** None can be written with the cards in content.
 
 ### KI-41: A dependency through another object is judged on the object being worked out
 

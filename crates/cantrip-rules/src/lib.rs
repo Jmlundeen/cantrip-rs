@@ -1357,6 +1357,8 @@ impl cantrip_api::Game for Cx<'_> {
         // What it changes may end a "for as long as" (Old Man of the Sea's "that creature's power remains less than or
         // equal to"), and with it the control it gave, at once (CR 611.2b).
         ops::settle_at_once(self);
+        // The effect may make a state trigger's state true with no event to ask it after (CR 603.8).
+        settle::state_triggers_now(self);
     }
 
     fn settle_once(&mut self, instruction: &mut dyn FnMut(&mut dyn cantrip_api::Game)) {
@@ -1367,6 +1369,7 @@ impl cantrip_api::Game for Cx<'_> {
         debug_assert!(kind.outlives_affected(), "a player's effect is about the player, not an object");
         let timestamp = self.g.state.timestamp();
         self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected: source, kind, duration });
+        settle::state_triggers_now(self);
     }
 
     fn counter(&mut self, spell: ObjectId) {

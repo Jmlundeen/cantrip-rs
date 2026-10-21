@@ -832,6 +832,47 @@ fn state_triggers(cx: &mut Cx) {
     }
 }
 
+/// The state triggers whose states are true now, in the middle of a resolution, as an effect begins (CR 603.8: a state trigger
+/// "triggers as soon as the game state matches the condition"): a change that records no event, after which no event asks the
+/// conditions, so a state true only until the next such change would be missed. Only the permanents and emblems that could
+/// have one are asked: those whose card (or the card they copy) prints one, and those an effect gives one.
+pub(crate) fn state_triggers_now(cx: &mut Cx) {
+    let granted = |cx: &Cx, id: ObjectId| {
+        cx.s().effects.iter().any(|e| {
+            e.affected == id
+                && matches!(e.kind, EffectKind::AddAbility(a) if matches!(cx.cards().ability(a), AbilityDef::Triggered(t) if t.state.is_some()))
+        })
+    };
+    let sources: Vec<ObjectId> = cx
+        .s()
+        .battlefield()
+        .iter()
+        .chain(cx.s().zone(Zone::COMMAND))
+        .copied()
+        .filter(|&id| {
+            let obj = cx.s().obj(id);
+            cx.cards().state_triggers[obj.copied_card().unwrap_or(obj.card).0 as usize] || granted(cx, id)
+        })
+        .collect();
+    let mut found: Found = Vec::new();
+    for source in sources {
+        let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
+        let controller = cx.s().obj(source).controller;
+        for ability in chars.abilities() {
+            if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
+                && let Some(state) = t.state
+                && state(cx, &Asker { source, controller })
+                && !state_trigger_waiting(cx, source, ability, &found, None)
+            {
+                found.push((state_trigger(source, ability, controller), t, Again::new()));
+            }
+        }
+    }
+    for (trigger, _, _) in found {
+        cx.st().trigger_push(trigger);
+    }
+}
+
 /// A Saga's chapter ability (CR 714.2b) triggers when lore counters are put on it and their number becomes at least
 /// its chapter number, having been less than it.
 fn chapter_reached(source: ObjectId, chapter: u8, event: &Event) -> Option<Fired> {

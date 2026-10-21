@@ -50,27 +50,63 @@ static SHRINK: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// Target creature gets -1/-1 until end of turn, then +1/+1 until end of turn: two effects, no event between or after them.
+fn flicker(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(id) = item.targets()[0] {
+        cantrip_mechanics::pump(g, item.object, id, -1, -1);
+        cantrip_mechanics::pump(g, item.object, id, 1, 1);
+    }
+    Ok(())
+}
+
+/// "{T}: Target creature gets -1/-1 until end of turn, then gets +1/+1 until end of turn." Its toughness is 0 only between
+/// the two effects, in the middle of the resolution.
+static FLICKER: CardDef = CardDef {
+    name: "Probe Flickerer",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(TAP, flicker, "{T}: Target creature gets -1/-1 until end of turn, then gets +1/+1 until end of turn.")
+        .targets(&[target(creature)])],
+    ..CardDef::BLANK
+};
+
 /// A land to fill hands and libraries.
 static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&FRAIL, &SHRINK, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&FRAIL, &SHRINK, &FLICKER, &FILLER]))
 }
 
 /// CR 603.8, 704.3: the -1/-1 ability resolves and the Frail is a 0/0 with no event to ask its state after; its state trigger has
 /// triggered all the same, before the state-based action puts it into the graveyard, and resolves with its source gone.
 #[test]
 fn a_state_true_after_a_resolution_triggers_though_a_state_based_action_ends_it() {
+    let game = play("Probe Shrinker");
+    assert!(game.state.battlefield().iter().all(|&id| game.name(id) != "Probe Frail"), "the 0/0 is put into the graveyard");
+    assert_eq!(game.state.player(PlayerId(0)).life, 23, "the state trigger triggered before the state-based action and resolved");
+}
+
+/// CR 603.8: "triggers as soon as the game state matches the condition" - the Frail's toughness is 0 between the two effects
+/// of one resolution, with no event before the second puts it back to 1; the state trigger triggers there all the same, and
+/// resolves though its state is false again. The Frail survives.
+#[test]
+fn a_state_true_only_in_the_middle_of_a_resolution_triggers() {
+    let game = play("Probe Flickerer");
+    assert!(game.state.battlefield().iter().any(|&id| game.name(id) == "Probe Frail"), "the Frail is a 1/1 again");
+    assert_eq!(game.state.player(PlayerId(0)).life, 23, "the state trigger triggered mid-resolution and resolved");
+}
+
+/// The first seat casts the Probe Frail and `artifact`, then activates the artifact at the Frail, and everything resolves.
+fn play(artifact: &'static str) -> Game {
     let frail = table().find("Probe Frail").unwrap();
-    let shrink = table().find("Probe Shrinker").unwrap();
+    let shrink = table().find(artifact).unwrap();
     let filler = table().find("Filler").unwrap();
     let mut deck = vec![frail, shrink];
     deck.extend(std::iter::repeat(filler).take(28));
     let others = vec![filler; 30];
     let mut game = Game::new(table(), &Setup { decks: vec![deck, others], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
     game.verify = true;
-    let mut cast = [(ActionKind::CastSpell, "Probe Frail"), (ActionKind::CastSpell, "Probe Shrinker"), (ActionKind::ActivateAbility, "Probe Shrinker")].into_iter().peekable();
+    let mut cast = [(ActionKind::CastSpell, "Probe Frail"), (ActionKind::CastSpell, artifact), (ActionKind::ActivateAbility, artifact)].into_iter().peekable();
     for _ in 0..100 {
         game.run();
         if cast.peek().is_none() && game.state.stack.is_empty() && game.state.triggers.is_empty() {
@@ -97,6 +133,5 @@ fn a_state_true_after_a_resolution_triggers_though_a_state_based_action_ends_it(
         };
         game.answer(request.id, request.player, answer).unwrap();
     }
-    assert!(game.state.battlefield().iter().all(|&id| game.name(id) != "Probe Frail"), "the 0/0 is put into the graveyard");
-    assert_eq!(game.state.player(PlayerId(0)).life, 23, "the state trigger triggered before the state-based action and resolved");
+    game
 }
