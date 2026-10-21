@@ -40,7 +40,12 @@ public sealed class ConnectionAbortTests
         Assert.Equal(1, socket.Aborts);
     }
 
-    /// <summary>A socket whose receive waits until it is cancelled, as a quiet client's does, and which counts its aborts.</summary>
+    /// <summary>
+    /// A socket whose receive waits until it is cancelled, as a quiet client's does, and which counts its aborts. It leaves
+    /// out one thing the real socket does: a cancelled receive or send aborts the real socket from its token's registration,
+    /// on the cancelling thread, while the operation is still pending in the request (which is safe, GameServer.Connection
+    /// says why). Here a cancelled receive only ends, so the aborts counted are the calls the connection makes itself.
+    /// </summary>
     private sealed class FakeSocket : WebSocket
     {
         private WebSocketState _state = WebSocketState.Open;

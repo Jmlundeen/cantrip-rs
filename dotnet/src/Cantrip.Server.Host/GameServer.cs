@@ -1205,13 +1205,20 @@ public sealed class GameServer : IAsyncDisposable
         /// Drops the connection. Called from the pump and from shutdown — never from inside the request that owns
         /// the socket.
         /// <para>
-        /// It never touches the socket itself. The socket forwards <c>Abort()</c> to the <see cref="HttpContext"/>
-        /// that accepted it, and that request can end on its own thread at any moment: an abort that lands just after
-        /// it has reaches a torn-down feature collection and throws a <see cref="NullReferenceException"/> (KI-85, a
-        /// client closing as the table was disposed). So the abort is a cancellation, which the read and write loops -
-        /// the request's own - wait on: the receive in progress is abandoned, the socket aborted by the request's
-        /// thread in the write loop's <c>finally</c>, and the request ends. A cancellation after the request is over
-        /// reaches nothing, since the loops' registrations are gone with them.
+        /// It never calls <c>socket.Abort()</c> itself. The socket forwards that to the <see cref="HttpContext"/> that
+        /// accepted it, and that request can end on its own thread at any moment: an abort that lands just after it has
+        /// reaches a torn-down feature collection and throws a <see cref="NullReferenceException"/> (KI-85, a client
+        /// closing as the table was disposed). So the abort is a cancellation, which the read and write loops - the
+        /// request's own - wait on.
+        /// </para>
+        /// <para>
+        /// The cancellation can still reach the socket on this thread: a receive or send in progress registered its
+        /// token, and the socket's registration aborts it as the token is cancelled. That is safe where a direct abort
+        /// is not, because the registration exists only while that receive or send is pending inside the request, so
+        /// the request cannot have ended; and the request cannot end under it either, since the operation's completion
+        /// disposes the registration, which waits for a callback already running. A cancellation with nothing pending -
+        /// or after the request is over - reaches no socket at all. The loops then end, the write loop's <c>finally</c>
+        /// aborts the socket on the request's side, and the request ends.
         /// </para>
         /// </summary>
         public void Abort()
