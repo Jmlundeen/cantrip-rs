@@ -50,7 +50,6 @@ keeps it).
 | [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
 | [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
-| [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
@@ -326,22 +325,6 @@ effects that set types (Oko's Elk) name their object. A fix asks the question ov
 at the cost of their characteristics part-way through the layer.
 
 **Scenarios.** None: no pair of implemented cards reaches it.
-
-### KI-48: Emperor of Bones puts its finality counter on after the creature enters
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | card | 2026-10-17, review of Esper Origins |
-
-**Notes.** "Put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it"
-is one entry with the counter on it (CR 122.6, 614.1c). `emperor_of_bones.rs` calls `put_onto_battlefield` and then
-`add_counters`, though `put_onto_battlefield_with_counters` does both, as Scavenger's Talent and Zoraline use (and
-`put_onto_battlefield_transformed_with_counters` for a card entering transformed, as Esper Origins uses). Nothing can happen
-between the two inside the resolution; the difference is to an ability that triggers on a permanent entering with a counter on
-it (no card in content has one) and to who puts the counter (CR 122.6a: the permanent's controller, which for the Emperor is
-also the ability's controller). A fix calls `put_onto_battlefield_with_counters`.
-
-**Scenarios.** none: no card reaches it.
 
 ### KI-49: The tactical bot does not know infect or poison
 
