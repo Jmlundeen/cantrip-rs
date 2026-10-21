@@ -1,0 +1,62 @@
+# A copy of a kicked spell is kicked (CR 707.10), so its new targets (CR 707.10c) are judged as the kicked spell's: Bot1
+# casts Bloodchief's Thirst kicked at Bot2's Ultron Drone, copies it with Return the Favor and aims the copy at Codie,
+# Ravenous Codex - mana value 3, a target only a kicked Thirst may have. Both creatures are destroyed.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Black Lotus
+Bloodchief's Thirst
+Return the Favor
+Mountain
+Mountain
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Codie, Ravenous Codex
+Ultron Drone
+Plains x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Codie, Ravenous Codex.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ultron Drone.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodchief's Thirst.Cast(Kicked: 1)
+Bot1.Target(Bot2.Battlefield.Ultron Drone)
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target)
+Bot1.Target(Stack.Bloodchief's Thirst)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Codie, Ravenous Codex)
+? Stack.Count = 2
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Ultron Drone; Codie, Ravenous Codex; Black Lotus
+Bot1.Graveyard = Bloodchief's Thirst; Return the Favor; Black Lotus

@@ -112,7 +112,6 @@ the line goes.
 
 | Path | Covered instead by | Why no scenario |
 | --- | --- | --- |
-| Retargeting a copy (`ops::retarget`): "up to" slots of a modal spell, each-opponent slots, spliced text (CR 702.47c) and kicked-spell targets | nothing | No modal spell in content has an "up to" mode target, no copyable spell has an each-opponent target, and no scenario copies a spliced or kicked spell. |
 | A granted static ability that affects other objects taken by a later "loses all abilities" (`layers::granted_to_others`: the `LoseAllAbilities` clear and the `has.abilities` filter) | The Irencrag's own "loses all other abilities" before its grants | No implemented card makes a noncreature artifact lose all abilities while it stays an Equipment (Oko's +1 makes Everflame an Elk creature, which unattaches it). |
 | A granted cast of a back face (`WAY_BACK_FACE` by a way a permanent gives, `faces_to_cast`) | nothing | No implemented double-faced card has a castable back face. |
 | A flash grant judged for an MDFC back face or a bestowed Aura through `actions::Speed::face`, beyond Sigarda's Aid's bestow | nothing | No implemented double-faced card has a castable noncreature back face; no flash grant names creatures. |

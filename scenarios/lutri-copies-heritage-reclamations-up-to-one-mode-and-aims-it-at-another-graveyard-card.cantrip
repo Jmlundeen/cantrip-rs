@@ -1,0 +1,49 @@
+# A copy of a modal spell keeps its modes and may have new targets (CR 707.10c), an "up to one" target among them: Bot1
+# casts Heritage Reclamation for "Exile up to one target card from a graveyard. Draw a card." at the Black Lotus in its own
+# graveyard, and Lutri, the Spellchaser copies it. The copy's slot of up to one target, which had one, is asked again with
+# the same count (CR 115.7d), and Bot1 aims it at the Lotus Petal instead. The copy exiles the Petal and draws, then the
+# original exiles the Lotus and draws.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Lotus Petal
+Heritage Reclamation
+Lutri, the Spellchaser
+Island x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+? Bot1.Graveyard = Lotus Petal; Black Lotus
+Bot1.Hand.Heritage Reclamation.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Lotus Petal)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Exile = Lotus Petal
+? Bot1.Hand.Count = 1
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Black Lotus; Lotus Petal
+Bot1.Graveyard = Heritage Reclamation
+Bot1.Hand = Island; Island
+Bot1.Battlefield = Mox Emerald; Mox Sapphire; Mox Ruby; Lutri, the Spellchaser

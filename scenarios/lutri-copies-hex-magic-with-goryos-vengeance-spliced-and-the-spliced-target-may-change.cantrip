@@ -1,0 +1,58 @@
+# A copy of a spell has the text spliced onto it (CR 702.47c, 707.10), and the new targets it may have (CR 707.10c) include
+# those of the spliced text, in the slots after the spell's own: Bot1 casts Hex Magic (an Arcane spell with no target)
+# with Goryo's Vengeance spliced on, aimed at Yargle, Glutton of Urborg in its graveyard, and Lutri, the Spellchaser copies
+# it. The copy's spliced target is asked again and becomes Yargle, Goliath of Otaria. The copy returns Goliath, the original
+# Glutton: both legends are on the battlefield with haste.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Sol Ring
+Black Lotus
+Faithless Looting
+Yargle, Glutton of Urborg
+Yargle, Goliath of Otaria
+Hex Magic
+Goryo's Vengeance
+Dark Ritual
+Lutri, the Spellchaser
+Island x9
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Yargle, Glutton of Urborg; Yargle, Goliath of Otaria)
+? Bot1.Hand = Hex Magic; Goryo's Vengeance
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Hex Magic.Cast
+Bot1.Choose(Goryo's Vengeance)
+Bot1.Target(Bot1.Graveyard.Yargle, Glutton of Urborg)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Yargle, Goliath of Otaria)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Yargle, Goliath of Otaria.Keywords = Haste
+? Bot1.Graveyard = Black Lotus; Dark Ritual; Faithless Looting; Yargle, Glutton of Urborg
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Ruby; Sol Ring; Lutri, the Spellchaser; Yargle, Goliath of Otaria; Yargle, Glutton of Urborg
+Bot1.Battlefield.Yargle, Glutton of Urborg.Keywords = Haste
+Bot1.Graveyard = Hex Magic; Black Lotus; Dark Ritual; Faithless Looting
