@@ -40,15 +40,32 @@ static TWO_GREEN: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn nothing(_: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
+    Ok(())
+}
+
+/// An artifact with "{4}, {T}: Do nothing."
+static TAPPER: CardDef = CardDef {
+    name: "Probe Tapper",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(cost("{4}, {T}"), nothing, "{4}, {T}: Do nothing.")],
+    ..CardDef::BLANK
+};
+
 static BEAR: CardDef = CardDef { name: "Probe Bear", types: TypeSet::of(&[CardType::Creature]), power: Some(2), toughness: Some(2), ..CardDef::BLANK };
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BEAR, &FOUR_BLUE, &THREE_AND_BLUE, &ONE_WHITE, &TWO_GREEN])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BEAR, &FOUR_BLUE, &THREE_AND_BLUE, &ONE_WHITE, &TWO_GREEN, &TAPPER])))
 }
 
 /// Whether, with `permanents` on Bot1's battlefield and `card` in hand, `card` is offered at Bot1's first main phase.
 fn offered(permanents: &[&str], card: &str) -> bool {
+    offered_as(permanents, card, ActionKind::CastSpell)
+}
+
+/// `offered`, for an option of `kind` whose source is named `card`, in hand or on the battlefield.
+fn offered_as(permanents: &[&str], card: &str, kind: ActionKind) -> bool {
     let find = |name: &str| table().find(name).unwrap_or_else(|| panic!("no card {name}"));
     let mut deck = vec![find(card)];
     deck.extend(vec![find("Island"); 29]);
@@ -64,7 +81,7 @@ fn offered(permanents: &[&str], card: &str) -> bool {
             && request.player == PlayerId(0)
             && game.state.turn.step() == Step::PrecombatMain
         {
-            return options.iter().any(|o| o.kind == ActionKind::CastSpell && o.source.is_some_and(|c| game.name(c) == card));
+            return options.iter().any(|o| o.kind == kind && o.source.is_some_and(|c| game.name(c) == card));
         }
         game.answer(request.id, request.player, Answer::Pass).unwrap();
     }
@@ -103,4 +120,12 @@ fn urza_taps_each_untapped_artifact_once_for_blue() {
 fn squandered_resources_adds_what_each_land_could_produce() {
     assert!(!offered(&["Squandered Resources", "Forest", "Island"], "Probe One White"));
     assert!(offered(&["Squandered Resources", "Forest", "Island"], "Probe Two Green"));
+}
+
+/// An artifact whose own {T} is in the cost being paid is not sacrificed for mana to pay it (CR 602.2b, 605.3b): Krark-Clan
+/// Ironworks and Probe Tapper make {C}{C} (the Ironworks itself), not {4}, for Probe Tapper's "{4}, {T}".
+#[test]
+fn a_permanent_tapped_for_the_cost_is_not_sacrificed_to_pay_it() {
+    assert!(!offered_as(&["Krark-Clan Ironworks", "Probe Tapper"], "Probe Tapper", ActionKind::ActivateAbility));
+    assert!(offered_as(&["Krark-Clan Ironworks", "Probe Tapper", "Mox Pearl"], "Probe Tapper", ActionKind::ActivateAbility));
 }

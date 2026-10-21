@@ -1856,6 +1856,9 @@ pub struct Available {
     /// (Chromatic Star's {1}, paid before what it adds is there) - each with how many alike: whether a cost is covered is
     /// then found by trying each one's choices (`Available::exact`). Empty on most boards.
     complex: Vec<(Vec<Alternative>, u32)>,
+    /// The permanents a mana ability that can be activated again would spend (`Repeat`: sacrifice or tap): one whose own {T}
+    /// is in a cost being paid stays for it, so its mana is worked out without it (`available_without`).
+    spent: Vec<ObjectId>,
 }
 
 /// One mana ability a source could be activated for, as the advice counts it: what it adds - fixed mana, and `k` mana of
@@ -1956,6 +1959,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     let mut repeatable: Vec<(Alternative, ObjectId, Repeat)> = Vec::new();
     // Each source's own mana abilities, kept until the repeatable ones that could tap it are known (`Repeat::Tap`).
     let mut own: Vec<(ObjectId, Vec<Alternative>)> = Vec::new();
+    let mut spent: Vec<ObjectId> = Vec::new();
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player || skip == Some(id) {
             continue;
@@ -1991,6 +1995,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                     any_color: false,
                     linked,
                     complex: Vec::new(),
+                    spent: Vec::new(),
                 };
             }
             let mut alternative = Alternative {
@@ -2049,7 +2054,11 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     };
     for (id, mut alternatives) in own.iter().cloned() {
         if !taps.is_empty() && alternatives.iter().all(|a| a.tapped) {
-            alternatives.extend(tapping(id));
+            let outlets = tapping(id);
+            if !outlets.is_empty() {
+                spent.push(id);
+            }
+            alternatives.extend(outlets);
         }
         account(&alternatives, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
     }
@@ -2060,6 +2069,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             }
             let outlets = tapping(target);
             if !outlets.is_empty() {
+                spent.push(target);
                 account(&outlets, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
             }
         }
@@ -2071,6 +2081,10 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     if !repeatable.is_empty() {
         let mut units: Vec<(Vec<Alternative>, u32)> = Vec::new();
         for target in cx.permanents_of(player) {
+            // A permanent whose own {T} is in the cost being paid stays to be tapped for it (CR 602.2b, 605.3b).
+            if skip == Some(target) {
+                continue;
+            }
             let outlets: Vec<Alternative> = repeatable
                 .iter()
                 .filter_map(|&(a, source, repeat)| match repeat {
@@ -2089,6 +2103,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             if outlets.is_empty() {
                 continue;
             }
+            spent.push(target);
             match units.iter_mut().find(|(alike, _)| *alike == outlets) {
                 Some((_, n)) => *n += 1,
                 None => units.push((outlets, 1)),
@@ -2116,6 +2131,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         any_color: static_rules::spend_any_color_always(cx, player),
         linked,
         complex,
+        spent,
     }
 }
 
@@ -2383,6 +2399,7 @@ impl Available {
             any_color: false,
             linked: self.linked.clone(),
             complex: Vec::new(),
+            spent: Vec::new(),
         };
         for (r, fixed, flex) in &self.restricted {
             if r.may_pay(payment) {
@@ -2517,6 +2534,7 @@ impl Available {
             any_color: self.any_color,
             linked: self.linked.clone(),
             complex: Vec::new(),
+            spent: Vec::new(),
         }
     }
 
@@ -3148,7 +3166,12 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             let owed = if def.special_action { special_action_cost(cx, player, id, ability, def) } else { def.cost.mana };
             let judged = owed.x == 0 && owed.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend;
             // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
-            let own = (judged && !unlimited && def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
+            // Nor may it be spent for mana by another's ability (sacrificed to an altar, tapped by Urza) while paying it.
+            let own = (judged
+                && !unlimited
+                && def.cost.tap
+                && (has_mana_source(cx, id, player) || available.get_or_init(|| self::available(cx, player)).spent.contains(&id)))
+            .then(|| available_without(cx, player, Some(id)));
             let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
             let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes } };
@@ -8222,6 +8245,7 @@ mod tests {
             any_color: false,
             linked: Vec::new(),
             complex,
+            spent: Vec::new(),
         }
     }
     fn adds(fixed: [u32; 6]) -> Alternative {
