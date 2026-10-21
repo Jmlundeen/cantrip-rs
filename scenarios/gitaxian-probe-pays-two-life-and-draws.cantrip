@@ -1,4 +1,4 @@
-# Gitaxian Probe's {U/P} is paid with 2 life (CR 107.4f) when Bot1 has no blue mana: it looks at Bot2's hand (not modelled,
+# Gitaxian Probe's {U/P} is paid with 2 life (CR 107.4f) when Bot1 has no blue mana: it looks at Bot2's hand (recorded,
 # a private look) and draws a card. Bot1 starts with seven cards and ends with seven.
 
 [Bot1 Deck]

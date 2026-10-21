@@ -1,0 +1,23 @@
+# Gitaxian Probe: "Look at target player's hand. Draw a card." Bot1 looks at Bot2's hand - the seven cards Bot2 holds as the
+# spell resolves, each recorded as looked at - and then draws.
+
+[Bot1 Deck]
+Island
+Gitaxian Probe
+Plains x18
+
+[Bot2 Deck]
+Lightning Bolt
+Forest x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Looked = Lightning Bolt; Forest; Forest; Forest; Forest; Forest; Forest
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Gitaxian Probe
