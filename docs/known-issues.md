@@ -58,6 +58,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-99](#ki-99-a-spell-or-ability-with-more-than-232-targets-or-a-question-of-more-than-231-candidates) | A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates | Won't fix | Won't fix: beyond practical scale |
+| [KI-100](#ki-100-a-choice-search-or-sacrifice-of-more-than-232-cards) | A choice, search or sacrifice of more than 2^32 cards | Won't fix | Won't fix: beyond practical scale |
 
 ## Issues
 
@@ -75,7 +76,7 @@ no printed card can reach it.
 
 | Path | Covered instead by | Why no scenario |
 | --- | --- | --- |
-| A fused split spell no longer allowed once its proposal is complete (CR 601.6: `actions::cast` asks `CardDef::spell_rules` again of the spell on the stack), its mana value the sum of its halves' | the check before the cast (every Gaddock Teeg scenario); a back face cast transformed, whose spell has its front face's mana value (CR 712.8c), in a Rust test (`transformed_cast_tests.rs`) | Fuse (CR 702.102) is not built: `CardDef` has no fuse, so no card can be cast fused (KI-76 is its effect-cast half). |
+| A fused split spell no longer allowed once its proposal is complete (CR 601.6: `actions::cast` asks `CardDef::spell_rules` again of the spell on the stack), its mana value the sum of its halves' | the check before the cast (every Gaddock Teeg scenario); a back face cast transformed, whose spell has its front face's mana value (CR 712.8c), in a Rust test (`transformed_cast_tests.rs`) | No scenario casts a fused spell (Turn // Burn, mana value 5) that a rule forbids by its whole mana value, such as Gaddock Teeg's. |
 
 **Scenarios.** None, by definition.
 
@@ -293,3 +294,20 @@ it. The target arena where an item's targets past the first 16 are kept is index
 share arena where the shares of a divided total are kept (`GameState::share_arena`) is named by a `u32`, and past 2^32 shares
 recorded in one game an item keeps none, so its targets are dealt or given nothing - 2^32 shares is 16 gigabytes of them,
 each chosen by hand.
+
+### KI-100: A choice, search or sacrifice of more than 2^32 cards
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Won't fix | Won't fix: beyond practical scale | engine / mechanics / cards / host | 2026-10-21, widening the card counts past 255 |
+
+**Notes.** A question to choose cards counts them in a `u32` (`RequestKind::ChooseCards::count`, with "any number" its own
+flag, `any_number`), as do a library search's and a find's counts (`SearchLibrary`, `Find`), craft's materials, and the
+counts cards work out from lists of cards or permanents (Balance, Settle the Wreckage, Winds of Abandon, Liliana of the
+Veil). A count made from a list's length stops at `u32::MAX` rather than wrap (`u32::try_from(..).unwrap_or(u32::MAX)`, as
+`cantrip_state::count_u32` does), so a list of more than 2^32 cards asks for 2^32; the host sends a count past 2^31 - 1 as
+2^31 - 1 (`wire`, KI-99). "Sacrifice any number" past 255 is tested (`any_number_sacrificed_is_any_number_past_255`), and an
+answer of more cards than asked is refused (`an_answer_of_257_cards_to_choose_one_is_refused`). Play cannot reach the
+bound: each card counted is an object in memory, 2^31 of them hundreds of gigabytes, chosen by hand; tokens doubling each
+round pass 255 in eight rounds - why the counts are no longer `u8` - but 2^31 takes thirty-one, in a timed game. No card
+needs more.
