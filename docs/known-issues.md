@@ -55,7 +55,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-61](#ki-61-a-land-whose-own-layer-4-ability-and-a-subtype-setting-ability-depend-on-each-other-is-judged-by-a-capped-fixpoint) | A land whose own layer-4 ability and a subtype-setting ability depend on each other is judged by a capped fixpoint | Pri-1 | Fix under way |
-| [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-99](#ki-99-a-spell-or-ability-with-more-than-232-targets-or-a-question-of-more-than-231-candidates) | A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates | Won't fix | Won't fix: beyond practical scale |
@@ -244,21 +243,6 @@ judgment of KI-41 (`layers::through_others`, the `layer_dependencies` cache), wi
 has a test card for each loop case; the cap goes with it.
 
 **Scenarios.** None; a Rust test with test cards comes with the fix.
-
-### KI-76: A fused cast is not among the ways an effect can cast a split card from a hand
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-18, review of Buster Sword |
-
-**Notes.** A fuse split card in a hand may be cast with both halves at once (CR 702.102a); its mana value on the stack is the
-sum of both halves' (CR 708.4, 702.102c). `Game::cast_ways_during_resolution` offers a split card's halves one at a time and no fused
-way, so an effect that casts a spell from a hand with a mana value limit (Buster Sword, Lady Octopus, Omniscience-style free casts)
-never offers the fused cast of a fuse card, and cannot judge its combined mana value against the limit. When fuse is built, the
-function must offer a fused way for a fuse card in a hand, with a mana value equal to the sum of both halves. No fuse card is in
-content yet.
-
-**Scenarios.** None yet: the first fuse card to be added (Turn // Burn) reaches it through Buster Sword.
 
 ### KI-78: The tactical bot attacks a player whom protection keeps from being dealt damage
 

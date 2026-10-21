@@ -1,0 +1,39 @@
+# Fuse lets both halves be cast only from a hand (CR 702.102a; the ruling: from any other zone only one half or the other).
+# Under Bolas's Citadel, Turn // Burn on top of Bot1's library is not offered fused; Burn is cast alone for 2 life, its own
+# mana value (CR 709.3b, 118.9), and deals 2 damage to Bot2.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Sol Ring
+Bolas's Citadel
+Swamp
+Swamp
+Turn // Burn
+Swamp x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Library.Turn // Burn.Cast(Ability: Fuse)
+Bot1.Library.Turn // Burn.Cast(Bot2; Ability: Burn)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Graveyard = Turn // Burn; Black Lotus

@@ -1,0 +1,54 @@
+# Turn // Burn with fuse (CR 702.102a): cast from Bot1's hand as both halves, the fused split spell, for both mana costs,
+# {2}{U} and {1}{R} (CR 702.102c), with Turn's target and Burn's. As it resolves Turn's instructions come first, then
+# Burn's (CR 702.102d): Bot2's Ornithopter loses flying and becomes a red Weird with base power and toughness 0/1 until
+# end of turn, and Burn deals 2 damage to Bot2. Next turn the Ornithopter is a colorless 0/2 Thopter with flying again.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Turn // Burn
+Island
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{U}{U}{B}{R}
+Bot1.Hand.Turn // Burn.Cast(Ability: Fuse)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 1
+? Bot2.Battlefield.Ornithopter.Colors = Red
+? Bot2.Battlefield.Ornithopter.Subtypes = Weird
+? Bot2.Battlefield.Ornithopter.Keywords = (absent)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Turn // Burn
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Ornithopter.Subtypes = Thopter

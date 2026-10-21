@@ -1,0 +1,40 @@
+# Under Omniscience ("You may cast spells from your hand without paying their mana costs") Turn // Burn may be cast fused
+# for nothing (the ruling); the row says it is fused, "Fuse: both halves - Without paying its mana cost". Turn makes Bot2's
+# Ornithopter a 0/1 and Burn deals 2 damage to Bot2, with no mana spent.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Show and Tell
+Omniscience
+Turn // Burn
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Omniscience)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Turn // Burn.Cast(Ability: Fuse: both halves - Without paying its mana cost)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Island.Tapped = false
+Bot2.Life = 18
+Bot2.Battlefield.Ornithopter.Toughness = 1

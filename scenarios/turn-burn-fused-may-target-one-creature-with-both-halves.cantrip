@@ -1,0 +1,44 @@
+# Each half of a fused split spell has its own targets, and both may be the same object (the ruling). Turn and Burn both
+# target Bot1's Ancient Adamantoise: Turn makes it a 0/1 with no abilities, and Burn's 2 damage then kills it. Bot1 takes
+# none; with its abilities gone the Adamantoise's dies trigger never comes, and it stays in the graveyard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Black Lotus
+Show and Tell
+Turn // Burn
+Ancient Adamantoise
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Turn // Burn.Cast(Ability: Fuse)
+Bot1.Target(Bot1.Battlefield.Ancient Adamantoise)
+Bot1.Target(Bot1.Battlefield.Ancient Adamantoise)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Ancient Adamantoise; Turn // Burn; Show and Tell; Black Lotus
