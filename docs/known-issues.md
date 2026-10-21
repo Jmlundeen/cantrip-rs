@@ -57,7 +57,6 @@ keeps it).
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
-| [KI-65](#ki-65-a-prepared-permanent-that-phases-out-loses-its-preparation-copy-for-good) | A prepared permanent that phases out loses its preparation copy for good | Low | Unexercised |
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
 | [KI-70](#ki-70-a-block-requirement-is-counted-on-the-declared-block-only-not-through-the-blocked-creatures-band) | A block requirement is counted on the declared block only, not through the blocked creature's band | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
@@ -494,20 +493,6 @@ controller. No card in content reads a controller in that window that a scenario
 gives control to (gain control of a Mind Control, and the creature it enchants follows). No card in content can take control
 of an Aura that gives control: Opalescence leaves Auras alone, and the stealing cards target creatures. The repeat has no
 scenario.
-
-### KI-65: A prepared permanent that phases out loses its preparation copy for good
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, Teferi's Protection |
-
-**Notes.** A prepare spell's copy in exile ceases to exist once what prepared it is no longer on the battlefield and prepared
-(`settle::state_based_actions`, CR 722.3c), and a phased-out permanent is not on the battlefield's list, so phasing a
-prepared permanent out (Teferi's Protection, Oubliette) ends its copy. CR 722.3c says that "as a permanent ... phases in
-prepared, its controller creates a copy" again; `phasing::phase_in` makes none. A fix creates the copy as a prepared permanent
-phases in (`ops::become_prepared`'s copy-making, without the event of becoming prepared).
-
-**Scenarios.** none yet: a prepare card under Teferi's Protection would show it.
 
 ### KI-68: The advice applies a total cost's least before a cast's own reductions and a permission's additions
 

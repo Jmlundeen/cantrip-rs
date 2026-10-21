@@ -1262,10 +1262,20 @@ pub fn become_prepared(cx: &mut Cx, permanent: ObjectId) {
         return;
     }
     let card = layers::chars(cx.cards(), cx.s(), &cx.g.log, permanent).card;
+    if cx.cards().get(card).prepare.is_none() {
+        return;
+    }
+    cx.st().update_obj(permanent, |o| o.prepared = true);
+    prepared_copy(cx, permanent);
+}
+
+/// The copy of a prepared permanent's prepare spell its controller creates in exile (CR 722.3c), as it becomes prepared
+/// or phases in prepared: its prepare spell's characteristics alone, whatever else the permanent's copy effects say.
+pub fn prepared_copy(cx: &mut Cx, permanent: ObjectId) {
+    let card = layers::chars(cx.cards(), cx.s(), &cx.g.log, permanent).card;
     let Some(spell) = cx.cards().get(card).prepare else { return };
     let spell = cx.cards().id_of(spell);
     let controller = cx.s().obj(permanent).controller;
-    cx.st().update_obj(permanent, |o| o.prepared = true);
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
     let mut obj = Obj::new(spell, controller, Zone::exile(controller));

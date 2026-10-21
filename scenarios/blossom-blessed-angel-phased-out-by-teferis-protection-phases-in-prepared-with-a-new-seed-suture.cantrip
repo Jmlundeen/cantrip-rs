@@ -1,0 +1,53 @@
+# A prepared permanent that phases out is not on the battlefield, so the copy of its prepare spell in exile ceases to exist
+# (CR 722.3c, 704.5e, 702.26b); as it phases in prepared its controller creates a copy again (CR 722.3c). Blossom-Blessed
+# Angel enters prepared on turn 1; on turn 3 Bot1's Teferi's Protection phases it out, and Seed Suture's copy is gone. On
+# turn 5 the Angel phases in still prepared, with a new Seed Suture in exile, which Bot1 casts on it.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Blossom-Blessed Angel
+Plains
+Teferi's Protection
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Blossom-Blessed Angel.Cast
+Bot1.Pass
+Bot2.Pass
+? Exile = Seed Suture
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut = Blossom-Blessed Angel; Mox Pearl; Mox Pearl; Mox Pearl; Mox Pearl; Plains
+? Exile = Teferi's Protection
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Blossom-Blessed Angel.Prepared = true
+? Exile = Teferi's Protection; Seed Suture
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Exile.Seed Suture.Cast(Bot1.Battlefield.Blossom-Blessed Angel)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Blossom-Blessed Angel.Counters.PlusOnePlusOne = 1
+Bot1.Life = 21
+Exile = Teferi's Protection

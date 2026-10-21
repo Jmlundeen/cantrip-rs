@@ -136,6 +136,15 @@ fn phase_in(cx: &mut Cx, permanents: &[ObjectId]) {
     }
     for &id in &all {
         crate::ops::refresh_control(cx, id);
+        // CR 722.3c: one that phases in prepared has its prepare spell's copy made in exile again, its old one having
+        // ceased to exist while it was phased out (no becoming prepared: nothing that watches that sees it) - unless the
+        // state-based actions have not yet ended the old one, which then stays the one copy.
+        let has_copy = |s: &GameState| {
+            s.seats().any(|p| s.zone(Zone::exile(p)).iter().any(|&c| s.obj(c).card_copy && s.obj(c).prepared_from == Some(id)))
+        };
+        if cx.s().obj(id).prepared && !has_copy(cx.s()) {
+            crate::ops::prepared_copy(cx, id);
+        }
         cx.record(Event::PhasedIn { permanent: id });
     }
 }
@@ -366,5 +375,26 @@ mod tests {
         assert_eq!(game.state.zone(Zone::PHASED_OUT), &[stolen]);
         untap_step_of(&mut game, 10, PlayerId(0));
         assert!(game.state.zone(Zone::PHASED_OUT).is_empty());
+    }
+
+    static JUMP: CardDef = CardDef { name: "Phasing Test Jump", types: TypeSet::of(&[CardType::Instant]), ..CardDef::BLANK };
+    static AVIATOR: CardDef = CardDef { prepare: Some(&JUMP), name: "Phasing Test Aviator", ..BEAR };
+
+    /// CR 722.3c: a prepared permanent phasing in makes its prepare spell's copy again - once: if the state-based actions
+    /// have not yet ended the copy it had (phased out and in again before they were checked), that one stays the only one.
+    #[test]
+    fn a_prepared_permanent_phasing_in_has_one_copy_of_its_prepare_spell() {
+        let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&AVIATOR, &JUMP])));
+        let mut game = Game::new(table, &crate::Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+        let aviator = game.state.push_obj(Obj::new(table.id_of(&AVIATOR), PlayerId(0), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, aviator);
+        let mut cx = cx(&mut game);
+        crate::ops::become_prepared(&mut cx, aviator);
+        let copies = |cx: &Cx| cx.s().zone(Zone::exile(PlayerId(0))).iter().filter(|&&c| cx.s().obj(c).prepared_from == Some(aviator)).count();
+        assert_eq!(copies(&cx), 1);
+        phase_out(&mut cx, &[aviator], None, false);
+        untap_step(&mut cx, PlayerId(0));
+        assert!(cx.s().battlefield().contains(&aviator) && cx.s().obj(aviator).prepared);
+        assert_eq!(copies(&cx), 1);
     }
 }
