@@ -31,4 +31,33 @@ A decision recorded here may be applied to a later case of the same kind; the la
 
 ## Exceptions
 
-None.
+### RX-1: A game that reaches the engine's maximum number of events ends in a draw
+
+| Rule | Category | Decided by | Date |
+| --- | --- | --- | --- |
+| CR 104.4b, 732.4-5 | niche and complex / beyond practical scale | jschibel | 2026-10-21 |
+
+**What the rules say.** A loop of mandatory actions is a draw (CR 104.4b); a loop the players keep going by their own
+choices goes on as long as they choose, and no player can be made to break it with an action outside the loop
+(CR 732.5). A run of play that never repeats exactly - a token, an effect or a card more each time round, while the
+other players only pass - is neither recognised as a loop nor ever ended by the rules.
+
+**What the engine does instead, and why.** The engine keeps recognising every loop it can tell exactly, as the rules
+say. Beyond that it has a practical maximum on the game's history (`MAX_GAME_EVENTS`, in events recorded), sized to
+hold the longest and most complicated multiplayer game with headroom; a game that reaches it ends in a draw. The
+engine's earlier judgements of "a run going nowhere" (a step-length limit, a forced-run limit) are replaced by this one
+bound.
+
+**Cards and cases it covers.** Any combination that grows without repeating while nobody acts to end it.
+
+### RX-2 (not a deviation, recorded as a decision): a "may" declined every time round a loop is left to the clock
+
+| Rule | Category | Decided by | Date |
+| --- | --- | --- | --- |
+| CR 732.5 | - | jschibel | 2026-10-21 |
+
+**What the rules say.** No player can be forced to perform an action that would end a loop other than those called for
+by objects in the loop (CR 732.5); a player who declines a "may" each time round keeps the loop going by choice.
+
+**What the engine does.** It does not end such a loop as a draw after a number of rounds. Every iteration is played by
+hand, and the match clock runs down until the player times out, as for any other loop kept going by choice.
