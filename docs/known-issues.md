@@ -98,6 +98,8 @@ keeps it).
 | [KI-92](#ki-92-an-activation-records-nothing-of-what-gave-it-and-its-alternative-cost-is-found-first) | An activation records nothing of what gave it, and its alternative cost is found first | Low | Open |
 | [KI-93](#ki-93-the-browser-shows-no-phased-out-permanents) | The browser shows no phased-out permanents | Medium | Open |
 | [KI-94](#ki-94-a-browser-scenarios-clientmenu-check-reads-a-menu-of-a-card-long-gone) | A browser scenario's `Client.Menu` check reads a menu of a card long gone | Low | Open |
+| [KI-96](#ki-96-a-cast-whose-cost-needs-a-triggered-mana-abilitys-mana-is-not-offered-until-the-player-taps-first) | A cast whose cost needs a triggered mana ability's mana is not offered until the player taps first | Medium | Open |
+| [KI-97](#ki-97-a-leaving-players-objects-are-recorded-one-at-a-time-not-as-they-were-together) | A leaving player's objects are recorded one at a time, not as they were together | Low | Open |
 
 ## Issues
 
@@ -1173,5 +1175,22 @@ nor a delayed one's (High Tide, Bubbling Muck, Molten Tide). So with High Tide r
 empty pool, a {U}{U}{U}{U} spell is legal to cast (CR 601.2g-h) but not offered; the player has to tap the Islands at
 priority first, and then it is. A fix counts, for each mana source, the additional mana the triggered mana abilities
 waiting on its tap would add, cheaply and only while one exists.
+
+**Scenarios.** None.
+
+### KI-97: A leaving player's objects are recorded one at a time, not as they were together
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-20, review of the last-known information change |
+
+**Notes.** When a player leaves the game (CR 800.4a), their objects cease to exist together, so each one's last-known
+information should be as it was before any of them left. `leave_game` in `crates/cantrip-rules/src/ops.rs` runs
+`cease_to_exist` over them one at a time, and each call records its row and then removes the object, so a later object's
+row misses the static effects of an earlier one already gone: with P3's Glorious Anthem processed before a Grizzly Bears P3
+owns and P1 controls, the Bears' row says 2/2, not 3/3. Permanents P3 controls but does not own are exiled through
+`move_together` after the owned objects have ceased, so their rows miss those effects too. Fix: record every row first,
+then remove the objects (a `cease_together`). The state-based action loops in `crates/cantrip-rules/src/settle.rs` that
+make tokens and spell copies cease to exist have the same order, where it practically never matters. Multiplayer only.
 
 **Scenarios.** None.
