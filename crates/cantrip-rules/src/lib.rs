@@ -16,6 +16,8 @@ mod loops;
 mod ops;
 mod phasing;
 #[cfg(test)]
+mod back_face_targets_tests;
+#[cfg(test)]
 mod cloak_tests;
 #[cfg(test)]
 mod copy_spell_tests;
