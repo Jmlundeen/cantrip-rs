@@ -54,6 +54,24 @@ public sealed class CardOracleTests
         Assert.Contains(view.InsetSpell, view.AlsoPrinted());
     }
 
+    /// <summary>
+    /// CR 721.2b-c: a station card prints its [P/T] box in its striation and has no power or toughness until it has the
+    /// counters, so the box is read beside its text - in a draft pack or a deck - and never as its power and toughness.
+    /// </summary>
+    [Fact]
+    public void A_station_card_carries_its_striation_box_and_no_power_or_toughness()
+    {
+        ObjectView view = Oracle("""
+            { "name": "Wurmwall Sweeper", "manaCost": "{2}", "type": "Artifact — Spacecraft", "stationPt": "2/2",
+              "oracleText": "When this Spacecraft enters, surveil 2.\nStation\n4+ | Flying" }
+            """).Oracle(new CardId("Wurmwall Sweeper"))!;
+
+        Assert.Equal("2/2", view.StationPt);
+        Assert.Null(view.Power);
+        Assert.Null(view.Toughness);
+        Assert.Equal(string.Empty, Oracle("""{ "name": "Bolt", "manaCost": "{R}", "type": "Instant", "oracleText": "" }""").Oracle(new CardId("Bolt"))!.StationPt);
+    }
+
     [Fact]
     public void A_card_the_content_does_not_have_is_null()
     {

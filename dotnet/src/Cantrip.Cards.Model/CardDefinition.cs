@@ -52,6 +52,13 @@ public sealed class CardDefinition
     /// <summary>Printed defense (CR 310.4a), or null for anything but a battle.</summary>
     public int? Defense;
 
+    /// <summary>
+    /// The power and toughness box a station card prints in its striation (CR 721.2b), "2/2" (<c>stationPt</c> in a card
+    /// file). Display only: the card has no power or toughness until it has the charge counters (CR 721.2c), so
+    /// <see cref="Power"/> and <see cref="Toughness"/> stay null. Empty for any other card.
+    /// </summary>
+    public string StationPt = string.Empty;
+
     /// <summary>Rules text as printed. Display only: nothing here parses it.</summary>
     public string OracleText = string.Empty;
 

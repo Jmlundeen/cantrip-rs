@@ -166,6 +166,7 @@ public static class CardFileReader
             Toughness = Int(entry, "toughness"),
             Loyalty = Int(entry, "loyalty"),
             Defense = Int(entry, "defense"),
+            StationPt = Text(entry, "stationPt") ?? string.Empty,
             ColorIndicator = colorIndicator,
             OracleText = Text(entry, "oracleText") ?? string.Empty,
             BackFace = Face(entry, "backFace", id, problems),

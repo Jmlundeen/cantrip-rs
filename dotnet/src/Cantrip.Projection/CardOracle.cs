@@ -69,6 +69,8 @@ public sealed partial class CardOracle
             Power = face.Power,
             Toughness = face.Toughness,
             StartingCounter = face.Loyalty ?? face.Defense,
+            // A station card's striation box (CR 721.2b), drawn in its striation: a pack or a deck shows the 2/2 it will be.
+            StationPt = face.StationPt,
         };
 
         foreach (Supertype supertype in face.TypeLine.Supertypes)
