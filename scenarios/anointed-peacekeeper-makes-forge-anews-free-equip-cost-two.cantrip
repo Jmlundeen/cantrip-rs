@@ -1,0 +1,71 @@
+# An alternative cost still takes the increases to it (CR 118.9d, 601.2f): Bot2's Anointed Peacekeeper names Bloodforged
+# Battle-Axe ("activated abilities of sources with the chosen name cost {2} more"), so the first equip Forge Anew lets Bot1
+# pay {0} for costs {2}. Turn 3, with only Mox Ruby untapped, it is not offered; with Mox Emerald cast too (the control),
+# it is, and the two Moxes pay it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Bloodforged Battle-Axe
+Forge Anew
+Mox Emerald
+Island
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Sapphire
+Mox Jet
+Anointed Peacekeeper
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Anointed Peacekeeper.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Name(Bloodforged Battle-Axe)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Forge Anew.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Ability: Equip)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Ragavan, Nimble Pilferer; Ability: rather than its mana cost (Forge Anew))
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Bloodforged Battle-Axe.AttachedTo = Ragavan, Nimble Pilferer
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = true

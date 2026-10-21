@@ -2211,10 +2211,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             let covered = |a: &Available, owed: ManaCost, targets: &[Target]| {
                 // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
                 // touch it; what changes its own cost is already in `owed` (`special_action_cost`), which `special_action`
-                // pays.
-                if owed.mana_value() == 0 && owed.x == 0 {
-                    return true;
-                }
+                // pays. A cost of nothing is judged too: an increase still applies to it (CR 118.9d, 601.2f).
                 let mut cost =
                     if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
