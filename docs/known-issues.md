@@ -60,7 +60,6 @@ keeps it).
 | [KI-83](#ki-83-teferis-protection-in-the-browser-shows-an-empty-battlefield) | Teferi's Protection in the browser shows an empty battlefield | Low | Open |
 | [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
-| [KI-91](#ki-91-an-energy-cost-is-not-judged-again-once-mana-abilities-have-been-activated) | An energy cost is not judged again once mana abilities have been activated | Low | Unexercised |
 | [KI-92](#ki-92-an-activation-records-nothing-of-what-gave-it-and-its-alternative-cost-is-found-first) | An activation records nothing of what gave it, and its alternative cost is found first | Low | Open |
 | [KI-93](#ki-93-the-browser-shows-no-phased-out-permanents) | The browser shows no phased-out permanents | Medium | Open |
 | [KI-94](#ki-94-a-browser-scenarios-clientmenu-check-reads-a-menu-of-a-card-long-gone) | A browser scenario's `Client.Menu` check reads a menu of a card long gone | Low | Open |
@@ -517,19 +516,6 @@ NullReferenceException in `GameServer` while a connection was closing, then pass
 A race in closing a table's connections, in code the change being tested did not touch. Not investigated.
 
 **Scenarios.** none; the .NET test above.
-
-### KI-91: An energy cost is not judged again once mana abilities have been activated
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-20, review of the action model |
-
-**Notes.** An energy cost (`Cost::energy`, CR 107.14: Primal Prayers' {E}) is judged payable as the cast or activation is
-offered and paid with the rest of the cost (`actions::pay_life_and_counters`). A mana ability activated while the cost is paid
-(CR 601.2g) that cost energy would leave too few to pay it, and the payment would be made from what remains, never below none,
-rather than the cast being taken back (CR 601.2h). No mana ability in content costs energy (Aether Hub is not built).
-
-**Scenarios.** None (no card reaches it).
 
 ### KI-92: An activation records nothing of what gave it, and its alternative cost is found first
 

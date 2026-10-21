@@ -222,6 +222,20 @@ static SUSPEND_FORBIDDER: CardDef =
 static SPLIT_SECOND_PROBE: CardDef =
     CardDef { name: "Route Split Second Probe", cost: ManaCost::ZERO, keywords: Keywords::of(&[Keyword::SplitSecond]), ..PROBE_SPELL };
 
+/// "{T}, Pay {E}: Add {C}" (Aether Hub's kind): a mana ability that costs energy.
+static ENERGY_MANA_ABILITY: [AbilityDef; 1] = [mana_ability(Cost { tap: true, energy: 1, ..Cost::NONE }, add(Mana::C), "{T}, Pay {E}: Add {C}.")];
+
+static ENERGY_SOURCE: CardDef =
+    CardDef { name: "Route Energy Source", types: TypeSet::of(&[CardType::Artifact]), abilities: &ENERGY_MANA_ABILITY, ..CardDef::BLANK };
+
+/// A {1} instant that also costs {E} (CR 107.14, 118.3).
+static ENERGY_SPELL: CardDef = CardDef {
+    name: "Route Energy Spell",
+    cost: ManaCost { generic: 1, ..ManaCost::ZERO },
+    additional_cost: Some(Cost { energy: 1, ..Cost::NONE }),
+    ..PROBE_SPELL
+};
+
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
 static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
@@ -259,6 +273,8 @@ fn table() -> &'static CardTable {
             &FREE_ALTERNATIVE,
             &FREE_EMBLEM,
             &SUSPEND_PROBE,
+            &ENERGY_SOURCE,
+            &ENERGY_SPELL,
             &SUSPEND_NEVER,
             &SUSPEND_FORBIDDER,
             &SPLIT_SECOND_PROBE,
@@ -671,6 +687,42 @@ fn suspend_is_taken_only_when_the_card_could_be_cast() {
     }
     assert!(game.state.stack.iter().any(|i| i.object != card), "the split-second spell is on the stack");
     assert!(activations_of(&game, card).is_empty(), "split second: the card could not be cast");
+}
+
+/// CR 601.2g-h, 107.14: an energy cost is paid with the rest of the cost, after the mana abilities activated to pay it.
+/// One that spent the energy the spell needs leaves a cost that can't be paid, and the cast is taken back; with energy to
+/// spare it is cast.
+#[test]
+fn an_energy_cost_is_judged_again_after_the_mana_abilities() {
+    for energy in [1u16, 2] {
+        let (mut game, spell) = game_with("Route Energy Spell", Zone::hand, 0);
+        let source = put(&mut game, "Route Energy Source", ME);
+        game.state.update_player(ME, |p| p.put_path_add(0, energy, 0));
+        game.run();
+        let cast = casts_of(&game, spell).into_iter().next().expect("offered: the energy and the mana are each there");
+        take(&mut game, &cast);
+        for _ in 0..8 {
+            game.run();
+            let request = game.pending().cloned().expect("asked");
+            let RequestKind::PayCosts { options, .. } = &request.kind else { break };
+            let pick = options
+                .iter()
+                .find(|o| o.kind == ActionKind::ActivateAbility && o.source == Some(source))
+                .or_else(|| options.iter().find(|o| o.kind == ActionKind::ConfirmCasting))
+                .or_else(|| options.iter().find(|o| o.kind == ActionKind::AssignMana))
+                .unwrap_or_else(|| panic!("unexpected payment options: {options:?}"));
+            game.answer(request.id, request.player, Answer::Act(Action::of(pick))).unwrap();
+        }
+        let cast_made = game.log.iter().any(|r| matches!(r.event, Event::SpellCast { player: ME, .. }));
+        if energy == 1 {
+            assert!(!cast_made, "the mana ability spent the energy the spell needs");
+            assert!(game.state.zone(Zone::hand(ME)).contains(&spell), "taken back to the hand");
+            assert_eq!(game.state.player(ME).energy(), 1, "and the energy with it");
+        } else {
+            assert!(cast_made, "with energy to spare it is cast");
+            assert_eq!(game.state.player(ME).energy(), 0);
+        }
+    }
 }
 
 fn emblem(game: &mut RulesGame, name: &str, player: PlayerId) -> ObjectId {

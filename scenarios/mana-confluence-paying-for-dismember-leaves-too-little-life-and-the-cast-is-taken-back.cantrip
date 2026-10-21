@@ -1,0 +1,43 @@
+# The life a cost asks is paid with the rest of the cost once the mana is (CR 601.2g-h), and only with that much life
+# (CR 119.4). Bot1, at 4 life, casts Dismember paying both {B/P} with life (4) and taps Mana Confluence for the {1}
+# ("{T}, Pay 1 life"): at 3 life the 4 can't be paid, so the cast is taken back, Dismember returns to the hand and the life
+# total to 4. Cast again with one {B/P} paid with life and the other with Mox Jet's {B}, it is paid: Bot1 ends at 1.
+
+[Life]
+Bot1: 4
+
+[Bot1 Deck]
+Mana Confluence
+Mox Jet
+Dismember
+Island x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Island x12
+
+[Actions]
+Bot1.Hand.Mana Confluence.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Dismember.Cast(Elvish Mystic)
+Bot1.Modes(1; 2)
+Bot1.Battlefield.Mana Confluence.Activate(Color: Black)
+? Bot1.Hand.Count = 6
+? Bot1.Life = 4
+? Stack.Count = 0
+Bot1.Hand.Dismember.Cast(Elvish Mystic)
+Bot1.Modes(1)
+Bot1.Battlefield.Mana Confluence.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 1
+Bot2.Graveyard = Elvish Mystic
+Bot1.Graveyard = Dismember

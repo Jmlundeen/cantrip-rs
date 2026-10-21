@@ -659,6 +659,12 @@ fn pay_discards(cx: &mut Cx, chosen: &[ObjectId]) {
 }
 
 /// Pays the life and counters parts of a cost.
+/// Whether `player` can still pay this much energy (CR 107.14) and life (CR 119.4) once the mana of the cost is paid: the
+/// mana abilities activated while paying it (CR 601.2g) may have spent energy or life the rest of the cost needs.
+fn rest_payable(cx: &Cx, player: PlayerId, energy: u32, life: u32) -> bool {
+    u32::from(cx.s().player(player).energy()) >= energy && (life == 0 || payable_life(cx, player) >= life.min(i32::MAX as u32) as i32)
+}
+
 fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) {
     if cost.energy > 0 {
         ops::change_energy(cx, player, -i32::from(cost.energy), player);
@@ -4286,6 +4292,11 @@ fn cast(
         o.cast_way = way;
         o.x = item.x;
     });
+    // The energy and life are judged again now the mana is paid: a mana ability activated while paying (CR 601.2g) may have
+    // spent what they needed, and a cost that can't be paid takes the cast back (CR 601.2h, 119.4, 107.14).
+    if !rest_payable(cx, player, cost.energy as u32 + extra.energy as u32, life_owed) {
+        return Err(Stop::Cancel);
+    }
     // Counters put on and taken off permanents are paid first (CR 601.2h: in any order), so a permanent the cost also
     // sacrifices leaves with them as the payment left it.
     pay_blight(cx, player, &cost, blighted);
@@ -5249,6 +5260,10 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     }
     let blighted = choose_blight(cx, player, source, &def.cost)?;
     let removed = choose_counters_among(cx, player, source, &def.cost)?;
+    // The energy and life, judged again after the mana abilities (CR 601.2g-h by way of 602.2b).
+    if !rest_payable(cx, player, def.cost.energy as u32, life as u32 + def.cost.life as u32) {
+        return Err(Stop::Cancel);
+    }
     if life > 0 {
         ops::change_life(cx, player, -(life as i32));
     }
