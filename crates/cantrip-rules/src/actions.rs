@@ -1520,8 +1520,9 @@ fn change_parts(
 /// A cost reduced by an amount of mana (CR 118.7): its generic part takes generic mana off only (118.7a); each colored
 /// or colorless symbol takes off one mana of that type, and one the cost has none of (118.7b), or has fewer of (118.7c-d),
 /// takes off generic mana instead; a Phyrexian symbol takes off mana of its color (118.7f). Nothing goes below zero
-/// (CR 601.2f). The reduced symbols are the cost's plain ones of that type: no cost a colored reduction meets has a
-/// hybrid or Phyrexian symbol of its color yet.
+/// (CR 601.2f). A hybrid, {2/C} or Phyrexian symbol of the cost was announced as one of its halves before the reductions
+/// (CR 601.2b, 601.2f), so a reduction of a type the cost's plain symbols don't absorb meets the symbols that may be paid
+/// with that type (`reduce_announced`).
 fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
     // A hybrid symbol in a reduction is split by the payer as the reduction is applied (CR 118.7e), a choice not built:
     // refused in every build rather than reduced some other way.
@@ -1537,10 +1538,46 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
         }
         let off = n.min(cost.symbols[i] as u32);
         cost.symbols[i] -= off as u8;
-        excess += n - off;
+        n -= off;
+        if n > 0 {
+            n = reduce_announced(&mut cost, i, n);
+        }
+        excess += n;
     }
     cost.generic = (cost.generic as u32).saturating_sub(excess) as u8;
     cost
+}
+
+/// `n` mana of the type `i` (as `Mana` orders them) that the cost's plain symbols of that type did not absorb, meeting the
+/// hybrid and {2/C} symbols that may be paid with it: each announced as that half (CR 601.2b) is reduced to nothing
+/// (CR 118.7c), which leaves a cost any payment of the other announcement also pays - a symbol of the other half, or the
+/// generic mana the reduction would otherwise take (118.7c), is never cheaper. Taken where those symbols are all of one
+/// kind (only {U/R}, or only {2/U}); where they differ, which to announce is the payer's choice (601.2b), not built, and
+/// the rest takes generic mana as before (KI-110). What is left over is returned.
+fn reduce_announced(cost: &mut ManaCost, i: usize, mut n: u32) -> u32 {
+    let meets = |h: &Option<(Mana, Mana)>| h.is_some_and(|(a, b)| a as usize == i || b as usize == i);
+    let mut pairs = cost.hybrid.iter().filter(|h| meets(h)).copied();
+    let first = pairs.next().flatten();
+    let one_pair = pairs.all(|p| p == first);
+    let twobrids = if i < 5 { cost.twobrid[i] as u32 } else { 0 };
+    if first.is_some() && twobrids == 0 && one_pair {
+        let mut kept = [None; 6];
+        let mut at = 0;
+        for h in cost.hybrid {
+            if meets(&h) && n > 0 {
+                n -= 1;
+            } else if h.is_some() {
+                kept[at] = h;
+                at += 1;
+            }
+        }
+        cost.hybrid = kept;
+    } else if first.is_none() && twobrids > 0 {
+        let off = n.min(twobrids);
+        cost.twobrid[i] -= off as u8;
+        n -= off;
+    }
+    n
 }
 
 /// The least mana a spell could be cast for with this base cost, for the advice that a cast that cannot be paid is
@@ -7857,5 +7894,29 @@ mod tests {
         let lotus = Alternative { k: 3, types: ANY_COLOR, ..adds([0; 6]) };
         assert!(pool([1, 1, 0, 1, 1, 0], vec![(vec![lotus], 1)]).covers(&mana("{G/W}{G/U}{B/G}{R/G}{B}{B}{B}")));
         assert!(!pool([1, 1, 0, 1, 1, 0], vec![(vec![lotus], 1)]).covers(&mana("{G/W}{G/U}{B/G}{R/G}{B}{B}{W}{W}")));
+    }
+
+    /// CR 118.7c, 601.2b: a {U} reduction the cost's {U} symbols don't absorb meets a hybrid symbol with a blue half, which
+    /// was announced as blue (Expansion's {U/R}{U/R} under Eluge is free), and only then takes generic mana; with symbols of
+    /// different kinds it may meet, which one is the payer's choice, and the reduction takes generic mana as before (KI-110).
+    #[test]
+    fn a_colored_reduction_meets_a_hybrid_symbol_of_that_color() {
+        let less = |n: u8| ManaCost { symbols: [0, n, 0, 0, 0, 0], ..ManaCost::ZERO };
+        assert_eq!(reduce(cantrip_api::mana("{U/R}{U/R}"), &less(2)), ManaCost::ZERO);
+        assert_eq!(reduce(cantrip_api::mana("{U/R}{U/R}"), &less(1)), cantrip_api::mana("{U/R}"));
+        assert_eq!(reduce(cantrip_api::mana("{1}{U/R}"), &less(2)), ManaCost::ZERO);
+        assert_eq!(reduce(cantrip_api::mana("{2}{U}{U/R}"), &less(2)), cantrip_api::mana("{2}"));
+        assert_eq!(reduce(cantrip_api::mana("{2/U}"), &less(1)), ManaCost::ZERO);
+        assert_eq!(reduce(cantrip_api::mana("{R}{W/B}"), &less(1)), cantrip_api::mana("{R}{W/B}"), "no symbol a blue half pays");
+        assert_eq!(reduce(cantrip_api::mana("{1}{U/R}{U/B}"), &less(1)), cantrip_api::mana("{U/R}{U/B}"), "the payer's choice: generic");
+    }
+
+    /// Mind Spring with X = 254, {254}{U}{U}, under 300 flooded lands (Eluge: 255 {U} and the next 45 as generic): free.
+    #[test]
+    fn a_blue_reduction_past_255_takes_generic_mana() {
+        let cost = ManaCost { generic: 254, symbols: [0, 2, 0, 0, 0, 0], ..ManaCost::ZERO };
+        let less = ManaCost { generic: 45, symbols: [0, 255, 0, 0, 0, 0], ..ManaCost::ZERO };
+        assert_eq!(reduce(cost, &less), ManaCost::ZERO);
+        assert_eq!(reduce(cost, &ManaCost { symbols: [0, 255, 0, 0, 0, 0], ..ManaCost::ZERO }), ManaCost { generic: 1, ..ManaCost::ZERO });
     }
 }

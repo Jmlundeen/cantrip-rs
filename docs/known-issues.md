@@ -55,6 +55,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
 | [KI-106](#ki-106-some-answers-are-compared-in-eight-bits-and-a-library-search-has-no-any-number) | Some answers are compared in eight bits, and a library search has no "any number" | Pri-1 | Fix queued |
 | [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
+| [KI-110](#ki-110-a-cost-reduction-does-not-ask-how-a-hybrid-or-phyrexian-symbol-was-announced) | A cost reduction does not ask how a hybrid or Phyrexian symbol was announced | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
@@ -329,6 +330,28 @@ list positions, a batch's length, lands played, extra combats, and more - are u3
 deals at most eight seats, which the per-seat masks hold (`MAX_SEATS`).
 
 **Scenarios.** None yet.
+
+### KI-110: A cost reduction does not ask how a hybrid or Phyrexian symbol was announced
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine | 2026-10-21, review of the event-cap sweep (Eluge and Expansion // Explosion) |
+
+**Notes.** A cost's hybrid, {2/C} and Phyrexian symbols are announced as one of their halves before its reductions apply
+(CR 601.2b, 601.2f), so a colored reduction meets the symbols announced as its color (118.7c). The engine asks no such
+announcement. `actions::reduce` takes a colored reduction the plain symbols leave off the hybrid symbols of that color
+where they are all one pair, or the {2/C} symbols of that color where they are the only kind (`reduce_announced`): the
+cost left is then one any other announcement's payment also pays, so nothing is lost. What is still not the rules':
+- symbols of different kinds a reduction could meet ({U/R} and {U/B}, or {U/R} and {2/U}): which to announce is the
+  payer's choice, and the reduction takes generic mana instead;
+- a Phyrexian symbol of the cost is never announced as its color for a reduction to take it, though paying 2 life
+  instead is the payer's choice;
+- a payer who would rather announce the other half and pay it - so that mana of that color is spent ("if {R} was spent",
+  Unnerving Assault) - is not offered that where the reduction would leave the cost free of it.
+A fix asks the 601.2b announcement for these symbols where a reduction meets them.
+
+**Scenarios.** None yet; `actions::tests::a_colored_reduction_meets_a_hybrid_symbol_of_that_color` shows the choice
+falling back to generic mana.
 
 ### KI-107: A layer-1 copy static ability is not counted among what could give a look-back ability
 

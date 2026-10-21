@@ -56,9 +56,37 @@ static OPT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "Put a flood counter on each land you control."
+fn flood_all(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    for id in g.permanents_of(item.controller) {
+        if g.chars(id).is(CardType::Land) {
+            g.add_counters(id, CounterKind::Flood, 1);
+        }
+    }
+    Ok(())
+}
+
+static FLOOD_ALL: CardDef = CardDef { name: "Probe Flood All", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], flood_all), ..CardDef::BLANK };
+/// Mind Spring at X = 254: an instant costing {254}{U}{U}.
+static SPRING: CardDef = CardDef {
+    name: "Probe Spring",
+    cost: ManaCost { generic: 254, symbols: [0, 2, 0, 0, 0, 0], ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], |_, _| Ok(())),
+    ..CardDef::BLANK
+};
+/// Expansion's {U/R}{U/R}.
+static EXPANSION: CardDef = CardDef {
+    name: "Probe Expansion",
+    cost: ManaCost { hybrid: [Some((Mana::U, Mana::R)), Some((Mana::U, Mana::R)), None, None, None, None], ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], |_, _| Ok(())),
+    ..CardDef::BLANK
+};
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&COMMANDEER, &UNLAND, &OPT, &MUTE])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&COMMANDEER, &UNLAND, &OPT, &MUTE, &FLOOD_ALL, &SPRING, &EXPANSION])))
 }
 
 /// What a seat does, in order, each as soon as its turn has come and it is offered: play a land, or cast a card (aimed at a
@@ -232,4 +260,49 @@ fn eluge_that_lost_its_abilities_has_power_0() {
     let eluge = *game.state.battlefield().iter().find(|&&id| game.name(id) == "Eluge, the Shoreless Sea").expect("Eluge");
     let c = game.chars(eluge);
     assert_eq!((c.power, c.toughness), (Some(0), Some(2)));
+}
+
+/// Eluge with 300 flooded lands: its reduction is 300 {U}, which a cost's {U} absorbs and the rest takes generic mana
+/// (CR 118.7c), so Mind Spring at X = 254 ({254}{U}{U}) is free; and Expansion's {U/R}{U/R}, announced as blue (CR 601.2b),
+/// is free too. Bot1 floods every land on turn 1; the totals are the table's on turn 3.
+#[test]
+fn eluges_reduction_past_255_flooded_lands_takes_generic_mana_and_hybrid_symbols() {
+    let mut totals: Option<(u32, u32)> = None;
+    let names = |list: &[&str]| -> Vec<CardId> { list.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))).collect() };
+    let mut deck = names(&["Probe Flood All", "Probe Spring", "Probe Expansion"]);
+    deck.extend(names(&["Island"; 27]));
+    let mut game = Game::new(table(), &Setup { decks: vec![deck, names(&["Island"; 30])], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
+    for name in std::iter::once("Eluge, the Shoreless Sea").chain(std::iter::repeat_n("Island", 300)) {
+        let id = game.state.push_obj(Obj::new(table().find(name).unwrap(), PlayerId(0), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, id);
+    }
+    for _ in 0..3000 {
+        game.run();
+        let request = game.pending().cloned().expect("a question");
+        let mine = request.player == PlayerId(0) && game.state.stack.is_empty() && game.state.turn.step() == cantrip_engine::Step::PrecombatMain;
+        if mine && game.state.turn.number == 3 && matches!(request.kind, RequestKind::Priority { .. }) {
+            let total = |name: &str| {
+                let card = *game.state.zone(Zone::hand(PlayerId(0))).iter().find(|&&c| game.name(c) == name).expect("in hand");
+                cast_total(&game, PlayerId(0), &ActionOption::on(ActionKind::CastSpell, card, 0)).expect("a total").1.mana_value()
+            };
+            totals = Some((total("Probe Spring"), total("Probe Expansion")));
+            break;
+        }
+        let answer = match &request.kind {
+            RequestKind::Priority { options } if mine && game.state.turn.number == 1 => options
+                .iter()
+                .find(|o| o.kind == ActionKind::CastSpell && o.source.is_some_and(|c| game.name(c) == "Probe Flood All"))
+                .map_or(Answer::Pass, |o| Answer::Act(Action::of(o))),
+            RequestKind::Priority { .. } => Answer::Pass,
+            RequestKind::PayCosts { options, .. } => Answer::Act(Action::of(
+                options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).or(options.first()).expect("a way to pay"),
+            )),
+            RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand.iter().rev().copied().take(*count as usize).collect()),
+            RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
+            RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),
+            other => panic!("unexpected question {other:?}"),
+        };
+        game.answer(request.id, request.player, answer).unwrap();
+    }
+    assert_eq!(totals, Some((0, 0)), "Mind Spring at X = 254 and Expansion, each the first instant of the turn under 300 flooded lands");
 }
