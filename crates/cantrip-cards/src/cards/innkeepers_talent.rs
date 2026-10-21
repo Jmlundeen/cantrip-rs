@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::replacements::{double_counters_applies, double_counters_apply};
-use cantrip_mechanics::{class, targets, triggers::ward};
+use cantrip_mechanics::{class, statics, targets, triggers::ward};
 use cantrip_oracle as oracle;
 
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -11,23 +11,13 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// Level 2: "Permanents you control with counters on them have ward {1}": from level 2 on, each permanent its controller
-/// has that has a counter on it, read afresh on every pass (CR 613.1f).
+/// has that has a counter on it, read afresh on every pass (CR 613.1f). Each Talent gives its own ward, so two give two,
+/// each triggering separately (CR 113.2c, 702.21a; `statics::grant_delayed_ability`).
 fn has_counters(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
     let s = view.state();
     s.obj(source).class_level >= 2
         && s.obj(affected).controller == s.obj(source).controller
         && s.obj(affected).has_counters()
-}
-
-fn grant_ward(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copied_card().unwrap_or(o.card);
-    let ward = AbilityRef::delayed(card, 0);
-    if !chars.abilities().any(|a| a == ward)
-        && let Some(slot) = chars.abilities.iter().position(|a| a.is_none())
-    {
-        chars.abilities[slot] = Some(ward);
-    }
 }
 
 /// Level 3: "If you would put one or more counters on a permanent or player, put twice that many of each of those kinds
@@ -48,7 +38,7 @@ pub static CARD: CardDef = CardDef {
         class::level_three("{3}{G}", "{3}{G}: Level 3"),
     ],
     delayed: &[ward::<1>("Ward {1} (Whenever this permanent becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)")],
-    statics: &[static_ability(Layer::Ability, has_counters, grant_ward, "Permanents you control with counters on them have ward {1}.")],
+    statics: &[static_ability(Layer::Ability, has_counters, statics::grant_delayed_ability, "Permanents you control with counters on them have ward {1}.")],
     replacements: &[replacement(ReplacementKind::Counters, doubles, double, "puts twice that many counters")],
     ..oracle::INNKEEPERS_TALENT
 };

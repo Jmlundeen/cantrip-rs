@@ -1,0 +1,64 @@
+# Two Innkeeper's Talents at level 2 each give "Permanents you control with counters on them have ward {1}": Bot1's
+# Ornithopter, with counters from both Talents' level-1 triggers, has two instances of ward {1}, and each triggers on its
+# own (CR 113.2c, 702.21a). Turn 2, Bot2's Lightning Bolt at it puts two ward triggers on the stack; Bot2 pays the first {1}
+# with its Mox Ruby, can't pay the second, and the Bolt is countered - with one ward, paying once would have let it
+# resolve.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Jet
+Ornithopter
+Innkeeper's Talent
+Innkeeper's Talent
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent#1.Activate(Ability: Level 2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent#2.Activate(Ability: Level 2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Triggers(Ward; Ward)
+? Stack.Count = 3
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.PayCost
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+Bot2.Decline
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot2.Graveyard = Lightning Bolt
