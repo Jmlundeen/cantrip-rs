@@ -49,8 +49,8 @@
 //!
 //! **What the watch keeps.** Each question of a busy step once (`GameState::loop_keys`, found by its key in a hashed index,
 //! journalled an entry at a time), with, for a priority, the round it was last asked in, and the answers in order: a loop
-//! played by hand for any number of rounds costs it nothing more per round. Past `KEPT` questions it starts over, so a loop
-//! is found again within two of its rounds.
+//! played by hand for any number of rounds costs it nothing more per round. Nothing bounds what it keeps but the game's own
+//! maximum on events (RX-1), which bounds the questions a step can ask.
 //!
 //! A normal game pays a comparison per priority and a count per read of the history: the fingerprinting starts only after
 //! a long run of priorities in which nobody could do anything, or in a step far longer than a game outside a loop has.
@@ -70,9 +70,6 @@ pub const WATCH_AFTER: u32 = 16;
 
 /// Events in a step before its questions are kept with their positions: far more than a step outside a loop has.
 pub const BUSY_STEP: u32 = 1024;
-
-/// The most questions the watch keeps in a step: far past any loop's round. Past it the watch starts over.
-const KEPT: usize = 1 << 18;
 
 /// The most positions a run of mandatory actions is fingerprinted at before the run is started over (its positions are
 /// compared again from there).
@@ -145,7 +142,7 @@ pub fn asked(cx: &mut Cx, player: PlayerId, kind: RequestKind, replayed: bool) -
         _ => kind,
     };
     drop(canon);
-    entry(cx.st(), key);
+    cx.st().loop_key_entry(key);
     (kind, Some(key))
 }
 
@@ -290,15 +287,6 @@ fn busy(cx: &Cx) -> bool {
     busy_at(cx.s(), cx.g.log.len())
 }
 
-/// The kept question `key`'s entry, made if it has none. Past `KEPT` of them the watch starts over.
-fn entry(s: &mut GameState, key: u64) -> usize {
-    if let Some(at) = s.loop_key_entry(key, KEPT) {
-        return at;
-    }
-    s.loop_keys_clear();
-    s.loop_key_entry(key, KEPT).unwrap_or_default()
-}
-
 /// The run of mandatory actions is broken: a real choice.
 fn clear_forced(cx: &mut Cx) {
     let w = &cx.s().loop_watch;
@@ -367,7 +355,7 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
     let here = seen_position.unwrap_or_else(|| position(cx.s(), &canon));
     let key = question_key(&canon, here, player, cx.frame, cx.cursor, &RequestKind::Priority { options: Vec::new() });
     drop(canon);
-    let at = entry(cx.st(), key);
+    let at = cx.st().loop_key_entry(key);
     let mut watch = cx.s().loop_watch.clone();
     // The same position, with nothing asking the history since it was last here: a round of a loop.
     let round = cx.s().loop_keys[at].round;

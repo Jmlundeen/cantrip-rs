@@ -1175,19 +1175,18 @@ impl GameState {
         }
     }
 
-    /// The kept question `key`'s entry, made if there is none and fewer than `kept` are kept. Its index, if it has one.
-    pub fn loop_key_entry(&mut self, key: u64, kept: usize) -> Option<usize> {
+    /// The kept question `key`'s entry, made if there is none: its index. Every question of a step is kept; how many a step
+    /// asks is bounded by the events the game records (`docs/rules-exceptions.md`, RX-1), far inside the `u32` that names
+    /// an entry.
+    pub fn loop_key_entry(&mut self, key: u64) -> usize {
         if let Some(&at) = self.loop_index.get(&key) {
-            return Some(at as usize);
-        }
-        // Past the bound nothing more is kept: the watch stops growing, and forgets nothing it has.
-        if self.loop_keys.len() >= kept {
-            return None;
+            return at as usize;
         }
         self.loop_keys.push(LoopKey { key, ..LoopKey::default() });
-        self.loop_index.insert(key, (self.loop_keys.len() - 1) as u32);
+        let at = self.loop_keys.len() - 1;
+        self.loop_index.insert(key, crate::count_u32(at));
         self.log(Undo::LoopKeyPushed);
-        Some(self.loop_keys.len() - 1)
+        at
     }
 
     /// Sets the round the kept question at `at` was last asked in, journalling that alone.
