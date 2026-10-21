@@ -1549,6 +1549,14 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
 /// life where the life total allows. `targets` are the candidate it would be announced with, where its target is announced
 /// with the cast, or none (CR 601.2c, 601.2f).
 fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost, targets: &[Target]) -> ManaCost {
+    let (cost, least) = least_cost_parts(cx, available, player, card, def, base, targets);
+    at_least(cost, least)
+}
+
+/// `least_cost` with the least the total may come to (`CostDelta::at_least`, Trinisphere) not yet applied but returned, for a
+/// cast whose own reductions (emerge, harmonize) are still to come: the least is applied after every reduction, as the cast
+/// applies it (CR 601.2f).
+fn least_cost_parts(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost, targets: &[Target]) -> (ManaCost, u8) {
     let mut cost = base;
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
@@ -1578,17 +1586,23 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
             cost = add_cost(cost, c);
         }
     }
-    let mut cost = finish(cx, available, player, card, def, cost, targets);
+    let (mut cost, least) = finish_parts(cx, available, player, card, def, cost, targets);
     // "Costs {1} less for each permanent sacrificed this way": as little as sacrificing every permanent that could be.
     if let Some(VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) {
         let candidates = def.additional_cost.and_then(|c| c.variable).map_or(0, |v| variable_candidates(cx, card, player, v).len());
         cost.generic = cost.generic.saturating_sub((candidates as u32 * less_each as u32).min(255) as u8);
     }
-    cost
+    (cost, least)
 }
 
 /// `least_cost`'s Phyrexian symbols paid with life where the life total allows, and the cost changes applied.
-fn finish(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, mut cost: ManaCost, targets: &[Target]) -> ManaCost {
+fn finish(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, targets: &[Target]) -> ManaCost {
+    let (cost, least) = finish_parts(cx, available, player, card, def, cost, targets);
+    at_least(cost, least)
+}
+
+/// `finish` with the least the total may come to returned, not yet applied.
+fn finish_parts(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, mut cost: ManaCost, targets: &[Target]) -> (ManaCost, u8) {
     let mut life = if cost.phyrexian.iter().any(|&n| n > 0) { payable_life(cx, player) } else { 0 };
     for (i, n) in cost.phyrexian.into_iter().enumerate() {
         for _ in 0..n {
@@ -1602,7 +1616,8 @@ fn finish(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def:
     cost.phyrexian = [0; 5];
     // A face cast from the hand (an Adventure, an Omen, a half, a back face) is judged as that face (CR 715.4, 720.3a,
     // 709.3, 712.8a).
-    change_with(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets)
+    let (cost, _, least) = change_parts(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets);
+    (cost, least)
 }
 
 /// Whether `player` could pay `cost` from the mana pool and what the mana abilities they could activate add (advice,
@@ -2956,10 +2971,12 @@ impl<'a> Offer<'a> {
     fn offer(&self, card: ObjectId, face: &'static CardDef, way: u8, route: &Route, base: ManaCost, paid_by: Option<Grant>, options: &mut Vec<ActionOption>) {
         let (cx, player) = (self.cx, self.player);
         let a = self.available();
+        // What the permission adds is part of the total before the cost changes apply, as the cast adds it (CR 118.8, 601.2f).
+        let mut base = base;
+        base.generic = base.generic.saturating_add(route.terms.more);
+        let base = add_cost(base, route.additional.mana);
         let covered = |targets: &[Target]| {
-            let mut least = least_cost(cx, a, player, card, face, base, targets);
-            least.generic = least.generic.saturating_add(route.terms.more);
-            least = add_cost(least, route.additional.mana);
+            let least = least_cost(cx, a, player, card, face, base, targets);
             // Mana of any type pays every symbol of it (CR 609.4b), by the permission that casts it.
             covers_total(cx, a, player, card, face, least, route.additional.exile_from_graveyard, route.terms.any_type)
                 && added_life_payable(cx, a, player, card, face, targets)
@@ -3433,10 +3450,12 @@ fn reduction_of(cx: &Cx, creature: ObjectId) -> u8 {
 /// richest sacrifice, is covered; or, for harmonize (CR 702.180a), is covered once some untapped creature is tapped for
 /// its power, that creature then not tapping for mana.
 fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, way: &Cost, any_type: bool) -> bool {
-    let mut cost = least_cost(cx, a, player, card, def, way.mana, &[]);
+    // The way's own reductions (emerge, harmonize) come before the least the total may come to (Trinisphere), as the cast
+    // applies them (CR 601.2f).
+    let (mut cost, least) = least_cost_parts(cx, a, player, card, def, way.mana, &[]);
     cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, card, way));
     // Mana of any type pays every symbol of it (CR 609.4b), as `cast` pays it.
-    if covers_total(cx, a, player, card, def, cost, way.exile_from_graveyard, any_type) {
+    if covers_total(cx, a, player, card, def, at_least(cost, least), way.exile_from_graveyard, any_type) {
         return true;
     }
     way.tap_to_reduce
@@ -3444,7 +3463,7 @@ fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &C
             let without = available_without(cx, player, Some(creature));
             let mut reduced = cost;
             reduced.generic = reduced.generic.saturating_sub(reduction_of(cx, creature));
-            covers_total(cx, &without, player, card, def, reduced, way.exile_from_graveyard, any_type)
+            covers_total(cx, &without, player, card, def, at_least(reduced, least), way.exile_from_graveyard, any_type)
         })
 }
 

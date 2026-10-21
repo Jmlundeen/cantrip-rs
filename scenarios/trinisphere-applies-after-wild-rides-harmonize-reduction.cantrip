@@ -1,0 +1,55 @@
+# Trinisphere's "costs three mana" applies to the total cost last, after every reduction (CR 601.2f), harmonize's among
+# them (CR 702.180a). Turn 3: Bot1's Wild Ride harmonize {4}{R}, tapping Patchwork Beastie (power 3), comes to {1}{R}, which
+# Trinisphere makes three mana: with only Mountain and Mox Emerald, it is not offered. Turn 5, with a second Mountain (the
+# control), it is, and the three lands and Mox pay it.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Patchwork Beastie
+Wild Ride
+Mountain
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Trinisphere
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Patchwork Beastie.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Patchwork Beastie)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Trinisphere.Cast
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Wild Ride.Cast(Patchwork Beastie; Ability: Harmonize)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Graveyard.Wild Ride.Cast(Patchwork Beastie; Ability: Harmonize)
+Bot1.Choose(Patchwork Beastie)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Battlefield.Patchwork Beastie.Power = 6
+Bot1.Battlefield.Patchwork Beastie.Tapped = true
+Bot1.Mana =

@@ -52,7 +52,6 @@ keeps it).
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
-| [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
@@ -403,25 +402,6 @@ controller. No card in content reads a controller in that window that a scenario
 gives control to (gain control of a Mind Control, and the creature it enchants follows). No card in content can take control
 of an Aura that gives control: Opalescence leaves Auras alone, and the stealing cards target creatures. The repeat has no
 scenario.
-
-### KI-68: The advice applies a total cost's least before a cast's own reductions and a permission's additions
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-17, review of Trinisphere |
-
-**Notes.** CR 601.2f applies what directly affects the total cost (Trinisphere's "costs three mana", `CostDelta::at_least`)
-last. `actions::cast` does (`apply_cost_changes_before_least`, then harmonize, a sacrifice for each and emerge, then
-`at_least`). The advice that decides whether a cast is offered does not: `least_cost`/`finish` apply it inside
-`change_total`, before Rottenmouth Viper's sacrifice-for-each reduction and before `way_covered`'s emerge and harmonize
-reductions, so under Trinisphere such a cast may be offered for less than it costs and given back at the payment (Wild
-Ride's harmonize with a 4-power creature is advised at {R}, costs {2}{R}); and `castable_ways` adds a permission's `more`
-and additional mana after it, so a cast it could pay may be withheld (a Bolt costing {2} more by a permission is advised at
-{4}{R}, costs {2}{R}). A fix gives the advice the cast's order: `change_parts`, the cast's own reductions and the
-permission's additions, then the least.
-
-**Scenarios.** none yet (Trinisphere with Wild Ride, Winternight Stories, Crabomination, Rottenmouth Viper or a permission
-with a tax would show it).
 
 ### KI-71: The tactical bot's combat planning ignores bands
 

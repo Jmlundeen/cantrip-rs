@@ -1,0 +1,52 @@
+# A permission's added cost is part of the total before Trinisphere's "costs three mana" brings it up (CR 118.8, 601.2f):
+# Bot2's Lightning Bolt, exiled by Lightstall Inquisitor ("each spell cast this way costs {1} more to cast"), costs {1}{R},
+# which Trinisphere makes three mana, not {3}{R}. With three Mountains on turn 6 the cast is offered, and paid with them.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sol Ring
+Lightstall Inquisitor
+Trinisphere
+Plains
+Plains x10
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightstall Inquisitor.Cast
+Bot1.Pass
+Bot2.Choose(Lightning Bolt)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Trinisphere.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+? Bot2.Mana =
+Bot2.Exile.Lightning Bolt.Cast(Lightstall Inquisitor)
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mountain#3.Activate
+Bot2.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightstall Inquisitor
+Bot2.Graveyard = Lightning Bolt
+Bot2.Mana =
