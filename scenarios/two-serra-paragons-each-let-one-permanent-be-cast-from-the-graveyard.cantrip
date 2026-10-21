@@ -1,0 +1,52 @@
+# Two Serra Paragons are two permissions (CR 601.3): "once during each of your turns" is each one's own, so with both on the
+# battlefield Bot1 casts Ornithopter from the graveyard by the first and Mox Ruby by the second in the same turn, and is
+# offered nothing more from there. (Two Lurruses could show it too, but the legend rule keeps only one.)
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Pearl
+Serra Paragon
+Serra Paragon
+Faithless Looting
+Mountain
+Ornithopter
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Mox Ruby)
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+Bot1.Graveyard.Mox Ruby.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+! Bot1.Graveyard.Black Lotus.Cast(Ability: Once during each of your turns)
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Serra Paragon; Serra Paragon; Mountain; Ornithopter; Mox Ruby
+Bot1.Graveyard = Faithless Looting; Black Lotus; Black Lotus; Black Lotus

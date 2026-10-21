@@ -1,0 +1,36 @@
+# CR 608.2g, 702.34a: flashback lets a card be cast from its owner's graveyard only. Chandra exiles Faithless Looting and
+# has it cast as she resolves: its mana cost is the one way offered (no choice of flashback is asked), and the spell,
+# cast without flashback, goes to the graveyard as it resolves rather than into exile.
+# Source: https://magic.wizards.com/en/news/feature/kaladesh-release-notes-2016-09-16
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Chandra, Torch of Defiance
+Island
+Island
+Island
+Faithless Looting
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Accept
+! Bot1.Modes
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Island; Island; Black Lotus
+Exile.Count = 0
+Bot2.Life = 20

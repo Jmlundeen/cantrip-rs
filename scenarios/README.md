@@ -198,7 +198,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot1.Battlefield.Island.Activate` | activate an ability, including a mana ability while paying |
 | `Bot1.Battlefield.Cathar Commando.Activate(Bot2.Battlefield.Sol Ring)` | arguments are targets, as for `Cast` |
 | `Bot1.Battlefield.Tundra.Activate(Ability: {U})` | pick one of several abilities by part of its text |
-| `Bot1.Battlefield.Basking Rootwalla.Activate(Ability: #2)` | pick the source's Nth ability, mana abilities first, where two read the same — one it prints and an identical one it acquired (CR 602.5c); also in a refusal |
+| `Bot1.Battlefield.Basking Rootwalla.Activate(Ability: #2)` | pick the source's Nth ability, mana abilities first, where two read the same — one it prints and an identical one it acquired (CR 602.5c); for a cast, the card's Nth own way (`#1` its mana cost), not one paying an alternative cost another permanent gives; also in a refusal |
 | `Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 2)` | X in an ability's cost, raised the way a cast's is |
 | `Bot1.Hand.Batroc the Leaper.Cast(Kicked: 2)` | kicker or multikicker paid that many times; unsaid is not kicked |
 | `Bot1.Hand.Hogaak, Arisen Necropolis.Cast(Convoke: Llanowar Elves, Ornithopter; Delve: 2)` | what pays a cost instead of mana (CR 601.2h): `Convoke:` taps the named creatures, one per question in the order given (CR 702.51a), and `Delve:` exiles that many graveyard cards, the first offered each time (CR 702.66a) |

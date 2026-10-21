@@ -345,3 +345,54 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
         }),
     }
 }
+
+#[cfg(test)]
+mod option_id_tests {
+    use super::*;
+
+    /// A priority question offering one card twice, by two permissions.
+    fn fixture() -> (Game, Request, HandleSpace, ViewHandle) {
+        let island = cantrip_engine::card("Island").unwrap();
+        let game = Game::new(cantrip_engine::cards(), &Setup { decks: vec![vec![island; 20]; 2], seed: 1, ..Setup::default() });
+        let source = ObjectId(0);
+        let mut handles = HandleSpace::new();
+        let handle = handles.handle(source);
+        let first = ActionOption::on(ActionKind::CastSpell, source, 0);
+        let second = ActionOption { granted_by: Some(Grant { object: ObjectId(1), ability: AbilityRef::default() }), ..first.clone() };
+        let request = Request { id: 1, player: PlayerId(0), may_cancel: false, kind: RequestKind::Priority { options: vec![first, second] } };
+        (game, request, handles, handle)
+    }
+
+    #[test]
+    fn the_option_taken_is_the_one_its_id_names_and_round_trips() {
+        let (game, request, mut handles, source) = fixture();
+        let mut taken = TakeActionAnswer::new(ActionKindView::CastSpell, source);
+        taken.option_id = 2;
+        let Ok(answer) = translate(&AnswerPayload::TakeActionAnswer(taken), &request, &handles, &game) else { panic!("an offered option") };
+        let Answer::Act(action) = &answer else { panic!("an action") };
+        assert_eq!(action.granted_by, Some(Grant { object: ObjectId(1), ability: AbilityRef::default() }));
+        let AnswerPayload::TakeActionAnswer(back) = payload_of(&answer, &request, &mut handles, &game) else { panic!("an action") };
+        assert_eq!(back.option_id, 2);
+    }
+
+    #[test]
+    fn an_answer_without_an_id_is_refused_where_two_options_are_alike() {
+        let (game, request, handles, source) = fixture();
+        let taken = TakeActionAnswer::new(ActionKindView::CastSpell, source);
+        assert!(matches!(translate(&AnswerPayload::TakeActionAnswer(taken), &request, &handles, &game), Err(Untranslatable::Illegal(_))));
+    }
+
+    #[test]
+    fn an_id_the_question_has_not_or_of_another_option_is_refused() {
+        let (game, request, handles, source) = fixture();
+        for id in [i32::MIN, -1, 3, i32::MAX] {
+            let mut taken = TakeActionAnswer::new(ActionKindView::CastSpell, source);
+            taken.option_id = id;
+            assert!(matches!(translate(&AnswerPayload::TakeActionAnswer(taken), &request, &handles, &game), Err(Untranslatable::Illegal(_))));
+        }
+        let mut taken = TakeActionAnswer::new(ActionKindView::CastSpell, source);
+        taken.option_id = 1;
+        taken.ability_index = 1;
+        assert!(matches!(translate(&AnswerPayload::TakeActionAnswer(taken), &request, &handles, &game), Err(Untranslatable::Illegal(_))));
+    }
+}

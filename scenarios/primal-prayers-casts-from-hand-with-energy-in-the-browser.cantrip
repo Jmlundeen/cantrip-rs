@@ -1,0 +1,34 @@
+# Browser
+# CR 603.6a, 107.14, 118.9: cast Prayers for mana, resolve the energy trigger and use the card menu to cast a creature for one energy.
+# Mox Pearl's {W} keeps the creature's own mana cost open, so the menu shows both casts, each with what it costs.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Primal Prayers
+Mother of Runes
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Primal Prayers.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Energy = 2
+Bot1.Hand.Mother of Runes.Cast(Ability: Pay {E})
+? Client.Bot1.Menu = Cast Mother of Runes — Pay {E} rather than its mana cost; Cast Mother of Runes
+
+[Expect]
+Bot1.Energy = 1
+Bot1.Battlefield = Forest; Mox Pearl; Primal Prayers; Mother of Runes
+Bot1.Mana =

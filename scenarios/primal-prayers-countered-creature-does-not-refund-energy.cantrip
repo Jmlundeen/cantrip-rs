@@ -1,0 +1,38 @@
+# CR 601.2h, 701.5: energy is paid while casting, and countering the creature does not refund it.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Mother of Runes
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island
+Black Lotus
+Counterspell
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot2.Choose()
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mother of Runes.Cast(Ability: Pay {E})
+Bot2.Hand.Counterspell.Cast(Stack.Mother of Runes)
+
+[Expect]
+Bot1.Energy = 1
+Bot1.Graveyard = Mother of Runes; Show and Tell; Black Lotus
+Bot2.Graveyard = Counterspell; Black Lotus

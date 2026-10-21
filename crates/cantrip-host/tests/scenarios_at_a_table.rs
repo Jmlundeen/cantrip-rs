@@ -39,6 +39,61 @@ fn at_a_table(name: &str, text: &str) -> Result<(), String> {
     Err("the scenario went on too long at the table".into())
 }
 
+/// Every string a step's requests hold under the key `key`, for every option of the card `source` (a handle) when given.
+fn fields(value: &Value, key: &str, source: Option<&Value>, out: &mut Vec<(String, Value)>) {
+    match value {
+        Value::Object(fields_of) => {
+            if fields_of.get("Kind").and_then(Value::as_str) == Some("CastSpell")
+                && source.is_none_or(|s| fields_of.get("Source") == Some(s))
+                && let Some(v) = fields_of.get(key)
+            {
+                let description = fields_of.get("Description").and_then(Value::as_str).unwrap_or("").to_owned();
+                out.push((description, v.clone()));
+            }
+            for v in fields_of.values() {
+                fields(v, key, source, out);
+            }
+        }
+        Value::Array(values) => values.iter().for_each(|v| fields(v, key, source, out)),
+        _ => {}
+    }
+}
+
+/// Web-slinging returns a tapped creature, chosen once the mana is paid (CR 702.188a, 601.2g-h): its cast row says so, the
+/// card's ordinary cast row does not.
+#[test]
+fn a_web_slinging_cast_row_says_its_creature_is_chosen_after_the_mana() {
+    let (mut saw_web, mut saw_printed) = (false, false);
+    play_looking("spider-sense-web-slinging-returns-the-birds-tapped-for-its-own-mana", |_, views, step| {
+        if let Some(card) = views[0].objects.iter().find(|o| o.name == "Spider-Sense") {
+            let mut rows = Vec::new();
+            fields(&step["Requests"], "TappedAfterMana", Some(&serde_json::to_value(card.handle).unwrap()), &mut rows);
+            for (description, tapped) in rows {
+                let web = description.contains("Web-slinging");
+                assert_eq!(tapped, Value::Bool(web), "{description}");
+                if web { saw_web = true } else { saw_printed = true }
+            }
+        }
+        false
+    });
+    assert!(saw_web && saw_printed);
+}
+
+/// Two permissions that would each let a card be cast for the same alternative cost (Lurrus of the Dream-Den's and Serra
+/// Paragon's, each with Primal Prayers' {E}) are two rows, each naming the permanent whose permission it is (CR 601.2b).
+#[test]
+fn rows_alike_in_cost_name_the_permission_each_is_cast_by() {
+    let mut saw_both = false;
+    play_looking("primal-prayers-chooses-between-granted-graveyard-permissions", |_, _, step| {
+        let mut rows = Vec::new();
+        fields(&step["Requests"], "Description", None, &mut rows);
+        let has = |name: &str| rows.iter().any(|(d, _)| d.contains("Pay {E}") && d.contains(&format!("({name})")));
+        saw_both |= has("Lurrus of the Dream-Den") && has("Serra Paragon");
+        false
+    });
+    assert!(saw_both, "no prompt showed both energy casts with their permissions");
+}
+
 /// Hidden information (CR 406.3, 708.2): Headliner Scarlett exiles Bot2's top card, Firdoch Core, face down. What Bot1's
 /// view says of that card - at the table, in the views as they are sent - carries nothing of what it is: no name, and not
 /// that it is every creature type (Changeling), which would say it.

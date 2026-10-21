@@ -1,0 +1,39 @@
+# CR 715.3, 715.5, 118.9: Stomp is not a creature spell; after its normal cast, the creature in exile can use the energy alternative.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Mox Ruby
+Black Lotus
+Bonecrusher Giant
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Stomp: Pay {E})
+Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Stomp)
+Bot1.Pass
+Bot2.Pass
+? Exile = Bonecrusher Giant
+[T2 Bot2.Main1]
+Bot1.Exile.Bonecrusher Giant.Cast(Ability: Pay {E})
+
+[Expect]
+Bot1.Energy = 1
+Bot1.Battlefield = Island; Mox Ruby; Primal Prayers; Bonecrusher Giant
+Bot2.Life = 18
+Exile =

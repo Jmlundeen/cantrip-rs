@@ -1,0 +1,51 @@
+# Bolas's Citadel permits a life-paid top cast; Mystic Forge separately permits artifact or colorless spells from the top
+# for their mana costs. With both in play the player chooses which permission a cast is made by (CR 601.2b): here
+# Citadel's, so Sol Ring costs 1 life and none of the mana that is in the pool.
+# Rules: CR 601.3 (a permission is required to cast), 601.2b and 118.9 (choose the cost for the permission used).
+# Sources: https://magic.wizards.com/en/rules ; https://magic.wizards.com/en/news/feature/core-set-2020-release-notes-2019-06-25 ; https://media.wizards.com/2025/downloads/FIN_Release_Notes_3O87RLY5EO/EN_FIN_Release_Notes_2025_1_15.pdf
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Jet
+Bolas's Citadel
+Mystic Forge
+Swamp
+Sol Ring
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Pass
+Bot1.Hand.Mystic Forge.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Library.Sol Ring.Cast(Ability: Cast by paying 1 life instead)
+
+[Expect]
+Turn = 3
+Bot1.Life = 19
+Bot1.Mana = {B}{B}
+Bot1.Battlefield.Sol Ring.Types = Artifact
+Stack.Count = 0

@@ -1,0 +1,62 @@
+# CR 118.9a: identical energy payments retain distinct Lurrus and Serra permission routes.
+# Lurrus refuses the three-mana Giant even before its use is spent; Serra permits it.
+# Ballista has X=0 and dies without Serra's consequence when Lurrus grants permission.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Black Lotus
+Serra Paragon
+Mox Pearl
+Black Lotus
+Lurrus of the Dream-Den
+Mountain
+Faithless Looting
+Walking Ballista
+Bonecrusher Giant
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Walking Ballista; Bonecrusher Giant)
+! Bot1.Graveyard.Bonecrusher Giant.Cast(Ability: Lurrus of the Dream-Den)
+Bot1.Graveyard.Walking Ballista.Cast(Ability: Lurrus of the Dream-Den)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Energy = 1
+! Bot1.Graveyard.Bonecrusher Giant.Cast(Ability: Lurrus of the Dream-Den)
+Bot1.Graveyard.Bonecrusher Giant.Cast(Ability: Serra Paragon)
+Bot1.Pass
+
+[Expect]
+Bot1.Energy = 0
+Bot1.Battlefield = Island; Mountain; Mox Pearl; Primal Prayers; Serra Paragon; Lurrus of the Dream-Den; Bonecrusher Giant
+Bot1.Life = 20
+Exile =
+Bot1.Graveyard = Walking Ballista; Faithless Looting; Black Lotus; Black Lotus; Show and Tell; Black Lotus

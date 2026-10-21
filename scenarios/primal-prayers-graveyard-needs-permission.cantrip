@@ -1,0 +1,38 @@
+# CR 601.3, 118.9: Prayers grants an alternative cost, not graveyard access. Yawgmoths Will supplies that permission.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Walking Ballista
+Yawgmoth's Will
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Walking Ballista.Cast(Ability: Pay {E})
+Bot1.Pass
+Bot2.Pass
+! Bot1.Graveyard.Walking Ballista.Cast(Ability: Pay {E})
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Graveyard.Walking Ballista.Cast(Ability: Pay {E})
+
+[Expect]
+Bot1.Energy = 0
+Exile = Yawgmoth's Will; Walking Ballista
+Bot1.Battlefield = Island; Primal Prayers

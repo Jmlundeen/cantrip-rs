@@ -1,0 +1,67 @@
+# After Case of the Locked Hothouse solves, its top-library permission lets Bot1 cast creature spells for their mana costs.
+# Bolas's Citadel also permits the top spell for life equal to its mana value. On Bot2's turn, Cathar Commando has flash;
+# Case supplies the {1}{W} route and Citadel supplies a separate life route.
+# Rules: CR 601.3, 601.2b and 118.9; each cast uses an applicable permission and the cost attached to that route.
+# Sources: https://magic.wizards.com/en/rules ; https://magic.wizards.com/en/news/feature/murders-at-karlov-manor-release-notes
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Forest
+Case of the Locked Hothouse
+Bolas's Citadel
+Black Lotus
+Plains
+Plains
+Plains
+Ponder
+Plains x3
+Cathar Commando
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Case of the Locked Hothouse.Cast
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T13 Bot1.End]
+Bot1.Pass
+[T16 Bot2.Main1]
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Library.Cathar Commando.Cast(Ability: Case of the Locked Hothouse)
+
+[Expect]
+Bot1.Life = 20
+Bot1.Mana =
+Bot1.Battlefield.Case of the Locked Hothouse.Solved = true
+Bot1.Battlefield.Cathar Commando.Power = 3
+Bot1.Battlefield.Cathar Commando.Toughness = 1
+Stack.Count = 0

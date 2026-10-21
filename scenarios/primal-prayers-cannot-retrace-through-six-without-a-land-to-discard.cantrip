@@ -1,0 +1,46 @@
+# CR 702.81a: energy cannot waive retrace's additional land discard.
+# Without a remaining land in hand, neither retrace payment route is offered.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Black Lotus
+Six
+Mox Ruby
+Mountain
+Faithless Looting
+Ornithopter
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Forest)
+! Bot1.Graveyard.Ornithopter.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 2
+Bot1.Battlefield = Island; Mountain; Mox Ruby; Primal Prayers; Six
+Bot1.Graveyard = Faithless Looting; Forest; Ornithopter; Black Lotus; Show and Tell; Black Lotus

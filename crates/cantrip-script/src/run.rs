@@ -2063,7 +2063,8 @@ impl<'s> Run<'s> {
         if let Some(ability) = step.named("Ability") {
             let needle = ability.to_lowercase();
             if let Some(n) = needle.strip_prefix('#').and_then(|n| n.parse::<usize>().ok()) {
-                offered.retain(|o| o.index as usize == n - 1);
+                // The card's nth own option (`#1` its mana cost), not paid for by an alternative cost another object gives.
+                offered.retain(|o| o.index as usize == n - 1 && (o.kind != ActionKind::CastSpell || o.paid_by.is_none()));
             } else {
                 offered.retain(|o| {
                     // An Adventure or an Omen says which face of the card is cast, as the C# engine's description does.

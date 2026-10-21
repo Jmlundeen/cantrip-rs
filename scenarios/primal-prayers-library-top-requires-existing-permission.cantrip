@@ -1,0 +1,43 @@
+# CR 601.3, 118.9: Prayers cannot cast from the library on its own. Mystic Forge supplies access; only a creature gets the energy alternative.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Black Lotus
+Black Lotus
+Mystic Forge
+Walking Ballista
+Mishra's Bauble
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Library.Walking Ballista.Cast(Ability: Pay {E})
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mystic Forge.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Library.Walking Ballista.Cast(X: 2; Ability: Pay {E})
+Bot1.Pass
+Bot2.Pass
+! Bot1.Library.Mishra's Bauble.Cast(Ability: Pay {E})
+Bot1.Library.Mishra's Bauble.Cast
+
+[Expect]
+Bot1.Energy = 1
+Bot1.Battlefield = Island; Primal Prayers; Mystic Forge; Mishra's Bauble
+Bot1.Graveyard = Walking Ballista; Black Lotus; Black Lotus; Show and Tell; Black Lotus

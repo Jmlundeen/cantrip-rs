@@ -1,0 +1,38 @@
+# CR 113.7a, 604.1: destroying the source in response does not stop its ETB energy trigger; its static casting permission ends immediately.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Ornithopter
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Force of Vigor
+Giant Growth
+Lightning Bolt x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot2.Choose(Forest)
+Bot2.Hand.Force of Vigor.Cast(Ability: Exile)
+Bot2.Target(Primal Prayers)
+Bot2.Choose(Giant Growth)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Energy = 2
+! Bot1.Hand.Ornithopter.Cast(Ability: Pay {E})
+Bot1.Hand.Ornithopter.Cast
+
+[Expect]
+Bot1.Energy = 2
+Bot1.Graveyard = Primal Prayers; Show and Tell; Black Lotus
+Bot1.Battlefield = Island; Ornithopter
