@@ -18,6 +18,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = g.state().spec_targets(item, 1).next().and_then(|slot| targets::object(g, item, slot)) {
         pump(g, item.object, creature, 1, 1);
     }
+    // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+    g.end_sentence();
     if let Some(creature) = g.state().spec_targets(item, 2).next().and_then(|slot| targets::object(g, item, slot)) {
         pump(g, item.object, creature, -1, -1);
     }

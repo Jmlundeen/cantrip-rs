@@ -426,9 +426,11 @@ each check of the state-based actions, so a state a resolution left and a state-
 704.3: Thespian's Stage that became a Dark Depths with no ice counters and lost the legend rule). A change with no event in
 the middle of a resolution - an effect beginning (`Game::add_effect`) or ending, an object becoming a copy - asks them too
 (`Cx::state_changed`, `settle::state_triggers_now`), so a state true only between two instructions of one resolution
-triggers. Several calls that are one instruction of the card's text (an exchange of control, an animation, "gets +2/+2 and
-gains trample") are made inside `Game::one_instruction`, and the state is judged once the outermost closes, never half-done;
-a run that suspends there is judged when it is redone. Only the objects that could have one are asked: a card as it is now
+triggers. A resolving spell or ability is one instruction by default: what it changes with no event is judged once it is
+done (the `Resolve` frame), so an "each" or "all", an animation or "gets +2/+2 and gains trample" is never judged half-done
+(CR 608.2c, 611.2c); a card whose text has two sentences that each change the game with no event marks where the first
+ends (`Game::end_sentence`), and the state is judged there. Outside a resolution, calls that are one instruction (an exchange
+of control) are made inside `Game::one_instruction`. A run that suspends is judged when it is redone. Only the objects that could have one are asked: a card as it is now
 (face or copy) that prints or gives one (`CardTable::state_triggers`, its `delayed` list included), a copy's exception
 abilities, an effect's granted ability, and every permanent while a static ability that gives others abilities is on the
 board (`CardTable::ability_grants`). It

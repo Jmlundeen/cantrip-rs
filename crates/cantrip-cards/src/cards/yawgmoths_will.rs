@@ -12,6 +12,8 @@ fn exile_instead_applies(_: &dyn Query, asker: &Asker, _: ObjectId, proposal: &P
 /// so they outlive the spell's own object. The spell is itself put into the graveyard once it is done, so it is exiled.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_effect(item.object, item.object, EffectKind::PlayFromGraveyard, Duration::EndOfTurn);
+    // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+    g.end_sentence();
     g.add_effect(item.object, item.object, EffectKind::ReplacementRule(0), Duration::EndOfTurn);
     Ok(())
 }

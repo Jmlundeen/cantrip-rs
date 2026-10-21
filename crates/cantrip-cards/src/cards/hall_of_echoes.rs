@@ -12,6 +12,8 @@ fn copy_and_lift_the_legend_rule(g: &mut dyn Game, item: &StackItem) -> Result<(
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let values = g.copiable_values(creature);
     g.become_copy(item.object, item.object, values, Duration::EndOfTurn);
+    // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+    g.end_sentence();
     g.add_effect(item.object, item.object, EffectKind::NoLegendRule(item.controller), Duration::EndOfTurn);
     Ok(())
 }

@@ -14,6 +14,8 @@ fn control_a_mouse(g: &dyn Game, item: &StackItem) -> bool {
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+    // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+    g.end_sentence();
     if control_a_mouse(g, item) {
         pump(g, item.object, creature, 1, 0);
     }

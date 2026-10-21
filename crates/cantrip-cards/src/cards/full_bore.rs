@@ -7,6 +7,8 @@ use cantrip_oracle as oracle;
 fn bore(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     pump(g, item.object, creature, 3, 2);
+    // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+    g.end_sentence();
     if warp::was_cast_for_warp(g, creature) {
         cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
         cantrip_mechanics::haste_until_end_of_turn(g, item.object, creature);

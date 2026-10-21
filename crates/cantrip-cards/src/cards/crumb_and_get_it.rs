@@ -8,6 +8,8 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     pump(g, item.object, creature, 2, 2);
+    // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+    g.end_sentence();
     if item.gift.is_some() {
         cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
     }

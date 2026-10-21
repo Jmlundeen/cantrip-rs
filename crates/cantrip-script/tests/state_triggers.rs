@@ -50,8 +50,29 @@ static SHRINK: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// Target creature gets -1/-1 until end of turn, then +1/+1 until end of turn: two effects, no event between or after them.
+/// "Target creature gets -1/-1 until end of turn. Then it gets +1/+1 until end of turn.": two sentences (`Game::end_sentence`
+/// between them), two effects, no event between or after them.
 fn flicker(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(id) = item.target(0) {
+        cantrip_mechanics::pump(g, item.object, id, -1, -1);
+        g.end_sentence();
+        cantrip_mechanics::pump(g, item.object, id, 1, 1);
+    }
+    Ok(())
+}
+
+/// "{T}: Target creature gets -1/-1 until end of turn. Then it gets +1/+1 until end of turn." Its toughness is 0 only between
+/// the two effects, in the middle of the resolution.
+static FLICKER: CardDef = CardDef {
+    name: "Probe Flickerer",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(TAP, flicker, "{T}: Target creature gets -1/-1 until end of turn. Then it gets +1/+1 until end of turn.")
+        .targets(&[target(creature)])],
+    ..CardDef::BLANK
+};
+
+/// "Target creature gets -1/-1 and +1/+1 until end of turn": one sentence, two effects - no point of the game between them.
+fn evened(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(id) = item.target(0) {
         cantrip_mechanics::pump(g, item.object, id, -1, -1);
         cantrip_mechanics::pump(g, item.object, id, 1, 1);
@@ -59,13 +80,12 @@ fn flicker(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "{T}: Target creature gets -1/-1 until end of turn, then gets +1/+1 until end of turn." Its toughness is 0 only between
-/// the two effects, in the middle of the resolution.
-static FLICKER: CardDef = CardDef {
-    name: "Probe Flickerer",
+/// "{T}: Target creature gets -1/-1 and +1/+1 until end of turn." One instruction: the creature's toughness is never 0 at a
+/// point of the game (CR 608.2c, 611.2c).
+static EVENER: CardDef = CardDef {
+    name: "Probe Evener",
     types: TypeSet::of(&[CardType::Artifact]),
-    abilities: &[ability(TAP, flicker, "{T}: Target creature gets -1/-1 until end of turn, then gets +1/+1 until end of turn.")
-        .targets(&[target(creature)])],
+    abilities: &[ability(TAP, evened, "{T}: Target creature gets -1/-1 and +1/+1 until end of turn.").targets(&[target(creature)])],
     ..CardDef::BLANK
 };
 
@@ -111,7 +131,7 @@ static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeS
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&FRAIL, &SHRINK, &FLICKER, &HERMIT, &TRADER, &BAUBLE, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&FRAIL, &SHRINK, &FLICKER, &EVENER, &HERMIT, &TRADER, &BAUBLE, &FILLER]))
 }
 
 /// CR 603.8, 704.3: the -1/-1 ability resolves and the Frail is a 0/0 with no event to ask its state after; its state trigger has
@@ -131,6 +151,14 @@ fn a_state_true_only_in_the_middle_of_a_resolution_triggers() {
     let game = play("Probe Flickerer");
     assert!(game.state.battlefield().iter().any(|&id| game.name(id) == "Probe Frail"), "the Frail is a 1/1 again");
     assert_eq!(game.state.player(PlayerId(0)).life, 23, "the state trigger triggered mid-resolution and resolved");
+}
+
+/// A resolving ability is one instruction unless its text marks a sentence's end: within one, the Frail's toughness is
+/// never 0 where the game could see it, and its state trigger does not trigger.
+#[test]
+fn a_state_true_only_inside_one_instruction_does_not_trigger() {
+    let game = play("Probe Evener");
+    assert_eq!(game.state.player(PlayerId(0)).life, 20, "no point of the game had the Frail at 0 toughness");
 }
 
 /// The first seat casts the Probe Frail and `artifact`, then activates the artifact at the Frail, and everything resolves.

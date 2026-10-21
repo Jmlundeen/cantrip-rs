@@ -7,6 +7,8 @@ use cantrip_oracle as oracle;
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let colors = ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Black).0);
     lands::becomes_creature_until_end_of_turn(g, item, (3, 2), colors, Subtype::Elemental, Keywords::NONE);
+    // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+    g.end_sentence();
     g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords::of(&[Keyword::CantBeBlocked])), Duration::EndOfTurn);
     Ok(())
 }

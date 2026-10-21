@@ -10,6 +10,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let x = item.x as i16;
     pump(g, item.object, creature, -x, -x);
+    // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+    g.end_sentence();
     if g.history().fact_as_cast(item.object) != 0 {
         pump(g, item.object, creature, -3, -3);
     }

@@ -8,13 +8,15 @@ use cantrip_oracle as oracle;
 fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.add_effect(item.object, item.object, EffectKind::PlayerHexproof, Duration::EndOfTurn);
-    let keywords = if item.gift.is_some() {
-        Keywords::of(&[Keyword::Hexproof, Keyword::Indestructible])
-    } else {
-        Keywords::of(&[Keyword::Hexproof])
-    };
     for permanent in g.permanents_of(you) {
-        g.add_effect(item.object, permanent, EffectKind::AddKeywords(keywords), Duration::EndOfTurn);
+        g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof])), Duration::EndOfTurn);
+    }
+    if item.gift.is_some() {
+        // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
+        g.end_sentence();
+        for permanent in g.permanents_of(you) {
+            g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+        }
     }
     Ok(())
 }

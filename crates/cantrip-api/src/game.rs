@@ -790,6 +790,11 @@ pub trait Game: Query {
     /// (an effect beginning, an object becoming a copy) is judged by the state triggers once it is all done (CR 603.8), not
     /// part-way. Animating a permanent (types, power and toughness, abilities) and an exchange of control are each one.
     fn one_instruction(&mut self, f: &mut dyn FnMut(&mut dyn Game) -> Result<(), Suspend>) -> Result<(), Suspend>;
+    /// A sentence of the card's text ends here (CR 608.2c: the instructions are followed in order): what the sentences before
+    /// changed with no event is judged by the state triggers now (CR 603.8), before the next one. A resolving spell or ability
+    /// is otherwise one instruction, judged once it is done, so an "each" or "all" is never judged half-applied (CR 611.2c);
+    /// a card whose text has two sentences that each change the game with no event marks the end of the first.
+    fn end_sentence(&mut self);
     /// Counters a spell (CR 701.5): it leaves the stack for its owner's graveyard, or exile if it was flashed back.
     fn counter(&mut self, spell: ObjectId);
     /// Counters a spell and puts it in its owner's hand, on top or bottom of their library, or in exile (CR 701.6a).

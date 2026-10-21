@@ -262,7 +262,18 @@ impl Game {
                     FrameKind::Priority => turn::priority(&mut cx),
                     FrameKind::Settle => settle::settle(&mut cx),
                     FrameKind::Act { player } => actions::act(&mut cx, player),
-                    FrameKind::Resolve => resolve::resolve(&mut cx),
+                    // A card's effect is carried out as one instruction unless its text marks where a sentence ends
+                    // (`Game::end_sentence`): a change with no event is judged by the state triggers once it is done
+                    // (CR 603.8, 608.2c, 611.2c), never half-done.
+                    FrameKind::Resolve => {
+                        cx.g.instruction_depth = cx.g.instruction_depth.saturating_add(1);
+                        let flow = resolve::resolve(&mut cx);
+                        cx.g.instruction_depth = cx.g.instruction_depth.saturating_sub(1);
+                        if cx.g.instruction_depth == 0 && std::mem::take(&mut cx.g.state_check_due) && flow.is_ok() {
+                            settle::state_triggers_now(&mut cx);
+                        }
+                        flow
+                    }
                 };
                 (flow, cx.asked_at)
             };
@@ -1531,6 +1542,12 @@ impl cantrip_api::Game for Cx<'_> {
             self.g.state.see_statics();
         }
         self.state_changed();
+    }
+
+    fn end_sentence(&mut self) {
+        if std::mem::take(&mut self.g.state_check_due) {
+            settle::state_triggers_now(self);
+        }
     }
 
     fn one_instruction(&mut self, f: &mut dyn FnMut(&mut dyn cantrip_api::Game) -> Result<(), Suspend>) -> Result<(), Suspend> {
