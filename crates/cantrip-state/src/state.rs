@@ -1058,7 +1058,7 @@ impl GameState {
     /// specs and shares are 0. Past `INLINE_TARGETS` targets the lists are put in the target arena, journaled, and the item
     /// names them (the first ones are in the item too).
     pub fn set_item_targets(&mut self, item: &mut StackItem, targets: &[Target], spec_of: &[u8], shares: &[u32]) {
-        // Counted in a u32, past any board's legal targets: a list longer than that takes no more (KI-99).
+        // Counted in a u32: every target is a different object or player (CR 115.3), which the event cap bounds (RX-1).
         item.target_count = crate::count_u32(targets.len());
         let n = item.target_count as usize;
         item.inline_targets = [Target::None; INLINE_TARGETS];
@@ -1076,7 +1076,8 @@ impl GameState {
             self.log(Undo::TargetsSpilled(start));
             item.spill = start;
         }
-        // The shares, when any is above 0, in their own arena; past the 2^32 a u32 names, none is kept (KI-99).
+        // The shares, when any is above 0, in their own arena, named by a u32: as many as each divided item's targets, every
+        // one chosen by hand in a game the event cap bounds (RX-1), far inside it. Past it none would be kept.
         item.shares = StackItem::NO_SHARES;
         if shares.iter().take(n).any(|&s| s > 0) {
             let start = self.share_arena.len();

@@ -1517,7 +1517,11 @@ mod tests {
     }
 }
 
-/// A length as a `u32` count: exactly, or past `u32::MAX` - beyond any practical game (KI-99) - that many and no more.
+/// A length as a `u32` count: exactly, or past `u32::MAX` that many and no more. A count of things that happen - objects
+/// (every one made by an event or dealt), targets and candidates (each a different object or player, CR 115.3), cards
+/// chosen, entries of the game's lists - is bounded by the most events a game records before it is a draw
+/// (`MAX_GAME_EVENTS`, 2^21; `docs/rules-exceptions.md`, RX-1), so a game never reaches the saturation: it is there so that
+/// no length is ever wrapped into a different, wrong count.
 pub fn count_u32(n: usize) -> u32 {
     u32::try_from(n).unwrap_or(u32::MAX)
 }

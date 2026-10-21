@@ -53,7 +53,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-103](#ki-103-mana-costs-x-kicker-and-the-mana-a-cast-records-are-narrower-than-play-reaches) | Mana costs, X, kicker and the mana a cast records are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
-| [KI-106](#ki-106-some-answers-and-counts-are-compared-or-kept-in-eight-bits) | Some answers and counts are compared or kept in eight bits | Pri-1 | Fix queued |
+| [KI-106](#ki-106-some-answers-are-compared-in-eight-bits-and-a-library-search-has-no-any-number) | Some answers are compared in eight bits, and a library search has no "any number" | Pri-1 | Fix queued |
 | [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
@@ -64,8 +64,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-57](#ki-57-the-tactical-bot-does-not-know-islandwalk) | The tactical bot does not know islandwalk | Pri-3 | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Pri-3 | Open |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Pri-3 | Open |
-| [KI-99](#ki-99-a-spell-or-ability-with-more-than-232-targets-or-a-question-of-more-than-231-candidates) | A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates | Won't fix | Won't fix: beyond practical scale |
-| [KI-100](#ki-100-a-choice-search-or-sacrifice-of-more-than-232-cards) | A choice, search or sacrifice of more than 2^32 cards | Won't fix | Won't fix: beyond practical scale |
 
 ## Issues
 
@@ -219,42 +217,6 @@ permanent's own reached striation prints.
 **Scenarios.** `wurmwall-sweeper-shows-its-striation-power-and-toughness-in-the-browser` (browser) checks the face in hand and
 below the threshold only, for this reason.
 
-### KI-99: A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Won't fix | Won't fix: beyond practical scale | engine / host | 2026-10-21, widening the target counts past 255 |
-
-**Notes.** A stack item counts its targets in a `u32` (`StackItem::target_count`), and a target question counts its
-candidates in a `u32` (`RequestKind::ChooseTarget::count`), which the host sends as the protocol's `int`. Each stops at its
-bound rather than wrap (`cantrip_state::count_u32`, the host's `wire`): a list of more than 2^32 targets keeps the first 2^32,
-a question of more candidates asks for at most 2^32, and the host sends a count past 2^31 - 1 as 2^31 - 1, so the client may
-offer fewer than the engine would take. Both are tested at their bounds. Play cannot reach them: every target and every
-candidate is a different object or player (CR 115.3), so each needs an object of its own in memory - 2^31 objects is
-hundreds of gigabytes - and a player chooses each target by hand. Tokens that double each round reach 2^16 in sixteen rounds,
-well within these limits; 2^31 would take thirty-one rounds of doubling in a timed game, and the memory above. No card needs
-it. The target arena where an item's targets past the first 16 are kept is indexed by a `usize`, with no bound of its own; the
-share arena where the shares of a divided total are kept (`GameState::share_arena`) is named by a `u32`, and past 2^32 shares
-recorded in one game an item keeps none, so its targets are dealt or given nothing - 2^32 shares is 16 gigabytes of them,
-each chosen by hand.
-
-### KI-100: A choice, search or sacrifice of more than 2^32 cards
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Won't fix | Won't fix: beyond practical scale | engine / mechanics / cards / host | 2026-10-21, widening the card counts past 255 |
-
-**Notes.** A question to choose cards counts them in a `u32` (`RequestKind::ChooseCards::count`, with "any number" its own
-flag, `any_number`), as do a library search's and a find's counts (`SearchLibrary`, `Find`), craft's materials, and the
-counts cards work out from lists of cards or permanents (Balance, Settle the Wreckage, Winds of Abandon, Liliana of the
-Veil). A count made from a list's length stops at `u32::MAX` rather than wrap (`u32::try_from(..).unwrap_or(u32::MAX)`, as
-`cantrip_state::count_u32` does), so a list of more than 2^32 cards asks for 2^32; the host sends a count past 2^31 - 1 as
-2^31 - 1 (`wire`, KI-99). "Sacrifice any number" past 255 is tested (`any_number_sacrificed_is_any_number_past_255`), and an
-answer of more cards than asked is refused (`an_answer_of_257_cards_to_choose_one_is_refused`). Play cannot reach the
-bound: each card counted is an object in memory, 2^31 of them hundreds of gigabytes, chosen by hand; tokens doubling each
-round pass 255 in eight rounds - why the counts are no longer `u8` - but 2^31 takes thirty-one, in a timed game. No card
-needs more.
-
 ### KI-101: A player out of a game that goes on sees it a step late
 
 | Priority | Status | Area | Found |
@@ -349,21 +311,19 @@ construction for the bands; and the modes kept as the chosen indices in order.
 
 **Scenarios.** None yet.
 
-### KI-106: Some answers and counts are compared or kept in eight bits
+### KI-106: Some answers are compared in eight bits, and a library search has no "any number"
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Pri-1 | Fix queued | engine / host | 2026-10-21, the engine-wide audit (workstream W4) |
 
 **Notes.**
-- Three answer checks compare `len() as u8` (`validate.rs:159` colors, `:320` discard to hand size, `:349` trigger
-  order), so an answer whose length wraps past 255 is accepted though it is not legal.
-- Extra combats are a `u8` that stops at 255 (`Turn::extra_combats`), and lands played a `u8` that wraps
-  (`Player::lands_played`).
-- Who has seen an object is a `u8` mask (`Obj::seen_by`), one bit a player, so more than eight players overflow it.
+- Three answer checks compare `len() as u8` (`validate.rs` colors, discard to hand size, trigger order), so an answer whose
+  length wraps past 255 is accepted though it is not legal.
 - A library search has no "any number" flag; the clients read a count of 255 or more as "any number".
-Counts of things that happen are bounded by the event cap (RX-1, 2^21 events), which the event-cap sweep uses to retire
-bounds play cannot reach.
+The counts of things that happen that were kept narrower than the event cap (RX-1, 2^21 events) can reach - the journal's
+list positions, a batch's length, lands played, extra combats, and more - are u32 since the event-cap sweep, and a game
+deals at most eight seats, which the per-seat masks hold (`MAX_SEATS`).
 
 **Scenarios.** None yet.
 

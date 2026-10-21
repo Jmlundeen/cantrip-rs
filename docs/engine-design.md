@@ -945,7 +945,11 @@ and a combination may go round as many times as it needs; a person is held to th
 stops itself (`LoopGuard`, C#: past 4096 questions in one step it passes, declines and picks each answer in turn). A game
 whose history reaches `MAX_GAME_EVENTS` (2,097,152 events) is a draw, checked between two frames (`Game::run`; RX-1): a
 run of play that never repeats exactly is neither a loop the rules can find nor ever ended by them, and an automated seat
-whose passive answers cannot end a run reaches that draw rather than conceding. The watch keeps each question of a busy
+whose passive answers cannot end a run reaches that draw rather than conceding. The cap bounds every count of things
+that happen - objects, effects, grants, rounds, questions, the history, arena entries - at 2^21, so such a count is a
+`u32` (a length made one by `count_u32`, which saturates rather than wrap, and sent as the host's `int` by `wire`), and one
+kept narrower is a bug; a game deals at most `MAX_SEATS` (eight) seats, which a set of seats holds a bit each. It bounds no amount:
+counters, damage, mana, life, power and toughness can double in one event. The watch keeps each question of a busy
 step once (`GameState::loop_keys`, found through a hashed index, journalled an entry at a time: a round of a priority and
 an answer given are small undo entries), so a loop played by hand costs the watch nothing more per round; nothing bounds
 what it keeps but `MAX_GAME_EVENTS`, which bounds the questions a step can ask. A normal game pays a comparison per
