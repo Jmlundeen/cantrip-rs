@@ -1,0 +1,53 @@
+# Ruling 2015-06-22: "that hasn't been chosen" refers only to that specific Demonic Pact, whoever chose them. Bot1's Pact
+# chooses its damage mode on turn 3 (Bot2 16, Bot1 24); Bot1 then gives the Pact to Bot2 with Harmless Offering. At Bot2's
+# upkeep the Pact triggers for Bot2, who may not choose the damage mode (`! Bot2.Modes(1)`) and draws two instead.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Demonic Pact
+Harmless Offering
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Demonic Pact.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Modes(deals 4 damage)
+Bot1.Target(Bot2)
+[T3 Bot1.Main1]
+? Bot2.Life = 16
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Bot1.Battlefield.Demonic Pact)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Demonic Pact
+[T4 Bot2.Upkeep]
+! Bot2.Modes(1)
+Bot2.Modes(Draw two)
+[T4 Bot2.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 16
+Bot1.Life = 24
+Bot2.Hand.Count = 10
+Bot2.Battlefield.Demonic Pact.ChosenModes = 1, 3
