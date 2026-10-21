@@ -1,0 +1,48 @@
+# Beyond the Quiet: "Exile all creatures and Spacecraft." A Spacecraft is exiled whether or not it is a creature: Bot1's
+# Wurmwall Sweeper, with no charge counters and so no creature (its 4+ striation unreached), is exiled with Bot2's Llanowar
+# Elves, while Bot1's Moxen stay.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Wurmwall Sweeper
+Beyond the Quiet
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Beyond the Quiet.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wurmwall Sweeper; Llanowar Elves
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire
+Bot2.Battlefield = Forest
