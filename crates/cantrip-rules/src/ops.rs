@@ -1755,6 +1755,10 @@ pub fn change_spell_controller(cx: &mut Cx, spell: ObjectId, player: PlayerId) {
     item.controller = player;
     cx.st().stack_set(at, item);
     cx.st().update_obj(spell, |o| o.controller = player);
+    // A "for as long as [its caster] controls it" ends the moment they don't (CR 611.2b: suspend's haste, CR 702.62a), not
+    // only when the state-based actions are next checked.
+    settle_at_once(cx);
+    cx.state_changed();
 }
 
 /// A copy of a permanent spell resolves (CR 707.10f): the copy is put onto the battlefield as a token that is a copy of

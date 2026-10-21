@@ -2485,6 +2485,10 @@ pub fn control_order(cards: &CardTable, state: &GameState, log: &[Record]) -> Ve
 
 /// The layer a resolved effect of this kind applies in (CR 613.1), as `apply_effect` applies it; none for an effect that
 /// is not a characteristic's.
+///
+/// This is also what counts as an effect that changes a characteristic for `ops::carry_effects` (CR 400.7a: such an
+/// effect on a permanent spell goes on applying to the permanent it becomes; control is carried beside it). Every
+/// `EffectKind` that changes a characteristic must be listed here, or a spell's would be lost as it resolves.
 pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
     Some(match kind {
         EffectKind::ChangeText { .. } | EffectKind::SetName(_) => Layer::Text,

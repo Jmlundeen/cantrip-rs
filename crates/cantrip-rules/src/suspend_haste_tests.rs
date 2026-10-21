@@ -31,13 +31,34 @@ static TRINKET: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn spell_on_the_stack(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == id))
+}
+
+/// "Gain control of target spell" (Aethersnatch's kind, CR 112.2).
+fn steal(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(spell) = g.state().target(item, 0).object()
+        && g.target_legal(item, 0)
+    {
+        g.change_controller(spell, item.controller);
+    }
+    Ok(())
+}
+
+static STEAL: CardDef = CardDef {
+    name: "Suspend Test Steal",
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[target(spell_on_the_stack)], steal),
+    ..CardDef::BLANK
+};
+
 fn cx(game: &mut Game) -> Cx<'_> {
     Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
 }
 
 /// Your turn about to reach its upkeep, `def` suspended in your exile with its last time counter.
 fn game(def: &'static CardDef) -> (Game, ObjectId) {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &SPRINTER, &TRINKET])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &SPRINTER, &TRINKET, &STEAL])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -56,6 +77,11 @@ fn game(def: &'static CardDef) -> (Game, ObjectId) {
 
 /// Plays on, passing priority and casting the suspended card when asked, until `done` says so.
 fn play_until(g: &mut Game, done: impl Fn(&Game) -> bool) {
+    play_until_with(g, done, |_, _| None);
+}
+
+/// `play_until`, with `act` answering any priority it wants to.
+fn play_until_with(g: &mut Game, done: impl Fn(&Game) -> bool, act: impl Fn(&Game, &Request) -> Option<Answer>) {
     for _ in 0..200 {
         g.run();
         if done(g) {
@@ -63,7 +89,8 @@ fn play_until(g: &mut Game, done: impl Fn(&Game) -> bool) {
         }
         let r = g.pending().cloned().expect("a question");
         let answer = match &r.kind {
-            RequestKind::Priority { .. } => Answer::Pass,
+            RequestKind::Priority { .. } => act(g, &r).unwrap_or(Answer::Pass),
+            RequestKind::ChooseTarget { candidates, .. } => Answer::Targets(vec![candidates[0]]),
             RequestKind::May { purpose: Purpose::CastFree, .. } => Answer::Yes,
             other => panic!("unexpected question {other:?}"),
         };
@@ -119,4 +146,31 @@ fn a_noncreature_cast_with_suspend_gains_nothing() {
     let (mut g, _) = game(&TRINKET);
     play_until(&mut g, |g| on_battlefield(g, &TRINKET).is_some());
     assert!(g.state.effects.iter().all(|e| !matches!(e.kind, EffectKind::AddKeywords(_))));
+}
+
+/// Their Steal takes the Sprinter spell on the stack (CR 112.2): its caster no longer controls it, so its haste is over
+/// (`caster_controls` reads the spell's controller now), and the creature it becomes under them has none.
+#[test]
+fn suspends_haste_ends_when_the_spell_changes_control_on_the_stack() {
+    let (mut g, _) = game(&SPRINTER);
+    let steal = g.state.push_obj(Obj::new(g.cards.id_of(&STEAL), THEM, Zone::hand(THEM)));
+    g.state.zone_push(Zone::hand(THEM), steal);
+    play_until(&mut g, |g| spell_on_stack(g).is_some());
+    let spell = spell_on_stack(&g).expect("cast");
+    assert!(has_haste(&mut g, spell));
+    play_until_with(
+        &mut g,
+        |g| g.state.obj(spell).controller == THEM,
+        |g, r| match &r.kind {
+            RequestKind::Priority { options } if r.player == THEM && g.state.obj(steal).zone == Zone::hand(THEM) => {
+                options.iter().find(|o| o.source == Some(steal)).map(|o| Answer::Act(Action { targets: o.target_candidates.clone(), ..Action::of(o) }))
+            }
+            _ => None,
+        },
+    );
+    assert!(!has_haste(&mut g, spell), "its caster lost control of the spell: no haste");
+    play_until(&mut g, |g| on_battlefield(g, &SPRINTER).is_some());
+    let sprinter = on_battlefield(&g, &SPRINTER).expect("resolved");
+    assert_eq!(g.state.obj(sprinter).controller, THEM);
+    assert!(!has_haste(&mut g, sprinter));
 }
