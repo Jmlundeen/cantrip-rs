@@ -116,8 +116,16 @@ pub fn mana_cost_of(card: &dyn Fn(CardId) -> &'static CardDef, obj: &Obj, c: &Ch
 pub fn mana_value_of(card: &dyn Fn(CardId) -> &'static CardDef, state: &GameState, id: ObjectId, c: &Chars) -> u32 {
     let obj = state.obj(id);
     let front = card(obj.card);
+    // CR 202.3b, 712.8c, 712.8e: a nonmodal double-faced permanent with its back face up, or a spell of one cast transformed (its
+    // own back face as the face it is on the stack as, not a copy of one: `card_copy`), has its front face's mana cost for its
+    // mana value; a copy of a back face has 0.
+    let cast_transformed = obj.zone.is(ZoneKind::Stack) && !obj.card_copy && front.back.is_some_and(|back| std::ptr::eq(card(c.card), back));
     let cost = match front.back {
-        Some(back) if obj.transformed && obj.copied_card().is_none() && !back.has_cost && !front.back_land && !c.no_cost => front.cost,
+        Some(back)
+            if ((obj.transformed && obj.copied_card().is_none()) || cast_transformed) && !back.has_cost && !front.back_land && !c.no_cost =>
+        {
+            front.cost
+        }
         _ => mana_cost_of(card, obj, c),
     };
     let x = if obj.zone.is(ZoneKind::Stack) { obj.x } else { state.left_stack(id).map_or(0, |item| item.x) };
