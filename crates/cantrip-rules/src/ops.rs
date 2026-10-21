@@ -759,7 +759,12 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
     if cx.s().effects.iter().any(|e| e.affected == id) {
         let carried = |e: &cantrip_state::ContinuousEffect| from.is(ZoneKind::Stack) && matches!(e.kind, EffectKind::ChangeText { .. });
         let keep: Vec<bool> = cx.s().effects.iter().map(|e| e.affected != id || carried(e)).collect();
+        let effects_before = cx.s().effects.len();
         cx.st().effects_keep(&keep);
+        // An effect that ends changes the game with no event (CR 603.8).
+        if cx.s().effects.len() < effects_before {
+            cx.state_changed();
+        }
     }
     note_statics(cx, id);
     let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
@@ -1116,7 +1121,12 @@ pub fn carry_effects(cx: &mut Cx, spell: ObjectId, permanent: ObjectId) {
         return;
     }
     let keep: Vec<bool> = cx.s().effects.iter().map(|e| !carries(e)).collect();
+    let effects_before = cx.s().effects.len();
     cx.st().effects_keep(&keep);
+    // An effect that ends changes the game with no event (CR 603.8).
+    if cx.s().effects.len() < effects_before {
+        cx.state_changed();
+    }
     for e in carried {
         cx.st().effect_push(cantrip_state::ContinuousEffect { affected: permanent, ..e });
     }
@@ -2292,7 +2302,12 @@ pub fn regenerate_instead(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
             continue;
         };
         let keep: Vec<bool> = (0..cx.s().effects.len()).map(|i| i != at).collect();
+        let effects_before = cx.s().effects.len();
         cx.st().effects_keep(&keep);
+        // An effect that ends changes the game with no event (CR 603.8).
+        if cx.s().effects.len() < effects_before {
+            cx.state_changed();
+        }
         cx.st().update_obj(id, |o| {
             o.damage = 0;
             o.deathtouched = false;
@@ -2458,7 +2473,12 @@ pub fn end_lapsed_durations(cx: &mut Cx, id: ObjectId) {
     let obj = *cx.s().obj(id);
     if cx.s().effects.iter().any(|e| e.affected == id && !e.duration.holds_for(&obj)) {
         let control = cx.s().effects.iter().any(|e| e.affected == id && !e.duration.holds_for(&obj) && matches!(e.kind, EffectKind::Control(_)));
+        let effects_before = cx.s().effects.len();
         cx.st().effects_retain(|e| e.affected != id || e.duration.holds_for(&obj));
+        // An effect that ends changes the game with no event (CR 603.8).
+        if cx.s().effects.len() < effects_before {
+            cx.state_changed();
+        }
         // A control-changing effect that ended gives the permanent back as it ends (CR 613.1b).
         if control {
             refresh_control(cx, id);
@@ -2878,7 +2898,12 @@ pub fn end_lapsed_conditions(cx: &mut Cx) -> bool {
     if keep.iter().all(|&k| k) {
         return false;
     }
+    let effects_before = cx.s().effects.len();
     cx.st().effects_keep(&keep);
+    // An effect that ends changes the game with no event (CR 603.8).
+    if cx.s().effects.len() < effects_before {
+        cx.state_changed();
+    }
     true
 }
 
@@ -3034,7 +3059,12 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
     cease_together(cx, &owned);
     // The effects that gave them control of objects end (CR 800.4a), and control is settled again (CR 613.1b).
     if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Control(p) if p == player)) {
+        let effects_before = cx.s().effects.len();
         cx.st().effects_retain(|e| !matches!(e.kind, EffectKind::Control(p) if p == player));
+        // An effect that ends changes the game with no event (CR 603.8).
+        if cx.s().effects.len() < effects_before {
+            cx.state_changed();
+        }
     }
     settle_control(cx);
     // Then the objects on the stack they control that no card represents (an ability, a copy of a spell) cease to exist,

@@ -455,7 +455,12 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 let asker = Asker { source, controller: e.controller };
                 // "The next time": used up by this event (CR 614.1a).
                 if once {
+                    let effects_before = cx.s().effects.len();
                     cx.st().effects_retain(|f| f.timestamp != timestamp);
+                    // An effect that ends changes the game with no event (CR 603.8).
+                    if cx.s().effects.len() < effects_before {
+                        cx.state_changed();
+                    }
                 }
                 let before = *proposal;
                 apply(&*cx, &asker, e.affected, proposal);
@@ -508,7 +513,12 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                             let prevented = left.min(d.amount);
                             prevent(cx, d, prevented, source);
                             if prevented == left {
+                                let effects_before = cx.s().effects.len();
                                 cx.st().effects_retain(|f| f.timestamp != timestamp);
+                                // An effect that ends changes the game with no event (CR 603.8).
+                                if cx.s().effects.len() < effects_before {
+                                    cx.state_changed();
+                                }
                             } else {
                                 e.kind = EffectKind::Prevention { card, index, to, shield: Shield::Next(left - prevented) };
                                 cx.st().effect_set(at, e);

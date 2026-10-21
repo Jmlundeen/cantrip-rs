@@ -423,7 +423,15 @@ you control no Islands") listens for no event: `state_triggered` gives it a `Tri
 permanent and emblem after every event (in `collect_batch`'s `consider`, on the characteristics already found there) and
 again each time a player would receive priority (`settle::state_triggers`, for a state that changed with no event), before
 each check of the state-based actions, so a state a resolution left and a state-based action ends has still triggered (CR
-704.3: Thespian's Stage that became a Dark Depths with no ice counters and lost the legend rule). It
+704.3: Thespian's Stage that became a Dark Depths with no ice counters and lost the legend rule). A change with no event in
+the middle of a resolution - an effect beginning (`Game::add_effect`) or ending, an object becoming a copy - asks them too
+(`Cx::state_changed`, `settle::state_triggers_now`), so a state true only between two instructions of one resolution
+triggers. Several calls that are one instruction of the card's text (an exchange of control, an animation, "gets +2/+2 and
+gains trample") are made inside `Game::one_instruction`, and the state is judged once the outermost closes, never half-done;
+a run that suspends there is judged when it is redone. Only the objects that could have one are asked: a card as it is now
+(face or copy) that prints or gives one (`CardTable::state_triggers`, its `delayed` list included), a copy's exception
+abilities, an effect's granted ability, and every permanent while a static ability that gives others abilities is on the
+board (`CardTable::ability_grants`). It
 triggers while the condition holds unless it has already triggered and not left the stack - found this batch, pending, or
 on the stack (`state_trigger_waiting`) - so it triggers again once it has resolved or been countered, if the state still
 holds; an object that changed zones is a new one with a new ability (CR 400.7).

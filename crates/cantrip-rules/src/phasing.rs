@@ -68,7 +68,12 @@ pub fn phase_out(cx: &mut Cx, permanents: &[ObjectId], until_leaves: Option<Obje
     // battlefield ends with the state-based check, `WhileSourceOnBattlefield`.)
     let tracks = |e: &ContinuousEffect| leaving(e.affected) && matches!(e.duration, Duration::WhileCounter(_) | Duration::WhileTapped);
     if cx.s().effects.iter().any(tracks) {
+        let effects_before = cx.s().effects.len();
         cx.st().effects_retain(|e| !tracks(e));
+        // An effect that ends changes the game with no event (CR 603.8).
+        if cx.s().effects.len() < effects_before {
+            cx.state_changed();
+        }
     }
     for &(id, indirect) in &all {
         let controller = cx.s().obj(id).controller;

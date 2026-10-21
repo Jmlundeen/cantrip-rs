@@ -52,7 +52,7 @@ static SHRINK: CardDef = CardDef {
 
 /// Target creature gets -1/-1 until end of turn, then +1/+1 until end of turn: two effects, no event between or after them.
 fn flicker(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(id) = item.targets()[0] {
+    if let Target::Object(id) = item.target(0) {
         cantrip_mechanics::pump(g, item.object, id, -1, -1);
         cantrip_mechanics::pump(g, item.object, id, 1, 1);
     }
@@ -87,7 +87,7 @@ fn opponents_artifact(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 
 /// Exchange control of this artifact and target artifact an opponent controls.
 fn trade(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(theirs) = item.targets()[0] {
+    if let Target::Object(theirs) = item.target(0) {
         g.exchange_control(item.object, item.object, theirs);
     }
     Ok(())

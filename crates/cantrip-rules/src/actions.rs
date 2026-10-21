@@ -4587,7 +4587,12 @@ fn apply_next_spell_effects(cx: &mut Cx, player: PlayerId, spell: ObjectId) {
     }
     cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true);
     let keep: Vec<bool> = cx.s().effects.iter().map(|e| !ours(e)).collect();
+    let effects_before = cx.s().effects.len();
     cx.st().effects_keep(&keep);
+    // An effect that ends changes the game with no event (CR 603.8).
+    if cx.s().effects.len() < effects_before {
+        cx.state_changed();
+    }
 }
 
 /// What a cast is made by, beyond the terms an effect or a permission sets (`CastTerms`): read once, as the cast begins, from
@@ -5165,7 +5170,12 @@ fn cast(
     // "Until this card is cast from exile" (CR 611.2a, 400.7) ends now, as the card that was in exile becomes cast: the
     // effects about it were there while its costs were paid.
     if cast_from == ZoneKind::Exile && cx.s().effects.iter().any(|e| e.duration == Duration::UntilCastFromExile(card)) {
+        let effects_before = cx.s().effects.len();
         cx.st().effects_retain(|e| e.duration != Duration::UntilCastFromExile(card));
+        // An effect that ends changes the game with no event (CR 603.8).
+        if cx.s().effects.len() < effects_before {
+            cx.state_changed();
+        }
     }
     let nth = cx.history().casts_by(player).count().min(255) as u8;
     cx.emit(Event::SpellCast { spell, player, nth });

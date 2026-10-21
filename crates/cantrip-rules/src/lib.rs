@@ -1544,7 +1544,8 @@ impl cantrip_api::Game for Cx<'_> {
         self.g.instruction_depth += 1;
         let done = f(self);
         self.g.instruction_depth -= 1;
-        if self.g.instruction_depth == 0 && std::mem::take(&mut self.g.state_check_due) {
+        if self.g.instruction_depth == 0 && std::mem::take(&mut self.g.state_check_due) && done.is_ok() {
+            // A run that suspended is redone with its answer, and judged then.
             settle::state_triggers_now(self);
         }
         done
