@@ -1259,12 +1259,15 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
 
     /// <summary>
     /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
-    /// offered "up to" every candidate, so taking them all meets it whenever anything can; one with a <see cref="Minimum"/>
-    /// takes that many; one limited to a total mana value takes the first that fit together within it.
+    /// offered "up to" every candidate, so taking every one with positive power meets it whenever anything can (a negative
+    /// power takes from the total, CR 107.1b); one with a <see cref="Minimum"/> takes that many; one limited to a total mana
+    /// value takes the first that fit together within it.
     /// </summary>
     public override AnswerPayload Default() => MaximumTotalManaValue is { } most
         ? new CardsChosenAnswer { Cards = Cantrip.Core.Decisions.TotalManaValue.FirstFitting(Eligible, ManaValues, Count, most) }
-        : new CardsChosenAnswer { Cards = [.. Eligible.Take(Minimum > 0 ? Minimum : Count)] };
+        : MinimumPower > 0
+            ? new CardsChosenAnswer { Cards = [.. Eligible.Where((_, i) => i >= Powers.Count || Powers[i] > 0)] }
+            : new CardsChosenAnswer { Cards = [.. Eligible.Take(Minimum > 0 ? Minimum : Count)] };
 }
 
 /// <summary>

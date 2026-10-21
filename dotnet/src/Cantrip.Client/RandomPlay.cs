@@ -649,8 +649,15 @@ public sealed class RandomPlay : IAutoPlayer
                     break;
                 }
 
+                int each = index < prompt.Powers.Count ? prompt.Powers[index] : 0;
+                if (each <= 0)
+                {
+                    // A creature with no power adds nothing, and a negative one takes from the total (CR 107.1b).
+                    continue;
+                }
+
                 taken.Add(prompt.Eligible[index]);
-                power += index < prompt.Powers.Count ? prompt.Powers[index] : 0;
+                power += each;
             }
 
             return power >= prompt.MinimumPower

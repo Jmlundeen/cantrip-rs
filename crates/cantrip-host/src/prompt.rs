@@ -854,6 +854,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 kind: if reduce { "creature".into() } else { String::new() },
                 up_to: true,
                 minimum_power: i32::from(*minimum),
+                // Signed: a negative power takes from the total (CR 107.1b).
                 powers: powers.iter().map(|&p| i32::from(p)).collect(),
                 ..Default::default()
             })

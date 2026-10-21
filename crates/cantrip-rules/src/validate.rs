@@ -183,10 +183,11 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             no("up to one creature may be tapped (CR 702.180a)")
         }
         (RequestKind::TapForPower { cards, powers, minimum, .. }, Answer::Cards(chosen)) => {
-            let total: u32 = chosen.iter().filter_map(|c| cards.iter().position(|x| x == c)).map(|i| powers[i] as u32).sum();
+            // Signed: a creature with negative power takes from the total (CR 107.1b).
+            let total: i32 = chosen.iter().filter_map(|c| cards.iter().position(|x| x == c)).map(|i| i32::from(powers[i])).sum();
             if !distinct(chosen) || !chosen.iter().all(|c| cards.contains(c)) {
                 no("not among the creatures that may be tapped")
-            } else if total < *minimum as u32 {
+            } else if total < i32::from(*minimum) {
                 no(format!("total power {total}, {minimum} needed"))
             } else {
                 Ok(())

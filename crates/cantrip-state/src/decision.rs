@@ -343,8 +343,9 @@ pub enum RequestKind {
     /// chosen player will do, as hint text.
     ChoosePlayer { source: ObjectId, candidates: Vec<PlayerId>, verb: &'static str, amount: u16 },
     /// Tap any number of untapped creatures with total power `minimum` or more (CR 702.122a crew, CR 702.171a saddle):
-    /// any subset of `cards` whose `powers` (what each counts as towards the total, CR 702.122b) add up to it.
-    TapForPower { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, powers: Vec<u8>, minimum: u8 },
+    /// any subset of `cards` whose `powers` (what each counts as towards the total, CR 702.122b) add up to it. A negative
+    /// power is added as it is (CR 107.1b), taking from the total.
+    TapForPower { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, powers: Vec<i16>, minimum: u8 },
     /// Collect evidence N (CR 701.59a): exile any subset of `cards` (the player's graveyard) whose `values` (their mana
     /// values) add up to `minimum` or more.
     CollectEvidence { source: ObjectId, cards: Vec<ObjectId>, values: Vec<u8>, minimum: u8 },

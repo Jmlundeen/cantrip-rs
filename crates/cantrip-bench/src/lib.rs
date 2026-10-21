@@ -264,9 +264,9 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
         }
         RequestKind::TapForPower { purpose: Purpose::TapToReduce, .. } => Answer::Cards(Vec::new()),
         RequestKind::TapForPower { cards, powers, minimum, .. } => {
-            // Everything that may be tapped, the most that can be asked: always enough if anything is.
-            let _ = (powers, minimum);
-            Answer::Cards(cards.clone())
+            // Everything with positive power that may be tapped, the most that can be counted: always enough if anything is.
+            let _ = minimum;
+            Answer::Cards(cards.iter().zip(powers).filter(|&(_, &p)| p > 0).map(|(&c, _)| c).collect())
         }
         RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(random.some(hand, *count as usize)),
         RequestKind::Mulligan { .. } => Answer::No,

@@ -455,6 +455,32 @@ public sealed class RandomPlayTests
     }
 
     [Fact]
+    public void Never_taps_a_creature_whose_negative_power_would_take_from_the_total()
+    {
+        // Crew 3 with a 3/3 and a -2/1 (CR 107.1b: a negative power is added as it is, so the two total 1): only the 3/3
+        // meets it, and the default answer takes every creature with positive power.
+        var prompt = new ChooseCardsPromptMessage
+        {
+            Player = Me,
+            Eligible = [Handle(1), Handle(2)],
+            Count = 2,
+            UpTo = true,
+            MinimumPower = 3,
+            Powers = [-2, 3],
+        };
+
+        var bot = new RandomPlay(seed: 29);
+
+        for (int i = 0; i < Draws; i++)
+        {
+            var chosen = Assert.IsType<CardsChosenAnswer>(bot.Decide(prompt));
+            Assert.Equal([Handle(2)], chosen.Cards);
+        }
+
+        Assert.Equal([Handle(2)], Assert.IsType<CardsChosenAnswer>(prompt.Default()).Cards);
+    }
+
+    [Fact]
     public void Meets_a_total_mana_value_a_choice_asks_for_while_still_drawing_which_cards()
     {
         // Collect evidence (CR 701.59a): which cards is a real choice, and the answer still has to add up.

@@ -169,7 +169,8 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     }
     if let Some(t) = cost.tap_creatures {
         let (_, powers) = tap_candidates(cx, source, controller, &t);
-        if powers.iter().map(|&p| p as u32).sum::<u32>() < t.power as u32 {
+        // Enough if the creatures with positive power are: a negative one only takes from the total (CR 107.1b).
+        if powers.iter().map(|&p| p.max(0) as u32).sum::<u32>() < t.power as u32 {
             return false;
         }
     }
@@ -390,7 +391,7 @@ fn pay_counters_among(cx: &mut Cx, taken: &[(ObjectId, CounterKind, u16)]) {
 
 /// The creatures that could be tapped for crew or saddle (CR 702.122a, 702.171a): the controller's other untapped
 /// creatures, summoning sick or not, each with what it counts as towards the total power (CR 702.122b).
-fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatures) -> (Vec<ObjectId>, Vec<u8>) {
+fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatures) -> (Vec<ObjectId>, Vec<i16>) {
     let mut cards = Vec::new();
     let mut powers = Vec::new();
     for id in cx.permanents_of(controller) {
@@ -401,10 +402,12 @@ fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatu
         if !c.is(CardType::Creature) {
             continue;
         }
-        // "As though its power were 2 greater": the power it counts with is 2 more than its power, a negative one too.
+        // "As though its power were 2 greater": the power it counts with is 2 more than its power, a negative one too. A
+        // power still negative counts as it is (CR 107.1b: "If a calculation or comparison needs to use a negative value,
+        // it does so"), so tapping it takes from the total.
         let bonus = if t.greater_with.is_some_and(|k| c.has(k)) { 2 } else { 0 };
         cards.push(id);
-        powers.push(c.power.unwrap_or(0).saturating_add(bonus).clamp(0, 255) as u8);
+        powers.push(c.power.unwrap_or(0).saturating_add(bonus));
     }
     (cards, powers)
 }
@@ -3391,7 +3394,7 @@ fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) 
     }
     // Before any target is chosen (CR 601.2b), so a change that reads the targets is not in it.
     let generic = apply_cost_changes(cx, player, Costed::Spell(source), cost.mana, &[]).generic;
-    let powers = eligible.iter().map(|&c| reduction_of(cx, c).min(generic)).collect();
+    let powers = eligible.iter().map(|&c| i16::from(reduction_of(cx, c).min(generic))).collect();
     let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToReduce, cards: eligible, powers, minimum: 0 };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards.first().copied()),

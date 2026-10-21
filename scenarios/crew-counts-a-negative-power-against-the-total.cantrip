@@ -1,0 +1,53 @@
+# Crew N taps creatures with total power N or more (CR 702.122a), and a negative power is added as it is (CR 107.1b: "If a
+# calculation or comparison needs to use a negative value, it does so"). Icy Reception makes Bot1's Llanowar Elves -4/1, so
+# with Embereth Shieldbreaker (power 2) the two total -2: too little for Smuggler's Copter's crew 1, and refused. The
+# Shieldbreaker alone crews it.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Sol Ring
+Smuggler's Copter
+Llanowar Elves
+Icy Reception
+Embereth Shieldbreaker
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Icy Reception.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = -4
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+! Bot1.Choose(Llanowar Elves; Embereth Shieldbreaker)
+Bot1.Choose(Embereth Shieldbreaker)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Embereth Shieldbreaker.Tapped = true
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Smuggler's Copter.Types = Artifact; Creature

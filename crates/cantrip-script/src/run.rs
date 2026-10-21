@@ -1002,13 +1002,16 @@ impl<'s> Run<'s> {
             }
             RequestKind::May { .. } => Answer::No,
             RequestKind::ChoosePlayer { candidates, .. } => Answer::Player(candidates[0]),
-            // The first creatures offered, until their power is enough.
+            // The first creatures offered with positive power, until their power is enough.
             RequestKind::TapForPower { cards, powers, minimum, .. } => {
                 let mut total = 0u32;
                 let mut chosen = Vec::new();
                 for (&card, &power) in cards.iter().zip(powers) {
                     if total >= *minimum as u32 {
                         break;
+                    }
+                    if power <= 0 {
+                        continue;
                     }
                     total += power as u32;
                     chosen.push(card);
@@ -1655,8 +1658,9 @@ impl<'s> Run<'s> {
             RequestKind::ChooseCards { eligible, .. } | RequestKind::TapForPower { cards: eligible, .. } | RequestKind::Craft { cards: eligible, .. } => {
                 let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
                 // Several names that are all eligible are one answer, which the question must refuse: more cards than it takes
-                // (`! Bot1.Choose(A; B; C)` for "up to two"), as for targets.
-                if matches!(request.kind, RequestKind::ChooseCards { .. }) && action.positional().count() > 1 {
+                // (`! Bot1.Choose(A; B; C)` for "up to two"), as for targets; or creatures whose total power falls short
+                // (`! Bot1.Choose(A; B)` for crew, a negative power taking from it).
+                if matches!(request.kind, RequestKind::ChooseCards { .. } | RequestKind::TapForPower { .. }) && action.positional().count() > 1 {
                     let mut named: Vec<ObjectId> = Vec::new();
                     for spec in action.positional() {
                         match self.objects(action, spec.trim(), eligible)?.into_iter().find(|id| !named.contains(id)) {
