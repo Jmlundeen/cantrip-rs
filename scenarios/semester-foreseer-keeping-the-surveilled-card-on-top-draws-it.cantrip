@@ -1,0 +1,27 @@
+# The surveil's other choice: the card stays on top, so the next turn's draw step draws that same Island. The creature is
+# still prepared - nothing cast its spell.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Semester Foreseer
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Semester Foreseer.Cast
+Bot1.Arrange(Island)
+? Stack.Count = 0
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+
+[Expect]
+Bot1.Battlefield.Semester Foreseer.Prepared = true
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 14
