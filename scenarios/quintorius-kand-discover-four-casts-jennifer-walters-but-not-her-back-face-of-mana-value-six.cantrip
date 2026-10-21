@@ -33,6 +33,7 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Quintorius Kand.Cast
 Bot1.Battlefield.Quintorius Kand.Activate(Ability: Discover)
 Bot1.Accept
+! Bot1.Modes
 ? Stack = Quintorius Kand; Jennifer Walters
 [T3 Bot1.Main2]
 

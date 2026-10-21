@@ -1,6 +1,7 @@
-//! A modal double-faced card's back face is cast only if its targets could be announced (CR 601.2c, 712.8a): judged as that face,
-//! from a hand with priority and as an effect casts it, over test cards - no printed castable back face in the engine has a
-//! target (Jennifer Walters', Gwen Stacy's, King T'Challa's and Norman Osborn's are creatures with none).
+//! A modal double-faced card's back face judged as that face (CR 601.3e, 712.8a), over test cards: it is cast only if its
+//! targets could be announced (CR 601.2c), from a hand with priority and as an effect casts it, and a flash permission reaches
+//! it alone when it is a sorcery behind a creature front. No printed castable back face in the engine has a target or is a
+//! noncreature behind a creature (Jennifer Walters', Gwen Stacy's, King T'Challa's and Norman Osborn's are creatures).
 
 use crate::actions::{cast_ways_during_resolution, priority_options, stack_item};
 use crate::{Cx, Game, Setup};
@@ -91,4 +92,50 @@ fn a_back_face_with_no_legal_target_is_not_offered_from_the_hand() {
 fn a_back_face_with_no_legal_target_is_not_among_the_ways_an_effect_casts() {
     assert_eq!(during_resolution(false), [0]);
     assert_eq!(during_resolution(true), [0, WAY_BACK_FACE]);
+}
+
+/// "You may cast noncreature spells as though they had flash" (Valley Floodcaller's).
+fn noncreature_you_cast(q: &dyn Query, asker: &Asker, spell: ObjectId, caster: PlayerId) -> bool {
+    caster == asker.controller && !q.chars(spell).is(CardType::Creature)
+}
+static FLASHER: CardDef = CardDef { name: "Back Face Test Flasher", types: TypeSet::of(&[CardType::Enchantment]), flash_rules: &[noncreature_you_cast], ..CardDef::BLANK };
+/// A sorcery back face with no target, behind a creature front face.
+static SORCERY_BACK: CardDef = CardDef { name: "Back Face Test Ponder", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], nothing), ..CardDef::BLANK };
+static SORCERY_FRONT: CardDef = CardDef {
+    name: "Back Face Test Wolf",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    back: Some(&SORCERY_BACK),
+    ..CardDef::BLANK
+};
+
+/// The ways the card in your hand is offered on your opponent's turn, with a "noncreature spells as though they had flash"
+/// permanent of yours or without.
+fn offered_on_their_turn(flasher: bool) -> Vec<u8> {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&SORCERY_FRONT, &SORCERY_BACK, &FLASHER])));
+    let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    let card = game.state.push_obj(Obj::new(table.id_of(&SORCERY_FRONT), YOU, Zone::hand(YOU)));
+    game.state.zone_push(Zone::hand(YOU), card);
+    if flasher {
+        let id = game.state.push_obj(Obj::new(table.id_of(&FLASHER), YOU, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, id);
+    }
+    game.state.update_turn(|t| {
+        t.active = PlayerId(1);
+        t.priority = YOU;
+        t.set_step(Step::PrecombatMain);
+    });
+    let mut ways: Vec<u8> =
+        priority_options(&cx(&mut game), YOU).iter().filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).map(|o| o.index).collect();
+    ways.sort_unstable();
+    ways
+}
+
+/// CR 601.3e, 712.8a: a flash permission for noncreature spells is judged on each face as it would be cast - the sorcery back
+/// face may be cast on the opponent's turn, the creature front face may not (`actions::Speed::face`).
+#[test]
+fn a_flash_permission_for_noncreature_spells_reaches_a_sorcery_back_face_and_not_its_creature_front() {
+    assert_eq!(offered_on_their_turn(false), Vec::<u8>::new(), "a face is offered on the opponent's turn with no permission");
+    assert_eq!(offered_on_their_turn(true), [WAY_BACK_FACE], "the permission is not judged face by face");
 }

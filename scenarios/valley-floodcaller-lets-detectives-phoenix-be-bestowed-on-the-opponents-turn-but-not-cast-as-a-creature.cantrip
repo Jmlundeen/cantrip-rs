@@ -1,0 +1,44 @@
+# A permission to cast spells as though they had flash is judged on the spell as it would be cast (CR 601.3e): a bestowed
+# Detective's Phoenix is an Aura spell, not a creature spell (CR 702.103b). On Bot2's turn Valley Floodcaller ("You may cast
+# noncreature spells as though they had flash") lets Bot1 bestow the Phoenix on the Floodcaller, collecting Griselbrand as
+# evidence - but not cast it for its mana cost as a creature, though the Black Lotus and Mountain could pay {2}{R}. The
+# Floodcaller, an Otter, has power 5: +2 from the Phoenix and +1 from its own trigger on the noncreature spell.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Valley Floodcaller
+Faithless Looting
+Detective's Phoenix
+Mox Ruby
+Griselbrand
+Island
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Island)
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+! Bot1.Hand.Detective's Phoenix.Cast(Ability: #1)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Detective's Phoenix.Cast(Bot1.Battlefield.Valley Floodcaller; Ability: Bestow)
+Bot1.Choose(Griselbrand)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Detective's Phoenix.AttachedTo = Valley Floodcaller
+Bot1.Battlefield.Valley Floodcaller.Power = 5
+Exile = Griselbrand
+Bot1.Battlefield.Black Lotus.Tapped = false
