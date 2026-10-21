@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
@@ -53,7 +52,7 @@ fn first_instant_or_sorcery_costs_less(q: &dyn Query, source: ObjectId, player: 
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[static_ability(Layer::PtDefine, itself, islands_you_control, "Eluge's power and toughness are each equal to the number of Islands you control.")],
+    statics: &[characteristic_defining(Layer::PtDefine, islands_you_control, "Eluge's power and toughness are each equal to the number of Islands you control.")],
     abilities: &[triggered(
         triggers::THIS_ENTERS_OR_ATTACKS,
         flood,
