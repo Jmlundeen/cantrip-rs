@@ -4,15 +4,14 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("Draw", "draw a card?", "", "Draw", "Don't draw");
 
-/// That creature's controller may draw a card; a player who has left the game is asked nothing.
+/// That creature's controller may draw a card; a player who has left the game is asked nothing, nor one who can't draw
+/// (CR 121.3).
 fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Player(who) = item.subject else { return Ok(()) };
     if !g.state().in_game(who) {
         return Ok(());
     }
-    if cantrip_mechanics::effects::ask_may(g, who, item.object, Purpose::Ask(&ASK))? {
-        g.draw(who, 1);
-    }
+    cantrip_mechanics::effects::may_draw(g, who, item.object, 1, &ASK)?;
     Ok(())
 }
 

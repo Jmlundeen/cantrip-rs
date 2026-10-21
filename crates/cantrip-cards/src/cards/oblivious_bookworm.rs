@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{discard_chosen, effects::ask_may, triggers::YOUR_END_STEP};
+use cantrip_mechanics::{discard_chosen, effects::may_draw, triggers::YOUR_END_STEP};
 use cantrip_oracle as oracle;
 
 const ASK_LOOT: Question = Question::new("Draw", "draw a card?", "If you do, discard a card", "Draw and discard", "Don't draw");
@@ -20,16 +20,15 @@ fn face_down_or_turned_up_this_turn(q: &dyn Query, player: PlayerId) -> bool {
 }
 
 /// "You may draw a card. If you do, discard a card unless ..." (CR 608.2c): "if you do" is whether a card was drawn, so an
-/// empty library discards nothing; the condition is read as the ability resolves (the ruling: too late to manifest or
+/// empty library discards nothing, and a player who can't draw is not asked (CR 121.3); the condition is read as the ability resolves (the ruling: too late to manifest or
 /// turn a permanent face up once it has begun to resolve). The question says whether the discard will follow.
 fn end_step(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
     let ask = if face_down_or_turned_up_this_turn(g, player) { &ASK_DRAW } else { &ASK_LOOT };
-    if !ask_may(g, player, item.object, Purpose::Ask(ask))? {
+    let before = g.history().drawn(player);
+    if !may_draw(g, player, item.object, 1, ask)? {
         return Ok(());
     }
-    let before = g.history().drawn(player);
-    g.draw(player, 1);
     if g.history().drawn(player) > before && !face_down_or_turned_up_this_turn(g, player) {
         discard_chosen(g, player, item.object, 1)?;
     }

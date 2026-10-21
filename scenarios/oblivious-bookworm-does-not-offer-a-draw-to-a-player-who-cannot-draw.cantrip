@@ -1,0 +1,42 @@
+# Oblivious Bookworm under Spirit of the Labyrinth: a player who can't draw can't choose to (CR 121.3). Bot1 has drawn its
+# card for turn 3, so at its end step "you may draw a card" is not offered, and with no draw there is no discard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Oblivious Bookworm
+Island x4
+Island
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Spirit of the Labyrinth
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oblivious Bookworm.Cast
+[T1 Bot1.End]
+Bot1.Decline
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Spirit of the Labyrinth.Cast
+[T3 Bot1.End]
+Bot1.Pass
+! Bot1.Accept
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 11
+Bot1.Graveyard.Count = 0

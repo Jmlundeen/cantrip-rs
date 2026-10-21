@@ -1,0 +1,43 @@
+# Terrasymbiosis under Spirit of the Labyrinth: a player who can't draw can't choose to (CR 121.3). Bot1 has drawn its card
+# for turn 5 when Luminarch Aspirant puts its +1/+1 counter, so "you may draw that many cards" is not offered.
+[Bot1 Deck]
+Forest
+Plains
+Forest
+Luminarch Aspirant
+Terrasymbiosis
+Plains
+Forest
+Forest x20
+[Bot2 Deck]
+Plains
+Mox Pearl
+Spirit of the Labyrinth
+Island x17
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Spirit of the Labyrinth.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Luminarch Aspirant.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Terrasymbiosis.Cast
+[Bot1.BeginCombat]
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+[Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Luminarch Aspirant.Counters.PlusOnePlusOne = 2
+Bot1.Library.Count = 18

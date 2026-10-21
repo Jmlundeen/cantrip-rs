@@ -1,0 +1,52 @@
+# Fecundity under Spirit of the Labyrinth: "If an effect says that a player can't draw cards and another effect offers that
+# player the choice to draw a card, that player can't choose to do so" (CR 121.3). Bot2 has drawn its card for turn 4 when
+# Bot1 bolts its Ornithopter, so Spirit's "can't draw more than one card each turn" forbids the draw Fecundity offers, and
+# Bot2 is not asked.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Fecundity
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Spirit of the Labyrinth
+Ornithopter
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fecundity.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Spirit of the Labyrinth.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot2.Pass
+! Bot2.Accept
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot2.Hand.Count = 5
