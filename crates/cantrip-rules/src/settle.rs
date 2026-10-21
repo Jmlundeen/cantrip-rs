@@ -861,8 +861,8 @@ fn trigger_rule_sources(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
 }
 
 /// Every triggered ability this event triggers (CR 603.2).
-pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>) {
-    collect_batch(cx, std::slice::from_ref(event), before);
+pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>, start: usize) {
+    collect_batch(cx, std::slice::from_ref(event), before, start);
 }
 
 /// Every triggered ability a batch of simultaneous events triggers (CR 603.2): leaves-the-battlefield abilities among
@@ -870,11 +870,17 @@ pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>)
 /// that function everywhere wherever they are. A "one or more" ability (CR 603.2c) triggers once for the batch, its
 /// members the subjects of the events it matched; a limited one ("triggers only N times each turn", no numbered rule; CR 603.2h is "do this only once each turn") stops triggering once it has used up its
 /// turn, a triggering that happens being noted in the history.
-pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>) {
+pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>, start: usize) {
     // A designation the events gave is had before anything they trigger is looked for, and the continuous effects that
     // read it apply to that look (CR 702.131d, 702.195c): Bifur, Melodic Rider entering for the third storied permanent
     // makes its own enters ability trigger an additional time.
     crate::designations::keyword_designations(cx);
+    // The events are recorded already (from `start`), so the continuous effects that read the history see them as the
+    // triggers are looked for (CR 603.10: "continuous effects that exist at that time are used to determine what the trigger
+    // conditions are"); each trigger's own question about the past is of the history as it was before them, as it always
+    // has been: "the first time each turn" is not this event.
+    let outer = cx.g.history_end;
+    cx.g.history_end = Some(start);
     let mut found: Found = Vec::new();
     let mut statics = TriggerStatics::new(before);
     for event in events {
@@ -1007,6 +1013,8 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
             }
         }
     }
+    // The triggerings are counted in the history as it now is (`Event::Triggered`).
+    cx.g.history_end = outer;
     if found.is_empty() {
         return;
     }

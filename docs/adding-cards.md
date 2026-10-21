@@ -245,7 +245,8 @@ Every rules event since the game began is in the history, in order: `q.history()
 `Record` has its serial, turn, step, whose turn it was, its cause, and the `Event`; records reference objects and copy
 nothing out of them, so what an object was is read from its row (never deleted; frozen as it left) or its last-known
 snapshot. A trigger matching an event, and a replacement deciding about one, see the history as it was just before
-that event.
+that event; a static ability that reads the history ("as long as you've surveilled this turn") already sees it when the
+triggers of that event are looked for (CR 603.10), so an ability it grants triggers on the event that granted it.
 
 Any question about the past is answered there, never with a new field in the state:
 

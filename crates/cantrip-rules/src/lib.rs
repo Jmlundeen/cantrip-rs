@@ -60,6 +60,10 @@ pub struct Game {
     pub cards: &'static CardTable,
     /// Check that every rollback restores the state exactly (slow; for tests). See [`Game::verifying`].
     pub verify: bool,
+    /// While the triggers of an event are looked for, where the history ends for the triggers' own questions: before the
+    /// event, which is already recorded so that the continuous effects that read the history see it (CR 603.10). None
+    /// otherwise.
+    pub(crate) history_end: Option<usize>,
 }
 
 /// With `verify`, every rollback is checked while a game has no more objects than this: twice the most any scenario but
@@ -81,6 +85,7 @@ impl Clone for Game {
             at: self.at,
             cards: self.cards,
             verify: self.verify,
+            history_end: self.history_end,
         }
     }
 }
@@ -165,7 +170,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, history_end: None };
         if real {
             game.state.frame_push(Frame::new(FrameKind::Opening));
         } else {
@@ -589,20 +594,23 @@ impl<'a> Cx<'a> {
         });
     }
 
-    /// An event happened: the triggers it causes are found, then it is recorded (so a trigger or replacement
-    /// deciding about it sees the history as it was just before it, `cantrip_api::history`).
+    /// An event happened: it is recorded, then the triggers it causes are found - the continuous effects that read the
+    /// history seeing it (CR 603.10), each trigger's own question about the past seeing the history as it was just before it
+    /// (`Game::history_end`, `cantrip_api::history`).
     pub fn emit(&mut self, event: Event) {
-        settle::collect_triggers(self, &event, None);
+        let start = self.g.log.len();
         self.record(event);
+        settle::collect_triggers(self, &event, None, start);
     }
 
     /// Events that happened together (CR 603.2c): triggers are collected over the whole batch, so a "one or more"
     /// ability triggers once. `before` is the battlefield before them, for look-back abilities.
     pub fn emit_batch(&mut self, events: &[Event], before: Option<&[ObjectId]>) {
-        settle::collect_batch(self, events, before);
+        let start = self.g.log.len();
         for &e in events {
             self.record(e);
         }
+        settle::collect_batch(self, events, before, start);
     }
 
     /// Records an event in the history without looking for triggers: the records no ability triggers on.
@@ -721,7 +729,7 @@ impl Query for Cx<'_> {
     }
 
     fn events(&self) -> &[Record] {
-        &self.g.log
+        &self.g.log[..self.g.history_end.unwrap_or(self.g.log.len()).min(self.g.log.len())]
     }
 
     fn card_id(&self, def: &'static CardDef) -> CardId {
