@@ -1,0 +1,53 @@
+# A leaves-the-battlefield ability looks back in time (CR 603.10a): the game as it was just before the event decides
+# whether it triggers and who controls it (CR 603.3a). Bot1's Old Man of the Sea holds Bot2's Blood Artist "for as long as"
+# it stays tapped; Bot2 bolts the Old Man. As it dies its control effect ends at once (CR 611.2b), and Blood Artist goes
+# back to Bot2 - but just before the death Bot1 controlled it, so Bot1 controls its "whenever another creature dies"
+# trigger: Bot2 loses 1 and Bot1 gains 1.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island x16
+
+[Bot2 Deck]
+Swamp
+Blood Artist
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Blood Artist.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Blood Artist)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blood Artist.Power = 0
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19

@@ -1219,10 +1219,20 @@ fn ready(view: &View, id: ObjectId, pending: &[Entry], chars: &Chars) -> usize {
     (0..n).find(|&a| (0..n).all(|b| !direct[a][b] || through[b][a])).unwrap_or(0)
 }
 
+/// Whether a static ability that could give an object an ability functions anywhere now (CR 613.1f): one of layer 6 that
+/// affects other objects, of a permanent, an emblem or a card in a graveyard or exile, or one an effect gave a permanent.
+pub fn ability_granting_present(cards: &CardTable, state: &GameState) -> bool {
+    state.statics_seen && {
+        let found = static_sources(cards, state);
+        !found.granted.is_empty() || found.list.iter().any(|&(source, _, _)| cards.ability_statics[cards.current(state.obj(source)).0 as usize])
+    }
+}
+
 /// The permanents with a control-changing static ability (CR 613.1b), in timestamp order.
 pub fn static_control_sources(cards: &CardTable, state: &GameState) -> Vec<ObjectId> {
     static_sources(cards, state).controllers.clone()
 }
+
 
 /// The control-changing static abilities that apply to `id` (CR 613.1b, layer 2), as (timestamp, the player who gains
 /// control): each source's controller, at its source's timestamp (CR 613.7; an Aura's is when it became attached, 613.7e),

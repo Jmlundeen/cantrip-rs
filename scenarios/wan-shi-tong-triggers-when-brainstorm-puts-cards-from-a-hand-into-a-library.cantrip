@@ -1,0 +1,44 @@
+# Wan Shi Tong, All-Knowing's "whenever one or more cards are put into a library from anywhere" triggers when Brainstorm
+# puts two cards from Bot1's hand on top of its library (CR 603.2c), and makes Spirits as its ability says - four in all
+# with the one from its own entering. A move from a hand to a library judges the abilities that look back on the game as
+# it is (CR 603.10a), not on nothing.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Wan Shi Tong, All-Knowing
+Brainstorm
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wan Shi Tong, All-Knowing.Cast
+Bot1.Target(Mox Ruby)
+Bot1.Modes(Bottom)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Brainstorm
+Bot1.Battlefield = Island; Island; Mox Jet; Mox Pearl; Mox Sapphire; Spirit; Spirit; Spirit; Spirit; Wan Shi Tong, All-Knowing

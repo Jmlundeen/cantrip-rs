@@ -2568,6 +2568,15 @@ pub struct CardTable {
     pub anywhere: Vec<bool>,
     /// Which cards have static abilities: the layers look for sources only among them.
     pub statics: Vec<bool>,
+    /// Which cards have a control-changing static ability (CR 613.1b, `Layer::Control`): what tells whether control could
+    /// change without working out the static sources.
+    pub control_statics: Vec<bool>,
+    /// Which cards could have a triggered ability that looks back in time (CR 603.10) of their own: one they print, one
+    /// they list to give (`CardDef::delayed`), or any a static ability of theirs could give themselves - the objects a
+    /// look-back pass needs as they were just before the event.
+    pub look_back: Vec<bool>,
+    /// Which cards have a static ability of layer 6 that affects other objects (CR 613.1f), which may give one an ability.
+    pub ability_statics: Vec<bool>,
     /// Whether any card has a static ability that functions from a graveyard, so graveyards are looked in at all.
     pub graveyard_statics: bool,
     /// Whether any card has a static ability that functions from exile (cipher's, CR 702.99a), so exile is looked in.
@@ -2696,6 +2705,17 @@ impl CardTable {
             .map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.anywhere)))
             .collect();
         let statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own)).collect();
+        let control_statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| s.layer == Layer::Control)).collect();
+        let looks_back = |a: &AbilityDef| matches!(a, AbilityDef::Triggered(t) if t.look_back);
+        let look_back: Vec<bool> = cards
+            .iter()
+            .map(|c| {
+                c.abilities.iter().any(looks_back)
+                    || c.delayed.iter().any(looks_back)
+                    || c.statics.iter().any(|s| s.own && s.layer == Layer::Ability)
+            })
+            .collect();
+        let ability_statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own && s.layer == Layer::Ability)).collect();
         let graveyard_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Graveyard));
         let exile_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Exile));
         let play_rules: Vec<bool> = cards.iter().map(|c| !c.play_rules.is_empty()).collect();
@@ -2736,6 +2756,9 @@ impl CardTable {
             cards,
             anywhere,
             statics,
+            control_statics,
+            look_back,
+            ability_statics,
             graveyard_statics,
             exile_statics,
             play_rules,

@@ -700,9 +700,16 @@ fn consider(
     statics: &mut TriggerStatics,
     found: &mut Found,
     mut later: Option<&mut Found>,
+    then: Option<&Then>,
 ) {
-    let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
-    let controller = cx.s().obj(source).controller;
+    // A look-back pass judges the object as it was just before the event (CR 603.10a): its characteristics then, and who
+    // controlled it then, who controls the ability (CR 603.3a).
+    // One that could have no look-back ability then (`Then`) looks back with none.
+    let (chars, controller) = match then.and_then(|t| t.of(source)) {
+        Some(Some((chars, controller))) => (chars, controller),
+        Some(None) => return,
+        None => (layers::chars(cx.cards(), cx.s(), &cx.g.log, source), cx.s().obj(source).controller),
+    };
     for ability in chars.abilities() {
         // A state trigger (CR 603.8) triggers as soon as its state is true, so it is asked after every event, of the board as
         // it is now (never of a look-back pass), as well as each time a player would receive priority (`state_triggers`).
@@ -891,8 +898,64 @@ fn trigger_rule_sources(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
         .collect()
 }
 
+/// The battlefield just before a batch of events (CR 603.10a), and what its permanents that could look back were then:
+/// what its look-back abilities are judged on.
+#[derive(Clone, Copy)]
+pub struct Before<'a> {
+    pub battlefield: &'a [ObjectId],
+    pub then: &'a Then,
+}
+
+/// The permanents that may have a look-back ability, with their characteristics and controller as they are before a batch
+/// of events (CR 603.10a), taken before the events happen (`Then::now`): every permanent that could have such an ability
+/// then - one its card could have of its own (printed, listed to give, or given by its own static ability; its own card, a
+/// copy's or its face-down values), one a copy effect's exception added, one a static ability that gives abilities
+/// anywhere or an effect could have given it, one from a keyword counter (CR 122.1b) - and any other has none to look back
+/// with. `Then::none` takes nothing, and the look-back pass then judges each permanent as it is now.
+pub struct Then {
+    taken: bool,
+    /// By object, for `of`.
+    objects: Vec<(ObjectId, Chars, PlayerId)>,
+}
+
+impl Then {
+    /// What was taken of `id`: `None` if nothing was taken (judge it now), `Some(None)` if it could look back with nothing.
+    fn of(&self, id: ObjectId) -> Option<Option<(Chars, PlayerId)>> {
+        if !self.taken {
+            return None;
+        }
+        Some(self.objects.binary_search_by_key(&id, |&(o, _, _)| o).ok().map(|at| (self.objects[at].1, self.objects[at].2)))
+    }
+
+    /// Nothing taken: the look-back pass judges the permanents as they are now.
+    pub(crate) fn none() -> Then {
+        Then { taken: false, objects: Vec::new() }
+    }
+
+    /// The permanents on the battlefield now that could look back, as they are now: called just before the events.
+    pub(crate) fn now(cx: &Cx) -> Then {
+        let cards = cx.cards();
+        let s = cx.s();
+        let granting = layers::ability_granting_present(cards, s)
+            || s.effects.iter().any(|e| matches!(e.kind, EffectKind::AddAbility(_) | EffectKind::AddKeywords(_)));
+        let could = |id: ObjectId| {
+            let o = s.obj(id);
+            granting || cards.look_back[cards.current(o).0 as usize] || o.has_counters() || o.copy.is_some_and(|c| c.extra_instances().next().is_some())
+        };
+        let mut objects: Vec<(ObjectId, Chars, PlayerId)> = s
+            .battlefield()
+            .iter()
+            .copied()
+            .filter(|&id| could(id))
+            .map(|id| (id, layers::chars(cards, s, &cx.g.log, id), s.obj(id).controller))
+            .collect();
+        objects.sort_unstable_by_key(|&(id, _, _)| id);
+        Then { taken: true, objects }
+    }
+}
+
 /// Every triggered ability this event triggers (CR 603.2).
-pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>, start: usize) {
+pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<Before>, start: usize) {
     collect_batch(cx, std::slice::from_ref(event), before, start);
 }
 
@@ -901,7 +964,7 @@ pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>,
 /// that function everywhere wherever they are. A "one or more" ability (CR 603.2c) triggers once for the batch, its
 /// members the subjects of the events it matched; a limited one ("triggers only N times each turn", no numbered rule; CR 603.2h is "do this only once each turn") stops triggering once it has used up its
 /// turn, a triggering that happens being noted in the history.
-pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>, start: usize) {
+pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, start: usize) {
     // A designation the events gave is had before anything they trigger is looked for, and the continuous effects that
     // read it apply to that look (CR 702.131d, 702.195c): Bifur, Melodic Rider entering for the third storied permanent
     // makes its own enters ability trigger an additional time.
@@ -910,6 +973,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>,
     // triggers are looked for (CR 603.10: "continuous effects that exist at that time are used to determine what the trigger
     // conditions are"); each trigger's own question about the past is of the history as it was before them, as it always
     // has been: "the first time each turn" is not this event.
+    // The look-back abilities are judged on the game just before the events (CR 603.10a), the history then included.
+    let then = before.map(|b| b.then);
+    let before = before.map(|b| b.battlefield);
     let outer = cx.g.history_end;
     cx.g.history_end = Some(start);
     // The cut is lifted however the look ends: a host that catches a panic goes on with the game (`cantrip_host::host`).
@@ -928,17 +994,17 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>,
             let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
             if let Some(before) = before {
                 for &id in before {
-                    consider(cx, id, true, true, event, mask, &mut statics, &mut found, None);
+                    consider(cx, id, true, true, event, mask, &mut statics, &mut found, None, then);
                 }
                 for &id in &now {
-                    consider(cx, id, false, true, event, mask, &mut statics, &mut found, None);
+                    consider(cx, id, false, true, event, mask, &mut statics, &mut found, None, None);
                 }
             } else {
                 // The same permanents for both: each one's characteristics are found once, and the abilities that don't look
                 // back come after every one that does, as they would from two passes.
                 let mut later: Found = Vec::new();
                 for &id in &now {
-                    consider(cx, id, true, true, event, mask, &mut statics, &mut found, Some(&mut later));
+                    consider(cx, id, true, true, event, mask, &mut statics, &mut found, Some(&mut later), None);
                 }
                 found.append(&mut later);
             }
@@ -949,7 +1015,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>,
             if !cx.s().zone(Zone::COMMAND).is_empty() {
                 let mut later: Found = Vec::new();
                 for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                    consider(cx, id, true, false, event, mask, &mut statics, &mut found, Some(&mut later));
+                    consider(cx, id, true, false, event, mask, &mut statics, &mut found, Some(&mut later), None);
                 }
                 found.append(&mut later);
             }

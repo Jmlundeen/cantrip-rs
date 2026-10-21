@@ -92,6 +92,10 @@ pub struct GameState {
     /// characteristics, though the card in exile has none. Set only for the length of that judgment
     /// (`cantrip_rules::layers::judged_face_up`), `None` at any other time; no part of the position.
     pub judged_face_up: std::cell::Cell<Option<ObjectId>>,
+    /// How many instructions that change several things at once are under way (an exchange of control, CR 701.12a): while
+    /// any is, what continuous effects say of control and "for as long as" durations is not settled between their parts,
+    /// only once the outermost has finished (`cantrip_rules::ops::settle_at_once`). No part of the position.
+    pub settle_held: std::cell::Cell<u32>,
 }
 
 /// What the rules watch to find a loop (CR 104.4b, 732): `cantrip_rules::loops` is what they do with it. Empty, but for the
@@ -384,6 +388,7 @@ impl GameState {
             lost_to_statics: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
             land_text_lost: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
             judged_face_up: std::cell::Cell::new(None),
+            settle_held: std::cell::Cell::new(0),
         }
     }
 

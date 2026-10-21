@@ -114,6 +114,15 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         moves
     };
     let before: Vec<ObjectId> = cx.s().battlefield().to_vec();
+    // The permanents that could look back, as they are just before the moves (CR 603.10a): only for moves a look-back
+    // ability can trigger on - leaving the battlefield or a graveyard, or a public object put into a hand or library.
+    let looks_back = moves.iter().any(|m| {
+        let from = cx.s().obj(m.id).zone;
+        from.is(ZoneKind::Battlefield)
+            || from.is(ZoneKind::Graveyard)
+            || ((m.to.is(ZoneKind::Hand) || m.to.is(ZoneKind::Library)) && !from.is(ZoneKind::Hand) && !from.is(ZoneKind::Library))
+    });
+    let then = if looks_back { crate::settle::Then::now(cx) } else { crate::settle::Then::none() };
     let mut events = Vec::with_capacity(moves.len());
     let mut created = Vec::with_capacity(moves.len());
     // CR 701.3d: every attachment these moves end, read before any is made: an attachment leaving the battlefield,
@@ -342,7 +351,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             become_prepared(cx, new_id);
         }
     }
-    cx.emit_batch(&events, Some(&before));
+    cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then }));
     created
 }
 
@@ -1140,6 +1149,8 @@ fn create_tokens_onto(
     let replaced = if spell.is_some() { None } else { replace::token_batch(cx, &proposed) };
     let tokens = replaced.as_deref().unwrap_or(&proposed);
     let before: Vec<ObjectId> = cx.s().battlefield().to_vec();
+    // Tokens entering trigger no look-back ability (CR 603.10a).
+    let then = crate::settle::Then::none();
     let mut events = Vec::new();
     let mut created = Vec::new();
     // CR 614.12, 101.4: tokens created together enter together. Each one's entering choices and replacements are worked
@@ -1236,7 +1247,7 @@ fn create_tokens_onto(
         events.extend(put);
         created.push(id);
     }
-    cx.emit_batch(&events, Some(&before));
+    cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then }));
     Ok(created)
 }
 
@@ -2741,9 +2752,60 @@ pub fn duration_begins(cx: &Cx, e: &cantrip_state::ContinuousEffect) -> bool {
     e.duration.holds_for(s.obj(e.affected)) && lasting_holds(cx, e)
 }
 
+/// Whether any control-changing effect could apply, or have applied: the guard of `settle_control`, free in nearly every
+/// position.
+fn control_may_change(cx: &Cx) -> bool {
+    let s = cx.s();
+    let cards = cx.cards();
+    s.effects.iter().any(|e| matches!(e.kind, EffectKind::Control(_)))
+        || s.battlefield().iter().any(|&id| {
+            let o = s.obj(id);
+            o.marks.control_base.is_some() || (s.statics_seen && cards.control_statics[cards.current(o).0 as usize])
+        })
+}
+
+/// Settles at once what continuous effects say of control (CR 613.1b) and of "for as long as" durations (CR 611.2b), as
+/// each event happens rather than only as the state-based actions are next checked: an Aura that gave control leaving or
+/// moving, a condition turning false partway through a resolution. Before an event's triggers are looked for (`Cx::emit`),
+/// so an ability triggering on it, and whatever the resolution reads next, sees the controller the effects now give.
+pub fn settle_at_once(cx: &mut Cx) {
+    if cx.s().settle_held.get() > 0 {
+        return;
+    }
+    let (lasting, control) = cx.s().effects.iter().fold((false, false), |(l, c), e| {
+        (l || matches!(e.duration, Duration::AsLongAs(..)), c || matches!(e.kind, EffectKind::Control(_)))
+    });
+    if lasting {
+        end_lapsed_conditions(cx);
+    }
+    if control || control_may_change(cx) {
+        settle_control(cx);
+    }
+}
+
+/// Runs `f` as one instruction (CR 608.2c): what continuous effects say of control and "for as long as" durations is
+/// settled once it has finished, not between its parts - the two halves of an exchange of control (CR 701.12a) leave no
+/// moment in which a player controls neither permanent.
+pub fn as_one_instruction<T>(cx: &mut Cx, f: impl FnOnce(&mut Cx) -> T) -> T {
+    let held = cx.s().settle_held.get();
+    cx.s().settle_held.set(held.saturating_add(1));
+    // Lowered again however the instruction ends: a host that catches a panic goes on with the game.
+    let done = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| f(&mut *cx)));
+    cx.s().settle_held.set(held);
+    let done = match done {
+        Ok(done) => done,
+        Err(panic) => std::panic::resume_unwind(panic),
+    };
+    if held == 0 {
+        settle_at_once(cx);
+    }
+    done
+}
+
 /// Ends each effect whose "for as long as [condition]" duration (`Duration::AsLongAs`) is no longer true (CR 611.2b), as
-/// the state-based actions are checked: it is over for good, though the condition become true again. A control-changing
-/// effect that ends gives its permanent back with the next `settle_control`. Whether any ended.
+/// each event happens and as the state-based actions are checked (`settle_at_once`): it is over for good, though the
+/// condition become true again. A control-changing effect that ends gives its permanent back with the next
+/// `settle_control`. Whether any ended.
 pub fn end_lapsed_conditions(cx: &mut Cx) -> bool {
     if !cx.s().effects.iter().any(|e| matches!(e.duration, Duration::AsLongAs(..))) {
         return false;
@@ -2762,11 +2824,7 @@ pub fn end_lapsed_conditions(cx: &mut Cx) -> bool {
 /// gives control to), so it is worked out again while anything changes. Whether any controller changed. Free while
 /// no control-changing effect applies and no permanent's control was ever changed.
 pub fn settle_control(cx: &mut Cx) -> bool {
-    let s = cx.s();
-    let any = s.effects.iter().any(|e| matches!(e.kind, EffectKind::Control(_)))
-        || s.battlefield().iter().any(|&id| s.obj(id).marks.control_base.is_some())
-        || (s.statics_seen && !layers::static_control_sources(cx.cards(), s).is_empty());
-    if !any {
+    if !control_may_change(cx) {
         return false;
     }
     let mut changed = false;

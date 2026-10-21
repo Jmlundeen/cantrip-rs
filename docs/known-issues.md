@@ -57,7 +57,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
-| [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
@@ -302,20 +301,6 @@ implemented card reaches:
   abilities applied to the object as its layer 4 is worked out.
 
 **Scenarios.** none: no implemented card reaches them.
-### KI-63: Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, review of the control-changing static abilities (Mind Control, Old Man of the Sea) |
-
-**Notes.** A resolved control effect changes the controller as it is created (`Game::add_effect`), and the untap step settles
-control after untapping (an Old Man of the Sea untapped there gives its creature back before the upkeep's triggers). But a
-static control-changing ability that starts or stops applying (`control_changing`: an Aura attached, moved or gone) and a
-`Duration::AsLongAs` condition that turns false partway through a resolution are worked out by `ops::settle_control` and
-`ops::end_lapsed_conditions` only when the state-based actions are next checked (CR 613.1b and 611.2b say at once). Anything
-read in between - later in the same resolution, or a trigger looking at the controller at the event - sees the old
-controller. No card in content reads a controller in that window that a scenario reaches.
-
 ### KI-71: The tactical bot's combat planning ignores bands
 
 | Priority | Status | Area | Found |

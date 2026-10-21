@@ -772,10 +772,16 @@ pub trait Game: Query {
         if a == b {
             return false;
         }
-        self.gain_control(source, first, b, Duration::Indefinite);
-        self.gain_control(source, second, a, Duration::Indefinite);
+        // One exchange (CR 701.12a): nothing is settled between its halves.
+        self.settle_once(&mut |g| {
+            g.gain_control(source, first, b, Duration::Indefinite);
+            g.gain_control(source, second, a, Duration::Indefinite);
+        });
         true
     }
+    /// Carries out `instruction` as one instruction (CR 608.2c): what continuous effects say of control and "for as long
+    /// as" durations is settled once it has finished, not between its parts (an exchange of control's two halves).
+    fn settle_once(&mut self, instruction: &mut dyn FnMut(&mut dyn Game));
     /// Counters a spell (CR 701.5): it leaves the stack for its owner's graveyard, or exile if it was flashed back.
     fn counter(&mut self, spell: ObjectId);
     /// Counters a spell and puts it in its owner's hand, on top or bottom of their library, or in exile (CR 701.6a).

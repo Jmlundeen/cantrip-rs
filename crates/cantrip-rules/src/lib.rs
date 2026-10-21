@@ -22,6 +22,8 @@ mod back_face_targets_tests;
 #[cfg(test)]
 mod cloak_tests;
 #[cfg(test)]
+mod control_at_once_tests;
+#[cfg(test)]
 mod history_cut_tests;
 #[cfg(test)]
 mod inherent_trigger_tests;
@@ -29,6 +31,8 @@ mod inherent_trigger_tests;
 mod copy_spell_tests;
 #[cfg(test)]
 mod leave_game_tests;
+#[cfg(test)]
+mod look_back_tests;
 #[cfg(test)]
 mod play_permission_tests;
 #[cfg(test)]
@@ -604,14 +608,17 @@ impl<'a> Cx<'a> {
     /// history seeing it (CR 603.10), each trigger's own question about the past seeing the history as it was just before it
     /// (`Game::history_end`, `cantrip_api::history`).
     pub fn emit(&mut self, event: Event) {
+        ops::settle_at_once(self);
         let start = self.g.log.len();
         self.record(event);
         settle::collect_triggers(self, &event, None, start);
     }
 
     /// Events that happened together (CR 603.2c): triggers are collected over the whole batch, so a "one or more"
-    /// ability triggers once. `before` is the battlefield before them, for look-back abilities.
-    pub fn emit_batch(&mut self, events: &[Event], before: Option<&[ObjectId]>) {
+    /// ability triggers once. `before` is the battlefield before them and the journal's mark then, for look-back
+    /// abilities (CR 603.10a).
+    pub fn emit_batch(&mut self, events: &[Event], before: Option<settle::Before>) {
+        ops::settle_at_once(self);
         let start = self.g.log.len();
         for &e in events {
             self.record(e);
@@ -1343,6 +1350,13 @@ impl cantrip_api::Game for Cx<'_> {
         if matches!(kind, EffectKind::Control(_)) {
             ops::refresh_control(self, affected);
         }
+        // What it changes may end a "for as long as" (Old Man of the Sea's "that creature's power remains less than or
+        // equal to"), and with it the control it gave, at once (CR 611.2b).
+        ops::settle_at_once(self);
+    }
+
+    fn settle_once(&mut self, instruction: &mut dyn FnMut(&mut dyn cantrip_api::Game)) {
+        ops::as_one_instruction(self, |cx| instruction(cx));
     }
 
     fn add_player_effect(&mut self, controller: PlayerId, source: ObjectId, kind: EffectKind, duration: Duration) {
