@@ -300,8 +300,9 @@ pub struct CostDelta {
     /// The amount of mana the cost is reduced by (CR 118.7). Its generic part reduces only the generic part of the cost
     /// (118.7a); each colored or colorless symbol reduces mana of its own type, and whatever of it the cost does not have
     /// reduces generic mana instead (118.7b-d); a Phyrexian symbol reduces mana of its color (118.7f). `x` is not read
-    /// (X is 0 in any mana cost not on the stack, CR 107.3). A hybrid symbol, which the payer would split as the
-    /// reduction is applied (118.7e), is refused: no card that reduces by one is built.
+    /// (X is 0 in any mana cost not on the stack, CR 107.3). A hybrid symbol is split by the payer as the reduction is
+    /// applied (118.7e: `Label::ReduceAs`), after any hybrid symbol of the cost it could meet is announced (601.2b:
+    /// `Label::PayHybridAs`).
     pub less: ManaCost,
     /// The least mana the total cost comes to (CR 601.2f: "once the total cost is determined, any effects that directly
     /// affect the total cost are applied"): "each spell that would cost less than three mana to cast costs three mana to
