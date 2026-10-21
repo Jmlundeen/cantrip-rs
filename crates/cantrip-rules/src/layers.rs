@@ -1127,7 +1127,7 @@ fn doors(cards: &CardTable, card: CardId, unlocked: u8, copy: Option<&Copiable>,
     chars.abilities = abilities;
 }
 
-/// Unlocking a Room's locked door is a special action the rules give its controller (CR 709.5e, 116.2), not an ability
+/// Unlocking a Room's locked door is a special action the rules give its controller (CR 709.5e, 116.2m), not an ability
 /// the permanent has, so an effect that takes its abilities (Humility over an Opalescence-animated Room) does not take
 /// it. It is carried as `intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, one per door still locked, given once layer 6 is done,
 /// as turning a face-down permanent face up is (`turn_face_up_action`).

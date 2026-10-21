@@ -313,6 +313,11 @@ a creature.
 - The modes chosen for a spell are a `u8` mask (`StackItem::modes`, `object.rs:575`) with two bits a mode where modes
   repeat, so a fourth pick of a mode carries into the next (the Seasons choose up to five).
 - The bands of `AbilityRef::index` are guarded only by `debug_assert`.
+- The special actions the rules give an object once layer 6 is done - a Room's unlock (`layers::unlock_actions`, CR
+  709.5e, 116.2m), turning a face-down permanent face up (`turn_face_up_action`, CR 116.2b) - and decayed's triggered
+  ability (`intrinsic_keyword_abilities`, CR 702.147a) take the first free slot of the ability list, so an object whose
+  list is full is not given them: the capacity fix and its test must cover them (a Room with a full list still offers
+  its unlock).
 A fix gives each a capacity past practical play, handled gracefully at its bound; a check of every card's lists at table
 construction for the bands; and the modes kept as the chosen indices in order.
 

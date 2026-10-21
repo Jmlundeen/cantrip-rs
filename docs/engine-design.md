@@ -1894,7 +1894,7 @@ Known gaps:
   the battlefield together (`cloak::cloak`).
 - Rooms (CR 709.5) are built: `Marks::doors` holds the unlocked designations, `layers::doors` gives a Room on the
   battlefield the name, mana cost and abilities of its unlocked doors (a copy effect's "except its name is X" keeps its
-  name, CR 707.9b: the rule takes away only the halves' names), and the unlock special action (CR 709.5e, 116.2) is given
+  name, CR 707.9b: the rule takes away only the halves' names), and the unlock special action (CR 709.5e, 116.2m) is given
   once layer 6 is done, one per locked door, as turning a face-down permanent face up is (`layers::unlock_actions`,
   `intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, cost read off the door), so an effect that takes all abilities (Humility over
   an Opalescence-animated Room) does not take it. `Event::DoorUnlocked` is what "when you unlock this door" listens for,

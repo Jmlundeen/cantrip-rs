@@ -1,4 +1,4 @@
-# Unlocking a Room's door is a special action (CR 709.5e, 116.2), not an ability of the Room, so an effect that takes all
+# Unlocking a Room's door is a special action (CR 709.5e, 116.2m), not an ability of the Room, so an effect that takes all
 # abilities cannot take it. Opalescence makes Unholy Annex a creature, and Humility takes all its abilities: Annex's end
 # step ability is gone (no card drawn and no life lost at the end of turns 5 and 7), yet the right door is still offered
 # and unlocked for its {3}{B}{B}. The Room has no abilities once it is unlocked either, so Ritual Chamber's "when you
