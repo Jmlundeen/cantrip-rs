@@ -1,0 +1,52 @@
+# The targeted trigger is on the stack when Unsummon returns Ruric Thar to its owner's hand (CR 603.3a, 113.7a): the
+# ability is independent of its source and still resolves, drawing a card. The Lightning Bolt it came from has no legal
+# target left and does nothing (CR 608.2b), so no damage is marked.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Ruric Thar, Biomagus
+Opt
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Lightning Bolt
+Unsummon
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ruric Thar, Biomagus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ruric Thar, Biomagus)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Ruric Thar, Biomagus)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Opt; Ruric Thar, Biomagus
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Ruric Thar, Biomagus = (absent)
+Bot2.Graveyard = Unsummon; Lightning Bolt

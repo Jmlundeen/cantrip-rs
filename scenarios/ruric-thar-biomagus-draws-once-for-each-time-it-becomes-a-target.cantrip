@@ -1,0 +1,52 @@
+# Each time it becomes the target is its own trigger (CR 603.2): Bot2's two Lightning Bolts draw two cards. Each Bolt's
+# trigger goes on the stack above it and resolves first, so both draws happen while Ruric Thar is still on the battlefield;
+# the second Bolt is the lethal one (six damage marked on a 4/6) and it dies after them.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Ruric Thar, Biomagus
+Opt
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ruric Thar, Biomagus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt#1.Cast(Bot1.Battlefield.Ruric Thar, Biomagus)
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ruric Thar, Biomagus)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Ruric Thar, Biomagus; Black Lotus
+Bot2.Graveyard.Count = 2

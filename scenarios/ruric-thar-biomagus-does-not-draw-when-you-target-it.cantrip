@@ -1,0 +1,44 @@
+# The trigger names a spell or ability "an opponent controls" (CR 115.10): Bot1's own Lightning Bolt targeting Ruric Thar
+# is no opponent's spell, so no card is drawn. (The positive control, the same Bolt from Bot2 drawing, is
+# ruric-thar-biomagus-draws-when-an-opponents-spell-targets-it.)
+
+[Bot1 Deck]
+Island
+Mountain
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Ruric Thar, Biomagus
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ruric Thar, Biomagus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ruric Thar, Biomagus)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Ruric Thar, Biomagus.Damage = 3
+Bot1.Graveyard = Lightning Bolt; Black Lotus
