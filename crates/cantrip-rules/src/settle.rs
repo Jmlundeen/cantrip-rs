@@ -920,6 +920,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                 let asker = Asker { source: d.source, controller: d.controller };
                 if d.when.is_event()
                     && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
+                    // A delayed triggered mana ability never goes on the stack: it resolves as the mana ability that
+                    // triggered it does (CR 605.1b, 605.4a), in `tapped_for_mana`.
+                    && !t.mana_ability
                     && t.listens.intersects(mask)
                     && let Some(fired) = t.fires(cx, &asker, event)
                     && t.condition.is_none_or(|condition| condition(cx, &asker))

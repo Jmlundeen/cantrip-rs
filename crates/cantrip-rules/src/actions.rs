@@ -5544,6 +5544,50 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
             }
         }
     }
+    if cx.s().delayed.iter().any(|d| d.when.is_event()) {
+        delayed_mana_abilities(cx, &event, &mut statics)?;
+    }
+    Ok(())
+}
+
+/// The delayed triggered mana abilities a mana ability's tap triggers: "until end of turn, whenever you tap a Mountain for
+/// mana, add an additional {R}" (Molten Tide, High Tide, Bubbling Muck). A delayed triggered ability that meets CR 605.1b is
+/// a mana ability, so it resolves at once as one of a permanent does (CR 605.4a), never on the stack; settle's delayed
+/// abilities leave it to this. "You" in its trigger event is its own controller, the player who controlled the spell or
+/// ability that created it (CR 603.7d-e), and it is stopped from triggering as any delayed ability is (CR 603.2) but
+/// never made to trigger an additional time (it is no ability of a permanent). Its mana is produced by its source, the
+/// spell or the source of the ability that created it (CR 106.3, 603.7d-e), wherever that has gone.
+fn delayed_mana_abilities(cx: &mut Cx, event: &Event, statics: &mut crate::settle::TriggerStatics) -> R<()> {
+    let delayed: Vec<cantrip_state::Delayed> = cx
+        .s()
+        .delayed
+        .iter()
+        .filter(|d| d.when.is_event() && matches!(cx.cards().ability(d.ability), AbilityDef::Triggered(t) if t.mana_ability))
+        .cloned()
+        .collect();
+    for d in delayed {
+        let AbilityDef::Triggered(t) = cx.cards().ability(d.ability) else { continue };
+        let asker = Asker { source: d.source, controller: d.controller };
+        let Some(fired) = t.fires(&*cx, &asker, event) else { continue };
+        if t.condition.is_some_and(|condition| !condition(&*cx, &asker))
+            || statics.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t, permanent: false })
+        {
+            continue;
+        }
+        // "When you next" is used up by the event it triggers on (CR 603.7b).
+        if d.when == DelayedWhen::NextThisTurn
+            && let Some(at) = cx.s().delayed.iter().position(|x| *x == d)
+        {
+            cx.st().delayed_remove(at);
+        }
+        let mut item = stack_item(StackKind::Triggered, d.source, d.ability, d.controller, &[]);
+        item.subject = fired.subject;
+        item.data = fired.data;
+        let outer = cx.mana_source.replace(d.source);
+        let added = cx.acting_as(d.controller, |cx| (t.effect)(cx, &item));
+        cx.mana_source = outer;
+        added?;
+    }
     Ok(())
 }
 

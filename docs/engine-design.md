@@ -1215,6 +1215,16 @@ a type of `Label::ManaType`, "Choose which type of mana to add") suspends the ac
 answer. "One mana of any type that land produced" reads `produced`: Lavaleaper, Mana Flare, and Heartbeat of Spring,
 Dictate of Karametra, Zendikar Resurgent, Mirari's Wake and Vorinclex, Voice of Hunger as written.
 
+A delayed triggered ability can be a mana ability too (CR 603.7, 605.1b): "until end of turn, whenever you tap a Mountain
+for mana, add an additional {R}" (Molten Tide, High Tide, Bubbling Muck) is a `DelayedWhen::ThisTurn` ability whose def
+is `.mana_ability()`. `tapped_for_mana` runs the waiting ones whose matcher accepts the tap right after the permanents'
+(`delayed_mana_abilities`, looked for only while some delayed ability waits on an event), each at once with its own
+controller as "you" (CR 603.7d-e), stopped as any delayed ability is but never made to trigger again, its mana produced by
+its source, the spell that made it, wherever that has gone (CR 106.3); settle's delayed abilities skip a mana ability, so
+it never goes on the stack (CR 605.4a). "Whenever [you tap / a player taps] a [land type] for mana, [that player] add[s]
+an additional [mana]" is `mana::you_tap_a_land_type_for_mana` or `a_player_taps_a_land_type_for_mana` with
+`mana::that_player_adds_an_additional`, the type read through the source's words (Nissa, Who Shakes the World too).
+
 "You may activate abilities of creatures you control as though those creatures had haste" (CR 302.6) is
 `CardDef::activate_as_though_haste`, asked (`static_rules::activates_as_though_haste`) only where a summoning-sick
 creature's {T} cost is paid: it gives no haste, so the creature still can't attack (Shang-Chi, Master of Kung Fu;
