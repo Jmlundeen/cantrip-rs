@@ -1429,16 +1429,70 @@ fn change_total(
 }
 
 /// The increases and reductions applied (CR 601.2f), the life the changes add (CR 118.8), and the least mana the total may
-/// come to, which is applied last (`CostDelta::at_least`), once every reduction is.
+/// come to, which is applied last (`CostDelta::at_least`), once every reduction is. Where a reduction meets a hybrid symbol
+/// not yet announced (`announcements`), the cost for the first announcement; a cast announces them first
+/// (`announce_hybrids`), and the advice tries each (`change_any`).
 fn change_parts(
     cx: &Cx,
     sources: &[ObjectId],
     player: PlayerId,
     costed: Costed,
-    mut cost: ManaCost,
+    cost: ManaCost,
     face: Option<CardId>,
     targets: &[Target],
 ) -> (ManaCost, u32, u8) {
+    let (more, less, life, least, discount) = deltas(cx, sources, player, costed, face, targets);
+    let mut cost = cost;
+    cost.generic = (cost.generic as u32 + more).min(255) as u8;
+    let mut first = cost;
+    any_announcement(&cost, &less, &mut |c| {
+        first = c;
+        true
+    });
+    (reduced(first, &less, discount), life, least)
+}
+
+/// Whether `covered` holds for `change_parts` at some announcement of the hybrid symbols a reduction meets (CR 601.2b,
+/// 601.2f): each total the cost could come to, with the least it may come to, as the advice judges it.
+#[allow(clippy::too_many_arguments)]
+fn change_any(
+    cx: &Cx,
+    sources: &[ObjectId],
+    player: PlayerId,
+    costed: Costed,
+    cost: ManaCost,
+    face: Option<CardId>,
+    targets: &[Target],
+    covered: &mut dyn FnMut(ManaCost, u8) -> bool,
+) -> bool {
+    let (more, less, _, least, discount) = deltas(cx, sources, player, costed, face, targets);
+    let mut cost = cost;
+    cost.generic = (cost.generic as u32 + more).min(255) as u8;
+    any_announcement(&cost, &less, &mut |c| covered(reduced(c, &less, discount), least))
+}
+
+/// Whether `f` holds for some cost of `announcements`, without listing them where no reduction meets a hybrid symbol.
+fn any_announcement(cost: &ManaCost, less: &ManaCost, f: &mut dyn FnMut(ManaCost) -> bool) -> bool {
+    if cost.hybrid.iter().all(Option::is_none) || less.symbols.iter().chain(&less.phyrexian).all(|&n| n == 0) {
+        return f(*cost);
+    }
+    announcements(cost, less).into_iter().any(f)
+}
+
+/// The reductions `less` and the "less to one" `discount` applied to a cost whose increases are (CR 601.2f).
+fn reduced(cost: ManaCost, less: &ManaCost, discount: u32) -> ManaCost {
+    let mut cost = reduce(cost, less);
+    // "Can't reduce the mana in that cost to less than one mana": applied to the cost the other changes left (CR 601.2f).
+    if discount > 0 {
+        let room = cost.mana_value().saturating_sub(1);
+        cost.generic -= discount.min(room).min(cost.generic as u32) as u8;
+    }
+    cost
+}
+
+/// What the cost changes come to (CR 601.2f): the generic mana they add, the mana they take off, the life they add
+/// (CR 118.8), the least the total may come to (`CostDelta::at_least`), and the "less to one" reduction.
+fn deltas(cx: &Cx, sources: &[ObjectId], player: PlayerId, costed: Costed, face: Option<CardId>, targets: &[Target]) -> (u32, ManaCost, u32, u8, u32) {
     let view;
     let q: &dyn Query = match (face, costed) {
         (Some(face), Costed::Spell(spell)) => {
@@ -1466,7 +1520,7 @@ fn change_parts(
     // The cost changes resolved spells and abilities made (CR 611.2c): of spells only, as every one printed says.
     let lasting = matches!(costed, Costed::Spell(_)) && lasting_changes(cx);
     if sources.is_empty() && own.is_empty() && ability_own.is_none() && !lasting {
-        return (cost, 0, 0);
+        return (0, ManaCost::ZERO, 0, 0, 0);
     }
     let mut more = 0u32;
     let mut less = ManaCost::ZERO;
@@ -1505,24 +1559,72 @@ fn change_parts(
             }
         }
     }
-    // Increases, then reductions (CR 601.2f). Reductions of generic and colored mana commute, so the order the player
-    // could apply them in changes nothing.
-    cost.generic = (cost.generic as u32 + more).min(255) as u8;
-    cost = reduce(cost, &less);
-    // "Can't reduce the mana in that cost to less than one mana": applied to the cost the other changes left (CR 601.2f).
-    if discount > 0 {
-        let room = cost.mana_value().saturating_sub(1);
-        cost.generic -= discount.min(room).min(cost.generic as u32) as u8;
+    // Increases, then reductions (CR 601.2f), applied by the caller. Reductions of generic and colored mana commute, so the
+    // order the player could apply them in changes nothing.
+    (more, less, life, least, discount)
+}
+
+/// The two-color hybrid symbols of `cost` a reduction `less` meets: a symbol with a half of a type whose reduction the
+/// cost's plain symbols of that type do not absorb (CR 118.7c), by slot, with the types of its halves so met. How such a
+/// symbol was announced (CR 601.2b) decides whether the reduction takes it off or takes generic mana instead.
+fn met_hybrids(cost: &ManaCost, less: &ManaCost) -> Vec<(usize, Vec<Mana>)> {
+    let left = |m: Mana| reduction_of_type(less, m).saturating_sub(u32::from(cost.symbols[m as usize]));
+    cost.hybrid
+        .iter()
+        .enumerate()
+        .filter_map(|(slot, h)| {
+            let (a, b) = (*h)?;
+            let halves: Vec<Mana> = [a, b].into_iter().filter(|&m| left(m) > 0).collect();
+            (!halves.is_empty()).then_some((slot, halves))
+        })
+        .collect()
+}
+
+/// How much mana of type `m` a reduction takes off (CR 118.7c-f): its plain symbols of that type, and its Phyrexian ones
+/// of that color.
+fn reduction_of_type(less: &ManaCost, m: Mana) -> u32 {
+    let i = m as usize;
+    u32::from(less.symbols[i]) + if i < 5 { u32::from(less.phyrexian[i]) } else { 0 }
+}
+
+/// The ways the hybrid symbols a reduction meets (`met_hybrids`) could be announced (CR 601.2b), as costs: each such symbol
+/// left a hybrid symbol - announced as a half the reduction then does not take, which takes generic mana instead - or
+/// announced as a half the reduction takes, no more of a type than the reduction has of it. Each is a cost the cast could
+/// come to; with no symbol met, the cost itself.
+fn announcements(cost: &ManaCost, less: &ManaCost) -> Vec<ManaCost> {
+    let met = met_hybrids(cost, less);
+    if met.is_empty() {
+        return vec![*cost];
     }
-    (cost, life, least)
+    fn go(less: &ManaCost, met: &[(usize, Vec<Mana>)], at: usize, now: ManaCost, out: &mut Vec<ManaCost>) {
+        let Some((slot, halves)) = met.get(at) else {
+            let mut done = now;
+            let kept: Vec<Option<(Mana, Mana)>> = done.hybrid.iter().copied().filter(Option::is_some).collect();
+            done.hybrid = [None; 6];
+            done.hybrid[..kept.len()].copy_from_slice(&kept);
+            out.push(done);
+            return;
+        };
+        for &m in halves {
+            if u32::from(now.symbols[m as usize]) < reduction_of_type(less, m) {
+                let mut next = now;
+                next.hybrid[*slot] = None;
+                next.symbols[m as usize] += 1;
+                go(less, met, at + 1, next, out);
+            }
+        }
+        go(less, met, at + 1, now, out);
+    }
+    let mut out = Vec::new();
+    go(less, &met, 0, *cost, &mut out);
+    out
 }
 
 /// A cost reduced by an amount of mana (CR 118.7): its generic part takes generic mana off only (118.7a); each colored
 /// or colorless symbol takes off one mana of that type, and one the cost has none of (118.7b), or has fewer of (118.7c-d),
 /// takes off generic mana instead; a Phyrexian symbol takes off mana of its color (118.7f). Nothing goes below zero
-/// (CR 601.2f). A hybrid symbol of the cost was announced as one of its halves before the reductions (CR 601.2b, 601.2f),
-/// so a reduction of a type the cost's plain symbols don't absorb meets the hybrid symbols that may be paid with that type
-/// (`reduce_announced`).
+/// (CR 601.2f). A hybrid symbol of the cost is announced as one of its halves before the reductions (CR 601.2b): one a
+/// reduction meets is announced first (`announce_hybrids`, `announcements`), and one still a hybrid symbol here meets none.
 fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
     // A hybrid symbol in a reduction is split by the payer as the reduction is applied (CR 118.7e), a choice not built:
     // refused in every build rather than reduced some other way.
@@ -1538,56 +1640,37 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
         }
         let off = n.min(cost.symbols[i] as u32);
         cost.symbols[i] -= off as u8;
-        n -= off;
-        if n > 0 {
-            n = reduce_announced(&mut cost, i, n);
-        }
-        excess += n;
+        excess += n - off;
     }
     cost.generic = (cost.generic as u32).saturating_sub(excess) as u8;
     cost
-}
-
-/// `n` mana of the type `i` (as `Mana` orders them) that the cost's plain symbols of that type did not absorb, meeting the
-/// two-color hybrid symbols that may be paid with it: each announced as that half (CR 601.2b) is reduced to nothing
-/// (CR 118.7c), which leaves a cost any payment of the other announcement also pays - a symbol of the other half, or the
-/// generic mana the reduction would otherwise take (118.7c), is never cheaper. Taken where those symbols are all one pair
-/// ({U/R}{U/R}); where they differ, which to announce is the payer's choice (601.2b), not built, and the rest takes
-/// generic mana as before (KI-110). {2/C} and Phyrexian symbols are announced before the cost changes
-/// (`announce_twobrids`, `announce_life`), so none is left here. What is left over is returned.
-fn reduce_announced(cost: &mut ManaCost, i: usize, mut n: u32) -> u32 {
-    let meets = |h: &Option<(Mana, Mana)>| h.is_some_and(|(a, b)| a as usize == i || b as usize == i);
-    let mut pairs = cost.hybrid.iter().filter(|h| meets(h)).copied();
-    let first = pairs.next().flatten();
-    if first.is_some() && pairs.all(|p| p == first) {
-        let mut kept = [None; 6];
-        let mut at = 0;
-        for h in cost.hybrid {
-            if meets(&h) && n > 0 {
-                n -= 1;
-            } else if h.is_some() {
-                kept[at] = h;
-                at += 1;
-            }
-        }
-        cost.hybrid = kept;
-    }
-    n
 }
 
 /// The least mana a spell could be cast for with this base cost, for the advice that a cast that cannot be paid is
 /// not offered (CR 601.2, 118.3): X at 0, no kicker, the cheapest modes it must choose, Phyrexian symbols paid with
 /// life where the life total allows. `targets` are the candidate it would be announced with, where its target is announced
 /// with the cast, or none (CR 601.2c, 601.2f).
-fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost, targets: &[Target]) -> ManaCost {
-    let (cost, least) = least_cost_parts(cx, available, player, card, def, base, targets);
-    at_least(cost, least)
+///
+/// One for each way the hybrid symbols a reduction meets could be announced (`announcements`): the cast may be paid if any is.
+#[allow(clippy::too_many_arguments)]
+fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost, targets: &[Target], covered: &mut dyn FnMut(ManaCost) -> bool) -> bool {
+    least_cost_parts(cx, available, player, card, def, base, targets, &mut |cost, least| covered(at_least(cost, least)))
 }
 
 /// `least_cost` with the least the total may come to (`CostDelta::at_least`, Trinisphere) not yet applied but returned, for a
 /// cast whose own reductions (emerge, harmonize) are still to come: the least is applied after every reduction, as the cast
 /// applies it (CR 601.2f).
-fn least_cost_parts(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost, targets: &[Target]) -> (ManaCost, u8) {
+#[allow(clippy::too_many_arguments)]
+fn least_cost_parts(
+    cx: &Cx,
+    available: &Available,
+    player: PlayerId,
+    card: ObjectId,
+    def: &CardDef,
+    base: ManaCost,
+    targets: &[Target],
+    covered: &mut dyn FnMut(ManaCost, u8) -> bool,
+) -> bool {
     let mut cost = base;
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
@@ -1609,7 +1692,9 @@ fn least_cost_parts(cx: &Cx, available: &Available, player: PlayerId, card: Obje
         // One mode to choose: the cheapest the player could pay for - Three Steps Ahead's {3} when its {1}{U} would need
         // a second blue.
         if modal.min <= 1
-            && let Some(i) = costs.iter().position(|&c| available.covers_for(&finish(cx, available, player, card, def, add_cost(cost, c), targets), &spell_kind(cx, available, card, def)))
+            && let Some(i) = costs.iter().position(|&c| {
+                finish(cx, available, player, card, def, add_cost(cost, c), targets, &mut |total, least| available.covers_for(&at_least(total, least), &spell_kind(cx, available, card, def)))
+            })
         {
             costs.swap(0, i);
         }
@@ -1617,23 +1702,30 @@ fn least_cost_parts(cx: &Cx, available: &Available, player: PlayerId, card: Obje
             cost = add_cost(cost, c);
         }
     }
-    let (mut cost, least) = finish_parts(cx, available, player, card, def, cost, targets);
     // "Costs {1} less for each permanent sacrificed this way": as little as sacrificing every permanent that could be.
-    if let Some(VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) {
-        let candidates = def.additional_cost.and_then(|c| c.variable).map_or(0, |v| variable_candidates(cx, card, player, v).len());
-        cost.generic = cost.generic.saturating_sub((candidates as u32 * less_each as u32).min(255) as u8);
-    }
-    (cost, least)
+    let off = match def.additional_cost.and_then(|c| c.variable) {
+        Some(v @ VariableCost::SacrificeAnyNumber { less_each, .. }) => (variable_candidates(cx, card, player, v).len() as u32 * less_each as u32).min(255) as u8,
+        _ => 0,
+    };
+    finish(cx, available, player, card, def, cost, targets, &mut |mut cost, least| {
+        cost.generic = cost.generic.saturating_sub(off);
+        covered(cost, least)
+    })
 }
 
 /// `least_cost`'s Phyrexian symbols paid with life where the life total allows, and the cost changes applied.
-fn finish(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, targets: &[Target]) -> ManaCost {
-    let (cost, least) = finish_parts(cx, available, player, card, def, cost, targets);
-    at_least(cost, least)
-}
-
-/// `finish` with the least the total may come to returned, not yet applied.
-fn finish_parts(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, mut cost: ManaCost, targets: &[Target]) -> (ManaCost, u8) {
+/// Whether `covered` holds for one of the totals (with the least each may come to, not yet applied).
+#[allow(clippy::too_many_arguments)]
+fn finish(
+    cx: &Cx,
+    available: &Available,
+    player: PlayerId,
+    card: ObjectId,
+    def: &CardDef,
+    mut cost: ManaCost,
+    targets: &[Target],
+    covered: &mut dyn FnMut(ManaCost, u8) -> bool,
+) -> bool {
     let mut life = if cost.phyrexian.iter().any(|&n| n > 0) { payable_life(cx, player) } else { 0 };
     for (i, n) in cost.phyrexian.into_iter().enumerate() {
         for _ in 0..n {
@@ -1647,8 +1739,7 @@ fn finish_parts(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId
     cost.phyrexian = [0; 5];
     // A face cast from the hand (an Adventure, an Omen, a half, a back face) is judged as that face (CR 715.4, 720.3a,
     // 709.3, 712.8a).
-    let (cost, _, least) = change_parts(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets);
-    (cost, least)
+    change_any(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets, covered)
 }
 
 /// Whether `player` could pay `cost` from the mana pool and what the mana abilities they could activate add (advice,
@@ -1933,6 +2024,7 @@ impl Repeat {
 }
 
 /// Adds `n` sources alike, each one of `alternatives`, to what a player has to pay with (`available_without`).
+#[inline]
 fn account(
     alternatives: &[Alternative],
     n: u32,
@@ -2933,13 +3025,15 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
                 // touch it; what changes its own cost is already in `owed` (`special_action_cost`), which `special_action`
                 // pays. A cost of nothing is judged too: an increase still applies to it (CR 118.9d, 601.2f).
-                let mut cost =
-                    if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
-                if static_rules::spend_any_color_for(cx, player, id, !def.special_action) {
-                    cost = cost.paid_with_any_color();
+                let any_color = static_rules::spend_any_color_for(cx, player, id, !def.special_action);
+                let judge = |cost: ManaCost| a.covers_for(&if any_color { cost.paid_with_any_color() } else { cost }, &payment);
+                if def.special_action {
+                    judge(owed)
+                } else {
+                    // Each way the hybrid symbols a reduction meets could be announced (CR 601.2b): covered if any is.
+                    change_any(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets, &mut |c, least| judge(at_least(c, least)))
                 }
-                a.covers_for(&cost, &payment)
             };
             // The total cost is determined once the targets are announced (CR 601.2c, 601.2f, 602.2b), so a change that reads
             // them ("equip abilities that target this creature cost {2} less") is judged for each candidate a target announced
@@ -3762,9 +3856,10 @@ impl<'a> Offer<'a> {
         base.generic = base.generic.saturating_add(route.terms.more);
         let base = add_cost(base, route.additional.mana);
         let covered = |targets: &[Target]| {
-            let least = least_cost(cx, a, player, card, face, base, targets);
             // Mana of any type pays every symbol of it (CR 609.4b), by the permission that casts it.
-            covers_total(cx, a, player, card, face, least, route.additional.exile_from_graveyard, route.terms.any_type)
+            least_cost(cx, a, player, card, face, base, targets, &mut |least| {
+                covers_total(cx, a, player, card, face, least, route.additional.exile_from_graveyard, route.terms.any_type)
+            })
                 && added_life_payable(cx, a, player, card, face, targets)
         };
         let mut option = ActionOption { granted_by: route.by, paid_by, ..ActionOption::on(ActionKind::CastSpell, card, way) };
@@ -4001,8 +4096,7 @@ impl<'a> Offer<'a> {
             return;
         }
         let (cx, player, a) = (self.cx, self.player, self.available());
-        let cost = least_cost(cx, a, player, card, def, overload, &[]);
-        if covers_total(cx, a, player, card, def, cost, 0, false) {
+        if least_cost(cx, a, player, card, def, overload, &[], &mut |cost| covers_total(cx, a, player, card, def, cost, 0, false)) {
             options.push(ActionOption::on(ActionKind::CastSpell, card, WAY_OVERLOAD));
         }
     }
@@ -4028,7 +4122,7 @@ impl<'a> Offer<'a> {
         }
         let a = self.available();
         let mut option = ActionOption::on(ActionKind::CastSpell, card, WAY_BESTOW);
-        if a.covers_for(&least_cost(cx, a, player, card, bestow, def.bestow_cost, &[]), &spell_kind(cx, a, card, bestow))
+        if least_cost(cx, a, player, card, bestow, def.bestow_cost, &[], &mut |cost| a.covers_for(&cost, &spell_kind(cx, a, card, bestow)))
             && offer_spell(cx, &self.asker(card), bestow, &mut option)
         {
             options.push(option);
@@ -4077,8 +4171,7 @@ impl<'a> Offer<'a> {
                 }
                 let a = self.available();
                 let covered = |targets: &[Target]| {
-                    let least = least_cost(cx, a, player, card, face, cost.mana, targets);
-                    covers_total(cx, a, player, card, face, least, cost.exile_from_graveyard, false)
+                    least_cost(cx, a, player, card, face, cost.mana, targets, &mut |least| covers_total(cx, a, player, card, face, least, cost.exile_from_graveyard, false))
                         && added_life_payable(cx, a, player, card, face, targets)
                 };
                 let mut option = ActionOption { granted_by: Some(way.grant), ..ActionOption::on(ActionKind::CastSpell, card, way_number) };
@@ -4251,19 +4344,20 @@ fn reduction_of(cx: &Cx, creature: ObjectId) -> u8 {
 fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, way: &Cost, any_type: bool) -> bool {
     // The way's own reductions (emerge, harmonize) come before the least the total may come to (Trinisphere), as the cast
     // applies them (CR 601.2f).
-    let (mut cost, least) = least_cost_parts(cx, a, player, card, def, way.mana, &[]);
-    cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, card, way));
-    // Mana of any type pays every symbol of it (CR 609.4b), as `cast` pays it.
-    if covers_total(cx, a, player, card, def, at_least(cost, least), way.exile_from_graveyard, any_type) {
-        return true;
-    }
-    way.tap_to_reduce
-        && reducer_candidates(cx, player).into_iter().any(|creature| {
-            let without = available_without(cx, player, Some(creature));
-            let mut reduced = cost;
-            reduced.generic = reduced.generic.saturating_sub(reduction_of(cx, creature));
-            covers_total(cx, &without, player, card, def, at_least(reduced, least), way.exile_from_graveyard, any_type)
-        })
+    least_cost_parts(cx, a, player, card, def, way.mana, &[], &mut |mut cost, least| {
+        cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, card, way));
+        // Mana of any type pays every symbol of it (CR 609.4b), as `cast` pays it.
+        if covers_total(cx, a, player, card, def, at_least(cost, least), way.exile_from_graveyard, any_type) {
+            return true;
+        }
+        way.tap_to_reduce
+            && reducer_candidates(cx, player).into_iter().any(|creature| {
+                let without = available_without(cx, player, Some(creature));
+                let mut reduced = cost;
+                reduced.generic = reduced.generic.saturating_sub(reduction_of(cx, creature));
+                covers_total(cx, &without, player, card, def, at_least(reduced, least), way.exile_from_graveyard, any_type)
+            })
+    })
 }
 
 /// Chooses the creature a cost taps to reduce its mana (CR 702.180b, 601.2b): up to one untapped creature, asked as the cost
@@ -5090,6 +5184,7 @@ fn cast(
         extra = extra.and(added);
         cost.mana = add_cost(cost.mana, added.mana);
     }
+    announce_hybrids(cx, player, spell, Costed::Spell(spell), &mut cost.mana, &targets, any_type)?;
     let (added_life, least);
     (cost.mana, added_life, least) = apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets);
     if added_life > 0 {
@@ -5886,6 +5981,83 @@ fn announce_twobrids(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut
     Ok(())
 }
 
+/// Announces the half each two-color hybrid symbol of a cost is paid with (CR 601.2b), where a reduction meets it
+/// (`met_hybrids`): announced as a half the reduction takes, the symbol is reduced to nothing (CR 118.7c); as the other, it
+/// is paid with that half and the reduction takes generic mana instead - which a player may want, to spend mana of that
+/// color ("if {R} was spent to cast this spell"). Each met symbol is announced as a half the reduction takes unless the
+/// player chooses its other half (`Label::PayHybridAs`). A symbol no reduction meets is paid either way as the cost is paid,
+/// which comes to the same, and is not asked about. Asked once the targets are announced, since a reduction may read
+/// them (CR 601.2f): an announcement nothing reads before the total cost is determined is the same then as before them.
+/// `any_type`: mana of any type may pay the cost (CR 609.4b), which the advice reads.
+fn announce_hybrids(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Costed, cost: &mut ManaCost, targets: &[Target], any_type: bool) -> R<()> {
+    if cost.hybrid.iter().all(Option::is_none) {
+        return Ok(());
+    }
+    let (more, less, ..) = deltas(cx, &cost_change_sources(cx), player, costed, None, targets);
+    let met = met_hybrids(cost, &less);
+    if met.is_empty() {
+        return Ok(());
+    }
+    // Each met symbol: its slot, the half it is announced as unless chosen otherwise, and its other half.
+    let symbols: Vec<(usize, Mana, Mana)> = met
+        .iter()
+        .map(|(slot, halves)| {
+            let (a, b) = cost.hybrid[*slot].expect("a hybrid symbol");
+            let taken = halves[0];
+            (*slot, taken, if taken == a { b } else { a })
+        })
+        .collect();
+    let announced = |chosen: &[bool]| {
+        let mut out = *cost;
+        for (i, &(slot, taken, other)) in symbols.iter().enumerate() {
+            out.hybrid[slot] = None;
+            let half = if chosen[i] { other } else { taken };
+            out.symbols[half as usize] += 1;
+        }
+        let kept: Vec<Option<(Mana, Mana)>> = out.hybrid.iter().copied().filter(Option::is_some).collect();
+        out.hybrid = [None; 6];
+        out.hybrid[..kept.len()].copy_from_slice(&kept);
+        out
+    };
+    let n = symbols.len();
+    // Advice: the fewest symbols announced as their other half that leave a total the player could pay.
+    let affordable: Vec<u8> = {
+        let mut masks: Vec<u32> = (0u32..1 << n).collect();
+        masks.sort_by_key(|m| (m.count_ones(), *m));
+        masks
+            .into_iter()
+            .find(|&mask| {
+                let chosen: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
+                let mut total = announced(&chosen);
+                total.generic = (total.generic as u32 + more).min(255) as u8;
+                let total = reduce(total, &less);
+                can_afford(cx, player, source, &if any_type { total.paid_with_any_type() } else { total })
+            })
+            .map(|mask| (0..n as u8).filter(|&i| mask & (1 << i) != 0).collect())
+            .unwrap_or_default()
+    };
+    let ask = RequestKind::ChooseModes {
+        source,
+        modes: symbols.iter().map(|&(slot, _, other)| {
+            let (a, b) = cost.hybrid[slot].expect("a hybrid symbol");
+            Label::PayHybridAs(a, b, other)
+        }).collect(),
+        eligible: (0..n as u8).collect(),
+        count: 0,
+        at_most: n as u8,
+        affordable,
+        additional_cost: true,
+        repeat: false,
+    };
+    let chosen = match cx.ask_core(player, ask, true)? {
+        Answer::Modes(chosen) => chosen,
+        _ => return Err(Stop::Cancel),
+    };
+    let chosen: Vec<bool> = (0..n as u8).map(|i| chosen.contains(&i)).collect();
+    *cost = announced(&chosen);
+    Ok(())
+}
+
 /// Announces which Phyrexian symbols are paid with 2 life (CR 107.4f, 601.2b), as the C# engine's prompt: a choice of
 /// up to as many as the life total covers, cheapest first. The symbols not paid with life become colored mana in
 /// `cost`. Returns the life to pay with the rest of the cost. `any_type`: mana of any type may pay it (CR 609.4b), which
@@ -6149,6 +6321,7 @@ fn activate(
     // change may read them ("equip abilities you activate that target this creature cost {2} less"). It is locked in
     // here, so nothing that happens to a target later changes what is paid. Life a change adds (CR 118.8) is payable only
     // with that much life, the rest of the cost's included (CR 119.4, 118.3), or the activation is taken back.
+    announce_hybrids(cx, player, source, Costed::Ability(source, ability), &mut mana, &targets, false)?;
     let added_life;
     (mana, added_life) = apply_cost_changes_total(cx, player, Costed::Ability(source, ability), mana, &targets);
     let life = life as u32 + added_life;
@@ -7978,17 +8151,25 @@ mod tests {
     }
 
     /// CR 118.7c, 601.2b: a {U} reduction the cost's {U} symbols don't absorb meets a hybrid symbol with a blue half, which
-    /// was announced as blue (Expansion's {U/R}{U/R} under Eluge is free), and only then takes generic mana; with symbols of
-    /// different kinds it may meet, which one is the payer's choice, and the reduction takes generic mana as before (KI-110).
+    /// may be announced as blue - and then is reduced to nothing - or as its other half, and the reduction takes generic mana
+    /// instead. The totals the cast could come to are each announcement's: Expansion's {U/R}{U/R} under two is free; with
+    /// {U/R} and {U/B} under one, either may be the one taken off.
     #[test]
-    fn a_colored_reduction_meets_a_hybrid_symbol_of_that_color() {
+    fn a_colored_reduction_meets_a_hybrid_symbol_announced_as_that_color() {
         let less = |n: u8| ManaCost { symbols: [0, n, 0, 0, 0, 0], ..ManaCost::ZERO };
-        assert_eq!(reduce(cantrip_api::mana("{U/R}{U/R}"), &less(2)), ManaCost::ZERO);
-        assert_eq!(reduce(cantrip_api::mana("{U/R}{U/R}"), &less(1)), cantrip_api::mana("{U/R}"));
-        assert_eq!(reduce(cantrip_api::mana("{1}{U/R}"), &less(2)), ManaCost::ZERO);
-        assert_eq!(reduce(cantrip_api::mana("{2}{U}{U/R}"), &less(2)), cantrip_api::mana("{2}"));
-        assert_eq!(reduce(cantrip_api::mana("{R}{W/B}"), &less(1)), cantrip_api::mana("{R}{W/B}"), "no symbol a blue half pays");
-        assert_eq!(reduce(cantrip_api::mana("{1}{U/R}{U/B}"), &less(1)), cantrip_api::mana("{U/R}{U/B}"), "the payer's choice: generic");
+        let totals = |cost: &str, n: u8| {
+            let mut out: Vec<String> = announcements(&cantrip_api::mana(cost), &less(n)).into_iter().map(|c| reduce(c, &less(n)).to_string()).collect();
+            out.sort();
+            out.dedup();
+            out
+        };
+        assert_eq!(totals("{U/R}{U/R}", 2), ["{0}", "{U/R}", "{U/R}{U/R}"]);
+        assert_eq!(totals("{1}{U/R}", 2), ["{0}", "{U/R}"]);
+        assert_eq!(totals("{2}{U}{U/R}", 2), ["{1}{U/R}", "{2}"]);
+        assert_eq!(totals("{R}{W/B}", 1), ["{W/B}{R}"], "no symbol a blue half pays");
+        assert_eq!(totals("{1}{U/R}{U/B}", 1), ["{1}{U/B}", "{1}{U/R}", "{U/R}{U/B}"], "either may be taken off, or neither");
+        // A symbol still hybrid meets no reduction.
+        assert_eq!(reduce(cantrip_api::mana("{U/R}{U/R}"), &less(2)), cantrip_api::mana("{U/R}{U/R}"));
     }
 
     /// Mind Spring with X = 254, {254}{U}{U}, under 300 flooded lands (Eluge: 255 {U} and the next 45 as generic): free.

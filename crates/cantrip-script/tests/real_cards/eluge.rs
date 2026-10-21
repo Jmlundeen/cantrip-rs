@@ -84,9 +84,26 @@ static EXPANSION: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// Unnerving Assault's {U/R} alone: an instant costing one hybrid symbol.
+static ASSAULT: CardDef = CardDef {
+    name: "Probe Assault",
+    cost: ManaCost { hybrid: [Some((Mana::U, Mana::R)), None, None, None, None, None], ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], |_, _| Ok(())),
+    ..CardDef::BLANK
+};
+/// {U/R}{U/B}: two hybrid symbols of different pairs, each with a blue half.
+static MIXED: CardDef = CardDef {
+    name: "Probe Mixed",
+    cost: ManaCost { hybrid: [Some((Mana::U, Mana::R)), Some((Mana::U, Mana::B)), None, None, None, None], ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], |_, _| Ok(())),
+    ..CardDef::BLANK
+};
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&COMMANDEER, &UNLAND, &OPT, &MUTE, &FLOOD_ALL, &SPRING, &EXPANSION])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&COMMANDEER, &UNLAND, &OPT, &MUTE, &FLOOD_ALL, &SPRING, &EXPANSION, &ASSAULT, &MIXED])))
 }
 
 /// What a seat does, in order, each as soon as its turn has come and it is offered: play a land, or cast a card (aimed at a
@@ -305,4 +322,89 @@ fn eluges_reduction_past_255_flooded_lands_takes_generic_mana_and_hybrid_symbols
         game.answer(request.id, request.player, answer).unwrap();
     }
     assert_eq!(totals, Some((0, 0)), "Mind Spring at X = 254 and Expansion, each the first instant of the turn under 300 flooded lands");
+}
+
+/// Eluge with one flooded land (a {U} reduction) and three Moxen; on turn 3 Bot1 casts `card`, answering the announcement of
+/// its hybrid symbols (CR 601.2b) with `choose`, and paying with the Moxen it is asked for. The announcement's options, and
+/// the Moxen tapped.
+fn announced(card: &str, choose: Vec<u8>) -> (Vec<String>, Vec<String>) {
+    let names = |list: &[&str]| -> Vec<CardId> { list.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))).collect() };
+    let mut deck = names(&["Probe Flood All", card]);
+    deck.extend(names(&["Swamp"; 28]));
+    let mut game = Game::new(table(), &Setup { decks: vec![deck, names(&["Island"; 30])], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
+    for name in ["Eluge, the Shoreless Sea", "Island", "Mox Ruby", "Mox Jet", "Mox Sapphire"] {
+        let id = game.state.push_obj(Obj::new(table().find(name).unwrap(), PlayerId(0), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, id);
+    }
+    let mut options = Vec::new();
+    let mut cast = false;
+    for _ in 0..3000 {
+        game.run();
+        let request = game.pending().cloned().expect("a question");
+        let mine = request.player == PlayerId(0) && game.state.stack.is_empty() && game.state.turn.step() == cantrip_engine::Step::PrecombatMain;
+        if cast && game.state.stack.is_empty() {
+            break;
+        }
+        let answer = match &request.kind {
+            RequestKind::Priority { options } if mine && (game.state.turn.number == 1 || game.state.turn.number == 3) => {
+                let wanted = if game.state.turn.number == 1 { "Probe Flood All" } else { card };
+                match options.iter().find(|o| o.kind == ActionKind::CastSpell && o.source.is_some_and(|c| game.name(c) == wanted)) {
+                    Some(o) => {
+                        cast |= game.state.turn.number == 3;
+                        Answer::Act(Action::of(o))
+                    }
+                    None => Answer::Pass,
+                }
+            }
+            RequestKind::Priority { .. } => Answer::Pass,
+            RequestKind::ChooseModes { modes, additional_cost: true, .. } => {
+                options = modes.iter().map(|m| cantrip_engine::label_text(m).to_string()).collect();
+                Answer::Modes(choose.clone())
+            }
+            // The Mox of the color still owed.
+            RequestKind::PayCosts { options, remaining, .. } => {
+                let mox = [(Mana::U, "Mox Sapphire"), (Mana::B, "Mox Jet"), (Mana::R, "Mox Ruby")]
+                    .into_iter()
+                    .find(|&(m, _)| remaining.symbols[m as usize] > 0)
+                    .map(|(_, name)| name);
+                Answer::Act(Action::of(
+                    options
+                        .iter()
+                        .find(|o| o.kind == ActionKind::ConfirmCasting)
+                        .or_else(|| options.iter().find(|o| o.kind == ActionKind::ActivateAbility && o.source.is_some_and(|s| Some(game.name(s)) == mox)))
+                        .expect("a way to pay"),
+                ))
+            }
+            RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand.iter().rev().copied().take(*count as usize).collect()),
+            RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
+            RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),
+            other => panic!("unexpected question {other:?}"),
+        };
+        game.answer(request.id, request.player, answer).unwrap();
+    }
+    assert!(cast, "{card} was cast");
+    let tapped = game.state.battlefield().iter().filter(|&&id| game.state.obj(id).tapped && game.name(id).starts_with("Mox")).map(|&id| game.name(id).to_string()).collect();
+    (options, tapped)
+}
+
+/// Unnerving Assault's {U/R} under a {U} reduction: announced as blue, the reduction takes it and nothing is paid; announced
+/// as red on purpose - to spend red mana on it - the reduction takes generic mana it has none of, and {R} is paid.
+#[test]
+fn a_hybrid_symbol_a_reduction_meets_is_announced_and_may_be_paid_with_its_other_half() {
+    let (options, tapped) = announced("Probe Assault", vec![]);
+    assert_eq!(options, ["Pay {U/R} with {R}"]);
+    assert!(tapped.is_empty(), "announced as blue, it is reduced to nothing: {tapped:?}");
+    let (_, tapped) = announced("Probe Assault", vec![0]);
+    assert_eq!(tapped, ["Mox Ruby"]);
+}
+
+/// {U/R}{U/B} under one {U}: announced {U}{U}, one is taken off and {U} paid; with {U/B} announced as black, {U} comes off
+/// the {U/R} and {B} is paid.
+#[test]
+fn hybrid_symbols_of_different_pairs_are_each_announced() {
+    let (options, tapped) = announced("Probe Mixed", vec![]);
+    assert_eq!(options, ["Pay {U/R} with {R}", "Pay {U/B} with {B}"]);
+    assert_eq!(tapped, ["Mox Sapphire"]);
+    let (_, tapped) = announced("Probe Mixed", vec![1]);
+    assert_eq!(tapped, ["Mox Jet"]);
 }

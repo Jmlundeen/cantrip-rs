@@ -1857,7 +1857,12 @@ Known gaps:
   then generic mana. A reduction by an amount that includes hybrid mana, which the payer splits as it is applied (CR
   118.7e), is not built and panics if reached: no card in content reduces a cost by hybrid mana. The power-up cards whose
   own mana cost has a hybrid symbol (She-Hulk, Attorney-at-Law; Brawn, Amadeus Cho; Abomination, Terrifying Titan) would,
-  and wait on it. Nor is a colored reduction meeting a hybrid or Phyrexian symbol of its color in the cost built.
+  and wait on it. A colored reduction that meets a two-color hybrid symbol of the cost (CR 118.7c: more of that color than
+  the plain symbols take) asks how that symbol is announced (CR 601.2b, `announce_hybrids`, `Label::PayHybridAs`): as the
+  color the reduction takes, it comes off; as its other half, it is paid and the reduction takes generic mana. Asked once
+  the targets are, since a reduction may read them; the advice tries every announcement (`announcements`,
+  `change_any`). {2/C} and Phyrexian symbols are announced before the cost changes (`announce_twobrids`,
+  `announce_life`).
 - Power-up abilities are not yet a class other cards can name ("power-up abilities of other creatures you control cost
   {3} less", "whenever you activate a power-up ability", "can be activated an additional time"): Hulk, Gamma Goliath,
   Marvel Boy, Wonder Man, Kang, Advancing the Spirit and Quinjet Technician wait on it.
