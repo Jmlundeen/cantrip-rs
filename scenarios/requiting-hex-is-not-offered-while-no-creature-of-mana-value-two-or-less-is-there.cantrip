@@ -1,0 +1,38 @@
+# Requiting Hex chooses its target after its additional cost (blight 1), so it is offered only if its slot could have a
+# legal target (CR 601.2c): with nothing on the battlefield but Bot2's Phyrexian Dragon Engine (mana value 3), Bot1 is not
+# offered the Hex at all. Once Bot2's Llanowar Elves (mana value 1) is there, it is, and destroys the Elves.
+
+[Bot1 Deck]
+Mox Jet
+Requiting Hex
+Island x18
+
+[Bot2 Deck]
+Black Lotus
+Phyrexian Dragon Engine
+Mox Emerald
+Llanowar Elves
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Phyrexian Dragon Engine.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Requiting Hex.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Emerald; Phyrexian Dragon Engine
+Bot2.Graveyard = Llanowar Elves; Black Lotus
+Bot1.Graveyard = Requiting Hex

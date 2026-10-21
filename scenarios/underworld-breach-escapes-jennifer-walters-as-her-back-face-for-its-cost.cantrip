@@ -1,0 +1,53 @@
+# A way a permanent gives a card to be cast is judged and costed on the face cast (CR 601.3e, 712.8a): Jennifer Walters,
+# discarded to Faithless Looting, is escaped from Bot1's graveyard under Underworld Breach as her back face, The Sensational
+# She-Hulk, for that face's mana cost {3}{G}{W}{W} and three other cards exiled from the graveyard. She enters back face up, a
+# 6/6.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Black Lotus
+Faithless Looting
+Jennifer Walters
+Underworld Breach
+Forest
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Jennifer Walters; Plains)
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Graveyard.Jennifer Walters.Cast(Ability: back face)
+Bot1.Choose(Faithless Looting; Plains; Black Lotus)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.The Sensational She-Hulk.Power = 6
+Bot1.Battlefield.The Sensational She-Hulk.Toughness = 6
+Exile = Faithless Looting; Plains; Black Lotus
+Bot1.Graveyard.Count = 0
+Bot1.Mana = 

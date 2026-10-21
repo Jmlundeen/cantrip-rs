@@ -1,0 +1,38 @@
+# A permission to cast spells as though they had flash is judged on the face being cast (CR 601.3e, 712.8a): Valley
+# Floodcaller lets Bot1 cast noncreature spells any time it could cast an instant, so on Bot2's turn Bot1 casts a Black
+# Lotus, and with six mana in its pool is still offered neither Jennifer Walters nor her back face, The Sensational
+# She-Hulk - each a creature.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Black Lotus
+Valley Floodcaller
+Jennifer Walters
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+! Bot1.Hand.Jennifer Walters.Cast
+! Bot1.Hand.Jennifer Walters.Cast(Ability: back face)
+? Bot1.Mana = {W}{W}{W}{G}{G}{G}
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus
