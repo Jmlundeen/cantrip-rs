@@ -8,7 +8,8 @@ line a card: `OK`, `OK PROMO-ONLY`, `NOART` or `ERR`. A file that already exists
 
 Choice, as in the mtgpics fetcher: the earliest regular printing wins (promo, Secret Lair, box topper, digital-only and
 other non-paper printings are skipped, token/"full art" or borderless variants lose to a normal frame of the same card).
-Scryfall asks for a User-Agent and 50-100 ms between requests; this sleeps 150 ms.
+Scryfall asks for a User-Agent and 50-100 ms between requests, but answers a long run 429 at that pace; this sleeps
+500 ms, and longer after a 429.
 """
 import json, os, re, sys, time, unicodedata, urllib.error, urllib.parse, urllib.request
 
@@ -23,16 +24,16 @@ def slug(name):
 
 
 def get(url):
-    for i in range(4):
+    for i in range(6):
         try:
-            time.sleep(.15)
+            time.sleep(.5)
             return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30).read()
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 return None
             if e.code not in (429, 500, 502, 503):
                 raise
-            time.sleep(2 * (i + 1))
+            time.sleep(5 * (i + 1))
     raise RuntimeError("Scryfall kept failing: " + url)
 
 
