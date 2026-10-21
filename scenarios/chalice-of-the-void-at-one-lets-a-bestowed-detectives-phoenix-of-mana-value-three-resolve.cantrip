@@ -1,7 +1,8 @@
 # Bestow is an alternative cost (CR 702.103a, 118.9): the bestowed Aura spell keeps the card's mana cost (CR 702.103b), so
 # a Detective's Phoenix cast for its bestow cost {R} has mana value 3, its {2}{R}'s (CR 202.3). Bot2's Chalice of the Void
 # with one charge counter ("counter a spell with mana value equal to the number of charge counters") lets it resolve,
-# and the Aura on Bot1's Ornithopter is mana value 3 on the battlefield too.
+# and the Aura on Bot1's Ornithopter is mana value 3 on the battlefield too. It keeps its other characteristics, flying and
+# haste among them (CR 702.103b).
 
 [Bot1 Deck]
 Mountain
@@ -51,3 +52,4 @@ Stack.Count = 0
 Bot1.Battlefield.Detective's Phoenix.AttachedTo = Ornithopter
 Bot1.Battlefield.Detective's Phoenix.ManaValue = 3
 Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Detective's Phoenix.Keywords = Flying; Haste

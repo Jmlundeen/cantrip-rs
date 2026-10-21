@@ -15,7 +15,6 @@ const STATICS: &[StaticDef] = &[
 /// creature", not a creature, with the card's mana cost (CR 702.103b); the bestow cost is the card's `bestow_cost`. The
 /// evidence is an additional cost of casting it that way.
 pub static BESTOWED: CardDef = bestow::bestowed(CardDef {
-        keywords: Keywords::of(&[]),
         additional_cost: Some(Cost { collect_evidence: 6, ..Cost::NONE }),
         statics: STATICS,
         ..oracle::DETECTIVES_PHOENIX
