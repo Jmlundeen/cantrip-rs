@@ -43,9 +43,14 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.CastCopyFree => "cast without paying its mana cost",
             _ => Action(context?.Action ?? ActionFor(prompt.Purpose)),
         };
+        // Without the server's word, judged as the server judges it (PromptPresentation): the purposes that only pay, or a
+        // choice the player may back out of, as every choice made while casting or activating is. A return to hand or a
+        // sacrifice an effect asks (Words of Wind, an edict) pays for nothing.
         bool cost = context?.Cause == PromptCauseView.Cost || context is null
-            && prompt.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.ReturnToHand or CardChoicePurposeView.TapToPay
-                or CardChoicePurposeView.TapToReduce;
+            && (prompt.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.TapToReduce
+                    or CardChoicePurposeView.Craft
+                || client.Prompt is { MayCancel: true } && prompt.Purpose is not (CardChoicePurposeView.Splice
+                    or CardChoicePurposeView.KeepLegend or CardChoicePurposeView.OrderSimultaneous or CardChoicePurposeView.PreventDamageFrom));
         // Behold and blight name the cost in their own verb ("to behold", "to blight"): "to pay for it" would add nothing.
         if (cost && prompt.Purpose is not (CardChoicePurposeView.Behold or CardChoicePurposeView.Blight)) verb += " to pay for it";
         ZoneKindView? table = ChoiceTable(client, prompt);

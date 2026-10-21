@@ -253,6 +253,25 @@ public sealed class PromptPresentationTests
         Assert.Equal(cost, model.Title.Contains("to pay for it", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Without the server's context, a return to hand or a sacrifice is a cost only where the player may back out of it, as
+    /// the server judges (KI-75): Words of Wind's return pays for nothing.
+    /// </summary>
+    [Theory]
+    [InlineData("choose-return-effect", false, false)]
+    [InlineData("choose-return-effect", true, true)]
+    [InlineData("choose-sacrifice-cost", false, false)]
+    [InlineData("choose-sacrifice-cost", true, true)]
+    public void Without_context_a_return_or_sacrifice_is_a_cost_only_when_it_can_be_backed_out_of(string name, bool mayCancel, bool cost)
+    {
+        GameClient client = Client(name);
+        client.Prompt!.Presentation = null;
+        client.Prompt.MayCancel = mayCancel;
+        var prompt = Assert.IsType<ChooseCardsPromptMessage>(client.Prompt.Prompt);
+        var model = CardChoicePresentation.Describe(client, prompt, []);
+        Assert.Equal(cost, model.Title.Contains("to pay for it", StringComparison.Ordinal));
+    }
+
     [Fact]
     public void Replacement_order_is_not_presented_as_discarding()
     {
