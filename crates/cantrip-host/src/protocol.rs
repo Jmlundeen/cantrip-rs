@@ -974,6 +974,8 @@ pub struct SearchLibraryPrompt {
     pub player: i32,
     pub count: i32,
     pub optional: bool,
+    /// "Any number of" (CR 701.23): none, some or all of `eligible`, which `count` then is.
+    pub any_number: bool,
     pub library: Vec<ViewHandle>,
     pub eligible: Vec<ViewHandle>,
     pub destination: SearchDestinationView,

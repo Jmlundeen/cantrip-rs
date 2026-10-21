@@ -631,7 +631,8 @@ pub fn choose_colors(g: &mut dyn Game, player: PlayerId, source: ObjectId, choic
 /// can make, finds nothing and is still a search); the search is recorded either way. A search the spell or ability can't
 /// cause (`Game::may_search`, CR 101.2) is not made: nothing is asked or found and no search is recorded, and the caller's
 /// "then shuffle" still shuffles (Ashiok, Dream Render's ruling). The library is listed bottom first, as the C# engine
-/// lists it. `destination` is where the cards found are going, for the question to say.
+/// lists it. `destination` is where the cards found are going, for the question to say. A `count` of `ANY_NUMBER` is "any
+/// number of [cards]", asked as such (`RequestKind::SearchLibrary::any_number`).
 pub fn search_library(
     g: &mut dyn Game,
     searcher: PlayerId,
@@ -651,8 +652,15 @@ pub fn search_library(
         Vec::new()
     } else {
         let can: Vec<ObjectId> = library.iter().copied().filter(|&c| eligible(g, c)).collect();
-        let count = if optional { count.max(1) } else { count.max(1).min(u32::try_from(can.len()).unwrap_or(u32::MAX)) };
-        match g.ask(searcher, RequestKind::SearchLibrary { source, library, eligible: can, count, optional, destination })? {
+        let any_number = optional && count == ANY_NUMBER;
+        let count = if any_number {
+            count_u32(can.len())
+        } else if optional {
+            count.max(1)
+        } else {
+            count.max(1).min(count_u32(can.len()))
+        };
+        match g.ask(searcher, RequestKind::SearchLibrary { source, library, eligible: can, count, optional, any_number, destination })? {
             Answer::Cards(cards) => cards,
             _ => Vec::new(),
         }
@@ -660,6 +668,9 @@ pub fn search_library(
     g.searched(searcher, owner);
     Ok(found)
 }
+
+/// The count of a search for "any number of [cards]" (`search_library`, `library::Find::ONE.up_to(ANY_NUMBER)`).
+pub const ANY_NUMBER: u32 = u32::MAX;
 
 /// The top `count` cards of a player's library, top first.
 pub fn top_of_library(g: &dyn Query, player: PlayerId, count: usize) -> Vec<ObjectId> {

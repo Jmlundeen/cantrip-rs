@@ -53,7 +53,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-103](#ki-103-mana-costs-x-kicker-and-the-mana-a-cast-records-are-narrower-than-play-reaches) | Mana costs, X, kicker and the mana a cast records are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
-| [KI-106](#ki-106-some-answers-are-compared-in-eight-bits-and-a-library-search-has-no-any-number) | Some answers are compared in eight bits, and a library search has no "any number" | Pri-1 | Fix queued |
 | [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
 | [KI-110](#ki-110-a-cost-reduction-does-not-ask-how-a-hybrid-symbol-was-announced) | A cost reduction does not ask how a hybrid symbol was announced | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
@@ -315,22 +314,6 @@ a creature.
 - The bands of `AbilityRef::index` are guarded only by `debug_assert`.
 A fix gives each a capacity past practical play, handled gracefully at its bound; a check of every card's lists at table
 construction for the bands; and the modes kept as the chosen indices in order.
-
-**Scenarios.** None yet.
-
-### KI-106: Some answers are compared in eight bits, and a library search has no "any number"
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine / host | 2026-10-21, the engine-wide audit (workstream W4) |
-
-**Notes.**
-- Three answer checks compare `len() as u8` (`validate.rs` colors, discard to hand size, trigger order), so an answer whose
-  length wraps past 255 is accepted though it is not legal.
-- A library search has no "any number" flag; the clients read a count of 255 or more as "any number".
-The counts of things that happen that were kept narrower than the event cap (RX-1, 2^21 events) can reach - the journal's
-list positions, a batch's length, lands played, extra combats, and more - are u32 since the event-cap sweep, and a game
-deals at most eight seats, which the per-seat masks hold (`MAX_SEATS`).
 
 **Scenarios.** None yet.
 

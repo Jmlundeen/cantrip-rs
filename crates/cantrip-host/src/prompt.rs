@@ -1228,7 +1228,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 may_shuffle: *may_shuffle,
             })
         }
-        RequestKind::SearchLibrary { source, library, eligible, count, optional, destination } => {
+        RequestKind::SearchLibrary { source, library, eligible, count, optional, any_number, destination } => {
             let _ = source;
             // Whose library it is: the cards in it are all its owner's.
             let owner = library.first().map_or(request.player, |c| game.state.obj(*c).owner);
@@ -1236,6 +1236,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 player,
                 count: wire(*count),
                 optional: *optional,
+                any_number: *any_number,
                 library: handles_of(handles, library),
                 eligible: handles_of(handles, eligible),
                 destination: match destination {

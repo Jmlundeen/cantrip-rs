@@ -94,7 +94,7 @@ pub fn exile_same_name_from_graveyard_hand_and_library(g: &mut dyn Game, searche
     found.extend(crate::choose::any_number_of(g, searcher, source, Purpose::Exile, "", hand.clone(), hand)?);
     let cards_found = found.len();
     // The library is searched and everything found goes to exile together; the owner shuffles (CR 701.23, 406.2).
-    let moved = search_to_exile(g, searcher, owner, source, Find::ONE.up_to(u32::MAX), &found, |q, c| has_name(q, c))?;
+    let moved = search_to_exile(g, searcher, owner, source, Find::ONE.up_to(crate::ANY_NUMBER), &found, |q, c| has_name(q, c))?;
     // A card for each one that actually reached exile from the hand: a replacement may have sent one elsewhere.
     let from_hand = moved[in_graveyard..cards_found].iter().filter(|&&c| g.obj(c).zone.is(ZoneKind::Exile)).count();
     g.draw(owner, from_hand as u32);

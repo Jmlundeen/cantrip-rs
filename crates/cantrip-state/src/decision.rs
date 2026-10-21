@@ -444,7 +444,9 @@ pub enum RequestKind {
     /// `optional`, finding nothing is allowed (CR 701.23b).
     /// `destination` is where the searcher is told the cards found are going; whose library it is, is the owner of the
     /// cards in `library`.
-    SearchLibrary { source: ObjectId, library: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u32, optional: bool, destination: SearchDestination },
+    /// `any_number`: "search for any number of [cards]" (CR 701.23): none, some or all of `eligible`, which `count` then is,
+    /// as `ChooseCards::any_number` says it.
+    SearchLibrary { source: ObjectId, library: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u32, optional: bool, any_number: bool, destination: SearchDestination },
     /// Which of several replacement effects applies to an event first (CR 616.1), asked of the affected player:
     /// `sources` are the objects whose effects apply and `hints` say what each does, in the order they are offered.
     /// `subject` is the object the event is about, if it is about one; `life`, for an event that changes the affected

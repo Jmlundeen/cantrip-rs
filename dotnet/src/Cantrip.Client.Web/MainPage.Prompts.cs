@@ -1644,7 +1644,7 @@ public sealed partial class MainPage
             title,
             prompt.Count == 1
                 ? $"Choose a card{what}  ·  {_picked.Count} chosen"
-                : prompt.Optional && prompt.Count >= 255
+                : prompt.AnyNumber
                 ? $"Choose any number of cards{what}  ·  {_picked.Count} chosen"
                 : $"Choose {(prompt.Optional ? "up to " : string.Empty)}{prompt.Count} cards{what}  ·  {_picked.Count} chosen");
 

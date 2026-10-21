@@ -1487,7 +1487,7 @@ public sealed class Decisions
 
         IReadOnlyList<int> picks = Many(new Question
         {
-            Heading = $"You are searching {library} for {(prompt.Optional && prompt.Count >= 255 ? "any number of cards" : count == 1 ? "a card" : $"{count} cards")}, "
+            Heading = $"You are searching {library} for {(prompt.AnyNumber ? "any number of cards" : count == 1 ? "a card" : $"{count} cards")}, "
                 + (prompt.Destination switch
                 {
                     SearchDestinationView.Found => "and what becomes of it is decided once it is found. What do you take?",

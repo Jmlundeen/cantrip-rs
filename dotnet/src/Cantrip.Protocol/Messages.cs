@@ -3042,6 +3042,13 @@ public sealed class SearchLibraryPromptMessage : PromptPayload
     [Key(6)]
     public int Owner { get; set; }
 
+    /// <summary>
+    /// "Any number of" (CR 701.23): none, some or all of <see cref="Eligible"/>, which <see cref="Count"/> then is, worded so
+    /// rather than as "up to" that many.
+    /// </summary>
+    [Key(7)]
+    public bool AnyNumber { get; set; }
+
     /// <summary>Finding nothing, which a search always allows (CR 701.19d).</summary>
     public override AnswerPayload Default() => new CardsChosenAnswer();
 }

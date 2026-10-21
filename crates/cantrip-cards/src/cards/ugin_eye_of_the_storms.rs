@@ -43,7 +43,7 @@ fn zero(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// may cast those cards without paying their mana costs.
 fn minus_eleven(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let exiled = library::search_to_exile(g, player, player, item.object, library::Find::ONE.up_to(u32::MAX), &[], |q, c| {
+    let exiled = library::search_to_exile(g, player, player, item.object, library::Find::ONE.up_to(cantrip_mechanics::ANY_NUMBER), &[], |q, c| {
         let chars = q.chars(c);
         !chars.is(CardType::Land) && chars.colors.is_empty()
     })?;
