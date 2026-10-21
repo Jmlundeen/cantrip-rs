@@ -1,0 +1,29 @@
+# Solve for Disappointment against a hand of only lands and an instant: the hand is revealed and, with no nonland permanent
+# card in it, no choice is made (CR 608.2d; the bare refusal fails if a question is put), so nothing is discarded. The spell
+# resolved, so its last instruction still happens: empower Jace makes a Jace token with one loyalty counter (CR 701.71a).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Solve for Disappointment
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Solve for Disappointment.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Solve for Disappointment
+Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot2.Graveyard.Count = 0
+Bot2.Hand.Count = 7

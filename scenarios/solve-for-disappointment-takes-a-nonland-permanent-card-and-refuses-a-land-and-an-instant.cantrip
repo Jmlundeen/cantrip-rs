@@ -1,0 +1,37 @@
+# Solve for Disappointment: "Target opponent reveals their hand. You choose a nonland permanent card from it. That player
+# discards that card. Empower Jace 1." Bot2 holds Llanowar Elves (a creature), an Island and a Lightning Bolt. The Island
+# is refused because the card must be nonland (CR 110.4a counts a land as a permanent card, so only "nonland" excludes
+# it), the Bolt because an instant is no permanent card at all (CR 110.4a); the Elves are taken, Bot2 discards only them,
+# and with no Jace token yet empower Jace makes one with one loyalty counter (CR 701.71a). The two Swamps pay for the
+# spell and the Mox Jet.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Solve for Disappointment
+Swamp x10
+
+[Bot2 Deck]
+Llanowar Elves
+Island
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Solve for Disappointment.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose(Island)
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Llanowar Elves)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Solve for Disappointment
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot2.Graveyard = Llanowar Elves
+Bot2.Hand.Count = 6
