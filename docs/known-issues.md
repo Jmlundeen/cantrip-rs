@@ -69,7 +69,6 @@ keeps it).
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
 | [KI-65](#ki-65-a-prepared-permanent-that-phases-out-loses-its-preparation-copy-for-good) | A prepared permanent that phases out loses its preparation copy for good | Low | Unexercised |
 | [KI-66](#ki-66-phasing-in-a-multiplayer-game-after-a-player-leaves-is-unbuilt) | Phasing in a multiplayer game after a player leaves is unbuilt | Low | Unexercised |
-| [KI-67](#ki-67-a-spell-cast-by-a-resolving-ability-under-split-second-is-unexercised) | A spell cast by a resolving ability under split second is unexercised | Low | Unexercised |
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
 | [KI-70](#ki-70-a-block-requirement-is-counted-on-the-declared-block-only-not-through-the-blocked-creatures-band) | A block requirement is counted on the declared block only, not through the blocked creature's band | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
@@ -708,17 +707,6 @@ while it was phased out is not exiled with what they control (CR 800.4a reads th
 with phased-out permanents.
 
 **Scenarios.** none yet.
-
-### KI-67: A spell cast by a resolving ability under split second is unexercised
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, review of Krosan Grip |
-
-**Notes.** Krosan Grip's ruling: "If the resolution of a triggered ability involves casting a spell, that spell can't be cast if
-a spell with split second is on the stack" (CR 702.61a). `actions::cast_ways_during_resolution` offers no way to cast while a
-spell with split second is on the stack under what resolves, but no scenario has a triggered ability that casts (cascade,
-discover) resolve above a split-second spell.
 
 ### KI-68: The advice applies a total cost's least before a cast's own reductions and a permission's additions
 

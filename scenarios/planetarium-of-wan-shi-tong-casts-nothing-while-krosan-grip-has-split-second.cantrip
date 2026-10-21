@@ -1,0 +1,74 @@
+# Split second (CR 702.61a): while Krosan Grip is on the stack no spell may be cast, by a resolving ability either (Krosan
+# Grip's ruling: "If the resolution of a triggered ability involves casting a spell, that spell can't be cast if a spell
+# with split second is on the stack"). Triggered abilities still trigger (CR 702.61b). Turn 5: Bot1 casts Krosan Grip at
+# Bot2's Mox Pearl; Dragon's Rage Channeler's "whenever you cast a noncreature spell, surveil 1" goes above it, keeps
+# Ornithopter on top, and the surveil triggers Planetarium of Wan Shi Tong above the Grip. It looks at the Ornithopter but
+# may not cast it: Bot1 is asked nothing. Once the Grip has resolved (the control), the Planetarium's own scry triggers it
+# again - nothing was cast with it this turn - and Bot1 casts the Ornithopter without paying its mana cost.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Sol Ring
+Mox Jet
+Black Lotus
+Planetarium of Wan Shi Tong
+Mox Ruby
+Dragon's Rage Channeler
+Krosan Grip
+Ornithopter
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dragon's Rage Channeler.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Krosan Grip.Cast(Bot2.Battlefield.Mox Pearl)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Ornithopter |)
+? Stack.Count = 2
+Bot1.Pass
+! Bot1.Accept
+? Stack = Krosan Grip
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Ornithopter; Island |)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot2.Battlefield.Count = 0
