@@ -653,3 +653,34 @@ fn protection_from_a_player_is_shown_to_both_players_and_follows_control() {
     });
     assert!(bot1_protected && bot2_protected, "not both were shown: {bot1_protected} {bot2_protected}");
 }
+
+/// "You may look at the top card of your library any time" (CR 401.2, `PlayRule::LookAtLibraryTop`): while Bolas's Citadel is
+/// on Bot1's battlefield, Bot1's view holds the top card of Bot1's library, named, whether or not it can be played - Island,
+/// on top after the turn's land was played - and Bot2's view holds no card of that library; before the Citadel, neither does.
+#[test]
+fn bolass_citadel_shows_its_controller_the_top_of_their_library_and_nobody_else() {
+    use cantrip_host::protocol::ZoneKindView;
+    let mut tops: Vec<String> = Vec::new();
+    play_looking("bolass-citadel-plays-off-the-top-for-life", |_, views, _| {
+        let citadel = views[0]
+            .objects
+            .iter()
+            .any(|o| o.name == "Bolas's Citadel" && o.zone == Some(ZoneKindView::Battlefield) && o.controller == 1);
+        let library = |viewer: usize| -> Vec<&cantrip_host::protocol::ObjectView> {
+            views[viewer].objects.iter().filter(|o| o.zone == Some(ZoneKindView::Library) && o.zone_owner == 1).collect()
+        };
+        assert!(library(1).is_empty(), "Bot2 is shown a card of Bot1's library");
+        let seen = library(0);
+        if citadel {
+            assert_eq!(seen.len(), 1, "Bot1 is not shown exactly its top card under the Citadel");
+            assert!(seen[0].known && !seen[0].name.is_empty());
+            if tops.last() != Some(&seen[0].name) {
+                tops.push(seen[0].name.clone());
+            }
+        } else {
+            assert!(seen.is_empty(), "Bot1 is shown its library without the Citadel");
+        }
+        false
+    });
+    assert_eq!(tops, ["Lightning Bolt", "Mox Sapphire", "Island", "Tundra", "Swamp"], "the tops Bot1 was shown");
+}
