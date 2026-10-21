@@ -57,6 +57,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
 | [KI-114](#ki-114-the-web-client-cannot-name-colorless-mana-for-a-sacrificed-land-that-could-also-produce-a-color) | The web client cannot name colorless mana for a sacrificed land that could also produce a color | Pri-2 | Open |
+| [KI-116](#ki-116-a-resolutions-unless-pays-question-shows-only-the-mana-and-life-parts-of-its-cost) | A resolution's "unless pays" question shows only the mana and life parts of its cost | Pri-2 | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Pri-3 | Fix queued |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Pri-3 | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Pri-3 | Open |
@@ -346,5 +347,19 @@ every cost count as payable. Life, energy and sacrifices that several mana abili
 alone: three Mana Confluences at 1 or 2 life count as three mana, so Raffine is offered. And the search's time budget
 falls back to offering the cast on rare heavy boards. A permanent Urza, Lord High Artificer could tap that also has a mana ability
 without {T} counts Urza's tap apart from its own abilities, as if both could be used (`available_without`, `Repeat::Tap`).
+
+**Scenarios.** None yet.
+
+### KI-116: A resolution's "unless pays" question shows only the mana and life parts of its cost
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client | 2026-10-21, KI-113's fix (resolution costs with any part) |
+
+**Notes.** A wrong display of a right game state. The engine now pays every part of a cost a resolving spell or ability
+asks for (`pay_during_resolution`, KI-113's fix): permanents, discard, exile, counters, behold and the rest. But the
+client's `{cost}` text in the `UnlessPays` question is built from the mana and life parts alone (`Messages.cs`,
+`CostText`), so a card whose cost has other parts must spell them out in its own question text. A fix sends the cost's
+other parts with the prompt and has the client write them.
 
 **Scenarios.** None yet.
