@@ -1451,6 +1451,13 @@ nothing of this cost is still offered (CR 601.2g) and is marked `pays_nothing`, 
 mana goes where the player sends it: two mana of one restriction may pay one ability or two. The pool empties at the end
 of each step and phase as any mana does (CR 106.4).
 
+A mana ability without {T} may be activated again for as long as its cost can be paid (CR 602.2, 605): where that cost is
+one permanent sacrificed or counters removed from its source (`actions::Repeat`), the advice counts it once for each thing
+it can spend. Each permanent it could sacrifice is a source of its own for `Available`, whose alternatives are the
+abilities that could sacrifice it (Ashnod's Altar, Phyrexian Altar: one or the other, never both), and each counter one
+activation (Cryptic Trilobite); the permanent's own mana abilities are counted apart, since it may be tapped for mana and
+then sacrificed.
+
 ### Mana spent as though it were of any color
 
 "Spend mana as though it were mana of any color" (CR 609.4b) is a `CardDef::spend_any_color` rule, asked of a payment

@@ -49,7 +49,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
 | [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Fix queued |
-| [KI-102](#ki-102-a-mana-ability-that-doesnt-tap-and-can-be-activated-again-is-counted-once-in-what-can-be-cast) | A mana ability that doesn't tap and can be activated again is counted once in what can be cast | Pri-1 | Fix queued |
 | [KI-103](#ki-103-mana-costs-x-kicker-and-the-mana-a-cast-records-are-narrower-than-play-reaches) | Mana costs, X, kicker and the mana a cast records are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
@@ -232,21 +231,6 @@ has left its own view at once, as the answering seat's is.
 
 **Scenarios.** None; `TableClockTests.In_a_game_of_four_a_player_out_of_time_leaves_and_the_others_play_on` answers the others'
 questions until the departed seat is told.
-
-### KI-102: A mana ability that doesn't tap and can be activated again is counted once in what can be cast
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine | 2026-10-21, review of the exact payability check |
-
-**Notes.** Whether a spell or ability is offered is judged from the mana its controller could make (`actions::Available`,
-the exact search behind `covers`). A mana ability without {T} in its cost can be activated again as long as its cost can
-be paid (CR 605, 602.2): Ashnod's Altar or Phyrexian Altar once per creature sacrificed, Krark-Clan Ironworks once per
-artifact, Cryptic Trilobite once per counter. Each is counted as one activation, so a cast the player could pay for is not
-offered (Ashnod's Altar with four creatures makes 8 mana; Myr Battlesphere is not offered). A fix counts such an ability
-as many times as its cost can be paid, sharing the resources it spends with the rest of the search.
-
-**Scenarios.** None yet: Ashnod's Altar, four creatures and Myr Battlesphere.
 
 ### KI-103: Mana costs, X, kicker and the mana a cast records are narrower than play reaches
 

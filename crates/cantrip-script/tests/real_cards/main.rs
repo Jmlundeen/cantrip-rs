@@ -10,6 +10,7 @@ mod floodpits_drowner_self;
 mod look_counts;
 mod lost_abilities;
 mod mana_ability_guards;
+mod repeatable_mana;
 mod search_any_number;
 mod turn_face_up_by_effect;
 mod until_exile;

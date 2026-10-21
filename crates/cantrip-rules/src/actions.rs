@@ -1790,6 +1790,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     let mut complex: Vec<(Vec<Alternative>, u32)> = Vec::new();
     // Each source's mana abilities, one list kept for all of them.
     let mut alternatives: Vec<Alternative> = Vec::new();
+    // The mana abilities without {T} that may be activated again for as long as their cost can be paid (CR 602.2, 605):
+    // each with the source and what one activation spends (`Repeat`).
+    let mut repeatable: Vec<(Alternative, ObjectId, Repeat)> = Vec::new();
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player || skip == Some(id) {
             continue;
@@ -1849,67 +1852,47 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                     (alternative.extra, alternative.produced) = tap_triggers(cx, &waiting, id, player, types);
                 }
             }
+            if let Some(repeat) = Repeat::of(&def.cost) {
+                repeatable.push((alternative, id, repeat));
+                continue;
+            }
             alternatives.push(alternative);
         }
-        match alternatives.as_slice() {
-            [] => {}
-            // One ability: its fixed mana, and one mana of a chosen type, are independent of anything else; its triggered
-            // mana of a type it produced is too where that type is fixed, and one choice with it where the type is chosen.
-            [one]
-                if one.cost.is_zero()
-                    && one.k <= 1
-                    && !(one.k == 1 && one.restriction.is_some() && one.types != ANY_COLOR)
-                    && !(one.k == 1 && one.produced > 0 && (one.restriction.is_some() || one.produces(None) != 0)) =>
-            {
-                match one.restriction {
-                    Some(kind) => add_available(&mut restricted, kind, one.fixed, one.k),
-                    None => {
-                        for m in 0..6 {
-                            fixed[m] = fixed[m].saturating_add(one.fixed[m]);
-                        }
-                        if one.k == 1 && one.produced == 0 {
-                            flex[one.types as usize] += 1;
-                        }
-                    }
-                }
-                for m in 0..6 {
-                    fixed[m] = fixed[m].saturating_add(one.extra[m]);
-                }
-                if one.produced > 0 {
-                    if one.k == 1 {
-                        linked.push((one.types, 1 + one.produced));
-                    } else {
-                        flex[one.produces(None) as usize] += one.produced;
-                    }
-                }
+        account(&alternatives, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
+    }
+    // A repeatable ability is activated once for each thing its cost spends: each permanent it could sacrifice is a source of
+    // its own, whose alternatives are the abilities that could sacrifice it - so one sacrificed to one is not to another -
+    // and each counter it could remove one activation. A permanent's own mana abilities are judged apart: it may be tapped
+    // for mana and then sacrificed.
+    if !repeatable.is_empty() {
+        let mut units: Vec<(Vec<Alternative>, u32)> = Vec::new();
+        for target in cx.permanents_of(player) {
+            let outlets: Vec<Alternative> = repeatable
+                .iter()
+                .filter(|(_, source, repeat)| match *repeat {
+                    Repeat::Sacrifice(cost, p) => pays_permanents(cx, &cost, &p, &Asker { source: *source, controller: player }, target),
+                    Repeat::Counters(..) => false,
+                })
+                .map(|&(a, ..)| a)
+                .collect();
+            if outlets.is_empty() {
+                continue;
             }
-            // Several abilities each making one unrestricted mana for nothing: one mana of a type chosen among theirs
-            // (a dual land), and triggered mana of that type one choice with it.
-            several
-                if several.len() > 1
-                    && several.iter().all(|a| {
-                        a.restriction.is_none()
-                            && a.cost.is_zero()
-                            && a.fixed.iter().sum::<u32>() + a.k == 1
-                            && a.extra == several[0].extra
-                            && a.produced == several[0].produced
-                    }) =>
-            {
-                let types = several.iter().fold(0u8, |t, a| t | a.produces(None) | a.types);
-                for m in 0..6 {
-                    fixed[m] = fixed[m].saturating_add(several[0].extra[m]);
-                }
-                if several[0].produced > 0 {
-                    linked.push((types, 1 + several[0].produced));
-                } else {
-                    flex[types as usize] += 1;
-                }
-            }
-            // Anything else is a choice the counts can't say: tried exactly (`Available::exact`).
-            _ => match complex.iter_mut().find(|(alike, _)| *alike == alternatives) {
+            match units.iter_mut().find(|(alike, _)| *alike == outlets) {
                 Some((_, n)) => *n += 1,
-                None => complex.push((alternatives.clone(), 1)),
-            },
+                None => units.push((outlets, 1)),
+            }
+        }
+        for &(a, source, repeat) in &repeatable {
+            if let Repeat::Counters(kind, each) = repeat {
+                let times = cx.s().obj(source).counters(kind).max(0) as u32 / u32::from(each.max(1));
+                if times > 0 {
+                    units.push((vec![a], times));
+                }
+            }
+        }
+        for (outlets, n) in units {
+            account(&outlets, n, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
         }
     }
     Available {
@@ -1922,6 +1905,107 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         any_color: static_rules::spend_any_color_always(cx, player),
         linked,
         complex,
+    }
+}
+
+/// What one activation of a mana ability without {T} spends, where its cost is that alone and so may be paid again for as
+/// long as there is more of it (CR 602.2): a permanent sacrificed (Ashnod's Altar, Phyrexian Altar, Krark-Clan Ironworks),
+/// or counters removed from its source (Cryptic Trilobite).
+#[derive(Clone, Copy)]
+enum Repeat {
+    Sacrifice(Cost, PermanentCost),
+    Counters(CounterKind, u8),
+}
+
+impl Repeat {
+    fn of(cost: &Cost) -> Option<Repeat> {
+        if cost.tap {
+            return None;
+        }
+        match (cost.permanents, cost.remove_counters) {
+            (Some(p), None) if p.count == 1 && p.action == PermanentAction::Sacrifice && !p.tapped && Cost { permanents: None, tap: true, ..*cost }.is_tap_only() => {
+                Some(Repeat::Sacrifice(*cost, p))
+            }
+            (None, Some((kind, n))) if n > 0 && Cost { remove_counters: None, tap: true, ..*cost }.is_tap_only() => Some(Repeat::Counters(kind, n)),
+            _ => None,
+        }
+    }
+}
+
+/// Adds `n` sources alike, each one of `alternatives`, to what a player has to pay with (`available_without`).
+fn account(
+    alternatives: &[Alternative],
+    n: u32,
+    fixed: &mut [u32; 6],
+    flex: &mut [u32; 64],
+    restricted: &mut Vec<(ManaRestriction, [u32; 6], u32)>,
+    linked: &mut Vec<(u8, u32)>,
+    complex: &mut Vec<(Vec<Alternative>, u32)>,
+) {
+    if n == 0 {
+        return;
+    }
+    let times = |x: u32| x.saturating_mul(n);
+    match alternatives {
+        [] => {}
+        // One ability: its fixed mana, and one mana of a chosen type, are independent of anything else; its triggered
+        // mana of a type it produced is too where that type is fixed, and one choice with it where the type is chosen.
+        [one]
+            if one.cost.is_zero()
+                && one.k <= 1
+                && !(one.k == 1 && one.restriction.is_some() && one.types != ANY_COLOR)
+                && !(one.k == 1 && one.produced > 0 && (one.restriction.is_some() || one.produces(None) != 0)) =>
+        {
+            match one.restriction {
+                Some(kind) => add_available(restricted, kind, one.fixed.map(times), times(one.k)),
+                None => {
+                    for m in 0..6 {
+                        fixed[m] = fixed[m].saturating_add(times(one.fixed[m]));
+                    }
+                    if one.k == 1 && one.produced == 0 {
+                        flex[one.types as usize] = flex[one.types as usize].saturating_add(n);
+                    }
+                }
+            }
+            for m in 0..6 {
+                fixed[m] = fixed[m].saturating_add(times(one.extra[m]));
+            }
+            if one.produced > 0 {
+                if one.k == 1 {
+                    linked.extend(std::iter::repeat_n((one.types, 1 + one.produced), n as usize));
+                } else {
+                    let types = one.produces(None) as usize;
+                    flex[types] = flex[types].saturating_add(times(one.produced));
+                }
+            }
+        }
+        // Several abilities each making one unrestricted mana for nothing: one mana of a type chosen among theirs
+        // (a dual land), and triggered mana of that type one choice with it.
+        several
+            if several.len() > 1
+                && several.iter().all(|a| {
+                    a.restriction.is_none()
+                        && a.cost.is_zero()
+                        && a.fixed.iter().sum::<u32>() + a.k == 1
+                        && a.extra == several[0].extra
+                        && a.produced == several[0].produced
+                }) =>
+        {
+            let types = several.iter().fold(0u8, |t, a| t | a.produces(None) | a.types);
+            for m in 0..6 {
+                fixed[m] = fixed[m].saturating_add(times(several[0].extra[m]));
+            }
+            if several[0].produced > 0 {
+                linked.extend(std::iter::repeat_n((types, 1 + several[0].produced), n as usize));
+            } else {
+                flex[types as usize] = flex[types as usize].saturating_add(n);
+            }
+        }
+        // Anything else is a choice the counts can't say: tried exactly (`Available::exact`).
+        _ => match complex.iter_mut().find(|(alike, _)| alike.as_slice() == alternatives) {
+            Some((_, count)) => *count = count.saturating_add(n),
+            None => complex.push((alternatives.to_vec(), n)),
+        },
     }
 }
 
