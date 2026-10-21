@@ -448,7 +448,9 @@ This settles Humility and Opalescence in both orders:
 While a layer is being built, every characteristic a reach, condition or `eval` reads, of any object, is read from the
 working copy as it stands at that point in the layer.
 
-A depends on B when all of these hold (613.8a):
+Dependencies are judged on this working copy at every step - the whole board with the effects applied so far - and judged
+again after each application (613.8c); never on a pair of effects against all the rest. A depends on B when all of these
+hold (613.8a):
 - both are in the same layer and sublayer;
 - both or neither are characteristic-defining abilities (CDAs go first, among themselves; 613.3);
 - applying B to the working copy would change A's text (B is a text change to A's source), A's existence, A's reach, or
@@ -462,43 +464,42 @@ incremental. After B applies, only the pairs whose read set meets B's write set 
 changed. Trial applications go into a copy-on-write overlay of the working copy (only the objects touched are copied),
 which is then dropped.
 
-**Open decision, put to the user: which reading of "ready" (613.8b).** 613.8b says a dependent effect waits for all of
-the effects it depends on, and that "if several dependent effects form a dependency loop, then this rule is ignored and
-the effects in the dependency loop are applied in timestamp order". When a member of the loop also depends on an effect
-outside the loop, the rule can be read three ways:
-- **(i) The loop waits as a unit.** It applies, in timestamp order, once every effect any of its members depends on
+**Open decision, put to the user: which reading of "ready" (613.8b). Undecided; nothing is built on it.** 613.8b says a
+dependent effect waits for all of the effects it depends on, and that "if several dependent effects form a dependency
+loop, then this rule is ignored and the effects in the dependency loop are applied in timestamp order". When a member of
+the loop also depends on an effect outside the loop, the rule can be read three ways:
+- **(A) The loop waits as a unit.** It applies, in timestamp order, once every effect any of its members depends on
   outside the loop has applied. These are the sink components of the "depends on" graph.
-- **(ii) The rule is ignored for the loop's members entirely.** They are as good as independent, and take their place in
+- **(B) The rule is ignored for the loop's members entirely.** They are as good as independent, and take their place in
   timestamp order among everything ready.
-- **(iii) Only the dependencies inside the loop are ignored.** Each member still waits for its own dependencies outside
-  the loop.
+- **(C) Only the dependencies inside the loop are ignored.** Each member still waits for its own dependencies outside
+  the loop. This is what main does today.
+
+The coordinator recommends (C).
+
+Every dependency is judged on the working copy as it stands at that step: the whole board with the effects applied so
+far, re-judged after each application (613.8c). It is never judged on one pair of effects against all the rest; the
+held KI-41 branch did that, and it contradicts 613.8c.
 
 The Arcane Adaptation board (`blood-moon-life-and-limb-and-arcane-adaptation-making-a-saproling-depend-through-the-layer`,
 held with KI-41) has Life and Limb (turn 1), Arcane Adaptation naming Saproling (turn 3) and Blood Moon (turn 5), all in
-layer 4:
-- Life and Limb and Blood Moon depend on each other, so they are a loop.
-- Life and Limb also depends on Arcane Adaptation, which makes the Elves a Saproling.
-- Arcane Adaptation depends on nothing.
+layer 4. Its starting graph, judged on the working copy:
+- Arcane Adaptation and Life and Limb depend on each other, so they are a loop.
+- Life and Limb also depends on Blood Moon.
+- Blood Moon depends on nothing.
 
 Results under each reading:
-- **(i):** Arcane Adaptation, then Life and Limb, then Blood Moon.
-  - Llanowar Elves: Creature Land, Elf Druid Saproling Mountain, green 1/1, without its {G} ability (305.7).
-  - Taiga: Land Creature, Mountain Saproling, green 1/1.
-  - This is what the held scenario expects.
-- **(ii):** timestamp order, Life and Limb, then Arcane Adaptation, then Blood Moon.
-  - Life and Limb finds no Saproling Elves.
-  - The Elves: Creature, Elf Druid Saproling, green 1/1, keeping {G}, no land.
-  - Taiga: as in (i).
-- **(iii):** Arcane Adaptation and Blood Moon are ready first (Blood Moon's only dependency is inside the loop). Arcane
-  Adaptation goes first by timestamp, then Life and Limb (now ready, and earlier than Blood Moon), then Blood Moon. Same
-  result as (i).
-  - Readings (i) and (iii) part when the outside effect is later than a member that depends only inside the loop. Had
-    Blood Moon been cast on turn 3 and Arcane Adaptation on turn 5, (iii) gives Blood Moon, then Arcane Adaptation, then
-    Life and Limb: Taiga is a Mountain land and not a creature, and the Elves are a Creature Land, Elf Druid Saproling
-    Forest, keeping {G}.
-  - (i) still gives Arcane Adaptation, Life and Limb, Blood Moon, so the board is as above.
+- **(A):** Blood Moon, then Arcane Adaptation, then Life and Limb.
+  - Taiga is a plain Mountain, tapping for {R}.
+  - Llanowar Elves are a Creature Land, Elf Druid Saproling Forest, keeping {G}.
+- **(B):** Life and Limb, then Arcane Adaptation, then Blood Moon.
+  - Taiga is a Land Creature, Mountain Saproling, 1/1.
+  - The Elves are a Creature, Elf Druid Saproling, keeping {G}, and not a land.
+- **(C):** Arcane Adaptation, then Life and Limb, then Blood Moon.
+  - Taiga is a Land Creature, Mountain Saproling, 1/1.
+  - The Elves are a Creature Land, Elf Druid Saproling Mountain, tapping for {R} (305.7).
 
-The pass is built so that "ready" is one function, and nothing is built on it until the user decides.
+The pass keeps "ready" as one function. The Arcane Adaptation scenario's expectation is settled by the reading chosen.
 
 **Layers 1 and 2.**
 - **Layer 1:** copy effects and face-down values stay the copiable values the per-object pipeline starts from. A copy
