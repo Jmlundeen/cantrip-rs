@@ -1,0 +1,38 @@
+# Despark: "Exile target permanent with mana value 4 or greater." The caster's own Hero of Bladehold (mana value 4) is a
+# legal target (CR 115.1: "target permanent", whoever controls it): a Swamp's {B} and a Black Lotus's three {W} pay its
+# {2}{W}{W}, and then a Mox Pearl's {W} and a Mox Jet's {B} pay Despark and exile it.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Pearl
+Hero of Bladehold
+Despark
+Mox Jet
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Hero of Bladehold.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hero of Bladehold.Tapped = false
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Despark.Cast(Hero of Bladehold)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Hero of Bladehold
+Bot1.Battlefield = Swamp; Mox Pearl; Mox Jet
+Bot1.Graveyard = Despark; Black Lotus
