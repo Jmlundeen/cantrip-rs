@@ -237,7 +237,7 @@ fn its_own_replacements_are_read_off_what_it_enters_as() {
     let mut cx = cx(&mut game);
     let mut e = entering(plain, P0, false);
     e.copy = Some(Copiable::of(table.id_of(&SLEEPER)));
-    let moves = [Moving { id: plain, to: Zone::BATTLEFIELD, entering: Some(e), reason: None }];
+    let moves = [Moving { entering: Some(e), ..Moving::to(plain, Zone::BATTLEFIELD) }];
     let new = ops::move_together(&mut cx, &moves, ZoneReason::Other)[0];
     assert_eq!(cx.chars(new).name, "Judged Sleeper");
     assert!(cx.s().obj(new).tapped);

@@ -66,11 +66,15 @@ pub struct Moving {
     pub entering: Option<Entering>,
     /// Why this move happens when it is not why the rest of the batch does: a sacrifice and a return made at once (CR 101.4).
     pub reason: Option<ZoneReason>,
+    /// The instruction moving it is the one that reveals it ("reveal it and put it into your hand", CR 701.20a): it is a
+    /// card all players can see as it moves (`seen_by_all`). Set by the reveal-and-move verbs, never by a move that is not
+    /// about the revealed card (a later draw).
+    pub revealed: bool,
 }
 
 impl Moving {
     pub fn to(id: ObjectId, to: Zone) -> Moving {
-        Moving { id, to, entering: None, reason: None }
+        Moving { id, to, entering: None, reason: None, revealed: false }
     }
 }
 
@@ -90,6 +94,96 @@ struct Plan {
     counts: [i16; CounterKind::COUNT],
     counts_by: PlayerId,
     last_known: LastKnown,
+    /// Every player could see it as it moved (`seen_by_all`), for a move into a hand or a library (CR 603.10a).
+    seen_by_all: bool,
+}
+
+/// Whether every player can see `id` as it moves now (CR 603.10a: "an object that all players can see"), the instruction
+/// moving it revealing it if `revealed_by_move`: "reveal it and put it into your hand" (`Moving::revealed`, the
+/// reveal-and-move verbs), "reveal it and shuffle it into its owner's library instead" (`ZoneChange::reveal`). An object in
+/// a public zone can be seen by all (CR 400.2), and one exiled face up, or face down where every player in the game may
+/// look at it (CR 406.3). A card in a hand or a library can be only while a reveal of it is in effect (CR 701.20a) - not
+/// because it was revealed once, which ended (the history's `Event::Revealed` is what was shown, not what is). An effect's
+/// reveal lasts only through the instruction about the card it revealed: the move that instruction makes is marked, and a
+/// later one in the same effect (a draw that takes it) is not. Otherwise: the cost or announcement of a spell or activated ability
+/// still on the stack revealed it, or it is the card an ability on the stack was activated from in that hidden zone (CR
+/// 602.2a); or its revealing triggered an ability that has not yet left the stack (miracle, CR 702.94a). No card the engine
+/// has keeps a card revealed by a continuous effect ("play with the top card of your library revealed"): the first that
+/// does adds that here.
+pub(crate) fn seen_by_all(cx: &Cx, id: ObjectId, revealed_by_move: bool) -> bool {
+    let s = cx.s();
+    let o = s.obj(id);
+    match o.zone.kind() {
+        ZoneKind::Battlefield | ZoneKind::Graveyard | ZoneKind::Stack | ZoneKind::Command => true,
+        ZoneKind::Exile => !o.face_down || s.apnap().all(|p| o.seen_by & (1 << p.0) != 0),
+        ZoneKind::Hand | ZoneKind::Library => {
+            revealed_by_move
+                || s.stack.iter().any(|i| match i.kind {
+                    // The cards its cost or announcement revealed are among the objects its cost chose (`StackItem::members`):
+                    // a spell's spliced cards and those it beheld (CR 702.47a, 701.4a), revealed from its announcement
+                    // until it leaves the stack (CR 701.20a) - while it is being cast (`being_cast`) and once it has become
+                    // cast (`cast_known`, CR 601.2i). A copy of a spell or an ability was neither (CR 707.10), so it revealed
+                    // nothing; a cast copy of a card was cast (CR 707.12). An activated ability's item is put on the stack
+                    // as it is announced (CR 602.2a), and only a copy of one is `copied`.
+                    StackKind::Spell => s.members(i.members).contains(&id) && (i.cast_known != u32::MAX || being_cast(cx, i)),
+                    StackKind::Activated => !i.copied && (i.object == id || s.members(i.members).contains(&id)),
+                    // A copy (Strionic Resonator) was never triggered by the reveal (CR 707.10): only "that triggered
+                    // ability" keeps the card revealed.
+                    StackKind::Triggered => !i.copied && triggered_by_revealing(i.ability, i.object, id),
+                })
+                || s.triggers.iter().any(|t| triggered_by_revealing(t.ability, t.source, id))
+        }
+        // A card outside the game (CR 400.11) is seen by all only as the instruction bringing it in reveals it.
+        ZoneKind::Sideboard => revealed_by_move,
+        _ => false,
+    }
+}
+
+/// Whether the spell `item` is being cast now, announced (CR 601.2a) and not yet cast (CR 601.2i): its card was moved to
+/// the stack to be cast (`ZoneReason::Cast`) in the run of records just before the item was put there (`StackItem::since`),
+/// which a copy of a spell, created on the stack (CR 707.10), never was. A cast given up is undone, item and all (CR 733.1).
+fn being_cast(cx: &Cx, item: &StackItem) -> bool {
+    let log = &cx.g.log;
+    let end = (item.since as usize).min(log.len());
+    let Some(last) = end.checked_sub(1) else { return false };
+    let cause = log[last].cause;
+    log[..end].iter().rev().take_while(|r| r.cause == cause).any(|r| {
+        matches!(r.event, Event::ZoneChange { new, to, reason: ZoneReason::Cast, .. } if new == item.object && to.is(ZoneKind::Stack))
+    })
+}
+
+/// Whether `ability`, of `source`, was triggered by revealing `card`, which stays revealed until the ability leaves the
+/// stack, or isn't put on it the next time a player would receive priority (CR 701.20a). The only ability the engine has
+/// that a reveal triggers is miracle's, by revealing its own card (CR 702.94a): no card's triggered ability listens for
+/// `Event::Revealed` (`cantrip-cards/tests/no_reveal_triggers.rs` holds the card table to that). The first that does
+/// records what it was triggered by and is asked of here.
+fn triggered_by_revealing(ability: AbilityRef, source: ObjectId, card: ObjectId) -> bool {
+    ability.is_miracle() && source == card
+}
+
+/// With `CANTRIP_VERIFY`: a card the resolving spell or ability revealed, put into a hand or a library by that resolution
+/// with a move that is not marked revealed (`Moving::revealed`) and is no draw, is a reveal-and-move verb forgotten -
+/// `reveal` then `return_to_hand` where the text is "reveal it and put it into your hand" (`Game::return_to_hand_revealed`)
+/// - which would judge a card all players can see as hidden (CR 603.10a, 701.20a). Its history is the run of records the
+/// resolution made (`Cx::cause`), an ability's earlier resolution cut off at its `Event::Resolved`.
+pub(crate) fn verify_reveal_carried(cx: &Cx, id: ObjectId) {
+    let Some(&cantrip_state::Frame { kind: cantrip_state::FrameKind::Resolve { .. }, .. }) = cx.s().agenda.get(cx.frame) else { return };
+    let cause = cx.cause();
+    for r in cx.g.log.iter().rev() {
+        if r.cause != cause {
+            return;
+        }
+        match r.event {
+            Event::Revealed { card, .. } if card == id => panic!(
+                "{} ({id:?}) was revealed by the effect putting it into a hand or a library, with a move not marked revealed: the \
+                 instruction that reveals it moves it with a reveal-and-move verb (`Game::return_to_hand_revealed`, \
+                 `move_together_revealed`, `bring_into_hand_revealed`; CR 701.20a, 603.10a)",
+                cx.g.name(id)
+            ),
+            Event::Resolved { source, ability } if cause == (Cause::Ability { source, ability }) => return,
+            _ => {}
+        }
+    }
 }
 
 /// Moves objects at once (CR 400.7: each arrives as a new object). Leaves-the-battlefield abilities are judged on
@@ -115,7 +209,8 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
     };
     let before: Vec<ObjectId> = cx.s().battlefield().to_vec();
     // The permanents that could look back, as they are just before the moves (CR 603.10a): only for moves a look-back
-    // ability can trigger on - leaving the battlefield or a graveyard, or a public object put into a hand or library.
+    // ability can trigger on - leaving the battlefield or a graveyard, or a public object put into a hand or library (one
+    // from a hand or a library, public while a reveal of it is in effect, is known once its move is planned, below).
     let looks_back = moves.iter().any(|m| {
         let from = cx.s().obj(m.id).zone;
         from.is(ZoneKind::Battlefield)
@@ -281,10 +376,29 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
                 None => counters::entering(cx, m.id, controller, controller, with),
             };
         }
-        plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, counts, counts_by, last_known });
+        // Whether all players can see it as it moves (CR 603.10a), decided now, before anything moves.
+        let seen_by_all = (to.is(ZoneKind::Hand) || to.is(ZoneKind::Library)) && seen_by_all(cx, m.id, change.reveal || m.revealed);
+        if layers::verifying()
+            && (to.is(ZoneKind::Hand) || to.is(ZoneKind::Library))
+            && matches!(from.kind(), ZoneKind::Hand | ZoneKind::Library | ZoneKind::Sideboard)
+            && !m.revealed
+            && !change.reveal
+            && reason != ZoneReason::Draw
+        {
+            verify_reveal_carried(cx, m.id);
+        }
+        plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, counts, counts_by, last_known, seen_by_all });
     }
     *cx.s().leaving_together.borrow_mut() = outer_leaving;
-    for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known } in plans {
+    // A card from a hand, a library or outside the game that all players can see as it is put into a hand or a library is
+    // looked back on too (CR 603.10a), which the moves' planned destinations and reveals say.
+    let then = if !then.taken() && plans.iter().any(|p| p.seen_by_all) {
+        crate::settle::Then::now(cx)
+    } else {
+        then
+    };
+    let seen: Vec<ObjectId> = plans.iter().filter(|p| p.seen_by_all).map(|p| p.m.id).collect();
+    for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known, .. } in plans {
         let m = &m;
         let row = cx.st().last_known_push(last_known);
         cx.st().zone_remove(from, m.id);
@@ -365,7 +479,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             become_prepared(cx, new_id);
         }
     }
-    cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then }));
+    cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then, seen_by_all: &seen }));
     for player in shuffled {
         cx.record(Event::Shuffled { player });
     }
@@ -918,7 +1032,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
         let mut entering =
             Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None };
         prepare_entry(cx, &mut entering)?;
-        moves.push(Moving { id, to: Zone::BATTLEFIELD, entering: Some(entering), reason: None });
+        moves.push(Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) });
     }
     Ok(())
 }
@@ -973,7 +1087,7 @@ pub fn put_onto_battlefield_as(
         instead: None,
     };
     prepare_entry(cx, &mut entering)?;
-    Ok(move_together(cx, &[Moving { id, to: Zone::BATTLEFIELD, entering: Some(entering), reason: None }], reason)[0])
+    Ok(move_together(cx, &[Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }], reason)[0])
 }
 
 /// Transforms a permanent (CR 701.27a): its other face is up. The same object, so nothing about it is new (CR 712.18).
@@ -1330,7 +1444,7 @@ fn create_tokens_onto(
         events.extend(put);
         created.push(id);
     }
-    cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then }));
+    cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then, seen_by_all: &[] }));
     Ok(created)
 }
 
@@ -2478,7 +2592,13 @@ pub fn put_into_library(cx: &mut Cx, ids: &[ObjectId], place: LibraryPlace) -> V
 
 /// Returns objects to their owners' hands together (CR 400.3, 101.4).
 pub fn return_to_hand(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
-    let moves: Vec<Moving> = live_ones(cx, ids).into_iter().map(|id| Moving::to(id, Zone::hand(cx.s().obj(id).owner))).collect();
+    return_to_hand_as(cx, ids, false)
+}
+
+/// `return_to_hand`, the move `revealed` (`Moving::revealed`) when the instruction moving the cards reveals them.
+pub fn return_to_hand_as(cx: &mut Cx, ids: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
+    let moves: Vec<Moving> =
+        live_ones(cx, ids).into_iter().map(|id| Moving { revealed, ..Moving::to(id, Zone::hand(cx.s().obj(id).owner)) }).collect();
     move_together(cx, &moves, ZoneReason::Other)
 }
 
@@ -2487,12 +2607,17 @@ pub fn return_to_hand(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
 /// basic land of a Limited event's supply (`GameState::outside_supply`) is replaced outside the game by another, since a
 /// Limited sideboard holds any number of them.
 pub fn bring_into_hand(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
+    bring_into_hand_as(cx, ids, false)
+}
+
+/// `bring_into_hand`, the move `revealed` (`Moving::revealed`) when the instruction bringing the cards in reveals them.
+pub fn bring_into_hand_as(cx: &mut Cx, ids: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
     let outside: Vec<Obj> =
         live_ones(cx, ids).into_iter().map(|id| *cx.s().obj(id)).filter(|o| o.zone.is(ZoneKind::Sideboard)).collect();
     let moves: Vec<Moving> = live_ones(cx, ids)
         .into_iter()
         .filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Sideboard))
-        .map(|id| Moving::to(id, Zone::hand(cx.s().obj(id).owner)))
+        .map(|id| Moving { revealed, ..Moving::to(id, Zone::hand(cx.s().obj(id).owner)) })
         .collect();
     let brought = move_together(cx, &moves, ZoneReason::Other);
     for row in outside {

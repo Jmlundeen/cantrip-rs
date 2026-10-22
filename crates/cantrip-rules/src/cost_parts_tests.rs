@@ -112,9 +112,77 @@ static RECALL: CardDef = CardDef { name: "Cost Test Recall", types: TypeSet::of(
 static TITHE: CardDef = CardDef { name: "Cost Test Tithe", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], discard_and_energy), ..CardDef::BLANK };
 static VOW: CardDef = CardDef { name: "Cost Test Vow", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], loyalty_cost), ..CardDef::BLANK };
 
+/// "Whenever a card is put into a hand or a library, you gain 2 life" (CR 603.10a: it looks back for a card all players can
+/// see).
+fn a_card_into_a_hand_or_library(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, to, .. } if (to.is(ZoneKind::Hand) || to.is(ZoneKind::Library)) && !q.obj(*old).token => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+fn gain_two(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    g.gain_life(item.controller, 2);
+    Ok(())
+}
+
+static LIBRARIAN: CardDef = CardDef {
+    name: "Cost Test Librarian",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, a_card_into_a_hand_or_library), gain_two, "Whenever a card is put into a hand or a library, you gain 2 life.")],
+    ..CardDef::BLANK
+};
+
+/// An Arcane sorcery for {1}: "You gain 3 life."
+static RITE: CardDef = CardDef {
+    name: "Cost Test Rite",
+    cost: ManaCost { generic: 1, ..ManaCost::ZERO },
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    subtypes: SubtypeSet::of(&[Subtype::Arcane]),
+    spell: spell(&[], gain_three),
+    ..CardDef::BLANK
+};
+
+/// "You gain 3 life. Splice onto Arcane {1}."
+static GRAFT: CardDef = CardDef {
+    name: "Cost Test Graft",
+    cost: ManaCost { generic: 1, ..ManaCost::ZERO },
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], gain_three),
+    splice: Some(ManaCost { generic: 1, ..ManaCost::ZERO }),
+    ..CardDef::BLANK
+};
+
+/// "{T}: Add {C}. Put each card in your hand on top of your library, and each Librarian you control into your graveyard,
+/// at once": a mana ability whose effect moves a card the spell being cast revealed (CR 605.1a, 601.2g).
+fn stow(g: &mut dyn cantrip_api::Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    g.add_mana(asker.controller, Mana::C, 1);
+    let hand = g.state().zone(Zone::hand(asker.controller)).to_vec();
+    let librarians: Vec<ObjectId> =
+        g.state().battlefield().iter().copied().filter(|&id| g.chars(id).name == "Cost Test Librarian").collect();
+    let moves: Vec<(ObjectId, Zone)> = hand
+        .iter()
+        .map(|&c| (c, Zone::library(asker.controller)))
+        .chain(librarians.iter().map(|&l| (l, Zone::graveyard(asker.controller))))
+        .collect();
+    g.move_together(&moves, ZoneReason::Other);
+    Ok(())
+}
+
+static STOWER: CardDef = CardDef {
+    name: "Cost Test Stower",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[mana_ability(TAP, add(Mana::C).by(stow), "{T}: Add {C}. Put each card in your hand on top of your library.")],
+    ..CardDef::BLANK
+};
+
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &DORK, &SEER, &GAZER, &RETURNER, &OFFER, &RECALL, &TITHE, &VOW, &RECOILER])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &DORK, &SEER, &GAZER, &RETURNER, &OFFER, &RECALL, &TITHE, &VOW, &RECOILER, &LIBRARIAN, &RITE, &GRAFT, &STOWER])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -245,6 +313,11 @@ fn an_activated_ability_beholds_a_card_from_the_hand_by_revealing_it() {
     }
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     assert!(g.log.iter().any(|rec| matches!(&rec.event, Event::Revealed { card, .. } if *card == bear)), "the Bear was revealed");
+    // It stays revealed until the ability leaves the stack (CR 701.20a): one of the objects its cost chose.
+    let item = *g.state.stack.last().expect("the ability is on the stack");
+    assert_eq!(g.state.members(item.members), &[bear]);
+    let cx = crate::Cx { g: &mut g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    assert!(crate::ops::seen_by_all(&cx, bear, false), "the Bear is public while the ability is on the stack");
 }
 
 /// The Returner's {1} is paid by tapping the Dork for mana while it is activated (CR 605.3a, 601.2g); the tapped creature
@@ -424,4 +497,34 @@ fn a_cost_with_its_own_tap_returns_its_source_as_the_tapped_creature() {
     resolve_all(&mut g);
     assert_eq!(g.state.player(YOU).life, life + 3);
     assert!(g.state.zone(Zone::hand(YOU)).iter().any(|&c| g.state.obj(c).card == g.cards.id_of(&RECOILER)), "it went back to the hand");
+}
+
+/// A card spliced onto a spell is revealed from the spell's announcement until it leaves the stack (CR 701.20a, 702.47a),
+/// before it has become cast (CR 601.2i) as much as after: a mana ability activated while the spell's cost is paid (CR
+/// 601.2g) puts the hand into the library as the Librarian dies, and the Librarian, judged as it was just before (CR
+/// 603.10a), triggers for the spliced card, one all players could see. Not spliced, every card it moves is hidden.
+#[test]
+fn a_card_revealed_for_a_spell_being_cast_is_looked_back_on_as_a_mana_ability_moves_it() {
+    for spliced in [true, false] {
+        let mut g = game();
+        let librarian = put(&mut g, &LIBRARIAN, Zone::BATTLEFIELD);
+        let stower = put(&mut g, &STOWER, Zone::BATTLEFIELD);
+        let rite = put(&mut g, &RITE, Zone::hand(YOU));
+        let graft = put(&mut g, &GRAFT, Zone::hand(YOU));
+        add_mana(&mut g, if spliced { 1 } else { 0 });
+        let r = next(&mut g);
+        let cast = option_of(&g, &r, rite).expect("the Rite may be cast");
+        answer(&mut g, &r, Answer::Act(Action::of(&cast)));
+        let r = next(&mut g);
+        assert!(matches!(r.kind, RequestKind::ChooseCards { purpose: Purpose::Splice, .. }), "splice is offered: {:?}", r.kind);
+        answer(&mut g, &r, Answer::Cards(if spliced { vec![graft] } else { Vec::new() }));
+        let r = next(&mut g);
+        let stow = option_of(&g, &r, stower).expect("the Stower's mana ability may pay");
+        answer(&mut g, &r, Answer::Act(Action::of(&stow)));
+        assert!(g.state.obj(graft).became.is_some_and(|c| g.state.obj(c).zone.is(ZoneKind::Library)), "the Graft is in the library");
+        assert!(!g.state.battlefield().contains(&librarian));
+        let triggered = g.state.triggers.iter().any(|t| t.source == librarian)
+            || g.state.stack.iter().any(|i| i.kind == StackKind::Triggered && i.object == librarian);
+        assert_eq!(triggered, spliced, "the Librarian looks back only on a card all players could see");
+    }
 }

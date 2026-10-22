@@ -38,7 +38,7 @@ fn reveal_seven(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         }
     }
     if !taken.is_empty() {
-        g.return_to_hand(&taken);
+        g.return_to_hand_revealed(&taken);
     }
     let rest: Vec<ObjectId> = revealed.into_iter().filter(|c| !taken.contains(c)).collect();
     g.bottom_in_random_order(player, &rest);

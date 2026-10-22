@@ -36,7 +36,7 @@ fn reveal_until_shared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
         return Ok(());
     }
     if let Some(card) = found {
-        g.return_to_hand(&[card]);
+        g.return_to_hand_revealed(&[card]);
     }
     g.bottom_in_random_order(you, &revealed);
     Ok(())

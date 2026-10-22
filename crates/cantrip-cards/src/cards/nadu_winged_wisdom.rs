@@ -19,7 +19,7 @@ fn reveal_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.chars(top).is(CardType::Land) {
         g.put_onto_battlefield(top, you, false)?;
     } else {
-        g.return_to_hand(&[top]);
+        g.return_to_hand_revealed(&[top]);
     }
     Ok(())
 }

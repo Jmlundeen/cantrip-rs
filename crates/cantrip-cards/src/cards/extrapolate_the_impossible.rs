@@ -14,7 +14,7 @@ fn reveal_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     };
     g.reveal(you, &[first, second]);
     if let Some(card) = choose::opponent_chooses_one(g, you, item.object, vec![first, second])? {
-        g.bring_into_hand(&[card]);
+        g.bring_into_hand_revealed(&[card]);
     }
     Ok(())
 }

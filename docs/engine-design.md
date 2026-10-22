@@ -663,7 +663,15 @@ library, a permanent phasing out, an unattachment, a countered spell, a player l
 zone-change event can't show are read from the ability's own trigger-condition words as the table is made
 (`read_zone_words`): "from anywhere" (CR 603.6c: never a leaves-the-battlefield ability) and a card leaving a graveyard
 (which looks back on a card put onto the battlefield from a graveyard, an enters-the-battlefield event for every other
-ability, CR 603.6a). No card declares anything. An ability that matches events of both kinds ("enters or dies") is
+ability, CR 603.6a). Whether all players could see the object is decided by the move as it is made
+(`ops::seen_by_all`): a card in a hand or a library is public only while a reveal of it is in effect (CR 701.20a) - its
+instruction moving it is the one that reveals it ("reveal it and put it into your hand": the reveal-and-move verbs,
+`Game::return_to_hand_revealed` and its kin, mark the move; an effect's reveal lasts only through that instruction, so a
+later draw in the same effect moves a hidden card), a replacement reveals it as it moves, a cost or announcement of a
+spell or ability still on the stack revealed it (`StackItem::members`) or it is an ability's hidden source (CR 602.2a),
+or its reveal triggered an ability not yet off the stack (miracle). No card the engine has keeps a card revealed by a
+continuous effect; the first that does builds that. The history's `Event::Revealed` is what was shown, never whether a card is revealed
+now. No card declares anything. An ability that matches events of both kinds ("enters or dies") is
 judged on each as that event says. An unattachment and a countered spell are announced just before they happen, so the
 board they are judged on is the one before them. Phasing out and losing the game are recorded in the history but are no
 trigger events yet (`EventMask::of` gives them no mask), so nothing triggers on them; the rule already says they look

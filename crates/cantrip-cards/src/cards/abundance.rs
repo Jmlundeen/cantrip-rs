@@ -27,7 +27,7 @@ fn reveal_until_kind(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Re
     let land = choose::one_of(g, player, source, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0;
     let (found, rest) = reveal_until(g, player, &|q, c| q.chars(c).is(CardType::Land) == land);
     if let Some(found) = found {
-        g.return_to_hand(&[found]);
+        g.return_to_hand_revealed(&[found]);
     }
     let bottom = ask_library_order(g, player, source, &rest, DestinationKind::LibraryBottom)?;
     g.arrange_library(player, &[], &bottom);

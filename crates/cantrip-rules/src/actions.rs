@@ -327,11 +327,27 @@ fn choose_behold(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
 }
 
 /// Pays the behold part of a cost (CR 701.4a): each card chosen from the hand is revealed; a permanent is only chosen.
-fn pay_behold(cx: &mut Cx, player: PlayerId, chosen: &[ObjectId]) {
+/// Returns the cards revealed.
+fn pay_behold(cx: &mut Cx, player: PlayerId, chosen: &[ObjectId]) -> Vec<ObjectId> {
     let revealed: Vec<ObjectId> = chosen.iter().copied().filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Hand)).collect();
     if !revealed.is_empty() {
         Game::reveal(cx, player, &revealed);
     }
+    revealed
+}
+
+/// The cards the cost or announcement of the spell or ability at `at` on the stack revealed from a hand (behold, CR 701.4a;
+/// splice, CR 702.47a): among the objects its cost chose (`StackItem::members`), as they stay revealed until it leaves the
+/// stack (CR 701.20a, `ops::seen_by_all`).
+fn add_revealed_to_item(cx: &mut Cx, at: usize, revealed: &[ObjectId]) {
+    if revealed.is_empty() {
+        return;
+    }
+    let mut with = cx.s().stack[at];
+    let mut objects = cx.s().members(with.members).to_vec();
+    objects.extend_from_slice(revealed);
+    with.members = cx.st().members_push(&objects);
+    cx.st().stack_set(at, with);
 }
 
 /// The creatures a cost that blights may put its counters on (CR 701.68a): not one that can't have -1/-1 counters put on it
@@ -5268,7 +5284,10 @@ fn cast(
                 _ => return Err(Stop::Cancel),
             };
             if !spliced.is_empty() {
+                // Revealed from its announcement until the spell leaves the stack (CR 701.20a): among the objects its
+                // announcement chose (`add_revealed_to_item`).
                 Game::reveal(cx, player, &spliced);
+                item.members = cx.st().members_push(&spliced);
             }
             for (n, c) in spliced.into_iter().take(2).enumerate() {
                 let splice_card = cx.s().obj(c).card;
@@ -5524,8 +5543,11 @@ fn cast(
     pay_exiles(cx, &extra_evidence);
     pay_life_and_counters(cx, player, spell, &cost);
     pay_permanents(cx, &extra, &extra_chosen, None);
-    pay_behold(cx, player, &beheld);
-    pay_behold(cx, player, &extra_beheld);
+    let mut revealed = pay_behold(cx, player, &beheld);
+    revealed.extend(pay_behold(cx, player, &extra_beheld));
+    if let Some(at) = cx.s().stack.iter().rposition(|i| i.kind == StackKind::Spell && i.object == spell) {
+        add_revealed_to_item(cx, at, &revealed);
+    }
     ops::sacrifice(cx, &extra_sacrifices);
     pay_discards(cx, &extra_discards);
     pay_life_and_counters(cx, player, spell, &extra);
@@ -6660,7 +6682,9 @@ fn activate(
     pay_blight(cx, player, &def.cost, blighted);
     pay_counters_among(cx, &removed);
     pay_permanents(cx, &def.cost, &chosen, Some(source));
-    pay_behold(cx, player, &beheld);
+    let revealed = pay_behold(cx, player, &beheld);
+    let at = cx.s().stack.len() - 1;
+    add_revealed_to_item(cx, at, &revealed);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
     pay_life_and_counters(cx, player, source, &def.cost);
@@ -6999,7 +7023,7 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
             if let Some(fired) = t.fires(&*cx, &Asker { source: id, controller }, &event) {
                 // Static abilities that stop it triggering or make it trigger again apply to it as to any triggered ability
                 // (CR 603.2, 603.2d): each triggering resolves at once.
-                let triggering = Triggering { source: id, controller, def: t, permanent: true, looks_back: cx.cards().looks_back(ability, &*cx, &event) };
+                let triggering = Triggering { source: id, controller, def: t, permanent: true, looks_back: cx.cards().looks_back(ability, &event, false) };
                 if statics.stop(cx, &event, &triggering) {
                     continue;
                 }
@@ -7052,7 +7076,7 @@ fn delayed_mana_abilities(cx: &mut Cx, event: &Event, statics: &mut crate::settl
             || statics.stop(
                 cx,
                 event,
-                &Triggering { source: d.source, controller: d.controller, def: t, permanent: false, looks_back: cx.cards().looks_back(d.ability, &*cx, event) },
+                &Triggering { source: d.source, controller: d.controller, def: t, permanent: false, looks_back: cx.cards().looks_back(d.ability, event, false) },
             )
         {
             continue;
@@ -7944,6 +7968,8 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     pay_blight(cx, payer, cost, blighted);
     pay_counters_among(cx, &removed);
     pay_permanents(cx, cost, &chosen, None);
+    // Revealed for the effect paying it, as part of that effect (CR 701.20a): no reveal of the effect's own lasts past the
+    // instruction it is for (`ops::seen_by_all`).
     pay_behold(cx, payer, &beheld);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);

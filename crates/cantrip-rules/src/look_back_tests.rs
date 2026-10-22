@@ -4,6 +4,7 @@
 
 use crate::{Cx, Game, Setup};
 use cantrip_api::*;
+use cantrip_state::{Frame, FrameKind, PendingTrigger, Span};
 
 /// "As long as no creature has died this turn": read off the history (`Query::history`).
 fn no_creature_died_this_turn(q: &dyn LayerQuery) -> bool {
@@ -455,4 +456,201 @@ fn a_countered_spell_is_judged_on_the_game_as_it_was_while_on_the_stack() {
     assert!(cx.s().stack.is_empty());
     assert!(cx.s().triggers.iter().any(|t| t.source == bear));
     assert!(!cx.chars(bear).abilities().any(|a| a.is_delayed()));
+}
+
+/// "Whenever a card is put into a hand or a library" (CR 603.10a: it looks back for a card all players can see).
+fn a_card_into_a_hand_or_library(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, to, .. } if (to.is(ZoneKind::Hand) || to.is(ZoneKind::Library)) && !q.obj(*old).token => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// Wan Shi Tong, All-Knowing's kind of listener: "Whenever a card is put into a hand or a library, you gain 2 life."
+static LIBRARIAN: CardDef = CardDef {
+    name: "Look-back Librarian",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, a_card_into_a_hand_or_library), gain_two, "Whenever a card is put into a hand or a library, you gain 2 life.")],
+    ..CardDef::BLANK
+};
+
+/// A game of the Librarian on player 0's battlefield, with a Bear in their hand and two in their library.
+fn librarian_game() -> (Game, ObjectId, ObjectId) {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&LIBRARIAN, &BEAR])));
+    let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    let put = |game: &mut Game, def: &'static CardDef, zone: Zone| {
+        let id = game.state.push_obj(Obj::new(table.id_of(def), PlayerId(0), zone));
+        game.state.zone_push(zone, id);
+        game.state.see_statics();
+        id
+    };
+    let librarian = put(&mut game, &LIBRARIAN, Zone::BATTLEFIELD);
+    let in_hand = put(&mut game, &BEAR, Zone::hand(PlayerId(0)));
+    put(&mut game, &BEAR, Zone::library(PlayerId(0)));
+    put(&mut game, &BEAR, Zone::library(PlayerId(0)));
+    (game, librarian, in_hand)
+}
+
+/// The Librarian dies as `card` is put into `to`, together, the move `revealed` (`Moving::revealed`) or not: only a look
+/// back - the card one all players could see as it moved (CR 603.10a) - finds the Librarian on the battlefield to trigger;
+/// judged after the event it is gone.
+fn librarian_dies_with(cx: &mut Cx, librarian: ObjectId, card: ObjectId, to: Zone, revealed: bool) -> bool {
+    let moves = [
+        crate::ops::Moving::to(librarian, Zone::graveyard(PlayerId(0))),
+        crate::ops::Moving { revealed, ..crate::ops::Moving::to(card, to) },
+    ];
+    crate::ops::move_together(cx, &moves, ZoneReason::Other);
+    cx.s().triggers.iter().any(|t| t.source == librarian)
+}
+
+fn librarian_triggers_as_it_dies_with(cx: &mut Cx, librarian: ObjectId, card: ObjectId, to: Zone) -> bool {
+    librarian_dies_with(cx, librarian, card, to, false)
+}
+
+/// The instruction that reveals a card and puts it into a library ("reveal it and put it on the bottom of your library")
+/// moves a card all players can see (CR 701.20a, 603.10a): the Librarian, dying with the move, is judged as it was just
+/// before.
+#[test]
+fn a_card_the_moving_instruction_reveals_is_looked_back_on() {
+    let (mut game, librarian, in_hand) = librarian_game();
+    let mut cx = cx(&mut game);
+    cantrip_api::Game::reveal(&mut cx, PlayerId(0), &[in_hand]);
+    assert!(librarian_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0)), true));
+}
+
+/// An effect reveals the top card of a library, and a later draw in the same effect takes it: the draw is no part of the
+/// effect the card is relevant to, so the reveal has ended (CR 701.20a) and the card is hidden as it moves - no look back.
+#[test]
+fn a_card_an_effect_revealed_is_hidden_when_a_later_draw_takes_it() {
+    let (mut game, librarian, _) = librarian_game();
+    let top = game.state.zone(Zone::library(PlayerId(0)))[0];
+    let mut cx = cx(&mut game);
+    cantrip_api::Game::reveal(&mut cx, PlayerId(0), &[top]);
+    // The Librarian leaves first, so only a look back could see the draw.
+    let moves = [crate::ops::Moving::to(librarian, Zone::graveyard(PlayerId(0))), crate::ops::Moving::to(top, Zone::hand(PlayerId(0)))];
+    crate::ops::move_together(&mut cx, &moves, ZoneReason::Draw);
+    assert!(!cx.s().triggers.iter().any(|t| t.source == librarian));
+}
+
+/// A card in a hand that nothing reveals is hidden (CR 400.2): no look back, and the Librarian, gone after the event, doesn't
+/// trigger.
+#[test]
+fn a_hidden_card_is_not_looked_back_on() {
+    let (mut game, librarian, in_hand) = librarian_game();
+    let mut cx = cx(&mut game);
+    assert!(!librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))));
+}
+
+/// A card revealed by an earlier action, whose reveal has ended (CR 701.20a), is hidden again as a later effect moves it:
+/// that it was once shown is no reveal in effect.
+#[test]
+fn a_card_revealed_earlier_is_hidden_again_as_it_moves() {
+    let (mut game, librarian, in_hand) = librarian_game();
+    // Revealed as a player's action (`Cause::Player`) ...
+    game.state.frame_push(Frame::new(FrameKind::Act { player: PlayerId(0) }));
+    let mut act = Cx { g: &mut game, frame: 0, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    cantrip_api::Game::reveal(&mut act, PlayerId(0), &[in_hand]);
+    assert!(matches!(game.log.last().map(|r| r.cause), Some(Cause::Player(_))));
+    // ... and moved by something else, the rules' own (`Cause::Rules`).
+    let mut cx = cx(&mut game);
+    assert!(!librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))));
+}
+
+/// A card a spell's or an activated ability's cost revealed stays revealed until it leaves the stack (CR 701.20a): one
+/// beheld (CR 701.4a) is among the objects its cost chose. A copy of the ability revealed nothing (CR 707.10).
+#[test]
+fn a_card_a_cost_revealed_is_looked_back_on_while_its_ability_is_on_the_stack() {
+    for copied in [false, true] {
+        let (mut game, librarian, in_hand) = librarian_game();
+        let card = game.state.obj(librarian).card;
+        let mut item = crate::actions::stack_item(StackKind::Activated, librarian, AbilityRef { card, index: 0 }, PlayerId(0), &[]);
+        item.members = game.state.members_push(&[in_hand]);
+        item.copied = copied;
+        game.state.stack_push(item);
+        let mut cx = cx(&mut game);
+        assert_eq!(librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))), !copied);
+    }
+}
+
+/// A card an ability is activated from in a hand is revealed until the ability leaves the stack (CR 602.2a, 701.20a).
+#[test]
+fn a_card_an_ability_on_the_stack_was_activated_from_is_looked_back_on() {
+    let (mut game, librarian, in_hand) = librarian_game();
+    let card = game.state.obj(in_hand).card;
+    game.state.stack_push(crate::actions::stack_item(StackKind::Activated, in_hand, AbilityRef { card, index: 0 }, PlayerId(0), &[]));
+    let mut cx = cx(&mut game);
+    assert!(librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))));
+}
+
+/// A card revealed for miracle stays revealed until its triggered ability leaves the stack, while it waits to be put on it
+/// included (CR 701.20a, 702.94a).
+#[test]
+fn a_card_revealed_for_miracle_is_looked_back_on_while_its_trigger_waits() {
+    let (mut game, librarian, in_hand) = librarian_game();
+    let card = game.state.obj(in_hand).card;
+    game.state.trigger_push(PendingTrigger {
+        source: in_hand,
+        ability: AbilityRef::miracle(card),
+        controller: PlayerId(0),
+        subject: Target::None,
+        data: [0; 2],
+        members: Span::default(),
+        count: None,
+        since: None,
+    });
+    let mut cx = cx(&mut game);
+    assert!(librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))));
+}
+
+/// A spell's cost revealed a card (behold, splice): it stays revealed until the spell leaves the stack (CR 701.20a), a cast
+/// copy of a card's as much as a card's own (CR 707.12). A copy of a spell was not cast (CR 707.10), so it revealed nothing.
+#[test]
+fn a_card_a_spells_cost_revealed_is_looked_back_on_only_for_a_cast_spell() {
+    for cast in [true, false] {
+        let (mut game, librarian, in_hand) = librarian_game();
+        let card = game.state.obj(in_hand).card;
+        let mut copy = Obj::new(card, PlayerId(0), Zone::STACK);
+        copy.card_copy = true;
+        let spell = game.state.push_obj(copy);
+        game.state.zone_push(Zone::STACK, spell);
+        let mut item = crate::actions::stack_item(StackKind::Spell, spell, AbilityRef::spell(card), PlayerId(0), &[]);
+        item.members = game.state.members_push(&[in_hand]);
+        item.cast_known = if cast { 0 } else { u32::MAX };
+        game.state.stack_push(item);
+        let mut cx = cx(&mut game);
+        assert_eq!(librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))), cast);
+    }
+}
+
+/// A copy of a triggered ability its revealing triggered (Strionic Resonator copying a miracle trigger) was never triggered
+/// by the reveal (CR 707.10): only "that triggered ability" keeps the card revealed (CR 701.20a).
+#[test]
+fn a_copy_of_a_reveal_triggered_ability_keeps_nothing_revealed() {
+    for copied in [false, true] {
+        let (mut game, librarian, in_hand) = librarian_game();
+        let card = game.state.obj(in_hand).card;
+        let mut item = crate::actions::stack_item(StackKind::Triggered, in_hand, AbilityRef::miracle(card), PlayerId(0), &[]);
+        item.copied = copied;
+        game.state.stack_push(item);
+        let mut cx = cx(&mut game);
+        assert_eq!(librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))), !copied);
+    }
+}
+
+/// With `CANTRIP_VERIFY`, a resolution that reveals a card and then puts it into a hand or a library with a move not
+/// marked revealed - `reveal` then `return_to_hand`, the reveal-and-move verb forgotten - is stopped, naming the card.
+#[test]
+#[should_panic(expected = "was revealed by the effect putting it into a hand or a library")]
+fn a_forgotten_reveal_and_move_verb_is_found() {
+    let (mut game, librarian, in_hand) = librarian_game();
+    let card = game.state.obj(librarian).card;
+    game.state.stack_push(crate::actions::stack_item(StackKind::Triggered, librarian, AbilityRef { card, index: 0 }, PlayerId(0), &[]));
+    let serial = game.state.stack.last().expect("the ability").serial;
+    game.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+    let frame = game.state.agenda.len() - 1;
+    let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    cantrip_api::Game::reveal(&mut cx, PlayerId(0), &[in_hand]);
+    crate::ops::verify_reveal_carried(&cx, in_hand);
 }

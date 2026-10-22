@@ -2846,22 +2846,16 @@ pub struct ZoneWords {
 /// - a card leaving a graveyard (CR 603.10a), unless the condition is about where it goes "from anywhere"; one put onto the
 ///   battlefield is an enters-the-battlefield event (CR 603.6a), looked back on only by a condition about the card leaving
 ///   the graveyard;
-/// - an object all players can see put into a hand or a library (CR 603.10a), "from anywhere" or not: one from the
-///   battlefield, a graveyard, the stack or the command zone, or from exile face up, or face down where every player in
-///   the game may look at it (CR 406.3);
+/// - an object all players can see put into a hand or a library (CR 603.10a), "from anywhere" or not: `seen_by_all`, which
+///   the move that made the event decided as it was made - one from a public zone, or from exile face up, or face down where
+///   every player in the game may look at it (CR 406.3), or a card in a hand or a library while a reveal of it is in effect
+///   (CR 400.2, 701.20a);
 /// - a permanent phasing out (CR 603.10b), a permanent becoming unattached (CR 603.10c), a spell countered (CR 603.10e) and
 ///   a player losing the game (CR 603.10f).
-pub fn looks_back(words: ZoneWords, q: &dyn Query, event: &Event) -> bool {
+pub fn looks_back(words: ZoneWords, event: &Event, seen_by_all: bool) -> bool {
     match event {
-        Event::ZoneChange { old, from, to, .. } => {
-            let seen_by_all = || {
-                [ZoneKind::Battlefield, ZoneKind::Graveyard, ZoneKind::Stack, ZoneKind::Command].into_iter().any(|z| from.is(z))
-                    || (from.is(ZoneKind::Exile) && {
-                        let o = q.obj(*old);
-                        !o.face_down || q.state().apnap().all(|p| o.seen_by & (1 << p.0) != 0)
-                    })
-            };
-            ((to.is(ZoneKind::Hand) || to.is(ZoneKind::Library)) && seen_by_all())
+        Event::ZoneChange { from, to, .. } => {
+            ((to.is(ZoneKind::Hand) || to.is(ZoneKind::Library)) && seen_by_all)
                 || (!words.from_anywhere
                     && (from.is(ZoneKind::Battlefield)
                         || (from.is(ZoneKind::Graveyard) && (!to.is(ZoneKind::Battlefield) || words.leaves_graveyard))))
@@ -3161,11 +3155,12 @@ impl CardTable {
     }
 
     /// Whether the triggered ability `ability`, triggering on `event`, looks back in time (CR 603.10, `looks_back`).
+    /// `seen_by_all`: for a zone change, whether every player could see its object as it moved (`looks_back`).
     #[inline]
-    pub fn looks_back(&self, ability: AbilityRef, q: &dyn Query, event: &Event) -> bool {
+    pub fn looks_back(&self, ability: AbilityRef, event: &Event, seen_by_all: bool) -> bool {
         match event {
-            Event::ZoneChange { .. } => looks_back(self.zone_words(ability), q, event),
-            _ => looks_back(ZoneWords::default(), q, event),
+            Event::ZoneChange { .. } => looks_back(self.zone_words(ability), event, seen_by_all),
+            _ => looks_back(ZoneWords::default(), event, false),
         }
     }
 

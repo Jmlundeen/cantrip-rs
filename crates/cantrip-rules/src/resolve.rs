@@ -466,7 +466,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                 cx.st().stack_remove(at);
                 ops::move_together(
                     cx,
-                    &[ops::Moving { id: item.object, to: Zone::BATTLEFIELD, entering: Some(entering), reason: None }],
+                    &[ops::Moving { entering: Some(entering), ..ops::Moving::to(item.object, Zone::BATTLEFIELD) }],
                     ZoneReason::Resolve,
                 );
                 if let Some(new) = cx.s().obj(item.object).became

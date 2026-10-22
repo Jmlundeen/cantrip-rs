@@ -1365,8 +1365,16 @@ impl cantrip_api::Game for Cx<'_> {
         ops::return_to_hand(self, objects)
     }
 
+    fn return_to_hand_revealed(&mut self, cards: &[ObjectId]) -> Vec<ObjectId> {
+        ops::return_to_hand_as(self, cards, true)
+    }
+
     fn bring_into_hand(&mut self, cards: &[ObjectId]) -> Vec<ObjectId> {
         ops::bring_into_hand(self, cards)
+    }
+
+    fn bring_into_hand_revealed(&mut self, cards: &[ObjectId]) -> Vec<ObjectId> {
+        ops::bring_into_hand_as(self, cards, true)
     }
 
     fn put_into_library(&mut self, objects: &[ObjectId], place: LibraryPlace) -> Vec<ObjectId> {
@@ -1439,6 +1447,11 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId> {
         let moves: Vec<ops::Moving> = moves.iter().map(|&(id, to)| ops::Moving::to(id, to)).collect();
+        ops::move_together(self, &moves, reason)
+    }
+
+    fn move_together_revealed(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId> {
+        let moves: Vec<ops::Moving> = moves.iter().map(|&(id, to)| ops::Moving { revealed: true, ..ops::Moving::to(id, to) }).collect();
         ops::move_together(self, &moves, reason)
     }
 

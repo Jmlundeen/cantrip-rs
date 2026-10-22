@@ -14,7 +14,7 @@ fn reveal_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     g.reveal(you, &revealed);
     let taken = choose::opponent_chooses_one(g, you, item.object, revealed.clone())?.unwrap_or(revealed[0]);
-    g.return_to_hand(&[taken]);
+    g.return_to_hand_revealed(&[taken]);
     for &other in &revealed {
         if other != taken {
             let owner = g.obj(other).owner;

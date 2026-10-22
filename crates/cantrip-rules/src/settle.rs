@@ -728,6 +728,7 @@ fn consider(
     look_back: bool,
     permanent: bool,
     event: &Event,
+    seen: bool,
     mask: EventMask,
     statics: &mut TriggerStatics,
     found: &mut Found,
@@ -757,7 +758,7 @@ fn consider(
             continue;
         }
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
-            && (later.is_some() || cx.cards().looks_back(ability, cx, event) == look_back)
+            && (later.is_some() || cx.cards().looks_back(ability, event, seen) == look_back)
             && let Some(fired) = if t.chapter > 0 { chapter_reached(source, t.chapter, event) } else if t.listens.intersects(mask) { t.fires(cx, &Asker { source, controller }, event) } else { None }
         {
             if let Some(condition) = t.condition
@@ -769,7 +770,7 @@ fn consider(
             if t.ward && layers::targeting_rule(cx.cards(), cx.s(), &cx.g.log, TargetingRuleKind::SuppressWard, source) {
                 continue;
             }
-            let looks_back = cx.cards().looks_back(ability, cx, event);
+            let looks_back = cx.cards().looks_back(ability, event, seen);
             let triggering = Triggering { source, controller, def: t, permanent, looks_back };
             if statics.stop(cx, event, &triggering) {
                 continue;
@@ -794,7 +795,7 @@ fn consider(
 /// triggering (CR 603.2), and once more for each static ability that makes it trigger again (CR 603.2d). The initiative's "one
 /// or more creatures a player controls" triggers once for that player in a batch (CR 603.2c); speed's once each turn, its
 /// triggering noted in the history - an ability stopped from triggering has not triggered.
-fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event: &Event, statics: &mut TriggerStatics, found: &mut Found) {
+fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event: &Event, seen: bool, statics: &mut TriggerStatics, found: &mut Found) {
     let card = cx.cards().intrinsic;
     let ability = AbilityRef { card, index };
     let AbilityDef::Triggered(t) = cx.cards().ability(ability) else { return };
@@ -808,7 +809,7 @@ fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event
     }
     // Its source, in no zone: what stops abilities triggering asks about it (CR 603.2d), and is given it back if it does.
     let source = cx.st().push_obj(Obj::new(card, controller, Zone::GONE));
-    let triggering = Triggering { source, controller, def: t, permanent: false, looks_back: cx.cards().looks_back(ability, cx, event) };
+    let triggering = Triggering { source, controller, def: t, permanent: false, looks_back: cx.cards().looks_back(ability, event, seen) };
     if statics.stop(cx, event, &triggering) {
         cx.st().pop_obj(source);
         return;
@@ -974,6 +975,9 @@ fn trigger_rule_sources(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
 pub struct Before<'a> {
     pub battlefield: &'a [ObjectId],
     pub then: &'a Then,
+    /// The objects put into a hand or a library that every player could see as they moved (CR 603.10a, `ops::seen_by_all`),
+    /// by their old ids: decided as the moves were made, which the objects left behind can't show.
+    pub seen_by_all: &'a [ObjectId],
 }
 
 /// The permanents that may have a look-back ability, with their characteristics and controller as they are before a batch
@@ -989,6 +993,11 @@ pub struct Then {
 }
 
 impl Then {
+    /// Whether anything was taken (`now`), rather than `none`.
+    pub(crate) fn taken(&self) -> bool {
+        self.taken
+    }
+
     /// What was taken of `id`: `None` if nothing was taken (judge it now), `Some(None)` if it could look back with nothing.
     fn of(&self, id: ObjectId) -> Option<Option<(Chars, PlayerId)>> {
         if !self.taken {
@@ -1089,6 +1098,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
     // has been: "the first time each turn" is not this event.
     // The look-back abilities are judged on the game just before the events (CR 603.10a), the history then included.
     let then = before.map(|b| b.then);
+    let seen_by_all = before.map_or(&[][..], |b| b.seen_by_all);
     let before = before.map(|b| b.battlefield);
     let outer = cx.g.history_end;
     cx.g.history_end = Some(start);
@@ -1101,24 +1111,26 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             if mask.0 == 0 {
                 continue;
             }
+            // Whether every player could see the object of a zone change as it moved (`looks_back`).
+            let seen = matches!(event, Event::ZoneChange { old, .. } if seen_by_all.contains(old));
             // The players' inherent triggered abilities (CR 725.2, 726.2, 702.179d), which no object has.
             for (index, controller, subject) in crate::designations::inherent_triggers(cx, event) {
-                inherent(cx, index, controller, subject, event, &mut statics, &mut found);
+                inherent(cx, index, controller, subject, event, seen, &mut statics, &mut found);
             }
             let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
             if let Some(before) = before {
                 for &id in before {
-                    consider(cx, id, true, true, event, mask, &mut statics, &mut found, None, then);
+                    consider(cx, id, true, true, event, seen, mask, &mut statics, &mut found, None, then);
                 }
                 for &id in &now {
-                    consider(cx, id, false, true, event, mask, &mut statics, &mut found, None, None);
+                    consider(cx, id, false, true, event, seen, mask, &mut statics, &mut found, None, None);
                 }
             } else {
                 // The same permanents for both: each one's characteristics are found once, and the abilities that don't look
                 // back come after every one that does, as they would from two passes.
                 let mut later: Found = Vec::new();
                 for &id in &now {
-                    consider(cx, id, true, true, event, mask, &mut statics, &mut found, Some(&mut later), None);
+                    consider(cx, id, true, true, event, seen, mask, &mut statics, &mut found, Some(&mut later), None);
                 }
                 found.append(&mut later);
             }
@@ -1129,7 +1141,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             if !cx.s().zone(Zone::COMMAND).is_empty() {
                 let mut later: Found = Vec::new();
                 for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                    consider(cx, id, true, false, event, mask, &mut statics, &mut found, Some(&mut later), None);
+                    consider(cx, id, true, false, event, seen, mask, &mut statics, &mut found, Some(&mut later), None);
                 }
                 found.append(&mut later);
             }
@@ -1162,7 +1174,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                     controller: d.controller,
                                     def: t,
                                     permanent: false,
-                                    looks_back: cx.cards().looks_back(d.ability, cx, event),
+                                    looks_back: cx.cards().looks_back(d.ability, event, seen),
                                 },
                             ))
                     {
@@ -1225,7 +1237,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                         {
                             continue;
                         }
-                        let looks_back = cx.cards().looks_back(ability, cx, event);
+                        let looks_back = cx.cards().looks_back(ability, event, seen);
                         let triggering = Triggering { source: id, controller, def: t, permanent: false, looks_back };
                         if statics.stop(cx, event, &triggering) {
                             continue;

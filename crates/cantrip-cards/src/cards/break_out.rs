@@ -28,7 +28,7 @@ fn break_out(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             on_battlefield = g.is_on_battlefield(entered);
         }
         if !on_battlefield {
-            g.return_to_hand(&[card]);
+            g.return_to_hand_revealed(&[card]);
         }
     }
     library::rest_to_bottom_in_random_order(g, you, &looked);

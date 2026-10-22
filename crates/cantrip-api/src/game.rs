@@ -202,8 +202,9 @@ pub trait Query {
     /// in the order chosen: "Put a number of charge counters on this permanent equal to the tapped creature's power"
     /// (station, CR 702.184a), "deals damage equal to the tapped creature's power" (Unerring Sling), "where X is the power of
     /// the creature tapped this way" (Keldon Battlewagon, Impelled Giant). A crew or saddle cost's creatures are among
-    /// them. Each is the object as it was chosen: read its characteristics with `chars`, which gives those it last had
-    /// on the battlefield once it has left (CR 608.2h). Empty for a spell or a triggered ability.
+    /// them, and after them any card the cost revealed from a hand (behold, CR 701.4a). Each is the object as it was chosen:
+    /// read its characteristics with `chars`, which gives those it last had on the battlefield once it has left (CR 608.2h).
+    /// Empty for a spell or a triggered ability.
     fn cost_objects(&self, item: &StackItem) -> &[ObjectId] {
         if item.kind != StackKind::Activated {
             return &[];
@@ -421,10 +422,18 @@ pub trait Game: Query {
     /// anywhere else, whoever controls them. A token that leaves the battlefield ceases to exist (CR 111.7, 704.5d). Something
     /// that is no longer the object it was is not returned (CR 400.7). The new objects, in order.
     fn return_to_hand(&mut self, objects: &[ObjectId]) -> Vec<ObjectId>;
+    /// `return_to_hand` for the instruction that reveals the cards it puts there: "reveal it and put it into your hand",
+    /// "reveal the top card ... if it's a land, put it into your hand" (CR 701.20a). The reveal lasts through that
+    /// instruction, so each card is one all players can see as it moves (CR 603.10a); it is shown with `reveal` first. A
+    /// later instruction that is not about the revealed card (a draw) moves it with `return_to_hand` or its own verb.
+    fn return_to_hand_revealed(&mut self, cards: &[ObjectId]) -> Vec<ObjectId>;
     /// Puts cards their owners have outside the game (`Query::outside_the_game`) into their owners' hands, bringing them
     /// into the game (CR 400.11b): each is a new object from then on. One no longer outside the game is not moved. The new
     /// objects, in order.
     fn bring_into_hand(&mut self, cards: &[ObjectId]) -> Vec<ObjectId>;
+    /// `bring_into_hand` for the instruction that reveals the cards it brings in ("reveal two cards you own from outside
+    /// the game ... put that card into your hand", CR 701.20a): each is a card all players can see as it moves (CR 603.10a).
+    fn bring_into_hand_revealed(&mut self, cards: &[ObjectId]) -> Vec<ObjectId>;
     /// Puts objects into their owners' libraries (CR 401.4, 400.3) at once, in `place`. The new objects, in order, of those
     /// that arrived in a library: a replacement may have sent one elsewhere, and it is not arranged.
     fn put_into_library(&mut self, objects: &[ObjectId], place: LibraryPlace) -> Vec<ObjectId>;
@@ -442,6 +451,10 @@ pub trait Game: Query {
     /// Moves several objects at once (CR 603.10a: a leaves-the-battlefield ability sees all of them leave), for a
     /// reason triggers can read. The new objects, in order.
     fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId>;
+    /// `move_together` for the instruction that reveals the cards it moves ("reveal it, put it into your hand", "put the
+    /// cards revealed this way into your hand and the rest into your graveyard", CR 701.20a): each is a card all players can
+    /// see as it moves (CR 603.10a), as `return_to_hand_revealed` says.
+    fn move_together_revealed(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId>;
     /// Puts an object onto the battlefield under `controller` (CR 110.2a), its entering replacements applied.
     fn put_onto_battlefield(&mut self, object: ObjectId, controller: PlayerId, tapped: bool) -> Result<ObjectId, Suspend>;
     /// `put_onto_battlefield`, the object entering with these counters as well (CR 122.6, 614.1c): persist's and undying's

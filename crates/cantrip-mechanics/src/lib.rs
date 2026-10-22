@@ -851,7 +851,7 @@ pub fn explore(g: &mut dyn Game, permanent: ObjectId) -> Result<(), Suspend> {
     if let Some(top) = top {
         g.reveal(who, &[top]);
         if g.chars(top).is(CardType::Land) {
-            g.move_to(top, Zone::hand(who));
+            g.move_together_revealed(&[(top, Zone::hand(who))], ZoneReason::Other);
             return Ok(());
         }
     }

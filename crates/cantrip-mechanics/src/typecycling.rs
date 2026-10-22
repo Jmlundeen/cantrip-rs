@@ -17,7 +17,7 @@ macro_rules! search_for {
             let found = search_library(g, player, player, item.object, SearchDestination::Hand, 1, true, |q, c| q.chars(c).has_subtype($subtype))?;
             g.reveal(player, &found);
             let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::hand(player))).collect();
-            g.move_together(&moves, ZoneReason::Search);
+            g.move_together_revealed(&moves, ZoneReason::Search);
             g.shuffle(player);
             Ok(())
         }

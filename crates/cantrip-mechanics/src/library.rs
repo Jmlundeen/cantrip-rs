@@ -52,7 +52,7 @@ fn find_by(g: &mut dyn Game, player: PlayerId, source: ObjectId, destination: Se
 /// print it.
 pub fn find_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection, reveal: bool) -> Result<Vec<ObjectId>, Suspend> {
     let found = find_by(g, player, source, SearchDestination::Hand, rule, reveal)?;
-    Ok(into_hand(g, player, &found))
+    Ok(into_hand(g, player, &found, reveal))
 }
 
 /// "Search your library for [`rule`], put it onto the battlefield [tapped], then shuffle" (CR 701.23): the permanents that
@@ -78,9 +78,11 @@ pub fn find_to_top(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: S
     Ok(found)
 }
 
-fn into_hand(g: &mut dyn Game, player: PlayerId, found: &[ObjectId]) -> Vec<ObjectId> {
+/// The cards found put into the hand, by the instruction that reveals them when the search says "reveal it" (CR 701.20a:
+/// `Game::move_together_revealed`).
+fn into_hand(g: &mut dyn Game, player: PlayerId, found: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
     let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::hand(player))).collect();
-    let moved = g.move_together(&moves, ZoneReason::Search);
+    let moved = if revealed { g.move_together_revealed(&moves, ZoneReason::Search) } else { g.move_together(&moves, ZoneReason::Search) };
     g.shuffle(player);
     moved
 }
@@ -242,7 +244,7 @@ pub fn search_to_hand(
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let found = find(g, player, source, SearchDestination::Hand, how, eligible)?;
-    Ok(into_hand(g, player, &found))
+    Ok(into_hand(g, player, &found, how.reveal))
 }
 
 /// "Search your library for an Aura or Equipment card, reveal it, put it into your hand, then shuffle" (CR 701.23). Open the
@@ -303,6 +305,7 @@ pub fn search_land_tapped_else_hand(
     let found = find(g, player, source, SearchDestination::LandTappedElseHand, how, eligible)?;
     let went = match found.first() {
         Some(&land) if g.chars(land).is(CardType::Land) => Some(g.put_onto_battlefield(land, player, true)?),
+        Some(&card) if how.reveal => g.move_together_revealed(&[(card, Zone::hand(player))], ZoneReason::Search).first().copied(),
         Some(&card) => g.move_together(&[(card, Zone::hand(player))], ZoneReason::Search).first().copied(),
         None => None,
     };
@@ -379,8 +382,10 @@ pub fn look_at_top(
     } else {
         if reveal {
             g.reveal(player, &taken);
+            g.return_to_hand_revealed(&taken)
+        } else {
+            g.return_to_hand(&taken)
         }
-        g.return_to_hand(&taken)
     };
     match rest {
         Rest::BottomChosen => g.arrange_library(player, &[], &bottom),
@@ -465,7 +470,7 @@ pub fn reveal_top_take_one_rest_to_graveyard(
             taken = placements[0].clone();
         }
     }
-    g.return_to_hand(&taken);
+    g.return_to_hand_revealed(&taken);
     let rest: Vec<ObjectId> = revealed.into_iter().filter(|c| !taken.contains(c)).collect();
     g.put_into_graveyard(&rest);
     Ok(())
@@ -543,7 +548,7 @@ pub fn reveal_top_to_hand(g: &mut dyn Game, player: PlayerId) -> Option<(ObjectI
     let &top = top_of_library(g, player, 1).first()?;
     let value = g.mana_value(top);
     g.reveal(player, &[top]);
-    let moved = g.return_to_hand(&[top]);
+    let moved = g.return_to_hand_revealed(&[top]);
     Some((moved.first().copied().unwrap_or(top), value))
 }
 

@@ -35,7 +35,7 @@ fn chapter_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(&top) = top_of_library(g, item.controller, 1).first() else { return Ok(()) };
     g.reveal(item.controller, &[top]);
     if targets::is_permanent_card(&g.chars(top)) {
-        g.return_to_hand(&[top]);
+        g.return_to_hand_revealed(&[top]);
     }
     Ok(())
 }

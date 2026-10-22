@@ -23,7 +23,7 @@ fn unify(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
     // What goes to hand leaves first; the rest are rearranged in the library, where they stay (nothing changes zones).
     let rest: Vec<ObjectId> = looked.iter().copied().filter(|c| !taken.contains(c)).collect();
-    g.return_to_hand(&taken);
+    g.return_to_hand_revealed(&taken);
     g.bottom_in_random_order(you, &rest);
     Ok(())
 }
