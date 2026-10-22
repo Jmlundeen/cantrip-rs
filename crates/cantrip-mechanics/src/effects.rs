@@ -316,6 +316,18 @@ pub fn damage_each_opponent(g: &mut dyn Game, item: &StackItem, n: u16) {
     g.damage_together(&hits);
 }
 
+/// "This source deals 1 damage to that creature's controller" (CR 113.7a, 608.2h, 800.4a/i): its current or last-known
+/// controller, if still in the game, with no target or retest of the trigger condition. Tetsuko Umezawa, Pursuer and
+/// Rampaging Ferocidon print this exact effect.
+pub fn ping_subject_controller(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let creature = item.subject.object().expect("the creature named by the trigger");
+    let controller = g.controller(creature);
+    if g.state().in_game(controller) {
+        g.damage(item.object, Target::Player(controller), 1);
+    }
+    Ok(())
+}
+
 /// "Surveil N" (CR 701.25) for the ability's controller. The surveil lands and Dragon's Rage Channeler print it.
 pub fn surveil(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspend> {
     crate::surveil(g, item.controller, item.object, n)
