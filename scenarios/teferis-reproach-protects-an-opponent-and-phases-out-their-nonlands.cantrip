@@ -1,0 +1,80 @@
+# Teferi's Reproach: "Choose target opponent. Until that player's next turn, they gain protection from everything and
+# their life total can't change. All nonland permanents they control phase out." Bot1 (turn 3) floats {W}{R}{R} and
+# cannot name itself as the target - "target opponent" (CR 115.1) - then casts it at Bot2: Bot2's Mox Ruby and Brazen
+# Borrower phase out while their Tundra, a land, stays, and Bot1's own permanents do not phase out. Bot2 has protection
+# from everything, so Bot1's Lightning Bolt can't target them (CR 702.16b, 702.16j). Bot1's Sunspine Lynx - "damage can't
+# be prevented" - deals Bot2 1 damage for the Tundra: nothing is prevented, yet Bot2's life total can't change (CR
+# 119.7). Bot2's next turn begins on turn 4, so both effects end (CR 611.2b) and the two permanents phase in during that
+# untap step (CR 502.1). On turn 5 Bot1's Lightning Bolt reaches Bot2 for 3: Bot2's life is 17, which shows the Lynx's 1
+# damage never changed it.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Pearl
+Mox Ruby
+Mox Ruby
+Black Lotus
+Teferi's Reproach
+Sunspine Lynx
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Tundra
+Black Lotus
+Mox Ruby
+Brazen Borrower
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Tundra.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Brazen Borrower.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+! Bot1.Hand.Teferi's Reproach.Cast(Bot1)
+Bot1.Hand.Teferi's Reproach.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.PhasedOut = Mox Ruby; Brazen Borrower
+? Bot1.PhasedOut.Count = 0
+Bot1.Battlefield.Mox Ruby#1.Activate
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Sunspine Lynx.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+? Prevented = (absent)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Bot2.PhasedOut.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Life = 20
+Bot2.Life = 17
+Bot2.Battlefield.Tundra.Tapped = false
+Exile = Teferi's Reproach
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot2.Graveyard = Black Lotus
