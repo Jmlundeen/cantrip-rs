@@ -2278,6 +2278,12 @@ engine does not have yet is skipped; one that can run must pass.
 
 ## Correctness
 
+- **Phased-out source information (CR 113.7a, 608.2h, 702.15c, 702.26b,d,g).** Before any permanent in a simultaneous
+  phase-out changes status, its complete characteristics, controller and text words are captured in the existing
+  LKI arena. The phasing status links that row, not the object's zone-change identity. Rules queries and damage source
+  quality/controller checks use it while the source is absent; projected characteristics and layer queries remain
+  current. Phasing in clears the status/link and recomputes current effects; each later phase-out takes a fresh snapshot.
+  The game-log tree journals the link/row and loop canonicalization hashes its contents, not its arena index.
 - **The scenarios are the reference.** A card is done when it is exact and its scenarios pass; a scenario that is
   wrong by the rules is fixed, with the rule.
 - **`CANTRIP_VERIFY=1`** runs the engine's own consistency checks while it plays; `tools\test.cmd` sets it.

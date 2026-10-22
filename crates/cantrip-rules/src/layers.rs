@@ -18,6 +18,15 @@ pub fn chars(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId)
     chars_before(cards, state, log, id, Layer::End)
 }
 
+/// Expected-zone source information (CR 113.7a, 608.2h, 702.15c): a phased-out permanent is read as it most recently
+/// existed phased in. `chars` remains the live projected calculation; phase-in drops this snapshot link.
+pub fn source_chars(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> Chars {
+    match state.phased_last_known(id) {
+        Some(last) => initial(cards, last.card, None).as_known(last),
+        None => chars(cards, state, log, id),
+    }
+}
+
 /// How many threads are working out an object's abilities' givers now (`ability_givers`): read first, so the layers pay one
 /// relaxed load per entry for the watching the rest of the time.
 static WATCHING: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
@@ -2953,7 +2962,7 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
             if asker.spell && !source.zone.is(ZoneKind::Battlefield) && !source.zone.is(ZoneKind::Stack) {
                 return true;
             }
-            let source_chars = chars(cards, state, log, asker.source);
+            let source_chars = source_chars(cards, state, log, asker.source);
             if let Some(target_chars) = &target_chars {
                 // Hexproof from [quality] (CR 702.11d): no [quality] spell an opponent controls, nor an ability an opponent
                 // controls from a [quality] source, the source as it is now (a spell, or an ability's source on the

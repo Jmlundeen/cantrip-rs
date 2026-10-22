@@ -803,6 +803,8 @@ impl Game {
                 let mana_value = cantrip_api::mana_value_of(&|c| self.cards.get(c), &self.state, id, &c);
                 let row = LastKnown {
                     id,
+                    card: c.card,
+                    controller: self.state.obj(id).controller,
                     name: c.name,
                     name_set: false,
                     supertypes: c.supertypes,
@@ -814,6 +816,15 @@ impl Game {
                     toughness: c.toughness,
                     keywords: c.keywords,
                     toxic: c.toxic,
+                    protection: c.protection,
+                    protection_colorless: c.protection_colorless,
+                    protection_players: c.protection_players,
+                    protection_types: c.protection_types,
+                    spell: c.spell,
+                    protection_colored_spells: c.protection_colored_spells,
+                    protection_everything: c.protection_everything,
+                    hexproof_from: c.hexproof_from,
+                    must_attack: c.must_attack,
                     mana_value,
                     abilities: c.abilities,
                     words: Words::NONE,
@@ -1387,7 +1398,7 @@ impl Query for Game {
     }
 
     fn chars(&self, id: ObjectId) -> Chars {
-        layers::chars(self.cards, &self.state, &self.log, id)
+        layers::source_chars(self.cards, &self.state, &self.log, id)
     }
 
     fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
@@ -1431,7 +1442,7 @@ impl Query for Cx<'_> {
     fn chars(&self, id: ObjectId) -> Chars {
         match self.entering {
             Some(e) if e.object == id => e.chars,
-            _ => layers::chars(self.g.cards, &self.g.state, &self.g.log, id),
+            _ => layers::source_chars(self.g.cards, &self.g.state, &self.g.log, id),
         }
     }
 
