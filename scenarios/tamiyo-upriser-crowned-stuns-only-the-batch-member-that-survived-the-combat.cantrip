@@ -1,0 +1,66 @@
+# Tamiyo, Upriser Crowned: "Whenever one or more creatures deal combat damage to you while you're the monarch, tap those
+# creatures and put a stun counter on each of them" - each of them that is still a permanent (CR 603.2c, 701.26a). Bot2's
+# Rancored Llanowar Elves (3/1 with trample) is blocked by Bot1's Baleful Strix (1/1 deathtouch): it deals 1 to the Strix
+# and 2 trample damage to Bot1 in the same combat damage step, and dies to the Strix's deathtouch. The other Elves deals 1
+# to Bot1. So the batch holds two creatures, but only the survivor is there to be stunned.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Tamiyo, Upriser Crowned
+Baleful Strix
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Rancor
+Llanowar Elves
+Llanowar Elves
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tamiyo, Upriser Crowned.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Rancor.Cast(Bot2.Battlefield.Llanowar Elves#1)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves#1 > Bot1; Llanowar Elves#2 > Bot1)
+[T4 Bot2.DeclareBlockers]
+Bot1.Block(Baleful Strix > Llanowar Elves#1)
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Llanowar Elves.Counters.Stun = 1
+
+[Expect]
+Turn = 4
+Monarch = Bot2
+Bot1.Life = 17
+Bot1.Graveyard = Baleful Strix; Black Lotus
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest; Llanowar Elves; Mox Emerald
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = 1

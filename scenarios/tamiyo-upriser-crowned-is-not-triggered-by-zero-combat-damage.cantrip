@@ -1,0 +1,42 @@
+# Tamiyo, Upriser Crowned: an Ornithopter attacks Bot1, the monarch, for 0. No combat damage is dealt, so the ability does
+# not trigger: the attacker is left tapped and unstunned and the crown stays with Bot1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Tamiyo, Upriser Crowned
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tamiyo, Upriser Crowned.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Tamiyo, Upriser Crowned
+Bot2.Life = 20
+Monarch = Bot1
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Ornithopter.Counters = (absent)

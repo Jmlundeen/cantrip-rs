@@ -1,0 +1,58 @@
+# Tamiyo, Upriser Crowned: "When Tamiyo enters, you become the monarch" (Bot1 wears it), and "Whenever one or more creatures
+# deal combat damage to you while you're the monarch, tap those creatures and put a stun counter on each of them." Two
+# Llanowar Elves attack Bot1 together for 2: one trigger for the batch, so each gets one stun counter, not two. Tamiyo shows
+# her flying, double strike and haste. Bot2's creatures took the crown as they damaged the monarch.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Tamiyo, Upriser Crowned
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tamiyo, Upriser Crowned.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1; Llanowar Elves#2 > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 18
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Tamiyo, Upriser Crowned
+Bot1.Battlefield.Tamiyo, Upriser Crowned.Keywords = DoubleStrike; Flying; Haste
+Bot2.Life = 20
+Monarch = Bot2
+Bot2.Battlefield.Llanowar Elves#1.Tapped = true
+Bot2.Battlefield.Llanowar Elves#1.Counters.Stun = 1
+Bot2.Battlefield.Llanowar Elves#2.Tapped = true
+Bot2.Battlefield.Llanowar Elves#2.Counters.Stun = 1
