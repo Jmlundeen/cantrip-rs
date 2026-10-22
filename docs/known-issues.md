@@ -48,7 +48,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
-| [KI-117](#ki-117-gingerbrutes-resolved-blocking-restriction-is-lost-with-its-abilities) | Gingerbrute's resolved blocking restriction is lost with its abilities | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
@@ -66,20 +65,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-120](#ki-120-a-card-revealed-as-it-moves-is-judged-hidden-by-look-back-triggers) | A card revealed as it moves is judged hidden by look-back triggers | Pri-1 | Fix queued |
 
 ## Issues
-
-### KI-117: Gingerbrute's resolved blocking restriction is lost with its abilities
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine / card | 2026-10-22, review of Gingerbrute's extraction from Ginger's token definition |
-
-**Notes.** The existing token implementation represented its resolved activation through `CardDef.block_rules`.
-The standalone card preserves that behavior. `declare_blockers` skips these callbacks when a source loses all
-abilities, so Dress Down incorrectly removes a restriction that has already resolved. Such an effect must persist
-for its stated duration (CR 611.2a). The effect needs a representation independent of the source's current abilities.
-
-**Scenarios.**
-- [`scenarios/gingerbrute-resolved-restriction-survives-losing-its-abilities.cantrip`](../scenarios/gingerbrute-resolved-restriction-survives-losing-its-abilities.cantrip) - Dress Down after activation, before blockers (marked `# Known bug`).
 
 ### KI-114: The web client cannot name colorless mana for a sacrificed land that could also produce a color
 

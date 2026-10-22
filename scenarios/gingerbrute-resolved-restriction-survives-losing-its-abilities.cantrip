@@ -1,4 +1,4 @@
-# Known bug: Losing abilities removes Gingerbrute's already-resolved blocking restriction (CR 611.2a).
+# Losing abilities preserves Gingerbrute's already-resolved blocking restriction (CR 611.2a).
 # Dress Down resolves after the activation. Llanowar Elves must still be unable to block
 # that Gingerbrute, but can block the unactivated one (CR 509.1b).
 

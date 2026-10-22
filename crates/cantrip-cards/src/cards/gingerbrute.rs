@@ -3,16 +3,15 @@ use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
 /// "{1}: This creature can't be blocked this turn except by creatures with haste."
-/// The resolved activation is recorded in history for the restriction below (CR 611.2a).
-fn cant_be_blocked_this_turn(_: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+/// The resolved restriction lasts independently of this creature's abilities (CR 611.2a).
+fn cant_be_blocked_this_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_effect(item.object, item.object, EffectKind::BlockRestriction { card: item.ability.card, index: 0 }, Duration::EndOfTurn);
     Ok(())
 }
 
-/// The restriction applies only to this attacker after its first ability resolves this turn (CR 509.1b, 611.2a).
+/// The resolved restriction applies only to this attacker (CR 509.1b, 611.2a).
 fn cant_be_blocked_except_by_haste(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
-    source != attacker
-        || q.history().resolutions(source, AbilityRef { card: q.chars(source).card, index: 0 }) == 0
-        || q.chars(blocker).has(Keyword::Haste)
+    source != attacker || q.chars(blocker).has(Keyword::Haste)
 }
 
 pub static CARD: CardDef = CardDef {
@@ -24,6 +23,6 @@ pub static CARD: CardDef = CardDef {
             "{2}, {T}, Sacrifice this creature: You gain 3 life.",
         ),
     ],
-    block_rules: &[cant_be_blocked_except_by_haste],
+    resolved_block_rules: &[cant_be_blocked_except_by_haste],
     ..oracle::GINGERBRUTE
 };
