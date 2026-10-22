@@ -1,0 +1,32 @@
+# Cinder Glade: "This land enters tapped unless you control two or more basic lands." Turn 5 Bot1 controls a Mountain (one
+# basic) and a Taiga (the Mountain and Forest types, but not basic, CR 205.4a): one basic is below the two, so its Cinder
+# Glade enters tapped - though Bot2, its opponent, controls two basic lands by then. Bot2 with a Mountain and a Forest of
+# its own plays the same land on turn 6 and it enters untapped (positive control).
+
+[Bot1 Deck]
+Mountain
+Taiga
+Cinder Glade
+Forest x20
+
+[Bot2 Deck]
+Mountain
+Forest
+Cinder Glade
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Taiga.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Cinder Glade.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Cinder Glade.Play
+
+[Expect]
+Bot1.Battlefield.Cinder Glade.Tapped = true
+Bot2.Battlefield.Cinder Glade.Tapped = false
