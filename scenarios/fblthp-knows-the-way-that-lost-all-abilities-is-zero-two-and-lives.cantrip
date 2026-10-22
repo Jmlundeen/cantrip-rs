@@ -1,0 +1,44 @@
+# Fblthp: "Domain - power is equal to the number of basic land types among lands you control", a characteristic-defining
+# ability (CR 604.3) over a printed */2. With a Forest it is a 1/2 (the control). Bot2's The Wondrous Wasp takes the ability
+# away on turn 2, the star is worth 0 (CR 208.2a, 208.5), and the 0/2 is not put into a graveyard (toughness is above 0).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Fblthp, Knows the Way
+Forest x17
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+The Wondrous Wasp
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fblthp, Knows the Way.Cast(X: 0)
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Fblthp, Knows the Way.Power = 1
+? Bot1.Battlefield.Fblthp, Knows the Way.Toughness = 2
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Fblthp, Knows the Way)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Fblthp, Knows the Way.Power = 0
+Bot1.Battlefield.Fblthp, Knows the Way.Toughness = 2
+Bot1.Graveyard.Count = 0

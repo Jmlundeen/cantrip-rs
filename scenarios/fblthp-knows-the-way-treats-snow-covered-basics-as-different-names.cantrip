@@ -1,4 +1,4 @@
-# X=2 can find Forest and Snow-Covered Forest: names, not basic land types, must differ (CR 201.2).
+# X=2 can find Forest and Snow-Covered Forest: names, not basic land types, must differ (CR 201.2b).
 # A second Forest makes the duplicate-name refusal meaningful beside the successful two-card search.
 [Bot1 Deck]
 Fblthp, Knows the Way

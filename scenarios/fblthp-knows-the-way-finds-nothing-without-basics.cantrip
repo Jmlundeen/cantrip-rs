@@ -1,5 +1,5 @@
 # X=2 finds nothing when the library has only a nonbasic land and a nonland (CR 701.23b).
-# No cards enter the hand; the remaining library is still shuffled (CR 701.23f).
+# No cards enter the hand; the remaining library is still shuffled (CR 701.24a).
 # The two-card shuffle can preserve their order; tests/fblthp_search.rs checks that it consumes randomness.
 [Bot1 Deck]
 Fblthp, Knows the Way
