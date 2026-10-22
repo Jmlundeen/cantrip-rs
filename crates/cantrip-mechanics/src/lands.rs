@@ -111,6 +111,24 @@ pub fn enters_tapped_unless_two_or_more_basic_lands(g: &mut dyn Game, entering: 
 }
 
 /// "This land enters tapped unless you control a [land type] or a [land type]" (CR 614.12, 614.1d): as `enters_tapped_unless_you_control`
+/// "This land enters tapped unless your opponents control [N] or more lands" (CR 614.1c): read on the battlefield as it is
+/// while the land enters, so lands entering at the same time (`became`) are not counted, and across every opponent's lands,
+/// never its controller's own. The eight Turbulent lands print it with N = 8 (Turbulent Crater, Turbulent Shore); other
+/// cycles print 7 and 6.
+pub fn enters_tapped_unless_opponents_control<const N: usize>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let opponents: Vec<PlayerId> = g.state().opponents(entering.controller).collect();
+    let lands = opponents
+        .into_iter()
+        .flat_map(|player| g.permanents_of(player))
+        .filter(|&id| g.obj(id).became.is_none() && g.chars(id).is(CardType::Land))
+        .count();
+    if lands < N {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
+/// "This land enters tapped unless you control a [land type] or a [land type]" (CR 614.1c): as `enters_tapped_unless_you_control`
 /// with two land types, each read through the layers and the land's words (CR 612.2). Cori Mountain Monastery (Plains or
 /// Island) and Mistrise Village (Mountain or Forest) print it.
 pub fn enters_tapped_unless_you_control_either<const A: u16, const B: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
