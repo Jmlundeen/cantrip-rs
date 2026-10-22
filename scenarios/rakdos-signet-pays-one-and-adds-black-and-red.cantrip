@@ -1,0 +1,40 @@
+# Rakdos Signet: "{1}, {T}: Add {B}{R}." (CR 605.1a, a mana ability with mana in its own cost, CR 602.2b).
+# Cast with two Mountains on turn 3. On turn 5 two Mountains tapped for {R}{R}, the ability's {1} paid from that pool, and
+# the Signet adds {B}{R}: the pool is exactly {R}{R}{B}, so a free ability would leave {R}{R}{R}{B} and an ability adding one
+# color would leave no {B}. Grim Repriser costs {B}{R} and is cast from that pool, proving both mana are the colors printed.
+# Green is refused beside the black and red the ability does add (the plain activation is the positive control), and a
+# tapped Signet is not offered a second time.
+
+[Bot1 Deck]
+Mountain x3
+Rakdos Signet
+Grim Repriser
+Mountain x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Rakdos Signet.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+? Bot1.Mana = {R}{R}
+! Bot1.Battlefield.Rakdos Signet.Activate(Color: Green)
+Bot1.Battlefield.Rakdos Signet.Activate
+? Bot1.Mana = {B}{R}{R}
+! Bot1.Battlefield.Rakdos Signet.Activate
+Bot1.Hand.Grim Repriser.Cast
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Rakdos Signet.Tapped = true
+Bot1.Battlefield.Grim Repriser.Subtypes = Bard; Zombie
+Bot1.Life = 20
