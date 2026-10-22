@@ -1,18 +1,11 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics;
 use cantrip_oracle as oracle;
 
 /// "You can't get poison counters" (CR 122.1, 101.2): none are given, by infect damage or by an effect, and the ones its
 /// controller already has stay (the 2011-06-01 ruling).
 fn you_cant_get_poison(_: &dyn Query, asker: &Asker, player: PlayerId, kind: PlayerCounter) -> bool {
     player == asker.controller && kind == PlayerCounter::Poison
-}
-
-/// "Creatures you control can't have -1/-1 counters put on them" (CR 122.6, 101.2): by damage from a source with wither or
-/// infect (CR 120.3d, which is still damage dealt), by an effect, or as the creature enters with them (persist's, CR 702.79a,
-/// 122.6), judged on the creature as it would have them and under the player it would be controlled by. The counters already
-/// on a creature stay (the 2011-06-01 ruling).
-fn no_minus_counters_on_your_creatures(q: &dyn Query, asker: &Asker, object: ObjectId, controller: PlayerId, kind: CounterKind) -> bool {
-    kind == CounterKind::MinusOne && controller == asker.controller && q.chars(object).is(CardType::Creature)
 }
 
 /// "Creatures your opponents control" (CR 613.1f, layer 6): judged on what the earlier layers made the object, and by
@@ -29,7 +22,7 @@ fn lose_infect(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     player_counter_bans: &[you_cant_get_poison],
-    counter_bans: &[no_minus_counters_on_your_creatures],
+    counter_bans: &[statics::no_minus_counters_on_your_creatures],
     statics: &[static_ability(Layer::Ability, your_opponents_creatures, lose_infect, "Creatures your opponents control lose infect.")],
     ..oracle::MELIRA_SYLVOK_OUTCAST
 };

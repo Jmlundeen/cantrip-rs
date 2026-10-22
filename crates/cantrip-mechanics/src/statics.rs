@@ -289,6 +289,15 @@ pub fn your_opponents_cant_win_the_game(_: &dyn Query, asker: &Asker, player: Pl
     player != asker.controller
 }
 
+/// "Creatures you control can't have -1/-1 counters put on them" (CR 122.6, 101.2) as a `CardDef::counter_bans` entry: by damage
+/// from a source with wither or infect (CR 120.3d, which is still damage dealt), by an effect, or as the creature enters with
+/// them (persist's, CR 702.79a, 122.6), judged on the creature as it would have them and under the player it would be
+/// controlled by. The counters already on a creature stay (the 2011-06-01 ruling). Darksteel Angel and Melira, Sylvok Outcast
+/// print it.
+pub fn no_minus_counters_on_your_creatures(q: &dyn Query, asker: &Asker, object: ObjectId, controller: PlayerId, kind: CounterKind) -> bool {
+    kind == CounterKind::MinusOne && controller == asker.controller && q.chars(object).is(CardType::Creature)
+}
+
 /// "You have shroud" (CR 702.18a) as a `CardDef::player_keywords` entry: the permanent's controller, while it is on the
 /// battlefield with its abilities. True Believer and Ivory Mask print it.
 pub const YOU_HAVE_SHROUD: PlayerKeywordRule = PlayerKeywordRule { keyword: Keyword::Shroud, applies: you };
