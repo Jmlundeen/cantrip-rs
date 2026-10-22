@@ -54,6 +54,8 @@ mod left_player_choice_tests;
 #[cfg(test)]
 mod look_back_tests;
 #[cfg(test)]
+mod mixed_zone_tests;
+#[cfg(test)]
 mod mana_trigger_tests;
 #[cfg(test)]
 mod room_door_tests;
@@ -1379,6 +1381,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn put_into_graveyard(&mut self, objects: &[ObjectId]) -> Vec<ObjectId> {
         ops::put_into_graveyard(self, objects)
+    }
+
+    fn put_into_hand_and_graveyard(&mut self, hand: &[ObjectId], graveyard: &[ObjectId]) -> Vec<ObjectId> {
+        ops::put_into_hand_and_graveyard(self, hand, graveyard)
     }
 
     fn move_to(&mut self, object: ObjectId, to: Zone) -> ObjectId {

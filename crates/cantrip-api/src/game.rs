@@ -436,6 +436,9 @@ pub trait Game: Query {
     /// longer the object it was is not moved (CR 400.7). The new objects, in order. Malevolent Rumble and Satyr Wayfinder
     /// put what they did not take there.
     fn put_into_graveyard(&mut self, objects: &[ObjectId]) -> Vec<ObjectId>;
+    /// Puts one group into its owners' hands and another into its owners' graveyards as a single action (CR 608.2f).
+    /// Replacements for every move see the state before either group moves. The new objects, hand group first.
+    fn put_into_hand_and_graveyard(&mut self, hand: &[ObjectId], graveyard: &[ObjectId]) -> Vec<ObjectId>;
     /// Moves an object to a zone (top of a library), returning the new object it becomes. Not for the battlefield:
     /// entering it is `put_onto_battlefield`, which applies entering replacements.
     fn move_to(&mut self, object: ObjectId, to: Zone) -> ObjectId;

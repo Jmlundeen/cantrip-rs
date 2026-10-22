@@ -2385,6 +2385,15 @@ pub fn put_into_graveyard(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     move_together(cx, &moves, ZoneReason::Other)
 }
 
+/// Puts two groups into their owners' hands and graveyards in one action (CR 608.2f). Both groups are planned against
+/// the state before either moves, and their zone-change events are announced as one batch.
+pub fn put_into_hand_and_graveyard(cx: &mut Cx, hand: &[ObjectId], graveyard: &[ObjectId]) -> Vec<ObjectId> {
+    let mut moves: Vec<Moving> =
+        live_ones(cx, hand).into_iter().map(|id| Moving::to(id, Zone::hand(cx.s().obj(id).owner))).collect();
+    moves.extend(live_ones(cx, graveyard).into_iter().map(|id| Moving::to(id, Zone::graveyard(cx.s().obj(id).owner))));
+    move_together(cx, &moves, ZoneReason::Other)
+}
+
 /// Exiles objects together, each to its owner's exile zone (CR 406.2).
 pub fn exile_all(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     let moves: Vec<Moving> = live_ones(cx, ids).into_iter().map(|id| Moving::to(id, Zone::exile(cx.s().obj(id).owner))).collect();

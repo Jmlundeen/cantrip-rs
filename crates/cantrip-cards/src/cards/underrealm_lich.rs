@@ -30,9 +30,8 @@ fn look_take_one_rest_to_graveyard(g: &mut dyn Game, player: PlayerId, source: O
     if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
         taken = placements[0].clone();
     }
-    g.return_to_hand(&taken);
     let rest: Vec<ObjectId> = looked.into_iter().filter(|c| !taken.contains(c)).collect();
-    g.put_into_graveyard(&rest);
+    g.put_into_hand_and_graveyard(&taken, &rest);
     Ok(())
 }
 
