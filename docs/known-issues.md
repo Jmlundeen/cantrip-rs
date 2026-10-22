@@ -49,8 +49,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
 | [KI-54](#ki-54-state-triggers-are-judged-only-where-a-cards-text-marks-a-sentences-end) | State triggers are judged only where a card's text marks a sentence's end | Pri-1 | Fix queued |
-| [KI-103](#ki-103-mana-costs-x-kicker-and-the-mana-a-cast-records-are-narrower-than-play-reaches) | Mana costs, X, kicker and the mana a cast records are narrower than play reaches | Pri-1 | Fix queued |
-| [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
 | [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
@@ -224,55 +222,6 @@ has left its own view at once, as the answering seat's is.
 
 **Scenarios.** None; `TableClockTests.In_a_game_of_four_a_player_out_of_time_leaves_and_the_others_play_on` answers the others'
 questions until the departed seat is told.
-
-### KI-103: Mana costs, X, kicker and the mana a cast records are narrower than play reaches
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine / mechanics / cards | 2026-10-21, the engine-wide audit (workstream W1, parked on `pool5-w1`) |
-
-**Notes.** Mana doubling reaches these within a timed game, so each is a rules violation, not a limit of scale:
-- A mana cost's counts are `u8` (`ManaCost`, `crates/cantrip-state/src/vocab.rs:281`): a total past 255 stops at 255, so
-  Fireball with X = 300 costs {255}{R}.
-- Multikicker's count is a `u8` and its cost is added in `u8`: Everflowing Chalice kicked 128 times costs {0}.
-- An activated ability's X is multiplied into the generic cost in `u8` (`actions.rs`, where an activation announces X:
-  `(n * x).min(255) as u8`): Kessig Wolf Run with X = 300 costs {255}{R}{G}. It saturates since the event-cap sweep, so it
-  no longer wraps or panics, but it still stops at 255.
-- X is a `u16` (`StackItem::x`, `Obj::x`), and X paid in life stops at 1000 (`actions.rs`,
-  `payable_life(..).clamp(0, 1000)`).
-- A reflexive trigger's "that many" becomes its X, so it is a `u16` too (`PendingTrigger::count`,
-  `Game::reflexive_trigger_counted`): the counts Loamcrafter Faun, Miasma Demon, Swashbuckler Extraordinaire, Seasoned
-  Cryomancer and Ill-Timed Explosion give it saturate at 65,535 rather than wrap, and widen with X.
-- Splice onto an Arcane spell takes at most two cards (`eligible.len().min(2)`, `actions.rs:4850`; CR 702.47 allows any
-  number), and twobrid symbols at most eight.
-- The mana a cast records per kind is a `u8` (`ManaTally`, `vocab.rs:250`): Dyadrine counts at most 255 spent.
-- Cards narrow their own reductions with `.min(255) as u8` (Eddymurk Crab, Embercleave, Affinity, Ghalta and others).
-A fix widens these to `u32` with saturating arithmetic, and a cost that saturates is judged unpayable, never cheap.
-
-**Scenarios.** None yet; each needs a test that fails on today's code (Everflowing Chalice kicked 128 times, Kessig Wolf
-Run at X = 256, Fireball at X = 300).
-
-### KI-104: Counters, power, toughness and damage are narrower than play reaches
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine / mechanics / cards | 2026-10-21, the engine-wide audit (workstream W2) |
-
-**Notes.** Counter and damage doublers reach these within a timed game:
-- An object's counters are `i16` (`Obj::counters`), and a doubling replacement (`*n *= 2`, Doubling Season) wraps
-  negative, after which the counters are dropped.
-- Power and toughness are `i16` (`Chars`, `Pump`, `Copiable::pt`), and the layers add them with plain `+`, which wraps.
-  Some thirty cards and mechanics make a power or toughness from a count of objects with `count() as i16` or
-  `len() as i16` (Cranial Plating, Nethergoyf, Ms. Marvel, Yuriko, `goyf`, `melee`, `lands.rs` and others), which wraps
-  negative past 32,767 objects.
-- Damage is a `u16` (`Obj::damage`, `ops::damage`, `Event::Damage`); `damage as i16 >= toughness` (`settle.rs`,
-  `turn.rs`) lets a creature dealt more than 32,767 damage survive it.
-- A player's poison, energy and experience counters are `u8` (`object.rs:1137-1139`, `pay_energy`).
-- A divided share of damage or counters is cut to the damage and counter widths (`damage_divided`, `counters_divided`).
-A fix widens these to `i32`/`u32` with saturating arithmetic.
-
-**Scenarios.** None yet: Doubling Season past 32,767 counters; a creature past 32,767 power; more than 65,535 damage to
-a creature.
 
 ### KI-105: An object's abilities, text changes and chosen modes are held in fixed lists
 

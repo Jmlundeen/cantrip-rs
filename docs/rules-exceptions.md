@@ -104,3 +104,15 @@ tractable; this is the closest to the spirit of the paper rules.
 **Cards and cases it covers.** Fragmented loops (CR 732.3); loops whose players keep choosing to go on; a loop of
 mandatory actions while a player holds an unused response outside it (drawn after a few rounds of passes).
 
+
+### RX-5: Numbers keep their current widths
+
+| Rule | Category | Decided by | Date |
+| --- | --- | --- | --- |
+| Any rule that counts (mana costs, X, kicker, counters, power, toughness, damage, player counters) | beyond practical scale | jschibel | 2026-10-21 |
+
+**What the rules say.** A number in the game has no upper limit.
+
+**What the engine does instead, and why.** The engine keeps the widths it has today for mana costs, X, multikicker,
+splice, the mana a cast records, counters, power, toughness, damage and player counters (KI-103 and KI-104, closed by
+this decision), with no rollover handling. If one of them rolls over in a real game, an issue is opened then.
