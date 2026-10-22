@@ -1,0 +1,5 @@
+{
+  "name": "Underground River",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{T}: Add {U} or {B}. This land deals 1 damage to you."
+}
