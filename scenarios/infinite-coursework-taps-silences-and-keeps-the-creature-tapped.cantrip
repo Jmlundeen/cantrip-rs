@@ -1,0 +1,39 @@
+# Infinite Coursework taps and silences a creature as it enters, and the enchanted creature remains tapped through its next untap step (CR 613.1f, 502.3).
+
+[Bot1 Deck]
+Forest
+Birds of Paradise
+Island
+Island
+Infinite Coursework
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+! Bot1.Hand.Infinite Coursework.Cast(Bot1.Battlefield.Forest)
+Bot1.Hand.Infinite Coursework.Cast(Bot1.Battlefield.Birds of Paradise)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Birds of Paradise.Tapped = true
+? Bot1.Battlefield.Birds of Paradise.Keywords = DoesNotUntap
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Birds of Paradise.Tapped = true
+Bot1.Battlefield.Birds of Paradise.Keywords = DoesNotUntap

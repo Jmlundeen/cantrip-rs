@@ -1,0 +1,43 @@
+# Infinite Coursework's enters trigger unprepares its enchanted prepared creature, removing the prepare spell copy (CR 722.3).
+
+[Bot1 Deck]
+Forest
+Island
+Konstrari Improviser
+Island
+Infinite Coursework
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Konstrari Improviser.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Konstrari Improviser.Prepared = true
+? Exile = Soul Tether
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Infinite Coursework.Cast(Bot1.Battlefield.Konstrari Improviser)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Konstrari Improviser.Tapped = true
+? Bot1.Battlefield.Konstrari Improviser.Prepared = (absent)
+? Exile.Count = 0
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Konstrari Improviser.Tapped = true
+Bot1.Battlefield.Konstrari Improviser.Prepared = (absent)
+Exile.Count = 0
