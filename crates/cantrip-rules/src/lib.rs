@@ -15,6 +15,8 @@ mod attack_option_tests;
 mod attacking_tokens_tests;
 mod attach;
 mod counters;
+#[cfg(test)]
+mod combat_assignment_tests;
 mod day_night;
 mod designations;
 mod layers;

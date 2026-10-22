@@ -1244,17 +1244,15 @@ fn blocked_by(cx: &Cx, blocker: ObjectId) -> Vec<ObjectId> {
 }
 
 /// Lethal damage for each of `creatures` from `source` (CR 702.19b, 120.4a): its toughness less the damage marked on it, or
-/// any 1 from a source with deathtouch (CR 702.2c).
+/// any 1 more from a source with deathtouch (CR 702.2c), unless it already has lethal damage marked.
 fn lethal_for(cx: &Cx, source: ObjectId, creatures: &[ObjectId]) -> Vec<u16> {
     let deathtouch = cx.chars(source).has(Keyword::Deathtouch);
     creatures
         .iter()
         .map(|&c| {
-            if deathtouch {
-                return 1;
-            }
             let chars = cx.chars(c);
-            (chars.toughness.unwrap_or(0) - cx.s().obj(c).damage as i16).max(0) as u16
+            let remaining = (i32::from(chars.toughness.unwrap_or(0)) - i32::from(cx.s().obj(c).damage)).max(0) as u16;
+            if deathtouch { remaining.min(1) } else { remaining }
         })
         .collect()
 }

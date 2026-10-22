@@ -269,13 +269,25 @@ pub fn activates_as_though_haste(cx: &Cx, player: PlayerId, creature: ObjectId) 
 }
 
 /// What `creature` assigns as combat damage (CR 510.1a): its power, or its toughness if a static ability says so.
+/// An "as though its power were positive" rule (CR 609.4) uses negative power's magnitude only when assigning by power;
+/// every other procedure still reads its actual negative power (CR 107.1b).
 pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
     let c = cx.chars(creature);
     let by_toughness = sources(cx, |d| !d.damage_by_toughness.is_empty()).any(|(id, controller, def)| {
         let asker = Asker { source: id, controller };
         def.damage_by_toughness.iter().any(|rule| rule(cx, &asker, creature))
     });
-    (if by_toughness { c.toughness } else { c.power }).unwrap_or(0).max(0) as u16
+    if by_toughness {
+        return c.toughness.unwrap_or(0).max(0) as u16;
+    }
+    let power = c.power.unwrap_or(0);
+    if power < 0 && sources(cx, |d| !d.damage_by_absolute_power.is_empty()).any(|(id, controller, def)| {
+        let asker = Asker { source: id, controller };
+        def.damage_by_absolute_power.iter().any(|rule| rule(cx, &asker, creature))
+    }) {
+        return power.unsigned_abs();
+    }
+    power.max(0) as u16
 }
 
 /// The card types `player` may cast as though they had flash (CR 307.5, 702.8): from effects that gave them that.
