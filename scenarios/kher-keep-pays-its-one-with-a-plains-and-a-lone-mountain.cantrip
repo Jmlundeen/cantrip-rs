@@ -1,0 +1,31 @@
+# Kher Keep: "{1}{R}, {T}: Create a 0/1 red Kobold creature token named Kobolds of Kher Keep." The {1} is generic, so a
+# Plains' {W} pays it and a lone Mountain pays the {R}; the Keep's own tap is part of the cost, so its {C} ability cannot
+# pay for it. Turn 5 both lands are spent and the token is made.
+
+[Bot1 Deck]
+Plains
+Mountain
+Kher Keep
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Kher Keep.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Kher Keep.Activate(Ability: {1}{R}, {T})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kobolds of Kher Keep.Token = true
+
+[Expect]
+Bot1.Battlefield.Kobolds of Kher Keep.Token = true
+Bot1.Battlefield.Kobolds of Kher Keep.Colors = Red
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Battlefield.Mountain.Tapped = true
