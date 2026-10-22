@@ -1,0 +1,60 @@
+# Darksteel Angel: "Creatures you control can't have -1/-1 counters put on them." Bot2's Glistener Elf, which has infect, is
+# blocked on turn 6 by Bot1's Ornithopter: the 1 damage it would deal as a -1/-1 counter is never put, so the 0/2 Ornithopter
+# is still a 0/2 with no counter on it, and Bot1, blocking, takes no poison.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Darksteel Angel
+Ornithopter
+Island x11
+
+[Bot2 Deck]
+Forest
+Glistener Elf
+Forest x5
+Forest x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Glistener Elf.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Darksteel Angel.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Glistener Elf > Bot1)
+[T6 Bot2.Blockers]
+Bot1.Block(Ornithopter > Glistener Elf)
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot1.Life = 20
+Bot1.Poison = 0
+Bot1.Battlefield = Darksteel Angel; Island; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters = (absent)
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot2.Life = 20
+Bot2.Battlefield = Forest; Glistener Elf
