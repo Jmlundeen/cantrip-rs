@@ -61,6 +61,8 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Pri-3 | Open |
 | [KI-117](#ki-117-a-searchs-world-keeps-what-the-real-game-did-with-hidden-cards-it-cannot-resample) | A search's world keeps what the real game did with hidden cards it cannot resample | Pri-3 | Open |
 | [KI-118](#ki-118-a-fix-agents-report-can-be-empty-or-claim-work-its-commit-does-not-hold) | A fix agent's report can be empty or claim work its commit does not hold | Pri-3 | Open |
+| [KI-119](#ki-119-a-triggered-abilitys-text-in-a-card-file-is-not-always-its-oracle-text) | A triggered ability's text in a card file is not always its Oracle text | Pri-2 | Open |
+| [KI-120](#ki-120-a-card-revealed-as-it-moves-is-judged-hidden-by-look-back-triggers) | A card revealed as it moves is judged hidden by look-back triggers | Pri-1 | Fix queued |
 
 ## Issues
 
@@ -288,3 +290,35 @@ landing. A fix makes that check part of the procedure rather than the coordinato
 whatever the report says - and find why the hand-back carries "placeholder" (the agent's final message, or the harness).
 
 **Scenarios.** None: a property of the agent workflow, not of the engine.
+
+### KI-119: A triggered ability's text in a card file is not always its Oracle text
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | cards | 2026-10-22, writing the CR 603.10 look-back change |
+
+**Notes.** The text a card file gives a triggered ability (what the client shows on the stack and in prompts) differs
+from the card's Oracle text for 159 abilities: an old self-reference instead of "this creature", one Oracle sentence
+split into two abilities ("When X enters or dies"), modal bullets flattened into a line, reminder text, and granted or
+delayed abilities' texts. Look-back now reads "from anywhere" and "leaves a graveyard" from that text (CR 603.6c,
+603.10a); `crates/cantrip-cards/tests/zone_words_match_oracle.rs` holds those words to the Oracle text, so the rules
+are safe. A fix makes every ability's text a sentence or clause of its card's Oracle text and tightens that test to
+say so.
+
+**Scenarios.** None: display text.
+
+### KI-120: A card revealed as it moves is judged hidden by look-back triggers
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine | 2026-10-22, the CR 603.10 look-back change |
+
+**Notes.** CR 603.10a: an ability that triggers when "an object that all players can see" is put into a hand or a
+library looks back. A card is public while a reveal is in effect - for the parts of the effect it matters to (CR
+701.20a: "reveal it and put it into your hand"), or while a continuous effect keeps it revealed (the top card of a
+library) - and only then. The engine treats every hand or library card as hidden for this. The tracked "revealed" state
+is a client aid (the eye icon) and is never rules state, so a card revealed earlier is rightly hidden. A fix asks
+whether a reveal is in effect at the moment of the move: the resolving effect's own reveal, or a continuous reveal.
+Only Wan Shi Tong, All-Knowing can reach it today.
+
+**Scenarios.** None yet.
