@@ -282,6 +282,21 @@ pub const fn pay_life_for_either(a: Color, b: Color, text: &'static str) -> Abil
     mana_ability(TAP.and(life(1)), add_any_color(1).colors(ColorSet(ColorSet::of(a).0 | ColorSet::of(b).0)), text)
 }
 
+/// A filter land's "{A/B}, {T}: Add {A}{A}, {A}{B}, or {B}{B}" (CR 106.1b, 605.3b, 608.2d): two mana, each a color of its
+/// own choosing from the two, chosen as the mana is added. `COLORS` is the two colors as a `ColorSet` numbers them, `cost`
+/// and `text` the card's own. Every Shadowmoor and Eventide filter land prints it: Fetid Heath, Mystic Gate, Sunken Ruins, Cascade Bluffs,
+/// Fire-Lit Thicket, Flooded Grove, Graven Cairns, Rugged Prairie, Twilight Mire and Wooded Bastion.
+pub const fn filter_two<const COLORS: u8>(cost: Cost, text: &'static str) -> AbilityDef {
+    mana_ability(cost, add_by(add_two_of::<COLORS>), text)
+}
+
+fn add_two_of<const COLORS: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    for color in crate::choose_colors(g, asker.controller, asker.source, ColorSet(COLORS), 2)? {
+        g.add_mana(asker.controller, color.mana(), 1);
+    }
+    Ok(())
+}
+
 /// A horizon land's other ability: "{1}, {T}, Sacrifice this land: Draw a card." (`text` is its full text, with the land's
 /// name). Horizon Canopy, Fiery Islet and Cryptic Caves (with its own restriction) print it.
 pub const fn sacrifice_to_draw(text: &'static str) -> AbilityDef {
