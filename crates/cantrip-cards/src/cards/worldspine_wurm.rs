@@ -31,14 +31,10 @@ fn put_into_a_graveyard(_: &dyn Query, source: ObjectId, event: &Event) -> Optio
     }
 }
 
-/// "Shuffle it into its owner's library": only the card that triggered it, still in that graveyard (CR 400.7); the
-/// library is shuffled once it is there.
+/// "Shuffle it into its owner's library": the card that triggered it goes there if it is still where it was put (CR 400.7), and
+/// the library is shuffled either way (CR 701.24c); the core does both.
 fn shuffle_it_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let card = item.object;
-    if !is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Graveyard) {
-        return Ok(());
-    }
-    g.put_into_library(&[card], LibraryPlace::ShuffledIn);
+    g.put_into_library(&[item.object], LibraryPlace::ShuffledIn);
     Ok(())
 }
 

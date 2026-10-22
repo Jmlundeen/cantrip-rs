@@ -1,10 +1,20 @@
 # Worldspine Wurm is discarded to the maximum hand size on turn 3 and its shuffle trigger goes on the stack; Bot2 answers with Ghost
-# Vacuum, exiling it from the graveyard. The trigger finds the card gone (a new object in exile, CR 400.7) and shuffles nothing in: it
-# stays exiled, and the library keeps its size.
+# Vacuum, exiling it from the graveyard. The trigger finds the card gone (a new object in exile, CR 400.7): it stays exiled and
+# nothing is put into the library, but the library is shuffled all the same (CR 701.24c). The library below is nine distinct-looking
+# cards in a known order, so `Bot1.Library !=` that order shows the shuffle.
 
 [Bot1 Deck]
 Worldspine Wurm
-Forest x16
+Forest x7
+Plains
+Island
+Swamp
+Mountain
+Plains
+Island
+Swamp
+Mountain
+Forest
 
 [Bot2 Deck]
 Island
@@ -26,3 +36,4 @@ Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Worldspine Wurm)
 Exile = Worldspine Wurm
 Bot1.Hand.Count = 7
 Bot1.Library.Count = 9
+Bot1.Library != Plains; Island; Swamp; Mountain; Plains; Island; Swamp; Mountain; Forest
