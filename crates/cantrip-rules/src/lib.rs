@@ -60,6 +60,8 @@ mod room_door_tests;
 #[cfg(test)]
 mod play_permission_tests;
 #[cfg(test)]
+mod preparation_tests;
+#[cfg(test)]
 mod remove_up_to_tests;
 #[cfg(test)]
 mod room_copy_tests;
@@ -1603,6 +1605,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn become_prepared(&mut self, permanent: ObjectId) {
         ops::become_prepared(self, permanent);
+    }
+
+    fn become_unprepared(&mut self, permanent: ObjectId) {
+        ops::become_unprepared(self, permanent);
     }
 
     fn set_class_level(&mut self, permanent: ObjectId, level: u8) {

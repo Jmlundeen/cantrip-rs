@@ -1,0 +1,49 @@
+# Preparation survives proposing its linked copy and mana payment, consumed only when casting finishes (CR 722.3c,
+# 601.2i). Cancel during payment: the same prepared source/copy remain, with no completed cast event (733.1).
+# The next cast pays successfully and prowess sees a cast, not the cancelled proposal.
+
+[Bot1 Deck]
+Mountain
+Pompous Battlemage
+Mox Ruby
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x18
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Pompous Battlemage.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Pompous Battlemage.Prepared = true
+? Exile = Improvised Act
+Bot1.Exile.Improvised Act.Cast
+? Bot1.Battlefield.Pompous Battlemage.Prepared = true
+? Stack = Improvised Act
+Bot1.Cancel
+? Bot1.Battlefield.Pompous Battlemage.Prepared = true
+? Exile = Improvised Act
+? Stack.Count = 0
+? Bot1.Battlefield.Pompous Battlemage.Power = 1
+Bot1.Exile.Improvised Act.Cast
+? Bot1.Battlefield.Pompous Battlemage.Prepared = true
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+? Bot1.Battlefield.Pompous Battlemage.Prepared = (absent)
+? Exile.Count = 0
+? Stack = Pompous Battlemage; Improvised Act
+Bot1.Choose()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Pompous Battlemage.Prepared = (absent)
+Bot1.Battlefield.Pompous Battlemage.Power = 2
+Bot1.Battlefield.Pompous Battlemage.Toughness = 2
+Exile.Count = 0
+Bot1.Graveyard.Count = 0

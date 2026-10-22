@@ -1,0 +1,56 @@
+# "Its controller may cast the copy" (CR 722.3c) refers to the current permanent controller, not its creator/owner.
+# Offering gives a prepared Pompous Battlemage to Bot2; only Bot2 may cast its linked copy, still in Bot1's exile.
+# The spell resolves for Bot2 and triggers Bot2's prowess; Bot1's hand and life stay unchanged.
+
+[Bot1 Deck]
+Mountain
+Pompous Battlemage
+Mox Ruby
+Sol Ring
+Harmless Offering
+Mountain
+Mountain
+Mountain x18
+
+[Bot2 Deck]
+Mountain
+Island x24
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Pompous Battlemage.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Pompous Battlemage)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Pompous Battlemage.Prepared = true
+? Exile = Improvised Act
+! Bot1.Exile.Improvised Act.Cast
+[T4 Bot2.Main1]
+Bot2.Exile.Improvised Act.Cast
+? Bot2.Battlefield.Pompous Battlemage.Prepared = true
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+? Bot2.Battlefield.Pompous Battlemage.Prepared = (absent)
+Bot2.Choose()
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Pompous Battlemage.Prepared = (absent)
+Bot2.Battlefield.Pompous Battlemage.Power = 2
+Bot2.Battlefield.Pompous Battlemage.Toughness = 2
+Bot1.Battlefield = Mountain; Mox Ruby; Sol Ring
+Exile.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20

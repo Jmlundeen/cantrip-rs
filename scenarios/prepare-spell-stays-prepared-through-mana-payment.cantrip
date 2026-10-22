@@ -1,0 +1,29 @@
+# A prepare permanent stays prepared through the spell's mana payment, losing the designation only once cast
+# (CR 722.3c, 601.2g-i). Payment uses the Island rather than floating mana, exposing the intermediate casting state.
+
+[Bot1 Deck]
+Black Lotus
+Paradox Shaper
+Island x35
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Paradox Shaper.Cast
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Paradox Shaper.Prepared = true
+Bot1.Exile.Omit Variables.Cast
+? Bot1.Battlefield.Paradox Shaper.Prepared = true
+Bot1.Battlefield.Island.Activate
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Paradox Shaper.Prepared = (absent)
+Bot1.Graveyard.Count = 4
+Exile.Count = 0
+Stack.Count = 0

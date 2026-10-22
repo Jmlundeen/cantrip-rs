@@ -1135,6 +1135,12 @@ permanent a spell targets in two slots is destroyed once.
 
 ### Actions: the source's own option, and what made it possible
 
+Preparation's designation is a core procedure (`Game::become_prepared` / `become_unprepared`, CR 722.3a-c). Removing it
+ends the old exile copy's permission permanently; `Obj::prepare_expired` retains that fact until the next state-based
+check ends the copy (CR 704.5e), with its `prepared_from` provenance intact. Becoming prepared again creates a new
+copy. Phasing out also expires the old copy permanently; phasing in prepared creates a fresh copy (CR 722.3c, 702.26f).
+Casting the copy removes the designation when the spell becomes cast (CR 601.2i), after its costs are paid.
+
 An action is what a player does with priority or while paying - cast a spell, activate an ability, take a special action,
 play a land (CR 116.2a, 305.1) - and an offered action (`ActionOption`) names four things:
 
@@ -1882,6 +1888,11 @@ engine does not have yet is skipped; one that can run must pass.
 
 ## Correctness
 
+- **Preparation consumption (CR 722.3c, 601.2i).** The linked exile copy's old object keeps its `prepared_from`
+  reference through the shared casting procedure. Its permanent remains prepared throughout announcement and
+  payment; after as-cast observations and the completed cast record, the live original permanent loses preparation
+  before cast triggers are collected. Cancelling reverts the whole announcement, including mana abilities. A copy
+  cast by a stolen permanent's current controller is controlled by its caster (601.2a), not its exile-zone owner.
 - **The scenarios are the reference.** A card is done when it is exact and its scenarios pass; a scenario that is
   wrong by the rules is fixed, with the rule.
 - **`CANTRIP_VERIFY=1`** runs the engine's own consistency checks while it plays; `tools\test.cmd` sets it.

@@ -4250,8 +4250,8 @@ impl<'a> Offer<'a> {
             }
             ZoneKind::Exile => {
                 // A prepare spell's copy, by the prepared permanent's controller (CR 722.3).
-                if own
-                    && obj.card_copy
+                if obj.card_copy
+                    && !obj.prepare_expired
                     && obj.prepared_from.is_some_and(|from| {
                         let f = cx.s().obj(from);
                         live(cx.s(), from) && f.zone.is(ZoneKind::Battlefield) && f.prepared && f.controller == player
@@ -5102,17 +5102,16 @@ fn cast(
     cost.life = cost.life.saturating_add(u16::from(life));
     cost.mana.generic = cost.mana.generic.saturating_add(more);
 
-    // CR 601.2a: the card moves to the stack first. Casting a prepare spell's copy unprepares its permanent
-    // (CR 722.3c).
-    if let Some(from) = cx.s().obj(card).prepared_from {
-        cx.st().update_obj(from, |o| o.prepared = false);
-    }
+    // CR 601.2a: the card moves to the stack first. Its permanent remains prepared until the copy becomes cast
+    // (CR 722.3c, 601.2i), including while its costs are paid.
+    let prepared_from = cx.s().obj(card).prepared_from;
     let from = cx.s().obj(card).zone.kind();
     let cast_from = from;
     // CR 307.1: whether a sorcery could have been cast now, read before the spell goes on the stack.
     let untimely = !(cx.s().turn.active == player && matches!(cx.s().turn.step(), Step::PrecombatMain | Step::PostcombatMain) && cx.s().stack.is_empty());
     let spell = ops::move_to_for(cx, card, Zone::STACK, ZoneReason::Cast);
     cx.st().update_obj(spell, |o| {
+        o.controller = player;
         o.cast_from = Some(from);
         o.marks.cast_untimely = untimely;
     });
@@ -5577,6 +5576,10 @@ fn cast(
         by: Grant::of(by.by),
         fact,
     }));
+    // CR 722.3c, 601.2i: as-cast facts read the completed casting first; cast triggers see preparation consumed.
+    if let Some(from) = prepared_from {
+        ops::become_unprepared(cx, from);
+    }
     // "Until this card is cast from exile" (CR 611.2a, 400.7) ends now, as the card that was in exile becomes cast: the
     // effects about it were there while its costs were paid.
     if cast_from == ZoneKind::Exile && cx.s().effects.iter().any(|e| e.duration == Duration::UntilCastFromExile(card)) {
@@ -8149,6 +8152,123 @@ mod tests {
 
     fn cx(game: &mut Game) -> Cx<'_> {
         Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
+    }
+
+    static PREPARE_SPELL: CardDef = CardDef {
+        name: "Preparation Test Spell",
+        types: TypeSet::of(&[CardType::Instant]),
+        has_cost: true,
+        ..CardDef::BLANK
+    };
+    static PREPARATION: CardDef = CardDef { name: "Preparation Test Creature", prepare: Some(&PREPARE_SPELL), ..BEAR };
+
+    fn preparation() -> (Game, ObjectId, ObjectId) {
+        let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&PREPARATION, &PREPARE_SPELL, &BEAR])));
+        let mut game = Game::new(table, &crate::Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+        game.state.update_turn(|t| {
+            t.number = 2;
+            t.set_step(Step::PrecombatMain);
+        });
+        let creature = game.state.push_obj(Obj::new(table.id_of(&PREPARATION), ME, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, creature);
+        cantrip_api::Game::become_prepared(&mut cx(&mut game), creature);
+        let copy = game.state.zone(Zone::exile(ME))[0];
+        (game, creature, copy)
+    }
+
+    /// CR 722.3b/c, 704.5e: becoming unprepared ends only this permanent's copy's permission and exemption, without
+    /// performing state-based actions in the middle of an effect. A new preparation cannot revive the expired copy.
+    /// Both changes to the object rows undo and redo together.
+    #[test]
+    fn becoming_unprepared_expires_the_old_copy_even_if_the_permanent_prepares_again_before_state_based_actions() {
+        let (mut game, creature, copy) = preparation();
+        let other = game.state.push_obj(Obj::new(game.cards.id_of(&PREPARATION), THEM, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, other);
+        cantrip_api::Game::become_prepared(&mut cx(&mut game), other);
+        let other_copy = game.state.zone(Zone::exile(THEM))[0];
+        assert_eq!(casts(&mut game, ME, copy), [(0, None)]);
+        let mark = game.state.mark();
+        cantrip_api::Game::become_unprepared(&mut cx(&mut game), creature);
+        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepare_expired);
+        assert_eq!(game.state.obj(copy).prepared_from, Some(creature));
+        assert_eq!(game.state.zone(Zone::exile(ME)), &[copy]);
+        assert!(casts(&mut game, ME, copy).is_empty());
+        let (undos, redos) = game.state.step_back(mark);
+        assert!(game.state.obj(creature).prepared && !game.state.obj(copy).prepare_expired);
+        game.state.step_forward(undos, redos);
+        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepare_expired);
+        let mark = game.state.mark();
+        cantrip_api::Game::become_unprepared(&mut cx(&mut game), creature);
+        assert_eq!(game.state.mark(), mark);
+        cantrip_api::Game::become_prepared(&mut cx(&mut game), creature);
+        let new_copy = game.state.zone(Zone::exile(ME))[1];
+        assert!(casts(&mut game, ME, copy).is_empty());
+        assert_eq!(casts(&mut game, ME, new_copy), [(0, None)]);
+        crate::settle::state_based_actions_alone(&mut cx(&mut game)).expect("no choices");
+        assert_eq!(game.state.zone(Zone::exile(ME)), &[new_copy]);
+        assert!(!live(&game.state, copy));
+        assert!(game.state.obj(other).prepared && !game.state.obj(other_copy).prepare_expired);
+        assert_eq!(game.state.zone(Zone::exile(THEM)), &[other_copy]);
+    }
+
+    /// CR 722.3b: removing the designation does not ask whether the permanent still has a prepare spell or abilities.
+    #[test]
+    fn becoming_unprepared_works_after_a_copy_effect_removes_the_prepare_spell() {
+        let (mut game, creature, copy) = preparation();
+        let bear = game.cards.id_of(&BEAR);
+        game.state.update_obj(creature, |o| o.copy = Some(Copiable::of(bear)));
+        cantrip_api::Game::add_effect(&mut cx(&mut game), creature, creature, EffectKind::LoseAllAbilities, Duration::Indefinite);
+        assert_eq!(cx(&mut game).chars(creature).card, bear);
+        assert!(cx(&mut game).lost_all_abilities(creature));
+        cantrip_api::Game::become_unprepared(&mut cx(&mut game), creature);
+        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepare_expired);
+        crate::settle::state_based_actions_alone(&mut cx(&mut game)).expect("no choices");
+        assert!(game.state.zone(Zone::exile(ME)).is_empty());
+    }
+
+    /// CR 400.7, 702.26b: neither a stale reference nor an object treated as absent can be made unprepared.
+    #[test]
+    fn becoming_unprepared_ignores_a_previous_object_and_a_phased_out_permanent() {
+        let (mut game, creature, _) = preparation();
+        let held = ops::return_to_hand(&mut cx(&mut game), &[creature])[0];
+        let returned = ops::put_onto_battlefield(&mut cx(&mut game), &[(held, ME, false)], ZoneReason::Other).expect("no choices")[0];
+        cantrip_api::Game::become_prepared(&mut cx(&mut game), returned);
+        let mark = game.state.mark();
+        cantrip_api::Game::become_unprepared(&mut cx(&mut game), creature);
+        cantrip_api::Game::become_unprepared(&mut cx(&mut game), held);
+        assert_eq!(game.state.mark(), mark);
+        assert!(game.state.obj(returned).prepared);
+        crate::phasing::phase_out(&mut cx(&mut game), &[returned], None, false);
+        let mark = game.state.mark();
+        cantrip_api::Game::become_unprepared(&mut cx(&mut game), returned);
+        assert_eq!(game.state.mark(), mark);
+        assert!(game.state.obj(returned).prepared);
+    }
+
+    fn cost_while_prepared(q: &dyn Query, _: &Asker, _: &[Target]) -> Cost {
+        assert!(q.state().battlefield().iter().any(|&id| q.obj(id).prepared), "its permanent is still prepared during CR 601.2f");
+        Cost::NONE
+    }
+    static COST_CHECKED_PREPARE: CardDef = CardDef { name: "Preparation Cost Test Spell", cost_of_targets: Some(cost_while_prepared), ..PREPARE_SPELL };
+    static COST_CHECKED_CREATURE: CardDef = CardDef { name: "Preparation Cost Test Creature", prepare: Some(&COST_CHECKED_PREPARE), ..BEAR };
+
+    /// CR 722.3c, 601.2i: the designation stays through cost determination and payment, and is gone by the cast event.
+    /// The cast copy remains a spell on the stack when state-based actions check the now-unprepared permanent.
+    #[test]
+    fn casting_a_prepare_copy_unprepares_its_permanent_only_after_paying_its_costs() {
+        let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&COST_CHECKED_CREATURE, &COST_CHECKED_PREPARE])));
+        let mut game = Game::new(table, &crate::Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+        let creature = game.state.push_obj(Obj::new(table.id_of(&COST_CHECKED_CREATURE), ME, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, creature);
+        let mut cx = cx(&mut game);
+        cantrip_api::Game::become_prepared(&mut cx, creature);
+        let copy = cx.s().zone(Zone::exile(ME))[0];
+        cast(&mut cx, ME, copy, 0, &[], CastTerms::default(), CastBy::default(), false).expect("cast");
+        assert!(!cx.s().obj(creature).prepared);
+        assert_eq!(cx.s().stack.len(), 1);
+        let spell = cx.s().stack[0].object;
+        crate::settle::state_based_actions_alone(&mut cx).expect("no choices");
+        assert!(live(cx.s(), spell) && cx.s().obj(spell).zone.is(ZoneKind::Stack));
     }
 
     /// The casts `player` is offered of `card` now: each one's way number, and the permanent whose alternative cost it pays.
