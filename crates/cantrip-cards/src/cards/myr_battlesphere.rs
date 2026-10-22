@@ -8,7 +8,8 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 colorless Myr artifact creature token.
 pub static MYR: CardDef = CardDef {
-    name: "Myr",
+    name: "Myr Token",
+    token_name: Some(&[Subtype::Myr]),
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
     subtypes: SubtypeSet::of(&[Subtype::Myr]),

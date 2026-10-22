@@ -5,7 +5,8 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 white Human creature token it makes.
 pub static HUMAN: CardDef = CardDef {
-    name: "Human",
+    name: "Human Token",
+    token_name: Some(&[Subtype::Human]),
     has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),

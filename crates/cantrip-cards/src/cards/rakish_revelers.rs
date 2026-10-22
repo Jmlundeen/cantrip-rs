@@ -5,7 +5,8 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 green and white Citizen creature token (CR 111.4).
 pub static CITIZEN: CardDef = CardDef {
-    name: "Citizen",
+    name: "Citizen Token",
+    token_name: Some(&[Subtype::Citizen]),
     has_cost: false,
     // White (bit 0) and green (bit 4).
     colors: Some(ColorSet(0b10001)),
