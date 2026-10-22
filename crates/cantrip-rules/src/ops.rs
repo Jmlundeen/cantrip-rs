@@ -1977,14 +1977,16 @@ pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16
 /// whose damage the shield prevents first, then the next while some is left; the damage of the others is dealt normally
 /// once it is used up. Everything else keeps its order. Players with such choices make them in APNAP order (CR 616.1).
 pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: bool) -> Vec<usize> {
-    let mut order: Vec<usize> = (0..hits.len()).collect();
+    let mut order: Vec<usize> = (0..hits.len())
+        .filter(|&i| !matches!(hits[i].1, Target::Player(p) if !cx.s().in_game(p)))
+        .collect();
     if hits.len() < 2 || !cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Prevention { shield: Shield::Next(_), .. })) {
         return order;
     }
     let mut recipients: Vec<(PlayerId, Target)> = Vec::new();
     for &(_, to, _) in hits {
         let chooser = match to {
-            Target::Player(p) => p,
+            Target::Player(p) if cx.s().in_game(p) => p,
             Target::Object(id) if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) => cx.s().obj(id).controller,
             _ => continue,
         };
@@ -2108,7 +2110,8 @@ pub fn deal_damage_with(
     combat: bool,
     batch: &mut DamageBatch,
 ) -> Option<Event> {
-    if amount == 0 {
+    // CR 102.1, 120.1, 800.4a: a departed player receives no damage, nor replacements or prevention of that damage.
+    if amount == 0 || matches!(target, Target::Player(p) if !cx.s().in_game(p)) {
         return None;
     }
     // CR 614.1a, 614.6: the replacement effects may change whom the damage is dealt to ("is dealt to this creature
@@ -2116,7 +2119,7 @@ pub fn deal_damage_with(
     // infect, lifelink, deathtouch, loyalty and defense are judged against that recipient.
     let event = replace::damage(cx, DamageEvent { source, target, amount, combat, heal_marked: false });
     let (target, amount, heal_marked) = (event.target, event.amount, event.heal_marked);
-    if amount == 0 {
+    if amount == 0 || matches!(target, Target::Player(p) if !cx.s().in_game(p)) {
         return None;
     }
     // Protection prevents the damage (CR 702.16e, 702.16j, 702.16k) unless it can't be prevented (CR 615.12), and the
@@ -2261,7 +2264,7 @@ pub fn life_total_cant_change(s: &GameState, player: PlayerId) -> bool {
 /// `player`'s life total goes up or down by `delta` (CR 119.3). Every gain and loss of life comes here: an effect's, a
 /// cost's (CR 119.4), damage (CR 120.3a), lifelink (CR 702.15b) and a life total set to a number (CR 119.5).
 pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
-    if delta == 0 {
+    if delta == 0 || !cx.s().in_game(player) {
         return;
     }
     // CR 119.7: a player who can't gain life gains none, and nothing happens: no life gain event, so nothing that
@@ -2278,7 +2281,7 @@ pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
     // history records the life that actually changed. A gain an effect turned into a loss, or a loss into a gain, the player
     // can't have is nothing (the Platinum Emperion rulings).
     let delta = crate::replace::life_change(cx, player, delta);
-    if delta == 0 || blocked(cx, player, delta) {
+    if delta == 0 || !cx.s().in_game(player) || blocked(cx, player, delta) {
         return;
     }
     cx.st().update_player(player, |p| p.life = p.life.saturating_add(delta));
@@ -3162,6 +3165,10 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
         move_together(cx, &moves, ZoneReason::Exile);
     }
 }
+
+#[cfg(test)]
+#[path = "departed_damage_tests.rs"]
+mod departed_damage_tests;
 
 #[cfg(test)]
 mod tests {

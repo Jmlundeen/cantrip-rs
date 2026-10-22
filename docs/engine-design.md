@@ -776,6 +776,16 @@ nothing where nothing targets an opponent's things. The scenario dump lists a pl
 
 ### Life: gaining it, and damage that can't be prevented
 
+Damage originally proposed to a player who has left the game does not happen (CR 102.1, 120.1, 800.4a).
+`ops::deal_damage_with` rejects that recipient before replacement/prevention; shield ordering leaves them out.
+An invalid redirection is different: the redirection effect does nothing, leaving the immediately prior proposal
+for other effects (CR 614.9). `replace::valid_redirection` checks changed recipients before offering/applying an effect;
+absent/non-damageable permanents or departed players cannot be its origin/destination. No side effect or once-only
+resource is consumed by an invalid redirection. Earlier replacement effects retain their one opportunity (CR 614.5).
+A live player at zero life still receives simultaneous damage before state-based actions. Life changes,
+including lifelink from a departed source-controller's independent ability, likewise affect only players still in the
+game. The original simultaneous batch and each source's live damage totals are preserved.
+
 Every gain and loss of life goes through `ops::change_life` (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR
 120.3a), lifelink (CR 702.15b), and a life total set to a number (`Game::set_life_total`, CR 119.5: the player gains or loses
 the difference). A gain does not happen while the player can't gain life (CR 119.7, `static_rules::cant_gain_life`): a
@@ -1738,6 +1748,14 @@ captions it as the opponent's creature's damage, and the attacking band carries 
 card). "Bands with other" (CR 702.22b) is not built: no card in content has it.
 
 ### The regular combat damage step
+
+Combat assignments themselves leave out a departed player (CR 800.4e), not merely the later damage operation.
+`turn::combat_defender_present` and `combat_assignments` exclude that defender from an unblocked or blocker-free
+trample assignment and from a trample division's options; remaining creatures still receive assignments normally.
+An absent attacked planeswalker/battle receives none (CR 506.4c, 510.1b); a battle still present keeps its departed
+protector through combat (CR 704.5x). Both damage steps use the same procedure.
+The departed-recipient/assignment checks measured 11.05 us per decision before and 9.94 after on 128 games
+(2026-10-21; shared-machine load, no speed claim), with earlier loaded runs of 16.90 and 13.83.
 
 CR 510.4: the regular combat damage step after a first-strike step is for the attackers and blockers that had neither first
 strike nor double strike as the first-strike step began, and those that have double strike now. `Attacker::first_strike` and
