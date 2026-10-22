@@ -1,0 +1,30 @@
+# Fetid Heath: "{W/B}, {T}: Add {W}{W}, {W}{B}, or {B}{B}." The {W/B} must be paid with white or black mana. Turn 3 the
+# Heath and a Forest are all Bot1 has: the filter ability is not offered (a Forest makes {G}, which pays neither half).
+# Turn 5, with a Plains played, the same ability is offered and a Plains pays it.
+
+[Bot1 Deck]
+Forest
+Fetid Heath
+Plains
+Swamp
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fetid Heath.Play
+! Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B}, {T})
+Bot1.Colors(White; Black)
+? Bot1.Mana = {W}{B}
+
+[Expect]
+Bot1.Life = 20

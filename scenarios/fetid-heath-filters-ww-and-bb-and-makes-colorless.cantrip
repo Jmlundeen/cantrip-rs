@@ -1,0 +1,35 @@
+# Fetid Heath: "{T}: Add {C}." and "{W/B}, {T}: Add {W}{W}, {W}{B}, or {B}{B}." Turn 3 a Plains pays {W/B} for {W}{W};
+# turn 5 a Swamp pays it for {B}{B}; turn 7 the Heath taps for {C} alone.
+
+[Bot1 Deck]
+Mountain
+Fetid Heath
+Plains
+Swamp
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fetid Heath.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B}, {T})
+Bot1.Colors(White; White)
+? Bot1.Mana = {W}{W}
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B}, {T})
+Bot1.Colors(Black; Black)
+? Bot1.Mana = {B}{B}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Fetid Heath.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Life = 20
