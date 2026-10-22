@@ -2267,7 +2267,9 @@ public sealed partial class MainPage
         string? issue = verdict?.Issue is { } why ? BlockIssueCaption(client, why) : null;
 
         // Creatures picked up that the attacker last clicked does not take, once the verdict says so: the dock says why.
-        string? held = _blockingInto != 0 && _pending.Count > 0 && verdict is not null ? HeldCaption(client, prompt, new ViewHandle(_blockingInto)) : null;
+        string? held = _blockingInto != 0 && _blockQueue.Count == 0 && _pending.Count > 0 && verdict is not null
+            ? HeldCaption(client, prompt, new ViewHandle(_blockingInto))
+            : null;
         int blockers = declared.Select(block => block.Blocker).Distinct().Count();
 
         Prompt(

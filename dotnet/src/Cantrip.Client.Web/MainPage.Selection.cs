@@ -207,7 +207,10 @@ public sealed partial class MainPage
         }
 
         _pending.Clear();
-        _blockingInto = 0;
+        if (_blockQueue.Count == 0)
+        {
+            _blockingInto = 0;
+        }
 
         if (client.Prompt?.Prompt is DeclareAttackersPromptMessage attackers && !ChoosesWhatToAttack(attackers))
         {

@@ -116,6 +116,12 @@ public sealed partial class MainPage
                 busy.Add("redraw");
             }
 
+            // Creatures on their way to the attacker clicked, one block at a time as the host's verdicts allow.
+            if (_blockQueue.Count > 0)
+            {
+                busy.Add("blocking");
+            }
+
             // A choice of cards whose picks the host is still judging, or an answer being settled with it before it is sent.
             if (client is not null && (client.IsChecking || client.IsSettling))
             {

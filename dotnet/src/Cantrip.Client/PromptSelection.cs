@@ -31,6 +31,12 @@ public sealed class PromptSelection
     /// </summary>
     public int BlockingInto { get; set; }
 
+    /// <summary>
+    /// The creatures picked up when the attacker was clicked, on their way to it one at a time (<see cref="BlockingInto"/>):
+    /// no longer picked up, so releasing the pointer puts nothing down. Those it never takes are picked up again.
+    /// </summary>
+    public List<int> BlockQueue { get; } = [];
+
     public Dictionary<(int Source, int Creature), int> DamageShares { get; } = [];
     /// <summary>A divided target's own share (CR 601.2d), keyed by candidate handle.</summary>
     public Dictionary<int, int> DividedShares { get; } = [];
@@ -84,6 +90,7 @@ public sealed class PromptSelection
         Blocking.Clear();
         Pending.Clear();
         BlockingInto = 0;
+        BlockQueue.Clear();
         DamageShares.Clear();
         DividedShares.Clear();
         CounterRemovals.Clear();

@@ -32,6 +32,7 @@ public sealed partial class MainPage
     private List<(int Blocker, int Attacker)> _blocking => _selection.Blocking;
     private List<int> _pending => _selection.Pending;
     private int _blockingInto { get => _selection.BlockingInto; set => _selection.BlockingInto = value; }
+    private List<int> _blockQueue => _selection.BlockQueue;
     private Dictionary<(int Source, int Creature), int> _shares => _selection.DamageShares;
     private Dictionary<int, int> _dividedShares => _selection.DividedShares;
     private ActionOptionMessage? _targeting { get => _selection.Targeting; set => _selection.Targeting = value; }
@@ -699,7 +700,10 @@ public sealed partial class MainPage
     private void PickUp(int creature)
     {
         // A creature picked up goes where the next click sends it, not to the attacker the last one did.
-        _blockingInto = 0;
+        if (_blockQueue.Count == 0)
+        {
+            _blockingInto = 0;
+        }
         if (!_pending.Remove(creature))
         {
             _pending.Add(creature);
@@ -799,6 +803,9 @@ public sealed partial class MainPage
         }
 
         _blockingInto = target;
+        _blockQueue.Clear();
+        _blockQueue.AddRange(_pending);
+        _pending.Clear();
         ContinueBlocking(client);
         _needsRedraw = true;
     }
@@ -810,7 +817,7 @@ public sealed partial class MainPage
     /// </summary>
     private void ContinueBlocking(GameClient client)
     {
-        while (_blockingInto != 0 && _pending.Count > 0)
+        while (_blockingInto != 0 && _blockQueue.Count > 0)
         {
             BlockVerdictView? verdict = DeclaredVerdict(client);
             if (verdict is null)
@@ -819,21 +826,25 @@ public sealed partial class MainPage
             }
 
             int target = _blockingInto;
-            int? next = _pending.Where(blocker => verdict.Addable.Exists(pair => pair.Blocker.Value == blocker && pair.Attacker.Value == target))
+            int? next = _blockQueue.Where(blocker => verdict.Addable.Exists(pair => pair.Blocker.Value == blocker && pair.Attacker.Value == target))
                 .Select(blocker => (int?)blocker)
                 .FirstOrDefault();
             if (next is not { } blocker)
             {
+                // The attacker takes none of the rest: they are picked up again, and the dock says why.
+                _pending.AddRange(_blockQueue.Where(creature => !_pending.Contains(creature)));
+                _blockQueue.Clear();
+                _needsRedraw = true;
                 return;
             }
 
             RetireArrows([blocker], CardBounds(new ViewHandle(target)));
             _blocking.Add((blocker, target));
-            _pending.Remove(blocker);
+            _blockQueue.Remove(blocker);
             _needsRedraw = true;
         }
 
-        if (_pending.Count == 0)
+        if (_blockQueue.Count == 0 && _pending.Count == 0)
         {
             _blockingInto = 0;
         }
@@ -866,7 +877,10 @@ public sealed partial class MainPage
     private void PutDown()
     {
         _pending.Clear();
-        _blockingInto = 0;
+        if (_blockQueue.Count == 0)
+        {
+            _blockingInto = 0;
+        }
         _needsRedraw = true;
     }
 

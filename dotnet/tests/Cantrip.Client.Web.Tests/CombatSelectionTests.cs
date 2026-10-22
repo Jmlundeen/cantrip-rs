@@ -99,9 +99,12 @@ public sealed class CombatSelectionTests(WebClient web)
         Assert.Equal("Savannah Lions can't be blocked by more than one creature", one.Detail);
         await table.PictureAsync("one-blocker-at-most");
 
-        // A second click on it sends nothing more; the one still held may block the Serra Angel.
+        // The Lions are no longer offered to the one still held - the host's verdict has no such block - so a click on them
+        // puts it down, as a click on anything that answers nothing does; picked up again, it may block the Serra Angel.
         await table.ClickCardAsync("Savannah Lions");
-        await table.SettledAsync(state => state.Selected == 1 && state.Controls.Any(control => control.Label == "Block with 1"));
+        await table.SettledAsync(state => state.Selected == 0 && state.Controls.Any(control => control.Label == "Block with 1"));
+        await table.ClickCardAsync("Gurmag Angler");
+        await table.SettledAsync(state => state.Selected == 1);
         await table.ClickCardAsync("Serra Angel");
         TableState both = await table.SettledAsync(state => state.Selected == 0 && state.Controls.Any(control => control.Label == "Block with 2"));
         Assert.Equal("2 attacking  ·  2 blocking", both.Detail);
