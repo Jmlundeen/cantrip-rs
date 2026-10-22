@@ -1,0 +1,32 @@
+# Radiant Summit: "This land enters tapped unless you control two or more basic lands." Turn 5 Bot1 controls a Plains (one
+# basic) and a Plateau (the Mountain and Plains types, but not basic, CR 205.4a): one basic is below the two, so its
+# Radiant Summit enters tapped - though Bot2, its opponent, controls two basic lands by then. Bot2 with a Plains and a
+# Mountain of its own plays the same land on turn 6 and it enters untapped (positive control).
+
+[Bot1 Deck]
+Plains
+Plateau
+Radiant Summit
+Mountain x20
+
+[Bot2 Deck]
+Plains
+Mountain
+Radiant Summit
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plateau.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Radiant Summit.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Radiant Summit.Play
+
+[Expect]
+Bot1.Battlefield.Radiant Summit.Tapped = true
+Bot2.Battlefield.Radiant Summit.Tapped = false
