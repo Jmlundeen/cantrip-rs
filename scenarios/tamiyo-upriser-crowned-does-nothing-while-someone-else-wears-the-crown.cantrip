@@ -1,0 +1,58 @@
+# Tamiyo, Upriser Crowned: "while you're the monarch" is part of the trigger, so a creature that damages the player who is
+# not the monarch is nothing. Bot2's Court of Garenbrig takes the crown on turn 4, then a Llanowar Elves attacks Bot1: Bot1
+# goes to 19, and the Elves are tapped by the attack alone, with no stun counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Tamiyo, Upriser Crowned
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Emerald
+Mox Sapphire
+Court of Garenbrig
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tamiyo, Upriser Crowned.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Court of Garenbrig.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 19
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Tamiyo, Upriser Crowned
+Bot2.Life = 20
+Monarch = Bot2
+Bot2.Battlefield = Court of Garenbrig; Forest; Llanowar Elves; Mox Emerald; Mox Sapphire
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Counters = (absent)

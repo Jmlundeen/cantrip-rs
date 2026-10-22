@@ -1,0 +1,13 @@
+{
+  "name": "Tamiyo, Upriser Crowned",
+  "manaCost": "{4}{R}{W}",
+  "type": "Legendary Creature — Moonfolk Warrior",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "Flying, double strike, haste\nWhen Tamiyo enters, you become the monarch.\nWhenever one or more creatures deal combat damage to you while you're the monarch, tap those creatures and put a stun counter on each of them.",
+  "keywords": [
+    "Flying",
+    "DoubleStrike",
+    "Haste"
+  ]
+}
