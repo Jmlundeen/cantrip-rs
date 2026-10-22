@@ -1,6 +1,6 @@
 # Hunter's Axe: "it gains your choice of trample or deathtouch until end of turn" (CR 608.2d). Bot1 chooses deathtouch,
-# so the equipped Llanowar Elves' 1 damage is enough to destroy a 0/4 blocker (CR 702.2b): Crystal Barricade dies to a
-# single point it could never take from a 3/1 without deathtouch, and without trample nothing carries over to Bot2.
+# so the equipped Llanowar Elves' 3 damage is enough to destroy a 0/4 blocker (CR 702.2b): Crystal Barricade takes 3,
+# less than its 4 toughness, and dies only because the damage is deathtouch; without trample nothing carries over to Bot2.
 
 [Bot1 Deck]
 Forest

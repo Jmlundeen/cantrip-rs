@@ -1,5 +1,5 @@
 # Hunter's Axe: "Equipped creature gets +2/+0 and has 'Whenever this creature attacks, it gains your choice of trample or
-# deathtouch until end of turn.'" Bot1 equips Llanowar Elves, a 1/1, which is a 3/1 with the Axe (CR 613.1f, layer 7c). It
+# deathtouch until end of turn.'" Bot1 equips Llanowar Elves, a 1/1, which is a 3/1 with the Axe (CR 613.4c). It
 # attacks; the Axe's granted ability triggers, and Bot1 chooses trample as it resolves (CR 608.2d), so the Elves deal 1 to
 # the 1/1 blocker Bot2 puts in the way and 2 trample over to Bot2 (CR 702.19b, 510.1c).
 
