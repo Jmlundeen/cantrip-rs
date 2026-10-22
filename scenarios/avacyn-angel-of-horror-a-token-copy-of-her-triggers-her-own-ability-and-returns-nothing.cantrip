@@ -1,0 +1,80 @@
+# Avacyn, Angel of Horror: "Whenever Avacyn or another nontoken creature you control dies" - "nontoken" qualifies only
+# "another ... creature"; "Avacyn" is the object itself, whatever it is (CR 700.4, 603.10a). Bot2 casts Avacyn; Bot1's
+# Fractured Identity exiles it and Bot1 gets a token copy, its only Avacyn (so the legend rule, CR 704.5j, has nothing to
+# choose between). Damnation kills that token: its dies ability still triggers and the delayed return is set up
+# (Delayed.Count = 1), but a token ceases to exist in the graveyard (CR 111.7, 704.5d), so at the end step nothing comes
+# back: Bot2's Avacyn stays in exile and Bot1 has no Avacyn.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Fractured Identity
+Damnation
+Swamp
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Island
+Avacyn, Angel of Horror
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Avacyn, Angel of Horror.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fractured Identity.Cast(Bot2.Battlefield.Avacyn, Angel of Horror)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Avacyn, Angel of Horror.Token = true
+? Bot2.Battlefield.Count = 5
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Damnation.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Count = 6
+? Delayed.Count = 1
+[T7 Bot1.Main1]
+
+[Expect]
+Turn = 7
+Delayed.Count = 0
+Exile = Avacyn, Angel of Horror
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Swamp
+Bot1.Graveyard = Damnation; Fractured Identity

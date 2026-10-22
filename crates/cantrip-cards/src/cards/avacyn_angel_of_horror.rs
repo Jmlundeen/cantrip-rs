@@ -3,8 +3,10 @@ use cantrip_mechanics::delayed;
 use cantrip_oracle as oracle;
 
 /// "Whenever Avacyn or another nontoken creature you control dies" (CR 700.4, 603.10a): a dies ability, looked back on,
-/// so it also fires for a creature that died in the same event as this one, and once for each of them. The card it is
-/// about is the new object the creature became in the graveyard (CR 400.7), and a token that dies leaves nothing to return.
+/// so it also fires for a creature that died in the same event as this one, and once for each of them. "Nontoken" qualifies
+/// only "another ... creature": Avacyn herself triggers it whatever she is, a token copy of her included, though a
+/// token that dies leaves nothing to return (CR 111.7). The card it is about is the new object the creature became in
+/// the graveyard (CR 400.7).
 fn avacyn_or_a_nontoken_creature_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, new, from, to, .. }
@@ -12,7 +14,7 @@ fn avacyn_or_a_nontoken_creature_dies(q: &dyn Query, me: &Asker, event: &Event) 
                 && to.is(ZoneKind::Graveyard)
                 && q.chars(*old).is(CardType::Creature)
                 && q.obj(*old).controller == me.controller
-                && !q.obj(*old).token =>
+                && (*old == me.source || !q.obj(*old).token) =>
         {
             Fired::about(Target::Object(*new))
         }

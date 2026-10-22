@@ -1,7 +1,8 @@
 # Avacyn, Angel of Horror: "return that card ... at the beginning of the next end step" is about the card it was, and a
 # card that has left the graveyard by then is a new object that the delayed ability does not find (CR 603.7c). Bot1's
-# Damnation kills Avacyn and her dies ability sets up the return; while that ability is on the stack Bot2 sacrifices
-# Soul-Guide Lantern to exile Bot1's graveyard, so at the end step nothing comes back and Avacyn stays in exile.
+# Damnation kills Avacyn and her dies ability resolves and sets up the return (Delayed.Count = 1); in Main2, with that
+# delayed ability waiting, Bot2 sacrifices Soul-Guide Lantern to exile Bot1's graveyard, so at the end step nothing comes
+# back and Avacyn stays in exile.
 
 [Bot1 Deck]
 Swamp
@@ -49,6 +50,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Damnation.Cast
 [T5 Bot1.Main2]
+? Delayed.Count = 1
 Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
 [T7 Bot1.Main1]
 ? Bot1.Battlefield.Count = 6
