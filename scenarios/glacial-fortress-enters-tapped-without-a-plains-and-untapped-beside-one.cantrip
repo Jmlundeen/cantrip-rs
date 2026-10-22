@@ -1,0 +1,32 @@
+# Glacial Fortress: "This land enters tapped unless you control a Plains or an Island." (CR 614.1c, 614.12a: read on the
+# battlefield as it enters, the land itself never counted). Beside a Swamp only the first copy enters tapped (turn 3);
+# once a Plains is out the second enters untapped (turn 7), the positive control for the first. It also taps for {W} or
+# {U}: red is refused beside the white it does add, and the {W} activation is that positive control.
+
+[Bot1 Deck]
+Swamp
+Glacial Fortress
+Plains
+Glacial Fortress
+Plains x10
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Glacial Fortress.Play
+? Bot1.Battlefield.Glacial Fortress.Tapped = true
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Glacial Fortress.Activate(Ability: {W} or {U}; Color: Red)
+Bot1.Battlefield.Glacial Fortress.Activate(Ability: {W} or {U}; Color: White)
+? Bot1.Mana = {W}
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Glacial Fortress.Play
+? Bot1.Battlefield.Glacial Fortress#2.Tapped = false
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Glacial Fortress#2.Tapped = false
