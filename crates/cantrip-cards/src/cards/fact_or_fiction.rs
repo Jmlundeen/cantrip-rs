@@ -18,12 +18,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let separator = choose::player(g, you, item.object, opponents, "separate the revealed cards into two piles", 5)?;
     let (first, second) = choose::separate(g, separator, item.object, revealed)?;
     let (keep, rest) = choose::pile(g, you, item.object, first, second)?;
-    if !keep.is_empty() {
-        g.return_to_hand(&keep);
-    }
-    if !rest.is_empty() {
-        g.put_into_graveyard(&rest);
-    }
+    g.put_into_hand_and_graveyard(&keep, &rest);
     Ok(())
 }
 
