@@ -303,6 +303,39 @@ fn an_ability_an_emblem_gave_is_looked_back_with() {
     assert!(cx.s().triggers.iter().any(|t| t.source == staying));
 }
 
+/// A Room's left door, "Whenever another creature dies, you gain 2 life" (Funeral Room's kind), and its right door, blank.
+static WAKE_DOOR: CardDef = CardDef {
+    name: "Look-back Wake Door",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Room]),
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.").look_back()],
+    ..CardDef::BLANK
+};
+static BLANK_DOOR: CardDef = CardDef { name: "Look-back Blank Door", abilities: &[], ..WAKE_DOOR };
+static WAKE_ROOM: CardDef =
+    CardDef { name: "Look-back Wake Door // Look-back Blank Door", split: Some((&WAKE_DOOR, &BLANK_DOOR)), abilities: &[], ..WAKE_DOOR };
+
+/// A Room with its left door unlocked has that door's "whenever another creature dies" (CR 709.5): a Bear dying triggers it.
+/// The ability is the door's, not the Room card's own, and it is looked back with all the same (CR 603.10a).
+#[test]
+fn an_unlocked_doors_leaves_ability_is_looked_back_with() {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&WAKE_DOOR, &BLANK_DOOR, &WAKE_ROOM, &BEAR])));
+    let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    let mut put = |def: &'static CardDef| {
+        let id = game.state.push_obj(Obj::new(table.id_of(def), PlayerId(0), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, id);
+        game.state.see_statics();
+        id
+    };
+    let room = put(&WAKE_ROOM);
+    let dying = put(&BEAR);
+    game.state.update_obj(room, |o| o.marks.doors = DOOR_LEFT);
+    let mut cx = cx(&mut game);
+    assert!(cx.chars(room).abilities().next().is_some());
+    crate::ops::move_to(&mut cx, dying, Zone::graveyard(PlayerId(0)));
+    assert!(cx.s().triggers.iter().any(|t| t.source == room));
+}
+
 /// Not a test of the rules: how long a wrath of a hundred creatures takes while a static ability that gives abilities is
 /// out, so every permanent is recorded for the look-back pass (`cargo test ... wrath_of_a_hundred -- --ignored --nocapture`).
 #[test]

@@ -1010,7 +1010,13 @@ impl Then {
     pub(crate) fn now(cx: &Cx) -> Then {
         let cards = cx.cards();
         let s = cx.s();
-        let granting = layers::ability_granting_present(cards, s)
+        // Every way the layers give an object an ability (CR 613.1): its copiable values (layer 1: its own card or face, a
+        // copy effect's card - `CardTable::current` - and a copy effect's exceptions), a Room's unlocked doors (in its card's
+        // `look_back`), a static ability (its own, in its card's `look_back`; another object's, wherever it functions), a
+        // resolved effect, a keyword counter (CR 122.1b), and the abilities the rules give for a keyword or a subtype
+        // (`intrinsic`). Layer 1 has no static abilities here: every copy effect, whatever made it, is `Obj::copy`.
+        let granting = cards.look_back[cards.intrinsic.0 as usize]
+            || layers::ability_granting_present(cards, s)
             || s.effects.iter().any(|e| matches!(e.kind, EffectKind::AddAbility(_) | EffectKind::AddKeywords(_)));
         let could = |id: ObjectId| {
             let o = s.obj(id);
@@ -1024,6 +1030,17 @@ impl Then {
             .map(|id| (id, layers::chars(cards, s, &cx.g.log, id), s.obj(id).controller))
             .collect();
         objects.sort_unstable_by_key(|&(id, _, _)| id);
+        // With `CANTRIP_VERIFY`: a permanent left out has no look-back ability now - a way of giving one that the set above
+        // misses is found here, not as a trigger that silently never happens.
+        if layers::verifying() {
+            for &id in s.battlefield().iter().filter(|&&id| !could(id)) {
+                let chars = layers::chars(cards, s, &cx.g.log, id);
+                assert!(
+                    !chars.abilities().any(|a| matches!(cards.ability(a), AbilityDef::Triggered(t) if t.look_back)),
+                    "{id:?} has a look-back ability that nothing counted as able to give it (CR 603.10a)"
+                );
+            }
+        }
         Then { taken: true, objects }
     }
 }

@@ -2588,6 +2588,71 @@ impl CardDef {
         self.split.is_some() && self.subtypes.has(Subtype::Room)
     }
 
+    /// What this door of a Room has that the engine does not take from its door (CR 709.5), if anything: the Room permanent
+    /// has an unlocked door's abilities (`layers::doors`) and play rules, and nothing else of its text. Everything a card
+    /// does while on the battlefield besides those - static abilities, replacement and prevention effects, an entering rule,
+    /// and each standing rule a card lists - is read off the Room card, so it would be absent; a triggered ability that
+    /// functions outside the battlefield would be too, as the doors' abilities are given on the battlefield alone; and a
+    /// keyword the door printed would be the whole card's whether or not the door is unlocked. `CardTable::new` refuses a
+    /// door that has any. What a door does as a spell (its cost, targets and effect, its own cost changes) is its own.
+    pub fn door_unsupported(&self) -> Option<&'static str> {
+        let refused = [
+            (!self.statics.is_empty(), "static abilities"),
+            (!self.replacements.is_empty(), "replacement effects"),
+            (!self.preventions.is_empty(), "prevention effects"),
+            (self.enters.is_some(), "an enters rule"),
+            (self.keywords != Keywords::NONE, "keywords"),
+            (self.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.anywhere)), "a triggered ability that functions outside the battlefield"),
+            (self.abilities.iter().any(|a| matches!(a, AbilityDef::Static(_))), "a static ability in its abilities"),
+            (self.cast_limit > 0, "a cast limit"),
+            (!self.cost_changes.is_empty(), "cost changes"),
+            (!self.grants_pay_with.is_empty(), "convoke, delve or improvise it gives"),
+            (!self.ability_alternatives.is_empty(), "alternative costs for abilities"),
+            (!self.granted_ways.is_empty(), "ways it gives to cast cards"),
+            (!self.spell_alternatives.is_empty(), "alternative costs it gives spells"),
+            (!self.exile_casts.is_empty(), "casting from exile it allows"),
+            (!self.granted_miracles.is_empty(), "miracle it gives"),
+            (!self.cast_rules.is_empty(), "cast rules"),
+            (!self.spell_rules.is_empty(), "spell rules"),
+            (!self.block_rules.is_empty(), "block rules"),
+            (!self.block_requirements.is_empty(), "block requirements"),
+            (!self.attack_rules.is_empty(), "attack rules"),
+            (!self.attack_costs.is_empty(), "attack costs"),
+            (!self.attacks_despite_defender.is_empty(), "attacking despite defender"),
+            (!self.targeting_rules.is_empty(), "targeting rules"),
+            (!self.player_keywords.is_empty(), "player keywords"),
+            (!self.player_protection.is_empty(), "player protection"),
+            (!self.unpreventable_damage.is_empty(), "unpreventable damage"),
+            (!self.cant_gain_life.is_empty(), "a life gain rule"),
+            (!self.cant_lose_life.is_empty(), "a life loss rule"),
+            (!self.cant_draw.is_empty(), "a draw rule"),
+            (!self.loss_rules.is_empty(), "loss rules"),
+            (!self.win_rules.is_empty(), "win rules"),
+            (!self.infect_damage_to.is_empty(), "an infect damage rule"),
+            (!self.counter_bans.is_empty(), "counter bans"),
+            (!self.player_counter_bans.is_empty(), "player counter bans"),
+            (!self.damage_by_toughness.is_empty(), "damage by toughness"),
+            (!self.damage_stays.is_empty(), "a damage-stays rule"),
+            (!self.mana_told_apart.is_empty(), "a mana source rule"),
+            (!self.zero_loyalty_stays.is_empty(), "a zero-loyalty rule"),
+            (!self.legend_rule_exempt.is_empty(), "a legend rule exemption"),
+            (!self.spend_any_color.is_empty(), "a spend-as-any-color rule"),
+            (!self.activate_as_though_haste.is_empty(), "activating as though with haste"),
+            (!self.cause_rules.is_empty(), "cause rules"),
+            (!self.turn_begin.is_empty(), "a turn-begin replacement"),
+            (!self.untap_in_others_untap_steps.is_empty(), "untapping in others' untap steps"),
+            (!self.instant_activation.is_empty(), "instant-speed activation rules"),
+            (!self.flash_rules.is_empty(), "flash rules"),
+            (!self.activation_rules.is_empty(), "activation rules"),
+            (!self.trigger_rules.is_empty(), "trigger rules"),
+            (!self.additional_triggers.is_empty(), "additional triggers"),
+            (self.ascend || self.storied || self.start_your_engines, "a designation keyword"),
+            (self.may_not_untap || self.sacrifice_at_cleanup.is_some() || self.granted_once_each_turn.is_some(), "a permanent's rule"),
+            (!self.basic_land_types.is_empty(), "basic land types"),
+        ];
+        refused.into_iter().find(|&(has, _)| has).map(|(_, what)| what)
+    }
+
     /// The doors of a Room that the unlocked designations `doors` name, left first (CR 709.5c).
     pub fn unlocked_doors(&self, doors: u8) -> impl Iterator<Item = &'static CardDef> {
         let (left, right) = self.split.map_or((None, None), |(l, r)| (Some(l), Some(r)));
@@ -2627,8 +2692,8 @@ pub struct CardTable {
     /// change without working out the static sources.
     pub control_statics: Vec<bool>,
     /// Which cards could have a triggered ability that looks back in time (CR 603.10) of their own: one they print, one
-    /// they list to give (`CardDef::delayed`), or any a static ability of theirs could give themselves - the objects a
-    /// look-back pass needs as they were just before the event.
+    /// they list to give (`CardDef::delayed`), any a static ability of theirs could give themselves, or, for a Room, one a
+    /// door prints (CR 709.5; `CardTable::new`) - the objects a look-back pass needs as they were just before the event.
     pub look_back: Vec<bool>,
     /// Which cards have a static ability of layer 6 that affects other objects (CR 613.1f), which may give one an ability.
     pub ability_statics: Vec<bool>,
@@ -2654,12 +2719,13 @@ pub struct CardTable {
     /// Per card: it gives players keyword abilities (`CardDef::player_keywords`) or protection (`CardDef::player_protection`).
     /// Read to find the few battlefield sources of one.
     pub player_keywords: Vec<bool>,
-    /// Which cards have a triggered mana ability: looked for among the permanents only when a permanent is tapped for mana.
+    /// Which cards have a triggered mana ability, a Room's doors' included: looked for among the permanents only when a
+    /// permanent is tapped for mana.
     pub mana_triggers: Vec<bool>,
     /// Per card: the fused split spell's target specs of a split card with fuse (CR 702.102b: the left half's, then the right
     /// half's), made once as the table is.
     pub fused_targets: Vec<Option<&'static [TargetSpec]>>,
-    /// Which cards have a state trigger (CR 603.8), printed or among the abilities they give (`CardDef::delayed`): looked for
+    /// Which cards have a state trigger (CR 603.8), printed, a Room's door's, or among the abilities they give (`CardDef::delayed`): looked for
     /// among the permanents as the game changes with no event (an effect beginning in the middle of a resolution).
     pub state_triggers: Vec<bool>,
     /// Which cards have a static ability that gives other objects abilities (layer 6, CR 613.1f): with one on the board, any
@@ -2893,20 +2959,26 @@ impl CardTable {
                 table.fronts[back.0 as usize] = Some(CardId(front as u16));
             }
             // A Room's doors (CR 709.5): the abilities and play rules of an unlocked one are the permanent's. What a door's
-            // text does beyond those (static abilities, replacement effects, entering rules) is read off the card, not off
-            // the door, so a door that has any is refused until those follow the designations: never quietly absent.
+            // text does beyond those is read off the card, not off the door, so a door that has any is refused until it
+            // follows the designations (`CardDef::door_unsupported`): never quietly absent.
             let card = table.cards[front];
             if card.is_room() {
                 let (left, right) = card.split.expect("a Room is a split card");
                 for half in [left, right] {
-                    assert!(
-                        half.statics.is_empty() && half.replacements.is_empty() && half.enters.is_none(),
-                        "{}: a door with static abilities, replacement effects or an enters rule is not supported yet (CR 709.5)",
-                        half.name
-                    );
+                    if let Some(what) = half.door_unsupported() {
+                        panic!("{}: a door with {what} is not supported yet (CR 709.5)", half.name);
+                    }
                 }
                 // The Room is looked at for play rules, which `actions::each_play_rule` takes from its unlocked doors.
                 table.play_rules[front] |= !left.play_rules.is_empty() || !right.play_rules.is_empty();
+                // And for the triggered abilities its doors print, which `layers::doors` gives it while they are unlocked:
+                // those that look back (CR 603.10a), state triggers (CR 603.8) and triggered mana abilities (CR 605.1b).
+                let triggered = |f: fn(&TriggeredDef) -> bool| {
+                    left.abilities.iter().chain(right.abilities.iter()).any(|a| matches!(a, AbilityDef::Triggered(t) if f(t)))
+                };
+                table.look_back[front] |= triggered(|t| t.look_back);
+                table.state_triggers[front] |= triggered(|t| t.state.is_some());
+                table.mana_triggers[front] |= triggered(|t| t.mana_ability);
                 let ids = (table.find(left.name), table.find(right.name));
                 table.halves[front] = Some((ids.0.expect("a door is in the card table"), ids.1.expect("a door is in the card table")));
             }
