@@ -1,0 +1,26 @@
+# Cascading Cataracts: "Indestructible" (CR 702.12). Bot2 sacrifices its Strip Mine to destroy the Cataracts and it stays
+# on the battlefield; the Strip Mine goes to the graveyard all the same.
+
+[Bot1 Deck]
+Cascading Cataracts
+Island x19
+
+[Bot2 Deck]
+Strip Mine
+Island x19
+
+[Actions]
+Bot1.Hand.Cascading Cataracts.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Strip Mine.Activate(Ability: Destroy target land; Bot1.Battlefield.Cascading Cataracts)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Cascading Cataracts
+Bot2.Graveyard = Strip Mine
+Stack.Count = 0
