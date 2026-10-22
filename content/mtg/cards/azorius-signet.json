@@ -1,0 +1,6 @@
+{
+  "name": "Azorius Signet",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "{1}, {T}: Add {W}{U}."
+}

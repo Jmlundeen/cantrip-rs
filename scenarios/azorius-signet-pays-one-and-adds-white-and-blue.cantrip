@@ -1,0 +1,40 @@
+# Azorius Signet: "{1}, {T}: Add {W}{U}." (CR 605.1a, a mana ability that costs mana of its own, CR 602.2b).
+# Bot1 casts it on turn 3 with two Plains ({2}), then on turn 5 taps two Plains for {W}{W}, pays the ability's {1} and
+# gets {W}{U}: the pool is exactly {W}{W}{U}, so an ability that cost nothing would show {W}{W}{W}{U} and one that added
+# only one color would show no {U} at all. Giver of Runes is then cast off the pooled {W}, so the mana is spendable.
+# The ability adds no color but white and blue and no colorless, and a tapped Signet is not offered again.
+
+[Bot1 Deck]
+Plains x3
+Azorius Signet
+Giver of Runes
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Azorius Signet.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+? Bot1.Mana = {W}{W}
+! Bot1.Battlefield.Azorius Signet.Activate(Color: Black)
+! Bot1.Battlefield.Azorius Signet.Activate(Color: Colorless)
+Bot1.Battlefield.Azorius Signet.Activate
+? Bot1.Mana = {W}{W}{U}
+! Bot1.Battlefield.Azorius Signet.Activate
+Bot1.Hand.Giver of Runes.Cast
+? Bot1.Mana = {W}{U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Azorius Signet.Tapped = true
+Bot1.Battlefield.Giver of Runes.Tapped = false
+Bot1.Life = 20
