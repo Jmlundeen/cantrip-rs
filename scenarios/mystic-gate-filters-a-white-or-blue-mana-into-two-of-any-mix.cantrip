@@ -1,0 +1,21 @@
+# Mystic Gate pays {W/U} (here from a Plains) and taps to add two mana, each white or blue as Bot1 chooses: {W}{U}, a
+# mix the Plains alone could never make.
+
+[Bot1 Deck]
+Plains
+Mystic Gate
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mystic Gate.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U}, {T}; Colors: White, Blue)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {W}{U}
