@@ -30,7 +30,7 @@ fn demons_you_control(view: &dyn LayerQuery, source: ObjectId, affected: ObjectI
         && chars.has_subtype(view.words(source).subtype(Subtype::Demon))
 }
 
-/// "... have menace, lifelink, and haste" (CR 702.110, 702.15, 702.10).
+/// "... have menace, lifelink, and haste" (CR 702.111, 702.15, 702.10).
 fn have_menace_lifelink_and_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Menace).with(Keyword::Lifelink).with(Keyword::Haste);
 }

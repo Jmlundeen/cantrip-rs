@@ -203,14 +203,13 @@ pub fn may_discard_to_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result
 }
 
 /// "You may discard a card" (CR 701.9): the controller chooses a card of their hand to discard or none, as the ability
-/// resolves and not as a cost, so nothing is asked of an empty hand. Whether a card was chosen and discarded, for the "if you
-/// do" or the reflexive "when you do" (CR 603.12) that follows. `may_discard_to_draw`, Inti, Seneschal of the Sun and
-/// Awaken the Honored Dead use it.
+/// resolves and not as a cost, so nothing is asked of an empty hand. Whether a card was discarded, for the "if you do" or the
+/// reflexive "when you do" (CR 603.12) that follows: a card chosen that its owner can't be made to discard stays (CR 101.2),
+/// and then nothing was done. `may_discard_to_draw`, Inti, Seneschal of the Sun and Awaken the Honored Dead use it.
 pub fn may_discard_a_card(g: &mut dyn Game, item: &StackItem) -> Result<bool, Suspend> {
     let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
     let Some(&card) = crate::choose::cards(g, item.controller, item.object, Purpose::Discard, hand, 1, true)?.first() else { return Ok(false) };
-    g.discard(card);
-    Ok(true)
+    Ok(!g.discard_together(&[card]).is_empty())
 }
 
 /// "You may sacrifice an artifact or discard a card. If you do, draw `n` cards" (CR 608.2c-d, 701.9, 701.21). The player chooses

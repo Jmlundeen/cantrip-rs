@@ -1,9 +1,9 @@
 # "This creature attacks that player this combat if able" never makes its controller pay a cost to attack (CR 508.1d):
 # Ursine Monstrosity's beginning-of-combat ability chooses Bot2, whose Ghostly Prison makes attacking Bot2 cost {2}. Bot1
-# has Mox Ruby and Mox Sapphire to pay with but need not; the Monstrosity still attacks each combat if able where that is
-# free, so declaring no attackers is refused, and it attacks Bot2's Liliana of the Veil for nothing - a declaration that
-# would be refused (it attacks someone other than the player it must attack) if attacking Bot2 cost nothing. Liliana dies
-# to 4 damage, Bot2 stays at 20 and both Moxen stay untapped.
+# has Mox Ruby and Mox Sapphire to pay with but need not; the requirement is only to attack that player, so the Monstrosity
+# may attack something else (or nothing, the ruling): here it attacks Bot2's Liliana of the Veil for nothing - a declaration
+# that would be refused (it attacks someone other than the player it must attack) if attacking Bot2 cost nothing. Liliana
+# dies to 4 damage, Bot2 stays at 20 and both Moxen stay untapped.
 
 [Bot1 Deck]
 Black Lotus
@@ -43,7 +43,6 @@ Bot2.Hand.Black Lotus.Cast
 Bot2.Battlefield.Black Lotus.Activate(Color: Black)
 Bot2.Hand.Liliana of the Veil.Cast
 [T3 Bot1.Main1]
-! Bot1.Attack()
 Bot1.Attack(Ursine Monstrosity > Liliana of the Veil)
 ? Combat.Attackers = Ursine Monstrosity > Liliana of the Veil
 [T3 Bot1.Main2]

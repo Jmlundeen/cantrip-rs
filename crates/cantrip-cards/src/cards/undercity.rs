@@ -42,7 +42,7 @@ fn trap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Room 4, Arena: goad (CR 701.15a), until the controller's next turn.
 fn arena(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        g.add_effect(item.object, creature, EffectKind::Goaded, Duration::UntilNextTurnOf(item.controller));
+        cantrip_mechanics::goad::goad(g, item, creature);
     }
     Ok(())
 }

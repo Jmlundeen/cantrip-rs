@@ -642,6 +642,7 @@ pub fn block_verdict_view(verdict: &BlockVerdict, handles: &mut HandleSpace) -> 
             other: i.other.map_or(ViewHandle::NONE, |o| handles.handle(o)),
             rule: i.rule.to_string(),
         }),
+        cost: if verdict.cost.is_zero() { String::new() } else { verdict.cost.to_string() },
     }
 }
 
@@ -1094,7 +1095,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 requirements: requirements
                     .required
                     .iter()
-                    .map(|r| BlockMessage { blocker: handles.handle(r.blocker), attacker: r.attacker.map_or(ViewHandle::NONE, |a| handles.handle(a)) })
+                    .map(|r| BlockMessage { blocker: r.blocker.map_or(ViewHandle::NONE, |b| handles.handle(b)), attacker: r.attacker.map_or(ViewHandle::NONE, |a| handles.handle(a)) })
                     .collect(),
                 most_requirements: wire(requirements.most),
                 suggested: blocks(handles, &requirements.suggested),

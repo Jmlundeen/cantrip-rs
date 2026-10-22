@@ -36,13 +36,14 @@ const fn creature(name: &'static str, keywords: Keywords) -> CardDef {
 static BEAR: CardDef = creature("Must Block Test Bear", Keywords::NONE);
 static MENACE: CardDef = creature("Must Block Test Menace", Keywords::of(&[Keyword::Menace]));
 static FLYER: CardDef = creature("Must Block Test Flyer", Keywords::of(&[Keyword::Flying]));
+static LONE: CardDef = creature("Must Block Test Lone", Keywords::of(&[Keyword::CantBeBlockedByMoreThanOne]));
 static LURE: CardDef = CardDef { block_requirements: &[lures], ..creature("Must Block Test Lure", Keywords::NONE) };
 
 fn table() -> &'static CardTable {
-    Box::leak(Box::new(CardTable::new([&FILLER, &PROVOKE, &BEAR, &MENACE, &FLYER, &LURE])))
+    Box::leak(Box::new(CardTable::new([&FILLER, &PROVOKE, &BEAR, &MENACE, &FLYER, &LONE, &LURE])))
 }
 
-/// A game of two on turn 1, P0's deck starting with two Provokes, and `permanents` on the battlefield.
+/// A game of two on turn 1, P0's deck starting with three Provokes, and `permanents` on the battlefield.
 fn game(permanents: &[(&'static CardDef, PlayerId)]) -> (Game, Vec<ObjectId>) {
     let table = table();
     let filler = table.id_of(&FILLER);
@@ -51,7 +52,7 @@ fn game(permanents: &[(&'static CardDef, PlayerId)]) -> (Game, Vec<ObjectId>) {
         d.extend(std::iter::repeat_n(filler, 30));
         d
     };
-    let mut g = Game::new(table, &Setup { decks: vec![deck(2), deck(0)], ..Default::default() });
+    let mut g = Game::new(table, &Setup { decks: vec![deck(3), deck(0)], ..Default::default() });
     g.verify = true;
     let ids = permanents
         .iter()
@@ -125,7 +126,7 @@ fn a_creature_that_blocks_if_able_blocks_any_attacker() {
     let (mut g, ids) = game(&[(&BEAR, P0), (&BEAR, P0), (&BEAR, P1), (&BEAR, P1)]);
     let (a1, a2, x, y) = (ids[0], ids[1], ids[2], ids[3]);
     let ask = declare(&mut g, &[x], &[a1, a2]);
-    assert_eq!(rules(&ask).required, vec![RequiredBlock { blocker: x, attacker: None }]);
+    assert_eq!(rules(&ask).required, vec![RequiredBlock { blocker: Some(x), attacker: None }]);
     assert_eq!(rules(&ask).most, 1);
     assert!(!legal(&g, &ask, &[]));
     assert!(!legal(&g, &ask, &[(y, a1)]));
@@ -214,4 +215,17 @@ fn each_provoked_creature_is_its_own_requirement() {
     assert_eq!(rules(&ask).most, 2);
     assert!(!legal(&g, &ask, &[(x, a1)]));
     assert!(legal(&g, &ask, &[(x, a1), (y, a1)]) && legal(&g, &ask, &[(x, a1), (y, a2)]));
+}
+
+/// CR 509.1c counts requirements, one per effect: X provoked twice and Y once, attacked by a creature only one creature may
+/// block. X blocking obeys two, Y one: only X's block is legal.
+#[test]
+fn two_effects_on_one_creature_are_two_requirements() {
+    let (mut g, ids) = game(&[(&LONE, P0), (&BEAR, P1), (&BEAR, P1)]);
+    let (a, x, y) = (ids[0], ids[1], ids[2]);
+    let ask = declare(&mut g, &[x, x, y], &[a]);
+    assert_eq!(rules(&ask).required.len(), 3);
+    assert_eq!(rules(&ask).most, 2);
+    assert!(legal(&g, &ask, &[(x, a)]));
+    assert!(!legal(&g, &ask, &[(y, a)]));
 }

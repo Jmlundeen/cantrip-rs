@@ -571,7 +571,15 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     let requirements: Vec<ObjectId> = eligible
         .iter()
         .copied()
-        .filter(|&id| must_attack(cx, id) && targets.iter().any(|&t| AttackCost::free(&costs, id, t)))
+        .filter(|&id| {
+            (must_attack(cx, id) && targets.iter().any(|&t| AttackCost::free(&costs, id, t)))
+                // "Attacks that player this combat if able" (CR 508.1d) is a requirement only while it can attack that player
+                // without paying a cost: otherwise it may attack something else, or nothing (Ursine Monstrosity's ruling).
+                || cx.s().effects.iter().any(|e| {
+                    matches!(e.kind, EffectKind::MustAttackPlayer(p)
+                        if e.affected == id && players.contains(&p) && AttackCost::free(&costs, id, Target::Player(p)))
+                })
+        })
         .collect();
     let can_pay = if costs.is_empty() { 0 } else { actions::available(cx, active).most_unrestricted() };
     let kind = RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, can_pay };
@@ -678,7 +686,7 @@ fn up_to_one_without_banding(q: &dyn Query, choice: &Choice, _: u32) -> Verdict 
 const BAND: Part = cantrip_api::select::part(&(up_to_one_without_banding as SelectFn), 0, "");
 
 /// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block (decayed's too, CR 702.147a), one that
-/// can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.110b) is about the
+/// can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.111b) is about the
 /// whole declaration, not a pair.
 fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[ObjectId]) -> bool {
     let a = cx.chars(attacker);
@@ -725,11 +733,10 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
 }
 
 /// Whether `id` attacks each combat if able (CR 508.1d): by an ability it has ("this creature attacks each combat if able", one
-/// it gained included), or by an effect on it that is no ability - goad (CR 701.15b) and "attacks that player this combat if
-/// able" - which a creature that loses its abilities is still under.
+/// it gained included), or by goad (CR 701.15b), an effect and no ability, which a creature that loses its abilities is still
+/// under.
 fn must_attack(cx: &Cx, id: ObjectId) -> bool {
-    cx.chars(id).must_attack
-        || cx.s().effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::Goaded | EffectKind::MustAttackPlayer(_)))
+    cx.chars(id).must_attack || cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::Goaded)
 }
 
 /// "Can't block" (CR 509.1b): from an effect on this creature, or the turn's rule that no creature can.
@@ -777,7 +784,7 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
             }
         }
     }
-    // Menace (CR 702.110b) and "except by three or more creatures" (CR 509.1b): an attacker that can't be blocked by
+    // Menace (CR 702.111b) and "except by three or more creatures" (CR 509.1b): an attacker that can't be blocked by
     // fewer than so many creatures is offered only if that many could, and not at all if it can't be blocked by that many
     // either ("can't be blocked by more than one creature" as well, CR 509.1b: the restrictions are cumulative).
     let menace: Vec<ObjectId> = attackers
@@ -863,22 +870,20 @@ fn block_rules(cx: &Cx, attackers: &[ObjectId], allowed: &[(ObjectId, ObjectId)]
             (a, count_u32(c.minimum_blockers()), u32::try_from(c.maximum_blockers()).unwrap_or(u32::MAX))
         })
         .collect();
-    let mut required: Vec<RequiredBlock> =
-        crate::static_rules::block_requirements(cx, allowed).into_iter().map(|(blocker, attacker)| RequiredBlock { blocker, attacker: Some(attacker) }).collect();
+    let mut required = crate::static_rules::block_requirements(cx, allowed);
+    // One requirement for each effect (CR 509.1c counts requirements): two "blocks this turn if able" on a creature are two.
     for e in &cx.s().effects {
-        if e.kind == EffectKind::MustBlock
-            && allowed.iter().any(|p| p.0 == e.affected)
-            && !required.iter().any(|r| r.blocker == e.affected && r.attacker.is_none())
-        {
-            required.push(RequiredBlock { blocker: e.affected, attacker: None });
+        if e.kind == EffectKind::MustBlock && allowed.iter().any(|p| p.0 == e.affected) {
+            required.push(RequiredBlock { blocker: Some(e.affected), attacker: None });
         }
     }
     // A creature blocking one member of an attacking band blocks every member (CR 702.22h), so blocking any member obeys a
     // requirement to block another, and one block may obey two.
     let bands = cx.s().attackers.iter().filter(|a| a.band != 0).map(|a| (a.id, a.band)).collect();
-    let mut rules = BlockRequirements { required, most: 0, suggested: Vec::new(), bands, limits };
+    // No block costs anything to declare yet (CR 509.1d): no effect that makes one is built.
+    let mut rules = BlockRequirements { required, most: 0, suggested: Vec::new(), bands, limits, costs: Vec::new() };
     if !rules.required.is_empty()
-        && let Some((most, suggested)) = rules.solve(allowed, &[], None)
+        && let Some((most, suggested)) = rules.solve(allowed, &[], None, true)
     {
         rules.most = most;
         if most > 0 {

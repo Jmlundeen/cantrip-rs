@@ -726,31 +726,49 @@ impl AttackCost {
     }
 }
 
-/// The rules of a declaration of blockers past which blocks are allowed (CR 509.1b-c), held in the question so the game-log
+/// The rules of a declaration of blockers past which blocks are allowed (CR 509.1b-d), held in the question so the game-log
 /// tree moves through them: each attacker's fewest and most blockers (menace, "can't be blocked by more than one creature");
-/// each requirement an effect puts on a creature to block if able (CR 509.1c), among the blocks the restrictions allow; the
-/// most of them any declaration that obeys every restriction obeys, which the declaration must obey too; and one such
-/// declaration, the engine's suggestion. `judge` (crate::blocks) says what they make of any declaration.
+/// each requirement an effect puts on the declaration (CR 509.1c), among the blocks the restrictions allow; what blocks cost
+/// (CR 509.1d); the most requirements any declaration that obeys every restriction obeys without paying a cost, which the
+/// declaration must obey too; and one such declaration, the engine's suggestion. `judge` (crate::blocks) says what they make
+/// of any declaration.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct BlockRequirements {
-    /// The requirements (CR 509.1c), one each: "all creatures able to block enchanted creature do so" (Lure) makes one of each
-    /// creature able to block it; "target creature blocks this turn if able" one of that creature, for any attacker.
+    /// The requirements (CR 509.1c), one for each effect or static ability and each creature it is about: two Lures on a
+    /// creature make two of each creature able to block it; "target creature blocks this turn if able" one of that creature,
+    /// for any attacker.
     pub required: Vec<RequiredBlock>,
     pub most: u32,
     pub suggested: Vec<(ObjectId, ObjectId)>,
     /// The attacking bands (CR 702.22h), each attacker in one with its band's number; empty where no attacker is banded.
     pub bands: Vec<(ObjectId, u32)>,
-    /// Each attacker offered with the fewest creatures that may block it, if any do (2 for menace, CR 702.110b), and the
+    /// Each attacker offered with the fewest creatures that may block it, if any do (2 for menace, CR 702.111b), and the
     /// most (`u32::MAX` for any number; 1 for "can't be blocked by more than one creature", CR 509.1b).
     pub limits: Vec<(ObjectId, u32, u32)>,
+    /// What each block that costs something costs (CR 509.1d); a block with no entry is free. A requirement is never obeyed
+    /// by paying (CR 509.1c): `most` counts free blocks only. Empty until an effect makes blocking cost something.
+    pub costs: Vec<BlockCost>,
 }
 
-/// One requirement on a declaration of blockers (CR 509.1c): `blocker` blocks `attacker` if able, or with `None` blocks
-/// if able, whichever attacker it blocks. Obeyed by a declaration where it blocks that attacker, or one in its band.
+/// One requirement on a declaration of blockers (CR 509.1c), obeyed by a block that matches it: `blocker` blocks `attacker`
+/// if able (Lure); with no attacker, `blocker` blocks if able, whichever attacker it blocks ("target creature blocks this turn
+/// if able"); with no blocker, `attacker` is blocked if able, by any creature ("must be blocked if able"). At least one of the
+/// two is named. An attacker is blocked through its band too (CR 702.22h).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct RequiredBlock {
-    pub blocker: ObjectId,
+    pub blocker: Option<ObjectId>,
     pub attacker: Option<ObjectId>,
+}
+
+/// What declaring `blocker` as a blocker of `attacker` costs (CR 509.1d): the sum of what every effect that makes that block
+/// cost something asks, with the first permanent asking it, which the payment is shown as being for. Paid as attack costs
+/// are (CR 509.1d-f, 508.1h-j: mana abilities, then the total at once), through the same payment question.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct BlockCost {
+    pub blocker: ObjectId,
+    pub attacker: ObjectId,
+    pub cost: ManaCost,
+    pub source: ObjectId,
 }
 
 impl BlockRequirements {
@@ -763,11 +781,11 @@ impl BlockRequirements {
 
     /// Whether `blocker` blocking `declared` obeys `r`.
     pub fn obeys(&self, r: &RequiredBlock, blocker: ObjectId, declared: ObjectId) -> bool {
-        r.blocker == blocker && r.attacker.is_none_or(|a| self.blocks_through(declared, a))
+        r.blocker.is_none_or(|b| b == blocker) && r.attacker.is_none_or(|a| self.blocks_through(declared, a))
     }
 
-    /// How many of the requirements a declaration obeys (CR 509.1c): each one whose blocker blocks its attacker, as declared or
-    /// through the attacker's band - so one block of a band may obey two - or blocks at all, for a requirement to block.
+    /// How many of the requirements a declaration obeys (CR 509.1c): each one some block matches, as declared or through the
+    /// attacker's band - so one block of a band may obey two.
     pub fn obeyed(&self, blocks: &[(ObjectId, ObjectId)]) -> u32 {
         crate::count_u32(self.required.iter().filter(|r| blocks.iter().any(|&(b, x)| self.obeys(r, b, x))).count())
     }
@@ -775,6 +793,22 @@ impl BlockRequirements {
     /// The fewest and most creatures that may block `attacker` (1 and any number for one not listed).
     pub fn limits_of(&self, attacker: ObjectId) -> (u32, u32) {
         self.limits.iter().find(|l| l.0 == attacker).map_or((1, u32::MAX), |l| (l.1, l.2))
+    }
+
+    /// Whether `blocker` blocking `attacker` costs nothing to declare (CR 509.1d).
+    pub fn free(&self, blocker: ObjectId, attacker: ObjectId) -> bool {
+        !self.costs.iter().any(|c| c.blocker == blocker && c.attacker == attacker)
+    }
+
+    /// What declaring `blocks` costs in all (CR 509.1d): each block's own cost, added up.
+    pub fn total_cost(&self, blocks: &[(ObjectId, ObjectId)]) -> ManaCost {
+        let mut total = ManaCost::ZERO;
+        for &(b, a) in blocks {
+            if let Some(c) = self.costs.iter().find(|c| c.blocker == b && c.attacker == a) {
+                total = total.plus(&c.cost);
+            }
+        }
+        total
     }
 }
 

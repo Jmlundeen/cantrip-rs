@@ -390,19 +390,21 @@ pub fn attack_rules_allow(q: &dyn Query, cards: &CardTable, creature: ObjectId) 
     })
 }
 
-/// The blocks among `allowed` that a static ability of a permanent on the battlefield with its abilities (CR 613.1f) requires
-/// if able (CR 509.1c, `CardDef::block_requirements`: Lure's "all creatures able to block enchanted creature do so"). A board
-/// with no such permanent, nearly every board, makes no list.
-pub fn block_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)]) -> Vec<(ObjectId, ObjectId)> {
+/// The requirements to block that the static abilities of the permanents on the battlefield with their abilities (CR 613.1f)
+/// put on the blocks among `allowed` (CR 509.1c, `CardDef::block_requirements`: Lure's "all creatures able to block enchanted
+/// creature do so"): one for each permanent and each block it requires, so two Lures on a creature make two of each creature
+/// able to block it. A board with no such permanent, nearly every board, makes none.
+pub fn block_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)]) -> Vec<RequiredBlock> {
     let rules: Vec<(ObjectId, PlayerId, &'static CardDef)> = sources(cx, |d| !d.block_requirements.is_empty()).collect();
-    if rules.is_empty() {
-        return Vec::new();
+    let mut required = Vec::new();
+    for &(id, _, def) in &rules {
+        for &(blocker, attacker) in allowed {
+            if def.block_requirements.iter().any(|rule| rule(cx, id, blocker, attacker)) {
+                required.push(RequiredBlock { blocker: Some(blocker), attacker: Some(attacker) });
+            }
+        }
     }
-    allowed
-        .iter()
-        .copied()
-        .filter(|&(blocker, attacker)| rules.iter().any(|&(id, _, def)| def.block_requirements.iter().any(|rule| rule(cx, id, blocker, attacker))))
-        .collect()
+    required
 }
 
 /// Whether a static ability of a permanent on the battlefield with its abilities (CR 613.1f) says `test` of its own rules.

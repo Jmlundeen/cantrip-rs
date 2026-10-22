@@ -1,0 +1,56 @@
+# CR 509.1c counts requirements, one for each effect: Bot1's Llanowar Elves wears two Lures and its Guerrilla Gorilla one,
+# and both attack. Bot2's Ornithopter, its only creature, is able to block either: blocking the Elves obeys two requirements,
+# blocking the Gorilla one, so it must block the Elves. Blocking the Gorilla is refused, as is no block at all; the Gorilla is
+# unblocked and deals 2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Guerrilla Gorilla
+Lure
+Lure
+Lure
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lure.Cast(Guerrilla Gorilla)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lure.Cast(Llanowar Elves)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lure.Cast(Llanowar Elves)
+Bot1.Attack(Llanowar Elves > Bot2; Guerrilla Gorilla > Bot2)
+! Bot2.Block(Count: 0)
+! Bot2.Block(Ornithopter > Guerrilla Gorilla)
+Bot2.Block(Ornithopter > Llanowar Elves)
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Life = 18
+Bot2.Battlefield = Ornithopter

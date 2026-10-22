@@ -946,9 +946,10 @@ pub struct DeclareBlockersPrompt {
     /// than one creature", 0 for any number.
     #[serde(default)]
     pub maximum_blockers: Vec<i32>,
-    /// The requirements effects put on the declaration (CR 509.1c), one each: a creature that must block an attacker if able
-    /// (Lure's "all creatures able to block enchanted creature do so"), or with no attacker (`ViewHandle::NONE`) a creature
-    /// that must block if able, whichever attacker it blocks ("target creature blocks this turn if able").
+    /// The requirements effects put on the declaration (CR 509.1c), one each, for showing the player: a creature that must
+    /// block an attacker if able (Lure's "all creatures able to block enchanted creature do so"); with no attacker
+    /// (`ViewHandle::NONE`) a creature that must block if able, whichever attacker it blocks ("target creature blocks this turn
+    /// if able"); with no blocker an attacker that must be blocked if able, by any creature. The host judges them (`verdict`).
     #[serde(default)]
     pub requirements: Vec<BlockMessage>,
     /// How many of `requirements` the declaration must obey: the most any declaration that obeys every restriction does.
@@ -975,6 +976,10 @@ pub struct BlockVerdictView {
     pub complete: bool,
     pub addable: Vec<BlockMessage>,
     pub issue: Option<BlockIssueView>,
+    /// What declaring it costs (CR 509.1d), in mana symbols ("{2}"); empty for a declaration that costs nothing. It is paid
+    /// once declared, through the payment prompt attack costs use (CR 509.1d-f, 508.1h-j).
+    #[serde(default)]
+    pub cost: String,
 }
 
 /// Why a declaration of blockers may not be made as it is, to caption as `Creature`, `Words`, then `Other` where there is

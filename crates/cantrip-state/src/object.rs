@@ -680,9 +680,9 @@ pub enum EffectKind {
     /// Gains "this creature attacks each combat if able" (CR 508.1d), layer 6: an ability, which "loses all abilities" later
     /// takes (Carnage, Crimson Chaos).
     MustAttack,
-    /// "Attacks that player this combat if able" (CR 508.1d): an attack requirement that names the player to attack. It also
-    /// makes the creature attack each combat if able, for as long as it lasts. An effect, not an ability: a creature that loses
-    /// its abilities is still under it.
+    /// "Attacks that player this combat if able" (CR 508.1d): an attack requirement that names the player to attack, and only
+    /// that: where the creature can't attack that player without paying a cost, it may attack anything else, or nothing (Ursine
+    /// Monstrosity's ruling). An effect, not an ability: a creature that loses its abilities is still under it.
     MustAttackPlayer(PlayerId),
     /// It becomes this subtype in addition to its other subtypes (CR 613.1d), layer 4.
     AddSubtype(Subtype),
