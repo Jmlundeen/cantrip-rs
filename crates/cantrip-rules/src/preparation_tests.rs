@@ -132,8 +132,8 @@ fn finish_payment(game: &mut Game, source: ObjectId, land: ObjectId) {
     action(game, ActionKind::ActivateAbility, land);
     assert!(game.state.obj(source).prepared, "still prepared when the additional discard is chosen");
     let r = game.pending().cloned().unwrap();
-    let RequestKind::ChooseCards { eligible, .. } = &r.kind else { panic!("discard not asked: {:?}", r.kind) };
-    game.answer(r.id, r.player, Answer::Cards(vec![eligible[0]])).unwrap();
+    let RequestKind::ChooseCards { cards, .. } = &r.kind else { panic!("discard not asked: {:?}", r.kind) };
+    game.answer(r.id, r.player, Answer::Cards(vec![cards[0]])).unwrap();
 }
 
 #[test]
@@ -211,8 +211,8 @@ fn current_controller_casts_and_consumes_the_original_linked_copy_despite_abilit
     refresh_priority(&mut g);
     action(&mut g, ActionKind::CastSpell, copy);
     let r = g.pending().cloned().unwrap();
-    let RequestKind::ChooseCards { eligible, .. } = &r.kind else { panic!("{:?}", r.kind) };
-    g.answer(r.id, THEM, Answer::Cards(vec![eligible[0]])).unwrap();
+    let RequestKind::ChooseCards { cards, .. } = &r.kind else { panic!("{:?}", r.kind) };
+    g.answer(r.id, THEM, Answer::Cards(vec![cards[0]])).unwrap();
     let cast = g.history().casts().next().copied().unwrap();
     assert_eq!(cast.player, THEM);
     assert_eq!(g.state.obj(cast.spell).controller, THEM, "CR 601.2a: caster controls spell, not linked copy's owner");
