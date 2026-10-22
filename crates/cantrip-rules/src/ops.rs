@@ -1094,13 +1094,15 @@ pub fn cease_together(cx: &mut Cx, objects: &[(Zone, ObjectId)]) {
 /// it, or a delayed ability it created, reads after (High Tide whose "Island" Magical Hack made "Swamp" watches Swamps;
 /// CR 603.7d). Nothing hidden reaches a player through it: it is read only where the rules read the object itself.
 pub fn last_known_of(cx: &Cx, id: ObjectId) -> LastKnown {
-    last_known_from(cx, id, &layers::chars(cx.cards(), cx.s(), &cx.g.log, id))
+    last_known_from(cx, id, &layers::source_chars(cx.cards(), cx.s(), &cx.g.log, id))
 }
 
 /// `last_known_of` with `id`'s characteristics `c` already worked out.
 pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
     LastKnown {
         id,
+        card: c.card,
+        controller: cx.controller(id),
         name: c.name,
         name_set: c.name_set,
         supertypes: c.supertypes,
@@ -1111,6 +1113,15 @@ pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
         power: c.power,
         toughness: c.toughness,
         keywords: c.keywords,
+        protection: c.protection,
+        protection_colorless: c.protection_colorless,
+        protection_players: c.protection_players,
+        protection_types: c.protection_types,
+        spell: c.spell,
+        protection_colored_spells: c.protection_colored_spells,
+        protection_everything: c.protection_everything,
+        hexproof_from: c.hexproof_from,
+        must_attack: c.must_attack,
         mana_value: cantrip_api::mana_value_of(&|card| cx.cards().get(card), cx.s(), id, c),
         abilities: c.abilities,
         words: cantrip_api::words(cx.s(), id),
@@ -2125,7 +2136,7 @@ pub fn deal_damage_with(
     // Protection prevents the damage (CR 702.16e, 702.16j, 702.16k) unless it can't be prevented (CR 615.12), and the
     // prevention is recorded (CR 615.6). Where replacement or other prevention effects applied, protection was ordered with them
     // (CR 616.1) and has prevented it already if it applies.
-    let source_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
+    let source_chars = layers::source_chars(cx.cards(), cx.s(), &cx.g.log, source);
     let prevented = |cx: &mut Cx, by: ObjectId| -> Option<Event> {
         cx.emit(Event::DamagePrevented { source, target, amount, combat, by });
         None
@@ -2133,7 +2144,7 @@ pub fn deal_damage_with(
     match target {
         Target::None | Target::Ability(_) => None,
         Target::Player(p) => {
-            if let Some(by) = layers::player_protection(cx.cards(), cx.s(), &cx.g.log, p, cx.s().obj(source).controller)
+            if let Some(by) = layers::player_protection(cx.cards(), cx.s(), &cx.g.log, p, cx.controller(source))
                 && damage_can_be_prevented(cx, source, combat)
             {
                 return prevented(cx, by);
@@ -2143,20 +2154,20 @@ pub fn deal_damage_with(
                 // Damage from a source with infect is dealt to a player as that many poison counters (CR 702.90b,
                 // 120.3b), and so is damage dealt "as though its source had infect" (Phyrexian Unlife): "that source's
                 // controller" gives them, so "if you would put one or more counters" is theirs.
-                let by = cx.s().obj(source).controller;
+                let by = cx.controller(source);
                 counters::put_on_player(cx, p, counters::PlayerCounts { poison: amount, ..Default::default() }, by);
             } else {
                 change_life(cx, p, -(amount as i32));
             }
             lifelink(cx, source, &source_chars, amount, batch);
-            Some(Event::Damage { source, target, amount, combat, controller: cx.s().obj(source).controller, colors: source_chars.colors })
+            Some(Event::Damage { source, target, amount, combat, controller: cx.controller(source), colors: source_chars.colors })
         }
         Target::Object(id) => {
             if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
                 return None;
             }
             let target_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
-            let source_controller = cx.s().obj(source).controller;
+            let source_controller = cx.controller(source);
             if target_chars.protected_from_by(&source_chars, source_controller) && damage_can_be_prevented(cx, source, combat) {
                 return prevented(cx, id);
             }
@@ -2194,7 +2205,7 @@ pub fn deal_damage_with(
                 counters::remove(cx, id, CounterKind::Loyalty, amount.min(i16::MAX as u16) as i16);
             }
             lifelink(cx, source, &source_chars, amount, batch);
-            Some(Event::Damage { source, target, amount, combat, controller: cx.s().obj(source).controller, colors: source_chars.colors })
+            Some(Event::Damage { source, target, amount, combat, controller: cx.controller(source), colors: source_chars.colors })
         }
     }
 }
@@ -2206,14 +2217,14 @@ pub fn deal_damage_with(
 /// (CR 616.1).
 pub(crate) fn protection_prevents(cx: &Cx, source: ObjectId, target: Target, combat: bool) -> Option<ObjectId> {
     let by = match target {
-        Target::Player(p) => layers::player_protection(cx.cards(), cx.s(), &cx.g.log, p, cx.s().obj(source).controller)?,
+        Target::Player(p) => layers::player_protection(cx.cards(), cx.s(), &cx.g.log, p, cx.controller(source))?,
         Target::Object(id) => {
             if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
                 return None;
             }
             let target_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
-            let source_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
-            if !target_chars.protected_from_by(&source_chars, cx.s().obj(source).controller) {
+            let source_chars = layers::source_chars(cx.cards(), cx.s(), &cx.g.log, source);
+            if !target_chars.protected_from_by(&source_chars, cx.controller(source)) {
                 return None;
             }
             id
@@ -2236,7 +2247,7 @@ pub(crate) fn damage_can_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -
 /// the damage event, not a trigger: added to what the source has dealt in this event, gained once it is all dealt.
 fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u16, batch: &mut DamageBatch) {
     if chars.has(Keyword::Lifelink) {
-        let controller = cx.s().obj(source).controller;
+        let controller = cx.controller(source);
         match batch.lifelink.iter_mut().find(|(s, _, _)| *s == source) {
             Some(entry) => entry.2 += amount as u32,
             None => batch.lifelink.push((source, controller, amount as u32)),
