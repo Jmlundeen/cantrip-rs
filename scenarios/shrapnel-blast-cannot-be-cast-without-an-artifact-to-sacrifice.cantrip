@@ -1,0 +1,29 @@
+# The additional cost is mandatory (CR 601.2b, 118.3): on turn 3 Bot1 has two Mountains tapped for {R}{R}, enough for the
+# {1}{R}, but no artifact in play, so Shrapnel Blast is refused. Then Mox Ruby is cast (the control) and the same cast is
+# legal, sacrificing it.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Ruby
+Shrapnel Blast
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+! Bot1.Hand.Shrapnel Blast.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Shrapnel Blast.Cast(Bot2)
+Bot1.Choose(Mox Ruby)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Shrapnel Blast; Mox Ruby

@@ -1,0 +1,38 @@
+# Exactly 5 damage is lethal to a 1/5 (a 4-damage Blast would leave Rhox Faithmender alive), and the Moxen/Ornithopter cost is
+# paid on the way: Bot1 sacrifices its Ornithopter, keeping Mox Ruby. Bot2's Black Lotus (white) and Plains cast the Rhino.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Shrapnel Blast
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Rhox Faithmender
+Plains x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Rhox Faithmender.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shrapnel Blast.Cast(Bot2.Battlefield.Rhox Faithmender)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Rhox Faithmender; Black Lotus
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby

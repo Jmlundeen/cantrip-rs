@@ -1,0 +1,41 @@
+# Shrapnel Blast sacrifices an artifact as a cost (CR 118.8, 601.2h) and deals exactly 5 damage to any target. Bot1 casts two:
+# one at Bot2 and one at itself (any target covers both players), each sacrificing an Ornithopter while the Moxen stay.
+# Both players end at 15.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Ornithopter
+Ornithopter
+Shrapnel Blast
+Shrapnel Blast
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Shrapnel Blast.Cast(Bot2)
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Shrapnel Blast.Cast(Bot1)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Life = 15
+Bot1.Battlefield = Mountain; Mountain; Mox Emerald; Mox Ruby
+Bot1.Graveyard.Count = 4

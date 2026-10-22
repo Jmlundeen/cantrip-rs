@@ -1,0 +1,6 @@
+{
+  "name": "Shrapnel Blast",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "As an additional cost to cast this spell, sacrifice an artifact.\nShrapnel Blast deals 5 damage to any target."
+}
