@@ -1,0 +1,52 @@
+# At seven cards in the graveyard, Loot can sacrifice another creature or planeswalker controlled by its controller,
+# but neither Loot itself nor an opponent's creature is eligible (CR 701.21a).
+
+[Bot1 Deck]
+Black Lotus x5
+Loot, the Anomaly
+Jace, the Mind Sculptor
+Black Lotus x2
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Loot, the Anomaly.Cast
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Battlefield.Loot, the Anomaly.Activate(Ability: Sacrifice another creature or planeswalker)
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Loot, the Anomaly.Activate(Ability: Sacrifice another creature or planeswalker)
+! Bot1.Choose(Loot, the Anomaly)
+! Bot1.Choose(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Jace, the Mind Sculptor)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Jace, the Mind Sculptor; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Black Lotus
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Loot, the Anomaly.Power = -4
+Bot1.Graveyard.Count = 8
+Bot2.Battlefield.Llanowar Elves.Power = 1

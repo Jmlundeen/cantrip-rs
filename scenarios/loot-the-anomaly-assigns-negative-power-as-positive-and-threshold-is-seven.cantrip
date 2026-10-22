@@ -1,0 +1,55 @@
+# Loot has negative actual power, but deals two combat damage. Its threshold ability is unavailable at six graveyard
+# cards and becomes available at seven; sacrificing another creature shrinks it through end of turn only (CR 510.1a,
+# 611.2a).
+
+[Bot1 Deck]
+Black Lotus x5
+Loot, the Anomaly
+Ornithopter
+Black Lotus x2
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Loot, the Anomaly.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Battlefield.Loot, the Anomaly.Activate(Ability: Sacrifice another creature or planeswalker)
+? Bot1.Battlefield.Loot, the Anomaly.Power = -2
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Loot, the Anomaly > Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Loot, the Anomaly.Activate(Ability: Sacrifice another creature or planeswalker)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loot, the Anomaly.Power = -4
+? Bot1.Battlefield.Loot, the Anomaly.Toughness = 4
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Loot, the Anomaly > Bot2)
+[T5 Bot1.Main2]
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Loot, the Anomaly > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Loot, the Anomaly.Power = -2
+Bot1.Battlefield.Loot, the Anomaly.Toughness = 4
+Bot1.Graveyard = Ornithopter; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Black Lotus
+Bot2.Life = 12
