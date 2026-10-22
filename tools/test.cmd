@@ -37,9 +37,15 @@ rem play one whole game in it and draw every prompt dock. Their pictures go unde
 rem take the installed Chrome or Edge; see dotnet\tests\Cantrip.Client.Web.Tests.
 rem
 rem Exits non-zero if the build or any test fails, and always ends with one
-rem verdict line: "All tests passed.", "Tests failed." or "Build failed. No
-rem tests ran." Read that line, not the tail of the output - and beware piping
-rem this through `tail`, which hands back its own exit code.
+rem verdict line: "All tests passed (1,262 .NET, 8,849 engine, 3 skipped).",
+rem "Tests failed (...)." or "Build failed. No tests ran." Read that line, not
+rem the tail of the output - and beware piping this through `tail`, which hands
+rem back its own exit code.
+rem
+rem The output is captured and only what a passing run does not print is shown
+rem (failures, errors, panics, anything unrecognised: tools\maintenance\
+rem test-report.ps1), so a pass is the verdict line alone. /detailed streams
+rem everything as it runs, each test listed.
 rem ---------------------------------------------------------------------------
 
 rem No delayed expansion: the /noweb filter carries a "!", which it would eat.
@@ -64,7 +70,7 @@ if /i "%~1"=="/engine"   ( set "ENGINE=1" & shift & goto args )
 if /i "%~1"=="/noweb"    ( set "WEB=" & set "SLOW=1" & shift & goto args )
 if /i "%~1"=="/all"      ( set "SLOW=1" & shift & goto args )
 if /i "%~1"=="/filter"   ( set "ARGS=%ARGS% --filter "%~2"" & set "FILTERED=1" & shift & shift & goto args )
-if /i "%~1"=="/detailed" ( set "ARGS=%ARGS% --logger "console;verbosity=detailed"" & shift & goto args )
+if /i "%~1"=="/detailed" ( set "ARGS=%ARGS% --logger "console;verbosity=detailed"" & set "DETAILED=1" & shift & goto args )
 if /i "%~1"=="/?"        goto usage
 echo Unknown option: %~1
 goto usage
@@ -81,6 +87,9 @@ rem slowest project by far and nothing /noweb runs needs it.
 set "SOLUTION=%ROOT%\dotnet\Cantrip.sln"
 if not defined WEB set "SOLUTION=%ROOT%\dotnet\Cantrip.NoWeb.slnf"
 
+rem Where each step's output is captured, for :report to sift.
+set "LOG=%TEMP%\cantrip-test-%RANDOM%%RANDOM%"
+
 rem /engine: the .NET side is neither built nor tested.
 set "RESULT=0"
 if defined ENGINE goto engine
@@ -89,7 +98,11 @@ rem A build failure ends the run, but it still goes through :report. Exiting her
 rem printed compiler errors and no verdict at all, which reads as success to
 rem anything that only keeps the tail of the output.
 if defined BUILD (
-  dotnet build "%SOLUTION%" -v q --nologo
+  if defined DETAILED (
+    dotnet build "%SOLUTION%" -v q --nologo
+  ) else (
+    dotnet build "%SOLUTION%" -v q --nologo > "%LOG%-build.txt" 2>&1
+  )
   if errorlevel 1 set "BUILDFAILED=1"
 )
 
@@ -98,7 +111,11 @@ if defined BUILDFAILED (
   goto report
 )
 
-dotnet test "%SOLUTION%" --no-build --nologo %ARGS%
+if defined DETAILED (
+  dotnet test "%SOLUTION%" --no-build --nologo %ARGS%
+) else (
+  dotnet test "%SOLUTION%" --no-build --nologo %ARGS% > "%LOG%-dotnet.txt" 2>&1
+)
 set "RESULT=%ERRORLEVEL%"
 
 :engine
@@ -110,12 +127,31 @@ rem names dotnet tests, so it leaves these out.
 if "%RESULT%"=="0" if not defined FILTERED (
   pushd "%ROOT%"
   set "CANTRIP_VERIFY=1"
-  cargo test --profile cards --workspace --quiet
+  if defined DETAILED (
+    cargo test --profile cards --workspace --quiet
+  ) else (
+    cargo test --profile cards --workspace --quiet > "%LOG%-engine.txt" 2>&1
+  )
   if errorlevel 1 set "RESULT=1"
   popd
 )
 
 :report
+if defined DETAILED goto verdict
+set "REPORTED="
+if defined BUILDFAILED (
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%ROOT%\tools\maintenance\test-report.ps1" -Result %RESULT% -BuildFailed "%LOG%-build.txt" && set "REPORTED=1"
+) else (
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%ROOT%\tools\maintenance\test-report.ps1" -Result %RESULT% "%LOG%-build.txt" "%LOG%-dotnet.txt" "%LOG%-engine.txt" && set "REPORTED=1"
+)
+rem The report failing to run is no reason to lose the output: it is printed whole.
+if not defined REPORTED (
+  for %%f in ("%LOG%-build.txt" "%LOG%-dotnet.txt" "%LOG%-engine.txt") do if exist %%f type %%f
+)
+del /q "%LOG%-build.txt" "%LOG%-dotnet.txt" "%LOG%-engine.txt" 2>nul
+if defined REPORTED goto done
+
+:verdict
 echo.
 if "%RESULT%"=="0" (
   echo All tests passed.
@@ -123,6 +159,7 @@ if "%RESULT%"=="0" (
   if defined BUILDFAILED (echo Build failed. No tests ran.) else (echo Tests failed.)
 )
 
+:done
 endlocal & exit /b %RESULT%
 
 :usage
