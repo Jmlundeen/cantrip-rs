@@ -1,0 +1,63 @@
+# Darksteel Angel: "your opponents can't win the game" (CR 104.2b). Bot1 puts the Angel out on turn 3 off an Island, Black
+# Lotus and five Moxen (nine mana). Bot2's library is down to two cards when its Thassa's Oracle enters on turn 4: its
+# devotion to blue, 2, is at least the cards in its library, so the Oracle says Bot2 wins the game - and with Bot1's Angel
+# out, Bot2 can't, so nothing happens and the game goes on. (In a duel the Angel's "can't lose" blocks the same win - an
+# opponent who can't lose can't be beaten - so this shows the two together; the win clause alone has no duel to show it in.)
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Darksteel Angel
+Island x12
+
+[Bot2 Deck]
+Island
+Island
+Thassa's Oracle
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Darksteel Angel.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+? Bot2.Library.Count = 2
+Bot2.Hand.Thassa's Oracle.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Status = (absent)
+Bot2.Battlefield.Thassa's Oracle.Tapped = false
+Bot2.Library.Count = 2
+Bot1.Battlefield.Darksteel Angel.Tapped = false

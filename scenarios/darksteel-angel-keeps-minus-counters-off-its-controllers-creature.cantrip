@@ -1,6 +1,6 @@
 # Darksteel Angel: "Creatures you control can't have -1/-1 counters put on them." Bot2's Glistener Elf, which has infect, is
 # blocked on turn 6 by Bot1's Ornithopter: the 1 damage it would deal as a -1/-1 counter is never put, so the 0/2 Ornithopter
-# is still a 0/2 with no counter on it, and Bot1, blocking, takes no poison.
+# is still a 0/2 with no counter on it.
 
 [Bot1 Deck]
 Island
