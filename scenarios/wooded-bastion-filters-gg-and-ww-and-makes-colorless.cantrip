@@ -21,6 +21,7 @@ Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W}, {T})
 Bot1.Colors(Green; Green)
 ? Bot1.Mana = {G}{G}
+! Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W}, {T})
 [T5 Bot1.Main1]
 Bot1.Hand.Plains.Play
 Bot1.Battlefield.Plains.Activate

@@ -21,6 +21,7 @@ Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U}, {T})
 Bot1.Colors(White; White)
 ? Bot1.Mana = {W}{W}
+! Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U}, {T})
 [T5 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate

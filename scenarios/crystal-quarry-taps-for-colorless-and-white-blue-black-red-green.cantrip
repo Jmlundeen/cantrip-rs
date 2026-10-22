@@ -29,6 +29,8 @@ Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Crystal Quarry.Activate(Ability: {5}, {T})
 ? Bot1.Mana = {W}{U}{B}{R}{G}
+! Bot1.Battlefield.Crystal Quarry.Activate(Ability: {5}, {T})
 
 [Expect]
 Turn = 11
+Bot1.Battlefield.Crystal Quarry.Tapped = true

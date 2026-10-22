@@ -21,6 +21,7 @@ Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B}, {T})
 Bot1.Colors(White; White)
 ? Bot1.Mana = {W}{W}
+! Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B}, {T})
 [T5 Bot1.Main1]
 Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Swamp.Activate

@@ -18,6 +18,8 @@ Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Viridescent Bog.Activate(Ability: {1}, {T})
 ? Bot1.Mana = {B}{G}
+! Bot1.Battlefield.Viridescent Bog.Activate(Ability: {1}, {T})
 
 [Expect]
 Turn = 3
+Bot1.Battlefield.Viridescent Bog.Tapped = true

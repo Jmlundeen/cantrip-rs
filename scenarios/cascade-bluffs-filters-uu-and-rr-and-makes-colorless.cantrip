@@ -21,6 +21,7 @@ Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Cascade Bluffs.Activate(Ability: {U/R}, {T})
 Bot1.Colors(Blue; Blue)
 ? Bot1.Mana = {U}{U}
+! Bot1.Battlefield.Cascade Bluffs.Activate(Ability: {U/R}, {T})
 [T5 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Mountain.Activate

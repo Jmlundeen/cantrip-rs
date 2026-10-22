@@ -32,6 +32,8 @@ Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Cascading Cataracts.Activate(Ability: {5}, {T})
 Bot1.Colors(White; Blue; Black; Red; Green)
 ? Bot1.Mana = {W}{U}{B}{R}{G}
+! Bot1.Battlefield.Cascading Cataracts.Activate(Ability: {5}, {T})
 
 [Expect]
 Turn = 11
+Bot1.Battlefield.Cascading Cataracts.Tapped = true
