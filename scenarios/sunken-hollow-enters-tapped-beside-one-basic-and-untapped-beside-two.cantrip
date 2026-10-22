@@ -1,0 +1,32 @@
+# Sunken Hollow: "This land enters tapped unless you control two or more basic lands." Turn 5 Bot1 controls an Island (one
+# basic) and an Underground Sea (the Island and Swamp types, but not basic, CR 205.4a): one basic is below the two, so its
+# Sunken Hollow enters tapped - though Bot2, its opponent, controls two basic lands by then. Bot2 with an Island and a
+# Swamp of its own plays the same land on turn 6 and it enters untapped (positive control).
+
+[Bot1 Deck]
+Island
+Underground Sea
+Sunken Hollow
+Swamp x20
+
+[Bot2 Deck]
+Island
+Swamp
+Sunken Hollow
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Underground Sea.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Sunken Hollow.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Sunken Hollow.Play
+
+[Expect]
+Bot1.Battlefield.Sunken Hollow.Tapped = true
+Bot2.Battlefield.Sunken Hollow.Tapped = false
