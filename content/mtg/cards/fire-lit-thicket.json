@@ -1,0 +1,5 @@
+{
+  "name": "Fire-Lit Thicket",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{R/G}, {T}: Add {R}{R}, {R}{G}, or {G}{G}."
+}
