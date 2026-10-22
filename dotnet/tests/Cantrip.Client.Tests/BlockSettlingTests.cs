@@ -148,4 +148,22 @@ public sealed class BlockSettlingTests
 
         Assert.Equal([(10, 1)], Answered(transport));
     }
+
+    /// <summary>A check the host refuses never lets the declaration go unsettled: nothing is sent.</summary>
+    [Theory]
+    [InlineData(ErrorCode.StaleReply, false)]
+    [InlineData(ErrorCode.UnknownHandle, true)]
+    public void A_refused_check_sends_nothing_and_asks_again_where_the_question_is_still_open(ErrorCode code, bool askedAgain)
+    {
+        (GameClient client, Judging transport) = Asked(TenMustBlock);
+        client.Answer(new BlockersDeclaredAnswer { Blocks = [B(11, 2)] });
+        Assert.True(client.IsChecking);
+        transport.Inbound.Clear();
+        transport.Inbound.Enqueue(new ErrorMessage { Code = code, Detail = "refused", RequestId = 9 });
+        client.Pump();
+
+        Assert.False(client.IsSettling);
+        Assert.Null(Answered(transport));
+        Assert.Equal(askedAgain, client.Prompt?.RequestId == 9);
+    }
 }

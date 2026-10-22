@@ -1705,28 +1705,36 @@ declare more. A multi-pair refusal in a scenario is judged by the engine's check
 
 ### Blocks an effect requires
 
-A requirement to block (CR 509.1c) is one `RequiredBlock` of the question's `BlockRequirements`: a creature that must block a
-given attacker, or with no attacker a creature that must block whichever attacker it blocks. Lure's "all creatures able to
-block enchanted creature do so" is a `CardDef::block_requirements` entry (`BlockRequirement`), asked of each block the
-restrictions allow with the permanent as its source (`static_rules::block_requirements`, only while a permanent with one is on
-the battlefield with its abilities); "target creature blocks this turn if able" is a resolved effect, `EffectKind::MustBlock`
-(an effect, not an ability: a creature that loses its abilities still must), which makes a requirement with no attacker of
-each creature it affects that may block something. A creature that is tapped, can't block or may block no attacker is
-required nothing; costs to block (CR 509.1d) are not built, and a block that costs something will not count toward a
-requirement when they are. `turn::block_rules` puts the requirements, each attacker's fewest and most blockers (`limits`) and
-the bands in the question, and `BlockRequirements::solve` (`crates/cantrip-state/src/blocks.rs`) finds the most of them any
-declaration that breaks no restriction obeys (each blocker blocks one attacker, every block allowed, each attacker blocked
-within its limits: menace) by a cut search over the blocks of the attackers a requirement can be obeyed through, with one
-such declaration (`suggested`).
+A requirement to block (CR 509.1c) is one `RequiredBlock` of the question's `BlockRequirements`, one for each effect or static
+ability and each creature it is about (CR 509.1c counts requirements: two Lures on a creature are two of each able blocker,
+two "blocks this turn if able" on a creature two): a blocker and an attacker it must block; a blocker with no attacker, which
+must block whichever attacker it blocks; or an attacker with no blocker, which must be blocked by any creature ("must be
+blocked if able", obeyed once however many block it). Lure's "all creatures able to block enchanted creature do so" is a
+`CardDef::block_requirements` entry (`BlockRequirement`), asked of each block the restrictions allow with the permanent as its
+source (`static_rules::block_requirements`, only while a permanent with one is on the battlefield with its abilities); "target
+creature blocks this turn if able" is a resolved effect, `EffectKind::MustBlock` (an effect, not an ability: a creature that
+loses its abilities still must), one requirement per effect of a creature that may block something. A creature that is
+tapped, can't block or may block no attacker is required nothing. Costs to block (CR 509.1d) are data in the question
+(`BlockRequirements::costs`, one `BlockCost` per block that costs something; no effect makes one yet) and the verdict carries a
+declaration's total; `most` counts free blocks only, since no requirement is obeyed by paying (CR 509.1c). Paying would reuse
+attack costs' payment (CR 509.1d-f mirrors 508.1h-j). `turn::block_rules` puts the requirements, each attacker's fewest and most
+blockers (`limits`), the costs and the bands in the question, and `BlockRequirements::solve` (`crates/cantrip-state/src/blocks.rs`)
+finds the most of them any declaration that breaks no restriction obeys by a cut search over the blocks of the attackers a
+requirement can be obeyed through, with one such declaration (`suggested`). A branch is bounded by what the creatures still
+to come could obey and by what the attackers' room for blockers lets them obey, whichever is less, and the search ends once a
+declaration reaches the bound - so Lured attackers that can't be blocked by more than one creature each stay quick at any
+size hand play builds.
 
 One validator judges every declaration: `BlockRequirements::judge` gives a `BlockVerdict` - `complete` (it may be declared as it
-is), `issue` (why not: the creature, the words, the other creature, the CR rule, for a caption) and, when asked, `addable`, the
-blocks some legal declaration extending it has, each found by `solve` with the declared blocks fixed. The core checks every
-answer with it (without `addable`, a walk over the blocks), the scenario harness picks among like-named blockers and judges
-refusals with it, and the host gives it to a client as the player declares (`CheckBlocks`, docs/host-protocol.md); every
-client's declaration is settled with the host by `GameClient.Answer`, so a new restriction or requirement changes the engine
-alone. Not built, as no card in content needs it: the static "blocks each combat if able" (a source of the same
-no-attacker requirement), "must be blocked if able" (a requirement on an attacker), "this combat" durations, and costs to block.
+is), `issue` (why not: the creature, the words, the other creature, the CR rule, for a caption), `cost` and, when asked,
+`addable`, the blocks some legal declaration extending it has, each found by `solve` with the declared blocks fixed. The core
+checks every answer with it (without `addable`, a walk over the blocks), the scenario harness picks among like-named blockers
+and judges refusals with it, and the host gives it to a client as the player declares (`CheckBlocks`, docs/host-protocol.md).
+The web client holds any set of blocks and offers exactly what the verdict adds, and every client's declaration is settled
+with the host by `GameClient.Answer`, so a new restriction, requirement or cost changes the engine alone. Not built, as no card
+in content needs it: the static "blocks each combat if able" (a source of the same no-attacker requirement), "must be blocked if
+able" (whose requirement already fits), "this combat" durations, an effect that makes blocking cost something, and a creature
+that can block additional creatures (the validator's one-attacker-per-blocker rule, CR 509.1a).
 
 ### Banding
 

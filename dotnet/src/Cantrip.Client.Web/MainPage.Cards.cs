@@ -29,9 +29,9 @@ public sealed partial class MainPage
     private List<TargetMessage> _pickedTargets => _selection.Targets;
     private List<int> _triggerOrder => _selection.TriggerOrder;
     private Dictionary<int, AttackChoice> _attacking => _selection.Attacking;
-    private Dictionary<int, int> _blocking => _selection.Blocking;
+    private List<(int Blocker, int Attacker)> _blocking => _selection.Blocking;
     private List<int> _pending => _selection.Pending;
-    private int _blockLimit { get => _selection.BlockLimit; set => _selection.BlockLimit = value; }
+    private int _blockingInto { get => _selection.BlockingInto; set => _selection.BlockingInto = value; }
     private Dictionary<(int Source, int Creature), int> _shares => _selection.DamageShares;
     private Dictionary<int, int> _dividedShares => _selection.DividedShares;
     private ActionOptionMessage? _targeting { get => _selection.Targeting; set => _selection.Targeting = value; }
@@ -271,19 +271,19 @@ public sealed partial class MainPage
                 when _pending.Count > 0 && _pending.Any(creature => MayAttack(attackers, creature, new AttackChoice(0, card.Handle))) =>
                 new CardLook(Actionable: true, Clicked: () => AssignAttack(client, attackers, new AttackChoice(0, card.Handle))),
 
-            // A blocker already against an attacker comes back off it when clicked; one that is not is picked up, and
-            // the attackers become the things to click.
-            DeclareBlockersPromptMessage when _eligible.Contains(handle) && _blocking.ContainsKey(handle) =>
-                new CardLook(Selected: true, Actionable: true, Clicked: () => Unassign(handle)),
-
+            // A creature is picked up, and the attackers become the things to click. One already blocking is picked up again
+            // where the rules' verdict lets it block another attacker too, and otherwise comes back off what it blocks.
             DeclareBlockersPromptMessage when _eligible.Contains(handle) =>
-                new CardLook(Selected: _pending.Contains(handle), Actionable: true, Clicked: () => PickUp(handle)),
+                new CardLook(
+                    Selected: _pending.Contains(handle) || _blocking.Exists(pair => pair.Blocker == handle),
+                    Actionable: true,
+                    Clicked: () => ClickBlocker(client, handle)),
 
             DeclareBlockersPromptMessage blockers
                 when _pending.Count > 0
-                    && blockers.Attackers.IndexOf(card.Handle) is >= 0 and var target
-                    && _pending.Any(blocker => MayBlock(blockers, blocker, card.Handle)) =>
-                new CardLook(Actionable: true, Clicked: () => AssignBlocks(client, blockers, target)),
+                    && blockers.Attackers.Contains(card.Handle)
+                    && _pending.Any(blocker => MayBlock(client, blocker, card.Handle.Value)) =>
+                new CardLook(Actionable: true, Clicked: () => AssignBlocks(client, card.Handle)),
 
             // An attacker none of the held blockers may block, such as a flier against creatures without flying or reach.
             DeclareBlockersPromptMessage blockers
@@ -698,6 +698,8 @@ public sealed partial class MainPage
     /// <summary>Picks a creature up, or puts it back down, to be sent somewhere along with the others picked up.</summary>
     private void PickUp(int creature)
     {
+        // A creature picked up goes where the next click sends it, not to the attacker the last one did.
+        _blockingInto = 0;
         if (!_pending.Remove(creature))
         {
             _pending.Add(creature);
@@ -710,8 +712,33 @@ public sealed partial class MainPage
     private static bool MayAttack(DeclareAttackersPromptMessage prompt, int attacker, AttackChoice choice) =>
         prompt.AttacksFor(new ViewHandle(attacker)).Any(attack => attack.TargetPlayer == choice.Player && attack.TargetPermanent == choice.Permanent);
 
-    private static bool MayBlock(DeclareBlockersPromptMessage prompt, int blocker, ViewHandle attacker) =>
-        prompt.Allowed.Any(pair => pair.Blocker.Value == blocker && pair.Attacker == attacker);
+    /// <summary>The blocks declared so far, as the answer and the host's check name them.</summary>
+    private List<BlockMessage> DeclaredBlocks() =>
+        [.. _blocking.Select(pair => new BlockMessage { Blocker = new ViewHandle(pair.Blocker), Attacker = new ViewHandle(pair.Attacker) })];
+
+    /// <summary>
+    /// What the rules make of the blocks declared so far (CR 509.1a-c): the host's verdict, asked the first time they are
+    /// declared and null until it comes back.
+    /// </summary>
+    private BlockVerdictView? DeclaredVerdict(GameClient client)
+    {
+        List<BlockMessage> declared = DeclaredBlocks();
+        BlockVerdictView? verdict = client.BlockVerdict(declared);
+        if (verdict is null)
+        {
+            client.CheckBlocks(declared);
+        }
+
+        return verdict;
+    }
+
+    /// <summary>
+    /// Whether a click may have <paramref name="blocker"/> block <paramref name="attacker"/>: the host's verdict on the blocks
+    /// so far offers the block, or it is made already and the click takes it back. Nothing is offered until the verdict is in.
+    /// </summary>
+    private bool MayBlock(GameClient client, int blocker, int attacker) =>
+        _blocking.Contains((blocker, attacker))
+        || DeclaredVerdict(client)?.Addable.Exists(pair => pair.Blocker.Value == blocker && pair.Attacker.Value == attacker) == true;
 
     /// <summary>
     /// Whether the attackers have a choice of what to attack: more than one seat, planeswalker or battle that some
@@ -757,39 +784,89 @@ public sealed partial class MainPage
     }
 
     /// <summary>
-    /// Has every blocker picked up that may block the attacker do so, and the arrows to it go in - as many as the attacker
-    /// may be blocked by (CR 509.1b: "can't be blocked by more than one creature"): the rest stay picked up, and the dock
-    /// says why.
+    /// Sends the creatures picked up at <paramref name="attacker"/>: a creature picked up that blocks it already comes back off
+    /// it, and the others go to it one at a time, each as the host's verdict on the blocks so far offers it
+    /// (<see cref="ContinueBlocking"/>) - so an attacker that can't be blocked by more than one creature (CR 509.1b) takes one,
+    /// and the rest stay picked up while the dock says why.
     /// </summary>
-    private void AssignBlocks(GameClient client, DeclareBlockersPromptMessage prompt, int attackerIndex)
+    private void AssignBlocks(GameClient client, ViewHandle attacker)
     {
-        ViewHandle attacker = prompt.Attackers[attackerIndex];
-        List<int> able = [.. _pending.Where(blocker => MayBlock(prompt, blocker, attacker))];
-        int room = prompt.MaximumFor(attackerIndex) - _blocking.Count(pair => pair.Value == attackerIndex && !able.Contains(pair.Key));
-        List<int> sent = [.. able.Take(Math.Max(room, 0))];
-        _blockLimit = sent.Count < able.Count ? attackerIndex : -1;
-        RetireArrows(sent, CardBounds(attacker));
-
-        foreach (int blocker in sent)
+        int target = attacker.Value;
+        foreach (int blocker in _pending.Where(blocker => _blocking.Contains((blocker, target))).ToList())
         {
-            _blocking[blocker] = attackerIndex;
+            _blocking.Remove((blocker, target));
             _pending.Remove(blocker);
         }
 
+        _blockingInto = target;
+        ContinueBlocking(client);
         _needsRedraw = true;
+    }
+
+    /// <summary>
+    /// Takes the creatures picked up to the attacker last clicked as far as the verdicts in hand allow: each that the verdict
+    /// on the blocks so far offers blocks it, its arrow going in, and the next waits for the host's verdict on the blocks with
+    /// it. Ends where none picked up is offered; those stay picked up.
+    /// </summary>
+    private void ContinueBlocking(GameClient client)
+    {
+        while (_blockingInto != 0 && _pending.Count > 0)
+        {
+            BlockVerdictView? verdict = DeclaredVerdict(client);
+            if (verdict is null)
+            {
+                return;
+            }
+
+            int target = _blockingInto;
+            int? next = _pending.Where(blocker => verdict.Addable.Exists(pair => pair.Blocker.Value == blocker && pair.Attacker.Value == target))
+                .Select(blocker => (int?)blocker)
+                .FirstOrDefault();
+            if (next is not { } blocker)
+            {
+                return;
+            }
+
+            RetireArrows([blocker], CardBounds(new ViewHandle(target)));
+            _blocking.Add((blocker, target));
+            _pending.Remove(blocker);
+            _needsRedraw = true;
+        }
+
+        if (_pending.Count == 0)
+        {
+            _blockingInto = 0;
+        }
+    }
+
+    /// <summary>
+    /// A click on a creature able to block: one picked up is put back down; one blocking that the verdict lets block another
+    /// attacker too is picked up again, and one that may block nothing more comes back off what it blocks; any other is picked up.
+    /// </summary>
+    private void ClickBlocker(GameClient client, int blocker)
+    {
+        if (_pending.Remove(blocker))
+        {
+            _needsRedraw = true;
+            return;
+        }
+
+        if (_blocking.Exists(pair => pair.Blocker == blocker)
+            && DeclaredVerdict(client)?.Addable.Exists(pair => pair.Blocker.Value == blocker) != true)
+        {
+            _blocking.RemoveAll(pair => pair.Blocker == blocker);
+            _needsRedraw = true;
+            return;
+        }
+
+        PickUp(blocker);
     }
 
     /// <summary>Puts down whatever was picked up.</summary>
     private void PutDown()
     {
         _pending.Clear();
-        _blockLimit = -1;
-        _needsRedraw = true;
-    }
-
-    private void Unassign(int blocker)
-    {
-        _blocking.Remove(blocker);
+        _blockingInto = 0;
         _needsRedraw = true;
     }
 
@@ -941,7 +1018,7 @@ public sealed partial class MainPage
             _picked.Contains(handle) ? "p" : "-",
             _pending.Contains(handle) ? "a" : "-",
             _planned.Contains(card.Handle) ? "x" : "-",
-            _blocking.TryGetValue(handle, out int blocking) ? blocking.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-1",
+            string.Join(',', _blocking.Where(pair => pair.Blocker == handle).Select(pair => pair.Attacker.ToString(System.Globalization.CultureInfo.InvariantCulture))),
             "|",
             (_shares.Where(pair => pair.Key.Creature == handle).Sum(pair => pair.Value) + _dividedShares.GetValueOrDefault(handle)).ToString(System.Globalization.CultureInfo.InvariantCulture),
             "|",

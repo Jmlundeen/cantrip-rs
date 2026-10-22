@@ -108,4 +108,36 @@ public sealed class CombatSelectionTests(WebClient web)
 
         Assert.Empty(table.Errors);
     }
+
+    /// <summary>
+    /// The page holds whatever blocks the rules' verdict offers and knows no rule of its own (CR 509.1a): where the verdict lets
+    /// a creature block two attackers (the gallery's stand-in for "can block an additional creature each combat"), the creature
+    /// blocking one is picked up again and blocks the other too, and the declaration sent has both blocks.
+    /// </summary>
+    [Fact]
+    public async Task A_creature_the_verdict_lets_block_two_attackers_blocks_both()
+    {
+        await using TablePage table = await TablePage.OpenAsync(web, "prompt=blockers-two-each", WebClient.Pictures(nameof(CombatSelectionTests)));
+        await table.SettledAsync(state => state.Fixture == "blockers-two-each");
+
+        await table.ClickCardAsync("Vampire Nighthawk");
+        await table.SettledAsync(state => state.Selected == 1);
+        await table.ClickCardAsync("Savannah Lions");
+        await table.SettledAsync(state => state.Selected == 0 && state.Controls.Any(control => control.Label == "Block with 1"));
+
+        // Blocking the Lions, the Nighthawk may still block the Serra Angel: a click picks it up again, not off the Lions.
+        await table.ClickCardAsync("Vampire Nighthawk");
+        await table.SettledAsync(state => state.Selected == 1);
+        await table.ClickCardAsync("Serra Angel");
+        TableState both = await table.SettledAsync(state => state.Selected == 0 && state.Controls.Any(control => control.Label == "Block with 1"));
+        Assert.Equal("2 attacking  ·  1 blocking", both.Detail);
+        await table.PictureAsync("one-creature-blocking-two");
+
+        await table.ClickAsync("Block with 1", "button");
+        TableState sent = await table.SettledAsync(state => state.Answered.Length > 0);
+        Assert.StartsWith("BlockersDeclaredAnswer ", sent.Answered);
+        Assert.Equal(2, sent.Answered.Split(',').Length);
+
+        Assert.Empty(table.Errors);
+    }
 }

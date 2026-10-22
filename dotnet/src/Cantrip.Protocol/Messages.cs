@@ -1438,6 +1438,13 @@ public sealed class BlockVerdictView
     /// <summary>Why it may not be declared as it is; null when it may.</summary>
     [Key(2)]
     public BlockIssueView? Issue { get; set; }
+
+    /// <summary>
+    /// What declaring it costs (CR 509.1d), in mana symbols ("{2}"); empty for a declaration that costs nothing. The cost is
+    /// paid once the declaration is sent, through the payment prompt attack costs use (<see cref="PayCostsPromptMessage"/>).
+    /// </summary>
+    [Key(3)]
+    public string Cost { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -2787,8 +2794,10 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     /// The requirements effects put on the declaration (CR 509.1c), one each, for the player to see: Lure's "all creatures
     /// able to block enchanted creature do so" makes one of each creature able to block the creature it enchants; "target
     /// creature blocks this turn if able" one of that creature with <see cref="BlockMessage.Attacker"/>
-    /// <see cref="ViewHandle.None"/>, obeyed by blocking any attacker. Empty where nothing is required. Whether a declaration
-    /// obeys enough of them is the host's to judge (<see cref="Verdict"/>, <see cref="CheckBlocksMessage"/>).
+    /// <see cref="ViewHandle.None"/>, obeyed by blocking any attacker; "must be blocked if able" one of that attacker with
+    /// <see cref="BlockMessage.Blocker"/> <see cref="ViewHandle.None"/>, obeyed by any creature blocking it. Empty where nothing
+    /// is required. Whether a declaration obeys enough of them is the host's to judge (<see cref="Verdict"/>,
+    /// <see cref="CheckBlocksMessage"/>).
     /// </summary>
     [Key(6)]
     public List<BlockMessage> Requirements { get; set; } = [];

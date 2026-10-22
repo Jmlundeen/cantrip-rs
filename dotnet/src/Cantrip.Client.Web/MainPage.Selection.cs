@@ -197,7 +197,7 @@ public sealed partial class MainPage
             int handle = card.Handle.Value;
             if (_eligible.Contains(handle)
                 && !_attacking.ContainsKey(handle)
-                && !_blocking.ContainsKey(handle)
+                && !_blocking.Exists(pair => pair.Blocker == handle)
                 && BoundsOn(_myHalf.Board, card.Handle) is { } at
                 && at.IntersectsWith(box)
                 && (view is null || at.IntersectsWith(view.Value)))
@@ -207,6 +207,7 @@ public sealed partial class MainPage
         }
 
         _pending.Clear();
+        _blockingInto = 0;
 
         if (client.Prompt?.Prompt is DeclareAttackersPromptMessage attackers && !ChoosesWhatToAttack(attackers))
         {

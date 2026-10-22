@@ -742,6 +742,22 @@ public sealed class GameClient
     private string Blocks(IEnumerable<BlockMessage> blocks) =>
         "[" + string.Join(", ", blocks.Select(block => $"{Cards([block.Blocker])} > {Cards([block.Attacker])}")) + "]";
 
+    /// <summary>
+    /// The host refused a check of a declaration being settled. Nothing unsettled is ever sent: a question no longer outstanding,
+    /// or not this seat's, has nothing to answer; otherwise the declaration is not sent and the question is asked of this client
+    /// again, the error kept in <see cref="Errors"/>, for its player to declare anew.
+    /// </summary>
+    private void RefusedBlockCheck(BlockSettling declaring, ErrorMessage error)
+    {
+        _checkingBlocks.Clear();
+        _blockSettling = null;
+        Mended($"a check of request {declaring.Asked.RequestId} was refused ({error.Code}: {error.Detail}); the declaration {Blocks(declaring.Proposal)} is not sent");
+        if (error.Code is not (ErrorCode.StaleReply or ErrorCode.NotYourTurnToAnswer) && Table?.Phase != TablePhase.Abandoned)
+        {
+            Prompt = declaring.Asked;
+        }
+    }
+
     /// <summary>Takes the declaration being settled as far as the verdicts in hand allow: sends it, or asks for the next verdict.</summary>
     private void SettleBlocks()
     {
@@ -1103,11 +1119,7 @@ public sealed class GameClient
 
                 if (_blockSettling is { } declaring && _checkingBlocks.Count > 0 && error.RequestId == declaring.Asked.RequestId)
                 {
-                    _checkingBlocks.Clear();
-                    _blockSettling = null;
-                    LastAnswered = declaring.Asked.RequestId;
-                    Mended($"a check of request {declaring.Asked.RequestId} was refused ({error.Code}: {error.Detail}); sending the declaration as it is: {Blocks(declaring.Proposal)}");
-                    _transport.Send(new AnswerMessage { RequestId = declaring.Asked.RequestId, Answer = new BlockersDeclaredAnswer { Blocks = declaring.Proposal } });
+                    RefusedBlockCheck(declaring, error);
                 }
 
                 // An answer to a draw refused leaves the seat free to answer again.

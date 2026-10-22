@@ -371,6 +371,7 @@ public static class PromptFixtures
         "blockers",
         "blockers-restricted",
         "blockers-one-at-most",
+        "blockers-two-each",
         "assign-damage",
         "player-aura",
         "waiting",
@@ -2562,7 +2563,7 @@ public static class PromptFixtures
             case "blockers":
             case "blockers-restricted":
                 UnderAttack(view);
-                return new DeclareBlockersPromptMessage
+                return Judged(new DeclareBlockersPromptMessage
                 {
                     Player = Viewer,
                     Eligible = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)],
@@ -2582,13 +2583,13 @@ public static class PromptFixtures
                             Block(MyBrute, TheirRecruit),
                             Block(MyLurker, TheirSentinel), Block(MyBrute, TheirSentinel),
                         ],
-                };
+                });
 
             case "blockers-one-at-most":
                 // Savannah Lions can't be blocked by more than one creature (CR 509.1b): both of the viewer's creatures may
                 // block it, but only one of them at a time.
                 UnderAttack(view);
-                return new DeclareBlockersPromptMessage
+                return Judged(new DeclareBlockersPromptMessage
                 {
                     Player = Viewer,
                     Eligible = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)],
@@ -2600,7 +2601,25 @@ public static class PromptFixtures
                         Block(MyLurker, TheirRecruit), Block(MyLurker, TheirSentinel),
                         Block(MyBrute, TheirRecruit), Block(MyBrute, TheirSentinel),
                     ],
-                };
+                });
+
+            case "blockers-two-each":
+                // A creature that can block an additional creature each combat (CR 509.1a, Palace Guard's kind): the page holds
+                // whatever blocks the rules' verdict offers - here the gallery's stand-in lets each creature block two - and
+                // knows nothing of the rule itself.
+                UnderAttack(view);
+                return Judged(new DeclareBlockersPromptMessage
+                {
+                    Player = Viewer,
+                    Eligible = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)],
+                    Attackers = [new ViewHandle(TheirRecruit), new ViewHandle(TheirSentinel)],
+                    MinimumBlockers = [1, 1],
+                    Allowed =
+                    [
+                        Block(MyLurker, TheirRecruit), Block(MyLurker, TheirSentinel),
+                        Block(MyBrute, TheirRecruit), Block(MyBrute, TheirSentinel),
+                    ],
+                }, BlocksPerBlocker("blockers-two-each"));
 
             case "assign-damage":
                 // A trampling 4-power attacker gang-blocked by a 1/1 and a 1/4: its controller divides the 4 among the
@@ -3638,6 +3657,16 @@ public static class PromptFixtures
     private static ZoneView Hidden(ZoneKindView kind, int owner, int count) =>
         new() { Kind = kind, Owner = owner, Count = count };
 
+    /// <summary>How many attackers each creature may block in a canned declaration of blockers, as the gallery's stand-in judges it.</summary>
+    public static int BlocksPerBlocker(string fixture) => fixture == "blockers-two-each" ? 2 : 1;
+
+    /// <summary>A canned declaration of blockers with the stand-in's verdict on no blocks, as a table's prompt carries the host's.</summary>
+    private static DeclareBlockersPromptMessage Judged(DeclareBlockersPromptMessage prompt, int perBlocker = 1)
+    {
+        prompt.Verdict = FixtureTransport.StandInBlockVerdict(prompt, [], perBlocker);
+        return prompt;
+    }
+
     private static ZoneView Zone(PlayerView view, ZoneKindView kind, int owner) =>
         view.Zones.First(zone => zone.Kind == kind && zone.Owner == owner);
 
@@ -3655,11 +3684,16 @@ public sealed class FixtureTransport : IGameTransport
     private readonly List<PromptMessage> _prompts;
     private readonly List<ServerMessage> _verdicts = [];
 
-    public FixtureTransport(IReadOnlyList<ServerMessage> messages)
+    private readonly int _perBlocker;
+
+    /// <param name="messages">The canned batch.</param>
+    /// <param name="perBlocker">How many attackers each creature may block, for the stand-in's verdicts on blocks.</param>
+    public FixtureTransport(IReadOnlyList<ServerMessage> messages, int perBlocker = 1)
     {
         ArgumentNullException.ThrowIfNull(messages);
         _pending = messages;
         _prompts = [.. messages.OfType<PromptMessage>()];
+        _perBlocker = perBlocker;
     }
 
     public bool IsConnected => true;
@@ -3684,26 +3718,30 @@ public sealed class FixtureTransport : IGameTransport
         if (message is CheckBlocksMessage blocks
             && _prompts.FirstOrDefault(prompt => prompt.RequestId == blocks.RequestId)?.Prompt is DeclareBlockersPromptMessage declaring)
         {
-            _verdicts.Add(new BlocksVerdictMessage { RequestId = blocks.RequestId, Blocks = blocks.Blocks, Verdict = StandInBlockVerdict(declaring, blocks.Blocks) });
+            _verdicts.Add(new BlocksVerdictMessage { RequestId = blocks.RequestId, Blocks = blocks.Blocks, Verdict = StandInBlockVerdict(declaring, blocks.Blocks, _perBlocker) });
         }
     }
 
     /// <summary>
-    /// The gallery has no rules engine: a declaration of a canned prompt is judged by its allowed pairs and each attacker's
-    /// fewest and most blockers alone, with no requirements. Only ever the gallery's; a table asks the host.
+    /// The gallery has no rules engine: a declaration of a canned prompt is judged by its allowed pairs, each attacker's fewest
+    /// and most blockers, and how many attackers each creature may block (<paramref name="perBlocker"/>), with no requirements.
+    /// Only ever the gallery's; a table asks the host.
     /// </summary>
-    public static BlockVerdictView StandInBlockVerdict(DeclareBlockersPromptMessage asked, IReadOnlyList<BlockMessage> blocks)
+    public static BlockVerdictView StandInBlockVerdict(DeclareBlockersPromptMessage asked, IReadOnlyList<BlockMessage> blocks, int perBlocker = 1)
     {
         ArgumentNullException.ThrowIfNull(asked);
         ArgumentNullException.ThrowIfNull(blocks);
         bool Allowed(BlockMessage block) => asked.Allowed.Exists(pair => pair.Blocker == block.Blocker && pair.Attacker == block.Attacker);
+        bool Has(BlockMessage pair) => blocks.Any(block => block.Blocker == pair.Blocker && block.Attacker == pair.Attacker);
         int On(ViewHandle attacker) => blocks.Count(block => block.Attacker == attacker);
+        int By(ViewHandle blocker) => blocks.Count(block => block.Blocker == blocker);
         bool complete = blocks.All(Allowed)
-            && blocks.Select(block => block.Blocker).Distinct().Count() == blocks.Count
+            && blocks.Select(block => (block.Blocker, block.Attacker)).Distinct().Count() == blocks.Count
+            && blocks.All(block => By(block.Blocker) <= perBlocker)
             && asked.Attackers.Select((attacker, i) => (On(attacker), i)).All(a => a.Item1 == 0 || (a.Item1 >= asked.MinimumFor(a.i) && a.Item1 <= asked.MaximumFor(a.i)));
         List<BlockMessage> addable =
         [
-            .. asked.Allowed.Where(pair => !blocks.Any(block => block.Blocker == pair.Blocker)
+            .. asked.Allowed.Where(pair => !Has(pair) && By(pair.Blocker) < perBlocker
                 && On(pair.Attacker) < asked.MaximumFor(asked.Attackers.IndexOf(pair.Attacker))),
         ];
         return new BlockVerdictView { Complete = complete, Addable = addable };

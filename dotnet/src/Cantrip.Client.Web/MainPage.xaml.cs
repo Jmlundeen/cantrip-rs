@@ -1281,7 +1281,7 @@ public sealed partial class MainPage : Page
         _fixtureName = name;
         _staged = false;
         _menu.Close();
-        _fixtureTransport = new FixtureTransport(PromptFixtures.Build(name));
+        _fixtureTransport = new FixtureTransport(PromptFixtures.Build(name), PromptFixtures.BlocksPerBlocker(name));
         _gameClient = new GameClient(_fixtureTransport);
         _journal = new GameJournal();
         _abilitiesTriggered.Clear();

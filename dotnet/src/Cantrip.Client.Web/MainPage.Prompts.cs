@@ -2254,39 +2254,31 @@ public sealed partial class MainPage
 
     private void FillBlockers(GameClient client, DeclareBlockersPromptMessage prompt)
     {
-        // The attacker the last click sent too many blockers at (CR 509.1b): those over its most are still picked up.
-        int limitIndex = _blockLimit >= 0 && _blockLimit < prompt.Attackers.Count && _pending.Count > 0 ? _blockLimit : -1;
+        // Creatures picked up still on their way to the attacker last clicked, as the host's verdicts allow.
+        ContinueBlocking(client);
 
-        List<BlockMessage> declared =
-        [
-            .. _blocking.Select(pair => new BlockMessage
-            {
-                Blocker = new ViewHandle(pair.Key),
-                Attacker = prompt.Attackers[pair.Value],
-            }),
-        ];
+        List<BlockMessage> declared = DeclaredBlocks();
 
         // What the rules make of the blocks so far (CR 509.1a-c), the host's word: asked the first time they are declared, and
         // the button waits for it. Why they may not be declared - an attacker short of the blockers menace needs, a creature an
-        // effect requires to block (Lure, "blocks this turn if able") - is the dock's caption.
-        BlockVerdictView? verdict = client.BlockVerdict(declared);
-        if (verdict is null)
-        {
-            client.CheckBlocks(declared);
-        }
-
+        // effect requires to block (Lure, "blocks this turn if able") - is the dock's caption, and what they cost (CR 509.1d) is
+        // on the button.
+        BlockVerdictView? verdict = DeclaredVerdict(client);
         string? issue = verdict?.Issue is { } why ? BlockIssueCaption(client, why) : null;
+
+        // Creatures picked up that the attacker last clicked does not take, once the verdict says so: the dock says why.
+        string? held = _blockingInto != 0 && _pending.Count > 0 && verdict is not null ? HeldCaption(client, prompt, new ViewHandle(_blockingInto)) : null;
+        int blockers = declared.Select(block => block.Blocker).Distinct().Count();
 
         Prompt(
             "Declare blockers",
-            limitIndex >= 0
-                ? $"{client.Object(prompt.Attackers[limitIndex])?.Name} can't be blocked by more than {Blockers(prompt.MaximumFor(limitIndex))}"
-                : _pending.Count > 0
+            held
+                ?? (_pending.Count > 0
                 ? $"Choose an attacker to block ({_pending.Count} selected)"
-                : issue ?? $"{prompt.Attackers.Count} attacking  ·  {_blocking.Count} blocking");
+                : issue ?? $"{prompt.Attackers.Count} attacking  ·  {blockers} blocking"));
 
         AddButton(
-            _blocking.Count == 0 ? "No blocks" : $"Block with {_blocking.Count}",
+            (_blocking.Count == 0 ? "No blocks" : $"Block with {blockers}") + (verdict is { Cost.Length: > 0 } ? $" for {verdict.Cost}" : string.Empty),
             () => Send(client, new BlockersDeclaredAnswer { Blocks = declared }),
             enabled: verdict?.Complete == true,
             primary: true).Tooltip = "Lock in the blocks" + Suffix(PassKey);
@@ -2314,6 +2306,20 @@ public sealed partial class MainPage
     {
         string creature = client.Object(issue.Creature)?.Name ?? "A creature";
         return issue.Other.IsNone ? $"{creature} {issue.Words}" : $"{creature} {issue.Words} {client.Object(issue.Other)?.Name ?? "a creature"}";
+    }
+
+    /// <summary>
+    /// Why the creatures still picked up did not go to the attacker clicked: as many blocking it as it may be blocked by
+    /// (CR 509.1b), or else no legal declaration has them block it with the blocks made.
+    /// </summary>
+    private string HeldCaption(GameClient client, DeclareBlockersPromptMessage prompt, ViewHandle attacker)
+    {
+        string name = client.Object(attacker)?.Name ?? "That attacker";
+        int index = prompt.Attackers.IndexOf(attacker);
+        int most = prompt.MaximumFor(index);
+        return _blocking.Count(pair => pair.Attacker == attacker.Value) >= most
+            ? $"{name} can't be blocked by more than {Blockers(most)}"
+            : $"{name} can't be blocked by {(_pending.Count == 1 ? "that creature" : "those creatures")} as well";
     }
 
     /// <summary>"one creature", "two creatures": how many blockers an attacker may have at most.</summary>

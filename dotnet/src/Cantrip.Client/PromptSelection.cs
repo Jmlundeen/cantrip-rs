@@ -13,7 +13,11 @@ public sealed class PromptSelection
     public List<TargetMessage> Targets { get; } = [];
     public List<int> TriggerOrder { get; } = [];
     public Dictionary<int, AttackChoice> Attacking { get; } = [];
-    public Dictionary<int, int> Blocking { get; } = [];
+    /// <summary>
+    /// The blocks declared so far, each a blocker and the attacker it blocks (handle values), in the order made: any set of
+    /// pairs, a creature blocking more than one attacker included, as the rules' verdict allows (CR 509.1a-c).
+    /// </summary>
+    public List<(int Blocker, int Attacker)> Blocking { get; } = [];
 
     /// <summary>
     /// Creatures picked up to attack or to block but not yet sent anywhere: clicking what to attack, or whom to block,
@@ -22,10 +26,10 @@ public sealed class PromptSelection
     public List<int> Pending { get; } = [];
 
     /// <summary>
-    /// The attacker the last click sent more blockers at than it may be blocked by (CR 509.1b), whose extra blockers are
-    /// still picked up; -1 for none.
+    /// The attacker (handle value) the last click sent the creatures picked up at, while they go to it one at a time as the
+    /// host's verdict on each declaration allows; 0 for none. Those the verdict never lets block it stay picked up.
     /// </summary>
-    public int BlockLimit { get; set; } = -1;
+    public int BlockingInto { get; set; }
 
     public Dictionary<(int Source, int Creature), int> DamageShares { get; } = [];
     /// <summary>A divided target's own share (CR 601.2d), keyed by candidate handle.</summary>
@@ -79,7 +83,7 @@ public sealed class PromptSelection
         Attacking.Clear();
         Blocking.Clear();
         Pending.Clear();
-        BlockLimit = -1;
+        BlockingInto = 0;
         DamageShares.Clear();
         DividedShares.Clear();
         CounterRemovals.Clear();

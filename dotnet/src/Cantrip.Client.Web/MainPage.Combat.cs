@@ -107,7 +107,7 @@ public sealed partial class MainPage
             {
                 foreach ((int blocker, int target) in _blocking)
                 {
-                    if (blocking.Attackers[target] == attacker.Attacker)
+                    if (target == attacker.Attacker.Value)
                     {
                         blockers.Add(new ViewHandle(blocker));
                     }
