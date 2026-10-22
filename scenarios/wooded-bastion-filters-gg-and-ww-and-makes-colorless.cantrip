@@ -1,0 +1,35 @@
+# Wooded Bastion: "{T}: Add {C}." and "{G/W}, {T}: Add {G}{G}, {G}{W}, or {W}{W}." Turn 3 a Forest pays {G/W} for {G}{G};
+# turn 5 a Plains pays it for {W}{W}; turn 7 the Bastion taps for {C} alone.
+
+[Bot1 Deck]
+Mountain
+Wooded Bastion
+Forest
+Plains
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Wooded Bastion.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W}, {T})
+Bot1.Colors(Green; Green)
+? Bot1.Mana = {G}{G}
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W}, {T})
+Bot1.Colors(White; White)
+? Bot1.Mana = {W}{W}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Wooded Bastion.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Life = 20
