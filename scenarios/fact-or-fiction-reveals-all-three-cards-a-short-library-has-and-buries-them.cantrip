@@ -1,0 +1,45 @@
+# Fact or Fiction with three cards in the library: it reveals all three (CR 609.3, "the top five" shows what there is),
+# Bot2 puts all three in the first pile leaving the second empty, and Bot1 keeps the empty pile, so all three revealed
+# cards go to the graveyard - three, not five, and an empty pile is a legal choice (CR 700.3d).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Fact or Fiction
+Island
+Island
+Island
+Lightning Bolt
+Counterspell
+Dark Ritual
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Fact or Fiction.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot2.Choose(Bot1.Library.Lightning Bolt; Bot1.Library.Counterspell; Bot1.Library.Dark Ritual)
+Bot1.Modes(Second pile: nothing)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Revealed = Lightning Bolt; Counterspell; Dark Ritual
+Bot1.Library.Count = 0
+Bot1.Hand.Count = 2
+Bot1.Graveyard.Count = 4
+Bot1.Graveyard = Fact or Fiction; Dark Ritual; Counterspell; Lightning Bolt
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Sapphire; Mox Ruby

@@ -1,0 +1,6 @@
+{
+  "name": "Fact or Fiction",
+  "manaCost": "{3}{U}",
+  "type": "Instant",
+  "oracleText": "Reveal the top five cards of your library. An opponent separates those cards into two piles. Put one pile into your hand and the other into your graveyard."
+}

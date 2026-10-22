@@ -1,0 +1,41 @@
+# Fact or Fiction with nothing left to reveal: Bot1's library holds one card, drawn at the start of turn 3, so when it
+# casts the spell the library is empty, nothing is revealed (CR 609.3: a library that has fewer cards shows what it has,
+# and an empty one shows nothing), no card moves anywhere and the spell simply goes to the graveyard. What the scenario
+# proves is that state, not that no question is asked - a question answered by default would leave the same state.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Fact or Fiction
+Island
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fact or Fiction.Cast
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Revealed = (absent)
+Bot1.Library.Count = 0
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Fact or Fiction
+Bot1.Battlefield = Mox Sapphire; Mox Sapphire; Mox Ruby; Mox Emerald; Mox Jet; Mox Pearl; Island
