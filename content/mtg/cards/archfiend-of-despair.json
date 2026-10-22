@@ -1,0 +1,11 @@
+{
+  "name": "Archfiend of Despair",
+  "manaCost": "{6}{B}{B}",
+  "type": "Creature — Demon",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Flying\nYour opponents can't gain life.\nAt the beginning of each end step, each opponent loses life equal to the life that player lost this turn. (Damage causes loss of life.)",
+  "keywords": [
+    "Flying"
+  ]
+}

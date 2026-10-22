@@ -1,0 +1,86 @@
+# Archfiend of Despair: "At the beginning of each end step, each opponent loses life equal to the life that player lost
+# this turn." Each Archfiend's ability is its own trigger and reads the opponent's total as it resolves, so a second one
+# sees the loss the first caused (2018-06-08 ruling). Bot1 has two Archfiends out by turn 7, Bot2 loses 2 to its own
+# Night's Whisper on turn 8 (20 - 2 = 18), and that turn's end step takes 2 and then 4: 18 - 2 - 4 = 12.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Sol Ring
+Mox Jet
+Mox Jet
+Mox Jet
+Archfiend of Despair
+Archfiend of Despair
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Mox Jet
+Night's Whisper
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Archfiend of Despair.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Swamp#4.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Archfiend of Despair.Cast
+[T8 Bot2.Main1]
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Night's Whisper.Cast
+[T8 Bot2.End]
+? Bot2.Life = 18
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 16
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 12
+
+[Expect]
+Turn = 8
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 12
+Bot1.Battlefield = Archfiend of Despair; Archfiend of Despair; Mox Jet; Mox Jet; Mox Jet; Sol Ring; Swamp; Swamp; Swamp; Swamp
+Bot1.Battlefield.Archfiend of Despair#1.Power = 6
+Bot2.Graveyard = Night's Whisper

@@ -1,0 +1,72 @@
+# Archfiend of Despair: in Bot2's turn 6, with the Archfiend out, Bot2's Healing Salve on itself gains nothing ("Your
+# opponents can't gain life") while the one it aims at Bot1 gives Bot1 the 3, and the 2 life Bot2 loses to Night's Whisper
+# that turn is taken once more in that turn's end step: 20 - 2 (turn 2) - 2 (turn 6) - 2 = 14, and Bot1 is 20 + 3 = 23.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Black Lotus
+Mox Jet
+Mox Jet
+Archfiend of Despair
+Swamp x13
+
+[Bot2 Deck]
+Night's Whisper
+Swamp
+Mox Jet
+Healing Salve
+Plains
+Mox Pearl
+Healing Salve
+Night's Whisper
+Night's Whisper
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Night's Whisper.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Archfiend of Despair.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Target player gains 3 life)
+Bot2.Target(Bot2)
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Target player gains 3 life)
+Bot2.Target(Bot1)
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Night's Whisper.Cast
+[T7 Bot1.Main1]
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 14
+Bot2.Battlefield = Mox Jet; Mox Pearl; Plains; Swamp

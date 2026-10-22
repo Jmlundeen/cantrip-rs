@@ -1,0 +1,55 @@
+# Archfiend of Despair: "At the beginning of each end step, each opponent loses life equal to the life that player lost
+# this turn." Bot2 loses 2 life to its own Night's Whisper on turn 2, and Bot1's Archfiend arrives on turn 5: the turn-5 end
+# step finds Bot2 having lost nothing that turn, so nothing happens. Bot1 is not an opponent and loses nothing either.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Black Lotus
+Mox Jet
+Mox Jet
+Archfiend of Despair
+Swamp x13
+
+[Bot2 Deck]
+Night's Whisper
+Swamp
+Mox Jet
+Island
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Night's Whisper.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Archfiend of Despair.Cast
+[T6 Bot2.Main1]
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 18
+Bot1.Battlefield = Archfiend of Despair; Mox Jet; Mox Jet; Swamp; Swamp; Swamp
+Bot1.Graveyard = Black Lotus
