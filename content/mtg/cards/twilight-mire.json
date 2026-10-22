@@ -1,0 +1,5 @@
+{
+  "name": "Twilight Mire",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{B/G}, {T}: Add {B}{B}, {B}{G}, or {G}{G}."
+}

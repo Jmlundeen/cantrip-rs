@@ -1,0 +1,35 @@
+# Twilight Mire: "{T}: Add {C}." and "{B/G}, {T}: Add {B}{B}, {B}{G}, or {G}{G}." Turn 3 a Swamp pays {B/G} for {B}{B};
+# turn 5 a Forest pays it for {G}{G}; turn 7 the Mire taps for {C} alone.
+
+[Bot1 Deck]
+Plains
+Twilight Mire
+Swamp
+Forest
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Twilight Mire.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Twilight Mire.Activate(Ability: {B/G}, {T})
+Bot1.Colors(Black; Black)
+? Bot1.Mana = {B}{B}
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Twilight Mire.Activate(Ability: {B/G}, {T})
+Bot1.Colors(Green; Green)
+? Bot1.Mana = {G}{G}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Twilight Mire.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Life = 20
