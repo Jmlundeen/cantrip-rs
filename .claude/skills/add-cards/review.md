@@ -3,7 +3,8 @@
 Before a card lands, someone other than its author - a person, or a separate agent that had no part in writing it -
 reviews it against `SKILL.md` beside this file: its non-negotiables, its "Where code goes" with the **"never" list**,
 and "Scenarios: what a card owes". Read those, then review with the Oracle text, the rulings and the CR open
-(`python tools\maintenance\scryfall.py "Card Name"`, `python tools\maintenance\cr.py <rule>`).
+(`python tools\maintenance\scryfall.py "Card Name"`, `python tools\maintenance\cr.py <rule>`). A card that arrives as a
+pull request is brought to this review, fixed and landed by the `review-card-pr` skill.
 
 Log it on the card's issue: `python tools\maintenance\card-issues.py log <N> review-started` first, and at the end
 `log <N> review-passed`, or `log <N> review-blocked --findings <how many blocking>` - fixed comments, nothing to write.
