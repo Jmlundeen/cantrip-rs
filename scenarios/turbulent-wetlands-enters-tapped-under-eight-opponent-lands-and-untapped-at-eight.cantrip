@@ -1,0 +1,36 @@
+# Turbulent Wetlands: "This land enters tapped unless your opponents control eight or more lands." On turn 15 Bot2 has
+# seven lands, so Bot1's Wetlands enters tapped - the seven lands Bot1 itself controls are not the ones counted. On turn
+# 16, with Bot1's eight lands out, Bot2's own Wetlands enters untapped (positive control).
+
+[Bot1 Deck]
+Swamp x7
+Turbulent Wetlands
+Swamp x12
+
+[Bot2 Deck]
+Island x7
+Turbulent Wetlands
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Turbulent Wetlands.Play
+Bot2.Hand.Turbulent Wetlands.Play
+
+[Expect]
+Turn = 16
+Bot1.Battlefield.Turbulent Wetlands.Tapped = true
+Bot2.Battlefield.Turbulent Wetlands.Tapped = false

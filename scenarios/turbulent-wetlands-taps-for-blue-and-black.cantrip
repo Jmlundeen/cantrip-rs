@@ -1,0 +1,25 @@
+# Turbulent Wetlands: "({T}: Add {U} or {B}.)" by its Island and Swamp land types (CR 305.6): turn 5 it taps for {U}, turn
+# 7 for {B}.
+
+[Bot1 Deck]
+Forest
+Turbulent Wetlands
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Turbulent Wetlands.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Turbulent Wetlands.Activate(Ability: {U})
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Turbulent Wetlands.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Turbulent Wetlands.Tapped = true
