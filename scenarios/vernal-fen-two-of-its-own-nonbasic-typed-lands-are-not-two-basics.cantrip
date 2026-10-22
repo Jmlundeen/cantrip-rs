@@ -1,0 +1,32 @@
+# Vernal Fen: "This land enters tapped unless you control two or more basic lands." Bot1 controls two Bayous - two lands
+# with the Swamp and Forest types, but neither basic (CR 205.4a; two or more of these lands do not count) - and no basic
+# land at all, so its Vernal Fen enters tapped. Bot2 with a Swamp and a Forest plays the same land untapped (positive
+# control).
+
+[Bot1 Deck]
+Bayou
+Bayou
+Vernal Fen
+Forest x20
+
+[Bot2 Deck]
+Swamp
+Forest
+Vernal Fen
+Forest x20
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Vernal Fen.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Vernal Fen.Play
+
+[Expect]
+Bot1.Battlefield.Vernal Fen.Tapped = true
+Bot2.Battlefield.Vernal Fen.Tapped = false
