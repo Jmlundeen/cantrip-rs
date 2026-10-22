@@ -1,0 +1,40 @@
+# Dimir Signet: "{1}, {T}: Add {U}{B}." (CR 605.1a, a mana ability with mana in its own cost, CR 602.2b).
+# Cast with two Swamps on turn 3. On turn 5 two Swamps tapped for {B}{B}, the ability's {1} paid from that pool, and the
+# Signet adds {U}{B}: the pool is exactly {B}{B}{U}, so a free ability would leave {B}{B}{B}{U} and an ability adding one
+# color would leave no {U}. Baleful Strix costs {U}{B} and is cast from that pool, proving both mana are the colors printed.
+# White is refused beside the blue and black the ability does add (the plain activation is the positive control), and a
+# tapped Signet is not offered a second time.
+
+[Bot1 Deck]
+Swamp x3
+Dimir Signet
+Baleful Strix
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Dimir Signet.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+? Bot1.Mana = {B}{B}
+! Bot1.Battlefield.Dimir Signet.Activate(Color: White)
+Bot1.Battlefield.Dimir Signet.Activate
+? Bot1.Mana = {U}{B}{B}
+! Bot1.Battlefield.Dimir Signet.Activate
+Bot1.Hand.Baleful Strix.Cast
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Dimir Signet.Tapped = true
+Bot1.Battlefield.Baleful Strix.Subtypes = Bird
+Bot1.Life = 20
