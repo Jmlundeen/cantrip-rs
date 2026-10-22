@@ -42,6 +42,9 @@ fn game() -> (Game, ObjectId) {
     game.state.zone_push(Zone::STACK, caster);
     let item = stack_item(StackKind::Spell, caster, AbilityRef { card: table.id_of(&CASTER), index: 0 }, YOU, &[]);
     game.state.stack_push(item);
+    // It is resolving: its frame names it (`Cx::resolving`).
+    let serial = game.state.stack.last().expect("the caster").serial;
+    game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
     game.state.update_turn(|t| {
         t.active = YOU;
         t.priority = YOU;
@@ -51,7 +54,8 @@ fn game() -> (Game, ObjectId) {
 }
 
 fn cx(game: &mut Game) -> Cx<'_> {
-    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
+    let frame = game.state.agenda.len() - 1;
+    Cx { g: game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
 }
 
 #[test]
@@ -99,6 +103,8 @@ fn squire_game(warden: bool) -> (Game, ObjectId) {
     let caster = game.state.push_obj(Obj::new(table.id_of(&CASTER), YOU, Zone::STACK));
     game.state.zone_push(Zone::STACK, caster);
     game.state.stack_push(stack_item(StackKind::Spell, caster, AbilityRef { card: table.id_of(&CASTER), index: 0 }, YOU, &[]));
+    let serial = game.state.stack.last().expect("the caster").serial;
+    game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
     game.state.update_turn(|t| {
         t.active = YOU;
         t.priority = YOU;

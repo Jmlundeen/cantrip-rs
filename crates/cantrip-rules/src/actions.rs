@@ -5630,7 +5630,8 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 /// sum of theirs, CR 702.102c, 709.4b) is a way too, from a hand only: the ruling has a fuse card cast from a hand without
 /// paying its mana cost cast fused.
 pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
-    let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
+    let Some(resolving) = cx.resolving() else { return Vec::new() };
+    let (player, serial) = (resolving.controller, resolving.serial);
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
         return Vec::new();
@@ -5638,8 +5639,7 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     // Split second (CR 702.61a): no spell is cast, by a resolving effect either, while a spell with it is on the stack under
     // what resolves (Krosan Grip's ruling: "If the resolution of a triggered ability involves casting a spell, that spell can't
     // be cast if a spell with split second is on the stack").
-    let below = &cx.s().stack[..cx.s().stack.len() - 1];
-    if below.iter().any(|i| i.kind == StackKind::Spell && has_split_second(cx, i.object)) {
+    if cx.s().stack.iter().any(|i| i.serial != serial && i.kind == StackKind::Spell && has_split_second(cx, i.object)) {
         return Vec::new();
     }
     if cast_barred(cx, player).contains(obj.zone.kind()) {
@@ -5699,7 +5699,7 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
 /// on the battlefield or the stack, it is their own turn (CR 305.3) and they have a land play left (CR 305.2). The phase,
 /// the stack and priority are not asked: the effect itself is the permission to play it now.
 pub fn could_play_land_during_resolution(cx: &Cx, card: ObjectId) -> bool {
-    let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return false };
+    let Some(player) = cx.resolving().map(|i| i.controller) else { return false };
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) || cx.s().turn.active != player {
         return false;
@@ -5717,7 +5717,7 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
     if !could_play_land_during_resolution(cx, card) {
         return Ok(None);
     }
-    let player = cx.s().stack.last().expect("a resolving item").controller;
+    let Some(player) = cx.resolving().map(|i| i.controller) else { return Ok(None) };
     cx.st().update_player(player, |p| p.lands_played = p.lands_played.saturating_add(1));
     ops::turn_up_to_play(cx, card);
     // Played by the effect, not by any permission on the card (CR 305.1, 608.2g): "each land played this way enters
@@ -5736,7 +5736,7 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
 /// Casts `card` as an effect resolves (CR 608.2g). A cast given up (CR 733.1) is undone, and nothing happens.
 pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> R<bool> {
     let ways = cast_ways_during_resolution(cx, card);
-    let player = cx.s().stack.last().expect("a resolving item").controller;
+    let Some(player) = cx.resolving().map(|i| i.controller) else { return Ok(false) };
     // CR 709.3, 715.3, 712.8a: which face is cast is chosen as it is cast, before it goes on the stack.
     let mut way = match (terms.way, ways.len()) {
         (_, 0) => return Ok(false),
@@ -5860,7 +5860,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
 /// Whether the resolving effect's controller could cast `card` transformed now (CR 608.2g, 712.11a): a double-faced
 /// card that is not modal (CR 712.11c-d: its back face has no mana cost of its own), judged as that back face alone.
 pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool {
-    let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return false };
+    let Some(player) = cx.resolving().map(|i| i.controller) else { return false };
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
         return false;
@@ -5893,7 +5893,7 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
     if !could_cast_transformed_during_resolution(cx, card) {
         return Ok(false);
     }
-    let player = cx.s().stack.last().expect("a resolving item").controller;
+    let Some(player) = cx.resolving().map(|i| i.controller) else { return Ok(false) };
     let mark = cx.s().mark();
     let log_mark = cx.g.log.len();
     match cast(cx, player, card, WAY_TRANSFORMED, &[], CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() }, CastBy::default(), true) {
@@ -8316,7 +8316,8 @@ mod tests {
         let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::exile(ME), ME)]);
         let genesis = game.cards.id_of(&GENESIS);
         game.state.stack_push(stack_item(StackKind::Triggered, ids[0], AbilityRef { card: genesis, index: 0 }, ME, &[]));
-        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
+        let serial = game.state.stack.last().expect("the resolving ability").serial;
+        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
         let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         assert!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).is_err(), "the cost is asked for");
@@ -8334,7 +8335,8 @@ mod tests {
         // Cast without paying its mana cost by the effect itself, it is asked nothing.
         let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::exile(ME), ME)]);
         game.state.stack_push(stack_item(StackKind::Triggered, ids[0], AbilityRef { card: genesis, index: 0 }, ME, &[]));
-        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
+        let serial = game.state.stack.last().expect("the resolving ability").serial;
+        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
         let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         let free = CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() };
@@ -8348,7 +8350,8 @@ mod tests {
         let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&COSTLESS, Zone::exile(ME), ME)]);
         let genesis = game.cards.id_of(&GENESIS);
         game.state.stack_push(stack_item(StackKind::Triggered, ids[0], AbilityRef { card: genesis, index: 0 }, ME, &[]));
-        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
+        let serial = game.state.stack.last().expect("the resolving ability").serial;
+        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
         let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         assert!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).is_err(), "the cost is asked for");
@@ -8357,7 +8360,10 @@ mod tests {
         // Under an opponent's Genesis, nothing lets it be cast.
         let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, THEM), (&COSTLESS, Zone::exile(ME), ME)]);
         game.state.stack_push(stack_item(StackKind::Triggered, ids[0], AbilityRef { card: genesis, index: 0 }, ME, &[]));
-        let mut cx = self::cx(&mut game);
+        let serial = game.state.stack.last().expect("the resolving ability").serial;
+        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
+        let frame = game.state.agenda.len() - 1;
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).ok(), Some(false));
         assert!(cx.s().stack.len() == 1);
     }

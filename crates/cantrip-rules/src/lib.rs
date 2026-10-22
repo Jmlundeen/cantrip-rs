@@ -329,13 +329,13 @@ impl Game {
                     FrameKind::Act { player } => actions::act(&mut cx, player),
                     // A card's effect is a run of instructions, each judged by the state triggers once it is done
                     // (`StateCheck`; CR 603.8, 608.2c, 611.2c), never half-done.
-                    FrameKind::Resolve => {
+                    FrameKind::Resolve { .. } => {
                         // A staged run goes on with what an earlier stage changed and the state triggers have not judged.
                         let carried = cx.s().agenda[at].unjudged;
                         if carried {
                             cx.st().update_frame(at, |f| f.unjudged = false);
                         }
-                        let resolving = cx.s().stack.last().map(|item| item.object);
+                        let resolving = cx.resolving().map(|item| item.object);
                         cx.g.check = StateCheck { depth: 1, resolving, due: carried, open: false, done: carried };
                         let flow = resolve::resolve(&mut cx);
                         let check = std::mem::replace(&mut cx.g.check, StateCheck::NONE);
@@ -1096,7 +1096,7 @@ impl<'a> Cx<'a> {
     /// turn's, or the rules'.
     pub fn effect_controller(&self) -> Option<PlayerId> {
         match self.cause() {
-            Cause::Spell(_) | Cause::Ability { .. } => self.g.state.stack.last().map(|i| i.controller),
+            Cause::Spell(_) | Cause::Ability { .. } => self.resolving().map(|i| i.controller),
             _ => None,
         }
     }
@@ -1112,7 +1112,7 @@ impl<'a> Cx<'a> {
         }
         match self.g.state.agenda.get(self.frame).map(|f| f.kind) {
             Some(FrameKind::Act { player }) => player,
-            Some(FrameKind::Resolve) if let Some(item) = self.resolving() => item.controller,
+            Some(FrameKind::Resolve { .. }) if let Some(item) = self.resolving() => item.controller,
             _ => {
                 debug_assert!(false, "card code acted with no player doing it");
                 self.g.state.turn.active
@@ -1134,7 +1134,7 @@ impl<'a> Cx<'a> {
         match frame.kind {
             FrameKind::Act { player } => Cause::Player(player),
             FrameKind::BeginStep | FrameKind::Opening => Cause::Turn,
-            FrameKind::Resolve => match self.resolving() {
+            FrameKind::Resolve { .. } => match self.resolving() {
                 Some(item) if item.kind == StackKind::Spell => Cause::Spell(item.object),
                 Some(item) => Cause::Ability { source: item.object, ability: item.ability },
                 None => Cause::Rules,
@@ -1149,13 +1149,13 @@ impl<'a> Cx<'a> {
         self.mana_source.or_else(|| self.resolving().map(|i| i.object)).unwrap_or(ObjectId::NONE)
     }
 
-    /// The spell or ability resolving, when the frame being run is its resolution: the top of the stack.
+    /// The spell or ability resolving, when the frame being run is its resolution: the item the frame was made for, found by
+    /// its serial (`FrameKind::Resolve`) - not the top of the stack, where a spell it casts or a copy it makes goes (CR
+    /// 608.2g, 707.10). One that has left the stack as it resolves (Time Spiral exiling itself) is as it last was there.
     pub(crate) fn resolving(&self) -> Option<&StackItem> {
-        let frame = self.g.state.agenda.get(self.frame)?;
-        if frame.kind != FrameKind::Resolve {
-            return None;
-        }
-        self.g.state.stack.last()
+        let FrameKind::Resolve { serial } = self.g.state.agenda.get(self.frame)?.kind else { return None };
+        let s = &self.g.state;
+        s.stack.iter().rev().find(|i| i.serial == serial).or_else(|| s.left_stack.iter().rev().find(|i| i.serial == serial))
     }
 
 }

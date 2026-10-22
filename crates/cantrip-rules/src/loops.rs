@@ -545,7 +545,11 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
     s.rng.hash(h);
     s.agenda.len().hash(h);
     for f in &s.agenda {
-        f.kind.hash(h);
+        match f.kind {
+            // The item resolving by its place on the stack, not its serial, a timestamp that differs each time round.
+            cantrip_state::FrameKind::Resolve { serial } => (u8::MAX, s.stack.iter().rposition(|i| i.serial == serial)).hash(h),
+            kind => kind.hash(h),
+        }
     }
 }
 

@@ -373,8 +373,9 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
 }
 
 pub fn resolve(cx: &mut Cx) -> R<Flow> {
-    let at = cx.s().stack.len() - 1;
-    let item = cx.s().stack[at];
+    // The item this frame resolves (`Cx::resolving`), wherever it is: what it cast or copied as it resolved went above it.
+    let Some(&item) = cx.resolving() else { return Ok(Flow::Done) };
+    let on_stack = |cx: &Cx| cx.s().stack.iter().rposition(|i| i.serial == item.serial);
 
     // CR 608.2b: a spell or ability whose every target has become illegal does nothing.
     let count = item.target_count as usize;
@@ -391,7 +392,9 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
         StackKind::Spell => {
             let def = cx.card(face(cx.s(), item.object));
             if fizzles {
-                cx.st().stack_remove(at);
+                if let Some(at) = on_stack(cx) {
+                    cx.st().stack_remove(at);
+                }
                 leave_stack(cx, &item, ZoneReason::Counter);
                 return Ok(Flow::Done);
             }
@@ -433,7 +436,9 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                 }
             } else if cx.s().obj(item.object).card_copy {
                 // A copy of a permanent spell becomes a token as it resolves (CR 707.10f).
-                ops::resolve_copy_as_token(cx, &item, at)?;
+                if let Some(at) = on_stack(cx) {
+                    ops::resolve_copy_as_token(cx, &item, at)?;
+                }
             } else {
                 // A permanent spell whose sneak cost was paid enters tapped and attacking what the creature returned to
                 // pay it was attacking (CR 702.190b), which the cast kept in `subject`.
@@ -463,7 +468,9 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     instead: None,
                 };
                 ops::prepare_entry(cx, &mut entering)?;
-                cx.st().stack_remove(at);
+                if let Some(at) = on_stack(cx) {
+                    cx.st().stack_remove(at);
+                }
                 ops::move_together(
                     cx,
                     &[ops::Moving { entering: Some(entering), ..ops::Moving::to(item.object, Zone::BATTLEFIELD) }],
@@ -514,12 +521,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
             // It leaves the stack as it finishes resolving (CR 608.2n), found by its serial: what it did may have taken an
             // item below it off the stack (Ertai Resurrected countering an ability), moving it down. An ability that ended
             // the turn has left the stack already, with everything else on it (CR 724.1b).
-            let now = if cx.s().stack.get(at).is_some_and(|i| i.serial == item.serial) {
-                Some(at)
-            } else {
-                cx.s().stack.iter().rposition(|i| i.serial == item.serial)
-            };
-            if let Some(now) = now {
+            if let Some(now) = on_stack(cx) {
                 cx.st().stack_remove(now);
             }
         }

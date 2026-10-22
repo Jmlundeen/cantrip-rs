@@ -106,8 +106,9 @@ pub enum FrameKind {
     /// Taking an action a player chose with priority: playing a land, casting a spell (CR 601.2), activating an
     /// ability (CR 602.2). The action is the frame's first answer.
     Act { player: PlayerId },
-    /// Resolving the top of the stack (CR 608).
-    Resolve,
+    /// Resolving the stack item with this serial (CR 608): the top of the stack as it began. What it casts or copies as it
+    /// resolves goes on the stack above it (CR 608.2g, 707.10), and it is still the one resolving.
+    Resolve { serial: u32 },
 }
 
 /// A question for one player.

@@ -165,7 +165,7 @@ pub fn venture(cx: &mut Cx, player: PlayerId) -> R<()> {
             }
             1 => room = arrows[0],
             _ => {
-                let source = cx.s().stack.last().map_or(ObjectId(0), |i| i.object);
+                let source = cx.resolving().map_or(ObjectId(0), |i| i.object);
                 let modes: Vec<Label> = arrows.iter().map(|&r| Label::Card(dungeon, r)).collect();
                 let eligible: Vec<u8> = (0..arrows.len() as u8).collect();
                 let ask = RequestKind::ChooseModes { source, modes, eligible, count: 1, at_most: 0, affordable: Vec::new(), additional_cost: false, repeat: false };

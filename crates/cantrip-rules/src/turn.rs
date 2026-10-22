@@ -1358,10 +1358,11 @@ pub fn priority(cx: &mut Cx) -> R<Flow> {
                 t.passes = 0;
                 t.priority = active;
             });
-            if cx.s().stack.is_empty() {
+            let Some(top) = cx.s().stack.last() else {
                 return Ok(Flow::Done);
-            }
-            cx.st().frame_push(Frame::new(FrameKind::Resolve));
+            };
+            let serial = top.serial;
+            cx.st().frame_push(Frame::new(FrameKind::Resolve { serial }));
             Ok(Flow::Again)
         }
     }

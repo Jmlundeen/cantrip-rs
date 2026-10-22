@@ -77,7 +77,12 @@ fn during_resolution(artifact: bool) -> Vec<u8> {
     game.state.zone_push(Zone::STACK, caster);
     let item = stack_item(StackKind::Spell, caster, AbilityRef { card: game.cards.find("Back Face Test Caster").unwrap(), index: 0 }, YOU, &[]);
     game.state.stack_push(item);
-    let mut ways: Vec<u8> = cast_ways_during_resolution(&cx(&mut game), card).iter().map(|w| w.way).collect();
+    // The caster is resolving: its frame names it (`Cx::resolving`).
+    let serial = game.state.stack.last().expect("the caster").serial;
+    game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
+    let frame = game.state.agenda.len() - 1;
+    let resolving = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let mut ways: Vec<u8> = cast_ways_during_resolution(&resolving, card).iter().map(|w| w.way).collect();
     ways.sort_unstable();
     ways
 }
