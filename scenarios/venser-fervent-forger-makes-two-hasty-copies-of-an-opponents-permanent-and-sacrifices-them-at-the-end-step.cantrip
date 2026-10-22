@@ -1,0 +1,53 @@
+# Venser, Fervent Forger: "Create two tokens that are copies of target permanent an opponent controls. They gain haste. At
+# the beginning of the next end step, sacrifice them." Bot2 has a Forest and a Llanowar Elves, so the choice of target is
+# asked: Venser's own controller's Mox Pearl is not one of the answers (it is not an opponent's permanent), the Elves is.
+# The two 1/1 Elf Druid tokens arrive under Bot1 with haste, and the delayed ability of Venser's own card sacrifices both
+# at the end step of this turn: they cease to exist, so they are in no graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Venser, Fervent Forger
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Venser, Fervent Forger.Cast
+! Bot1.Target(Bot1.Battlefield.Mox Pearl)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+? Bot1.Battlefield.Llanowar Elves#1.Keywords = Haste
+? Bot1.Battlefield.Llanowar Elves#2.Keywords = Haste
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Sapphire; Venser, Fervent Forger
+Bot1.Graveyard = Black Lotus
+Bot2.Life = 20
+Bot2.Battlefield = Forest; Llanowar Elves

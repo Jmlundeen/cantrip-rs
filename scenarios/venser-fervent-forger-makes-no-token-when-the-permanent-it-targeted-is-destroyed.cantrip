@@ -1,0 +1,51 @@
+# Venser, Fervent Forger: "Create two tokens that are copies of target permanent an opponent controls" - the tokens are
+# made as the ability resolves, and a permanent that has left the battlefield by then is copied not at all (CR 608.2b), so
+# no tokens and no sacrifice at the end step. Bot1 casts Venser in its main phase, the trigger targets Bot2's Llanowar
+# Elves, and Bot1 answers its own trigger with Cut Down.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Venser, Fervent Forger
+Island
+Cut Down
+Island x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Venser, Fervent Forger.Cast
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+? Delayed.Count = 0
+? Bot1.Battlefield.Count = 5
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Venser, Fervent Forger
+Bot1.Graveyard = Cut Down; Black Lotus
+Bot2.Graveyard = Llanowar Elves
+Delayed.Count = 0

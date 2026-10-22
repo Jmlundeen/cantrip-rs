@@ -1,0 +1,52 @@
+# Venser, Fervent Forger: "Copy target instant or sorcery spell an opponent controls twice." Bot1's own Lightning Bolt is
+# on the stack under Bot1 when Venser's trigger is put on it, and the Shock under it is Bot2's: only the opponent's spell is
+# a target, so no choice is asked and the two copies are of Shock, aimed by Bot1 at Bot2 (2 and 2), then Bot1's Bolt hits
+# Bot2 (3) and Bot2's Shock hits Bot1 (2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Venser, Fervent Forger
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Mountain
+Shock
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Hand.Venser, Fervent Forger.Cast
+Bot1.Modes(Copy target instant or sorcery spell an opponent controls twice. You may choose new targets for the copies.)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 18
+Bot2.Life = 13
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Venser, Fervent Forger
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot2.Graveyard = Shock
