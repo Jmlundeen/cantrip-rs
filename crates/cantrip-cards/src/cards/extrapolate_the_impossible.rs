@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::{choose, same_name};
 use cantrip_oracle as oracle;
 
 /// "You may reveal exactly two cards you own with different names from outside the game. An opponent chooses one of them.
@@ -19,20 +19,17 @@ fn reveal_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Choose a pairable first card, then a differently named partner (CR 608.2d).
+/// Choose a pairable first card, then a differently named partner (CR 608.2d). Cards have different names only if no
+/// two of them share a name (CR 201.2b), and a card with a name in common has the same name even with additional
+/// names (CR 201.2a), so a split card and a card named for one half do not pair: `same_name` decides.
 /// Declining or having no legal pair returns `None`; neither card is revealed yet.
 fn pair(g: &mut dyn Game, player: PlayerId, source: ObjectId, outside: &[ObjectId]) -> Result<Option<[ObjectId; 2]>, Suspend> {
-    let pairable: Vec<ObjectId> = outside.iter().copied().filter(|&card| outside.iter().any(|&other| name_of(g, other) != name_of(g, card))).collect();
+    let pairable: Vec<ObjectId> = outside.iter().copied().filter(|&card| outside.iter().any(|&other| !same_name(g, other, card))).collect();
     let Some(first) = choose::cards(g, player, source, Purpose::Reveal, pairable, 1, true)?.first().copied() else {
         return Ok(None);
     };
-    let partners: Vec<ObjectId> = outside.iter().copied().filter(|&card| name_of(g, card) != name_of(g, first)).collect();
+    let partners: Vec<ObjectId> = outside.iter().copied().filter(|&card| !same_name(g, card, first)).collect();
     Ok(choose::cards(g, player, source, Purpose::Reveal, partners, 1, false)?.first().copied().map(|second| [first, second]))
-}
-
-/// A card's printed name outside the game (CR 201.2).
-fn name_of(g: &dyn Game, card: ObjectId) -> &'static str {
-    g.card(g.obj(card).card).name
 }
 
 pub static CARD: CardDef = CardDef {
