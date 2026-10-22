@@ -1,0 +1,23 @@
+# Viridescent Bog: "{1}, {T}: Add {B}{G}." Turn 1 it is the only land, so the ability is not offered - it needs one
+# mana. Turn 3 an Island pays the {1} and the Bog adds one black and one green: {B}{G}, the fixed pair, never two of one
+# color.
+
+[Bot1 Deck]
+Viridescent Bog
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Viridescent Bog.Play
+! Bot1.Battlefield.Viridescent Bog.Activate(Ability: {1}, {T})
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Viridescent Bog.Activate(Ability: {1}, {T})
+? Bot1.Mana = {B}{G}
+
+[Expect]
+Turn = 3
