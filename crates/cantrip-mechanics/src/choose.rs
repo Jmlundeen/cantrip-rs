@@ -178,6 +178,24 @@ pub fn one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, modes: Vec<L
     }
 }
 
+/// "Separate [these] into two piles" (CR 700.3a): `separator` chooses the cards of the first pile and the rest are the second,
+/// so either pile may be empty (CR 700.3d); the two piles come back in that order. Nothing is asked when there is
+/// nothing to separate, or when no player is there to separate (the caller's whole pile stays second). Fact or Fiction and
+/// Liliana of the Veil print it.
+pub fn separate(g: &mut dyn Game, separator: Option<PlayerId>, source: ObjectId, cards: Vec<ObjectId>) -> Result<(Vec<ObjectId>, Vec<ObjectId>), Suspend> {
+    let Some(separator) = separator else { return Ok((Vec::new(), cards)) };
+    let first = select(g, separator, source, Purpose::SeparatePiles, cards.clone(), crate::select::cards(crate::select::ANY_NUMBER))?;
+    let second = cards.into_iter().filter(|id| !first.contains(id)).collect();
+    Ok((first, second))
+}
+
+/// "Choose a pile" during resolution (CR 608.2d, 700.3b-d): name both piles and whether each is empty. Return the chosen
+/// pile first and the other second. Fact or Fiction and Liliana of the Veil print it.
+pub fn pile(g: &mut dyn Game, chooser: PlayerId, source: ObjectId, first: Vec<ObjectId>, second: Vec<ObjectId>) -> Result<(Vec<ObjectId>, Vec<ObjectId>), Suspend> {
+    let piles = vec![Label::Pile { first: true, cards: first.clone() }, Label::Pile { first: false, cards: second.clone() }];
+    Ok(if one_of(g, chooser, source, piles)? == 1 { (second, first) } else { (first, second) })
+}
+
 /// The face a card is cast as (CR 709.3, 715.3, 712.8a), chosen from `ways` (`Game::cast_ways_during_resolution`, narrowed to
 /// the ones the effect allows: a mana value, a type), as the player puts it on the stack. Nothing is asked when there is one;
 /// `None` when there is none. Uldaros Theorix, Beseech the Mirror and Bilbo, Thief in the Night print a restriction on the spell.

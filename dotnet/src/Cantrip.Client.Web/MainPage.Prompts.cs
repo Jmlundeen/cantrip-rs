@@ -758,6 +758,20 @@ public sealed partial class MainPage
                 enabled: _pickedTargets.Count >= prompt.Minimum,
                 primary: true);
         }
+
+        // A non-targeted choice may name revealed library cards (Fact or Fiction). They have no row on the board;
+        // show only the offered handles, never the rest of the library.
+        List<ObjectView> libraryCards = [.. prompt.Candidates.Where(candidate => !candidate.IsPlayer)
+            .Select(candidate => client.Object(candidate.Object)).OfType<ObjectView>()
+            .Where(card => card.Zone == ZoneKindView.Library)];
+        if (libraryCards.Count > 0)
+        {
+            OpenChoices($"Revealed library cards  ·  {libraryCards.Count} cards", closable: false, libraryCards.Count);
+            foreach (ObjectView card in libraryCards)
+            {
+                AddChoice(card, LookOf(client, card));
+            }
+        }
     }
 
     /// <summary>

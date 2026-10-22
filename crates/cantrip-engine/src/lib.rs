@@ -119,10 +119,10 @@ pub fn label_text_in(table: &'static CardTable, label: &Label) -> &'static str {
         Label::Name(card) | Label::Face(card) => cards().get(card).name,
         Label::Fused(_) => "Fuse: both halves",
         Label::TargetSlot(text, _) => text,
-        Label::Pile { first: true, empty: true } => "First pile: nothing",
-        Label::Pile { first: true, empty: false } => "First pile",
-        Label::Pile { first: false, empty: true } => "Second pile: nothing",
-        Label::Pile { first: false, empty: false } => "Second pile",
+        Label::Pile { first: true, ref cards } if cards.is_empty() => "First pile: nothing",
+        Label::Pile { first: true, .. } => "First pile",
+        Label::Pile { first: false, ref cards } if cards.is_empty() => "Second pile: nothing",
+        Label::Pile { first: false, .. } => "Second pile",
         // A modal spell's or ability's mode, from the card's own definition (its spell's, or the modal ability's, a reflexive
         // one among them).
         Label::Mode(ability, i) => cards().modal_of(ability).and_then(|m| m.modes.get(i as usize)).map_or("", |m| m.text),

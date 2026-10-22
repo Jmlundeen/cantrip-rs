@@ -582,8 +582,15 @@ impl RequestKind {
                 add(&[*source]);
                 add(&candidates.iter().filter_map(|t| t.object()).collect::<Vec<_>>());
             }
-            RequestKind::ChooseModes { source, .. }
-            | RequestKind::ChooseColors { source, .. }
+            RequestKind::ChooseModes { source, modes, .. } => {
+                add(&[*source]);
+                for mode in modes {
+                    if let Label::Pile { cards, .. } = mode {
+                        add(cards);
+                    }
+                }
+            }
+            RequestKind::ChooseColors { source, .. }
             | RequestKind::ChooseSubtype { source, .. }
             | RequestKind::May { source, .. }
             | RequestKind::ChoosePlayer { source, .. } => add(&[*source]),
@@ -1375,8 +1382,8 @@ pub enum Purpose {
     PayLifeOrPutOnTop(u8),
 }
 
-/// The text of one option, as an index, so no string is built at runtime.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+/// One option's meaning: usually an index into fixed text; a pile carries the objects the chooser sees.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Label {
     /// The nth label of the source card's definition.
     Card(CardId, u8),
@@ -1385,8 +1392,8 @@ pub enum Label {
     Option(CardId, u8),
     /// A card's name: an option that is one of several cards, named as the C# engine offers them.
     Name(CardId),
-    /// One of two piles (CR 700.3), and whether it has nothing in it.
-    Pile { first: bool, empty: bool },
+    /// One of two piles (CR 700.3), whose members the chooser sees. Fact or Fiction and Liliana of the Veil ask it.
+    Pile { first: bool, cards: Vec<ObjectId> },
     /// The nth mode of a modal spell (its ability has index `u8::MAX`) or ability.
     Mode(AbilityRef, u8),
     /// The nth way of paying the source card's additional cost (`CardDef::additional_choice`).

@@ -130,6 +130,10 @@ answered so again, so an automatic seat never goes round forever. So no client w
 and a new one changes the engine alone. `MinimumBlockers`, `MaximumBlockers`, `Requirements` and `MostRequirements` are for
 showing the player. The answer is still checked when it is given. Version 205.
 
+An unrestricted `SeparatePiles` selection (`AnyNumber`, no parts or candidate restriction) uses the existing non-targeted
+`ChooseTargetPromptMessage` presentation; its `TargetsChosenAnswer` is translated to the engine's card selection and
+checked by the same validator. A pile-choice mode names its members, with an empty pile named "nothing" (CR 700.3d).
+
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed
 counters, added mana or cost life (a land, Black Lotus, Lotus Petal, Pentad Prism, a Treasure), that seat's next priority

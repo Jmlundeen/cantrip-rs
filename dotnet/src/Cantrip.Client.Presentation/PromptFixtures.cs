@@ -280,6 +280,8 @@ public static class PromptFixtures
         "may-have-controller-draw-one",
         "may-take-damage-instead-of-return",
         "modes-one",
+        "separate-piles",
+        "choose-pile",
         "additional-cost",
         "phyrexian-life",
         "venture-room",
@@ -1777,6 +1779,34 @@ public static class PromptFixtures
                 // get back. Neither button is primary, so passing through never spends the life.
                 Announce(view, "Pia's Revolution", "{2}{R}", "Whenever a nontoken artifact is put into your graveyard from the battlefield, return that card to your hand unless target opponent has this enchantment deal 3 damage to them.", Rival, CardTypeView.Enchantment);
                 return new MayPromptMessage { Player = Viewer, Source = new ViewHandle(OnStack), Verb = "TakeDamageInsteadOfReturn", Amount = 3 };
+
+            case "separate-piles":
+                Object(view, HandRitual).Name = "Fact or Fiction";
+                return new ChooseTargetPromptMessage
+                {
+                    Player = Viewer,
+                    Ability = new ViewHandle(HandRitual),
+                    Source = new ViewHandle(HandRitual),
+                    Text = "Separate into two piles: choose the first pile; the rest form the second. Either pile may be empty.",
+                    Targeted = false,
+                    Optional = true,
+                    AnyNumber = true,
+                    Count = 4,
+                    Candidates = [.. RevealedLibraryTop(view, 4).Select(card => new TargetMessage { Object = card })],
+                };
+
+            case "choose-pile":
+                Object(view, HandRitual).Name = "Fact or Fiction";
+                RevealedLibraryTop(view, 4);
+                return new ChooseModesPromptMessage
+                {
+                    Player = Viewer,
+                    Source = new ViewHandle(HandRitual),
+                    Modes = ["First pile: Grizzly Bears, Island", "Second pile: Counterspell, Brainstorm"],
+                    Eligible = [0, 1],
+                    Count = 1,
+                    Detail = "Chosen, not targeted",
+                };
 
             case "modes-one":
                 return new ChooseModesPromptMessage
