@@ -1,0 +1,49 @@
+# Dreadhorde Invasion: "Whenever a Zombie token you control with power 6 or greater attacks, it gains lifelink until end of
+# turn." Only a Zombie counts: a Citizen token from Grand Crescendo (X = 1, paid with Black Lotus) becomes a 7/7 with two
+# Giant Growths and attacks for 7 without gaining Bot1 any life (18 after two upkeeps).
+
+[Bot1 Deck]
+Swamp
+Dreadhorde Invasion
+Mox Jet
+Black Lotus
+Grand Crescendo
+Giant Growth
+Giant Growth
+Forest
+Mox Emerald
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dreadhorde Invasion.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Grand Crescendo.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Citizen Token)
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Citizen Token)
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Citizen Token > Bot2)
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Life = 18
+Bot2.Life = 13
+Bot1.Battlefield.Citizen Token.Power = 7
+Bot1.Battlefield.Citizen Token.Keywords = (absent)
