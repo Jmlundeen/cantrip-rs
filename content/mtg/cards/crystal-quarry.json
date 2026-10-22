@@ -1,0 +1,5 @@
+{
+  "name": "Crystal Quarry",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{5}, {T}: Add {W}{U}{B}{R}{G}."
+}

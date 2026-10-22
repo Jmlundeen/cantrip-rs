@@ -1,0 +1,34 @@
+# Crystal Quarry: "{T}: Add {C}." and "{5}, {T}: Add {W}{U}{B}{R}{G}." Turn 1 it taps for {C} alone; turn 11, with five
+# Islands to pay the {5}, it adds exactly one mana of each color - no choice, and no way to add two of one.
+
+[Bot1 Deck]
+Crystal Quarry
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Crystal Quarry.Play
+Bot1.Battlefield.Crystal Quarry.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Crystal Quarry.Activate(Ability: {5}, {T})
+? Bot1.Mana = {W}{U}{B}{R}{G}
+
+[Expect]
+Turn = 11
