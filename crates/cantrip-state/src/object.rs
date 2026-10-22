@@ -677,10 +677,12 @@ pub enum EffectKind {
     AddTypes(TypeSet),
     /// Its controller is this player (CR 613.1b, layer 2). The latest of an object's control effects applies.
     Control(PlayerId),
-    /// "Attacks each combat if able" (CR 508.1d): an attack requirement.
+    /// Gains "this creature attacks each combat if able" (CR 508.1d), layer 6: an ability, which "loses all abilities" later
+    /// takes (Carnage, Crimson Chaos).
     MustAttack,
     /// "Attacks that player this combat if able" (CR 508.1d): an attack requirement that names the player to attack. It also
-    /// makes the creature attack each combat if able, for as long as it lasts.
+    /// makes the creature attack each combat if able, for as long as it lasts. An effect, not an ability: a creature that loses
+    /// its abilities is still under it.
     MustAttackPlayer(PlayerId),
     /// It becomes this subtype in addition to its other subtypes (CR 613.1d), layer 4.
     AddSubtype(Subtype),
@@ -708,7 +710,7 @@ pub enum EffectKind {
     /// "Loses all abilities" (CR 613.1f), layer 6: at its timestamp, so what is granted later is kept.
     LoseAllAbilities,
     /// Goaded by the effect's controller (CR 701.15a): attacks each combat if able, and attacks a player other than
-    /// the goader if able (CR 701.15b).
+    /// the goader if able (CR 701.15b). An effect, not an ability: a goaded creature that loses its abilities is still goaded.
     Goaded,
     /// "Can't block" (CR 509.1b) for as long as the effect lasts.
     CantBlock,

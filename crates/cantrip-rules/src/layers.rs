@@ -2514,9 +2514,7 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
         | EffectKind::Suspected
         | EffectKind::LoseKeywords(_)
         | EffectKind::AddAbility(_)
-        | EffectKind::MustAttack
-        | EffectKind::Goaded
-        | EffectKind::MustAttackPlayer(_) => Layer::Ability,
+        | EffectKind::MustAttack => Layer::Ability,
         EffectKind::SetPt(..) => Layer::PtSet,
         EffectKind::Pump(..) => Layer::PtModify,
         EffectKind::SwitchPt => Layer::PtSwitch,
@@ -2645,7 +2643,9 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
                     chars.abilities[slot] = Some(ability);
                 }
             }
-            (Layer::Ability, EffectKind::MustAttack | EffectKind::Goaded | EffectKind::MustAttackPlayer(_)) => chars.must_attack = true,
+            // A gained "this creature attacks each combat if able" (Carnage, Crimson Chaos). Goad and "attacks that player this
+            // combat if able" are effects, not abilities: they are read from the effects as attackers are declared.
+            (Layer::Ability, EffectKind::MustAttack) => chars.must_attack = true,
             // CR 613.4d: power and toughness switch, whatever set and modified them first.
             (Layer::PtSwitch, EffectKind::SwitchPt) => std::mem::swap(&mut chars.power, &mut chars.toughness),
             (Layer::PtModify, EffectKind::Pump(p, t)) => {

@@ -571,7 +571,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     let requirements: Vec<ObjectId> = eligible
         .iter()
         .copied()
-        .filter(|&id| cx.chars(id).must_attack && targets.iter().any(|&t| AttackCost::free(&costs, id, t)))
+        .filter(|&id| must_attack(cx, id) && targets.iter().any(|&t| AttackCost::free(&costs, id, t)))
         .collect();
     let can_pay = if costs.is_empty() { 0 } else { actions::available(cx, active).most_unrestricted() };
     let kind = RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, can_pay };
@@ -722,6 +722,14 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
         }
     }
     !a.protected_from_by(&b, cx.s().obj(blocker).controller)
+}
+
+/// Whether `id` attacks each combat if able (CR 508.1d): by an ability it has ("this creature attacks each combat if able", one
+/// it gained included), or by an effect on it that is no ability - goad (CR 701.15b) and "attacks that player this combat if
+/// able" - which a creature that loses its abilities is still under.
+fn must_attack(cx: &Cx, id: ObjectId) -> bool {
+    cx.chars(id).must_attack
+        || cx.s().effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::Goaded | EffectKind::MustAttackPlayer(_)))
 }
 
 /// "Can't block" (CR 509.1b): from an effect on this creature, or the turn's rule that no creature can.
