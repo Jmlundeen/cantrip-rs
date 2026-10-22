@@ -246,8 +246,6 @@ in the world, and a seat's search could read them:
   differ only there make different worlds. The redaction test skips dealing a world for such a pair ("histories apart":
   10 positions of 176 pairs, `accumulate-wisdom` among them). A fix renumbers the seat's unseen hand objects too, or
   deals the hidden objects as a set.
-- A library the journal tail rearranges (a resolution in progress drew from it or put a card in it) keeps its real order
-  (`zone_order_touched`).
 - In hidden mode, the cards that began outside the game (sideboards) stay what they are when the prior has no list for
   them.
 - A face-down object (morph, manifest) may be rebound to a card that could not have been face down that way.

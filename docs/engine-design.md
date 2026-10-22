@@ -137,7 +137,8 @@ a search branch is a sibling path that shares everything above it.
   copies instead, as `reseed` does:
   - `GameState::rebind_hidden` and `Game::rebind_hidden` give a hidden object, and the hidden rows it became from,
     another card, and patch the `AbilityRef`s naming it in the stack, triggers and log;
-  - `GameState::reorder_library` reorders a library the tail does not touch (`zone_order_touched`);
+  - `GameState::reorder_library` reorders a library, renaming the objects the tail's removals put back and keeping in
+    place what the tail made (`zone_order_fixed`);
   - `GameState::restamp_hidden` resets a timestamp no event recorded;
   - `Game::ask_again` asks the waiting question again of the new cards.
 - **An answer without stages redoes its run from the run's start**, so its node begins before the events the run

@@ -805,6 +805,110 @@ Bot1.Hand.Duress.Cast(Bot2)
 
 /// A world dealt while a spell is being cast keeps its cards when the cast is cancelled (CR 733.1): the hand Duress
 /// goes back to is the world's.
+/// A library a resolution in progress drew from is dealt anew all the same: the seat does not know its own library's
+/// order, the draws in the fork's journal tail notwithstanding. The tail's records of what it took out are renamed with
+/// the places, so the re-run the answer makes, and the way back to the fork's root, lay out the world's library.
+#[test]
+fn a_library_drawn_from_mid_resolution_is_reordered_and_rolls_back_whole() {
+    let game = handed_over(LOOTING_CHOOSES);
+    let bot1 = PlayerId(0);
+    let run = game.state.agenda.last().expect("the resolution waits").log_mark as usize;
+    assert!(game.log[run..].iter().any(|r| matches!(r.event, Event::Drew { player, .. } if player == bot1)), "the resolution waiting drew from the library");
+    let mut world = game.fork_for_search();
+    world.reseed(5);
+    determinize(&mut world, &Knowledge::of(&game, bot1), bot1, InfoMode::Decklist, prior(), &mut Rng::new(5));
+    // The objects themselves are moved, not only dealt other cards: which object lies where is what the real game's order
+    // would otherwise tell.
+    let order = |g: &Game| g.state.zone(Zone::library(bot1)).to_vec();
+    assert_ne!(order(&world), order(&game), "Bot1's library's objects are in another order in the world");
+    let dealt = (world.state.clone(), world.log.clone());
+    let root = world.checkpoint();
+    let request = world.pending().cloned().expect("the discard");
+    let RequestKind::ChooseCards { eligible, count, .. } = &request.kind else { panic!("a card choice: {request:?}") };
+    let chosen: Vec<ObjectId> = eligible[..*count as usize].to_vec();
+    world.answer(request.id, request.player, Answer::Cards(chosen)).expect("legal");
+    world.goto(root);
+    assert!(world.state == dealt.0 && world.log == dealt.1, "back at the fork's root, the world as dealt");
+}
+
+/// Ancestral Recall under Chains of Mephistopheles, Golgari Grave-Troll back in Bot1's hand from the first dredge: the
+/// second draw is replaced by a discard, and Bot1 is offered the dredge on the draw Chains gives back. Its run milled six
+/// cards from Bot1's library before it asked, and put them back when it stopped to ask: the journal's tail names them.
+const CHAINS_DREDGES: &str = "
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Chains of Mephistopheles
+Entomb
+Ancestral Recall
+Mox Jet
+Golgari Grave-Troll
+Forest x12
+Swamp x13
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Search(Golgari Grave-Troll)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Golgari Grave-Troll)
+Bot1.Accept
+Bot1.Choose(Golgari Grave-Troll)
+[Handover Bot1.Accept]
+";
+
+/// A library whose objects a resolution waiting on its question took out and put back is dealt anew with them in it (the
+/// long test found the real top six kept here, which told the seat the real shuffle): the answer's re-run mills the
+/// world's top six, and the way back to the fork's root gives the world as dealt. That a rollback through the tail lays
+/// out the new order is `GameState`'s own test (`a_reordered_library_rolls_back_in_its_new_order`).
+#[test]
+fn a_library_a_waiting_resolution_took_from_and_put_back_is_dealt_anew_with_the_rest() {
+    let game = handed_over(CHAINS_DREDGES);
+    let bot1 = PlayerId(0);
+    let mut world = game.fork_for_search();
+    world.reseed(5);
+    determinize(&mut world, &Knowledge::of(&game, bot1), bot1, InfoMode::Hidden, prior(), &mut Rng::new(5));
+    let library = |g: &Game| g.state.zone(Zone::library(bot1)).to_vec();
+    assert_ne!(library(&world), library(&game), "Bot1's library's objects are in another order in the world");
+    let top: Vec<ObjectId> = library(&world)[..6].to_vec();
+    let dealt = (world.state.clone(), world.log.clone());
+    let root = world.checkpoint();
+    let request = world.pending().cloned().expect("the dredge offered");
+    world.answer(request.id, request.player, Answer::Yes).expect("legal");
+    let milled: Vec<ObjectId> = world
+        .log
+        .iter()
+        .rev()
+        .filter_map(|r| match r.event {
+            Event::ZoneChange { old, from, to, .. } if from == Zone::library(bot1) && to == Zone::graveyard(bot1) => Some(old),
+            _ => None,
+        })
+        .take(6)
+        .collect();
+    let mut want = top.clone();
+    want.sort();
+    let mut got = milled.clone();
+    got.sort();
+    assert_eq!(got, want, "the dredge mills the world's top six");
+    world.goto(root);
+    assert!(world.state == dealt.0 && world.log == dealt.1, "back at the fork's root, the world as dealt");
+}
+
 #[test]
 fn a_world_dealt_mid_cast_keeps_its_cards_when_the_cast_is_cancelled() {
     let game = handed_over(DURESS_PAYS);

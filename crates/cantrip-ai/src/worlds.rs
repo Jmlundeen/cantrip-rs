@@ -190,8 +190,11 @@ pub fn determinize(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: InfoMod
     for p in game.state.seats() {
         let slot = Zone::library(p).slot(players);
         let zone = &game.state.zones[slot];
-        let at: Vec<usize> = (0..zone.len()).filter(|&i| unplaced.contains(&zone[i])).collect();
-        if at.len() < 2 || game.state.zone_order_touched(slot) {
+        // What a resolution in progress put into it keeps its place (`zone_order_fixed`): a rollback inside the fork takes
+        // it away by place. What the resolution took from it and put back moves with the rest (`reorder_library`).
+        let fixed = game.state.zone_order_fixed(slot);
+        let at: Vec<usize> = (0..zone.len()).filter(|&i| unplaced.contains(&zone[i]) && !fixed.contains(&zone[i])).collect();
+        if at.len() < 2 {
             continue;
         }
         let mut objects: Vec<ObjectId> = at.iter().map(|&i| zone[i]).collect();

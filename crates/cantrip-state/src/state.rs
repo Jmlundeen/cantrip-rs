@@ -1379,6 +1379,7 @@ impl GameState {
             self.statics_seen = true;
         }
         self.epoch += 1;
+        self.chars_epoch += 1;
     }
 
     /// Gives a hidden object another timestamp, for a search's world: never on a real game. Not journalled, as
@@ -1403,30 +1404,51 @@ impl GameState {
             }
         }
         self.epoch += 1;
+        self.chars_epoch += 1;
     }
 
     /// Puts a library's objects in another order, for a search's world: never on a real game. Not journalled, as
-    /// `rebind_hidden` is not. Only for a library whose order the journal's tail never changes (`zone_order_touched`),
-    /// since a rollback inside the fork would put the old order's insertions and removals at the wrong places.
+    /// `rebind_hidden` is not. The journal's tail keeps up: a removal it records names the object it puts back, and that
+    /// name is changed as the object's place is, so that a rollback inside the fork lays the library out in the new order
+    /// at every point. An object made in the tail (`zone_order_fixed`) keeps its place: a rollback takes away by place.
     pub fn reorder_library(&mut self, slot: usize, order: Vec<ObjectId>) {
-        debug_assert!(!self.zone_order_touched(slot), "reordering a zone the journal's tail rearranges");
+        let fixed = self.zone_order_fixed(slot);
         debug_assert!({
             let mut a = order.clone();
             let mut b = self.zones[slot].clone();
             a.sort();
             b.sort();
-            a == b
+            a == b && self.zones[slot].iter().zip(&order).all(|(was, now)| was == now || !(fixed.contains(was) || fixed.contains(now)))
         });
+        // The object now at each place stands, through the tail, for the one that was there.
+        let moved: Vec<(ObjectId, ObjectId)> = self.zones[slot].iter().zip(&order).filter(|(was, now)| was != now).map(|(&was, &now)| (was, now)).collect();
+        if !moved.is_empty() {
+            for entry in &mut self.journal.entries {
+                if let Undo::ZoneRemoved { slot: s, id, .. } = entry
+                    && *s as usize == slot
+                    && let Some(&(_, now)) = moved.iter().find(|(was, _)| was == id)
+                {
+                    *id = now;
+                }
+            }
+        }
         self.zones[slot] = order;
         self.epoch += 1;
+        self.chars_epoch += 1;
     }
 
-    /// Whether the journal's tail inserts into or removes from a zone slot: one a rollback would rearrange.
-    pub fn zone_order_touched(&self, slot: usize) -> bool {
-        self.journal.entries.iter().any(|e| match e {
-            Undo::ZoneInserted { slot: s, .. } | Undo::ZoneRemoved { slot: s, .. } => *s as usize == slot,
-            _ => false,
-        })
+    /// The objects of a zone slot that the journal's tail made: a rollback inside the tail takes them away by their place,
+    /// so a reorder keeps them where they are (`reorder_library`).
+    pub fn zone_order_fixed(&self, slot: usize) -> Vec<ObjectId> {
+        let mut len = self.objects.len();
+        for entry in self.journal.entries.iter().rev() {
+            match entry {
+                Undo::ObjectPushed => len -= 1,
+                Undo::ObjectPopped(_) => len += 1,
+                _ => {}
+            }
+        }
+        self.zones[slot].iter().copied().filter(|id| id.index() >= len).collect()
     }
 
     pub fn step_back(&mut self, mark: Mark) -> (Vec<Undo>, Vec<Undo>) {
@@ -1710,6 +1732,38 @@ mod tests {
             copied: false,
             cast_known: u32::MAX,
         }
+    }
+
+    /// A library reordered for a search's world, after the journal's tail took cards from it and put them back: rolling the
+    /// tail back lays the library out in the new order, every object once, and an object the tail made keeps its place.
+    #[test]
+    fn a_reordered_library_rolls_back_in_its_new_order() {
+        let mut s = GameState::new(2, 1);
+        let library = Zone::library(PlayerId(0));
+        let ids: Vec<ObjectId> = (0..6).map(|_| s.push_obj(Obj::new(CardId(0), PlayerId(0), library))).collect();
+        for &id in &ids {
+            s.zone_push(library, id);
+        }
+        let start = s.mark();
+        // The tail: the top two taken out and put back (a run that stopped to ask), one taken out for good, and a new
+        // object put on the bottom.
+        s.zone_remove(library, ids[0]);
+        s.zone_remove(library, ids[1]);
+        s.zone_insert(library, 0, ids[1]);
+        s.zone_insert(library, 0, ids[0]);
+        s.zone_remove(library, ids[5]);
+        let made = s.push_obj(Obj::new(CardId(0), PlayerId(0), library));
+        s.zone_push(library, made);
+        // A fork's journal begins where the tail does.
+        let mut fork = s.clone_with_journal_from(start);
+        let slot = library.slot(2);
+        assert_eq!(fork.zone_order_fixed(slot), vec![made]);
+        // Now: 0 1 2 3 4 made. Reordered: 3 0 4 1 2 made.
+        let order = vec![ids[3], ids[0], ids[4], ids[1], ids[2], made];
+        fork.reorder_library(slot, order);
+        fork.rollback(start);
+        // At the start the real order was 0 1 2 3 4 5; each object stands where the one it replaced stood.
+        assert_eq!(fork.zone(library), &[ids[3], ids[0], ids[4], ids[1], ids[2], ids[5]][..]);
     }
 
     /// Past `INLINE_TARGETS` a stack item's targets and specs are in the game's arena, and its shares in theirs, read back whole; changing one

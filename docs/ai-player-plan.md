@@ -160,8 +160,9 @@ The search needs a complete game. It makes one without reading what is hidden.
    `GameState::reseed`, they rewrite the stored copies in the journal's tail instead.
    - `GameState::rebind_hidden(chain, card, abilities, statics)`, wrapped by `Game::rebind_hidden(chain, card)`, rebinds
      one object together with the rows it became from while it stayed hidden;
-   - `GameState::reorder_library`, used only when no `ZoneInserted`/`ZoneRemoved` entry in the tail touches that
-     library (`zone_order_touched`);
+   - `GameState::reorder_library`, which renames the objects the tail's `ZoneRemoved` entries put back as their places
+     are traded, so a rollback inside the fork lays the library out in the new order, and keeps in place the objects
+     the tail made (`zone_order_fixed`), which a rollback takes away by place;
    - `GameState::restamp_hidden(id, 0)`;
    - and `Game::ask_again`: the waiting question was put to the real cards (a Priority request's castable options),
      so after a change it is asked again of the world's. It reverts to the top frame's mark, truncates the log and
