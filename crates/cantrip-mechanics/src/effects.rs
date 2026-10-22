@@ -440,6 +440,19 @@ pub fn damage_each_opponent(g: &mut dyn Game, item: &StackItem, n: u16) {
     g.damage_together(&hits);
 }
 
+/// "This source deals 1 damage to that creature's controller", the creature being the trigger's subject: its controller
+/// as the ability resolves, or as it last existed if it has left the battlefield (CR 608.2h), with no target and no
+/// retest of the trigger condition. The damage is dealt by the ability's source, as it last existed if it has left
+/// (CR 113.7a); none is dealt to a player who has left the game (CR 800.4a), which the core's damage sees to. Rampaging
+/// Ferocidon and Tetsuko Umezawa, Pursuer print it.
+pub fn ping_subject_controller(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = item.subject.object() {
+        let controller = g.controller(creature);
+        g.damage(item.object, Target::Player(controller), 1);
+    }
+    Ok(())
+}
+
 /// "Surveil N" (CR 701.25) for the ability's controller. The surveil lands and Dragon's Rage Channeler print it.
 pub fn surveil(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspend> {
     crate::surveil(g, item.controller, item.object, n)
