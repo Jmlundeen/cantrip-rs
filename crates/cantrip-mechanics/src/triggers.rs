@@ -892,6 +892,15 @@ pub fn each_end_step(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
     }
 }
 
+/// "At the beginning of each upkeep" (CR 503.1a): any player's upkeep step began. Command the Stage and Ginger, Queen of
+/// Sweets print it.
+pub fn each_upkeep(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::StepBegan { step: Step::Upkeep } => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "At end of combat" (CR 511.2): it triggers as the end of combat step begins, in any player's turn - each combat phase's,
 /// where a turn has more than one. Kytheon, Hero of Akros, Clockwork Avian and Kjeldoran Frostbeast print it.
 pub fn end_of_combat(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
@@ -1341,6 +1350,7 @@ pub const YOUR_SECOND_MAIN_PHASE: Trigger = when_asked(EventMask::STEP_BEGAN, yo
 pub const EACH_OPPONENTS_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, each_opponents_upkeep);
 pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, beginning_of_your_combat);
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
+pub const EACH_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, each_upkeep);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const END_OF_COMBAT: Trigger = when(EventMask::STEP_BEGAN, end_of_combat);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
