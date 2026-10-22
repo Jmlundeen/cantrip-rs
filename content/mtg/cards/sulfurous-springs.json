@@ -1,0 +1,5 @@
+{
+  "name": "Sulfurous Springs",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{T}: Add {B} or {R}. This land deals 1 damage to you."
+}
