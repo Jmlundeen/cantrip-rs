@@ -2331,17 +2331,31 @@ fn account(
     }
 }
 
+/// The permanents that could have a triggered mana ability (CR 605.1b) now, however it was given (`settle::could_have`): the
+/// only ones looked at when a permanent is tapped for mana. Unallocated while there are none.
+fn mana_trigger_holders(cx: &Cx) -> Vec<ObjectId> {
+    let could = crate::settle::could_have(cx, &cx.cards().mana_triggers, |t| t.mana_ability);
+    let holders: Vec<ObjectId> = cx.s().battlefield().iter().copied().filter(|&id| could(id)).collect();
+    // With `CANTRIP_VERIFY`: a permanent left out has no triggered mana ability now - a way of giving one that the set misses
+    // is found here, not as mana that silently never comes.
+    if crate::layers::verifying() {
+        for &id in cx.s().battlefield().iter().filter(|&&id| !could(id)) {
+            assert!(
+                !cx.chars(id).abilities().any(|a| matches!(cx.cards().ability(a), AbilityDef::Triggered(t) if t.mana_ability)),
+                "{id:?} has a triggered mana ability that nothing counted as able to give it (CR 605.1b)"
+            );
+        }
+    }
+    holders
+}
+
 /// The triggered mana abilities that a permanent's being tapped for mana could trigger (CR 605.1b): those of the permanents
-/// whose cards have one, and the delayed ones (High Tide's). Empty, and unallocated, while there are none.
+/// that could have one (`mana_trigger_holders`), and the delayed ones (High Tide's). Empty, and unallocated, while there are none.
 fn waiting_mana_triggers(cx: &Cx) -> Vec<(Asker, &'static TriggeredDef)> {
     let mut waiting = Vec::new();
     let cards = cx.cards();
-    for &id in cx.s().battlefield() {
-        let obj = cx.s().obj(id);
-        if !cards.mana_triggers[obj.copy.map_or(obj.card, |c| c.card).0 as usize] {
-            continue;
-        }
-        let asker = Asker { source: id, controller: obj.controller };
+    for id in mana_trigger_holders(cx) {
+        let asker = Asker { source: id, controller: cx.s().obj(id).controller };
         for ability in cx.chars(id).abilities() {
             if let AbilityDef::Triggered(t) = cards.ability(ability)
                 && t.mana_ability
@@ -6975,7 +6989,7 @@ fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
 /// A permanent was tapped for mana (CR 106.12, 605.1b) and produced `produced`: the fact is recorded, and, if it produced any
 /// mana, the triggered mana abilities it triggers (CR 106.12a) resolve at once, as part of the mana ability that triggered
 /// them (CR 605.4a): "whenever you tap a Forest for mana, add an additional {G}". They are looked for among the permanents
-/// whose cards have one. One that asks (a type of the mana that land produced) suspends the activation, to be run again
+/// that could have one (`mana_trigger_holders`). One that asks (a type of the mana that land produced) suspends the activation, to be run again
 /// with the answer.
 fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: ManaPool) -> R<()> {
     let event = Event::TappedForMana { permanent: source, player, produced: ManaTally::of(produced) };
@@ -6983,16 +6997,7 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
     if produced.is_empty() {
         return Ok(());
     }
-    let holders: Vec<ObjectId> = cx
-        .s()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| {
-            let obj = cx.s().obj(id);
-            cx.cards().mana_triggers[obj.copied_card().unwrap_or(obj.card).0 as usize]
-        })
-        .collect();
+    let holders = mana_trigger_holders(cx);
     let mut statics = crate::settle::TriggerStatics::new(None);
     for id in holders {
         let controller = cx.s().obj(id).controller;

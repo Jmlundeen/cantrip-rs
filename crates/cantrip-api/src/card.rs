@@ -2719,7 +2719,9 @@ pub struct CardTable {
     /// Per card: it gives players keyword abilities (`CardDef::player_keywords`) or protection (`CardDef::player_protection`).
     /// Read to find the few battlefield sources of one.
     pub player_keywords: Vec<bool>,
-    /// Which cards have a triggered mana ability, a Room's doors' included: looked for among the permanents only when a
+    /// Which cards could have a triggered mana ability (CR 605.1b) of their own, as `look_back` says for look-back abilities:
+    /// one they print (a Room's doors' included), one they list to give, or any a static ability of theirs could give
+    /// themselves. With every other way an ability is given (`settle::could_have`), the permanents looked at when a
     /// permanent is tapped for mana.
     pub mana_triggers: Vec<bool>,
     /// Per card: the fused split spell's target specs of a split card with fuse (CR 702.102b: the left half's, then the right
@@ -2874,8 +2876,14 @@ impl CardTable {
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let player_keywords: Vec<bool> = cards.iter().map(|c| !c.player_keywords.is_empty() || !c.player_protection.is_empty()).collect();
-        let mana_triggers: Vec<bool> =
-            cards.iter().map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.mana_ability))).collect();
+        // Like `look_back`: one it prints, one it lists to give, or any a static ability of its own could give itself.
+        let mana_triggers: Vec<bool> = cards
+            .iter()
+            .map(|c| {
+                c.abilities.iter().chain(c.delayed).any(|a| matches!(a, AbilityDef::Triggered(t) if t.mana_ability))
+                    || c.statics.iter().any(|s| s.own && s.layer == Layer::Ability)
+            })
+            .collect();
         let state_triggers: Vec<bool> = cards
             .iter()
             .map(|c| c.abilities.iter().chain(c.delayed).any(|a| matches!(a, AbilityDef::Triggered(t) if t.state.is_some())))

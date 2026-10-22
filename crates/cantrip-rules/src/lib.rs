@@ -52,6 +52,8 @@ mod left_player_choice_tests;
 #[cfg(test)]
 mod look_back_tests;
 #[cfg(test)]
+mod mana_trigger_tests;
+#[cfg(test)]
 mod room_door_tests;
 #[cfg(test)]
 mod play_permission_tests;

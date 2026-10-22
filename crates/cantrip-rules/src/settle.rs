@@ -1010,18 +1010,7 @@ impl Then {
     pub(crate) fn now(cx: &Cx) -> Then {
         let cards = cx.cards();
         let s = cx.s();
-        // Every way the layers give an object an ability (CR 613.1): its copiable values (layer 1: its own card or face, a
-        // copy effect's card - `CardTable::current` - and a copy effect's exceptions), a Room's unlocked doors (in its card's
-        // `look_back`), a static ability (its own, in its card's `look_back`; another object's, wherever it functions), a
-        // resolved effect, a keyword counter (CR 122.1b), and the abilities the rules give for a keyword or a subtype
-        // (`intrinsic`). Layer 1 has no static abilities here: every copy effect, whatever made it, is `Obj::copy`.
-        let granting = cards.look_back[cards.intrinsic.0 as usize]
-            || layers::ability_granting_present(cards, s)
-            || s.effects.iter().any(|e| matches!(e.kind, EffectKind::AddAbility(_) | EffectKind::AddKeywords(_)));
-        let could = |id: ObjectId| {
-            let o = s.obj(id);
-            granting || cards.look_back[cards.current(o).0 as usize] || o.has_counters() || o.copy.is_some_and(|c| c.extra_instances().next().is_some())
-        };
+        let could = could_have(cx, &cards.look_back, |t| t.look_back);
         let mut objects: Vec<(ObjectId, Chars, PlayerId)> = s
             .battlefield()
             .iter()
@@ -1042,6 +1031,30 @@ impl Then {
             }
         }
         Then { taken: true, objects }
+    }
+}
+
+/// Which permanents could have a triggered ability of a kind now (`kind`), `table` saying which cards could of their own
+/// (`CardTable::look_back`, `CardTable::mana_triggers`): a superset of those that have one, which the caller then looks at
+/// through the layers. Every way the layers give an object an ability counts (CR 613.1): its copiable values (layer 1: its
+/// own card or the face that shows, a copy effect's card or its face-down values - `CardTable::current` - and a copy
+/// effect's exceptions), a Room's unlocked doors (in its card's entry), a static ability (its own, in its card's entry;
+/// another object's, wherever it functions, which may give anything), a resolved effect that gives it such an ability, and
+/// the abilities the rules give for a keyword or a subtype (`intrinsic`) - the only way a keyword, granted or a counter's
+/// (CR 122.1b), is an ability an object has. Layer 1 has no static abilities here: every copy effect, whatever made it, is
+/// `Obj::copy`.
+pub(crate) fn could_have<'a>(cx: &'a Cx, table: &'a [bool], kind: fn(&TriggeredDef) -> bool) -> impl Fn(ObjectId) -> bool + 'a {
+    let cards = cx.cards();
+    let s = cx.s();
+    let is_kind = move |a: AbilityRef| matches!(cards.ability(a), AbilityDef::Triggered(t) if kind(t));
+    let granting = table[cards.intrinsic.0 as usize] || layers::ability_granting_present(cards, s);
+    let effects = s.effects.iter().any(|e| matches!(e.kind, EffectKind::AddAbility(a) if is_kind(a)));
+    move |id: ObjectId| {
+        let o = s.obj(id);
+        granting
+            || table[cards.current(o).0 as usize]
+            || o.copy.is_some_and(|c| c.extra_instances().any(is_kind))
+            || (effects && s.effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::AddAbility(a) if is_kind(a))))
     }
 }
 
