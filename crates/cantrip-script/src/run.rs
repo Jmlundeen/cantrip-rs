@@ -1168,7 +1168,9 @@ impl<'s> Run<'s> {
                 let both: Vec<ObjectId> = planeswalkers.iter().chain(battles.iter()).copied().collect();
                 self.attack(step, eligible, players, &both)?
             },
-            (V::Block, RequestKind::DeclareBlockers { eligible, attackers, allowed, .. }) => self.block(step, eligible, attackers, allowed)?,
+            (V::Block, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements }) => {
+                self.block(step, eligible, attackers, allowed, requirements)?
+            }
             (V::AssignDamage, RequestKind::AssignCombatDamage { divisions }) => self.assign_damage(step, divisions)?,
             // "Choose odd or even" is a name in the C# engine's scripts: `Name(Odd)`.
             (V::Modes | V::Name, RequestKind::ChooseModes { modes, eligible, count, at_most, .. }) => {
@@ -1452,26 +1454,13 @@ impl<'s> Run<'s> {
     /// proves nothing.
     fn check_refused_declaration(&self, action: &ActionStep, line: usize, text: &str, request: &Request) -> R<()> {
         match &request.kind {
-            RequestKind::DeclareBlockers { eligible, attackers, allowed, .. } => {
+            RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements } => {
                 // `! Bot2.Block()`: declaring no blockers at all is refused, because some creature must block (CR 509.1c).
                 if action.positional().next().is_none() {
                     if check_answer(&self.game, request, &Answer::Block(Vec::new())).is_ok() {
                         return fail(format!("line {line} says {text} must not be allowed, but declaring no blockers is"));
                     }
                     return Ok(());
-                }
-                // The line names a whole declaration: an attacker that needs several blockers (menace, CR 702.110b) is not
-                // legally blocked by fewer of them than the line gives it, however each pair stands alone.
-                let mut given: Vec<(ObjectId, usize)> = Vec::new();
-                for spec in action.positional() {
-                    if let Some((_, atk)) = spec.split_once('>') {
-                        for a in self.objects(action, atk.trim(), attackers)? {
-                            match given.iter_mut().find(|g| g.0 == a) {
-                                Some(g) => g.1 += 1,
-                                None => given.push((a, 1)),
-                            }
-                        }
-                    }
                 }
                 // The declaration the line names, the first candidate for each side of each pair.
                 let mut pairs: Vec<(ObjectId, ObjectId)> = Vec::new();
@@ -1483,13 +1472,13 @@ impl<'s> Run<'s> {
                         pairs.push((b, a));
                     }
                 }
-                // A declaration of blocks each allowed alone that the engine's own check refuses as a whole holds: one that
-                // obeys fewer of the blocks effects require than a declaration could (CR 509.1c: Lure).
-                if pairs.len() == action.positional().count()
-                    && pairs.iter().all(|p| allowed.contains(p))
-                    && matches!(&request.kind, RequestKind::DeclareBlockers { requirements, .. } if requirements.most > 0)
-                    && check_answer(&self.game, request, &Answer::Block(pairs.clone())).is_err()
-                {
+                // A declaration of blocks each allowed alone is judged as a whole (CR 509.1a-c, the core's validator): refused
+                // when it may not be declared as it is - an attacker short of the blockers menace requires, or over the most it
+                // allows, or fewer requirements obeyed than a declaration could (Lure, "blocks this turn if able").
+                if pairs.len() == action.positional().count() && pairs.iter().all(|p| allowed.contains(p)) {
+                    if requirements.judge(allowed, &pairs, false).complete {
+                        return fail(format!("line {line} says {text} must not be allowed, but it is"));
+                    }
                     return Ok(());
                 }
                 for spec in action.positional() {
@@ -1518,16 +1507,7 @@ impl<'s> Run<'s> {
                         }
                         continue;
                     }
-                    // Fewer blockers than an attacker requires (menace): the declaration is refused (CR 509.1b). A line of
-                    // several pairs is one declaration: more blockers on an attacker than "can't be blocked by more than one
-                    // creature" allows (CR 509.1b), which the engine's own check of the answer must refuse.
-                    let short = targets.iter().any(|&a| {
-                        given.iter().find(|g| g.0 == a).is_some_and(|g| (g.1 as usize) < self.game.chars(a).minimum_blockers())
-                    }) || (pairs.len() > 1
-                        && pairs.iter().all(|p| allowed.contains(p))
-                        && pairs.iter().any(|&(_, a)| pairs.iter().filter(|p| p.1 == a).count() > self.game.chars(a).maximum_blockers())
-                        && check_answer(&self.game, request, &Answer::Block(pairs.clone())).is_err());
-                    if !short && blockers.iter().any(|&b| targets.iter().any(|&a| allowed.contains(&(b, a)))) {
+                    if blockers.iter().any(|&b| targets.iter().any(|&a| allowed.contains(&(b, a)))) {
                         return fail(format!("line {line} says {text} must not be allowed, but it is"));
                     }
                 }
@@ -1818,6 +1798,7 @@ impl<'s> Run<'s> {
         eligible: &[ObjectId],
         attackers: &[ObjectId],
         allowed: &[(ObjectId, ObjectId)],
+        rules: &BlockRequirements,
     ) -> R<Option<Answer>> {
         let mut blocks: Vec<(ObjectId, ObjectId)> = Vec::new();
         for spec in step.positional() {
@@ -1831,7 +1812,12 @@ impl<'s> Run<'s> {
             if blockers.is_empty() {
                 return Ok(None);
             }
-            let Some(blocker) = blockers.into_iter().find(|&b| allowed.contains(&(b, attacker))) else {
+            // Of creatures the line names alike, one that some legal declaration has blocking it with the blocks so far (the
+            // core's validator, CR 509.1a-c), else any it may: the answer is checked as a whole when it is given.
+            let addable = rules.judge(allowed, &blocks, true).addable;
+            let Some(blocker) =
+                blockers.iter().copied().find(|&b| addable.contains(&(b, attacker))).or_else(|| blockers.into_iter().find(|&b| allowed.contains(&(b, attacker))))
+            else {
                 return fail(format!("line {}: no {} may block {}", step.line, parts[0].trim(), parts[1].trim()));
             };
             blocks.push((blocker, attacker));

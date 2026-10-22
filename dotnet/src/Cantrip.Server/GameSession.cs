@@ -545,6 +545,10 @@ public sealed class GameSession : IDisposable
                 Check(from, check);
                 break;
 
+            case CheckBlocksMessage check:
+                CheckBlocks(from, check);
+                break;
+
             case ConcedeMessage when CanConcede(from):
                 Concede(from);
                 break;
@@ -677,6 +681,41 @@ public sealed class GameSession : IDisposable
         if (_outbox.TryGetValue(from, out Queue<ServerMessage>? queue))
         {
             queue.Enqueue(new SelectionVerdictMessage { RequestId = message.RequestId, Selected = message.Selected, Verdict = verdict });
+        }
+    }
+
+    /// <summary>
+    /// What the rules make of a declaration of blockers for the seat's outstanding declaration, sent back to that seat alone
+    /// as a <see cref="BlocksVerdictMessage"/>. Nothing in the game moves; a check refused is only reported.
+    /// </summary>
+    private void CheckBlocks(PlayerId from, CheckBlocksMessage message)
+    {
+        if (IsOver || !_published.TryGetValue(message.RequestId, out (PlayerId Seat, PromptMessage Message) outstanding))
+        {
+            Reject(from, ErrorCode.StaleReply, $"request {message.RequestId} is not outstanding.", message.RequestId);
+            return;
+        }
+
+        if (outstanding.Seat != from)
+        {
+            Reject(from, ErrorCode.NotYourTurnToAnswer, $"request {message.RequestId} belongs to seat {outstanding.Seat.Value}.", message.RequestId);
+            return;
+        }
+
+        BlockVerdictView verdict;
+        try
+        {
+            verdict = _rules.CheckBlocks(message.RequestId, from.Value, message.Blocks);
+        }
+        catch (RulesRejectedException refused)
+        {
+            Reject(from, refused.Code, refused.Detail, message.RequestId);
+            return;
+        }
+
+        if (_outbox.TryGetValue(from, out Queue<ServerMessage>? queue))
+        {
+            queue.Enqueue(new BlocksVerdictMessage { RequestId = message.RequestId, Blocks = message.Blocks, Verdict = verdict });
         }
     }
 

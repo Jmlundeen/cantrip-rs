@@ -712,6 +712,13 @@ pub enum EffectKind {
     Goaded,
     /// "Can't block" (CR 509.1b) for as long as the effect lasts.
     CantBlock,
+    /// "Blocks this turn if able" (CR 509.1c): a requirement that the creature block, any attacker it is able to, in each
+    /// declaration of blockers while the effect lasts - with `Duration::EndOfTurn`, each declare blockers step of the turn
+    /// (CR 509.1c's last sentence). One requirement however many creatures it could block. It is an effect, not an ability
+    /// (CR 113.1): a creature that loses its abilities still blocks if able. Obeyed only as far as the restrictions allow and
+    /// at no cost: a tapped creature, one that can't block, or one with no attacker it may block is not required to (the
+    /// rulings).
+    MustBlock,
     /// "Its activated abilities can't be activated" (CR 602.5) for as long as the effect lasts: every activated ability of
     /// the object, mana abilities (CR 605.1a) and abilities whose cost untaps it included, whoever would activate them. A
     /// resolved effect, so it outlasts its source (Braided Net).

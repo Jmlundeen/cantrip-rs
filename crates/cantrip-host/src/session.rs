@@ -551,6 +551,32 @@ impl Session {
         }
     }
 
+    /// What the rules make of the declaration of blockers `blocks`, as the seat's handles name them, for the outstanding
+    /// declaration (CR 509.1a-c, `BlockRequirements::judge`): whether it may be declared as it is (`Complete`), why not
+    /// (`Issue`), and the blocks some legal declaration extending it has (`Addable`). The client asks it as its player
+    /// declares; the game does not move, and the answer itself is still checked when it is given.
+    pub fn check_blocks(&mut self, request_id: u32, seat_number: i32, blocks: &[crate::protocol::BlockMessage]) -> Result<Value, Rejection> {
+        let Some(request) = self.pending().filter(|r| r.id == request_id) else {
+            return Err(Rejection::new("StaleReply", format!("request {request_id} is not outstanding")));
+        };
+        if seat(request.player) != seat_number {
+            return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(request.player))));
+        }
+        let space = &mut self.handles[request.player.index()];
+        let mut pairs = Vec::with_capacity(blocks.len());
+        for b in blocks {
+            let object = |h: ViewHandle| match space.object(h) {
+                Some(id) if id.index() < self.game.state.objects.len() => Ok(id),
+                _ => Err(Rejection::new("UnknownHandle", format!("handle {} names nothing this seat can see", h.0))),
+            };
+            pairs.push((object(b.blocker)?, object(b.attacker)?));
+        }
+        match crate::prompt::blocks_verdict_of(&request, &pairs, space) {
+            Some(verdict) => Ok(serde_json::to_value(verdict).expect("a verdict serializes")),
+            None => Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of blockers"))),
+        }
+    }
+
     /// The seat gives up: it loses, and the game ends if one side is left.
     /// Takes back the latest mana ability `player` activated: the game goes back to the node it was activated at, by
     /// the tree (`Game::goto`), and what was told of it is retracted.

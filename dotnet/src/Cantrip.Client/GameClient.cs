@@ -138,6 +138,11 @@ public sealed class GameClient
             Settle();
         }
 
+        if (_blockSettling is not null)
+        {
+            SettleBlocks();
+        }
+
         return applied;
     }
 
@@ -414,6 +419,14 @@ public sealed class GameClient
             return;
         }
 
+        if (Prompt.Prompt is DeclareBlockersPromptMessage && answer is BlockersDeclaredAnswer declared && BlockVerdict(declared.Blocks) is not { Complete: true })
+        {
+            _blockSettling = new BlockSettling(Prompt, declared.Blocks);
+            Prompt = null;
+            SettleBlocks();
+            return;
+        }
+
         var message = new AnswerMessage { RequestId = Prompt.RequestId, Answer = answer };
 
         // Cleared before sending. With a loopback transport the send runs the engine synchronously and can
@@ -524,11 +537,11 @@ public sealed class GameClient
     /// <summary>A choice of cards answered but not yet sent: being checked, and mended if the rules refuse it.</summary>
     private Settling? _settling;
 
-    /// <summary>Whether an answer to a choice of cards is being settled with the host before it is sent.</summary>
-    public bool IsSettling => _settling is not null;
+    /// <summary>Whether an answer to a choice of cards or a declaration of blockers is being settled with the host before it is sent.</summary>
+    public bool IsSettling => _settling is not null || _blockSettling is not null;
 
-    /// <summary>Whether a check of a selection has been sent and its verdict has not come back.</summary>
-    public bool IsChecking => _checking.Count > 0;
+    /// <summary>Whether a check of a selection or a declaration of blockers has been sent and its verdict has not come back.</summary>
+    public bool IsChecking => _checking.Count > 0 || _checkingBlocks.Count > 0;
 
     /// <summary>
     /// An answer to a choice of cards on its way to being one the rules take: the cards proposed, checked as they are; and if
@@ -638,6 +651,160 @@ public sealed class GameClient
             _settling = null;
             LastAnswered = asked.RequestId;
             _transport.Send(new AnswerMessage { RequestId = asked.RequestId, Answer = new CardsChosenAnswer { Cards = [.. cards] } });
+        }
+    }
+
+    // --- Declarations of blockers, judged by the host as they are made. ---
+
+    /// <summary>The verdicts the host has given on declarations of the request in <see cref="_blockVerdictsFor"/>.</summary>
+    private readonly Dictionary<string, BlockVerdictView> _blockVerdicts = new(StringComparer.Ordinal);
+
+    /// <summary>The declarations asked about and not yet answered.</summary>
+    private readonly HashSet<string> _checkingBlocks = new(StringComparer.Ordinal);
+
+    private int _blockVerdictsFor;
+
+    private static string KeyOf(IEnumerable<BlockMessage> blocks) =>
+        string.Join(',', blocks.Select(block => $"{block.Blocker.Value}>{block.Attacker.Value}").Order(StringComparer.Ordinal));
+
+    private static bool Same(BlockMessage a, BlockMessage b) => a.Blocker == b.Blocker && a.Attacker == b.Attacker;
+
+    /// <summary>The request a declaration of blockers being made is for: the one asked, or the one being settled.</summary>
+    private PromptMessage? Declaring => Prompt is { Prompt: DeclareBlockersPromptMessage } asked ? asked : _blockSettling?.Asked;
+
+    /// <summary>
+    /// What the rules made of the declaration of blockers <paramref name="blocks"/> for the declaration outstanding (CR
+    /// 509.1a-c): whether it may be declared, why not, and which blocks may be added. For no blocks it is the prompt's own
+    /// <see cref="DeclareBlockersPromptMessage.Verdict"/>; any other declaration is known once the host has answered a
+    /// <see cref="CheckBlocks"/> of it, and null until then (or when no declaration is asked).
+    /// </summary>
+    public BlockVerdictView? BlockVerdict(IEnumerable<BlockMessage> blocks)
+    {
+        ArgumentNullException.ThrowIfNull(blocks);
+        if (Declaring is not { Prompt: DeclareBlockersPromptMessage declaring } asked) return null;
+        List<BlockMessage> declared = [.. blocks];
+        if (declared.Count == 0) return declaring.Verdict;
+        return _blockVerdictsFor == asked.RequestId && _blockVerdicts.TryGetValue(KeyOf(declared), out BlockVerdictView? verdict) ? verdict : null;
+    }
+
+    /// <summary>
+    /// Asks the host what the rules make of <paramref name="blocks"/> for the outstanding declaration of blockers
+    /// (docs/host-protocol.md, "Checking a declaration of blockers"): its <see cref="BlocksVerdictMessage"/> arrives with a
+    /// later <see cref="Pump"/>, and <see cref="BlockVerdict"/> reads it. A declaration already judged, or being judged, is
+    /// not asked again.
+    /// </summary>
+    public void CheckBlocks(IEnumerable<BlockMessage> blocks)
+    {
+        ArgumentNullException.ThrowIfNull(blocks);
+        if (Declaring is not { } asked) return;
+        List<BlockMessage> declared = [.. blocks];
+        if (BlockVerdict(declared) is not null) return;
+        if (_blockVerdictsFor != asked.RequestId)
+        {
+            _blockVerdicts.Clear();
+            _checkingBlocks.Clear();
+            _blockVerdictsFor = asked.RequestId;
+        }
+
+        if (!_checkingBlocks.Add(KeyOf(declared))) return;
+        _transport.Send(new CheckBlocksMessage { RequestId = asked.RequestId, Blocks = declared });
+    }
+
+    private void Note(BlocksVerdictMessage message)
+    {
+        if (message.RequestId != _blockVerdictsFor) return;
+        string key = KeyOf(message.Blocks);
+        _checkingBlocks.Remove(key);
+        _blockVerdicts[key] = message.Verdict;
+        VerdictRevision++;
+    }
+
+    /// <summary>A declaration of blockers answered but not yet sent: being checked, and mended if the rules refuse it.</summary>
+    private BlockSettling? _blockSettling;
+
+    /// <summary>
+    /// A declaration of blockers on its way to being one the rules take: the blocks proposed, checked as they are; and if the
+    /// host refuses them, a declaration built a block at a time from what may be added - the blocks proposed first, then the
+    /// engine's own declaration's, then any. An addable block is one some legal declaration has, so adding them never runs
+    /// into a dead end.
+    /// </summary>
+    private sealed class BlockSettling(PromptMessage asked, IReadOnlyList<BlockMessage> proposal)
+    {
+        public PromptMessage Asked { get; } = asked;
+
+        public List<BlockMessage> Proposal { get; } = [.. proposal];
+
+        public bool Mending { get; set; }
+
+        public List<BlockMessage> Picked { get; } = [];
+    }
+
+    private string Blocks(IEnumerable<BlockMessage> blocks) =>
+        "[" + string.Join(", ", blocks.Select(block => $"{Cards([block.Blocker])} > {Cards([block.Attacker])}")) + "]";
+
+    /// <summary>Takes the declaration being settled as far as the verdicts in hand allow: sends it, or asks for the next verdict.</summary>
+    private void SettleBlocks()
+    {
+        while (_blockSettling is { } settling)
+        {
+            var asked = (DeclareBlockersPromptMessage)settling.Asked.Prompt;
+            if (!settling.Mending)
+            {
+                BlockVerdictView? judged = BlockVerdict(settling.Proposal);
+                if (judged is null)
+                {
+                    CheckBlocks(settling.Proposal);
+                    return;
+                }
+
+                if (judged.Complete)
+                {
+                    Send(settling.Proposal);
+                    return;
+                }
+
+                settling.Mending = true;
+                Mended($"request {settling.Asked.RequestId} (DeclareBlockersPromptMessage): the rules refuse the declaration {Blocks(settling.Proposal)} ({judged.Issue?.Words}, CR {judged.Issue?.Rule}); mending it from what may be added");
+                continue;
+            }
+
+            BlockVerdictView? verdict = BlockVerdict(settling.Picked);
+            if (verdict is null)
+            {
+                CheckBlocks(settling.Picked);
+                return;
+            }
+
+            bool Offered(BlockMessage block) => verdict.Addable.Exists(addable => Same(addable, block));
+
+            // The blocks proposed come first; others only to reach a legal declaration, the engine's own first.
+            BlockMessage? next = settling.Proposal.FirstOrDefault(Offered);
+            if (next is null && !verdict.Complete)
+            {
+                next = asked.Suggested.FirstOrDefault(Offered) ?? verdict.Addable.FirstOrDefault();
+            }
+
+            if (next is not null && settling.Picked.Count < asked.Allowed.Count)
+            {
+                settling.Picked.Add(next);
+                continue;
+            }
+
+            Send(verdict.Complete ? settling.Picked : asked.Suggested);
+            return;
+        }
+
+        void Send(IReadOnlyList<BlockMessage> blocks)
+        {
+            PromptMessage asked = _blockSettling!.Asked;
+            if (_blockSettling.Mending)
+            {
+                Mended($"request {asked.RequestId} (DeclareBlockersPromptMessage): proposed {Blocks(_blockSettling.Proposal)}, sent {Blocks(blocks)}");
+            }
+
+            _blockSettling = null;
+            LastAnswered = asked.RequestId;
+            _transport.Send(new AnswerMessage { RequestId = asked.RequestId, Answer = new BlockersDeclaredAnswer { Blocks = [.. blocks] } });
         }
     }
 
@@ -898,8 +1065,9 @@ public sealed class GameClient
 
             case PromptMessage prompt:
                 // The question an answer is being settled for, asked again (a resumed connection): the answer is still on its way.
-                if (_settling?.Asked.RequestId == prompt.RequestId) break;
+                if (_settling?.Asked.RequestId == prompt.RequestId || _blockSettling?.Asked.RequestId == prompt.RequestId) break;
                 _settling = null;
+                _blockSettling = null;
                 if (Table?.Phase != TablePhase.Abandoned) Prompt = prompt;
                 break;
 
@@ -907,10 +1075,15 @@ public sealed class GameClient
                 Note(verdict);
                 break;
 
+            case BlocksVerdictMessage verdict:
+                Note(verdict);
+                break;
+
             case GameOverMessage over:
                 Outcome = over;
                 Prompt = null;
                 _settling = null;
+                _blockSettling = null;
                 DrawOffer = null;
                 break;
 
@@ -926,6 +1099,15 @@ public sealed class GameClient
                     LastAnswered = settling.Asked.RequestId;
                     Mended($"a check of request {settling.Asked.RequestId} was refused ({error.Code}: {error.Detail}); sending the proposal as it is: {Cards(settling.Proposal)}");
                     _transport.Send(new AnswerMessage { RequestId = settling.Asked.RequestId, Answer = new CardsChosenAnswer { Cards = settling.Proposal } });
+                }
+
+                if (_blockSettling is { } declaring && _checkingBlocks.Count > 0 && error.RequestId == declaring.Asked.RequestId)
+                {
+                    _checkingBlocks.Clear();
+                    _blockSettling = null;
+                    LastAnswered = declaring.Asked.RequestId;
+                    Mended($"a check of request {declaring.Asked.RequestId} was refused ({error.Code}: {error.Detail}); sending the declaration as it is: {Blocks(declaring.Proposal)}");
+                    _transport.Send(new AnswerMessage { RequestId = declaring.Asked.RequestId, Answer = new BlockersDeclaredAnswer { Blocks = declaring.Proposal } });
                 }
 
                 // An answer to a draw refused leaves the seat free to answer again.

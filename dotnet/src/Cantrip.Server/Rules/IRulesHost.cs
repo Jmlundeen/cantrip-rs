@@ -54,6 +54,17 @@ public interface IRulesHost : IDisposable
     SelectionVerdictView CheckSelection(int requestId, int seat, IReadOnlyList<ViewHandle> selected) =>
         throw new RulesRejectedException(ErrorCode.IllegalAnswer, "this rules host judges no selections.");
 
+    /// <summary>
+    /// What the rules make of a declaration of blockers a seat is making for an outstanding declaration (docs/host-protocol.md,
+    /// "Checking a declaration of blockers"): whether it may be declared, why not, and which blocks may be added. Nothing advances.
+    /// </summary>
+    /// <exception cref="RulesRejectedException">
+    /// The request is not outstanding (<see cref="ErrorCode.StaleReply"/>), not the seat's, not a declaration of blockers, or a
+    /// creature is unknown to the seat.
+    /// </exception>
+    BlockVerdictView CheckBlocks(int requestId, int seat, IReadOnlyList<BlockMessage> blocks) =>
+        throw new RulesRejectedException(ErrorCode.IllegalAnswer, "this rules host judges no declarations of blockers.");
+
     /// <summary>Whether a seat may concede now: only when that ends the game (CR 104.3a, 800.4a).</summary>
     bool CanConcede(int seat);
 

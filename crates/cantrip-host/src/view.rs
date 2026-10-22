@@ -1212,13 +1212,22 @@ impl<'a> Projector<'a> {
         if (on_battlefield || zone.is(ZoneKind::Stack)) && !obj.face_down {
             self.ability_changes(&mut view, id, &c, obj.copy);
         }
-        // "Can't attack" and "can't block" from a resolved effect (CR 508.1c, 509.1b), with how long they last: no ability
+        // "Can't attack", "can't block" and "blocks if able" from a resolved effect (CR 508.1c, 509.1b-c), with how long they last: no ability
         // of the creature says so, so its face does.
         if on_battlefield {
             for e in s.effects.iter().filter(|e| e.affected == id) {
                 let what = match e.kind {
                     EffectKind::CantAttack => "Can't attack",
                     EffectKind::CantBlock => "Can't block",
+                    // A requirement to block (CR 509.1c): "Blocks this turn if able."
+                    EffectKind::MustBlock => {
+                        let until = match self.until_text(e.duration) {
+                            when if when.is_empty() => " each combat".to_string(),
+                            when => when,
+                        };
+                        view.granted_abilities.push(AbilityTextView { text: format!("Blocks{until} if able."), spent: false });
+                        continue;
+                    }
                     EffectKind::CantActivateAbilities => "Its activated abilities can't be activated",
                     // A resolved control-changing effect (CR 613.1b): who has it and for how long, named for where it came
                     // from, as nothing else on the permanent says so. A permanent given for good says nothing.

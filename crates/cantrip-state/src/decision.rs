@@ -726,17 +726,31 @@ impl AttackCost {
     }
 }
 
-/// The requirements on a declaration of blockers (CR 509.1c): each block an effect requires if able ("all creatures able to
-/// block enchanted creature do so"), among the blocks the restrictions allow; the most of them any declaration that obeys
-/// every restriction obeys, which the declaration must obey too; and one such declaration, the engine's suggestion. Empty
-/// where no effect requires a block.
+/// The rules of a declaration of blockers past which blocks are allowed (CR 509.1b-c), held in the question so the game-log
+/// tree moves through them: each attacker's fewest and most blockers (menace, "can't be blocked by more than one creature");
+/// each requirement an effect puts on a creature to block if able (CR 509.1c), among the blocks the restrictions allow; the
+/// most of them any declaration that obeys every restriction obeys, which the declaration must obey too; and one such
+/// declaration, the engine's suggestion. `judge` (crate::blocks) says what they make of any declaration.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct BlockRequirements {
-    pub pairs: Vec<(ObjectId, ObjectId)>,
+    /// The requirements (CR 509.1c), one each: "all creatures able to block enchanted creature do so" (Lure) makes one of each
+    /// creature able to block it; "target creature blocks this turn if able" one of that creature, for any attacker.
+    pub required: Vec<RequiredBlock>,
     pub most: u32,
     pub suggested: Vec<(ObjectId, ObjectId)>,
     /// The attacking bands (CR 702.22h), each attacker in one with its band's number; empty where no attacker is banded.
     pub bands: Vec<(ObjectId, u32)>,
+    /// Each attacker offered with the fewest creatures that may block it, if any do (2 for menace, CR 702.110b), and the
+    /// most (`u32::MAX` for any number; 1 for "can't be blocked by more than one creature", CR 509.1b).
+    pub limits: Vec<(ObjectId, u32, u32)>,
+}
+
+/// One requirement on a declaration of blockers (CR 509.1c): `blocker` blocks `attacker` if able, or with `None` blocks
+/// if able, whichever attacker it blocks. Obeyed by a declaration where it blocks that attacker, or one in its band.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct RequiredBlock {
+    pub blocker: ObjectId,
+    pub attacker: Option<ObjectId>,
 }
 
 impl BlockRequirements {
@@ -747,10 +761,20 @@ impl BlockRequirements {
         declared == attacker || (band(declared) != 0 && band(declared) == band(attacker))
     }
 
+    /// Whether `blocker` blocking `declared` obeys `r`.
+    pub fn obeys(&self, r: &RequiredBlock, blocker: ObjectId, declared: ObjectId) -> bool {
+        r.blocker == blocker && r.attacker.is_none_or(|a| self.blocks_through(declared, a))
+    }
+
     /// How many of the requirements a declaration obeys (CR 509.1c): each one whose blocker blocks its attacker, as declared or
-    /// through the attacker's band - so one block of a band may obey two.
+    /// through the attacker's band - so one block of a band may obey two - or blocks at all, for a requirement to block.
     pub fn obeyed(&self, blocks: &[(ObjectId, ObjectId)]) -> u32 {
-        crate::count_u32(self.pairs.iter().filter(|&&(b, a)| blocks.iter().any(|&(bb, x)| bb == b && self.blocks_through(x, a))).count())
+        crate::count_u32(self.required.iter().filter(|r| blocks.iter().any(|&(b, x)| self.obeys(r, b, x))).count())
+    }
+
+    /// The fewest and most creatures that may block `attacker` (1 and any number for one not listed).
+    pub fn limits_of(&self, attacker: ObjectId) -> (u32, u32) {
+        self.limits.iter().find(|l| l.0 == attacker).map_or((1, u32::MAX), |l| (l.1, l.2))
     }
 }
 

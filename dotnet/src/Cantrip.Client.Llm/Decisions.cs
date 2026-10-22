@@ -852,12 +852,8 @@ public sealed class Decisions
             }
         }
 
-        // Blocks an effect requires (CR 509.1c: Lure) that this left out: the engine's own declaration, which obeys them.
-        if (!prompt.ObeysRequirements(answer.Blocks))
-        {
-            return (BlockersDeclaredAnswer)prompt.Default();
-        }
-
+        // Blocks an effect requires (CR 509.1c: Lure, "blocks this turn if able") are the host's to judge: GameClient.Answer
+        // settles the declaration with it, mending one it refuses from what may be added.
         return answer;
     }
 

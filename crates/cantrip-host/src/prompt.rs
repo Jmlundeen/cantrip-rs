@@ -631,6 +631,29 @@ fn blocks(handles: &mut HandleSpace, pairs: &[(ObjectId, ObjectId)]) -> Vec<Bloc
     pairs.iter().map(|&(blocker, attacker)| BlockMessage { blocker: handles.handle(blocker), attacker: handles.handle(attacker) }).collect()
 }
 
+/// A verdict on a declaration of blockers as the seat with `handles` sees it.
+pub fn block_verdict_view(verdict: &BlockVerdict, handles: &mut HandleSpace) -> BlockVerdictView {
+    BlockVerdictView {
+        complete: verdict.complete,
+        addable: blocks(handles, &verdict.addable),
+        issue: verdict.issue.as_ref().map(|i| BlockIssueView {
+            creature: handles.handle(i.creature),
+            words: i.words.clone(),
+            other: i.other.map_or(ViewHandle::NONE, |o| handles.handle(o)),
+            rule: i.rule.to_string(),
+        }),
+    }
+}
+
+/// What the rules make of `blocks` for `request`, a declaration of blockers (`BlockRequirements::judge`), as the seat with
+/// `handles` sees it; none for any other question.
+pub fn blocks_verdict_of(request: &Request, blocks: &[(ObjectId, ObjectId)], handles: &mut HandleSpace) -> Option<BlockVerdictView> {
+    match &request.kind {
+        RequestKind::DeclareBlockers { allowed, requirements, .. } => Some(block_verdict_view(&requirements.judge(allowed, blocks, true), handles)),
+        _ => None,
+    }
+}
+
 /// The prompt a request is, and whether the seat may give the announcement up.
 pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Result<(PromptPayload, bool), String> {
     let player = seat(request.player);
@@ -1060,17 +1083,22 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .iter()
                     .map(|&(blocker, attacker)| BlockMessage { blocker: handles.handle(blocker), attacker: handles.handle(attacker) })
                     .collect(),
-                minimum_blockers: attackers.iter().map(|&a| wire(count_u32(game.chars(a).minimum_blockers()))).collect(),
+                minimum_blockers: attackers.iter().map(|&a| wire(requirements.limits_of(a).0)).collect(),
                 maximum_blockers: attackers
                     .iter()
-                    .map(|&a| match game.chars(a).maximum_blockers() {
-                        usize::MAX => 0,
-                        most => wire(count_u32(most)),
+                    .map(|&a| match requirements.limits_of(a).1 {
+                        u32::MAX => 0,
+                        most => wire(most),
                     })
                     .collect(),
-                requirements: blocks(handles, &requirements.pairs),
+                requirements: requirements
+                    .required
+                    .iter()
+                    .map(|r| BlockMessage { blocker: handles.handle(r.blocker), attacker: r.attacker.map_or(ViewHandle::NONE, |a| handles.handle(a)) })
+                    .collect(),
                 most_requirements: wire(requirements.most),
                 suggested: blocks(handles, &requirements.suggested),
+                verdict: block_verdict_view(&requirements.judge(allowed, &[], true), handles),
                 bands: attackers
                     .iter()
                     .map(|a| requirements.bands.iter().find(|b| b.0 == *a).map_or(0, |b| b.1 as i32))

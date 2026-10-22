@@ -58,6 +58,8 @@ mod look_back_tests;
 #[cfg(test)]
 mod mana_trigger_tests;
 #[cfg(test)]
+mod must_block_tests;
+#[cfg(test)]
 mod room_door_tests;
 #[cfg(test)]
 mod play_permission_tests;

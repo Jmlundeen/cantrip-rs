@@ -33,7 +33,7 @@ Bot2.Battlefield.Black Lotus.Activate(Color: Green)
 Bot2.Hand.Lure.Cast(Bot2.Battlefield.Llanowar Elves)
 Bot2.Attack(Llanowar Elves > Bot1)
 Bot1.Pass
-? Client.Bot1.Prompt.Detail = Llanowar Elves is able to block Llanowar Elves and must
+? Client.Bot1.Prompt.Detail = Llanowar Elves must block Llanowar Elves
 Bot1.Block(Llanowar Elves > Llanowar Elves)
 [T4 Bot2.Main2]
 

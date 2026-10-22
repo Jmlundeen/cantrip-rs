@@ -360,24 +360,10 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             Ok(())
         }
         (RequestKind::DeclareBlockers { allowed, requirements, .. }, Answer::Block(blocks)) => {
-            let ids: Vec<ObjectId> = blocks.iter().map(|b| b.0).collect();
-            if !distinct(&ids) || !blocks.iter().all(|b| allowed.contains(b)) {
-                no("not a legal declaration of blockers")
-            } else if blocks.iter().any(|&(_, a)| {
-                // Menace (CR 702.110b), "except by three or more creatures": blocked by that many or not at all.
-                blocks.iter().filter(|b| b.1 == a).count() < game.chars(a).minimum_blockers()
-            }) {
-                no("a creature can't be blocked by fewer creatures than it requires (CR 509.1b, 702.110b)")
-            } else if blocks.iter().any(|&(_, a)| {
-                // "Can't be blocked by more than one creature" (CR 509.1b).
-                blocks.iter().filter(|b| b.1 == a).count() > game.chars(a).maximum_blockers()
-            }) {
-                no("a creature can't be blocked by more creatures than it allows (CR 509.1b)")
-            } else if requirements.obeyed(blocks) < requirements.most {
-                // CR 509.1c: as many requirements obeyed as any declaration that disobeys no restriction obeys.
-                no("a creature able to block where an effect requires it to does not (CR 509.1c)")
-            } else {
-                Ok(())
+            // CR 509.1a-c: one validator for every restriction and requirement (cantrip_state::blocks).
+            match requirements.judge(allowed, blocks, false).issue {
+                None => Ok(()),
+                Some(issue) => no(format!("not a legal declaration of blockers: {} (CR {})", issue.words, issue.rule)),
             }
         }
         (RequestKind::DiscardToHandSize { count, hand }, Answer::Cards(cards)) => {

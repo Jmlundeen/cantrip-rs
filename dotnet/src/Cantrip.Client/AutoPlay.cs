@@ -225,8 +225,9 @@ public static class AutoPlay
             }
         }
 
-        // Blocks an effect requires (CR 509.1c: Lure) that this left out: the engine's own declaration, which obeys them.
-        return prompt.ObeysRequirements(answer.Blocks) ? answer : (BlockersDeclaredAnswer)prompt.Default();
+        // Whether this obeys the restrictions and requirements (CR 509.1b-c: Lure, "blocks this turn if able") is the host's to
+        // judge: GameClient.Answer settles the declaration with it, mending one it refuses from what may be added.
+        return answer;
     }
 
     /// <summary>

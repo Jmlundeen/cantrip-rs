@@ -280,16 +280,17 @@ public sealed class ProtocolJsonTests
     }
 
     [Fact]
-    public void A_block_of_a_band_obeys_the_requirement_of_each_member()
+    public void A_declaration_of_blockers_carries_its_requirements_and_the_hosts_verdict()
     {
-        // Lure on banded attackers 3 and 4 and on attacker 5 alone (CR 509.1c, 702.22h): blocker 9 blocking 3 blocks 4 too and
-        // obeys two requirements; blocking 5 obeys one.
+        // A creature that blocks this turn if able (CR 509.1c) is a requirement with no attacker; the verdict on declaring no
+        // blockers says why that may not be declared, and which blocks may be declared first.
         var prompt = ProtocolJson.Deserialize<PromptPayload>(
-            """{"$type":"DeclareBlockersPromptMessage","Player":2,"Eligible":[9],"Attackers":[3,4,5],"Allowed":[{"Blocker":9,"Attacker":3},{"Blocker":9,"Attacker":4},{"Blocker":9,"Attacker":5}],"MinimumBlockers":[1,1,1],"Requirements":[{"Blocker":9,"Attacker":3},{"Blocker":9,"Attacker":4},{"Blocker":9,"Attacker":5}],"MostRequirements":2,"Bands":[1,1,0]}""") as DeclareBlockersPromptMessage;
+            """{"$type":"DeclareBlockersPromptMessage","Player":2,"Eligible":[9],"Attackers":[3],"Allowed":[{"Blocker":9,"Attacker":3}],"MinimumBlockers":[1],"Requirements":[{"Blocker":9,"Attacker":0}],"MostRequirements":1,"Suggested":[{"Blocker":9,"Attacker":3}],"Verdict":{"Complete":false,"Addable":[{"Blocker":9,"Attacker":3}],"Issue":{"Creature":9,"Words":"must block","Other":0,"Rule":"509.1c"}}}""") as DeclareBlockersPromptMessage;
         Assert.NotNull(prompt);
-        BlockMessage Block(int attacker) => new() { Blocker = new ViewHandle(9), Attacker = new ViewHandle(attacker) };
-        Assert.Equal(2, prompt.Obeyed([Block(4)]));
-        Assert.True(prompt.ObeysRequirements([Block(3)]));
-        Assert.False(prompt.ObeysRequirements([Block(5)]));
+        Assert.True(prompt.Requirements[0].Attacker.IsNone);
+        Assert.False(prompt.Verdict.Complete);
+        Assert.Equal(new ViewHandle(3), Assert.Single(prompt.Verdict.Addable).Attacker);
+        Assert.Equal(("must block", "509.1c"), (prompt.Verdict.Issue!.Words, prompt.Verdict.Issue.Rule));
+        Assert.True(prompt.Verdict.Issue.Other.IsNone);
     }
 }

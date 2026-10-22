@@ -5,7 +5,7 @@
 use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
 
-use cantrip_host::protocol::{AnswerPayload, ViewHandle};
+use cantrip_host::protocol::{AnswerPayload, BlockMessage, ViewHandle};
 use cantrip_host::session::{Deal, Rejection, Session};
 use cantrip_host::view::printed;
 use serde::Deserialize;
@@ -58,6 +58,18 @@ enum Request {
         seat: i32,
         #[serde(rename = "Selected", default)]
         selected: Vec<ViewHandle>,
+    },
+    /// What the rules make of a declaration of blockers for an outstanding declaration (docs/host-protocol.md, "Checking a
+    /// declaration of blockers"): nothing advances.
+    CheckBlocks {
+        #[serde(rename = "GameId")]
+        game_id: u32,
+        #[serde(rename = "RequestId")]
+        request_id: u32,
+        #[serde(rename = "Seat")]
+        seat: i32,
+        #[serde(rename = "Blocks", default)]
+        blocks: Vec<BlockMessage>,
     },
     Concede {
         #[serde(rename = "GameId")]
@@ -151,6 +163,7 @@ impl Host {
             Request::Start { game_id } => self.with(game_id, |g| Ok(g.step())),
             Request::Answer { game_id, request_id, seat, answer } => self.with(game_id, |g| g.answer(request_id, seat, &answer)),
             Request::Check { game_id, request_id, seat, selected } => self.with(game_id, |g| g.check(request_id, seat, &selected)),
+            Request::CheckBlocks { game_id, request_id, seat, blocks } => self.with(game_id, |g| g.check_blocks(request_id, seat, &blocks)),
             Request::Concede { game_id, seat } => self.with(game_id, |g| g.concede(seat)),
             Request::View { game_id, seat } => self.with(game_id, |g| g.view(seat).map(|v| json!({ "View": v }))),
             Request::Oracle { name } => {

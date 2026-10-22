@@ -3680,6 +3680,33 @@ public sealed class FixtureTransport : IGameTransport
         {
             _verdicts.Add(new SelectionVerdictMessage { RequestId = check.RequestId, Selected = check.Selected, Verdict = StandInVerdict(asked, check.Selected) });
         }
+
+        if (message is CheckBlocksMessage blocks
+            && _prompts.FirstOrDefault(prompt => prompt.RequestId == blocks.RequestId)?.Prompt is DeclareBlockersPromptMessage declaring)
+        {
+            _verdicts.Add(new BlocksVerdictMessage { RequestId = blocks.RequestId, Blocks = blocks.Blocks, Verdict = StandInBlockVerdict(declaring, blocks.Blocks) });
+        }
+    }
+
+    /// <summary>
+    /// The gallery has no rules engine: a declaration of a canned prompt is judged by its allowed pairs and each attacker's
+    /// fewest and most blockers alone, with no requirements. Only ever the gallery's; a table asks the host.
+    /// </summary>
+    public static BlockVerdictView StandInBlockVerdict(DeclareBlockersPromptMessage asked, IReadOnlyList<BlockMessage> blocks)
+    {
+        ArgumentNullException.ThrowIfNull(asked);
+        ArgumentNullException.ThrowIfNull(blocks);
+        bool Allowed(BlockMessage block) => asked.Allowed.Exists(pair => pair.Blocker == block.Blocker && pair.Attacker == block.Attacker);
+        int On(ViewHandle attacker) => blocks.Count(block => block.Attacker == attacker);
+        bool complete = blocks.All(Allowed)
+            && blocks.Select(block => block.Blocker).Distinct().Count() == blocks.Count
+            && asked.Attackers.Select((attacker, i) => (On(attacker), i)).All(a => a.Item1 == 0 || (a.Item1 >= asked.MinimumFor(a.i) && a.Item1 <= asked.MaximumFor(a.i)));
+        List<BlockMessage> addable =
+        [
+            .. asked.Allowed.Where(pair => !blocks.Any(block => block.Blocker == pair.Blocker)
+                && On(pair.Attacker) < asked.MaximumFor(asked.Attackers.IndexOf(pair.Attacker))),
+        ];
+        return new BlockVerdictView { Complete = complete, Addable = addable };
     }
 
     /// <summary>

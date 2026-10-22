@@ -27,6 +27,7 @@ namespace Cantrip.Protocol;
 [Union(14, typeof(ClockMessage))]
 [Union(15, typeof(DrawOfferMessage))]
 [Union(16, typeof(SelectionVerdictMessage))]
+[Union(17, typeof(BlocksVerdictMessage))]
 public abstract class ServerMessage
 {
     public abstract string Describe();
@@ -844,6 +845,7 @@ public enum ErrorCode
 [Union(11, typeof(OfferDrawMessage))]
 [Union(12, typeof(AnswerDrawMessage))]
 [Union(13, typeof(CheckSelectionMessage))]
+[Union(14, typeof(CheckBlocksMessage))]
 public abstract class ClientMessage
 {
     public abstract string Describe();
@@ -1411,6 +1413,86 @@ public sealed class SelectionVerdictMessage : ServerMessage
     public SelectionVerdictView Verdict { get; set; } = new();
 
     public override string Describe() => $"verdict {RequestId}: {(Verdict.Complete ? "complete" : "incomplete")}, {Verdict.Addable.Count} addable";
+}
+
+/// <summary>
+/// What the rules make of a declaration of blockers (CR 509.1a-c), as the host's one validator judges it: whether it may be
+/// declared as it is, why not, and the blocks that some legal declaration extending it has. Every restriction and requirement
+/// is the host's to weigh, so a client asks it (<see cref="CheckBlocksMessage"/>) rather than working the rules out.
+/// </summary>
+[MessagePackObject]
+public sealed class BlockVerdictView
+{
+    /// <summary>The declaration may be made as it is.</summary>
+    [Key(0)]
+    public bool Complete { get; set; }
+
+    /// <summary>
+    /// The blocks not declared that some legal declaration extending it has: one blocker of a menace creature is addable
+    /// though alone it is no declaration, and a block no legal declaration has alongside the ones declared is not. Taking a
+    /// block back out is always allowed.
+    /// </summary>
+    [Key(1)]
+    public List<BlockMessage> Addable { get; set; } = [];
+
+    /// <summary>Why it may not be declared as it is; null when it may.</summary>
+    [Key(2)]
+    public BlockIssueView? Issue { get; set; }
+}
+
+/// <summary>
+/// Why a declaration of blockers may not be made as it is, to caption as <see cref="Creature"/>, <see cref="Words"/>, then
+/// <see cref="Other"/> where it is not <see cref="ViewHandle.None"/> ("Grizzly Bears" "must block" "Ox"; "Ox" "can't be
+/// blocked except by two or more creatures"), with the Comprehensive Rules number of the rule it breaks ("509.1c").
+/// </summary>
+[MessagePackObject]
+public sealed class BlockIssueView
+{
+    [Key(0)]
+    public ViewHandle Creature { get; set; }
+
+    [Key(1)]
+    public string Words { get; set; } = string.Empty;
+
+    [Key(2)]
+    public ViewHandle Other { get; set; }
+
+    [Key(3)]
+    public string Rule { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// "Judge this declaration of blockers for the pending question": answered with a <see cref="BlocksVerdictMessage"/>, to this
+/// seat alone. Nothing in the game moves; the answer itself is still checked when it is given. For a
+/// <see cref="DeclareBlockersPromptMessage"/> only.
+/// </summary>
+[MessagePackObject]
+public sealed class CheckBlocksMessage : ClientMessage
+{
+    [Key(0)]
+    public int RequestId { get; set; }
+
+    [Key(1)]
+    public List<BlockMessage> Blocks { get; set; } = [];
+
+    public override string Describe() => $"check {RequestId}: {Blocks.Count} blocks";
+}
+
+/// <summary>The rules' verdict on a declaration of blockers a <see cref="CheckBlocksMessage"/> asked about.</summary>
+[MessagePackObject]
+public sealed class BlocksVerdictMessage : ServerMessage
+{
+    [Key(0)]
+    public int RequestId { get; set; }
+
+    /// <summary>The declaration the verdict is on, as it was asked.</summary>
+    [Key(1)]
+    public List<BlockMessage> Blocks { get; set; } = [];
+
+    [Key(2)]
+    public BlockVerdictView Verdict { get; set; } = new();
+
+    public override string Describe() => $"blocks verdict {RequestId}: {(Verdict.Complete ? "complete" : "incomplete")}, {Verdict.Addable.Count} addable";
 }
 
 /// <summary>
@@ -2702,8 +2784,11 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     public List<int> MaximumBlockers { get; set; } = [];
 
     /// <summary>
-    /// The blocks an effect requires if able (CR 509.1c): Lure's "all creatures able to block enchanted creature do so" makes
-    /// one of each creature able to block the creature it enchants. Empty where nothing is required.
+    /// The requirements effects put on the declaration (CR 509.1c), one each, for the player to see: Lure's "all creatures
+    /// able to block enchanted creature do so" makes one of each creature able to block the creature it enchants; "target
+    /// creature blocks this turn if able" one of that creature with <see cref="BlockMessage.Attacker"/>
+    /// <see cref="ViewHandle.None"/>, obeyed by blocking any attacker. Empty where nothing is required. Whether a declaration
+    /// obeys enough of them is the host's to judge (<see cref="Verdict"/>, <see cref="CheckBlocksMessage"/>).
     /// </summary>
     [Key(6)]
     public List<BlockMessage> Requirements { get; set; } = [];
@@ -2726,6 +2811,13 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     [Key(9)]
     public List<int> Bands { get; set; } = [];
 
+    /// <summary>
+    /// The rules' verdict on declaring no blockers (CR 509.1a-c): whether that may be declared, why not, and the blocks that
+    /// may be declared first. Every other declaration is judged by the host as it is made (<see cref="CheckBlocksMessage"/>).
+    /// </summary>
+    [Key(10)]
+    public BlockVerdictView Verdict { get; set; } = new() { Complete = true };
+
     /// <summary>Whether a creature blocking <paramref name="declared"/> blocks <paramref name="attacker"/>: the same creature, or a member of its band.</summary>
     public bool BlocksThrough(ViewHandle declared, ViewHandle attacker)
     {
@@ -2742,29 +2834,6 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
 
         return Band(declared) != 0 && Band(declared) == Band(attacker);
     }
-
-    /// <summary>
-    /// How many of <see cref="Requirements"/> <paramref name="blocks"/> obeys (CR 509.1c): each one whose blocker blocks its
-    /// attacker, as declared or through the attacker's band - so one block of a band may obey two.
-    /// </summary>
-    public int Obeyed(IEnumerable<BlockMessage> blocks)
-    {
-        List<BlockMessage> declared = [.. blocks];
-        return Requirements.Count(r => declared.Exists(block => block.Blocker == r.Blocker && BlocksThrough(block.Attacker, r.Attacker)));
-    }
-
-    /// <summary>Whether <paramref name="blocks"/> obeys as many of the requirements as the declaration must (CR 509.1c).</summary>
-    public bool ObeysRequirements(IEnumerable<BlockMessage> blocks) => Obeyed(blocks) >= MostRequirements;
-
-    /// <summary>
-    /// A requirement <paramref name="blocks"/> leaves unobeyed by a creature that blocks nothing required: the one to name
-    /// when the declaration obeys too few. Null when it obeys enough.
-    /// </summary>
-    public BlockMessage? UnmetRequirement(IReadOnlyCollection<BlockMessage> blocks) =>
-        ObeysRequirements(blocks)
-            ? null
-            : Requirements.FirstOrDefault(r => !blocks.Any(b => b.Blocker == r.Blocker && Requirements.Exists(q => q.Blocker == b.Blocker && BlocksThrough(b.Attacker, q.Attacker))))
-              ?? Requirements.FirstOrDefault();
 
     /// <summary>The fewest creatures that may block the attacker at <paramref name="index"/>, at least 1.</summary>
     public int MinimumFor(int index) => index >= 0 && index < MinimumBlockers.Count ? Math.Max(MinimumBlockers[index], 1) : 1;

@@ -2254,12 +2254,6 @@ public sealed partial class MainPage
 
     private void FillBlockers(GameClient client, DeclareBlockersPromptMessage prompt)
     {
-        // An attacker with menace or the like, blocked by fewer creatures than it needs (CR 509.1b).
-        int shortIndex = Enumerable.Range(0, Math.Min(prompt.Attackers.Count, prompt.MinimumBlockers.Count))
-            .FirstOrDefault(
-                i => _blocking.Values.Count(attacker => attacker == i) is > 0 and var n && n < prompt.MinimumBlockers[i],
-                -1);
-
         // The attacker the last click sent too many blockers at (CR 509.1b): those over its most are still picked up.
         int limitIndex = _blockLimit >= 0 && _blockLimit < prompt.Attackers.Count && _pending.Count > 0 ? _blockLimit : -1;
 
@@ -2272,9 +2266,16 @@ public sealed partial class MainPage
             }),
         ];
 
-        // A creature an effect requires to block (CR 509.1c: Lure), left out of a declaration that obeys too few: what the
-        // server would refuse, so the button waits and the dock says which.
-        BlockMessage? unmet = prompt.UnmetRequirement(declared);
+        // What the rules make of the blocks so far (CR 509.1a-c), the host's word: asked the first time they are declared, and
+        // the button waits for it. Why they may not be declared - an attacker short of the blockers menace needs, a creature an
+        // effect requires to block (Lure, "blocks this turn if able") - is the dock's caption.
+        BlockVerdictView? verdict = client.BlockVerdict(declared);
+        if (verdict is null)
+        {
+            client.CheckBlocks(declared);
+        }
+
+        string? issue = verdict?.Issue is { } why ? BlockIssueCaption(client, why) : null;
 
         Prompt(
             "Declare blockers",
@@ -2282,16 +2283,12 @@ public sealed partial class MainPage
                 ? $"{client.Object(prompt.Attackers[limitIndex])?.Name} can't be blocked by more than {Blockers(prompt.MaximumFor(limitIndex))}"
                 : _pending.Count > 0
                 ? $"Choose an attacker to block ({_pending.Count} selected)"
-                : shortIndex >= 0
-                    ? $"{client.Object(prompt.Attackers[shortIndex])?.Name} needs {prompt.MinimumBlockers[shortIndex]} or more blockers"
-                    : unmet is not null
-                        ? $"{client.Object(unmet.Blocker)?.Name ?? "A creature"} is able to block {client.Object(unmet.Attacker)?.Name ?? "an attacker"} and must"
-                        : $"{prompt.Attackers.Count} attacking  ·  {_blocking.Count} blocking");
+                : issue ?? $"{prompt.Attackers.Count} attacking  ·  {_blocking.Count} blocking");
 
         AddButton(
             _blocking.Count == 0 ? "No blocks" : $"Block with {_blocking.Count}",
             () => Send(client, new BlockersDeclaredAnswer { Blocks = declared }),
-            enabled: shortIndex < 0 && unmet is null,
+            enabled: verdict?.Complete == true,
             primary: true).Tooltip = "Lock in the blocks" + Suffix(PassKey);
 
         if (_pending.Count > 0)
@@ -2307,6 +2304,16 @@ public sealed partial class MainPage
                 _needsRedraw = true;
             });
         }
+    }
+
+    /// <summary>
+    /// Why a declaration of blockers may not be made, as the host words it: the creature, what it breaks, and the other
+    /// creature where there is one ("Llanowar Elves must block Llanowar Elves").
+    /// </summary>
+    private static string BlockIssueCaption(GameClient client, BlockIssueView issue)
+    {
+        string creature = client.Object(issue.Creature)?.Name ?? "A creature";
+        return issue.Other.IsNone ? $"{creature} {issue.Words}" : $"{creature} {issue.Words} {client.Object(issue.Other)?.Name ?? "a creature"}";
     }
 
     /// <summary>"one creature", "two creatures": how many blockers an attacker may have at most.</summary>

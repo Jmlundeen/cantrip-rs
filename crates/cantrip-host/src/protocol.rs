@@ -946,7 +946,9 @@ pub struct DeclareBlockersPrompt {
     /// than one creature", 0 for any number.
     #[serde(default)]
     pub maximum_blockers: Vec<i32>,
-    /// The blocks an effect requires if able (CR 509.1c: Lure's "all creatures able to block enchanted creature do so").
+    /// The requirements effects put on the declaration (CR 509.1c), one each: a creature that must block an attacker if able
+    /// (Lure's "all creatures able to block enchanted creature do so"), or with no attacker (`ViewHandle::NONE`) a creature
+    /// that must block if able, whichever attacker it blocks ("target creature blocks this turn if able").
     #[serde(default)]
     pub requirements: Vec<BlockMessage>,
     /// How many of `requirements` the declaration must obey: the most any declaration that obeys every restriction does.
@@ -959,6 +961,31 @@ pub struct DeclareBlockersPrompt {
     /// of a band blocks every member, so it obeys a requirement to block any of them.
     #[serde(default)]
     pub bands: Vec<i32>,
+    /// The rules' verdict on declaring no blockers: whether that may be declared, why not, and the blocks that may be declared
+    /// first. Every other declaration is asked of the host (`CheckBlocks`).
+    #[serde(default)]
+    pub verdict: BlockVerdictView,
+}
+
+/// What the rules make of a declaration of blockers (CR 509.1a-c): whether it may be declared as it is, why not, and the
+/// blocks some legal declaration extending it has (docs/host-protocol.md, "Checking a declaration of blockers").
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct BlockVerdictView {
+    pub complete: bool,
+    pub addable: Vec<BlockMessage>,
+    pub issue: Option<BlockIssueView>,
+}
+
+/// Why a declaration of blockers may not be made as it is, to caption as `Creature`, `Words`, then `Other` where there is
+/// one ("Grizzly Bears" "must block" "Ox"), with the rule's number ("509.1c").
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct BlockIssueView {
+    pub creature: ViewHandle,
+    pub words: String,
+    pub other: ViewHandle,
+    pub rule: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

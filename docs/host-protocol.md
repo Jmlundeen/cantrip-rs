@@ -18,6 +18,7 @@ Requests and replies (a reply is `{"Ok": {...}}` or `{"Rejected": {"Code": "..."
 | `{"Cmd":"Start","GameId":1}` | a step |
 | `{"Cmd":"Answer","GameId":1,"RequestId":7,"Seat":1,"Answer":{AnswerPayload}}` | a step, or `Rejected` with `IllegalAnswer`, `StaleReply`, `UnknownHandle` or `NotYourTurnToAnswer`, after which the request is still outstanding |
 | `{"Cmd":"Check","GameId":1,"RequestId":7,"Seat":1,"Selected":[12, 15]}` | `{"Complete":true,"Addable":[18, 21]}` - what the rule of the outstanding choice of cards says of a partial selection (below); nothing advances. `Rejected` with `StaleReply`, `NotYourTurnToAnswer`, `UnknownHandle`, or `IllegalAnswer` for a question that picks no cards |
+| `{"Cmd":"CheckBlocks","GameId":1,"RequestId":7,"Seat":1,"Blocks":[{"Blocker":12,"Attacker":3}]}` | `{"Complete":false,"Addable":[{"Blocker":15,"Attacker":3}],"Issue":{"Creature":3,"Words":"can't be blocked except by two or more creatures","Other":0,"Rule":"509.1b"}}` - what the rules make of a declaration of blockers for the outstanding declaration (below); nothing advances. `Rejected` with `StaleReply`, `NotYourTurnToAnswer`, `UnknownHandle`, or `IllegalAnswer` for a question that is not a declaration of blockers |
 | `{"Cmd":"Concede","GameId":1,"Seat":1}` | a step |
 | `{"Cmd":"View","GameId":1,"Seat":1}` | `{"View":PlayerView}` - the seat's current view, for resynchronising a client |
 | `{"Cmd":"Oracle","Name":"Lightning Bolt"}` | `{"Card":ObjectView}` or `{"Card":null}` - a card as printed |
@@ -75,6 +76,22 @@ the same prompt carries, are checked the same way. `GameClient.Answer` settles a
 before sending it - checked, and if refused mended a card at a time from what may be added - so every client, the bots
 included, answers what the rules take. A check the host refuses is answered with an `ErrorMessage` whose `RequestId` names the
 request, so a client reacts only to the error of its own check. Version 203.
+
+**Checking a declaration of blockers.** A declaration of blockers (`DeclareBlockersPromptMessage`) is judged by one validator
+in the engine (`BlockRequirements::judge`, `crates/cantrip-state/src/blocks.rs`) against every restriction and requirement
+(CR 509.1a-c): each block allowed, each blocker blocking one creature, each attacker within its fewest and most blockers
+(menace, "can't be blocked by more than one creature"), and as many requirements obeyed as any declaration can (Lure; "target
+creature blocks this turn if able", a requirement whose `Attacker` is `0`, obeyed by blocking any attacker). The prompt
+carries the rules' `Verdict` on no blocks: `Complete`, whether that may be declared; `Issue`, why not (`Creature`, `Words`,
+`Other` - `0` for none - and `Rule`, the CR number, to caption as "Llanowar Elves must block Llanowar Elves"); and `Addable`,
+the blocks some legal declaration has. Addable is not "legal now": one blocker of a menace creature is addable where a second
+can join it, and a block no legal declaration has alongside those declared is not. Every other declaration is asked of the
+host as it changes: the client sends `CheckBlocksMessage { RequestId, Blocks }`, the server asks the host's `CheckBlocks` and
+answers `BlocksVerdictMessage { RequestId, Blocks, Verdict }`, to that seat alone. `GameClient.Answer` settles every
+declaration with the host before sending it - checked, and if refused mended a block at a time from what may be added, the
+blocks meant first and the engine's own declaration (`Suggested`) next - so no client works out a requirement or a
+restriction itself, and a new one changes the engine alone. `MinimumBlockers`, `MaximumBlockers`, `Requirements` and
+`MostRequirements` are for showing the player. The answer is still checked when it is given. Version 204.
 
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed
