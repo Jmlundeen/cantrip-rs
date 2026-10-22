@@ -878,8 +878,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         Label::TargetSlot(text, held) => format!("{text}: {}", target_words(game, *held)),
                         Label::Pile { cards, .. } if !cards.is_empty() => format!("{}: {}", label_text(l), cards.iter()
                             .map(|&id| {
-                                let name = game.name(id);
-                                if !name.is_empty() { name } else if game.obj(id).face_down { "Face-down permanent" } else { "Nameless permanent" }
+                                let name = game.name(id).to_string();
+                                if !name.is_empty() { name } else if game.obj(id).face_down { "Face-down permanent".into() } else { "Nameless permanent".into() }
                             }).collect::<Vec<_>>().join(", ")),
                         other => label_text(other).to_string(),
                     })
