@@ -1,0 +1,11 @@
+{
+  "name": "Faerie Miscreant",
+  "manaCost": "{U}",
+  "type": "Creature — Faerie Rogue",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\nWhen this creature enters, if you control another creature named Faerie Miscreant, draw a card.",
+  "keywords": [
+    "Flying"
+  ]
+}

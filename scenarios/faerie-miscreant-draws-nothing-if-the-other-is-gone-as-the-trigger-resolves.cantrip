@@ -1,0 +1,38 @@
+# Faerie Miscreant: the intervening "if you control another creature named Faerie Miscreant" is checked again as the
+# ability resolves (CR 603.4). Bot1 Lightning Bolts the first Miscreant in response to the second's trigger: no card is drawn.
+
+[Bot1 Deck]
+Island
+Mountain
+Faerie Miscreant x2
+Lightning Bolt
+Island x2
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Faerie Miscreant.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Faerie Miscreant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Faerie Miscreant)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Faerie Miscreant; Lightning Bolt
+Bot1.Hand.Count = 3

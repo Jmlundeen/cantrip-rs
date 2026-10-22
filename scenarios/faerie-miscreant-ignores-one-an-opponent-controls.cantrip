@@ -1,0 +1,37 @@
+# Faerie Miscreant: "another creature named Faerie Miscreant" must be one you control. Bot2 controls a Miscreant when
+# Bot1's enters, so Bot1 draws nothing (CR 603.4).
+
+[Bot1 Deck]
+Island x2
+Faerie Miscreant
+Island x4
+Island x12
+
+[Bot2 Deck]
+Island
+Faerie Miscreant
+Island x5
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Faerie Miscreant.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Faerie Miscreant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Faerie Miscreant.Keywords = Flying
+Bot2.Battlefield.Faerie Miscreant.Keywords = Flying
+Bot1.Hand.Count = 5
