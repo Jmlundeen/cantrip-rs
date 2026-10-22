@@ -1,0 +1,20 @@
+# "...unless you control a Plains or an Island": the Island branch, read by land type and not by name (CR 305.6, 305.7).
+# Volcanic Island is an Island (and a Mountain, which does not count here) and no Plains is anywhere, so the Fortress
+# enters untapped.
+
+[Bot1 Deck]
+Volcanic Island
+Glacial Fortress
+Mountain x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Glacial Fortress.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Glacial Fortress.Tapped = false
