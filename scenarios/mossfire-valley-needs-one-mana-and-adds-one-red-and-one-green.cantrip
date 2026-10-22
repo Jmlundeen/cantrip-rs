@@ -1,0 +1,23 @@
+# Mossfire Valley: "{1}, {T}: Add {R}{G}." Turn 1 it is the only land, so the ability is not offered - it needs one
+# mana. Turn 3 an Island pays the {1} and the Valley adds one red and one green: {R}{G}, the fixed pair, never two of
+# one color.
+
+[Bot1 Deck]
+Mossfire Valley
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mossfire Valley.Play
+! Bot1.Battlefield.Mossfire Valley.Activate(Ability: {1}, {T})
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mossfire Valley.Activate(Ability: {1}, {T})
+? Bot1.Mana = {R}{G}
+
+[Expect]
+Turn = 3
