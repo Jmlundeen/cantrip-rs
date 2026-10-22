@@ -14,6 +14,26 @@ pub fn this_enters(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
     }
 }
 
+/// "Whenever another creature or planeswalker you control enters" (CR 603.6a): a different permanent that entered
+/// the battlefield under this source's controller's control, and is a creature or planeswalker as it entered. Liliana
+/// the Faultless and Liliana the Repentant print it.
+pub fn another_creature_or_planeswalker_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if *new != source
+                && to.is(ZoneKind::Battlefield)
+                && q.controller(*new) == q.controller(source)
+                && {
+                    let chars = q.chars(*new);
+                    chars.is(CardType::Creature) || chars.is(CardType::Planeswalker)
+                } =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "When this enters, if you cast it" (CR 603.4, 603.6a): the permanent entered as the spell that resolved, and that spell
 /// was cast - the history says so. A permanent put onto the battlefield, or a copy of a permanent spell (a token, CR 707.10f),
 /// was not cast. Lutri, The One Ring and Uldaros Theorix print it.
