@@ -1,0 +1,57 @@
+# Waterbent Ruinous Waterbending kills Bot2's Hushbringer (1/2) and Ornithopter (0/2) at once: the "whenever a creature dies this turn"
+# ability looks back to the battlefield as it was before the event (CR 603.10a), so Hushbringer, itself included, stops it from triggering
+# for either (Hushbringer's rulings): Bot1 stays at 20. Patchwork Beastie (3/3) survives as a 1/1; with Hushbringer gone, Lightning Bolt
+# kills it later the same turn and that does trigger it: 21.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Ruby
+Lightning Bolt
+Ruinous Waterbending
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Hushbringer
+Patchwork Beastie
+Ornithopter
+Plains x15
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Hushbringer.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Patchwork Beastie.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ruinous Waterbending.Cast(Kicked: 1; Convoke: Mox Sapphire, Mox Pearl, Mox Jet, Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot2.Battlefield.Hushbringer = (absent)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Patchwork Beastie)
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Battlefield = Plains; Mox Pearl; Mox Emerald
+Bot2.Graveyard.Count = 3

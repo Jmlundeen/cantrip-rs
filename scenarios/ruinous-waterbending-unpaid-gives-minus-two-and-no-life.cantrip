@@ -1,0 +1,31 @@
+# Without the waterbend additional cost, Black Lotus pays {1}{B}{B}: both Ornithopters die and nothing is gained, and the 3/3 Beastie survives.
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Ruinous Waterbending
+Island x15
+
+[Bot2 Deck]
+Patchwork Beastie
+Ornithopter
+Forest x15
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Patchwork Beastie.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ruinous Waterbending.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield.Patchwork Beastie.Toughness = 1
+Bot2.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Ornithopter = (absent)

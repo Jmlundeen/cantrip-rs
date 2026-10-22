@@ -1,0 +1,58 @@
+# Bot1's Mutavault is animated (a creature only on the battlefield) in response to the spell and dies to it, counted as the creature it last was (CR 603.10a).
+# Black Lotus pays {1}{B}{B} and four Moxen are tapped for the waterbend {4} (the fifth, Emerald, stays untapped: it pays for Mutavault). All creatures get -2/-2: Bot1's Mutavault and
+# Bot2's Ornithopter die (+2 life, one per creature, both players' creatures count) and Bot2's Patchwork Beastie (3/3) survives as a 1/1, so
+# the -2/-2 is exactly two. The effect and the trigger end with the turn: on turn 5 the Beastie dies to Lightning Bolt and gains nothing.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mutavault
+Ruinous Waterbending
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Patchwork Beastie
+Ornithopter
+Forest x15
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Patchwork Beastie.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ruinous Waterbending.Cast(Kicked: 1; Convoke: Mox Sapphire, Mox Pearl, Mox Jet, Mox Ruby)
+Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Life = 22
+? Bot1.Battlefield.Mox Ruby.Tapped = true
+? Bot2.Battlefield.Patchwork Beastie.Power = 1
+? Bot2.Battlefield.Patchwork Beastie.Toughness = 1
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Patchwork Beastie.Power = 3
+[T5 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Patchwork Beastie)
+Bot1.Battlefield.Mox Ruby.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard.Count = 2
+Bot2.Battlefield.Ornithopter = (absent)
+Bot1.Graveyard.Count = 4
