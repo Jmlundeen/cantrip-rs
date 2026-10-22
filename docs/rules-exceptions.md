@@ -121,3 +121,14 @@ The same decision keeps today's capacities (KI-105, closed): an object's 32 abil
 abilities added by exceptions, four text-changing effects (`Words::MAX`), and the special actions given once layer 6 is
 done taking the first free ability slot. A full list takes no more and never panics; a repeatable modal counts each mode
 to 15.
+
+### RX-6: A player keeps after their seventh mulligan
+
+| Rule | Category | Decided by | Date |
+| --- | --- | --- | --- |
+| CR 103.5 | beyond practical scale | jschibel | 2026-10-21 |
+
+**What the rules say.** A player may mulligan as many times as they like.
+
+**What the engine does instead, and why.** After seven mulligans the player keeps (`turn.rs`). A player who mulligans
+seven times has an empty opening hand to put cards back from, so an eighth mulligan makes no practical difference.
