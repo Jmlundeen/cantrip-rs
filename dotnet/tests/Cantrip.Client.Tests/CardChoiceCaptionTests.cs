@@ -29,9 +29,9 @@ public sealed class CardChoiceCaptionTests
         Source = Handle(90),
         Purpose = purpose,
         Cards = [.. cards.Select(card => card.Handle)],
-        Eligible = [.. cards.Select(card => card.Handle)],
+        Verdict = new() { Addable = [.. cards.Select(card => card.Handle)], Complete = upTo },
         Count = count,
-        UpTo = upTo,
+        CountKind = upTo ? CountKindView.UpTo : CountKindView.Exactly,
     };
 
     private static ObjectView Spell() => new()
@@ -79,7 +79,7 @@ public sealed class CardChoiceCaptionTests
 
         // "Any number of" is said so by the host (`AnyNumber`), its count every eligible card.
         ChooseCardsPromptMessage anyNumber = Choice(CardChoicePurposeView.Exile, 2, true, one, two);
-        anyNumber.AnyNumber = true;
+        anyNumber.CountKind = CountKindView.AnyNumber;
         Assert.Equal(
             "Strategic Betrayal: choose any number of cards to exile",
             CardChoicePresentation.Describe(client, anyNumber, []).Title);
@@ -154,7 +154,7 @@ public sealed class CardChoiceCaptionTests
 
         ChooseCardsPromptMessage one = Choice(CardChoicePurposeView.Craft, 1, false, bears, elves);
         one.Kind = "creature";
-        CardChoicePresentation exactly = CardChoicePresentation.Describe(client, one, [3]);
+        CardChoicePresentation exactly = Judged(client, one, [3]);
         Assert.Equal("Strategic Betrayal: craft - choose a creature you control or a creature card from your graveyard to exile", exactly.Title);
         Assert.Equal("Exile it", exactly.Confirm);
         Assert.True(exactly.CanSubmit);
@@ -162,11 +162,12 @@ public sealed class CardChoiceCaptionTests
         ChooseCardsPromptMessage more = Choice(CardChoicePurposeView.Craft, 2, true, bears, elves);
         more.Kind = "creature";
         more.Minimum = 1;
+        more.Verdict.Complete = false;
         Assert.Equal(
             "Strategic Betrayal: craft - choose 1 or more from among creatures you control and/or creature cards in your graveyard to exile",
             CardChoicePresentation.Describe(client, more, []).Title);
         Assert.False(CardChoicePresentation.Describe(client, more, []).CanSubmit);
-        Assert.True(CardChoicePresentation.Describe(client, more, [3, 4]).CanSubmit);
+        Assert.True(Judged(client, more, [3, 4]).CanSubmit);
         Assert.Equal("Exile 2", CardChoicePresentation.Describe(client, more, [3, 4]).Confirm);
 
         ChooseCardsPromptMessage two = Choice(CardChoicePurposeView.Craft, 2, false, bears, elves);
@@ -174,7 +175,7 @@ public sealed class CardChoiceCaptionTests
         Assert.Equal(
             "Strategic Betrayal: craft - choose 2 from among creatures you control and/or creature cards in your graveyard to exile",
             CardChoicePresentation.Describe(client, two, []).Title);
-        Assert.False(CardChoicePresentation.Describe(client, two, [3]).CanSubmit);
+        Assert.False(Judged(client, two, [3]).CanSubmit);
 
         // Named as cards, the materials are graveyard cards alone (CR 702.167b): Ore-Rich Stalactite's four or more.
         ChooseCardsPromptMessage cards = Choice(CardChoicePurposeView.Craft, 2, true, elves);

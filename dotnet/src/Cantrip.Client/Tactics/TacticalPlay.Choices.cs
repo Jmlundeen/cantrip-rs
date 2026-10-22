@@ -613,7 +613,7 @@ public sealed partial class TacticalPlay
             return new CardsChosenAnswer { Cards = [] };
         }
 
-        List<(ViewHandle Card, int Margin)> options = [.. prompt.Eligible.Select((card, index) =>
+        List<(ViewHandle Card, int Margin)> options = [.. prompt.Cards.Select((card, index) =>
         {
             ObjectView? creature = client.Object(card);
             int own = creature is { ProducesMana: true } && !creature.SummoningSick ? 1 : 0;
@@ -638,7 +638,7 @@ public sealed partial class TacticalPlay
     private List<ViewHandle> ToPlot(GameClient client, ChooseCardsPromptMessage prompt)
     {
         int nextTurn = Mana(client) + (client.MyHand().Any(IsLand) ? 1 : 0);
-        List<ObjectView> known = [.. prompt.Eligible.Select(client.Object).OfType<ObjectView>()];
+        List<ObjectView> known = [.. prompt.Verdict.Addable.Select(client.Object).OfType<ObjectView>()];
         List<ObjectView> ranked = [.. known
             .OrderBy(card => IsLand(card) ? 1 : 0)
             .ThenByDescending(card => card.ManaValue)
@@ -646,13 +646,13 @@ public sealed partial class TacticalPlay
             .ThenBy(card => card.CardTypes.Contains(CardTypeView.Instant)
                 || (CardReading.KeywordsOf(card) & Keywords.Flash) != 0 ? 1 : 0)
             .ThenByDescending(card => Worth(client, card))];
-        int most = Math.Min(prompt.Count, prompt.Eligible.Count);
+        int most = Math.Min(prompt.Count, prompt.Verdict.Addable.Count);
         List<ViewHandle> chosen = [.. ranked.Where(card => !IsLand(card) && card.ManaValue > 0).Take(most).Select(card => card.Handle)];
 
         if (!prompt.UpTo || chosen.Count < prompt.Minimum)
         {
             int need = prompt.UpTo ? prompt.Minimum : most;
-            chosen.AddRange(ranked.Select(card => card.Handle).Concat(prompt.Eligible)
+            chosen.AddRange(ranked.Select(card => card.Handle).Concat(prompt.Verdict.Addable)
                 .Distinct().Where(card => !chosen.Contains(card)).Take(need - chosen.Count));
         }
 
@@ -672,9 +672,10 @@ public sealed partial class TacticalPlay
     /// </summary>
     private List<ViewHandle> WorthMostWithin(GameClient client, ChooseCardsPromptMessage prompt, int budget)
     {
-        int n = prompt.Eligible.Count;
-        double[] worth = [.. prompt.Eligible.Select(card => client.Object(card) is { } known ? Math.Max(0, _model.WorthOnceCast(known)) : 0)];
-        int[] value = [.. Enumerable.Range(0, n).Select(index => index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0)];
+        List<ViewHandle> eligible = prompt.Verdict.Addable;
+        int n = eligible.Count;
+        double[] worth = [.. eligible.Select(card => client.Object(card) is { } known ? Math.Max(0, _model.WorthOnceCast(known)) : 0)];
+        int[] value = [.. eligible.Select(card => prompt.Cards.IndexOf(card) is >= 0 and var at && at < prompt.ManaValues.Count ? prompt.ManaValues[at] : 0)];
         int most = Math.Min(prompt.Count, n);
 
         if (n > 16)
@@ -685,7 +686,7 @@ public sealed partial class TacticalPlay
             {
                 if (taken.Count < most && worth[index] > 0 && value[index] <= left)
                 {
-                    taken.Add(prompt.Eligible[index]);
+                    taken.Add(eligible[index]);
                     left -= value[index];
                 }
             }
@@ -716,7 +717,7 @@ public sealed partial class TacticalPlay
             }
         }
 
-        return [.. Enumerable.Range(0, n).Where(index => (best & 1 << index) != 0).Select(index => prompt.Eligible[index])];
+        return [.. Enumerable.Range(0, n).Where(index => (best & 1 << index) != 0).Select(index => eligible[index])];
     }
 
     private AnswerPayload Cards(GameClient client, PlayerView view, ChooseCardsPromptMessage prompt)
@@ -724,7 +725,7 @@ public sealed partial class TacticalPlay
         // A choice that has to add up to a power (saddle, crew): the creatures that reach it and give up least, where
         // the prompt's own answer is every creature there is.
         if (prompt.MinimumPower > 0 && Policy("crew") > 0
-            && Crewing(client, prompt.Eligible, prompt.Powers, prompt.MinimumPower) is { Count: > 0 } crew)
+            && Crewing(client, prompt.Cards, prompt.Powers, prompt.MinimumPower) is { Count: > 0 } crew)
         {
             return new CardsChosenAnswer { Cards = crew };
         }
@@ -735,7 +736,7 @@ public sealed partial class TacticalPlay
             List<ViewHandle> taken = [];
             int total = 0;
 
-            foreach (int index in Enumerable.Range(0, prompt.Eligible.Count)
+            foreach (int index in Enumerable.Range(0, prompt.Cards.Count)
                 .OrderByDescending(index => index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0))
             {
                 if (total >= prompt.MinimumManaValue)
@@ -743,7 +744,7 @@ public sealed partial class TacticalPlay
                     break;
                 }
 
-                taken.Add(prompt.Eligible[index]);
+                taken.Add(prompt.Cards[index]);
                 total += index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0;
             }
 
@@ -759,7 +760,7 @@ public sealed partial class TacticalPlay
         }
 
         // Otherwise that, an order or a vote: the prompt's own answer.
-        if (prompt.MinimumPower > 0 || prompt.Eligible.Count == 0
+        if (prompt.MinimumPower > 0 || prompt.Verdict.Addable.Count == 0
             || prompt.Purpose is CardChoicePurposeView.OrderSimultaneous or CardChoicePurposeView.Vote or CardChoicePurposeView.Splice)
         {
             return prompt.Default();
@@ -777,7 +778,7 @@ public sealed partial class TacticalPlay
         // left to prevent all of it (any of it dealt is the whole harm), then the most damage.
         if (prompt.Purpose == CardChoicePurposeView.PreventDamageFrom)
         {
-            ViewHandle first = prompt.Eligible
+            ViewHandle first = prompt.Verdict.Addable
                 .OrderByDescending(card => client.Object(card) is { } source && (source.Power ?? 0) <= prompt.PreventLeft
                     && (CardReading.KeywordsOf(source) & (Keywords.Deathtouch | Keywords.Lifelink)) != 0 ? 1 : 0)
                 .ThenByDescending(card => client.Object(card)?.Power ?? 0)
@@ -816,15 +817,15 @@ public sealed partial class TacticalPlay
             return new CardsChosenAnswer { Cards = ToPlot(client, prompt) };
         }
 
-        int most = Math.Min(prompt.Count, prompt.Eligible.Count);
+        int most = Math.Min(prompt.Count, prompt.Verdict.Addable.Count);
 
         // Station's creature (CR 702.184a): its power is the counters the permanent gets, so the one Station chose, or else
         // the one of most power - not the one worth least, as another cost that taps would have it.
         if (prompt.Purpose == CardChoicePurposeView.TapToPay && client.Object(prompt.Source) is { } stationed
             && CardReading.LastStationThreshold(CardReading.Text(stationed)) > 0)
         {
-            ViewHandle chosen = prompt.Eligible.Contains(_stationWith) ? _stationWith
-                : prompt.Eligible.OrderByDescending(card => client.Object(card)?.Power ?? 0).First();
+            ViewHandle chosen = prompt.Verdict.Addable.Contains(_stationWith) ? _stationWith
+                : prompt.Verdict.Addable.OrderByDescending(card => client.Object(card)?.Power ?? 0).First();
             _stationWith = ViewHandle.None;
             return new CardsChosenAnswer { Cards = [chosen] };
         }
@@ -832,14 +833,14 @@ public sealed partial class TacticalPlay
         // Ill-Timed Explosion: the two cards that make the damage biggest for the least loss (see SweepDiscards).
         if (prompt.Purpose == CardChoicePurposeView.Discard && !prompt.UpTo && most == 2 && client.Object(prompt.Source)?.Name == "Ill-Timed Explosion")
         {
-            return new CardsChosenAnswer { Cards = [.. SweepDiscards(client, prompt.Eligible).Select(card => card.Handle)] };
+            return new CardsChosenAnswer { Cards = [.. SweepDiscards(client, prompt.Verdict.Addable).Select(card => card.Handle)] };
         }
 
         // What to behold (CR 701.4a): a permanent on the battlefield before a card from the hand, since revealing a card tells the
         // opponent what is in it and choosing a permanent tells them nothing.
         if (prompt.Purpose == CardChoicePurposeView.Behold)
         {
-            List<ViewHandle> beheld = [.. prompt.Eligible.OrderBy(card => client.Object(card)?.Zone == ZoneKindView.Battlefield ? 0 : 1)];
+            List<ViewHandle> beheld = [.. prompt.Verdict.Addable.OrderBy(card => client.Object(card)?.Zone == ZoneKindView.Battlefield ? 0 : 1)];
             return new CardsChosenAnswer { Cards = [.. beheld.Take(most)] };
         }
 
@@ -848,7 +849,7 @@ public sealed partial class TacticalPlay
         if (prompt.Purpose == CardChoicePurposeView.Craft)
         {
             int need = prompt.UpTo ? Math.Max(prompt.Minimum, 1) : prompt.Count;
-            List<ViewHandle> materials = [.. prompt.Eligible
+            List<ViewHandle> materials = [.. prompt.Verdict.Addable
                 .OrderBy(card => client.Object(card)?.Zone == ZoneKindView.Battlefield ? 1 : 0)
                 .ThenBy(card => client.Object(card) is { } known ? Worth(client, known) : 0)];
             return new CardsChosenAnswer { Cards = [.. materials.Take(need)] };
@@ -860,7 +861,7 @@ public sealed partial class TacticalPlay
             && client.Object(prompt.Source) is { } flung
             && CardReading.Plain(CardReading.Text(flung)).Contains("sacrificed creature's power", StringComparison.Ordinal))
         {
-            List<ViewHandle> strongest = [.. prompt.Eligible
+            List<ViewHandle> strongest = [.. prompt.Verdict.Addable
                 .OrderByDescending(card => client.Object(card)?.Power ?? 0)
                 .ThenBy(card => client.Object(card) is { } known ? Worth(client, known) : 0)];
             return new CardsChosenAnswer { Cards = [.. strongest.Take(1)] };
@@ -880,7 +881,7 @@ public sealed partial class TacticalPlay
             // does; harmful ones (-1/-1, stun) go on the one worth least.
             || prompt.Purpose == CardChoicePurposeView.PutCounters && prompt.Counter is "-1/-1" or "stun";
 
-        List<ObjectView> known = [.. prompt.Eligible.Select(client.Object).OfType<ObjectView>()];
+        List<ObjectView> known = [.. prompt.Verdict.Addable.Select(client.Object).OfType<ObjectView>()];
         bool theirs = known.Count > 0 && known.TrueForAll(card => card.Owner != client.Seat && card.Controller != client.Seat);
         bool board = known.Count > 0 && known.TrueForAll(card => card.Zone == ZoneKindView.Battlefield);
 
@@ -898,22 +899,22 @@ public sealed partial class TacticalPlay
             && known.TrueForAll(card => card.Zone == ZoneKindView.Hand))
         {
             List<ViewHandle> worth = [.. Cheated(client, view, CardReading.Text(cheat), ViewHandle.None, Mana(client))
-                .Where(one => prompt.Eligible.Contains(one.Creature.Handle))
+                .Where(one => prompt.Verdict.Addable.Contains(one.Creature.Handle))
                 .OrderByDescending(one => one.Net)
                 .Select(one => one.Creature.Handle)];
 
             if (worth.Count > 0 || prompt.UpTo)
             {
-                return new CardsChosenAnswer { Cards = [.. worth.Take(Math.Min(prompt.Count, prompt.Eligible.Count))] };
+                return new CardsChosenAnswer { Cards = [.. worth.Take(Math.Min(prompt.Count, prompt.Verdict.Addable.Count))] };
             }
         }
 
         List<ViewHandle> ranked = board
             ? [.. known.OrderByDescending(card => Worth(client, card)).Select(card => card.Handle)]
             : free ? [.. known.OrderByDescending(_model.WorthOnceCast).Select(card => card.Handle)]
-            : Ranked(client, prompt.Eligible);
+            : Ranked(client, prompt.Verdict.Addable);
 
-        ranked.AddRange(prompt.Eligible.Where(card => !ranked.Contains(card)));
+        ranked.AddRange(prompt.Verdict.Addable.Where(card => !ranked.Contains(card)));
 
         // The worst of its own when it is losing them, the best of an opponent's when they are: Duress takes the
         // card worth most, an edict gives up the creature worth least.
@@ -975,12 +976,12 @@ public sealed partial class TacticalPlay
     private AnswerPayload Search(GameClient client, PlayerView view, SearchLibraryPromptMessage prompt)
     {
         _ = view;
-        List<ObjectView> eligible = [.. prompt.Eligible.Select(client.Object).OfType<ObjectView>()];
-        int most = Math.Min(prompt.Count, prompt.Eligible.Count);
+        List<ObjectView> eligible = [.. prompt.Verdict.Addable.Select(client.Object).OfType<ObjectView>()];
+        int most = Math.Min(prompt.Count, prompt.Verdict.Addable.Count);
 
         if (eligible.Count == 0 || most <= 0)
         {
-            return new CardsChosenAnswer { Cards = [.. prompt.Eligible.Take(most)] };
+            return new CardsChosenAnswer { Cards = [.. prompt.Verdict.Addable.Take(most)] };
         }
 
         if (eligible.TrueForAll(IsLand))
@@ -1019,7 +1020,7 @@ public sealed partial class TacticalPlay
             };
         }
 
-        return new CardsChosenAnswer { Cards = [.. Ranked(client, prompt.Eligible).Take(most)] };
+        return new CardsChosenAnswer { Cards = [.. Ranked(client, prompt.Verdict.Addable).Take(most)] };
     }
 
     /// <summary>

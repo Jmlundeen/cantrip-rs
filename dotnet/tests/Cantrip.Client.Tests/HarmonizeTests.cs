@@ -61,10 +61,10 @@ public sealed class HarmonizeTests
         Source = Handle(90),
         Purpose = CardChoicePurposeView.TapToReduce,
         Cards = [.. creatures.Select(c => Handle(c.Handle))],
-        Eligible = [.. creatures.Select(c => Handle(c.Handle))],
+        Verdict = new() { Addable = [.. creatures.Select(c => Handle(c.Handle))], Complete = true },
         Powers = [.. creatures.Select(c => c.Power)],
         Count = 1,
-        UpTo = true,
+        CountKind = CountKindView.UpTo,
         Kind = "creature",
     };
 
@@ -82,7 +82,7 @@ public sealed class HarmonizeTests
         Assert.False(none.AnswersOnLastPick);
         Assert.Contains("full cost", none.Detail);
 
-        CardChoicePresentation tapped = CardChoicePresentation.Describe(client, prompt, [10]);
+        CardChoicePresentation tapped = Judged(client, prompt, [10]);
         Assert.Equal("Tap it (-2)", tapped.Confirm);
         Assert.Contains("2 off the generic mana", tapped.Detail);
         Assert.True(tapped.CanSubmit);

@@ -152,8 +152,8 @@ fn ids_bear(game: &Game) -> ObjectId {
 fn a_concession_keeps_the_answers_given_before_it_with_the_players_who_gave_them() {
     let mut p2_asked = 0;
     let (game, ids) = play("Probe Council", &[("Ornithopter", P2), ("Ornithopter", P2)], |game, request| match &request.kind {
-        RequestKind::ChooseCards { eligible, .. } => {
-            let _ = game;
+        RequestKind::ChooseCards { .. } => {
+            let eligible = first_choices(game, request);
             // The Ornithopters by age: the first put onto the battlefield, then the second.
             let (first, second) = (*eligible.iter().min().unwrap(), *eligible.iter().max().unwrap());
             match request.player {
@@ -188,8 +188,9 @@ static EDICT: CardDef = CardDef { name: "Probe Edict", types: TypeSet::of(&[Card
 #[test]
 fn a_voter_who_leaves_before_voting_has_no_vote_and_no_one_votes_for_them() {
     let mut asked: Vec<PlayerId> = Vec::new();
-    let (game, ids) = play_among(4, P2, "Probe Council", &[("Ornithopter", P3), ("Ornithopter", P3)], |_, request| match &request.kind {
-        RequestKind::ChooseCards { eligible, .. } => {
+    let (game, ids) = play_among(4, P2, "Probe Council", &[("Ornithopter", P3), ("Ornithopter", P3)], |game, request| match &request.kind {
+        RequestKind::ChooseCards { .. } => {
+            let eligible = first_choices(game, request);
             asked.push(request.player);
             let (first, second) = (*eligible.iter().min().unwrap(), *eligible.iter().max().unwrap());
             match request.player {
@@ -220,8 +221,9 @@ fn a_player_who_leaves_before_sacrificing_chooses_nothing_and_no_one_chooses_for
         P2,
         "Probe Edict",
         &[("Ornithopter", P0), ("Ornithopter", P0), ("Ornithopter", P1), ("Ornithopter", P1), ("Ornithopter", P2), ("Ornithopter", P2), ("Ornithopter", P3), ("Ornithopter", P3)],
-        |_, request| match &request.kind {
-            RequestKind::ChooseCards { eligible, .. } => {
+        |game, request| match &request.kind {
+            RequestKind::ChooseCards { .. } => {
+                let eligible = first_choices(game, request);
                 asked.push(request.player);
                 (Some(Answer::Cards(vec![eligible[0]])), request.player == P1 && asked.iter().filter(|&&p| p == P1).count() == 1)
             }

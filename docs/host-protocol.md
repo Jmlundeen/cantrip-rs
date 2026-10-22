@@ -17,6 +17,7 @@ Requests and replies (a reply is `{"Ok": {...}}` or `{"Rejected": {"Code": "..."
 | `{"Cmd":"NewGame","Seats":[{"Name":"You","Deck":[]}, ...],"Seed":1,"Scenario":{"Name":"...","Text":"...","Driven":[1]}}` | the same: a table playing a `.cantrip` scenario, its decks, order and dice the scenario's; the `Driven` seats are answered by the table and every other by the script, and each step carries a `Scenario` object (`docs/scenarios-in-the-browser.md`) |
 | `{"Cmd":"Start","GameId":1}` | a step |
 | `{"Cmd":"Answer","GameId":1,"RequestId":7,"Seat":1,"Answer":{AnswerPayload}}` | a step, or `Rejected` with `IllegalAnswer`, `StaleReply`, `UnknownHandle` or `NotYourTurnToAnswer`, after which the request is still outstanding |
+| `{"Cmd":"Check","GameId":1,"RequestId":7,"Seat":1,"Selected":[12, 15]}` | `{"Complete":true,"Addable":[18, 21]}` - what the rule of the outstanding choice of cards says of a partial selection (below); nothing advances. `Rejected` with `StaleReply`, `NotYourTurnToAnswer`, `UnknownHandle`, or `IllegalAnswer` for a question that picks no cards |
 | `{"Cmd":"Concede","GameId":1,"Seat":1}` | a step |
 | `{"Cmd":"View","GameId":1,"Seat":1}` | `{"View":PlayerView}` - the seat's current view, for resynchronising a client |
 | `{"Cmd":"Oracle","Name":"Lightning Bolt"}` | `{"Card":ObjectView}` or `{"Card":null}` - a card as printed |
@@ -56,6 +57,19 @@ A pay-costs prompt that `AnnouncesXOrKicks` (CR 601.2b) is answered with an `Ann
 times kicked, from 0 to the prompt's `MostAnnounced` - one answer however high it goes, so a page steps the value itself and
 sends nothing until it is chosen. A value past `MostAnnounced` is refused with `IllegalAnswer`. Its `IncreaseX` and
 `DecreaseX` options still step it one answer at a time, as the bots do. Version 202.
+
+**Checking a selection.** A choice of cards (`ChooseCardsPromptMessage`) and a library search (`SearchLibraryPromptMessage`)
+are judged by the question's selection rule (docs/engine-design.md, "Selection rules"), which the client cannot run: the
+prompt says how many it takes for its caption (`Count`, `CountKind`: `Exactly`, `UpTo`, `AnyNumber`, `AsManyAsCan`), its
+noun and its parts' words (`Kind`, `Words`: "with different names"), a running total a part keeps for the player
+(`MaximumTotalManaValue` with each card's `ManaValues`, for "total mana value 6 or less": `Tally`, display alone), and the
+rule's `Verdict` on none chosen yet - `Complete`, whether that is an answer, and `Addable`, the cards that may be picked first. There is no eligible list beside
+it. Every other selection is asked of the host as it changes: the client sends `CheckSelectionMessage { RequestId, Selected }`,
+the server asks the host's `Check` and answers `SelectionVerdictMessage { RequestId, Selected, Verdict }`, to that seat
+alone. The answer is still checked when it is given. A cost's tapping for power, collecting evidence and crafting, which
+the same prompt carries, are checked the same way. `GameClient.Answer` settles any answer to such a question with the host
+before sending it - checked, and if refused mended a card at a time from what may be added - so every client, the bots
+included, answers what the rules take. Version 203.
 
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed

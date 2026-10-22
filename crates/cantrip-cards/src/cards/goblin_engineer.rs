@@ -1,6 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::library::{ask_may_search, search_to_graveyard, Find};
+use cantrip_mechanics::library::{self, ask_may_search};
+use cantrip_mechanics::select;
 use cantrip_mechanics::targets::card_in_graveyard;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
@@ -14,7 +15,7 @@ fn search_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !ask_may_search(g, player, item.object, &ASK)? {
         return Ok(());
     }
-    search_to_graveyard(g, player, item.object, Find::ONE, |q, c| q.chars(c).is(CardType::Artifact))?;
+    library::find_to_graveyard(g, player, item.object, select::ARTIFACT_CARD)?;
     Ok(())
 }
 

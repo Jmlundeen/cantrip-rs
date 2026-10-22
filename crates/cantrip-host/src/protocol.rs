@@ -972,14 +972,37 @@ pub struct AssignCombatDamagePrompt {
 #[serde(rename_all = "PascalCase")]
 pub struct SearchLibraryPrompt {
     pub player: i32,
+    /// How many the search takes, for its caption, as `count_kind` counts it.
     pub count: i32,
-    pub optional: bool,
-    /// "Any number of" (CR 701.23): none, some or all of `eligible`, which `count` then is.
-    pub any_number: bool,
     pub library: Vec<ViewHandle>,
-    pub eligible: Vec<ViewHandle>,
     pub destination: SearchDestinationView,
     pub owner: i32,
+    pub count_kind: CountKindView,
+    /// The noun the search's rule calls the cards ("basic land"), empty for "card".
+    pub kind: String,
+    /// What the rule's parts ask, each in the words a caption puts after the noun ("with different names").
+    pub words: Vec<String>,
+    /// The rule's verdict on finding nothing yet: whether that is an answer, and which cards may be picked first. Every pick
+    /// after is asked of the host (`Check`).
+    pub verdict: SelectionVerdictView,
+}
+
+/// How a choice of cards counts them (`Count`): exactly `Count`, up to it, any number, or `Count` unless fewer can be found.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum CountKindView {
+    #[default]
+    Exactly,
+    UpTo,
+    AnyNumber,
+    AsManyAsCan,
+}
+
+/// What a question's rule says of a selection of its cards: whether it is an answer, and which further cards may be added.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct SelectionVerdictView {
+    pub complete: bool,
+    pub addable: Vec<ViewHandle>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1029,16 +1052,19 @@ pub struct PayCostsPrompt {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ChooseCardsPrompt {
-    /// "Any number of" (CR 608.2d): `count` is then every eligible card, and the choice may be none, some or all.
-    pub any_number: bool,
     pub player: i32,
     pub owner: i32,
     pub source: ViewHandle,
     pub purpose: CardChoicePurposeView,
     pub cards: Vec<ViewHandle>,
-    pub eligible: Vec<ViewHandle>,
+    /// How many the choice takes, for its caption, as `count_kind` counts it.
     pub count: i32,
-    pub up_to: bool,
+    pub count_kind: CountKindView,
+    /// What the rule's parts ask, each in the words a caption puts after the noun ("with total mana value 6 or less").
+    pub words: Vec<String>,
+    /// The rule's verdict on choosing nothing yet: whether that is an answer, and which cards may be picked first. Every pick
+    /// after is asked of the host (`Check`).
+    pub verdict: SelectionVerdictView,
     pub kind: String,
     pub minimum_power: i32,
     pub powers: Vec<i32>,
@@ -1049,11 +1075,11 @@ pub struct ChooseCardsPrompt {
     pub counter: String,
     /// For `PutCounters`, how many counters the chosen permanent gets.
     pub counter_count: i32,
-    /// The fewest that may be chosen when `UpTo` makes `Count` a maximum: craft's "one or more" (CR 702.167a). Zero when
-    /// any number up to `Count` will do.
+    /// The fewest that may be chosen when `CountKind` is `UpTo`: craft's "one or more" (CR 702.167a), for the caption. Zero
+    /// when any number up to `Count` will do.
     pub minimum: i32,
-    /// "With total mana value N or less" (CR 202.3): the most the chosen cards' `mana_values` may add up to; none when the
-    /// choice asks nothing of them.
+    /// "With total mana value N or less" (CR 202.3): the most the chosen cards' `mana_values` add up to, for the client's running
+    /// total (`Tally::ManaValueAtMost`); none when the rule keeps no such count. The rule's verdicts judge the cards.
     pub maximum_total_mana_value: Option<i32>,
     /// For `PreventDamageFrom`, how much damage the shield has left to prevent (CR 615.7).
     pub prevent_left: i32,
@@ -1604,20 +1630,22 @@ impl PromptPayload {
                 }
                 AnswerPayload::CombatDamageAssignedAnswer(CombatDamageAssignedAnswer { shares })
             }
-            PromptPayload::SearchLibraryPromptMessage(_) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer::default()),
+            // Nothing found where that is an answer (CR 701.23b); otherwise the first cards that may be found, as many as it takes.
+            PromptPayload::SearchLibraryPromptMessage(p) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer {
+                cards: if p.verdict.complete { Vec::new() } else { p.verdict.addable.iter().take(p.count.max(0) as usize).copied().collect() },
+            }),
             PromptPayload::PayCostsPromptMessage(_) => {
                 AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::CancelCasting, ViewHandle::NONE))
             }
             PromptPayload::ChooseCardsPromptMessage(p) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer {
-                cards: match p.maximum_total_mana_value {
-                    // "With total mana value N or less": the first cards that fit together, in order.
-                    Some(most) => first_fitting(&p.eligible, &p.mana_values, p.count, most),
+                cards: if p.minimum_power > 0 {
                     // "Total power N or more" (crew, saddle): every creature with positive power, enough whenever anything is;
                     // a negative power would take from the total (CR 107.1b).
-                    None if p.minimum_power > 0 => {
-                        p.eligible.iter().enumerate().filter(|&(i, _)| p.powers.get(i).is_none_or(|&power| power > 0)).map(|(_, &c)| c).collect()
-                    }
-                    None => p.eligible.iter().take(p.count.max(0) as usize).copied().collect(),
+                    p.cards.iter().enumerate().filter(|&(i, _)| p.powers.get(i).is_none_or(|&power| power > 0)).map(|(_, &c)| c).collect()
+                } else {
+                    // The first cards that may be picked, as many as it takes: an answer for a rule of a count alone; one asking
+                    // more of the cards together is settled by asking the host as the cards are picked (`Check`).
+                    p.verdict.addable.iter().take(p.count.max(0) as usize).copied().collect()
                 },
             }),
             PromptPayload::UnlessPaysPromptMessage(_) => {
@@ -2049,9 +2077,9 @@ mod tests {
     fn the_default_crew_answer_leaves_out_a_negative_power() {
         let prompt = PromptPayload::ChooseCardsPromptMessage(ChooseCardsPrompt {
             player: 1,
-            eligible: vec![ViewHandle(3), ViewHandle(4)],
+            cards: vec![ViewHandle(3), ViewHandle(4)],
             count: 2,
-            up_to: true,
+            count_kind: CountKindView::UpTo,
             minimum_power: 1,
             powers: vec![-4, 2],
             ..Default::default()

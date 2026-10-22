@@ -1,6 +1,7 @@
 //! Whether an answer fits its request: the right kind, and only what was offered. The engine refuses anything else
 //! before it touches the game, so a refused answer leaves the request outstanding.
 
+use cantrip_api::select;
 use cantrip_api::*;
 
 use crate::{Game, Rejected};
@@ -102,6 +103,59 @@ pub fn name_problem(cards: &CardTable, kind: NameKind, card: CardId) -> Option<&
     None
 }
 
+/// Why a selection of `n` cards a rule refuses is refused, in its words: the count it takes, and what its parts ask.
+fn refusal(rule: &Selection, n: usize) -> String {
+    let wanted = match rule.count {
+        Count::Exactly(c) => format!("{c}"),
+        Count::UpTo(c) => format!("up to {c}"),
+        Count::AnyNumber => "any number".to_string(),
+        Count::AsManyAsCan(c) => format!("{c}, or as many as can be"),
+    };
+    let words = rule.words();
+    let asks = if words.is_empty() { String::new() } else { format!(", {}", words.join(", ")) };
+    format!("{n} chosen, {wanted} wanted{asks}, as the question's rule allows")
+}
+
+/// What the rule of a question that picks a set of cards says of `selected`, given as the cards it picks among: whether
+/// they are an answer and which of the cards may be added to them (`Verdict`). The question a client checks a partial
+/// selection against as its player picks (the host's `Check`): a choice of cards and a library search judge by their rule
+/// (`Selection`, the same check `check` makes of an answer), and a cost's tapping for power, collecting evidence and
+/// crafting by theirs. `None` for any other question.
+pub fn selection_verdict(game: &Game, request: &Request, selected: &[ObjectId]) -> Option<(Vec<ObjectId>, Verdict)> {
+    let unchosen = |cards: &[ObjectId]| Bits::of(cards.len(), |i| !selected.contains(&cards[i]));
+    let among = |cards: &[ObjectId]| distinct(selected) && selected.iter().all(|c| cards.contains(c));
+    let source = request.kind.source().unwrap_or(ObjectId::NONE);
+    Some(match &request.kind {
+        RequestKind::ChooseCards { cards, rule, .. } | RequestKind::SearchLibrary { library: cards, rule, .. } => {
+            let verdict = select::judge(game, rule, &Choice { chooser: request.player, source, candidates: cards, selected });
+            (cards.clone(), verdict)
+        }
+        // Harmonize's creature is up to one (CR 702.180a).
+        RequestKind::TapForPower { purpose: Purpose::TapToReduce, cards, .. } => {
+            let addable = if selected.is_empty() { unchosen(cards) } else { Bits::new(cards.len(), false) };
+            (cards.clone(), Verdict { complete: among(cards) && selected.len() <= 1, addable })
+        }
+        // Crew and saddle (CR 702.122a, 702.171a): any of them, with total power `minimum` or more; signed, a negative power
+        // taking from it (CR 107.1b).
+        RequestKind::TapForPower { cards, powers, minimum, .. } => {
+            let total: i32 = selected.iter().filter_map(|c| cards.iter().position(|x| x == c)).map(|i| i32::from(powers[i])).sum();
+            (cards.clone(), Verdict { complete: among(cards) && total >= i32::from(*minimum), addable: unchosen(cards) })
+        }
+        // Collect evidence (CR 701.59a): total mana value `minimum` or more.
+        RequestKind::CollectEvidence { cards, values, minimum, .. } => {
+            let total: u32 = selected.iter().filter_map(|c| cards.iter().position(|x| x == c)).map(|i| u32::from(values[i])).sum();
+            (cards.clone(), Verdict { complete: among(cards) && total >= u32::from(*minimum), addable: unchosen(cards) })
+        }
+        // Craft's materials (CR 702.167a): `minimum` to `maximum` of them.
+        RequestKind::Craft { cards, minimum, maximum, .. } => {
+            let n = selected.len();
+            let addable = if n < *maximum as usize { unchosen(cards) } else { Bits::new(cards.len(), false) };
+            (cards.clone(), Verdict { complete: among(cards) && n >= *minimum as usize && n <= *maximum as usize, addable })
+        }
+        _ => return None,
+    })
+}
+
 /// Whether `answer` fits `request` (exported as `check_answer`, for a scenario that shows an answer is refused).
 pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Rejected> {
     if *answer == Answer::Cancel {
@@ -117,19 +171,13 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         (RequestKind::PayCosts { announcing: true, most, .. }, Answer::Announce(value)) => {
             if value <= most { Ok(()) } else { no(format!("{value} announced, {most} at most (CR 601.2b)")) }
         }
-        (RequestKind::ChooseCards { eligible, count, up_to, total, purpose, .. }, Answer::Cards(cards)) => {
-            // Counted as wide as the answer is: a count narrowed to the question's width would wrap, and pass a wrong answer.
-            let n = cards.len();
-            let wanted = *count as usize;
-            if !distinct(cards) || !cards.iter().all(|c| eligible.contains(c)) {
+        (RequestKind::ChooseCards { cards: candidates, rule, .. }, Answer::Cards(cards)) | (RequestKind::SearchLibrary { library: candidates, rule, .. }, Answer::Cards(cards)) => {
+            // The question's own rule judges the answer, as it judged each pick (`selection_verdict`).
+            let source = request.kind.source().unwrap_or(ObjectId::NONE);
+            if !distinct(cards) || !cards.iter().all(|c| candidates.contains(c) && rule.listed_card(*c)) {
                 no("not among the cards that may be chosen")
-            } else if n > wanted || (!up_to && n != wanted) {
-                no(format!("{n} chosen, {count} wanted"))
-            } else if *purpose == Purpose::Band && cards.iter().filter(|&&c| !game.chars(c).has(Keyword::Banding)).count() > 1 {
-                // CR 702.22c: one or more creatures with banding and up to one without.
-                no("a band may have at most one creature without banding (CR 702.22c)")
-            } else if let Some(t) = total.as_ref().filter(|t| !t.allows(eligible, cards)) {
-                no(format!("total mana value {}, {} or less wanted (CR 202.3)", t.of(eligible, cards), t.most))
+            } else if !select::answers(game, rule, request.player, source, candidates, cards) {
+                no(refusal(rule, cards.len()))
             } else {
                 Ok(())
             }
@@ -335,17 +383,6 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 None => Ok(()),
             }
         }
-        (RequestKind::SearchLibrary { eligible, count, optional, .. }, Answer::Cards(found)) => {
-            let n = found.len();
-            let wanted = (*count as usize).min(eligible.len());
-            if !distinct(found) || !found.iter().all(|c| eligible.contains(c)) {
-                no("not among the cards the search may find")
-            } else if (*optional && n > *count as usize) || (!*optional && n != wanted) {
-                no(format!("{n} found, {wanted} wanted"))
-            } else {
-                Ok(())
-            }
-        }
         (RequestKind::OrderTriggers { sources, .. }, Answer::Order(order)) => {
             let mut seen = order.clone();
             seen.sort();
@@ -366,4 +403,10 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         }
         _ => no("that is not an answer to this question"),
     }
+}
+
+/// The cards that may be chosen first for a question that picks a set of cards (`selection_verdict` of none chosen): its
+/// eligible cards, for a test or a player reading the question. Empty for any other question.
+pub fn first_choices(game: &Game, request: &Request) -> Vec<ObjectId> {
+    selection_verdict(game, request, &[]).map_or_else(Vec::new, |(cards, verdict)| verdict.addable.ones().map(|i| cards[i]).collect())
 }

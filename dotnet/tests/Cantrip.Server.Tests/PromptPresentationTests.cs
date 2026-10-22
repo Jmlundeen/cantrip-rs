@@ -23,7 +23,7 @@ public sealed class PromptPresentationTests
     {
         var prompt = new ChooseCardsPromptMessage
         {
-            Player = 1, Owner = 1, Source = new ViewHandle(3), Purpose = purpose, Cards = [new ViewHandle(4)], Eligible = [new ViewHandle(4)], Count = 1,
+            Player = 1, Owner = 1, Source = new ViewHandle(3), Purpose = purpose, Cards = [new ViewHandle(4)], Verdict = new() { Addable = [new ViewHandle(4)] }, Count = 1,
         };
 
         PromptPresentationContext? context = PromptPresentation.Describe(prompt, mayCancel, view: null);

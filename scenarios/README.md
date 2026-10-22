@@ -312,7 +312,14 @@ planeswalker while attacking the player costs nothing, CR 508.1d).
 A search, `! Bot1.Search(Plains)`, is checked at that player's next library search, and fails if a Plains is among
 the cards it may find. The card must be in the library searched, or the refusal fails as proving nothing. A search for
 a quality may always find nothing (CR 701.23b), so this is the only way to show a card is not one; the search itself
-is still answered by the next line, `Bot1.Search()` or another card.
+is still answered by the next line, `Bot1.Search()` or another card. Several names that are all among the cards it may
+find are instead one answer, which the search's rule must refuse: `! Bot1.Search(A; B; C)` for "up to two", or two cards
+with a name in common for "with different names".
+
+`Choose(..)` and `Search(..)` lines are answered through the question's own selection rule (docs/engine-design.md,
+"Selection rules"), as a player picks: each name is the first card of that name that may be added to the ones named before
+it, and the cards named together must be an answer; a refusal of one name holds when no card of that name may be picked
+first.
 
 A target, `! Bot1.Target(Lightning Bolt)`, is checked at that player's next target question and fails if the named object is among its
 candidates; it fails as proving nothing when no such card exists anywhere in the game. It shows a spell or ability cannot target something

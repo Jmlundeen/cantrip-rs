@@ -1,10 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::{search_to_graveyard, Find};
+use cantrip_mechanics::{library, select};
 use cantrip_oracle as oracle;
 
 /// Search your library for a card, put that card into your graveyard, then shuffle.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    search_to_graveyard(g, item.controller, item.object, Find::ANY, |_, _| true)?;
+    library::find_to_graveyard(g, item.controller, item.object, select::CARD)?;
     Ok(())
 }
 

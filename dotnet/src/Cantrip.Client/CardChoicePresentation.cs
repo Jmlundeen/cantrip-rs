@@ -62,8 +62,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         bool said = prompt.Purpose is CardChoicePurposeView.Behold or CardChoicePurposeView.Blight;
         string kind = prompt.Kind.Length > 0 ? (said || permanents || table == ZoneKindView.Battlefield ? prompt.Kind : prompt.Kind + " card") : one;
         string many = prompt.Count == 1 && !prompt.AnyNumber ? kind : kind.EndsWith('y') ? kind[..^1] + "ies" : kind + "s";
-        // "Up to two creature cards with total mana value 6 or less" (CR 202.3): the cards chosen together, not each one.
-        if (prompt.MaximumTotalManaValue is { } within) many += $" with total mana value {within} or less";
+        // What the question's rule asks of the cards together or each beyond their noun, in its own words: "up to two creature
+        // cards with total mana value 6 or less" (CR 202.3), "two cards with different names" (CR 201.2b).
+        foreach (string words in prompt.Words) many += " " + words;
         string article = "aeiou".Contains(kind[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a";
         // "Any number of": every one of several that may be chosen, as the rules text says when it does not name a count.
         bool anyNumber = prompt.AnyNumber;
@@ -79,8 +80,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             _ when outside => "  ·  from your sideboard, which only you can see",
             _ => string.Empty,
         };
-        int power = Cantrip.Core.Decisions.TotalPower.Of(prompt.Eligible, prompt.Powers, picked.Select(h => new ViewHandle(h)));
-        int manaValue = Cantrip.Core.Decisions.TotalManaValue.Of(prompt.Eligible, prompt.ManaValues, picked.Select(h => new ViewHandle(h)));
+        int power = Cantrip.Core.Decisions.TotalPower.Of(prompt.Cards, prompt.Powers, picked.Select(h => new ViewHandle(h)));
+        int manaValue = Cantrip.Core.Decisions.TotalManaValue.Of(prompt.Cards, prompt.ManaValues, picked.Select(h => new ViewHandle(h)));
         // Craft (CR 702.167a): the materials are permanents you control and cards in your graveyard, of the quality the ability
         // names, exiled with the crafting permanent as its cost.
         bool craft = prompt.Purpose == CardChoicePurposeView.Craft;
@@ -193,13 +194,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",
         };
-        bool valid = picked.Distinct().Count() == picked.Count
-            && picked.All(handle => prompt.Eligible.Any(eligible => eligible.Value == handle))
-            && (prompt.UpTo ? picked.Count <= prompt.Count && picked.Count >= prompt.Minimum : picked.Count == prompt.Count)
-            && power >= prompt.MinimumPower
-            && manaValue >= prompt.MinimumManaValue
-            && (prompt.MaximumTotalManaValue is not { } limit || manaValue <= limit)
-            && (prompt.Purpose != CardChoicePurposeView.Band || withoutBanding <= 1);
+        // Whether the cards picked are an answer is the rules' word (the question's selection rule), asked of the host once for
+        // each selection as it changes; until it comes back, they are not offered as one.
+        bool valid = Judged(client, prompt, picked)?.Complete == true;
         bool answersOnLastPick = table == ZoneKindView.Battlefield && !prompt.UpTo && prompt.MinimumPower == 0 && prompt.MinimumManaValue == 0
             && prompt.Count > 0 && !ordered;
         return new(title, detail, Origins(client, prompt.Cards, context) + $"  ·  {prompt.Cards.Count} card{(prompt.Cards.Count == 1 ? "" : "s")}",
@@ -207,18 +204,36 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
     }
 
     /// <summary>
-    /// Whether clicking <paramref name="handle"/> keeps a choice "with total mana value N or less" (CR 202.3) within it: a card
-    /// that would take the picked cards over the limit is refused, as the engine would refuse the answer. A picked card can
-    /// always be clicked (to put it back), and any card can when the choice has no such limit. With one to choose, a click
-    /// trades, so the card is judged alone.
+    /// Whether clicking <paramref name="handle"/> may add it to the cards picked, by the question's rule as the host judged
+    /// the cards picked so far: a card the rule would refuse with them ("with total mana value N or less", CR 202.3; "with
+    /// different names", CR 201.2b) is not offered, as the engine would refuse the answer. A picked card can always be clicked
+    /// (to put it back). With one to choose, a click trades, so the card is judged alone. Until the host's word on the cards
+    /// picked comes back, nothing more is offered.
     /// </summary>
-    public static bool Fits(ChooseCardsPromptMessage prompt, IReadOnlyList<int> picked, int handle)
+    public static bool Fits(GameClient client, ChooseCardsPromptMessage prompt, IReadOnlyList<int> picked, int handle)
     {
+        ArgumentNullException.ThrowIfNull(client);
         ArgumentNullException.ThrowIfNull(prompt);
         ArgumentNullException.ThrowIfNull(picked);
-        if (prompt.MaximumTotalManaValue is null || picked.Contains(handle)) return true;
-        IEnumerable<int> after = prompt.Count == 1 ? [handle] : picked.Append(handle);
-        return Cantrip.Core.Decisions.TotalManaValue.Within(prompt.Eligible, prompt.ManaValues, after.Select(h => new ViewHandle(h)), prompt.MaximumTotalManaValue);
+        if (picked.Contains(handle)) return true;
+        SelectionVerdictView? verdict = prompt.Count == 1 ? prompt.Verdict : Judged(client, prompt, picked);
+        return verdict?.Addable.Exists(card => card.Value == handle) == true;
+    }
+
+    /// <summary>
+    /// The rules' word on the cards <paramref name="picked"/> for <paramref name="prompt"/>: its own verdict for none, and for
+    /// any other selection the host's, asked the first time those cards are picked and null until it comes back.
+    /// </summary>
+    public static SelectionVerdictView? Judged(GameClient client, ISelectionPrompt prompt, IReadOnlyList<int> picked)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(prompt);
+        ArgumentNullException.ThrowIfNull(picked);
+        if (picked.Count == 0) return prompt.Verdict;
+        List<ViewHandle> selection = [.. picked.Select(h => new ViewHandle(h))];
+        SelectionVerdictView? verdict = client.Verdict(selection);
+        if (verdict is null) client.Check(selection);
+        return verdict;
     }
 
     public static ZoneKindView? ChoiceTable(GameClient client, ChooseCardsPromptMessage prompt)

@@ -548,9 +548,9 @@ public sealed class DecisionTests
             {
                 Player = Me,
                 Count = 1,
-                Optional = true,
+                CountKind = CountKindView.UpTo,
                 Library = [Handle(1), Handle(2)],
-                Eligible = [Handle(1), Handle(2)],
+                Verdict = new() { Addable = [Handle(1), Handle(2)] },
                 Destination = SearchDestinationView.Hand,
             });
 

@@ -56,7 +56,7 @@ public static class AutoPlay
 
             case ChooseCardsPromptMessage choose:
                 // The first eligible cards. Which card hurts most to lose is strategy this does not have.
-                client.Answer(new CardsChosenAnswer { Cards = [.. choose.Eligible.Take(choose.Count)] });
+                client.Answer(new CardsChosenAnswer { Cards = [.. choose.Verdict.Addable.Take(choose.Count)] });
                 return true;
 
             case DistributeCardsPromptMessage distribute:
@@ -90,7 +90,7 @@ public static class AutoPlay
             case SearchLibraryPromptMessage search:
                 // Takes the first cards it is allowed to. Which card is worth having is strategy this does not have,
                 // and taking the most allowed is legal whether or not the search was optional.
-                client.Answer(new CardsChosenAnswer { Cards = [.. search.Eligible.Take(search.Count)] });
+                client.Answer(new CardsChosenAnswer { Cards = [.. search.Verdict.Addable.Take(search.Count)] });
                 return true;
 
             case ChooseTargetPromptMessage target:

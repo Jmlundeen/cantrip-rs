@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::{Find, search_to_hand};
+use cantrip_mechanics::{library, select};
 use cantrip_oracle as oracle;
 
 /// "Discard a creature card": a creature card in the activator's hand.
@@ -10,7 +10,7 @@ fn creature_card(q: &dyn Query, _: &Asker, card: ObjectId) -> bool {
 /// Search your library for a creature card, reveal it, put it into your hand, then shuffle. The search may come up
 /// empty; the shuffle follows either way.
 fn tutor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    search_to_hand(g, item.controller, item.object, Find::ONE.revealed(), |q, c| q.chars(c).is(CardType::Creature))?;
+    library::find_to_hand(g, item.controller, item.object, select::CREATURE_CARD, true)?;
     Ok(())
 }
 

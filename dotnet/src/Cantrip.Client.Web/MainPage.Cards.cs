@@ -91,7 +91,7 @@ public sealed partial class MainPage
                 break;
 
             case ChooseCardsPromptMessage choose when CardChoicePresentation.ChoiceTable(client, choose) is not null:
-                _eligible.UnionWith(choose.Eligible.Select(handle => handle.Value));
+                _eligible.UnionWith(choose.Verdict.Addable.Select(handle => handle.Value));
                 break;
 
             case ChooseDividedTargetsPromptMessage divide:
@@ -254,8 +254,8 @@ public sealed partial class MainPage
                     Selected: _picked.Contains(handle),
                     Dimmed: !_eligible.Contains(handle),
                     Actionable: _eligible.Contains(handle) && !_picked.Contains(handle) && _selection.CanPick(choose.Count)
-                        && CardChoicePresentation.Fits(choose, _picked, handle),
-                    Clicked: _eligible.Contains(handle) && (_picked.Contains(handle) || _selection.CanPick(choose.Count) && CardChoicePresentation.Fits(choose, _picked, handle))
+                        && CardChoicePresentation.Fits(client, choose, _picked, handle),
+                    Clicked: _eligible.Contains(handle) && (_picked.Contains(handle) || _selection.CanPick(choose.Count) && CardChoicePresentation.Fits(client, choose, _picked, handle))
                         ? () => PickOnBoard(client, choose, handle)
                         : null,
                     Annotation: PutBackAnnotation(choose, handle)),
@@ -344,7 +344,7 @@ public sealed partial class MainPage
                 : at == prompt.Count - 1 ? "On top" : $"{at + 1}"
             // A choice "with total mana value N or less" (CR 202.3): what each card it may take counts, as the engine read it
             // (an {X} in a library is 0, CR 202.3e).
-            : prompt.MaximumTotalManaValue is not null && prompt.Eligible.FindIndex(card => card.Value == handle) is >= 0 and var index
+            : prompt.MaximumTotalManaValue is not null && prompt.Cards.FindIndex(card => card.Value == handle) is >= 0 and var index
                 && index < prompt.ManaValues.Count
                 ? $"Mana value {prompt.ManaValues[index]}"
             : null;
@@ -547,10 +547,18 @@ public sealed partial class MainPage
     {
         Pick(handle, choose.Count);
 
+        // The click that reaches an exact number of permanents answers, once the host calls the cards picked an answer.
         CardChoicePresentation model = CardChoicePresentation.Describe(client, choose, _picked);
-        if (model.AnswersOnLastPick && model.CanSubmit)
+        if (model.AnswersOnLastPick && _picked.Count == choose.Count)
         {
-            Send(client, new CardsChosenAnswer { Cards = [.. _picked.Select(h => new ViewHandle(h))] });
+            if (model.CanSubmit)
+            {
+                Send(client, new CardsChosenAnswer { Cards = [.. _picked.Select(h => new ViewHandle(h))] });
+            }
+            else
+            {
+                _answerWhenJudged = true;
+            }
         }
     }
 

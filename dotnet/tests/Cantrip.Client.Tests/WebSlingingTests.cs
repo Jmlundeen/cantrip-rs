@@ -50,7 +50,7 @@ public sealed class WebSlingingTests
         Source = Handle(90),
         Purpose = CardChoicePurposeView.ReturnToHand,
         Cards = [.. creatures.Select(Handle)],
-        Eligible = [.. creatures.Select(Handle)],
+        Verdict = new() { Addable = [.. creatures.Select(Handle)] },
         Count = 1,
         Kind = "tapped creature",
     };

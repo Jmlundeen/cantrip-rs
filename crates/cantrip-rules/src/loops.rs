@@ -60,7 +60,11 @@ pub fn forced(kind: &RequestKind) -> bool {
         RequestKind::ChooseTarget { candidates, optional, least, count, any_number, .. } => {
             !optional && !any_number && least == count && *count as usize == candidates.len()
         }
-        RequestKind::ChooseCards { eligible, count, up_to, .. } => !up_to && *count as usize == eligible.len(),
+        // Every one of the cards it may take, and nothing else for its rule to judge.
+        RequestKind::ChooseCards { cards, rule, .. } => {
+            let eligible = rule.among.as_ref().map_or(cards.len(), Vec::len);
+            rule.parts().next().is_none() && rule.count == Count::Exactly(count_u32(eligible))
+        }
         RequestKind::ChooseModes { eligible, count, at_most, repeat, .. } => !repeat && *at_most == 0 && *count as usize == eligible.len(),
         RequestKind::ChoosePlayer { candidates, .. } => candidates.len() == 1,
         RequestKind::OrderTriggers { abilities, .. } => abilities.len() < 2,

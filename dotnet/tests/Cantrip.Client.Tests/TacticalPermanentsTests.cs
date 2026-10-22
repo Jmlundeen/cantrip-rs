@@ -271,7 +271,7 @@ public sealed class TacticalPermanentsTests
             Player = Me,
             Count = 1,
             Library = [Handle(20), Handle(21)],
-            Eligible = [Handle(20), Handle(21)],
+            Verdict = new() { Addable = [Handle(20), Handle(21)] },
             Destination = destination,
         };
 
@@ -555,7 +555,7 @@ public sealed class TacticalPermanentsTests
             Source = Handle(2),
             Purpose = CardChoicePurposeView.TapToPay,
             Cards = [Handle(3), Handle(4)],
-            Eligible = [Handle(3), Handle(4)],
+            Verdict = new() { Addable = [Handle(3), Handle(4)] },
             Count = 1,
         };
         Assert.Equal([Handle(4)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt)).Cards);
@@ -590,9 +590,9 @@ public sealed class TacticalPermanentsTests
             Owner = Me,
             Purpose = CardChoicePurposeView.ExileToPay,
             Cards = [Handle(3), Handle(4), Handle(5), Handle(6)],
-            Eligible = [Handle(3), Handle(4), Handle(5), Handle(6)],
+            Verdict = new() { Addable = [Handle(3), Handle(4), Handle(5), Handle(6)] },
             Count = 4,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
             MinimumManaValue = 6,
             ManaValues = [3, 0, 4, 2],
         };
@@ -620,9 +620,9 @@ public sealed class TacticalPermanentsTests
             Owner = Me,
             Purpose = CardChoicePurposeView.PutOntoBattlefield,
             Cards = [Handle(3), Handle(4), Handle(5)],
-            Eligible = [Handle(3), Handle(4), Handle(5)],
+            Verdict = new() { Addable = [Handle(3), Handle(4), Handle(5)] },
             Count = 2,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
             Kind = "creature",
             ManaValues = [4, 3, 2],
             MaximumTotalManaValue = 6,
@@ -647,16 +647,16 @@ public sealed class TacticalPermanentsTests
             Owner = Me,
             Purpose = CardChoicePurposeView.Craft,
             Cards = [Handle(3), Handle(4), Handle(5)],
-            Eligible = [Handle(3), Handle(4), Handle(5)],
+            Verdict = new() { Addable = [Handle(3), Handle(4), Handle(5)] },
             Count = 3,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
             Minimum = 1,
             Kind = "creature",
         };
 
         Assert.Equal([Handle(4)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt)).Cards);
 
-        prompt.UpTo = false;
+        prompt.CountKind = CountKindView.Exactly;
         prompt.Minimum = 0;
         prompt.Count = 2;
         Assert.Equal([Handle(4), Handle(3)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt)).Cards);
@@ -707,9 +707,9 @@ public sealed class TacticalPermanentsTests
             Source = Handle(2),
             Purpose = CardChoicePurposeView.TapToPay,
             Cards = [Handle(3), Handle(4), Handle(5)],
-            Eligible = [Handle(3), Handle(4), Handle(5)],
+            Verdict = new() { Addable = [Handle(3), Handle(4), Handle(5)] },
             Count = 3,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
             MinimumPower = 3,
             Powers = [3, 1, 2],
         };

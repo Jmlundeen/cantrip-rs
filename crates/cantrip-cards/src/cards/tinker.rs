@@ -1,11 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::{search_to_battlefield, Find};
+use cantrip_mechanics::{library, select};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
 /// Search your library for an artifact card, put that card onto the battlefield, then shuffle.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    search_to_battlefield(g, item.controller, item.object, Find::ONE, false, |q, c| q.chars(c).is(CardType::Artifact))?;
+    library::find_to_battlefield(g, item.controller, item.object, select::ARTIFACT_CARD, false)?;
     Ok(())
 }
 

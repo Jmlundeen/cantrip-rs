@@ -116,6 +116,12 @@ public sealed partial class MainPage
                 busy.Add("redraw");
             }
 
+            // A choice of cards whose picks the host is still judging, or an answer being settled with it before it is sent.
+            if (client is not null && (client.IsChecking || client.IsSettling))
+            {
+                busy.Add("verdict");
+            }
+
             if (DeckEditorShown && _catalog is null && _catalogFailure is null)
             {
                 busy.Add("catalog");

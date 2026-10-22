@@ -443,10 +443,16 @@ public sealed class Champion
                 case "Send" when args is [{ } message]:
                     byte[] bytes = (byte[])Champion._serialize.Invoke(null, [message, null, default(CancellationToken)])!;
 
-                    // Only an answer is this seat's to send: the lab has already joined the table for it.
-                    if (MessagePackSerializer.Deserialize<ClientMessage>(bytes) is AnswerMessage answer && Outbound is { IsWaitingOnMe: true } client)
+                    // Only an answer, and a check of the choice it is making, are this seat's to send: the lab has already joined
+                    // the table for it.
+                    ClientMessage sent = MessagePackSerializer.Deserialize<ClientMessage>(bytes);
+                    if (sent is AnswerMessage answer && Outbound is { IsWaitingOnMe: true } client)
                     {
                         client.Answer(answer.Answer);
+                    }
+                    else if (sent is CheckSelectionMessage check && Outbound is { } checking)
+                    {
+                        checking.Check(check.Selected);
                     }
 
                     return null;

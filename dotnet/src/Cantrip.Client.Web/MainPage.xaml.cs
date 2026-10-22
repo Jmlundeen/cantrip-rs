@@ -1466,6 +1466,7 @@ public sealed partial class MainPage : Page
             _lastPromptId = promptId;
             _choiceCollapsed = false;
             _selection.Clear();
+            _answerWhenJudged = false;
             _peekedForTargets = false;
         }
 

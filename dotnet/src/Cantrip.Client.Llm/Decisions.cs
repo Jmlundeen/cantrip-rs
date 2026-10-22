@@ -1238,7 +1238,7 @@ public sealed class Decisions
 
     private AnswerPayload Cards(GameClient client, ChooseCardsPromptMessage prompt)
     {
-        if (prompt.Eligible.Count == 0 || prompt.Count == 0)
+        if (prompt.Verdict.Addable.Count == 0 || prompt.Count == 0)
         {
             return prompt.Default();
         }
@@ -1260,17 +1260,22 @@ public sealed class Decisions
             return new CardsChosenAnswer { Cards = WithinManaValue(client, prompt, what, most) };
         }
 
-        int count = Math.Min(prompt.Count, prompt.Eligible.Count);
+        int count = Math.Min(prompt.Count, prompt.Verdict.Addable.Count);
 
+        // What the question's rule asks of the cards together ("with total mana value 6 or less", "with different names") is said;
+        // the rules judge the cards picked, and a set they refuse is cut back to the best of it they take (GameClient.Answer).
         IReadOnlyList<int> picks = Many(new Question
         {
             Heading = what,
-            Choices = [.. prompt.Eligible.Select(card => GameText.Named(client, card))],
+            Note = prompt.Words.Count > 0
+                ? $"The cards chosen must also be {string.Join(" and ", prompt.Words)}; pick them in the order you want them most."
+                : string.Empty,
+            Choices = [.. prompt.Verdict.Addable.Select(card => GameText.Named(client, card))],
             Picks = count,
             UpTo = prompt.UpTo,
         });
 
-        List<ViewHandle> chosen = [.. picks.Select(pick => prompt.Eligible[pick])];
+        List<ViewHandle> chosen = [.. picks.Select(pick => prompt.Verdict.Addable[pick])];
 
         // A band (CR 702.22c) has at most one creature without banding: the first picked stays.
         if (prompt.Purpose == CardChoicePurposeView.Band)
@@ -1280,14 +1285,14 @@ public sealed class Decisions
         }
 
         // Craft's "one or more" (CR 702.167a): an answer short of the least it takes is made up with the first ones offered.
-        chosen.AddRange(prompt.Eligible.Where(card => !chosen.Contains(card)).Take(Math.Max(prompt.Minimum - chosen.Count, 0)));
+        chosen.AddRange(prompt.Verdict.Addable.Where(card => !chosen.Contains(card)).Take(Math.Max(prompt.Minimum - chosen.Count, 0)));
         return new CardsChosenAnswer { Cards = chosen };
     }
 
     /// <summary>A choice that has to add up to a total power, as saddle's does (CR 702.171a): one creature at a time.</summary>
     private List<ViewHandle> ToPower(GameClient client, ChooseCardsPromptMessage prompt, string what)
     {
-        List<int> left = [.. Enumerable.Range(0, prompt.Eligible.Count)];
+        List<int> left = [.. Enumerable.Range(0, prompt.Cards.Count)];
         List<ViewHandle> taken = [];
         int power = 0;
 
@@ -1299,11 +1304,11 @@ public sealed class Decisions
                 Note = string.Create(
                     CultureInfo.InvariantCulture,
                     $"You need {prompt.MinimumPower} total power and have {power} so far."),
-                Choices = [.. left.Select(index => GameText.Creature(client, prompt.Eligible[index]))],
+                Choices = [.. left.Select(index => GameText.Creature(client, prompt.Cards[index]))],
             });
 
             int chosen = left[pick];
-            taken.Add(prompt.Eligible[chosen]);
+            taken.Add(prompt.Cards[chosen]);
             power += chosen < prompt.Powers.Count ? prompt.Powers[chosen] : 0;
             left.RemoveAt(pick);
         }
@@ -1314,7 +1319,7 @@ public sealed class Decisions
     /// <summary>A choice that has to add up to a total mana value, as collect evidence's does (CR 701.59a): one card at a time.</summary>
     private List<ViewHandle> ToManaValue(GameClient client, ChooseCardsPromptMessage prompt, string what)
     {
-        List<int> left = [.. Enumerable.Range(0, prompt.Eligible.Count)];
+        List<int> left = [.. Enumerable.Range(0, prompt.Cards.Count)];
         List<ViewHandle> taken = [];
         int total = 0;
 
@@ -1326,11 +1331,11 @@ public sealed class Decisions
                 Note = string.Create(
                     CultureInfo.InvariantCulture,
                     $"You need total mana value {prompt.MinimumManaValue} and have {total} so far."),
-                Choices = [.. left.Select(index => GameText.Named(client, prompt.Eligible[index]))],
+                Choices = [.. left.Select(index => GameText.Named(client, prompt.Cards[index]))],
             });
 
             int chosen = left[pick];
-            taken.Add(prompt.Eligible[chosen]);
+            taken.Add(prompt.Cards[chosen]);
             total += chosen < prompt.ManaValues.Count ? prompt.ManaValues[chosen] : 0;
             left.RemoveAt(pick);
         }
@@ -1341,17 +1346,18 @@ public sealed class Decisions
     /// <summary>
     /// A choice "with total mana value N or less" (CR 202.3), as Michelangelo's Technique's "up to two creature cards with total
     /// mana value 6 or less": one card at a time, each offered with its mana value, only those that still fit what is left of
-    /// the limit, and stopping is a choice of its own.
+    /// the limit, and stopping is a choice of its own. The rule's verdicts judge the cards (GameClient.Answer).
     /// </summary>
     private List<ViewHandle> WithinManaValue(GameClient client, ChooseCardsPromptMessage prompt, string what, int most)
     {
+        List<ViewHandle> eligible = prompt.Verdict.Addable;
         List<ViewHandle> taken = [];
         int total = 0;
 
         while (taken.Count < prompt.Count)
         {
-            List<int> fitting = [.. Enumerable.Range(0, prompt.Eligible.Count)
-                .Where(index => !taken.Contains(prompt.Eligible[index]) && total + ManaValueAt(prompt, index) <= most)];
+            List<int> fitting = [.. Enumerable.Range(0, eligible.Count)
+                .Where(index => !taken.Contains(eligible[index]) && total + ManaValueOf(prompt, eligible[index]) <= most)];
             if (fitting.Count == 0)
             {
                 break;
@@ -1363,7 +1369,7 @@ public sealed class Decisions
                 Note = string.Create(
                     CultureInfo.InvariantCulture,
                     $"The cards chosen together may have a total mana value of at most {most}; {total} is taken so far, by {taken.Count} of at most {prompt.Count} card(s). Only cards that still fit are listed."),
-                Choices = [.. fitting.Select(index => string.Create(CultureInfo.InvariantCulture, $"{GameText.Named(client, prompt.Eligible[index])} (mana value {ManaValueAt(prompt, index)})")),
+                Choices = [.. fitting.Select(index => string.Create(CultureInfo.InvariantCulture, $"{GameText.Named(client, eligible[index])} (mana value {ManaValueOf(prompt, eligible[index])})")),
                     "Take no more cards"],
             });
 
@@ -1372,14 +1378,16 @@ public sealed class Decisions
                 break;
             }
 
-            taken.Add(prompt.Eligible[fitting[pick]]);
-            total += ManaValueAt(prompt, fitting[pick]);
+            taken.Add(eligible[fitting[pick]]);
+            total += ManaValueOf(prompt, eligible[fitting[pick]]);
         }
 
         return taken;
     }
 
-    private static int ManaValueAt(ChooseCardsPromptMessage prompt, int index) => index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0;
+    /// <summary>A card's mana value as the prompt gives it, index for index with its cards.</summary>
+    private static int ManaValueOf(ChooseCardsPromptMessage prompt, ViewHandle card) =>
+        prompt.Cards.IndexOf(card) is >= 0 and var at && at < prompt.ManaValues.Count ? prompt.ManaValues[at] : 0;
 
     /// <summary>What a choice of cards is for, in the words the card would use.</summary>
     private static string Purpose(GameClient client, ChooseCardsPromptMessage prompt)
@@ -1469,14 +1477,14 @@ public sealed class Decisions
 
     private AnswerPayload Search(GameClient client, SearchLibraryPromptMessage prompt)
     {
-        if (prompt.Eligible.Count == 0)
+        if (prompt.Verdict.Addable.Count == 0)
         {
             return new CardsChosenAnswer();
         }
 
-        int count = Math.Min(prompt.Count, prompt.Eligible.Count);
+        int count = Math.Min(prompt.Count, prompt.Verdict.Addable.Count);
 
-        if (prompt.Eligible.Count > MostChoices)
+        if (prompt.Verdict.Addable.Count > MostChoices)
         {
             // A library too long to offer as a list. Taking what the prompt itself would is better than offering the
             // first sixty cards and calling it a search.
@@ -1487,7 +1495,7 @@ public sealed class Decisions
 
         IReadOnlyList<int> picks = Many(new Question
         {
-            Heading = $"You are searching {library} for {(prompt.AnyNumber ? "any number of cards" : count == 1 ? "a card" : $"{count} cards")}, "
+            Heading = $"You are searching {library} for {(prompt.AnyNumber ? $"any number of {Noun(prompt.Kind, 2)}" : count == 1 ? $"{Noun(prompt.Kind, 1)}" : $"{count} {Noun(prompt.Kind, 2)}")}, "
                 + (prompt.Destination switch
                 {
                     SearchDestinationView.Found => "and what becomes of it is decided once it is found. What do you take?",
@@ -1495,13 +1503,21 @@ public sealed class Decisions
                         "and it is revealed: a land card goes onto the battlefield tapped, any other card into your hand. What do you take?",
                     _ => $"to go to {Destination(prompt.Destination)}. What do you take?",
                 }),
-            Note = prompt.Optional ? "You may find nothing, which shuffles the library and takes nothing." : string.Empty,
-            Choices = [.. prompt.Eligible.Select(card => GameText.Named(client, card))],
+            Note = (prompt.Optional ? "You may find nothing, which shuffles the library and takes nothing." : string.Empty)
+                + (prompt.Words.Count > 0 ? $" The cards found must also be {string.Join(" and ", prompt.Words)}; pick them in the order you want them most." : string.Empty),
+            Choices = [.. prompt.Verdict.Addable.Select(card => GameText.Named(client, card))],
             Picks = count,
             UpTo = prompt.Optional,
         });
 
-        return new CardsChosenAnswer { Cards = [.. picks.Select(pick => prompt.Eligible[pick])] };
+        return new CardsChosenAnswer { Cards = [.. picks.Select(pick => prompt.Verdict.Addable[pick])] };
+    }
+
+    /// <summary>The cards a search looks for, in its rule's noun: "a basic land card", "basic land cards", "a card".</summary>
+    private static string Noun(string kind, int count)
+    {
+        string noun = kind.Length > 0 ? kind + " card" : "card";
+        return count == 1 ? ("aeiou".Contains(noun[0], StringComparison.OrdinalIgnoreCase) ? "an " : "a ") + noun : noun + "s";
     }
 
     private static string Destination(SearchDestinationView destination) => destination switch

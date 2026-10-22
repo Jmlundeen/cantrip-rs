@@ -1,14 +1,46 @@
 //! A player choosing as an effect resolves (CR 608.2d): a card, some cards, or a player, asked as the core's question and
 //! answered as the thing chosen. The core checks every answer against its question before it is taken (a card that was
-//! not offered, or the wrong number of them, is refused and asked again), so a card's file reads the choice and nothing
+//! not offered, or a set its rule refuses, is refused and asked again), so a card's file reads the choice and nothing
 //! else; what it does with "nothing to choose" is its own.
+//!
+//! **A choice of cards is `select`**, with a rule from `crate::select` ("up to two creature cards", "two cards with
+//! different names"). The older functions below that take a list of eligible cards and a count (`card`, `cards`,
+//! `card_from`, `cards_from`, `cards_from_kind`, `any_number_of`, `cards_within_total`) are kept for existing cards; new
+//! cards use `select`.
 
+use crate::select::{total_mana_value_at_most, Count, Selection};
 use cantrip_api::*;
+
+/// "Choose [cards]": the cards `rule` allows (`crate::select`: how many, of what quality, together how), chosen from among
+/// `cards`, every one of which the player sees - a revealed hand, the cards looked at, a graveyard. Asked whenever there are
+/// cards to show, even when none of them may be chosen (seeing them is part of the effect: Duress); a caller with nothing
+/// to show asks nothing. The cards chosen come back in the order chosen; none when the choice is a discard or sacrifice the
+/// player can't be made to make (CR 101.2).
+pub fn select(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, rule: Selection) -> Result<Vec<ObjectId>, Suspend> {
+    if cards.is_empty() {
+        return Ok(Vec::new());
+    }
+    match g.ask(player, select_question(source, purpose, cards, rule))? {
+        Answer::Cards(chosen) => Ok(chosen),
+        _ => Ok(Vec::new()),
+    }
+}
+
+/// The question `select` asks, for a card written as explicit stages, which asks it with `Game::ask_then` (Duress).
+pub fn select_question(source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, rule: Selection) -> RequestKind {
+    RequestKind::ChooseCards { source, purpose, cards, rule: Box::new(rule) }
+}
+
+/// The count an older choice of `count` (or up to `count`) of `eligible` asks: no more than there are eligible cards.
+fn listed_count(eligible: &[ObjectId], count: u32, up_to: bool) -> Count {
+    let count = count.min(count_u32(eligible.len()));
+    if up_to { Count::UpTo(count) } else { Count::Exactly(count) }
+}
 
 /// `count` of `eligible` (or up to `count` with `up_to`), chosen from among `shown`, every one of which the player sees:
 /// Aesir Escape Valhalla shows the whole graveyard and lets only its permanent cards be chosen. Nothing is asked when
 /// nothing is eligible. Fewer than `count` come back only when fewer were eligible, or when the choice is a discard or
-/// sacrifice the player can't be made to make (CR 101.2).
+/// sacrifice the player can't be made to make (CR 101.2). Kept for existing cards; new cards use `select`.
 pub fn cards_from(
     g: &mut dyn Game,
     player: PlayerId,
@@ -24,6 +56,7 @@ pub fn cards_from(
 
 /// `cards_from` for a choice the asking card words with more than "card": `kind` is its own filter ("nonland", "artifact or
 /// creature"), which the question says to the chooser. Elite Spellbinder and Tidehollow Sculler print "a nonland card".
+/// Kept for existing cards; new cards use `select`.
 pub fn cards_from_kind(
     g: &mut dyn Game,
     player: PlayerId,
@@ -38,11 +71,13 @@ pub fn cards_from_kind(
     if eligible.is_empty() || count == 0 {
         return Ok(Vec::new());
     }
-    ask_cards(g, player, RequestKind::ChooseCards { any_number: false, source, purpose, cards: shown, eligible, count, up_to, kind, total: None })
+    let rule = Selection::listed(listed_count(&eligible, count, up_to), &shown, eligible).called(kind);
+    select(g, player, source, purpose, shown, rule)
 }
 
 /// "Any number of" `eligible` (CR 608.2d: none, some or all), chosen from among `shown`, every one of which the player sees,
-/// the choice worded as the card words it (`kind`, empty for "card"). Nothing is asked when nothing is eligible.
+/// the choice worded as the card words it (`kind`, empty for "card"). Nothing is asked when nothing is eligible. Kept for
+/// existing cards; new cards use `select` with `select::ANY_NUMBER`.
 pub fn any_number_of(
     g: &mut dyn Game,
     player: PlayerId,
@@ -55,15 +90,14 @@ pub fn any_number_of(
     if eligible.is_empty() {
         return Ok(Vec::new());
     }
-    let count = u32::try_from(eligible.len()).unwrap_or(u32::MAX);
-    ask_cards(g, player, RequestKind::ChooseCards { any_number: true, source, purpose, cards: shown, eligible, count, up_to: true, kind, total: None })
+    let rule = Selection::listed(crate::select::ANY_NUMBER, &shown, eligible).called(kind);
+    select(g, player, source, purpose, shown, rule)
 }
 
-/// Up to `count` of `eligible` "with total mana value `most` or less" (CR 202.3), chosen from among `shown`: the mana values
-/// of the cards chosen together add up to at most `most`, each read where the card is now (an {X} in a library or graveyard
-/// is 0, CR 202.3e). A card worth more than `most` by itself is not eligible; the core refuses a choice whose total is too
+/// Up to `count` of `eligible` "with total mana value `most` or less" (CR 202.3, `select::total_mana_value_at_most`), chosen
+/// from among `shown`. A card worth more than `most` by itself is not eligible; the core refuses a choice whose total is too
 /// much. Nothing is asked when nothing is eligible. Michelangelo's Technique (up to two, 6), Lively Dirge (up to two, 4)
-/// and Ao, the Dawn Sky (any number, 4) print it.
+/// and Ao, the Dawn Sky (any number, 4) print it. Kept for existing cards; new cards use `select` with that part.
 pub fn cards_within_total(
     g: &mut dyn Game,
     player: PlayerId,
@@ -75,39 +109,28 @@ pub fn cards_within_total(
     count: u32,
     most: u32,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let (eligible, values): (Vec<ObjectId>, Vec<u32>) =
-        eligible.into_iter().map(|c| (c, g.mana_value(c))).filter(|&(_, value)| value <= most).unzip();
+    let eligible: Vec<ObjectId> = eligible.into_iter().filter(|&c| g.mana_value(c) <= most).collect();
     if eligible.is_empty() || count == 0 {
         return Ok(Vec::new());
     }
-    let total = Some(TotalAtMost { values, most });
-    ask_cards(g, player, RequestKind::ChooseCards { any_number: false, source, purpose, cards: shown, eligible, count, up_to: true, kind, total })
-}
-
-/// Asks a `ChooseCards` question, its count no more than there are eligible cards ("any number" says so apart, `any_number`).
-fn ask_cards(g: &mut dyn Game, player: PlayerId, mut ask: RequestKind) -> Result<Vec<ObjectId>, Suspend> {
-    if let RequestKind::ChooseCards { eligible, count, .. } = &mut ask {
-        *count = (*count).min(u32::try_from(eligible.len()).unwrap_or(u32::MAX));
-    }
-    match g.ask(player, ask)? {
-        Answer::Cards(chosen) => Ok(chosen),
-        _ => Ok(Vec::new()),
-    }
+    let rule = Selection::listed(listed_count(&eligible, count, true), &shown, eligible).called(kind).with(total_mana_value_at_most(most));
+    select(g, player, source, purpose, shown, rule)
 }
 
 /// `count` of `among` (or up to `count` with `up_to`), all of them shown: `cards_from` with nothing shown but what may be
-/// chosen.
+/// chosen. Kept for existing cards; new cards use `select`.
 pub fn cards(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, among: Vec<ObjectId>, count: u32, up_to: bool) -> Result<Vec<ObjectId>, Suspend> {
     cards_from(g, player, source, purpose, among.clone(), among, count, up_to)
 }
 
 /// One of `among`, asked even when the choice is forced: none only when `among` is empty, or when the choice is a discard
-/// or sacrifice the player can't be made to make (CR 101.2).
+/// or sacrifice the player can't be made to make (CR 101.2). Kept for existing cards; new cards use `select`.
 pub fn card(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, among: Vec<ObjectId>) -> Result<Option<ObjectId>, Suspend> {
     Ok(cards(g, player, source, purpose, among, 1, false)?.first().copied())
 }
 
-/// One of `eligible`, chosen from among `shown`: `card` for a choice made in view of cards that may not be chosen.
+/// One of `eligible`, chosen from among `shown`: `card` for a choice made in view of cards that may not be chosen. Kept for
+/// existing cards; new cards use `select`.
 pub fn card_from(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, shown: Vec<ObjectId>, eligible: Vec<ObjectId>) -> Result<Option<ObjectId>, Suspend> {
     Ok(cards_from(g, player, source, purpose, shown, eligible, 1, false)?.first().copied())
 }

@@ -94,8 +94,10 @@ fn play(first: &[&str], steps: &[(ActionKind, &str, u8)], exile: &str) -> (Game,
                 }
             }
             RequestKind::Priority { .. } => Answer::Pass,
-            RequestKind::ChooseCards { purpose, eligible, count, kind, .. } => {
-                asked.push(Asked { purpose: *purpose, kind, count: *count, among: eligible.iter().map(|&c| game.name(c).to_string()).collect() });
+            RequestKind::ChooseCards { purpose, rule, .. } => {
+                let eligible = first_choices(&game, &request);
+                let count = rule.count.most().unwrap_or(0);
+                asked.push(Asked { purpose: *purpose, kind: rule.kind, count, among: eligible.iter().map(|&c| game.name(c).to_string()).collect() });
                 Answer::Cards(eligible.iter().copied().filter(|&c| game.name(c) == exile).collect())
             }
             other => panic!("unexpected question {other:?}"),

@@ -198,6 +198,12 @@ public sealed class NativeRulesHost : IRulesHost
         return step;
     }
 
+    public SelectionVerdictView CheckSelection(int requestId, int seat, IReadOnlyList<ViewHandle> selected)
+    {
+        ArgumentNullException.ThrowIfNull(selected);
+        return Send<SelectionVerdictView>(new { Cmd = "Check", GameId, RequestId = requestId, Seat = seat, Selected = selected });
+    }
+
     /// <summary>
     /// Only when conceding ends the game (CR 104.3a, 800.4a), read off the last view the way the rules decide it: the
     /// seat is in the game, and everyone else still in it is of one team.

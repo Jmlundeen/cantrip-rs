@@ -414,9 +414,10 @@ impl<'s> Run<'s> {
                     .collect();
                 format!("{} [{}]", kind_name(&r.kind), list.join(" | "))
             }
-            RequestKind::ChooseCards { eligible, count, total, .. } => {
-                let within = total.as_ref().map(|t| format!(" with total mana value {} or less", t.most)).unwrap_or_default();
-                format!("ChooseCards {count} of [{}]{within}", eligible.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
+            RequestKind::ChooseCards { rule, .. } => {
+                let words: String = rule.words().iter().map(|w| format!(" {w}")).collect();
+                let eligible = first_choices(g, r);
+                format!("ChooseCards {} of [{}]{words}", count_words(rule.count), eligible.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
             }
             RequestKind::Craft { cards, minimum, maximum, .. } => {
                 format!("Craft {minimum} to {maximum} of [{}]", cards.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
@@ -1031,8 +1032,10 @@ impl<'s> Run<'s> {
             // Craft's materials (CR 702.167a): the fewest it takes, the first offered - the permanents before the graveyard.
             RequestKind::Craft { cards, minimum, .. } => Answer::Cards(cards.iter().take(*minimum as usize).copied().collect()),
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand[hand.len() - *count as usize..].to_vec()),
-            RequestKind::ChooseCards { eligible, count, total: Some(t), .. } => Answer::Cards(t.first_fitting(eligible, *count as usize)),
-            RequestKind::ChooseCards { eligible, count, .. } => Answer::Cards(eligible.iter().take(*count as usize).copied().collect()),
+            // The first cards offered, as many as the rule lets be taken one after another.
+            RequestKind::ChooseCards { source, cards, rule, .. } => {
+                Answer::Cards(select::first_answer(&self.game, rule, request.player, *source, cards, true).unwrap_or_default())
+            }
             // A creature that attacks each combat if able attacks whether or not the script says so (CR 508.1d): the first
             // player, planeswalker or battle it may attack without paying a cost to attack, which is never required.
             RequestKind::DeclareAttackers { requirements, players, planeswalkers, battles, costs, .. } if !players.is_empty() => {
@@ -1096,8 +1099,10 @@ impl<'s> Run<'s> {
             RequestKind::DistributeCards { cards, destinations, .. } => {
                 Answer::Placements { placements: greedy_distribution(cards, destinations), shuffle: false }
             }
-            RequestKind::SearchLibrary { eligible, count, optional, .. } => {
-                if *optional { Answer::Cards(Vec::new()) } else { Answer::Cards(eligible.iter().take(*count as usize).copied().collect()) }
+            // Nothing found where finding nothing is allowed (CR 701.23b); otherwise the first cards offered, as few as the rule
+            // takes.
+            RequestKind::SearchLibrary { source, library, rule, .. } => {
+                Answer::Cards(select::first_answer(&self.game, rule, request.player, *source, library, false).unwrap_or_default())
             }
         })
     }
@@ -1140,7 +1145,7 @@ impl<'s> Run<'s> {
                 options.iter().find(|o| o.kind == ActionKind::CancelCasting).map(|o| Answer::Act(Action::of(o)))
             }
             (V::Cancel, _) if request.may_cancel => Some(Answer::Cancel),
-            (V::Choose, RequestKind::ChooseCards { eligible, count, up_to, .. }) => Some(self.pick(step, eligible, *count as usize, !up_to)?),
+            (V::Choose, RequestKind::ChooseCards { .. }) => Some(self.pick_by_rule(step, request)?),
             // Harmonize's creature is up to one (CR 702.180a): unless the script taps one, none is.
             (V::Choose, RequestKind::TapForPower { purpose: Purpose::TapToReduce, cards, .. }) => Some(self.pick(step, cards, 1, false)?),
             (V::Choose, RequestKind::TapForPower { cards, .. }) => Some(self.pick(step, cards, cards.len(), false)?),
@@ -1194,9 +1199,7 @@ impl<'s> Run<'s> {
             (V::Arrange, RequestKind::DistributeCards { cards, destinations, may_shuffle, .. }) => {
                 Some(self.arrange(step, cards, destinations, *may_shuffle)?)
             }
-            (V::Search, RequestKind::SearchLibrary { eligible, count, optional, .. }) => {
-                Some(self.pick(step, eligible, *count as usize, !*optional)?)
-            }
+            (V::Search, RequestKind::SearchLibrary { .. }) => Some(self.pick_by_rule(step, request)?),
             // "Choose a creature type" is a modes question in the C# engine: `Modes(Elf)`.
             (V::Modes, RequestKind::ChooseSubtype { choices, .. }) => {
                 let spec = step.positional().next().unwrap_or("").trim();
@@ -1364,6 +1367,32 @@ impl<'s> Run<'s> {
             return fail(format!("line {}: {spec} could be more than one card; write the one meant", step.line));
         }
         Ok(Some(Target::Object(first)))
+    }
+
+    /// The cards a `Choose(..)` or `Search(..)` line names for a choice of cards or a library search, judged by the question's
+    /// own rule as a player picks (`selection_verdict`): each name is the first card of that name that may be added to the
+    /// ones named before it, and together they must be an answer.
+    fn pick_by_rule(&self, step: &ActionStep, request: &Request) -> R<Answer> {
+        let mut chosen: Vec<ObjectId> = Vec::new();
+        for spec in step.positional() {
+            let Some((cards, verdict)) = selection_verdict(&self.game, request, &chosen) else {
+                return fail(format!("line {}: not a choice of cards", step.line));
+            };
+            let addable: Vec<ObjectId> = verdict.addable.ones().map(|i| cards[i]).collect();
+            match self.objects(step, spec, &addable)?.first() {
+                Some(&id) => chosen.push(id),
+                None => return fail(format!("line {}: {spec} is not among the cards that may be chosen", step.line)),
+            }
+        }
+        let complete = selection_verdict(&self.game, request, &chosen).is_some_and(|(_, verdict)| verdict.complete);
+        if !complete {
+            let wanted = match &request.kind {
+                RequestKind::ChooseCards { rule, .. } | RequestKind::SearchLibrary { rule, .. } => count_words(rule.count),
+                _ => String::new(),
+            };
+            return fail(format!("line {}: {wanted} cards wanted, the line names {}, which the question does not take", step.line, chosen.len()));
+        }
+        Ok(Answer::Cards(chosen))
     }
 
     fn pick(&self, step: &ActionStep, pool: &[ObjectId], count: usize, exactly: bool) -> R<Answer> {
@@ -1661,7 +1690,9 @@ impl<'s> Run<'s> {
                     return fail(format!("line {line} says {text} must not be an answer the question accepts, but it is"));
                 }
             }
-            RequestKind::ChooseCards { eligible, .. } | RequestKind::TapForPower { cards: eligible, .. } | RequestKind::Craft { cards: eligible, .. } => {
+            RequestKind::ChooseCards { .. } | RequestKind::TapForPower { .. } | RequestKind::Craft { .. } => {
+                // What may be chosen at all: the cards its rule lets be picked first.
+                let eligible = &first_choices(&self.game, request);
                 let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
                 // Several names that are all eligible are one answer, which the question must refuse: more cards than it takes
                 // (`! Bot1.Choose(A; B; C)` for "up to two"), as for targets; or creatures whose total power falls short
@@ -1732,7 +1763,25 @@ impl<'s> Run<'s> {
                     }
                 }
             }
-            RequestKind::SearchLibrary { library, eligible, .. } => {
+            RequestKind::SearchLibrary { library, .. } => {
+                let eligible = first_choices(&self.game, request);
+                // Several names that are all findable are one answer, which the search must refuse: more cards than it takes, or
+                // cards it may not find together (`! Bot1.Search(Forest; Forest)` for "with different names").
+                if action.positional().count() > 1 {
+                    let mut named: Vec<ObjectId> = Vec::new();
+                    for spec in action.positional() {
+                        match self.objects(action, spec.trim(), &eligible)?.into_iter().find(|id| !named.contains(id)) {
+                            Some(id) => named.push(id),
+                            None => break,
+                        }
+                    }
+                    if named.len() == action.positional().count() {
+                        if check_answer(&self.game, request, &Answer::Cards(named)).is_ok() {
+                            return fail(format!("line {line} says {text} must not be an answer the search accepts, but it is"));
+                        }
+                        return Ok(());
+                    }
+                }
                 for spec in action.positional() {
                     let in_library = self.objects(action, spec.trim(), library)?;
                     if in_library.is_empty() {
@@ -2335,4 +2384,13 @@ fn modes_the_source_could_offer(game: &Game, source: ObjectId) -> Vec<&'static s
         out.extend(face.labels.iter().copied());
     }
     out
+}
+
+/// A count as a failure report words it: "2", "up to 2", "any number".
+fn count_words(count: Count) -> String {
+    match count {
+        Count::Exactly(n) | Count::AsManyAsCan(n) => n.to_string(),
+        Count::UpTo(n) => format!("up to {n}"),
+        Count::AnyNumber => "any number of".to_string(),
+    }
 }

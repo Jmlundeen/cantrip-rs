@@ -43,14 +43,15 @@ fn a_search_for_any_number_is_asked_as_any_number_and_takes_all_300() {
                 .map_or(Answer::Pass, |o| Answer::Act(Action::of(o))),
             RequestKind::Priority { .. } => Answer::Pass,
             RequestKind::PayCosts { options, .. } => Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).expect("nothing to pay"))),
-            RequestKind::SearchLibrary { eligible, count, optional, any_number, .. } => {
-                asked = Some((*any_number, *optional, *count, eligible.len()));
-                Answer::Cards(eligible.clone())
+            RequestKind::SearchLibrary { rule, .. } => {
+                let eligible = first_choices(&game, &request);
+                asked = Some((rule.count, eligible.len()));
+                Answer::Cards(eligible)
             }
             other => panic!("unexpected question {other:?}"),
         };
         game.answer(request.id, request.player, answer).unwrap();
     }
-    assert_eq!(asked, Some((true, true, 300, 300)));
+    assert_eq!(asked, Some((Count::AnyNumber, 300)));
     assert_eq!(game.state.zone(Zone::hand(PlayerId(0))).len(), 6 + 300);
 }

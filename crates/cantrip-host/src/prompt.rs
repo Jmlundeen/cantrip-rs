@@ -700,7 +700,12 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             choosing_x: x.is_some(),
             x: x.map_or(0, i32::from),
         }),
-        RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to, any_number, kind, total } => {
+        RequestKind::ChooseCards { source, purpose, cards, rule } => {
+            let kind = &rule.kind;
+            let verdict = verdict_view(game, request, handles);
+            // A rule that keeps a running total of mana value (CR 202.3): its most, and each card's mana value, read where it is
+            // (an {X} in a library or graveyard is 0, CR 202.3e), index for index with the cards.
+            let tally = rule.parts().find(|p| p.tally == cantrip_engine::select::Tally::ManaValueAtMost).map(|p| p.n);
             let owner = if *purpose == Purpose::TakeFromHand {
                 cards.first().map_or(request.player, |c| game.state.obj(*c).owner)
             } else {
@@ -712,10 +717,11 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 source: source_handle(game, handles, *source),
                 purpose: purpose_view(*purpose, opening),
                 cards: handles_of(handles, cards),
-                eligible: handles_of(handles, eligible),
-                count: wire(*count),
-                up_to: *up_to,
-                any_number: *any_number,
+                count: count_shown(rule.count, &verdict),
+                count_kind: count_kind_view(rule.count),
+                words: rule.words(),
+                mana_values: if tally.is_some() { cards.iter().map(|&c| wire(game.mana_value(c))).collect() } else { Vec::new() },
+                maximum_total_mana_value: tally.map(wire),
                 // Blight (CR 701.68a) is a creature you control; behold (CR 701.4a) names its quality ("Dragon"): the
                 // client says so in its caption. Any other choice is worded as the asking card words it ("nonland"), if it does.
                 kind: match purpose {
@@ -737,21 +743,19 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     Purpose::PutCounters(_, n) => i32::from(*n),
                     _ => 0,
                 },
-                // "With total mana value N or less": each eligible card's mana value, and the most they may add up to.
-                mana_values: total.as_ref().map_or_else(Vec::new, |t| t.values.iter().map(|&v| wire(v)).collect()),
-                maximum_total_mana_value: total.as_ref().map(|t| wire(t.most)),
                 prevent_left: match purpose {
                     Purpose::PreventDamageFrom(n) => i32::from(*n),
                     _ => 0,
                 },
-                // A band may have at most one creature without banding (CR 702.22c): which of the eligible ones those are.
+                // A band may have at most one creature without banding (CR 702.22c): which of the ones offered those are.
                 without_banding: match purpose {
                     Purpose::Band => handles_of(
                         handles,
-                        &eligible.iter().copied().filter(|&c| !game.chars(c).has(Keyword::Banding)).collect::<Vec<_>>(),
+                        &cards.iter().copied().filter(|&c| !game.chars(c).has(Keyword::Banding)).collect::<Vec<_>>(),
                     ),
                     _ => Vec::new(),
                 },
+                verdict,
                 life: match purpose {
                     Purpose::PayLifeOrPutOnTop(n) => i32::from(*n),
                     _ => 0,
@@ -768,10 +772,10 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 source: source_handle(game, handles, *source),
                 purpose: if reduce { CardChoicePurposeView::TapToReduce } else { CardChoicePurposeView::TapToPay },
                 cards: handles_of(handles, cards),
-                eligible: handles_of(handles, cards),
+                verdict: verdict_view(game, request, handles),
                 count: if reduce { 1 } else { cards.len() as i32 },
                 kind: if reduce { "creature".into() } else { String::new() },
-                up_to: true,
+                count_kind: CountKindView::UpTo,
                 minimum_power: i32::from(*minimum),
                 // Signed: a negative power takes from the total (CR 107.1b).
                 powers: powers.iter().map(|&p| i32::from(p)).collect(),
@@ -785,9 +789,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 source: source_handle(game, handles, *source),
                 purpose: CardChoicePurposeView::ExileToPay,
                 cards: handles_of(handles, cards),
-                eligible: handles_of(handles, cards),
+                verdict: verdict_view(game, request, handles),
                 count: cards.len() as i32,
-                up_to: true,
+                count_kind: CountKindView::UpTo,
                 minimum_mana_value: i32::from(*minimum),
                 mana_values: values.iter().map(|&v| i32::from(v)).collect(),
                 ..Default::default()
@@ -802,9 +806,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 source: source_handle(game, handles, *source),
                 purpose: CardChoicePurposeView::Craft,
                 cards: handles_of(handles, cards),
-                eligible: handles_of(handles, cards),
+                verdict: verdict_view(game, request, handles),
                 count: wire(*maximum),
-                up_to: minimum < maximum,
+                count_kind: if minimum < maximum { CountKindView::UpTo } else { CountKindView::Exactly },
                 minimum: if minimum < maximum { wire(*minimum) } else { 0 },
                 kind: (*quality).to_string(),
                 ..Default::default()
@@ -1123,17 +1127,19 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 may_shuffle: *may_shuffle,
             })
         }
-        RequestKind::SearchLibrary { source, library, eligible, count, optional, any_number, destination } => {
+        RequestKind::SearchLibrary { source, library, rule, destination } => {
             let _ = source;
             // Whose library it is: the cards in it are all its owner's.
             let owner = library.first().map_or(request.player, |c| game.state.obj(*c).owner);
+            let verdict = verdict_view(game, request, handles);
             PromptPayload::SearchLibraryPromptMessage(SearchLibraryPrompt {
                 player,
-                count: wire(*count),
-                optional: *optional,
-                any_number: *any_number,
+                count: count_shown(rule.count, &verdict),
+                count_kind: count_kind_view(rule.count),
+                kind: rule.kind.to_string(),
+                words: rule.words(),
+                verdict,
                 library: handles_of(handles, library),
-                eligible: handles_of(handles, eligible),
                 destination: match destination {
                     SearchDestination::Hand => SearchDestinationView::Hand,
                     SearchDestination::TopOfLibrary => SearchDestinationView::TopOfLibrary,
@@ -1177,6 +1183,32 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
     Ok((payload, request.may_cancel))
 }
 
+/// What the rule of `request`, a question that picks a set of cards, says of `selected` (`selection_verdict`), as the seat
+/// with `handles` sees it: whether it is an answer, and the cards that may be added. The prompt carries it for none chosen;
+/// the host's `Check` answers it for any other selection.
+pub fn verdict_of(game: &Game, request: &Request, selected: &[ObjectId], handles: &mut HandleSpace) -> Option<SelectionVerdictView> {
+    let (cards, verdict) = selection_verdict(game, request, selected)?;
+    Some(SelectionVerdictView { complete: verdict.complete, addable: verdict.addable.ones().map(|i| handles.handle(cards[i])).collect() })
+}
+
+fn verdict_view(game: &Game, request: &Request, handles: &mut HandleSpace) -> SelectionVerdictView {
+    verdict_of(game, request, &[], handles).unwrap_or_default()
+}
+
+fn count_kind_view(count: Count) -> CountKindView {
+    match count {
+        Count::Exactly(_) => CountKindView::Exactly,
+        Count::UpTo(_) => CountKindView::UpTo,
+        Count::AnyNumber => CountKindView::AnyNumber,
+        Count::AsManyAsCan(_) => CountKindView::AsManyAsCan,
+    }
+}
+
+/// The number a caption says of a count: its own, or for "any number" every card that may be picked first.
+fn count_shown(count: Count, verdict: &SelectionVerdictView) -> i32 {
+    count.most().map_or(wire(count_u32(verdict.addable.len())), wire)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1202,16 +1234,7 @@ mod tests {
             let request = Request {
                 id: 1,
                 player: seat,
-                kind: RequestKind::ChooseCards { any_number: false,
-                    source: hand[0],
-                    purpose: Purpose::Exile,
-                    cards: hand.clone(),
-                    eligible: creatures.clone(),
-                    count: 1,
-                    up_to: false,
-                    kind,
-                    total: None,
-                },
+                kind: RequestKind::choose_cards(hand[0], Purpose::Exile, hand.clone(), creatures.clone(), 1, false, kind),
                 may_cancel: false,
             };
             match prompt(&game, &request, &mut HandleSpace::new()).expect("a prompt").0 {
@@ -1225,35 +1248,36 @@ mod tests {
         assert_eq!(kind_of(""), "");
     }
 
-    /// "With total mana value N or less" reaches the client as the most the chosen cards may add up to and each eligible card's
-    /// mana value, index for index; a choice without it says nothing of either.
+    /// A part of a test rule that refuses an Ornithopter: what a card's own rule would be.
+    fn no_ornithopter(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+        Verdict::each(choice, |card| q.chars(card).name != "Ornithopter")
+    }
+
+    /// A choice of cards reaches the client as its rule says it: the count and how it counts, the words its parts add to the
+    /// caption, the running total a part keeps, and the rule's verdict on choosing nothing yet - the cards that may be picked first, which the rule's parts and
+    /// its list decide together, and whether none at all is an answer.
     #[test]
-    fn a_choice_within_a_total_mana_value_sends_the_limit_and_each_cards_value() {
+    fn a_choice_sends_its_rule_as_count_words_and_first_verdict() {
         let (game, hand) = game_with(&["Llanowar Elves", "Ornithopter", "Forest"]);
         let seat = game.state.seats().next().expect("a seat");
-        let ask = |total: Option<TotalAtMost>| {
-            let request = Request {
-                id: 1,
-                player: seat,
-                kind: RequestKind::ChooseCards { any_number: false,
-                    source: hand[0],
-                    purpose: Purpose::PutOntoBattlefield,
-                    cards: hand.clone(),
-                    eligible: hand[..2].to_vec(),
-                    count: 2,
-                    up_to: true,
-                    kind: "creature",
-                    total,
-                },
-                may_cancel: false,
-            };
-            match prompt(&game, &request, &mut HandleSpace::new()).expect("a prompt").0 {
-                PromptPayload::ChooseCardsPromptMessage(p) => (p.maximum_total_mana_value, p.mana_values),
-                other => panic!("{other:?}"),
-            }
+        let part = cantrip_engine::select::tallied(&(no_ornithopter as SelectFn), 6, "with total mana value {n} or less", cantrip_engine::select::Tally::ManaValueAtMost);
+        let rule = Selection::listed(Count::UpTo(2), &hand, hand[..2].to_vec()).called("creature").with(part);
+        let request = Request {
+            id: 1,
+            player: seat,
+            kind: RequestKind::ChooseCards { source: hand[0], purpose: Purpose::PutOntoBattlefield, cards: hand.clone(), rule: Box::new(rule) },
+            may_cancel: false,
         };
-        assert_eq!(ask(Some(TotalAtMost { values: vec![1, 0], most: 6 })), (Some(6), vec![1, 0]));
-        assert_eq!(ask(None), (None, Vec::new()));
+        let mut handles = HandleSpace::new();
+        let PromptPayload::ChooseCardsPromptMessage(p) = prompt(&game, &request, &mut handles).expect("a prompt").0 else { panic!("cards") };
+        assert_eq!((p.count, p.count_kind, p.kind.as_str()), (2, CountKindView::UpTo, "creature"));
+        assert_eq!(p.words, vec!["with total mana value 6 or less".to_string()]);
+        // The running total it keeps (display alone): its most, and every card's mana value, index for index.
+        assert_eq!((p.maximum_total_mana_value, p.mana_values.len()), (Some(6), hand.len()));
+        assert_eq!(p.mana_values[..2], [1, 0], "the Elves 1, the Ornithopter 0");
+        // The Elves alone: the Ornithopter is refused by the part, the Forest by the list.
+        assert_eq!(p.verdict, SelectionVerdictView { complete: true, addable: vec![handles.handle(hand[0])] });
+        assert_eq!(verdict_of(&game, &request, &[hand[0]], &mut handles).map(|v| (v.complete, v.addable.len())), Some((true, 0)));
     }
 
     /// "Any number of target creature cards with total mana value X or less" reaches the client as the limit and each

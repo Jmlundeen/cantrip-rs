@@ -2166,7 +2166,7 @@ public static class PromptFixtures
             case "choose-splice":
             {
                 ChooseCardsPromptMessage choice = Choose(CardChoicePurposeView.Splice, Viewer, Hand(), count: 2, upTo: true);
-                choice.Eligible = [.. choice.Cards.Take(2)];
+                choice.Verdict.Addable = [.. choice.Cards.Take(2)];
                 return choice;
             }
 
@@ -2252,6 +2252,7 @@ public static class PromptFixtures
                 List<ViewHandle> creatures = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)];
                 ChooseCardsPromptMessage saddle = Choose(CardChoicePurposeView.TapToPay, Viewer, creatures, count: 2, upTo: true);
                 saddle.MinimumPower = 3;
+                saddle.Verdict.Complete = false;
                 saddle.Powers = [.. creatures.Select(creature => Object(view, creature.Value).Power ?? 0)];
                 return saddle;
             }
@@ -2262,6 +2263,7 @@ public static class PromptFixtures
                 List<ViewHandle> evidenceCards = Graveyard(view, 4);
                 ChooseCardsPromptMessage evidence = Choose(CardChoicePurposeView.ExileToPay, Viewer, evidenceCards, count: 4, upTo: true);
                 evidence.MinimumManaValue = 6;
+                evidence.Verdict.Complete = false;
                 evidence.ManaValues = [3, 0, 4, 1];
                 return evidence;
             }
@@ -2282,7 +2284,7 @@ public static class PromptFixtures
 
                 view.Zones.First(zone => zone.Kind == ZoneKindView.Graveyard && zone.Owner == Viewer).Contents.Clear();
                 ChooseCardsPromptMessage choose = Choose(CardChoicePurposeView.PutOntoBattlefield, Viewer, revealed, count: 1, upTo: false);
-                choose.Eligible = [revealed[2]];
+                choose.Verdict.Addable = [revealed[2]];
                 return choose;
             }
 
@@ -2299,8 +2301,9 @@ public static class PromptFixtures
                 view.Zones.First(zone => zone.Kind == ZoneKindView.Graveyard && zone.Owner == Viewer).Contents.Clear();
                 ChooseCardsPromptMessage choose = Choose(CardChoicePurposeView.PutOntoBattlefield, Viewer, looked, count: 2, upTo: true);
                 choose.Kind = "creature";
-                choose.Eligible = [looked[0], looked[1], looked[2]];
-                choose.ManaValues = [4, 2, 3];
+                choose.Verdict.Addable = [looked[0], looked[1], looked[2]];
+                choose.ManaValues = [4, 2, 3, 5];
+                choose.Words = ["with total mana value 6 or less"];
                 choose.MaximumTotalManaValue = 6;
                 return choose;
             }
@@ -2310,7 +2313,7 @@ public static class PromptFixtures
                 // Barrowgoyf: the cards it just milled, up to one creature card among them into your hand.
                 List<ViewHandle> milled = Graveyard(view, 4);
                 ChooseCardsPromptMessage choose = Choose(CardChoicePurposeView.PutIntoHand, Viewer, milled, count: 1, upTo: true);
-                choose.Eligible = [milled[2]];
+                choose.Verdict.Addable = [milled[2]];
                 return choose;
             }
             case "choose-put-into-their-hand":
@@ -2393,7 +2396,7 @@ public static class PromptFixtures
                     Source = new ViewHandle(HandRitual),
                     Purpose = CardChoicePurposeView.Discard,
                     Cards = Hand(),
-                    Eligible = [],
+                    Verdict = new() { Addable = [], Complete = true },
                     Count = 0,
                 };
 
@@ -3089,9 +3092,9 @@ public static class PromptFixtures
         {
             Player = Viewer,
             Count = count,
-            Optional = optional,
+            CountKind = optional ? CountKindView.UpTo : CountKindView.AsManyAsCan,
             Library = library,
-            Eligible = eligible,
+            Verdict = new() { Addable = eligible, Complete = optional },
             Destination = destination,
         };
     }
@@ -3269,7 +3272,8 @@ public static class PromptFixtures
     /// <summary>"Any number of" (the host's <c>AnyNumber</c>): every eligible card may be chosen, and the question says so.</summary>
     private static ChooseCardsPromptMessage AnyNumber(ChooseCardsPromptMessage choose)
     {
-        choose.AnyNumber = true;
+        choose.CountKind = CountKindView.AnyNumber;
+        choose.Verdict.Complete = true;
         return choose;
     }
 
@@ -3286,9 +3290,9 @@ public static class PromptFixtures
             Source = new ViewHandle(HandRitual),
             Purpose = purpose,
             Cards = cards,
-            Eligible = [.. cards],
+            Verdict = new() { Addable = [.. cards], Complete = upTo || count == 0 },
             Count = count,
-            UpTo = upTo,
+            CountKind = upTo ? CountKindView.UpTo : CountKindView.Exactly,
         };
 
     /// <summary>
@@ -3648,11 +3652,14 @@ public static class PromptFixtures
 public sealed class FixtureTransport : IGameTransport
 {
     private IReadOnlyList<ServerMessage>? _pending;
+    private readonly List<PromptMessage> _prompts;
+    private readonly List<ServerMessage> _verdicts = [];
 
     public FixtureTransport(IReadOnlyList<ServerMessage> messages)
     {
         ArgumentNullException.ThrowIfNull(messages);
         _pending = messages;
+        _prompts = [.. messages.OfType<PromptMessage>()];
     }
 
     public bool IsConnected => true;
@@ -3660,14 +3667,57 @@ public sealed class FixtureTransport : IGameTransport
     /// <summary>What the dock sent, oldest first, for a test to read back what a click answered.</summary>
     public List<ClientMessage> Sent { get; } = [];
 
-    /// <summary>Nothing is listening: a click in the gallery has nowhere to go and no game to change, and is only kept.</summary>
-    public void Send(ClientMessage message) => Sent.Add(message);
+    /// <summary>
+    /// Nothing is listening: a click in the gallery has nowhere to go and no game to change, and is only kept. A check of a
+    /// choice of cards is answered as the gallery's stand-in for the rules (<see cref="StandInVerdict"/>), so its dock can be
+    /// clicked through.
+    /// </summary>
+    public void Send(ClientMessage message)
+    {
+        Sent.Add(message);
+        if (message is CheckSelectionMessage check
+            && _prompts.FirstOrDefault(prompt => prompt.RequestId == check.RequestId)?.Prompt is ISelectionPrompt asked)
+        {
+            _verdicts.Add(new SelectionVerdictMessage { RequestId = check.RequestId, Selected = check.Selected, Verdict = StandInVerdict(asked, check.Selected) });
+        }
+    }
+
+    /// <summary>
+    /// The gallery has no rules engine: a selection of a canned choice is judged by its count alone, among the cards its
+    /// prompt lets be picked first. Only ever the gallery's; a table asks the host.
+    /// </summary>
+    public static SelectionVerdictView StandInVerdict(ISelectionPrompt asked, IReadOnlyList<ViewHandle> selected)
+    {
+        ArgumentNullException.ThrowIfNull(asked);
+        ArgumentNullException.ThrowIfNull(selected);
+        bool among = selected.Distinct().Count() == selected.Count && selected.All(asked.Verdict.Addable.Contains);
+        int n = selected.Count;
+        bool room = asked.CountKind == CountKindView.AnyNumber || n < asked.Count;
+        List<ViewHandle> addable = room ? [.. asked.Verdict.Addable.Where(card => !selected.Contains(card))] : [];
+        bool complete = among && asked.CountKind switch
+        {
+            CountKindView.Exactly => n == asked.Count,
+            CountKindView.AsManyAsCan => n == asked.Count || addable.Count == 0,
+            CountKindView.AnyNumber => true,
+            _ => n <= asked.Count,
+        };
+
+        // A cost's totals and craft's least, which the canned prompt carries for its caption.
+        if (asked is ChooseCardsPromptMessage cards)
+        {
+            int Sum(List<int> values) => selected.Sum(card => cards.Cards.IndexOf(card) is >= 0 and var i && i < values.Count ? values[i] : 0);
+            complete &= n >= cards.Minimum && Sum(cards.Powers) >= cards.MinimumPower && Sum(cards.ManaValues) >= cards.MinimumManaValue;
+        }
+
+        return new SelectionVerdictView { Complete = complete, Addable = addable };
+    }
 
     public IReadOnlyList<ServerMessage> Receive()
     {
-        IReadOnlyList<ServerMessage>? waiting = _pending;
+        List<ServerMessage> waiting = [.. _pending ?? [], .. _verdicts];
         _pending = null;
-        return waiting ?? [];
+        _verdicts.Clear();
+        return waiting;
     }
 
     public void Dispose()

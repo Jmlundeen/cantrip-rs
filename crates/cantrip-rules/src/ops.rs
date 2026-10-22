@@ -2023,16 +2023,7 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
             if sources.len() < 2 {
                 break;
             }
-            let ask = RequestKind::ChooseCards { any_number: false,
-                source: by,
-                purpose: Purpose::PreventDamageFrom(left),
-                cards: sources.clone(),
-                eligible: sources,
-                count: 1,
-                up_to: false,
-                kind: "",
-                total: None,
-            };
+            let ask = RequestKind::choose_cards(by, Purpose::PreventDamageFrom(left), sources.clone(), sources, 1, false, "");
             // Unanswered yet, the run goes on with the first and is replayed with the answer (`Cx::ask_core`).
             let pick = match cx.ask_core(chooser, ask, false) {
                 Ok(Answer::Cards(c)) if c.len() == 1 => rest.iter().position(|&i| hits[i].0 == c[0]).unwrap_or(0),

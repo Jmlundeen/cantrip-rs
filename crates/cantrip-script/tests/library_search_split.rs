@@ -92,7 +92,8 @@ fn play(pick: Option<&str>) -> (Game, Option<ObjectId>, SearchDestination, Vec<&
                 }
             }
             RequestKind::Priority { .. } => Answer::Pass,
-            RequestKind::SearchLibrary { eligible, destination, .. } => {
+            RequestKind::SearchLibrary { destination, .. } => {
+                let eligible = first_choices(&game, &request);
                 let names: Vec<&'static str> = eligible.iter().map(|&c| game.name(c)).collect();
                 let chosen: Vec<ObjectId> = pick.map(|p| eligible.iter().copied().filter(|&c| game.name(c) == p).take(1).collect()).unwrap_or_default();
                 asked = Some((*destination, names, chosen.first().copied()));

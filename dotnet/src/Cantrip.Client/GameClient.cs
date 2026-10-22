@@ -132,7 +132,17 @@ public sealed class GameClient
     public int Pump()
     {
         IReadOnlyList<ServerMessage> messages = _transport.Receive();
+        int applied = PumpMessages(messages);
+        if (_settling is not null)
+        {
+            Settle();
+        }
 
+        return applied;
+    }
+
+    private int PumpMessages(IReadOnlyList<ServerMessage> messages)
+    {
         List<GameEventView>? events = null;
         _sequences.Clear();
 
@@ -376,7 +386,17 @@ public sealed class GameClient
     /// <summary>The request this client last answered, 0 before its first answer.</summary>
     public int LastAnswered { get; private set; }
 
-    /// <summary>Answers the outstanding prompt and clears it, so the same answer cannot be sent twice.</summary>
+    /// <summary>
+    /// Answers the outstanding prompt and clears it, so the same answer cannot be sent twice.
+    /// <para>
+    /// A choice of cards (<see cref="ISelectionPrompt"/>) is settled with the host first, whoever is answering: unless the
+    /// host has already called the cards chosen an answer, they are checked (<see cref="Check"/>) and sent once it does. A
+    /// selection the host refuses is mended one card at a time from what may be added - the cards proposed first, then the
+    /// rest in the question's order - until it is one (<see cref="Settling"/>), so a player that picks without knowing the
+    /// question's rule ("with different names", "total mana value 6 or less") still answers what the rules take. The prompt
+    /// is cleared as soon as this is called, as for any answer.
+    /// </para>
+    /// </summary>
     public void Answer(AnswerPayload answer)
     {
         ArgumentNullException.ThrowIfNull(answer);
@@ -384,6 +404,14 @@ public sealed class GameClient
         if (Prompt is null)
         {
             throw new InvalidOperationException("Nothing has been asked.");
+        }
+
+        if (Prompt.Prompt is ISelectionPrompt && answer is CardsChosenAnswer chosen && Verdict(chosen.Cards) is not { Complete: true })
+        {
+            _settling = new Settling(Prompt, chosen.Cards);
+            Prompt = null;
+            Settle();
+            return;
         }
 
         var message = new AnswerMessage { RequestId = Prompt.RequestId, Answer = answer };
@@ -396,6 +424,184 @@ public sealed class GameClient
     }
 
     public void Pass() => Answer(new PassAnswer());
+
+    // --- Choices of cards, judged by the host as they are made. ---
+
+    /// <summary>The verdicts the host has given on selections of the request in <see cref="_verdictsFor"/>, by selection.</summary>
+    private readonly Dictionary<string, SelectionVerdictView> _verdicts = new(StringComparer.Ordinal);
+
+    /// <summary>The selections asked about and not yet answered.</summary>
+    private readonly HashSet<string> _checking = new(StringComparer.Ordinal);
+
+    private int _verdictsFor;
+
+    /// <summary>Bumped whenever a verdict arrives, so a renderer knows to draw the choice again.</summary>
+    public int VerdictRevision { get; private set; }
+
+    private static string KeyOf(IEnumerable<ViewHandle> selected) =>
+        string.Join(',', selected.Select(handle => handle.Value).Order());
+
+    /// <summary>The request a choice of cards being made is for: the one asked, or the one being settled.</summary>
+    private PromptMessage? Choosing => Prompt is { Prompt: ISelectionPrompt } asked ? asked : _settling?.Asked;
+
+    /// <summary>
+    /// What the rules said of <paramref name="selected"/> for the choice of cards outstanding (<see cref="ISelectionPrompt"/>):
+    /// whether the cards are an answer, and which may be added to them. For none chosen it is the prompt's own
+    /// <see cref="ISelectionPrompt.Verdict"/>; any other selection is known once the host has answered a <see cref="Check"/>
+    /// of it, and null until then (or when nothing such is asked).
+    /// </summary>
+    public SelectionVerdictView? Verdict(IEnumerable<ViewHandle> selected)
+    {
+        ArgumentNullException.ThrowIfNull(selected);
+        if (Choosing is not { Prompt: ISelectionPrompt selection } asked) return null;
+        List<ViewHandle> cards = [.. selected];
+        if (cards.Count == 0) return selection.Verdict;
+        return _verdictsFor == asked.RequestId && _verdicts.TryGetValue(KeyOf(cards), out SelectionVerdictView? verdict) ? verdict : null;
+    }
+
+    /// <summary>
+    /// Asks the host what the outstanding choice of cards' rule says of <paramref name="selected"/> (docs/host-protocol.md,
+    /// "Checking a selection"): its <see cref="SelectionVerdictMessage"/> arrives with a later <see cref="Pump"/>, and
+    /// <see cref="Verdict"/> reads it. A selection already judged, or being judged, is not asked again.
+    /// </summary>
+    public void Check(IEnumerable<ViewHandle> selected)
+    {
+        ArgumentNullException.ThrowIfNull(selected);
+        if (Choosing is not { } asked) return;
+        List<ViewHandle> cards = [.. selected];
+        if (Verdict(cards) is not null) return;
+        if (_verdictsFor != asked.RequestId)
+        {
+            _verdicts.Clear();
+            _checking.Clear();
+            _verdictsFor = asked.RequestId;
+        }
+
+        if (!_checking.Add(KeyOf(cards))) return;
+        _transport.Send(new CheckSelectionMessage { RequestId = asked.RequestId, Selected = cards });
+    }
+
+    private void Note(SelectionVerdictMessage message)
+    {
+        if (message.RequestId != _verdictsFor) return;
+        string key = KeyOf(message.Selected);
+        _checking.Remove(key);
+        _verdicts[key] = message.Verdict;
+        VerdictRevision++;
+    }
+
+    /// <summary>A choice of cards answered but not yet sent: being checked, and mended if the rules refuse it.</summary>
+    private Settling? _settling;
+
+    /// <summary>Whether an answer to a choice of cards is being settled with the host before it is sent.</summary>
+    public bool IsSettling => _settling is not null;
+
+    /// <summary>Whether a check of a selection has been sent and its verdict has not come back.</summary>
+    public bool IsChecking => _checking.Count > 0;
+
+    /// <summary>
+    /// An answer to a choice of cards on its way to being one the rules take: the cards proposed, checked as they are; and if
+    /// the host refuses them, a selection built a card at a time from what may be added, preferring the cards proposed and
+    /// then the question's own order, going back a card where nothing more may be added and the cards are no answer.
+    /// </summary>
+    private sealed class Settling(PromptMessage asked, IReadOnlyList<ViewHandle> proposal)
+    {
+        public PromptMessage Asked { get; } = asked;
+
+        public List<ViewHandle> Proposal { get; } = [.. proposal];
+
+        public bool Mending { get; set; }
+
+        public List<ViewHandle> Picked { get; } = [];
+
+        /// <summary>For each card picked and the next, the cards already tried there.</summary>
+        public List<HashSet<int>> Tried { get; } = [[]];
+
+        /// <summary>How many selections have been judged, against a choice whose rule nothing satisfies.</summary>
+        public int Steps { get; set; }
+
+        public IEnumerable<ViewHandle> Preference =>
+            Proposal.Concat(((ISelectionPrompt)Asked.Prompt).Candidates.Where(card => !Proposal.Contains(card)));
+    }
+
+    /// <summary>The most selections settling a choice judges before it sends what it has and leaves the rest to the host.</summary>
+    private const int SettlingSteps = 400;
+
+    /// <summary>Takes the answer being settled as far as the verdicts in hand allow: sends it, or asks for the next verdict.</summary>
+    private void Settle()
+    {
+        while (_settling is { } settling)
+        {
+            if (!settling.Mending)
+            {
+                SelectionVerdictView? judged = Verdict(settling.Proposal);
+                if (judged is null)
+                {
+                    Check(settling.Proposal);
+                    return;
+                }
+
+                if (judged.Complete)
+                {
+                    Send(settling.Proposal);
+                    return;
+                }
+
+                settling.Mending = true;
+                continue;
+            }
+
+            SelectionVerdictView? verdict = Verdict(settling.Picked);
+            if (verdict is null)
+            {
+                Check(settling.Picked);
+                return;
+            }
+
+            if (++settling.Steps > SettlingSteps)
+            {
+                Send(settling.Picked);
+                return;
+            }
+
+            if (verdict.Complete && settling.Picked.Count >= settling.Proposal.Count)
+            {
+                Send(settling.Picked);
+                return;
+            }
+
+            HashSet<int> tried = settling.Tried[^1];
+            ViewHandle? next = settling.Preference
+                .Where(card => !settling.Picked.Contains(card) && !tried.Contains(card.Value) && verdict.Addable.Contains(card))
+                .Select(card => (ViewHandle?)card)
+                .FirstOrDefault();
+            if (next is { } card)
+            {
+                tried.Add(card.Value);
+                settling.Picked.Add(card);
+                settling.Tried.Add([]);
+                continue;
+            }
+
+            if (verdict.Complete || settling.Picked.Count == 0)
+            {
+                // The most that could be added is an answer; or nothing is, and the host is left to refuse what was meant.
+                Send(verdict.Complete ? settling.Picked : settling.Proposal);
+                return;
+            }
+
+            settling.Picked.RemoveAt(settling.Picked.Count - 1);
+            settling.Tried.RemoveAt(settling.Tried.Count - 1);
+        }
+
+        void Send(IReadOnlyList<ViewHandle> cards)
+        {
+            PromptMessage asked = _settling!.Asked;
+            _settling = null;
+            LastAnswered = asked.RequestId;
+            _transport.Send(new AnswerMessage { RequestId = asked.RequestId, Answer = new CardsChosenAnswer { Cards = [.. cards] } });
+        }
+    }
 
     public void Discard(IEnumerable<ViewHandle> cards) =>
         Answer(new CardsChosenAnswer { Cards = [.. cards] });
@@ -653,17 +859,34 @@ public sealed class GameClient
                 break;
 
             case PromptMessage prompt:
+                // The question an answer is being settled for, asked again (a resumed connection): the answer is still on its way.
+                if (_settling?.Asked.RequestId == prompt.RequestId) break;
+                _settling = null;
                 if (Table?.Phase != TablePhase.Abandoned) Prompt = prompt;
+                break;
+
+            case SelectionVerdictMessage verdict:
+                Note(verdict);
                 break;
 
             case GameOverMessage over:
                 Outcome = over;
                 Prompt = null;
+                _settling = null;
                 DrawOffer = null;
                 break;
 
             case ErrorMessage error:
                 _errors.Add(error);
+
+                // A check refused while an answer was being settled: the answer meant goes as it is, for the host to judge.
+                if (_settling is { } settling && _checking.Count > 0)
+                {
+                    _checking.Clear();
+                    _settling = null;
+                    LastAnswered = settling.Asked.RequestId;
+                    _transport.Send(new AnswerMessage { RequestId = settling.Asked.RequestId, Answer = new CardsChosenAnswer { Cards = settling.Proposal } });
+                }
 
                 // An answer to a draw refused leaves the seat free to answer again.
                 _drawAnswerSent = false;

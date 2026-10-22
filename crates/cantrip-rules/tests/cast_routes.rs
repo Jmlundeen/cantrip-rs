@@ -361,7 +361,7 @@ static ROUTE_ARTIFACT: CardDef = CardDef { name: "Route Artifact", types: TypeSe
 
 fn choose_one_card_of_hand(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
     let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
-    let ask = RequestKind::ChooseCards { any_number: false, source: item.object, purpose: Purpose::Discard, cards: hand.clone(), eligible: hand, count: 1, up_to: false, kind: "", total: None };
+    let ask = RequestKind::choose_cards(item.object, Purpose::Discard, hand.clone(), hand, 1, false, "");
     let _ = g.ask(item.controller, ask)?;
     Ok(())
 }
@@ -981,9 +981,9 @@ fn any_number_sacrificed_is_any_number_past_255() {
                 let kind = if *x < 300 { ActionKind::IncreaseX } else { ActionKind::ConfirmCasting };
                 Answer::Act(Action::of(options.iter().find(|o| o.kind == kind).unwrap_or_else(|| panic!("{kind:?} at {x}"))))
             }
-            RequestKind::ChooseCards { eligible, count, .. } => {
-                chose = *count;
-                Answer::Cards(eligible.clone())
+            RequestKind::ChooseCards { rule, .. } => {
+                chose = rule.count.most().unwrap_or(0);
+                Answer::Cards(cantrip_rules::first_choices(&game, &request))
             }
             RequestKind::PayCosts { options, .. } => Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).expect("nothing left to pay"))),
             RequestKind::Priority { .. } => break,
@@ -1017,7 +1017,8 @@ fn an_answer_of_257_cards_to_choose_one_is_refused() {
         game.run();
         let request = game.pending().cloned().expect("asked");
         match &request.kind {
-            RequestKind::ChooseCards { eligible, count: 1, .. } => {
+            RequestKind::ChooseCards { rule, .. } if rule.count == Count::Exactly(1) => {
+                let eligible = cantrip_rules::first_choices(&game, &request);
                 assert!(eligible.len() >= 257);
                 let rejected = game.answer(request.id, request.player, Answer::Cards(eligible[..257].to_vec()));
                 assert!(rejected.is_err(), "257 cards are not one");

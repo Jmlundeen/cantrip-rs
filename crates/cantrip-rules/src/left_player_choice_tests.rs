@@ -33,7 +33,7 @@ fn cx(game: &mut Game, frame: usize) -> Cx<'_> {
 
 /// "Choose a card": what the Trinket asks.
 fn choose(trinket: ObjectId) -> RequestKind {
-    RequestKind::ChooseCards { source: trinket, purpose: Purpose::Vote, cards: vec![trinket], eligible: vec![trinket], count: 1, up_to: false, any_number: false, kind: "", total: None }
+    RequestKind::choose_cards(trinket, Purpose::Vote, vec![trinket], vec![trinket], 1, false, "")
 }
 
 fn pending(g: &Game, at: usize) -> (PlayerId, RequestKind) {

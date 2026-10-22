@@ -26,6 +26,7 @@ namespace Cantrip.Protocol;
 [Union(13, typeof(PairingsMessage))]
 [Union(14, typeof(ClockMessage))]
 [Union(15, typeof(DrawOfferMessage))]
+[Union(16, typeof(SelectionVerdictMessage))]
 public abstract class ServerMessage
 {
     public abstract string Describe();
@@ -838,6 +839,7 @@ public enum ErrorCode
 [Union(10, typeof(DropMessage))]
 [Union(11, typeof(OfferDrawMessage))]
 [Union(12, typeof(AnswerDrawMessage))]
+[Union(13, typeof(CheckSelectionMessage))]
 public abstract class ClientMessage
 {
     public abstract string Describe();
@@ -1148,16 +1150,18 @@ public sealed class DistributeCardsPromptMessage : PromptPayload
 }
 
 /// <summary>
-/// This client chooses cards from a hand as a spell resolves: its own discards, or a card from an opponent's hand
-/// that has been revealed to it, as Duress does.
+/// This client chooses cards from among <see cref="Cards"/>, every one of which it sees: its own discards, a card from an
+/// opponent's hand revealed to it (Duress), permanents for a cost, cards looked at.
 /// <para>
-/// Every card in the hand is listed, and <see cref="Eligible"/> says which may be picked. Exactly
-/// <see cref="Count"/> have to be picked, which is already reduced to what is possible — zero when nothing is eligible,
-/// in which case the answer is an empty choice once the hand has been looked at.
+/// Which sets of the cards are an answer is the rules' to say, by the question's selection rule (docs/engine-design.md,
+/// "Selection rules"): <see cref="Verdict"/> is its word on choosing nothing yet - the cards that may be picked first, and
+/// whether none at all is an answer - and every selection after is checked with the host as it changes
+/// (<see cref="CheckSelectionMessage"/>), which says whether it is an answer and what may be added to it.
+/// <see cref="Count"/>, <see cref="CountKind"/>, <see cref="Kind"/> and <see cref="Words"/> are for wording the question.
 /// </para>
 /// </summary>
 [MessagePackObject]
-public sealed class ChooseCardsPromptMessage : PromptPayload
+public sealed class ChooseCardsPromptMessage : PromptPayload, ISelectionPrompt
 {
     /// <summary>Who is choosing.</summary>
     [Key(0)]
@@ -1174,20 +1178,13 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     [Key(3)]
     public CardChoicePurposeView Purpose { get; set; }
 
-    /// <summary>The whole hand, in hand order.</summary>
+    /// <summary>The cards chosen from, in the question's order: what <see cref="Verdict"/> and every check name cards of.</summary>
     [Key(4)]
     public List<ViewHandle> Cards { get; set; } = [];
 
-    [Key(5)]
-    public List<ViewHandle> Eligible { get; set; } = [];
-
-    /// <summary>How many to choose, or with <see cref="UpTo"/> the most that may be chosen.</summary>
+    /// <summary>How many the choice takes, as <see cref="CountKind"/> counts it, for wording it.</summary>
     [Key(6)]
     public int Count { get; set; }
-
-    /// <summary>Whether <see cref="Count"/> is a maximum rather than an exact number ("up to three lands").</summary>
-    [Key(7)]
-    public bool UpTo { get; set; }
 
     /// <summary>What kind of card is being chosen ("artifact"), where the purpose alone does not say. Empty otherwise.</summary>
     [Key(8)]
@@ -1200,7 +1197,7 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     [Key(9)]
     public int MinimumPower { get; set; }
 
-    /// <summary>The power of each card in <see cref="Eligible"/>, index for index, when <see cref="MinimumPower"/> is set.</summary>
+    /// <summary>The power of each of <see cref="Cards"/>, index for index, when <see cref="MinimumPower"/> is set.</summary>
     [Key(10)]
     public List<int> Powers { get; set; } = [];
 
@@ -1211,7 +1208,7 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     [Key(11)]
     public int MinimumManaValue { get; set; }
 
-    /// <summary>The mana value of each card in <see cref="Eligible"/>, index for index, when <see cref="MinimumManaValue"/> or <see cref="MaximumTotalManaValue"/> is set.</summary>
+    /// <summary>The mana value of each of <see cref="Cards"/>, index for index, when <see cref="MinimumManaValue"/> or <see cref="MaximumTotalManaValue"/> is set.</summary>
     [Key(12)]
     public List<int> ManaValues { get; set; } = [];
 
@@ -1231,16 +1228,16 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     public int CounterCount { get; set; }
 
     /// <summary>
-    /// The fewest that may be chosen when <see cref="UpTo"/> makes <see cref="Count"/> a maximum: craft's "one or more"
-    /// (CR 702.167a). Zero when any number up to <see cref="Count"/> will do.
+    /// The fewest that may be chosen when <see cref="CountKind"/> makes <see cref="Count"/> a maximum: craft's "one or more"
+    /// (CR 702.167a), for wording it. Zero when any number up to <see cref="Count"/> will do.
     /// </summary>
     [Key(16)]
     public int Minimum { get; set; }
 
     /// <summary>
-    /// "With total mana value N or less" (CR 202.3): the most the chosen cards' <see cref="ManaValues"/> may add up to,
-    /// as Michelangelo's Technique's "up to two creature cards with total mana value 6 or less". Null when the choice asks
-    /// nothing of them. <c>Cantrip.Core.Decisions.TotalManaValue.Within</c> is the rule; the engine refuses a choice over it.
+    /// "With total mana value N or less" (CR 202.3), as Michelangelo's Technique's "up to two creature cards with total mana value
+    /// 6 or less": the most the chosen cards' <see cref="ManaValues"/> add up to, for the running total a client shows. Null when
+    /// the question's rule keeps no such count. Display alone: the rule's verdicts judge the cards.
     /// </summary>
     [Key(17)]
     public int? MaximumTotalManaValue { get; set; }
@@ -1260,24 +1257,124 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     [Key(19)]
     public List<ViewHandle> WithoutBanding { get; set; } = [];
 
-    /// <summary>
-    /// "Any number of" (CR 608.2d): none, some or all of <see cref="Eligible"/>, which <see cref="Count"/> then is, worded so
-    /// rather than as "up to" that many.
-    /// </summary>
-    [Key(21)]
-    public bool AnyNumber { get; set; }
+    /// <summary>How the choice counts its cards: exactly <see cref="Count"/>, up to it, any number, or as many as there are.</summary>
+    [Key(22)]
+    public CountKindView CountKind { get; set; }
+
+    /// <summary>What the question's rule asks of the cards beyond their noun, each in the words a caption puts after it ("with total mana value 6 or less", "with different names").</summary>
+    [Key(23)]
+    public List<string> Words { get; set; } = [];
+
+    /// <summary>The rule's verdict on choosing nothing yet: whether that is an answer, and the cards that may be picked first.</summary>
+    [Key(24)]
+    public SelectionVerdictView Verdict { get; set; } = new();
+
+    [IgnoreMember]
+    public IReadOnlyList<ViewHandle> Candidates => Cards;
+
+    /// <summary>For wording: <see cref="Count"/> is a most, fewer allowed ("up to three lands", or "any number").</summary>
+    [IgnoreMember]
+    public bool UpTo => CountKind is CountKindView.UpTo or CountKindView.AnyNumber;
+
+    /// <summary>For wording: "any number of" (CR 608.2d), none, some or all, rather than "up to" so many.</summary>
+    [IgnoreMember]
+    public bool AnyNumber => CountKind == CountKindView.AnyNumber;
 
     /// <summary>
-    /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
+    /// The first cards that may be picked, as many as it takes (a rule of a count alone takes them; one asking more of the
+    /// cards together is settled with the host, <see cref="CheckSelectionMessage"/>). A choice that must add up to a power is
     /// offered "up to" every candidate, so taking every one with positive power meets it whenever anything can (a negative
-    /// power takes from the total, CR 107.1b); one with a <see cref="Minimum"/> takes that many; one limited to a total mana
-    /// value takes the first that fit together within it.
+    /// power takes from the total, CR 107.1b); one with a <see cref="Minimum"/> takes that many.
     /// </summary>
-    public override AnswerPayload Default() => MaximumTotalManaValue is { } most
-        ? new CardsChosenAnswer { Cards = Cantrip.Core.Decisions.TotalManaValue.FirstFitting(Eligible, ManaValues, Count, most) }
-        : MinimumPower > 0
-            ? new CardsChosenAnswer { Cards = [.. Eligible.Where((_, i) => i >= Powers.Count || Powers[i] > 0)] }
-            : new CardsChosenAnswer { Cards = [.. Eligible.Take(Minimum > 0 ? Minimum : Count)] };
+    public override AnswerPayload Default() => MinimumPower > 0
+        ? new CardsChosenAnswer { Cards = [.. Cards.Where((_, i) => i >= Powers.Count || Powers[i] > 0)] }
+        : new CardsChosenAnswer { Cards = [.. Verdict.Addable.Take(Minimum > 0 ? Minimum : Count)] };
+}
+
+/// <summary>
+/// A question that picks a set of cards by a selection rule (<see cref="ChooseCardsPromptMessage"/>,
+/// <see cref="SearchLibraryPromptMessage"/>): what a client reads of it to let a player pick, every selection after the
+/// first checked with the host (<see cref="CheckSelectionMessage"/>).
+/// </summary>
+public interface ISelectionPrompt
+{
+    /// <summary>Every card that may be picked from, in the question's order.</summary>
+    IReadOnlyList<ViewHandle> Candidates { get; }
+
+    int Count { get; }
+
+    CountKindView CountKind { get; }
+
+    /// <summary>The rule's verdict on choosing nothing yet.</summary>
+    SelectionVerdictView Verdict { get; }
+}
+
+/// <summary>How a choice of cards counts them: what its caption says of <c>Count</c>.</summary>
+public enum CountKindView
+{
+    /// <summary>Exactly that many.</summary>
+    Exactly = 0,
+
+    /// <summary>Up to that many, none included.</summary>
+    UpTo = 1,
+
+    /// <summary>Any number, none and all included (CR 608.2d, 701.23).</summary>
+    AnyNumber = 2,
+
+    /// <summary>That many, or fewer only when no more can be found (a search for "a card", CR 701.23b).</summary>
+    AsManyAsCan = 3,
+}
+
+/// <summary>What a question's selection rule says of a set of cards picked: whether it is an answer, and which may be added.</summary>
+[MessagePackObject]
+public sealed class SelectionVerdictView
+{
+    /// <summary>The cards picked are an answer the rules take.</summary>
+    [Key(0)]
+    public bool Complete { get; set; }
+
+    /// <summary>The cards not picked that may be added to them, in the question's order. Taking one back out is always allowed.</summary>
+    [Key(1)]
+    public List<ViewHandle> Addable { get; set; } = [];
+}
+
+/// <summary>
+/// "Check this partial selection for the pending question": what the question's selection rule says of the cards a player
+/// has picked so far, asked as the selection changes, answered with a <see cref="SelectionVerdictMessage"/>. Nothing in the
+/// game moves; the answer itself is still checked when it is given. For a <see cref="ChooseCardsPromptMessage"/> or a
+/// <see cref="SearchLibraryPromptMessage"/> only.
+/// </summary>
+[MessagePackObject]
+public sealed class CheckSelectionMessage : ClientMessage
+{
+    [Key(0)]
+    public int RequestId { get; set; }
+
+    /// <summary>The cards picked so far, in the order picked.</summary>
+    [Key(1)]
+    public List<ViewHandle> Selected { get; set; } = [];
+
+    public override string Describe() => $"check {RequestId}: {Selected.Count} picked";
+}
+
+/// <summary>
+/// The rules' verdict on a selection a <see cref="CheckSelectionMessage"/> asked about: whether the cards picked are an
+/// answer, and which may be added to them.
+/// </summary>
+[MessagePackObject]
+public sealed class SelectionVerdictMessage : ServerMessage
+{
+    [Key(0)]
+    public int RequestId { get; set; }
+
+    /// <summary>The selection the verdict is on, as it was asked.</summary>
+    [Key(1)]
+    public List<ViewHandle> Selected { get; set; } = [];
+
+    [Key(2)]
+    public SelectionVerdictView Verdict { get; set; } = new();
+
+    public override string Describe() => $"verdict {RequestId}: {(Verdict.Complete ? "complete" : "incomplete")}, {Verdict.Addable.Count} addable";
 }
 
 /// <summary>
@@ -3038,25 +3135,18 @@ public interface IGameTransport : IDisposable
 /// </para>
 /// </summary>
 [MessagePackObject]
-public sealed class SearchLibraryPromptMessage : PromptPayload
+public sealed class SearchLibraryPromptMessage : PromptPayload, ISelectionPrompt
 {
     [Key(0)]
     public int Player { get; set; }
 
-    /// <summary>The required number of cards, or the most that may be taken when <see cref="Optional"/>.</summary>
+    /// <summary>How many the search takes, as <see cref="CountKind"/> counts it, for wording it.</summary>
     [Key(1)]
     public int Count { get; set; }
 
-    /// <summary>Whether fewer may be taken, including none; true for a search with a stated quality (CR 701.23b).</summary>
-    [Key(2)]
-    public bool Optional { get; set; }
-
+    /// <summary>The whole library, which the searcher sees, in the order the search lists it.</summary>
     [Key(3)]
     public List<ViewHandle> Library { get; set; } = [];
-
-    /// <summary>The cards the search may take: all of <see cref="Library"/> for "a card", fewer for "a Plains or Island card".</summary>
-    [Key(4)]
-    public List<ViewHandle> Eligible { get; set; } = [];
 
     /// <summary>Where the chosen cards will go.</summary>
     [Key(5)]
@@ -3067,12 +3157,38 @@ public sealed class SearchLibraryPromptMessage : PromptPayload
     public int Owner { get; set; }
 
     /// <summary>
-    /// "Any number of" (CR 701.23): none, some or all of <see cref="Eligible"/>, which <see cref="Count"/> then is, worded so
-    /// rather than as "up to" that many.
+    /// How the search counts its cards: up to <see cref="Count"/> for a search with a stated quality, which may find nothing
+    /// (CR 701.23b); as many as there are, up to it, for "a card"; any number.
     /// </summary>
-    [Key(7)]
-    public bool AnyNumber { get; set; }
+    [Key(8)]
+    public CountKindView CountKind { get; set; }
 
-    /// <summary>Finding nothing, which a search always allows (CR 701.19d).</summary>
-    public override AnswerPayload Default() => new CardsChosenAnswer();
+    /// <summary>What the search's rule calls the cards it looks for ("basic land"), empty for "card".</summary>
+    [Key(9)]
+    public string Kind { get; set; } = string.Empty;
+
+    /// <summary>What the rule asks of the cards beyond their noun, in the words a caption puts after it ("with different names").</summary>
+    [Key(10)]
+    public List<string> Words { get; set; } = [];
+
+    /// <summary>
+    /// The rule's verdict on finding nothing yet: whether that is an answer (a search with a quality may always find
+    /// nothing, CR 701.23b), and the cards that may be found first. Every selection after is checked with the host.
+    /// </summary>
+    [Key(11)]
+    public SelectionVerdictView Verdict { get; set; } = new();
+
+    [IgnoreMember]
+    public IReadOnlyList<ViewHandle> Candidates => Library;
+
+    /// <summary>For wording: fewer than <see cref="Count"/> may be found, none included (CR 701.23b), or any number.</summary>
+    [IgnoreMember]
+    public bool Optional => CountKind is CountKindView.UpTo or CountKindView.AnyNumber;
+
+    /// <summary>For wording: "any number of" (CR 701.23), rather than "up to" so many.</summary>
+    [IgnoreMember]
+    public bool AnyNumber => CountKind == CountKindView.AnyNumber;
+
+    /// <summary>Finding nothing where that is an answer (CR 701.23b); otherwise the first cards that may be found.</summary>
+    public override AnswerPayload Default() => new CardsChosenAnswer { Cards = Verdict.Complete ? [] : [.. Verdict.Addable.Take(Count)] };
 }

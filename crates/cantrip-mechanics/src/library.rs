@@ -1,11 +1,116 @@
 //! Library recipes (CR 401, 701.23): searching, looking at the top, exiling it to play.
+//!
+//! **A search is `search`, or one of the `find_to_*` wrappers, with a rule from `crate::select`** ("a basic land card",
+//! "up to two land cards", "cards with different names"). `Find` and the `search_to_*` wrappers, which take a count and a
+//! closure, are kept for existing cards; new cards use the rules.
 
 use crate::{search_library, top_of_library};
 use cantrip_api::*;
 
+/// The cards of `owner`'s library as a search shows them: bottom first, as the C# engine lists them.
+pub fn searched_cards(q: &dyn Query, owner: PlayerId) -> Vec<ObjectId> {
+    let mut library: Vec<ObjectId> = q.state().zone(Zone::library(owner)).to_vec();
+    library.reverse();
+    library
+}
+
+/// `searcher` searches the library of `owner` (CR 701.23, 701.23f; the same player for "search your library") for the
+/// cards `rule` allows (`crate::select`: `select::CARD`, `select::basic_land_cards(up_to(2))`), and they come back in the
+/// order chosen. The whole library is shown, and the searcher is told the cards found go to `destination`. Asked only when
+/// the library has cards and the rule could take one; the search is recorded either way (a search for zero cards, as
+/// Settle the Wreckage can make, is still a search). A search the spell or ability can't cause (`Game::may_search`,
+/// CR 101.2) is not made: nothing is asked or found and no search is recorded, and the caller's "then shuffle" still
+/// shuffles (Ashiok, Dream Render's ruling). What becomes of the cards, and the shuffle, are the caller's.
+pub fn search(g: &mut dyn Game, searcher: PlayerId, owner: PlayerId, source: ObjectId, destination: SearchDestination, rule: Selection) -> Result<Vec<ObjectId>, Suspend> {
+    if !g.may_search(searcher, owner) {
+        return Ok(Vec::new());
+    }
+    let library = searched_cards(g, owner);
+    let found = if library.is_empty() || rule.count.most() == Some(0) {
+        Vec::new()
+    } else {
+        match g.ask(searcher, RequestKind::SearchLibrary { source, library, rule: Box::new(rule), destination })? {
+            Answer::Cards(cards) => cards,
+            _ => Vec::new(),
+        }
+    };
+    g.searched(searcher, owner);
+    Ok(found)
+}
+
+/// `player` searches their own library for the cards `rule` allows, revealing them with `reveal` ("reveal it").
+fn find_by(g: &mut dyn Game, player: PlayerId, source: ObjectId, destination: SearchDestination, rule: Selection, reveal: bool) -> Result<Vec<ObjectId>, Suspend> {
+    let found = search(g, player, player, source, destination, rule)?;
+    if reveal {
+        g.reveal(player, &found);
+    }
+    Ok(found)
+}
+
+/// "Search your library for [`rule`], [reveal it,] put it into your hand, then shuffle" (CR 701.23): the cards found, as
+/// they are in the hand. Demonic Tutor (`select::CARD`) and the basic land searches (`select::BASIC_LAND_CARD`, revealed)
+/// print it.
+pub fn find_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection, reveal: bool) -> Result<Vec<ObjectId>, Suspend> {
+    let found = find_by(g, player, source, SearchDestination::Hand, rule, reveal)?;
+    Ok(into_hand(g, player, &found))
+}
+
+/// "Search your library for [`rule`], put it onto the battlefield [tapped], then shuffle" (CR 701.23): the permanents that
+/// arrived. The basic land fetches (`select::BASIC_LAND_CARD`) and Crop Rotation (`select::LAND_CARD`) print it.
+pub fn find_to_battlefield(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
+    let to = if tapped { SearchDestination::BattlefieldTapped } else { SearchDestination::Battlefield };
+    let found = find_by(g, player, source, to, rule, false)?;
+    onto_battlefield(g, player, found, tapped)
+}
+
+/// "Search your library for [`rule`], put it into your graveyard, then shuffle" (CR 701.23). Entomb (`select::CARD`) and
+/// Goblin Engineer (`select::ARTIFACT_CARD`) print it.
+pub fn find_to_graveyard(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection) -> Result<Vec<ObjectId>, Suspend> {
+    let found = find_by(g, player, source, SearchDestination::Graveyard, rule, false)?;
+    Ok(into_graveyard(g, player, &found))
+}
+
+/// "Search your library for [`rule`], [reveal it,] then shuffle and put that card on top" (CR 701.23). Vampiric Tutor
+/// (`select::CARD`) and Worldly Tutor (`select::CREATURE_CARD`, revealed) print it.
+pub fn find_to_top(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection, reveal: bool) -> Result<Vec<ObjectId>, Suspend> {
+    let found = find_by(g, player, source, SearchDestination::TopOfLibrary, rule, reveal)?;
+    onto_top(g, player, &found);
+    Ok(found)
+}
+
+fn into_hand(g: &mut dyn Game, player: PlayerId, found: &[ObjectId]) -> Vec<ObjectId> {
+    let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::hand(player))).collect();
+    let moved = g.move_together(&moves, ZoneReason::Search);
+    g.shuffle(player);
+    moved
+}
+
+fn into_graveyard(g: &mut dyn Game, player: PlayerId, found: &[ObjectId]) -> Vec<ObjectId> {
+    let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::graveyard(player))).collect();
+    let moved = g.move_together(&moves, ZoneReason::Search);
+    g.shuffle(player);
+    moved
+}
+
+fn onto_battlefield(g: &mut dyn Game, player: PlayerId, found: Vec<ObjectId>, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
+    // All the cards found enter at the same time (CR 110.2a, 701.23): each sees the others already there, as a landfall-like
+    // "if you control N other Forests" does (Roiling Canopy).
+    let arrived = g.put_all_onto_battlefield_as(&found.into_iter().map(|c| (c, player, tapped)).collect::<Vec<_>>())?;
+    g.shuffle(player);
+    Ok(arrived)
+}
+
+fn onto_top(g: &mut dyn Game, player: PlayerId, found: &[ObjectId]) {
+    g.shuffle(player);
+    if !found.is_empty() {
+        g.arrange_library(player, found, &[]);
+    }
+}
+
 /// What a library search looks for (CR 701.23): how many cards, whether finding fewer is allowed, whether the cards
 /// found are revealed. `Find::ONE` is "a [quality] card", which a player may fail to find (CR 701.23b); `Find::ANY` is
-/// "a card" with nothing to fail at, so the searcher must take one.
+/// "a card" with nothing to fail at, so the searcher must take one. Kept for existing cards; new cards say what they look
+/// for with a rule from `crate::select` and search with `search` or the `find_to_*` wrappers.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Find {
     pub count: u32,
@@ -127,7 +232,8 @@ pub fn exile_up_to_four_named_from_graveyard_hand_and_library(g: &mut dyn Game, 
 }
 
 /// "Search your library for [cards], put them into your hand, then shuffle" (CR 701.23): the cards found, as they are
-/// in the hand. Demonic Tutor (`Find::ANY`) and Expedition Map (`Find::ONE.revealed()`) print it.
+/// in the hand. Demonic Tutor (`Find::ANY`) and Expedition Map (`Find::ONE.revealed()`) print it. Kept for existing cards; new cards
+/// use the `find_to_*` wrapper with a rule from `crate::select`.
 pub fn search_to_hand(
     g: &mut dyn Game,
     player: PlayerId,
@@ -136,10 +242,7 @@ pub fn search_to_hand(
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let found = find(g, player, source, SearchDestination::Hand, how, eligible)?;
-    let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::hand(player))).collect();
-    let moved = g.move_together(&moves, ZoneReason::Search);
-    g.shuffle(player);
-    Ok(moved)
+    Ok(into_hand(g, player, &found))
 }
 
 /// "Search your library for an Aura or Equipment card, reveal it, put it into your hand, then shuffle" (CR 701.23). Open the
@@ -152,7 +255,8 @@ pub fn search_aura_or_equipment_to_hand(g: &mut dyn Game, player: PlayerId, sour
 }
 
 /// "Search your library for [cards], put them into your graveyard, then shuffle" (CR 701.23). Entomb and Goblin
-/// Engineer print it.
+/// Engineer print it. Kept for existing cards; new cards
+/// use the `find_to_*` wrapper with a rule from `crate::select`.
 pub fn search_to_graveyard(
     g: &mut dyn Game,
     player: PlayerId,
@@ -161,14 +265,12 @@ pub fn search_to_graveyard(
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let found = find(g, player, source, SearchDestination::Graveyard, how, eligible)?;
-    let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::graveyard(player))).collect();
-    let moved = g.move_together(&moves, ZoneReason::Search);
-    g.shuffle(player);
-    Ok(moved)
+    Ok(into_graveyard(g, player, &found))
 }
 
 /// "Search your library for [cards], put them onto the battlefield [tapped], then shuffle" (CR 701.23): the permanents
-/// that arrived. The fetch lands (Flooded Strand, Arid Mesa), Tinker and Natural Order print it.
+/// that arrived. The fetch lands (Flooded Strand, Arid Mesa), Tinker and Natural Order print it. Kept for existing cards; new cards
+/// use the `find_to_*` wrapper with a rule from `crate::select`.
 pub fn search_to_battlefield(
     g: &mut dyn Game,
     player: PlayerId,
@@ -178,11 +280,7 @@ pub fn search_to_battlefield(
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let found = find(g, player, source, if tapped { SearchDestination::BattlefieldTapped } else { SearchDestination::Battlefield }, how, eligible)?;
-    // All the cards found enter at the same time (CR 110.2a, 701.23): each sees the others already there, as a landfall-like
-    // "if you control N other Forests" does (Roiling Canopy).
-    let arrived = g.put_all_onto_battlefield_as(&found.into_iter().map(|c| (c, player, tapped)).collect::<Vec<_>>())?;
-    g.shuffle(player);
-    Ok(arrived)
+    onto_battlefield(g, player, found, tapped)
 }
 
 /// "Search your library for [a card] and reveal it. Put it onto the battlefield tapped if it's a land card. Otherwise, put
@@ -213,7 +311,8 @@ pub fn search_land_tapped_else_hand(
 }
 
 /// "Search your library for [a card], then shuffle and put that card on top" (CR 701.23): the library is shuffled
-/// and the card placed on top; it never changes zones. Enlightened Tutor and Vampiric Tutor print it.
+/// and the card placed on top; it never changes zones. Enlightened Tutor and Vampiric Tutor print it. Kept for existing cards; new cards
+/// use the `find_to_*` wrapper with a rule from `crate::select`.
 pub fn search_to_top(
     g: &mut dyn Game,
     player: PlayerId,
@@ -222,10 +321,7 @@ pub fn search_to_top(
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let found = find(g, player, source, SearchDestination::TopOfLibrary, how, eligible)?;
-    g.shuffle(player);
-    if !found.is_empty() {
-        g.arrange_library(player, &found, &[]);
-    }
+    onto_top(g, player, &found);
     Ok(found)
 }
 

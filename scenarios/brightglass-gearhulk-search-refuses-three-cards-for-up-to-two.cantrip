@@ -1,0 +1,36 @@
+# A search's rule judges the cards found together (CR 701.23): Brightglass Gearhulk searches for "up to two" artifact,
+# creature and/or enchantment cards with mana value 1 or less, so Sol Ring, Llanowar Elves and Fastbond - each findable
+# alone - are refused as one answer of three, and two of them are taken. The refusal names three findable cards, so the
+# harness checks the answer against the search's own rule rather than each card alone. Black Lotus pays {G}{G} with Mox
+# Pearl and a Plains paying {W}{W} on turn 1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Brightglass Gearhulk
+Island x3
+Sol Ring
+Llanowar Elves
+Fastbond
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Brightglass Gearhulk.Cast
+Bot1.Accept
+! Bot1.Search(Sol Ring; Llanowar Elves; Fastbond)
+Bot1.Search(Sol Ring; Fastbond)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Sol Ring; Fastbond
+Bot1.Library.Count = 11

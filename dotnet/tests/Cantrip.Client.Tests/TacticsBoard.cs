@@ -16,6 +16,30 @@ internal static class TacticsBoard
 
     internal static ViewHandle Handle(int value) => new(value);
 
+    /// <summary>The request ids the questions a test asks a seated client go out under.</summary>
+    private static int _asked = 900;
+
+    /// <summary>
+    /// <paramref name="prompt"/> described with <paramref name="picked"/> once the rules have judged them: asked of the client
+    /// (if it was not already its question), described, the check it sends answered, and described again.
+    /// </summary>
+    internal static CardChoicePresentation Judged(GameClient client, ChooseCardsPromptMessage prompt, IReadOnlyList<int> picked)
+    {
+        if (!ReferenceEquals(client.Prompt?.Prompt, prompt))
+        {
+            Transport(client).Inbound.Enqueue(new PromptMessage { RequestId = ++_asked, Prompt = prompt });
+            client.Pump();
+        }
+
+        CardChoicePresentation.Describe(client, prompt, picked);
+        client.Pump();
+        return CardChoicePresentation.Describe(client, prompt, picked);
+    }
+
+    /// <summary>The transport a seated client was made over.</summary>
+    internal static Held Transport(GameClient client) =>
+        (Held)typeof(GameClient).GetField("_transport", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(client)!;
+
     /// <summary>A client whose view holds these objects, on this seat's own precombat main phase unless told otherwise.</summary>
     internal static GameClient Seated(
         IEnumerable<ObjectView> objects,
@@ -176,14 +200,34 @@ internal static class TacticsBoard
 
         internal List<ClientMessage> Sent { get; } = [];
 
+        /// <summary>Every question the client was sent, for answering its checks.</summary>
+        private readonly List<PromptMessage> _asked = [];
+
         public bool IsConnected => true;
 
-        public void Send(ClientMessage message) => Sent.Add(message);
+        /// <summary>
+        /// Kept; a check of a choice of cards is answered by the gallery's stand-in for the rules (judged by its count, among
+        /// the cards its prompt lets be picked first), as no rules engine is behind a written board.
+        /// </summary>
+        public void Send(ClientMessage message)
+        {
+            Sent.Add(message);
+            if (message is CheckSelectionMessage check && _asked.LastOrDefault(asked => asked.RequestId == check.RequestId)?.Prompt is ISelectionPrompt prompt)
+            {
+                Inbound.Enqueue(new SelectionVerdictMessage
+                {
+                    RequestId = check.RequestId,
+                    Selected = check.Selected,
+                    Verdict = Cantrip.Client.Presentation.FixtureTransport.StandInVerdict(prompt, check.Selected),
+                });
+            }
+        }
 
         public IReadOnlyList<ServerMessage> Receive()
         {
             List<ServerMessage> messages = [.. Inbound];
             Inbound.Clear();
+            _asked.AddRange(messages.OfType<PromptMessage>());
             return messages;
         }
 

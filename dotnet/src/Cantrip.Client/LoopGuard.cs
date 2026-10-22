@@ -105,9 +105,9 @@ public sealed class LoopGuard : IAutoPlayer
             ChooseTargetPromptMessage { Optional: false, Count: 1, Candidates.Count: > 1 } target
                 when target.MaximumTotalManaValue is null
                 => new TargetsChosenAnswer { Targets = [target.Candidates[Pick(turn, target.Candidates.Count)]] },
-            ChooseCardsPromptMessage { Count: 1, Eligible.Count: > 1, UpTo: false } cards
-                when cards.MaximumTotalManaValue is null && cards.MinimumPower == 0
-                => new CardsChosenAnswer { Cards = [cards.Eligible[Pick(turn, cards.Eligible.Count)]] },
+            ChooseCardsPromptMessage { Count: 1, Verdict.Addable.Count: > 1, UpTo: false } cards
+                when cards.Words.Count == 0 && cards.MinimumPower == 0
+                => new CardsChosenAnswer { Cards = [cards.Verdict.Addable[Pick(turn, cards.Verdict.Addable.Count)]] },
             ChoosePlayerPromptMessage { Candidates.Count: > 1 } player
                 => new PlayerChosenAnswer { Player = player.Candidates[Pick(turn, player.Candidates.Count)] },
             ChooseModesPromptMessage { Count: 1, Eligible.Count: > 1 } modes

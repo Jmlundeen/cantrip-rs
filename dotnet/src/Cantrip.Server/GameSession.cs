@@ -541,6 +541,10 @@ public sealed class GameSession : IDisposable
                 Answer(from, answer);
                 break;
 
+            case CheckSelectionMessage check:
+                Check(from, check);
+                break;
+
             case ConcedeMessage when CanConcede(from):
                 Concede(from);
                 break;
@@ -637,6 +641,42 @@ public sealed class GameSession : IDisposable
         if (withdrawn)
         {
             TellOffer();
+        }
+    }
+
+    /// <summary>
+    /// What the rules say of a partial selection for the seat's outstanding choice of cards, sent back to that seat alone as a
+    /// <see cref="SelectionVerdictMessage"/>. Nothing in the game moves, and nothing is asked again: a check refused (a stale
+    /// request, a card the seat cannot see) is only reported.
+    /// </summary>
+    private void Check(PlayerId from, CheckSelectionMessage message)
+    {
+        if (IsOver || !_published.TryGetValue(message.RequestId, out (PlayerId Seat, PromptMessage Message) outstanding))
+        {
+            Reject(from, ErrorCode.StaleReply, $"request {message.RequestId} is not outstanding.");
+            return;
+        }
+
+        if (outstanding.Seat != from)
+        {
+            Reject(from, ErrorCode.NotYourTurnToAnswer, $"request {message.RequestId} belongs to seat {outstanding.Seat.Value}.");
+            return;
+        }
+
+        SelectionVerdictView verdict;
+        try
+        {
+            verdict = _rules.CheckSelection(message.RequestId, from.Value, message.Selected);
+        }
+        catch (RulesRejectedException refused)
+        {
+            Reject(from, refused.Code, refused.Detail);
+            return;
+        }
+
+        if (_outbox.TryGetValue(from, out Queue<ServerMessage>? queue))
+        {
+            queue.Enqueue(new SelectionVerdictMessage { RequestId = message.RequestId, Selected = message.Selected, Verdict = verdict });
         }
     }
 

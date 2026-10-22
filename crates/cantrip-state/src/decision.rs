@@ -343,22 +343,16 @@ pub enum RequestKind {
         options: Vec<ActionOption>,
         x: Option<u16>,
     },
-    /// Choose `count` (or up to `count`) of `eligible`, from among `cards` (all of which the player sees).
-    /// `kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or creature",
-    /// "nonland"), empty otherwise: the dock words the choice as the card does. `total`, when the cards chosen together are
-    /// limited to a total mana value ("up to two creature cards with total mana value 6 or less"), is that limit: the core
-    /// refuses a choice whose mana values add up to more. `any_number` says the choice is of "any number" (up to all of
-    /// `eligible`, which `count` then is): the dock words it so, where "up to two" of two cards would read otherwise.
+    /// Choose cards from among `cards`, every one of which the player sees: which sets of them are an answer is `rule`'s to
+    /// say (`Selection`; the core checks every answer with it), and what may be chosen next as the player picks is asked of
+    /// it too. `rule.kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or
+    /// creature", "nonland"): the dock words the choice as the card does.
     ChooseCards {
         source: ObjectId,
         purpose: Purpose,
         cards: Vec<ObjectId>,
-        eligible: Vec<ObjectId>,
-        count: u32,
-        up_to: bool,
-        any_number: bool,
-        kind: &'static str,
-        total: Option<TotalAtMost>,
+        /// Boxed, so that a question of another kind is no bigger for it.
+        rule: Box<Selection>,
     },
     /// `least` to `count` targets are chosen (a range, "one or two target creatures", CR 601.2c); `optional` is `least == 0`.
     /// Targets for an ability as it goes on the stack, or any other "choose a [thing]" the C# engine asks as targets.
@@ -447,13 +441,10 @@ pub enum RequestKind {
     /// Cards looked at, each to be put in one of the destinations (Ponder, surveil, "put one into your hand and the
     /// rest into your graveyard"). `cards` are top of the library first.
     DistributeCards { source: ObjectId, cards: Vec<ObjectId>, destinations: Vec<Destination>, may_shuffle: bool },
-    /// Search a library (CR 701.23): `library` is the whole library, `eligible` what the search may find; with
-    /// `optional`, finding nothing is allowed (CR 701.23b).
-    /// `destination` is where the searcher is told the cards found are going; whose library it is, is the owner of the
-    /// cards in `library`.
-    /// `any_number`: "search for any number of [cards]" (CR 701.23): none, some or all of `eligible`, which `count` then is,
-    /// as `ChooseCards::any_number` says it.
-    SearchLibrary { source: ObjectId, library: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u32, optional: bool, any_number: bool, destination: SearchDestination },
+    /// Search a library (CR 701.23): `library` is the whole library, which the searcher sees, and `rule` which sets of its
+    /// cards the search may find (`Selection`: how many, of what quality, CR 701.23b). `destination` is where the searcher
+    /// is told the cards found are going; whose library it is, is the owner of the cards in `library`.
+    SearchLibrary { source: ObjectId, library: Vec<ObjectId>, rule: Box<Selection>, destination: SearchDestination },
     /// Which of several replacement effects applies to an event first (CR 616.1), asked of the affected player:
     /// `sources` are the objects whose effects apply and `hints` say what each does, in the order they are offered.
     /// `subject` is the object the event is about, if it is about one; `life`, for an event that changes the affected
@@ -475,6 +466,14 @@ pub enum RequestKind {
 }
 
 impl RequestKind {
+    /// A choice of `count` of `eligible` (or up to `count` with `up_to`) from among `cards`, called `kind`: the shape the
+    /// core's costs and turn-based choices ask, as a `ChooseCards` with that rule (`Selection::listed`).
+    pub fn choose_cards(source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u32, up_to: bool, kind: &'static str) -> RequestKind {
+        let count = if up_to { Count::UpTo(count) } else { Count::Exactly(count) };
+        let rule = Selection::listed(count, &cards, eligible).called(kind);
+        RequestKind::ChooseCards { source, purpose, cards, rule: Box::new(rule) }
+    }
+
     /// The object a question is for: the spell, ability or permanent whose text asks it. None for a choice the rules
     /// themselves ask: attacks, blocks, combat damage, the discard to hand size, mulligans, who goes first, the order of
     /// triggers, which replacement effect applies first.
@@ -547,10 +546,10 @@ impl RequestKind {
                 add(attackers);
                 options(&mut add, o);
             }
-            RequestKind::ChooseCards { source, cards, eligible, .. } => {
+            RequestKind::ChooseCards { source, cards, rule, .. } => {
                 add(&[*source]);
                 add(cards);
-                add(eligible);
+                add(rule.among.as_deref().unwrap_or(&[]));
             }
             RequestKind::ChooseTarget { source, candidates, .. } | RequestKind::ChooseDividedTargets { source, candidates, .. } => {
                 add(&[*source]);
@@ -603,10 +602,10 @@ impl RequestKind {
                     add(&d.eligible);
                 }
             }
-            RequestKind::SearchLibrary { source, library, eligible, .. } => {
+            RequestKind::SearchLibrary { source, library, rule, .. } => {
                 add(&[*source]);
                 add(library);
-                add(eligible);
+                add(rule.among.as_deref().unwrap_or(&[]));
             }
             RequestKind::ChooseReplacement { subject, sources, damage, .. } => {
                 if let Some(s) = subject {
@@ -828,6 +827,177 @@ impl TotalAtMost {
             }
         }
         taken
+    }
+}
+
+/// How many cards a choice of cards takes: the count of its `Selection`, which its caption words ("up to two").
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Count {
+    /// Exactly this many.
+    Exactly(u32),
+    /// From none to this many ("up to two").
+    UpTo(u32),
+    /// "Any number": none, some or all (CR 701.23, 608.2d).
+    AnyNumber,
+    /// This many, or fewer only when nothing more may be added: a search for "a card" or "two cards" with no quality it
+    /// could fail to find takes what it can (CR 701.23b), and a choice of "a [quality] card" among cards some of which may
+    /// not be chosen takes one if there is one.
+    AsManyAsCan(u32),
+}
+
+impl Count {
+    /// The most it takes, or `None` for any number.
+    pub fn most(self) -> Option<u32> {
+        match self {
+            Count::Exactly(n) | Count::UpTo(n) | Count::AsManyAsCan(n) => Some(n),
+            Count::AnyNumber => None,
+        }
+    }
+
+    /// Whether a selection of `n` cards has room for one more.
+    pub fn room(self, n: usize) -> bool {
+        self.most().is_none_or(|most| (n as u64) < u64::from(most))
+    }
+
+    /// Whether `n` cards are as many as it takes, `more` saying whether any card could still be added to them.
+    pub fn complete(self, n: usize, more: bool) -> bool {
+        let n = n as u64;
+        match self {
+            Count::Exactly(most) => n == u64::from(most),
+            Count::UpTo(most) => n <= u64::from(most),
+            Count::AnyNumber => true,
+            Count::AsManyAsCan(most) => n == u64::from(most) || (n < u64::from(most) && !more),
+        }
+    }
+}
+
+/// One part of a selection rule (`Selection`): a validator over the cards chosen so far, with the one number it is
+/// parameterised by. The validator is a `cantrip_api::select::SelectFn` - a plain function, never a closure, so the rule is
+/// data that the game-log tree moves through and replays like any other (`Game::goto`) - held here as `dyn Any`, because
+/// this crate can't name the `Query` it reads the game through; `cantrip_api::select` makes parts and runs them. Two parts
+/// are the same when they hold the same function with the same number and words.
+#[derive(Clone, Copy)]
+pub struct Part {
+    pub judge: &'static (dyn std::any::Any + Send + Sync),
+    /// The number the part is parameterised by: a count, a mana value, a card's id. Zero when it takes none.
+    pub n: u32,
+    /// What the part asks, in the words a caption puts after the cards' noun ("with different names", "with total mana
+    /// value {n} or less", `{n}` standing for `n`); empty for a part the noun already says (`Selection::kind`).
+    pub words: &'static str,
+    /// What a client keeps count of for the player as the cards are chosen, beside the words: nothing, or a running total.
+    pub tally: Tally,
+}
+
+/// What a client keeps count of for a part of a selection rule as the cards are chosen (`Part::tally`): display alone,
+/// the rule's verdicts still judge the cards.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum Tally {
+    #[default]
+    Nothing,
+    /// The cards' total mana value, against the part's number as its most (CR 202.3).
+    ManaValueAtMost,
+}
+
+impl Part {
+    /// `words`, with `n` where it says `{n}`.
+    pub fn worded(&self) -> String {
+        self.words.replace("{n}", &self.n.to_string())
+    }
+}
+
+impl std::fmt::Debug for Part {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Part({:?}, {})", self.words, self.n)
+    }
+}
+
+impl PartialEq for Part {
+    fn eq(&self, other: &Part) -> bool {
+        std::ptr::addr_eq(self.judge as *const _, other.judge as *const _) && self.n == other.n && self.words == other.words && self.tally == other.tally
+    }
+}
+
+impl Eq for Part {}
+
+/// Hashed by its number and words alone, which equal parts share: an address is no part of a position's fingerprint.
+impl std::hash::Hash for Part {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.n.hash(state);
+        self.words.hash(state);
+    }
+}
+
+/// The most parts a `Selection` holds besides its count.
+pub const MAX_PARTS: usize = 4;
+
+/// A selection rule (docs/engine-design.md, "Selection rules"): which sets of a question's cards answer a choice of cards
+/// (`RequestKind::ChooseCards`) or a library search (`RequestKind::SearchLibrary`). Plain data: the `count`, the `parts`,
+/// every one of which must allow a card for it to be added and call the cards chosen complete for them to be an answer,
+/// and `among`, the cards a question asked by a list (`cantrip_mechanics::choose`'s older functions, `search_library`, the
+/// core's costs) lets be chosen at all. `cantrip_api::select::judge` judges a selection by it; the core checks every
+/// answer with it, and a client asks it which cards may be added as the player picks (the host's `Check`).
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct Selection {
+    pub count: Count,
+    /// What the asking card calls the cards that may be chosen when it says more than "card" ("basic land", "nonland"):
+    /// the caption's noun. Empty for "card".
+    pub kind: &'static str,
+    pub parts: [Option<Part>; MAX_PARTS],
+    /// The only cards that may be chosen, worked out as the question was asked; `None` for any of the question's cards.
+    pub among: Option<Vec<ObjectId>>,
+}
+
+impl Selection {
+    /// `count` cards, any of the question's.
+    pub const fn new(count: Count) -> Selection {
+        Selection { count, kind: "", parts: [None; MAX_PARTS], among: None }
+    }
+
+    /// `count` of `eligible`, from among `cards`: a question asked with its eligible cards listed. An `eligible` that is
+    /// all of `cards` leaves the rule no list to keep.
+    pub fn listed(count: Count, cards: &[ObjectId], eligible: Vec<ObjectId>) -> Selection {
+        let among = if eligible.as_slice() == cards { None } else { Some(eligible) };
+        Selection { among, ..Selection::new(count) }
+    }
+
+    /// The same rule, with `part` as well.
+    pub const fn with(mut self, part: Part) -> Selection {
+        let mut i = 0;
+        while i < MAX_PARTS {
+            if self.parts[i].is_none() {
+                self.parts[i] = Some(part);
+                return self;
+            }
+            i += 1;
+        }
+        panic!("a selection holds at most MAX_PARTS parts")
+    }
+
+    /// The same rule, its cards called `kind` ("basic land").
+    pub const fn called(mut self, kind: &'static str) -> Selection {
+        self.kind = kind;
+        self
+    }
+
+    /// The same rule, taking `count` cards.
+    pub const fn taking(mut self, count: Count) -> Selection {
+        self.count = count;
+        self
+    }
+
+    /// The parts it has.
+    pub fn parts(&self) -> impl Iterator<Item = &Part> {
+        self.parts.iter().flatten()
+    }
+
+    /// The words of every part that has some, `{n}` filled in: what a caption says after the noun.
+    pub fn words(&self) -> Vec<String> {
+        self.parts().filter(|p| !p.words.is_empty()).map(Part::worded).collect()
+    }
+
+    /// Whether `card` is one of the cards `among` lets be chosen.
+    pub fn listed_card(&self, card: ObjectId) -> bool {
+        self.among.as_ref().is_none_or(|among| among.contains(&card))
     }
 }
 

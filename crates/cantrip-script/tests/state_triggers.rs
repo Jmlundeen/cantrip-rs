@@ -148,7 +148,7 @@ fn shrink_then_ask(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
             }
             let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
             let eligible = hand.iter().copied().take(1).collect();
-            let kind = RequestKind::ChooseCards { any_number: false, source: item.object, purpose: Purpose::Reveal, cards: hand, eligible, count: 1, up_to: false, kind: "", total: None };
+            let kind = RequestKind::choose_cards(item.object, Purpose::Reveal, hand, eligible, 1, false, "");
             Err(g.ask_then(1, item.controller, kind))
         }
         _ => Ok(()),
@@ -312,7 +312,7 @@ fn play_steps(steps: &[(ActionKind, &'static str)], card: &'static str) -> Game 
             RequestKind::Priority { .. } => Answer::Pass,
             RequestKind::ChooseModes { eligible, count, .. } => Answer::Modes(eligible.iter().copied().take(*count as usize).collect()),
             RequestKind::ChooseTarget { candidates, .. } => Answer::Targets(vec![frail_target(&game, candidates)]),
-            RequestKind::ChooseCards { eligible, .. } => Answer::Cards(eligible.clone()),
+            RequestKind::ChooseCards { .. } => Answer::Cards(first_choices(&game, &request)),
             other => panic!("unexpected question {other:?}"),
         };
         game.answer(request.id, request.player, answer).unwrap();

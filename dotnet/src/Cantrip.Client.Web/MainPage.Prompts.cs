@@ -1684,15 +1684,22 @@ public sealed partial class MainPage
             _ => $" {destination}",
         };
 
+        // The cards it looks for, as its rule words them: "a basic land card", "up to 2 cards with different names".
+        string noun = prompt.Kind.Length > 0 ? $"{prompt.Kind} card" : "card";
+        string asks = string.Concat(prompt.Words.Select(words => " " + words));
         Prompt(
             title,
             prompt.Count == 1
-                ? $"Choose a card{what}  ·  {_picked.Count} chosen"
+                ? $"Choose {("aeiou".Contains(noun[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a")} {noun}{asks}{what}  ·  {_picked.Count} chosen"
                 : prompt.AnyNumber
-                ? $"Choose any number of cards{what}  ·  {_picked.Count} chosen"
-                : $"Choose {(prompt.Optional ? "up to " : string.Empty)}{prompt.Count} cards{what}  ·  {_picked.Count} chosen");
+                ? $"Choose any number of {noun}s{asks}{what}  ·  {_picked.Count} chosen"
+                : $"Choose {(prompt.Optional ? "up to " : string.Empty)}{prompt.Count} {noun}s{asks}{what}  ·  {_picked.Count} chosen");
 
-        HashSet<int> eligible = [.. prompt.Eligible.Select(card => card.Value)];
+        // The cards the search may find at all, and what the rules say of the ones picked so far: which may join them, and
+        // whether they are an answer - asked of the host as the picks change.
+        HashSet<int> eligible = [.. prompt.Verdict.Addable.Select(card => card.Value)];
+        SelectionVerdictView? judged = CardChoicePresentation.Judged(client, prompt, _picked);
+        HashSet<int> addable = [.. (judged?.Addable ?? []).Select(card => card.Value)];
         List<ObjectView> shown =
         [
             .. prompt.Library
@@ -1729,19 +1736,21 @@ public sealed partial class MainPage
             {
                 int handle = card.Handle.Value;
                 bool canTake = eligible.Contains(handle);
+                // With one to find, a click trades, so any card it may find may be clicked; else only one the rules let join.
+                bool joins = prompt.Count == 1 || addable.Contains(handle);
 
                 AddChoice(card, new CardLook(
                     Selected: _picked.Contains(handle),
                     Dimmed: !canTake,
-                    Actionable: canTake && !_picked.Contains(handle) && _selection.CanPick(prompt.Count),
-                    Clicked: canTake && (_picked.Contains(handle) || _selection.CanPick(prompt.Count)) ? () => Pick(handle, prompt.Count) : null));
+                    Actionable: canTake && !_picked.Contains(handle) && _selection.CanPick(prompt.Count) && joins,
+                    Clicked: canTake && (_picked.Contains(handle) || _selection.CanPick(prompt.Count) && joins) ? () => Pick(handle, prompt.Count) : null));
             }
         }
 
         AddButton(
             _picked.Count == 0 ? take : _picked.Count == 1 ? $"{take} 1 card" : $"{take} {_picked.Count} cards",
             () => Send(client, new CardsChosenAnswer { Cards = [.. _picked.Select(h => new ViewHandle(h))] }),
-            enabled: prompt.Optional ? _picked.Count > 0 && _picked.Count <= prompt.Count : _picked.Count == prompt.Count,
+            enabled: (_picked.Count > 0 || !prompt.Optional) && judged?.Complete == true,
             primary: true);
 
         if (prompt.Optional)
@@ -1751,16 +1760,32 @@ public sealed partial class MainPage
         }
     }
 
+    /// <summary>
+    /// An exact number of permanents picked on the board, its last pick made: sent once the host has called it an answer,
+    /// and left for the dock if it does not.
+    /// </summary>
+    private bool _answerWhenJudged;
+
     /// <summary>Choosing cards as a spell resolves: on the board where they are, or in the choice window.</summary>
     private void FillChooseCards(GameClient client, ChooseCardsPromptMessage prompt)
     {
         CardChoicePresentation model = CardChoicePresentation.Describe(client, prompt, _picked);
+        if (_answerWhenJudged && CardChoicePresentation.Judged(client, prompt, _picked) is { } judged)
+        {
+            _answerWhenJudged = false;
+            if (judged.Complete && model.AnswersOnLastPick && _picked.Count == prompt.Count)
+            {
+                Send(client, new CardsChosenAnswer { Cards = [.. _picked.Select(h => new ViewHandle(h))] });
+                return;
+            }
+        }
+
         Prompt(model.Title, model.Detail);
 
         if (model.BoardZone is null)
         {
             OpenChoices(model.TrayTitle, closable: false, prompt.Cards.Count);
-            HashSet<int> eligible = [.. prompt.Eligible.Select(card => card.Value)];
+            HashSet<int> eligible = [.. prompt.Verdict.Addable.Select(card => card.Value)];
 
             foreach (ViewHandle card in prompt.Cards)
             {
@@ -1772,9 +1797,10 @@ public sealed partial class MainPage
                     AddChoice(shown, new CardLook(
                         Selected: _picked.Contains(handle),
                         Dimmed: !canPick,
-                        // A card that would take a choice "with total mana value N or less" over it is refused (CR 202.3).
-                        Actionable: canPick && !_picked.Contains(handle) && _selection.CanPick(prompt.Count) && CardChoicePresentation.Fits(prompt, _picked, handle),
-                        Clicked: canPick && (_picked.Contains(handle) || _selection.CanPick(prompt.Count) && CardChoicePresentation.Fits(prompt, _picked, handle))
+                        // A card the question's rule would refuse with those picked ("with total mana value N or less", CR 202.3) is
+                        // not offered: the host's word on the cards picked.
+                        Actionable: canPick && !_picked.Contains(handle) && _selection.CanPick(prompt.Count) && CardChoicePresentation.Fits(client, prompt, _picked, handle),
+                        Clicked: canPick && (_picked.Contains(handle) || _selection.CanPick(prompt.Count) && CardChoicePresentation.Fits(client, prompt, _picked, handle))
                             ? () => Pick(handle, prompt.Count)
                             : null,
                         Annotation: PutBackAnnotation(prompt, handle)));

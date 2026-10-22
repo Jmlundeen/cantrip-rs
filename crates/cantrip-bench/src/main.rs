@@ -338,8 +338,8 @@ fn main() {
         let script = cantrip_script::GameScript::parse(&text, file).expect("parses");
         let mut g = cantrip_script::run(&script).map_err(|f| f.report).expect("reaches its handover").game;
         let request = g.pending().cloned().expect("a question");
-        let RequestKind::ChooseCards { eligible, count, .. } = &request.kind else { panic!("a card choice") };
-        let answer = Answer::Cards(eligible.iter().take(*count as usize).copied().collect());
+        let RequestKind::ChooseCards { source, cards, rule, .. } = &request.kind else { panic!("a card choice") };
+        let answer = Answer::Cards(select::first_answer(&g, rule, request.player, *source, cards, true).expect("an answer"));
         const TIMES: u32 = 100_000;
         let t = Instant::now();
         for _ in 0..TIMES {

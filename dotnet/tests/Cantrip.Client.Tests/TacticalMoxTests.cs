@@ -52,9 +52,9 @@ public sealed class TacticalMoxTests
             Source = Handle(10),
             Purpose = CardChoicePurposeView.Exile,
             Cards = [Handle(11), Handle(12)],
-            Eligible = [Handle(11), Handle(12)],
+            Verdict = new() { Addable = [Handle(11), Handle(12)] },
             Count = 1,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
         };
 
         Assert.Single(Assert.IsType<CardsChosenAnswer>(Bot().Decide(imprinting, imprint)).Cards);

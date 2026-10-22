@@ -43,6 +43,17 @@ public interface IRulesHost : IDisposable
     /// </exception>
     RulesStep Answer(int requestId, int seat, AnswerPayload answer);
 
+    /// <summary>
+    /// What the rule of an outstanding choice of cards says of the cards a seat has <paramref name="selected"/> so far
+    /// (docs/host-protocol.md, "Checking a selection"): whether they are an answer, and which may be added. Nothing advances.
+    /// </summary>
+    /// <exception cref="RulesRejectedException">
+    /// The request is not outstanding (<see cref="ErrorCode.StaleReply"/>), not the seat's, not a choice of cards, or a card
+    /// is unknown to the seat.
+    /// </exception>
+    SelectionVerdictView CheckSelection(int requestId, int seat, IReadOnlyList<ViewHandle> selected) =>
+        throw new RulesRejectedException(ErrorCode.IllegalAnswer, "this rules host judges no selections.");
+
     /// <summary>Whether a seat may concede now: only when that ends the game (CR 104.3a, 800.4a).</summary>
     bool CanConcede(int seat);
 

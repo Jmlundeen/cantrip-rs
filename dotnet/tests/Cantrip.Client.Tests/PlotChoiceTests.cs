@@ -34,9 +34,9 @@ public sealed class PlotChoiceTests
         Source = Handle(90),
         Purpose = CardChoicePurposeView.Plot,
         Cards = [.. cards.Select(Handle)],
-        Eligible = [.. cards.Select(Handle)],
+        Verdict = new() { Addable = [.. cards.Select(Handle)], Complete = upTo },
         Count = 1,
-        UpTo = upTo,
+        CountKind = upTo ? CountKindView.UpTo : CountKindView.Exactly,
         Kind = "nonland",
     };
 
@@ -55,7 +55,7 @@ public sealed class PlotChoiceTests
         Assert.Equal("Plot nothing", none.Confirm);
         Assert.True(none.CanSubmit);
 
-        CardChoicePresentation one = CardChoicePresentation.Describe(client, prompt, [10]);
+        CardChoicePresentation one = Judged(client, prompt, [10]);
         Assert.Equal("Exile and plot it", one.Confirm);
         Assert.True(one.CanSubmit);
     }

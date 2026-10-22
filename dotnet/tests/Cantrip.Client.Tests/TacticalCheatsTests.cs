@@ -91,9 +91,9 @@ public sealed class TacticalCheatsTests
             Owner = Me,
             Purpose = CardChoicePurposeView.PutOntoBattlefield,
             Cards = [Handle(10), Handle(11)],
-            Eligible = [Handle(10), Handle(11)],
+            Verdict = new() { Addable = [Handle(10), Handle(11)] },
             Count = 1,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
         };
 
         Assert.Equal([Handle(10)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt)).Cards);
@@ -150,9 +150,9 @@ public sealed class TacticalCheatsTests
             Source = Handle(20),
             Purpose = CardChoicePurposeView.PutOntoBattlefield,
             Cards = [Handle(10), Handle(11)],
-            Eligible = [Handle(10), Handle(11)],
+            Verdict = new() { Addable = [Handle(10), Handle(11)] },
             Count = 1,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
         };
 
         Assert.Equal([Handle(11)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt)).Cards);

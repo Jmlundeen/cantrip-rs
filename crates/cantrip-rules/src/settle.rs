@@ -348,13 +348,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                 if group.len() < 2 {
                     continue;
                 }
-                let ask = RequestKind::ChooseCards { any_number: false,
-                    source: group[0],
-                    purpose: Purpose::KeepLegend,
-                    cards: group.clone(),
-                    eligible: group.clone(),
-                    count: 1,
-                    up_to: false, kind: "", total: None };
+                let ask = RequestKind::choose_cards(group[0], Purpose::KeepLegend, group.clone(), group.clone(), 1, false, "");
                 let keep = match cx.ask_rule(p, ask)? {
                     Some(Answer::Cards(cards)) => cards.first().copied().unwrap_or(group[0]),
                     // A player who has left has taken their legends with them (CR 800.4a).

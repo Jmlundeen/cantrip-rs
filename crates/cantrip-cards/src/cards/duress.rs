@@ -1,21 +1,19 @@
 use cantrip_api::*;
 use cantrip_oracle as oracle;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{choose, select, targets};
 
-fn eligible(g: &dyn Query, hand: &[ObjectId]) -> Vec<ObjectId> {
-    hand.iter()
-        .copied()
-        .filter(|&c| {
-            let chars = g.chars(c);
-            !chars.is(CardType::Creature) && !chars.is(CardType::Land)
-        })
-        .collect()
+/// "A noncreature, nonland card": the quality of the card Duress takes, each card's own.
+fn noncreature_nonland(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |card| {
+        let chars = q.chars(card);
+        !chars.is(CardType::Creature) && !chars.is(CardType::Land)
+    })
 }
 
-fn question(g: &dyn Query, item: &StackItem, hand: Vec<ObjectId>) -> RequestKind {
-    let eligible = eligible(g, &hand);
-    let count = u32::from(!eligible.is_empty());
-    RequestKind::ChooseCards { any_number: false, source: item.object, purpose: Purpose::Discard, cards: hand, eligible, count, up_to: false, kind: "", total: None }
+/// "You choose a noncreature, nonland card from it": one, if the hand has one (CR 608.2d), with the whole hand shown.
+fn question(item: &StackItem, hand: Vec<ObjectId>) -> RequestKind {
+    let rule = Selection::new(select::as_many_as_can(1)).with(select::part(&(noncreature_nonland as SelectFn), 0, ""));
+    choose::select_question(item.object, Purpose::Discard, hand, rule)
 }
 
 /// Target opponent reveals their hand; you choose a noncreature, nonland card from it; they discard it. Asked even
@@ -28,7 +26,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     g.reveal(opponent, &hand);
-    let ask = question(g, item, hand);
+    let ask = question(item, hand);
     if let Answer::Cards(cards) = g.ask(item.controller, ask)? {
         g.discard_together(&cards);
     }
@@ -46,7 +44,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
                 return Ok(());
             }
             g.reveal(opponent, &hand);
-            let ask = question(g, item, hand);
+            let ask = question(item, hand);
             Err(g.ask_then(1, item.controller, ask))
         }
         _ => {

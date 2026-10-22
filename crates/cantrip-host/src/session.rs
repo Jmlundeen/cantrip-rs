@@ -526,6 +526,31 @@ impl Session {
         Ok(self.step())
     }
 
+    /// What the rule of the outstanding question, a choice of cards or a library search (or a cost's tapping for power,
+    /// collecting evidence or crafting), says of the cards `selected` so far, as the seat's handles name them: whether they are
+    /// an answer (`Complete`) and which further cards may be added (`Addable`). The client asks it as its player picks; the
+    /// game does not move, and the answer itself is still checked when it is given.
+    pub fn check(&mut self, request_id: u32, seat_number: i32, selected: &[ViewHandle]) -> Result<Value, Rejection> {
+        let Some(request) = self.pending().filter(|r| r.id == request_id) else {
+            return Err(Rejection::new("StaleReply", format!("request {request_id} is not outstanding")));
+        };
+        if seat(request.player) != seat_number {
+            return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(request.player))));
+        }
+        let space = &mut self.handles[request.player.index()];
+        let mut ids = Vec::with_capacity(selected.len());
+        for &h in selected {
+            match space.object(h) {
+                Some(id) if id.index() < self.game.state.objects.len() => ids.push(id),
+                _ => return Err(Rejection::new("UnknownHandle", format!("handle {} names nothing this seat can see", h.0))),
+            }
+        }
+        match crate::prompt::verdict_of(&self.game, &request, &ids, space) {
+            Some(verdict) => Ok(json!({ "Complete": verdict.complete, "Addable": verdict.addable })),
+            None => Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a choice of cards"))),
+        }
+    }
+
     /// The seat gives up: it loses, and the game ends if one side is left.
     /// Takes back the latest mana ability `player` activated: the game goes back to the node it was activated at, by
     /// the tree (`Game::goto`), and what was told of it is retracted.

@@ -644,7 +644,7 @@ public sealed class RandomPlay : IAutoPlayer
     {
         if (prompt.MinimumPower > 0)
         {
-            List<int> order = Shuffled(prompt.Eligible.Count);
+            List<int> order = Shuffled(prompt.Cards.Count);
             List<ViewHandle> taken = [];
             int power = 0;
 
@@ -662,7 +662,7 @@ public sealed class RandomPlay : IAutoPlayer
                     continue;
                 }
 
-                taken.Add(prompt.Eligible[index]);
+                taken.Add(prompt.Cards[index]);
                 power += each;
             }
 
@@ -677,14 +677,14 @@ public sealed class RandomPlay : IAutoPlayer
             List<ViewHandle> taken = [];
             int total = 0;
 
-            foreach (int index in Shuffled(prompt.Eligible.Count))
+            foreach (int index in Shuffled(prompt.Cards.Count))
             {
                 if (total >= prompt.MinimumManaValue)
                 {
                     break;
                 }
 
-                taken.Add(prompt.Eligible[index]);
+                taken.Add(prompt.Cards[index]);
                 total += index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0;
             }
 
@@ -696,18 +696,20 @@ public sealed class RandomPlay : IAutoPlayer
         if (prompt.MaximumTotalManaValue is { } limit)
         {
             // "With total mana value N or less" (CR 202.3): a shuffled order, each card taken while it still fits, up to a drawn
-            // number of them.
-            List<int> order = Shuffled(prompt.Eligible.Count);
-            int wanted = _random.Next(Math.Min(prompt.Count, prompt.Eligible.Count) + 1);
+            // number of them. The rule's verdicts judge the cards (GameClient.Answer).
+            List<ViewHandle> eligible = prompt.Verdict.Addable;
+            List<int> order = Shuffled(eligible.Count);
+            int wanted = _random.Next(Math.Min(prompt.Count, eligible.Count) + 1);
             List<ViewHandle> taken = [];
             int left = limit;
 
             foreach (int index in order)
             {
-                int value = index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0;
+                int at = prompt.Cards.IndexOf(eligible[index]);
+                int value = at >= 0 && at < prompt.ManaValues.Count ? prompt.ManaValues[at] : 0;
                 if (taken.Count < wanted && value <= left)
                 {
-                    taken.Add(prompt.Eligible[index]);
+                    taken.Add(eligible[index]);
                     left -= value;
                 }
             }
@@ -716,9 +718,9 @@ public sealed class RandomPlay : IAutoPlayer
         }
 
         // "Up to" a number takes any number down to the least the prompt allows: none, or craft's "one or more" (CR 702.167a).
-        int most = Math.Min(prompt.Count, prompt.Eligible.Count);
+        int most = Math.Min(prompt.Count, prompt.Verdict.Addable.Count);
         int least = Math.Min(prompt.Minimum, most);
-        List<ViewHandle> drawn = Some(prompt.Eligible, prompt.UpTo ? least + _random.Next(most - least + 1) : most);
+        List<ViewHandle> drawn = Some(prompt.Verdict.Addable, prompt.UpTo ? least + _random.Next(most - least + 1) : most);
 
         // A band (CR 702.22c) has at most one creature without banding: the first drawn stays.
         if (prompt.Purpose == CardChoicePurposeView.Band)
@@ -733,8 +735,8 @@ public sealed class RandomPlay : IAutoPlayer
     /// <summary>Drawn cards from a library search, including finding nothing where that is allowed (CR 701.19d).</summary>
     private AnswerPayload Search(SearchLibraryPromptMessage prompt)
     {
-        int most = Math.Min(prompt.Count, prompt.Eligible.Count);
-        return new CardsChosenAnswer { Cards = Some(prompt.Eligible, prompt.Optional ? _random.Next(most + 1) : most) };
+        int most = Math.Min(prompt.Count, prompt.Verdict.Addable.Count);
+        return new CardsChosenAnswer { Cards = Some(prompt.Verdict.Addable, prompt.Optional ? _random.Next(most + 1) : most) };
     }
 
     /// <summary>Drawn colors, repeats and all where the choice allows them.</summary>

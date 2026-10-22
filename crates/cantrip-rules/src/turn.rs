@@ -215,13 +215,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
                         let hand = cx.s().zone(Zone::hand(p)).to_vec();
                         let answer = cx.ask_rule(
                             p,
-                            RequestKind::ChooseCards { any_number: false,
-                                source: hand[0],
-                                purpose: Purpose::Discard,
-                                cards: hand.clone(),
-                                eligible: hand,
-                                count: u32::from(mulligans),
-                                up_to: false, kind: "", total: None },
+                            RequestKind::choose_cards(hand[0], Purpose::Discard, hand.clone(), hand, u32::from(mulligans), false, ""),
                         )?;
                         if let Some(Answer::Cards(bottom)) = answer {
                             for card in bottom {
@@ -268,7 +262,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
             let hand = cx.s().zone(Zone::hand(p)).to_vec();
             if action.exile_from_hand > 0 && !hand.is_empty() {
                 let count = u32::from(action.exile_from_hand).min(u32::try_from(hand.len()).unwrap_or(u32::MAX));
-                let ask = RequestKind::ChooseCards { any_number: false, source: card, purpose: Purpose::Exile, cards: hand.clone(), eligible: hand, count, up_to: false, kind: "", total: None };
+                let ask = RequestKind::choose_cards(card, Purpose::Exile, hand.clone(), hand, count, false, "");
                 if let Some(Answer::Cards(cards)) = cx.ask_rule(p, ask)? {
                     for c in cards {
                         ops::move_to_for(cx, c, Zone::exile(p), ZoneReason::Exile);
@@ -657,16 +651,7 @@ fn declare_bands(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) 
             continue;
         }
         let count = u32::try_from(eligible.len()).unwrap_or(u32::MAX);
-        let ask = RequestKind::ChooseCards { any_number: false,
-            source,
-            purpose: Purpose::Band,
-            cards: eligible.clone(),
-            eligible,
-            count,
-            up_to: true,
-            kind: "attacking creature",
-            total: None,
-        };
+        let ask = RequestKind::ChooseCards { source, purpose: Purpose::Band, cards: eligible, rule: Box::new(Selection::new(Count::UpTo(count)).called("attacking creature").with(BAND)) };
         let Some(Answer::Cards(chosen)) = cx.ask_rule(active, ask)? else { continue };
         if chosen.is_empty() {
             continue;
@@ -681,6 +666,16 @@ fn declare_bands(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) 
     }
     Ok(band)
 }
+
+/// "Any number of creatures with banding and up to one without" (CR 702.22c): the creatures that join a band.
+fn up_to_one_without_banding(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    let banding = |c: ObjectId| q.chars(c).has(Keyword::Banding);
+    let without = choice.selected.iter().filter(|&&c| !banding(c)).count();
+    Verdict { complete: without <= 1, addable: Bits::of(choice.candidates.len(), |i| without == 0 || banding(choice.candidates[i])) }
+}
+
+/// The rule of a band's other members (CR 702.22c), a part of the question that asks for them.
+const BAND: Part = cantrip_api::select::part(&(up_to_one_without_banding as SelectFn), 0, "");
 
 /// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block (decayed's too, CR 702.147a), one that
 /// can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.110b) is about the

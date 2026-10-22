@@ -33,7 +33,7 @@ public sealed class ExilePermanentsCostTests
         Source = Handle(90),
         Purpose = CardChoicePurposeView.ExileToPay,
         Cards = [.. creatures.Select(Handle)],
-        Eligible = [.. creatures.Select(Handle)],
+        Verdict = new() { Addable = [.. creatures.Select(Handle)] },
         Count = 1,
         Kind = "creature",
     };

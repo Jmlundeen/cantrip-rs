@@ -180,17 +180,16 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             }
             Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::DeclineCost).expect("decline")))
         }
-        RequestKind::ChooseCards { eligible, count, up_to, total, .. } => {
-            let n = if *up_to { random.below(*count as usize + 1) } else { *count as usize };
-            let chosen = random.some(eligible, n);
-            // "With total mana value N or less": a random choice over it is cut back to the cards that fit, in the order drawn.
-            match total {
-                Some(t) => {
-                    let values: Vec<u32> = chosen.iter().map(|c| t.values[eligible.iter().position(|e| e == c).unwrap_or(0)]).collect();
-                    Answer::Cards(TotalAtMost { values, most: t.most }.first_fitting(&chosen, chosen.len()))
-                }
-                None => Answer::Cards(chosen),
-            }
+        RequestKind::ChooseCards { rule, .. } => {
+            let eligible = first_choices(game, request);
+            let (count, up_to) = match rule.count {
+                Count::Exactly(n) => (n as usize, false),
+                Count::UpTo(n) => (n as usize, true),
+                Count::AnyNumber => (eligible.len(), true),
+                Count::AsManyAsCan(n) => ((n as usize).min(eligible.len()), false),
+            };
+            let n = if up_to { random.below(count + 1) } else { count };
+            Answer::Cards(fitting(game, request, random.some(&eligible, n)))
         }
         RequestKind::ChooseTarget { candidates, least, count, total, .. } => {
             let n = *least as usize + random.below((*count - *least) as usize + 1);
@@ -282,9 +281,14 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
         RequestKind::DistributeCards { cards, destinations, .. } => {
             Answer::Placements { placements: greedy_distribution(cards, destinations), shuffle: false }
         }
-        RequestKind::SearchLibrary { eligible, count, optional, .. } => {
-            let n = if *optional { random.below(*count as usize + 1) } else { (*count as usize).min(eligible.len()) };
-            Answer::Cards(random.some(eligible, n))
+        RequestKind::SearchLibrary { rule, .. } => {
+            let eligible = first_choices(game, request);
+            let n = match rule.count {
+                Count::UpTo(n) => random.below(n.max(1) as usize + 1),
+                Count::AnyNumber => random.below(eligible.len() + 1),
+                Count::Exactly(n) | Count::AsManyAsCan(n) => (n as usize).min(eligible.len()),
+            };
+            Answer::Cards(fitting(game, request, random.some(&eligible, n)))
         }
         RequestKind::OrderTriggers { sources, .. } => {
             let all: Vec<u32> = (0..count_u32(sources.len())).collect();
@@ -336,4 +340,17 @@ pub fn play(game: &mut Game, random: &mut Random, limit: u32) -> Played {
         decisions += 1;
     }
     Played { decisions, turns: game.state.turn.number, finished: game.is_over(), engine }
+}
+
+/// A random choice of cards cut back to those its question's rule lets be added one after another, in the order drawn ("with
+/// total mana value N or less", "with different names").
+fn fitting(game: &Game, request: &Request, drawn: Vec<ObjectId>) -> Vec<ObjectId> {
+    let mut kept: Vec<ObjectId> = Vec::new();
+    for card in drawn {
+        let Some((cards, verdict)) = selection_verdict(game, request, &kept) else { break };
+        if cards.iter().position(|&c| c == card).is_some_and(|i| verdict.addable.get(i)) {
+            kept.push(card);
+        }
+    }
+    kept
 }

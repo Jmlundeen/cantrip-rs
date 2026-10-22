@@ -88,11 +88,8 @@ pub fn look_and_may_choose(
         return Ok(None);
     }
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(&*g, c)).collect();
-    let ask = RequestKind::ChooseCards { any_number: false, source: item.object, purpose, cards: hand, count: u32::from(!eligible.is_empty()), eligible, up_to: true, kind, total: None };
-    Ok(match g.ask(item.controller, ask)? {
-        Answer::Cards(chosen) => chosen.first().copied(),
-        _ => None,
-    })
+    let rule = Selection::listed(Count::UpTo(u32::from(!eligible.is_empty())), &hand, eligible).called(kind);
+    Ok(crate::choose::select(g, item.controller, item.object, purpose, hand, rule)?.first().copied())
 }
 
 /// "Exile [that card]. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to

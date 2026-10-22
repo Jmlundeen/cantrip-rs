@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{choose, select, targets};
 use cantrip_oracle as oracle;
 
 /// Target opponent reveals their hand. You may choose a nonland card from it; if you do, that player discards it. If you
@@ -11,18 +11,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut chosen: Vec<ObjectId> = Vec::new();
     if !hand.is_empty() {
         g.reveal(opponent, &hand);
-        let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !g.chars(c).is(CardType::Land)).collect();
-        let count = u32::from(!eligible.is_empty());
-        let ask = RequestKind::ChooseCards { any_number: false,
-            source: item.object,
-            purpose: Purpose::Discard,
-            cards: hand,
-            eligible,
-            count,
-            up_to: true, kind: "", total: None };
-        if let Answer::Cards(cards) = g.ask(item.controller, ask)? {
-            chosen = cards;
-        }
+        chosen = choose::select(g, item.controller, item.object, Purpose::Discard, hand, select::NONLAND_CARD)?;
     }
     if !chosen.is_empty() {
         g.discard_together(&chosen);

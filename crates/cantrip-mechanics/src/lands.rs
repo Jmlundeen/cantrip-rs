@@ -5,7 +5,8 @@
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
 //! `enters_tapped_unless_you_control` or `enters_tapped_unless_you_control_either` below; the card sets it in `enters`.
 
-use crate::library::{ask_may_search, search_to_battlefield, search_to_hand, search_to_top, Find};
+use crate::library::{ask_may_search, find_to_battlefield, find_to_hand, find_to_top, search_to_battlefield, Find};
+use crate::select;
 use crate::{choose, effects, mana, triggers};
 use cantrip_api::*;
 
@@ -131,7 +132,7 @@ pub fn search_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, sour
 /// `search_basic_land_to_battlefield`, giving the land that arrived (none if the player found none) for an ability that goes
 /// on to do something to it: Elven Passage's "untap that land".
 pub fn fetch_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, source: ObjectId, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
-    search_to_battlefield(g, player, source, Find::ONE, tapped, is_basic_land_card)
+    find_to_battlefield(g, player, source, select::BASIC_LAND_CARD, tapped)
 }
 
 /// What "you may search your library for a basic land card, reveal it, put it into your hand, then shuffle" asks.
@@ -146,7 +147,7 @@ pub const FETCH_BASIC_TO_HAND: Question = Question::new(
 /// "Search your library for a basic land card, reveal it, put it into your hand, then shuffle" (CR 701.23): the player
 /// finding one or none, and the library shuffled either way. Bushwhack's first mode and Environmental Scientist print it.
 pub fn search_basic_land_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
-    search_to_hand(g, player, source, Find::ONE.revealed(), is_basic_land_card)?;
+    find_to_hand(g, player, source, select::BASIC_LAND_CARD, true)?;
     Ok(())
 }
 
@@ -175,7 +176,7 @@ pub const FETCH_BASIC_TO_TOP: Question = Question::new(
 /// hand and battlefield siblings (`search_basic_land_to_hand`, `search_basic_land_to_battlefield`) so the basic-land predicate and
 /// the question wording are the shared ones, and `library::search_to_top` is shared with Enlightened Tutor and Mystical Tutor.
 pub fn search_basic_land_to_top(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
-    search_to_top(g, player, source, Find::ONE.revealed(), is_basic_land_card)?;
+    find_to_top(g, player, source, select::BASIC_LAND_CARD, true)?;
     Ok(())
 }
 

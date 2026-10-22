@@ -195,8 +195,8 @@ fn an_activated_ability_beholds_a_permanent_once_its_mana_is_paid_and_not_withou
         r = next(&mut g);
     }
     match &r.kind {
-        RequestKind::ChooseCards { purpose: Purpose::Behold, eligible, .. } => {
-            assert_eq!(eligible, &vec![bear]);
+        RequestKind::ChooseCards { purpose: Purpose::Behold, .. } => {
+            assert_eq!(crate::first_choices(&g, &r), vec![bear]);
             assert_eq!(g.state.player(YOU).pool.total(), 0, "the mana is paid before the behold is chosen");
         }
         other => panic!("expected the behold, got {other:?}"),
@@ -218,7 +218,7 @@ fn an_activated_ability_may_behold_its_own_source() {
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
     match &r.kind {
-        RequestKind::ChooseCards { purpose: Purpose::Behold, eligible, .. } => assert_eq!(eligible, &vec![gazer]),
+        RequestKind::ChooseCards { purpose: Purpose::Behold, .. } => assert_eq!(crate::first_choices(&g, &r), vec![gazer]),
         other => panic!("expected the behold, got {other:?}"),
     }
     answer(&mut g, &r, Answer::Cards(vec![gazer]));
@@ -270,7 +270,7 @@ fn a_mana_ability_returns_a_tapped_creature_chosen_once_its_own_mana_is_paid() {
         r = next(&mut g);
     }
     match &r.kind {
-        RequestKind::ChooseCards { purpose: Purpose::ReturnToHand, eligible, .. } => assert_eq!(eligible, &vec![dork]),
+        RequestKind::ChooseCards { purpose: Purpose::ReturnToHand, .. } => assert_eq!(crate::first_choices(&g, &r), vec![dork]),
         other => panic!("expected the tapped creature, got {other:?}"),
     }
     answer(&mut g, &r, Answer::Cards(vec![dork]));
@@ -320,7 +320,7 @@ fn a_resolving_spell_takes_mana_and_a_sacrificed_creature_chosen_as_it_is_paid()
     answer(&mut g, &r, Answer::Act(Action::of(&pay)));
     let r = next(&mut g);
     match &r.kind {
-        RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, eligible, .. } => assert_eq!(eligible, &vec![bear]),
+        RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. } => assert_eq!(crate::first_choices(&g, &r), vec![bear]),
         other => panic!("expected the sacrifice, got {other:?}"),
     }
     let life = g.state.player(YOU).life;
@@ -347,7 +347,7 @@ fn a_resolving_spells_tapped_creature_is_judged_after_the_mana_abilities() {
     answer(&mut g, &r, Answer::Act(Action::of(&pay)));
     let r = next(&mut g);
     match &r.kind {
-        RequestKind::ChooseCards { purpose: Purpose::ReturnToHand, eligible, .. } => assert_eq!(eligible, &vec![dork]),
+        RequestKind::ChooseCards { purpose: Purpose::ReturnToHand, .. } => assert_eq!(crate::first_choices(&g, &r), vec![dork]),
         other => panic!("expected the tapped creature, got {other:?}"),
     }
     let life = g.state.player(YOU).life;
@@ -416,7 +416,7 @@ fn a_cost_with_its_own_tap_returns_its_source_as_the_tapped_creature() {
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
     match &r.kind {
-        RequestKind::ChooseCards { purpose: Purpose::ReturnToHand, eligible, .. } => assert_eq!(eligible, &vec![recoiler]),
+        RequestKind::ChooseCards { purpose: Purpose::ReturnToHand, .. } => assert_eq!(crate::first_choices(&g, &r), vec![recoiler]),
         other => panic!("expected the tapped creature, got {other:?}"),
     }
     answer(&mut g, &r, Answer::Cards(vec![recoiler]));

@@ -475,6 +475,9 @@ public sealed class GameServer : IAsyncDisposable
                 Note($"seat {member.Seat}: {message.Describe()}");
                 FollowEvent();
                 break;
+            case CheckSelectionMessage when _phase == TablePhase.Playing:
+                _session!.Submit(new PlayerId(member.Seat), message);
+                break;
             case AnswerMessage answer when _phase == TablePhase.Playing:
                 if (answer.Answer is null) Refuse(connection, ErrorCode.IllegalAnswer, "An answer payload is required.");
                 else _session!.Submit(new PlayerId(member.Seat), answer);

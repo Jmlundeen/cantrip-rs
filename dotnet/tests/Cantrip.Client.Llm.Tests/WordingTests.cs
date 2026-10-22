@@ -74,7 +74,7 @@ public sealed class WordingTests
                 Source = Handle(9),
                 Purpose = CardChoicePurposeView.Exile,
                 Cards = [Handle(3), Handle(4)],
-                Eligible = [Handle(3), Handle(4)],
+                Verdict = new() { Addable = [Handle(3), Handle(4)] },
                 Count = 1,
             });
 
@@ -99,7 +99,7 @@ public sealed class WordingTests
                 Source = Handle(9),
                 Purpose = CardChoicePurposeView.Play,
                 Cards = [Handle(3), Handle(4)],
-                Eligible = [Handle(3), Handle(4)],
+                Verdict = new() { Addable = [Handle(3), Handle(4)] },
                 Count = 1,
             });
 
@@ -122,9 +122,9 @@ public sealed class WordingTests
                 Source = Handle(9),
                 Purpose = CardChoicePurposeView.CastCopyFree,
                 Cards = [Handle(3), Handle(4)],
-                Eligible = [Handle(3)],
+                Verdict = new() { Addable = [Handle(3)] },
                 Count = 1,
-                UpTo = true,
+                CountKind = CountKindView.UpTo,
                 MaximumManaValue = 4,
             });
 
@@ -174,7 +174,7 @@ public sealed class WordingTests
                 Source = Handle(9),
                 Purpose = CardChoicePurposeView.ReturnToHand,
                 Cards = [Handle(3), Handle(4)],
-                Eligible = [Handle(3), Handle(4)],
+                Verdict = new() { Addable = [Handle(3), Handle(4)] },
                 Count = 1,
                 Kind = "tapped creature",
             });
@@ -196,10 +196,10 @@ public sealed class WordingTests
                 Source = Handle(9),
                 Purpose = CardChoicePurposeView.TapToReduce,
                 Cards = [Handle(3)],
-                Eligible = [Handle(3)],
+                Verdict = new() { Addable = [Handle(3)] },
                 Powers = [2],
                 Count = 1,
-                UpTo = true,
+                CountKind = CountKindView.UpTo,
             });
 
         string heading = chooser.Asked[0].Heading;
@@ -222,9 +222,9 @@ public sealed class WordingTests
                 Source = Handle(9),
                 Purpose = CardChoicePurposeView.Plot,
                 Cards = [Handle(3)],
-                Eligible = [Handle(3)],
+                Verdict = new() { Addable = [Handle(3)] },
                 Count = 1,
-                UpTo = true,
+                CountKind = CountKindView.UpTo,
             });
 
         string heading = chooser.Asked[0].Heading;
@@ -245,9 +245,9 @@ public sealed class WordingTests
                 Player = Me,
                 Owner = Them,
                 Count = 2,
-                Optional = true,
+                CountKind = CountKindView.UpTo,
                 Library = [Handle(5), Handle(6)],
-                Eligible = [Handle(5), Handle(6)],
+                Verdict = new() { Addable = [Handle(5), Handle(6)] },
                 Destination = SearchDestinationView.Exile,
             });
 

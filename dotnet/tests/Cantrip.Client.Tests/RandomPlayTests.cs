@@ -406,8 +406,10 @@ public sealed class RandomPlayTests
     [Fact]
     public void Chooses_as_many_cards_as_a_choice_asks_for_and_up_to_that_many_where_fewer_will_do()
     {
-        var exact = new ChooseCardsPromptMessage { Player = Me, Eligible = [Handle(1), Handle(2), Handle(3)], Count = 2 };
-        var upTo = new ChooseCardsPromptMessage { Player = Me, Eligible = [Handle(1), Handle(2), Handle(3)], Count = 2, UpTo = true };
+        var exact = new ChooseCardsPromptMessage { Player = Me, Cards = [Handle(1), Handle(2), Handle(3)],
+            Verdict = new() { Addable = [Handle(1), Handle(2), Handle(3)] }, Count = 2 };
+        var upTo = new ChooseCardsPromptMessage { Player = Me, Cards = [Handle(1), Handle(2), Handle(3)],
+            Verdict = new() { Addable = [Handle(1), Handle(2), Handle(3)] }, Count = 2, CountKind = CountKindView.UpTo };
 
         var bot = new RandomPlay(seed: 19);
         var counts = new HashSet<int>();
@@ -416,7 +418,7 @@ public sealed class RandomPlayTests
         {
             var chosen = Assert.IsType<CardsChosenAnswer>(bot.Decide(exact));
             Assert.Equal(2, chosen.Cards.Count);
-            Assert.All(chosen.Cards, card => Assert.Contains(card, exact.Eligible));
+            Assert.All(chosen.Cards, card => Assert.Contains(card, exact.Verdict.Addable));
             Assert.Equal(chosen.Cards.Distinct().Count(), chosen.Cards.Count);
 
             counts.Add(Assert.IsType<CardsChosenAnswer>(bot.Decide(upTo)).Cards.Count);
@@ -432,9 +434,10 @@ public sealed class RandomPlayTests
         var prompt = new ChooseCardsPromptMessage
         {
             Player = Me,
-            Eligible = [Handle(1), Handle(2), Handle(3)],
+            Cards = [Handle(1), Handle(2), Handle(3)],
+            Verdict = new() { Addable = [Handle(1), Handle(2), Handle(3)] },
             Count = 3,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
             MinimumPower = 3,
             Powers = [1, 2, 3],
         };
@@ -445,7 +448,7 @@ public sealed class RandomPlayTests
         for (int i = 0; i < Draws; i++)
         {
             var chosen = Assert.IsType<CardsChosenAnswer>(bot.Decide(prompt));
-            int power = chosen.Cards.Sum(card => prompt.Powers[prompt.Eligible.IndexOf(card)]);
+            int power = chosen.Cards.Sum(card => prompt.Powers[prompt.Cards.IndexOf(card)]);
 
             Assert.True(power >= 3, $"chose {power} power against a minimum of 3");
             sets.Add(string.Join(",", chosen.Cards.Select(card => card.Value).OrderBy(value => value)));
@@ -462,9 +465,10 @@ public sealed class RandomPlayTests
         var prompt = new ChooseCardsPromptMessage
         {
             Player = Me,
-            Eligible = [Handle(1), Handle(2)],
+            Cards = [Handle(1), Handle(2)],
+            Verdict = new() { Addable = [Handle(1), Handle(2)] },
             Count = 2,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
             MinimumPower = 3,
             Powers = [-2, 3],
         };
@@ -487,9 +491,10 @@ public sealed class RandomPlayTests
         var prompt = new ChooseCardsPromptMessage
         {
             Player = Me,
-            Eligible = [Handle(1), Handle(2), Handle(3), Handle(4)],
+            Cards = [Handle(1), Handle(2), Handle(3), Handle(4)],
+            Verdict = new() { Addable = [Handle(1), Handle(2), Handle(3), Handle(4)] },
             Count = 4,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
             MinimumManaValue = 6,
             ManaValues = [3, 0, 4, 2],
         };
@@ -500,7 +505,7 @@ public sealed class RandomPlayTests
         for (int i = 0; i < Draws; i++)
         {
             var chosen = Assert.IsType<CardsChosenAnswer>(bot.Decide(prompt));
-            int total = chosen.Cards.Sum(card => prompt.ManaValues[prompt.Eligible.IndexOf(card)]);
+            int total = chosen.Cards.Sum(card => prompt.ManaValues[prompt.Cards.IndexOf(card)]);
 
             Assert.True(total >= 6, $"chose {total} mana value against a minimum of 6");
             sets.Add(string.Join(",", chosen.Cards.Select(card => card.Value).OrderBy(value => value)));
@@ -516,9 +521,10 @@ public sealed class RandomPlayTests
         var prompt = new ChooseCardsPromptMessage
         {
             Player = Me,
-            Eligible = [Handle(1), Handle(2), Handle(3), Handle(4)],
+            Cards = [Handle(1), Handle(2), Handle(3), Handle(4)],
+            Verdict = new() { Addable = [Handle(1), Handle(2), Handle(3), Handle(4)] },
             Count = 2,
-            UpTo = true,
+            CountKind = CountKindView.UpTo,
             ManaValues = [4, 3, 2, 6],
             MaximumTotalManaValue = 6,
         };
@@ -529,7 +535,7 @@ public sealed class RandomPlayTests
         for (int i = 0; i < Draws; i++)
         {
             var chosen = Assert.IsType<CardsChosenAnswer>(bot.Decide(prompt));
-            int total = chosen.Cards.Sum(card => prompt.ManaValues[prompt.Eligible.IndexOf(card)]);
+            int total = chosen.Cards.Sum(card => prompt.ManaValues[prompt.Cards.IndexOf(card)]);
 
             Assert.True(total <= 6, $"chose {total} mana value against a most of 6");
             Assert.True(chosen.Cards.Count <= 2, $"chose {chosen.Cards.Count} cards of up to 2");

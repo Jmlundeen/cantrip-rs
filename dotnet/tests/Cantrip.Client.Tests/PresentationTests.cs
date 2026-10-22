@@ -138,8 +138,8 @@ public sealed class PromptPresentationTests
         var model = CardChoicePresentation.Describe(client, prompt, []);
         Assert.Equal(canSubmit, model.CanSubmit);
         if (maximum == 0) Assert.Equal("Continue", model.Confirm);
-        List<int> filled = [.. prompt.Eligible.Take(maximum).Select(handle => handle.Value)];
-        Assert.True(CardChoicePresentation.Describe(client, prompt, filled).CanSubmit);
+        List<int> filled = [.. prompt.Verdict.Addable.Take(maximum).Select(handle => handle.Value)];
+        Assert.True(Judged(client, prompt, filled).CanSubmit);
     }
 
     [Fact]
@@ -189,55 +189,53 @@ public sealed class PromptPresentationTests
         // Collect evidence 6 (CR 701.59a) over mana values 3, 0, 4 and 1: how many is free, what they add up to is not.
         GameClient client = Client("choose-collect-evidence");
         ChooseCardsPromptMessage prompt = Assert.IsType<ChooseCardsPromptMessage>(client.Prompt!.Prompt);
-        int[] cards = [.. prompt.Eligible.Select(handle => handle.Value)];
+        int[] cards = [.. prompt.Verdict.Addable.Select(handle => handle.Value)];
 
         CardChoicePresentation none = CardChoicePresentation.Describe(client, prompt, []);
         Assert.Contains("choose cards with total mana value 6 or more to exile to pay for it", none.Title);
         Assert.DoesNotContain("power", none.Title);
         Assert.False(none.CanSubmit);
 
-        CardChoicePresentation short_ = CardChoicePresentation.Describe(client, prompt, [cards[0], cards[1], cards[3]]);
+        CardChoicePresentation short_ = Judged(client, prompt, [cards[0], cards[1], cards[3]]);
         Assert.Contains("total mana value 4 of 6", short_.Detail);
         Assert.False(short_.CanSubmit);
 
-        CardChoicePresentation enough = CardChoicePresentation.Describe(client, prompt, [cards[0], cards[2]]);
+        CardChoicePresentation enough = Judged(client, prompt, [cards[0], cards[2]]);
         Assert.Contains("total mana value 7 of 6", enough.Detail);
         Assert.True(enough.CanSubmit);
     }
 
     [Fact]
-    public void A_choice_within_a_total_mana_value_shows_the_running_total_and_refuses_a_card_that_would_go_over()
+    public void A_choice_says_its_rules_words_and_takes_its_verdicts_from_the_host()
     {
-        // Michelangelo's Technique: up to two creature cards with total mana value 6 or less, over mana values 4, 2 and 3.
+        // Michelangelo's Technique: up to two creature cards with total mana value 6 or less. The caption says what the rule
+        // asks; whether a selection is an answer, and what may be added to it, is the host's word, asked as the cards are
+        // picked (here the gallery's stand-in for it).
         GameClient client = Client("choose-put-onto-battlefield-within-total");
+        var transport = (FixtureTransport)typeof(GameClient).GetField("_transport", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(client)!;
         ChooseCardsPromptMessage prompt = Assert.IsType<ChooseCardsPromptMessage>(client.Prompt!.Prompt);
-        int[] cards = [.. prompt.Eligible.Select(handle => handle.Value)];
+        int[] cards = [.. prompt.Verdict.Addable.Select(handle => handle.Value)];
 
         CardChoicePresentation none = CardChoicePresentation.Describe(client, prompt, []);
         Assert.Contains("choose up to 2 creature cards with total mana value 6 or less to put onto the battlefield", none.Title);
         Assert.Contains("0 of 2 chosen  ·  total mana value 0 of 6 or less", none.Detail);
-        Assert.True(none.CanSubmit);
+        Assert.True(none.CanSubmit, "the prompt's own verdict: none is an answer");
         Assert.Equal("Put nothing", none.Confirm);
+        Assert.True(CardChoicePresentation.Fits(client, prompt, [], cards[1]));
 
-        // The 4 picked: the 2 still fits (6), the 3 would make 7 and is refused; the 4 itself can be put back.
+        // One picked: nothing is offered or sent until the host has judged it, and it is asked once.
+        CardChoicePresentation asked = CardChoicePresentation.Describe(client, prompt, [cards[0]]);
+        Assert.False(asked.CanSubmit);
+        Assert.False(CardChoicePresentation.Fits(client, prompt, [cards[0]], cards[1]));
+        Assert.True(CardChoicePresentation.Fits(client, prompt, [cards[0]], cards[0]), "a picked card can always be put back");
+        CardChoicePresentation.Describe(client, prompt, [cards[0]]);
+        Assert.Single(transport.Sent.OfType<CheckSelectionMessage>(), check => check.Selected.SequenceEqual([new ViewHandle(cards[0])]));
+
+        client.Pump();
         CardChoicePresentation four = CardChoicePresentation.Describe(client, prompt, [cards[0]]);
+        Assert.True(four.CanSubmit);
         Assert.Contains("1 of 2 chosen  ·  total mana value 4 of 6 or less", four.Detail);
-        Assert.True(CardChoicePresentation.Fits(prompt, [cards[0]], cards[1]));
-        Assert.False(CardChoicePresentation.Fits(prompt, [cards[0]], cards[2]));
-        Assert.True(CardChoicePresentation.Fits(prompt, [cards[0]], cards[0]));
-
-        CardChoicePresentation six = CardChoicePresentation.Describe(client, prompt, [cards[0], cards[1]]);
-        Assert.Contains("total mana value 6 of 6 or less", six.Detail);
-        Assert.True(six.CanSubmit);
-
-        // An answer over the limit, however it was reached, cannot be sent.
-        CardChoicePresentation over = CardChoicePresentation.Describe(client, prompt, [cards[0], cards[2]]);
-        Assert.Contains("total mana value 7 of 6 or less", over.Detail);
-        Assert.False(over.CanSubmit);
-
-        // The prompt's own answer for a player who answers without reading: the first cards that fit together.
-        CardsChosenAnswer fallback = Assert.IsType<CardsChosenAnswer>(prompt.Default());
-        Assert.Equal([prompt.Eligible[0], prompt.Eligible[1]], fallback.Cards);
+        Assert.True(CardChoicePresentation.Fits(client, prompt, [cards[0]], cards[1]));
     }
 
     [Theory]
@@ -300,7 +298,7 @@ public sealed class PromptPresentationTests
         Assert.Equal(canSubmit, model.CanSubmit);
         Assert.Contains("to discard", model.Title);
         Assert.Equal("Discard it", CardChoicePresentation.Describe(
-            client, prompt, [prompt.Eligible[0].Value]).Confirm);
+            client, prompt, [prompt.Verdict.Addable[0].Value]).Confirm);
     }
 
     /// <summary>
@@ -320,7 +318,7 @@ public sealed class PromptPresentationTests
         Assert.Equal(canSubmit, model.CanSubmit);
         Assert.Contains("to sacrifice", model.Title);
         Assert.Equal("Sacrifice it", CardChoicePresentation.Describe(
-            client, prompt, [prompt.Eligible[0].Value]).Confirm);
+            client, prompt, [prompt.Verdict.Addable[0].Value]).Confirm);
     }
 
     /// <summary>
@@ -340,9 +338,9 @@ public sealed class PromptPresentationTests
         Assert.Equal(ZoneKindView.Battlefield, none.BoardZone);
         Assert.False(none.AnswersOnLastPick);
 
-        Assert.Equal("Attach it", CardChoicePresentation.Describe(client, prompt, [prompt.Eligible[0].Value]).Confirm);
+        Assert.Equal("Attach it", CardChoicePresentation.Describe(client, prompt, [prompt.Verdict.Addable[0].Value]).Confirm);
         Assert.Equal("Attach 2", CardChoicePresentation.Describe(
-            client, prompt, [prompt.Eligible[0].Value, prompt.Eligible[1].Value]).Confirm);
+            client, prompt, [prompt.Verdict.Addable[0].Value, prompt.Verdict.Addable[1].Value]).Confirm);
 
         GameClient single = Client("choose-attach-one");
         var one = Assert.IsType<ChooseCardsPromptMessage>(single.Prompt!.Prompt);
@@ -423,7 +421,7 @@ public sealed class PromptPresentationTests
 
         Assert.Contains($"to put into {whose}", CardChoicePresentation.Describe(client, prompt, []).Title);
         Assert.Equal(confirm, CardChoicePresentation.Describe(
-            client, prompt, [prompt.Eligible[0].Value]).Confirm);
+            client, prompt, [prompt.Verdict.Addable[0].Value]).Confirm);
     }
 
     [Fact]
@@ -485,9 +483,9 @@ public sealed class PromptPresentationTests
     {
         GameClient client = Client("choose-discard");
         var prompt = Assert.IsType<ChooseCardsPromptMessage>(client.Prompt!.Prompt);
-        int first = prompt.Eligible[0].Value;
-        Assert.False(CardChoicePresentation.Describe(client, prompt, [first, first]).CanSubmit);
-        Assert.False(CardChoicePresentation.Describe(client, prompt, [first, int.MaxValue]).CanSubmit);
+        int first = prompt.Verdict.Addable[0].Value;
+        Assert.False(Judged(client, prompt, [first, first]).CanSubmit);
+        Assert.False(Judged(client, prompt, [first, int.MaxValue]).CanSubmit);
     }
 
     /// <summary>
@@ -655,6 +653,14 @@ public sealed class PromptPresentationTests
 
         // Relic of Sauron's two of three colours: three uniform and three mixed.
         Assert.Equal(6, CardActions.ColorCombinations([ColorView.Blue, ColorView.Black, ColorView.Red], 2).Count);
+    }
+
+    /// <summary>A choice described once the host has judged the cards picked: described, its check answered, described again.</summary>
+    private static CardChoicePresentation Judged(GameClient client, ChooseCardsPromptMessage prompt, IReadOnlyList<int> picked)
+    {
+        CardChoicePresentation.Describe(client, prompt, picked);
+        client.Pump();
+        return CardChoicePresentation.Describe(client, prompt, picked);
     }
 
     private static GameClient Client(string fixture)

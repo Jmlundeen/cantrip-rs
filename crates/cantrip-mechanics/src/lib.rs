@@ -88,6 +88,7 @@ pub mod recruit;
 pub mod reconfigure;
 pub mod regenerate;
 pub mod saddle;
+pub mod select;
 pub mod replicate;
 pub mod retrace;
 pub mod ripple;
@@ -626,13 +627,11 @@ pub fn choose_colors(g: &mut dyn Game, player: PlayerId, source: ObjectId, choic
 }
 
 /// `searcher` searches the library of `owner` (CR 701.23, 701.23f; the two are the same player for "search your
-/// library") for up to `count` cards (exactly as many as can be found, when not `optional`) that pass `eligible`.
-/// Asked only when the library has cards and `count` is not zero (a search for zero cards, as Settle the Wreckage
-/// can make, finds nothing and is still a search); the search is recorded either way. A search the spell or ability can't
-/// cause (`Game::may_search`, CR 101.2) is not made: nothing is asked or found and no search is recorded, and the caller's
-/// "then shuffle" still shuffles (Ashiok, Dream Render's ruling). The library is listed bottom first, as the C# engine
-/// lists it. `destination` is where the cards found are going, for the question to say. A `count` of `ANY_NUMBER` is "any
-/// number of [cards]", asked as such (`RequestKind::SearchLibrary::any_number`).
+/// library") for up to `count` cards (exactly as many as can be found, when not `optional`) that pass `eligible`, asked as
+/// `library::search` asks with the rule that says so: `select::up_to(count)` (any number for a `count` of `ANY_NUMBER`) or
+/// `select::as_many_as_can(count)` of the cards `eligible` passes. A search for zero cards, as Settle the Wreckage can make,
+/// finds nothing and is still a search. Kept for existing cards; new cards use `library::search` (or the
+/// `library::find_to_*` wrappers) with a rule from `select`.
 pub fn search_library(
     g: &mut dyn Game,
     searcher: PlayerId,
@@ -643,33 +642,22 @@ pub fn search_library(
     optional: bool,
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    if !g.may_search(searcher, owner) {
-        return Ok(Vec::new());
-    }
-    let mut library: Vec<ObjectId> = g.state().zone(Zone::library(owner)).to_vec();
-    library.reverse();
-    let found = if library.is_empty() || count == 0 {
-        Vec::new()
+    let library = library::searched_cards(g, owner);
+    let can: Vec<ObjectId> = library.iter().copied().filter(|&c| eligible(g, c)).collect();
+    let count = if count == 0 {
+        select::Count::UpTo(0)
+    } else if optional && count == ANY_NUMBER {
+        select::ANY_NUMBER
+    } else if optional {
+        select::up_to(count)
     } else {
-        let can: Vec<ObjectId> = library.iter().copied().filter(|&c| eligible(g, c)).collect();
-        let any_number = optional && count == ANY_NUMBER;
-        let count = if any_number {
-            count_u32(can.len())
-        } else if optional {
-            count.max(1)
-        } else {
-            count.max(1).min(count_u32(can.len()))
-        };
-        match g.ask(searcher, RequestKind::SearchLibrary { source, library, eligible: can, count, optional, any_number, destination })? {
-            Answer::Cards(cards) => cards,
-            _ => Vec::new(),
-        }
+        select::as_many_as_can(count)
     };
-    g.searched(searcher, owner);
-    Ok(found)
+    library::search(g, searcher, owner, source, destination, Selection::listed(count, &library, can))
 }
 
-/// The count of a search for "any number of [cards]" (`search_library`, `library::Find::ONE.up_to(ANY_NUMBER)`).
+/// The count of a search for "any number of [cards]" (`search_library`, `library::Find::ONE.up_to(ANY_NUMBER)`). Kept for
+/// existing cards; new cards use `select::ANY_NUMBER`.
 pub const ANY_NUMBER: u32 = u32::MAX;
 
 /// The top `count` cards of a player's library, top first.

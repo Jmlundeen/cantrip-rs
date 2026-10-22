@@ -317,7 +317,7 @@ public sealed class TacticalPlayTests
 
         ChooseCardsPromptMessage Offered() => new()
         {
-            Player = Me, Owner = Me, Purpose = CardChoicePurposeView.Cast, Cards = [Handle(20)], Eligible = [Handle(20)], Count = 1, UpTo = true,
+            Player = Me, Owner = Me, Purpose = CardChoicePurposeView.Cast, Cards = [Handle(20)], Verdict = new() { Addable = [Handle(20)] }, Count = 1, CountKind = CountKindView.UpTo,
         };
 
         Assert.Equal([Handle(20)], Assert.IsType<CardsChosenAnswer>(bot.Decide(client, Offered())).Cards);
@@ -364,7 +364,7 @@ public sealed class TacticalPlayTests
         var sacrifice = new ChooseCardsPromptMessage
         {
             Player = Me, Source = Handle(10), Purpose = CardChoicePurposeView.Sacrifice, Count = 1,
-            Cards = [Handle(3), Handle(4)], Eligible = [Handle(3), Handle(4)],
+            Cards = [Handle(3), Handle(4)], Verdict = new() { Addable = [Handle(3), Handle(4)] },
         };
 
         Assert.Equal([Handle(4)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, sacrifice)).Cards);
@@ -875,7 +875,7 @@ public sealed class TacticalPlayTests
         List<ViewHandle> discarded = [.. Assert.IsType<CardsChosenAnswer>(Bot().Decide(big, new ChooseCardsPromptMessage
         {
             Player = Me, Owner = Me, Source = Handle(20), Purpose = CardChoicePurposeView.Discard,
-            Cards = [Handle(30), Handle(31), Handle(32)], Eligible = [Handle(30), Handle(31), Handle(32)], Count = 2,
+            Cards = [Handle(30), Handle(31), Handle(32)], Verdict = new() { Addable = [Handle(30), Handle(31), Handle(32)] }, Count = 2,
         })).Cards];
         Assert.Equal(2, discarded.Count);
         Assert.Contains(Handle(30), discarded);

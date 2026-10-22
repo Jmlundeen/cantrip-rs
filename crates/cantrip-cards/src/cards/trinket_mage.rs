@@ -1,5 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::{ask_may_search, Find, search_to_hand};
+use cantrip_mechanics::library::{ask_may_search, find_to_hand};
+use cantrip_mechanics::select::{self, up_to};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -12,10 +13,7 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !ask_may_search(g, player, item.object, &ASK)? {
         return Ok(());
     }
-    search_to_hand(g, player, item.object, Find::ONE.revealed(), |q, c| {
-        let chars = q.chars(c);
-        chars.is(CardType::Artifact) && q.mana_value(c) <= 1
-    })?;
+    find_to_hand(g, player, item.object, select::artifact_cards(up_to(1)).with(select::mana_value_at_most(1)), true)?;
     Ok(())
 }
 
