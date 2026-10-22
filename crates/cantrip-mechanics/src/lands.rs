@@ -88,6 +88,22 @@ pub fn enters_tapped_unless_you_control_basic_land(g: &mut dyn Game, entering: &
     Ok(())
 }
 
+/// "This land enters tapped unless you control two or more basic lands" (CR 614.1c, 205.4a): the supertype, not a land type,
+/// read on the battlefield as it is while the land enters, so the land itself - and any land entering at the same time
+/// (`became`) - is not counted. The Battle lands print it: Prairie Stream and Radiant Summit (also Canopy Vista, Cinder Glade,
+/// Smoldering Marsh and Sunken Hollow).
+pub fn enters_tapped_unless_two_or_more_basic_lands(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let basics = g
+        .permanents_of(entering.controller)
+        .into_iter()
+        .filter(|&id| g.obj(id).became.is_none() && g.chars(id).is(CardType::Land) && g.chars(id).supertypes.basic)
+        .count();
+    if basics < 2 {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
 /// "This land enters tapped unless you control a [land type] or a [land type]" (CR 614.1c): as `enters_tapped_unless_you_control`
 /// with two land types, each read through the layers and the land's words (CR 612.2). Cori Mountain Monastery (Plains or
 /// Island) and Mistrise Village (Mountain or Forest) print it.
