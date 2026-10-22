@@ -68,7 +68,7 @@ pub fn enters_tapped_unless_pay_three_life(g: &mut dyn Game, entering: &mut Ente
     Ok(())
 }
 
-/// Adds one mana of the color chosen as the ability was activated (CR 106.5), then the source deals 1 damage to its
+/// Adds one mana of the color chosen as the ability was activated (CR 106.1a), then the source deals 1 damage to its
 /// controller, all at once (a mana ability: no stack). The Talismans print it, every one of the five enemy-color pairs:
 /// `mana_ability(TAP, add_one_of(&[a, b]).by(mana::add_chosen_and_hurt), text)`.
 pub fn add_chosen_and_hurt(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Result<(), Suspend> {

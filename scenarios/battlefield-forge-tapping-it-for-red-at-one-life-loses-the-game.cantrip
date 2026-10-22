@@ -1,5 +1,5 @@
 # Battlefield Forge: "{T}: Add {R} or {W}. This land deals 1 damage to you." - the damage comes with the mana, as the mana
-# ability resolves (CR 605.4a), and a player at 0 life loses the game (CR 704.5a). Bot1 starts at 1 life, taps the Forge
+# ability resolves (CR 605.3b), and a player at 0 life loses the game (CR 704.5a). Bot1 starts at 1 life, taps the Forge
 # for {R} on turn 3 and loses to life.
 
 [Life]
