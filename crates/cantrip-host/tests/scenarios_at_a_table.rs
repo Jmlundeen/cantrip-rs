@@ -684,3 +684,36 @@ fn bolass_citadel_shows_its_controller_the_top_of_their_library_and_nobody_else(
     });
     assert_eq!(tops, ["Lightning Bolt", "Mox Sapphire", "Island", "Tundra", "Swamp"], "the tops Bot1 was shown");
 }
+
+/// The host's `CheckBlocks` (docs/host-protocol.md, "Checking a declaration of blockers") judges Bot1's declaration under
+/// Lure (CR 509.1c): no blocks is no declaration, with the issue naming the creature that must block; the scenario's own block
+/// is one; and the prompt's verdict on no blocks is the host's.
+#[test]
+fn the_host_judges_a_declaration_of_blockers_under_lure() {
+    let name = "lure-tells-the-defender-which-creature-must-block-in-the-browser";
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).ok().unwrap();
+    let mut step = session.step();
+    for _ in 0..20_000 {
+        let expected = step["Scenario"]["Expected"].clone();
+        assert!(!expected.is_null(), "the declaration never came");
+        let answer: AnswerPayload = serde_json::from_value(expected["Answer"].clone()).unwrap();
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        if let AnswerPayload::BlockersDeclaredAnswer(declared) = &answer {
+            let none = session.check_blocks(id, seat, &[]).ok().unwrap();
+            assert_eq!(none["Complete"], Value::Bool(false));
+            assert_eq!(none["Issue"]["Rule"], Value::String("509.1c".into()));
+            assert_eq!(none["Issue"]["Words"], Value::String("must block".into()));
+            assert_eq!(none["Addable"].as_array().map(Vec::len), Some(1));
+            let prompt = step["Requests"].to_string();
+            assert!(prompt.contains("\"Verdict\""), "the prompt carries no verdict: {prompt}");
+            let theirs = session.check_blocks(id, seat, &declared.blocks).ok().unwrap();
+            assert_eq!(theirs["Complete"], Value::Bool(true), "{theirs}");
+            assert!(theirs["Issue"].is_null());
+            return;
+        }
+        step = session.answer(id, seat, &answer).ok().unwrap();
+    }
+    panic!("the declaration never came");
+}

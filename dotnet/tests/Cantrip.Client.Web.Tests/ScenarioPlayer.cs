@@ -322,6 +322,8 @@ public sealed class ScenarioPlayer
                     await ClickHandleAsync(one.Attacker.Value);
                 }
 
+                // The dock's button waits for the host's word on the blocks declared (CheckBlocks), as it does for a person.
+                await _page.SettledAsync();
                 await _page.Page.Keyboard.PressAsync("Space");
                 return;
 
