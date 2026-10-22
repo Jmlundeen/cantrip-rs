@@ -527,12 +527,12 @@ impl StateDump {
                         d.set(format!("{key}.ChosenOption"), label_text(&Label::Option(chosen.card, chosen.index)));
                     }
                     // The modes its modal abilities have chosen, from the history (`Event::ModesChosen`), numbered from 1.
-                    let chosen = game.history().all().iter().fold(0u8, |acc, r| match r.event {
+                    let chosen = game.history().all().iter().fold(0u32, |acc, r| match r.event {
                         Event::ModesChosen { source, modes, .. } if source == id => acc | modes,
                         _ => acc,
                     });
                     if chosen != 0 {
-                        let taken: Vec<String> = (0..8).filter(|&m| chosen & (1 << m) != 0).map(|m| (m + 1).to_string()).collect();
+                        let taken: Vec<String> = (0..32).filter(|&m| chosen & (1 << m) != 0).map(|m| (m + 1).to_string()).collect();
                         d.set(format!("{key}.ChosenModes"), taken.join(", "));
                     }
                     if let Some(chosen) = obj.marks.chosen_card {

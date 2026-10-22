@@ -1394,25 +1394,43 @@ pub struct ModalDef {
 }
 
 impl ModalDef {
+    /// How many bits a mode's count takes in a `StackItem::modes` mask, for a modal that repeats: counts up to 15, past the
+    /// five the Seasons choose of one mode (CR 700.2d), for up to eight modes.
+    const COUNT_BITS: usize = 4;
+    const COUNT_MAX: u32 = (1 << Self::COUNT_BITS) - 1;
+
+    /// Where mode `i`'s bit, or its count's bits for a modal that repeats, are in a mask: `None` past the mask's width.
+    fn shift(&self, i: usize) -> Option<u32> {
+        let at = if self.repeat { Self::COUNT_BITS * i } else { i };
+        (at < 32).then_some(at as u32)
+    }
+
     /// How many times mode `i` is chosen in a `StackItem::modes` mask. A mask holds a bit for each mode, or, for a
-    /// modal that repeats (at most four modes, each chosen up to three times), two bits for each: its count.
-    pub fn times(&self, mask: u8, i: usize) -> u8 {
-        if self.repeat { (mask >> (2 * i)) & 3 } else { (mask >> i) & 1 }
+    /// modal that repeats, four bits for each: its count.
+    pub fn times(&self, mask: u32, i: usize) -> u8 {
+        let Some(at) = self.shift(i) else { return 0 };
+        let width = if self.repeat { Self::COUNT_MAX } else { 1 };
+        ((mask >> at) & width) as u8
     }
 
     /// The mask of mode `i` chosen once.
-    pub fn once(&self, i: usize) -> u8 {
-        if self.repeat { 1 << (2 * i) } else { 1 << i }
+    pub fn once(&self, i: usize) -> u32 {
+        self.with(0, i)
     }
 
-    /// The mask of one more choice of mode `i` on top of `mask`.
-    pub fn with(&self, mask: u8, i: usize) -> u8 {
-        if self.repeat { mask + (1 << (2 * i)) } else { mask | (1 << i) }
+    /// The mask of one more choice of mode `i` on top of `mask`. A count already at its most takes no more, and never
+    /// carries into the next mode's.
+    pub fn with(&self, mask: u32, i: usize) -> u32 {
+        let Some(at) = self.shift(i) else { return mask };
+        if !self.repeat {
+            return mask | (1 << at);
+        }
+        if u32::from(self.times(mask, i)) >= Self::COUNT_MAX { mask } else { mask + (1 << at) }
     }
 
     /// How many modes a mask chooses, repeats included.
-    pub fn chosen(&self, mask: u8) -> u8 {
-        (0..self.modes.len()).map(|i| self.times(mask, i)).sum()
+    pub fn chosen(&self, mask: u32) -> u8 {
+        (0..self.modes.len()).map(|i| self.times(mask, i)).fold(0u8, u8::saturating_add)
     }
 }
 

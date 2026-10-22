@@ -448,18 +448,19 @@ impl Copiable {
 
     /// The most distinct abilities exceptions add to one copy. Each card that prints such an exception adds its own one
     /// ability (Thespian's Stage, Phantasmal Image, Evil Twin, Likeness Looter), so a copy gathers one per such card in its
-    /// chain of copies; past this the game cannot go on rightly, and stops loudly rather than drop one.
+    /// chain of copies. A list that is full takes no more, as every full list does.
     pub const EXTRA_ABILITIES: usize = 6;
 
     /// "Except it has [this ability]." Another instance of an ability the exceptions already add is counted in its slot
-    /// (CR 113.2c), up to 255 of them, which is past what any object holds (`MAX_ABILITIES`).
+    /// (CR 113.2c), up to 255 of them, which is past what any object holds (`MAX_ABILITIES`). A new one with every slot
+    /// taken (`EXTRA_ABILITIES`) is not added: the values are left as they were.
     pub fn with_ability(mut self, ability: AbilityRef) -> Copiable {
         let slot = self
             .extra_abilities
             .iter()
             .position(|e| e.instances > 0 && e.ability() == ability)
-            .or_else(|| self.extra_abilities.iter().position(|e| e.instances == 0))
-            .expect("a copy holds at most Copiable::EXTRA_ABILITIES distinct abilities added by exceptions");
+            .or_else(|| self.extra_abilities.iter().position(|e| e.instances == 0));
+        let Some(slot) = slot else { return self };
         let e = &mut self.extra_abilities[slot];
         *e = ExtraAbility { card: ability.card, index: ability.index, instances: e.instances.saturating_add(1) };
         self
@@ -575,7 +576,7 @@ pub struct StackItem {
     /// Which way it was cast (0 for the mana cost, n for the nth alternative cost), or activated.
     pub way: u8,
     /// The modes chosen as it was put on the stack (CR 700.2): a bit for each mode of its modal definition.
-    pub modes: u8,
+    pub modes: u32,
     /// Card code's own values chosen as it was put on the stack: a mode, a pile, a number.
     pub choice: u32,
     /// What the event that triggered it was about (CR 603.2): not a target. For an ability or a permanent spell whose cost
@@ -1816,5 +1817,25 @@ mod tests {
             let name = r.name();
             assert_eq!(ManaRestriction::parse(name.split_whitespace()), Some(r), "{name}");
         }
+    }
+}
+
+#[cfg(test)]
+mod copiable_tests {
+    use super::*;
+
+    /// A seventh distinct ability added by exceptions to a copy that holds six: not taken, the six and their counts left as
+    /// they were, and no panic (it panicked).
+    #[test]
+    fn a_seventh_exception_ability_is_not_taken_and_nothing_panics() {
+        let ability = |index: u8| AbilityRef { card: CardId(7), index };
+        let mut six = Copiable::of(CardId(1));
+        for index in 0..Copiable::EXTRA_ABILITIES as u8 {
+            six = six.with_ability(ability(index));
+        }
+        six = six.with_ability(ability(0));
+        let seventh = six.with_ability(ability(Copiable::EXTRA_ABILITIES as u8));
+        assert_eq!(seventh, six, "a full list takes no more");
+        assert_eq!(seventh.extra_instances().count(), Copiable::EXTRA_ABILITIES + 1);
     }
 }

@@ -116,3 +116,8 @@ mandatory actions while a player holds an unused response outside it (drawn afte
 **What the engine does instead, and why.** The engine keeps the widths it has today for mana costs, X, multikicker,
 splice, the mana a cast records, counters, power, toughness, damage and player counters (KI-103 and KI-104, closed by
 this decision), with no rollover handling. If one of them rolls over in a real game, an issue is opened then.
+
+The same decision keeps today's capacities (KI-105, closed): an object's 32 abilities (`MAX_ABILITIES`), a copy's six
+abilities added by exceptions, four text-changing effects (`Words::MAX`), and the special actions given once layer 6 is
+done taking the first free ability slot. A full list takes no more and never panics; a repeatable modal counts each mode
+to 15.

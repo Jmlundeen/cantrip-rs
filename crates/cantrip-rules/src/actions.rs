@@ -5153,7 +5153,7 @@ fn cast(
     // CR 601.2b: a modal spell's modes are chosen first (CR 700.2), each adding its cost (spree, escalate) - unless how
     // many it chooses is defined by whether its optional additional cost is paid or it is kicked, which is announced in
     // the same step: then that is announced first and the modes after it (below).
-    let mut mask = 0u8;
+    let mut mask = 0u32;
     let modes_after_costs = def.modal.is_some_and(|modal| modal.when_paid.is_some());
     if let Some(modal) = def.modal
         && !modes_after_costs
@@ -6038,7 +6038,7 @@ fn set_item_targets(cx: &mut Cx, targets: &[Target], of: &[u8]) {
 }
 
 /// The target slots of the chosen modes, in printed order (CR 700.2c).
-pub(crate) fn mode_specs(modal: &ModalDef, mask: u8) -> Vec<TargetSpec> {
+pub(crate) fn mode_specs(modal: &ModalDef, mask: u32) -> Vec<TargetSpec> {
     let mut specs = Vec::new();
     for (i, mode) in modal.modes.iter().enumerate() {
         for _ in 0..modal.times(mask, i) {
@@ -6050,7 +6050,7 @@ pub(crate) fn mode_specs(modal: &ModalDef, mask: u8) -> Vec<TargetSpec> {
 
 /// The cost of choosing these modes on top of `base` (CR 601.2f): each mode's own cost (spree, CR 702.172a), and the
 /// escalate cost once for each mode beyond the first (CR 702.120a).
-fn modal_cost(modal: &ModalDef, mask: u8, base: ManaCost) -> ManaCost {
+fn modal_cost(modal: &ModalDef, mask: u32, base: ManaCost) -> ManaCost {
     let mut cost = base;
     for (i, mode) in modal.modes.iter().enumerate() {
         for _ in 0..modal.times(mask, i) {
@@ -6061,7 +6061,7 @@ fn modal_cost(modal: &ModalDef, mask: u8, base: ManaCost) -> ManaCost {
 }
 
 /// The escalate cost of a choice of modes (CR 702.120a): paid once for each mode beyond the first.
-fn escalate_cost(modal: &ModalDef, mask: u8) -> Cost {
+fn escalate_cost(modal: &ModalDef, mask: u32) -> Cost {
     match modal.escalate {
         Some(escalate) => escalate.times(modal.chosen(mask).saturating_sub(1)),
         None => Cost::NONE,
@@ -6080,7 +6080,7 @@ fn cast_modes(
     range: (u8, u8),
     cost: &mut Cost,
     extra: &mut Cost,
-) -> R<u8> {
+) -> R<u32> {
     let mask = choose_modes(cx, player, spell, item.ability, modal, range, cost.mana)?;
     cost.mana = modal_cost(modal, mask, cost.mana);
     item.modes = mask;
@@ -6094,7 +6094,7 @@ fn cast_modes(
 /// Asks for a modal spell's or ability's modes (CR 601.2b, 602.2b, 700.2), as the C# engine's `ChooseModesPrompt`:
 /// `range` (at least, at most) of the eligible modes, with the ones whose own cost could be paid beside `base` as advice.
 /// Returns the chosen modes as a bit for each.
-fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, modal: &ModalDef, range: (u8, u8), base: ManaCost) -> R<u8> {
+fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, modal: &ModalDef, range: (u8, u8), base: ManaCost) -> R<u32> {
     let (least, max) = range;
     let asker = Asker { source, controller: player };
     let eligible = eligible_modes(cx, &asker, modal);
@@ -6112,7 +6112,7 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
     }
     if modal.escalate.is_some() {
         let payable = |cx: &Cx, n: u8| {
-            let first_n = (1u16 << n).wrapping_sub(1) as u8;
+            let first_n = (0..usize::from(n)).fold(0u32, |mask, i| modal.with(mask, i));
             can_afford(cx, player, source, &modal_cost(modal, first_n, base)) && can_pay_other(cx, source, player, &escalate_cost(modal, first_n))
         };
         while most > least.max(1) && !payable(cx, most) {
@@ -6131,7 +6131,7 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
     };
     match cx.ask_core(player, ask, true)? {
         Answer::Modes(chosen) => {
-            let modes = chosen.iter().fold(0u8, |mask, &i| modal.with(mask, i as usize));
+            let modes = chosen.iter().fold(0u32, |mask, &i| modal.with(mask, i as usize));
             cx.record(Event::ModesChosen { source, ability, modes });
             Ok(modes)
         }
@@ -6536,7 +6536,7 @@ fn activate(
     }
 
     // CR 602.2b, 601.2b: a modal ability's modes first, then X, then the Phyrexian symbols paid with life.
-    let mut mask = 0u8;
+    let mut mask = 0u32;
     if let Some(modal) = def.modal {
         mask = choose_modes(cx, player, source, ability, modal, (modal.min, modal.max), mana)?;
         item.modes = mask;

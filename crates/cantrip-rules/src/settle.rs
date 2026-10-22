@@ -605,7 +605,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
     let mut targets = Vec::new();
     let mut of: Vec<u8> = Vec::new();
     let mut shares: Vec<u32> = Vec::new();
-    let mut mask = 0u8;
+    let mut mask = 0u32;
     if let Some(modal) = def.modal {
         // A modal ability's modes are chosen as it is put on the stack (CR 603.3c, 700.2), then each chosen mode's
         // target, in printed order. A mode whose required target has no candidate cannot be chosen (CR 700.2a), and with

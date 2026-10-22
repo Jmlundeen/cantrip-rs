@@ -49,7 +49,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
 | [KI-54](#ki-54-state-triggers-are-judged-only-where-a-cards-text-marks-a-sentences-end) | State triggers are judged only where a card's text marks a sentence's end | Pri-1 | Fix queued |
-| [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
@@ -221,31 +220,6 @@ has left its own view at once, as the answering seat's is.
 
 **Scenarios.** None; `TableClockTests.In_a_game_of_four_a_player_out_of_time_leaves_and_the_others_play_on` answers the others'
 questions until the departed seat is told.
-
-### KI-105: An object's abilities, text changes and chosen modes are held in fixed lists
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine | 2026-10-21, the engine-wide audit (workstream W3, part on `pool-4-w3-wip`) |
-
-**Notes.**
-- An object holds at most 32 abilities (`MAX_ABILITIES`, `object.rs:1083`); a grant past it is not given, which stacked
-  grants or a chain of Thespian's Stage copies reach.
-- A copy holds at most six distinct abilities added by exceptions (`Copiable::EXTRA_ABILITIES`), and a seventh panics
-  (`with_ability`'s `expect`): a crash, pri-0 if reached.
-- An object keeps at most four text-changing effects (`Words::MAX`, `vocab.rs:709`); a fifth is ignored.
-- The modes chosen for a spell are a `u8` mask (`StackItem::modes`, `object.rs:575`) with two bits a mode where modes
-  repeat, so a fourth pick of a mode carries into the next (the Seasons choose up to five).
-- The bands of `AbilityRef::index` are guarded only by `debug_assert`.
-- The special actions the rules give an object once layer 6 is done - a Room's unlock (`layers::unlock_actions`, CR
-  709.5e, 116.2m), turning a face-down permanent face up (`turn_face_up_action`, CR 116.2b) - and decayed's triggered
-  ability (`intrinsic_keyword_abilities`, CR 702.147a) take the first free slot of the ability list, so an object whose
-  list is full is not given them: the capacity fix and its test must cover them (a Room with a full list still offers
-  its unlock).
-A fix gives each a capacity past practical play, handled gracefully at its bound; a check of every card's lists at table
-construction for the bands; and the modes kept as the chosen indices in order.
-
-**Scenarios.** None yet.
 
 ### KI-108: What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared
 
