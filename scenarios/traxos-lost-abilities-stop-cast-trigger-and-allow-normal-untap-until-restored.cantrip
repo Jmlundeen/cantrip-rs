@@ -1,0 +1,68 @@
+# Kasmina's Transmutation removes both the cast trigger and the untap restriction (CR 613.1f). Ornithopter no longer
+# untaps Traxos, but the next untap step does. Disenchant restores the abilities; its next attack stays tapped through
+# another untap step, then a new artifact cast untaps it (CR 502.3/603.2). Both sides of ability loss are exercised.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Kasmina's Transmutation
+Mox Pearl
+Ornithopter
+Disenchant
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kasmina's Transmutation.Cast(Traxos, Scourge Eternal)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Traxos, Scourge Eternal.Keywords = (absent)
+Bot1.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Disenchant.Cast(Kasmina's Transmutation)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Traxos, Scourge Eternal.Keywords = DoesNotUntap; Trample
+Bot1.Attack(Traxos, Scourge Eternal > Bot2)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Hand.Mox Jet.Cast
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Traxos, Scourge Eternal.Power = 5
+Bot1.Graveyard = Disenchant; Kasmina's Transmutation
+Bot2.Life = 15

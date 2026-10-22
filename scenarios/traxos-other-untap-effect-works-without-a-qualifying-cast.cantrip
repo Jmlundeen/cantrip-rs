@@ -1,0 +1,49 @@
+# Show and Tell puts Divining Duelist onto the battlefield without casting it (CR 701.4/601.2i), so no Traxos trigger.
+# Duelist's own enters ability explicitly untaps Traxos outside the untap step, which its restriction permits (CR 701.26b).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Show and Tell
+Divining Duelist
+Island x19
+
+[Bot2 Deck]
+Island x26
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Divining Duelist)
+Bot2.Choose()
+Bot1.Modes(Untap target creature)
+Bot1.Target(Traxos, Scourge Eternal)
+? Stack = Divining Duelist
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Divining Duelist.Power = 3
+Bot1.Graveyard = Show and Tell

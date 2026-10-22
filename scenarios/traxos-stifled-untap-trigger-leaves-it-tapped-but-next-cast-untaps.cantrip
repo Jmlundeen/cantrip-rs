@@ -1,0 +1,47 @@
+# Stifle counters the untap ability, not the artifact spell (CR 701.6/603.3). Traxos stays tapped after Ornithopter
+# resolves; the next artifact cast makes a fresh, successful untap trigger, the positive control.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Ornithopter
+Mox Jet
+Island x19
+
+[Bot2 Deck]
+Island
+Stifle
+Island x24
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+Bot1.Hand.Ornithopter.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Stifle.Cast(Stack.Traxos, Scourge Eternal)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Hand.Mox Jet.Cast
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot2.Graveyard = Stifle

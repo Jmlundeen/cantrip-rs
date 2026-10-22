@@ -1,0 +1,46 @@
+# Springleaf Drum may tap a newly entered creature: its cost does not use that creature's {T} symbol (CR 302.6).
+# Elvish Mystic is a creature, not an artifact; casting it puts one untap trigger above the spell (CR 601.2i/603.3).
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Springleaf Drum
+Traxos, Scourge Eternal
+Elvish Mystic
+Forest
+Forest x18
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Green)
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Hand.Elvish Mystic.Cast
+? Stack = Traxos, Scourge Eternal; Elvish Mystic
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Stack = Elvish Mystic
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Elvish Mystic.SummoningSick = true
+Bot1.Battlefield.Springleaf Drum.Tapped = true

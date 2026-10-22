@@ -1,0 +1,61 @@
+# Traxos triggers even while untapped: it has no intervening "if" (CR 603.2/603.4). Sage's cast makes one untap trigger
+# and one copy trigger. After the untap resolves, tap Traxos with Drum; Sage's spell copy and both entries must leave
+# it tapped because a copy is not cast (CR 707.10). The earlier Mox Jet cast is the qualifying-cast positive control.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Mox Pearl
+Sage of the Skies
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sage of the Skies.Cast
+Bot1.Triggers(Sage of the Skies; Traxos, Scourge Eternal)
+? Stack = Traxos, Scourge Eternal; Sage of the Skies; Sage of the Skies
+Bot1.Pass
+Bot2.Pass
+? Stack = Sage of the Skies; Sage of the Skies
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+Bot1.Pass
+Bot2.Pass
+? Stack = Sage of the Skies; Sage of the Skies
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Battlefield.Sage of the Skies#1.Token = true
+Bot1.Battlefield.Sage of the Skies#2.Token = (absent)
