@@ -35,9 +35,10 @@ pub fn put(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16, by: Player
 
 /// Counters of several kinds put on `id` together by `by` (CR 122.6): on a permanent, as many as the replacement effects
 /// of counters being put leave (CR 614.1a); on a card in another zone, as many as it can have (CR 101.2), which no
-/// replacement of counters put on a permanent sees. Each kind put is announced, with `by`.
+/// replacement of counters put on a permanent sees. Phased-out permanents cannot be affected (CR 702.26b).
+/// Each kind put is announced, with `by`.
 pub fn put_all(cx: &mut Cx, id: ObjectId, counts: [i16; CounterKind::COUNT], by: PlayerId, how: How) {
-    if !live(cx.s(), id) || counts.iter().all(|&n| n <= 0) {
+    if !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) || counts.iter().all(|&n| n <= 0) {
         return;
     }
     let on_battlefield = cx.s().obj(id).zone.is(ZoneKind::Battlefield);
@@ -47,7 +48,8 @@ pub fn put_all(cx: &mut Cx, id: ObjectId, counts: [i16; CounterKind::COUNT], by:
     } else {
         counts
     };
-    if counts.iter().all(|&n| n <= 0) {
+    // A replacement's continuation may move or phase out the recipient before the placement finishes.
+    if !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) || counts.iter().all(|&n| n <= 0) {
         return;
     }
     cx.st().update_obj(id, |o| o.put_path_add(&counts));
@@ -79,7 +81,7 @@ pub fn put_all(cx: &mut Cx, id: ObjectId, counts: [i16; CounterKind::COUNT], by:
 /// the state-based action of CR 704.5q. When the last defense counter comes off a Siege, its defeat ability triggers
 /// (CR 310.12b).
 pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i16) {
-    if n <= 0 || !live(cx.s(), id) {
+    if n <= 0 || !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) {
         return;
     }
     let before = cx.s().obj(id).counters(kind);
@@ -98,7 +100,7 @@ pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i16) {
 /// together. Nothing is asked of an object that has changed zones (CR 400.7) or that has no counters. How many came off:
 /// "for each counter removed this way". Heartless Act, Hex Parasite, Price of Betrayal (its permanents).
 pub fn remove_up_to(cx: &mut Cx, player: PlayerId, source: ObjectId, id: ObjectId, maximum: u8) -> crate::R<u16> {
-    if maximum == 0 || !live(cx.s(), id) {
+    if maximum == 0 || !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) {
         return Ok(0);
     }
     let obj = cx.s().obj(id);
@@ -235,6 +237,102 @@ pub fn put_on_player(cx: &mut Cx, player: PlayerId, counts: PlayerCounts, by: Pl
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::{Game, Setup};
+
+    const YOU: PlayerId = PlayerId(0);
+    const THEM: PlayerId = PlayerId(1);
+
+    static BEAR: CardDef = CardDef {
+        name: "Counter Phasing Test Bear", types: TypeSet::of(&[CardType::Creature]),
+        power: Some(2), toughness: Some(2), ..CardDef::BLANK
+    };
+
+    fn applies(_: &dyn Query, _: &Asker, proposal: &Proposal) -> bool {
+        matches!(proposal, Proposal::Counters(c) if c.effect && c.putter == THEM)
+    }
+
+    fn twice(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+        if let Proposal::Counters(c) = proposal {
+            for n in &mut c.counts { *n *= 2; }
+        }
+    }
+
+    static DOUBLER: CardDef = CardDef {
+        name: "Counter Phasing Test Doubler", types: TypeSet::of(&[CardType::Enchantment]),
+        replacements: &[replacement(ReplacementKind::Counters, applies, twice, "double counters put by the other player")],
+        ..CardDef::BLANK
+    };
+
+    fn cx(g: &mut Game) -> Cx<'_> {
+        Cx { g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
+    }
+
+    #[test]
+    fn phased_out_placement_does_nothing_but_existing_counters_and_other_zones_survive() {
+        let table = Box::leak(Box::new(CardTable::new([&BEAR, &DOUBLER])));
+        let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+        let object = |game: &mut Game, card: &'static CardDef, zone: Zone| {
+            let id = game.state.push_obj(Obj::new(table.id_of(card), YOU, zone));
+            game.state.zone_push(zone, id);
+            id
+        };
+        let bear = object(&mut game, &BEAR, Zone::BATTLEFIELD);
+        object(&mut game, &DOUBLER, Zone::BATTLEFIELD);
+        let cards = [Zone::hand(YOU), Zone::graveyard(YOU), Zone::exile(YOU)].map(|z| object(&mut game, &BEAR, z));
+        let mut context = cx(&mut game);
+        put_all(&mut context, bear, {
+            let mut c = [0; CounterKind::COUNT]; c[CounterKind::PlusOne as usize] = 1; c[CounterKind::Shield as usize] = 1; c
+        }, THEM, How::Effect);
+        assert_eq!(context.s().obj(bear).counters(CounterKind::PlusOne), 2);
+        assert_eq!(context.s().obj(bear).counters(CounterKind::Shield), 2);
+        crate::phasing::phase_out(&mut context, &[bear], None, false);
+        let events = context.g.log.len();
+        for how in [How::Effect, How::Cost, How::TurnBased] {
+            put(&mut context, bear, CounterKind::PlusOne, 3, THEM, how);
+        }
+        remove(&mut context, bear, CounterKind::PlusOne, 1);
+        assert_eq!(remove_up_to(&mut context, YOU, bear, bear, 3), Ok(0));
+        assert_eq!(context.g.log.len(), events, "a nonexistent placement emitted an event");
+        assert_eq!(context.s().obj(bear).counters(CounterKind::PlusOne), 2);
+        assert_eq!(context.s().obj(bear).counters(CounterKind::Shield), 2);
+        for card in cards {
+            put(&mut context, card, CounterKind::PlusOne, 3, THEM, How::Effect);
+            assert_eq!(context.s().obj(card).counters(CounterKind::PlusOne), 3, "card in another zone was rejected or doubled");
+        }
+        crate::phasing::untap_step(&mut context, YOU);
+        put(&mut context, bear, CounterKind::PlusOne, 1, THEM, How::Effect);
+        assert_eq!(context.s().obj(bear).counters(CounterKind::PlusOne), 4);
+        assert!(matches!(context.g.log.last().unwrap().event, Event::CountersPut { object, amount: 2, total: 4, by: THEM, .. } if object == bear));
+    }
+
+    fn phase_recipient(g: &mut dyn cantrip_api::Game, _: &Asker, _: &Proposal, after: &Proposal) {
+        if let Proposal::Counters(c) = after { g.phase_out(&[c.object]); }
+    }
+
+    static PHASER: CardDef = CardDef {
+        name: "Counter Phasing Test Continuation", types: TypeSet::of(&[CardType::Enchantment]),
+        replacements: &[ReplacementDef {
+            then: Some(phase_recipient),
+            ..replacement(ReplacementKind::Counters, applies, twice, "double counters and phase out recipient")
+        }],
+        ..CardDef::BLANK
+    };
+
+    #[test]
+    fn replacement_continuation_phasing_out_recipient_prevents_the_remaining_placement() {
+        let table = Box::leak(Box::new(CardTable::new([&BEAR, &PHASER])));
+        let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+        let bear = game.state.push_obj(Obj::new(table.id_of(&BEAR), YOU, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, bear);
+        let phaser = game.state.push_obj(Obj::new(table.id_of(&PHASER), YOU, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, phaser);
+        put(&mut cx(&mut game), bear, CounterKind::PlusOne, 2, THEM, How::Effect);
+        assert!(game.state.obj(bear).zone.is(ZoneKind::PhasedOut));
+        assert_eq!(game.state.obj(bear).counters(CounterKind::PlusOne), 0);
+        assert!(!game.log.iter().any(|r| matches!(r.event, Event::CountersPut { .. })));
+    }
+
     /// The counter storage's adder is called from the put path alone: any other caller would put counters with no
     /// player putting them and no replacement applied (CR 122.6a, 614.1a). The privacy of the storage stops every other
     /// write; this stops a second caller of the one adder, which the compiler cannot, as it is in another crate.

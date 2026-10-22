@@ -1,0 +1,43 @@
+# Second exact callback composition: Knight of Autumn chooses counters, then phases out (CR 702.26b). Its independent
+# ETB ability resolves, but cannot put counters on the phased-out permanent. Independent review F1 repro.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Mox Pearl
+Knight of Autumn
+Teferi's Protection
+Plains
+Forest x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Knight of Autumn.Cast
+Bot1.Modes(Put two)
+? Stack = Knight of Autumn
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Teferi's Protection.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.PhasedOut.Knight of Autumn.Counters.PlusOnePlusOne = (absent)
+Bot1.PhasedOut.Knight of Autumn.Power = 2
+Bot1.PhasedOut.Knight of Autumn.Toughness = 1
