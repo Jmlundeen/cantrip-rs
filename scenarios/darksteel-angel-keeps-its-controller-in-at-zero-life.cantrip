@@ -1,0 +1,60 @@
+# Darksteel Angel: "You can't lose the game and your opponents can't win the game." Bot1 begins at 3 life and puts the Angel
+# out on turn 3 off an Island, Black Lotus and five Moxen (nine mana). Bot2 Bolts Bot1 to 0 on turn 4: the state-based action
+# that would make Bot1 lose does not run, the game goes on at 0 life, and Bot2, who would win, does not. The Angel shows its
+# flying and indestructible.
+
+[Life]
+Bot1: 3
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Darksteel Angel
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Darksteel Angel.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Result = InProgress
+Bot1.Life = 0
+Bot1.Status = (absent)
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Darksteel Angel; Island; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot1.Battlefield.Darksteel Angel.Keywords = Flying; Indestructible
+Bot2.Life = 20

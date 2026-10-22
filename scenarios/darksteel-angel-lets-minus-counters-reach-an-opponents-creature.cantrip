@@ -1,0 +1,63 @@
+# Darksteel Angel: "Creatures you control can't have -1/-1 counters put on them" is about its controller's creatures only. On
+# turn 6 Bot2's Guerrilla Gorilla attacks and Bot1's Glistener Elf, which has infect, blocks it: the Elf's 1 damage is dealt to
+# the Gorilla as a -1/-1 counter, so it is a 1/1 with one on it, and the Gorilla's 2 damage kills the 1/1 Elf.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Darksteel Angel
+Glistener Elf
+Island x11
+
+[Bot2 Deck]
+Forest
+Guerrilla Gorilla
+Mox Emerald
+Forest x4
+Forest x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Darksteel Angel.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glistener Elf.Cast
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Guerrilla Gorilla > Bot1)
+[T6 Bot2.Blockers]
+Bot1.Block(Glistener Elf > Guerrilla Gorilla)
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot1.Life = 20
+Bot1.Graveyard.Count = 2
+Bot2.Life = 20
+Bot2.Battlefield.Guerrilla Gorilla.Counters.MinusOneMinusOne = 1
+Bot2.Battlefield.Guerrilla Gorilla.Power = 1
+Bot2.Battlefield.Guerrilla Gorilla.Toughness = 1
