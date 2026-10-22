@@ -1,0 +1,33 @@
+# Go Blank makes Bot2 discard Titanbones, then exiles it before the trigger goes on the stack. The ability still gains
+# life for Bot2, not Go Blank's controller, and survives the card's next zone change (CR 113.8/113.7a/608.2c).
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Go Blank
+Island x17
+
+[Bot2 Deck]
+Titanbones, Towering Heart
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Go Blank.Cast(Bot2)
+Bot2.Choose(Titanbones, Towering Heart; Island)
+? Bot2.Life = 20
+? Stack = Titanbones, Towering Heart
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 23
+Bot1.Graveyard = Go Blank
+Bot2.Graveyard.Count = 0
+Exile = Titanbones, Towering Heart; Island

@@ -1,0 +1,54 @@
+# Titanbones's growth uses the stack and Stifle can counter it (CR 603.3/701.6), without undoing the gained life.
+# No target choice is needed for the growth (CR 115.1d), and the later trigger resolves normally.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Pearl
+Healing Salve
+Healing Salve
+Forest x17
+
+[Bot2 Deck]
+Island
+Stifle
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Stack = Titanbones, Towering Heart
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Stifle.Cast(Stack.Titanbones, Towering Heart)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 2
+Bot2.Graveyard = Stifle

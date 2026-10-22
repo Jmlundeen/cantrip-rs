@@ -1,0 +1,37 @@
+# A mill is not a discard (CR 701.17/701.9). Thought Scour mills Titanbones, then Iron-Shield Elf discards an Island
+# while that Titanbones is in the graveyard: neither event is this card's own discard. Positive self-discard in sibling tests.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Iron-Shield Elf
+Thought Scour
+Island
+Island
+Island
+Titanbones, Towering Heart
+Island x15
+
+[Bot2 Deck]
+Island x23
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iron-Shield Elf.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Iron-Shield Elf.Activate
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Island; Thought Scour; Island; Titanbones, Towering Heart
+Bot1.Battlefield.Iron-Shield Elf.Tapped = true

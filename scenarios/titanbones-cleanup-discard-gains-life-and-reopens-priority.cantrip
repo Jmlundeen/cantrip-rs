@@ -1,0 +1,23 @@
+# Bot2 does not spend a card, so its first draw leaves eight. Discarding Titanbones during cleanup still triggers
+# (CR 514.3a/701.9/113.6k), reopens priority, and gains life before the new cleanup step.
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Titanbones, Towering Heart
+Island x19
+
+[Actions]
+[T2 Bot2.End]
+Bot2.Pass
+Bot2.Discard(Titanbones, Towering Heart)
+? Step = Cleanup
+? Stack = Titanbones, Towering Heart
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 23
+Bot2.Graveyard = Titanbones, Towering Heart
+Bot2.Hand.Count = 7

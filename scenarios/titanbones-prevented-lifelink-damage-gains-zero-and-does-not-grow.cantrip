@@ -1,0 +1,54 @@
+# Preventing all of a Hawk's combat damage prevents its lifelink gain, so Titanbones does not trigger (CR 615.6/119.9).
+# The same unprevented attack next turn gains 1 and puts exactly two counters on Titanbones.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Pearl
+Healer's Hawk
+Forest x18
+
+[Bot2 Deck]
+Plains
+Healing Salve
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+Bot1.Attack(Healer's Hawk > Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(2)
+Bot2.Target(Bot2)
+[T3 Bot1.Main2]
+? Bot1.Life = 20
+? Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = (absent)
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Healer's Hawk > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 2
+Prevented = 1 Healer's Hawk > Bot2 by Healing Salve

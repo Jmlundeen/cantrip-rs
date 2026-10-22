@@ -1,0 +1,30 @@
+# Discarding Titanbones puts its ability on the stack; Stifle counters that ability, not the already completed discard
+# (CR 603.3/701.6). No life is gained, while the unstifled sibling scenarios gain exactly 3.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Titanbones, Towering Heart
+Island x19
+
+[Bot2 Deck]
+Island
+Stifle
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Titanbones, Towering Heart; Island)
+? Stack = Titanbones, Towering Heart
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Stifle.Cast(Stack.Titanbones, Towering Heart)
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Faithless Looting; Island; Titanbones, Towering Heart
+Bot2.Graveyard = Stifle

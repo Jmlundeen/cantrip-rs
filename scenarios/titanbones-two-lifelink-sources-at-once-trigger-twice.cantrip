@@ -1,0 +1,47 @@
+# Two Healer's Hawks deal combat damage at once, but each source gains life separately (CR 119.9/702.15; Titanbones's
+# 2026-08-21 ruling). Titanbones gets four counters, not two, and only after both sources have dealt damage.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Pearl
+Healer's Hawk
+Healer's Hawk
+Forest x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Healer's Hawk#1 > Bot2; Healer's Hawk#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Titanbones, Towering Heart.Power = 8

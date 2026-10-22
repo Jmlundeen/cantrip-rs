@@ -1,0 +1,47 @@
+# Discarding Titanbones pays Iron-Shield Elf's cost (CR 601.2h/701.9). Its own trigger is above the Elf ability and
+# gains 3 for its owner (CR 113.8); the other Titanbones on the battlefield then gets two counters, never the hand copy.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Jet
+Iron-Shield Elf
+Titanbones, Towering Heart
+Forest x18
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iron-Shield Elf.Cast
+Bot1.Pass
+Bot1.Battlefield.Iron-Shield Elf.Activate
+Bot1.Choose(Titanbones, Towering Heart)
+? Stack = Titanbones, Towering Heart; Iron-Shield Elf
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 20
+Bot1.Graveyard = Titanbones, Towering Heart
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Iron-Shield Elf.Tapped = true
+Bot1.Battlefield.Iron-Shield Elf.Keywords = Indestructible

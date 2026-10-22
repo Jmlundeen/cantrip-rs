@@ -1,0 +1,60 @@
+# Tamiyo prevents Go Blank causing its controller to discard, so no choice and no Titanbones trigger are produced
+# (CR 101.2/603.2g). The same Titanbones can still pay that player's own discard cost and gain 3, a positive control.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Sapphire
+Tamiyo, Collector of Tales
+Iron-Shield Elf
+Mox Jet
+Titanbones, Towering Heart
+Forest x18
+
+[Bot2 Deck]
+Swamp
+Sol Ring
+Go Blank
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Tamiyo, Collector of Tales.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Go Blank.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Choose
+[T5 Bot1.Main1]
+? Bot1.Life = 20
+? Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iron-Shield Elf.Cast
+Bot1.Pass
+Bot1.Battlefield.Iron-Shield Elf.Activate
+Bot1.Choose(Titanbones, Towering Heart)
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Titanbones, Towering Heart
+Exile.Count = 0
+Bot2.Graveyard = Go Blank

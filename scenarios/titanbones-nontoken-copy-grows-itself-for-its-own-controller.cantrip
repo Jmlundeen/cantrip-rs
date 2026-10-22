@@ -1,0 +1,66 @@
+# Phantasmal Image copies Titanbones's abilities but not counters (CR 707.2); separate controllers keep both legends.
+# Each gain grows only that player's object. Growth does not target the Image, so its added sacrifice ability does
+# not trigger (CR 115.1d/201.5), even though its copied name is Titanbones.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Pearl
+Healing Salve
+Forest x18
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Phantasmal Image
+Mox Pearl
+Healing Salve
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Phantasmal Image.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+? Bot2.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(1)
+Bot2.Target(Bot2)
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 23
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Titanbones, Towering Heart.Subtypes = Druid; Illusion; Skeleton
+Bot2.Battlefield.Titanbones, Towering Heart.Token = (absent)
+Bot2.Battlefield.Titanbones, Towering Heart.Power = 6

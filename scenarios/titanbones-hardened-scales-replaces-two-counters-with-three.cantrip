@@ -1,0 +1,44 @@
+# Hardened Scales replaces Titanbones's one placement of two counters with three (CR 614.1a/122.6), not four from
+# two placements. It does not change the amount of life gained. Countered-growth sibling test is the negative control.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Pearl
+Healing Salve
+Hardened Scales
+Forest x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hardened Scales.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Titanbones, Towering Heart.Power = 7
+Bot1.Battlefield.Titanbones, Towering Heart.Toughness = 6

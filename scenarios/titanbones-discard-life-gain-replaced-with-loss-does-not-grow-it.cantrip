@@ -1,0 +1,56 @@
+# Tainted Remedy replaces the discarded Titanbones's gain of 3 with a loss of 3 (CR 614.6). The battlefield Titanbones
+# sees no life gain and gets no counters. This contrasts with the positive discard-cost/growth scenario.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Jet
+Iron-Shield Elf
+Titanbones, Towering Heart
+Forest x18
+
+[Bot2 Deck]
+Swamp
+Sol Ring
+Tainted Remedy
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Tainted Remedy.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iron-Shield Elf.Cast
+Bot1.Pass
+Bot1.Battlefield.Iron-Shield Elf.Activate
+Bot1.Choose(Titanbones, Towering Heart)
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Titanbones, Towering Heart
