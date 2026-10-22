@@ -432,6 +432,14 @@ pub const NONLAND_PERMANENT: TargetSpec = target(nonland_permanent_filter);
 pub fn nonland_permanent_with_mana_value_at_most<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
 }
+
+/// "Target permanent with mana value `N` or greater" (CR 115.1, 202.3: X in a mana cost is 0 on the battlefield, a copy has
+/// its copiable mana value, a face-down permanent 0): any permanent, land or not, whoever controls it. Despark (4) and
+/// Kin-Tree Severance (3) print it.
+pub fn permanent_with_mana_value_at_least<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) >= N)
+}
+
 /// "Target artifact or enchantment an opponent controls". Cathartic Parting, Witch Enchanter, Wistfulness and Scrapshooter print it.
 pub const ARTIFACT_OR_ENCHANTMENT_AN_OPPONENT_CONTROLS: TargetSpec = target(artifact_or_enchantment_an_opponent_controls_filter);
 fn permanent_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
