@@ -132,7 +132,7 @@ mod validate;
 use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Rng};
 
-pub use actions::{activation_costs, revealed_companion, alternative_cast_total, cast_costs, cast_face_of, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction, replaced_mana_yields, options_with_mana_to_spare};
+pub use actions::{activation_costs, revealed_companion, alternative_cast_total, cast_costs, cast_face_of, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction, replaced_mana_yields, options_with_mana_to_spare, payment_mana_options_with_mana_to_spare};
 pub use validate::{check as check_answer, distribution_problem, name_problem, selection_verdict, first_choices, attack_targets};
 pub use turn::eligible_companions;
 pub use layers::{ApplyContract, apply_contract_check, chars, control_order, live, summoning_sick};

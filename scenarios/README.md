@@ -341,8 +341,9 @@ engine's own check refuses the declaration as a whole - it obeys fewer of the re
 declaration with requirements is the engine's own, which obeys them.
 
 `! Bot1.Attack()` says declaring no attackers at all is refused at the next declaration (a creature must attack, CR 508.1d).
-`! Bot1.Battlefield.Llanowar Elves.Activate` right after an `Attack` line is checked while that declaration's cost to attack is
-paid, and fails if that mana ability is offered then.
+A refused activation (`! Bot1.Battlefield.Llanowar Elves.Activate`) is checked at the player's next priority or payment -
+a cost being paid, a cost to attack after an `Attack` line among them, or an "unless pays" question - and fails if that
+ability is offered then.
 An attack, `! Bot1.Attack(Sylvan Caryatid > Bot2)`, is checked at the next declaration of attackers and fails if that attacker may attack the
 target. The attacker must be one the question offers, or else one that only a restriction (Defender, "can't attack", summoning sickness) can have left
 out: the asked player's own, untapped, with another creature of theirs offered in the same question. A pair the question

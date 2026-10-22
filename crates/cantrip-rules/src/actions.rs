@@ -2367,6 +2367,22 @@ pub fn options_with_mana_to_spare(game: &crate::Game, player: PlayerId) -> Vec<A
     priority_options(&mut cx, player)
 }
 
+/// `options_with_mana_to_spare` for a payment: the mana abilities `player` could activate while paying a cost (CR 601.2g,
+/// 605.3a) with a thousand mana of every type to spare, for the scenario harness to tell a mana ability refused at a payment
+/// for want of mana from one refused for any other reason.
+pub fn payment_mana_options_with_mana_to_spare(game: &crate::Game, player: PlayerId) -> Vec<ActionOption> {
+    let mut copy = advice_game(game);
+    copy.state.update_player(player, |p| {
+        for mana in Mana::ALL {
+            p.pool.0[mana as usize] += 1000;
+        }
+    });
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    let mut options = Vec::new();
+    mana_ability_options(&cx, player, &mut options);
+    options
+}
+
 /// The face a cast option casts, as the card id the cost changes judge it by where it is not the card itself (CR 715.4,
 /// 720.3a, 709.3, 712.8a).
 fn option_face(game: &crate::Game, card: ObjectId, index: u8) -> (&'static CardDef, Option<CardId>) {
