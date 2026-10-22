@@ -1,0 +1,19 @@
+# "...unless you control an Island or a Mountain": the Mountain branch, read by land type and not by name (CR 305.6, 305.7).
+# Taiga is a Mountain (and a Forest, which does not count) and no Island is anywhere, so Sulfur Falls enters untapped.
+
+[Bot1 Deck]
+Taiga
+Sulfur Falls
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Taiga.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Sulfur Falls.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Sulfur Falls.Tapped = false
