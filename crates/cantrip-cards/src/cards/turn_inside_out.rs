@@ -19,6 +19,6 @@ fn manifest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::CREATURE], turn_inside_out),
-    delayed: &[triggered(triggers::THIS_DIES, manifest, "When it dies this turn, manifest dread.").look_back()],
+    delayed: &[triggered(triggers::THIS_DIES, manifest, "When it dies this turn, manifest dread.")],
     ..oracle::TURN_INSIDE_OUT
 };

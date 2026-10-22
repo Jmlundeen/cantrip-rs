@@ -11,7 +11,7 @@ fn scry_and_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 
 pub static CARD: CardDef = CardDef {
     // A leaves-the-battlefield trigger is looked back on (CR 603.10a).
-    abilities: &[triggered(triggers::THIS_DIES, scry_and_treasure, "When this creature dies, scry 1 and create a Treasure token.").look_back()],
+    abilities: &[triggered(triggers::THIS_DIES, scry_and_treasure, "When this creature dies, scry 1 and create a Treasure token.")],
     ..oracle::GREEDY_FREEBOOTER
 };
 

@@ -24,8 +24,7 @@ pub static CARD: CardDef = CardDef {
         // "Enters or dies" is one event or the other, never both at once, so it is written as the two triggers it is:
         // a leaves-the-battlefield trigger is looked back on (CR 603.10a), an enters trigger is not (CR 603.6a).
         triggered(THIS_ENTERS, create_heartwood, "When Aerid Konstrari enters, create a Heartwood token."),
-        triggered(THIS_DIES, create_heartwood, "When Aerid Konstrari dies, create a Heartwood token.")
-            .look_back(),
+        triggered(THIS_DIES, create_heartwood, "When Aerid Konstrari dies, create a Heartwood token."),
         ability(cost("{6}"), make_and_grow, "{6}: Create a Heartwood token. Then Aerid Konstrari gets +X/+0 until end of turn, where X is the number of artifacts you control."),
     ],
     ..oracle::AERID_KONSTRARI

@@ -18,8 +18,7 @@ pub static CARD: CardDef = CardDef {
         THIS_DIES,
         each_player_creates_a_lander,
         "When this creature dies, each player creates a Lander token.",
-    )
-    .look_back()],
+    )],
     ..oracle::EDGE_ROVER
 };
 

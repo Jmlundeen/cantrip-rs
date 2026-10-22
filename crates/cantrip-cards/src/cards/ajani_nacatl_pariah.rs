@@ -115,7 +115,6 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, enters_make_cat, "When Ajani enters, create a 2/1 white Cat Warrior creature token."),
         triggered(when(EventMask::ZONE_CHANGE, cats_die), exile_and_return, "Whenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.")
-            .look_back()
             .once_per_batch(),
     ],
     back: Some(&BACK),

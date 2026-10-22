@@ -49,8 +49,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, gambit, "When this enchantment enters, you draw three cards, gain 6 life, and create three 2/1 black Bat creature tokens with flying."),
         triggered(YOUR_END_STEP, pay_the_price, "At the beginning of your end step, you discard a card, lose 2 life, and sacrifice a creature."),
-        triggered(THIS_LEAVES, pay_the_bill, "When this enchantment leaves the battlefield, you discard three cards, lose 6 life, and sacrifice three creatures.")
-            .look_back(),
+        triggered(THIS_LEAVES, pay_the_bill, "When this enchantment leaves the battlefield, you discard three cards, lose 6 life, and sacrifice three creatures."),
     ],
     ..oracle::GREEDS_GAMBIT
 };

@@ -16,8 +16,7 @@ pub static MUNITIONS: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     abilities: &[triggered(THIS_LEAVES, munitions_damage, "When this token leaves the battlefield, it deals 2 damage to any target.")
-        .targets(&[targets::ANY])
-        .look_back()],
+        .targets(&[targets::ANY])],
     text: "When this token leaves the battlefield, it deals 2 damage to any target.",
     ..CardDef::BLANK
 };

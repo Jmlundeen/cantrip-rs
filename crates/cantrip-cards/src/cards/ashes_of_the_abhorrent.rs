@@ -22,7 +22,7 @@ fn gain_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(CREATURE_DIES, gain_one, "Whenever a creature dies, you gain 1 life.").look_back()],
+    abilities: &[triggered(CREATURE_DIES, gain_one, "Whenever a creature dies, you gain 1 life.")],
     cast_rules: &[no_casting_from_graveyards],
     activation_rules: &[no_activating_in_graveyards],
     ..oracle::ASHES_OF_THE_ABHORRENT

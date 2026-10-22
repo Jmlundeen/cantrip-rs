@@ -15,7 +15,6 @@ pub static CARD: CardDef = CardDef {
         triggers::THIS_DIES,
         exile_top,
         "When this creature dies, exile the top card of your library. You may play it until the end of your next turn.",
-    )
-    .look_back()],
+    )],
     ..oracle::CLOCKWORK_PERCUSSIONIST
 };

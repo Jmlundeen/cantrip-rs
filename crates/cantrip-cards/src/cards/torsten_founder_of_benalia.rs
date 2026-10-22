@@ -55,8 +55,7 @@ pub static EXTRA: &[&CardDef] = &[&SOLDIER];
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, reveal_seven, "When Torsten enters, reveal the top seven cards of your library. Put any number of creature and/or land cards from among them into your hand and the rest on the bottom of your library in a random order."),
-        triggered(triggers::THIS_DIES, create_soldiers, "When Torsten dies, create seven 1/1 white Soldier creature tokens.")
-            .look_back(),
+        triggered(triggers::THIS_DIES, create_soldiers, "When Torsten dies, create seven 1/1 white Soldier creature tokens."),
     ],
     ..oracle::TORSTEN_FOUNDER_OF_BENALIA
 };

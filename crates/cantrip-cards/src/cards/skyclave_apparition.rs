@@ -38,8 +38,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, cantrip_mechanics::effects::exile_first_target_with_this, "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.")
             .targets(&[up_to_one(target_filter)]),
-        triggered(triggers::THIS_LEAVES, illusion_for_owner, "When this creature leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.")
-            .look_back(),
+        triggered(triggers::THIS_LEAVES, illusion_for_owner, "When this creature leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card."),
     ],
     ..oracle::SKYCLAVE_APPARITION
 };

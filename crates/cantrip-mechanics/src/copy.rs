@@ -86,7 +86,7 @@ pub fn enter_as_copy_of_one_of(
 
 /// The intervening "if it isn't a token" of "When this creature dies, if it isn't a token, create a token that's a copy
 /// of it" (CR 603.4, 111.7): judged on the creature as it last existed on the battlefield (CR 603.10a). Use as
-/// `TriggeredDef::condition` with `look_back: true`. Sphinx of False Conclusions and Vaultborn Tyrant print it.
+/// `TriggeredDef::condition` of a dies ability, which looks back. Sphinx of False Conclusions and Vaultborn Tyrant print it.
 pub fn not_a_token(q: &dyn Query, asker: &Asker) -> bool {
     !q.obj(asker.source).token
 }

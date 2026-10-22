@@ -109,8 +109,9 @@ abilities: &[
   anything an opponent controls or a card in an opponent's graveyard (never a copy, never a changed target); "if you've
   committed a crime this turn" asks the history for one.
 - **The rest** is a method after the call: `.targets(..)`, `.sorcery_speed()`, `.once_each_turn()`, `.condition(..)`
-  (an activation restriction, or a trigger's intervening "if"), `.modal(..)`, `.look_back()`, `.anywhere()`, and the
-  others in `ability.rs`. A loyalty ability is already sorcery speed (CR 606.3).
+  (an activation restriction, or a trigger's intervening "if"), `.modal(..)`, `.anywhere()`, and the
+  others in `ability.rs`. Whether a trigger looks back in time (CR 603.10) is never written: the rules decide it from
+  the event and the ability's own words (`CardTable::looks_back`). A loyalty ability is already sorcery speed (CR 606.3).
 - **Shared effects with an argument** are called in place: `triggered(THIS_ENTERS, |g, item| effects::draw(g, item, 1), ..)`.
 
 The rest of a card is written the same way, one constructor each, the rare parts as methods:

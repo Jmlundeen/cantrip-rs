@@ -26,8 +26,7 @@ fn battle_cannon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, battle_cannon, "Battle Cannon - When Chaos Defiler enters, for each opponent, choose a nonland permanent that player controls. Destroy one of them chosen at random."),
-        triggered(cantrip_mechanics::triggers::THIS_DIES, battle_cannon, "Battle Cannon - When Chaos Defiler dies, for each opponent, choose a nonland permanent that player controls. Destroy one of them chosen at random.")
-            .look_back(),
+        triggered(cantrip_mechanics::triggers::THIS_DIES, battle_cannon, "Battle Cannon - When Chaos Defiler dies, for each opponent, choose a nonland permanent that player controls. Destroy one of them chosen at random."),
     ],
     ..oracle::CHAOS_DEFILER
 };

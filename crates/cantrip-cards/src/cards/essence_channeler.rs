@@ -37,8 +37,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(YOU_GAIN_LIFE, plus_one_counter_on_this,"Whenever you gain life, put a +1/+1 counter on this creature."),
         triggered(THIS_DIES, pass_counters, "When this creature dies, put its counters on target creature you control.")
-            .targets(&[targets::CREATURE_YOU_CONTROL])
-            .look_back(),
+            .targets(&[targets::CREATURE_YOU_CONTROL]),
     ],
     statics: &[static_ability(
         Layer::Ability,

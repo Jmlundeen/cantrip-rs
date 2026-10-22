@@ -55,8 +55,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ATTACKS, each_opponent_discards, "Whenever Aclazotz attacks, each opponent discards a card. For each opponent who can't, you draw a card."),
         triggered(when_asked(EventMask::DISCARDED, opponent_discards_a_land_card), create_bat, "Whenever an opponent discards a land card, create a 1/1 black Bat creature token with flying."),
-        triggered(THIS_DIES, effects::return_it_tapped_and_transformed, "When Aclazotz dies, return it to the battlefield tapped and transformed under its owner's control.")
-            .look_back(),
+        triggered(THIS_DIES, effects::return_it_tapped_and_transformed, "When Aclazotz dies, return it to the battlefield tapped and transformed under its owner's control."),
     ],
     back: Some(&BACK),
     ..oracle::ACLAZOTZ_DEEPEST_BETRAYAL

@@ -28,8 +28,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, effects::exile_first_target_with_this, "When this Vehicle enters, exile up to one target creature with toughness 5 or less.")
             .targets(&[up_to_one(target_filter)]),
-        triggered(triggers::THIS_LEAVES, owner_manifests_dread, "When this Vehicle leaves the battlefield, the exiled card's owner manifests dread.")
-            .look_back(),
+        triggered(triggers::THIS_LEAVES, owner_manifests_dread, "When this Vehicle leaves the battlefield, the exiled card's owner manifests dread."),
         crew(1, "Crew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)"),
     ],
     ..oracle::UNIDENTIFIED_HOVERSHIP

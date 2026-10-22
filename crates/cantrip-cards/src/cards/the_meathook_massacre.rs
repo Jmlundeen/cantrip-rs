@@ -39,10 +39,8 @@ fn opponents_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fire
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, shrink_all, "When The Meathook Massacre enters, each creature gets -X/-X until end of turn."),
-        triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES, cantrip_mechanics::effects::each_opponent_loses_1_life, "Whenever a creature you control dies, each opponent loses 1 life.")
-            .look_back(),
-        triggered(when(EventMask::ZONE_CHANGE, opponents_dies), |g, item| effects::gain_life(g, item, 1), "Whenever a creature an opponent controls dies, you gain 1 life.")
-            .look_back(),
+        triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES, cantrip_mechanics::effects::each_opponent_loses_1_life, "Whenever a creature you control dies, each opponent loses 1 life."),
+        triggered(when(EventMask::ZONE_CHANGE, opponents_dies), |g, item| effects::gain_life(g, item, 1), "Whenever a creature an opponent controls dies, you gain 1 life."),
     ],
     ..oracle::THE_MEATHOOK_MASSACRE
 };

@@ -17,6 +17,6 @@ fn create_treasures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(effects::enters_with_x_counters),
-    abilities: &[triggered(THIS_DIES, create_treasures, "When this creature dies, create a number of tapped Treasure tokens equal to its power.").look_back()],
+    abilities: &[triggered(THIS_DIES, create_treasures, "When this creature dies, create a number of tapped Treasure tokens equal to its power.")],
     ..oracle::GOLDVEIN_HYDRA
 };

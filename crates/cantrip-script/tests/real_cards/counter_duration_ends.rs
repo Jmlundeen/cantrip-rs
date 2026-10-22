@@ -84,8 +84,7 @@ static BOLT_WALKER: CardDef =
 static MOURNER: CardDef = CardDef {
     name: "Probe Mourner",
     types: TypeSet::of(&[CardType::Enchantment]),
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, your_planeswalker_dies), gain_one, "Whenever a planeswalker you control is put into a graveyard from the battlefield, you gain 1 life.")
-        .look_back()],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, your_planeswalker_dies), gain_one, "Whenever a planeswalker you control is put into a graveyard from the battlefield, you gain 1 life.")],
     ..CardDef::BLANK
 };
 

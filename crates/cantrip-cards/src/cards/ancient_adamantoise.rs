@@ -24,7 +24,7 @@ fn exile_it_and_make_treasures(g: &mut dyn Game, item: &StackItem) -> Result<(),
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ward::<3>("Ward {3} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {3}.)"),
-        triggered(THIS_DIES, exile_it_and_make_treasures, "When this creature dies, exile it and create ten tapped Treasure tokens.").look_back(),
+        triggered(THIS_DIES, exile_it_and_make_treasures, "When this creature dies, exile it and create ten tapped Treasure tokens."),
     ],
     replacements: &[DAMAGE_TO_YOU_AND_YOUR_OTHER_PERMANENTS_IS_DEALT_TO_THIS],
     damage_stays: &[this_creature],

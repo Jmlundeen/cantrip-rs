@@ -35,8 +35,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, enters), gain_and_draw, "Whenever this creature or another creature you control with power 4 or greater enters, you gain 3 life and draw a card."),
         triggered(THIS_DIES, create_copy, "When this creature dies, if it's not a token, create a token that's a copy of it, except it's an artifact in addition to its other types.")
-            .condition(not_a_token)
-            .look_back(),
+            .condition(not_a_token),
     ],
     ..oracle::VAULTBORN_TYRANT
 };

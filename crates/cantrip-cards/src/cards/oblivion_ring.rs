@@ -9,8 +9,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, effects::exile_first_target_with_this, "When this enchantment enters, exile another target nonland permanent.")
             .targets(&[target(targets::other_nonland_permanent_filter)]),
-        triggered(triggers::THIS_LEAVES, effects::return_exiled_to_battlefield, "When this enchantment leaves the battlefield, return the exiled card to the battlefield under its owner's control.")
-            .look_back(),
+        triggered(triggers::THIS_LEAVES, effects::return_exiled_to_battlefield, "When this enchantment leaves the battlefield, return the exiled card to the battlefield under its owner's control."),
     ],
     ..oracle::OBLIVION_RING
 };

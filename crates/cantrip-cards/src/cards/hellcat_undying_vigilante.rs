@@ -24,7 +24,6 @@ pub static CARD: CardDef = CardDef {
         THIS_DIES,
         return_changed,
         "When Hellcat dies, return her to the battlefield under her owner's control with a +1/+1 counter on her. She loses all abilities and gains haste.",
-    )
-    .look_back()],
+    )],
     ..oracle::HELLCAT_UNDYING_VIGILANTE
 };

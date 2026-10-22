@@ -21,8 +21,7 @@ pub static CARD: CardDef = CardDef {
             rally,
             "Whenever another creature you control enters, it gets +2/+0 and gains haste until end of turn.",
         ),
-        triggered(when(EventMask::ZONE_CHANGE, enduring::dies_as_a_creature), enduring::return_as_enchantment, "When Enduring Courage dies, if it was a creature, return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)")
-            .look_back(),
+        triggered(when(EventMask::ZONE_CHANGE, enduring::dies_as_a_creature), enduring::return_as_enchantment, "When Enduring Courage dies, if it was a creature, return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)"),
     ],
     ..oracle::ENDURING_COURAGE
 };

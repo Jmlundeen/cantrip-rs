@@ -25,8 +25,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, reveal_and_exile, "When this creature enters, target opponent reveals their hand and you choose a nonland card from it. Exile that card.")
             .targets(&[targets::OPPONENT]),
-        triggered(cantrip_mechanics::triggers::THIS_LEAVES, return_exiled, "When this creature leaves the battlefield, return the exiled card to its owner's hand.")
-            .look_back(),
+        triggered(cantrip_mechanics::triggers::THIS_LEAVES, return_exiled, "When this creature leaves the battlefield, return the exiled card to its owner's hand."),
     ],
     ..oracle::TIDEHOLLOW_SCULLER
 };

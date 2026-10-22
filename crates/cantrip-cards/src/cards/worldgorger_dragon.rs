@@ -17,8 +17,7 @@ fn exile_all_others(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, exile_all_others, "When this creature enters, exile all other permanents you control."),
-        triggered(triggers::THIS_LEAVES, effects::return_exiled_to_battlefield, "When this creature leaves the battlefield, return the exiled cards to the battlefield under their owners' control.")
-            .look_back(),
+        triggered(triggers::THIS_LEAVES, effects::return_exiled_to_battlefield, "When this creature leaves the battlefield, return the exiled cards to the battlefield under their owners' control."),
     ],
     ..oracle::WORLDGORGER_DRAGON
 };

@@ -9,8 +9,7 @@ use cantrip_oracle as oracle;
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{2}, {T}").and(SACRIFICE_THIS), |g, item| effects::gain_life(g, item, 3), "{2}, {T}, Sacrifice this artifact: You gain 3 life."),
-        triggered(THIS_DIES, |g, item| effects::draw(g, item, 1), "When this artifact is put into a graveyard from the battlefield, draw a card.")
-            .look_back(),
+        triggered(THIS_DIES, |g, item| effects::draw(g, item, 1), "When this artifact is put into a graveyard from the battlefield, draw a card."),
     ],
     ..oracle::NUTRIENT_BLOCK
 };

@@ -52,8 +52,7 @@ pub static EMBLEM: CardDef = CardDef {
         target_player_loses_1_life_you_gain_1,
         "Whenever a creature dies, target opponent loses 1 life and you gain 1 life.",
     )
-    .targets(&[targets::OPPONENT])
-    .look_back()],
+    .targets(&[targets::OPPONENT])],
     text: "Whenever a creature dies, target opponent loses 1 life and you gain 1 life.",
     ..CardDef::BLANK
 };
@@ -96,8 +95,7 @@ pub static CARD: CardDef = CardDef {
             drain_and_maybe_transform,
             "Whenever another creature dies, target opponent loses 1 life and you gain 1 life. If this is the fourth time this ability has resolved this turn, transform Sephiroth.",
         )
-        .targets(&[targets::OPPONENT])
-        .look_back(),
+        .targets(&[targets::OPPONENT]),
     ],
     back: Some(&BACK),
     ..oracle::SEPHIROTH_FABLED_SOLDIER

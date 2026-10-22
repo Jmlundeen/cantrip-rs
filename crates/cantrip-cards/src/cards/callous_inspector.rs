@@ -13,7 +13,7 @@ fn dies(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(THIS_DIES, dies, "When this creature dies, it deals 1 damage to you. Create a Clue token.").look_back()],
+    abilities: &[triggered(THIS_DIES, dies, "When this creature dies, it deals 1 damage to you. Create a Clue token.")],
     ..oracle::CALLOUS_INSPECTOR
 };
 

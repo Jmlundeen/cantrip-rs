@@ -22,5 +22,4 @@ fn returns(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub const fn trigger(text: &'static str) -> AbilityDef {
     triggered(THIS_DIES, returns, text)
         .condition(had_no_minus_counters)
-        .look_back()
 }

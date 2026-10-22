@@ -24,7 +24,6 @@ pub static CARD: CardDef = CardDef {
         two_damage_to_them,
         "Whenever an opponent sacrifices an artifact, this creature deals 2 damage to them.",
     )
-    .on_sacrifice()
-    .look_back()],
+    .on_sacrifice()],
     ..oracle::VENGEFUL_TRACKER
 };

@@ -55,8 +55,7 @@ pub static BACK: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, look_for_a_creature, "When Aang enters, look at the top five cards of your library. You may put a creature card with mana value 4 or less from among them onto the battlefield. Put the rest on the bottom of your library in a random order."),
-        triggered(when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_leaves), transform_at_the_next_upkeep, "When another creature you control leaves the battlefield, transform Aang at the beginning of the next upkeep.")
-            .look_back(),
+        triggered(when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_leaves), transform_at_the_next_upkeep, "When another creature you control leaves the battlefield, transform Aang at the beginning of the next upkeep."),
     ],
     // Earthbend's returning ability is the card's delayed ability 0 (`earthbend::RETURN`), the back face's earthbend
     // reading it off the card.

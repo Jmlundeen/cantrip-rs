@@ -24,7 +24,6 @@ fn each_other_sacrifices(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, your_creature_dies), each_other_sacrifices, "Whenever a creature you control dies, each other player sacrifices a creature of their choice.")
-        .look_back()],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, your_creature_dies), each_other_sacrifices, "Whenever a creature you control dies, each other player sacrifices a creature of their choice.")],
     ..oracle::GRAVE_PACT
 };

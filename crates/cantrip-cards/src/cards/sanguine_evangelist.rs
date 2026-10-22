@@ -13,8 +13,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         battle_cry::TRIGGER,
         triggered(THIS_ENTERS, make_bat, "When Sanguine Evangelist enters, create a 1/1 black Bat creature token with flying."),
-        triggered(THIS_DIES, make_bat, "When Sanguine Evangelist dies, create a 1/1 black Bat creature token with flying.")
-            .look_back(),
+        triggered(THIS_DIES, make_bat, "When Sanguine Evangelist dies, create a 1/1 black Bat creature token with flying."),
     ],
     ..oracle::SANGUINE_EVANGELIST
 };

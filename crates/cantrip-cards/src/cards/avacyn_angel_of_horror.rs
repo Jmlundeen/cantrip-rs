@@ -47,8 +47,7 @@ pub static CARD: CardDef = CardDef {
         when_asked(EventMask::ZONE_CHANGE, avacyn_or_a_nontoken_creature_dies),
         return_it_at_the_next_end_step,
         "Whenever Avacyn or another nontoken creature you control dies, return that card to the battlefield under your control at the beginning of the next end step.",
-    )
-    .look_back()],
+    )],
     delayed: &[delayed_trigger(
         return_under_your_control,
         "Return that card to the battlefield under your control at the beginning of the next end step.",

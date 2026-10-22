@@ -12,8 +12,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ATTACKS, loot, "Whenever this creature attacks, draw a card, then discard a card."),
         triggered(THIS_DIES, create_copy, "When this creature dies, if it isn't a token, create a token that's a copy of it.")
-            .condition(not_a_token)
-            .look_back(),
+            .condition(not_a_token),
     ],
     ..oracle::SPHINX_OF_FALSE_CONCLUSIONS
 };

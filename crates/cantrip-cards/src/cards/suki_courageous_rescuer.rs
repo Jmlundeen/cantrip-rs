@@ -32,7 +32,6 @@ pub static CARD: CardDef = CardDef {
         create_ally,
         "Whenever another permanent you control leaves the battlefield during your turn, create a 1/1 white Ally creature token. This ability triggers only once each turn.",
     )
-    .look_back()
     .triggers_each_turn(1)],
     ..oracle::SUKI_COURAGEOUS_RESCUER
 };

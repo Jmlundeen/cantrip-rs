@@ -22,7 +22,6 @@ pub static CARD: CardDef = CardDef {
         "Whenever a player sacrifices a permanent, this creature deals 1 damage to any target.",
     )
     .on_sacrifice()
-    .look_back()
     .targets(&[targets::ANY])],
     ..oracle::MAYHEM_DEVIL
 };

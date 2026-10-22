@@ -37,8 +37,7 @@ pub static CARD: CardDef = CardDef {
             return_stunned,
             "When this creature dies, if it had no counters on it, return it to the battlefield tapped under its owner's control with two stun counters on it.",
         )
-        .condition(had_no_counters)
-        .look_back(),
+        .condition(had_no_counters),
     ],
     ..oracle::UNSTOPPABLE_SLASHER
 };

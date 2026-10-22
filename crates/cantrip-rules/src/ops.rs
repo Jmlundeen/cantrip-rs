@@ -418,11 +418,16 @@ pub fn unattach(cx: &mut Cx, attachment: ObjectId) {
     if !live(cx.s(), attachment) {
         return;
     }
-    cx.st().update_obj(attachment, |o| o.attached_to = None);
-    // A host that has already left was unattached from as it left, and announced then.
+    // A host that has already left was unattached from as it left, and announced then. Announced before it happens: what
+    // triggers on it looks back on the game as it was just before (CR 603.10c), still attached.
     if live(cx.s(), host) && cx.s().obj(host).zone.is(ZoneKind::Battlefield) {
         cx.emit(Event::Unattached { attachment, from: host });
     }
+    cx.st().update_obj(attachment, |o| o.attached_to = None);
+    // The board changed after the event was announced: what "for as long as" durations (CR 611.2b) and control (CR 613.1b)
+    // say of it is settled now, and the state triggers asked (CR 603.8), as an event would have.
+    settle_at_once(cx);
+    cx.state_changed();
 }
 
 /// Exiles cards with a permanent's ability (CR 607.2a, 610.3), linking each to it and to where it came from.

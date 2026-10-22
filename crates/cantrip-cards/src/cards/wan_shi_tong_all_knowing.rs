@@ -34,7 +34,6 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, put_into_library, "When Wan Shi Tong enters, target nonland permanent's owner puts it into their library second from the top or on the bottom.")
             .targets(&[targets::NONLAND_PERMANENT]),
         triggered(when(EventMask::ZONE_CHANGE, cards_into_a_library), make_spirits, "Whenever one or more cards are put into a library from anywhere, create two 1/1 colorless Spirit creature tokens with \"This token can't block or be blocked by non-Spirit creatures.\"")
-            .look_back()
             .once_per_batch()
             .batch_by_data(),
     ],

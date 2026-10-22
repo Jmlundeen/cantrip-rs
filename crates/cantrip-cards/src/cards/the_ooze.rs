@@ -40,8 +40,7 @@ pub static CARD: CardDef = CardDef {
             when_asked(EventMask::ZONE_CHANGE, creature_with_a_counter_leaves),
             mutagens_for_the_counters,
             "Whenever a creature you control with a +1/+1 counter on it leaves the battlefield, create a Mutagen token for each +1/+1 counter on it.",
-        )
-        .look_back(),
+        ),
         ability(TAP, exile_and_mutagen, "{T}: Exile target card from a graveyard. Create a Mutagen token.")
             .targets(&[targets::CARD_IN_A_GRAVEYARD]),
     ],

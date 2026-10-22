@@ -239,8 +239,8 @@ pub fn this_dealt_damage(_: &dyn Query, source: ObjectId, event: &Event) -> Opti
 }
 
 /// "Whenever you sacrifice [a permanent]" (CR 701.21a): the permanent `player` sacrificed, as it last was on the
-/// battlefield, for the card to judge the quality it names. The ability is `.on_sacrifice().look_back()`. Tireless Tracker
-/// (a Clue) and Biotech Specialist (an artifact) print it.
+/// battlefield, for the card to judge the quality it names. The ability is `.on_sacrifice()`, and looks back as any ability
+/// that triggers on a sacrifice does (CR 603.10a). Tireless Tracker (a Clue) and Biotech Specialist (an artifact) print it.
 pub fn sacrificed_by(q: &dyn Query, player: PlayerId, event: &Event) -> Option<ObjectId> {
     match event {
         Event::ZoneChange { old, from, reason: ZoneReason::Sacrifice, .. } if from.is(ZoneKind::Battlefield) && q.controller(*old) == player => Some(*old),
@@ -695,7 +695,7 @@ pub fn you_cast_or_copy_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Ev
 }
 
 /// "When this is put into a graveyard from the battlefield" (CR 700.4 for a creature: "dies"), looked back on: the
-/// ability is the object's as it last existed there (CR 603.10a). Use with `look_back: true`.
+/// ability is the object's as it last existed there (CR 603.10a).
 pub fn this_dies(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, from, to, .. } if *old == source && from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) => {
@@ -705,8 +705,8 @@ pub fn this_dies(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired
     }
 }
 
-/// "When this leaves the battlefield" (CR 603.6c, 603.10a), looked back on whichever zone it goes to. Use with
-/// `look_back: true`. Animate Dead and Cryogen Relic print it.
+/// "When this leaves the battlefield" (CR 603.6c, 603.10a), looked back on whichever zone it goes to. Animate Dead and
+/// Cryogen Relic print it.
 pub fn this_leaves(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, from, .. } if *old == source && from.is(ZoneKind::Battlefield) => Fired::PLAIN,
@@ -882,9 +882,9 @@ pub fn another_creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Ev
 }
 
 /// "Whenever a creature dies" (CR 700.4, 603.10a), looked back on: any creature, anyone's, as it last was on the battlefield.
-/// The ability carries the player who then controlled it (CR 608.2h). Use with `.look_back()`, on a permanent or an emblem
-/// alike (the Sephiroth, One-Winged Angel emblem): a dies ability is a leaves-the-battlefield ability wherever it functions
-/// from. Fecundity and Ashes of the Abhorrent print it.
+/// The ability carries the player who then controlled it (CR 608.2h). On a permanent or an emblem alike (the Sephiroth,
+/// One-Winged Angel emblem), a dies ability is a leaves-the-battlefield ability wherever it functions from, and looks back
+/// (`CardTable::looks_back`). Fecundity and Ashes of the Abhorrent print it.
 pub fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, from, to, .. }
@@ -897,8 +897,8 @@ pub fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
 }
 
 /// "Whenever a creature you control dies" (CR 700.4, 603.10a), looked back on: the creature as it last was on the
-/// battlefield, under the controller it last had. Use with `.look_back()`, on a permanent or an emblem alike. Grave
-/// Venerations and Warhost's Frenzy print it.
+/// battlefield, under the controller it last had, on a permanent or an emblem alike. Grave Venerations and Warhost's Frenzy
+/// print it.
 pub fn creature_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, from, to, .. }

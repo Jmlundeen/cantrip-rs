@@ -31,7 +31,7 @@ fn return_host(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, enchanted_creature_dies), return_host, "When enchanted creature dies, return that card to the battlefield tapped under its owner's control.").look_back()],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, enchanted_creature_dies), return_host, "When enchanted creature dies, return that card to the battlefield tapped under its owner's control.")],
     statics: &[
         static_ability(Layer::PtModify, attached_object, plus_pt::<1, 0>, "Enchanted creature gets +1/+0."),
         static_ability(Layer::Ability, attached_object, have_deathtouch, "Enchanted creature has deathtouch."),

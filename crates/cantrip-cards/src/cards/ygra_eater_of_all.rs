@@ -54,8 +54,7 @@ pub static CARD: CardDef = CardDef {
             when(EventMask::ZONE_CHANGE, food_put_into_graveyard),
             two_counters,
             "Whenever a Food is put into a graveyard from the battlefield, put two +1/+1 counters on Ygra.",
-        )
-        .look_back(),
+        ),
     ],
     delayed: &[ability(cost("{2}, {T}").and(SACRIFICE_THIS), gain_three_life, "{2}, {T}, Sacrifice this permanent: You gain 3 life.")],
     statics: &[

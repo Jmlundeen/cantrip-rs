@@ -16,7 +16,6 @@ fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(CREATURE_DIES, may_draw, "Whenever a creature dies, that creature's controller may draw a card.")
-        .look_back()],
+    abilities: &[triggered(CREATURE_DIES, may_draw, "Whenever a creature dies, that creature's controller may draw a card.")],
     ..oracle::FECUNDITY
 };

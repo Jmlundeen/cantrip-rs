@@ -6999,7 +6999,7 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
             if let Some(fired) = t.fires(&*cx, &Asker { source: id, controller }, &event) {
                 // Static abilities that stop it triggering or make it trigger again apply to it as to any triggered ability
                 // (CR 603.2, 603.2d): each triggering resolves at once.
-                let triggering = Triggering { source: id, controller, def: t, permanent: true };
+                let triggering = Triggering { source: id, controller, def: t, permanent: true, looks_back: cx.cards().looks_back(ability, &*cx, &event) };
                 if statics.stop(cx, &event, &triggering) {
                     continue;
                 }
@@ -7049,7 +7049,11 @@ fn delayed_mana_abilities(cx: &mut Cx, event: &Event, statics: &mut crate::settl
         let asker = Asker { source: d.source, controller: d.controller };
         let Some(fired) = t.fires(&*cx, &asker, event) else { continue };
         if t.condition.is_some_and(|condition| !condition(&*cx, &asker))
-            || statics.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t, permanent: false })
+            || statics.stop(
+                cx,
+                event,
+                &Triggering { source: d.source, controller: d.controller, def: t, permanent: false, looks_back: cx.cards().looks_back(d.ability, &*cx, event) },
+            )
         {
             continue;
         }

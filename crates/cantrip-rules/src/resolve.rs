@@ -583,8 +583,10 @@ pub fn counter(cx: &mut Cx, spell: ObjectId) {
     if cx.chars(spell).keywords.has(Keyword::CantBeCountered) || cx.s().obj(spell).marks.cant_be_countered {
         return;
     }
-    let item = cx.st().stack_remove(at);
+    // Announced before it leaves the stack: what triggers on a spell being countered looks back on the game as it was just
+    // before (CR 603.10e), the spell still on the stack.
     cx.emit(Event::Countered { spell });
+    let item = cx.st().stack_remove(at);
     leave_stack(cx, &item, ZoneReason::Counter);
 }
 

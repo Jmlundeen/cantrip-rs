@@ -13,7 +13,6 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(THIS_DIES, drain, "When Kokusho, the Evening Star dies, each opponent loses 5 life. You gain life equal to the life lost this way.")
-        .look_back()],
+    abilities: &[triggered(THIS_DIES, drain, "When Kokusho, the Evening Star dies, each opponent loses 5 life. You gain life equal to the life lost this way.")],
     ..oracle::KOKUSHO_THE_EVENING_STAR
 };

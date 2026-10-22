@@ -566,11 +566,6 @@ const fn triggered_def(a: AbilityDef, method: &str) -> TriggeredDef {
 
 /// What only a triggered ability (CR 603) has.
 impl AbilityDef {
-    /// A leaves-the-battlefield ability (CR 603.10a): it looks back at the board as it was before the event.
-    pub const fn look_back(self) -> AbilityDef {
-        AbilityDef::Triggered(TriggeredDef { look_back: true, ..triggered_def(self, "only a triggered ability looks back") })
-    }
-
     /// It functions outside the battlefield too; the ability checks the zone itself.
     pub const fn anywhere(self) -> AbilityDef {
         AbilityDef::Triggered(TriggeredDef { anywhere: true, ..triggered_def(self, "only a triggered ability functions anywhere this way") })

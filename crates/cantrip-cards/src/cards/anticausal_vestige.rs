@@ -20,8 +20,7 @@ pub static CARD: CardDef = CardDef {
         THIS_LEAVES,
         draw_then_put,
         "When this creature leaves the battlefield, draw a card, then you may put a permanent card with mana value less than or equal to the number of lands you control from your hand onto the battlefield tapped.",
-    )
-    .look_back()],
+    )],
     ways: &[warp::way(mana("{4}"), "Warp {4}")],
     end_step_riders: warp::RIDERS,
     delayed: &[warp::EXILE],

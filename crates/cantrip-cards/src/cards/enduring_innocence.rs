@@ -23,8 +23,7 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::ZONE_CHANGE, small_creatures_enter), |g, item| cantrip_mechanics::effects::draw(g, item, 1), "Whenever one or more other creatures you control with power 2 or less enter, draw a card. This ability triggers only once each turn.")
             .triggers_each_turn(1)
             .once_per_batch(),
-        triggered(when(EventMask::ZONE_CHANGE, cantrip_mechanics::enduring::dies_as_a_creature), cantrip_mechanics::enduring::return_as_enchantment, "When Enduring Innocence dies, if it was a creature, return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)")
-            .look_back(),
+        triggered(when(EventMask::ZONE_CHANGE, cantrip_mechanics::enduring::dies_as_a_creature), cantrip_mechanics::enduring::return_as_enchantment, "When Enduring Innocence dies, if it was a creature, return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)"),
     ],
     ..oracle::ENDURING_INNOCENCE
 };

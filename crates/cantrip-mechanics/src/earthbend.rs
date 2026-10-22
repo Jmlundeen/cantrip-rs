@@ -59,5 +59,4 @@ fn return_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub const RETURN: AbilityDef = triggered(when(EventMask::ZONE_CHANGE, dies_or_is_exiled), return_tapped, "When this land dies or is put into exile, return it to the battlefield tapped.")
-    .look_back();
+pub const RETURN: AbilityDef = triggered(when(EventMask::ZONE_CHANGE, dies_or_is_exiled), return_tapped, "When this land dies or is put into exile, return it to the battlefield tapped.");

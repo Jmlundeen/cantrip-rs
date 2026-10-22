@@ -17,7 +17,7 @@ pub static CARD: CardDef = CardDef {
             "When this creature enters, you may search your library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
         ),
         // CR 700.4: "dies" is put into a graveyard from the battlefield; the ability looks back at the creature (CR 603.10a).
-        triggered(THIS_DIES, |g, item| effects::draw(g, item, 1), "When this creature dies, draw a card.").look_back(),
+        triggered(THIS_DIES, |g, item| effects::draw(g, item, 1), "When this creature dies, draw a card."),
     ],
     ..oracle::SIMULACRUM_SHAPER
 };

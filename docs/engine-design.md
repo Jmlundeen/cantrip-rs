@@ -656,7 +656,18 @@ scenario, `layer_dependency.rs`, the reviewer's order and off-field probes). New
 ### Events and triggers
 
 Triggers are indexed by the kinds of event they listen for (`EventMask`), so an event checks only the triggers that
-could match it. "Leaves the battlefield" look-back (CR 603.10) reads the frozen last-known rows.
+could match it. "Leaves the battlefield" look-back (CR 603.10) reads the frozen last-known rows. Whether a triggering
+looks back is the rules' to say from the event it matched (`CardTable::looks_back`), never a card's: a zone change
+from the battlefield (a sacrifice's included) or from a graveyard, an object all players can see put into a hand or a
+library, a permanent phasing out, an unattachment, a countered spell, a player losing the game. The two things a
+zone-change event can't show are read from the ability's own trigger-condition words as the table is made
+(`read_zone_words`): "from anywhere" (CR 603.6c: never a leaves-the-battlefield ability) and a card leaving a graveyard
+(which looks back on a card put onto the battlefield from a graveyard, an enters-the-battlefield event for every other
+ability, CR 603.6a). No card declares anything. An ability that matches events of both kinds ("enters or dies") is
+judged on each as that event says. An unattachment and a countered spell are announced just before they happen, so the
+board they are judged on is the one before them. Phasing out and losing the game are recorded in the history but are no
+trigger events yet (`EventMask::of` gives them no mask), so nothing triggers on them; the rule already says they look
+back. No event records a change of control (CR 603.10d).
 
 A static ability that stops abilities from triggering (CR 603.2: Torpor Orb's "Creatures entering don't cause abilities
 to trigger", Doorkeeper Thrull, Hushbringer's "entering or dying") is a `CardDef::trigger_rules` entry, asked by

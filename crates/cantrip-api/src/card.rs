@@ -1119,6 +1119,12 @@ impl TriggeredDef {
         }
     }
 
+    /// Whether it could look back on some event (`CardTable::looks_back`): it listens for one that can. What `CardTable::look_back` and
+    /// `settle::Then` count.
+    pub fn may_look_back(&self) -> bool {
+        self.listens.intersects(EventMask::LOOKS_BACK)
+    }
+
     pub const BLANK: TriggeredDef = TriggeredDef {
         text: "",
         listens: EventMask(0),
@@ -1126,7 +1132,6 @@ impl TriggeredDef {
         asked: None,
         targets: &[],
         effect: no_effect,
-        look_back: false,
         anywhere: false,
         condition: None,
         only_if: None,
@@ -1203,11 +1208,6 @@ pub struct TriggeredDef {
     pub asked: Option<AskedMatch>,
     pub targets: &'static [TargetSpec],
     pub effect: Effect,
-    /// A leaves-the-battlefield ability (CR 603.10a): judged on the board as it was before the event, so it sees
-    /// its own source and everything that left with it, and is stopped or multiplied by what was there (CR 603.2d).
-    /// An emblem's ability (CR 114.4) is marked the same way: the emblem, in the command zone before and after, is asked
-    /// either way, and the mark decides which board's statics judge it.
-    pub look_back: bool,
     /// Functions outside the battlefield too (the ability checks the zone itself), as "at the beginning of your
     /// upkeep, if this card is in your graveyard" does.
     pub anywhere: bool,
@@ -1845,6 +1845,9 @@ pub struct Triggering<'a> {
     /// opponents control" ask. False for a card in another zone, an emblem (CR 114.4), and a delayed triggered ability,
     /// which is no ability the object has (CR 603.2d, 603.7).
     pub permanent: bool,
+    /// It looks back in time on the event it triggers on (CR 603.10, `CardTable::looks_back`): what stops it triggering or
+    /// makes it trigger again is what was on the battlefield just before the event.
+    pub looks_back: bool,
 }
 
 impl Triggering<'_> {
@@ -2710,10 +2713,15 @@ pub struct CardTable {
     /// Which cards have a control-changing static ability (CR 613.1b, `Layer::Control`): what tells whether control could
     /// change without working out the static sources.
     pub control_statics: Vec<bool>,
-    /// Which cards could have a triggered ability that looks back in time (CR 603.10) of their own: one they print, one
-    /// they list to give (`CardDef::delayed`), any a static ability of theirs could give themselves, or, for a Room, one a
-    /// door prints (CR 709.5; `CardTable::new`) - the objects a look-back pass needs as they were just before the event.
+    /// Which cards could have a triggered ability that may look back in time (CR 603.10, `TriggeredDef::may_look_back`) of
+    /// their own: one they print, one they list to give (`CardDef::delayed`), any a static ability of theirs could give
+    /// themselves, or, for a Room, one a door prints (CR 709.5; `CardTable::new`) - the objects a look-back pass needs as
+    /// they were just before the event.
     pub look_back: Vec<bool>,
+    /// The triggered abilities whose condition says what its event can't show (`read_zone_words`), by ability, sorted; and which
+    /// cards have one, so the rest are never searched.
+    pub zone_words: Vec<(AbilityRef, ZoneWords)>,
+    pub zone_word_cards: Vec<bool>,
     /// Which cards have a static ability of layer 6 that affects other objects (CR 613.1f), which may give one an ability.
     pub ability_statics: Vec<bool>,
     /// Whether any card has a static ability that functions from a graveyard, so graveyards are looked in at all.
@@ -2794,6 +2802,75 @@ pub struct CardTable {
     pub card_named: Vec<bool>,
 }
 
+/// What a triggered ability's trigger condition says about where its trigger event's object comes from, the part of a
+/// zone-change trigger condition its event can't show (`CardTable::looks_back`), read from the ability's own words as the
+/// table is made, so no card declares it: "from anywhere" (CR 603.6c) - not "from anywhere other than ...", which names the
+/// zones it leaves out and is about leaving the others - and a card leaving a graveyard (CR 603.10a), "leave(s) ...
+/// graveyard". The condition is the text up to the first comma that doesn't continue a list ("an artifact, creature, or
+/// enchantment card"): what follows is the effect or an intervening "if".
+pub fn read_zone_words(text: &str) -> ZoneWords {
+    let text = text.to_ascii_lowercase();
+    let mut segments = text.split(", ");
+    let mut condition = segments.next().unwrap_or_default().to_string();
+    for next in segments {
+        if next.starts_with("or ") || next.starts_with("and ") || !next.contains(' ') {
+            condition.push_str(", ");
+            condition.push_str(next);
+        } else {
+            break;
+        }
+    }
+    let from_anywhere = condition.match_indices("from anywhere").any(|(at, w)| !condition[at + w.len()..].starts_with(" other than"));
+    let leaves_graveyard = condition.match_indices("leave").any(|(at, _)| condition[at..].contains("graveyard"));
+    ZoneWords { from_anywhere, leaves_graveyard }
+}
+
+/// What a zone-change trigger condition says that its event can't show (`read_zone_words`).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ZoneWords {
+    /// "Whenever [a card] is put into [a zone] from anywhere" (CR 603.6c): about where the object goes, so never a
+    /// leaves-the-battlefield ability, even for an object put there from the battlefield (Planar Void).
+    pub from_anywhere: bool,
+    /// Its trigger event is a card leaving a graveyard (CR 603.10a): it looks back on a card put onto the battlefield from
+    /// a graveyard too, which is otherwise an enters-the-battlefield event judged after it (CR 603.6a) (Hardened Academic).
+    pub leaves_graveyard: bool,
+}
+
+/// Whether a triggered ability whose condition says `words` looks back in time (CR 603.10) as it triggers on `event`: it is
+/// judged on the game as it was just before the event - which objects had it, what they looked like, who controlled them,
+/// and what stopped or multiplied triggering (CR 603.2d) - rather than as it is after. The rules decide it from the trigger
+/// event, never the card:
+///
+/// - a zone change from the battlefield is a leaves-the-battlefield ability's (CR 603.6c, 603.10a), a sacrifice's included,
+///   unless the condition is "put into [a zone] from anywhere" (CR 603.6c);
+/// - a card leaving a graveyard (CR 603.10a), unless the condition is about where it goes "from anywhere"; one put onto the
+///   battlefield is an enters-the-battlefield event (CR 603.6a), looked back on only by a condition about the card leaving
+///   the graveyard;
+/// - an object all players can see put into a hand or a library (CR 603.10a), "from anywhere" or not: one from the
+///   battlefield, a graveyard, the stack or the command zone, or from exile face up, or face down where every player in
+///   the game may look at it (CR 406.3);
+/// - a permanent phasing out (CR 603.10b), a permanent becoming unattached (CR 603.10c), a spell countered (CR 603.10e) and
+///   a player losing the game (CR 603.10f).
+pub fn looks_back(words: ZoneWords, q: &dyn Query, event: &Event) -> bool {
+    match event {
+        Event::ZoneChange { old, from, to, .. } => {
+            let seen_by_all = || {
+                [ZoneKind::Battlefield, ZoneKind::Graveyard, ZoneKind::Stack, ZoneKind::Command].into_iter().any(|z| from.is(z))
+                    || (from.is(ZoneKind::Exile) && {
+                        let o = q.obj(*old);
+                        !o.face_down || q.state().apnap().all(|p| o.seen_by & (1 << p.0) != 0)
+                    })
+            };
+            ((to.is(ZoneKind::Hand) || to.is(ZoneKind::Library)) && seen_by_all())
+                || (!words.from_anywhere
+                    && (from.is(ZoneKind::Battlefield)
+                        || (from.is(ZoneKind::Graveyard) && (!to.is(ZoneKind::Battlefield) || words.leaves_graveyard))))
+        }
+        Event::PhasedOut { .. } | Event::Unattached { .. } | Event::Countered { .. } | Event::GameLost { .. } => true,
+        _ => false,
+    }
+}
+
 /// How a card is put onto the battlefield face down, which says what it is while it is (CR 708.2): manifested, a 2/2
 /// creature (CR 701.40a); cloaked, a 2/2 creature with ward {2} (CR 701.58a). Either is turned face up for its card's
 /// mana cost if it is a creature card (CR 701.40b, 701.58b).
@@ -2868,7 +2945,7 @@ impl CardTable {
             .collect();
         let statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own)).collect();
         let control_statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| s.layer == Layer::Control)).collect();
-        let looks_back = |a: &AbilityDef| matches!(a, AbilityDef::Triggered(t) if t.look_back);
+        let looks_back = |a: &AbilityDef| matches!(a, AbilityDef::Triggered(t) if t.may_look_back());
         let look_back: Vec<bool> = cards
             .iter()
             .map(|c| {
@@ -2877,6 +2954,25 @@ impl CardTable {
                     || c.statics.iter().any(|s| s.own && s.layer == Layer::Ability)
             })
             .collect();
+        // Read once, from each triggered ability's words (`read_zone_words`): a card's place in `cards` is its id.
+        let mut zone_words: Vec<(AbilityRef, ZoneWords)> = Vec::new();
+        for (id, card) in cards.iter().enumerate() {
+            let listed = card.abilities.iter().enumerate().map(|(i, a)| (i as u8, a));
+            let delayed = card.delayed.iter().enumerate().map(|(i, a)| (AbilityRef::DELAYED + i as u8, a));
+            for (index, ability) in listed.chain(delayed) {
+                if let AbilityDef::Triggered(t) = ability {
+                    let words = read_zone_words(t.text);
+                    if words != ZoneWords::default() {
+                        zone_words.push((AbilityRef { card: CardId(id as u16), index }, words));
+                    }
+                }
+            }
+        }
+        zone_words.sort_unstable_by_key(|&(a, _)| a);
+        let mut zone_word_cards = vec![false; cards.len()];
+        for &(a, _) in &zone_words {
+            zone_word_cards[a.card.0 as usize] = true;
+        }
         let ability_statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own && s.layer == Layer::Ability)).collect();
         let graveyard_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Graveyard));
         let exile_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Exile));
@@ -2942,6 +3038,8 @@ impl CardTable {
             statics,
             control_statics,
             look_back,
+            zone_words,
+            zone_word_cards,
             ability_statics,
             graveyard_statics,
             exile_statics,
@@ -3003,7 +3101,7 @@ impl CardTable {
                 let triggered = |f: fn(&TriggeredDef) -> bool| {
                     left.abilities.iter().chain(right.abilities.iter()).any(|a| matches!(a, AbilityDef::Triggered(t) if f(t)))
                 };
-                table.look_back[front] |= triggered(|t| t.look_back);
+                table.look_back[front] |= triggered(TriggeredDef::may_look_back);
                 table.state_triggers[front] |= triggered(|t| t.state.is_some());
                 table.mana_triggers[front] |= triggered(|t| t.mana_ability);
                 let ids = (table.find(left.name), table.find(right.name));
@@ -3052,6 +3150,23 @@ impl CardTable {
         (self.cards.get(first).is_some_and(|card| card.name == name).then_some(first))
             .or_else(|| self.cards.iter().position(|card| card.name.eq_ignore_ascii_case(name)))
             .map(|i| CardId(i as u16))
+    }
+
+    /// What `ability`'s trigger condition says that its event can't show (`read_zone_words`).
+    pub fn zone_words(&self, ability: AbilityRef) -> ZoneWords {
+        if !self.zone_word_cards.get(ability.card.0 as usize).copied().unwrap_or(false) {
+            return ZoneWords::default();
+        }
+        self.zone_words.binary_search_by_key(&ability, |&(a, _)| a).map(|at| self.zone_words[at].1).unwrap_or_default()
+    }
+
+    /// Whether the triggered ability `ability`, triggering on `event`, looks back in time (CR 603.10, `looks_back`).
+    #[inline]
+    pub fn looks_back(&self, ability: AbilityRef, q: &dyn Query, event: &Event) -> bool {
+        match event {
+            Event::ZoneChange { .. } => looks_back(self.zone_words(ability), q, event),
+            _ => looks_back(ZoneWords::default(), q, event),
+        }
     }
 
     pub fn ability(&self, ability: AbilityRef) -> &'static AbilityDef {
@@ -3189,4 +3304,22 @@ fn rebound_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{read_zone_words as zone_words, ZoneWords};
+
+    /// The words read from a zone-change trigger condition (`CardTable::new`): only its condition, a list's commas included,
+    /// is read, and "from anywhere other than ..." is about leaving the zones it doesn't name.
+    #[test]
+    fn zone_words_read_the_trigger_condition_only() {
+        let w = |from_anywhere, leaves_graveyard| ZoneWords { from_anywhere, leaves_graveyard };
+        assert_eq!(zone_words("Whenever another card is put into a graveyard from anywhere, exile that card."), w(true, false));
+        assert_eq!(zone_words("Whenever an artifact, creature, or enchantment card is put into a graveyard from anywhere, draw a card."), w(true, false));
+        assert_eq!(zone_words("Whenever one or more cards leave your graveyard, put a +1/+1 counter on target creature you control."), w(false, true));
+        assert_eq!(zone_words("When this creature enters, choose target permanent card in your graveyard that was put there from anywhere this turn."), w(false, false));
+        assert_eq!(zone_words("When this creature enters from anywhere other than a graveyard or exile, roll a 20-sided die."), w(false, false));
+        assert_eq!(zone_words("When this creature leaves the battlefield, return the exiled card to its owner's graveyard."), w(false, false));
+    }
 }

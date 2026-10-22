@@ -19,8 +19,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::LANDFALL, clue, "Landfall \u{2014} Whenever a land you control enters, investigate."),
         triggered(when_asked(EventMask::ZONE_CHANGE, you_sacrifice_a_clue), plus_one_counter_on_this, "Whenever you sacrifice a Clue, put a +1/+1 counter on Tireless Tracker.")
-            .on_sacrifice()
-            .look_back(),
+            .on_sacrifice(),
     ],
     ..oracle::TIRELESS_TRACKER
 };

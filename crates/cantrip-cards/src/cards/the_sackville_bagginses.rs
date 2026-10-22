@@ -43,8 +43,7 @@ pub static CARD: CardDef = CardDef {
         triggered(triggers::THIS_ENTERS, sacrifice_for_a_card, "When The Sackville-Bagginses enter, you may sacrifice another creature or artifact. If you do, draw a card and create a Treasure token."),
         triggered(when_asked(EventMask::ZONE_CHANGE, you_sacrifice_a_token), opponent_loses_a_life, "Whenever you sacrifice a token, target opponent loses 1 life.")
             .targets(&[targets::OPPONENT])
-            .on_sacrifice()
-            .look_back(),
+            .on_sacrifice(),
     ],
     ..oracle::THE_SACKVILLE_BAGGINSES
 };

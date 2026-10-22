@@ -22,8 +22,7 @@ pub static CARD: CardDef = CardDef {
         THIS_DIES,
         may_cast_as_adventure,
         "When this creature dies, you may cast it from your graveyard as an Adventure until the end of your next turn.",
-    )
-    .look_back()],
+    )],
     adventure: Some(&DREAD_WHISPERS),
     ..oracle::MOSSWOOD_DREADKNIGHT
 };

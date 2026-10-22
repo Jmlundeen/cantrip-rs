@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::THIS_DIES, |g, item| gain_life(g, item, 3), "When this creature dies, you gain 3 life.").look_back(),
+        triggered(triggers::THIS_DIES, |g, item| gain_life(g, item, 3), "When this creature dies, you gain 3 life."),
         ability(cost("{2}").and(SACRIFICE_THIS), destroy_first_target, "{2}, Sacrifice this creature: Destroy up to one target artifact or enchantment.")
             .targets(&[targets::ARTIFACT_OR_ENCHANTMENT.between(0, 1)]),
     ],

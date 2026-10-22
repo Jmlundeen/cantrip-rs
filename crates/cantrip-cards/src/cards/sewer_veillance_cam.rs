@@ -16,8 +16,7 @@ pub static CARD: CardDef = CardDef {
         triggered(triggers::THIS_ENTERS, tap_or_untap, "When Sewer-veillance Cam enters, you may tap or untap target creature.")
             .targets(&[targets::CREATURE]),
         triggered(triggers::THIS_LEAVES, tap_or_untap, "When Sewer-veillance Cam leaves the battlefield, you may tap or untap target creature.")
-            .targets(&[targets::CREATURE])
-            .look_back(),
+            .targets(&[targets::CREATURE]),
         ability(cost("{3}{U}").and(SACRIFICE_THIS), |g, item| effects::draw(g, item, 2), "{3}{U}, Sacrifice Sewer-veillance Cam: Draw two cards."),
     ],
     ..oracle::SEWER_VEILLANCE_CAM

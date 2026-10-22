@@ -65,7 +65,6 @@ pub static CARD: CardDef = CardDef {
             create_food,
             "Whenever one or more creatures you control die, create a Food token. This ability triggers only once each turn.",
         )
-        .look_back()
         .once_per_batch()
         .triggers_each_turn(1),
         class::level_two("{1}{B}", "{1}{B}: Level 2"),
@@ -75,7 +74,6 @@ pub static CARD: CardDef = CardDef {
             "Whenever you sacrifice a permanent, target player mills two cards.",
         )
         .on_sacrifice()
-        .look_back()
         .targets(&[targets::PLAYER]),
         class::level_three("{2}{B}", "{2}{B}: Level 3"),
         triggered(

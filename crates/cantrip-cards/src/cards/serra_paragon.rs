@@ -51,7 +51,6 @@ pub static CARD: CardDef = CardDef {
         permission: true,
         ..GrantedWay::CAST
     }],
-    delayed: &[triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), exile_and_gain, "When this permanent is put into a graveyard from the battlefield, exile it and you gain 2 life.")
-        .look_back()],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), exile_and_gain, "When this permanent is put into a graveyard from the battlefield, exile it and you gain 2 life.")],
     ..oracle::SERRA_PARAGON
 };

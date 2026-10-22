@@ -32,7 +32,6 @@ pub static CARD: CardDef = CardDef {
             "Whenever you sacrifice an artifact, this creature deals 2 damage to target opponent.",
         )
         .on_sacrifice()
-        .look_back()
         .targets(&[targets::OPPONENT]),
     ],
     ..oracle::BIOTECH_SPECIALIST

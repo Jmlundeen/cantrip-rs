@@ -1,5 +1,6 @@
-//! Leaves-the-battlefield abilities look back in time (CR 603.10a): whether one triggers, and who controls it (CR 603.3a),
-//! is judged on the game as it was just before the event - characteristics, control and history - over test cards.
+//! Abilities that look back in time (CR 603.10: leaves-the-battlefield abilities, CR 603.10a, and the others it lists):
+//! whether one triggers, and who controls it (CR 603.3a), is judged on the game as it was just before the event -
+//! characteristics, control and history - over test cards.
 
 use crate::{Cx, Game, Setup};
 use cantrip_api::*;
@@ -42,7 +43,7 @@ static VIGIL: CardDef = CardDef {
     name: "Look-back Vigil",
     types: TypeSet::of(&[CardType::Enchantment]),
     statics: &[static_ability(Layer::Ability, creature_while_none_died, grant, "")],
-    delayed: &[triggered(when(EventMask::ZONE_CHANGE, this_dies), gain_two, "When this creature dies, you gain 2 life.").look_back()],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, this_dies), gain_two, "When this creature dies, you gain 2 life.")],
     ..CardDef::BLANK
 };
 
@@ -98,7 +99,7 @@ static WAKE: CardDef = CardDef {
     name: "Look-back Wake",
     types: TypeSet::of(&[CardType::Enchantment]),
     statics: &[static_ability(Layer::Ability, creature, grant, "")],
-    delayed: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.").look_back()],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.")],
     ..CardDef::BLANK
 };
 
@@ -130,7 +131,7 @@ static ARTIST: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(0),
     toughness: Some(1),
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.").look_back()],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.")],
     ..CardDef::BLANK
 };
 
@@ -211,7 +212,7 @@ static SELF_GRANTER: CardDef = CardDef {
     power: Some(1),
     toughness: Some(1),
     statics: &[characteristic_defining(Layer::Ability, while_you_control_an_artifact, "")],
-    delayed: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.").look_back()],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.")],
     ..CardDef::BLANK
 };
 
@@ -245,7 +246,7 @@ static HAUNT: CardDef = CardDef {
     name: "Look-back Haunt",
     types: TypeSet::of(&[CardType::Enchantment]),
     statics: &[static_ability(Layer::Ability, creature, grant, "").from(ZoneKind::Graveyard)],
-    delayed: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.").look_back()],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.")],
     ..CardDef::BLANK
 };
 
@@ -279,7 +280,7 @@ fn an_ability_a_static_ability_in_a_graveyard_gave_is_looked_back_with() {
 static EMBLEM: CardDef = CardDef {
     name: "Look-back Emblem",
     statics: &[static_ability(Layer::Ability, creature, grant, "")],
-    delayed: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.").look_back()],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.")],
     ..CardDef::BLANK
 };
 
@@ -308,7 +309,7 @@ static WAKE_DOOR: CardDef = CardDef {
     name: "Look-back Wake Door",
     types: TypeSet::of(&[CardType::Enchantment]),
     subtypes: SubtypeSet::of(&[Subtype::Room]),
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.").look_back()],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, another_dies), gain_two, "Whenever another creature dies, you gain 2 life.")],
     ..CardDef::BLANK
 };
 static BLANK_DOOR: CardDef = CardDef { name: "Look-back Blank Door", abilities: &[], ..WAKE_DOOR };
@@ -365,4 +366,93 @@ fn wrath_of_a_hundred_with_a_granting_static() {
         total / rounds,
         std::mem::size_of::<(ObjectId, Chars, PlayerId)>()
     );
+}
+
+fn equipped(q: &dyn LayerQuery, source: ObjectId, id: ObjectId, _: &Chars) -> bool {
+    q.state().obj(source).attached_to == Some(id)
+}
+
+/// "Whenever an Equipment becomes unattached from this creature" (CR 603.10c).
+fn unattached_from_this(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Unattached { from, .. } if *from == source => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "Equipped creature has 'Whenever an Equipment becomes unattached from this creature, you gain 2 life.'"
+static TETHER: CardDef = CardDef {
+    name: "Look-back Tether",
+    types: TypeSet::of(&[CardType::Artifact]),
+    statics: &[static_ability(Layer::Ability, equipped, grant, "")],
+    delayed: &[triggered(when(EventMask::UNATTACHED, unattached_from_this), gain_two, "Whenever an Equipment becomes unattached from this creature, you gain 2 life.")],
+    ..CardDef::BLANK
+};
+
+/// An ability that triggers on becoming unattached looks back (CR 603.10c): the creature had the ability the Equipment gave
+/// it just before the Equipment came off, so it triggers, though it has no such ability once it is unattached.
+#[test]
+fn an_unattachment_is_judged_on_the_game_as_it_was_while_attached() {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&TETHER, &BEAR])));
+    let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    let mut put = |def: &'static CardDef| {
+        let id = game.state.push_obj(Obj::new(table.id_of(def), PlayerId(0), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, id);
+        game.state.see_statics();
+        id
+    };
+    let tether = put(&TETHER);
+    let bear = put(&BEAR);
+    game.state.update_obj(tether, |o| o.attached_to = Some(bear));
+    let mut cx = cx(&mut game);
+    assert!(cx.chars(bear).abilities().any(|a| a.is_delayed()));
+    crate::ops::unattach(&mut cx, tether);
+    assert!(cx.s().triggers.iter().any(|t| t.source == bear));
+    assert!(!cx.chars(bear).abilities().any(|a| a.is_delayed()));
+}
+
+fn creature_while_a_spell_is_on_the_stack(q: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+    c.is(CardType::Creature) && !q.state().stack.is_empty()
+}
+
+/// "Whenever a spell is countered" (CR 603.10e).
+fn a_spell_is_countered(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Countered { .. } => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "As long as a spell is on the stack, creatures have 'Whenever a spell is countered, you gain 2 life.'"
+static HUSH: CardDef = CardDef {
+    name: "Look-back Hush",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[static_ability(Layer::Ability, creature_while_a_spell_is_on_the_stack, grant, "")],
+    delayed: &[triggered(when(EventMask::COUNTERED, a_spell_is_countered), gain_two, "Whenever a spell is countered, you gain 2 life.")],
+    ..CardDef::BLANK
+};
+
+/// An ability that triggers on a spell being countered looks back (CR 603.10e): the Bear had the Hush's ability just before
+/// the only spell left the stack, so it triggers, though it has no such ability once the stack is empty.
+#[test]
+fn a_countered_spell_is_judged_on_the_game_as_it_was_while_on_the_stack() {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&HUSH, &BEAR])));
+    let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    let mut put = |def: &'static CardDef| {
+        let id = game.state.push_obj(Obj::new(table.id_of(def), PlayerId(0), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, id);
+        game.state.see_statics();
+        id
+    };
+    put(&HUSH);
+    let bear = put(&BEAR);
+    let spell = game.state.push_obj(Obj::new(table.id_of(&BEAR), PlayerId(1), Zone::STACK));
+    game.state.zone_push(Zone::STACK, spell);
+    game.state.stack_push(crate::actions::stack_item(StackKind::Spell, spell, AbilityRef { card: table.id_of(&BEAR), index: 0 }, PlayerId(1), &[]));
+    let mut cx = cx(&mut game);
+    assert!(cx.chars(bear).abilities().any(|a| a.is_delayed()));
+    crate::resolve::counter(&mut cx, spell);
+    assert!(cx.s().stack.is_empty());
+    assert!(cx.s().triggers.iter().any(|t| t.source == bear));
+    assert!(!cx.chars(bear).abilities().any(|a| a.is_delayed()));
 }

@@ -28,7 +28,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, creature_leaves_without_dying), draw,
             "Whenever one or more other creatures you control leave the battlefield without dying, draw a card.")
-            .once_per_batch().look_back(),
+            .once_per_batch(),
         ability(cost("{1}{U}").and(TAP), return_creature,
             "{1}{U}, {T}: Return another target creature you control to its owner's hand.")
             .targets(&[cantrip_mechanics::targets::OTHER_CREATURE_YOU_CONTROL]),

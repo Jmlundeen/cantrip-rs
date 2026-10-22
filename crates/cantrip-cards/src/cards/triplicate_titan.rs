@@ -31,8 +31,7 @@ fn golems(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(cantrip_mechanics::triggers::THIS_DIES, golems, "When this creature dies, create a 3/3 colorless Golem artifact creature token with flying, a 3/3 colorless Golem artifact creature token with vigilance, and a 3/3 colorless Golem artifact creature token with trample.")
-        .look_back()],
+    abilities: &[triggered(cantrip_mechanics::triggers::THIS_DIES, golems, "When this creature dies, create a 3/3 colorless Golem artifact creature token with flying, a 3/3 colorless Golem artifact creature token with vigilance, and a 3/3 colorless Golem artifact creature token with trample.")],
     ..oracle::TRIPLICATE_TITAN
 };
 

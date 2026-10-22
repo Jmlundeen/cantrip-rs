@@ -396,6 +396,8 @@ impl EventMask {
     pub const SHOWN: EventMask = EventMask(1 << 53);
     pub const SHUFFLED: EventMask = EventMask(1 << 54);
     pub const RANDOMIZED: EventMask = EventMask(1 << 55);
+    /// A permanent phased out (CR 702.26): recorded in the history; no ability triggers on it yet.
+    pub const PHASED_OUT: EventMask = EventMask(1 << 56);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -421,9 +423,17 @@ impl EventMask {
             Event::Shown { .. } => EventMask::SHOWN,
             Event::Shuffled { .. } => EventMask::SHUFFLED,
             Event::Randomized { .. } => EventMask::RANDOMIZED,
+            Event::PhasedOut { .. } => EventMask::PHASED_OUT,
             other => EventMask::of(other),
         }
     }
+
+    /// The events a triggered ability can look back on (CR 603.10, `CardTable::looks_back`): every kind `looks_back` says
+    /// yes to, so an ability listening for one is among the permanents taken as they were before (`settle::Then`). Phasing
+    /// out and losing the game are filed in the history only (`of_history`); no ability triggers on them yet.
+    pub const LOOKS_BACK: EventMask = EventMask(
+        EventMask::ZONE_CHANGE.0 | EventMask::UNATTACHED.0 | EventMask::COUNTERED.0 | EventMask::PHASED_OUT.0 | EventMask::GAME_OVER.0,
+    );
 
     pub fn of(event: &Event) -> EventMask {
         match event {

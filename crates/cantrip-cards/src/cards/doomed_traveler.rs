@@ -11,7 +11,7 @@ fn spirit(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(THIS_DIES, spirit, "When this creature dies, create a 1/1 white Spirit creature token with flying.").look_back()],
+    abilities: &[triggered(THIS_DIES, spirit, "When this creature dies, create a 1/1 white Spirit creature token with flying.")],
     ..oracle::DOOMED_TRAVELER
 };
 

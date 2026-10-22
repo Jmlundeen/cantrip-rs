@@ -715,9 +715,9 @@ pub(crate) type Again = Vec<(ObjectId, u8)>;
 
 type Found = Vec<(PendingTrigger, &'static TriggeredDef, Again)>;
 
-/// The triggered abilities of `source` that `event` triggers, onto `found`: those that look back (CR 603.10a) or those that
-/// don't, as `look_back` says. With `later`, both, the object's characteristics found once: the look-back ones onto `found`,
-/// the others onto `later`.
+/// The triggered abilities of `source` that `event` triggers, onto `found`: those that look back on it (CR 603.10,
+/// `CardTable::looks_back`) or those that don't, as `look_back` says. With `later`, both, the object's characteristics
+/// found once: the look-back ones onto `found`, the others onto `later`.
 ///
 /// `permanent`: the source is on the battlefield (or was, for a look-back ability); false for an emblem in the command zone,
 /// which is no permanent (CR 114.4), so "a triggered ability of a permanent" does not mean its abilities.
@@ -757,7 +757,7 @@ fn consider(
             continue;
         }
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
-            && (later.is_some() || t.look_back == look_back)
+            && (later.is_some() || cx.cards().looks_back(ability, cx, event) == look_back)
             && let Some(fired) = if t.chapter > 0 { chapter_reached(source, t.chapter, event) } else if t.listens.intersects(mask) { t.fires(cx, &Asker { source, controller }, event) } else { None }
         {
             if let Some(condition) = t.condition
@@ -769,14 +769,15 @@ fn consider(
             if t.ward && layers::targeting_rule(cx.cards(), cx.s(), &cx.g.log, TargetingRuleKind::SuppressWard, source) {
                 continue;
             }
-            let triggering = Triggering { source, controller, def: t, permanent };
+            let looks_back = cx.cards().looks_back(ability, cx, event);
+            let triggering = Triggering { source, controller, def: t, permanent, looks_back };
             if statics.stop(cx, event, &triggering) {
                 continue;
             }
             let mut again = Again::new();
             statics.additional(cx, event, &triggering, &mut again);
             let into = match later.as_deref_mut() {
-                Some(later) if !t.look_back => later,
+                Some(later) if !looks_back => later,
                 _ => &mut *found,
             };
             into.push((
@@ -807,7 +808,7 @@ fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event
     }
     // Its source, in no zone: what stops abilities triggering asks about it (CR 603.2d), and is given it back if it does.
     let source = cx.st().push_obj(Obj::new(card, controller, Zone::GONE));
-    let triggering = Triggering { source, controller, def: t, permanent: false };
+    let triggering = Triggering { source, controller, def: t, permanent: false, looks_back: cx.cards().looks_back(ability, cx, event) };
     if statics.stop(cx, event, &triggering) {
         cx.st().pop_obj(source);
         return;
@@ -911,8 +912,8 @@ fn chapter_reached(source: ObjectId, chapter: u8, event: &Event) -> Option<Fired
 /// The permanents with static abilities that stop abilities from triggering (CR 603.2, `CardDef::trigger_rules`) or make them
 /// trigger additional times (CR 603.2d, `CardDef::additional_triggers`): found from the board, once per batch and only when an
 /// ability has matched, so a batch that triggers nothing pays nothing. An ability that triggers on the board as it is after the
-/// events asks those on the battlefield now; a leaves-the-battlefield ability, which looks back (CR 603.10a), asks those that
-/// were there before, the ones leaving with the event included.
+/// events asks those on the battlefield now; one that looks back on its event (CR 603.10, `CardTable::looks_back`), a
+/// leaves-the-battlefield ability's, asks those that were there before, the ones leaving with the event included.
 pub(crate) struct TriggerStatics<'a> {
     before: Option<&'a [ObjectId]>,
     now: Option<Vec<ObjectId>>,
@@ -926,7 +927,7 @@ impl<'a> TriggerStatics<'a> {
 
     /// The permanents whose rules apply to this triggering (CR 603.10).
     fn sources(&mut self, cx: &Cx, triggering: &Triggering) -> &[ObjectId] {
-        if triggering.def.look_back && self.before.is_some() {
+        if self.before.is_some() && triggering.looks_back {
             let before = self.before.unwrap_or_default();
             self.then.get_or_insert_with(|| trigger_rule_sources(cx, before))
         } else {
@@ -1005,7 +1006,7 @@ impl Then {
     pub(crate) fn now(cx: &Cx) -> Then {
         let cards = cx.cards();
         let s = cx.s();
-        let could = could_have(cx, &cards.look_back, |t| t.look_back);
+        let could = could_have(cx, &cards.look_back, TriggeredDef::may_look_back);
         let mut objects: Vec<(ObjectId, Chars, PlayerId)> = s
             .battlefield()
             .iter()
@@ -1020,7 +1021,7 @@ impl Then {
             for &id in s.battlefield().iter().filter(|&&id| !could(id)) {
                 let chars = layers::chars(cards, s, &cx.g.log, id);
                 assert!(
-                    !chars.abilities().any(|a| matches!(cards.ability(a), AbilityDef::Triggered(t) if t.look_back)),
+                    !chars.abilities().any(|a| matches!(cards.ability(a), AbilityDef::Triggered(t) if t.may_look_back())),
                     "{id:?} has a look-back ability that nothing counted as able to give it (CR 603.10a)"
                 );
             }
@@ -1153,7 +1154,17 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                         // (CR 603.7b) and is stopped like any other. It is no ability of a permanent, and nothing makes it trigger an
                         // additional time (CR 603.2d).
                         && (d.when == DelayedWhen::UntilEvent
-                            || !statics.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t, permanent: false }))
+                            || !statics.stop(
+                                cx,
+                                event,
+                                &Triggering {
+                                    source: d.source,
+                                    controller: d.controller,
+                                    def: t,
+                                    permanent: false,
+                                    looks_back: cx.cards().looks_back(d.ability, cx, event),
+                                },
+                            ))
                     {
                         found.push((
                             PendingTrigger {
@@ -1214,7 +1225,8 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                         {
                             continue;
                         }
-                        let triggering = Triggering { source: id, controller, def: t, permanent: false };
+                        let looks_back = cx.cards().looks_back(ability, cx, event);
+                        let triggering = Triggering { source: id, controller, def: t, permanent: false, looks_back };
                         if statics.stop(cx, event, &triggering) {
                             continue;
                         }

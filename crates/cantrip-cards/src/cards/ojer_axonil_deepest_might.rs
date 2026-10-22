@@ -58,8 +58,7 @@ pub static BACK: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_DIES, effects::return_it_tapped_and_transformed, "When Ojer Axonil dies, return it to the battlefield tapped and transformed under its owner's control.")
-            .look_back(),
+        triggered(THIS_DIES, effects::return_it_tapped_and_transformed, "When Ojer Axonil dies, return it to the battlefield tapped and transformed under its owner's control."),
     ],
     replacements: &[replacement(
         ReplacementKind::Damage,

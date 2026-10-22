@@ -30,7 +30,6 @@ pub static CARD: CardDef = CardDef {
         pass_counters,
         "When this creature dies, put its counters on up to one target creature you control.",
     )
-    .targets(&[targets::CREATURE_YOU_CONTROL.optional()])
-    .look_back()],
+    .targets(&[targets::CREATURE_YOU_CONTROL.optional()])],
     ..oracle::GRAFT_SURGEON
 };

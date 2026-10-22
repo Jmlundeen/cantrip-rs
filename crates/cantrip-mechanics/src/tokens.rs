@@ -393,8 +393,7 @@ pub static PEST: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Pest]),
     power: Some(1),
     toughness: Some(1),
-    abilities: &[triggered(crate::triggers::THIS_DIES, gain_a_life, "When this token dies, you gain 1 life.")
-        .look_back()],
+    abilities: &[triggered(crate::triggers::THIS_DIES, gain_a_life, "When this token dies, you gain 1 life.")],
     text: "When this token dies, you gain 1 life.",
     ..CardDef::BLANK
 };

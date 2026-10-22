@@ -19,8 +19,7 @@ fn equipped_creature_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Opt
 pub static CARD: CardDef = CardDef {
     abilities: &[
         equip(mana("{1}"), "Equip {1}"),
-        triggered(when(EventMask::ZONE_CHANGE, equipped_creature_dies), |g, item| effects::draw(g, item, 2), "Whenever equipped creature dies, draw two cards.")
-            .look_back(),
+        triggered(when(EventMask::ZONE_CHANGE, equipped_creature_dies), |g, item| effects::draw(g, item, 2), "Whenever equipped creature dies, draw two cards."),
     ],
     statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, -1>, "Equipped creature gets +1/-1.")],
     ..oracle::SKULLCLAMP

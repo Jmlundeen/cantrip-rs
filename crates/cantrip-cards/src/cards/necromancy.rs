@@ -41,8 +41,7 @@ pub static CARD: CardDef = CardDef {
         triggered(triggers::THIS_ENTERS, reanimate, "When this enchantment enters, if it's on the battlefield, it becomes an Aura with \"enchant creature put onto the battlefield with Necromancy.\" Put target creature card from a graveyard onto the battlefield under your control and attach this enchantment to it.")
             .targets(&[targets::CREATURE_CARD_IN_A_GRAVEYARD])
             .condition(triggers::this_is_on_the_battlefield),
-        triggered(triggers::THIS_LEAVES, sacrifice_creature, "When this enchantment leaves the battlefield, that creature's controller sacrifices it.")
-            .look_back(),
+        triggered(triggers::THIS_LEAVES, sacrifice_creature, "When this enchantment leaves the battlefield, that creature's controller sacrifices it."),
     ],
     ..oracle::NECROMANCY
 };
