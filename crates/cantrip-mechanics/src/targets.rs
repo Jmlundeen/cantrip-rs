@@ -714,4 +714,11 @@ pub mod filters {
     pub fn another_creature_or_artifact(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
         id != asker.source && artifact_or_creature(q, asker, id)
     }
+    /// "Another creature or planeswalker" (CR 701.21a): Loot, the Anomaly and Edgar, Ancient Bloodlord sacrifice one.
+    pub fn another_creature_or_planeswalker(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+        id != asker.source && {
+            let c = q.chars(id);
+            c.is(CardType::Creature) || c.is(CardType::Planeswalker)
+        }
+    }
 }
