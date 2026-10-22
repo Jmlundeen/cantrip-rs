@@ -1,0 +1,48 @@
+# Venser, Fervent Forger: "Copy target instant or sorcery spell an opponent controls twice. You may choose new targets for
+# the copies." Venser has flash, so Bot1 casts it in response to Bot2's Lightning Bolt at Bot1: the trigger copies the Bolt
+# twice and Bot1 aims both copies at Bot2. The copies resolve first (3 and 3: Bot2 at 14), then the original Bolt resolves
+# at Bot1 (17). Neither copy was cast, so both are in no graveyard: Bot2's Bolt alone is.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Venser, Fervent Forger
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack = Lightning Bolt
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Venser, Fervent Forger.Cast
+Bot1.Modes(Copy target instant or sorcery spell an opponent controls twice. You may choose new targets for the copies.)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 17
+Bot2.Life = 14
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Sapphire; Venser, Fervent Forger
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Lightning Bolt
