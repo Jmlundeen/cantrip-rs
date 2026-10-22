@@ -1,0 +1,32 @@
+# Eclipsed Steppe: "This land enters tapped unless you control two or more basic lands." Bot1 controls two Scrublands - two
+# lands with the Plains and Swamp types, but neither basic (CR 205.4a; two or more of these lands do not count) - and no
+# basic land at all, so its Eclipsed Steppe enters tapped. Bot2 with a Plains and a Swamp plays the same land untapped
+# (positive control).
+
+[Bot1 Deck]
+Scrubland
+Scrubland
+Eclipsed Steppe
+Swamp x20
+
+[Bot2 Deck]
+Plains
+Swamp
+Eclipsed Steppe
+Swamp x20
+
+[Actions]
+Bot1.Hand.Scrubland.Play
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Scrubland.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Eclipsed Steppe.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Eclipsed Steppe.Play
+
+[Expect]
+Bot1.Battlefield.Eclipsed Steppe.Tapped = true
+Bot2.Battlefield.Eclipsed Steppe.Tapped = false
