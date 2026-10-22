@@ -89,10 +89,11 @@ pub fn enters_tapped_unless_you_control_basic_land(g: &mut dyn Game, entering: &
     Ok(())
 }
 
-/// "This land enters tapped unless you control two or more basic lands" (CR 614.1c, 205.4a): the supertype, not a land type,
-/// read on the battlefield as it is while the land enters, so the land itself - and any land entering at the same time
-/// (`became`) - is not counted. The Battle lands print it: Prairie Stream and Radiant Summit (also Canopy Vista, Cinder Glade,
-/// Smoldering Marsh and Sunken Hollow).
+/// "This land enters tapped unless you control two or more basic lands" (CR 614.12, 614.1d, 205.4c): the supertype, not a land
+/// type, read on the battlefield as it is while the land enters, so the land itself - and any land entering at the same time,
+/// which the core leaves out as not yet on the battlefield - is not counted; `became.is_none()` drops the objects that already
+/// moved. The five battle lands print it (Prairie Stream, Sunken Hollow, Smoldering Marsh, Cinder Glade, Canopy Vista), and so
+/// does the enemy-color cycle that completes them (Radiant Summit, Scorched Geyser, Sodden Verdure, Eclipsed Steppe, Vernal Fen).
 pub fn enters_tapped_unless_two_or_more_basic_lands(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let basics = g
         .permanents_of(entering.controller)

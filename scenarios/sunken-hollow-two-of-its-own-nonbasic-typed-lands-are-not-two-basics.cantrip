@@ -1,5 +1,5 @@
 # Sunken Hollow: "This land enters tapped unless you control two or more basic lands." Bot1 controls two Underground Seas
-# - two lands with the Island and Swamp types, but neither basic (CR 205.4a; two or more of these lands do not count) -
+# - two lands with the Island and Swamp types, but neither basic (CR 205.4c; two or more of these lands do not count) -
 # and no basic land at all, so its Sunken Hollow enters tapped. Bot2 with an Island and a Swamp plays the same land
 # untapped (positive control).
 

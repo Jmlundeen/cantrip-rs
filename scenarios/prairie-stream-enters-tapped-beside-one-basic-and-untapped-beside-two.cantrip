@@ -1,5 +1,5 @@
 # Prairie Stream: "This land enters tapped unless you control two or more basic lands." Turn 5 Bot1 controls a Plains (one
-# basic) and a Tundra (the Plains and Island types, but not basic, CR 205.4a): one basic is below the two, so its Prairie
+# basic) and a Tundra (the Plains and Island types, but not basic, CR 205.4c): one basic is below the two, so its Prairie
 # Stream enters tapped - though Bot2, its opponent, controls two basic lands by then. Bot2 with a Plains and an Island of
 # its own plays the same land on turn 6 and it enters untapped (positive control).
 

@@ -1,5 +1,5 @@
 # Vernal Fen: "This land enters tapped unless you control two or more basic lands." Turn 5 Bot1 controls a Swamp (one
-# basic) and a Bayou (the Swamp and Forest types, but not basic, CR 205.4a): one basic is below the two, so its Vernal Fen
+# basic) and a Bayou (the Swamp and Forest types, but not basic, CR 205.4c): one basic is below the two, so its Vernal Fen
 # enters tapped - though Bot2, its opponent, controls two basic lands by then. Bot2 with a Swamp and a Forest of its own
 # plays the same land on turn 6 and it enters untapped (positive control).
 
