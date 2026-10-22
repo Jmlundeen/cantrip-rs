@@ -1,0 +1,52 @@
+# Phased-out Ultron cannot receive its power-up's counters (CR 702.26b), but its independent ability still creates
+# its token (113.7a, 609.3). Token enters phased in: Protection only phased the permanents present on resolution.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Mox Pearl
+Ultron Drone
+Black Lotus
+Teferi's Protection
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ultron Drone.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Ultron Drone.Activate
+? Stack = Ultron Drone
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Teferi's Protection.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.PhasedOut.Ultron Drone.Counters.PlusOnePlusOne = (absent)
+Bot1.PhasedOut.Ultron Drone.Power = 2
+Bot1.PhasedOut.Ultron Drone.Toughness = 3
+Bot1.Battlefield = Robot Villain Token
+Bot1.Battlefield.Robot Villain Token.Token = true
+Bot1.Battlefield.Robot Villain Token.Power = 2
+Bot1.Battlefield.Robot Villain Token.Toughness = 2

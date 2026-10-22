@@ -1882,6 +1882,11 @@ engine does not have yet is skipped; one that can run must pass.
 
 ## Correctness
 
+- **Counter placement and phasing (CR 702.26b-d).** `counters::put_all` excludes phased-out recipients before
+  replacements and rechecks presence after their continuations; removal rejects phased-out recipients too. Existing
+  counters remain through phasing; normal placements on cards in other zones still work. Identity liveness is
+  unchanged, so phasing does not become a zone
+  change or erase a source's history. A failed counter placement never stops the rest of a card's effect.
 - **The scenarios are the reference.** A card is done when it is exact and its scenarios pass; a scenario that is
   wrong by the rules is fixed, with the rule.
 - **`CANTRIP_VERIFY=1`** runs the engine's own consistency checks while it plays; `tools\test.cmd` sets it.
