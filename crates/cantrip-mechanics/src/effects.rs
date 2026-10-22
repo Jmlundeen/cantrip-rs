@@ -257,6 +257,13 @@ pub fn discard_hand_then_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Res
     Ok(())
 }
 
+/// "Each opponent discards a card" (CR 101.4, 701.9): opponents of the ability's fixed controller choose in APNAP order,
+/// then discard together. Tinybones, Pocket Nuisance and Rank Rat print this exact effect.
+pub fn each_opponent_discards_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
+    crate::each_discards_a_card(g, &opponents, item.object).map(drop)
+}
+
 /// "Each player discards their hand, then draws seven cards": every player, in turn order from the active player
 /// (CR 101.4), discards together and then draws; nobody is asked, a whole hand leaving nothing to choose. Wheel of Fortune
 /// and Reforge the Soul print it.
