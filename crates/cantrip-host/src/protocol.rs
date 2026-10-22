@@ -1020,6 +1020,10 @@ pub struct PayCostsPrompt {
     /// sacrificed this way", CR 601.2b, 601.2f); `x` is the number so far and `most_affordable` how many could be. Zero
     /// for any other announcement.
     pub sacrifice_reduces: i32,
+    /// While announcing: the largest value an `AnnounceAnswer` may announce (CR 601.2b) - the rules' limit, as many as the
+    /// legal targets an "X target" spell has, once for a kicker paid at most once; how much could be paid for is
+    /// `most_affordable`. Zero while paying.
+    pub most_announced: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1289,7 +1293,7 @@ pub struct MulliganPrompt {
 
 // --- Answers ---
 
-/// What a player answers, one of 18 kinds, each the C# class of the same name.
+/// What a player answers, one of 19 kinds, each the C# class of the same name.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "$type")]
 pub enum AnswerPayload {
@@ -1311,6 +1315,7 @@ pub enum AnswerPayload {
     ColorsChosenAnswer(ColorsChosenAnswer),
     TargetsDividedAnswer(TargetsDividedAnswer),
     CountersRemovedAnswer(CountersRemovedAnswer),
+    AnnounceAnswer(AnnounceAnswer),
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1320,6 +1325,14 @@ pub struct PassAnswer {}
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct CancelAnnouncementAnswer {}
+
+/// The value of X, or how many times the spell is kicked, announced at once (CR 601.2b): an answer to a pay-costs prompt
+/// that `announces_x_or_kicks`, from zero to its `most_announced`.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct AnnounceAnswer {
+    pub value: i32,
+}
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]

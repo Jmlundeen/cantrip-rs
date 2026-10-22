@@ -59,6 +59,11 @@ public sealed partial class MainPage
     private void ReadPrompt(GameClient client)
     {
         _actions = new CardActions(client.Prompt?.Prompt);
+        if (client.Prompt?.Prompt is PriorityPromptMessage)
+        {
+            ForgetPlan();
+        }
+
         _targetableObjects.Clear();
         _eligible.Clear();
         _looks.Clear();
@@ -284,6 +289,10 @@ public sealed partial class MainPage
             DeclareBlockersPromptMessage blockers
                 when _pending.Count > 0 && blockers.Attackers.Contains(card.Handle) =>
                 new CardLook(Dimmed: true, Note: "Can't be blocked by " + (_pending.Count == 1 ? "that creature." : "those creatures.")),
+
+            // A mana source while X is announced (CR 601.2b): planned for X, to be tapped as the spell is paid for (CR 601.2g).
+            PayCostsPromptMessage plan when PlansMana(plan) && card.Zone == ZoneKindView.Battlefield && ManaFrom(card.Handle) > 0 =>
+                PlannedLook(client, plan, card),
 
             // The spell being paid for. Not a control, but it says what it is waiting on - unless it can help pay.
             PayCostsPromptMessage pay when pay.Spell == card.Handle && _actions.For(card.Handle).Count == 0 =>
@@ -631,6 +640,7 @@ public sealed partial class MainPage
         // Whether the cast or activation just chosen returns a tapped creature (CR 702.188a, 601.2g-h), for the payment's caption to say what it needs.
         if (client.Prompt.Prompt is PriorityPromptMessage priority)
         {
+            RememberCast(priority, answer);
             _tappedAfterMana = answer is TakeActionAnswer taken && priority.Options.Exists(option => AutoPlay.ReturnsTappedAfterMana(option)
                 && option.Source == taken.Source && option.AbilityIndex == taken.AbilityIndex && option.OptionId == taken.OptionId && option.Kind == taken.Kind);
         }
@@ -922,6 +932,7 @@ public sealed partial class MainPage
             _selection.CostChoice is null ? "-" : _costTakes.ContainsKey(handle) ? "c" : "x",
             _picked.Contains(handle) ? "p" : "-",
             _pending.Contains(handle) ? "a" : "-",
+            _planned.Contains(card.Handle) ? "x" : "-",
             _blocking.TryGetValue(handle, out int blocking) ? blocking.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-1",
             "|",
             (_shares.Where(pair => pair.Key.Creature == handle).Sum(pair => pair.Value) + _dividedShares.GetValueOrDefault(handle)).ToString(System.Globalization.CultureInfo.InvariantCulture),

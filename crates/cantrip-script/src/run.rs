@@ -547,29 +547,23 @@ impl<'s> Run<'s> {
                 continue;
             }
 
-            // `! Bot1.Hand.Fire Covenant.Cast(X: 6)` after the cast that announces X: X cannot be announced that high. The announcement
-            // is raised one at a time; the refusal holds if raising stops short of 6 (life to pay, creatures to sacrifice) and fails if
-            // 6 is reached. The card announcing must be the one named, or the refusal proves nothing.
+            // `! Bot1.Hand.Fire Covenant.Cast(X: 6)` after the cast that announces X: X cannot be announced that high. The refusal
+            // holds if the most the question lets be announced is short of 6 (life to pay, creatures to sacrifice) and fails if 6 could
+            // be. The card announcing must be the one named, or the refusal proves nothing.
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
                 && matches!(action.verb, ScriptVerb::Cast | ScriptVerb::Activate)
                 && let Some(wanted) = action.named("X")
                 && request.player == player_of(action.bot)
-                && let RequestKind::PayCosts { announcing: true, source, x, options, .. } = &request.kind
+                && let RequestKind::PayCosts { announcing: true, source, most, .. } = &request.kind
             {
                 let Ok(wanted) = wanted.trim().parse::<u32>() else { return fail(format!("line {line}: {wanted} is not a number")) };
                 if !action.card.as_deref().is_some_and(|card| self.game.known_name(*source).eq_ignore_ascii_case(card)) {
                     return fail(format!("line {line}: {text} proves nothing: {} is the one announcing X", self.game.known_name(*source)));
                 }
-                if *x >= wanted {
-                    return fail(format!("line {line} says {text} must not be allowed, but X was announced up to {wanted}"));
+                if *most >= wanted {
+                    return fail(format!("line {line} says {text} must not be allowed, but X could be announced up to {most}"));
                 }
-                match options.iter().find(|o| o.kind == ActionKind::IncreaseX) {
-                    Some(raise) => {
-                        let answer = Answer::Act(Action::of(raise));
-                        self.deliver(&request, answer, None)?;
-                    }
-                    None => self.next(),
-                }
+                self.next();
                 continue;
             }
 
@@ -921,21 +915,11 @@ impl<'s> Run<'s> {
 
     /// Paying from the pool without being told (`AutoPay`): `Spend:` first, then any pool mana that pays what is owed.
     fn auto_pay(&mut self, request: &Request) -> R<Option<Answer>> {
-        let RequestKind::PayCosts { remaining, options, announcing, x, .. } = &request.kind else { return Ok(None) };
-        let offers = |kind: ActionKind| options.iter().find(|o| o.kind == kind);
+        let RequestKind::PayCosts { remaining, options, announcing, most, .. } = &request.kind else { return Ok(None) };
         if *announcing {
-            // X, or how many times it is kicked, raised or lowered to what the line said, then confirmed.
+            // X, or how many times it is kicked, announced as the line said, as a page announces it.
             let want = u32::from(self.casting.as_ref().and_then(|c| c.x).unwrap_or(0));
-            if *x < want && let Some(o) = offers(ActionKind::IncreaseX) {
-                return Ok(Some(Answer::Act(Action::of(o))));
-            }
-            if *x > want && let Some(o) = offers(ActionKind::DecreaseX) {
-                return Ok(Some(Answer::Act(Action::of(o))));
-            }
-            if *x == want && let Some(o) = offers(ActionKind::ConfirmCasting) {
-                return Ok(Some(Answer::Act(Action::of(o))));
-            }
-            return Ok(None);
+            return Ok((want <= *most).then_some(Answer::Announce(want)));
         }
         // Convoke taps the creatures it names, one per question, and Delve exiles that many cards from the graveyard, the
         // first offered each time: what pays the cost instead of mana (CR 601.2h).

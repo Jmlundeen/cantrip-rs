@@ -54,8 +54,15 @@ public sealed class ScenarioPlayer
     /// <summary>Bot2's seat as a client of the table's, answering as the script means after a pause; null when the script answers it.</summary>
     private readonly (GameClient Client, TimeSpan Thinks)? _opponent;
 
-    private ScenarioPlayer(TablePage page, ScenarioTable table, bool hold, (GameClient Client, TimeSpan Thinks)? opponent)
+    /// <summary>
+    /// The mana source an X is raised with as it is announced, and how many of them: clicked on the battlefield rather than
+    /// the dock's plus, planned for X and tapped by the page once the payment is asked. Null to step X on the dock.
+    /// </summary>
+    private readonly (string Name, int Count)? _planX;
+
+    private ScenarioPlayer(TablePage page, ScenarioTable table, bool hold, (GameClient Client, TimeSpan Thinks)? opponent, (string Name, int Count)? planX)
     {
+        _planX = planX;
         _page = page;
         _table = table;
         _hold = hold;
@@ -69,14 +76,16 @@ public sealed class ScenarioPlayer
     /// priority held) unless given: a test of the stops themselves gives the ones a player would set, does not hold
     /// priority, and the page passes by itself everywhere else, the table judging each such pass as it judges a click.
     /// With <paramref name="opponentThinks"/>, Bot2 is a client at the table too, as an opponent at a real table is, and
-    /// answers each of its questions as the script means that long after it is asked.
+    /// answers each of its questions as the script means that long after it is asked. With <paramref name="planX"/>, an X is
+    /// raised by planning that many of the named mana source for it, and the page pays with them by itself.
     /// </summary>
     public static async Task<string?> PlayAsync(
         WebClient web,
         string path,
         IReadOnlyList<TurnStepView>? stopsMine = null,
         IReadOnlyList<TurnStepView>? stopsTheirs = null,
-        TimeSpan? opponentThinks = null)
+        TimeSpan? opponentThinks = null,
+        (string Name, int Count)? planX = null)
     {
         ScenarioSpec scenario = ScenarioSpec.Load(path, opponentThinks is null ? [1] : [1, 2]);
         await using ScenarioTable table = await ScenarioTable.StartAsync(scenario, WebClient.Content);
@@ -104,7 +113,8 @@ public sealed class ScenarioPlayer
             page,
             table,
             hold: stopsMine is null && stopsTheirs is null,
-            opponent is null ? null : (opponent, opponentThinks!.Value));
+            opponent is null ? null : (opponent, opponentThinks!.Value),
+            planX);
         try
         {
             return await player.PlayAsync();
@@ -264,6 +274,29 @@ public sealed class ScenarioPlayer
 
             case TakeActionAnswer action:
                 await TakeAsync(action, state, expected.Line);
+                return;
+
+            // X, or the times kicked, stepped up from the 0 it is asked at on the dock's plus, which sends nothing, and announced
+            // with Okay (CR 601.2b).
+            case AnnounceAnswer announced when _planX is { } plan:
+                for (int i = 0; i < plan.Count; i++)
+                {
+                    TableState now = await _page.SettledAsync();
+                    CardState source = now.Cards.FirstOrDefault(card => card.Place == "battlefield" && card.Name == plan.Name && !card.Tapped && card.Annotation != "For X")
+                        ?? throw new NotDrivenException($"No {plan.Name} left to plan for X", now);
+                    await _page.Page.Mouse.ClickAsync(source.X, source.Y);
+                }
+
+                await _page.ClickAsync("Okay", "button");
+                return;
+
+            case AnnounceAnswer announced:
+                for (int i = 0; i < announced.Value; i++)
+                {
+                    await _page.ClickAsync("+", "button");
+                }
+
+                await _page.ClickAsync("Okay", "button");
                 return;
 
             case AttackersDeclaredAnswer attack:

@@ -6486,8 +6486,10 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         }
         options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         options.push(ActionOption::simple(ActionKind::CancelCasting));
-        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, loyalty, attackers: Vec::new(), life: 0 };
+        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, most, loyalty, attackers: Vec::new(), life: 0 };
         match cx.ask_core(player, ask, true)? {
+            // The whole value at once, which the request's `most` bounds (`validate::check`).
+            Answer::Announce(value) if value <= most => return Ok(value),
             Answer::Act(a) => match a.kind {
                 ActionKind::IncreaseX => n += 1,
                 ActionKind::DecreaseX => n -= 1,
@@ -7699,7 +7701,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life };
+        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life };
         let answer = cx.ask_core(player, ask, true)?;
         match answer {
             Answer::Act(action) => match action.kind {

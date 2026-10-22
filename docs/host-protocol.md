@@ -52,6 +52,11 @@ source or index, is refused with `IllegalAnswer`; an answer without one (0) is t
 source and index, and refused where several do. The rows themselves say what tells them apart (`Description`: "Pay {E} rather
 than its mana cost (Lurrus of the Dream-Den)", "Mystic Forge"). The C# protocol is version 194 for this.
 
+A pay-costs prompt that `AnnouncesXOrKicks` (CR 601.2b) is answered with an `AnnounceAnswer` whose `Value` is the X, or the
+times kicked, from 0 to the prompt's `MostAnnounced` - one answer however high it goes, so a page steps the value itself and
+sends nothing until it is chosen. A value past `MostAnnounced` is refused with `IllegalAnswer`. Its `IncreaseX` and
+`DecreaseX` options still step it one answer at a time, as the bots do. Version 202.
+
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed
 counters, added mana or cost life (a land, Black Lotus, Lotus Petal, Pentad Prism, a Treasure), that seat's next priority

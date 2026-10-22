@@ -2292,6 +2292,14 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(24)]
     public int SacrificeReduces { get; set; }
 
+    /// <summary>
+    /// For the announcement: the largest value an <see cref="AnnounceAnswer"/> may announce (CR 601.2b) - the rules' limit,
+    /// such as one for a kicker paid at most once, rather than what could be paid for, which is <see cref="MostAffordable"/>.
+    /// Zero while paying.
+    /// </summary>
+    [Key(25)]
+    public int MostAnnounced { get; set; }
+
     /// <summary>Giving up on the spell, which is always among the options (CR 733.1).</summary>
     public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
 }
@@ -2756,6 +2764,7 @@ public sealed class DamageShareMessage
 [Union(15, typeof(ColorsChosenAnswer))]
 [Union(16, typeof(TargetsDividedAnswer))]
 [Union(17, typeof(CountersRemovedAnswer))]
+[Union(18, typeof(AnnounceAnswer))]
 public abstract class AnswerPayload;
 
 /// <summary>The counters taken for a <see cref="RemoveCountersPromptMessage"/>: how many of each kind from each permanent.</summary>
@@ -2769,6 +2778,18 @@ public sealed class CountersRemovedAnswer : AnswerPayload
 /// <summary>Gives up the spell or ability being announced, in answer to any prompt that <see cref="PromptMessage.MayCancel"/>.</summary>
 [MessagePackObject]
 public sealed class CancelAnnouncementAnswer : AnswerPayload;
+
+/// <summary>
+/// The value of X, or how many times the spell is kicked, announced at once (CR 601.2b): an answer to a
+/// <see cref="PayCostsPromptMessage"/> that <see cref="PayCostsPromptMessage.AnnouncesXOrKicks"/>, from zero to its
+/// <see cref="PayCostsPromptMessage.MostAnnounced"/>, in place of stepping to it with IncreaseX and DecreaseX.
+/// </summary>
+[MessagePackObject]
+public sealed class AnnounceAnswer : AnswerPayload
+{
+    [Key(0)]
+    public int Value { get; set; }
+}
 
 /// <summary>The modes chosen for a <see cref="ChooseModesPromptMessage"/>, as indexes into its modes.</summary>
 [MessagePackObject]

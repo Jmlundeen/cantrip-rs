@@ -114,6 +114,9 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         | (RequestKind::UnlessPays { options, .. }, Answer::Act(action)) => {
             if options.iter().any(|o| fits(o, action)) { Ok(()) } else { no("that action is not one of the options") }
         }
+        (RequestKind::PayCosts { announcing: true, most, .. }, Answer::Announce(value)) => {
+            if value <= most { Ok(()) } else { no(format!("{value} announced, {most} at most (CR 601.2b)")) }
+        }
         (RequestKind::ChooseCards { eligible, count, up_to, total, purpose, .. }, Answer::Cards(cards)) => {
             // Counted as wide as the answer is: a count narrowed to the question's width would wrap, and pass a wrong answer.
             let n = cards.len();

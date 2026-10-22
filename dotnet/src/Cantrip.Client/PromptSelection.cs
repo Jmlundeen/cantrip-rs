@@ -40,6 +40,12 @@ public sealed class PromptSelection
     /// </summary>
     public List<ActionOptionMessage>? CostChoice { get; set; }
     public string NameTyped { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The value of X, or how many times to kick, set on the page and not announced yet (CR 601.2b): stepped here, with
+    /// nothing sent, and announced at once. Null until it is changed from the value the question was asked at.
+    /// </summary>
+    public int? Announced { get; set; }
     public List<List<int>>? Placements { get; set; }
     public bool CanPick(int limit) => Cards.Count < limit || limit == 1;
 
@@ -80,6 +86,7 @@ public sealed class PromptSelection
         Targeting = null;
         CostChoice = null;
         NameTyped = string.Empty;
+        Announced = null;
         Placements = null;
     }
 }

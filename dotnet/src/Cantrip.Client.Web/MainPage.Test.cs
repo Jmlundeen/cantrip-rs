@@ -121,6 +121,12 @@ public sealed partial class MainPage
                 busy.Add("catalog");
             }
 
+            // Mana planned for X still to be tapped by the page itself as the payment it was planned for is asked.
+            if (_planned.Count > 0 && client?.Prompt?.Prompt is PayCostsPromptMessage { AnnouncesXOrKicks: false } paying && paying.Spell == _plannedFor)
+            {
+                busy.Add("planned");
+            }
+
             json.WriteStartObject();
             json.WriteBoolean("ready", ready);
             json.WriteBoolean("busy", busy.Count > 0);
@@ -444,6 +450,7 @@ public sealed partial class MainPage
         {
             null => string.Empty,
             ModesChosenAnswer modes => $"{nameof(ModesChosenAnswer)} {string.Join(",", modes.Modes)}",
+            AnnounceAnswer announced => $"{nameof(AnnounceAnswer)} {announced.Value}",
             CountersRemovedAnswer removed =>
                 $"{nameof(CountersRemovedAnswer)} {string.Join("; ", removed.Removals.Select(r => $"{r.Object.Value} {r.Counter} {r.Count}"))}".TrimEnd(),
             { } answer => answer.GetType().Name,

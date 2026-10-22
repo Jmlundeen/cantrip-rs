@@ -1,0 +1,33 @@
+# Browser
+# Fireball's X is announced before its targets and before anything is paid (CR 601.2b): the page steps it to 2 itself and
+# sends it once, as one answer; or, played with its lands planned, three Mountains clicked during the announcement raise
+# it to 2 untapped, and are tapped for it only once the payment is asked (CR 601.2g). Either way {2}{R} is paid by the
+# three Mountains and Bot2 takes 2.
+
+[Bot1 Deck]
+Fireball
+Mountain x16
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Fireball.Cast(X: 2)
+? Client.Bot1.Prompt.Title = Choose X for Fireball
+Bot1.Target(Bot2)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Fireball
+Bot2.Life = 18

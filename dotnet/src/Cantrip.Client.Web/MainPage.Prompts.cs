@@ -423,15 +423,15 @@ public sealed partial class MainPage
 
         // Kicker (CR 702.33) and buyback (CR 702.27): the count being chosen is how many times that cost is paid.
         bool kicker = prompt.Kicker.Length > 0;
-        string raise = !kicker
+        string raise = _actions.IncreaseX is null
+            ? string.Empty
+            : !kicker
             ? "  ·  tap a land or click mana in your pool to raise X"
-            : _actions.IncreaseX is null
-                ? string.Empty
-                : prompt.Buyback
-                    ? $"  ·  tap a land or click mana in your pool to buy it back for {prompt.Kicker}"
-                    : prompt.X == 0
-                        ? $"  ·  tap a land or click mana in your pool to kick it for {prompt.Kicker}"
-                        : $"  ·  tap a land or click mana in your pool to kick it again for {prompt.Kicker}";
+            : prompt.Buyback
+                ? $"  ·  tap a land or click mana in your pool to buy it back for {prompt.Kicker}"
+                : prompt.X == 0
+                    ? $"  ·  tap a land or click mana in your pool to kick it for {prompt.Kicker}"
+                    : $"  ·  tap a land or click mana in your pool to kick it again for {prompt.Kicker}";
 
         Prompt(
             !kicker ? $"Choose X for {name}" : prompt.Buyback ? $"Buy back {name}?" : $"Kick {name}?",
@@ -443,14 +443,19 @@ public sealed partial class MainPage
         {
             _pass = () => Send(client, AnswerFor(confirm));
             AddButton("Okay", () => Send(client, AnswerFor(confirm)), primary: true).Tooltip =
-                (kicker ? $"Cast {Paid(prompt)}" : $"Cast with X = {prompt.X}") + Suffix(PassKey);
+                (kicker ? $"Cast {Paid(prompt, prompt.X, prompt.KickerPaid)}" : $"Cast with X = {prompt.X}") + Suffix(PassKey);
         }
         else
         {
             AddButton("Okay", () => { }, enabled: false).Tooltip = "Pay what is still owed first.";
         }
 
-        AddXStepper(client, prompt);
+        AddXStepper(
+            prompt,
+            prompt.X,
+            prompt.KickerPaid,
+            _actions.DecreaseX is { } down ? () => { Send(client, AnswerFor(down)); RedrawNow(); } : null,
+            _actions.IncreaseX is { } up ? () => { Send(client, AnswerFor(up)); RedrawNow(); } : null);
 
         if (_actions.Cancel is { } giveUp)
         {
@@ -458,9 +463,21 @@ public sealed partial class MainPage
         }
     }
 
-    /// <summary>The announcement (CR 601.2b): X, or how many times to kick, chosen before the targets and before anything is paid.</summary>
+    /// <summary>
+    /// The announcement (CR 601.2b): X, or how many times to kick, chosen before the targets and before anything is paid. The
+    /// value is stepped on the page, with nothing sent, and announced at once as one <see cref="AnnounceAnswer"/>; for an
+    /// {X} paid in mana, a mana source clicked is planned for it (<see cref="TogglePlanned"/>) and raises X to what the mana
+    /// reaches.
+    /// </summary>
     private void FillAnnouncement(GameClient client, PayCostsPromptMessage prompt, string name)
     {
+        int x = Announced(prompt);
+        bool kickerPaid = Announcement.KickerPaid(prompt, x);
+        string total = Announcement.TotalAt(prompt, x);
+        Action? announce = _actions.Confirm is null ? null : () => Send(client, new AnnounceAnswer { Value = x });
+        Action? lower = x > 0 ? () => StepAnnounced(prompt, x - 1) : null;
+        Action? raise = x < prompt.MostAnnounced ? () => StepAnnounced(prompt, x + 1) : null;
+
         // A "−X" loyalty cost (CR 606.4, 107.3): X loyalty counters come off the permanent, up to its loyalty; no mana.
         if (prompt.XRemovesLoyalty)
         {
@@ -468,14 +485,14 @@ public sealed partial class MainPage
                 $"Choose X for {name}",
                 $"−X removes X loyalty counters  ·  {name} has {prompt.MostAffordable}  ·  targets come next");
 
-            if (_actions.Confirm is { } activate)
+            if (announce is not null)
             {
-                _pass = () => Send(client, AnswerFor(activate));
-                AddButton("Okay", () => Send(client, AnswerFor(activate)), primary: true).Tooltip =
-                    $"Activate with X = {prompt.X}, removing {prompt.X} loyalty" + Suffix(PassKey);
+                _pass = announce;
+                AddButton("Okay", announce, primary: true).Tooltip =
+                    $"Activate with X = {x}, removing {x} loyalty" + Suffix(PassKey);
             }
 
-            AddXStepper(client, prompt);
+            AddXStepper(prompt, x, kickerPaid, lower, raise);
 
             if (_actions.Cancel is { } back)
             {
@@ -491,16 +508,16 @@ public sealed partial class MainPage
         {
             Prompt(
                 $"Sacrifice how many for {name}?",
-                $"{prompt.X} of up to {prompt.MostAffordable}  ·  each takes {{{prompt.SacrificeReduces}}} off  ·  {prompt.Total} in all  ·  which ones come after the mana");
+                $"{x} of up to {prompt.MostAffordable}  ·  each takes {{{prompt.SacrificeReduces}}} off  ·  {total} in all  ·  which ones come after the mana");
 
-            if (_actions.Confirm is { } sacrifice)
+            if (announce is not null)
             {
-                _pass = () => Send(client, AnswerFor(sacrifice));
-                AddButton("Okay", () => Send(client, AnswerFor(sacrifice)), primary: true).Tooltip =
-                    $"Cast it sacrificing {prompt.X}" + Suffix(PassKey);
+                _pass = announce;
+                AddButton("Okay", announce, primary: true).Tooltip =
+                    $"Cast it sacrificing {x}" + Suffix(PassKey);
             }
 
-            AddXStepper(client, prompt);
+            AddXStepper(prompt, x, kickerPaid, lower, raise);
 
             if (_actions.Cancel is { } back)
             {
@@ -527,20 +544,27 @@ public sealed partial class MainPage
                         : "not enough mana to kick it"
                 : $"enough mana for X up to {prompt.MostAffordable}";
 
+        // Mana planned for X is made once the targets are chosen (CR 601.2g): until then the caption says how much there is.
+        string planning = !PlansMana(prompt)
+            ? string.Empty
+            : _planned.Count > 0
+                ? $"  ·  {ManaForX(client)} mana for it, tapped as it is paid"
+                : "  ·  tap lands to raise X";
+
         Prompt(
             !kicker ? $"Choose X for {name}" : prompt.Buyback ? $"Buy back {name}?" : $"Kick {name}?",
             prompt.XPaidInLife
-                ? $"{prompt.Total} and {prompt.X} life  ·  {reach}  ·  targets and paying come next"
-                : $"{prompt.Total} in all  ·  {reach}  ·  targets and paying come next");
+                ? $"{total} and {x} life  ·  {reach}  ·  targets and paying come next"
+                : $"{total} in all  ·  {reach}{planning}  ·  targets and paying come next");
 
-        if (_actions.Confirm is { } confirm)
+        if (announce is not null)
         {
-            _pass = () => Send(client, AnswerFor(confirm));
-            AddButton("Okay", () => Send(client, AnswerFor(confirm)), primary: true).Tooltip =
-                (kicker ? $"Cast {Paid(prompt)}" : $"Announce X = {prompt.X}") + Suffix(PassKey);
+            _pass = announce;
+            AddButton("Okay", announce, primary: true).Tooltip =
+                (kicker ? $"Cast {Paid(prompt, x, kickerPaid)}" : $"Announce X = {x}") + Suffix(PassKey);
         }
 
-        AddXStepper(client, prompt);
+        AddXStepper(prompt, x, kickerPaid, lower, raise);
 
         if (_actions.Cancel is { } giveUp)
         {
@@ -554,40 +578,54 @@ public sealed partial class MainPage
         };
     }
 
-    private static string Paid(PayCostsPromptMessage prompt) => prompt.VariableKicker
-        ? prompt.KickerPaid ? $"kicked with X = {prompt.X}" : "not kicked"
+    /// <summary>The value being announced: the page's own once it has been stepped, else the one the question was asked at.</summary>
+    private int Announced(PayCostsPromptMessage prompt) => Announcement.Clamp(prompt, _selection.Announced ?? prompt.X);
+
+    /// <summary>Steps the value being announced on the page, sending nothing: the dock is drawn again at once with it.</summary>
+    private void StepAnnounced(PayCostsPromptMessage prompt, int value)
+    {
+        _selection.Announced = Announcement.Clamp(prompt, value);
+        _needsRedraw = true;
+        RedrawNow();
+    }
+
+    private static string Paid(PayCostsPromptMessage prompt, int x, bool kickerPaid) => prompt.VariableKicker
+        ? kickerPaid ? $"kicked with X = {x}" : "not kicked"
         : prompt.Buyback
-        ? prompt.X == 0 ? "without buyback" : "with buyback"
-        : prompt.X switch
+        ? x == 0 ? "without buyback" : "with buyback"
+        : x switch
         {
             0 => "not kicked",
             1 => "kicked",
             var times => $"kicked {times} times",
         };
 
-    /// <summary>The step down, the value, and the step up, as one group the dock's flow cannot wrap apart.</summary>
-    private void AddXStepper(GameClient client, PayCostsPromptMessage prompt)
+    /// <summary>
+    /// The step down, the value, and the step up, as one group the dock's flow cannot wrap apart; a step with nothing to do
+    /// is drawn disabled.
+    /// </summary>
+    private void AddXStepper(PayCostsPromptMessage prompt, int x, bool kickerPaid, Action? lower, Action? raise)
     {
         bool kicker = prompt.Kicker.Length > 0;
         string down = !kicker ? "Lower X by one" : prompt.VariableKicker
             ? "Lower X, or decline the kicker" : prompt.Buyback ? "Cast it without buying it back" : "Kick it one time fewer";
         string up = !kicker
             ? "Raise X by one"
-            : prompt.VariableKicker ? prompt.KickerPaid ? "Raise kicker X by one" : $"Pay kicker {prompt.Kicker}"
+            : prompt.VariableKicker ? kickerPaid ? "Raise kicker X by one" : $"Pay kicker {prompt.Kicker}"
             : prompt.Buyback ? $"Buy it back for {prompt.Kicker}" : $"Kick it once more for {prompt.Kicker}";
 
         _buttons.Children.Add(Stepper(
             8,
-            StepButton("−", down, _actions.DecreaseX),
-            new SymbolText(13, Theme.Fg, semibold: true) { Text = kicker ? Paid(prompt) : $"X = {prompt.X}" },
-            StepButton("+", up, _actions.IncreaseX)));
+            StepButton("−", down, lower),
+            new SymbolText(13, Theme.Fg, semibold: true) { Text = kicker ? Paid(prompt, x, kickerPaid) : $"X = {x}" },
+            StepButton("+", up, raise)));
 
-        DockButton StepButton(string text, string tooltip, ActionOptionMessage? option)
+        static DockButton StepButton(string text, string tooltip, Action? step)
         {
-            var button = new DockButton(text, primary: false, enabled: option is not null) { Tooltip = tooltip };
-            if (option is not null)
+            var button = new DockButton(text, primary: false, enabled: step is not null) { Tooltip = tooltip };
+            if (step is not null)
             {
-                button.Clicked += () => { Send(client, AnswerFor(option)); RedrawNow(); };
+                button.Clicked += step;
             }
 
             return button;

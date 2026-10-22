@@ -253,6 +253,16 @@ rather than leaving before the arrow reaches it. Abilities resolving together ar
 gone from the table - a creature whose dying it was - is not lit, and its arrows set off from where the ability was on
 the stack. A reload's whole log again shows nothing, and the Animate cards setting turns it off.
 
+## Announcing X
+
+X, or how many times a spell is kicked, is announced before its targets (CR 601.2b), and the dock's − and + step it on
+the page alone (`PromptSelection.Announced`, `Announcement` for the total at each value): nothing is sent until **Okay**
+announces it, as one `AnnounceAnswer`. For an {X} paid in mana, a mana source clicked during the announcement is planned
+for it rather than tapped (`MainPage.Announcing.cs`), since mana abilities wait for the payment (CR 601.2g): it wears
+"For X", X rises to what the pool and the planned mana reach, and a second click takes it back. Once the targets are
+chosen and the payment is asked, the page taps what was planned, one source an answer, choosing each one's mana as
+auto-mana would, and asks the player only for whatever is still owed.
+
 ## Declaring attackers and blockers
 
 Creatures are declared by picking them up and then clicking what they go at (`MainPage.Selection.cs`,

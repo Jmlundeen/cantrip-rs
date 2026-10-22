@@ -310,6 +310,8 @@ pub enum RequestKind {
         /// Announcing X or how many times it is kicked (CR 601.2b), with the value so far, rather than paying.
         announcing: bool,
         x: u32,
+        /// While announcing: the largest value that may be announced (`Answer::Announce`). Zero while paying.
+        most: u32,
         /// The X being announced is a "−X" loyalty cost's (CR 606.4, 107.3): it removes that many loyalty counters from
         /// `source`, up to the loyalty it has, and costs no mana.
         loyalty: bool,
@@ -1050,6 +1052,9 @@ pub enum Answer {
     Divided(Vec<(Target, u32)>),
     /// Give up the spell or ability being announced (CR 733.1).
     Cancel,
+    /// The value of X, or how many times the spell is kicked, announced at once (CR 601.2b): an answer to a `PayCosts` that
+    /// is `announcing`, up to its `most`, in place of raising and lowering it a step at a time.
+    Announce(u32),
     /// The counters removed for a `RequestKind::RemoveCounters`: how many of each kind from each permanent.
     Counters(Vec<(ObjectId, CounterKind, u16)>),
     /// The index of the option chosen, for a question of one-of-several (which replacement effect applies first).

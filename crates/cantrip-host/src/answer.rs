@@ -20,6 +20,7 @@
 //! | `ColorsChosenAnswer`                          | `Colors`                                                     |
 //! | `TargetsDividedAnswer`                        | `Divided`                                                    |
 //! | `CountersRemovedAnswer`                       | `Counters`                                                   |
+//! | `AnnounceAnswer`                              | `Announce`                                                   |
 
 use cantrip_engine::*;
 
@@ -86,6 +87,9 @@ pub fn translate(
     Ok(match payload {
         AnswerPayload::PassAnswer(_) => Answer::Pass,
         AnswerPayload::CancelAnnouncementAnswer(_) => Answer::Cancel,
+        AnswerPayload::AnnounceAnswer(a) => Answer::Announce(
+            u32::try_from(a.value).map_err(|_| Untranslatable::Illegal(format!("{} cannot be announced (CR 107.1)", a.value)))?,
+        ),
         AnswerPayload::CardsChosenAnswer(a) => Answer::Cards(cards(handles, game, &a.cards)?),
         AnswerPayload::TakeActionAnswer(a) => {
             let kind = kind_of(a.kind)?;
@@ -249,6 +253,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
     match answer {
         Answer::Pass => AnswerPayload::PassAnswer(PassAnswer {}),
         Answer::Cancel => AnswerPayload::CancelAnnouncementAnswer(CancelAnnouncementAnswer {}),
+        Answer::Announce(value) => AnswerPayload::AnnounceAnswer(AnnounceAnswer { value: crate::prompt::wire(*value) }),
         Answer::Cards(ids) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer { cards: ids.iter().map(|&id| handles.handle(id)).collect() }),
         Answer::Act(action) => {
             let source = action.source.map_or(ViewHandle::NONE, |s| handles.handle(s));

@@ -57,6 +57,7 @@ public sealed class ProtocolJsonTests
         """{"$type":"ReplacementChosenAnswer","Index":1}""",
         """{"$type":"TriggersOrderedAnswer","Order":[1,0]}""",
         """{"$type":"CancelAnnouncementAnswer"}""",
+        """{"$type":"AnnounceAnswer","Value":3}""",
         """{"$type":"CardNamedAnswer","Name":"Lightning Bolt"}""",
         """{"$type":"PlayerChosenAnswer","Player":2}""",
         """{"$type":"ColorsChosenAnswer","Colors":["Blue"]}""",

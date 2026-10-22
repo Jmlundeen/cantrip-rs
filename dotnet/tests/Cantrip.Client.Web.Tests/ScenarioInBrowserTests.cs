@@ -63,6 +63,22 @@ public sealed class ScenarioInBrowserTests(WebClient web)
     }
 
     /// <summary>
+    /// Mana planned for X as it is announced (CR 601.2b, 601.2g): the three Mountains clicked during Fireball's announcement are
+    /// not tapped then, raise X to 2, and are tapped by the page once the payment is asked - each tap the answer the script
+    /// means, so the table judges the page's own payment as it judges a click.
+    /// </summary>
+    [Fact]
+    public async Task Lands_planned_for_x_raise_it_and_are_tapped_as_the_spell_is_paid_for()
+    {
+        const string name = "fireball-x-announced-on-the-page-and-paid-with-the-lands-planned-for-it-in-the-browser";
+        string? failure = await ScenarioPlayer.PlayAsync(
+            web,
+            Path.Combine(WebClient.Root, "scenarios", name + ".cantrip"),
+            planX: ("Mountain", 3));
+        Assert.True(failure is null, $"{name}:\n{failure}");
+    }
+
+    /// <summary>
     /// The defender's side: with the default stops (none on the opponent's turn) a player who was attacked and declared
     /// no blockers is still asked in the declare blockers step, and bolts the unblocked attacker before damage.
     /// </summary>

@@ -2085,6 +2085,12 @@ public sealed partial class MainPage : Page
             return;
         }
 
+        // The mana planned for X as it was announced, made now the cost is paid (CR 601.2g).
+        if (TapPlanned(client))
+        {
+            return;
+        }
+
         // Passing the turn attacks with what was chosen to, though the attack was not locked in, and what must attack, a
         // goaded creature (CR 701.15b).
         if (_passTurn && client.Prompt?.Prompt is DeclareAttackersPromptMessage passing)
