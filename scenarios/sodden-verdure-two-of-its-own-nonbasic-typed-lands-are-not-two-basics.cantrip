@@ -1,0 +1,32 @@
+# Sodden Verdure: "This land enters tapped unless you control two or more basic lands." Bot1 controls two Tropical Islands
+# - two lands with the Forest and Island types, but neither basic (CR 205.4a; two or more of these lands do not count) -
+# and no basic land at all, so its Sodden Verdure enters tapped. Bot2 with a Forest and an Island plays the same land
+# untapped (positive control).
+
+[Bot1 Deck]
+Tropical Island
+Tropical Island
+Sodden Verdure
+Island x20
+
+[Bot2 Deck]
+Forest
+Island
+Sodden Verdure
+Island x20
+
+[Actions]
+Bot1.Hand.Tropical Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Tropical Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Sodden Verdure.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Sodden Verdure.Play
+
+[Expect]
+Bot1.Battlefield.Sodden Verdure.Tapped = true
+Bot2.Battlefield.Sodden Verdure.Tapped = false
