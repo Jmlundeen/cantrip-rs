@@ -201,15 +201,35 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
   the subject), `CopySpell`, `UntapSource`, `ReturnToHand`, `ReturnToBattlefield`, `ReturnPermanentCard` (a card chosen
   once paid, its greatest mana value the `amount`), `CreateCopyToken`, `Transform`, `PutOntoBattlefield`, `LookAgain`,
   `EnterUntapped`. A new verb gets its weighing in the tactical bot's `WorthPaying`.
-- Most questions are asked through `cantrip_mechanics::choose` (`card`, `cards`, `card_from`, `cards_from`, `player`,
-  `one_of`), which return the thing chosen. The core checks every answer against its question before the card sees
-  it, so a card never matches on an answer of the wrong shape.
+- Most questions are asked through `cantrip_mechanics::choose`, which returns the thing chosen. The core checks every
+  answer against its question before the card sees it, so a card never matches on an answer of the wrong shape.
+- **A choice of cards, or a library search, is a selection rule** (docs/engine-design.md, "Selection rules"): look in
+  `cantrip_mechanics::select` first for the wording the card prints, and ask it with `choose::select` (cards shown to
+  choose among) or `library::search` / `library::find_to_hand`, `find_to_battlefield`, `find_to_graveyard`, `find_to_top`:
+
+  ```rust
+  use cantrip_mechanics::{library, select::{self, up_to, DIFFERENT_NAMES}};
+
+  // "Search your library for a basic land card, reveal it, put it into your hand, then shuffle."
+  library::find_to_hand(g, you, item.object, select::BASIC_LAND_CARD, true)?;
+  // "... for up to X basic land cards with different names ..."
+  library::find_to_hand(g, you, item.object, select::basic_land_cards(up_to(x)).with(DIFFERENT_NAMES), true)?;
+  // "You may choose a nonland card from it." (a revealed hand)
+  let chosen = choose::select(g, you, item.object, Purpose::Discard, hand, select::NONLAND_CARD)?;
+  ```
+
+  A quality only this card asks is a `SelectFn` in its file - `fn noncreature_nonland(q: &dyn Query, choice: &Choice, _: u32)
+  -> Verdict { Verdict::each(choice, |card| ..) }` - made a part with `select::part(&(noncreature_nonland as SelectFn), 0,
+  "")` (Duress); one a second printed card asks moves into `select`. Never a closure, never a list worked out before asking:
+  the core judges the answer, and the client each pick, by the rule. The older `choose::{card, cards, card_from, cards_from,
+  cards_from_kind, any_number_of, cards_within_total}`, `search_library` and `library::Find` / `search_to_*` are kept for
+  existing cards.
 
 **The questions** (`RequestKind`, `crates/cantrip-state/src/decision.rs`), and the script verb that answers each:
 
 | Question | `RequestKind` | Script verb |
 | --- | --- | --- |
-| choose cards | `ChooseCards { purpose, cards, eligible, count, up_to }` | `Choose(...)` |
+| choose cards | `ChooseCards { purpose, cards, rule }` (`choose::select`, a rule from `select`) | `Choose(...)` |
 | a choice, or a trigger's targets | `ChooseTarget { candidates, optional, count, any_number }` | `Target(...)` |
 | modes, piles, options | `ChooseModes { modes: Vec<Label>, eligible, count }` | `Modes(...)` |
 | colors | `ChooseColors { choices, count }` | `Colors(...)` |
@@ -217,7 +237,7 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
 | a payment ("you may pay", "unless pays") | `g.may_pay(...)` asks it (`UnlessPays`) | `PayCost` (`Accept` for one of life alone) / `Decline` |
 | "you may pay {X}", X the payer's (CR 107.3f) | `g.may_pay_x(...)` asks it (`UnlessPays` with `x`), the X paid or `None` | `PayCost(X: 3)` / `Decline` |
 | distribute cards | `DistributeCards { cards, destinations, may_shuffle }` | `Arrange(... \| ...)` |
-| search a library | `SearchLibrary` (use `mechanics::search_library`, which names where the cards found go: the question says it; a search the effect can't cause, `Game::may_search`, finds nothing) | `Search(...)` |
+| search a library | `SearchLibrary { library, rule, destination }` (use `library::search` or a `find_to_*` wrapper with a rule from `select`, which names where the cards found go: the question says it; a search the effect can't cause, `Game::may_search`, finds nothing) | `Search(...)` |
 | "you may search" | `library::ask_may_search(..)`, never `ask_may`: not asked when the search can't be made (CR 101.2), and the search and its shuffle run only on a yes | `Accept` / `Decline` |
 
 What a player is told about a question is part of the card (non-negotiable 5 of the `add-cards` skill): a `TargetSpec`

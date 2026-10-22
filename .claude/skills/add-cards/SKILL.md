@@ -64,12 +64,18 @@ Three layers, kept apart by the compiler (`cantrip-api` is all a card can see):
   object whose text it is (`g.words(item.object).subtype(Subtype::Goblin)`, `view.words(source).color(Color::Red)`),
   so a text-changing effect (CR 612) changes what the card does (`docs/adding-cards.md`, "Words of its rules text").
   Mana symbols are not words, and the type line and the tokens it makes follow by themselves;
-- build a choice question by hand that `cantrip_mechanics::choose` asks (`card`, `cards`, `card_from`, `cards_from`,
-  `player`, `one_of`), or write a fallback arm for an answer of the wrong shape: the core checks every answer first;
+- build a choice question by hand that `cantrip_mechanics::choose` asks, or write a fallback arm for an answer of the wrong
+  shape: the core checks every answer first. A choice of cards or a library search is a **selection rule**, looked up
+  first in `cantrip_mechanics::select` (`select::BASIC_LAND_CARD`, `select::basic_land_cards(up_to(2)).with(DIFFERENT_NAMES)`)
+  and asked with `choose::select` or `library::search` / `library::find_to_*` (`docs/adding-cards.md`); a rule only this card
+  prints is a `SelectFn` part in its file, never a closure or a list of eligible cards worked out first. The older
+  `choose::{card, cards, card_from, cards_from, ..}`, `search_library` and `library::Find`/`search_to_*` are kept for
+  existing cards, not for new ones;
 - read a printed cost where the rules mean mana value (`Query::mana_value`: copies, tokens, face-down, X on the stack);
 - implement a keyword, even one only this card has today;
 - copy something `cantrip-mechanics` or `cantrip-api` already has (target filters and `targets::object`, trigger
-  matchers, `effects`, `tokens`, `delayed`, `library`, `lands`), or define a token a shared definition covers;
+  matchers, `effects`, `tokens`, `delayed`, `library`, `lands`, the selection rules of `select`), or define a token a shared
+  definition covers;
 - keep a counter or a flag for something that happened earlier: the past is asked of the event history,
   `q.history()` (a one-off query in the card; a question a second card asks moves to `cantrip_mechanics::history`);
 - hand-write a stale-object guard (`targets::permanent`, `cantrip_api::is_live`), or guard `sacrifice`, which already

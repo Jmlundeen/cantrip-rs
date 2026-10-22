@@ -198,12 +198,50 @@ question over writing each card as explicit stages, which the spike measured, an
 
 Every answer is checked against its question before the card sees it (`cantrip-rules/src/validate.rs`): a card that was
 not offered, the wrong number, an over-budget total is refused and asked again, so a card's file reads the choice and
-nothing else. A limit on what the cards chosen together add up to is part of the question: "up to two creature cards with
-total mana value 6 or less" (CR 202.3) is a `ChooseCards` with `total: Some(TotalAtMost { values, most })`, each eligible
-card's mana value read as the question is asked (`choose::cards_within_total`), and the client shows the running total and
-refuses a card that would go over by the same numbers. Michelangelo's Technique asks it, through
-`library::look_at_top_onto_battlefield` (which Aang, at the Crossroads and United Battlefront use without a total), and Lively
-Dirge asks it from the graveyard ("up to two creature cards with total mana value 4 or less"); Ao, the Dawn Sky prints it too.
+nothing else.
+
+#### Selection rules
+
+A question that picks a set of cards - a choice of cards (`RequestKind::ChooseCards`) or a library search
+(`RequestKind::SearchLibrary`) - carries its **selection rule** (`Selection`, `cantrip-state/src/decision.rs`): which sets
+of its cards are an answer, as data. A rule is a `Count` (`Exactly(n)`, `UpTo(n)`, `AnyNumber`, `AsManyAsCan(n)` - fewer only
+when nothing more may be added, a search with no quality to fail at, CR 701.23b), the noun its caption uses (`kind`), up to
+`MAX_PARTS` **parts**, and, for a question asked by a list (the older `choose` functions, `search_library`, the core's
+costs), the list of cards it may take at all (`among`). A part is a validator over the cards chosen so far - a plain
+function, `cantrip_api::select::SelectFn`, `fn(&dyn Query, &Choice, u32) -> Verdict`, with the one number it takes as data
+beside it - never a closure, so the rule moves through the game-log tree (`Game::goto`) and replays like the rest of the
+pending question. It reads the game through the `Query` and nothing else: "a card with the same name as a card in your
+graveyard" reads the graveyard. (The state holds the function as `&'static dyn Any`, since `cantrip-state` cannot name the
+`Query` it takes; `cantrip_api::select::part` makes one and `judge` runs it. Parts compare by the function and their number;
+they hash by their number and words.)
+
+`cantrip_api::select::judge(q, &rule, &Choice { chooser, source, candidates, selected })` says what the rule says of the cards
+`selected` so far: a `Verdict { complete, addable }` - whether they are an answer, and which of the candidates not yet chosen
+may be added (a bit set over the candidates, in their order). Every part must allow a card for it to be addable and call the
+cards complete for them to be an answer; then the count: a card is addable only while the count has room, and
+`AsManyAsCan` is complete short of its number only when nothing more is addable. Removing a card is always allowed. The
+cards a question may take at all are the addable set of none chosen. The core checks every answer with the same `judge`
+(`validate.rs`: the cards are distinct candidates the list allows, and complete by the rule), the scenario harness answers
+`Choose(..)` and `Search(..)` through it (each name the first card of that name the rule lets be added, `run.rs`), and a client
+asks it as its player picks: the prompt carries the verdict for none chosen, and the host's `Check` request
+(docs/host-protocol.md, "Checking a selection") answers any other selection. `cantrip_rules::selection_verdict` gives the same
+`Verdict` for a cost's tapping for power, collecting evidence and crafting, so a client checks every card choice one way.
+
+The ready-made rules are `cantrip_mechanics::select`, where a new card looks first: whole rules for the common wordings
+(`select::CARD`, `BASIC_LAND_CARD`, `basic_land_cards(up_to(2))`, ...), the counts, qualities of each card (`BASIC_LAND`,
+`CREATURE`, `mana_value_at_most(n)`, `named(card)`, ...), rules of the cards together (`DIFFERENT_NAMES`, CR 201.2b;
+`total_mana_value_at_most(n)`, CR 202.3) and how to combine them (`Selection::new(count).with(part).called("noun")`). They
+are asked with `choose::select` and `library::search` (or the `library::find_to_*` wrappers). The older card-facing
+functions - `choose::{card, cards, card_from, cards_from, cards_from_kind, any_number_of, cards_within_total}`,
+`search_library`, `library::Find` and the `search_to_*` wrappers - keep their signatures, re-implemented on the rules, and
+are kept for existing cards; new cards use the rules.
+
+"Up to two creature cards with total mana value 6 or less" (CR 202.3) is a rule with `select::total_mana_value_at_most(6)`,
+each card's mana value read where it is (an {X} in a library or graveyard is 0, CR 202.3e); the part's `Tally` has the client
+keep the running total for the player, which is display alone. Michelangelo's Technique asks it,
+through `library::look_at_top_onto_battlefield` (which Aang, at the Crossroads and United Battlefront use without a total),
+and Lively Dirge asks it from the graveyard; Ao, the Dawn Sky prints it too. "With different names" (CR 201.2b: each has a
+name and no two share one, a split card sharing each half's name, CR 201.2a) is `select::DIFFERENT_NAMES`.
 
 Targets can carry the same limit (CR 601.2c, 603.3d): "any number of target creature cards with total mana value X or less" is
 a `TargetSpec` with `total_mana_value` (`TargetSpec::total_mana_value_at_most`, `COUNTED` for X), and wherever targets are
