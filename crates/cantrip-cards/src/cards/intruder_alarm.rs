@@ -2,13 +2,6 @@ use cantrip_api::*;
 use cantrip_oracle as oracle;
 
 /// "Creatures don't untap during their controllers' untap steps" (CR 502.3): every creature, whoever controls it,
-/// is read as the untap step untaps. It is a rule of the Alarm, never an ability of the creatures, so it is applied
-/// in the last layer, after anything that took their abilities away (CR 613.1f), and is the "does not untap" the
-/// untap step already asks every permanent for (`statics::all_creatures`).
-fn does_not_untap(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::DoesNotUntap);
-}
-
 /// "Whenever a creature enters": any creature under any player's control, and the Alarm itself if it enters as one.
 fn creature_enters(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -29,6 +22,6 @@ fn untap_all(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::ZONE_CHANGE, creature_enters), untap_all, "Whenever a creature enters, untap all creatures.")],
-    statics: &[static_ability(Layer::PtModify, cantrip_mechanics::statics::all_creatures, does_not_untap, "Creatures don't untap during their controllers' untap steps.")],
+    statics: &[static_ability(Layer::PtModify, cantrip_mechanics::statics::all_creatures, cantrip_mechanics::statics::does_not_untap, "Creatures don't untap during their controllers' untap steps.")],
     ..oracle::INTRUDER_ALARM
 };
