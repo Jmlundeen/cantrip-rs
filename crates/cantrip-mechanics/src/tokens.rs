@@ -533,6 +533,32 @@ pub static GOBLIN: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 1/1 green and white Citizen creature token (CR 111.4). Grand Crescendo and Rakish Revelers make it.
+pub static CITIZEN: CardDef = CardDef {
+    name: "Citizen Token",
+    token_name: Some(&[Subtype::Citizen]),
+    has_cost: false,
+    colors: Some(ColorSet(0b10001)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Citizen]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
+/// The 1/1 white Human creature token (CR 111.4). Adeline, Resplendent Cathar and Stroke of Midnight make it.
+pub static HUMAN: CardDef = CardDef {
+    name: "Human Token",
+    token_name: Some(&[Subtype::Human]),
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Human]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
 /// The 1/1 white Soldier creature token. Hero of Bladehold, Elspeth, Storm Slayer and Torsten, Founder of Benalia make
 /// it. (Third Path Iconoclast's is an artifact Soldier of the same name.)
 pub static SOLDIER: CardDef = CardDef {
