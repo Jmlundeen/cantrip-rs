@@ -2651,7 +2651,11 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     Ok(())
 }
 
+/// Taps an untapped permanent (CR 701.26a): only a live, phased-in permanent on the battlefield can become tapped.
 pub fn tap(cx: &mut Cx, id: ObjectId) {
+    if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).tapped {
+        return;
+    }
     cx.st().update_obj(id, |o| o.tapped = true);
     cx.emit(Event::Tapped { permanent: id });
 }
@@ -2669,7 +2673,7 @@ fn note_statics(cx: &mut Cx, id: ObjectId) {
     }
 }
 
-/// Untaps a permanent (CR 701.26a). A permanent with a stun counter on it that would become untapped has a stun
+/// Untaps a permanent (CR 701.26b). A permanent with a stun counter on it that would become untapped has a stun
 /// counter removed from it instead (CR 122.1d): one counter for each untap, whatever their number.
 pub fn untap(cx: &mut Cx, id: ObjectId) {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || !cx.s().obj(id).tapped {
@@ -3442,5 +3446,44 @@ mod tests {
         put_into_library(&mut cx, &[source], LibraryPlace::ShuffledIn);
         assert_eq!(cx.s().obj(source).zone, Zone::PHASED_OUT);
         assert_ne!(cx.s().rng, rng);
+    }
+
+    /// CR 701.26a, 400.7, 702.26b: only an untapped permanent present on the battlefield can become tapped. Repeating
+    /// the instruction, remembering an old object, naming a card in hand, or a phased-out permanent does nothing and
+    /// announces no tapped event.
+    #[test]
+    fn tap_only_changes_a_live_untapped_permanent_on_the_battlefield() {
+        let (mut game, held) = game_with(&[&ANIMATOR]);
+        let permanent = game.state.battlefield()[0];
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        cantrip_api::Game::tap(&mut cx, permanent);
+        assert!(cx.s().obj(permanent).tapped);
+        assert_eq!(cx.g.log.iter().filter(|r| matches!(r.event, Event::Tapped { permanent: id } if id == permanent)).count(), 1);
+        let mark = cx.s().mark();
+        let events = cx.g.log.len();
+        cantrip_api::Game::tap(&mut cx, permanent);
+        cantrip_api::Game::tap(&mut cx, held[0]);
+        assert_eq!(cx.s().mark(), mark);
+        assert_eq!(cx.g.log.len(), events);
+        assert!(!cx.s().obj(held[0]).tapped);
+
+        cantrip_api::Game::untap(&mut cx, permanent);
+        let returned = return_to_hand(&mut cx, &[permanent])[0];
+        let mark = cx.s().mark();
+        let events = cx.g.log.len();
+        cantrip_api::Game::tap(&mut cx, permanent);
+        cantrip_api::Game::tap(&mut cx, returned);
+        assert_eq!(cx.s().mark(), mark);
+        assert_eq!(cx.g.log.len(), events);
+        assert!(!cx.s().obj(permanent).tapped && !cx.s().obj(returned).tapped);
+
+        let phased = put_onto_battlefield(&mut cx, &[(returned, PlayerId(0), false)], ZoneReason::Other).expect("no choices")[0];
+        crate::phasing::phase_out(&mut cx, &[phased], None, false);
+        let mark = cx.s().mark();
+        let events = cx.g.log.len();
+        cantrip_api::Game::tap(&mut cx, phased);
+        assert_eq!(cx.s().mark(), mark);
+        assert_eq!(cx.g.log.len(), events);
+        assert!(!cx.s().obj(phased).tapped);
     }
 }
