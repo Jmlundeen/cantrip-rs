@@ -1,0 +1,32 @@
+# Smoldering Marsh: "This land enters tapped unless you control two or more basic lands." Turn 5 Bot1 controls a Swamp (one
+# basic) and a Badlands (the Swamp and Mountain types, but not basic, CR 205.4a): one basic is below the two, so its
+# Smoldering Marsh enters tapped - though Bot2, its opponent, controls two basic lands by then. Bot2 with a Swamp and a
+# Mountain of its own plays the same land on turn 6 and it enters untapped (positive control).
+
+[Bot1 Deck]
+Swamp
+Badlands
+Smoldering Marsh
+Mountain x20
+
+[Bot2 Deck]
+Swamp
+Mountain
+Smoldering Marsh
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Badlands.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Smoldering Marsh.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Smoldering Marsh.Play
+
+[Expect]
+Bot1.Battlefield.Smoldering Marsh.Tapped = true
+Bot2.Battlefield.Smoldering Marsh.Tapped = false
