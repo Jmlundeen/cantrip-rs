@@ -13,6 +13,14 @@ pub static THOPTER: CardDef = CardDef {
     ..token!(Thopter)
 };
 
+/// A 1/1 colorless Myr artifact creature token (CR 111). Memnarch, the Warden and Myr Battlesphere create this exact token.
+pub static MYR: CardDef = CardDef {
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Myr)
+};
+
 /// A Royal Role token (CR 111.10m, 303.7): "a colorless Aura Role enchantment token named Royal with enchant creature and
 /// 'Enchanted creature gets +1/+1 and has ward {1}.'" Royal Treatment, Charmed Clothier, Gylwain, Casting Director,
 /// Besotted Knight and Redtooth Genealogist make it, attached to a creature (`create_role`).

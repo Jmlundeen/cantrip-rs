@@ -6,16 +6,8 @@ use cantrip_mechanics::tokens;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-/// The 1/1 colorless Myr artifact creature token.
-pub static MYR: CardDef = CardDef {
-    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    power: Some(1),
-    toughness: Some(1),
-    ..token!(Myr)
-};
-
 fn myr(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &MYR, 4)?;
+    tokens::create(g, item.controller, &tokens::MYR, 4)?;
     Ok(())
 }
 
@@ -62,4 +54,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::MYR_BATTLESPHERE
 };
 
-pub static EXTRA: &[&CardDef] = &[&MYR];
+pub static EXTRA: &[&CardDef] = &[&tokens::MYR];
