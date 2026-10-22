@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, power_up};
+use cantrip_mechanics::{choose, effects, power_up};
 use cantrip_oracle as oracle;
 
 /// "Put two +1/+1 counters on Thanos. Choose odd or even. Destroy each other creature with mana value of the chosen
@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// together (CR 701.8). "Other" leaves out this object alone: once Thanos has left, every creature of the quality is
 /// destroyed.
 fn snap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 2);
+    effects::two_plus_one_counters_on_this(g, item)?;
     let me = g.card_id(&CARD);
     let odd = choose::odd_or_even(g, item.controller, item.object, me)?;
     let doomed: Vec<ObjectId> = g

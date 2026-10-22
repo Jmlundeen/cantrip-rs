@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{copy, delayed, power_up, targets, triggers};
+use cantrip_mechanics::{copy, delayed, effects, power_up, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "When you next cast an instant or sorcery spell with mana value less than or equal to Loki's power this turn": a spell
@@ -20,12 +20,6 @@ fn watch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Put two +1/+1 counters on Loki."
-fn two_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 2);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(
@@ -35,7 +29,7 @@ pub static CARD: CardDef = CardDef {
         ),
         power_up::ability(
             cost("{4}{R}"),
-            two_counters,
+            effects::two_plus_one_counters_on_this,
             "Power-up \u{2014} {4}{R}: Put two +1/+1 counters on Loki. (Activate each power-up ability only once. Reduce the cost by his mana cost if he entered this turn.)",
         ),
     ],

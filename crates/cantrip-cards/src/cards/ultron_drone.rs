@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{power_up, tokens};
+use cantrip_mechanics::{effects, power_up, tokens};
 use cantrip_oracle as oracle;
 
 /// The 2/2 colorless Robot Villain artifact creature token (CR 111.4: named for its subtypes).
@@ -17,7 +17,7 @@ pub static ROBOT_VILLAIN: CardDef = CardDef {
 /// "Put two +1/+1 counters on this creature and create a 2/2 colorless Robot Villain artifact creature token." The
 /// token is made even if the creature has left, and only the counters have nothing to go on (CR 609.3).
 fn counters_and_robot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 2);
+    effects::two_plus_one_counters_on_this(g, item)?;
     tokens::create(g, item.controller, &ROBOT_VILLAIN, 1)?;
     Ok(())
 }

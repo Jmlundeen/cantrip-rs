@@ -105,6 +105,13 @@ pub fn plus_one_counter_on_this(g: &mut dyn Game, item: &StackItem) -> Result<()
     Ok(())
 }
 
+/// "Put two +1/+1 counters on [this permanent]" (CR 122.1, 201.5): the ability's source, not a new object once it has
+/// left the battlefield (CR 400.7). Knight of Autumn, Ygra, Eater of All and Brave Brawler print it.
+pub fn two_plus_one_counters_on_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_counters(item.object, CounterKind::PlusOne, 2);
+    Ok(())
+}
+
 fn creatures_on_the_battlefield(g: &dyn Game) -> Vec<ObjectId> {
     g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect()
 }

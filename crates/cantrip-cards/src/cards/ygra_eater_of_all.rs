@@ -41,18 +41,12 @@ fn food_put_into_graveyard(q: &dyn Query, _: ObjectId, event: &Event) -> Option<
     }
 }
 
-/// "Put two +1/+1 counters on Ygra": none once Ygra has left the battlefield (CR 400.7, 122.1).
-fn two_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 2);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ward_sacrifice_a_food("Ward\u{2014}Sacrifice a Food."),
         triggered(
             when(EventMask::ZONE_CHANGE, food_put_into_graveyard),
-            two_counters,
+            effects::two_plus_one_counters_on_this,
             "Whenever a Food is put into a graveyard from the battlefield, put two +1/+1 counters on Ygra.",
         ),
     ],
