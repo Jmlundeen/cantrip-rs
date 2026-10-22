@@ -1,0 +1,52 @@
+# Browser
+# What Bot1's page asks for Dack Fayden, Helping Hand in a game of three: the reveal finds Llanowar Elves and then Elvish
+# Mystic, both put onto the battlefield and goaded. "For each of those permanents, choose a different opponent": the first
+# question is for the Elves, and the page says so - the player chosen gains control of Llanowar Elves, not of "this
+# artifact" (Wishclaw Talisman's question). Bot1 chooses Bot2; the Mystic, the second, goes to Bot3, the one opponent left,
+# with no question asked. In a game of more than two the player who goes first draws on turn 1 (CR 103.8c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Dack Fayden, Helping Hand
+Island
+Island
+Forest
+Forest
+Llanowar Elves
+Island
+Elvish Mystic
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dack Fayden, Helping Hand.Cast
+Bot1.Pass
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Dack Fayden, Helping Hand: choose an opponent
+? Client.Bot1.Prompt.Detail = The player you choose gains control of Llanowar Elves
+Bot1.ChoosePlayer(Bot2)
+! Bot1.ChoosePlayer
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Bot2.Battlefield = Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.GoadedBy = Bot1
+Bot3.Battlefield = Elvish Mystic
+Bot3.Battlefield.Elvish Mystic.GoadedBy = Bot1

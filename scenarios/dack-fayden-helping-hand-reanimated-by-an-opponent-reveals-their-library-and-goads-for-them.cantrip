@@ -1,0 +1,43 @@
+# Dack Fayden, Helping Hand entering under an opponent's control: Bot1 discards Dack to Faithless Looting and Bot2
+# reanimates it, so the enters ability is Bot2's (CR 603.3a) and "you" is Bot2 (CR 109.5). Bot2's library is revealed -
+# past a Forest that stays in it - and Bot2's Llanowar Elves is put onto the battlefield, goaded by Bot2 for the rest of
+# the game (CR 701.15b), and given to Bot2's only opponent, Bot1 - Dack's owner. Bot1's library is untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Dack Fayden, Helping Hand
+Island x4
+Island x13
+
+[Bot2 Deck]
+Mox Jet
+Reanimate
+Island x5
+Island
+Forest
+Llanowar Elves
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Dack Fayden, Helping Hand; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Reanimate.Cast(Bot1.Graveyard.Dack Fayden, Helping Hand)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Life = 14
+Bot2.Battlefield = Dack Fayden, Helping Hand; Mox Jet
+Bot1.Battlefield = Llanowar Elves; Mox Ruby
+Bot1.Battlefield.Llanowar Elves.GoadedBy = Bot2
+Bot1.Library.Count = 11
+Bot2.Library.Count = 11

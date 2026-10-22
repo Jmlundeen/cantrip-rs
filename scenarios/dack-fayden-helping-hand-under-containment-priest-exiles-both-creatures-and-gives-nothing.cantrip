@@ -1,0 +1,54 @@
+# Dack Fayden, Helping Hand under Containment Priest, in a game of three: X is two, so two Llanowar Elves are revealed and put
+# onto the battlefield, but neither was cast, so the Priest exiles each instead (CR 614.1a, 614.12). They are not "those
+# permanents" - none entered - so nothing is goaded, no opponent is chosen for either (no ChoosePlayer is asked), and neither
+# opponent gains control of anything. Bot1 flashes in the Priest before casting Dack; in a game of more than two the player
+# who goes first draws on turn 1 (CR 103.8c), so the whole hand is the eight cards cast.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Containment Priest
+Dack Fayden, Helping Hand
+Forest
+Llanowar Elves
+Island
+Llanowar Elves
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Containment Priest.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dack Fayden, Helping Hand.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.ChoosePlayer
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Exile = Llanowar Elves; Llanowar Elves
+Bot1.Library.Count = 11
+Bot1.Battlefield = Containment Priest; Dack Fayden, Helping Hand; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot2.Battlefield.Count = 0
+Bot3.Battlefield.Count = 0

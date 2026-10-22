@@ -1,0 +1,54 @@
+# Dack Fayden, Helping Hand under Weathered Runestone, in a game of three: X is two, so the reveal finds Llanowar Elves and
+# then Dryad Arbor. Both are put onto the battlefield, but the Runestone keeps the Elves - a nonland permanent card in a
+# library - from entering (CR 101.2), so it stays in the library and is shuffled away; only the Arbor, a land, enters. It
+# alone is one of "those permanents": it is goaded, and the one choice of opponent is for it, between both opponents - the
+# Elves use none of them up. Bot1 chooses Bot3, who gains control of the goaded Arbor; Bot2 gets nothing. In a game of more
+# than two the player who goes first draws on turn 1 (CR 103.8c), so the whole hand is the eight cards cast.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Weathered Runestone
+Dack Fayden, Helping Hand
+Island
+Llanowar Elves
+Island
+Dryad Arbor
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Weathered Runestone.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dack Fayden, Helping Hand.Cast
+Bot1.ChoosePlayer(Bot3)
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Bot1.Library.Count = 12
+Bot1.Library.Llanowar Elves.Colors = Green
+Bot1.Battlefield = Dack Fayden, Helping Hand; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Weathered Runestone
+Bot2.Battlefield.Count = 0
+Bot3.Battlefield = Dryad Arbor
+Bot3.Battlefield.Dryad Arbor.GoadedBy = Bot1
