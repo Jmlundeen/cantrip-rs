@@ -1,0 +1,44 @@
+# Gardenize's "whenever a creature you control dies" is a leaves-the-battlefield ability: it looks back to the board as it
+# was before the event (CR 603.10a), so a creature dying at the same time as Hushbringer, Hushbringer included, doesn't
+# cause it to trigger (Hushbringer's rulings). Bot1 casts Gardenize, Ornithopter and Hushbringer on turn 1; on turn 3
+# Pyroclasm kills Hushbringer and the Ornithopter together, and Gardenize gets no charge counter.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Black Lotus
+Gardenize
+Hushbringer
+Ornithopter
+Pyroclasm
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Gardenize.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Hushbringer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Ruby; Gardenize
+Bot1.Battlefield.Gardenize.Counters.Charge = (absent)
+Bot1.Graveyard = Hushbringer; Ornithopter; Pyroclasm; Black Lotus

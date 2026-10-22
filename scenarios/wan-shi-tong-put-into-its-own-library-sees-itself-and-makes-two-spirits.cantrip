@@ -1,0 +1,37 @@
+# Wan Shi Tong, All-Knowing's "whenever one or more cards are put into a library from anywhere" looks back in time when the
+# card was one all players could see (CR 603.10a: an object put into a hand or library from a public zone), so Wan Shi
+# Tong putting itself into its library with its own enters ability sees its own move: the trigger is judged on the board
+# as it was before, Wan Shi Tong on it. Its owner tucks it second from the top and gets two 1/1 Spirits.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Wan Shi Tong, All-Knowing
+Island
+Island
+Island
+Plains
+Swamp
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Wan Shi Tong, All-Knowing.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Wan Shi Tong, All-Knowing)
+Bot1.Modes(Second from the top)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Library = Plains; Wan Shi Tong, All-Knowing; Swamp
+Bot1.Battlefield = Island; Sol Ring; Spirit; Spirit
+Bot1.Graveyard = Black Lotus

@@ -1,0 +1,37 @@
+# Hardened Academic's "whenever one or more cards leave your graveyard" looks back to the board as it was before the event
+# (CR 603.10a), so a card put onto the battlefield from the graveyard - an enters-the-battlefield event for other abilities
+# (CR 603.6a) - triggers it only if it was on the battlefield then. Bot1 Entombs the Academic and Reanimates it: it was in
+# the graveyard, not on the battlefield, as it left, so it gets no +1/+1 counter. Reanimate costs 2 life (18).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Entomb
+Reanimate
+Island
+Island
+Island
+Hardened Academic
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Hardened Academic)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Hardened Academic)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 18
+Bot1.Battlefield = Swamp; Mox Jet; Hardened Academic
+Bot1.Battlefield.Hardened Academic.Power = 2
+Bot1.Battlefield.Hardened Academic.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Reanimate; Entomb

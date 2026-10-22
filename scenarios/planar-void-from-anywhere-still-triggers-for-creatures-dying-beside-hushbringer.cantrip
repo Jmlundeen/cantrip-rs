@@ -1,0 +1,46 @@
+# Planar Void's "whenever another card is put into a graveyard from anywhere" is never a leaves-the-battlefield ability
+# (CR 603.6c), so it doesn't look back in time (CR 603.10a): it is judged on the board after the event, and a Hushbringer
+# dying at the same time as the creatures no longer stops anything (Hushbringer's rulings: a "from anywhere" ability
+# triggers if Hushbringer leaves the battlefield at the same time). Bot1 casts Planar Void, Ornithopter and Hushbringer on
+# turn 1; on turn 3 Pyroclasm kills Hushbringer and the Ornithopter together, and the Void exiles both and the Pyroclasm
+# (and the Island Bot2 discarded to hand size on turn 2).
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Pearl
+Mox Ruby
+Planar Void
+Hushbringer
+Ornithopter
+Pyroclasm
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Hushbringer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Exile = Hushbringer; Island; Ornithopter; Pyroclasm
+Bot1.Battlefield = Mountain; Mox Jet; Mox Pearl; Mox Ruby; Planar Void

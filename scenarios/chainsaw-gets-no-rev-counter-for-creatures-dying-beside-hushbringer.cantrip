@@ -1,0 +1,45 @@
+# Chainsaw's "whenever one or more creatures die" is a leaves-the-battlefield ability: it looks back to the board as it was
+# before the event (CR 603.10a), so creatures dying at the same time as Hushbringer, Hushbringer included, don't cause it to
+# trigger (Hushbringer's rulings). Bot1 casts Ornithopter, Chainsaw (no target) and Hushbringer on turn 1; on turn 3
+# Pyroclasm kills Hushbringer and the Ornithopter together, and Chainsaw gets no rev counter.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Chainsaw
+Hushbringer
+Ornithopter
+Pyroclasm
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chainsaw.Cast
+Bot1.Target()
+Bot1.Hand.Hushbringer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Jet; Chainsaw
+Bot1.Battlefield.Chainsaw.Counters.Rev = (absent)
+Bot1.Graveyard = Hushbringer; Ornithopter; Pyroclasm; Black Lotus
