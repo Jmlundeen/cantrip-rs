@@ -1,0 +1,5 @@
+{
+  "name": "Fetid Heath",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{W/B}, {T}: Add {W}{W}, {W}{B}, or {B}{B}."
+}

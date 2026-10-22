@@ -1,0 +1,21 @@
+# Fetid Heath pays {W/B} (here from a Swamp) and taps to add two mana, each white or black as Bot1 chooses: {W}{B}, a
+# mix the Swamp alone could never make.
+
+[Bot1 Deck]
+Swamp
+Fetid Heath
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fetid Heath.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B}, {T}; Colors: White, Black)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {W}{B}
