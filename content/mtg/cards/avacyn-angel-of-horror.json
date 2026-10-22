@@ -1,0 +1,12 @@
+{
+  "name": "Avacyn, Angel of Horror",
+  "manaCost": "{5}{B}{B}{B}",
+  "type": "Legendary Creature — Angel",
+  "power": 8,
+  "toughness": 8,
+  "oracleText": "Flying, deathtouch\nWhenever Avacyn or another nontoken creature you control dies, return that card to the battlefield under your control at the beginning of the next end step.",
+  "keywords": [
+    "Flying",
+    "Deathtouch"
+  ]
+}
