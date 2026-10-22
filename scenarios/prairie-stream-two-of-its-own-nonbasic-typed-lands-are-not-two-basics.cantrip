@@ -1,0 +1,32 @@
+# Prairie Stream: "This land enters tapped unless you control two or more basic lands." Bot1 controls two Tundras - two
+# lands with the Plains and Island types, but neither basic (CR 205.4a; two or more of these lands do not count) - and no
+# basic land at all, so its Prairie Stream enters tapped. Bot2 with a Plains and an Island plays the same land untapped
+# (positive control).
+
+[Bot1 Deck]
+Tundra
+Tundra
+Prairie Stream
+Island x20
+
+[Bot2 Deck]
+Plains
+Island
+Prairie Stream
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Prairie Stream.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Prairie Stream.Play
+
+[Expect]
+Bot1.Battlefield.Prairie Stream.Tapped = true
+Bot2.Battlefield.Prairie Stream.Tapped = false
