@@ -1,0 +1,67 @@
+# Splice onto Arcane (CR 702.47a-b): any number of different cards may be spliced onto one spell, each once. Bot1 casts
+# Hex Magic with three Through the Breach cards spliced onto it, paying {2}{R} and {2}{R}{R} three times (fifteen mana).
+# Hex Magic exiles the three revealed cards from the hand and draws three Ornithopters; then each spliced text, in the
+# order spliced, puts one Ornithopter onto the battlefield with haste (CR 702.47c).
+
+[Bot1 Deck]
+Hex Magic
+Through the Breach
+Through the Breach
+Through the Breach
+Black Lotus
+Mountain
+Mox Ruby
+Mana Vault
+Grim Monolith
+Sol Ring
+Mountain
+Mountain
+Ornithopter
+Ornithopter
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Plains x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mana Vault.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grim Monolith.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Hex Magic.Cast
+Bot1.Choose(Through the Breach; Through the Breach#2; Through the Breach#3)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mana Vault.Activate
+Bot1.Battlefield.Grim Monolith.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Revealed = Through the Breach; Through the Breach; Through the Breach
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Ornithopter)
+? Bot1.Battlefield.Ornithopter#3.Keywords = Flying; Haste
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Exile = Through the Breach; Through the Breach; Through the Breach
+Bot1.Hand.Count = 0
+Bot1.Battlefield = Grim Monolith; Mana Vault; Mountain; Mountain; Mountain; Mox Ruby; Ornithopter; Ornithopter; Ornithopter; Sol Ring
+Bot1.Graveyard = Hex Magic; Black Lotus

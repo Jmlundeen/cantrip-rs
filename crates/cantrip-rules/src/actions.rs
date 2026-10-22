@@ -5277,22 +5277,23 @@ fn cast(
             .filter(|&c| cx.card(cx.s().obj(c).card).splice.is_some())
             .collect();
         if !eligible.is_empty() {
-            let count = eligible.len().min(2) as u32;
+            // Any number of different cards, each once (CR 702.47a-b).
+            let count = eligible.len() as u32;
             let ask = RequestKind::choose_cards(spell, Purpose::Splice, hand, eligible.clone(), count, true, "");
             let spliced = match cx.ask_core(player, ask, true)? {
                 Answer::Cards(cards) => cards,
                 _ => return Err(Stop::Cancel),
             };
             if !spliced.is_empty() {
-                // Revealed from its announcement until the spell leaves the stack (CR 701.20a): among the objects its
-                // announcement chose (`add_revealed_to_item`).
+                // Revealed from its announcement until the spell leaves the stack (CR 701.20a): the first objects its
+                // announcement chose (`add_revealed_to_item`), in the order spliced, and how many (`resolve::spliced`).
                 Game::reveal(cx, player, &spliced);
                 item.members = cx.st().members_push(&spliced);
+                item.data[0] = spliced.len() as u32;
             }
-            for (n, c) in spliced.into_iter().take(2).enumerate() {
+            for &c in &spliced {
                 let splice_card = cx.s().obj(c).card;
                 cost.mana = add_cost(cost.mana, cx.card(splice_card).splice.expect("a splice card"));
-                item.data[n] = splice_card.0 as u32 + 1;
             }
         }
     }
@@ -5356,15 +5357,16 @@ fn cast(
     }
 
     // CR 702.47c, 601.2c: the targets of spliced text are chosen after the spell's own, in the order the cards were spliced.
-    if item.data.iter().any(|&d| d != 0) {
+    let spliced = crate::resolve::spliced(cx.s(), &item);
+    if !spliced.is_empty() {
         let mut all = targets.clone();
         // Targets announced with the cast are the lone slot's, the first.
         of.resize(targets.len(), 0);
         // A spliced card's slots are numbered on past the spell's own specs, in splice order (`resolve::slot_spec`), each
         // target recording its slot, so the spell's own slots need hold no set number of targets.
         let mut next = specs.len() as u8;
-        for &spliced in item.data.iter().filter(|&&d| d != 0) {
-            let specs = cx.card(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets);
+        for spliced in spliced {
+            let specs = cx.card(spliced).spell.map_or(&[][..], |s| s.targets);
             if !specs.is_empty() {
                 let (chosen, chosen_of) = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
                 of.extend(chosen_of.iter().map(|&s| next + s));

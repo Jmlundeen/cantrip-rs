@@ -89,10 +89,10 @@ pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, 
     let specs = target_specs(cards, state, item);
     // CR 702.47c: the slots of spliced text follow the spell's own, in the order the cards were spliced, and are numbered on
     // from them (`StackItem::spec_of`).
-    if item.kind == StackKind::Spell && state.spec(item, slot) as usize >= specs.len() && item.data.iter().any(|&d| d != 0) {
+    if item.kind == StackKind::Spell && state.spec(item, slot) as usize >= specs.len() && item.data[0] > 0 {
         let mut all = specs.to_vec();
-        for &spliced in item.data.iter().filter(|&&d| d != 0) {
-            all.extend_from_slice(cards.get(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets));
+        for spliced in spliced(state, item) {
+            all.extend_from_slice(cards.get(spliced).spell.map_or(&[][..], |s| s.targets));
         }
         return recorded_spec(state, item, &all, slot);
     }
@@ -116,10 +116,21 @@ pub(crate) fn spell_specs(cards: &CardTable, state: &GameState, item: &StackItem
         return specs;
     }
     let mut specs = target_specs(cards, state, item).to_vec();
-    for &spliced in item.data.iter().filter(|&&d| d != 0 && item.kind == StackKind::Spell) {
-        specs.extend_from_slice(cards.get(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets));
+    for spliced in spliced(state, item) {
+        specs.extend_from_slice(cards.get(spliced).spell.map_or(&[][..], |s| s.targets));
     }
     specs
+}
+
+/// The cards spliced onto a spell (CR 702.47a-c), in the order they were spliced, any number of them: the first
+/// `data[0]` objects its announcement chose (`StackItem::members`), as they were in the hand. A copy of the spell has the
+/// same (CR 707.10c). None for an ability.
+pub(crate) fn spliced(state: &GameState, item: &StackItem) -> Vec<CardId> {
+    if item.kind != StackKind::Spell {
+        return Vec::new();
+    }
+    let members = state.members(item.members);
+    members[..(item.data[0] as usize).min(members.len())].iter().map(|&o| state.obj(o).card).collect()
 }
 
 /// Runs the chosen modes of a modal item in printed order (CR 700.2d), each as if it were a spell of its own with
@@ -423,8 +434,8 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     paradigm(cx, &item)?;
                 }
                 // The spell abilities spliced onto it follow its own (CR 702.47c).
-                for &spliced in item.data.iter().filter(|&&d| d != 0) {
-                    if let Some(added) = cx.card(CardId(spliced as u16 - 1)).spell {
+                for spliced in spliced(cx.s(), &item) {
+                    if let Some(added) = cx.card(spliced).spell {
                         (added.effect)(cx, &item)?;
                     }
                 }
