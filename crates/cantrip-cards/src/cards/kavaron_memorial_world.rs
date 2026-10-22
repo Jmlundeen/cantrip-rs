@@ -7,9 +7,12 @@ use cantrip_oracle as oracle;
 /// them, and none that enters later.
 fn robot_then_pump_and_haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create(g, item.controller, &tokens::ROBOT_2_2, 1)?;
-    for creature in effects::pump_creatures_you_control(g, item, 1, 0) {
-        haste_until_end_of_turn(g, item.object, creature);
-    }
+    g.end_sentence();
+    instruction(g, |g| {
+        for creature in effects::pump_creatures_you_control(g, item, 1, 0) {
+            haste_until_end_of_turn(g, item.object, creature);
+        }
+    });
     Ok(())
 }
 

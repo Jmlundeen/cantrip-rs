@@ -9,9 +9,11 @@ use cantrip_oracle as oracle;
 fn becomes(g: &mut dyn Game, item: &StackItem, kind: Subtype, power: i16, toughness: i16, keywords: Keywords) {
     let Some(creature) = targets::object(g, item, 0) else { return };
     let words = g.words(item.object);
-    g.add_effect(item.object, creature, EffectKind::SetCreatureType(words.subtype(kind)), Duration::EndOfTurn);
-    g.add_effect(item.object, creature, EffectKind::SetPt(power, toughness), Duration::EndOfTurn);
-    g.add_effect(item.object, creature, EffectKind::AddKeywords(keywords), Duration::EndOfTurn);
+    instruction(g, |g| {
+        g.add_effect(item.object, creature, EffectKind::SetCreatureType(words.subtype(kind)), Duration::EndOfTurn);
+        g.add_effect(item.object, creature, EffectKind::SetPt(power, toughness), Duration::EndOfTurn);
+        g.add_effect(item.object, creature, EffectKind::AddKeywords(keywords), Duration::EndOfTurn);
+    });
 }
 
 /// Conceal: a Citizen 1/1 with hexproof.

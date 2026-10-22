@@ -102,10 +102,37 @@ pub struct Game {
     /// event, which is already recorded so that the continuous effects that read the history see it (CR 603.10). None
     /// otherwise.
     pub(crate) history_end: Option<usize>,
-    /// How many `one_instruction` calls are open, and whether a change with no event happened inside one: the state triggers
-    /// are asked once the outermost closes (`Cx::state_changed`). Bookkeeping of a call, not of the game.
-    pub(crate) instruction_depth: u8,
-    pub(crate) state_check_due: bool,
+    /// Where the state triggers stand in the run of a resolution (`StateCheck`). Bookkeeping of a call, not of the game.
+    pub(crate) check: StateCheck,
+}
+
+/// When the state triggers judge a change that records no event (CR 603.8: a state trigger "triggers as soon as the game
+/// state matches the condition"): an effect beginning or ending, an object becoming a copy. Outside a resolution, at once.
+/// A resolving spell or ability is a run of instructions followed in the order written (CR 608.2c), each a point of the
+/// game the state triggers see once it is done, and none of them seen half done - an "each" or "all" is applied to every
+/// object at once (CR 611.2c), an exchange of control's two halves together (CR 701.12a). Which calls of a card's code are
+/// one instruction only its text says, so a card says it wherever it changes the game with no event more than once:
+/// `Game::end_sentence` after an instruction, `Game::one_instruction` around one made of several calls. Under
+/// `CANTRIP_VERIFY` a resolution that changes the game with no event twice and says neither between is refused (`unsaid`),
+/// so the corpus, which runs every line of every card, finds a card that has not said it.
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct StateCheck {
+    /// How many instructions are open: the resolution itself, then each `one_instruction` (and each engine call that is one)
+    /// inside it.
+    depth: u8,
+    /// The object whose spell or ability is resolving, at depth 1, where one is under way.
+    resolving: Option<ObjectId>,
+    /// A change with no event that the state triggers have not judged.
+    due: bool,
+    /// Such a change inside the instruction now open within the resolution (depth 2 and more).
+    open: bool,
+    /// Such a change by an instruction of the resolution that is done: another, before the state triggers judge it, is a
+    /// second instruction the card has not said is one with it, nor apart from it.
+    done: bool,
+}
+
+impl StateCheck {
+    pub(crate) const NONE: StateCheck = StateCheck { depth: 0, resolving: None, due: false, open: false, done: false };
 }
 
 /// The most events a game records before it is a draw (`docs/rules-exceptions.md`, RX-1): a run of play that never repeats
@@ -135,8 +162,7 @@ impl Clone for Game {
             verify: self.verify,
             max_events: self.max_events,
             history_end: self.history_end,
-            instruction_depth: 0,
-            state_check_due: false,
+            check: StateCheck::NONE,
         }
     }
 }
@@ -221,7 +247,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, instruction_depth: 0, state_check_due: false };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE };
         if real {
             game.state.frame_push(Frame::new(FrameKind::Opening));
         } else {
@@ -300,15 +326,29 @@ impl Game {
                     FrameKind::Priority => turn::priority(&mut cx),
                     FrameKind::Settle => settle::settle(&mut cx),
                     FrameKind::Act { player } => actions::act(&mut cx, player),
-                    // A card's effect is carried out as one instruction unless its text marks where a sentence ends
-                    // (`Game::end_sentence`): a change with no event is judged by the state triggers once it is done
-                    // (CR 603.8, 608.2c, 611.2c), never half-done.
+                    // A card's effect is a run of instructions, each judged by the state triggers once it is done
+                    // (`StateCheck`; CR 603.8, 608.2c, 611.2c), never half-done.
                     FrameKind::Resolve => {
-                        cx.g.instruction_depth = cx.g.instruction_depth.saturating_add(1);
+                        // A staged run goes on with what an earlier stage changed and the state triggers have not judged.
+                        let carried = cx.s().agenda[at].unjudged;
+                        if carried {
+                            cx.st().update_frame(at, |f| f.unjudged = false);
+                        }
+                        let resolving = cx.s().stack.last().map(|item| item.object);
+                        cx.g.check = StateCheck { depth: 1, resolving, due: carried, open: false, done: carried };
                         let flow = resolve::resolve(&mut cx);
-                        cx.g.instruction_depth = cx.g.instruction_depth.saturating_sub(1);
-                        if cx.g.instruction_depth == 0 && std::mem::take(&mut cx.g.state_check_due) && flow.is_ok() {
-                            settle::state_triggers_now(&mut cx);
+                        let check = std::mem::replace(&mut cx.g.check, StateCheck::NONE);
+                        if check.due {
+                            match flow {
+                                Ok(_) => settle::state_triggers_now(&mut cx),
+                                // A staged run stopped at its question keeps what it did (`Game::ask_then`): the change is
+                                // judged as the run goes on, as if it had never stopped. A run that is redone from its
+                                // start when answered makes it again.
+                                Err(Stop::Suspend) if cx.s().agenda.get(at).is_some_and(|f| f.staged) => {
+                                    cx.st().update_frame(at, |f| f.unjudged = true);
+                                }
+                                Err(_) => {}
+                            }
                         }
                         flow
                     }
@@ -812,10 +852,99 @@ impl<'a> Cx<'a> {
     /// are asked now (CR 603.8), or, inside an instruction the card performs as several calls (`Game::one_instruction`), once
     /// it is done - an exchange of control is not judged with one permanent given and the other not yet taken.
     pub(crate) fn state_changed(&mut self) {
-        if self.g.instruction_depth > 0 {
-            self.g.state_check_due = true;
-        } else {
+        let check = &mut self.g.check;
+        if check.depth == 0 {
             settle::state_triggers_now(self);
+            return;
+        }
+        check.due = true;
+        // A change by an instruction after another's that is not judged yet: the card has not said whether they are one.
+        let unsaid = check.done;
+        if check.resolving.is_some() && check.depth == 1 {
+            check.done = true;
+        } else {
+            check.open = true;
+        }
+        if unsaid {
+            self.unsaid();
+        }
+    }
+
+    /// A continuous effect begins (`Game::add_effect`).
+    fn begin_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {
+        // An object that has changed zones is a new object the effect knows nothing of (CR 400.7, 611.2c), and "for as long
+        // as [the source] remains on the battlefield" is over before it begins once the source has left (CR 611.2b).
+        if !(live(&self.g.state, affected) || kind.outlives_affected()) {
+            return;
+        }
+        // A phased-out permanent is in no set of objects an effect affects, even one naming it (CR 702.26e).
+        if self.g.state.obj(affected).zone.is(ZoneKind::PhasedOut) && !kind.outlives_affected() {
+            return;
+        }
+        let controller = self.g.state.obj(source).controller;
+        let timestamp = self.g.state.timestamp();
+        let effect = ContinuousEffect { source, controller, timestamp, affected, kind, duration };
+        // A duration already over as the effect would begin never starts, and the effect does nothing (CR 611.2b).
+        if !ops::duration_begins(self, &effect) {
+            return;
+        }
+        self.g.state.effect_push(effect);
+        // A static ability given to a permanent that affects other objects makes it a source of static abilities.
+        if let EffectKind::AddAbility(ability) = kind
+            && matches!(self.cards().ability(ability), AbilityDef::Static(s) if !s.own)
+        {
+            self.g.state.see_statics();
+        }
+        if matches!(kind, EffectKind::Control(_)) {
+            ops::settle_control(self);
+        }
+        // What it changes may end a "for as long as" (Old Man of the Sea's "that creature's power remains less than or
+        // equal to"), and with it the control it gave, at once (CR 611.2b).
+        ops::settle_at_once(self);
+        self.state_changed();
+    }
+
+    /// An action the rules make a point of the game is done (a draw, CR 121.2): what it changed with no event is judged now.
+    pub(crate) fn judge_if_due(&mut self) {
+        if self.g.check.due {
+            settle::state_triggers_now(self);
+        }
+    }
+
+    /// The state triggers have judged the game as it is now (`StateCheck`): every change so far is seen.
+    pub(crate) fn state_judged(&mut self) {
+        let StateCheck { depth, resolving, .. } = self.g.check;
+        self.g.check = StateCheck { depth, resolving, ..StateCheck::NONE };
+    }
+
+    /// Carries out `f` as one instruction (`StateCheck`): what it changes with no event is judged once it is done, and, within
+    /// a resolution, is one change however many it makes.
+    pub(crate) fn instruction<T>(&mut self, f: impl FnOnce(&mut Self) -> T, done: impl FnOnce(&T) -> bool) -> T {
+        self.g.check.depth = self.g.check.depth.saturating_add(1);
+        let result = f(self);
+        let check = &mut self.g.check;
+        check.depth = check.depth.saturating_sub(1);
+        if check.resolving.is_some() && check.depth == 1 && std::mem::take(&mut check.open) {
+            check.done = true;
+        } else if check.depth == 0 && check.due && done(&result) {
+            // A run that suspended is redone with its answer, and judged then.
+            settle::state_triggers_now(self);
+        }
+        result
+    }
+
+    /// A resolution changed the game with no event twice, and its card said neither that the two are one instruction nor
+    /// that an instruction ended between them (`StateCheck`). Under `CANTRIP_VERIFY` (or a game's `verify`) that is refused, naming the card; a game
+    /// goes on judging them together.
+    #[cold]
+    fn unsaid(&self) {
+        if self.g.verify || layers::verifying() {
+            let name = self.g.check.resolving.map_or("?", |id| self.cards().get(self.g.state.obj(id).card).name);
+            panic!(
+                "{name}'s resolution changed the game twice with no event between and said neither that the changes are one \
+                 instruction (`Game::one_instruction`) nor that an instruction ended between them (`Game::end_sentence`): \
+                 the state triggers can't tell when to judge it (CR 603.8, 608.2c)"
+            );
         }
     }
 
@@ -1179,11 +1308,11 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn phase_out(&mut self, permanents: &[ObjectId]) {
-        phasing::phase_out(self, permanents, None, false);
+        self.instruction(|cx| phasing::phase_out(cx, permanents, None, false), |_| true);
     }
 
     fn phase_out_until_leaves(&mut self, permanent: ObjectId, source: ObjectId, tapped: bool) {
-        phasing::phase_out(self, &[permanent], Some(source), tapped);
+        self.instruction(|cx| phasing::phase_out(cx, &[permanent], Some(source), tapped), |_| true);
     }
 
     fn unlock_door(&mut self, permanent: ObjectId, door: u8, player: PlayerId) {
@@ -1406,7 +1535,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn become_copy(&mut self, source: ObjectId, permanent: ObjectId, values: Copiable, duration: Duration) {
-        ops::become_copy(self, source, permanent, values, duration);
+        self.instruction(|cx| ops::become_copy(cx, source, permanent, values, duration), |_| true);
     }
 
     fn win_game(&mut self, player: PlayerId) {
@@ -1572,40 +1701,8 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {
-        // An object that has changed zones is a new object the effect knows nothing of (CR 400.7, 611.2c), and "for as long
-        // as [the source] remains on the battlefield" is over before it begins once the source has left (CR 611.2b).
-        if !(live(&self.g.state, affected) || kind.outlives_affected()) {
-            return;
-        }
-        // A phased-out permanent is in no set of objects an effect affects, even one naming it (CR 702.26e).
-        if self.g.state.obj(affected).zone.is(ZoneKind::PhasedOut) && !kind.outlives_affected() {
-            return;
-        }
-        let controller = self.g.state.obj(source).controller;
-        let timestamp = self.g.state.timestamp();
-        let effect = ContinuousEffect { source, controller, timestamp, affected, kind, duration };
-        // A duration already over as the effect would begin never starts, and the effect does nothing (CR 611.2b).
-        if !ops::duration_begins(self, &effect) {
-            return;
-        }
-        self.g.state.effect_push(effect);
-        // A static ability given to a permanent that affects other objects makes it a source of static abilities.
-        if let EffectKind::AddAbility(ability) = kind
-            && matches!(self.cards().ability(ability), AbilityDef::Static(s) if !s.own)
-        {
-            self.g.state.see_statics();
-        }
-        if matches!(kind, EffectKind::Control(_)) {
-            ops::settle_control(self);
-        }
-        // What it changes may end a "for as long as" (Old Man of the Sea's "that creature's power remains less than or
-        // equal to"), and with it the control it gave, at once (CR 611.2b).
-        ops::settle_at_once(self);
-        self.state_changed();
-    }
-
-    fn settle_once(&mut self, instruction: &mut dyn FnMut(&mut dyn cantrip_api::Game)) {
-        ops::as_one_instruction(self, |cx| instruction(cx));
+        // One change, though control and the "for as long as" durations it ends are settled with it.
+        self.instruction(|cx| cx.begin_effect(source, affected, kind, duration), |_| true);
     }
 
     fn add_player_effect(&mut self, controller: PlayerId, source: ObjectId, kind: EffectKind, duration: Duration) {
@@ -1613,6 +1710,10 @@ impl cantrip_api::Game for Cx<'_> {
         let timestamp = self.g.state.timestamp();
         self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected: source, kind, duration });
         self.state_changed();
+    }
+
+    fn settle_once(&mut self, instruction: &mut dyn FnMut(&mut dyn cantrip_api::Game)) {
+        ops::as_one_instruction(self, |cx| instruction(cx));
     }
 
     fn counter(&mut self, spell: ObjectId) {
@@ -1624,7 +1725,8 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn change_controller(&mut self, spell: ObjectId, player: PlayerId) {
-        ops::change_spell_controller(self, spell, player);
+        // One change, though the "for as long as" durations it ends are settled with it.
+        self.instruction(|cx| ops::change_spell_controller(cx, spell, player), |_| true);
     }
 
     fn change_target(&mut self, of: Target, chooser: PlayerId) -> Result<(), Suspend> {
@@ -1768,20 +1870,11 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn end_sentence(&mut self) {
-        if std::mem::take(&mut self.g.state_check_due) {
-            settle::state_triggers_now(self);
-        }
+        self.judge_if_due();
     }
 
     fn one_instruction(&mut self, f: &mut dyn FnMut(&mut dyn cantrip_api::Game) -> Result<(), Suspend>) -> Result<(), Suspend> {
-        self.g.instruction_depth += 1;
-        let done = f(self);
-        self.g.instruction_depth -= 1;
-        if self.g.instruction_depth == 0 && std::mem::take(&mut self.g.state_check_due) && done.is_ok() {
-            // A run that suspended is redone with its answer, and judged then.
-            settle::state_triggers_now(self);
-        }
-        done
+        self.instruction(|cx| f(cx), Result::is_ok)
     }
 }
 

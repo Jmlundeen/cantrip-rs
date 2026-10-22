@@ -4,12 +4,13 @@ use cantrip_oracle as oracle;
 
 /// Life: "All lands you control become 1/1 creatures until end of turn. They're still lands."
 fn life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for land in g.permanents_of(item.controller) {
-        if g.chars(land).is(CardType::Land) {
+    let lands: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Land)).collect();
+    instruction(g, |g| {
+        for land in lands {
             g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::EndOfTurn);
             g.add_effect(item.object, land, EffectKind::SetPt(1, 1), Duration::EndOfTurn);
         }
-    }
+    });
     Ok(())
 }
 

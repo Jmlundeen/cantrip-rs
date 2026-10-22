@@ -19,9 +19,12 @@ fn behold_a_dragon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let sarkhan = item.object;
     g.add_counters(sarkhan, CounterKind::PlusOne, 1);
+    g.end_sentence();
     let dragon = g.words(sarkhan).subtype(Subtype::Dragon);
-    g.add_effect(sarkhan, sarkhan, EffectKind::AddSubtype(dragon), Duration::EndOfTurn);
-    g.add_effect(sarkhan, sarkhan, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
+    instruction(g, |g| {
+        g.add_effect(sarkhan, sarkhan, EffectKind::AddSubtype(dragon), Duration::EndOfTurn);
+        g.add_effect(sarkhan, sarkhan, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
+    });
     Ok(())
 }
 

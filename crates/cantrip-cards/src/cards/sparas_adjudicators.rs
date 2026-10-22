@@ -8,8 +8,10 @@ use cantrip_oracle as oracle;
 fn restrain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         let until = Duration::UntilNextTurnOf(item.controller);
-        g.add_effect(item.object, creature, EffectKind::CantAttack, until);
-        g.add_effect(item.object, creature, EffectKind::CantBlock, until);
+        instruction(g, |g| {
+            g.add_effect(item.object, creature, EffectKind::CantAttack, until);
+            g.add_effect(item.object, creature, EffectKind::CantBlock, until);
+        });
     }
     Ok(())
 }

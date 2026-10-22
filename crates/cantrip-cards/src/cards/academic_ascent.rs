@@ -6,8 +6,11 @@ use cantrip_oracle as oracle;
 /// empower too (CR 608.2b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    pump(g, item.object, creature, 2, 2);
-    g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
+    instruction(g, |g| {
+        pump(g, item.object, creature, 2, 2);
+        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
+    });
+    g.end_sentence();
     empower::jace(g, item.controller, item.object, 2)
 }
 

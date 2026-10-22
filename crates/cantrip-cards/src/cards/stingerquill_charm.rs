@@ -19,9 +19,13 @@ fn first_strike_and_deathtouch(g: &mut dyn Game, item: &StackItem) -> Result<(),
 
 /// "Create a 2/2 colorless Wizard Soldier creature token named Cadet. It gains haste until end of turn."
 fn create_cadet(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for cadet in tokens::create(g, item.controller, &tokens::CADET, 1)? {
-        haste_until_end_of_turn(g, item.object, cadet);
-    }
+    let made = tokens::create(g, item.controller, &tokens::CADET, 1)?;
+    g.end_sentence();
+    instruction(g, |g| {
+        for cadet in made {
+            haste_until_end_of_turn(g, item.object, cadet);
+        }
+    });
     Ok(())
 }
 

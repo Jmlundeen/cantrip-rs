@@ -6,8 +6,10 @@ use cantrip_oracle as oracle;
 /// ability's target, if it is still legal as the ability resolves (CR 608.2b).
 fn hunt(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, 2, 2);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Deathtouch])), Duration::EndOfTurn);
+        instruction(g, |g| {
+            pump(g, item.object, creature, 2, 2);
+            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Deathtouch])), Duration::EndOfTurn);
+        });
     }
     Ok(())
 }

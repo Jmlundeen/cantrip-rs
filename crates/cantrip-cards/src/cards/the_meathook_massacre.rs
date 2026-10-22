@@ -12,9 +12,11 @@ fn shrink_all(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let creatures: Vec<ObjectId> =
         g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for creature in creatures {
-        pump(g, item.object, creature, -x, -x);
-    }
+    instruction(g, |g| {
+        for creature in creatures {
+            pump(g, item.object, creature, -x, -x);
+        }
+    });
     Ok(())
 }
 

@@ -74,8 +74,10 @@ static FLICKER: CardDef = CardDef {
 /// "Target creature gets -1/-1 and +1/+1 until end of turn": one sentence, two effects - no point of the game between them.
 fn evened(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(id) = item.target(0) {
-        cantrip_mechanics::pump(g, item.object, id, -1, -1);
-        cantrip_mechanics::pump(g, item.object, id, 1, 1);
+        cantrip_api::instruction(g, |g| {
+            cantrip_mechanics::pump(g, item.object, id, -1, -1);
+            cantrip_mechanics::pump(g, item.object, id, 1, 1);
+        });
     }
     Ok(())
 }
@@ -86,6 +88,78 @@ static EVENER: CardDef = CardDef {
     name: "Probe Evener",
     types: TypeSet::of(&[CardType::Artifact]),
     abilities: &[ability(TAP, evened, "{T}: Target creature gets -1/-1 and +1/+1 until end of turn.").targets(&[target(creature)])],
+    ..CardDef::BLANK
+};
+
+/// "Target creature gets -1/-1 until end of turn. Then it gets +1/+1 until end of turn." written as `flicker` is, but with
+/// nothing said between the two effects: neither that they are one instruction nor that one ends between them.
+fn unsaid(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(id) = item.target(0) {
+        cantrip_mechanics::pump(g, item.object, id, -1, -1);
+        cantrip_mechanics::pump(g, item.object, id, 1, 1);
+    }
+    Ok(())
+}
+
+static UNSAID: CardDef = CardDef {
+    name: "Probe Unsaid",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(TAP, unsaid, "{T}: Target creature gets -1/-1 until end of turn. Then it gets +1/+1 until end of turn.").targets(&[target(creature)])],
+    ..CardDef::BLANK
+};
+
+fn minus_one(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(id) = item.target(0) {
+        cantrip_mechanics::pump(g, item.object, id, -1, -1);
+    }
+    Ok(())
+}
+
+fn plus_one(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(id) = item.target(0) {
+        cantrip_mechanics::pump(g, item.object, id, 1, 1);
+    }
+    Ok(())
+}
+
+static CHARM_MODES: ModalDef = modes(&[
+    mode(minus_one, "Target creature gets -1/-1 until end of turn.").targets(&[target(creature)]),
+    mode(plus_one, "Target creature gets +1/+1 until end of turn.").targets(&[target(creature)]),
+])
+.choose(2, 2);
+
+/// "Choose both - Target creature gets -1/-1 until end of turn. - Target creature gets +1/+1 until end of turn." No
+/// `end_sentence` in it: the modes are followed in the order printed (CR 700.2d, 608.2c), the second after the first is done.
+static CHARM: CardDef = CardDef {
+    name: "Probe Charm",
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: Some(SpellDef::MODAL),
+    modal: Some(&CHARM_MODES),
+    ..CardDef::BLANK
+};
+
+/// Stage 0: "Target creature gets -1/-1 until end of turn", then a question - you choose a card in your hand - that stops the
+/// run (`Game::ask_then`); stage 1 changes nothing more. The effect has begun before the question and is still there after.
+fn shrink_then_ask(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    match g.stage() {
+        0 => {
+            if let Target::Object(id) = item.target(0) {
+                cantrip_mechanics::pump(g, item.object, id, -1, -1);
+            }
+            let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
+            let eligible = hand.iter().copied().take(1).collect();
+            let kind = RequestKind::ChooseCards { any_number: false, source: item.object, purpose: Purpose::Reveal, cards: hand, eligible, count: 1, up_to: false, kind: "", total: None };
+            Err(g.ask_then(1, item.controller, kind))
+        }
+        _ => Ok(()),
+    }
+}
+
+/// "{T}: Target creature gets -1/-1 until end of turn. Choose a card in your hand." written as explicit stages.
+static ASKER: CardDef = CardDef {
+    name: "Probe Asker",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(TAP, shrink_then_ask, "{T}: Target creature gets -1/-1 until end of turn. Choose a card in your hand.").targets(&[target(creature)])],
     ..CardDef::BLANK
 };
 
@@ -131,7 +205,7 @@ static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeS
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&FRAIL, &SHRINK, &FLICKER, &EVENER, &HERMIT, &TRADER, &BAUBLE, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&FRAIL, &SHRINK, &FLICKER, &EVENER, &UNSAID, &CHARM, &ASKER, &HERMIT, &TRADER, &BAUBLE, &FILLER]))
 }
 
 /// CR 603.8, 704.3: the -1/-1 ability resolves and the Frail is a 0/0 with no event to ask its state after; its state trigger has
@@ -153,28 +227,70 @@ fn a_state_true_only_in_the_middle_of_a_resolution_triggers() {
     assert_eq!(game.state.player(PlayerId(0)).life, 23, "the state trigger triggered mid-resolution and resolved");
 }
 
-/// A resolving ability is one instruction unless its text marks a sentence's end: within one, the Frail's toughness is
-/// never 0 where the game could see it, and its state trigger does not trigger.
+/// Two effects the card says are one instruction (`cantrip_api::instruction`): the Frail's toughness is never 0 where the
+/// game could see it, and its state trigger does not trigger.
 #[test]
 fn a_state_true_only_inside_one_instruction_does_not_trigger() {
     let game = play("Probe Evener");
     assert_eq!(game.state.player(PlayerId(0)).life, 20, "no point of the game had the Frail at 0 toughness");
 }
 
+/// CR 603.8, 608.2c: a card that changes the game with no event twice and says neither that the changes are one
+/// instruction nor that one ends between them is refused under verification, naming it - the engine can't know which its
+/// text means, and the corpus, which runs every line of every card under `CANTRIP_VERIFY`, finds it.
+#[test]
+fn a_card_that_says_neither_where_an_instruction_ends_nor_that_it_is_one_is_refused() {
+    let Err(refused) = std::panic::catch_unwind(|| play("Probe Unsaid")) else { panic!("the resolution is not refused") };
+    let message = refused.downcast_ref::<String>().cloned().unwrap_or_default();
+    assert!(message.contains("Probe Unsaid's resolution changed the game twice"), "{message}");
+}
+
+/// CR 603.8, 700.2d, 608.2c: a modal spell's modes are followed in order, each done before the next - with no
+/// `end_sentence` in the card, the Frail is 0/0 between the -1/-1 mode and the +1/+1 mode, and its state trigger triggers
+/// there.
+#[test]
+fn a_state_true_between_two_modes_triggers() {
+    let game = play_steps(&[(ActionKind::CastSpell, "Probe Frail"), (ActionKind::CastSpell, "Probe Charm")], "Probe Charm");
+    let charm = game.state.zone(Zone::graveyard(PlayerId(0))).iter().any(|&id| game.name(id) == "Probe Charm");
+    assert!(charm, "the Charm resolved");
+    assert!(game.state.battlefield().iter().any(|&id| game.name(id) == "Probe Frail"), "the Frail is a 1/1 again");
+    assert_eq!(game.state.player(PlayerId(0)).life, 23, "the state trigger triggered between the modes and resolved");
+}
+
+/// CR 603.8, 704.3: a staged resolution that stops at a question (`Game::ask_then`) keeps what it did before it, and what
+/// that changed with no event is judged as the resolution goes on - here once it ends, before the 0-toughness state-based
+/// action puts the Frail into the graveyard.
+#[test]
+fn a_change_before_a_staged_question_is_judged_when_the_resolution_goes_on() {
+    let game = play("Probe Asker");
+    assert!(game.state.battlefield().iter().all(|&id| game.name(id) != "Probe Frail"), "the 0/0 is put into the graveyard");
+    assert_eq!(game.state.player(PlayerId(0)).life, 23, "the state trigger triggered before the state-based action and resolved");
+}
+
 /// The first seat casts the Probe Frail and `artifact`, then activates the artifact at the Frail, and everything resolves.
 fn play(artifact: &'static str) -> Game {
+    play_steps(&[(ActionKind::CastSpell, "Probe Frail"), (ActionKind::CastSpell, artifact), (ActionKind::ActivateAbility, artifact)], artifact)
+}
+
+/// The first seat takes `steps` in order, aiming each at the Probe Frail, and everything resolves; `card` is the second
+/// card of its deck.
+fn play_steps(steps: &[(ActionKind, &'static str)], card: &'static str) -> Game {
     let frail = table().find("Probe Frail").unwrap();
-    let shrink = table().find(artifact).unwrap();
+    let shrink = table().find(card).unwrap();
     let filler = table().find("Filler").unwrap();
     let mut deck = vec![frail, shrink];
     deck.extend(std::iter::repeat(filler).take(28));
     let others = vec![filler; 30];
     let mut game = Game::new(table(), &Setup { decks: vec![deck, others], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
     game.verify = true;
-    let mut cast = [(ActionKind::CastSpell, "Probe Frail"), (ActionKind::CastSpell, artifact), (ActionKind::ActivateAbility, artifact)].into_iter().peekable();
+    let frail_target = |game: &Game, candidates: &[Target]| {
+        candidates.iter().copied().find(|t| matches!(t, Target::Object(id) if game.name(*id) == "Probe Frail")).unwrap_or(candidates[0])
+    };
+    let mut cast = steps.iter().copied().peekable();
     for _ in 0..100 {
         game.run();
-        if cast.peek().is_none() && game.state.stack.is_empty() && game.state.triggers.is_empty() {
+        let at_priority = matches!(game.pending().map(|r| &r.kind), Some(RequestKind::Priority { .. }));
+        if cast.peek().is_none() && at_priority && game.state.stack.is_empty() && game.state.triggers.is_empty() {
             break;
         }
         let Some(request) = game.pending().cloned() else { panic!("the game ended") };
@@ -186,7 +302,7 @@ fn play(artifact: &'static str) -> Game {
                         cast.next();
                         let mut action = Action::of(option);
                         if option.targets_required > 0 {
-                            action.targets = vec![option.target_candidates[0]];
+                            action.targets = vec![frail_target(&game, &option.target_candidates)];
                         }
                         Answer::Act(action)
                     }
@@ -194,6 +310,9 @@ fn play(artifact: &'static str) -> Game {
                 }
             }
             RequestKind::Priority { .. } => Answer::Pass,
+            RequestKind::ChooseModes { eligible, count, .. } => Answer::Modes(eligible.iter().copied().take(*count as usize).collect()),
+            RequestKind::ChooseTarget { candidates, .. } => Answer::Targets(vec![frail_target(&game, candidates)]),
+            RequestKind::ChooseCards { eligible, .. } => Answer::Cards(eligible.clone()),
             other => panic!("unexpected question {other:?}"),
         };
         game.answer(request.id, request.player, answer).unwrap();

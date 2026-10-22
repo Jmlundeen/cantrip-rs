@@ -6,8 +6,10 @@ use cantrip_oracle as oracle;
 /// resolving spell (CR 611.2a); a spell whose target has become illegal does nothing (CR 608.2b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    pump(g, item.object, creature, 2, 2);
-    effects::gain_hexproof_until_end_of_turn(g, item.object, creature);
+    instruction(g, |g| {
+        pump(g, item.object, creature, 2, 2);
+        effects::gain_hexproof_until_end_of_turn(g, item.object, creature);
+    });
     Ok(())
 }
 

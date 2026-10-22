@@ -5,8 +5,11 @@ use cantrip_oracle as oracle;
 /// "Target creature gets +2/+2 and gains reach until end of turn. Untap it."
 fn buff_and_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, 2, 2);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Reach])), Duration::EndOfTurn);
+        instruction(g, |g| {
+            pump(g, item.object, creature, 2, 2);
+            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Reach])), Duration::EndOfTurn);
+        });
+        g.end_sentence();
         g.untap(creature);
     }
     Ok(())

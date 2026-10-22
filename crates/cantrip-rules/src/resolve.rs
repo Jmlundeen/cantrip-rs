@@ -144,6 +144,8 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
             if targets.iter().any(|&t| t != Target::None) && (0..n).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &sub, slot)) {
                 continue;
             }
+            // Each mode's instructions follow the last mode's (CR 608.2c), which the state triggers have seen done.
+            cx.judge_if_due();
             (mode.effect)(cx, &sub)?;
         }
     }
@@ -169,6 +171,8 @@ fn run_fused(cx: &mut Cx, item: &StackItem, left: &'static CardDef, right: &'sta
         let shares = if shares.is_empty() { Vec::new() } else { shares[from..to].to_vec() };
         let targets = cx.s().targets(item)[from..to].to_vec();
         cx.st().set_item_targets(&mut sub, &targets, &of, &shares);
+        // The right half's instructions follow the left half's (CR 608.2c), which the state triggers have seen done.
+        cx.judge_if_due();
         (spell.effect)(cx, &sub)?;
     }
     Ok(())

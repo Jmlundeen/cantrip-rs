@@ -12,8 +12,11 @@ fn before_combat_damage(q: &dyn Query, _: &Asker) -> bool {
 fn frenzy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let power = g.chars(creature).power.unwrap_or(0);
-    g.add_effect(item.object, creature, EffectKind::Pump(power, 0), Duration::EndOfTurn);
-    cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+    instruction(g, |g| {
+        g.add_effect(item.object, creature, EffectKind::Pump(power, 0), Duration::EndOfTurn);
+        cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+    });
+    g.end_sentence();
     delayed::at_next_end_step(g, item, 0, Target::Object(creature));
     Ok(())
 }

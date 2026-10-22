@@ -9,9 +9,12 @@ const UP_TO_ONE_CREATURE_YOU_CONTROL: TargetSpec = targets::CREATURE_YOU_CONTROL
 /// Device transforms if there are four or more (CR 608.2c).
 fn pump_then_transform(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, 1, 0);
-        haste_until_end_of_turn(g, item.object, creature);
+        instruction(g, |g| {
+            pump(g, item.object, creature, 1, 0);
+            haste_until_end_of_turn(g, item.object, creature);
+        });
     }
+    g.end_sentence();
     if artifacts_you_control(g, item.controller) >= 4 {
         g.transform_by(item.object, item)?;
     }
@@ -22,8 +25,10 @@ fn pump_then_transform(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 fn grotto_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         let x = artifacts_you_control(g, item.controller) as i16;
-        pump(g, item.object, creature, x, 0);
-        haste_until_end_of_turn(g, item.object, creature);
+        instruction(g, |g| {
+            pump(g, item.object, creature, x, 0);
+            haste_until_end_of_turn(g, item.object, creature);
+        });
     }
     Ok(())
 }

@@ -6,8 +6,10 @@ use cantrip_oracle as oracle;
 
 /// "{3}{R}{R}: This creature gets +3/+3 and gains menace until end of turn" (CR 611.2, 702.111).
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    pump(g, item.object, item.object, 3, 3);
-    g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace])), Duration::EndOfTurn);
+    instruction(g, |g| {
+        pump(g, item.object, item.object, 3, 3);
+        g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace])), Duration::EndOfTurn);
+    });
     Ok(())
 }
 

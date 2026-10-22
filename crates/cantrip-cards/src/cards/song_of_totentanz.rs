@@ -10,11 +10,14 @@ use tokens::RAT_CANT_BLOCK as RAT;
 /// do not (CR 611.2c). X is the value announced (0 makes no tokens, yet the haste still happens).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create(g, item.controller, &RAT, item.x as u32)?;
+    g.end_sentence();
     let creatures: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for creature in creatures {
-        cantrip_mechanics::haste_until_end_of_turn(g, item.object, creature);
-    }
+    instruction(g, |g| {
+        for creature in creatures {
+            cantrip_mechanics::haste_until_end_of_turn(g, item.object, creature);
+        }
+    });
     Ok(())
 }
 

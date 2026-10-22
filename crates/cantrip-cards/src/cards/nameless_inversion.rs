@@ -9,8 +9,10 @@ use cantrip_oracle as oracle;
 /// does not resolve. Changeling makes the card itself every creature type in every zone (CR 702.73a).
 fn invert(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    pump(g, item.object, creature, 3, -3);
-    g.add_effect(item.object, creature, EffectKind::LoseAllCreatureTypes, Duration::EndOfTurn);
+    instruction(g, |g| {
+        pump(g, item.object, creature, 3, -3);
+        g.add_effect(item.object, creature, EffectKind::LoseAllCreatureTypes, Duration::EndOfTurn);
+    });
     Ok(())
 }
 

@@ -16,8 +16,11 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .into_iter()
         .filter(|&card| object_names(g, card).contains(&name))
         .count();
-    cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
-    pump(g, item.object, creature, 1 + named as i16, 0);
+    instruction(g, |g| {
+        cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+        pump(g, item.object, creature, 1 + named as i16, 0);
+    });
+    g.end_sentence();
     g.draw(item.controller, 1);
     Ok(())
 }

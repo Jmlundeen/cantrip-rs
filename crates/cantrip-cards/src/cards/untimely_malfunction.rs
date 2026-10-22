@@ -10,11 +10,13 @@ fn destroy_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// One or two target creatures can't block this turn.
 fn cant_block(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for slot in 0..item.target_count as usize {
-        if let Some(creature) = targets::object(g, item, slot) {
-            g.add_effect(item.object, creature, EffectKind::CantBlock, Duration::EndOfTurn);
+    instruction(g, |g| {
+        for slot in 0..item.target_count as usize {
+            if let Some(creature) = targets::object(g, item, slot) {
+                g.add_effect(item.object, creature, EffectKind::CantBlock, Duration::EndOfTurn);
+            }
         }
-    }
+    });
     Ok(())
 }
 

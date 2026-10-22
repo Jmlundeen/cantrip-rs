@@ -6,8 +6,10 @@ use cantrip_oracle as oracle;
 /// creature is the trigger's subject, and if it has left the battlefield by now it is a new object (CR 400.7), so nothing happens.
 fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(creature) = item.subject {
-        pump(g, item.object, creature, 2, 0);
-        haste_until_end_of_turn(g, item.object, creature);
+        instruction(g, |g| {
+            pump(g, item.object, creature, 2, 0);
+            haste_until_end_of_turn(g, item.object, creature);
+        });
     }
     Ok(())
 }

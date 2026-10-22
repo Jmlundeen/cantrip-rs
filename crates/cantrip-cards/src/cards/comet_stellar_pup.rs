@@ -33,9 +33,12 @@ fn roll(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             loyalty(g, comet, 2);
             let squirrel = g.card_id(&SQUIRREL);
             let made = g.create_tokens_together(&[(squirrel, you), (squirrel, you)])?;
-            for token in made {
-                haste_until_end_of_turn(g, comet, token);
-            }
+            g.end_sentence();
+            instruction(g, |g| {
+                for token in made {
+                    haste_until_end_of_turn(g, comet, token);
+                }
+            });
         }
         // "[-1], then return a card with mana value 2 or less from your graveyard to your hand."
         3 => {

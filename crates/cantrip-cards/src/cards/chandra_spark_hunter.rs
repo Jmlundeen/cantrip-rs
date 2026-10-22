@@ -13,8 +13,10 @@ fn vehicle_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// gains, and haste.
 fn animate_vehicle(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(vehicle) = targets::object(g, item, 0) else { return Ok(()) };
-    g.add_effect(item.object, vehicle, EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])), Duration::EndOfTurn);
-    haste_until_end_of_turn(g, item.object, vehicle);
+    instruction(g, |g| {
+        g.add_effect(item.object, vehicle, EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])), Duration::EndOfTurn);
+        haste_until_end_of_turn(g, item.object, vehicle);
+    });
     Ok(())
 }
 

@@ -5,8 +5,10 @@ use cantrip_oracle as oracle;
 /// Target creature gains trample and haste until end of turn: the granted ability's source is the land (CR 113.7).
 fn trample_and_haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
-        cantrip_mechanics::haste_until_end_of_turn(g, item.object, creature);
+        instruction(g, |g| {
+            cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+            cantrip_mechanics::haste_until_end_of_turn(g, item.object, creature);
+        });
     }
     Ok(())
 }

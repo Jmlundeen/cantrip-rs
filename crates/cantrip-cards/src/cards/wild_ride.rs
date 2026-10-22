@@ -6,8 +6,10 @@ use cantrip_oracle as oracle;
 /// the creature is no longer a legal target the spell does nothing (CR 608.2b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, 3, 0);
-        haste_until_end_of_turn(g, item.object, creature);
+        instruction(g, |g| {
+            pump(g, item.object, creature, 3, 0);
+            haste_until_end_of_turn(g, item.object, creature);
+        });
     }
     Ok(())
 }

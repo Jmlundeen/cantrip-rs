@@ -38,8 +38,11 @@ fn creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// "Target creature gets +0/+2 and loses all abilities."
 fn mute(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(id) = item.target(0) {
-        g.add_effect(item.object, id, EffectKind::Pump(0, 2), Duration::Indefinite);
-        g.add_effect(item.object, id, EffectKind::LoseAllAbilities, Duration::Indefinite);
+        // "Target creature gets +0/+2 and loses all abilities": one instruction.
+        cantrip_api::instruction(g, |g| {
+            g.add_effect(item.object, id, EffectKind::Pump(0, 2), Duration::Indefinite);
+            g.add_effect(item.object, id, EffectKind::LoseAllAbilities, Duration::Indefinite);
+        });
     }
     Ok(())
 }

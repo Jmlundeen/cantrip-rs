@@ -13,9 +13,11 @@ fn shrink_others(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .copied()
         .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature))
         .collect();
-    for id in others {
-        pump(g, item.object, id, -2, -2);
-    }
+    instruction(g, |g| {
+        for id in others {
+            pump(g, item.object, id, -2, -2);
+        }
+    });
     Ok(())
 }
 

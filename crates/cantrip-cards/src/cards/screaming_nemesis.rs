@@ -19,11 +19,14 @@ fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         _ => None,
     };
     let players: Vec<PlayerId> = g.history().all()[before..].iter().filter_map(dealt_to).collect();
-    for (i, &p) in players.iter().enumerate() {
-        if !players[..i].contains(&p) {
-            g.add_effect(item.object, item.object, EffectKind::CantGainLife(p), Duration::Indefinite);
+    g.end_sentence();
+    instruction(g, |g| {
+        for (i, &p) in players.iter().enumerate() {
+            if !players[..i].contains(&p) {
+                g.add_effect(item.object, item.object, EffectKind::CantGainLife(p), Duration::Indefinite);
+            }
         }
-    }
+    });
     Ok(())
 }
 

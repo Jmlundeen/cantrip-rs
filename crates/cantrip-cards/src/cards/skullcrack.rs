@@ -9,10 +9,14 @@ use cantrip_oracle as oracle;
 /// spell (CR 608.2b, the ruling): the core does not resolve it.
 fn skullcrack(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let players: Vec<PlayerId> = g.state().apnap().collect();
-    for p in players {
-        g.add_effect(item.object, item.object, EffectKind::CantGainLife(p), Duration::EndOfTurn);
-    }
+    instruction(g, |g| {
+        for p in players {
+            g.add_effect(item.object, item.object, EffectKind::CantGainLife(p), Duration::EndOfTurn);
+        }
+    });
+    g.end_sentence();
     g.damage_cant_be_prevented();
+    g.end_sentence();
     damage_target(g, item, 0, 3);
     Ok(())
 }

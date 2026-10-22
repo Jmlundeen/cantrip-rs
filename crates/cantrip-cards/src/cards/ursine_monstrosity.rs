@@ -12,9 +12,12 @@ fn combat(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             g.add_effect(item.object, item.object, EffectKind::MustAttackPlayer(chosen), Duration::EndOfTurn);
         }
     }
+    g.end_sentence();
     let types = g.state().zone(Zone::graveyard(me)).iter().fold(0u16, |all, &card| all | g.chars(card).types.0).count_ones() as i16;
-    g.add_effect(item.object, item.object, EffectKind::Pump(types, types), Duration::EndOfTurn);
-    cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, item.object);
+    instruction(g, |g| {
+        g.add_effect(item.object, item.object, EffectKind::Pump(types, types), Duration::EndOfTurn);
+        cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, item.object);
+    });
     Ok(())
 }
 

@@ -28,9 +28,12 @@ fn illusion_for_owner(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     let owner = g.obj(card).owner;
     let x = g.mana_value(card) as i16;
     let def = g.card_id(&ILLUSION);
-    for token in g.create_tokens(def, owner, 1, false)? {
-        g.add_effect(item.object, token, EffectKind::SetPt(x, x), Duration::Indefinite);
-    }
+    let made = g.create_tokens(def, owner, 1, false)?;
+    instruction(g, |g| {
+        for token in made {
+            g.add_effect(item.object, token, EffectKind::SetPt(x, x), Duration::Indefinite);
+        }
+    });
     Ok(())
 }
 

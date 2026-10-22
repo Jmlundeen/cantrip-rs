@@ -23,9 +23,12 @@ fn pump_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             kinds.iter().any(|&t| chars.has_subtype(t))
         })
         .collect();
-    for &id in &chosen {
-        cantrip_mechanics::pump(g, item.object, id, 1, 1);
-    }
+    instruction(g, |g| {
+        for &id in &chosen {
+            cantrip_mechanics::pump(g, item.object, id, 1, 1);
+        }
+    });
+    g.end_sentence();
     for &id in &chosen {
         g.untap(id);
     }

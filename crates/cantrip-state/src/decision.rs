@@ -37,6 +37,10 @@ pub struct Frame {
     pub next_stage: u16,
     pub staged: bool,
     pub scratch: [u32; 4],
+    /// For a staged frame waiting on a question: a change with no event an earlier stage made that the state triggers have
+    /// not judged yet (CR 603.8). The resolution goes on with it when answered, as a run never stopped would
+    /// (`cantrip_rules::StateCheck`).
+    pub unjudged: bool,
 }
 
 impl Frame {
@@ -53,20 +57,21 @@ impl Frame {
             next_stage: 0,
             staged: false,
             scratch: [0; 4],
+            unjudged: false,
         }
     }
 
     #[allow(clippy::type_complexity)]
     fn position(
         &self,
-    ) -> (&FrameKind, (&Vec<(Option<PlayerId>, Answer)>, &Vec<(u32, PlayerId)>, &Option<Box<(u16, RequestKind)>>), Option<(&PlayerId, &RequestKind)>, u16, u16, bool, &[u32; 4]) {
+    ) -> (&FrameKind, (&Vec<(Option<PlayerId>, Answer)>, &Vec<(u32, PlayerId)>, &Option<Box<(u16, RequestKind)>>), Option<(&PlayerId, &RequestKind)>, u16, u16, (bool, bool), &[u32; 4]) {
         (
             &self.kind,
             (&self.answers, &self.conceded, &self.stand_in),
             self.pending.as_ref().map(|r| (&r.player, &r.kind)),
             self.stage,
             self.next_stage,
-            self.staged,
+            (self.staged, self.unjudged),
             &self.scratch,
         )
     }

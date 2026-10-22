@@ -17,12 +17,16 @@ fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cards: Vec<(ObjectId, PlayerId, bool)> =
         g.exiled_with(item.object).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).map(|id| (id, item.controller, false)).collect();
     let spirit = g.words(item.object).subtype(Subtype::Spirit);
-    for arrived in g.put_all_onto_battlefield_with_counters(&cards, &[(CounterKind::Flying, 1)])? {
-        if targets::permanent(g, arrived) {
-            g.add_effect(item.object, arrived, EffectKind::SetPt(1, 1), Duration::Indefinite);
-            g.add_effect(item.object, arrived, EffectKind::AddSubtype(spirit), Duration::Indefinite);
+    let arrived = g.put_all_onto_battlefield_with_counters(&cards, &[(CounterKind::Flying, 1)])?;
+    g.end_sentence();
+    instruction(g, |g| {
+        for arrived in arrived {
+            if targets::permanent(g, arrived) {
+                g.add_effect(item.object, arrived, EffectKind::SetPt(1, 1), Duration::Indefinite);
+                g.add_effect(item.object, arrived, EffectKind::AddSubtype(spirit), Duration::Indefinite);
+            }
         }
-    }
+    });
     Ok(())
 }
 

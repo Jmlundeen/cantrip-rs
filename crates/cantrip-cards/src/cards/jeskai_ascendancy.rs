@@ -7,6 +7,7 @@ use cantrip_oracle as oracle;
 /// resolves (CR 611.2c): "those creatures" is exactly that set.
 fn pump_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = effects::pump_creatures_you_control(g, item, 1, 1);
+    g.end_sentence();
     for &creature in &creatures {
         g.untap(creature);
     }

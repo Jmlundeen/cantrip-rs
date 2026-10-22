@@ -7,8 +7,11 @@ use cantrip_oracle as oracle;
 /// (CR 608.2h).
 fn double(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        double::power(g, item.object, creature);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+        // "Double target creature's power and it gains first strike": one instruction (CR 608.2c).
+        instruction(g, |g| {
+            double::power(g, item.object, creature);
+            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+        });
     }
     Ok(())
 }

@@ -17,9 +17,13 @@ static SPIRIT: CardDef = CardDef {
 /// "Create two 1/1 colorless Spirit creature tokens. They gain haste until end of turn" (CR 111.1, 611.2): both tokens,
 /// created together, gain haste from this ability's source.
 fn two_hasty_spirits(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for spirit in tokens::create(g, item.controller, &SPIRIT, 2)? {
-        haste_until_end_of_turn(g, item.object, spirit);
-    }
+    let spirits = tokens::create(g, item.controller, &SPIRIT, 2)?;
+    g.end_sentence();
+    instruction(g, |g| {
+        for spirit in spirits {
+            haste_until_end_of_turn(g, item.object, spirit);
+        }
+    });
     Ok(())
 }
 

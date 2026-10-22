@@ -19,9 +19,12 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for &token in &tokens {
         g.add_counters(token, CounterKind::PlusOne, 1);
     }
-    for &token in &tokens {
-        cantrip_mechanics::trample_until_end_of_turn(g, item.object, token);
-    }
+    g.end_sentence();
+    instruction(g, |g| {
+        for &token in &tokens {
+            cantrip_mechanics::trample_until_end_of_turn(g, item.object, token);
+        }
+    });
     Ok(())
 }
 

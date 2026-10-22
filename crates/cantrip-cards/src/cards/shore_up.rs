@@ -6,8 +6,11 @@ use cantrip_oracle as oracle;
 /// target is no longer legal (CR 608.2b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        cantrip_mechanics::pump(g, item.object, creature, 1, 1);
-        cantrip_mechanics::effects::gain_hexproof_until_end_of_turn(g, item.object, creature);
+        instruction(g, |g| {
+            cantrip_mechanics::pump(g, item.object, creature, 1, 1);
+            cantrip_mechanics::effects::gain_hexproof_until_end_of_turn(g, item.object, creature);
+        });
+        g.end_sentence();
         g.untap(creature);
     }
     Ok(())

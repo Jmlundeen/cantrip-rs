@@ -5,11 +5,12 @@ use cantrip_oracle as oracle;
 /// that are there as it resolves, and no others.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let x = item.x as i16;
-    for id in g.permanents_of(item.controller) {
-        if g.chars(id).is(CardType::Creature) {
+    let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    instruction(g, |g| {
+        for id in creatures {
             g.add_effect(item.object, id, EffectKind::SetPt(x, x), Duration::EndOfTurn);
         }
-    }
+    });
     Ok(())
 }
 

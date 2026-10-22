@@ -39,10 +39,14 @@ fn artifact_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 fn grow_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(artifact) = targets::object(g, item, 0) else { return Ok(()) };
     g.add_counters(artifact, CounterKind::PlusOne, 3);
+    g.end_sentence();
     if !g.chars(artifact).is(CardType::Creature) {
-        g.add_effect(item.object, artifact, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
-        g.add_effect(item.object, artifact, EffectKind::AddSubtype(g.words(item.object).subtype(Subtype::Robot)), Duration::Indefinite);
-        g.add_effect(item.object, artifact, EffectKind::SetPt(0, 0), Duration::Indefinite);
+        let robot = g.words(item.object).subtype(Subtype::Robot);
+        instruction(g, |g| {
+            g.add_effect(item.object, artifact, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
+            g.add_effect(item.object, artifact, EffectKind::AddSubtype(robot), Duration::Indefinite);
+            g.add_effect(item.object, artifact, EffectKind::SetPt(0, 0), Duration::Indefinite);
+        });
     }
     Ok(())
 }

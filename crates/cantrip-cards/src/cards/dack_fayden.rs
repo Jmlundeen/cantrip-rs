@@ -56,9 +56,12 @@ fn you_cast_a_spell_that_targets_a_permanent(q: &dyn Query, source: ObjectId, ev
 /// anything to them, and it resolves with targets its controller now owns (CR 608.2b).
 fn seize(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(spell) = item.subject else { return Ok(()) };
-    for permanent in permanents_targeted(g, spell) {
-        g.gain_control(item.object, permanent, item.controller, Duration::Indefinite);
-    }
+    let permanents = permanents_targeted(g, spell);
+    instruction(g, |g| {
+        for permanent in permanents {
+            g.gain_control(item.object, permanent, item.controller, Duration::Indefinite);
+        }
+    });
     Ok(())
 }
 

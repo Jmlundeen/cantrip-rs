@@ -759,12 +759,8 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
     if cx.s().effects.iter().any(|e| e.affected == id) {
         let carried = |e: &cantrip_state::ContinuousEffect| from.is(ZoneKind::Stack) && matches!(e.kind, EffectKind::ChangeText { .. });
         let keep: Vec<bool> = cx.s().effects.iter().map(|e| e.affected != id || carried(e)).collect();
-        let effects_before = cx.s().effects.len();
+        // Taken back below with the rest: no point of the game, so nothing for the state triggers.
         cx.st().effects_keep(&keep);
-        // An effect that ends changes the game with no event (CR 603.8).
-        if cx.s().effects.len() < effects_before {
-            cx.state_changed();
-        }
     }
     note_statics(cx, id);
     let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
@@ -1873,7 +1869,12 @@ fn which_miracle(cx: &mut Cx, player: PlayerId, card: ObjectId, miracles: &[cant
 /// An instruction to draw `count` cards (CR 121.2): effects that change how many apply first (CR 121.2a), before any
 /// of the individual draws, which are then made one at a time.
 pub fn draw_cards(cx: &mut Cx, player: PlayerId, count: u32) {
-    for _ in 0..replace::draw_count(cx, player, count) {
+    for n in 0..replace::draw_count(cx, player, count) {
+        // Cards are drawn one at a time (CR 121.2): what a draw changed with no event (a replacement effect used up) is a
+        // point of the game the state triggers see before the next.
+        if n > 0 {
+            cx.judge_if_due();
+        }
         draw(cx, player);
     }
 }

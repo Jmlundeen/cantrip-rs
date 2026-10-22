@@ -23,9 +23,11 @@ pub fn enters_with_minus_one_counters<const N: i16>(_: &mut dyn Game, entering: 
 /// Ascendancy, Lorehold Charm, Silk Web Weaver and Warhost's Frenzy print it.
 pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
     let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for &id in &creatures {
-        crate::pump(g, item.object, id, power, toughness);
-    }
+    instruction(g, |g| {
+        for &id in &creatures {
+            crate::pump(g, item.object, id, power, toughness);
+        }
+    });
     creatures
 }
 
@@ -35,9 +37,11 @@ pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16
 pub fn pump_other_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
     let others: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| id != item.object && g.chars(id).is(CardType::Creature)).collect();
-    for &id in &others {
-        crate::pump(g, item.object, id, power, toughness);
-    }
+    instruction(g, |g| {
+        for &id in &others {
+            crate::pump(g, item.object, id, power, toughness);
+        }
+    });
     others
 }
 
@@ -45,18 +49,23 @@ pub fn pump_other_creatures_you_control(g: &mut dyn Game, item: &StackItem, powe
 /// it resolves, and no creature that enters later. Bitter Reunion and Ingris Stingerquill print it.
 pub fn creatures_you_control_gain_haste(g: &mut dyn Game, item: &StackItem) {
     let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for id in creatures {
-        crate::haste_until_end_of_turn(g, item.object, id);
-    }
+    instruction(g, |g| {
+        for id in creatures {
+            crate::haste_until_end_of_turn(g, item.object, id);
+        }
+    });
 }
 
 /// "All creatures get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): every creature on the battlefield as
 /// `source`'s spell or ability resolves, whoever controls it, and no creature that enters later. Toxic Deluge (-X/-X) and
 /// Withering Curse (-2/-2) print it.
 pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i16, toughness: i16) {
-    for id in creatures_on_the_battlefield(g) {
-        crate::pump(g, source, id, power, toughness);
-    }
+    let creatures = creatures_on_the_battlefield(g);
+    instruction(g, |g| {
+        for id in creatures {
+            crate::pump(g, source, id, power, toughness);
+        }
+    });
 }
 
 /// "Creatures you control gain trample and get +P/+T until end of turn" (CR 611.2c): `pump_creatures_you_control` and trample for
@@ -64,10 +73,13 @@ pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i16, toughn
 /// to them. Craterclaw Colossus (+X/+0, X the artifacts you control), Craterhoof Behemoth (+X/+X, X the creatures) and Balmor,
 /// Battlemage Captain (+1/+0) print it.
 pub fn pump_and_trample_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
-    let creatures = pump_creatures_you_control(g, item, power, toughness);
-    for &creature in &creatures {
-        crate::trample_until_end_of_turn(g, item.object, creature);
-    }
+    let mut creatures = Vec::new();
+    instruction(g, |g| {
+        creatures = pump_creatures_you_control(g, item, power, toughness);
+        for &creature in &creatures {
+            crate::trample_until_end_of_turn(g, item.object, creature);
+        }
+    });
     creatures
 }
 
@@ -659,7 +671,10 @@ pub fn exile_all_creatures(g: &mut dyn Game) -> usize {
 pub fn gain_control_untap_haste(g: &mut dyn Game, item: &StackItem) -> Option<ObjectId> {
     let creature = crate::targets::object(g, item, 0)?;
     g.gain_control(item.object, creature, item.controller, Duration::EndOfTurn);
+    // Three sentences, each judged by the state triggers before the next (CR 603.8, 608.2c).
+    g.end_sentence();
     g.untap(creature);
+    g.end_sentence();
     crate::haste_until_end_of_turn(g, item.object, creature);
     Some(creature)
 }
@@ -690,8 +705,11 @@ pub fn loses_all_abilities_and_becomes(g: &mut dyn Game, item: &StackItem, slot:
     let Some(creature) = crate::targets::object(g, item, slot) else { return };
     let words = g.words(item.object);
     let source = item.object;
-    g.add_effect(source, creature, EffectKind::LoseAllAbilities, Duration::EndOfTurn);
-    g.add_effect(source, creature, EffectKind::SetCreatureType(words.subtype(kind)), Duration::EndOfTurn);
-    g.add_effect(source, creature, EffectKind::SetColors(words.colors(ColorSet::of(color))), Duration::EndOfTurn);
-    g.add_effect(source, creature, EffectKind::SetPt(power, toughness), Duration::EndOfTurn);
+    // One instruction (CR 608.2c): the state triggers see it all done.
+    instruction(g, |g| {
+        g.add_effect(source, creature, EffectKind::LoseAllAbilities, Duration::EndOfTurn);
+        g.add_effect(source, creature, EffectKind::SetCreatureType(words.subtype(kind)), Duration::EndOfTurn);
+        g.add_effect(source, creature, EffectKind::SetColors(words.colors(ColorSet::of(color))), Duration::EndOfTurn);
+        g.add_effect(source, creature, EffectKind::SetPt(power, toughness), Duration::EndOfTurn);
+    });
 }

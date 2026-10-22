@@ -9,9 +9,12 @@ fn creatures_you_control(g: &dyn Game, player: PlayerId) -> Vec<ObjectId> {
 /// ones their controller has as the chapter resolves, fixed then (CR 611.2c); the grant outlives the Saga.
 fn grant_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let me = g.obj(item.object).card;
-    for id in creatures_you_control(g, item.controller) {
-        g.add_effect(item.object, id, EffectKind::AddAbility(AbilityRef::delayed(me, 0)), Duration::UntilNextTurnOf(item.controller));
-    }
+    let creatures = creatures_you_control(g, item.controller);
+    instruction(g, |g| {
+        for id in creatures {
+            g.add_effect(item.object, id, EffectKind::AddAbility(AbilityRef::delayed(me, 0)), Duration::UntilNextTurnOf(item.controller));
+        }
+    });
     Ok(())
 }
 
@@ -22,10 +25,13 @@ fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for &id in &creatures {
         g.add_counters(id, CounterKind::PlusOne, 1);
     }
+    g.end_sentence();
     let keywords = Keywords::of(&[Keyword::Vigilance, Keyword::Trample, Keyword::Indestructible]);
-    for id in creatures {
-        g.add_effect(item.object, id, EffectKind::AddKeywords(keywords), Duration::EndOfTurn);
-    }
+    instruction(g, |g| {
+        for id in creatures {
+            g.add_effect(item.object, id, EffectKind::AddKeywords(keywords), Duration::EndOfTurn);
+        }
+    });
     Ok(())
 }
 

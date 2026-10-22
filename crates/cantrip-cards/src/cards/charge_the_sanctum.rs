@@ -6,8 +6,11 @@ use cantrip_oracle as oracle;
 /// 702.7, 122.1.)
 fn charge_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        g.add_effect(item.object, creature, EffectKind::Pump(2, 0), Duration::EndOfTurn);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+        instruction(g, |g| {
+            g.add_effect(item.object, creature, EffectKind::Pump(2, 0), Duration::EndOfTurn);
+            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+        });
+        g.end_sentence();
         g.add_counters(creature, CounterKind::PlusOne, 1);
     }
     Ok(())

@@ -6,9 +6,12 @@ use cantrip_oracle as oracle;
 /// target creatures you control gain indestructible until end of turn." Each target still legal gains it (CR 608.2b); kicked
 /// with no target chosen, it does nothing.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in targets::legal_objects(g, item) {
-        cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
-    }
+    let creatures = targets::legal_objects(g, item);
+    instruction(g, |g| {
+        for creature in creatures {
+            cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
+        }
+    });
     Ok(())
 }
 

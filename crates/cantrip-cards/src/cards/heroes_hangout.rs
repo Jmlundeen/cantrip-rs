@@ -13,10 +13,13 @@ fn date_night(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Patrol Night - One or two target creatures each get +1/+0 and gain first strike until end of turn."
 fn patrol_night(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in targets::legal_objects(g, item) {
-        g.add_effect(item.object, creature, EffectKind::Pump(1, 0), Duration::EndOfTurn);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
-    }
+    let creatures = targets::legal_objects(g, item);
+    instruction(g, |g| {
+        for creature in creatures {
+            g.add_effect(item.object, creature, EffectKind::Pump(1, 0), Duration::EndOfTurn);
+            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+        }
+    });
     Ok(())
 }
 

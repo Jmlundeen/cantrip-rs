@@ -589,9 +589,13 @@ pub trait Game: Query {
     /// source's, and outlives it.
     fn skip_next_turns(&mut self, source: ObjectId, player: PlayerId, count: u32) {
         let controller = self.obj(source).controller;
-        for _ in 0..count {
-            self.add_player_effect(controller, source, EffectKind::SkipNextTurn(player), Duration::Indefinite);
-        }
+        // "Skips their next X turns": one instruction (CR 608.2c).
+        let _ = self.one_instruction(&mut |g| {
+            for _ in 0..count {
+                g.add_player_effect(controller, source, EffectKind::SkipNextTurn(player), Duration::Indefinite);
+            }
+            Ok(())
+        });
     }
     /// "[Kind of] spells [player] casts this turn cost ... less / more to cast" (CR 611.2a/c, 601.2f), made by the resolving
     /// spell or ability `item`: the `index`th of the `lasting_cost_changes` of its card (the face that is up, for a permanent's
@@ -791,12 +795,17 @@ pub trait Game: Query {
     fn settle_once(&mut self, instruction: &mut dyn FnMut(&mut dyn Game));
     /// Carries out `f`, several calls that are one instruction of a card's text, as one: what changes the game with no event
     /// (an effect beginning, an object becoming a copy) is judged by the state triggers once it is all done (CR 603.8), not
-    /// part-way. Animating a permanent (types, power and toughness, abilities) and an exchange of control are each one.
+    /// part-way - an "each" or "all" is never judged half-applied (CR 611.2c). Animating a permanent (types, power and
+    /// toughness, abilities), "gets +2/+2 and gains flying", and an exchange of control are each one. [`instruction`] is the
+    /// same for code that asks nothing.
+    ///
+    /// A resolution that changes the game with no event more than once says, between each two such changes, either this or
+    /// [`Game::end_sentence`]: which calls are one instruction only the card's text knows, and under `CANTRIP_VERIFY` a
+    /// resolution that says neither is refused, so the scenarios find a card that has not said it.
     fn one_instruction(&mut self, f: &mut dyn FnMut(&mut dyn Game) -> Result<(), Suspend>) -> Result<(), Suspend>;
-    /// A sentence of the card's text ends here (CR 608.2c: the instructions are followed in order): what the sentences before
-    /// changed with no event is judged by the state triggers now (CR 603.8), before the next one. A resolving spell or ability
-    /// is otherwise one instruction, judged once it is done, so an "each" or "all" is never judged half-applied (CR 611.2c);
-    /// a card whose text has two sentences that each change the game with no event marks the end of the first.
+    /// An instruction of the card's text ends here - a sentence, or a "then" (CR 608.2c: the instructions are followed in
+    /// order): what it changed with no event is judged by the state triggers now (CR 603.8), before the next one. See
+    /// [`Game::one_instruction`] for when a card says it.
     fn end_sentence(&mut self);
     /// Counters a spell (CR 701.5): it leaves the stack for its owner's graveyard, or exile if it was flashed back.
     fn counter(&mut self, spell: ObjectId);
@@ -906,4 +915,16 @@ pub trait Game: Query {
     /// which gets another counter of each kind it already has. One question, asked of `player` about `source`'s effect;
     /// nothing is asked when no permanent or player has a counter.
     fn proliferate(&mut self, player: PlayerId, source: ObjectId) -> Result<(), Suspend>;
+}
+
+/// Carries out `f`, several calls that are one instruction of a card's text and ask no question, as one
+/// (`Game::one_instruction`): "target creature gets +2/+2 and gains hexproof", "each creature you control gets +1/+1".
+pub fn instruction(g: &mut dyn Game, f: impl FnOnce(&mut dyn Game)) {
+    let mut f = Some(f);
+    let _ = g.one_instruction(&mut |g| {
+        if let Some(f) = f.take() {
+            f(g);
+        }
+        Ok(())
+    });
 }

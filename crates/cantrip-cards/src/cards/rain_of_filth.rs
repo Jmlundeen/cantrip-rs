@@ -5,11 +5,12 @@ use cantrip_oracle as oracle;
 /// (CR 611.2c): a land that arrives later never gains the ability.
 fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let this = g.obj(item.object).card;
-    for land in g.permanents_of(item.controller) {
-        if g.chars(land).is(CardType::Land) {
+    let lands: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Land)).collect();
+    instruction(g, |g| {
+        for land in lands {
             g.add_effect(item.object, land, EffectKind::AddAbility(AbilityRef::delayed(this, 0)), Duration::EndOfTurn);
         }
-    }
+    });
     Ok(())
 }
 

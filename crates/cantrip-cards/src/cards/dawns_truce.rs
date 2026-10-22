@@ -7,16 +7,22 @@ use cantrip_oracle as oracle;
 /// (CR 611.2c); the gift itself was given by the rules before this runs (CR 702.174j).
 fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    g.add_effect(item.object, item.object, EffectKind::PlayerHexproof, Duration::EndOfTurn);
-    for permanent in g.permanents_of(you) {
-        g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof])), Duration::EndOfTurn);
-    }
+    let permanents = g.permanents_of(you);
+    instruction(g, |g| {
+        g.add_effect(item.object, item.object, EffectKind::PlayerHexproof, Duration::EndOfTurn);
+        for permanent in permanents {
+            g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof])), Duration::EndOfTurn);
+        }
+    });
     if item.gift.is_some() {
         // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
         g.end_sentence();
-        for permanent in g.permanents_of(you) {
-            g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
-        }
+        let permanents = g.permanents_of(you);
+        instruction(g, |g| {
+            for permanent in permanents {
+                g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+            }
+        });
     }
     Ok(())
 }

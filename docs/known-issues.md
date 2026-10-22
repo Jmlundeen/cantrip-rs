@@ -48,7 +48,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
-| [KI-54](#ki-54-state-triggers-are-judged-only-where-a-cards-text-marks-a-sentences-end) | State triggers are judged only where a card's text marks a sentence's end | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
@@ -126,23 +125,6 @@ client shows poison on the player rail and the language-model client in its text
 affected.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome; a bot-lab duel with infect decks would show it.
-
-### KI-54: State triggers are judged only where a card's text marks a sentence's end
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine | 2026-10-17, CR 104.4b loop detection; narrowed by RX-4 to what is left |
-
-**Notes.** What this entry once listed of the loop watch's judgement - CR 732.3's fragmented loops, the choices a
-designated player was refused, a {T} mana ability counted as no choice, the busy-step watch - is settled by
-`docs/rules-exceptions.md`, RX-4: the engine draws only a loop every player only passes in, after three confirmed rounds,
-and every other loop is the players' and the clock's (draw offers come with the server's support for them; `loops.rs`'s
-module comment is the design). What is left is a
-gap in when state triggers are judged (CR 603.8), which a loop or any other run can reach: a card's text is one
-instruction unless it marks a sentence's end with `end_sentence`, which only some cards do (every Oracle sentence needs
-one), and a staged frame (`Game::ask_then`) drops a pending `state_check_due` when it suspends.
-
-**Scenarios.** None yet.
 
 ### KI-57: The tactical bot does not know islandwalk
 

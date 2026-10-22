@@ -10,11 +10,13 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let words = g.words(item.object);
     let creatures = overload::affected(g, item, |chars, controller| chars.is(CardType::Creature) && controller == you);
-    for creature in creatures {
-        g.add_effect(item.object, creature, EffectKind::SetCreatureType(words.subtype(Subtype::Wurm)), Duration::EndOfTurn);
-        g.add_effect(item.object, creature, EffectKind::SetColors(words.colors(ColorSet::of(Color::Green))), Duration::EndOfTurn);
-        g.add_effect(item.object, creature, EffectKind::SetPt(6, 4), Duration::EndOfTurn);
-    }
+    instruction(g, |g| {
+        for creature in creatures {
+            g.add_effect(item.object, creature, EffectKind::SetCreatureType(words.subtype(Subtype::Wurm)), Duration::EndOfTurn);
+            g.add_effect(item.object, creature, EffectKind::SetColors(words.colors(ColorSet::of(Color::Green))), Duration::EndOfTurn);
+            g.add_effect(item.object, creature, EffectKind::SetPt(6, 4), Duration::EndOfTurn);
+        }
+    });
     Ok(())
 }
 

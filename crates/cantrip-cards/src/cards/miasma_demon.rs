@@ -18,9 +18,12 @@ fn discard_any(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Up to that many target creatures each get -2/-2 until end of turn: each target still legal (CR 608.2b).
 fn shrink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in targets::legal_objects(g, item) {
-        pump(g, item.object, creature, -2, -2);
-    }
+    let creatures = targets::legal_objects(g, item);
+    instruction(g, |g| {
+        for creature in creatures {
+            pump(g, item.object, creature, -2, -2);
+        }
+    });
     Ok(())
 }
 

@@ -13,9 +13,11 @@ fn citizen(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Creatures you control get +2/+2 and gain vigilance until end of turn": the creatures there are as it resolves
 /// (CR 611.2c).
 fn pump_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for id in effects::pump_creatures_you_control(g, item, 2, 2) {
-        g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::Vigilance])), Duration::EndOfTurn);
-    }
+    instruction(g, |g| {
+        for id in effects::pump_creatures_you_control(g, item, 2, 2) {
+            g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::Vigilance])), Duration::EndOfTurn);
+        }
+    });
     Ok(())
 }
 

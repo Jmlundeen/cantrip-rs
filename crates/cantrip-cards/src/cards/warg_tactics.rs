@@ -13,8 +13,11 @@ fn destroy_flyer(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn counter_trample_hexproof(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         g.add_counters(creature, CounterKind::PlusOne, 1);
-        trample_until_end_of_turn(g, item.object, creature);
-        gain_hexproof_until_end_of_turn(g, item.object, creature);
+        g.end_sentence();
+        instruction(g, |g| {
+            trample_until_end_of_turn(g, item.object, creature);
+            gain_hexproof_until_end_of_turn(g, item.object, creature);
+        });
     }
     Ok(())
 }

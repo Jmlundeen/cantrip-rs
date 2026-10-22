@@ -7,9 +7,11 @@ use cantrip_oracle as oracle;
 /// layer 6 effects, from this spell, on the creature if it is still a legal target.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    pump(g, item.object, creature, 2, 0);
-    gain_lifelink_until_end_of_turn(g, item.object, creature);
-    gain_indestructible_until_end_of_turn(g, item.object, creature);
+    instruction(g, |g| {
+        pump(g, item.object, creature, 2, 0);
+        gain_lifelink_until_end_of_turn(g, item.object, creature);
+        gain_indestructible_until_end_of_turn(g, item.object, creature);
+    });
     Ok(())
 }
 

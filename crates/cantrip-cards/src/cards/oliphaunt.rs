@@ -8,8 +8,10 @@ use cantrip_oracle as oracle;
 /// "Another target creature you control gets +2/+0 and gains trample until end of turn."
 fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, 2, 0);
-        cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+        instruction(g, |g| {
+            pump(g, item.object, creature, 2, 0);
+            cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+        });
     }
     Ok(())
 }

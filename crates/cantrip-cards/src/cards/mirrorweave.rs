@@ -22,9 +22,11 @@ fn each_other_creature_becomes_a_copy(g: &mut dyn Game, item: &StackItem) -> Res
     let values = g.copiable_values(original);
     let others: Vec<ObjectId> =
         g.state().battlefield().iter().copied().filter(|&id| id != original && g.chars(id).is(CardType::Creature)).collect();
-    for creature in others {
-        g.become_copy(item.object, creature, values, Duration::EndOfTurn);
-    }
+    instruction(g, |g| {
+        for creature in others {
+            g.become_copy(item.object, creature, values, Duration::EndOfTurn);
+        }
+    });
     Ok(())
 }
 

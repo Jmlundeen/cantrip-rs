@@ -8,10 +8,14 @@ use cantrip_oracle as oracle;
 /// instruction, so it goes to exile rather than to its owner's graveyard.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    g.add_player_effect(you, item.object, EffectKind::LifeTotalCantChange(you), Duration::UntilNextTurnOf(you));
-    g.add_player_effect(you, item.object, EffectKind::PlayerProtectionFromEverything, Duration::UntilNextTurnOf(you));
+    instruction(g, |g| {
+        g.add_player_effect(you, item.object, EffectKind::LifeTotalCantChange(you), Duration::UntilNextTurnOf(you));
+        g.add_player_effect(you, item.object, EffectKind::PlayerProtectionFromEverything, Duration::UntilNextTurnOf(you));
+    });
+    g.end_sentence();
     let permanents = g.permanents_of(you);
     g.phase_out(&permanents);
+    g.end_sentence();
     g.exile(item.object);
     Ok(())
 }

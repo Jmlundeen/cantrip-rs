@@ -15,9 +15,12 @@ fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired>
 
 fn pump_other_attackers(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let others: Vec<ObjectId> = g.state().attackers.iter().map(|a| a.id).filter(|&id| id != item.object).collect();
-    for id in others {
-        pump(g, item.object, id, 1, 0);
-    }
+    // "Each other attacking creature": one instruction (CR 611.2c).
+    instruction(g, |g| {
+        for id in others {
+            pump(g, item.object, id, 1, 0);
+        }
+    });
     Ok(())
 }
 

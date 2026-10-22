@@ -17,8 +17,10 @@ fn critter_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// "... gets +1/+0 and gains haste until end of turn": nothing if the target is no longer legal (CR 608.2b).
 fn hurry(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(critter) = targets::object(g, item, 0) {
-        pump(g, item.object, critter, 1, 0);
-        haste_until_end_of_turn(g, item.object, critter);
+        instruction(g, |g| {
+            pump(g, item.object, critter, 1, 0);
+            haste_until_end_of_turn(g, item.object, critter);
+        });
     }
     Ok(())
 }

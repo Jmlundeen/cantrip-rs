@@ -19,11 +19,16 @@ fn animate_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let Target::Object(land) = item.target(0) else { return Ok(()) };
     g.add_counters(land, CounterKind::PlusOne, 3);
+    g.end_sentence();
     g.untap(land);
-    g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
-    g.add_effect(item.object, land, EffectKind::AddSubtype(g.words(item.object).subtype(Subtype::Elemental)), Duration::Indefinite);
-    g.add_effect(item.object, land, EffectKind::AddKeywords(Keywords::of(&[Keyword::Vigilance, Keyword::Haste])), Duration::Indefinite);
-    g.add_effect(item.object, land, EffectKind::SetPt(0, 0), Duration::Indefinite);
+    g.end_sentence();
+    let elemental = g.words(item.object).subtype(Subtype::Elemental);
+    instruction(g, |g| {
+        g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
+        g.add_effect(item.object, land, EffectKind::AddSubtype(elemental), Duration::Indefinite);
+        g.add_effect(item.object, land, EffectKind::AddKeywords(Keywords::of(&[Keyword::Vigilance, Keyword::Haste])), Duration::Indefinite);
+        g.add_effect(item.object, land, EffectKind::SetPt(0, 0), Duration::Indefinite);
+    });
     Ok(())
 }
 

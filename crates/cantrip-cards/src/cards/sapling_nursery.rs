@@ -29,12 +29,19 @@ fn create_treefolk(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let words = g.words(item.object);
     let (treefolk, forest) = (words.subtype(Subtype::Treefolk), words.subtype(Subtype::Forest));
-    for permanent in g.permanents_of(item.controller) {
-        let subtypes = g.chars(permanent).subtypes;
-        if subtypes.has(treefolk) || subtypes.has(forest) {
+    let permanents: Vec<ObjectId> = g
+        .permanents_of(item.controller)
+        .into_iter()
+        .filter(|&permanent| {
+            let subtypes = g.chars(permanent).subtypes;
+            subtypes.has(treefolk) || subtypes.has(forest)
+        })
+        .collect();
+    instruction(g, |g| {
+        for permanent in permanents {
             gain_indestructible_until_end_of_turn(g, item.object, permanent);
         }
-    }
+    });
     Ok(())
 }
 

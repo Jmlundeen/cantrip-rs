@@ -6,11 +6,14 @@ use cantrip_oracle as oracle;
 /// by its timestamp: setting its card types to what they already are clears the subtypes an earlier stage added, and
 /// the new ones follow. Figure of Fable is only ever a creature, so its card types do not change.
 fn become_kithkin(g: &mut dyn Game, source: ObjectId, kind: Subtype, power: i16, toughness: i16) {
-    g.add_effect(source, source, EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
     let words = g.words(source);
-    g.add_effect(source, source, EffectKind::AddSubtype(words.subtype(Subtype::Kithkin)), Duration::Indefinite);
-    g.add_effect(source, source, EffectKind::AddSubtype(words.subtype(kind)), Duration::Indefinite);
-    g.add_effect(source, source, EffectKind::SetPt(power, toughness), Duration::Indefinite);
+    // "It becomes a Kithkin [...] with base power and toughness [P]/[T]": one instruction (CR 608.2c).
+    instruction(g, |g| {
+        g.add_effect(source, source, EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
+        g.add_effect(source, source, EffectKind::AddSubtype(words.subtype(Subtype::Kithkin)), Duration::Indefinite);
+        g.add_effect(source, source, EffectKind::AddSubtype(words.subtype(kind)), Duration::Indefinite);
+        g.add_effect(source, source, EffectKind::SetPt(power, toughness), Duration::Indefinite);
+    });
 }
 
 fn become_scout(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -32,11 +35,13 @@ fn become_soldier(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// the opponents as the ability resolves.
 fn become_avatar(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if targets::permanent(g, item.object) && g.chars(item.object).has_subtype(g.words(item.object).subtype(Subtype::Soldier)) {
-        become_kithkin(g, item.object, Subtype::Avatar, 7, 8);
         let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
-        for opponent in opponents {
-            g.add_effect(item.object, item.object, EffectKind::ProtectionFromPlayer(opponent), Duration::Indefinite);
-        }
+        instruction(g, |g| {
+            become_kithkin(g, item.object, Subtype::Avatar, 7, 8);
+            for opponent in opponents {
+                g.add_effect(item.object, item.object, EffectKind::ProtectionFromPlayer(opponent), Duration::Indefinite);
+            }
+        });
     }
     Ok(())
 }

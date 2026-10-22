@@ -50,9 +50,11 @@ fn chapter_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// III: "Other creatures you control get +2/+2 and gain trample until end of turn." The creatures are those its controller
 /// controls as it resolves, not the Saga itself, and none that enters later (CR 611.2c).
 fn chapter_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in effects::pump_other_creatures_you_control(g, item, 2, 2) {
-        trample_until_end_of_turn(g, item.object, creature);
-    }
+    instruction(g, |g| {
+        for creature in effects::pump_other_creatures_you_control(g, item, 2, 2) {
+            trample_until_end_of_turn(g, item.object, creature);
+        }
+    });
     Ok(())
 }
 

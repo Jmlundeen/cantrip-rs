@@ -5,8 +5,10 @@ use cantrip_oracle as oracle;
 
 /// "{6}{G}{G}: This creature gets +4/+4 and gains trample until end of turn." (CR 613.4c, 611.2.)
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    pump(g, item.object, item.object, 4, 4);
-    trample_until_end_of_turn(g, item.object, item.object);
+    instruction(g, |g| {
+        pump(g, item.object, item.object, 4, 4);
+        trample_until_end_of_turn(g, item.object, item.object);
+    });
     Ok(())
 }
 

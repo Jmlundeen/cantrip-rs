@@ -24,9 +24,11 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Creatures you control get +1/+1 and gain trample until end of turn": the creatures there as it resolves (CR 611.2c).
 fn pump_and_trample(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in effects::pump_creatures_you_control(g, item, 1, 1) {
-        trample_until_end_of_turn(g, item.object, creature);
-    }
+    instruction(g, |g| {
+        for creature in effects::pump_creatures_you_control(g, item, 1, 1) {
+            trample_until_end_of_turn(g, item.object, creature);
+        }
+    });
     Ok(())
 }
 

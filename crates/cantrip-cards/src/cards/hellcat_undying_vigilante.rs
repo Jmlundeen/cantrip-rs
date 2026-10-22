@@ -11,8 +11,11 @@ fn return_changed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
     let owner = g.obj(card).owner;
     let hellcat = g.put_onto_battlefield_with_counters(card, owner, false, &[(CounterKind::PlusOne, 1)])?;
-    g.add_effect(item.object, hellcat, EffectKind::LoseAllAbilities, Duration::Indefinite);
-    g.add_effect(item.object, hellcat, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+    g.end_sentence();
+    instruction(g, |g| {
+        g.add_effect(item.object, hellcat, EffectKind::LoseAllAbilities, Duration::Indefinite);
+        g.add_effect(item.object, hellcat, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+    });
     Ok(())
 }
 

@@ -12,10 +12,13 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.remove_spell(spell, CounterTo::Hand);
     }
     if item.gift.is_some() {
+        g.end_sentence();
         let players: Vec<PlayerId> = g.state().apnap().collect();
-        for player in players {
-            g.add_player_effect(item.controller, item.object, EffectKind::CantCastSpellsFrom(player, ZoneKinds::ALL), Duration::EndOfTurn);
-        }
+        instruction(g, |g| {
+            for player in players {
+                g.add_player_effect(item.controller, item.object, EffectKind::CantCastSpellsFrom(player, ZoneKinds::ALL), Duration::EndOfTurn);
+            }
+        });
     }
     Ok(())
 }

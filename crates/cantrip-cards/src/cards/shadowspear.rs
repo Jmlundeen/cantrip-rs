@@ -13,9 +13,11 @@ fn opponents_permanents_lose_protection(g: &mut dyn Game, item: &StackItem) -> R
     let lost = Keywords::of(&[Keyword::Hexproof, Keyword::Indestructible]);
     let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
     let permanents: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| opponents.contains(&g.controller(id))).collect();
-    for permanent in permanents {
-        g.add_effect(item.object, permanent, EffectKind::LoseKeywords(lost), Duration::EndOfTurn);
-    }
+    instruction(g, |g| {
+        for permanent in permanents {
+            g.add_effect(item.object, permanent, EffectKind::LoseKeywords(lost), Duration::EndOfTurn);
+        }
+    });
     Ok(())
 }
 

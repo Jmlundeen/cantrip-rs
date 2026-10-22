@@ -23,15 +23,19 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .filter(|&id| Some(id) != spared && g.chars(id).is(CardType::Creature))
         .collect();
     airbend_all(g, &others);
+    g.end_sentence();
     let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
-    for opponent in opponents {
-        g.add_player_effect(
-            item.controller,
-            item.object,
-            EffectKind::CantCastSpellsFrom(opponent, ZoneKinds::all_but(&[ZoneKind::Hand])),
-            Duration::UntilNextTurnOf(item.controller),
-        );
-    }
+    instruction(g, |g| {
+        for opponent in opponents {
+            g.add_player_effect(
+                item.controller,
+                item.object,
+                EffectKind::CantCastSpellsFrom(opponent, ZoneKinds::all_but(&[ZoneKind::Hand])),
+                Duration::UntilNextTurnOf(item.controller),
+            );
+        }
+    });
+    g.end_sentence();
     g.exile(item.object);
     Ok(())
 }

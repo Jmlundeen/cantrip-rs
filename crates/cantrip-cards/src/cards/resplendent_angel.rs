@@ -13,8 +13,10 @@ fn create_angel(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Until end of turn, this creature gets +2/+2 and gains lifelink" (CR 611.2, 702.15).
 fn pump_and_lifelink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    pump(g, item.object, item.object, 2, 2);
-    gain_lifelink_until_end_of_turn(g, item.object, item.object);
+    instruction(g, |g| {
+        pump(g, item.object, item.object, 2, 2);
+        gain_lifelink_until_end_of_turn(g, item.object, item.object);
+    });
     Ok(())
 }
 

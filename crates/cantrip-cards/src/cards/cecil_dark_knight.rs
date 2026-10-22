@@ -35,9 +35,11 @@ fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .map(|a| a.id)
         .filter(|&id| id != item.object && g.is_attacking(id) && g.is_on_battlefield(id) && g.chars(id).is(CardType::Creature))
         .collect();
-    for id in others {
-        cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, id);
-    }
+    instruction(g, |g| {
+        for id in others {
+            cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, id);
+        }
+    });
     Ok(())
 }
 

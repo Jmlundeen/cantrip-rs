@@ -22,9 +22,13 @@ fn cura(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Permanents you control gain hexproof and indestructible until end of turn. You gain 6 life." The permanents are the
 /// ones there are as this resolves, and only those (CR 611.2c).
 fn curaga(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for permanent in g.permanents_of(item.controller) {
-        protect(g, item.object, permanent);
-    }
+    let permanents = g.permanents_of(item.controller);
+    instruction(g, |g| {
+        for permanent in permanents {
+            protect(g, item.object, permanent);
+        }
+    });
+    g.end_sentence();
     gain_life(g, item, 6)
 }
 

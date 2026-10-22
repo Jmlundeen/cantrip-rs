@@ -11,10 +11,13 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.is_on_battlefield(returned) {
         return Ok(());
     }
-    g.add_effect(item.object, returned, EffectKind::MustAttack, Duration::Indefinite);
     let o = g.obj(item.object);
     let this = o.copied_card().unwrap_or(o.card);
-    g.add_effect(item.object, returned, EffectKind::AddAbility(AbilityRef::delayed(this, 0)), Duration::Indefinite);
+    // "It gains [this] and [that]": one instruction (CR 608.2c).
+    instruction(g, |g| {
+        g.add_effect(item.object, returned, EffectKind::MustAttack, Duration::Indefinite);
+        g.add_effect(item.object, returned, EffectKind::AddAbility(AbilityRef::delayed(this, 0)), Duration::Indefinite);
+    });
     Ok(())
 }
 

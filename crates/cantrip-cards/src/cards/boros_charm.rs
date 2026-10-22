@@ -12,9 +12,12 @@ fn four_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Permanents you control gain indestructible until end of turn": the permanents there are as it resolves, and only those
 /// (CR 611.2c).
 fn indestructible(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for permanent in g.permanents_of(item.controller) {
-        gain_indestructible_until_end_of_turn(g, item.object, permanent);
-    }
+    let permanents = g.permanents_of(item.controller);
+    instruction(g, |g| {
+        for permanent in permanents {
+            gain_indestructible_until_end_of_turn(g, item.object, permanent);
+        }
+    });
     Ok(())
 }
 

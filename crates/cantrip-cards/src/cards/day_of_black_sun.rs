@@ -17,9 +17,12 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .copied()
         .filter(|&id| g.chars(id).is(CardType::Creature) && g.mana_value(id) <= x)
         .collect();
-    for &creature in &creatures {
-        g.add_effect(item.object, creature, EffectKind::LoseAllAbilities, Duration::EndOfTurn);
-    }
+    instruction(g, |g| {
+        for &creature in &creatures {
+            g.add_effect(item.object, creature, EffectKind::LoseAllAbilities, Duration::EndOfTurn);
+        }
+    });
+    g.end_sentence();
     g.destroy_all(&creatures);
     Ok(())
 }

@@ -144,7 +144,11 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    ..oracle::LIGHTNING_BOLT }`). Ask questions with `g.ask(..)` in the order the rules ask them, offering options in
    the order the engine and the implemented cards do. Doc comments quote the Oracle sentence each function implements
    and cite the CR. A replacement that does another thing "instead" leaves its event at nothing and does the other
-   thing in its `then` (`ReplacementThen`; Hullbreacher, Soul-Scar Mage) - that is the design, not a workaround. If
+   thing in its `then` (`ReplacementThen`; Hullbreacher, Soul-Scar Mage) - that is the design, not a workaround.
+   Where a resolution makes more than one change with no event (effects beginning, copy effects, control), say between
+   each two whether they are one instruction (`instruction(g, |g| ..)`: "gets +2/+2 and gains trample", "each creature
+   you control ...") or an instruction ends there (`g.end_sentence()`, at a sentence's end or a "then"; CR 608.2c,
+   603.8): `CANTRIP_VERIFY` refuses a resolution that says neither. If
    the engine cannot express the text as the rules have it, and the code would need a stand-in that only behaves
    alike (a value faked to get an effect), stop: that is a core gap -
    keep the claim, log `blocked --rule <CR>` and report the gap, as the non-negotiables say.

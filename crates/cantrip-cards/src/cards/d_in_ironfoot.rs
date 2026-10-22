@@ -44,11 +44,12 @@ fn double_strike_for_equipped(g: &mut dyn Game, item: &StackItem) -> Result<(), 
     let attackers: Vec<ObjectId> = g.state().attackers.iter().map(|a| a.id).collect();
     let equipment: Vec<ObjectId> =
         g.state().battlefield().iter().copied().filter(|&id| g.chars(id).has_subtype(Subtype::Equipment)).collect();
-    for creature in attackers {
-        if equipment.iter().any(|&e| g.attached_to(e) == Some(creature)) {
+    let equipped: Vec<ObjectId> = attackers.into_iter().filter(|&creature| equipment.iter().any(|&e| g.attached_to(e) == Some(creature))).collect();
+    instruction(g, |g| {
+        for creature in equipped {
             g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])), Duration::EndOfTurn);
         }
-    }
+    });
     Ok(())
 }
 

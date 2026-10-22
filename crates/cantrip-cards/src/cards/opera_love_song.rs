@@ -11,9 +11,12 @@ fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "One or two target creatures each get +2/+0 until end of turn."
 fn two_creatures_get_plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in targets::legal_objects(g, item) {
-        cantrip_mechanics::pump(g, item.object, creature, 2, 0);
-    }
+    let creatures = targets::legal_objects(g, item);
+    instruction(g, |g| {
+        for creature in creatures {
+            cantrip_mechanics::pump(g, item.object, creature, 2, 0);
+        }
+    });
     Ok(())
 }
 

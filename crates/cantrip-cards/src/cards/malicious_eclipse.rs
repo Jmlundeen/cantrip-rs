@@ -14,6 +14,7 @@ fn would_die(q: &dyn Query, asker: &Asker, _: ObjectId, proposal: &Proposal) -> 
 /// the turn (CR 611.2), made by the resolving spell for its controller.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     pump_all_creatures(g, item.object, -2, -2);
+    g.end_sentence();
     g.add_player_effect(item.controller, item.object, EffectKind::ReplacementRule(0), Duration::EndOfTurn);
     Ok(())
 }

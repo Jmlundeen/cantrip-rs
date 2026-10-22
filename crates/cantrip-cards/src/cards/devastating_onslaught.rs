@@ -13,9 +13,13 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if tokens.is_empty() {
         return Ok(());
     }
-    for &token in &tokens {
-        haste_until_end_of_turn(g, item.object, token);
-    }
+    g.end_sentence();
+    instruction(g, |g| {
+        for &token in &tokens {
+            haste_until_end_of_turn(g, item.object, token);
+        }
+    });
+    g.end_sentence();
     delayed::at_next_end_step_about(g, item, 0, &tokens);
     Ok(())
 }

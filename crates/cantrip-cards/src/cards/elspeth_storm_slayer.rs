@@ -12,14 +12,17 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// 0: Put a +1/+1 counter on each creature you control. Those creatures gain flying until your next turn.
 fn zero(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = cantrip_mechanics::effects::counters_on_creatures_you_control(g, item.controller, CounterKind::PlusOne, 1);
-    for &id in &creatures {
-        g.add_effect(
-            item.object,
-            id,
-            EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])),
-            Duration::UntilNextTurnOf(item.controller),
-        );
-    }
+    g.end_sentence();
+    instruction(g, |g| {
+        for &id in &creatures {
+            g.add_effect(
+                item.object,
+                id,
+                EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])),
+                Duration::UntilNextTurnOf(item.controller),
+            );
+        }
+    });
     Ok(())
 }
 

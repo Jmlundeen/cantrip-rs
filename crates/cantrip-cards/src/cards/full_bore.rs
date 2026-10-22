@@ -10,8 +10,10 @@ fn bore(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
     g.end_sentence();
     if warp::was_cast_for_warp(g, creature) {
-        cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
-        cantrip_mechanics::haste_until_end_of_turn(g, item.object, creature);
+        instruction(g, |g| {
+            cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+            cantrip_mechanics::haste_until_end_of_turn(g, item.object, creature);
+        });
     }
     Ok(())
 }

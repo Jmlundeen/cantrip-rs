@@ -34,12 +34,15 @@ fn creature_attacks_one_of_your_opponents(q: &dyn Query, me: &Asker, event: &Eve
 /// "Those creatures get +2/+2 and gain trample until end of turn" (CR 611.2): the creatures of the batch that are still on
 /// the battlefield as the ability resolves.
 fn attackers_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in g.event_objects(item).to_vec() {
-        if g.is_on_battlefield(creature) {
-            pump(g, item.object, creature, 2, 2);
-            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+    let creatures = g.event_objects(item).to_vec();
+    instruction(g, |g| {
+        for creature in creatures {
+            if g.is_on_battlefield(creature) {
+                pump(g, item.object, creature, 2, 2);
+                g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+            }
         }
-    }
+    });
     Ok(())
 }
 

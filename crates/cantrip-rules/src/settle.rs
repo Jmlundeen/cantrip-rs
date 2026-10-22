@@ -900,6 +900,7 @@ pub(crate) fn state_triggers_now(cx: &mut Cx) {
     for (trigger, _, _) in found {
         cx.st().trigger_push(trigger);
     }
+    cx.state_judged();
 }
 
 /// A Saga's chapter ability (CR 714.2b) triggers when lore counters are put on it and their number becomes at least
@@ -1242,6 +1243,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
         Ok(found) => found,
         Err(panic) => std::panic::resume_unwind(panic),
     };
+    // An event any ability listens for has had the state triggers judge the game as it is (`consider`).
+    if events.iter().any(|e| EventMask::of(e).0 != 0) {
+        cx.state_judged();
+    }
     if found.is_empty() {
         return;
     }

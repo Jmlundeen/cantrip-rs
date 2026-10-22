@@ -29,14 +29,18 @@ fn become_everflame(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let me = item.object;
     let card = g.card_id(&CARD);
     let forever = Duration::Indefinite;
-    g.add_effect(me, me, EffectKind::SetName(EVERFLAME), forever);
-    g.add_effect(me, me, EffectKind::SetTypes(TypeSet::of(&[CardType::Artifact])), forever);
-    g.add_effect(me, me, EffectKind::AddSubtype(Subtype::Equipment), forever);
+    instruction(g, |g| {
+        g.add_effect(me, me, EffectKind::SetName(EVERFLAME), forever);
+        g.add_effect(me, me, EffectKind::SetTypes(TypeSet::of(&[CardType::Artifact])), forever);
+        g.add_effect(me, me, EffectKind::AddSubtype(Subtype::Equipment), forever);
+    });
     // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
     g.end_sentence();
-    g.add_effect(me, me, EffectKind::LoseAllAbilities, forever);
-    g.add_effect(me, me, EffectKind::AddAbility(AbilityRef::delayed(card, 0)), forever);
-    g.add_effect(me, me, EffectKind::AddAbility(AbilityRef::delayed(card, 1)), forever);
+    instruction(g, |g| {
+        g.add_effect(me, me, EffectKind::LoseAllAbilities, forever);
+        g.add_effect(me, me, EffectKind::AddAbility(AbilityRef::delayed(card, 0)), forever);
+        g.add_effect(me, me, EffectKind::AddAbility(AbilityRef::delayed(card, 1)), forever);
+    });
     Ok(())
 }
 

@@ -26,9 +26,12 @@ fn sacrifice_treasures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 /// Up to that many target creatures gain double strike until end of turn: each target still legal (CR 608.2b).
 fn double_strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in targets::legal_objects(g, item) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])), Duration::EndOfTurn);
-    }
+    let creatures = targets::legal_objects(g, item);
+    instruction(g, |g| {
+        for creature in creatures {
+            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])), Duration::EndOfTurn);
+        }
+    });
     Ok(())
 }
 

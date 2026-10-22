@@ -28,9 +28,11 @@ fn tokens_gain_haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
         .into_iter()
         .filter(|&id| g.obj(id).token && g.chars(id).is(CardType::Creature))
         .collect();
-    for id in tokens {
-        haste_until_end_of_turn(g, item.object, id);
-    }
+    instruction(g, |g| {
+        for id in tokens {
+            haste_until_end_of_turn(g, item.object, id);
+        }
+    });
     Ok(())
 }
 

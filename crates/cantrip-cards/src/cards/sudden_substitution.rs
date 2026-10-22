@@ -20,10 +20,14 @@ fn exchange(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         if let Some(spell_by) = spell_by
             && spell_by != creature_by
         {
-            g.change_controller(spell, creature_by);
-            g.add_effect(item.object, creature, EffectKind::Control(spell_by), Duration::Indefinite);
+            // One exchange (CR 701.12a).
+            instruction(g, |g| {
+                g.change_controller(spell, creature_by);
+                g.add_effect(item.object, creature, EffectKind::Control(spell_by), Duration::Indefinite);
+            });
         }
     }
+    g.end_sentence();
     // Still on the stack, even when the exchange did not happen: its controller may retarget it.
     if let Some(controller) = spell_controller(g, spell) {
         g.choose_new_targets(spell, controller)?;
