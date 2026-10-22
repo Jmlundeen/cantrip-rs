@@ -1,0 +1,32 @@
+# Sulfur Falls: "This land enters tapped unless you control an Island or a Mountain." (CR 614.1c, 614.12a: read on the
+# battlefield as it enters, the land itself never counted). Beside a Plains only the first copy enters tapped (turn 3);
+# once an Island is out the second enters untapped (turn 7), the positive control for the first. It also taps for {U} or
+# {R}: green is refused beside the blue it does add, and the {U} activation is that positive control.
+
+[Bot1 Deck]
+Plains
+Sulfur Falls
+Island
+Sulfur Falls
+Island x10
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Sulfur Falls.Play
+? Bot1.Battlefield.Sulfur Falls.Tapped = true
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Sulfur Falls.Activate(Ability: {U} or {R}; Color: Green)
+Bot1.Battlefield.Sulfur Falls.Activate(Ability: {U} or {R}; Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Sulfur Falls.Play
+? Bot1.Battlefield.Sulfur Falls#2.Tapped = false
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Sulfur Falls#2.Tapped = false
