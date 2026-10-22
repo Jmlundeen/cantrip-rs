@@ -1,0 +1,36 @@
+# Turbulent Shore: "This land enters tapped unless your opponents control eight or more lands." On turn 15 Bot2 has seven
+# lands, so Bot1's Shore enters tapped - the seven lands Bot1 itself controls are not the ones counted. On turn 16, with
+# Bot1's eight lands out, Bot2's own Shore enters untapped (positive control).
+
+[Bot1 Deck]
+Plains x7
+Turbulent Shore
+Plains x12
+
+[Bot2 Deck]
+Island x7
+Turbulent Shore
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Turbulent Shore.Play
+Bot2.Hand.Turbulent Shore.Play
+
+[Expect]
+Turn = 16
+Bot1.Battlefield.Turbulent Shore.Tapped = true
+Bot2.Battlefield.Turbulent Shore.Tapped = false

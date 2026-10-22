@@ -1,0 +1,25 @@
+# Turbulent Shore: "({T}: Add {W} or {U}.)" by its Plains and Island land types (CR 305.6): turn 5 it taps for {W}, turn 7
+# for {U}.
+
+[Bot1 Deck]
+Forest
+Turbulent Shore
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Turbulent Shore.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Turbulent Shore.Activate(Ability: {W})
+? Bot1.Mana = {W}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Turbulent Shore.Activate(Ability: {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Turbulent Shore.Tapped = true
