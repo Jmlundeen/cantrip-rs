@@ -1,0 +1,43 @@
+# Despark: "Exile target permanent with mana value 4 or greater." Bot2 has Brazen Borrower (mana value 3) and Displacer
+# Kitten (mana value 4): the Borrower is refused - the same action one mana value below the limit - and the Kitten is
+# exiled.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Mox Jet
+Despark
+Island x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Black Lotus
+Brazen Borrower
+Displacer Kitten
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Brazen Borrower.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Displacer Kitten.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Despark.Cast(Brazen Borrower)
+Bot1.Hand.Despark.Cast(Displacer Kitten)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Displacer Kitten
+Bot2.Graveyard = Black Lotus; Black Lotus
+Bot2.Battlefield = Island; Brazen Borrower
