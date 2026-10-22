@@ -1,0 +1,21 @@
+# Twilight Mire pays {B/G} (here from a Forest) and taps to add two mana, each black or green as Bot1 chooses: {B}{G}, a
+# mix the Forest alone could never make.
+
+[Bot1 Deck]
+Forest
+Twilight Mire
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Twilight Mire.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Twilight Mire.Activate(Ability: {B/G}, {T}; Colors: Black, Green)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {B}{G}

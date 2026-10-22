@@ -1,0 +1,30 @@
+# Twilight Mire: "{B/G}, {T}: Add {B}{B}, {B}{G}, or {G}{G}." The {B/G} must be paid with black or green mana. Turn 3 the
+# Mire and a Plains are all Bot1 has: the filter ability is not offered (a Plains makes {W}, which pays neither half).
+# Turn 5, with a Swamp played, the same ability is offered and a Swamp pays it.
+
+[Bot1 Deck]
+Plains
+Twilight Mire
+Swamp
+Forest
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Twilight Mire.Play
+! Bot1.Battlefield.Twilight Mire.Activate(Ability: {B/G})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Twilight Mire.Activate(Ability: {B/G}, {T})
+Bot1.Colors(Black; Green)
+? Bot1.Mana = {B}{G}
+
+[Expect]
+Bot1.Life = 20
