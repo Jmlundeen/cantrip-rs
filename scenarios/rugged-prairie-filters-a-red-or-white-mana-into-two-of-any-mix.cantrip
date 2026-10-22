@@ -1,0 +1,21 @@
+# Rugged Prairie pays {R/W} (here from a Mountain) and taps to add two mana, each red or white as Bot1 chooses: {R}{W}, a
+# mix the Mountain alone could never make.
+
+[Bot1 Deck]
+Mountain
+Rugged Prairie
+Mountain x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Rugged Prairie.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Rugged Prairie.Activate(Ability: {R/W}, {T}; Colors: Red, White)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {W}{R}

@@ -1,0 +1,35 @@
+# Rugged Prairie: "{T}: Add {C}." and "{R/W}, {T}: Add {R}{R}, {R}{W}, or {W}{W}." Turn 3 a Mountain pays {R/W} for {R}{R};
+# turn 5 a Plains pays it for {W}{W}; turn 7 the Prairie taps for {C} alone.
+
+[Bot1 Deck]
+Island
+Rugged Prairie
+Mountain
+Plains
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Rugged Prairie.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Rugged Prairie.Activate(Ability: {R/W}, {T})
+Bot1.Colors(Red; Red)
+? Bot1.Mana = {R}{R}
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Rugged Prairie.Activate(Ability: {R/W}, {T})
+Bot1.Colors(White; White)
+? Bot1.Mana = {W}{W}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Rugged Prairie.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Life = 20
