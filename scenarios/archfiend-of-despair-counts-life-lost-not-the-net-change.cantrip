@@ -1,0 +1,61 @@
+# Archfiend of Despair: "...loses life equal to the life that player lost this turn" - it doesn't care whether the player
+# also gained life (2018-06-08 ruling). In turn 9, before the Archfiend is out (so the gain is allowed), Bot1 gives Bot2
+# 3 life with Healing Salve (23) and bolts it for 3 (20; damage causes loss of life, CR 120.3a): net change 0, but 3 life
+# lost. The Archfiend is then cast and its end step takes those 3: 17.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Mox Pearl
+Mox Ruby
+Healing Salve
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Archfiend of Despair
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 23
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Archfiend of Despair.Cast
+[T10 Bot2.Main1]
+
+[Expect]
+Turn = 10
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 17

@@ -1,6 +1,7 @@
 # Archfiend of Despair: "At the beginning of each end step, each opponent loses life equal to the life that player lost
 # this turn." Bot2 loses 2 life to its own Night's Whisper on turn 2, and Bot1's Archfiend arrives on turn 5: the turn-5 end
-# step finds Bot2 having lost nothing that turn, so nothing happens. Bot1 is not an opponent and loses nothing either.
+# step finds Bot2 having lost nothing that turn, so nothing happens. (That the controller is no opponent is shown where
+# it loses life in a turn the Archfiend's trigger resolves: the two-Archfiend scenario.)
 
 [Bot1 Deck]
 Swamp
