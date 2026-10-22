@@ -1,11 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, power_up, targets};
+use cantrip_mechanics::{damage_target, effects, power_up, targets};
 use cantrip_oracle as oracle;
 
 /// "Put two +1/+1 counters on this creature. It deals 1 damage to any target." If the creature has left the
 /// battlefield, it still deals the damage, as it last existed (CR 608.2h).
 fn counters_and_ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 2);
+    effects::two_plus_one_counters_on_this(g, item)?;
     damage_target(g, item, 0, 1);
     Ok(())
 }

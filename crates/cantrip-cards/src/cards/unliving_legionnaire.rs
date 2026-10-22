@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{power_up, targets};
+use cantrip_mechanics::{effects, power_up, targets};
 use cantrip_oracle as oracle;
 
 /// "Return up to one target creature card from your graveyard to your hand. Put two +1/+1 counters on this creature."
@@ -9,8 +9,7 @@ fn return_and_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     if let Some(card) = targets::object(g, item, 0) {
         g.return_to_hand(&[card]);
     }
-    g.add_counters(item.object, CounterKind::PlusOne, 2);
-    Ok(())
+    effects::two_plus_one_counters_on_this(g, item)
 }
 
 pub static CARD: CardDef = CardDef {
