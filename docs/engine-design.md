@@ -141,8 +141,8 @@ a search branch is a sibling path that shares everything above it.
   - `GameState::restamp_hidden` resets a timestamp no event recorded;
   - `Game::ask_again` asks the waiting question again of the new cards.
 - **An answer without stages redoes its run from the run's start**, so its node begins before the events the run
-  recorded until it asked; the node keeps those events (`displaced`) and gives them back when the game goes up to its
-  parent.
+  recorded until it asked; the node keeps those events (`displaced`, a range of one arena the tree holds, so an answer
+  allocates nothing for them) and gives them back when the game goes up to its parent.
 - `CANTRIP_VERIFY=1` turns on the engine's own checks while it plays: every answer is round-tripped through the tree
   and the position it lands on is compared.
 

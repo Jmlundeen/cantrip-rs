@@ -651,7 +651,7 @@ fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cos
     let Some(p) = cost.permanents else { return Ok(Vec::new()) };
     let asker = Asker { source, controller: player };
     let eligible: Vec<ObjectId> = cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).collect();
-    if p.tapped && eligible.len() < p.count as usize {
+    if eligible.len() < p.count as usize {
         return Err(Stop::Cancel);
     }
     let purpose = match p.action {

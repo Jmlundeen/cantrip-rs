@@ -59,10 +59,10 @@ pub struct PlayerObs {
     pub poison: u8,
     pub energy: u8,
     pub lost: bool,
-    pub lands_played: u8,
+    pub lands_played: u32,
     pub mulligans: u8,
     /// Mana in the pool, W U B R G C.
-    pub pool: [u8; 6],
+    pub pool: [u32; 6],
     /// How many cards are in their hand and library.
     pub hand: u16,
     pub library: u16,

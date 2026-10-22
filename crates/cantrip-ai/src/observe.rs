@@ -204,7 +204,7 @@ impl View<'_> {
             token: o.token,
             tapped: o.tapped,
             damage: o.damage,
-            counters: o.counters.iter().enumerate().filter(|&(_, &n)| n != 0).map(|(k, &n)| (k as u16, n)).collect(),
+            counters: o.counter_array().iter().enumerate().filter(|&(_, &n)| n != 0).map(|(k, &n)| (k as u16, n)).collect(),
             attacking: attacker.map(|a| r(a.target)),
             blocked: attacker.is_some_and(|a| a.blocked),
             blocking: s.blocks.iter().filter(|b| b.blocker == id).map(|b| r(Target::Object(b.attacker))).collect(),
@@ -216,7 +216,7 @@ impl View<'_> {
             },
             spell: o.zone.is(ZoneKind::Stack).then(|| SpellObs {
                 controller: item.map_or(o.controller, |i| i.controller).0,
-                targets: item.map_or_else(Vec::new, |i| i.targets[..i.target_count as usize].iter().map(|&t| r(t)).collect()),
+                targets: item.map_or_else(Vec::new, |i| s.targets(i).iter().map(|&t| r(t)).collect()),
                 x: item.map_or(o.x, |i| i.x),
             }),
         }
@@ -245,7 +245,7 @@ impl View<'_> {
                     name,
                     kind: if item.kind == StackKind::Activated { 1 } else { 2 },
                     controller: item.controller.0,
-                    targets: item.targets[..item.target_count as usize].iter().map(|&t| target_ref(t, refs)).collect(),
+                    targets: s.targets(&item).iter().map(|&t| target_ref(t, refs)).collect(),
                     x: item.x,
                 }
             }
@@ -264,8 +264,8 @@ impl View<'_> {
         library_known.sort();
         PlayerObs {
             life: pl.life,
-            poison: pl.poison,
-            energy: pl.energy,
+            poison: pl.poison(),
+            energy: pl.energy(),
             lost: pl.lost,
             lands_played: pl.lands_played,
             mulligans: pl.mulligans,
@@ -362,7 +362,7 @@ impl View<'_> {
                     Event::Drew { card, .. } | Event::Discarded { card, .. } | Event::Revealed { card, .. } | Event::Cycled { card, .. } => obs.objects = vec![o(card)],
                     Event::SpellCast { spell, .. } | Event::Countered { spell } => obs.objects = vec![o(spell)],
                     Event::Attacks { attacker, defender } => obs.objects = vec![o(attacker), target_ref(defender, refs)],
-                    Event::Blocks { blocker, attacker } => obs.objects = vec![o(blocker), o(attacker)],
+                    Event::Blocks { blocker, attacker, .. } => obs.objects = vec![o(blocker), o(attacker)],
                     Event::Tapped { permanent } | Event::TurnedFaceUp { permanent, .. } | Event::Transformed { object: permanent } => obs.objects = vec![o(permanent)],
                     Event::CountersPut { object, kind, amount, .. } => {
                         obs.objects = vec![o(object)];

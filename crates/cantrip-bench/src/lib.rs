@@ -181,11 +181,6 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::DeclineCost).expect("decline")))
         }
         RequestKind::ChooseCards { eligible, count, up_to, total, .. } => {
-            // Too few to choose (a sacrifice cost whose only artifact was sacrificed for mana while paying): the one
-            // answer is to take the announcement back.
-            if !*up_to && eligible.len() < *count as usize && request.may_cancel {
-                return Answer::Cancel;
-            }
             let n = if *up_to { random.below(*count as usize + 1) } else { *count as usize };
             let chosen = random.some(eligible, n);
             // "With total mana value N or less": a random choice over it is cut back to the cards that fit, in the order drawn.

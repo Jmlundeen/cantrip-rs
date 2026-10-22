@@ -40,7 +40,7 @@ struct Case {
     chooser: Option<PlayerId>,
     dice: Vec<u8>,
     life: Vec<(usize, i32)>,
-    poison: Vec<(usize, u8)>,
+    event_limit: Option<usize>,
     /// A scenario's answers in order; none for a bot game, which the bench's random seat plays.
     answers: Option<Vec<(PlayerId, Answer)>>,
     bot: u64,
@@ -72,7 +72,7 @@ fn bot_case(i: u64) -> Case {
         chooser: None,
         dice: vec![],
         life: vec![],
-        poison: vec![],
+        event_limit: None,
         answers: None,
         bot: i,
         deep: 15,
@@ -94,7 +94,7 @@ fn scenario_case(path: &Path) -> Option<Case> {
         chooser: script.opening.then(|| PlayerId((script.chooser.max(1) - 1) as u8)),
         dice: script.dice.clone(),
         life: script.life.clone(),
-        poison: script.poison.iter().map(|&(s, p)| (s, p as u8)).collect(),
+        event_limit: script.event_limit,
         answers: Some(answers),
         bot: 0,
         deep: 3,
@@ -153,10 +153,8 @@ fn deal(case: &Case, variant: Option<(PlayerId, InfoMode, u64)>) -> Game {
             player.life = life;
         }
     }
-    for &(seat, poison) in &case.poison {
-        if let Some(player) = game.state.players.get_mut(seat) {
-            player.poison = poison;
-        }
+    if let Some(limit) = case.event_limit {
+        game.max_events = limit;
     }
     game
 }
@@ -221,7 +219,7 @@ fn witness(game: &Game, seat: PlayerId) -> Vec<String> {
         let attached = o.attached_to.map(|a| short(game, seat, a));
         let face = knows_face(s, seat, id);
         let chars = if face || o.zone.is(ZoneKind::Battlefield) { format!("{:?}", game.chars(id)) } else { String::new() };
-        let counters: Vec<(usize, i16)> = o.counters.iter().enumerate().filter(|&(_, &n)| n != 0).map(|(k, &n)| (k, n)).collect();
+        let counters: Vec<(usize, i16)> = o.counter_array().iter().enumerate().filter(|&(_, &n)| n != 0).map(|(k, &n)| (k, n)).collect();
         lines.insert(format!(
             "obj {} {position:?} own{} ctl{} tap{} dmg{} {counters:?} {attacking:?} {blocking:?} {attached:?} {:?} fd{} tok{} {chars}",
             short(game, seat, id),
@@ -236,7 +234,7 @@ fn witness(game: &Game, seat: PlayerId) -> Vec<String> {
     }
     let mut out: Vec<String> = lines.into_iter().collect();
     for (i, item) in s.stack.iter().enumerate() {
-        let targets: Vec<String> = item.targets[..item.target_count as usize].iter().map(|t| target(game, seat, t)).collect();
+        let targets: Vec<String> = game.state.targets(item).iter().map(|t| target(game, seat, t)).collect();
         out.push(format!("stack {i} {:?} {} ctl{} {targets:?} x{}", item.kind, short(game, seat, item.object), item.controller.0, item.x));
     }
     for p in s.seats() {
@@ -244,7 +242,7 @@ fn witness(game: &Game, seat: PlayerId) -> Vec<String> {
         let counts: Vec<usize> = [Zone::library(p), Zone::hand(p), Zone::graveyard(p), Zone::exile(p), Zone::sideboard(p)].iter().map(|&z| s.zone(z).len()).collect();
         out.push(format!(
             "player {} {} {} {} {} {} {} {:?} {} {:?} {counts:?}",
-            p.0, pl.life, pl.poison, pl.energy, pl.lost, pl.lands_played, pl.mulligans, pl.pool, pl.monarch, pl.speed
+            p.0, pl.life, pl.poison(), pl.energy(), pl.lost, pl.lands_played, pl.mulligans, pl.pool, pl.monarch, pl.speed
         ));
     }
     let t = &s.turn;

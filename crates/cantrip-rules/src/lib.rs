@@ -439,10 +439,10 @@ impl Game {
         // the child's begin where the run did, the child keeping them to give back to its parent; the journal only grows (a
         // revert appends the inverse entries).
         let (child_start, displaced) = if self.state.agenda[at].staged {
-            (here, Vec::new())
+            (here, &self.log[..0])
         } else {
             let log_mark = self.state.agenda[at].log_mark as usize;
-            ((here.0, log_mark), self.log[log_mark..].to_vec())
+            ((here.0, log_mark), &self.log[log_mark..])
         };
         let child = self.tree.add(self.at, (request, player, answer.clone()), child_start, displaced);
 
@@ -633,7 +633,7 @@ impl Game {
         let state = self.state.clone_with_journal_from(floor);
         let root = self.tree.next();
         let tree = tree::Tree::rooted(root, (state.mark(), self.log.len()));
-        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify }
+        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE }
     }
 
     /// Gives the game's generator another seed (`GameState::reseed`): a fork for search that must not shuffle or roll
@@ -650,6 +650,7 @@ impl Game {
     /// on a fork still at its root.
     pub fn ask_again(&mut self) {
         assert_eq!(self.tree.len(), 1, "asking again in a game whose tree has left its root");
+        assert_ne!(self.tree.root(), tree::NodeId::ROOT, "only a game forked for search (`fork_for_search`) is dealt anew");
         let Some(at) = self.state.agenda.len().checked_sub(1) else { return };
         let frame = &self.state.agenda[at];
         if frame.pending.is_none() || frame.staged {
@@ -669,6 +670,7 @@ impl Game {
     /// are rewritten too (a face-down spell's, a hidden card's ability activated from a hand).
     pub fn rebind_hidden(&mut self, chain: &[ObjectId], card: CardId) {
         assert_eq!(self.tree.len(), 1, "rebinding a hidden object of a game whose tree has left its root");
+        assert_ne!(self.tree.root(), tree::NodeId::ROOT, "only a game forked for search (`fork_for_search`) is dealt anew");
         let old = self.state.obj(chain[0]).card;
         if old == card {
             return;
@@ -899,7 +901,12 @@ impl<'a> Cx<'a> {
         loops::asked(&mut self.g.state, &kind);
         if let Some(answer) = replay {
             self.cursor += 1;
-            self.shown(player, &kind);
+            if matches!(
+                kind,
+                RequestKind::DistributeCards { .. } | RequestKind::SearchLibrary { .. } | RequestKind::ChooseCards { .. } | RequestKind::ChooseName { .. } | RequestKind::ChooseTarget { .. }
+            ) {
+                self.shown(player, &kind);
+            }
             return Ok(answer);
         }
         let frame = &self.g.state.agenda[self.frame];
@@ -921,13 +928,8 @@ impl<'a> Cx<'a> {
     /// The hidden cards a question showed its player, recorded as it is answered (`Event::Shown`): the cards a scry,
     /// surveil or look at the top looked at, a library searched, a hand chosen from. Only the questions that show cards;
     /// priority and combat name nothing hidden.
+    #[inline(never)]
     fn shown(&mut self, player: PlayerId, kind: &RequestKind) {
-        if !matches!(
-            kind,
-            RequestKind::DistributeCards { .. } | RequestKind::SearchLibrary { .. } | RequestKind::ChooseCards { .. } | RequestKind::ChooseName { .. } | RequestKind::ChooseTarget { .. }
-        ) {
-            return;
-        }
         let mut hidden: Vec<ObjectId> = Vec::new();
         kind.objects(&mut |id| {
             if id.index() < self.g.state.objects.len() && !hidden.contains(&id) && hidden_from(&self.g.state, player, id) {
@@ -2045,7 +2047,7 @@ mod tests {
             RequestKind::DeclareAttackers { eligible, players, .. } => Answer::Attack(eligible.iter().map(|&a| (a, Target::Player(players[0]))).collect()),
             RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand[..*count as usize].to_vec()),
-            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..sources.len() as u8).collect()),
+            RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..sources.len() as u32).collect()),
             other => panic!("no answer for {other:?}"),
         }
     }

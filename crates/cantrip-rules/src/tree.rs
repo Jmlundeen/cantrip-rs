@@ -43,8 +43,8 @@ struct Node {
     away: Option<Away>,
     /// The events its parent had recorded that its run threw away: an answer without stages redoes the run from its start,
     /// so it begins where the run did, before the events the run recorded until it asked. They are its parent's again once
-    /// the working state goes back up to it.
-    displaced: Vec<Record>,
+    /// the working state goes back up to it. A range of the tree's `displaced`, so that no answer allocates for them.
+    displaced: (u32, u32),
 }
 
 /// The tree of every position the game has been in and every branch a search has looked at.
@@ -54,6 +54,8 @@ pub struct Tree {
     /// (`Game::fork_for_search`), so that no node of the true past names one of its nodes.
     first: u32,
     nodes: Vec<Node>,
+    /// Every node's displaced events, end to end (`Node::displaced`).
+    displaced: Vec<Record>,
 }
 
 impl Tree {
@@ -63,7 +65,8 @@ impl Tree {
 
     /// A tree whose root is `root`, beginning at this journal mark and history length.
     pub fn rooted(root: NodeId, start: (Mark, usize)) -> Tree {
-        Tree { first: root.0, nodes: vec![Node { parent: None, answer: None, children: Vec::new(), start, end: None, away: None, displaced: Vec::new() }] }
+        let node = Node { parent: None, answer: None, children: Vec::new(), start, end: None, away: None, displaced: (0, 0) };
+        Tree { first: root.0, nodes: vec![node], displaced: Vec::new() }
     }
 
     pub fn root(&self) -> NodeId {
@@ -122,8 +125,11 @@ impl Tree {
         path
     }
 
-    pub(crate) fn add(&mut self, parent: NodeId, answer: (u32, PlayerId, Answer), start: (Mark, usize), displaced: Vec<Record>) -> NodeId {
+    pub(crate) fn add(&mut self, parent: NodeId, answer: (u32, PlayerId, Answer), start: (Mark, usize), displaced: &[Record]) -> NodeId {
         let id = self.next();
+        let from = self.displaced.len() as u32;
+        self.displaced.extend_from_slice(displaced);
+        let displaced = (from, self.displaced.len() as u32);
         self.nodes.push(Node { parent: Some(parent), answer: Some(answer), children: Vec::new(), start, end: None, away: None, displaced });
         let i = self.ix(parent);
         self.nodes[i].children.push(id);
@@ -135,7 +141,8 @@ impl Tree {
     }
 
     pub(crate) fn displaced(&self, node: NodeId) -> &[Record] {
-        &self.nodes[self.ix(node)].displaced
+        let (from, to) = self.nodes[self.ix(node)].displaced;
+        &self.displaced[from as usize..to as usize]
     }
 
     pub fn end(&self, node: NodeId) -> Option<(Mark, usize)> {
