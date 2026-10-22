@@ -1,0 +1,5 @@
+{
+  "name": "Isolated Chapel",
+  "type": "Land",
+  "oracleText": "This land enters tapped unless you control a Plains or a Swamp.\n{T}: Add {W} or {B}."
+}
