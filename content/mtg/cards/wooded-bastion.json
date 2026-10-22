@@ -1,0 +1,5 @@
+{
+  "name": "Wooded Bastion",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{G/W}, {T}: Add {G}{G}, {G}{W}, or {W}{W}."
+}

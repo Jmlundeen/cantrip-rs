@@ -1,0 +1,30 @@
+# Wooded Bastion: "{G/W}, {T}: Add {G}{G}, {G}{W}, or {W}{W}." The {G/W} must be paid with green or white mana. Turn 3 the
+# Bastion and a Mountain are all Bot1 has: the filter ability is not offered (a Mountain makes {R}, which pays neither
+# half). Turn 5, with a Forest played, the same ability is offered and a Forest pays it.
+
+[Bot1 Deck]
+Mountain
+Wooded Bastion
+Forest
+Plains
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Wooded Bastion.Play
+! Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W}, {T})
+Bot1.Colors(Green; White)
+? Bot1.Mana = {W}{G}
+
+[Expect]
+Bot1.Life = 20

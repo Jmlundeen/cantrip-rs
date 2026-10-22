@@ -1,0 +1,21 @@
+# Wooded Bastion pays {G/W} (here from a Plains) and taps to add two mana, each green or white as Bot1 chooses: {G}{W}, a
+# mix the Plains alone could never make.
+
+[Bot1 Deck]
+Plains
+Wooded Bastion
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Wooded Bastion.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W}, {T}; Colors: Green, White)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {W}{G}
