@@ -1,0 +1,73 @@
+# Liliana returns only a creature or planeswalker card from her controller's graveyard. The first target is refused when it is an artifact card; her {5}{B} exhaust activation returns a creature, puts one +1/+1 counter on her, and cannot be activated a second time when a legal target and enough mana remain (CR 115.1, 602.5d, 602.5b, 702.177a).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Liliana the Repentant
+Swamp
+Duress
+Llanowar Elves
+Swamp
+Swamp
+Ornithopter
+Llanowar Elves
+Ornithopter
+Ornithopter
+Mox Jet
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Liliana the Repentant.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Swamp#4.Activate
+Bot1.Battlefield.Swamp#5.Activate
+Bot1.Battlefield.Swamp#6.Activate
+! Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot1.Graveyard.Mox Jet)
+Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot1.Graveyard.Llanowar Elves)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T13 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Swamp#4.Activate
+Bot1.Battlefield.Swamp#5.Activate
+Bot1.Battlefield.Swamp#6.Activate
+! Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot1.Graveyard.Ornithopter)
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Types = Creature
+Bot1.Battlefield.Liliana the Repentant.Counters.PlusOnePlusOne = 1

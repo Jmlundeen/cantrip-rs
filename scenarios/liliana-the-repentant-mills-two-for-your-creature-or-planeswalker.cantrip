@@ -1,0 +1,64 @@
+# Liliana's own entry and an opponent's creature do not trigger; her creature and planeswalker each mill two (CR 603.6a, 701.17).
+
+[Bot1 Deck]
+Swamp
+Liliana the Repentant
+Island
+Llanowar Elves
+Forest
+Island
+Jace Reawakened
+Swamp
+Swamp
+Mountain
+Plains
+Forest
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Ornithopter
+Mountain x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Liliana the Repentant.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard.Count = 0
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Jace Reawakened.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mountain; Mountain; Plains; Mountain
+Bot1.Battlefield.Liliana the Repentant.Types = Creature
+Bot1.Battlefield.Jace Reawakened.Types = Planeswalker
+Bot2.Graveyard =

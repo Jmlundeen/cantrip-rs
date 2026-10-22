@@ -1,0 +1,53 @@
+# Liliana's exhaust ability can return a planeswalker card from her controller's graveyard (CR 115.1, 702.177a). Ornithopter entering mills Jace Reawakened; Sol Ring and Mox Jet leave six mana sources to pay {5}{B} on turn 5.
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Jet
+Liliana the Repentant
+Ornithopter
+Swamp
+Swamp
+Jace Reawakened
+Island
+Swamp x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Liliana the Repentant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot1.Graveyard.Jace Reawakened)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Reawakened.Types = Planeswalker
+Bot1.Battlefield.Liliana the Repentant.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Swamp; Swamp; Island
