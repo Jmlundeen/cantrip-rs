@@ -32,5 +32,6 @@ Bot1.Attack(Fblthp, Impossibly Lost > Bot2)
 Bot1.Battlefield.Count = 2
 Bot1.Graveyard.Count = 0
 Bot2.Life = 19
+Bot1.Library.Count = 10
 Result = InProgress
 Stack.Count = 0

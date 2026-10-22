@@ -1,5 +1,5 @@
 # Fblthp, Impossibly Lost: "Draw two cards. If your library has no cards in it, you win the game." Bot1's library holds one
-# card as the trigger resolves: the first draw takes it, the second draws nothing (CR 121.3), and Bot1 wins while the
+# card as the trigger resolves: the first draw takes it, the second draws nothing (CR 121.4), and Bot1 wins while the
 # ability is resolving, before state-based actions could make Bot1 lose for the empty-library draw (the card's ruling).
 # CR 104.1 ends the game immediately at the win, so Fblthp stays on the battlefield and the library stays empty.
 

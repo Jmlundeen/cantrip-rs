@@ -14,8 +14,10 @@ fn opponents_dealt_combat_damage(q: &dyn Query, me: &Asker, event: &Event) -> Op
     }
 }
 
-/// Check the win before empty-draw state-based actions. Shuffle into the owner's library only if the original
-/// permanent remains (CR 400.7); the engine skips the shuffle if the game has ended (CR 104.1).
+/// "Draw two cards. If your library has no cards in it, you win the game. Fblthp's owner shuffles him into their library."
+/// The win is checked as the ability resolves, before the state-based actions could make an empty-library draw lose
+/// (CR 704.5b); if the game is over the ability stops there. Otherwise Fblthp is shuffled into his owner's library: the
+/// move needs the original object (CR 400.7), but the library is shuffled either way (CR 701.24c).
 fn draw_win_and_shuffle(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, 2);
