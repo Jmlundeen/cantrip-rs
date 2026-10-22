@@ -1,0 +1,32 @@
+# Canopy Vista: "This land enters tapped unless you control two or more basic lands." Bot1 controls two Savannahs - two
+# lands with the Forest and Plains types, but neither basic (CR 205.4a; two or more of these lands do not count) - and no
+# basic land at all, so its Canopy Vista enters tapped. Bot2 with a Forest and a Plains plays the same land untapped
+# (positive control).
+
+[Bot1 Deck]
+Savannah
+Savannah
+Canopy Vista
+Plains x20
+
+[Bot2 Deck]
+Forest
+Plains
+Canopy Vista
+Plains x20
+
+[Actions]
+Bot1.Hand.Savannah.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Savannah.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Canopy Vista.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Canopy Vista.Play
+
+[Expect]
+Bot1.Battlefield.Canopy Vista.Tapped = true
+Bot2.Battlefield.Canopy Vista.Tapped = false
