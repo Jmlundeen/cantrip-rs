@@ -42,7 +42,7 @@ Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player)
 [T11 Bot1.Main1]
 ? Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 6
 Bot1.Battlefield.Liliana of the Veil.Activate(Bot2; Ability: Separate)
-Bot1.Target(Bot2.Battlefield.Llanowar Elves; Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Choose(Bot2.Battlefield.Llanowar Elves; Bot2.Battlefield.Guerrilla Gorilla)
 Bot2.Modes(First pile)
 
 [Expect]

@@ -20,28 +20,8 @@ fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn minus_six(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(victim) = item.target(0).player() else { return Ok(()) };
     let permanents = g.permanents_of(victim);
-    let first: Vec<ObjectId> = if permanents.is_empty() {
-        Vec::new()
-    } else {
-        let candidates: Vec<Target> = permanents.iter().map(|&id| Target::Object(id)).collect();
-        let count = count_u32(candidates.len());
-        let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
-            source: item.object,
-            purpose: Purpose::SeparatePiles,
-            candidates,
-            optional: true,
-            least: 0,
-            count,
-            any_number: true,
-        };
-        match g.ask(item.controller, ask)? {
-            Answer::Targets(targets) => targets.iter().filter_map(|t| t.object()).collect(),
-            _ => Vec::new(),
-        }
-    };
-    let second: Vec<ObjectId> = permanents.iter().copied().filter(|id| !first.contains(id)).collect();
-    let piles = vec![Label::Pile { first: true, empty: first.is_empty() }, Label::Pile { first: false, empty: second.is_empty() }];
-    let pile = if choose::one_of(g, victim, item.object, piles)? == 1 { second } else { first };
+    let (first, second) = choose::separate(g, Some(item.controller), item.object, permanents)?;
+    let (pile, _) = choose::pile(g, victim, item.object, first, second)?;
     g.sacrifice(&pile);
     Ok(())
 }

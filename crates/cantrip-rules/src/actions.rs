@@ -5800,7 +5800,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
                 let ask = RequestKind::ChooseModes {
                     source: card,
                     eligible: (0..choices.len() as u8).collect(),
-                    modes: choices.iter().map(|c| c.0).collect(),
+                    modes: choices.iter().map(|c| c.0.clone()).collect(),
                     count: 1,
                     at_most: 0,
                     affordable: Vec::new(),

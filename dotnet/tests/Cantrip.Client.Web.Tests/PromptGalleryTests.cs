@@ -30,6 +30,37 @@ public sealed class PromptGalleryTests(WebClient web)
         Assert.Empty(table.Errors);
     }
 
+    [Fact]
+    public async Task Piles_are_separated_with_an_empty_pile_allowed_and_chosen_by_their_contents()
+    {
+        await using TablePage table = await TablePage.OpenAsync(
+            web, "prompt=separate-piles", WebClient.Pictures(nameof(PromptGalleryTests)));
+        TableState opened = await table.SettledAsync(state => state.Fixture == "separate-piles");
+        Assert.Equal("Any number of choices for Fact or Fiction", opened.Title);
+        Assert.Contains("choose the first pile; the rest form the second", opened.Detail, StringComparison.Ordinal);
+        Assert.Contains(opened.Cards, card => card.Visible && card.Name == "Grizzly Bears");
+        await table.ClickAsync("Choose none", "button");
+        TableState separated = await table.SettledAsync(state => state.Answered.Length > 0);
+        Assert.StartsWith("TargetsChosenAnswer", separated.Answered, StringComparison.Ordinal);
+
+        await table.Page.EvaluateAsync("name => location.hash = name", "choose-pile");
+        TableState choice = await table.SettledAsync(state => state.Fixture == "choose-pile");
+        Assert.Contains(choice.Controls, control => control.Label == "First pile: Grizzly Bears, Island");
+        Assert.Contains(choice.Controls, control => control.Label == "Second pile: Counterspell, Brainstorm");
+        await table.ClickAsync("Second pile: Counterspell, Brainstorm", "button");
+        TableState chosen = await table.SettledAsync(state => state.Answered.Length > 0);
+        Assert.Equal("ModesChosenAnswer 1", chosen.Answered);
+
+        await table.Page.EvaluateAsync("name => location.hash = name", "separate-piles");
+        await table.SettledAsync(state => state.Fixture == "separate-piles" && state.Answered.Length == 0);
+        await table.ClickCardAsync("Grizzly Bears");
+        await table.SettledAsync(state => state.Detail.Contains("1 of 4 chosen", StringComparison.Ordinal));
+        await table.ClickAsync("Done with 1 choice", "button");
+        TableState picked = await table.SettledAsync(state => state.Answered.Length > 0);
+        Assert.StartsWith("TargetsChosenAnswer", picked.Answered, StringComparison.Ordinal);
+        Assert.Empty(table.Errors);
+    }
+
     /// <summary>
     /// A list of options too long for a button each - every creature type - is found by typing: the box narrows the
     /// buttons to what matches, a click on one answers with that option, and Enter takes the one the typing settles on.

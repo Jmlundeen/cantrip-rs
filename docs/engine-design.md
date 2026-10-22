@@ -202,6 +202,11 @@ nothing else.
 
 #### Selection rules
 
+A pile separation (CR 700.3a, 700.3c-d; Fact or Fiction, Liliana of the Veil) uses `choose::select` with `ANY_NUMBER`: the chosen
+objects form the first pile and the complement the second, either possibly empty. The later pile choice carries each
+pile's members in `Label::Pile`, so `RequestKind::objects` shows the chooser those objects and the host names the contents
+in the options. Separating a pile neither targets (CR 115.10a) nor moves its members (CR 700.3c).
+
 A question that picks a set of cards - a choice of cards (`RequestKind::ChooseCards`) or a library search
 (`RequestKind::SearchLibrary`) - carries its **selection rule** (`Selection`, `cantrip-state/src/decision.rs`): which sets
 of its cards are an answer, as data. A rule is a `Count` (`Exactly(n)`, `UpTo(n)`, `AnyNumber`, `AsManyAsCan(n)` - fewer only

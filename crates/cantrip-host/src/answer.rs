@@ -190,7 +190,15 @@ pub fn translate(
             shuffle: a.shuffle,
         },
         AnswerPayload::TargetsChosenAnswer(a) => {
-            Answer::Targets(a.targets.iter().map(|t| target(handles, game, t)).collect::<Result<_, _>>()?)
+            let targets = a.targets.iter().map(|t| target(handles, game, t)).collect::<Result<Vec<_>, _>>()?;
+            if crate::prompt::pile_selection(&request.kind) {
+                Answer::Cards(targets.into_iter().map(|t| match t {
+                    Target::Object(id) => Ok(id),
+                    _ => Err(Untranslatable::Illegal("a pile contains only the offered cards or permanents".into())),
+                }).collect::<Result<_, _>>()?)
+            } else {
+                Answer::Targets(targets)
+            }
         }
         AnswerPayload::MayChosenAnswer(a) => {
             if a.accept {
@@ -254,6 +262,9 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
         Answer::Pass => AnswerPayload::PassAnswer(PassAnswer {}),
         Answer::Cancel => AnswerPayload::CancelAnnouncementAnswer(CancelAnnouncementAnswer {}),
         Answer::Announce(value) => AnswerPayload::AnnounceAnswer(AnnounceAnswer { value: crate::prompt::wire(*value) }),
+        Answer::Cards(ids) if crate::prompt::pile_selection(&request.kind) => AnswerPayload::TargetsChosenAnswer(TargetsChosenAnswer {
+            targets: ids.iter().map(|&id| wire_target(handles, Target::Object(id))).collect(),
+        }),
         Answer::Cards(ids) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer { cards: ids.iter().map(|&id| handles.handle(id)).collect() }),
         Answer::Act(action) => {
             let source = action.source.map_or(ViewHandle::NONE, |s| handles.handle(s));

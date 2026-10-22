@@ -74,6 +74,10 @@ before sending it - checked, and if refused mended a card at a time from what ma
 included, answers what the rules take. A check the host refuses is answered with an `ErrorMessage` whose `RequestId` names the
 request, so a client reacts only to the error of its own check. Version 203.
 
+An unrestricted `SeparatePiles` selection (`AnyNumber`, no parts or candidate restriction) uses the existing non-targeted
+`ChooseTargetPromptMessage` presentation; its `TargetsChosenAnswer` is translated to the engine's card selection and
+checked by the same validator. A pile-choice mode names its members, with an empty pile named "nothing" (CR 700.3d).
+
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed
 counters, added mana or cost life (a land, Black Lotus, Lotus Petal, Pentad Prism, a Treasure), that seat's next priority

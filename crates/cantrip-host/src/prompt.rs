@@ -700,6 +700,19 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             choosing_x: x.is_some(),
             x: x.map_or(0, i32::from),
         }),
+        // Protocol 203 already shows an unrestricted, non-targeted set choice. Keep that presentation for pile
+        // separation while the engine asks and validates it through its selection rule.
+        RequestKind::ChooseCards { source, cards, .. } if pile_selection(&request.kind) => {
+            let source = source_handle(game, handles, *source);
+            PromptPayload::ChooseTargetPromptMessage(ChooseTargetPrompt {
+                player, source, ability: source,
+                text: "Separate into two piles: choose the first pile; the rest form the second. Either pile may be empty.".into(),
+                candidates: cards.iter().filter_map(|&id| target_message(handles, Target::Object(id))).collect(),
+                count: wire(count_u32(cards.len())),
+                targeted: false, optional: true, any_number: true,
+                ..Default::default()
+            })
+        }
         RequestKind::ChooseCards { source, purpose, cards, rule } => {
             let kind = &rule.kind;
             let verdict = verdict_view(game, request, handles);
@@ -863,6 +876,11 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         Label::Miracle(m) => miracle_label(game, *m),
                         // The slot's text and what it holds now, so two slots worded alike are told apart.
                         Label::TargetSlot(text, held) => format!("{text}: {}", target_words(game, *held)),
+                        Label::Pile { cards, .. } if !cards.is_empty() => format!("{}: {}", label_text(l), cards.iter()
+                            .map(|&id| {
+                                let name = game.name(id);
+                                if !name.is_empty() { name } else if game.obj(id).face_down { "Face-down permanent" } else { "Nameless permanent" }
+                            }).collect::<Vec<_>>().join(", ")),
                         other => label_text(other).to_string(),
                     })
                     .collect(),
@@ -1183,6 +1201,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
     Ok((payload, request.may_cancel))
 }
 
+/// The unrestricted pile selection that protocol 203 can show as its existing non-targeted choice. Any rule with
+/// further constraints keeps the ordinary selection prompt and its `Check` feedback.
+pub(crate) fn pile_selection(kind: &RequestKind) -> bool {
+    matches!(kind, RequestKind::ChooseCards { purpose: Purpose::SeparatePiles, rule, .. }
+        if rule.count == Count::AnyNumber && rule.parts().next().is_none() && rule.among.is_none())
+}
+
 /// What the rule of `request`, a question that picks a set of cards, says of `selected` (`selection_verdict`), as the seat
 /// with `handles` sees it: whether it is an answer, and the cards that may be added. The prompt carries it for none chosen;
 /// the host's `Check` answers it for any other selection.
@@ -1385,6 +1410,69 @@ mod tests {
         assert_eq!(heading, "Gollum, Riddle Master: choose Odd or Even");
         assert_eq!(modes, vec!["Odd".to_string(), "Even".to_string()]);
         assert_eq!(ask(vec![Label::Card(card, 0), Label::Card(card, 1)]).0, "");
+    }
+
+    #[test]
+    fn separating_piles_is_an_any_number_choice_and_names_each_piles_members() {
+        let (mut game, hand) = game_with(&["Liliana of the Veil", "Lightning Bolt", "Counterspell", "Forest"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let source = hand[0];
+        let request = Request {
+            id: 1,
+            player: seat,
+            kind: RequestKind::ChooseCards {
+                source, purpose: Purpose::SeparatePiles, cards: hand[1..3].to_vec(),
+                rule: Box::new(Selection::new(Count::AnyNumber)),
+            },
+            may_cancel: false,
+        };
+        let mut handles = HandleSpace::new();
+        let PromptPayload::ChooseTargetPromptMessage(p) = prompt(&game, &request, &mut handles).expect("a prompt").0 else { panic!("a compatible choice") };
+        assert!(!p.targeted && p.any_number && p.optional);
+        assert_eq!(p.candidates.len(), 2);
+        assert!(p.text.contains("the rest form the second"));
+        assert!(verdict_of(&game, &request, &[], &mut handles).expect("a verdict").complete, "the first pile may be empty");
+        assert!(verdict_of(&game, &request, &hand[1..3], &mut handles).expect("a verdict").complete, "the second pile may be empty");
+        for selected in [vec![], vec![hand[1]], hand[1..3].to_vec(), vec![hand[1], hand[1]], vec![hand[3]]] {
+            let wire = crate::answer::payload_of(&Answer::Cards(selected.clone()), &request, &mut handles, &game);
+            assert!(matches!(wire, AnswerPayload::TargetsChosenAnswer(_)));
+            let Ok(Answer::Cards(back)) = crate::answer::translate(&wire, &request, &handles, &game) else { panic!("a card selection") };
+            assert_eq!(back, selected);
+            let legal = back != vec![hand[1], hand[1]] && back != vec![hand[3]];
+            assert_eq!(verdict_of(&game, &request, &back, &mut handles).expect("a verdict").complete, legal);
+        }
+        let player = AnswerPayload::TargetsChosenAnswer(TargetsChosenAnswer { targets: vec![TargetMessage { player: 2, ..Default::default() }] });
+        assert!(matches!(crate::answer::translate(&player, &request, &handles, &game), Err(crate::answer::Untranslatable::Illegal(_))));
+        for rule in [Selection::new(Count::Exactly(1)), Selection::listed(Count::AnyNumber, &hand[1..3], vec![hand[1]])] {
+            let kind = RequestKind::ChooseCards { source, purpose: Purpose::SeparatePiles, cards: hand[1..3].to_vec(), rule: Box::new(rule) };
+            assert!(!pile_selection(&kind), "a restricted choice keeps its selection prompt");
+        }
+
+        let ask = |first: Vec<ObjectId>, second: Vec<ObjectId>| Request {
+            id: 2, player: seat, may_cancel: false,
+            kind: RequestKind::ChooseModes {
+                source, modes: vec![Label::Pile { first: true, cards: first }, Label::Pile { first: false, cards: second }],
+                eligible: vec![0, 1], count: 1, at_most: 0, affordable: Vec::new(), additional_cost: false, repeat: false,
+            },
+        };
+        let request = ask(vec![hand[1]], vec![hand[2]]);
+        let mut shown = Vec::new();
+        request.kind.objects(&mut |id| shown.push(id));
+        assert_eq!(shown, hand[..3], "the chooser sees both piles, without unrelated cards");
+        let PromptPayload::ChooseModesPromptMessage(p) = prompt(&game, &request, &mut handles).expect("a prompt").0 else { panic!("piles") };
+        assert_eq!(p.modes, ["First pile: Lightning Bolt", "Second pile: Counterspell"]);
+        let PromptPayload::ChooseModesPromptMessage(p) = prompt(&game, &ask(vec![], vec![hand[1], hand[2]]), &mut handles).expect("a prompt").0 else { panic!("piles") };
+        assert_eq!(p.modes, ["First pile: nothing", "Second pile: Lightning Bolt, Counterspell"]);
+        let printed = game.obj(hand[1]).card;
+        let renamed = game.state.push_obj(Obj::new(printed, seat, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, renamed);
+        game.state.update_obj(renamed, |o| o.copy = Some(Copiable::of(printed).named("Renamed permanent")));
+        let hidden = game.state.push_obj(Obj::new(printed, seat, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, hidden);
+        let values = game.cards.face_down_values(FaceDown::Manifested);
+        game.state.update_obj(hidden, |o| { o.face_down = true; o.marks.face_down_as = Some(values); });
+        let PromptPayload::ChooseModesPromptMessage(p) = prompt(&game, &ask(vec![renamed], vec![hidden]), &mut handles).expect("a prompt").0 else { panic!("piles") };
+        assert_eq!(p.modes, ["First pile: Renamed permanent", "Second pile: Face-down permanent"]);
     }
 
     #[test]
