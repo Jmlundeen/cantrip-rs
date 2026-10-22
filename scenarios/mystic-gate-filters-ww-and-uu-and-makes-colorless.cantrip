@@ -1,0 +1,35 @@
+# Mystic Gate: "{T}: Add {C}." and "{W/U}, {T}: Add {W}{W}, {W}{U}, or {U}{U}." Turn 3 a Plains pays {W/U} for {W}{W};
+# turn 5 an Island pays it for {U}{U}; turn 7 the Gate taps for {C} alone.
+
+[Bot1 Deck]
+Swamp
+Mystic Gate
+Plains
+Island
+Island x4
+Island x10
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mystic Gate.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U}, {T})
+Bot1.Colors(White; White)
+? Bot1.Mana = {W}{W}
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U}, {T})
+Bot1.Colors(Blue; Blue)
+? Bot1.Mana = {U}{U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mystic Gate.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Life = 20

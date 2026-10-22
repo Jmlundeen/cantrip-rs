@@ -1,0 +1,5 @@
+{
+  "name": "Mystic Gate",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{W/U}, {T}: Add {W}{W}, {W}{U}, or {U}{U}."
+}

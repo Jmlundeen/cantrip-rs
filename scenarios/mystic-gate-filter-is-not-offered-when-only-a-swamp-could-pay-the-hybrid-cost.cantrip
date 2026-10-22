@@ -1,0 +1,30 @@
+# Mystic Gate: "{W/U}, {T}: Add {W}{W}, {W}{U}, or {U}{U}." The {W/U} must be paid with white or blue mana. Turn 3 the
+# Gate and a Swamp are all Bot1 has: the filter ability is not offered (a Swamp makes {B}, which pays neither half).
+# Turn 5, with a Plains played, the same ability is offered and a Plains pays it.
+
+[Bot1 Deck]
+Swamp
+Mystic Gate
+Plains
+Island
+Island x4
+Island x10
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mystic Gate.Play
+! Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U}, {T})
+Bot1.Colors(White; Blue)
+? Bot1.Mana = {W}{U}
+
+[Expect]
+Bot1.Life = 20
