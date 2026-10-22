@@ -1,0 +1,38 @@
+# Kher Keep: "{T}: Add {C}." and "{1}{R}, {T}: Create a 0/1 red Kobold creature token named Kobolds of Kher Keep." Turn
+# 5 the Keep taps for {C} alone. Turn 7 two Mountains pay {1}{R} and it makes the 0/1 red Kobold token, spelled as its
+# own name (CR 111.4).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Kher Keep
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Kher Keep.Play
+Bot1.Battlefield.Kher Keep.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Kher Keep.Activate(Ability: {1}{R}, {T})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kobolds of Kher Keep.Token = true
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Kobolds of Kher Keep.Token = true
+Bot1.Battlefield.Kobolds of Kher Keep.Types = Creature
+Bot1.Battlefield.Kobolds of Kher Keep.Subtypes = Kobold
+Bot1.Battlefield.Kobolds of Kher Keep.Colors = Red
+Bot1.Battlefield.Kobolds of Kher Keep.Power = 0
+Bot1.Battlefield.Kobolds of Kher Keep.Toughness = 1
+Bot1.Battlefield.Kher Keep.Tapped = true
