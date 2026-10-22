@@ -415,7 +415,7 @@ impl<'s> Run<'s> {
                 format!("{} [{}]", kind_name(&r.kind), list.join(" | "))
             }
             RequestKind::ChooseCards { rule, .. } => {
-                let words: String = rule.words().iter().map(|w| format!(" {w}")).collect();
+                let words: String = rule.words(&|id| self.game.cards.get(CardId(id as u16)).name.to_string()).iter().map(|w| format!(" {w}")).collect();
                 let eligible = first_choices(g, r);
                 format!("ChooseCards {} of [{}]{words}", count_words(rule.count), eligible.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
             }

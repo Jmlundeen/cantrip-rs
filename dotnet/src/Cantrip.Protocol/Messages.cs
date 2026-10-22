@@ -802,6 +802,10 @@ public sealed class ErrorMessage : ServerMessage
     [Key(1)]
     public string Detail { get; set; } = string.Empty;
 
+    /// <summary>The request the error is about, when it is about one (a refused <see cref="CheckSelectionMessage"/>); 0 otherwise.</summary>
+    [Key(2)]
+    public int RequestId { get; set; }
+
     public override string Describe() => $"error {Code}: {Detail}";
 }
 
@@ -1288,7 +1292,31 @@ public sealed class ChooseCardsPromptMessage : PromptPayload, ISelectionPrompt
     /// </summary>
     public override AnswerPayload Default() => MinimumPower > 0
         ? new CardsChosenAnswer { Cards = [.. Cards.Where((_, i) => i >= Powers.Count || Powers[i] > 0)] }
-        : new CardsChosenAnswer { Cards = [.. Verdict.Addable.Take(Minimum > 0 ? Minimum : Count)] };
+        : MaximumTotalManaValue is { } most
+            ? new CardsChosenAnswer { Cards = FirstFitting(most) }
+            : new CardsChosenAnswer { Cards = [.. Verdict.Addable.Take(Minimum > 0 ? Minimum : Count)] };
+
+    /// <summary>
+    /// "With total mana value N or less" (CR 202.3): the first cards that may be picked and fit together, in order, as many
+    /// as it takes - the first <see cref="Count"/> of them alone could add up to more (a 3 and a 2 under 4). Each card's mana
+    /// value is at its place among <see cref="Cards"/>.
+    /// </summary>
+    private List<ViewHandle> FirstFitting(int most)
+    {
+        List<ViewHandle> taken = [];
+        foreach (ViewHandle card in Verdict.Addable)
+        {
+            int at = Cards.IndexOf(card);
+            int value = at >= 0 && at < ManaValues.Count ? ManaValues[at] : 0;
+            if (taken.Count < Count && value <= most)
+            {
+                most -= value;
+                taken.Add(card);
+            }
+        }
+
+        return taken;
+    }
 }
 
 /// <summary>
@@ -1336,6 +1364,14 @@ public sealed class SelectionVerdictView
     /// <summary>The cards not picked that may be added to them, in the question's order. Taking one back out is always allowed.</summary>
     [Key(1)]
     public List<ViewHandle> Addable { get; set; } = [];
+
+    /// <summary>
+    /// In a prompt's first verdict, for a question that takes one card at most: the <see cref="Addable"/> cards that are, picked
+    /// alone, an answer. A client may send such a pick at once, without asking the host (<see cref="CheckSelectionMessage"/>);
+    /// empty in any other verdict and for a question of more cards.
+    /// </summary>
+    [Key(2)]
+    public List<ViewHandle> CompleteAlone { get; set; } = [];
 }
 
 /// <summary>

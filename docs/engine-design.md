@@ -205,22 +205,35 @@ nothing else.
 A question that picks a set of cards - a choice of cards (`RequestKind::ChooseCards`) or a library search
 (`RequestKind::SearchLibrary`) - carries its **selection rule** (`Selection`, `cantrip-state/src/decision.rs`): which sets
 of its cards are an answer, as data. A rule is a `Count` (`Exactly(n)`, `UpTo(n)`, `AnyNumber`, `AsManyAsCan(n)` - fewer only
-when nothing more may be added, a search with no quality to fail at, CR 701.23b), the noun its caption uses (`kind`), up to
-`MAX_PARTS` **parts**, and, for a question asked by a list (the older `choose` functions, `search_library`, the core's
+when nothing more may be added, a search with no quality to fail at, CR 701.23b), the noun its caption uses (`kind`), any
+number of **parts** (`Parts`: borrowed for the whole program for a rule built in a constant, `Selection::of`, shared when put
+together as the question is asked, `.with`), and, for a question asked by a list (the older `choose` functions, `search_library`, the core's
 costs), the list of cards it may take at all (`among`). A part is a validator over the cards chosen so far - a plain
 function, `cantrip_api::select::SelectFn`, `fn(&dyn Query, &Choice, u32) -> Verdict`, with the one number it takes as data
 beside it - never a closure, so the rule moves through the game-log tree (`Game::goto`) and replays like the rest of the
 pending question. It reads the game through the `Query` and nothing else: "a card with the same name as a card in your
 graveyard" reads the graveyard. (The state holds the function as `&'static dyn Any`, since `cantrip-state` cannot name the
-`Query` it takes; `cantrip_api::select::part` makes one and `judge` runs it. Parts compare by the function and their number;
+`Query` it takes; `cantrip_api::select::part` / `tallied` make one - the validator is private to `Part`, so a part holds a
+`SelectFn` or does not exist - and `judge` runs it. Parts compare by the function and their number;
 they hash by their number and words.)
 
 `cantrip_api::select::judge(q, &rule, &Choice { chooser, source, candidates, selected })` says what the rule says of the cards
 `selected` so far: a `Verdict { complete, addable }` - whether they are an answer, and which of the candidates not yet chosen
 may be added (a bit set over the candidates, in their order). Every part must allow a card for it to be addable and call the
 cards complete for them to be an answer; then the count: a card is addable only while the count has room, and
-`AsManyAsCan` is complete short of its number only when nothing more is addable. Removing a card is always allowed. The
-cards a question may take at all are the addable set of none chosen. The core checks every answer with the same `judge`
+`AsManyAsCan` is complete short of its number only when nothing more is addable. Removing a card is always allowed. A selection holding a card that is not a listed candidate is refused before
+any part is run (`complete: false`, nothing addable), since parts read the characteristics of the cards they are given. The
+cards a question may take at all are the addable set of none chosen.
+
+**"Addable" means that adding the card does not break the rule - not that a complete answer is still reachable.** A client
+that picks only addable cards reaches a complete answer one card at a time only if the rule is *downward-closed*: every
+subset of a valid selection is itself addable-from (it breaks nothing), so the cards of any valid answer can be added one
+at a time in any order. Every shipped part is: a quality of each card, `DIFFERENT_NAMES` (a pair is allowed only if each card
+is allowed beside the others), and `total_mana_value_at_most` (a sum only grows as cards are added). A new part that
+combined `exactly(n)` with a set rule that is not downward-closed ("exactly two, total mana value exactly 5", an
+all-or-nothing group) could leave the player with cards that are all addable and no way to a complete answer: the client
+would dead-end, so such a part must keep the property or answer the dead end itself. `GameClient`'s settling of a bot's answer
+mends by backing out of a dead end, but a player picking by hand cannot. The core checks every answer with the same `judge`
 (`validate.rs`: the cards are distinct candidates the list allows, and complete by the rule), the scenario harness answers
 `Choose(..)` and `Search(..)` through it (each name the first card of that name the rule lets be added, `run.rs`), and a client
 asks it as its player picks: the prompt carries the verdict for none chosen, and the host's `Check` request

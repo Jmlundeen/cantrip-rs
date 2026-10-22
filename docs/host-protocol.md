@@ -63,13 +63,16 @@ are judged by the question's selection rule (docs/engine-design.md, "Selection r
 prompt says how many it takes for its caption (`Count`, `CountKind`: `Exactly`, `UpTo`, `AnyNumber`, `AsManyAsCan`), its
 noun and its parts' words (`Kind`, `Words`: "with different names"), a running total a part keeps for the player
 (`MaximumTotalManaValue` with each card's `ManaValues`, for "total mana value 6 or less": `Tally`, display alone), and the
-rule's `Verdict` on none chosen yet - `Complete`, whether that is an answer, and `Addable`, the cards that may be picked first. There is no eligible list beside
+rule's `Verdict` on none chosen yet - `Complete`, whether that is an answer, and `Addable`, the cards that may be picked first, and for a
+question that takes one card at most `CompleteAlone`, the addable cards that are an answer picked alone (a one-card pick of
+those is sent without asking; every other selection waits for the host's verdict as it is made). There is no eligible list beside
 it. Every other selection is asked of the host as it changes: the client sends `CheckSelectionMessage { RequestId, Selected }`,
 the server asks the host's `Check` and answers `SelectionVerdictMessage { RequestId, Selected, Verdict }`, to that seat
 alone. The answer is still checked when it is given. A cost's tapping for power, collecting evidence and crafting, which
 the same prompt carries, are checked the same way. `GameClient.Answer` settles any answer to such a question with the host
 before sending it - checked, and if refused mended a card at a time from what may be added - so every client, the bots
-included, answers what the rules take. Version 203.
+included, answers what the rules take. A check the host refuses is answered with an `ErrorMessage` whose `RequestId` names the
+request, so a client reacts only to the error of its own check. Version 203.
 
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed

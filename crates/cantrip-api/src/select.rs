@@ -4,10 +4,20 @@
 //! (`Verdict::complete`) and which further cards may be added to them (`Verdict::addable`). The core checks every answer
 //! with it, a client asks it what may be picked next (the host's `Check`), and the scenario harness answers through it.
 //!
+//! **"Addable" means that adding the card does not break the rule - not that a complete answer is still reachable.** Picking
+//! only addable cards reaches a complete answer one card at a time only for a rule whose parts are downward-closed: whatever
+//! is valid stays addable-from as cards of it are taken away, so every valid answer is reachable by adding its cards in any
+//! order. Every part shipped in `cantrip_mechanics::select` is (a quality of each card, `DIFFERENT_NAMES`, a total that only
+//! grows). A new part that combines `exactly(n)` with a set rule which is not - one that can leave only cards that are each
+//! addable and no complete answer - must keep the property, or the client can dead-end.
+//!
+//! A selection holding a card that is not a listed candidate is refused by `judge` before any part is run (`complete: false`,
+//! nothing addable): parts read the characteristics of the cards they are given.
+//!
 //! The ready-made rules and parts new cards use are `cantrip_mechanics::select`; a card with a rule of its own writes a
 //! `SelectFn` and makes it a part with `part`.
 
-pub use cantrip_state::{Count, Part, Selection, Tally, MAX_PARTS};
+pub use cantrip_state::{Count, Part, Parts, Selection, Tally};
 
 use crate::Query;
 use cantrip_state::{ObjectId, PlayerId};
@@ -132,17 +142,17 @@ pub type SelectFn = fn(q: &dyn Query, choice: &Choice, n: u32) -> Verdict;
 /// A part made of `judge`, with its number and its words (`Part::words`). Called with the function as a constant
 /// reference, `part(&(my_rule as SelectFn), 0, "with ...")`, which the compiler keeps for the whole program.
 pub const fn part(judge: &'static SelectFn, n: u32, words: &'static str) -> Part {
-    Part { judge, n, words, tally: Tally::Nothing }
+    Part::erased(judge, n, words, Tally::Nothing)
 }
 
 /// `part`, with what a client keeps count of for the player as the cards are chosen (`Tally`).
 pub const fn tallied(judge: &'static SelectFn, n: u32, words: &'static str, tally: Tally) -> Part {
-    Part { judge, n, words, tally }
+    Part::erased(judge, n, words, tally)
 }
 
 /// The validator a part holds.
 fn validator(part: &Part) -> SelectFn {
-    *part.judge.downcast_ref::<SelectFn>().expect("a selection rule's part holds a SelectFn (cantrip_api::select::part)")
+    *part.judge().downcast_ref::<SelectFn>().expect("a selection rule's part holds a SelectFn (cantrip_api::select::part)")
 }
 
 /// What `rule` says of `choice`: every part's verdict together, then the count. A card is addable when it is a candidate
@@ -152,8 +162,13 @@ fn validator(part: &Part) -> SelectFn {
 pub fn judge(q: &dyn Query, rule: &Selection, choice: &Choice) -> Verdict {
     let candidates = choice.candidates;
     let chosen = |c: ObjectId| choice.selected.contains(&c);
+    // A card that is not a listed candidate is no part of any answer, and the parts read the characteristics of the cards
+    // they are given: none of them is run over it.
+    if !choice.selected.iter().all(|&c| candidates.contains(&c) && rule.listed_card(c)) {
+        return Verdict { complete: false, addable: Bits::new(candidates.len(), false) };
+    }
     let mut addable = Bits::of(candidates.len(), |i| !chosen(candidates[i]) && rule.listed_card(candidates[i]));
-    let mut complete = choice.selected.iter().enumerate().all(|(i, c)| candidates.contains(c) && rule.listed_card(*c) && !choice.selected[..i].contains(c));
+    let mut complete = choice.selected.iter().enumerate().all(|(i, c)| !choice.selected[..i].contains(c));
     for part in rule.parts() {
         let verdict = validator(part)(q, choice, part.n);
         addable.and(&verdict.addable);

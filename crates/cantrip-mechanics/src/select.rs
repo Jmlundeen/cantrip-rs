@@ -1,6 +1,6 @@
 //! Ready-made selection rules: what a card's choice of cards or library search may take, written as its Oracle text words
 //! it (docs/engine-design.md, "Selection rules"; `cantrip_api::select` is the machinery). **A new card looks here first.**
-//! A rule is a `Selection`: a `Count`, the noun its caption uses, and up to `MAX_PARTS` parts, each a plain function the core
+//! A rule is a `Selection`: a `Count`, the noun its caption uses, and any number of parts, each a plain function the core
 //! runs over the cards chosen so far, both to check the answer and to tell the player, as they pick, which cards may be
 //! added. It is asked with `choose::select` (a choice among cards) or `library::search` and the `library::find_to_*`
 //! wrappers (a library search).
@@ -106,7 +106,7 @@ pub const fn mana_value_at_most(most: u32) -> Part {
 /// "A card named [`card`]" (CR 201.2a): a card that has the name of the card `card`, one of a split card's names included.
 /// Ancient Vendetta and The Rise of Sozin's chapter II search for cards "with that name".
 pub const fn named(card: CardId) -> Part {
-    part(&(has_name as SelectFn), card.0 as u32, "")
+    part(&(has_name as SelectFn), card.0 as u32, "named {card}")
 }
 
 fn different_names(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
@@ -158,7 +158,7 @@ pub const ARTIFACT_CARD: Selection = artifact_cards(up_to(1));
 
 /// "You may choose a nonland card from it" (a revealed or looked-at hand): Reckoner Shakedown, and Deep Cavern Bat's "you
 /// may exile a nonland card from it".
-pub const NONLAND_CARD: Selection = Selection::new(up_to(1)).with(NONLAND).called("nonland");
+pub const NONLAND_CARD: Selection = Selection::of(up_to(1), &[NONLAND]).called("nonland");
 
 /// `count` cards, any of them: Demonic Tutor's "a card" (`CARD`), Ugin, Eye of the Storms' "any number of" cards.
 pub const fn cards(count: Count) -> Selection {
@@ -168,22 +168,22 @@ pub const fn cards(count: Count) -> Selection {
 /// `count` basic land cards: Settle the Wreckage's "that many basic land cards", Fblthp, Knows the Way's "up to X" (with
 /// `DIFFERENT_NAMES`), the basic land fetches' one (`BASIC_LAND_CARD`).
 pub const fn basic_land_cards(count: Count) -> Selection {
-    Selection::new(count).with(BASIC_LAND).called("basic land")
+    Selection::of(count, &[BASIC_LAND]).called("basic land")
 }
 
 /// `count` land cards: Crop Rotation's and Expedition Map's one (`LAND_CARD`), and Hexhaven Invigorator's "up to that many
 /// land cards".
 pub const fn land_cards(count: Count) -> Selection {
-    Selection::new(count).with(LAND).called("land")
+    Selection::of(count, &[LAND]).called("land")
 }
 
 /// `count` creature cards: Survival of the Fittest's and Worldly Tutor's one (`CREATURE_CARD`).
 pub const fn creature_cards(count: Count) -> Selection {
-    Selection::new(count).with(CREATURE).called("creature")
+    Selection::of(count, &[CREATURE]).called("creature")
 }
 
 /// `count` artifact cards: Tinker's and Goblin Engineer's one (`ARTIFACT_CARD`), and Trinket Mage's one with
 /// `mana_value_at_most(1)`.
 pub const fn artifact_cards(count: Count) -> Selection {
-    Selection::new(count).with(ARTIFACT).called("artifact")
+    Selection::of(count, &[ARTIFACT]).called("artifact")
 }

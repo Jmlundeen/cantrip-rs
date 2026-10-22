@@ -138,6 +138,7 @@ fn the_qualities_allow_only_the_cards_that_have_them() {
     // A split card has the name of each half (CR 201.2a).
     let named = select::cards(select::up_to(1)).with(select::named(card("Probe Ice")));
     assert_eq!(verdict(&game, &named, &[]).1, vec!["Probe Fire // Probe Ice"]);
+    assert_eq!(named.words(&|n| game.cards.get(CardId(n as u16)).name.to_string()), vec!["named Probe Ice".to_string()]);
 }
 
 /// "With total mana value N or less" (CR 202.3): two 2s fit in 4, not in 3, and a 3 alone fits in 3.
@@ -151,7 +152,7 @@ fn a_total_mana_value_limits_the_cards_together() {
     let three = select::cards(select::up_to(2)).with(select::total_mana_value_at_most(3));
     assert!(!verdict(&game, &three, &[fire, ice]).0);
     assert!(verdict(&game, &three, &[bear]).0);
-    assert_eq!(three.words(), vec!["with total mana value 3 or less".to_string()]);
+    assert_eq!(three.words(&|n| n.to_string()), vec!["with total mana value 3 or less".to_string()]);
 }
 
 /// The first answer reached by taking the first addable card each time: the most a rule allows, or the fewest it needs.
@@ -202,4 +203,45 @@ fn the_core_refuses_an_answer_its_rule_refuses() {
         game.answer(request.id, request.player, answer).unwrap();
     }
     panic!("the search was never asked");
+}
+
+fn unreachable_part(_: &dyn Query, _: &Choice, _: u32) -> Verdict {
+    panic!("a part was run over a selection holding a card that is not a candidate")
+}
+
+/// A card that is none of the question's candidates (a card in hand, say) is no part of any answer: the rule says so
+/// without running its parts over it, which read the characteristics of the cards they are given.
+#[test]
+fn a_selected_card_that_is_not_a_candidate_is_refused_without_running_the_parts() {
+    let game = game(&["Probe Fire", "Probe Ice"]);
+    let in_hand = game.state.zone(Zone::hand(YOU))[0];
+    let candidates = searched_cards(&game, YOU);
+    assert!(!candidates.contains(&in_hand));
+    let rule = select::cards(select::up_to(2)).with(select::part(&(unreachable_part as SelectFn), 0, ""));
+    let v = judge(&game, &rule, &Choice { chooser: YOU, source: ObjectId::NONE, candidates: &candidates, selected: &[in_hand] });
+    assert!(!v.complete && !v.addable.any());
+    // A card the rule's list leaves out is no candidate either.
+    let listed = Selection::listed(Count::UpTo(2), &candidates, vec![candidates[0]]).with(select::part(&(unreachable_part as SelectFn), 0, ""));
+    let v = judge(&game, &listed, &Choice { chooser: YOU, source: ObjectId::NONE, candidates: &candidates, selected: &[candidates[1]] });
+    assert!(!v.complete && !v.addable.any());
+}
+
+/// A rule holds any number of parts: five together all judge, none dropped and none a panic.
+#[test]
+fn a_rule_holds_more_than_four_parts() {
+    let game = game(&["Probe Wastes", "Probe Bear"]);
+    let wastes = of(&game, "Probe Wastes");
+    let rule = select::basic_land_cards(select::up_to(2))
+        .with(select::mana_value_at_most(5))
+        .with(select::mana_value_at_most(4))
+        .with(select::mana_value_at_most(3))
+        .with(select::mana_value_at_most(2))
+        .with(select::mana_value_at_most(0))
+        .with(select::total_mana_value_at_most(1));
+    assert_eq!(rule.parts().count(), 7);
+    assert_eq!(verdict(&game, &rule, &[]), (true, vec!["Probe Wastes"]));
+    assert!(verdict(&game, &rule, &[wastes]).0);
+    // The fifth (and sixth) parts still judge: a fixed-cost card is refused by mana_value_at_most(0).
+    let strict = select::cards(select::up_to(1)).with(select::mana_value_at_most(5)).with(select::mana_value_at_most(5)).with(select::mana_value_at_most(5)).with(select::mana_value_at_most(5)).with(select::mana_value_at_most(0));
+    assert_eq!(verdict(&game, &strict, &[]).1, vec!["Probe Wastes"], "the bear's 3 passes four parts and fails the fifth");
 }

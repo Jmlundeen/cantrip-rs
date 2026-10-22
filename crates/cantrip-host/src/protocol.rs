@@ -1003,6 +1003,9 @@ pub enum CountKindView {
 pub struct SelectionVerdictView {
     pub complete: bool,
     pub addable: Vec<ViewHandle>,
+    /// In a prompt's first verdict, for a question that takes one card at most: the `addable` cards that are, picked alone, an
+    /// answer. A client may send such a pick at once, without asking the host (`Check`); empty otherwise.
+    pub complete_alone: Vec<ViewHandle>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1642,6 +1645,11 @@ impl PromptPayload {
                     // "Total power N or more" (crew, saddle): every creature with positive power, enough whenever anything is;
                     // a negative power would take from the total (CR 107.1b).
                     p.cards.iter().enumerate().filter(|&(i, _)| p.powers.get(i).is_none_or(|&power| power > 0)).map(|(_, &c)| c).collect()
+                } else if let Some(most) = p.maximum_total_mana_value {
+                    // "With total mana value N or less": the first cards that may be picked and fit together, in order (each
+                    // one's mana value is at its place among `cards`).
+                    let values: Vec<i32> = p.verdict.addable.iter().map(|a| p.cards.iter().position(|c| c == a).and_then(|i| p.mana_values.get(i).copied()).unwrap_or(0)).collect();
+                    first_fitting(&p.verdict.addable, &values, p.count, most)
                 } else {
                     // The first cards that may be picked, as many as it takes: an answer for a rule of a count alone; one asking
                     // more of the cards together is settled by asking the host as the cards are picked (`Check`).
@@ -2073,6 +2081,23 @@ mod tests {
 
     /// Crew 1 with a -4/1 and a 2/1 (CR 107.1b: a negative power takes from the total): the default answer takes only the
     /// creature with positive power, whose total meets the minimum, as the C# `Default()` does.
+    #[test]
+    fn the_default_total_mana_value_answer_fits_together() {
+        // Lively Dirge: up to two, total mana value 4 or less, a 3 and a 2 offered (and a 1 after them).
+        let prompt = PromptPayload::ChooseCardsPromptMessage(ChooseCardsPrompt {
+            player: 1,
+            cards: vec![ViewHandle(3), ViewHandle(4), ViewHandle(5)],
+            count: 2,
+            count_kind: CountKindView::UpTo,
+            verdict: SelectionVerdictView { complete: true, addable: vec![ViewHandle(3), ViewHandle(4), ViewHandle(5)], complete_alone: vec![] },
+            mana_values: vec![3, 2, 1],
+            maximum_total_mana_value: Some(4),
+            ..Default::default()
+        });
+        let AnswerPayload::CardsChosenAnswer(answer) = prompt.default_answer() else { panic!("cards") };
+        assert_eq!(answer.cards, vec![ViewHandle(3), ViewHandle(5)], "the 3 and the 1 fit in 4; the 2 does not follow the 3");
+    }
+
     #[test]
     fn the_default_crew_answer_leaves_out_a_negative_power() {
         let prompt = PromptPayload::ChooseCardsPromptMessage(ChooseCardsPrompt {

@@ -878,7 +878,9 @@ impl Count {
 /// are the same when they hold the same function with the same number and words.
 #[derive(Clone, Copy)]
 pub struct Part {
-    pub judge: &'static (dyn std::any::Any + Send + Sync),
+    /// The validator, private so that a part is made only by `cantrip_api::select::part` / `tallied`, the one place that
+    /// knows its type; read it with `Part::judge`.
+    judge: &'static (dyn std::any::Any + Send + Sync),
     /// The number the part is parameterised by: a count, a mana value, a card's id. Zero when it takes none.
     pub n: u32,
     /// What the part asks, in the words a caption puts after the cards' noun ("with different names", "with total mana
@@ -899,9 +901,23 @@ pub enum Tally {
 }
 
 impl Part {
-    /// `words`, with `n` where it says `{n}`.
-    pub fn worded(&self) -> String {
-        self.words.replace("{n}", &self.n.to_string())
+    /// A part of `judge`, which must be a `cantrip_api::select::SelectFn`: called only by `cantrip_api::select::part` and
+    /// `tallied`, which are the ways to make a part.
+    #[doc(hidden)]
+    pub const fn erased(judge: &'static (dyn std::any::Any + Send + Sync), n: u32, words: &'static str, tally: Tally) -> Part {
+        Part { judge, n, words, tally }
+    }
+
+    /// The validator, as `dyn Any`: `cantrip_api::select` knows its type.
+    #[doc(hidden)]
+    pub fn judge(&self) -> &'static (dyn std::any::Any + Send + Sync) {
+        self.judge
+    }
+
+    /// `words`, with `n` where it says `{n}`, and the name of the card whose id is `n` (`card`) where it says `{card}`.
+    pub fn worded(&self, card: &dyn Fn(u32) -> String) -> String {
+        let words = self.words.replace("{n}", &self.n.to_string());
+        if words.contains("{card}") { words.replace("{card}", &card(self.n)) } else { words }
     }
 }
 
@@ -927,8 +943,37 @@ impl std::hash::Hash for Part {
     }
 }
 
-/// The most parts a `Selection` holds besides its count.
-pub const MAX_PARTS: usize = 4;
+/// The parts of a selection rule, as many as it has: borrowed for ever when a rule is built in a constant
+/// (`Selection::of`), shared when one is put together as the question is asked (`Selection::with`).
+#[derive(Clone, Debug)]
+pub enum Parts {
+    Static(&'static [Part]),
+    Shared(std::sync::Arc<[Part]>),
+}
+
+impl Parts {
+    /// The parts, in order.
+    pub fn as_slice(&self) -> &[Part] {
+        match self {
+            Parts::Static(parts) => parts,
+            Parts::Shared(parts) => parts,
+        }
+    }
+}
+
+impl PartialEq for Parts {
+    fn eq(&self, other: &Parts) -> bool {
+        self.as_slice() == other.as_slice()
+    }
+}
+
+impl Eq for Parts {}
+
+impl std::hash::Hash for Parts {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.as_slice().hash(state);
+    }
+}
 
 /// A selection rule (docs/engine-design.md, "Selection rules"): which sets of a question's cards answer a choice of cards
 /// (`RequestKind::ChooseCards`) or a library search (`RequestKind::SearchLibrary`). Plain data: the `count`, the `parts`,
@@ -942,7 +987,7 @@ pub struct Selection {
     /// What the asking card calls the cards that may be chosen when it says more than "card" ("basic land", "nonland"):
     /// the caption's noun. Empty for "card".
     pub kind: &'static str,
-    pub parts: [Option<Part>; MAX_PARTS],
+    pub parts: Parts,
     /// The only cards that may be chosen, worked out as the question was asked; `None` for any of the question's cards.
     pub among: Option<Vec<ObjectId>>,
 }
@@ -950,7 +995,7 @@ pub struct Selection {
 impl Selection {
     /// `count` cards, any of the question's.
     pub const fn new(count: Count) -> Selection {
-        Selection { count, kind: "", parts: [None; MAX_PARTS], among: None }
+        Selection { count, kind: "", parts: Parts::Static(&[]), among: None }
     }
 
     /// `count` of `eligible`, from among `cards`: a question asked with its eligible cards listed. An `eligible` that is
@@ -960,17 +1005,18 @@ impl Selection {
         Selection { among, ..Selection::new(count) }
     }
 
-    /// The same rule, with `part` as well.
-    pub const fn with(mut self, part: Part) -> Selection {
-        let mut i = 0;
-        while i < MAX_PARTS {
-            if self.parts[i].is_none() {
-                self.parts[i] = Some(part);
-                return self;
-            }
-            i += 1;
-        }
-        panic!("a selection holds at most MAX_PARTS parts")
+    /// The same rule, with `part` as well: any number of parts may be added.
+    pub fn with(mut self, part: Part) -> Selection {
+        let mut parts = self.parts.as_slice().to_vec();
+        parts.push(part);
+        self.parts = Parts::Shared(parts.into());
+        self
+    }
+
+    /// `count` cards with exactly `parts`: how a rule is built in a constant (`&[BASIC_LAND]` is kept for the whole
+    /// program).
+    pub const fn of(count: Count, parts: &'static [Part]) -> Selection {
+        Selection { count, kind: "", parts: Parts::Static(parts), among: None }
     }
 
     /// The same rule, its cards called `kind` ("basic land").
@@ -987,12 +1033,13 @@ impl Selection {
 
     /// The parts it has.
     pub fn parts(&self) -> impl Iterator<Item = &Part> {
-        self.parts.iter().flatten()
+        self.parts.as_slice().iter()
     }
 
-    /// The words of every part that has some, `{n}` filled in: what a caption says after the noun.
-    pub fn words(&self) -> Vec<String> {
-        self.parts().filter(|p| !p.words.is_empty()).map(Part::worded).collect()
+    /// The words of every part that has some, `{n}` filled in: what a caption says after the noun. `card` names the card
+    /// of an id, for a part that asks for a name ("named {card}").
+    pub fn words(&self, card: &dyn Fn(u32) -> String) -> Vec<String> {
+        self.parts().filter(|p| !p.words.is_empty()).map(|p| p.worded(card)).collect()
     }
 
     /// Whether `card` is one of the cards `among` lets be chosen.

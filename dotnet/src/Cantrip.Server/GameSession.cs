@@ -653,13 +653,13 @@ public sealed class GameSession : IDisposable
     {
         if (IsOver || !_published.TryGetValue(message.RequestId, out (PlayerId Seat, PromptMessage Message) outstanding))
         {
-            Reject(from, ErrorCode.StaleReply, $"request {message.RequestId} is not outstanding.");
+            Reject(from, ErrorCode.StaleReply, $"request {message.RequestId} is not outstanding.", message.RequestId);
             return;
         }
 
         if (outstanding.Seat != from)
         {
-            Reject(from, ErrorCode.NotYourTurnToAnswer, $"request {message.RequestId} belongs to seat {outstanding.Seat.Value}.");
+            Reject(from, ErrorCode.NotYourTurnToAnswer, $"request {message.RequestId} belongs to seat {outstanding.Seat.Value}.", message.RequestId);
             return;
         }
 
@@ -670,7 +670,7 @@ public sealed class GameSession : IDisposable
         }
         catch (RulesRejectedException refused)
         {
-            Reject(from, refused.Code, refused.Detail);
+            Reject(from, refused.Code, refused.Detail, message.RequestId);
             return;
         }
 
@@ -799,11 +799,11 @@ public sealed class GameSession : IDisposable
         JudgeOffer();
     }
 
-    private void Reject(PlayerId seat, ErrorCode code, string detail)
+    private void Reject(PlayerId seat, ErrorCode code, string detail, int requestId = 0)
     {
         if (_outbox.TryGetValue(seat, out Queue<ServerMessage>? queue))
         {
-            queue.Enqueue(new ErrorMessage { Code = code, Detail = detail });
+            queue.Enqueue(new ErrorMessage { Code = code, Detail = detail, RequestId = requestId });
         }
     }
 

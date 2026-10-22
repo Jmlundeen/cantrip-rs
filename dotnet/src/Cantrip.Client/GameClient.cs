@@ -447,7 +447,8 @@ public sealed class GameClient
     /// <summary>
     /// What the rules said of <paramref name="selected"/> for the choice of cards outstanding (<see cref="ISelectionPrompt"/>):
     /// whether the cards are an answer, and which may be added to them. For none chosen it is the prompt's own
-    /// <see cref="ISelectionPrompt.Verdict"/>; any other selection is known once the host has answered a <see cref="Check"/>
+    /// <see cref="ISelectionPrompt.Verdict"/>, and for the one card it calls an answer alone
+    /// (<see cref="SelectionVerdictView.CompleteAlone"/>) a complete selection with nothing to add, known without asking; any other selection is known once the host has answered a <see cref="Check"/>
     /// of it, and null until then (or when nothing such is asked).
     /// </summary>
     public SelectionVerdictView? Verdict(IEnumerable<ViewHandle> selected)
@@ -456,6 +457,14 @@ public sealed class GameClient
         if (Choosing is not { Prompt: ISelectionPrompt selection } asked) return null;
         List<ViewHandle> cards = [.. selected];
         if (cards.Count == 0) return selection.Verdict;
+
+        // A card the prompt calls an answer alone (a question of one card at most) is one, with nothing more to add: known
+        // without a round trip to the host, which would say the same.
+        if (cards.Count == 1 && selection.Verdict.CompleteAlone.Contains(cards[0]))
+        {
+            return new SelectionVerdictView { Complete = true };
+        }
+
         return _verdictsFor == asked.RequestId && _verdicts.TryGetValue(KeyOf(cards), out SelectionVerdictView? verdict) ? verdict : null;
     }
 
@@ -489,6 +498,28 @@ public sealed class GameClient
         _verdicts[key] = message.Verdict;
         VerdictRevision++;
     }
+
+    /// <summary>
+    /// A proposal the rules refused was rebuilt (or sent as it was): the request, the proposal and what was sent, one line each.
+    /// A mend is a client that proposed what the rules do not take - a bug in that client, kept visible rather than smoothed
+    /// over. Also written to the error stream, and kept in <see cref="Mends"/>.
+    /// </summary>
+    public event Action<string>? MendedSelection;
+
+    private readonly List<string> _mends = [];
+
+    /// <summary>Every mend this client has made, oldest first.</summary>
+    public IReadOnlyList<string> Mends => _mends;
+
+    private void Mended(string line)
+    {
+        _mends.Add(line);
+        Console.Error.WriteLine($"[client seat {Seat}] {line}");
+        MendedSelection?.Invoke(line);
+    }
+
+    private string Cards(IEnumerable<ViewHandle> cards) =>
+        "[" + string.Join(", ", cards.Select(card => Object(card)?.Name is { Length: > 0 } name ? $"{name} #{card.Value}" : $"#{card.Value}")) + "]";
 
     /// <summary>A choice of cards answered but not yet sent: being checked, and mended if the rules refuse it.</summary>
     private Settling? _settling;
@@ -548,6 +579,7 @@ public sealed class GameClient
                 }
 
                 settling.Mending = true;
+                Mended($"request {settling.Asked.RequestId} ({settling.Asked.Prompt.GetType().Name}): the rules refuse the proposal {Cards(settling.Proposal)}; mending it from what may be added");
                 continue;
             }
 
@@ -564,17 +596,18 @@ public sealed class GameClient
                 return;
             }
 
-            if (verdict.Complete && settling.Picked.Count >= settling.Proposal.Count)
+            HashSet<int> tried = settling.Tried[^1];
+            bool Offered(ViewHandle card) =>
+                !settling.Picked.Contains(card) && !tried.Contains(card.Value) && verdict.Addable.Contains(card);
+
+            // The cards proposed come first, in the order proposed. Cards the proposal never named are added only to reach an
+            // answer: once the cards picked are one, an optional choice is not grown into a card its player never picked.
+            ViewHandle? next = settling.Proposal.Where(Offered).Select(card => (ViewHandle?)card).FirstOrDefault();
+            if (next is null && !verdict.Complete)
             {
-                Send(settling.Picked);
-                return;
+                next = settling.Preference.Where(Offered).Select(card => (ViewHandle?)card).FirstOrDefault();
             }
 
-            HashSet<int> tried = settling.Tried[^1];
-            ViewHandle? next = settling.Preference
-                .Where(card => !settling.Picked.Contains(card) && !tried.Contains(card.Value) && verdict.Addable.Contains(card))
-                .Select(card => (ViewHandle?)card)
-                .FirstOrDefault();
             if (next is { } card)
             {
                 tried.Add(card.Value);
@@ -597,6 +630,11 @@ public sealed class GameClient
         void Send(IReadOnlyList<ViewHandle> cards)
         {
             PromptMessage asked = _settling!.Asked;
+            if (_settling.Mending)
+            {
+                Mended($"request {asked.RequestId} ({asked.Prompt.GetType().Name}): proposed {Cards(_settling.Proposal)}, sent {Cards(cards)}");
+            }
+
             _settling = null;
             LastAnswered = asked.RequestId;
             _transport.Send(new AnswerMessage { RequestId = asked.RequestId, Answer = new CardsChosenAnswer { Cards = [.. cards] } });
@@ -879,12 +917,14 @@ public sealed class GameClient
             case ErrorMessage error:
                 _errors.Add(error);
 
-                // A check refused while an answer was being settled: the answer meant goes as it is, for the host to judge.
-                if (_settling is { } settling && _checking.Count > 0)
+                // The check of this answer's own question refused while it was being settled (the error names the request it is
+                // about; any other error is not this answer's): the answer meant goes as it is, for the host to judge.
+                if (_settling is { } settling && _checking.Count > 0 && error.RequestId == settling.Asked.RequestId)
                 {
                     _checking.Clear();
                     _settling = null;
                     LastAnswered = settling.Asked.RequestId;
+                    Mended($"a check of request {settling.Asked.RequestId} was refused ({error.Code}: {error.Detail}); sending the proposal as it is: {Cards(settling.Proposal)}");
                     _transport.Send(new AnswerMessage { RequestId = settling.Asked.RequestId, Answer = new CardsChosenAnswer { Cards = settling.Proposal } });
                 }
 

@@ -158,4 +158,140 @@ public sealed class SelectionSettlingTests
         client.Answer(new CardsChosenAnswer { Cards = [H(3), H(4)] });
         Assert.Equal([H(3), H(4)], Answered(transport));
     }
+
+    private static ErrorMessage Refusal(int requestId) => new() { Code = ErrorCode.StaleReply, Detail = "refused", RequestId = requestId };
+
+    [Fact]
+    public void An_error_that_is_not_about_the_check_does_not_send_the_proposal()
+    {
+        (GameClient client, Judging transport) = Asked(TwoWithDifferentNames);
+        client.Answer(new CardsChosenAnswer { Cards = [H(2), H(4)] });
+        Assert.True(client.IsChecking);
+
+        // An error about nothing in particular, and one about another request: neither is this check's.
+        transport.Inbound.Clear();
+        transport.Inbound.Enqueue(Refusal(0));
+        transport.Inbound.Enqueue(Refusal(99));
+        client.Pump();
+
+        Assert.True(client.IsSettling);
+        Assert.Null(Answered(transport));
+    }
+
+    [Fact]
+    public void The_check_of_its_own_request_refused_sends_the_proposal_as_it_is()
+    {
+        (GameClient client, Judging transport) = Asked(TwoWithDifferentNames);
+        client.Answer(new CardsChosenAnswer { Cards = [H(2), H(4)] });
+        transport.Inbound.Clear();
+        transport.Inbound.Enqueue(Refusal(7));
+        client.Pump();
+
+        Assert.False(client.IsSettling);
+        Assert.Equal([H(2), H(4)], Answered(transport));
+        Assert.Single(client.Mends);
+    }
+
+    [Fact]
+    public void A_mend_is_logged_with_the_request_the_proposal_and_what_was_sent()
+    {
+        (GameClient client, Judging transport) = Asked(TwoWithDifferentNames);
+        List<string> told = [];
+        client.MendedSelection += told.Add;
+        client.Answer(new CardsChosenAnswer { Cards = [H(2), H(4)] });
+        for (int i = 0; i < 10 && client.IsSettling; i++) client.Pump();
+
+        Assert.Equal(2, told.Count);
+        Assert.Contains("request 7", told[0]);
+        Assert.Contains("#2", told[0]);
+        Assert.Contains("#4", told[0]);
+        Assert.Contains("proposed [#2, #4], sent [#2, #3]", told[1]);
+        Assert.Equal(told, client.Mends);
+
+        // An answer the host takes as it is is no mend.
+        (GameClient clean, Judging cleanTransport) = Asked(TwoWithDifferentNames);
+        clean.Answer(new CardsChosenAnswer { Cards = [H(2), H(3)] });
+        clean.Pump();
+        Assert.Empty(clean.Mends);
+    }
+
+    [Fact]
+    public void Mending_keeps_the_cards_meant_and_adds_none_the_player_never_picked_once_they_are_an_answer()
+    {
+        // Up to two of 1 to 4, but 1 and 2 may not be together. Meant: 1 and 2. 1 alone is an answer, and 3 and 4 could join it:
+        // mending sends 1, the card meant, and does not grow it into 1 and 3.
+        static SelectionVerdictView Rule(IReadOnlyList<ViewHandle> picked)
+        {
+            bool clash = picked.Contains(H(1)) && picked.Contains(H(2));
+            List<ViewHandle> addable = clash || picked.Count >= 2 ? [] : [.. new[] { H(1), H(2), H(3), H(4) }
+                .Where(card => !picked.Contains(card) && !(card == H(2) && picked.Contains(H(1))) && !(card == H(1) && picked.Contains(H(2))))];
+            return new SelectionVerdictView { Complete = !clash, Addable = addable };
+        }
+
+        (GameClient client, Judging transport) = Asked(Rule, noneIsAnswer: true);
+        client.Answer(new CardsChosenAnswer { Cards = [H(1), H(2)] });
+        for (int i = 0; i < 20 && client.IsSettling; i++) client.Pump();
+
+        Assert.Equal([H(1)], Answered(transport));
+    }
+
+    [Fact]
+    public void A_one_card_answer_the_prompt_calls_complete_alone_is_sent_without_a_check()
+    {
+        var transport = new Judging(TwoWithDifferentNames);
+        var client = new GameClient(transport);
+        transport.Inbound.Enqueue(new PromptMessage
+        {
+            RequestId = 9,
+            Prompt = new ChooseCardsPromptMessage
+            {
+                Player = 1,
+                Count = 1,
+                CountKind = CountKindView.Exactly,
+                Cards = [H(1), H(2), H(3)],
+                Verdict = new SelectionVerdictView { Addable = [H(1), H(2), H(3)], CompleteAlone = [H(1), H(2)] },
+            },
+        });
+        client.Pump();
+
+        Assert.True(client.Verdict([H(2)])!.Complete);
+        Assert.Empty(transport.Sent.OfType<CheckSelectionMessage>());
+        client.Answer(new CardsChosenAnswer { Cards = [H(2)] });
+        Assert.Empty(transport.Sent.OfType<CheckSelectionMessage>());
+        Assert.Equal([H(2)], Answered(transport));
+
+        // A card the prompt does not mark waits for the host's word, as does any other selection.
+        transport.Inbound.Enqueue(new PromptMessage
+        {
+            RequestId = 10,
+            Prompt = new ChooseCardsPromptMessage
+            {
+                Player = 1, Count = 1, CountKind = CountKindView.Exactly, Cards = [H(1), H(2), H(3)],
+                Verdict = new SelectionVerdictView { Addable = [H(1), H(2), H(3)], CompleteAlone = [H(1)] },
+            },
+        });
+        client.Pump();
+        Assert.Null(client.Verdict([H(3)]));
+        client.Answer(new CardsChosenAnswer { Cards = [H(3)] });
+        Assert.Single(transport.Sent.OfType<CheckSelectionMessage>());
+    }
+
+    [Fact]
+    public void The_default_answer_of_a_total_mana_value_choice_fits_within_the_limit()
+    {
+        // Lively Dirge: up to two, total mana value 4 or less, a 3 and a 2 offered first - together 5, which the rules refuse.
+        var prompt = new ChooseCardsPromptMessage
+        {
+            Player = 1,
+            Cards = [H(1), H(2), H(3)],
+            Count = 2,
+            CountKind = CountKindView.UpTo,
+            ManaValues = [3, 2, 1],
+            MaximumTotalManaValue = 4,
+            Verdict = new SelectionVerdictView { Complete = true, Addable = [H(1), H(2), H(3)] },
+        };
+
+        var chosen = Assert.IsType<CardsChosenAnswer>(prompt.Default());
+        Assert.Equal([H(1), H(3)], chosen.Cards);
+    }
 }

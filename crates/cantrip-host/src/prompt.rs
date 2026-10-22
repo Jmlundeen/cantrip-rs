@@ -719,7 +719,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 cards: handles_of(handles, cards),
                 count: count_shown(rule.count, &verdict),
                 count_kind: count_kind_view(rule.count),
-                words: rule.words(),
+                words: rule.words(&|id| game.cards.get(CardId(id as u16)).name.to_string()),
                 mana_values: if tally.is_some() { cards.iter().map(|&c| wire(game.mana_value(c))).collect() } else { Vec::new() },
                 maximum_total_mana_value: tally.map(wire),
                 // Blight (CR 701.68a) is a creature you control; behold (CR 701.4a) names its quality ("Dragon"): the
@@ -1137,7 +1137,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 count: count_shown(rule.count, &verdict),
                 count_kind: count_kind_view(rule.count),
                 kind: rule.kind.to_string(),
-                words: rule.words(),
+                words: rule.words(&|id| game.cards.get(CardId(id as u16)).name.to_string()),
                 verdict,
                 library: handles_of(handles, library),
                 destination: match destination {
@@ -1188,11 +1188,25 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
 /// the host's `Check` answers it for any other selection.
 pub fn verdict_of(game: &Game, request: &Request, selected: &[ObjectId], handles: &mut HandleSpace) -> Option<SelectionVerdictView> {
     let (cards, verdict) = selection_verdict(game, request, selected)?;
-    Some(SelectionVerdictView { complete: verdict.complete, addable: verdict.addable.ones().map(|i| handles.handle(cards[i])).collect() })
+    Some(SelectionVerdictView { complete: verdict.complete, addable: verdict.addable.ones().map(|i| handles.handle(cards[i])).collect(), complete_alone: Vec::new() })
 }
 
+/// The prompt's first verdict (`verdict_of` of none chosen), and for a question that takes one card at most, which of the
+/// cards that may be picked are an answer alone (`SelectionVerdictView::complete_alone`): the client sends such a pick at
+/// once, where any other pick waits for the host's verdict on the cards chosen so far.
 fn verdict_view(game: &Game, request: &Request, handles: &mut HandleSpace) -> SelectionVerdictView {
-    verdict_of(game, request, &[], handles).unwrap_or_default()
+    let mut view = verdict_of(game, request, &[], handles).unwrap_or_default();
+    if let RequestKind::ChooseCards { rule, .. } | RequestKind::SearchLibrary { rule, .. } = &request.kind {
+        if rule.count.most() == Some(1) {
+            let (cards, first) = selection_verdict(game, request, &[]).expect("a rule's question");
+            for i in first.addable.ones() {
+                if selection_verdict(game, request, &[cards[i]]).is_some_and(|(_, v)| v.complete) {
+                    view.complete_alone.push(handles.handle(cards[i]));
+                }
+            }
+        }
+    }
+    view
 }
 
 fn count_kind_view(count: Count) -> CountKindView {
@@ -1204,9 +1218,14 @@ fn count_kind_view(count: Count) -> CountKindView {
     }
 }
 
-/// The number a caption says of a count: its own, or for "any number" every card that may be picked first.
+/// The number a caption says of a count: its own, for "as many as can be found" no more than can be, and for "any number"
+/// every card that may be picked first.
 fn count_shown(count: Count, verdict: &SelectionVerdictView) -> i32 {
-    count.most().map_or(wire(count_u32(verdict.addable.len())), wire)
+    let found = count_u32(verdict.addable.len());
+    match count {
+        Count::AsManyAsCan(n) => wire(n.min(found)),
+        _ => count.most().map_or(wire(found), wire),
+    }
 }
 
 #[cfg(test)]
@@ -1276,8 +1295,31 @@ mod tests {
         assert_eq!((p.maximum_total_mana_value, p.mana_values.len()), (Some(6), hand.len()));
         assert_eq!(p.mana_values[..2], [1, 0], "the Elves 1, the Ornithopter 0");
         // The Elves alone: the Ornithopter is refused by the part, the Forest by the list.
-        assert_eq!(p.verdict, SelectionVerdictView { complete: true, addable: vec![handles.handle(hand[0])] });
+        assert_eq!(p.verdict, SelectionVerdictView { complete: true, addable: vec![handles.handle(hand[0])], complete_alone: vec![] });
         assert_eq!(verdict_of(&game, &request, &[hand[0]], &mut handles).map(|v| (v.complete, v.addable.len())), Some((true, 0)));
+    }
+
+    /// A question that takes one card at most says in its prompt which cards are an answer alone, so the client sends such a
+    /// pick without asking; a question of more cards says none.
+    #[test]
+    fn a_one_card_choice_marks_the_cards_that_are_an_answer_alone() {
+        let (game, hand) = game_with(&["Llanowar Elves", "Ornithopter", "Forest"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let ask = |rule: Selection| Request {
+            id: 1,
+            player: seat,
+            kind: RequestKind::ChooseCards { source: hand[0], purpose: Purpose::PutOntoBattlefield, cards: hand.clone(), rule: Box::new(rule) },
+            may_cancel: false,
+        };
+        let mut handles = HandleSpace::new();
+        let PromptPayload::ChooseCardsPromptMessage(one) = prompt(&game, &ask(Selection::listed(Count::Exactly(1), &hand, hand[..2].to_vec())), &mut handles).expect("a prompt").0 else { panic!("cards") };
+        assert_eq!(one.verdict.addable, vec![handles.handle(hand[0]), handles.handle(hand[1])]);
+        assert_eq!(one.verdict.complete_alone, one.verdict.addable, "either of the two is the whole answer");
+        let PromptPayload::ChooseCardsPromptMessage(two) = prompt(&game, &ask(Selection::new(Count::Exactly(2))), &mut handles).expect("a prompt").0 else { panic!("cards") };
+        assert!(two.verdict.complete_alone.is_empty(), "no one card answers a choice of two");
+        // "As many as can be found" says the number that can be: two wanted, one findable.
+        let PromptPayload::ChooseCardsPromptMessage(found) = prompt(&game, &ask(Selection::listed(Count::AsManyAsCan(2), &hand, hand[..1].to_vec())), &mut handles).expect("a prompt").0 else { panic!("cards") };
+        assert_eq!((found.count, found.count_kind), (1, CountKindView::AsManyAsCan));
     }
 
     /// "Any number of target creature cards with total mana value X or less" reaches the client as the limit and each

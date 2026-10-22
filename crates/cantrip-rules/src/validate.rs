@@ -104,14 +104,14 @@ pub fn name_problem(cards: &CardTable, kind: NameKind, card: CardId) -> Option<&
 }
 
 /// Why a selection of `n` cards a rule refuses is refused, in its words: the count it takes, and what its parts ask.
-fn refusal(rule: &Selection, n: usize) -> String {
+fn refusal(game: &Game, rule: &Selection, n: usize) -> String {
     let wanted = match rule.count {
         Count::Exactly(c) => format!("{c}"),
         Count::UpTo(c) => format!("up to {c}"),
         Count::AnyNumber => "any number".to_string(),
         Count::AsManyAsCan(c) => format!("{c}, or as many as can be"),
     };
-    let words = rule.words();
+    let words = rule.words(&|id| game.cards.get(CardId(id as u16)).name.to_string());
     let asks = if words.is_empty() { String::new() } else { format!(", {}", words.join(", ")) };
     format!("{n} chosen, {wanted} wanted{asks}, as the question's rule allows")
 }
@@ -125,7 +125,7 @@ pub fn selection_verdict(game: &Game, request: &Request, selected: &[ObjectId]) 
     let unchosen = |cards: &[ObjectId]| Bits::of(cards.len(), |i| !selected.contains(&cards[i]));
     let among = |cards: &[ObjectId]| distinct(selected) && selected.iter().all(|c| cards.contains(c));
     let source = request.kind.source().unwrap_or(ObjectId::NONE);
-    Some(match &request.kind {
+    let (cards, verdict) = match &request.kind {
         RequestKind::ChooseCards { cards, rule, .. } | RequestKind::SearchLibrary { library: cards, rule, .. } => {
             let verdict = select::judge(game, rule, &Choice { chooser: request.player, source, candidates: cards, selected });
             (cards.clone(), verdict)
@@ -153,7 +153,14 @@ pub fn selection_verdict(game: &Game, request: &Request, selected: &[ObjectId]) 
             (cards.clone(), Verdict { complete: among(cards) && n >= *minimum as usize && n <= *maximum as usize, addable })
         }
         _ => return None,
-    })
+    };
+    // A card that is none of the question's is no part of any answer, and nothing may be added to it.
+    if selected.iter().all(|c| cards.contains(c)) {
+        Some((cards, verdict))
+    } else {
+        let none = Bits::new(cards.len(), false);
+        Some((cards, Verdict { complete: false, addable: none }))
+    }
 }
 
 /// Whether `answer` fits `request` (exported as `check_answer`, for a scenario that shows an answer is refused).
@@ -177,7 +184,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             if !distinct(cards) || !cards.iter().all(|c| candidates.contains(c) && rule.listed_card(*c)) {
                 no("not among the cards that may be chosen")
             } else if !select::answers(game, rule, request.player, source, candidates, cards) {
-                no(refusal(rule, cards.len()))
+                no(refusal(game, rule, cards.len()))
             } else {
                 Ok(())
             }
