@@ -1982,6 +1982,10 @@ pub type PlayerCounterBan = fn(&dyn Query, &Asker, PlayerId, PlayerCounter) -> b
 /// (CR 510.1a): given the rule's own asker.
 pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether a static ability makes this creature assign combat damage as though negative power were positive
+/// (CR 510.1a, 609.4): given the rule's own asker. This changes combat assignment alone, never the creature's power.
+pub type DamageByAbsolutePowerRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability keeps the damage marked on this permanent through the cleanup step (CR 514.2): given the
 /// rule's own asker. "Damage isn't removed from this creature during cleanup steps" (Ancient Adamantoise); "from creatures
 /// your opponents control" (Patient Zero, Uthgardt Fury) and "from creatures" (Case of the Market Melee) are the same kind.
@@ -2394,6 +2398,10 @@ pub struct CardDef {
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
     /// Assault Formation, Doran, the Siege Tower.
     pub damage_by_toughness: &'static [DamageByToughnessRule],
+    /// "If [this creature]'s power is negative, it assigns combat damage as though its power were positive"
+    /// (CR 510.1a, 609.4), while the source has its abilities: Loot, the Anomaly. The rule selects the creatures;
+    /// the core computes the positive magnitude only where combat assignment uses their power.
+    pub damage_by_absolute_power: &'static [DamageByAbsolutePowerRule],
     /// Its static abilities that keep damage on permanents during cleanup steps (CR 514.2), while it is on the battlefield
     /// with its abilities. An effect that removes all damage (regeneration, CR 701.19a) still removes it.
     pub damage_stays: &'static [DamageStaysRule],
@@ -2570,6 +2578,7 @@ impl CardDef {
         counter_bans: &[],
         player_counter_bans: &[],
         damage_by_toughness: &[],
+        damage_by_absolute_power: &[],
         damage_stays: &[],
         mana_told_apart: &[],
         zero_loyalty_stays: &[],

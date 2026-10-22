@@ -234,7 +234,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                 to_graveyard.push(id);
                 continue;
             }
-            if obj.damage as i16 >= toughness || obj.deathtouched {
+            if i32::from(obj.damage) >= i32::from(toughness) || obj.deathtouched {
                 destroyed.push(id);
                 continue;
             }
