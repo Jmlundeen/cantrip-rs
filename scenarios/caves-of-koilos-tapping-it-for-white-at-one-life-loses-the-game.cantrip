@@ -1,0 +1,27 @@
+# Caves of Koilos: "{T}: Add {W} or {B}. This land deals 1 damage to you." - the damage comes with the mana, as the mana
+# ability resolves (CR 605.4a), and a player at 0 life loses the game (CR 704.5a). Bot1 starts at 1 life, taps the Caves
+# for {W} on turn 3 and loses to life.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Caves of Koilos
+Plains x15
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Caves of Koilos.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Caves of Koilos.Activate(Ability: {W} or {B}; Color: White)
+? Bot1.Life = 0
+
+[Expect]
+Turn = 3
+Bot1.Life = 0
+Bot1.LostTo = Life
+Bot1.Status = Lost
+Bot2.Life = 20
+Bot1.Battlefield.Caves of Koilos.Tapped = true
