@@ -1,0 +1,6 @@
+{
+  "name": "Whirlwind of Thought",
+  "manaCost": "{1}{U}{R}{W}",
+  "type": "Enchantment",
+  "oracleText": "Whenever you cast a noncreature spell, draw a card."
+}

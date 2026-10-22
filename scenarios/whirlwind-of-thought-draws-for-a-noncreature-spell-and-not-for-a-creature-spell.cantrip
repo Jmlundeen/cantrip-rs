@@ -1,0 +1,38 @@
+# Whirlwind of Thought: "Whenever you cast a noncreature spell, draw a card." Bot1 casts it on turn 1 off four Moxen, then
+# casts Ornithopter (a creature spell: no draw) and Lotus Petal (an artifact spell: one draw). Hand: 7 - 6 cast = 1, minus
+# the Lotus Petal goes to the battlefield... the Petal is cast too, so 7 - 7 cast = 0, plus the single draw = 1 card.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Whirlwind of Thought
+Mox Jet
+Ornithopter
+Lotus Petal
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Whirlwind of Thought.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Lotus Petal.Cast
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand = Island
+Bot1.Hand.Count = 1
+Bot1.Library.Count = 12
+Bot1.Battlefield = Lotus Petal; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter; Whirlwind of Thought
+Bot1.Graveyard.Count = 0

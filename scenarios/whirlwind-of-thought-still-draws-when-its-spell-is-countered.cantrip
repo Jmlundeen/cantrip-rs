@@ -1,0 +1,51 @@
+# Whirlwind of Thought: "An ability that triggers when a player casts a spell resolves before the spell that caused it to
+# trigger. It resolves even if that spell is countered" (ruling 2020-04-17). Bot2's Counterspell counters Bot1's Lotus Petal
+# on turn 3, the Petal goes to the graveyard, and Bot1 still draws its card: hand 2 + the turn-3 draw - 1 cast + 1 = 3.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Whirlwind of Thought
+Mox Jet
+Lotus Petal
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island
+Counterspell
+Mox Sapphire
+Island
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Whirlwind of Thought.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lotus Petal)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Lotus Petal
+Bot2.Graveyard = Counterspell
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Whirlwind of Thought
