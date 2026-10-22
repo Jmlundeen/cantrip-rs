@@ -1,0 +1,49 @@
+# Infinite Coursework leaves after its enters trigger, but the trigger uses its last known attachment
+# and still taps the creature (CR 303.4m, 608.2h). Disenchant resolves before the trigger.
+
+[Bot1 Deck]
+Forest
+Birds of Paradise
+Island
+Island
+Infinite Coursework
+Island x18
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Infinite Coursework.Cast(Bot1.Battlefield.Birds of Paradise)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Infinite Coursework)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Birds of Paradise.Tapped = true
+Bot1.Battlefield.Birds of Paradise.Keywords = Flying
+Bot1.Graveyard = Infinite Coursework
+Bot2.Graveyard = Disenchant
+Stack.Count = 0
