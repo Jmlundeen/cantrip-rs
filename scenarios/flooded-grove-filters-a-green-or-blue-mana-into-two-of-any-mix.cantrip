@@ -1,0 +1,21 @@
+# Flooded Grove pays {G/U} (here from a Forest) and taps to add two mana, each green or blue as Bot1 chooses: {G}{U}, a
+# mix the Forest alone could never make.
+
+[Bot1 Deck]
+Forest
+Flooded Grove
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Flooded Grove.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Flooded Grove.Activate(Ability: {G/U}, {T}; Colors: Green, Blue)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {U}{G}

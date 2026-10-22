@@ -1,0 +1,30 @@
+# Flooded Grove: "{G/U}, {T}: Add {G}{G}, {G}{U}, or {U}{U}." The {G/U} must be paid with green or blue mana. Turn 3 the
+# Grove and a Mountain are all Bot1 has: the filter ability is not offered (a Mountain makes {R}, which pays neither half).
+# Turn 5, with a Forest played, the same ability is offered and a Forest pays it.
+
+[Bot1 Deck]
+Mountain
+Flooded Grove
+Forest
+Island
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Flooded Grove.Play
+! Bot1.Battlefield.Flooded Grove.Activate(Ability: {G/U})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Flooded Grove.Activate(Ability: {G/U}, {T})
+Bot1.Colors(Green; Blue)
+? Bot1.Mana = {U}{G}
+
+[Expect]
+Bot1.Life = 20
