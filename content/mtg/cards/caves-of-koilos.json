@@ -1,0 +1,5 @@
+{
+  "name": "Caves of Koilos",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{T}: Add {W} or {B}. This land deals 1 damage to you."
+}
