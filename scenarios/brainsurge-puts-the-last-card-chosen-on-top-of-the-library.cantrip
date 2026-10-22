@@ -1,0 +1,42 @@
+# Brainsurge: "Draw four cards, then put two cards from your hand on top of your library in any order." Bot1 draws exactly
+# four (Lightning Bolt, Counterspell, Dark Ritual, Mox Jet: after the spell two of them are in hand) and puts two of them
+# back with Counterspell chosen first and Lightning Bolt last, so Lightning Bolt is the top card and Counterspell the one
+# under it - the last chosen ends on top. Hand 8 - 2 = 6, library 8 + 2 = 10.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Brainsurge
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Counterspell
+Dark Ritual
+Mox Jet
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainsurge.Cast
+Bot1.Choose(Counterspell; Lightning Bolt)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 10
+Bot1.Library = Lightning Bolt; Counterspell; Island; Island; Island; Island; Island; Island; Island; Island
+Bot1.Graveyard = Brainsurge
+Bot1.Battlefield = Island; Island; Mox Sapphire

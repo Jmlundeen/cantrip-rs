@@ -1,0 +1,42 @@
+# Brainsurge: "then put two cards from your hand on top of your library in any order" - the two may be cards that were
+# already in hand, not only the four just drawn (ruling 2024-06-07). Bot1 keeps its opening-hand Mox Emerald and the drawn
+# Dark Ritual on top, Dark Ritual chosen last and so on top, and the two other drawn cards stay in its hand: 8 - 2 = 6
+# there, 8 + 2 = 10 in the library.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Brainsurge
+Mox Emerald
+Island
+Island
+Island
+Island
+Lightning Bolt
+Counterspell
+Dark Ritual
+Mox Jet
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainsurge.Cast
+Bot1.Choose(Mox Emerald; Dark Ritual)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 10
+Bot1.Library = Dark Ritual; Mox Emerald; Island; Island; Island; Island; Island; Island; Island; Island
+Bot1.Graveyard = Brainsurge
+Bot1.Battlefield = Island; Island; Mox Sapphire
