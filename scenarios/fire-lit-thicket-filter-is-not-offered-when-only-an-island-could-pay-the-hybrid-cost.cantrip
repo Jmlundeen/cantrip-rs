@@ -1,0 +1,30 @@
+# Fire-Lit Thicket: "{R/G}, {T}: Add {R}{R}, {R}{G}, or {G}{G}." The {R/G} must be paid with red or green mana. Turn 3 the
+# Thicket and an Island are all Bot1 has: the filter ability is not offered (an Island makes {U}, which pays neither half).
+# Turn 5, with a Mountain played, the same ability is offered and a Mountain pays it.
+
+[Bot1 Deck]
+Island
+Fire-Lit Thicket
+Mountain
+Forest
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fire-Lit Thicket.Play
+! Bot1.Battlefield.Fire-Lit Thicket.Activate(Ability: {R/G})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Fire-Lit Thicket.Activate(Ability: {R/G}, {T})
+Bot1.Colors(Red; Green)
+? Bot1.Mana = {R}{G}
+
+[Expect]
+Bot1.Life = 20

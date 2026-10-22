@@ -1,0 +1,21 @@
+# Fire-Lit Thicket pays {R/G} (here from a Forest) and taps to add two mana, each red or green as Bot1 chooses: {R}{G}, a
+# mix the Forest alone could never make.
+
+[Bot1 Deck]
+Forest
+Fire-Lit Thicket
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fire-Lit Thicket.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Fire-Lit Thicket.Activate(Ability: {R/G}, {T}; Colors: Red, Green)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {R}{G}

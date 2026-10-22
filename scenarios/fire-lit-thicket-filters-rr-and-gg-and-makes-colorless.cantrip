@@ -1,0 +1,35 @@
+# Fire-Lit Thicket: "{T}: Add {C}." and "{R/G}, {T}: Add {R}{R}, {R}{G}, or {G}{G}." Turn 3 a Mountain pays {R/G} for
+# {R}{R}; turn 5 a Forest pays it for {G}{G}; turn 7 the Thicket taps for {C} alone.
+
+[Bot1 Deck]
+Island
+Fire-Lit Thicket
+Mountain
+Forest
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fire-Lit Thicket.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Fire-Lit Thicket.Activate(Ability: {R/G}, {T})
+Bot1.Colors(Red; Red)
+? Bot1.Mana = {R}{R}
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Fire-Lit Thicket.Activate(Ability: {R/G}, {T})
+Bot1.Colors(Green; Green)
+? Bot1.Mana = {G}{G}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Fire-Lit Thicket.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Life = 20
