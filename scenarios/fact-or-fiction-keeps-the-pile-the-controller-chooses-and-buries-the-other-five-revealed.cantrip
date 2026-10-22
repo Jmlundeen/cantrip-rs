@@ -1,0 +1,53 @@
+# Fact or Fiction: "Reveal the top five cards of your library. An opponent separates those cards into two piles. Put one
+# pile into your hand and the other into your graveyard." Bot1 reveals exactly five (Lightning Bolt, Counterspell, Dark
+# Ritual, Mox Emerald, Mox Jet) and Bot2 splits them into a first pile of two and a second of three. Bot1 keeps the first
+# pile - and casts the Lightning Bolt it kept, which is the proof the card reached its hand - while the other three go to
+# the graveyard. Five cards left the library: 20 - 7 opening cards - 1 draw - 5 revealed = 7.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Fact or Fiction
+Island
+Island
+Island
+Lightning Bolt
+Counterspell
+Dark Ritual
+Mox Emerald
+Mox Jet
+Island x7
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Fact or Fiction.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot2.Choose(Bot1.Library.Lightning Bolt; Bot1.Library.Counterspell)
+Bot1.Modes(First pile)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 7
+Bot1.Graveyard.Count = 5
+Bot1.Graveyard = Lightning Bolt; Fact or Fiction; Mox Jet; Mox Emerald; Dark Ritual
+Bot1.Revealed = Lightning Bolt; Counterspell; Dark Ritual; Mox Emerald; Mox Jet
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Sapphire; Mox Ruby

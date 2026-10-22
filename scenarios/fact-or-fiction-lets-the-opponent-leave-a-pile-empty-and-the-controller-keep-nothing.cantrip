@@ -1,0 +1,47 @@
+# Fact or Fiction: either pile may be empty (CR 700.3d). Bot2 puts all five revealed cards in the
+# second pile, so the first pile is empty, and Bot1 chooses the empty pile: its hand gains nothing and all five revealed
+# cards go to the graveyard - five, no more and no less.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Fact or Fiction
+Island
+Island
+Island
+Lightning Bolt
+Counterspell
+Dark Ritual
+Mox Emerald
+Mox Jet
+Island x7
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Fact or Fiction.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot2.Choose()
+Bot1.Modes(First pile: nothing)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 2
+Bot1.Library.Count = 7
+Bot1.Graveyard.Count = 6
+Bot1.Graveyard = Fact or Fiction; Mox Jet; Mox Emerald; Dark Ritual; Counterspell; Lightning Bolt
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Sapphire; Mox Ruby
