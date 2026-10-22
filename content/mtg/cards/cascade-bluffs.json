@@ -1,0 +1,5 @@
+{
+  "name": "Cascade Bluffs",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{U/R}, {T}: Add {U}{U}, {U}{R}, or {R}{R}."
+}

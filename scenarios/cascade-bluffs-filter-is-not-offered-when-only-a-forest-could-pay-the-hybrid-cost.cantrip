@@ -1,0 +1,30 @@
+# Cascade Bluffs: "{U/R}, {T}: Add {U}{U}, {U}{R}, or {R}{R}." The {U/R} must be paid with blue or red mana. Turn 3 the
+# Bluffs and a Forest are all Bot1 has: the filter ability is not offered (a Forest makes {G}, which pays neither half).
+# Turn 5, with an Island played, the same ability is offered and an Island pays it.
+
+[Bot1 Deck]
+Forest
+Cascade Bluffs
+Island
+Mountain
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Cascade Bluffs.Play
+! Bot1.Battlefield.Cascade Bluffs.Activate(Ability: {U/R})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Cascade Bluffs.Activate(Ability: {U/R}, {T})
+Bot1.Colors(Blue; Red)
+? Bot1.Mana = {U}{R}
+
+[Expect]
+Bot1.Life = 20

@@ -1,0 +1,21 @@
+# Cascade Bluffs pays {U/R} (here from a Mountain) and taps to add two mana, each blue or red as Bot1 chooses: {U}{R}, a
+# mix the Mountain alone could never make.
+
+[Bot1 Deck]
+Mountain
+Cascade Bluffs
+Mountain x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Cascade Bluffs.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Cascade Bluffs.Activate(Ability: {U/R}, {T}; Colors: Blue, Red)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {U}{R}
