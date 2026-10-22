@@ -139,15 +139,15 @@ pub fn draw_a_card_and_lose_1_life(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
-/// "Draw N cards, then put two cards from your hand on top of your library in any order" (CR 121.1, 701.20): the two are
+/// "Draw N cards, then put two cards from your hand on top of your library in any order" (CR 121.1, 401.4): the two are
 /// chosen together (CR 608.2d) and put back one at a time in the order chosen, so the last chosen ends on top; either may be
-/// a card that was already in hand (ruling 2024-06-07), not only one of the N just drawn. Brainsurge (four) and Brainstorm
-/// (three) print it.
+/// a card that was already in hand (ruling 2024-06-07), not only one of the N just drawn. Brainsurge (four), Brainstorm and
+/// Jace, the Mind Sculptor's 0 ability (three) print it.
 pub fn draw_then_put_two_back(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
     let player = item.controller;
     g.draw(player, n);
     let hand = g.state().zone(Zone::hand(player)).to_vec();
-    let cards = crate::choose::cards(g, player, item.object, Purpose::PutOnTop, hand, 2, false)?;
+    let cards = crate::choose::select(g, player, item.object, Purpose::PutOnTop, hand, crate::select::cards(crate::select::as_many_as_can(2)))?;
     // The last card chosen ends up on top.
     let order: Vec<ObjectId> = cards.iter().rev().copied().collect();
     g.put_into_library(&order, LibraryPlace::Top);
