@@ -1,0 +1,40 @@
+# Izzet Signet: "{1}, {T}: Add {U}{R}." (CR 605.1a, a mana ability with mana in its own cost, CR 602.2b).
+# Cast with two Islands on turn 3. On turn 5 two Islands tapped for {U}{U}, the ability's {1} paid from that pool, and the
+# Signet adds {U}{R}: the pool is exactly {U}{U}{R}, so a free ability would leave {U}{U}{U}{R} and an ability adding one
+# color would leave no {R}. Third Path Iconoclast costs {U}{R} and is cast from that pool, proving both mana are the colors
+# printed. Green is refused beside the blue and red the ability does add (the plain activation is the positive control), and
+# a tapped Signet is not offered a second time.
+
+[Bot1 Deck]
+Island x3
+Izzet Signet
+Third Path Iconoclast
+Island x12
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Izzet Signet.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+? Bot1.Mana = {U}{U}
+! Bot1.Battlefield.Izzet Signet.Activate(Color: Green)
+Bot1.Battlefield.Izzet Signet.Activate
+? Bot1.Mana = {U}{U}{R}
+! Bot1.Battlefield.Izzet Signet.Activate
+Bot1.Hand.Third Path Iconoclast.Cast
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Izzet Signet.Tapped = true
+Bot1.Battlefield.Third Path Iconoclast.Subtypes = Human; Monk
+Bot1.Life = 20
