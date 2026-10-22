@@ -1,0 +1,32 @@
+# Scorched Geyser: "This land enters tapped unless you control two or more basic lands." Turn 5 Bot1 controls an Island (one
+# basic) and a Volcanic Island (the Island and Mountain types, but not basic, CR 205.4a): one basic is below the two, so
+# its Scorched Geyser enters tapped - though Bot2, its opponent, controls two basic lands by then. Bot2 with an Island and
+# a Mountain of its own plays the same land on turn 6 and it enters untapped (positive control).
+
+[Bot1 Deck]
+Island
+Volcanic Island
+Scorched Geyser
+Mountain x20
+
+[Bot2 Deck]
+Island
+Mountain
+Scorched Geyser
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Scorched Geyser.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Scorched Geyser.Play
+
+[Expect]
+Bot1.Battlefield.Scorched Geyser.Tapped = true
+Bot2.Battlefield.Scorched Geyser.Tapped = false
