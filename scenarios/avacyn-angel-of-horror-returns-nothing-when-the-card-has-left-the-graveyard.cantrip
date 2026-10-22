@@ -1,0 +1,64 @@
+# Avacyn, Angel of Horror: "return that card ... at the beginning of the next end step" is about the card it was, and a
+# card that has left the graveyard by then is a new object that the delayed ability does not find (CR 603.7c). Bot1's
+# Damnation kills Avacyn and her dies ability sets up the return; while that ability is on the stack Bot2 sacrifices
+# Soul-Guide Lantern to exile Bot1's graveyard, so at the end step nothing comes back and Avacyn stays in exile.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Avacyn, Angel of Horror
+Damnation
+Island x11
+
+[Bot2 Deck]
+Swamp
+Soul-Guide Lantern
+Swamp x5
+Swamp x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Avacyn, Angel of Horror.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Damnation.Cast
+[T5 Bot1.Main2]
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Count = 6
+? Bot1.Graveyard.Count = 0
+? Exile.Count = 3
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Swamp
+Bot1.Graveyard.Count = 0
+Exile = Avacyn, Angel of Horror; Black Lotus; Damnation
+Bot2.Battlefield = Swamp
+Result = InProgress

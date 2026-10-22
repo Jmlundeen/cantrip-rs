@@ -1,0 +1,62 @@
+# Avacyn, Angel of Horror: a token that dies leaves nothing to return. Avacyn dies with three Rabbit tokens from Hop to
+# It in the same Damnation, and only Avacyn sets up a return: one delayed ability, not four, and no Rabbits after it.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Avacyn, Angel of Horror
+Hop to It
+Damnation
+Island x10
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Avacyn, Angel of Horror.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hop to It.Cast
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Count = 10
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Damnation.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Count = 6
+? Delayed.Count = 1
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Battlefield = Avacyn, Angel of Horror; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Swamp
+Bot1.Battlefield.Avacyn, Angel of Horror.Keywords = Deathtouch; Flying
+Bot1.Graveyard.Count = 3

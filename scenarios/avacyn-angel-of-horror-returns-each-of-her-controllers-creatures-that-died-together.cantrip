@@ -1,0 +1,71 @@
+# Avacyn, Angel of Horror: "Whenever Avacyn or another nontoken creature you control dies, return that card to the
+# battlefield under your control at the beginning of the next end step." Bot1's Damnation kills Avacyn and Bot1's Llanowar
+# Elves together, so the ability triggers once for each of them: both come back at this turn's end step. Bot2's Llanowar
+# Elves dies in the same event and nothing returns it, since it is not a creature Bot1 controls. Avacyn shows her flying
+# and deathtouch.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Avacyn, Angel of Horror
+Llanowar Elves
+Damnation
+Island x11
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Avacyn, Angel of Horror.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Damnation.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Count = 6
+? Bot1.Graveyard.Count = 4
+? Delayed.Count = 2
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Battlefield = Avacyn, Angel of Horror; Llanowar Elves; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Swamp
+Bot1.Battlefield.Avacyn, Angel of Horror.Keywords = Deathtouch; Flying
+Bot1.Graveyard.Count = 2
+Bot2.Battlefield = Forest
