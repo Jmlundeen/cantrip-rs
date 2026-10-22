@@ -1,0 +1,71 @@
+# Knight of Dusk's Shadow prevents Bot1 gaining life from either Healing Salve or Titanbones's discard (CR 119.7).
+# Neither produces a growth trigger. Removing the Knight lets the next same life-gain instruction grow Titanbones.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Pearl
+Healing Salve
+Mox Ruby
+Faithless Looting
+Titanbones, Towering Heart
+Forest
+Lightning Bolt
+Healing Salve
+Forest x16
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Knight of Dusk's Shadow
+Island x24
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Knight of Dusk's Shadow.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Titanbones, Towering Heart; Forest)
+[T5 Bot1.Main1]
+? Bot1.Life = 20
+? Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Knight of Dusk's Shadow)
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 2
+Bot2.Graveyard = Knight of Dusk's Shadow

@@ -1,0 +1,40 @@
+# Swords exiles Titanbones first, then its controller gains its 4 power as life (CR 608.2c/608.2h). The counter ability
+# functions only on the battlefield (CR 113.6), and the graveyard/exile discard ability sees no discard (CR 701.9).
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Forest x17
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Titanbones, Towering Heart)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 20
+Exile = Titanbones, Towering Heart
+Bot1.Battlefield = Forest; Sol Ring; Mox Emerald

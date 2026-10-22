@@ -1,0 +1,9 @@
+{
+  "name": "Titanbones, Towering Heart",
+  "manaCost": "{3}{G}",
+  "type": "Legendary Creature — Skeleton Druid",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Reach\nWhenever you gain life, put two +1/+1 counters on Titanbones.\nWhen you discard this card, you gain 3 life.",
+  "keywords": ["Reach"]
+}

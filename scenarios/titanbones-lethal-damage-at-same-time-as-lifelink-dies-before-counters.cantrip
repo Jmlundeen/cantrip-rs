@@ -1,0 +1,73 @@
+# Titanbones blocks a 5/5 while its controller's Hawk blocks a 1/1. The Hawk gains 1 at the same time Titanbones takes
+# lethal damage; state-based actions kill Titanbones before its counter trigger can resolve (CR 704.5g; official ruling).
+# Reach lets Titanbones block the flying Angel of Vitality; the opponent is below 25 life, so the Angel is 2/2 + Growth.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Pearl
+Healer's Hawk
+Island
+Forest x18
+
+[Bot2 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Angel of Vitality
+Healer's Hawk
+Mox Emerald
+Giant Growth
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Angel of Vitality.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Pass
+Bot2.Attack(Angel of Vitality > Bot1; Healer's Hawk > Bot1)
+Bot1.Block(Titanbones, Towering Heart > Angel of Vitality; Healer's Hawk > Healer's Hawk)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Angel of Vitality)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 22
+Bot1.Graveyard = Titanbones, Towering Heart; Healer's Hawk
+Bot1.Battlefield = Forest; Sol Ring; Mox Emerald; Mox Pearl
+Bot2.Battlefield.Angel of Vitality.Damage = 4
+Bot2.Graveyard = Healer's Hawk; Giant Growth

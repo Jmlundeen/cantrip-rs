@@ -1,0 +1,62 @@
+# Three Steps Ahead copies Titanbones without its counters (CR 707.2). Keep the token under the legend rule;
+# the original's graveyard move is no discard (CR 704.5j/701.9). The token grows from life gain, then ceases when
+# returned to hand (CR 111.7), again without a discard trigger.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Mox Sapphire
+Three Steps Ahead
+Mox Pearl
+Healing Salve
+Unsummon
+Forest x17
+
+[Bot2 Deck]
+Island x26
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Create a token)
+Bot1.Target(Titanbones, Towering Heart)
+Bot1.Choose(Titanbones, Towering Heart#2)
+Bot1.Pass
+? Bot1.Life = 20
+? Bot1.Battlefield.Titanbones, Towering Heart.Token = true
+? Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 2
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Titanbones, Towering Heart)
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Unsummon; Healing Salve; Titanbones, Towering Heart; Three Steps Ahead
+Bot1.Battlefield = Forest; Sol Ring; Mox Emerald; Mox Sapphire; Mox Pearl

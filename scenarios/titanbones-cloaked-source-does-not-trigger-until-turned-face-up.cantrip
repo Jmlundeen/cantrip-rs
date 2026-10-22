@@ -1,0 +1,59 @@
+# A cloaked Titanbones has no printed abilities (CR 708.2), so gaining life cannot grow it. Turning it face up is a
+# special action, not entering again; its growth ability then works on that same object (CR 708.8/119.9).
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Forest
+Sol Ring
+Mox Emerald
+Mox Pearl
+Healing Salve
+Titanbones, Towering Heart
+Healing Salve
+Forest x15
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+[T3 Bot1.Main1]
+? Bot1.Life = 23
+? Bot1.Battlefield..FaceDownName = Titanbones, Towering Heart
+? Bot1.Battlefield..Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield..Power = 3
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield.Titanbones, Towering Heart.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Titanbones, Towering Heart.Power = 7
+Bot1.Battlefield.Titanbones, Towering Heart.Toughness = 5
+Bot1.Battlefield.Titanbones, Towering Heart.FaceDown = (absent)
+Bot1.Battlefield.Cryptic Coat.AttachedTo = Titanbones, Towering Heart

@@ -1,0 +1,57 @@
+# Reach permits Titanbones to block Ornithopter, while Elvish Mystic cannot (CR 702.17/702.9b). It grants no evasion:
+# on Titanbones's attack, the opponent's nonflying Mystic blocks it normally (CR 509.1b).
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Titanbones, Towering Heart
+Elvish Mystic
+Forest
+Forest
+Forest x15
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Elvish Mystic
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Titanbones, Towering Heart.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot2.Attack(Ornithopter > Bot1)
+! Bot1.Block(Elvish Mystic > Ornithopter)
+Bot1.Block(Titanbones, Towering Heart > Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Titanbones, Towering Heart > Bot2)
+Bot2.Block(Elvish Mystic > Titanbones, Towering Heart)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Titanbones, Towering Heart.Damage = 1
+Bot2.Graveyard = Elvish Mystic; Ornithopter

@@ -1,0 +1,28 @@
+# Faithless Looting discards two Titanbones simultaneously. Each card sees only its own discard and gains 3 once
+# (CR 603.2c/701.9); the triggers wait until the spell has finished (CR 603.3). A third copy in hand gains nothing.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Titanbones, Towering Heart
+Titanbones, Towering Heart
+Titanbones, Towering Heart
+Island x17
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Titanbones, Towering Heart#1; Titanbones, Towering Heart#2)
+? Bot1.Life = 20
+Bot1.Pass
+? Stack = Titanbones, Towering Heart; Titanbones, Towering Heart
+
+[Expect]
+Bot1.Life = 26
+Bot2.Life = 20
+Bot1.Graveyard = Faithless Looting; Titanbones, Towering Heart; Titanbones, Towering Heart
+Bot1.Hand.Titanbones, Towering Heart.Power = 4
