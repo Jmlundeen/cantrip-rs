@@ -1,0 +1,32 @@
+# Drowned Catacomb: "This land enters tapped unless you control an Island or a Swamp." (CR 614.1c, 614.12a: read on the
+# battlefield as it enters, the land itself never counted). Beside a Mountain only the first copy enters tapped (turn 3);
+# once an Island is out the second enters untapped (turn 7), the positive control for the first. It also taps for {U} or
+# {B}: red is refused beside the blue it does add, and the {U} activation is that positive control.
+
+[Bot1 Deck]
+Mountain
+Drowned Catacomb
+Island
+Drowned Catacomb
+Island x10
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Drowned Catacomb.Play
+? Bot1.Battlefield.Drowned Catacomb.Tapped = true
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Drowned Catacomb.Activate(Ability: {U} or {B}; Color: Red)
+Bot1.Battlefield.Drowned Catacomb.Activate(Ability: {U} or {B}; Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Drowned Catacomb.Play
+? Bot1.Battlefield.Drowned Catacomb#2.Tapped = false
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Drowned Catacomb#2.Tapped = false

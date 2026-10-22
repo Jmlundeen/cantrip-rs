@@ -1,0 +1,19 @@
+# "...unless you control an Island or a Swamp": the Swamp branch, read by land type and not by name (CR 305.6, 305.7).
+# Bayou is a Swamp (and a Forest, which does not count) and no Island is anywhere, so the Catacomb enters untapped.
+
+[Bot1 Deck]
+Bayou
+Drowned Catacomb
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Bayou.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Drowned Catacomb.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Drowned Catacomb.Tapped = false

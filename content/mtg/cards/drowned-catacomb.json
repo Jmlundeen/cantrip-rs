@@ -1,0 +1,5 @@
+{
+  "name": "Drowned Catacomb",
+  "type": "Land",
+  "oracleText": "This land enters tapped unless you control an Island or a Swamp.\n{T}: Add {U} or {B}."
+}
