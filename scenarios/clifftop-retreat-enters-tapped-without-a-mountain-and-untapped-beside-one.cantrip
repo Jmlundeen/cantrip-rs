@@ -1,0 +1,33 @@
+# Clifftop Retreat: "This land enters tapped unless you control a Mountain or a Plains." (CR 614.1c, 614.12a: read on
+# the battlefield as it enters, so the land itself is never one of the two). Beside a Swamp only the first copy enters
+# tapped (turn 3); once a Mountain is out the second enters untapped (turn 7), the positive control for the first. It also
+# taps for {R} or {W}: blue is refused beside the red it does add, and the {R} activation is that positive control.
+
+[Bot1 Deck]
+Swamp
+Clifftop Retreat
+Mountain
+Clifftop Retreat
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Clifftop Retreat.Play
+? Bot1.Battlefield.Clifftop Retreat.Tapped = true
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Clifftop Retreat.Activate(Ability: {R} or {W}; Color: Blue)
+Bot1.Battlefield.Clifftop Retreat.Activate(Ability: {R} or {W}; Color: Red)
+? Bot1.Mana = {R}
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Clifftop Retreat.Play
+? Bot1.Battlefield.Clifftop Retreat#2.Tapped = false
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Clifftop Retreat#2.Tapped = false
+Bot1.Battlefield.Clifftop Retreat#2.Subtypes = (absent)

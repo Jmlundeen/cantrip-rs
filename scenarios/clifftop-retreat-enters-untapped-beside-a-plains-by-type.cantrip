@@ -1,0 +1,19 @@
+# "...unless you control a Mountain or a Plains": the Plains branch, read by land type and not by name (CR 305.6, 305.7).
+# Savannah is a Plains (and a Forest, which does not count) and no Mountain is anywhere, so the Retreat enters untapped.
+
+[Bot1 Deck]
+Savannah
+Clifftop Retreat
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Savannah.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Clifftop Retreat.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Clifftop Retreat.Tapped = false
