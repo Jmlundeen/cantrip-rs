@@ -50,7 +50,7 @@ pub fn chosen_color(q: &dyn Query, asker: &Asker) -> ColorSet {
     q.obj(asker.source).chosen_color.map_or(ColorSet::NONE, ColorSet::of)
 }
 
-/// "This land enters tapped unless you control a [land type]" (CR 614.1c): read on the battlefield as it is while the land
+/// "This land enters tapped unless you control a [land type]" (CR 614.12, 614.1d): read on the battlefield as it is while the land
 /// enters, so the land itself is not counted, through the layers (a land of any kind may have the type). Arena of Glory
 /// (Mountain), Castle Locthwain (Swamp) and Shifting Woodland (Forest) print it.
 pub fn enters_tapped_unless_you_control<const TYPE: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
@@ -61,7 +61,7 @@ pub fn enters_tapped_unless_you_control<const TYPE: u16>(g: &mut dyn Game, enter
     Ok(())
 }
 
-/// "This land enters tapped unless you control a planeswalker" (CR 614.1c): read on the battlefield as it is while the land
+/// "This land enters tapped unless you control a planeswalker" (CR 614.12, 614.1d): read on the battlefield as it is while the land
 /// enters, through the layers; a planeswalker entering simultaneously is not counted, and only the controller's own
 /// planeswalkers count. The ten lands in the Annex and Commons cycle print it.
 pub fn enters_tapped_unless_you_control_a_planeswalker(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
@@ -89,7 +89,7 @@ pub fn enters_tapped_unless_you_control_basic_land(g: &mut dyn Game, entering: &
     Ok(())
 }
 
-/// "This land enters tapped unless you control a [land type] or a [land type]" (CR 614.1c): as `enters_tapped_unless_you_control`
+/// "This land enters tapped unless you control a [land type] or a [land type]" (CR 614.12, 614.1d): as `enters_tapped_unless_you_control`
 /// with two land types, each read through the layers and the land's words (CR 612.2). Cori Mountain Monastery (Plains or
 /// Island) and Mistrise Village (Mountain or Forest) print it.
 pub fn enters_tapped_unless_you_control_either<const A: u16, const B: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
