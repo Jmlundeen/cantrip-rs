@@ -119,6 +119,8 @@ abilities: &[
   zone says so, `.functions_in(IN_A_GRAVEYARD)`: one that returns "this card from your graveyard" (CR 113.6m) or says
   "if this card is in your graveyard" (CR 113.6b). The engine asks it there and nowhere else, so its matcher never checks
   the zone; `tests/functioning_zones_match_text.rs` holds every ability's zones to its words. A loyalty ability is already sorcery speed (CR 606.3).
+  `.only_as_an_instant()` requires priority even for a mana ability (CR 304.5, 602.5e): it cannot be activated during
+  payment, though its mana floated beforehand remains spendable.
 - **Shared effects with an argument** are called in place: `triggered(THIS_ENTERS, |g, item| effects::draw(g, item, 1), ..)`.
 
 The rest of a card is written the same way, one constructor each, the rare parts as methods:

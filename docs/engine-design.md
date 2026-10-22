@@ -1733,6 +1733,16 @@ if you control a Wizard").
 
 ### Restricted mana
 
+An ability's explicit "Activate only as an instant" is `ActivatedDef::priority_only`, written with
+`.only_as_an_instant()` (CR 304.5, 602.5e). It does not change mana-ability classification (CR 605.1a): the ability
+still resolves immediately at priority. `actions::ManaWindow` separates priority inventory from every payment
+inventory, including nested mana-ability costs, casting during resolution, attack taxes, special actions and unless/ward
+payments. Cost estimates count only sources available during payment, so a priority-only source must be activated
+before announcing the cost; mana already in the pool still pays normally. Restrictions are read from actual current abilities, so copied and granted abilities
+keep their restriction, while an ordinary ability of the same permanent is unaffected. Lion's Eye Diamond and Rhystic
+Cave print this restriction. The 128-game benchmark measured 9.71 us per decision before and 9.09 after in back-to-back
+runs of the two builds (2026-10-21; shared-machine load, no speed claim); the earlier loaded runs were 28.32 and 9.01.
+
 Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction present
 (`GameState::restricted_mana`, a list of player, restriction and pool beside the players, so that a player stays plain
 `Copy` data; written through its own undo entry, only when it changes, and empty in nearly every position). A
