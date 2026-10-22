@@ -1,0 +1,5 @@
+{
+  "name": "Graven Cairns",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{B/R}, {T}: Add {B}{B}, {B}{R}, or {R}{R}."
+}

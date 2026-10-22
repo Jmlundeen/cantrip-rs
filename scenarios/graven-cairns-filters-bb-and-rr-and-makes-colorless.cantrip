@@ -1,0 +1,35 @@
+# Graven Cairns: "{T}: Add {C}." and "{B/R}, {T}: Add {B}{B}, {B}{R}, or {R}{R}." Turn 3 a Swamp pays {B/R} for {B}{B};
+# turn 5 a Mountain pays it for {R}{R}; turn 7 the Cairns taps for {C} alone.
+
+[Bot1 Deck]
+Plains
+Graven Cairns
+Swamp
+Mountain
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Graven Cairns.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Graven Cairns.Activate(Ability: {B/R}, {T})
+Bot1.Colors(Black; Black)
+? Bot1.Mana = {B}{B}
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Graven Cairns.Activate(Ability: {B/R}, {T})
+Bot1.Colors(Red; Red)
+? Bot1.Mana = {R}{R}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Graven Cairns.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Life = 20

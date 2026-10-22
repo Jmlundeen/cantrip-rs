@@ -1,0 +1,30 @@
+# Graven Cairns: "{B/R}, {T}: Add {B}{B}, {B}{R}, or {R}{R}." The {B/R} must be paid with black or red mana. Turn 3 the
+# Cairns and a Plains are all Bot1 has: the filter ability is not offered (a Plains makes {W}, which pays neither half).
+# Turn 5, with a Swamp played, the same ability is offered and a Swamp pays it.
+
+[Bot1 Deck]
+Plains
+Graven Cairns
+Swamp
+Mountain
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Graven Cairns.Play
+! Bot1.Battlefield.Graven Cairns.Activate(Ability: {B/R})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Graven Cairns.Activate(Ability: {B/R}, {T})
+Bot1.Colors(Black; Red)
+? Bot1.Mana = {B}{R}
+
+[Expect]
+Bot1.Life = 20

@@ -1,0 +1,21 @@
+# Graven Cairns pays {B/R} (here from a Swamp) and taps to add two mana, each black or red as Bot1 chooses: {B}{R}, a mix
+# the Swamp alone could never make.
+
+[Bot1 Deck]
+Swamp
+Graven Cairns
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Graven Cairns.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Graven Cairns.Activate(Ability: {B/R}, {T}; Colors: Black, Red)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {B}{R}
