@@ -1,0 +1,11 @@
+{
+  "name": "Traxos, Scourge Eternal",
+  "manaCost": "{4}",
+  "type": "Legendary Artifact Creature — Dragon Construct",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Trample\nTraxos doesn't untap during your untap step.\nWhenever you cast an artifact or creature spell, untap Traxos.",
+  "keywords": [
+    "Trample"
+  ]
+}

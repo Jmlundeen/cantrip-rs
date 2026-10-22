@@ -1,0 +1,64 @@
+# Phantasmal Image copies Traxos for another controller (CR 707.2). Each cast untaps only that player's Traxos;
+# the Image's self-untap does not target it and therefore does not trigger its sacrifice exception (CR 115.1d/201.5).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Phantasmal Image
+Springleaf Drum
+Ornithopter
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Springleaf Drum.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Phantasmal Image.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+Bot2.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+? Bot2.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Hand.Mox Jet.Cast
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot2.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot2.Battlefield.Traxos, Scourge Eternal.Token = (absent)
+Bot2.Battlefield.Traxos, Scourge Eternal.Subtypes = Construct; Dragon; Illusion
+Bot2.Battlefield.Traxos, Scourge Eternal.Keywords = DoesNotUntap; Trample

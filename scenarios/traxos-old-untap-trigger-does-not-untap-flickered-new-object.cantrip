@@ -1,0 +1,56 @@
+# Flickering Traxos makes a new object (CR 400.7). Tap the returned creature with Drum before the old untap trigger
+# resolves: that trigger must leave the new one tapped. A new artifact cast does untap it, the positive control.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Ornithopter
+Ephemerate
+Plains
+Mox Jet
+Island x17
+
+[Bot2 Deck]
+Island x26
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Traxos, Scourge Eternal)
+Bot1.Pass
+Bot2.Pass
+? Stack = Traxos, Scourge Eternal; Ornithopter
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+Bot1.Pass
+Bot2.Pass
+? Stack = Ornithopter
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+[T5 Bot1.Main2]
+Bot1.Hand.Mox Jet.Cast
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Traxos, Scourge Eternal.SummoningSick = true
+Exile = Ephemerate

@@ -1,0 +1,55 @@
+# An instant, an enchantment, a land play and mana abilities are not artifact-or-creature spell casts (CR 601.2i).
+# Each leaves Traxos tapped. The same source then untaps to a zero-mana artifact cast, the positive control.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Springleaf Drum
+Traxos, Scourge Eternal
+Giant Growth
+Rancor
+Forest
+Mox Jet
+Forest x17
+
+[Bot2 Deck]
+Island x26
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Green)
+Bot1.Hand.Giant Growth.Cast(Traxos, Scourge Eternal)
+? Stack = Giant Growth
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Hand.Rancor.Cast(Traxos, Scourge Eternal)
+? Stack = Rancor
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Hand.Mox Jet.Cast
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Traxos, Scourge Eternal.Power = 7
+Bot1.Battlefield.Rancor.AttachedTo = Traxos, Scourge Eternal

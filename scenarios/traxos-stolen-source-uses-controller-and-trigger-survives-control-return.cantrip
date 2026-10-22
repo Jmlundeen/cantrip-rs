@@ -1,0 +1,78 @@
+# Mind Control makes "you" Bot2, who also skips Traxos's untap in their own step (CR 109.5/502.3). Bot1's cast cannot
+# untap it. Bot2's cast triggers; removing Mind Control in response returns Traxos still tapped, then that independent
+# Bot2-controlled trigger untaps the same permanent now controlled by Bot1 (CR 113.7a/603.3a).
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Springleaf Drum
+Traxos, Scourge Eternal
+Disenchant
+Mox Pearl
+Ornithopter
+Forest x19
+
+[Bot2 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Mind Control
+Ornithopter
+Island
+Island
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Green)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Mind Control.Cast(Traxos, Scourge Eternal)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot2.Hand.Ornithopter.Cast
+? Stack = Traxos, Scourge Eternal; Ornithopter
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Mind Control)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Traxos, Scourge Eternal.Keywords = DoesNotUntap; Trample
+Bot2.Graveyard = Mind Control
+Bot2.Life = 20

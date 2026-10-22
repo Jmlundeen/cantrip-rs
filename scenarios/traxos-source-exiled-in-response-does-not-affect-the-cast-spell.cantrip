@@ -1,0 +1,50 @@
+# Swords exiles Traxos after its ability has triggered. The independent untap ability still resolves, but cannot
+# untap a departed object (CR 113.7a/400.7/701.26b); Ornithopter remains on the stack and resolves normally.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Ornithopter
+Mox Jet
+Island x19
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Island x24
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Traxos, Scourge Eternal; Color: Blue)
+Bot1.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Traxos, Scourge Eternal)
+Bot2.Pass
+Bot1.Pass
+? Stack = Traxos, Scourge Eternal; Ornithopter
+[T3 Bot1.Main2]
+Bot1.Hand.Mox Jet.Cast
+? Stack = Mox Jet
+
+[Expect]
+Exile = Traxos, Scourge Eternal
+Bot1.Life = 25
+Bot1.Battlefield = Island; Sol Ring; Mox Sapphire; Springleaf Drum; Ornithopter; Mox Jet

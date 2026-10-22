@@ -1,0 +1,63 @@
+# Mirror Gallery lets two Traxos stay under one controller (CR 704.5j). One artifact-creature cast makes one trigger
+# from each source, never four (CR 603.2c). Both tapped sources untap independently and retain their printed values.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Mirror Gallery
+Traxos, Scourge Eternal
+Island
+Ornithopter
+Island x19
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mirror Gallery.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+[T9 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Traxos, Scourge Eternal#1; Traxos, Scourge Eternal#2 > Bot2)
+[T9 Bot1.Main2]
+? Bot1.Battlefield.Traxos, Scourge Eternal#1.Tapped = true
+? Bot1.Battlefield.Traxos, Scourge Eternal#2.Tapped = true
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Stack = Traxos, Scourge Eternal; Traxos, Scourge Eternal; Ornithopter
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal#1.Tapped = false
+Bot1.Battlefield.Traxos, Scourge Eternal#2.Tapped = false
+Bot1.Battlefield.Traxos, Scourge Eternal#1.Power = 5
+Bot1.Battlefield.Traxos, Scourge Eternal#2.Power = 5
+Bot2.Life = 10

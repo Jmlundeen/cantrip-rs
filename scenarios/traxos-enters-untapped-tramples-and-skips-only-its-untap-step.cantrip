@@ -1,0 +1,69 @@
+# Traxos enters untapped: no enters-tapped sentence exists. Its 5 damage tramples over a 1/1 blocker (CR 702.19b),
+# then it stays tapped at its untap step while its mana permanents untap (CR 502.3). A later artifact cast untaps it.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Traxos, Scourge Eternal
+Mox Jet
+Forest
+Forest
+Forest x18
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest
+Forest x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+? Bot1.Battlefield.Traxos, Scourge Eternal.Keywords = DoesNotUntap; Trample
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Traxos, Scourge Eternal > Bot2)
+Bot2.Block(Elvish Mystic > Traxos, Scourge Eternal)
+Bot1.AssignDamage(Traxos, Scourge Eternal > Elvish Mystic: 1; Traxos, Scourge Eternal > Bot2: 4)
+[T5 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+? Bot1.Battlefield.Traxos, Scourge Eternal.Damage = 1
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+? Bot1.Battlefield.Sol Ring.Tapped = false
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Attack(Traxos, Scourge Eternal > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 11
+Bot2.Graveyard = Elvish Mystic
+Bot1.Battlefield.Traxos, Scourge Eternal.Power = 5
+Bot1.Battlefield.Traxos, Scourge Eternal.Toughness = 4
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+Bot1.Battlefield.Traxos, Scourge Eternal.Types = Artifact; Creature
+Bot1.Battlefield.Traxos, Scourge Eternal.Subtypes = Construct; Dragon

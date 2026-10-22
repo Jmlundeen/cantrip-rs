@@ -1,0 +1,63 @@
+# Lodestone Needle taps Traxos and puts two stun counters on it. Its untap prohibition means its untap step removes
+# neither counter (CR 502.3/122.1d). Ornithopter is both artifact and creature: one OR trigger removes exactly one stun.
+# Two later artifact-only casts remove the other counter, then finally untap Traxos (CR 603.2c/701.26b).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Springleaf Drum
+Traxos, Scourge Eternal
+Lodestone Needle
+Ornithopter
+Mox Jet
+Mox Pearl
+Island x17
+
+[Bot2 Deck]
+Island x26
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Traxos, Scourge Eternal.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lodestone Needle.Cast
+Bot1.Target(Traxos, Scourge Eternal)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+? Bot1.Battlefield.Traxos, Scourge Eternal.Counters.Stun = 2
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+? Bot1.Battlefield.Traxos, Scourge Eternal.Counters.Stun = 2
+Bot1.Hand.Ornithopter.Cast
+? Stack = Traxos, Scourge Eternal; Ornithopter
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+? Bot1.Battlefield.Traxos, Scourge Eternal.Counters.Stun = 1
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = true
+? Bot1.Battlefield.Traxos, Scourge Eternal.Counters.Stun = (absent)
+Bot1.Hand.Mox Pearl.Cast
+
+[Expect]
+Bot1.Battlefield.Traxos, Scourge Eternal.Tapped = false
+Bot1.Battlefield.Traxos, Scourge Eternal.Counters.Stun = (absent)
+Bot1.Battlefield.Traxos, Scourge Eternal.Keywords = DoesNotUntap; Trample
