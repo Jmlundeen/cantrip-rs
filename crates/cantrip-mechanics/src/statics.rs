@@ -98,6 +98,13 @@ pub fn cant_be_countered(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::CantBeCountered);
 }
 
+/// "Doesn't untap during its controller's untap step" (CR 502.3, 613.1f): the untap step reads this restriction from
+/// the permanent's characteristics, so it persists even after the permanent loses its abilities.
+/// Intruder Alarm, Bombur, Gentle Dreamer and Infinite Coursework use it as `StaticDef::apply`.
+pub fn does_not_untap(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::DoesNotUntap);
+}
+
 /// "... has flying" (CR 702.9, layer 6) as a static ability's `StaticDef::apply`. Dragon's Rage Channeler's delirium and Iron
 /// Man Armor's equipped creature print it.
 pub fn have_flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
