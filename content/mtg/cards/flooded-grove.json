@@ -1,0 +1,5 @@
+{
+  "name": "Flooded Grove",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{G/U}, {T}: Add {G}{G}, {G}{U}, or {U}{U}."
+}
