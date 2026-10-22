@@ -423,7 +423,7 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   already attached to does nothing and is not one (CR 701.3b). Absent until something has become attached
 - `Exile` lists a card exiled face down as `(face down)` (CR 406.3), and `Exile.FaceDown` says what those cards are (the dump sees
   everything; a player's view does not)
-- `BotN.Life`, `.Poison`, `.Energy`, `.Status` (`Lost`, once the player has lost the game and absent until then), `.Mana` (`{U}{U}`), `.LandsPlayed`
+- `BotN.Life`, `.Poison`, `.Energy`, `.Status` (`Lost`, once the player has lost the game and absent until then), `.CantWin` (`true` while an effect keeps the player from winning the game, CR 104.2b - Platinum Angel's "your opponents can't win" - absent otherwise), `.Mana` (`{U}{U}`), `.LandsPlayed`
 - `BotN.LostTo` (`Life`, `EmptyLibrary`, `Poison`, `Effect`), how the player lost the game (CR 104.3), from the history; absent
   until they have
 - `BotN.ManaFrom` (with `.Count`), the pool's mana by the source that produced it (CR 106.3), restricted mana too and without

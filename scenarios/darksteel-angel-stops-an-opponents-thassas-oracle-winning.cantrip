@@ -2,7 +2,7 @@
 # Lotus and five Moxen (nine mana). Bot2's library is down to two cards when its Thassa's Oracle enters on turn 4: its
 # devotion to blue, 2, is at least the cards in its library, so the Oracle says Bot2 wins the game - and with Bot1's Angel
 # out, Bot2 can't, so nothing happens and the game goes on. (In a duel the Angel's "can't lose" blocks the same win - an
-# opponent who can't lose can't be beaten - so this shows the two together; the win clause alone has no duel to show it in.)
+# opponent who can't lose can't be beaten - so this shows the two together; the CantWin key shows the win clause alone.)
 
 [Bot1 Deck]
 Island
@@ -58,6 +58,6 @@ Bot2.Hand.Thassa's Oracle.Cast
 [Expect]
 Result = InProgress
 Bot1.Status = (absent)
-Bot2.Battlefield.Thassa's Oracle.Tapped = false
 Bot2.Library.Count = 2
-Bot1.Battlefield.Darksteel Angel.Tapped = false
+Bot2.CantWin = true
+Bot1.CantWin = (absent)

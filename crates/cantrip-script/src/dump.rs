@@ -324,6 +324,10 @@ impl StateDump {
             if player.lost {
                 d.set(format!("{b}.Status"), "Lost");
             }
+            // An effect that says an opponent wins does nothing for them (CR 104.2b): Platinum Angel, Darksteel Angel.
+            if game.cant_win(p) {
+                d.set(format!("{b}.CantWin"), true);
+            }
             // How they lost (CR 104.3), from the history: absent for a player who has not, or who left another way.
             if let Some(reason) = game.log.iter().find_map(|r| match r.event {
                 Event::GameLost { player, reason } if player == p => Some(reason),
