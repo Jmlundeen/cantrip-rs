@@ -19,6 +19,8 @@ checked for sufficiency, not exhaustiveness:
   names (and flags a number the current rules don't have) - each rule says what the comment says it does - citations copied from
   older code can name a rule that was renumbered (CR 712.4 is meld cards, not modal double-faced cards);
 - the "never" list, line by line;
+- no rules property set by hand (`SKILL.md`, "A card never tells the engine what the rules already decide"): a flag the
+  card sets so the engine applies a rule correctly is a core gap, reported, not a card finding to patch;
 - no parallel system (`CLAUDE.md`, "Use the systems that exist"): every new store, cache, flag, record, lookup or helper
   is checked against what the engine already has for that job - the event history for the past, the layers for
   characteristics, the journal for undoable state, the shared mechanics and `cantrip_state` helpers - and a second

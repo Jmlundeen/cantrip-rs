@@ -97,6 +97,12 @@ function and change every card that has a copy to call it, in this change: it is
 for later. Never stretch a shared function over something that only looks alike: a flag or parameter only one
 caller uses, or a branch on which card is calling, means it was not the same thing.
 
+**A card never tells the engine what the rules already decide.** Where the rules fix a property of an ability or an
+effect from what it is - whether a trigger looks back in time (CR 603.10a) follows from its trigger event - the engine
+derives it; a card is never responsible for setting a flag for it, because a flag a card can forget is a rules
+deviation waiting to happen. Card files stay as simple as the text they implement. If the engine needs such a flag from
+a card to get the rules right, that is a core gap: report it (`blocked`), never set the flag and move on.
+
 ## Which card, and claiming it
 
 Every card worked on is a GitHub issue, claimed before any work on it (`claims.md` has it in full):
