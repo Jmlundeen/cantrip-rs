@@ -1,0 +1,30 @@
+# Rugged Prairie: "{R/W}, {T}: Add {R}{R}, {R}{W}, or {W}{W}." The {R/W} must be paid with red or white mana. Turn 3 the
+# Prairie and an Island are all Bot1 has: the filter ability is not offered (an Island makes {U}, which pays neither half).
+# Turn 5, with a Mountain played, the same ability is offered and a Mountain pays it.
+
+[Bot1 Deck]
+Island
+Rugged Prairie
+Mountain
+Plains
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Rugged Prairie.Play
+! Bot1.Battlefield.Rugged Prairie.Activate(Ability: {R/W})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Rugged Prairie.Activate(Ability: {R/W}, {T})
+Bot1.Colors(Red; White)
+? Bot1.Mana = {W}{R}
+
+[Expect]
+Bot1.Life = 20
