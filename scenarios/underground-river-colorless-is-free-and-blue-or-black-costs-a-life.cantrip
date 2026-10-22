@@ -1,6 +1,6 @@
 # Underground River prints two mana abilities (CR 605.1a): "{T}: Add {C}." costs nothing, while "{T}: Add {U} or {B}. This
-# land deals 1 damage to you." deals the damage as it resolves (a mana ability, CR 605.4a) and names its color as it is
-# activated (CR 106.5). Bot1 taps it for {C} on turn 3 and stays at 20, for {U} on turn 5 and for {B} on turn 7, one damage
+# land deals 1 damage to you." deals the damage as it resolves (a mana ability, CR 605.3b) and names its color as it is
+# activated (CR 106.1a). Bot1 taps it for {C} on turn 3 and stays at 20, for {U} on turn 5 and for {B} on turn 7, one damage
 # each. The colored ability refuses green beside the blue it does add (the {U} activation is the positive control), and the
 # colorless ability takes no color at all.
 
