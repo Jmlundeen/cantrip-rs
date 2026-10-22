@@ -11,6 +11,7 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 use cantrip_engine::visibility::{StackEntry, ability_key, deferred, knows_face, looks_into, observable, request_objects, stack_entries};
 use cantrip_engine::*;
 use cantrip_obs::*;
+use cantrip_obs::Count;
 
 use crate::knowledge::{Knowledge, front};
 

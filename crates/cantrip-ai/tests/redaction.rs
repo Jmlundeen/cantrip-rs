@@ -757,7 +757,8 @@ fn a_world_dealt_mid_resolution_keeps_its_cards_through_the_rerun_and_back() {
     let root = world.checkpoint();
 
     let request = world.pending().cloned().expect("the discard");
-    let RequestKind::ChooseCards { eligible, count, .. } = &request.kind else { panic!("a card choice: {request:?}") };
+    let RequestKind::ChooseCards { cards, rule, .. } = &request.kind else { panic!("a card choice: {request:?}") };
+    let (eligible, count) = (rule.among.as_ref().unwrap_or(cards), &rule.count.most().expect("a number"));
     let chosen: Vec<ObjectId> = eligible[..*count as usize].to_vec();
     let discarded: Vec<&str> = chosen.iter().map(|&id| world.cards.get(card(&world, id)).name).collect();
     world.answer(request.id, request.player, Answer::Cards(chosen)).expect("legal");
@@ -824,7 +825,8 @@ fn a_library_drawn_from_mid_resolution_is_reordered_and_rolls_back_whole() {
     let dealt = (world.state.clone(), world.log.clone());
     let root = world.checkpoint();
     let request = world.pending().cloned().expect("the discard");
-    let RequestKind::ChooseCards { eligible, count, .. } = &request.kind else { panic!("a card choice: {request:?}") };
+    let RequestKind::ChooseCards { cards, rule, .. } = &request.kind else { panic!("a card choice: {request:?}") };
+    let (eligible, count) = (rule.among.as_ref().unwrap_or(cards), &rule.count.most().expect("a number"));
     let chosen: Vec<ObjectId> = eligible[..*count as usize].to_vec();
     world.answer(request.id, request.player, Answer::Cards(chosen)).expect("legal");
     world.goto(root);

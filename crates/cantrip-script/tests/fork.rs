@@ -62,7 +62,8 @@ Bot1.Hand.Duress.Cast(Bot2)
 /// Chooses the eligible card named `card`.
 fn choose(game: &mut Game, card: &str) {
     let request = game.pending().cloned().expect("a question");
-    let RequestKind::ChooseCards { eligible, .. } = &request.kind else { panic!("a card choice: {request:?}") };
+    let RequestKind::ChooseCards { cards, rule, .. } = &request.kind else { panic!("a card choice: {request:?}") };
+    let eligible = rule.among.as_ref().unwrap_or(cards);
     let id = eligible.iter().copied().find(|&id| name(game, id) == card).expect("eligible");
     game.answer(request.id, request.player, Answer::Cards(vec![id])).expect("legal");
 }
