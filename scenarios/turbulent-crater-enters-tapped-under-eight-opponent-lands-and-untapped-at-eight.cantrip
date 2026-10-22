@@ -1,0 +1,43 @@
+# Turbulent Crater: "This land enters tapped unless your opponents control eight or more lands." On turn 19 Bot2 has seven
+# lands and Bot1 has nine of its own, so Bot1's Crater enters tapped: its controller's lands are not the ones counted. On
+# turn 20, with Bot1's ten lands out, Bot2's own Crater enters untapped (positive control).
+
+[Bot1 Deck]
+Swamp x9
+Turbulent Crater
+Swamp x10
+
+[Bot2 Deck]
+Mountain x7
+Turbulent Crater
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Turbulent Crater.Play
+? Bot1.Battlefield.Turbulent Crater.Tapped = true
+? Bot1.Battlefield.Count = 10
+Bot2.Hand.Turbulent Crater.Play
+? Bot2.Battlefield.Turbulent Crater.Tapped = false
+
+[Expect]
+Turn = 20
+Bot1.Battlefield.Count = 10
+Bot1.Battlefield.Turbulent Crater.Tapped = true
+Bot2.Battlefield.Count = 8
+Bot2.Battlefield.Turbulent Crater.Tapped = false
