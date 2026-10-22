@@ -139,6 +139,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
             let obj = cx.s().obj(id);
             obj.card_copy && !obj.zone.is(ZoneKind::Stack) && {
                 let kept = obj.zone.is(ZoneKind::Exile)
+                    && !obj.prepare_expired
                     && obj.prepared_from.is_some_and(|from| {
                         let f = cx.s().obj(from);
                         live(cx.s(), from) && f.zone.is(ZoneKind::Battlefield) && f.prepared

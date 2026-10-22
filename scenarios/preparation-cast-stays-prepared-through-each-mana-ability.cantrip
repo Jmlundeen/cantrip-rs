@@ -1,0 +1,45 @@
+# Soul Tether costs three; announcing and tapping each of the first two mana sources cannot consume preparation
+# (CR 601.2g-h, 722.3c). Crafter's own restricted mana may pay its linked exile copy, not hand spells (106.6).
+# Last payment finishes casting; the designation is then gone before Soul Tether resolves.
+
+[Bot1 Deck]
+Forest
+Heartwood Crafter
+Forest
+Mox Emerald
+Forest
+Forest
+Forest
+Forest x18
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Heartwood Crafter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Exile.Soul Tether.Cast
+? Bot1.Battlefield.Heartwood Crafter.Prepared = true
+? Stack = Soul Tether
+Bot1.Battlefield.Heartwood Crafter.Activate
+? Bot1.Battlefield.Heartwood Crafter.Prepared = true
+Bot1.Battlefield.Forest.Activate
+? Bot1.Battlefield.Heartwood Crafter.Prepared = true
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+? Bot1.Battlefield.Heartwood Crafter.Prepared = (absent)
+? Exile.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Heartwood Crafter.Prepared = (absent)
+Bot1.Battlefield.Heartwood Crafter.Tapped = true
+Bot1.Battlefield.Heartwood Token.Token = true
+Bot1.Battlefield.Heartwood Token.Colors = Green; Red
+Bot1.Graveyard.Count = 0
+Exile.Count = 0

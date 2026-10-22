@@ -1570,8 +1570,6 @@ fn create_tokens_onto(
     Ok(created)
 }
 
-/// Becomes prepared (CR 722.2): the permanent is marked, and a copy of its prepare spell is put into exile under its
-/// controller, linked to it.
 /// A copy of a card (CR 707.12) in the zone the card is in, owned and controlled by `controller`, who is to cast it: a
 /// card_copy object, not a card, which ceases to exist anywhere but the stack it was cast onto and where it began.
 pub fn copy_card(cx: &mut Cx, card: ObjectId, controller: PlayerId) -> ObjectId {
@@ -1596,6 +1594,7 @@ pub fn copy_card_into(cx: &mut Cx, card: ObjectId, controller: PlayerId, zone: Z
     copy
 }
 
+/// Becomes prepared (CR 722.3a/c): the permanent gains the designation and its controller creates its prepare copy.
 pub fn become_prepared(cx: &mut Cx, permanent: ObjectId) {
     if !live(cx.s(), permanent) || !cx.s().obj(permanent).zone.is(ZoneKind::Battlefield) || cx.s().obj(permanent).prepared {
         return;
@@ -1606,6 +1605,34 @@ pub fn become_prepared(cx: &mut Cx, permanent: ObjectId) {
     }
     cx.st().update_obj(permanent, |o| o.prepared = true);
     prepared_copy(cx, permanent);
+}
+
+/// Becomes unprepared (CR 722.3b): the designation is removed even if the permanent no longer has a prepare spell or
+/// its abilities. Infinite Coursework instructs this; every preparation card also loses the designation when its
+/// prepare copy becomes cast (CR 722.3c). Expire the old copy's exception permanently without ending it before the next
+/// state-based check (CR 704.5e): becoming prepared again creates a new copy, never revives the old one.
+pub fn become_unprepared(cx: &mut Cx, permanent: ObjectId) {
+    if !live(cx.s(), permanent) || !cx.s().obj(permanent).zone.is(ZoneKind::Battlefield) || !cx.s().obj(permanent).prepared {
+        return;
+    }
+    cx.st().update_obj(permanent, |o| o.prepared = false);
+    expire_prepared_copies(cx, permanent);
+    cx.state_changed();
+}
+
+/// The "for as long as" exemption of a permanent's prepare copies ends permanently when it becomes unprepared or
+/// phases out (CR 722.3c, 702.26f). The copies keep their provenance until the next state-based check ends them.
+pub(crate) fn expire_prepared_copies(cx: &mut Cx, permanent: ObjectId) {
+    let copies: Vec<ObjectId> = cx
+        .s()
+        .seats()
+        .flat_map(|p| cx.s().zone(Zone::exile(p)))
+        .copied()
+        .filter(|&id| cx.s().obj(id).card_copy && cx.s().obj(id).prepared_from == Some(permanent))
+        .collect();
+    for copy in copies {
+        cx.st().update_obj(copy, |o| o.prepare_expired = true);
+    }
 }
 
 /// The copy of a prepared permanent's prepare spell its controller creates in exile (CR 722.3c), as it becomes prepared

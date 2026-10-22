@@ -72,6 +72,9 @@ pub struct Obj {
     pub card_copy: bool,
     /// For a prepare spell's copy in exile: the prepared permanent it belongs to.
     pub prepared_from: Option<ObjectId>,
+    /// Its permanent became unprepared or phased out: this copy's exemption from ceasing to exist has ended for good,
+    /// even if it prepares again or phases in before the next state-based check (CR 722.3b/c, 702.26f, 704.5e).
+    pub prepare_expired: bool,
     /// A color chosen as it entered ("as this enters, choose a color", CR 614.12).
     pub chosen_color: Option<Color>,
     /// A creature or land type chosen as it entered.
@@ -307,6 +310,7 @@ impl Obj {
             prepared: false,
             card_copy: false,
             prepared_from: None,
+            prepare_expired: false,
             chosen_color: None,
             chosen_subtype: None,
             on_adventure: None,

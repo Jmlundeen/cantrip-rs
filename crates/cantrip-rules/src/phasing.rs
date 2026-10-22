@@ -76,6 +76,11 @@ pub fn phase_out(cx: &mut Cx, permanents: &[ObjectId], until_leaves: Option<Obje
         }
     }
     for &(id, indirect) in &all {
+        // CR 722.3c, 702.26f: the old prepare copy's "for as long as" exemption ends for good. The permanent keeps
+        // the designation while phased out; phasing back in prepared creates a fresh copy, even before the next SBA.
+        if cx.s().obj(id).prepared {
+            crate::ops::expire_prepared_copies(cx, id);
+        }
         let controller = cx.s().obj(id).controller;
         let phased = if indirect {
             Phased { under: controller, indirect, until_leaves: None, tapped_as_it_returns: false }
@@ -143,13 +148,8 @@ fn phase_in(cx: &mut Cx, permanents: &[ObjectId]) {
     // control phasing in on its own, CR 702.26).
     crate::ops::settle_control(cx);
     for &id in &all {
-        // CR 722.3c: one that phases in prepared has its prepare spell's copy made in exile again, its old one having
-        // ceased to exist while it was phased out (no becoming prepared: nothing that watches that sees it) - unless the
-        // state-based actions have not yet ended the old one, which then stays the one copy.
-        let has_copy = |s: &GameState| {
-            s.seats().any(|p| s.zone(Zone::exile(p)).iter().any(|&c| s.obj(c).card_copy && s.obj(c).prepared_from == Some(id)))
-        };
-        if cx.s().obj(id).prepared && !has_copy(cx.s()) {
+        // CR 722.3c: phasing in prepared creates a fresh copy; phase_out expired the old one.
+        if cx.s().obj(id).prepared {
             crate::ops::prepared_copy(cx, id);
         }
         cx.record(Event::PhasedIn { permanent: id });
@@ -384,24 +384,53 @@ mod tests {
         assert!(game.state.zone(Zone::PHASED_OUT).is_empty());
     }
 
-    static JUMP: CardDef = CardDef { name: "Phasing Test Jump", types: TypeSet::of(&[CardType::Instant]), ..CardDef::BLANK };
+    static JUMP: CardDef = CardDef { name: "Phasing Test Jump", types: TypeSet::of(&[CardType::Instant]), has_cost: true, ..CardDef::BLANK };
     static AVIATOR: CardDef = CardDef { prepare: Some(&JUMP), name: "Phasing Test Aviator", ..BEAR };
 
-    /// CR 722.3c: a prepared permanent phasing in makes its prepare spell's copy again - once: if the state-based actions
-    /// have not yet ended the copy it had (phased out and in again before they were checked), that one stays the only one.
+    /// CR 722.3c, 702.26f: phasing out ends the old copy's exemption permanently, and phasing in prepared creates a new
+    /// copy, whether state-based actions have ended the old one yet or not. Only the new one can be cast, and an unrelated
+    /// permanent's prepare copy keeps its own exemption and permission.
     #[test]
-    fn a_prepared_permanent_phasing_in_has_one_copy_of_its_prepare_spell() {
-        let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&AVIATOR, &JUMP])));
-        let mut game = Game::new(table, &crate::Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
-        let aviator = game.state.push_obj(Obj::new(table.id_of(&AVIATOR), PlayerId(0), Zone::BATTLEFIELD));
-        game.state.zone_push(Zone::BATTLEFIELD, aviator);
-        let mut cx = cx(&mut game);
-        crate::ops::become_prepared(&mut cx, aviator);
-        let copies = |cx: &Cx| cx.s().zone(Zone::exile(PlayerId(0))).iter().filter(|&&c| cx.s().obj(c).prepared_from == Some(aviator)).count();
-        assert_eq!(copies(&cx), 1);
-        phase_out(&mut cx, &[aviator], None, false);
-        untap_step(&mut cx, PlayerId(0));
-        assert!(cx.s().battlefield().contains(&aviator) && cx.s().obj(aviator).prepared);
-        assert_eq!(copies(&cx), 1);
+    fn a_prepared_permanent_phasing_in_gets_a_fresh_copy_and_never_revives_its_old_copy() {
+        for settle_while_phased_out in [false, true] {
+            let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&AVIATOR, &JUMP])));
+            let mut game = Game::new(table, &crate::Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+            let mut permanents = Vec::new();
+            for _ in 0..2 {
+                let id = game.state.push_obj(Obj::new(table.id_of(&AVIATOR), PlayerId(0), Zone::BATTLEFIELD));
+                game.state.zone_push(Zone::BATTLEFIELD, id);
+                crate::ops::become_prepared(&mut cx(&mut game), id);
+                permanents.push(id);
+            }
+            let [aviator, other] = permanents[..] else { unreachable!() };
+            let mut cx = cx(&mut game);
+            let can_cast = |cx: &Cx, copy| {
+                crate::actions::priority_options(cx, PlayerId(0)).iter().any(|o| o.kind == ActionKind::CastSpell && o.source == Some(copy))
+            };
+            let old_copy = cx.s().zone(Zone::exile(PlayerId(0)))[0];
+            let other_copy = cx.s().zone(Zone::exile(PlayerId(0)))[1];
+            assert!(can_cast(&cx, old_copy) && can_cast(&cx, other_copy));
+            phase_out(&mut cx, &[aviator], None, false);
+            assert!(cx.s().obj(aviator).prepared && cx.s().obj(old_copy).prepare_expired);
+            assert_eq!(cx.s().obj(old_copy).prepared_from, Some(aviator));
+            assert!(live(cx.s(), old_copy) && !can_cast(&cx, old_copy));
+            assert!(!cx.s().obj(other_copy).prepare_expired && can_cast(&cx, other_copy));
+            if settle_while_phased_out {
+                crate::settle::state_based_actions_alone(&mut cx).expect("no choices");
+                assert!(!live(cx.s(), old_copy));
+            }
+            untap_step(&mut cx, PlayerId(0));
+            assert!(cx.s().battlefield().contains(&aviator) && cx.s().obj(aviator).prepared);
+            let new_copy = *cx.s().zone(Zone::exile(PlayerId(0))).last().expect("a new prepare copy");
+            assert_ne!(new_copy, old_copy);
+            assert_eq!(cx.s().obj(new_copy).prepared_from, Some(aviator));
+            assert!(!cx.s().obj(new_copy).prepare_expired && can_cast(&cx, new_copy));
+            assert!(!can_cast(&cx, old_copy));
+            crate::settle::state_based_actions_alone(&mut cx).expect("no choices");
+            assert!(!live(cx.s(), old_copy));
+            assert_eq!(cx.s().zone(Zone::exile(PlayerId(0))), &[other_copy, new_copy]);
+            assert!(cx.s().obj(other).prepared && !cx.s().obj(other_copy).prepare_expired);
+        }
     }
+
 }

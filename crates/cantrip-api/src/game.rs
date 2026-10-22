@@ -666,9 +666,12 @@ pub trait Game: Query {
         let kind = EffectKind::SpellCostChange { card: item.ability.card, index, player };
         self.add_player_effect(item.controller, item.object, kind, Duration::EndOfTurn);
     }
-    /// A permanent with a prepare spell becomes prepared (CR 722.2): a copy of the spell is put in exile, which its
+    /// A permanent with a prepare spell becomes prepared (CR 722.3a/c): a copy of the spell is put in exile, which its
     /// controller may cast while it stays prepared. Nothing if it already is, or is not on the battlefield.
     fn become_prepared(&mut self, permanent: ObjectId);
+    /// A permanent becomes unprepared (CR 722.3b): removes its prepared designation, ending its prepare copy's
+    /// permission and exemption from ceasing to exist (CR 722.3c, 704.5e). Nothing if it is no longer on the battlefield.
+    fn become_unprepared(&mut self, permanent: ObjectId);
     /// A Class becomes a level (CR 716.2a), announced to what watches it. Nothing if it is not on the battlefield.
     fn set_class_level(&mut self, permanent: ObjectId, level: u8);
     /// Puts cards of a player's library on its top in this order, the first on top (CR 401.4), or on its bottom,
