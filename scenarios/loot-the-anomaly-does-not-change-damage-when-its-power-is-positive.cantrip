@@ -1,0 +1,33 @@
+# A +3/+3 effect makes Loot's power positive, so it assigns damage normally; its negative-power combat exception no
+# longer applies (CR 510.1a).
+
+[Bot1 Deck]
+Black Lotus x2
+Loot, the Anomaly
+Ornithopter
+Giant Growth
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Loot, the Anomaly.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Loot, the Anomaly)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loot, the Anomaly.Power = 1
+! Bot1.Battlefield.Loot, the Anomaly.Activate(Ability: Sacrifice another creature or planeswalker)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Loot, the Anomaly > Bot2)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Loot, the Anomaly.Power = -2
+Bot2.Life = 19

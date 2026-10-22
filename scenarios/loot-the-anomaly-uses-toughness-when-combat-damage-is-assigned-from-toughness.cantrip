@@ -1,0 +1,27 @@
+# Assault Formation assigns Loot's combat damage from toughness rather than power. Loot's negative-power exception
+# does not replace that rule, so its four toughness yields four damage (CR 510.1a; Loot's 2026-08-21 ruling).
+
+[Bot1 Deck]
+Black Lotus x2
+Loot, the Anomaly
+Assault Formation
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Loot, the Anomaly.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Assault Formation.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Loot, the Anomaly > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Loot, the Anomaly.Power = -2
+Bot1.Battlefield.Loot, the Anomaly.Toughness = 4
+Bot2.Life = 16
