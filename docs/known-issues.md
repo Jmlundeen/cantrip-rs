@@ -60,6 +60,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Pri-3 | Open |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Pri-3 | Open |
 | [KI-117](#ki-117-a-searchs-world-keeps-what-the-real-game-did-with-hidden-cards-it-cannot-resample) | A search's world keeps what the real game did with hidden cards it cannot resample | Pri-3 | Open |
+| [KI-118](#ki-118-a-fix-agents-report-can-be-empty-or-claim-work-its-commit-does-not-hold) | A fix agent's report can be empty or claim work its commit does not hold | Pri-3 | Open |
 
 ## Issues
 
@@ -217,6 +218,14 @@ alone: three Mana Confluences at 1 or 2 life count as three mana, so Raffine is 
 falls back to offering the cast on rare heavy boards. A permanent Urza, Lord High Artificer could tap that also has a mana ability
 without {T} counts Urza's tap apart from its own abilities, as if both could be used (`available_without`, `Repeat::Tap`).
 
+The filter lands now share this unstated yield: `lands::filter_two` (Sunken Ruins, Mystic Gate, Fetid Heath, Cascade
+Bluffs, Fire-Lit Thicket, Flooded Grove, Graven Cairns, Rugged Prairie, Twilight Mire, Wooded Bastion) and Cascading
+Cataracts' {5} ability set no `yields_any`, so each counts every cost as payable while it is untapped. A plain
+`yields_any(2)` would misdescribe the {X}{X}/{X}{Y}/{Y}{Y} choice, so a fix needs a yield the payability check can read
+for a choice of colour pairs. The review of PR #564 saw it at its sharpest: Mystic Gate's filter edited to cost `{W/U}`
+without {T} was offered with only a Swamp and the Gate on the battlefield, though nothing there could pay {W/U} - the
+unknown yield counted the filter as able to pay its own cost.
+
 **Scenarios.** None yet.
 
 ### KI-116: A resolution's "unless pays" question shows only the mana and life parts of its cost
@@ -261,3 +270,21 @@ in the world, and a seat's search could read them:
 
 **Scenarios.** none: these are properties of a search's world, checked by `crates/cantrip-ai/tests/redaction.rs`.
 
+
+### KI-118: A fix agent's report can be empty or claim work its commit does not hold
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Open | tooling (agents) | 2026-10-22, reviewing the card pull requests #547-#564 (`review-card-pr`) |
+
+**Notes.** The Sonnet agents that apply review fixes (`review-card-pr` step 3, `coordinator.md` step 2) do not always
+report what they did. Twice (Sulfurous Springs, PR #553; Underground River, PR #554) the final report was the single word
+"placeholder", though the commit was right and the issue log written - the second time after the prompt asked for "the
+actual report, not a placeholder". Once (Hunter's Axe, PR #547) the report said the content JSON's reminder text was
+fixed and the commit held only the scenario changes; the re-review caught it, and the agent then made the edit. Nothing
+wrong landed: the coordinator read each commit (`git show --stat`, the diff, `git status --short`, the issue log) before
+landing. A fix makes that check part of the procedure rather than the coordinator's habit: `review-card-pr` and
+`coordinator.md` say to verify every fix commit's contents against the findings before the re-review and the landing,
+whatever the report says - and find why the hand-back carries "placeholder" (the agent's final message, or the harness).
+
+**Scenarios.** None: a property of the agent workflow, not of the engine.
