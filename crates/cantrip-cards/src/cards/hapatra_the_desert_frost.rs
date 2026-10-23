@@ -1,6 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::THIS_ENTERS;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
 /// The slot for one opponent of "for each opponent, ... up to one target creature that player controls" (CR 601.2c, 115.1):
@@ -25,13 +26,6 @@ fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "{2}{U}: Untap target creature" (CR 701.20a): a stunned creature does not untap - one stun counter is removed instead.
-fn untap_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    g.untap(creature);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
@@ -40,7 +34,7 @@ pub static CARD: CardDef = CardDef {
             "When Hapatra enters, for each opponent, tap up to one target creature that player controls. Put a stun counter on each of those creatures.",
         )
         .targets(&[FOR_EACH_OPPONENT]),
-        ability(cost("{2}{U}"), untap_target, "{2}{U}: Untap target creature.").targets(&[targets::CREATURE]),
+        ability(cost("{2}{U}"), effects::untap_targets, "{2}{U}: Untap target creature.").targets(&[targets::CREATURE]),
     ],
     ..oracle::HAPATRA_THE_DESERT_FROST
 };
