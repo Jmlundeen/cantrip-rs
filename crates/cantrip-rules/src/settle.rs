@@ -659,6 +659,12 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         for &n in &chosen {
             mask = modal.with(mask, n as usize);
         }
+        // "Choose up to": with no mode chosen the ability is removed from the stack as it is put there (CR 603.3c,
+        // 700.2b), so it never stays there for anyone to respond to, copy or count. No mode was chosen, so nothing is
+        // recorded as chosen.
+        if mask == 0 {
+            return Ok(());
+        }
         // Chosen as it goes on the stack: chosen even if the ability is later countered (CR 603.3c, 700.2).
         cx.record(Event::ModesChosen { source: trigger.source, ability: trigger.ability, modes: mask });
         let mut first_spec = 0u8;
