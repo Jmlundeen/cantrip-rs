@@ -1,0 +1,37 @@
+# Myriad Landscape enters tapped; two mana pays its search ability. A Forest and second Forest are allowed, while a Plains cannot join that choice because it shares no land type with the Forest (CR 205.3i, 305.6, 701.23b).
+
+[Bot1 Deck]
+Myriad Landscape
+Mox Pearl
+Mox Sapphire
+Island x4
+Forest x6
+Plains x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Myriad Landscape.Play
+? Bot1.Battlefield.Myriad Landscape.Tapped = true
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Myriad Landscape.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Myriad Landscape.Activate(Ability: {2}, {T}, Sacrifice this land)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana =
+! Bot1.Search(Forest; Plains)
+Bot1.Search(Forest; Forest)
+
+[Expect]
+Bot1.Graveyard = Myriad Landscape
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Forest#1.Tapped = true
+Bot1.Battlefield.Forest#2.Tapped = true
