@@ -2,15 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{Animation, animate, mana};
 use cantrip_oracle as oracle;
 
-/// "If you control two or more other lands, this land enters tapped" (CR 614.1c): read on the battlefield as it is while
-/// the land enters, so the land itself (and lands entering with it) is not counted.
-fn enters_tapped_with_two_or_more_other_lands(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    if mana::other_lands_you_control(g, entering) >= 2 {
-        entering.tapped = true;
-    }
-    Ok(())
-}
-
 /// "Until end of turn, this land becomes an X/X green Hydra creature. It's still a land." (CR 613.1d, 613.1f, 613.4b): X
 /// is the one announced for the ability (CR 107.3a, never 0 here); the color and the creature type are the ones its own
 /// text has now (CR 612).
@@ -33,7 +24,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(enters_tapped_with_two_or_more_other_lands),
+    enters: Some(mana::enters_tapped_if_two_or_more_other_lands),
     abilities: &[
         mana_ability(TAP, add(Mana::G), "{T}: Add {G}."),
         ability(cost("{X}{G}"), becomes_creature, "{X}{G}: Until end of turn, this land becomes an X/X green Hydra creature. It's still a land. X can't be 0.")

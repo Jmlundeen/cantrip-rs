@@ -34,13 +34,13 @@ pub fn colors_of_cards_exiled_with_this(q: &dyn Query, asker: &Asker) -> ColorSe
     colors
 }
 
-/// "This land enters tapped" (CR 614.1c): the modal double-faced lands' (Bala Ged Sanctuary, Haven of the Harvest).
+/// "This land enters tapped" (CR 614.1d): the modal double-faced lands' (Bala Ged Sanctuary, Haven of the Harvest).
 pub fn enters_tapped(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.tapped = true;
     Ok(())
 }
 
-/// "This creature enters tapped unless it's your turn" / "enters tapped if it's not your turn" (CR 614.1c): it only ever sets
+/// "This creature enters tapped unless it's your turn" / "enters tapped if it's not your turn" (CR 614.1d): it only ever sets
 /// tapped, so a permanent an instruction puts onto the battlefield tapped stays tapped. It is its controller's turn when the
 /// active player is the one it enters under. Eddymurk Crab and Horned Loch-Whale print it.
 pub fn enters_tapped_unless_your_turn(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
@@ -80,7 +80,7 @@ pub fn add_chosen_and_hurt(g: &mut dyn Game, asker: &Asker, color: Option<Color>
 }
 
 /// How many other lands the entering land's controller controls, read on the battlefield as it is while the land enters,
-/// so the land itself is not counted (CR 614.1c).
+/// so the land itself is not counted (CR 614.1d).
 pub fn other_lands_you_control(g: &mut dyn Game, entering: &Entering) -> usize {
     g.permanents_of(entering.controller)
         .into_iter()
@@ -88,7 +88,17 @@ pub fn other_lands_you_control(g: &mut dyn Game, entering: &Entering) -> usize {
         .count()
 }
 
-/// "This land enters tapped unless you control two or fewer other lands" (CR 614.1c): read on the battlefield as it is
+/// "If you control two or more other lands, this land enters tapped" (CR 614.1d): read on the battlefield as it is while the
+/// land enters, so the land itself (and lands entering with it) is not counted. Den of the Bugbear, Lair of the Hydra and
+/// Hall of Storm Giants print it.
+pub fn enters_tapped_if_two_or_more_other_lands(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    if other_lands_you_control(g, entering) >= 2 {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
+/// "This land enters tapped unless you control two or fewer other lands" (CR 614.1d): read on the battlefield as it is
 /// while the land enters, so the land itself is not counted. Concealed Courtyard, Copperline Gorge and Darkslick
 /// Shores print it.
 pub fn enters_tapped_unless_two_or_fewer_other_lands(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
@@ -99,7 +109,7 @@ pub fn enters_tapped_unless_two_or_fewer_other_lands(g: &mut dyn Game, entering:
     Ok(())
 }
 
-/// "This land enters tapped unless you control two or more other lands" (CR 614.1c): read on the battlefield as it is
+/// "This land enters tapped unless you control two or more other lands" (CR 614.1d): read on the battlefield as it is
 /// while the land enters, so the land itself is not counted. The slow lands: Shattered Sanctum, Stormcarved Coast and
 /// Sundown Pass print it.
 pub fn enters_tapped_unless_two_or_more_other_lands(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
