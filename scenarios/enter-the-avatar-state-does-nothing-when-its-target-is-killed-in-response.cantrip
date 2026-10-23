@@ -1,0 +1,44 @@
+# CR 608.2b: with its only target gone (Bot2's Lightning Bolt kills the Dryad Arbor before Enter the Avatar State
+# resolves) the spell does nothing: no Avatar, no keywords on anything, and Bot1's other creature is untouched.
+
+[Bot1 Deck]
+Dryad Arbor
+Plains
+Plains
+Ornithopter
+Enter the Avatar State
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x4
+Mountain x10
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Enter the Avatar State.Cast(Bot1.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Enter the Avatar State; Dryad Arbor
+Bot1.Battlefield.Ornithopter.Subtypes = Thopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Graveyard = Lightning Bolt

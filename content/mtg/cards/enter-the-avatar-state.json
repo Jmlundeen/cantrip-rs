@@ -1,0 +1,6 @@
+{
+  "name": "Enter the Avatar State",
+  "manaCost": "{W}",
+  "type": "Instant — Lesson",
+  "oracleText": "Until end of turn, target creature you control becomes an Avatar in addition to its other types and gains flying, first strike, lifelink, and hexproof. (A creature with hexproof can't be the target of spells or abilities your opponents control.)"
+}

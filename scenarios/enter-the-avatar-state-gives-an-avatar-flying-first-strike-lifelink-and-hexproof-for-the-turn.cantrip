@@ -1,0 +1,56 @@
+# Enter the Avatar State: until end of turn the target creature you control becomes an Avatar in addition to its other
+# types (CR 205.1b) and gains flying, first strike, lifelink and hexproof (CR 611.2a). Bot2 has a creature too, which the
+# spell cannot target ("you control", CR 115.1); Bot2's Lightning Bolt cannot target the hexproof Dryad Arbor (CR 702.11b)
+# but can target Bot1's other Ornithopter (the positive control). The Arbor's lifelink gains Bot1 a life when it hits;
+# on Bot2's turn the effect has ended (CR 514.2) and nothing shows on it.
+
+[Bot1 Deck]
+Dryad Arbor
+Plains
+Plains
+Ornithopter
+Enter the Avatar State
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x4
+Mountain x10
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Enter the Avatar State.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Enter the Avatar State.Cast(Bot1.Battlefield.Dryad Arbor)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dryad Arbor.Subtypes = Avatar; Dryad; Forest
+? Bot1.Battlefield.Dryad Arbor.Keywords = FirstStrike; Flying; Hexproof; Lifelink
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dryad Arbor)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Dryad Arbor > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Life = 21
+? Bot2.Life = 19
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Forest
+Bot1.Battlefield.Dryad Arbor.Keywords = (absent)
+Bot1.Battlefield.Ornithopter = (absent)
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Ornithopter.Subtypes = Thopter
