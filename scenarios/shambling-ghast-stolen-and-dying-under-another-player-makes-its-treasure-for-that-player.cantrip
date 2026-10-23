@@ -1,0 +1,74 @@
+# Shambling Ghast's Treasure goes to the controller of the ability, who controlled the Ghast as it died (CR 603.3a,
+# 603.10a), not to its owner: Bot2 takes Bot1's Ghast with Act of Treason and bolts it, so the Treasure is Bot2's.
+# Bot2's own Ornithopter is a creature the first mode could not target, so it is the Treasure mode that is chosen.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Shambling Ghast
+Ornithopter
+Aunt May
+Plains x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Act of Treason
+Lightning Bolt
+Ornithopter
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shambling Ghast.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Ruby#3.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Shambling Ghast)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#4.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Shambling Ghast)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(Create a Treasure token)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Graveyard = Shambling Ghast
+Bot1.Battlefield = Aunt May; Mox Jet; Mox Pearl; Ornithopter
+Bot2.Battlefield = Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby; Ornithopter; Treasure Token

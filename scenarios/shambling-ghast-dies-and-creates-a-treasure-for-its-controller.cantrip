@@ -1,0 +1,42 @@
+# Shambling Ghast, second mode: "Create a Treasure token." Bot2 kills the Ghast with Lightning Bolt on turn 2 although
+# the first mode had a target (Bot2's Ornithopter, left untouched); the Treasure is made for Bot1, the Ghast's controller, not for
+# Bot2 who killed it (CR 603.3a).
+
+[Bot1 Deck]
+Mox Jet
+Shambling Ghast
+Plains x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Ornithopter
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shambling Ghast.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Shambling Ghast)
+Bot2.Pass
+Bot1.Pass
+Bot1.Modes(Create a Treasure token)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Graveyard = Shambling Ghast
+Bot1.Battlefield = Mox Jet; Treasure Token
+Bot2.Battlefield = Mox Ruby; Ornithopter
+Bot2.Battlefield.Ornithopter.Toughness = 2

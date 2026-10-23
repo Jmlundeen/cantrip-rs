@@ -1,0 +1,79 @@
+# Shambling Ghast's first mode is "an opponent controls" relative to the ability's controller, who controlled the Ghast as
+# it died (CR 603.3a, 603.10a): Bot2 takes Bot1's Ghast with Act of Treason and bolts it, so Bot2's trigger refuses Bot2's own
+# Ornithopter and shrinks Bot1's Ornithopter (0/2 to -1/1); Bot1's Aunt May is not chosen and stays 0/2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Shambling Ghast
+Ornithopter
+Aunt May
+Plains x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Act of Treason
+Lightning Bolt
+Ornithopter
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shambling Ghast.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Ruby#3.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Shambling Ghast)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#4.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Shambling Ghast)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(Target creature an opponent controls)
+! Bot2.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Target(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Ornithopter.Power = -1
+? Bot1.Battlefield.Ornithopter.Toughness = 1
+? Bot1.Battlefield.Aunt May.Toughness = 2
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+
+[Expect]
+Turn = 2
+Bot1.Graveyard = Shambling Ghast
+Bot2.Battlefield = Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby; Ornithopter
