@@ -9,14 +9,8 @@ use cantrip_oracle as oracle;
 fn snap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 2);
     let me = g.card_id(&CARD);
-    let odd = choose::odd_or_even(g, item.controller, item.object, me)?;
-    let doomed: Vec<ObjectId> = g
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature) && choose::mana_value_of_quality(g, id, odd))
-        .collect();
+    let doomed: Vec<ObjectId> =
+        choose::creatures_of_chosen_quality(g, item, me)?.into_iter().filter(|&id| id != item.object).collect();
     g.destroy_all(&doomed);
     Ok(())
 }

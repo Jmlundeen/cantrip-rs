@@ -284,6 +284,20 @@ pub fn odd_or_even(g: &mut dyn Game, player: PlayerId, source: ObjectId, card: C
     Ok(option(g, player, source, card, 0..2)? == 0)
 }
 
+/// "Choose odd or even. [Do something to] each creature with mana value of the chosen quality" (Extinction Event, Thanos, the
+/// Mad Titan): the choice is made as the spell or ability resolves (CR 608.2d), and the creatures of that quality, any
+/// player's and the source's own included, are returned for the caller to act on all at once. `card` is the card whose
+/// `labels` are `ODD_OR_EVEN`.
+pub fn creatures_of_chosen_quality(g: &mut dyn Game, item: &StackItem, card: CardId) -> Result<Vec<ObjectId>, Suspend> {
+    let odd = odd_or_even(g, item.controller, item.object, card)?;
+    Ok(g.state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| g.chars(id).is(CardType::Creature) && mana_value_of_quality(g, id, odd))
+        .collect())
+}
+
 /// The labels "you may tap or untap [it]" offers: a card that asks it lists them as its `labels`.
 pub const TAP_OR_UNTAP: &[&str] = &["Tap", "Untap", "Do nothing"];
 
