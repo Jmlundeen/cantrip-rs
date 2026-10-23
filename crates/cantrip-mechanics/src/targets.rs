@@ -9,15 +9,26 @@ fn on_battlefield(q: &dyn Query, id: ObjectId) -> bool {
 fn any_target_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     match t {
         Target::Player(_) => true,
-        Target::Object(id) => {
-            on_battlefield(q, id) && {
-                let c = q.chars(id);
-                c.is(CardType::Creature) || c.is(CardType::Planeswalker) || c.is(CardType::Battle)
-            }
-        }
+        Target::Object(id) => creature_planeswalker_or_battle(q, id),
         Target::None | Target::Ability(_) => false,
     }
 }
+
+/// A creature, planeswalker or battle on the battlefield (CR 110.4).
+fn creature_planeswalker_or_battle(q: &dyn Query, id: ObjectId) -> bool {
+    on_battlefield(q, id) && {
+        let c = q.chars(id);
+        c.is(CardType::Creature) || c.is(CardType::Planeswalker) || c.is(CardType::Battle)
+    }
+}
+
+fn creature_planeswalker_or_battle_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if creature_planeswalker_or_battle(q, id))
+}
+
+/// "Target creature, planeswalker, or battle" (CR 115.1, 110.4). Volcanic Spite, Cosmic Hunger, Nahiri's Warcrafting, Shatter
+/// the Source and Tandem Takedown print it.
+pub const CREATURE_PLANESWALKER_OR_BATTLE: TargetSpec = target(creature_planeswalker_or_battle_filter);
 
 fn creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Creature))
