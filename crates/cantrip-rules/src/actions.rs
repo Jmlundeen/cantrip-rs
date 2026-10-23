@@ -7220,50 +7220,169 @@ fn activate_player_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, n: u8) 
     Ok(())
 }
 
-/// The mana types a permanent could produce (CR 106.7): the colors its mana abilities add or let the player name, and
-/// whether they add colorless. Restrictions and costs are not considered.
-fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
+/// The mana types a permanent could produce (CR 106.7): "any type of mana that an ability of that permanent would produce if the
+/// ability were to resolve at that time, taking into account any applicable replacement effects in any possible order", costs
+/// ignored. A mana ability that lists its mana adds that, and its mana of one color any it may name; one whose mana is its own
+/// effect's (a filter land's "{U}{U}, {U}{B}, or {B}{B}", Gemstone Caverns' {C} or a color) is run on a copy of the position
+/// for every answer to the questions it asks (`effect_productions`). Through the replacement effects on a tap for mana where
+/// its cost has {T} (CR 106.12b).
+pub(crate) fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
     let controller = cx.s().obj(land).controller;
-    let (mut colors, mut colorless) = (ColorSet::NONE, false);
-    // "Taking into account any applicable replacement effects in any possible order" (CR 106.7): a tap for mana's (CR 106.12b).
+    let mut types = 0u8;
     let replaceable = crate::replace::mana_may_be_replaced(cx);
     for ability in cx.chars(land).abilities() {
         let Some(def) = activated(cx, ability) else { continue };
         if !def.is_mana_ability() || def.from != ZoneKind::Battlefield {
             continue;
         }
-        if replaceable && def.cost.tap {
-            let any = if def.any_color { any_types(cx, land, controller, def) } else { 0 };
-            let k = if any != 0 { u32::from(def.adds_any.max(1)) } else { 0 };
-            let restriction = def.restricted.map(|r| restriction_from(cx, land, r));
-            if let Some(outcomes) = replaced_yields(cx, land, controller, def.adds.0, k, any, restriction) {
-                for o in outcomes {
-                    colorless |= o.mana.get(Mana::C) > 0;
-                    for c in Color::ALL {
-                        if o.mana.get(c.mana()) > 0 {
-                            colors = colors.with(c);
-                        }
-                    }
+        let any = if def.any_color { any_types(cx, land, controller, def) } else { 0 };
+        // The mana it would produce, by each answer to its own questions: what its effect adds, or what it lists.
+        let productions: Vec<[u32; 6]> = match def.mana.and_then(|effect| effect_productions(cx, land, controller, def, effect)) {
+            Some(made) => made,
+            None => {
+                let k = if any != 0 { u32::from(def.adds_any.max(1)) } else { 0 };
+                if k > 0 {
+                    (0..6)
+                        .filter(|&m| any & (1 << m) != 0)
+                        .map(|m| {
+                            let mut made = def.adds.0;
+                            made[m] = made[m].saturating_add(k);
+                            made
+                        })
+                        .collect()
+                } else {
+                    vec![def.adds.0]
+                }
+            }
+        };
+        let restriction = def.restricted.map(|r| restriction_from(cx, land, r));
+        for made in productions {
+            let outcomes: Option<Vec<[u32; 6]>> = if replaceable && def.cost.tap {
+                replaced_yields(cx, land, controller, made, 0, 0, restriction).map(|o| o.into_iter().map(|p| p.mana.0).collect())
+            } else {
+                None
+            };
+            for o in outcomes.unwrap_or_else(|| vec![made]) {
+                types |= (0..6).filter(|&m| o[m] > 0).fold(0u8, |t, m| t | 1 << m);
+            }
+        }
+    }
+    (ColorSet(types & ANY_COLOR), types & (1 << Mana::C as u8) != 0)
+}
+
+/// What the mana ability `def` of `id`, whose mana is its own `effect`'s, would add if it resolved now for `player` (CR 106.7):
+/// its effect run on a copy of the position, once for each color the activation may name and each answer to each question it
+/// asks as it adds (the colors of "in any combination of", a "you may", a choice of one), the mana held as a tap's would be
+/// (`Cx::producing`). Each run is on the advice copy of the position every menu row's advice is judged on (`advice_game`):
+/// it is asked from a view of the game (`&Cx`), in the middle of a run, where the working state can't be moved.
+///
+/// None where it asks a question whose answers `answers_to_try` does not list, or would need more than `MOST_RUNS` runs:
+/// then what it lists stands for it, which may not be what it could produce - so with `CANTRIP_VERIFY` that panics, naming
+/// the card and the question, and the first card to need it fails its scenarios. No printed land (the permanents "could
+/// produce" is asked of: `colors_from_sacrifice`) asks more than one question of a few answers, the most being Cascading
+/// Cataracts' five colors in any combination, 126 runs (`docs/known-issues.md`, KI-124).
+fn effect_productions(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef, effect: ManaEffect) -> Option<Vec<[u32; 6]>> {
+    /// More runs than this is no mana ability of a land a card prints (KI-124).
+    const MOST_RUNS: usize = 256;
+    let unjudged = |why: String| {
+        if crate::layers::verifying() {
+            panic!("{}: what its mana ability could produce (CR 106.7) can't be judged: {why}", cx.chars(id).name);
+        }
+        None
+    };
+    let named: Vec<Option<Color>> = if def.any_color {
+        let colors = any_types(cx, id, player, def);
+        let named: Vec<Option<Color>> = Color::ALL.into_iter().filter(|c| colors & (1 << c.mana() as u8) != 0).map(Some).collect();
+        if named.is_empty() { vec![None] } else { named }
+    } else {
+        vec![None]
+    };
+    let mut out: Vec<[u32; 6]> = Vec::new();
+    let mut runs = 0;
+    for color in named {
+        let mut waiting: Vec<Vec<Answer>> = vec![Vec::new()];
+        while let Some(answers) = waiting.pop() {
+            runs += 1;
+            if runs > MOST_RUNS {
+                return unjudged(format!("more than {MOST_RUNS} answers to try"));
+            }
+            let mut copy = advice_game(cx.g);
+            copy.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
+            let frame = copy.state.agenda.len() - 1;
+            copy.state.update_frame(frame, |f| f.answers = answers.iter().cloned().map(|a| (None, a)).collect());
+            let mut run = Cx {
+                g: &mut copy,
+                frame,
+                cursor: 0,
+                mana_source: Some(id),
+                entering: None,
+                lineage: Vec::new(),
+                asked_at: None,
+                doer: None,
+                producing: Some(Vec::new()),
+            };
+            let asker = Asker { source: id, controller: player };
+            let done = run.acting_as(player, |run| effect(run, &asker, color)).is_ok();
+            let held = run.producing.take().unwrap_or_default();
+            if done {
+                let mut made = [0u32; 6];
+                for h in held {
+                    made[h.mana as usize] += h.amount;
+                }
+                if !out.contains(&made) {
+                    out.push(made);
                 }
                 continue;
             }
-        }
-        colorless |= def.adds.0[Mana::C as usize] > 0;
-        for c in Color::ALL {
-            if def.adds.0[c.mana() as usize] > 0 {
-                colors = colors.with(c);
+            let Some(request) = copy.state.agenda[frame].pending.clone() else {
+                return unjudged("its effect stopped without a question".to_string());
+            };
+            let Some(tries) = answers_to_try(&request.kind) else {
+                let kind = format!("{:?}", request.kind);
+                return unjudged(format!("it asks {}", kind.split([' ', '{', '(']).next().unwrap_or("")));
+            };
+            for answer in tries {
+                let mut next = answers.clone();
+                next.push(answer);
+                waiting.push(next);
             }
         }
-        if def.any_color {
-            let named = match def.colors_from {
-                Some(from) => from(cx, &Asker { source: land, controller }),
-                None if def.colors.is_empty() => ColorSet(0b11111),
-                None => def.colors,
-            };
-            colors = ColorSet(colors.0 | named.0);
-        }
     }
-    (colors, colorless)
+    Some(out)
+}
+
+/// Every answer to a question a mana ability's effect asks as it adds its mana, where they are few enough to try
+/// (`effect_productions`): colors for each mana (repeats allowed, their order no matter to the mana), "you may", one of
+/// several modes or players. None for any other question.
+fn answers_to_try(kind: &RequestKind) -> Option<Vec<Answer>> {
+    match kind {
+        RequestKind::ChooseColors { choices, count, .. } => {
+            let colors: Vec<Color> = Color::ALL.into_iter().filter(|&c| choices.has(c)).collect();
+            if colors.is_empty() {
+                return None;
+            }
+            // Each multiset of `count` colors, as a non-decreasing run of indices.
+            let mut out = Vec::new();
+            let mut at = vec![0usize; *count as usize];
+            loop {
+                out.push(Answer::Colors(at.iter().map(|&i| colors[i]).collect()));
+                if out.len() > 256 {
+                    return None;
+                }
+                let Some(i) = (0..at.len()).rev().find(|&i| at[i] + 1 < colors.len()) else { break };
+                at[i] += 1;
+                let v = at[i];
+                for j in at.iter_mut().skip(i + 1) {
+                    *j = v;
+                }
+            }
+            Some(out)
+        }
+        RequestKind::May { .. } => Some(vec![Answer::Yes, Answer::No]),
+        RequestKind::ChooseModes { eligible, count: 1, at_most: 0, .. } => Some(eligible.iter().map(|&i| Answer::Modes(vec![i])).collect()),
+        RequestKind::ChoosePlayer { candidates, .. } => Some(candidates.iter().map(|&p| Answer::Player(p)).collect()),
+        _ => None,
+    }
 }
 
 /// A permanent was tapped for mana (CR 106.12, 605.1b) and produced `produced`: the fact is recorded, and, if it produced any

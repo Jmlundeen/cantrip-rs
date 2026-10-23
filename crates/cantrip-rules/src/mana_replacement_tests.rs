@@ -405,3 +405,20 @@ fn a_question_asked_in_the_middle_of_a_production_is_replayed_and_the_whole_prod
     g.run();
     assert_eq!(g.state.player(YOU).pool, pool(&[(Mana::U, 2), (Mana::B, 2)]));
 }
+
+/// CR 106.7: the types a permanent could produce count a mana ability whose mana is its own effect's, every answer to its
+/// question tried, and the replacement effects in any order: a filter land could produce {U} or {B}; under Contamination only
+/// {B}; under the Sphere, whose two mana become {C}, only {C}.
+#[test]
+fn the_types_a_permanent_could_produce_count_its_effects_mana_through_the_replacements() {
+    use crate::actions::producible_types;
+    let blue_black = ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Black).0);
+    let mut g = game();
+    let ruins = put(&mut g, &RUINS);
+    assert_eq!(producible_types(&cx(&mut g), ruins), (blue_black, false));
+    let contamination = put(&mut g, &CONTAMINATION);
+    assert_eq!(producible_types(&cx(&mut g), ruins), (ColorSet::of(Color::Black), false));
+    g.state.zone_remove(Zone::BATTLEFIELD, contamination);
+    put(&mut g, &SPHERE);
+    assert_eq!(producible_types(&cx(&mut g), ruins), (ColorSet::NONE, true));
+}
