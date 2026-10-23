@@ -1,0 +1,11 @@
+{
+  "name": "Needleverge Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {R}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Pillarverge Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {W}."
+  }
+}

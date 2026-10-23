@@ -1,0 +1,23 @@
+# Needleverge Pathway is a modal double-faced card (CR 712.3) whose faces are both lands: one copy is played as its front
+# face (taps for {R}, not {W}), the other as its back face Pillarverge Pathway (taps for {W}, not {R}); neither enters
+# tapped. The pool is checked right after each activation, so each face's colour is pinned.
+
+[Bot1 Deck]
+Needleverge Pathway
+Needleverge Pathway
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Needleverge Pathway.Play(Ability: #1)
+Bot1.Battlefield.Needleverge Pathway.Activate
+? Bot1.Mana = {R}
+[T3 Bot1.Main1]
+Bot1.Hand.Needleverge Pathway.Play(Ability: back face)
+Bot1.Battlefield.Pillarverge Pathway.Activate
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Battlefield = Needleverge Pathway; Pillarverge Pathway
