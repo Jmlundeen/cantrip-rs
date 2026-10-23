@@ -92,6 +92,21 @@ pub fn token_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Opt
     }
 }
 
+/// "Whenever [a permanent] you control leaves the battlefield during your turn" (CR 603.6c, 603.10a), looked back on: the
+/// permanent that left, under the source's controller's control as it last was on the battlefield, to whichever zone it went,
+/// while it is that controller's turn. The caller narrows it (another permanent, a type). Suki, Courageous Rescuer and
+/// Oni-Cult Anvil print it.
+pub fn permanent_you_control_left_on_your_turn(q: &dyn Query, me: &Asker, event: &Event) -> Option<ObjectId> {
+    match event {
+        Event::ZoneChange { old, from, .. }
+            if from.is(ZoneKind::Battlefield) && q.obj(*old).controller == me.controller && q.state().turn.active == me.controller =>
+        {
+            Some(*old)
+        }
+        _ => None,
+    }
+}
+
 /// Landfall (CR 207.2c): a land entering the battlefield under your control, by any means. Icetill Explorer and
 /// Tireless Tracker print it.
 pub fn landfall(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
