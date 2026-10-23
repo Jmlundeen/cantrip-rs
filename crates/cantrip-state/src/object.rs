@@ -205,6 +205,79 @@ pub struct ExileLink {
 }
 
 impl Obj {
+    /// Whether its record names another object: what it became, what it was prepared from, what it is attached to, what it
+    /// entered with, what exiled it, what it is phased out until. Every field is named here, with no rest pattern, so a field
+    /// added to `Obj` or `Marks` must be sorted into a link or not before the crate compiles (the announcement search in
+    /// `cantrip-rules` relies on it to know a card's record tells it of no other object).
+    pub fn links_an_object(&self) -> bool {
+        let Obj {
+            card: _,
+            owner: _,
+            controller: _,
+            zone: _,
+            token: _,
+            tapped: _,
+            controlled_since: _,
+            damage: _,
+            deathtouched: _,
+            counters: _,
+            timestamp: _,
+            copy: _,
+            loyalty_turn: _,
+            became,
+            last_known: _,
+            exile_on_leave: _,
+            kicked: _,
+            paid: _,
+            gift: _,
+            spent: _,
+            cast_way: _,
+            class_level: _,
+            prepared: _,
+            card_copy: _,
+            prepared_from,
+            chosen_color: _,
+            chosen_subtype: _,
+            on_adventure: _,
+            cast_from: _,
+            activated_turn: _,
+            activated_mask: _,
+            attached_to,
+            attached_player: _,
+            entered_with,
+            x: _,
+            marks,
+            transformed: _,
+            exiled,
+            face_down: _,
+            seen_by: _,
+        } = *self;
+        let Marks {
+            doors: _,
+            exerted_by: _,
+            monstrous: _,
+            solved: _,
+            protector: _,
+            gains_haste: _,
+            gains: _,
+            cast_untimely: _,
+            cant_be_countered: _,
+            saddled_turn: _,
+            chosen_player: _,
+            chosen_card: _,
+            chosen_option: _,
+            control_base: _,
+            phased,
+            face_down_as: _,
+        } = marks;
+        became.is_some()
+            || prepared_from.is_some()
+            || attached_to.is_some()
+            || entered_with.is_some()
+            || exiled.is_some()
+            || phased.is_some_and(|p| p.until_leaves.is_some())
+    }
+
     /// A fresh object in `zone`, with nothing about it set: the rules' own source for an ability no card has (the
     /// monarch's, a dungeon room's), which is in no zone's list.
     pub fn new(card: CardId, owner: PlayerId, zone: Zone) -> Obj {

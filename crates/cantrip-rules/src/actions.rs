@@ -1264,7 +1264,8 @@ struct Watching {
 struct Watch<'a> {
     q: &'a dyn Query,
     w: &'a Watching,
-    /// The spell being costed, a card not yet cast: its own record names no candidate.
+    /// The spell being costed, a card not yet cast, where its record names no other object (`Obj::links_an_object`): reading
+    /// it tells no candidates apart. A record that links one (what exiled it, what it became, ...) is noted as any is.
     spell: Option<ObjectId>,
 }
 
@@ -1322,8 +1323,9 @@ impl Query for Watch<'_> {
     }
 
     fn obj(&self, id: ObjectId) -> &Obj {
-        // An object's record may name another (what it is attached to): only the costed card's is taken to name none.
-        if Some(id) != self.spell {
+        // An object's record may name another (what it is attached to): only the costed card's, where it links none, tells
+        // nothing.
+        if Some(id) != self.spell || self.q.obj(id).links_an_object() {
             self.w.told.set(true);
         }
         self.q.obj(id)

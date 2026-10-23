@@ -222,7 +222,8 @@ questions until the departed seat is told.
 wrong. A mana ability whose yield is not stated (Sunken Ruins, X costs, Phyrexian or {2/W} symbols in its cost) makes
 every cost count as payable. Life, energy and sacrifices that several mana abilities would share are judged for each
 alone: three Mana Confluences at 1 or 2 life count as three mana, so Raffine is offered. And the search's time budget
-falls back to offering the cast on rare heavy boards, as the walk over the target announcements a cost change could
+falls back to offering the cast where the mana is hard to judge (about 1 ms of search: several Caverns of Souls and
+Chromatic Stars under two Mana Flares with a Black Lotus), as the walk over the target announcements a cost change could
 read does past `ANNOUNCEMENT_BUDGET` (`some_cast`): only where a cost change tells apart the candidates of a slot of many
 targets among more than a dozen (one that reads each target, as "{1} less for each target you control" does), since
 candidates no change tells apart are judged by how many of them there are (Fireball). A kicker's
