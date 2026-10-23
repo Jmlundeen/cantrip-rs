@@ -1,0 +1,52 @@
+# "Return it to the battlefield under its owner's control" (CR 110.2a): Bot2 steals the Spirit with Act of Treason and discards
+# a card to blink it. At the end step it comes back under Bot1, its owner, and Act of Treason is gone with the old object.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Fleeting Spirit
+Plains
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Ruby x3
+Act of Treason
+Island x2
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fleeting Spirit.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Ruby#3.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Fleeting Spirit)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Count = 4
+Bot2.Battlefield.Fleeting Spirit.Activate(Ability: Discard)
+Bot2.Choose(Island)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Count = 3
+? Bot2.Battlefield.Count = 3
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Count = 4
+? Bot2.Battlefield.Count = 3
+
+[Expect]
+Turn = 3
+Bot2.Battlefield.Count = 3
+Bot2.Graveyard = Island; Act of Treason

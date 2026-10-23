@@ -1,0 +1,59 @@
+# "{W}, Exile three cards from your graveyard: This creature gains first strike until end of turn." Bot2's Chain of Smog puts two
+# Islands in Bot1's graveyard on turn 2 (two: the ability is refused), a discard to the Spirit's other ability makes three
+# (it blinks and is back at that end step). On turn 3 Bot1 taps Island, activates, and pays the {W} from Plains (the {U} in the
+# pool cannot pay it, and is left), exiles exactly the three Islands, and the Spirit has first strike - which is gone on Bot2's turn 4.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Fleeting Spirit
+Plains
+Island x3
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Jet x4
+Chain of Smog
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fleeting Spirit.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Hand.Chain of Smog.Cast(Bot1)
+Bot2.Pass
+Bot1.Choose(Island; Island)
+Bot1.Pass
+! Bot1.Battlefield.Fleeting Spirit.Activate(Ability: Exile three)
+Bot1.Battlefield.Fleeting Spirit.Activate(Ability: Discard)
+Bot1.Choose(Island)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Fleeting Spirit.Activate(Ability: Exile three)
+Bot1.Choose(Island; Island; Island)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+? Bot1.Mana = {U}
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Fleeting Spirit.Keywords = FirstStrike
+? Exile.Count = 3
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Fleeting Spirit.Keywords = (absent)
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Fleeting Spirit.Power = 3

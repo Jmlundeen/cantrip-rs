@@ -1,0 +1,58 @@
+# "Discard a card: Exile this creature. Return it ... at the beginning of the next end step." Bot2's Lightning Bolt targets the
+# Spirit; Bot1 activates the blink twice in response (two discards). The second to resolve exiles it, the first finds the
+# source gone (CR 400.7) and does nothing, so one Spirit returns at the end step - though both blinks made their delayed
+# trigger (two on the stack at the end step, CR 603.7a), the one about nothing doing nothing (CR 603.7c) - and the Bolt had no target (CR 608.2b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Fleeting Spirit
+Plains
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fleeting Spirit.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Fleeting Spirit)
+Bot1.Battlefield.Fleeting Spirit.Activate(Ability: Discard)
+Bot1.Choose(Island)
+Bot1.Battlefield.Fleeting Spirit.Activate(Ability: Discard)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 1
+? Delayed.Count = 2
+? Bot1.Battlefield.Count = 3
+? Bot1.Graveyard.Count = 2
+[T2 Bot2.End]
+Bot2.Pass
+? Stack.Count = 2
+[T3 Bot1.Main1]
+? Exile.Count = 0
+? Bot1.Battlefield.Fleeting Spirit.Damage = 0
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Fleeting Spirit.Power = 3
+Bot1.Battlefield.Count = 4
+Bot2.Graveyard = Lightning Bolt
