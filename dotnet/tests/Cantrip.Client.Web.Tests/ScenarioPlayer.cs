@@ -548,6 +548,17 @@ public sealed class ScenarioPlayer
                 return;
             }
 
+            case TriggersOrderedAnswer ordered:
+                // Which of the controller's simultaneous triggers goes on the stack next (CR 603.3b): the Stack Triggers window shows each
+                // as a stand-in card whose handle is minus (the request's number times 64, plus its index, plus 1); each is clicked in
+                // the order named, and the last click sends the order.
+                foreach (int index in ordered.Order)
+                {
+                    await ClickHandleAsync(-((expected.RequestId * 64) + index + 1));
+                }
+
+                return;
+
             case ReplacementChosenAnswer replacement:
                 // Which of several replacement effects applies first (CR 616.1): the dock has a button for each, "Source: what
                 // it does", in the order the question offers them.
