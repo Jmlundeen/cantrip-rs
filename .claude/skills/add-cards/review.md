@@ -35,7 +35,8 @@ checked for sufficiency, not exhaustiveness:
 - any core or mechanics change against its rule, its second printed card (a non-keyword recipe) and the benchmark (a
   core change);
 - overlap: code in the card that an existing shared function already does, or that does the same as code in another
-  card, which should have been shared;
+  card, which should have been shared. This is a finding the author fixes in this change (`SKILL.md`, "Share what is
+  the same"), never an optional note: grep `cantrip-mechanics` for the effect, and the other cards for the same body;
 - the client: everything the card puts into the game is shown, every question it asks has a true caption, every action
   it offers is clickable with its cost, and a browser scenario proves each new user interaction (`client.md`) - or the
   card needs nothing the client did not already do, and no browser scenario is owed. The tactical bot is never checked.
