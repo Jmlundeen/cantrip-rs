@@ -1,0 +1,5 @@
+{
+  "name": "Blasted Landscape",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\nCycling {2} ({2}, Discard this card: Draw a card.)"
+}
