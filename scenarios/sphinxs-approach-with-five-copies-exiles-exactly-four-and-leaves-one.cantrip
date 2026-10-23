@@ -49,6 +49,7 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Sphinx's Approach.Cast
 Bot1.Pass
 Bot1.Accept
+Bot1.Choose(Sphinx's Approach#1; Sphinx's Approach#2; Sphinx's Approach#3; Sphinx's Approach#4)
 Bot1.Search(Sphinx of the Guildpact)
 [T3 Bot1.Main2]
 
