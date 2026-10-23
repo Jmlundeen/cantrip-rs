@@ -198,6 +198,7 @@ public sealed partial class MainPage
             if (_eligible.Contains(handle)
                 && !_attacking.ContainsKey(handle)
                 && !_blocking.Exists(pair => pair.Blocker == handle)
+                && !_blockQueue.Contains(handle)
                 && BoundsOn(_myHalf.Board, card.Handle) is { } at
                 && at.IntersectsWith(box)
                 && (view is null || at.IntersectsWith(view.Value)))

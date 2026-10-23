@@ -628,7 +628,8 @@ public sealed class Decisions
             return answer;
         }
 
-        List<ViewHandle> forced = [.. prompt.Requirements.Select(requirement => requirement.Attacker)];
+        // The creatures an effect requires to attack (CR 508.1d), as the host worked them out: the engine's own declaration's.
+        List<ViewHandle> forced = [.. prompt.Suggested.Select(attack => attack.Attacker)];
 
         if (prompt.AttackablePlayers.Count == 1 && prompt.AttackablePlaneswalkers.Count == 0 && prompt.AttackableBattles.Count == 0
             && prompt.Forbidden.Count == 0)
@@ -637,9 +638,8 @@ public sealed class Decisions
 
             foreach (ViewHandle attacker in prompt.Eligible.Where(forced.Contains))
             {
-                // Where attacking costs nothing, which a cost to attack never stops it doing (CR 508.1d).
-                answer.Attacks.Add(prompt.AttacksFor(attacker).Find(attack => prompt.CostOf(attack) is null)
-                    ?? new AttackMessage { Attacker = attacker, TargetPlayer = defender });
+                // Where the engine's own declaration sends it, which never pays a cost to attack (CR 508.1d).
+                answer.Attacks.Add(prompt.SuggestedFor(attacker) ?? new AttackMessage { Attacker = attacker, TargetPlayer = defender });
             }
 
             List<ViewHandle> free = [.. prompt.Eligible.Where(attacker => !forced.Contains(attacker))];
@@ -667,39 +667,30 @@ public sealed class Decisions
 
         foreach (ViewHandle attacker in prompt.Eligible)
         {
-            AttackRequirementMessage? must = prompt.Requirements.Find(requirement => requirement.Attacker == attacker);
+            // What the host's verdict on no attacks offers it (CR 508.1c-d), and not attacking where nothing requires it to.
+            bool must = prompt.IsRequired(attacker);
+            List<AttackMessage> offered = prompt.OfferedFor(attacker);
             List<AttackMessage?> attacks = [];
             List<string> choices = [];
 
-            IEnumerable<int> players = must is { Players.Count: > 0 } ? must.Players : prompt.AttackablePlayers;
-
-            foreach (int seat in players.Where(seat => !prompt.IsForbidden(new AttackMessage { Attacker = attacker, TargetPlayer = seat })))
+            foreach (AttackMessage attack in offered.Count > 0 ? offered : prompt.AttacksFor(attacker))
             {
-                var attack = new AttackMessage { Attacker = attacker, TargetPlayer = seat };
                 attacks.Add(attack);
-                choices.Add($"Attack {GameText.Player(client, seat)}.{CostOf(prompt, attack)}");
-            }
-
-            if (must is not { Players.Count: > 0 })
-            {
-                foreach (ViewHandle walker in prompt.AttackablePlaneswalkers
-                    .Where(walker => !prompt.IsForbidden(new AttackMessage { Attacker = attacker, TargetPermanent = walker })))
+                if (attack.TargetPermanent.IsNone)
                 {
-                    var attack = new AttackMessage { Attacker = attacker, TargetPermanent = walker };
-                    attacks.Add(attack);
-                    choices.Add($"Attack {GameText.Named(client, walker)}.{CostOf(prompt, attack)}");
+                    choices.Add($"Attack {GameText.Player(client, attack.TargetPlayer)}.{CostOf(prompt, attack)}");
                 }
-
-                foreach (ViewHandle battle in prompt.AttackableBattles
-                    .Where(battle => !prompt.IsForbidden(new AttackMessage { Attacker = attacker, TargetPermanent = battle })))
+                else if (prompt.AttackableBattles.Contains(attack.TargetPermanent))
                 {
-                    var attack = new AttackMessage { Attacker = attacker, TargetPermanent = battle };
-                    attacks.Add(attack);
-                    choices.Add($"Attack the battle {GameText.Named(client, battle)}.{CostOf(prompt, attack)}");
+                    choices.Add($"Attack the battle {GameText.Named(client, attack.TargetPermanent)}.{CostOf(prompt, attack)}");
+                }
+                else
+                {
+                    choices.Add($"Attack {GameText.Named(client, attack.TargetPermanent)}.{CostOf(prompt, attack)}");
                 }
             }
 
-            if (must is null)
+            if (!must)
             {
                 attacks.Add(null);
                 choices.Add("Do not attack with it. Keep it back to block.");
@@ -713,7 +704,7 @@ public sealed class Decisions
             int pick = One(new Question
             {
                 Heading = $"Declare attackers. What does {GameText.Creature(client, attacker)} do?",
-                Note = Declared(client, answer.Attacks) + (must is not null ? "\nThis creature must attack." : string.Empty) + AttackCostNote(client, prompt),
+                Note = Declared(client, answer.Attacks) + (must ? "\nThis creature must attack." : string.Empty) + AttackCostNote(client, prompt),
                 Choices = choices,
             });
 

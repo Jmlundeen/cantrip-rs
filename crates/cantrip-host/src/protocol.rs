@@ -821,6 +821,9 @@ pub struct AttackVerdictView {
     /// What declaring it costs (CR 508.1h), in mana symbols; empty when nothing.
     #[serde(default)]
     pub cost: String,
+    /// Nothing is required: any declaration of `addable` attacks, each creature attacking once, is legal, and need not be asked.
+    #[serde(default)]
+    pub free: bool,
 }
 
 /// Why a declaration of attackers may not be made as it is, to caption as `Creature`, `Words`, then the seat

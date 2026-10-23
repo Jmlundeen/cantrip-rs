@@ -1686,9 +1686,17 @@ added up, so two Ghostly Prisons ask {4} a creature, and `can_pay`, advice on th
 creatures are tapped (508.1f); the total is locked in (508.1h) and paid with the mana abilities offered while it is owed
 (508.1i-j, `PayCosts` with the `attackers` it pays for). A payment given up (or one that cannot be completed) makes the
 declaration illegal: everything since it is reverted, mana abilities included (CR 733), and attackers are declared again.
-A cost is never a requirement (CR 508.1d): a creature that attacks each combat if able is required only while some attack
-open to it costs nothing, and a requirement to attack a certain player (or a goaded creature's other players) only
-counts that player while attacking them is free. The board is searched for these only as attackers are declared. The
+Requirements on a declaration of attackers are counted as CR 508.1d says, as blocks are (below): `turn::attack_rules` puts
+one `RequiredAttack` per source in the question's `AttackRules` - each instance of "attacks each combat if able"
+(`Chars::must_attack` counts them, printed or gained in layer 6), two for each player who goaded the creature (attack; attack
+a player other than that one, CR 701.15b-d - goad is an effect, read from the effects, so losing abilities keeps it), and one
+per "attacks that player this combat if able" (`EffectKind::MustAttackPlayer`, `Duration::EndOfCombat`). The declaration must
+obey as many as any declaration can attacking for free (a cost is never a requirement): a goaded creature told to attack its
+goader may attack the goader or another player, each obeying two of three. `AttackRules::judge` (`cantrip_state::attacks`) is
+the one validator - complete, issue, addable, cost - that the core, the scenario harness and the host (`CheckAttacks`) use,
+and `GameClient.Answer` settles every declaration of attackers with the host. Every restriction the engine has is on one
+attacker at a time, so `AttackRules::solve` adds up each attacker's best free attack; a restriction on the attack as a whole
+would make it a search like blocks'. The board is searched for these only as attackers are declared. The
 benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
 
 ### Blocked by at most one creature

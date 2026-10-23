@@ -19,6 +19,7 @@ Requests and replies (a reply is `{"Ok": {...}}` or `{"Rejected": {"Code": "..."
 | `{"Cmd":"Answer","GameId":1,"RequestId":7,"Seat":1,"Answer":{AnswerPayload}}` | a step, or `Rejected` with `IllegalAnswer`, `StaleReply`, `UnknownHandle` or `NotYourTurnToAnswer`, after which the request is still outstanding |
 | `{"Cmd":"Check","GameId":1,"RequestId":7,"Seat":1,"Selected":[12, 15]}` | `{"Complete":true,"Addable":[18, 21]}` - what the rule of the outstanding choice of cards says of a partial selection (below); nothing advances. `Rejected` with `StaleReply`, `NotYourTurnToAnswer`, `UnknownHandle`, or `IllegalAnswer` for a question that picks no cards |
 | `{"Cmd":"CheckBlocks","GameId":1,"RequestId":7,"Seat":1,"Blocks":[{"Blocker":12,"Attacker":3}]}` | `{"Complete":false,"Addable":[{"Blocker":15,"Attacker":3}],"Issue":{"Creature":3,"Words":"can't be blocked except by two or more creatures","Other":0,"Rule":"509.1b"},"Cost":""}` (captioned "Boggart Brute can't be blocked except by two or more creatures": Grizzly Bears, 12, blocks the menace Boggart Brute, 3, alone, and Llanowar Elves, 15, may join it) - what the rules make of a declaration of blockers for the outstanding declaration (below); nothing advances. `Rejected` with `StaleReply`, `NotYourTurnToAnswer`, `UnknownHandle`, or `IllegalAnswer` for a question that is not a declaration of blockers |
+| `{"Cmd":"CheckAttacks","GameId":1,"RequestId":7,"Seat":1,"Attacks":[]}` | `{"Complete":false,"Addable":[{"Attacker":12,"TargetPlayer":2,"TargetPermanent":0},{"Attacker":12,"TargetPlayer":3,"TargetPermanent":0}],"Issue":{"Creature":12,"Words":"must attack","OtherPlayer":0,"OtherPermanent":0,"Rule":"508.1d"},"Cost":""}` (captioned "Ursine Monstrosity must attack": goaded by seat 2 and told to attack seat 2, it may attack either opponent) - what the rules make of a declaration of attackers for the outstanding declaration (below); nothing advances. `Rejected` as for `CheckBlocks` |
 | `{"Cmd":"Concede","GameId":1,"Seat":1}` | a step |
 | `{"Cmd":"View","GameId":1,"Seat":1}` | `{"View":PlayerView}` - the seat's current view, for resynchronising a client |
 | `{"Cmd":"Oracle","Name":"Lightning Bolt"}` | `{"Card":ObjectView}` or `{"Card":null}` - a card as printed |
@@ -77,6 +78,16 @@ before sending it - checked, and if refused mended a card at a time from what ma
 included, answers what the rules take. A check the host refuses is answered with an `ErrorMessage` whose `RequestId` names the
 request, so a client reacts only to the error of its own check. Version 203.
 
+**Checking a declaration of attackers.** A declaration of attackers (`DeclareAttackersPromptMessage`) is judged the same way, by
+the engine's one validator (`AttackRules::judge`, `crates/cantrip-state/src/attacks.rs`): each attacker eligible and attacking
+something offered, and as many of the requirements obeyed as any declaration can attacking for free (CR 508.1d). The prompt's
+`Requirements` are one per source, for showing the player - an `Attacker` that must attack (`TargetPlayer` `0`,
+`TargetPermanent` `0`), that must attack a seat or permanent, or that must attack a player other than `OtherThan` (a goad's,
+two per goader) - with `MostRequirements`, the engine's own declaration `Suggested`, and the `Verdict` on no attacks
+(`Complete`, `Issue`, `Addable`, `Cost`). Any other declaration is asked with `CheckAttacksMessage { RequestId, Attacks }`,
+answered with `AttacksVerdictMessage { RequestId, Attacks, Verdict }`. `GameClient.Answer` settles every declaration of
+attackers with the host as it does blocks, and a client offers the attacks the verdict does. Version 204.
+
 **Checking a declaration of blockers.** A declaration of blockers (`DeclareBlockersPromptMessage`) is judged by one validator
 in the engine (`BlockRequirements::judge`, `crates/cantrip-state/src/blocks.rs`) against every restriction, requirement and
 cost (CR 509.1a-d): each block allowed, each creature blocking as many attackers as it may, each attacker within its fewest
@@ -94,7 +105,8 @@ answers `BlocksVerdictMessage { RequestId, Blocks, Verdict }`, to that seat alon
 creature blocking more than one attacker included - and offers exactly the verdict's `Addable`; `GameClient.Answer` settles
 every declaration with the host before sending it - checked, and if refused mended a block at a time from what may be added,
 the blocks meant first and the engine's own declaration (`Suggested`) next; a check the host refuses sends nothing, and the
-question is asked again unless it is no longer outstanding. So no client works out a requirement, restriction or cost itself,
+question is asked again unless it is no longer outstanding - and answered with the engine's own declaration if it is
+answered so again, so an automatic seat never goes round forever. So no client works out a requirement, restriction or cost itself,
 and a new one changes the engine alone. `MinimumBlockers`, `MaximumBlockers`, `Requirements` and `MostRequirements` are for
 showing the player. The answer is still checked when it is given. Version 204.
 

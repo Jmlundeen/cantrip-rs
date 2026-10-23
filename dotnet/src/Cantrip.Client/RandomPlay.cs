@@ -440,22 +440,16 @@ public sealed class RandomPlay : IAutoPlayer
 
         foreach (ViewHandle attacker in prompt.Eligible)
         {
-            AttackRequirementMessage? must = prompt.Requirements.Find(requirement => requirement.Attacker == attacker);
+            // What the host's verdict on no attacks offers it (CR 508.1c-d), and not attacking where nothing requires it to.
             List<AttackMessage?> choices = [];
 
-            if (must is null)
+            if (!prompt.IsRequired(attacker))
             {
                 choices.Add(null);
             }
 
-            if (must is { Players.Count: > 0 })
-            {
-                choices.AddRange(must.Players.Select(seat => new AttackMessage { Attacker = attacker, TargetPlayer = seat })!);
-            }
-            else
-            {
-                choices.AddRange(prompt.AttacksFor(attacker)!);
-            }
+            List<AttackMessage> offered = prompt.OfferedFor(attacker);
+            choices.AddRange(offered.Count > 0 ? offered! : prompt.AttacksFor(attacker)!);
 
             if (choices.Count > 0 && Any(choices) is { } attack)
             {

@@ -65,6 +65,13 @@ public interface IRulesHost : IDisposable
     BlockVerdictView CheckBlocks(int requestId, int seat, IReadOnlyList<BlockMessage> blocks) =>
         throw new RulesRejectedException(ErrorCode.IllegalAnswer, "this rules host judges no declarations of blockers.");
 
+    /// <summary>
+    /// What the rules make of a declaration of attackers a seat is making for an outstanding declaration (docs/host-protocol.md,
+    /// "Checking a declaration of attackers"): whether it may be declared, why not, and which attacks may be added. Nothing advances.
+    /// </summary>
+    AttackVerdictView CheckAttacks(int requestId, int seat, IReadOnlyList<AttackMessage> attacks) =>
+        throw new RulesRejectedException(ErrorCode.IllegalAnswer, "this rules host judges no declarations of attackers.");
+
     /// <summary>Whether a seat may concede now: only when that ends the game (CR 104.3a, 800.4a).</summary>
     bool CanConcede(int seat);
 

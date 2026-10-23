@@ -52,6 +52,9 @@ pub struct AttackVerdict {
     pub issue: Option<AttackIssue>,
     /// What declaring it costs (CR 508.1h), zero when nothing.
     pub cost: ManaCost,
+    /// Nothing is required of the declaration (the most is 0): any declaration of `addable` attacks, each creature attacking
+    /// once, is legal, so a client need not ask about each one.
+    pub free: bool,
 }
 
 /// Why a declaration of attackers may not be made as it is, as a caption reads it: `creature`, then `words`, then `other`
@@ -169,7 +172,7 @@ impl AttackRules {
         } else {
             Vec::new()
         };
-        AttackVerdict { complete, addable, issue: found, cost: AttackCost::total(costs, attacks) }
+        AttackVerdict { complete, addable, issue: found, cost: AttackCost::total(costs, attacks), free: self.most == 0 }
     }
 }
 

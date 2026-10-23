@@ -2022,7 +2022,8 @@ fn fields(c: &Chars) -> [(&'static str, Field); 18] {
                     | u64::from(c.protection_everything) << 2,
             ),
         ),
-        ("must_attack", plain(&|h| c.must_attack.hash(h))),
+        // A count: the same change is the same instances added (an audit's field; past i16 it reads as the most).
+        ("must_attack", Field::Number(Some(i16::try_from(c.must_attack).unwrap_or(i16::MAX)))),
         ("losses", bits(u64::from(c.lost_all) | u64::from(c.text_lost) << 1)),
         ("marks", bits(u64::from(c.spell) | u64::from(c.no_cost) << 1 | u64::from(c.name_set) << 2)),
         ("card", plain(&|h| c.card.hash(h))),

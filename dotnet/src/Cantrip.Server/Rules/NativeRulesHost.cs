@@ -210,6 +210,12 @@ public sealed class NativeRulesHost : IRulesHost
         return Send<BlockVerdictView>(new { Cmd = "CheckBlocks", GameId, RequestId = requestId, Seat = seat, Blocks = blocks });
     }
 
+    public AttackVerdictView CheckAttacks(int requestId, int seat, IReadOnlyList<AttackMessage> attacks)
+    {
+        ArgumentNullException.ThrowIfNull(attacks);
+        return Send<AttackVerdictView>(new { Cmd = "CheckAttacks", GameId, RequestId = requestId, Seat = seat, Attacks = attacks });
+    }
+
     /// <summary>
     /// Only when conceding ends the game (CR 104.3a, 800.4a), read off the last view the way the rules decide it: the
     /// seat is in the game, and everyone else still in it is of one team.

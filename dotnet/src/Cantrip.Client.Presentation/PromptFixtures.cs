@@ -2513,25 +2513,25 @@ public static class PromptFixtures
             case "attackers":
                 view.Step = TurnStepView.DeclareAttackers;
                 Untap(view, MyLurker, MyBrute);
-                return new DeclareAttackersPromptMessage
+                return JudgedAttacks(new DeclareAttackersPromptMessage
                 {
                     Player = Viewer,
                     Eligible = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)],
                     AttackablePlayers = [Rival],
-                };
+                });
 
             case "attackers-planeswalker":
                 // The rival has a planeswalker out, so each attacker may be sent at it instead (CR 508.1b).
                 view.Step = TurnStepView.DeclareAttackers;
                 Untap(view, MyLurker, MyBrute);
                 Planeswalker(view);
-                return new DeclareAttackersPromptMessage
+                return JudgedAttacks(new DeclareAttackersPromptMessage
                 {
                     Player = Viewer,
                     Eligible = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)],
                     AttackablePlayers = [Rival],
                     AttackablePlaneswalkers = [new ViewHandle(TheirSaheeli)],
-                };
+                });
 
             case "attackers-battle":
                 // The viewer's own Siege, protected by the rival (CR 310.12a), so each attacker may be sent at it
@@ -2539,26 +2539,31 @@ public static class PromptFixtures
                 view.Step = TurnStepView.DeclareAttackers;
                 Untap(view, MyLurker, MyBrute);
                 Siege(view);
-                return new DeclareAttackersPromptMessage
+                return JudgedAttacks(new DeclareAttackersPromptMessage
                 {
                     Player = Viewer,
                     Eligible = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)],
                     AttackablePlayers = [Rival],
                     AttackableBattles = [new ViewHandle(MySiege)],
-                };
+                });
 
             case "attackers-goaded":
                 // The Brute was goaded (CR 701.15b): it must attack, and the dock waits until it does.
                 view.Step = TurnStepView.DeclareAttackers;
                 Untap(view, MyLurker, MyBrute);
                 Object(view, MyBrute).Goaded = true;
-                return new DeclareAttackersPromptMessage
+                return JudgedAttacks(new DeclareAttackersPromptMessage
                 {
                     Player = Viewer,
                     Eligible = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)],
                     AttackablePlayers = [Rival],
-                    Requirements = [new AttackRequirementMessage { Attacker = new ViewHandle(MyBrute), Players = [Rival] }],
-                };
+                    Requirements =
+                    [
+                        new AttackRequirementMessage { Attacker = new ViewHandle(MyBrute) },
+                        new AttackRequirementMessage { Attacker = new ViewHandle(MyBrute), OtherThan = Viewer },
+                    ],
+
+                });
 
             case "blockers":
             case "blockers-restricted":
@@ -3660,6 +3665,9 @@ public static class PromptFixtures
     /// <summary>How many attackers each creature may block in a canned declaration of blockers, as the gallery's stand-in judges it.</summary>
     public static int BlocksPerBlocker(string fixture) => fixture == "blockers-two-each" ? 2 : 1;
 
+    /// <summary>A canned declaration of attackers with the stand-in's verdict on no attacks, as a table's prompt carries the host's.</summary>
+    private static DeclareAttackersPromptMessage JudgedAttacks(DeclareAttackersPromptMessage prompt) => FixtureTransport.JudgeAttackers(prompt);
+
     /// <summary>A canned declaration of blockers with the stand-in's verdict on no blocks, as a table's prompt carries the host's.</summary>
     private static DeclareBlockersPromptMessage Judged(DeclareBlockersPromptMessage prompt, int perBlocker = 1)
     {
@@ -3715,11 +3723,95 @@ public sealed class FixtureTransport : IGameTransport
             _verdicts.Add(new SelectionVerdictMessage { RequestId = check.RequestId, Selected = check.Selected, Verdict = StandInVerdict(asked, check.Selected) });
         }
 
+        if (message is CheckAttacksMessage attacks
+            && _prompts.FirstOrDefault(prompt => prompt.RequestId == attacks.RequestId)?.Prompt is DeclareAttackersPromptMessage attacking)
+        {
+            _verdicts.Add(new AttacksVerdictMessage { RequestId = attacks.RequestId, Attacks = attacks.Attacks, Verdict = StandInAttackVerdict(attacking, attacks.Attacks) });
+        }
+
         if (message is CheckBlocksMessage blocks
             && _prompts.FirstOrDefault(prompt => prompt.RequestId == blocks.RequestId)?.Prompt is DeclareBlockersPromptMessage declaring)
         {
             _verdicts.Add(new BlocksVerdictMessage { RequestId = blocks.RequestId, Blocks = blocks.Blocks, Verdict = StandInBlockVerdict(declaring, blocks.Blocks, _perBlocker) });
         }
+    }
+
+    /// <summary>
+    /// The gallery has no rules engine: a declaration of attackers of a canned prompt is judged by counting its
+    /// <see cref="DeclareAttackersPromptMessage.Requirements"/> as CR 508.1d does - each attacker's best attack free of cost,
+    /// added up, is the most a declaration must obey. Only ever the gallery's and the client tests'; a table asks the host.
+    /// </summary>
+    public static AttackVerdictView StandInAttackVerdict(DeclareAttackersPromptMessage asked, IReadOnlyList<AttackMessage> attacks)
+    {
+        ArgumentNullException.ThrowIfNull(asked);
+        ArgumentNullException.ThrowIfNull(attacks);
+        bool Same(AttackMessage a, AttackMessage b) => a.TargetPlayer == b.TargetPlayer && a.TargetPermanent == b.TargetPermanent;
+        int Gain(AttackMessage attack) => asked.Requirements.Count(r => Obeys(r, attack));
+        int Best(ViewHandle creature, bool freeOnly) =>
+            asked.AttacksFor(creature).Where(attack => !freeOnly || asked.CostOf(attack) is null).Select(Gain).DefaultIfEmpty(0).Max();
+        int most = asked.Eligible.Sum(creature => Best(creature, true));
+        bool structural = attacks.All(attack => asked.Eligible.Contains(attack.Attacker) && asked.AttacksFor(attack.Attacker).Exists(a => Same(a, attack)))
+            && attacks.Select(attack => attack.Attacker).Distinct().Count() == attacks.Count;
+        int obeyed = attacks.Sum(Gain);
+        List<ViewHandle> free = [.. asked.Eligible.Where(creature => !attacks.Any(attack => attack.Attacker == creature))];
+        int rest = free.Sum(creature => Best(creature, false));
+        List<AttackMessage> addable = structural
+            ? [.. free.SelectMany(creature => asked.AttacksFor(creature).Where(attack => obeyed + Gain(attack) + rest - Best(creature, false) >= most))]
+            : [];
+        ViewHandle shortOf = structural && obeyed < most
+            ? asked.Eligible.FirstOrDefault(creature => (attacks.FirstOrDefault(a => a.Attacker == creature) is { } at ? Gain(at) : 0) < Best(creature, true))
+            : ViewHandle.None;
+        return new AttackVerdictView
+        {
+            Complete = structural && obeyed >= most,
+            Addable = addable,
+            Free = most == 0,
+            Issue = !structural
+                ? new AttackIssueView { Creature = attacks.FirstOrDefault()?.Attacker ?? ViewHandle.None, Words = "can't attack", Rule = "508.1c" }
+                : !shortOf.IsNone ? new AttackIssueView { Creature = shortOf, Words = "must attack", Rule = "508.1d" } : null,
+        };
+    }
+
+    /// <summary>Whether <paramref name="attack"/> obeys the requirement <paramref name="r"/> (CR 508.1d), as the stand-in counts.</summary>
+    private static bool Obeys(AttackRequirementMessage r, AttackMessage attack) =>
+        r.Attacker == attack.Attacker
+        && (r.TargetPermanent.IsNone
+            ? r.TargetPlayer == 0 || (attack.TargetPermanent.IsNone && attack.TargetPlayer == r.TargetPlayer)
+            : attack.TargetPermanent == r.TargetPermanent)
+        && (r.OtherThan == 0 || (attack.TargetPermanent.IsNone && attack.TargetPlayer != r.OtherThan));
+
+    /// <summary>
+    /// A canned declaration of attackers judged as the host would carry it: the most its requirements ask, the stand-in's own
+    /// declaration obeying it (each creature at its best free attack) and the verdict on no attacks. The gallery's and the
+    /// client tests'.
+    /// </summary>
+    public static DeclareAttackersPromptMessage JudgeAttackers(DeclareAttackersPromptMessage prompt)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        prompt.Suggested = [];
+        prompt.MostRequirements = 0;
+        foreach (ViewHandle creature in prompt.Eligible)
+        {
+            AttackMessage? best = null;
+            int gain = 0;
+            foreach (AttackMessage attack in prompt.AttacksFor(creature).Where(attack => prompt.CostOf(attack) is null))
+            {
+                int g = prompt.Requirements.Count(r => Obeys(r, attack));
+                if (g > gain)
+                {
+                    (best, gain) = (attack, g);
+                }
+            }
+
+            if (best is not null)
+            {
+                prompt.Suggested.Add(best);
+                prompt.MostRequirements += gain;
+            }
+        }
+
+        prompt.Verdict = StandInAttackVerdict(prompt, []);
+        return prompt;
     }
 
     /// <summary>

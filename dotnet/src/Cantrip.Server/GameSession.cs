@@ -549,6 +549,10 @@ public sealed class GameSession : IDisposable
                 CheckBlocks(from, check);
                 break;
 
+            case CheckAttacksMessage check:
+                CheckAttacks(from, check);
+                break;
+
             case ConcedeMessage when CanConcede(from):
                 Concede(from);
                 break;
@@ -681,6 +685,41 @@ public sealed class GameSession : IDisposable
         if (_outbox.TryGetValue(from, out Queue<ServerMessage>? queue))
         {
             queue.Enqueue(new SelectionVerdictMessage { RequestId = message.RequestId, Selected = message.Selected, Verdict = verdict });
+        }
+    }
+
+    /// <summary>
+    /// What the rules make of a declaration of attackers for the seat's outstanding declaration, sent back to that seat alone
+    /// as an <see cref="AttacksVerdictMessage"/>. Nothing in the game moves; a check refused is only reported.
+    /// </summary>
+    private void CheckAttacks(PlayerId from, CheckAttacksMessage message)
+    {
+        if (IsOver || !_published.TryGetValue(message.RequestId, out (PlayerId Seat, PromptMessage Message) outstanding))
+        {
+            Reject(from, ErrorCode.StaleReply, $"request {message.RequestId} is not outstanding.", message.RequestId);
+            return;
+        }
+
+        if (outstanding.Seat != from)
+        {
+            Reject(from, ErrorCode.NotYourTurnToAnswer, $"request {message.RequestId} belongs to seat {outstanding.Seat.Value}.", message.RequestId);
+            return;
+        }
+
+        AttackVerdictView verdict;
+        try
+        {
+            verdict = _rules.CheckAttacks(message.RequestId, from.Value, message.Attacks);
+        }
+        catch (RulesRejectedException refused)
+        {
+            Reject(from, refused.Code, refused.Detail, message.RequestId);
+            return;
+        }
+
+        if (_outbox.TryGetValue(from, out Queue<ServerMessage>? queue))
+        {
+            queue.Enqueue(new AttacksVerdictMessage { RequestId = message.RequestId, Attacks = message.Attacks, Verdict = verdict });
         }
     }
 

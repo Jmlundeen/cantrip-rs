@@ -45,7 +45,8 @@ fn required_after_losing_abilities(kind: EffectKind) -> u32 {
 
 #[test]
 fn a_goaded_creature_that_loses_its_abilities_is_still_goaded() {
-    assert_eq!(required_after_losing_abilities(EffectKind::Goaded), 2, "attack, and attack a player other than its goader");
+    // A game of two: attacking the goader, the only opponent, obeys "attack"; "a player other than the goader" can't be obeyed.
+    assert_eq!(required_after_losing_abilities(EffectKind::Goaded), 1);
 }
 
 #[test]

@@ -670,6 +670,7 @@ pub fn attack_verdict_view(verdict: &AttackVerdict, handles: &mut HandleSpace) -
             rule: i.rule.to_string(),
         }),
         cost: if verdict.cost.is_zero() { String::new() } else { verdict.cost.to_string() },
+        free: verdict.free,
     }
 }
 

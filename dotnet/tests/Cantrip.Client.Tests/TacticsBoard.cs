@@ -221,6 +221,27 @@ internal static class TacticsBoard
                     Verdict = Cantrip.Client.Presentation.FixtureTransport.StandInVerdict(prompt, check.Selected),
                 });
             }
+
+            // A check of a declaration, by the gallery's stand-ins for the rules too.
+            if (message is CheckAttacksMessage attacks && _asked.LastOrDefault(asked => asked.RequestId == attacks.RequestId)?.Prompt is DeclareAttackersPromptMessage attacking)
+            {
+                Inbound.Enqueue(new AttacksVerdictMessage
+                {
+                    RequestId = attacks.RequestId,
+                    Attacks = attacks.Attacks,
+                    Verdict = Cantrip.Client.Presentation.FixtureTransport.StandInAttackVerdict(attacking, attacks.Attacks),
+                });
+            }
+
+            if (message is CheckBlocksMessage blocks && _asked.LastOrDefault(asked => asked.RequestId == blocks.RequestId)?.Prompt is DeclareBlockersPromptMessage blocking)
+            {
+                Inbound.Enqueue(new BlocksVerdictMessage
+                {
+                    RequestId = blocks.RequestId,
+                    Blocks = blocks.Blocks,
+                    Verdict = Cantrip.Client.Presentation.FixtureTransport.StandInBlockVerdict(blocking, blocks.Blocks),
+                });
+            }
         }
 
         public IReadOnlyList<ServerMessage> Receive()

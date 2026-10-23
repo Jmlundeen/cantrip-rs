@@ -2143,7 +2143,7 @@ public sealed partial class MainPage
         List<AttackMessage> attacks = DeclaredAttacks();
         foreach (int creature in _pending)
         {
-            if (!_attacking.ContainsKey(creature) && prompt.AttacksFor(new ViewHandle(creature)) is [var first, ..])
+            if (!_attacking.ContainsKey(creature) && prompt.OfferedFor(new ViewHandle(creature)) is [var first, ..])
             {
                 attacks.Add(first);
             }
@@ -2159,17 +2159,24 @@ public sealed partial class MainPage
     {
         List<AttackMessage> declared = DeclaredAttacks();
 
-        // A goaded creature left home (CR 701.15b): what the server would refuse, so the button waits and the dock says why.
-        AttackRequirementMessage? unmet = prompt.Requirements.FirstOrDefault(requirement => !requirement.MetBy(declared));
+        // What the rules make of the attack so far (CR 508.1a-d), the host's word: asked the first time it is declared, and the
+        // button waits for it. Why it may not be declared - a creature an effect requires to attack left home or sent elsewhere
+        // (goad, CR 701.15b; "attacks that player this combat if able") - is the dock's caption.
+        AttackVerdictView? verdict = client.AttackVerdict(declared);
+        if (verdict is null)
+        {
+            client.CheckAttacks(declared);
+        }
+
+        string? unmet = verdict?.Issue is { } why ? AttackIssueCaption(client, why) : null;
 
         // A cost to attack (CR 508.1h): what the attack chosen so far costs in all, paid once it is locked in.
-        string cost = prompt.TotalCostText(declared);
+        string cost = verdict?.Cost ?? prompt.TotalCostText(declared);
 
         Prompt(
             "Declare attackers",
             unmet is not null
-                ? $"{client.Object(unmet.Attacker)?.Name ?? "A creature"} is goaded and must attack"
-                  + (unmet.Players.Count > 0 ? $" {string.Join(" or ", unmet.Players.Select(seat => NameOf(client, seat)))}" : string.Empty)
+                ? unmet
                 : _pending.Count > 0
                     ? $"Choose what to attack ({_pending.Count} selected)"
                     : (_attacking.Count switch
@@ -2182,7 +2189,7 @@ public sealed partial class MainPage
         AddButton(
             _attacking.Count == 0 ? "No attack" : cost.Length > 0 ? $"Attack with {_attacking.Count}, pay {cost}" : $"Attack with {_attacking.Count}",
             () => Send(client, new AttackersDeclaredAnswer { Attacks = declared }),
-            enabled: unmet is null,
+            enabled: verdict?.Complete == true,
             primary: true).Tooltip = (cost.Length > 0 ? $"Lock in the attack, then pay {cost} to attack" : "Lock in the attack") + Suffix(PassKey);
 
         if (_pending.Count > 0)
@@ -2196,11 +2203,13 @@ public sealed partial class MainPage
         {
             _attackAll = () =>
             {
+                // Each at the first seat the host's verdict offers it, the first defender where it may.
                 foreach (ViewHandle creature in prompt.Eligible)
                 {
-                    int seat = prompt.Requirements.FirstOrDefault(r => r.Attacker == creature) is { Players.Count: > 0 } must
-                        ? must.Players[0]
-                        : prompt.AttackablePlayers[0];
+                    List<AttackMessage> offered = prompt.OfferedFor(creature);
+                    int seat = offered.Exists(attack => attack.TargetPermanent.IsNone && attack.TargetPlayer == prompt.AttackablePlayers[0])
+                        ? prompt.AttackablePlayers[0]
+                        : offered.FirstOrDefault(attack => attack.TargetPermanent.IsNone)?.TargetPlayer ?? prompt.AttackablePlayers[0];
                     _attacking[creature.Value] = new AttackChoice(seat, ViewHandle.None);
                 }
 
@@ -2219,6 +2228,19 @@ public sealed partial class MainPage
                 _needsRedraw = true;
             });
         }
+    }
+
+    /// <summary>
+    /// Why a declaration of attackers may not be made, as the host words it: the creature, what it breaks, and the seat or
+    /// permanent where there is one ("Ursine Monstrosity must attack Bot2").
+    /// </summary>
+    private static string AttackIssueCaption(GameClient client, AttackIssueView issue)
+    {
+        string creature = client.Object(issue.Creature)?.Name ?? "A creature";
+        string other = !issue.OtherPermanent.IsNone
+            ? $" {client.Object(issue.OtherPermanent)?.Name ?? "a permanent"}"
+            : issue.OtherPlayer != 0 ? $" {NameOf(client, issue.OtherPlayer)}" : string.Empty;
+        return $"{creature} {issue.Words}{other}";
     }
 
     /// <summary>

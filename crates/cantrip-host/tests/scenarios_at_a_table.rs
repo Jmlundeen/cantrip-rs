@@ -717,3 +717,46 @@ fn the_host_judges_a_declaration_of_blockers_under_lure() {
     }
     panic!("the declaration never came");
 }
+
+/// The host's `CheckAttacks` (docs/host-protocol.md, "Checking a declaration of attackers") counts CR 508.1d's requirements:
+/// the goaded Ursine Monstrosity told to attack its goader may attack either opponent, and attacking nothing is refused with
+/// the 508.1d issue.
+#[test]
+fn the_host_judges_a_declaration_of_attackers_under_goad() {
+    use cantrip_host::protocol::AttackMessage;
+    let name = "a-goaded-ursine-monstrosity-told-to-attack-its-goader-may-attack-bot3";
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).ok().unwrap();
+    let mut step = session.step();
+    // Turns 4 and 7 send it at Bot3 untaxed and ungoaded; turn 10's is the goaded declaration.
+    let mut at_bot3 = 0;
+    for _ in 0..20_000 {
+        let expected = step["Scenario"]["Expected"].clone();
+        assert!(!expected.is_null(), "the declaration never came");
+        let answer: AnswerPayload = serde_json::from_value(expected["Answer"].clone()).unwrap();
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        if let AnswerPayload::AttackersDeclaredAnswer(declared) = &answer
+            && declared.attacks.first().is_some_and(|a| a.target_player == 3)
+            && {
+                at_bot3 += 1;
+                at_bot3 == 3
+            }
+        {
+            let none = session.check_attacks(id, seat, &[]).ok().unwrap();
+            assert_eq!(none["Complete"], Value::Bool(false));
+            assert_eq!(none["Issue"]["Rule"], Value::String("508.1d".into()));
+            let ursine = declared.attacks[0].attacker;
+            for target_player in [2, 3] {
+                let attack = AttackMessage { attacker: ursine, target_player, target_permanent: ViewHandle::NONE };
+                let verdict = session.check_attacks(id, seat, &[attack]).ok().unwrap();
+                assert_eq!(verdict["Complete"], Value::Bool(true), "attacking seat {target_player}: {verdict}");
+            }
+            let too_many = vec![AttackMessage { attacker: ursine, target_player: 2, target_permanent: ViewHandle::NONE }; 9];
+            assert!(session.check_attacks(id, seat, &too_many).is_err());
+            return;
+        }
+        step = session.answer(id, seat, &answer).ok().unwrap();
+    }
+    panic!("the declaration never came");
+}

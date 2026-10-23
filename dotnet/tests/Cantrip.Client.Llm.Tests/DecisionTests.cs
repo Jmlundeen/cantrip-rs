@@ -252,6 +252,12 @@ public sealed class DecisionTests
                 Eligible = [Handle(1), Handle(2)],
                 AttackablePlayers = [Them],
                 Requirements = [new() { Attacker = Handle(2) }],
+                MostRequirements = 1,
+                Suggested = [new AttackMessage { Attacker = Handle(2), TargetPlayer = Them }],
+                Verdict = new AttackVerdictView
+                {
+                    Addable = [new AttackMessage { Attacker = Handle(1), TargetPlayer = Them }, new AttackMessage { Attacker = Handle(2), TargetPlayer = Them }],
+                },
             });
 
         var attacks = Assert.IsType<AttackersDeclaredAnswer>(answer);

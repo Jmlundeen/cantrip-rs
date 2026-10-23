@@ -1,3 +1,4 @@
+using Cantrip.Client.Presentation;
 using Cantrip.Client.Tactics;
 using Cantrip.Protocol;
 using Xunit;
@@ -416,12 +417,13 @@ public sealed class TacticalPermanentsTests
         GameClient client = Seated([Creature(1, "Bear", 2, 2), Walker(5, "Jace", 2, Them)], step: TurnStepView.DeclareAttackers);
 
         DeclareAttackersPromptMessage prompt = Attackers([1], 5);
-        prompt.Requirements.Add(new AttackRequirementMessage { Attacker = Handle(1), Players = [Them] });
+        prompt.Requirements.Add(new AttackRequirementMessage { Attacker = Handle(1), TargetPlayer = Them });
+        FixtureTransport.JudgeAttackers(prompt);
 
         AttackMessage attack = Assert.Single(Assert.IsType<AttackersDeclaredAnswer>(Bot().Decide(client, prompt)).Attacks);
 
         Assert.True(attack.TargetPermanent.IsNone);
-        Assert.True(prompt.Requirements[0].MetBy([attack]));
+        Assert.True(FixtureTransport.StandInAttackVerdict(prompt, [attack]).Complete);
     }
 
     [Fact]

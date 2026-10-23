@@ -68,9 +68,8 @@ public static class AttackCosts
         for (int i = 0; i < kept.Count; i++)
         {
             AttackMessage attack = kept[i];
-            AttackRequirementMessage? must = prompt.Requirements.Find(requirement => requirement.Attacker == attack.Attacker);
-            if (must is not null && prompt.CostOf(attack) is not null
-                && prompt.AttacksFor(attack.Attacker).Find(free => prompt.CostOf(free) is null && must.MetBy([free])) is { } free)
+            // A creature the engine's own declaration has attack for nothing goes there rather than pay (CR 508.1d).
+            if (prompt.CostOf(attack) is not null && prompt.SuggestedFor(attack.Attacker) is { } free && prompt.CostOf(free) is null)
             {
                 kept[i] = free;
             }
@@ -84,7 +83,7 @@ public static class AttackCosts
         {
             AttackMessage? costliest = kept
                 .Where(attack => prompt.CostOf(attack) is not null
-                    && !prompt.Requirements.Exists(requirement => requirement.Attacker == attack.Attacker))
+                    && !prompt.IsRequired(attack.Attacker))
                 .OrderByDescending(attack => prompt.CostOf(attack)!.ManaValue)
                 .FirstOrDefault();
             if (costliest is null)

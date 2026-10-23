@@ -182,13 +182,13 @@ public sealed class RandomPlayTests
     [Fact]
     public void Attacks_with_a_creature_that_must_attack_every_time()
     {
-        var prompt = new DeclareAttackersPromptMessage
+        DeclareAttackersPromptMessage prompt = FixtureTransport.JudgeAttackers(new DeclareAttackersPromptMessage
         {
             Player = Me,
             Eligible = [Handle(1), Handle(2)],
             AttackablePlayers = [Them],
             Requirements = [new AttackRequirementMessage { Attacker = Handle(1) }],
-        };
+        });
 
         var bot = new RandomPlay(seed: 3);
         bool stayedHome = false;
@@ -207,16 +207,20 @@ public sealed class RandomPlayTests
     [Fact]
     public void Sends_a_goaded_creature_only_where_its_requirement_allows()
     {
-        // CR 701.15b: goaded, so it attacks a player other than whoever goaded it — which rules out the planeswalker
-        // as well, because attacking one would leave the requirement unmet.
-        var prompt = new DeclareAttackersPromptMessage
+        // CR 701.15b: goaded by Them, so it attacks a player other than Them — which rules out the planeswalker as well,
+        // because attacking one obeys one requirement where attacking seat 3 obeys two.
+        DeclareAttackersPromptMessage prompt = FixtureTransport.JudgeAttackers(new DeclareAttackersPromptMessage
         {
             Player = Me,
             Eligible = [Handle(1)],
             AttackablePlayers = [Them, 3],
             AttackablePlaneswalkers = [Handle(9)],
-            Requirements = [new AttackRequirementMessage { Attacker = Handle(1), Players = [3] }],
-        };
+            Requirements =
+            [
+                new AttackRequirementMessage { Attacker = Handle(1) },
+                new AttackRequirementMessage { Attacker = Handle(1), OtherThan = Them },
+            ],
+        });
 
         var bot = new RandomPlay(seed: 3);
 
@@ -225,7 +229,7 @@ public sealed class RandomPlayTests
             AttackMessage attack = Assert.Single(Assert.IsType<AttackersDeclaredAnswer>(bot.Decide(prompt)).Attacks);
             Assert.True(attack.TargetPermanent.IsNone);
             Assert.Equal(3, attack.TargetPlayer);
-            Assert.True(prompt.Requirements[0].MetBy([attack]));
+            Assert.True(FixtureTransport.StandInAttackVerdict(prompt, [attack]).Complete);
         }
     }
 
@@ -233,7 +237,7 @@ public sealed class RandomPlayTests
     public void Never_sends_a_creature_at_a_seat_it_is_forbidden_to_attack_and_must_attacks_go_elsewhere()
     {
         // CR 508.1c: "you can't be attacked except by creatures with flying" closes the seat to creature 1 alone.
-        var prompt = new DeclareAttackersPromptMessage
+        DeclareAttackersPromptMessage prompt = FixtureTransport.JudgeAttackers(new DeclareAttackersPromptMessage
         {
             Player = Me,
             Eligible = [Handle(1), Handle(2)],
@@ -241,7 +245,7 @@ public sealed class RandomPlayTests
             AttackablePlaneswalkers = [Handle(9)],
             Requirements = [new AttackRequirementMessage { Attacker = Handle(1) }],
             Forbidden = [new AttackMessage { Attacker = Handle(1), TargetPlayer = Them }],
-        };
+        });
 
         var bot = new RandomPlay(seed: 3);
 

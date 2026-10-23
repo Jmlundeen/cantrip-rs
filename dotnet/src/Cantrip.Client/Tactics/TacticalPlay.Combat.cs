@@ -60,7 +60,7 @@ public sealed partial class TacticalPlay
         int forced = 0;
         for (int a = 0; a < attackers.Count; a++)
         {
-            if (prompt.Requirements.Exists(requirement => requirement.Attacker == attackers[a].Handle))
+            if (prompt.IsRequired(attackers[a].Handle))
             {
                 forced |= 1 << a;
             }
@@ -341,26 +341,29 @@ public sealed partial class TacticalPlay
                 continue;
             }
 
-            // A goaded creature at a seat its requirement allows (CR 701.15b).
-            AttackRequirementMessage? must = prompt.Requirements.Find(requirement => requirement.Attacker == attackers[a].Handle);
-            answer.Attacks.Add(new AttackMessage
+            // A creature an effect requires to attack at the seat the host's verdict offers it, the defender where it may.
+            var planned = new AttackMessage
             {
                 Attacker = attackers[a].Handle,
-                TargetPlayer = must is { Players.Count: > 0 } && !must.Players.Contains(defender) ? must.Players[0] : defender,
+                TargetPlayer = defender,
                 TargetPermanent = aside.GetValueOrDefault(attackers[a].Handle, ViewHandle.None),
-            });
+            };
+            if (prompt.IsRequired(planned.Attacker)
+                && !prompt.OfferedFor(planned.Attacker).Exists(offered => offered.TargetPlayer == planned.TargetPlayer && offered.TargetPermanent == planned.TargetPermanent)
+                && prompt.SuggestedFor(planned.Attacker) is { } suggested)
+            {
+                planned = suggested;
+            }
+
+            answer.Attacks.Add(planned);
         }
 
-        // Past the ones considered, a creature that must attack still has to.
-        foreach (AttackRequirementMessage requirement in prompt.Requirements)
+        // Past the ones considered, a creature an effect requires to attack still has to: where the engine's own declaration sends it.
+        foreach (AttackMessage required in prompt.Suggested)
         {
-            if (!answer.Attacks.Exists(attack => attack.Attacker == requirement.Attacker))
+            if (!answer.Attacks.Exists(attack => attack.Attacker == required.Attacker))
             {
-                answer.Attacks.Add(new AttackMessage
-                {
-                    Attacker = requirement.Attacker,
-                    TargetPlayer = requirement.Players.Count > 0 && !requirement.Players.Contains(defender) ? requirement.Players[0] : defender,
-                });
+                answer.Attacks.Add(required);
             }
         }
 
@@ -425,8 +428,9 @@ public sealed partial class TacticalPlay
             return aside;
         }
 
-        // A creature that must attack a player (CR 701.15b) stays on the player.
-        bool Bound(int a) => prompt.Requirements.Exists(requirement => requirement.Attacker == attackers[a].Handle && requirement.Players.Count > 0);
+        // A creature the host's verdict offers no planeswalker or battle (it must attack a player, CR 701.15b) stays on the player.
+        bool Bound(int a) => prompt.IsRequired(attackers[a].Handle)
+            && !prompt.OfferedFor(attackers[a].Handle).Exists(offered => !offered.TargetPermanent.IsNone);
 
         int[] none = [.. attackers.Select(_ => -1)];
 

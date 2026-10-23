@@ -1,3 +1,4 @@
+using Cantrip.Client.Presentation;
 using Cantrip.Client.Tactics;
 using Cantrip.Protocol;
 using Xunit;
@@ -473,12 +474,12 @@ public sealed class TacticalPlayTests
 
     // --- Combat --------------------------------------------------------------------------------------------------------
 
-    private static DeclareAttackersPromptMessage Attackers(params int[] eligible) => new()
+    private static DeclareAttackersPromptMessage Attackers(params int[] eligible) => FixtureTransport.JudgeAttackers(new()
     {
         Player = Me,
         Eligible = [.. eligible.Select(Handle)],
         AttackablePlayers = [Them],
-    };
+    });
 
     private static List<int> Attacking(AnswerPayload answer) =>
         [.. Assert.IsType<AttackersDeclaredAnswer>(answer).Attacks.Select(attack => attack.Attacker.Value).Order()];
@@ -572,6 +573,7 @@ public sealed class TacticalPlayTests
 
         DeclareAttackersPromptMessage prompt = Attackers(1);
         prompt.Requirements.Add(new AttackRequirementMessage { Attacker = Handle(1) });
+        FixtureTransport.JudgeAttackers(prompt);
 
         Assert.Equal([1], Attacking(Bot().Decide(client, prompt)));
     }
@@ -621,6 +623,7 @@ public sealed class TacticalPlayTests
         DeclareAttackersPromptMessage prompt = Taxed(2, 0, 1);
         prompt.AttackablePlaneswalkers.Add(Handle(5));
         prompt.Requirements.Add(new AttackRequirementMessage { Attacker = Handle(1) });
+        FixtureTransport.JudgeAttackers(prompt);
 
         AttackMessage attack = Assert.Single(Assert.IsType<AttackersDeclaredAnswer>(Bot().Decide(client, prompt)).Attacks);
         Assert.Equal(Handle(5), attack.TargetPermanent);

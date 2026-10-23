@@ -274,6 +274,10 @@ public sealed partial class MainPage
 
             // A creature is picked up, and the attackers become the things to click. One already blocking is picked up again
             // where the rules' verdict lets it block another attacker too, and otherwise comes back off what it blocks.
+            // A creature still on its way to the attacker clicked waits for the host's verdict, and is no control meanwhile.
+            DeclareBlockersPromptMessage when _eligible.Contains(handle) && _blockQueue.Contains(handle) =>
+                new CardLook(Selected: true),
+
             DeclareBlockersPromptMessage when _eligible.Contains(handle) =>
                 new CardLook(
                     Selected: _pending.Contains(handle) || _blocking.Exists(pair => pair.Blocker == handle),
@@ -693,8 +697,12 @@ public sealed partial class MainPage
     }
 
     /// <summary>What one creature may be sent at: every offered seat and planeswalker but those closed to it (CR 508.1c).</summary>
+    /// <summary>
+    /// What <paramref name="attacker"/> may be sent at: the attacks the host's verdict on no attacks offers it (CR 508.1c-d) -
+    /// for a creature an effect requires to attack a certain player, only those obeying as much - seats first.
+    /// </summary>
     private static List<AttackChoice> AttackChoices(DeclareAttackersPromptMessage prompt, ViewHandle attacker) =>
-        [.. prompt.AttacksFor(attacker).Select(attack => new AttackChoice(attack.TargetPlayer, attack.TargetPermanent))];
+        [.. prompt.OfferedFor(attacker).Select(attack => new AttackChoice(attack.TargetPlayer, attack.TargetPermanent))];
 
     /// <summary>Picks a creature up, or puts it back down, to be sent somewhere along with the others picked up.</summary>
     private void PickUp(int creature)
@@ -714,7 +722,7 @@ public sealed partial class MainPage
 
     /// <summary>Whether a creature may be declared making an attack (CR 508.1c).</summary>
     private static bool MayAttack(DeclareAttackersPromptMessage prompt, int attacker, AttackChoice choice) =>
-        prompt.AttacksFor(new ViewHandle(attacker)).Any(attack => attack.TargetPlayer == choice.Player && attack.TargetPermanent == choice.Permanent);
+        prompt.OfferedFor(new ViewHandle(attacker)).Exists(attack => attack.TargetPlayer == choice.Player && attack.TargetPermanent == choice.Permanent);
 
     /// <summary>The blocks declared so far, as the answer and the host's check name them.</summary>
     private List<BlockMessage> DeclaredBlocks() =>
@@ -856,6 +864,12 @@ public sealed partial class MainPage
     /// </summary>
     private void ClickBlocker(GameClient client, int blocker)
     {
+        // One on its way to an attacker is not picked up again: the host's verdict sends it there, or leaves it picked up.
+        if (_blockQueue.Contains(blocker))
+        {
+            return;
+        }
+
         if (_pending.Remove(blocker))
         {
             _needsRedraw = true;

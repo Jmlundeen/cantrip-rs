@@ -28,6 +28,7 @@ namespace Cantrip.Protocol;
 [Union(15, typeof(DrawOfferMessage))]
 [Union(16, typeof(SelectionVerdictMessage))]
 [Union(17, typeof(BlocksVerdictMessage))]
+[Union(18, typeof(AttacksVerdictMessage))]
 public abstract class ServerMessage
 {
     public abstract string Describe();
@@ -846,6 +847,7 @@ public enum ErrorCode
 [Union(12, typeof(AnswerDrawMessage))]
 [Union(13, typeof(CheckSelectionMessage))]
 [Union(14, typeof(CheckBlocksMessage))]
+[Union(15, typeof(CheckAttacksMessage))]
 public abstract class ClientMessage
 {
     public abstract string Describe();
@@ -2616,8 +2618,8 @@ public sealed class DeclareAttackersPromptMessage : PromptPayload
     public List<ViewHandle> AttackableBattles { get; set; } = [];
 
     /// <summary>
-    /// Creatures that must attack (CR 508.1d), as a goaded one must (CR 701.15b), each among <see cref="Eligible"/>. A
-    /// declaration leaving one out, or sending it at a seat its requirement does not name, is refused.
+    /// The requirements on the declaration (CR 508.1d), one for each source, for showing the player: a goaded creature has
+    /// two for each player who goaded it (CR 701.15b). The host judges how many a declaration obeys (<see cref="Verdict"/>).
     /// </summary>
     [Key(4)]
     public List<AttackRequirementMessage> Requirements { get; set; } = [];
@@ -2692,19 +2694,38 @@ public sealed class DeclareAttackersPromptMessage : PromptPayload
             .Where(attack => !IsForbidden(attack)),
     ];
 
+    /// <summary>How many of <see cref="Requirements"/> the declaration must obey (CR 508.1d), for showing the player.</summary>
+    [Key(9)]
+    public int MostRequirements { get; set; }
+
+    /// <summary>A declaration that obeys that many, the engine's own; empty where nothing is required.</summary>
+    [Key(10)]
+    public List<AttackMessage> Suggested { get; set; } = [];
+
     /// <summary>
-    /// Attacking with nobody but the creatures that must, each at the first thing it may attack for nothing (a cost to
-    /// attack is never required, CR 508.1d).
+    /// The rules' verdict on declaring no attackers (CR 508.1a-d): whether that may be declared, why not, and the attacks
+    /// that may be declared first. Every other declaration is judged by the host as it is made (<see cref="CheckAttacksMessage"/>).
     /// </summary>
-    public override AnswerPayload Default() => new AttackersDeclaredAnswer
-    {
-        Attacks =
-        [
-            .. Requirements.Select(requirement => requirement.Players.Count > 0
-                ? new AttackMessage { Attacker = requirement.Attacker, TargetPlayer = requirement.Players[0] }
-                : AttacksFor(requirement.Attacker).Find(attack => CostOf(attack) is null) ?? AttacksFor(requirement.Attacker)[0]),
-        ],
-    };
+    [Key(11)]
+    public AttackVerdictView Verdict { get; set; } = new() { Complete = true };
+
+    /// <summary>No attack, or where an effect requires attacks (CR 508.1d) the engine's own declaration, which obeys them.</summary>
+    public override AnswerPayload Default() => new AttackersDeclaredAnswer { Attacks = [.. Suggested] };
+
+    /// <summary>
+    /// Whether the engine's own declaration (<see cref="Suggested"/>) has <paramref name="attacker"/> attack: an effect requires
+    /// it to (CR 508.1d), as the host worked out. Leaving it out is no declaration the rules take.
+    /// </summary>
+    public bool IsRequired(ViewHandle attacker) => Suggested.Exists(attack => attack.Attacker == attacker);
+
+    /// <summary>The engine's own attack for <paramref name="attacker"/>, or null where nothing requires it to attack.</summary>
+    public AttackMessage? SuggestedFor(ViewHandle attacker) => Suggested.Find(attack => attack.Attacker == attacker);
+
+    /// <summary>
+    /// The attacks of <paramref name="attacker"/> the host's verdict on no attacks offers (<see cref="Verdict"/>): those some
+    /// legal declaration has - for a creature an effect requires to attack a certain player, only those obeying as much.
+    /// </summary>
+    public List<AttackMessage> OfferedFor(ViewHandle attacker) => Verdict.Addable.FindAll(attack => attack.Attacker == attacker);
 }
 
 /// <summary>
@@ -2737,8 +2758,11 @@ public sealed class AttackCostMessage
 }
 
 /// <summary>
-/// A creature that must attack, and where <see cref="Players"/> names any, must attack one of those seats: a goaded
-/// creature attacks a player other than whoever goaded it (CR 701.15b). Empty means it may attack anything.
+/// One requirement on a declaration of attackers (CR 508.1d), one for each ability, effect and player it comes from, for
+/// showing the player: <see cref="Attacker"/> attacks, whatever it attacks; or attacks the seat <see cref="TargetPlayer"/>
+/// or the permanent <see cref="TargetPermanent"/> ("attacks that player this combat if able"); or attacks a player other
+/// than the seat <see cref="OtherThan"/> (a goad's, CR 701.15b). How many must be obeyed, and whether a declaration obeys
+/// them, is the host's to judge (<see cref="DeclareAttackersPromptMessage.Verdict"/>, <see cref="CheckAttacksMessage"/>).
 /// </summary>
 [MessagePackObject]
 public sealed class AttackRequirementMessage
@@ -2746,13 +2770,105 @@ public sealed class AttackRequirementMessage
     [Key(0)]
     public ViewHandle Attacker { get; set; }
 
+    /// <summary>The seat it must attack, or 0.</summary>
     [Key(1)]
-    public List<int> Players { get; set; } = [];
+    public int TargetPlayer { get; set; }
 
-    /// <summary>Whether a declaration obeys this requirement: the same test the engine makes.</summary>
-    public bool MetBy(IEnumerable<AttackMessage> attacks) =>
-        attacks.Any(attack => attack.Attacker == Attacker
-            && (Players.Count == 0 || (attack.TargetPermanent.IsNone && Players.Contains(attack.TargetPlayer))));
+    /// <summary>The planeswalker or battle it must attack, or none.</summary>
+    [Key(2)]
+    public ViewHandle TargetPermanent { get; set; }
+
+    /// <summary>A seat it must attack a player other than, or 0.</summary>
+    [Key(3)]
+    public int OtherThan { get; set; }
+}
+
+/// <summary>
+/// What the rules make of a declaration of attackers (CR 508.1a-d), as the host's one validator judges it: whether it may be
+/// declared as it is, why not, what it costs, and the attacks that some legal declaration extending it has.
+/// </summary>
+[MessagePackObject]
+public sealed class AttackVerdictView
+{
+    /// <summary>The declaration may be made as it is.</summary>
+    [Key(0)]
+    public bool Complete { get; set; }
+
+    /// <summary>The attacks, by creatures not attacking, that some legal declaration extending it has.</summary>
+    [Key(1)]
+    public List<AttackMessage> Addable { get; set; } = [];
+
+    /// <summary>Why it may not be declared as it is; null when it may.</summary>
+    [Key(2)]
+    public AttackIssueView? Issue { get; set; }
+
+    /// <summary>What declaring it costs (CR 508.1h), in mana symbols; empty when nothing.</summary>
+    [Key(3)]
+    public string Cost { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Nothing is required of the declaration: any declaration of <see cref="Addable"/> attacks, each creature attacking once,
+    /// is legal, so a client need not ask the host about each one (the prompt's own verdict says so for the whole question).
+    /// </summary>
+    [Key(4)]
+    public bool Free { get; set; }
+}
+
+/// <summary>
+/// Why a declaration of attackers may not be made as it is, to caption as <see cref="Creature"/>, <see cref="Words"/>, then
+/// the seat <see cref="OtherPlayer"/> or the permanent <see cref="OtherPermanent"/> where there is one ("Ursine Monstrosity
+/// must attack Bot2"), with the Comprehensive Rules number of the rule it breaks ("508.1d").
+/// </summary>
+[MessagePackObject]
+public sealed class AttackIssueView
+{
+    [Key(0)]
+    public ViewHandle Creature { get; set; }
+
+    [Key(1)]
+    public string Words { get; set; } = string.Empty;
+
+    [Key(2)]
+    public int OtherPlayer { get; set; }
+
+    [Key(3)]
+    public ViewHandle OtherPermanent { get; set; }
+
+    [Key(4)]
+    public string Rule { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// "Judge this declaration of attackers for the pending question": answered with an <see cref="AttacksVerdictMessage"/>, to
+/// this seat alone. Nothing in the game moves. For a <see cref="DeclareAttackersPromptMessage"/> only.
+/// </summary>
+[MessagePackObject]
+public sealed class CheckAttacksMessage : ClientMessage
+{
+    [Key(0)]
+    public int RequestId { get; set; }
+
+    [Key(1)]
+    public List<AttackMessage> Attacks { get; set; } = [];
+
+    public override string Describe() => $"check {RequestId}: {Attacks.Count} attacks";
+}
+
+/// <summary>The rules' verdict on a declaration of attackers a <see cref="CheckAttacksMessage"/> asked about.</summary>
+[MessagePackObject]
+public sealed class AttacksVerdictMessage : ServerMessage
+{
+    [Key(0)]
+    public int RequestId { get; set; }
+
+    /// <summary>The declaration the verdict is on, as it was asked.</summary>
+    [Key(1)]
+    public List<AttackMessage> Attacks { get; set; } = [];
+
+    [Key(2)]
+    public AttackVerdictView Verdict { get; set; } = new();
+
+    public override string Describe() => $"attacks verdict {RequestId}: {(Verdict.Complete ? "complete" : "incomplete")}, {Verdict.Addable.Count} addable";
 }
 
 /// <summary>One defending player declares blockers (CR 509.1).</summary>

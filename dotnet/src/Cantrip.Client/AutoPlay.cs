@@ -71,12 +71,12 @@ public static class AutoPlay
                     Attacks = AttackCosts.Within(
                         attackers,
                         [
-                            // A goaded creature at a seat its requirement allows (CR 701.15b), and any other at the first
-                            // thing it may attack (CR 508.1c).
+                            // A creature an effect requires to attack where the engine's own declaration sends it (CR 508.1d),
+                            // and any other at the first thing the host's verdict offers it (CR 508.1c).
                             .. attackers.Eligible.Select(creature =>
-                                attackers.Requirements.FirstOrDefault(r => r.Attacker == creature) is { Players.Count: > 0 } must
-                                    ? new AttackMessage { Attacker = creature, TargetPlayer = must.Players[0] }
-                                    : attackers.AttacksFor(creature)[0]),
+                                attackers.SuggestedFor(creature)
+                                    ?? attackers.OfferedFor(creature).FirstOrDefault()
+                                    ?? attackers.AttacksFor(creature)[0]),
                         ],
                         AttackCosts.Mana(client, attackers)),
                 });
