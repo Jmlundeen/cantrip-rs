@@ -2,6 +2,9 @@
 
 use cantrip_api::*;
 
+/// "Whenever this creature enlists a creature" (CR 702.154c): enlist's, kept with the keyword.
+pub use crate::enlist::{THIS_ENLISTS, this_enlists};
+
 /// What ward's discard cost asks the player whose spell or ability targeted, the question on that spell or ability.
 const WARD_DISCARD: Question =
     Question::new("DiscardUnlessCountered", "Discard a card, or {source} is countered?", "Ward: what it targeted can't be targeted for free", "Discard a card", "Let it be countered").no_default();
