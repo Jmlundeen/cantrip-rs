@@ -1,0 +1,74 @@
+# Momentum Breaker: "Each opponent who can't discards a card" and "{2}, Sacrifice this enchantment: You gain life equal to
+# your speed" (CR 701.9, 702.179f). Bot2 controls only a Mox Emerald, an artifact but no creature or Vehicle, so it can't
+# sacrifice and discards a Forest of its choice (its hand goes 6 to 5). Cast with a third mana source, the pool is left with
+# exactly {B}: the cost is {1}{B}. Bot1 is not asked to discard (its hand is unchanged). The Ballista's hit on turn 3 makes
+# Bot2 lose life, so Bot1's speed goes from 1 to 2 (CR 702.179d), and the turn 5 sacrifice, paid with exactly {2}, gains 2.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Mox Jet
+Walking Ballista
+Momentum Breaker
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Momentum Breaker.Cast
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Forest)
+? Bot2.Hand.Count = 5
+? Bot2.Graveyard = Forest
+? Bot1.Speed = 1
+Bot1.Attack(Walking Ballista > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot1.Speed = 2
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Momentum Breaker.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Speed = 2
+Bot1.Graveyard = Momentum Breaker
+Bot2.Life = 19
+Bot2.Graveyard = Forest

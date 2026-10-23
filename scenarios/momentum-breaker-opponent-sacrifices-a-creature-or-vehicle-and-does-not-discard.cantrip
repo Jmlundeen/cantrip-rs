@@ -1,0 +1,70 @@
+# Momentum Breaker: "When this enchantment enters, each opponent sacrifices a creature or Vehicle of their choice. Each
+# opponent who can't discards a card." (CR 701.21a, 701.9). Bot2 controls a Llanowar Elves, an uncrewed Smuggler's Copter
+# (a Vehicle that is not a creature, CR 301.7) and two Mox Emeralds (artifacts, neither): only the Elves and the Copter are
+# offered, Bot2 picks the Copter, so the Elves stay and nothing is discarded. Bot1's own Walking Ballista is not touched
+# (each opponent), and Bot1 has speed 1 from Start your engines!.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Walking Ballista
+Momentum Breaker
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Llanowar Elves
+Smuggler's Copter
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Smuggler's Copter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Momentum Breaker.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot2.Choose(Mox Emerald)
+Bot2.Choose(Smuggler's Copter)
+? Bot2.Hand.Count = 3
+? Bot1.Speed = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Llanowar Elves; Mox Emerald; Mox Emerald
+Bot2.Graveyard = Smuggler's Copter
+Bot2.Hand.Count = 3
+Bot1.Battlefield.Walking Ballista.Power = 1
+Bot1.Battlefield.Momentum Breaker.Types = Enchantment
+Bot1.Speed = 1
