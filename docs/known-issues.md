@@ -62,6 +62,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-117](#ki-117-a-searchs-world-keeps-what-the-real-game-did-with-hidden-cards-it-cannot-resample) | A search's world keeps what the real game did with hidden cards it cannot resample | Pri-3 | Open |
 | [KI-118](#ki-118-a-fix-agents-report-can-be-empty-or-claim-work-its-commit-does-not-hold) | A fix agent's report can be empty or claim work its commit does not hold | Pri-3 | Open |
 | [KI-119](#ki-119-a-triggered-abilitys-text-in-a-card-file-is-not-always-its-oracle-text) | A triggered ability's text in a card file is not always its Oracle text | Pri-2 | Open |
+| [KI-121](#ki-121-the-host-never-marks-a-kicker-x-as-variable) | The host never marks a kicker {X} as variable | Pri-2 | Open |
 
 ## Issues
 
@@ -305,3 +306,16 @@ are safe. A fix makes every ability's text a sentence or clause of its card's Or
 say so.
 
 **Scenarios.** None: display text.
+
+### KI-121: The host never marks a kicker {X} as variable
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host, client | 2026-10-22, building "X can't be 0" (CR 107.3a) |
+
+**Notes.** `PayCostsPrompt.variable_kicker` (`crates/cantrip-host/src/protocol.rs`) is never set, so it is always
+false. The web client reads it for a kicker {X} (`Announcement.TotalAt`, the stepper's labels in
+`MainPage.Prompts.cs`), so Thieving Skydiver's kicker is shown as a fixed kicker: its totals and button captions are
+likely wrong. The engine's announcement itself is right; what is paid and put on the stack does not change.
+
+**Scenarios.** None: display.
