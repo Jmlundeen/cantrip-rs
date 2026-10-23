@@ -769,6 +769,19 @@ pub fn return_exiled(cx: &mut Cx) -> R<bool> {
     if !to_battlefield.is_empty() {
         put_onto_battlefield(cx, &to_battlefield, ZoneReason::Other)?;
     }
+    // The return is one one-shot effect, created once (CR 610.3): the duration is over whether or not the card got where
+    // it went. One that could not - an Aura with nothing to enchant (CR 303.4g), a move a replacement left in exile - stays
+    // there as a card exiled with that permanent and nothing more, never returned again. Cleared once the moves are done,
+    // so a return that stops for a question (an Aura's host, CR 303.4f) is the same return when it goes on.
+    for &(id, _) in &due {
+        if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Exile) {
+            cx.st().update_obj(id, |o| {
+                if let Some(link) = &mut o.exiled {
+                    link.until_leaves = false;
+                }
+            });
+        }
+    }
     Ok(true)
 }
 

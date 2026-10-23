@@ -408,6 +408,13 @@ fn fingerprint(s: &GameState, canon: &Canon) -> u64 {
     h.finish()
 }
 
+/// The position written out in full, as a loop's rounds are compared (see the module): the same words are the same
+/// position up to the identity of objects and the values of timestamps. The verifier's check that a settling loop makes
+/// progress (`settle`).
+pub(crate) fn position(s: &GameState) -> Vec<u64> {
+    words(s, &Canon::new(s))
+}
+
 /// The position's canonical words (see `Words`).
 fn words(s: &GameState, canon: &Canon) -> Vec<u64> {
     let mut w = Words::default();

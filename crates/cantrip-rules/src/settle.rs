@@ -15,8 +15,28 @@ fn bestowed(cx: &Cx, id: ObjectId) -> bool {
     obj.copy.is_some_and(|c| cx.card(obj.card).bestow.is_some_and(|b| std::ptr::eq(cx.card(c.card), b)))
 }
 
+/// The verifier's watch on a settling loop (`CANTRIP_VERIFY`): every round after the first follows one that said it did
+/// something, so the position has changed since the round before (`loops::position`, which looks past object identities
+/// and timestamps). One that has not would go round for ever - an exiled card returned "until" over and over that could
+/// never leave exile (CR 610.3, 303.4g) - and fails at once instead of hanging.
+#[derive(Default)]
+struct Progress(Option<Vec<u64>>);
+
+impl Progress {
+    fn check(&mut self, cx: &Cx) {
+        if !cx.g.verify {
+            return;
+        }
+        let now = crate::loops::position(cx.s());
+        assert!(self.0.as_ref() != Some(&now), "settling went round again with nothing changed: it would never end");
+        self.0 = Some(now);
+    }
+}
+
 pub fn settle(cx: &mut Cx) -> R<Flow> {
+    let mut progress = Progress::default();
     loop {
+        progress.check(cx);
         // CR 603.8: a state trigger triggers as soon as its state is true, so the board a resolution leaves is asked before
         // the state-based actions change it (CR 704.3): Thespian's Stage that became a Dark Depths with no ice counters has
         // triggered even if the legend rule then puts it into the graveyard.
@@ -45,7 +65,9 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
 /// step (CR 514.3a) and of a turn being ended (CR 724.1c). Whether anything was done.
 pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
     let mut acted = false;
+    let mut progress = Progress::default();
     loop {
+        progress.check(cx);
         if state_based_actions(cx)? {
             acted = true;
             continue;

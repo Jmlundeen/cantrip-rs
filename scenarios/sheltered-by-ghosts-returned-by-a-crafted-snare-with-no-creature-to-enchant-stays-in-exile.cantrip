@@ -1,0 +1,87 @@
+# Perilous Snare exiles Bot2's Sheltered by Ghosts until the Snare leaves the battlefield. Swords to Plowshares then
+# exiles Bot2's only creature, and Bot1 crafts Braided Net with the Snare (CR 702.167a), exiling it as a cost: the Aura
+# would return (CR 610.3), but there is no creature Bot2 controls for it to enchant, so it stays in exile (CR 303.4g).
+# That return was the one the duration gave: Sheltered by Ghosts stays in exile as an ordinary exiled card and is never
+# tried again, and the game goes on (it once tried again for ever). The craft resolves into Braided Quipu. On turn 6 Bot2
+# casts Doomed Traveler: there is a creature for the Aura now, but its one return is over, so it stays in exile.
+
+[Bot1 Deck]
+Plains
+Island
+Island
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Perilous Snare
+Braided Net
+Swords to Plowshares
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Sheltered by Ghosts
+Doomed Traveler
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sheltered by Ghosts.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Sheltered by Ghosts.AttachedTo = Ornithopter
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Perilous Snare.Cast
+Bot1.Pass
+Bot1.Target(Sheltered by Ghosts)
+Bot1.Pass
+Bot2.Pass
+? Exile = Sheltered by Ghosts
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Plains; Mox Pearl
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Braided Net.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Braided Net.Activate(Ability: Craft)
+Bot1.Choose(Perilous Snare)
+? Exile = Sheltered by Ghosts; Ornithopter; Braided Net; Perilous Snare
+Bot1.Pass
+Bot2.Pass
+? Exile = Sheltered by Ghosts; Ornithopter; Perilous Snare
+[T6 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Doomed Traveler.Cast
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Exile = Sheltered by Ghosts; Ornithopter; Perilous Snare
+Bot1.Battlefield = Plains; Island; Island; Mox Pearl; Mox Sapphire; Mox Jet; Braided Quipu
+Bot2.Battlefield = Plains; Mox Pearl; Doomed Traveler

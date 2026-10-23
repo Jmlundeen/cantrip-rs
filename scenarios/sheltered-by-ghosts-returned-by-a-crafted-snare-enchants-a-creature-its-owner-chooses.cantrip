@@ -1,0 +1,89 @@
+# The positive control to the Aura that stays in exile: Perilous Snare exiles Bot2's Sheltered by Ghosts, enchanting
+# Ornithopter, until the Snare leaves the battlefield. When Bot1 crafts Braided Net with the Snare (CR 702.167a), the
+# Aura returns under its owner's control (CR 610.3c), and Bot2 chooses which of its creatures it enchants as it enters
+# (CR 303.4f): Doomed Traveler, not the Ornithopter it was on before (a new object, CR 400.7), a 2/1 with lifelink. Its
+# enters trigger exiles Bot1's Mox Pearl until it leaves; the Snare's link is over.
+
+[Bot1 Deck]
+Plains
+Island
+Island
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Perilous Snare
+Braided Net
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Sheltered by Ghosts
+Plains
+Doomed Traveler
+Plains x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sheltered by Ghosts.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Sheltered by Ghosts.AttachedTo = Ornithopter
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Perilous Snare.Cast
+Bot1.Pass
+Bot1.Target(Sheltered by Ghosts)
+Bot1.Pass
+Bot2.Pass
+? Exile = Sheltered by Ghosts
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Doomed Traveler.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Braided Net.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Braided Net.Activate(Ability: Craft)
+Bot1.Choose(Perilous Snare)
+Bot2.Target(Doomed Traveler)
+? Bot2.Battlefield.Sheltered by Ghosts.AttachedTo = Doomed Traveler
+Bot2.Target(Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+? Exile = Braided Net; Perilous Snare; Mox Pearl
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile = Perilous Snare; Mox Pearl
+Bot1.Battlefield = Plains; Island; Island; Mox Sapphire; Mox Jet; Braided Quipu
+Bot2.Battlefield = Plains; Mox Pearl; Ornithopter; Plains; Doomed Traveler; Sheltered by Ghosts
+Bot2.Battlefield.Sheltered by Ghosts.AttachedTo = Doomed Traveler
+Bot2.Battlefield.Doomed Traveler.Power = 2
+Bot2.Battlefield.Doomed Traveler.Keywords = Lifelink
