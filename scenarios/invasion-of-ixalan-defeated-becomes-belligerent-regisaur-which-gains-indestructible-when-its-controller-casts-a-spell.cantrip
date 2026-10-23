@@ -1,0 +1,73 @@
+# Invasion of Ixalan entering: the top five hold a Plains, a land and so a permanent card (CR 110.4a), and Bot1 takes it.
+# Bot1's Gorilla then attacks the Siege (4 defense counters, CR 310.4b) for 2 on turn 3 and
+# for 2 on turn 5, defeating it (CR 310.12b): it is cast transformed, Belligerent Regisaur (trample), not itself a spell
+# cast "after" it is on the battlefield. Casting Ornithopter on turn 5 gives it indestructible until end of turn; the
+# trigger is "whenever you cast", so Bot2's Brainstorm on turn 7 does not, and the turn 5 grant is gone by turn 7.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Plains
+Mox Pearl
+Invasion of Ixalan
+Plains
+Plains
+Plains x5
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island x3
+Brainstorm
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Invasion of Ixalan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Arrange(Plains | Plains; Plains; Plains; Plains)
+Bot1.Attack(Guerrilla Gorilla > Bot1.Battlefield.Invasion of Ixalan)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Invasion of Ixalan.Counters.Defense = 2
+[T5 Bot1.Main1]
+Bot1.Attack(Guerrilla Gorilla > Bot1.Battlefield.Invasion of Ixalan)
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Belligerent Regisaur.Keywords = Trample
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Belligerent Regisaur.Keywords = Indestructible; Trample
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Upkeep]
+Bot2.Hand.Brainstorm.Cast
+Bot2.Battlefield.Island.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Belligerent Regisaur.Keywords = Trample
+Bot1.Hand = Plains; Plains; Plains

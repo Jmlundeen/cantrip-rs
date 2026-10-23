@@ -1,0 +1,35 @@
+# Invasion of Ixalan: "You may reveal a permanent card": with a creature card among the top five Bot1 declines it, so nothing
+# goes into hand and all five go to the bottom (CR 401.4), the library keeping its size.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Invasion of Ixalan
+Plains
+Plains
+Plains
+Plains
+Yargle, Glutton of Urborg
+Plains x3
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Invasion of Ixalan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Arrange( | Yargle, Glutton of Urborg; Plains; Plains; Plains; Ornithopter)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Plains; Plains; Plains; Plains
+Bot1.Library.Count = 15

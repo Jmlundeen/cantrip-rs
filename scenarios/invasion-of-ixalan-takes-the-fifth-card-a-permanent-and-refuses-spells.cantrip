@@ -1,0 +1,45 @@
+# Invasion of Ixalan: "look at the top five cards of your library. You may reveal a permanent card from among them and put
+# it into your hand. Put the rest on the bottom." (CR 110.4a: instants and sorceries are no permanent cards.) The top five
+# are Lightning Bolt, Day of Judgment, Giant Growth, Forest and Yargle, Glutton of Urborg (fifth); the sixth, Ornithopter, is not looked at.
+# Bot1 may not take the instant or the sorcery, and takes the fifth card, Yargle, revealing it. The other four go to the bottom and
+# Ornithopter is the new top card.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Invasion of Ixalan
+Plains
+Plains
+Plains
+Plains
+Lightning Bolt
+Day of Judgment
+Giant Growth
+Forest
+Yargle, Glutton of Urborg
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Invasion of Ixalan.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Arrange(Lightning Bolt | Day of Judgment; Giant Growth; Forest; Yargle, Glutton of Urborg)
+! Bot1.Arrange(Day of Judgment | Lightning Bolt; Giant Growth; Forest; Yargle, Glutton of Urborg)
+! Bot1.Arrange(Giant Growth | Lightning Bolt; Day of Judgment; Forest; Yargle, Glutton of Urborg)
+Bot1.Arrange(Yargle, Glutton of Urborg | Lightning Bolt; Day of Judgment; Giant Growth; Forest)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Revealed = Yargle, Glutton of Urborg
+Turn = 1
+Bot1.Hand = Yargle, Glutton of Urborg; Plains; Plains; Plains; Plains
+Bot1.Library.Count = 15

@@ -1,0 +1,20 @@
+{
+  "name": "Invasion of Ixalan",
+  "manaCost": "{1}{G}",
+  "type": "Battle — Siege",
+  "defense": 4,
+  "oracleText": "(As a Siege enters, choose an opponent to protect it. You and others can attack it. When it's defeated, exile it, then cast it transformed.)\nWhen this Siege enters, look at the top five cards of your library. You may reveal a permanent card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.",
+  "backFace": {
+    "name": "Belligerent Regisaur",
+    "colorIndicator": [
+      "Green"
+    ],
+    "type": "Creature — Dinosaur",
+    "power": 4,
+    "toughness": 3,
+    "oracleText": "Trample\nWhenever you cast a spell, this creature gains indestructible until end of turn.",
+    "keywords": [
+      "Trample"
+    ]
+  }
+}
