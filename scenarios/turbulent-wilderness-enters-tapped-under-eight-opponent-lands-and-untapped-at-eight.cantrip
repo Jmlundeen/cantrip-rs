@@ -1,0 +1,36 @@
+# Turbulent Wilderness: "This land enters tapped unless your opponents control eight or more lands." On turn 15 Bot2 has
+# seven lands, so Bot1's Turbulent Wilderness enters tapped - the seven lands Bot1 itself controls are not the ones counted. On turn
+# 16, with Bot1's eight lands out, Bot2's own Turbulent Wilderness enters untapped (positive control).
+
+[Bot1 Deck]
+Forest x7
+Turbulent Wilderness
+Forest x12
+
+[Bot2 Deck]
+Island x7
+Turbulent Wilderness
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Turbulent Wilderness.Play
+Bot2.Hand.Turbulent Wilderness.Play
+
+[Expect]
+Turn = 16
+Bot1.Battlefield.Turbulent Wilderness.Tapped = true
+Bot2.Battlefield.Turbulent Wilderness.Tapped = false
