@@ -1,0 +1,52 @@
+# Oni-Cult Anvil: "Whenever one or more artifacts you control leave the battlefield during your turn" is one trigger for a
+# batch (CR 603.2c). Bot1 casts the Anvil on turn 1, then on turn 3 Vicious Rivalry with X = 0 destroys all five Moxen at
+# once (mana value 0; the Anvil, mana value 2, survives): one Construct, not five, made after the Moxen are gone.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Oni-Cult Anvil
+Vicious Rivalry
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oni-Cult Anvil.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Vicious Rivalry.Cast(X: 0)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Construct; Oni-Cult Anvil
+Bot1.Battlefield.Construct.Power = 1
+Bot1.Graveyard.Count = 6

@@ -1,0 +1,85 @@
+# Oni-Cult Anvil's trigger needs an artifact YOU control leaving DURING YOUR turn. Bot1 plays Strip Mine, casts four Moxen and
+# the Anvil. On Bot2's turn 2 Bot1 destroys its own Mox Sapphire with Disenchant: your artifact, but not your turn - no
+# Construct. On turn 3 Disenchant on Bot2's Mox Emerald (your turn, not your artifact) and Strip Mine sacrificing itself to
+# destroy Bot2's Island (your turn, not an artifact) make none either. Then the Anvil sacrifices itself: it leaves the
+# battlefield as an artifact on Bot1's turn, so it sees itself leave (CR 603.10a) and makes the one Construct.
+
+[Bot1 Deck]
+Strip Mine
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Oni-Cult Anvil
+Disenchant
+Disenchant
+Plains x20
+
+[Bot2 Deck]
+Island
+Mox Emerald
+Plains x20
+
+[Actions]
+Bot1.Hand.Strip Mine.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oni-Cult Anvil.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Count = 5
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Strip Mine.Activate(Ability: Destroy target land; Target: Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Oni-Cult Anvil.Activate
+Bot1.Choose(Oni-Cult Anvil)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Construct; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Battlefield.Construct.Power = 1
+Bot1.Graveyard = Oni-Cult Anvil; Strip Mine; Disenchant; Disenchant; Mox Sapphire
+Bot2.Battlefield.Count = 0
+Bot2.Life = 19
+Bot1.Life = 21

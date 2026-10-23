@@ -1,0 +1,62 @@
+# Oni-Cult Anvil: {T}, Sacrifice an artifact: 1 damage to each opponent and you gain 1 life; and the first time artifacts
+# you control leave during your turn it makes a 1/1 Construct, only once each turn. Bot1 plays Plains, casts four Moxen free,
+# then the Anvil with Jet and Ruby exactly ({B}{R}, nothing floating). Sacrificing Mox Emerald to it (a Plains is refused)
+# drains for exactly 1 and makes the Construct; Disenchant on Mox Jet the same turn is a second artifact leaving, and
+# makes no second Construct.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Plains
+Mox Emerald
+Oni-Cult Anvil
+Disenchant
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oni-Cult Anvil.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Oni-Cult Anvil.Activate
+! Bot1.Choose(Plains)
+Bot1.Choose(Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Construct; Mox Pearl; Mox Ruby; Oni-Cult Anvil; Plains
+Bot1.Battlefield.Construct.Power = 1
+Bot1.Battlefield.Construct.Toughness = 1
+Bot1.Battlefield.Construct.Types = Artifact; Creature
+Bot1.Battlefield.Construct.Subtypes = Construct
+Bot1.Battlefield.Construct.Token = true
+Bot1.Battlefield.Oni-Cult Anvil.Tapped = true
+Bot1.Graveyard = Disenchant; Mox Jet; Mox Emerald
+Bot2.Life = 19
+Bot1.Life = 21
