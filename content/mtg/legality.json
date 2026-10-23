@@ -120,6 +120,18 @@
         "vintage": "legal"
       }
     },
+    "Absolute Virtue": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Abundance": {
       "identity": "G",
       "legalities": {
@@ -128,6 +140,30 @@
         "modern": "legal",
         "penny": "legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Academic Ascent": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Academic Dispute": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -252,6 +288,18 @@
         "vintage": "legal"
       }
     },
+    "Aether Gust": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Aether Spellbomb": {
       "identity": "U",
       "legalities": {
@@ -271,6 +319,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Afterthought Sentry": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -624,6 +684,18 @@
         "vintage": "legal"
       }
     },
+    "Anger of the Gods": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Animate Dead": {
       "identity": "B",
       "legalities": {
@@ -672,8 +744,32 @@
         "vintage": "legal"
       }
     },
+    "Anticausal Vestige": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Anzrag's Rampage": {
       "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Apex Witchstalker": {
+      "identity": "B",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -720,8 +816,56 @@
         "vintage": "legal"
       }
     },
+    "Arcane Amphisbaena": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Archdruid's Charm": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Archenemy's Charm": {
       "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Archfiend of Despair": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Archive Arbiter": {
+      "identity": "",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -753,6 +897,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Ardyn, the Usurper": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -792,6 +948,18 @@
         "vintage": "legal"
       }
     },
+    "Arid Archway": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Arid Mesa": {
       "identity": "",
       "legalities": {
@@ -804,6 +972,42 @@
         "vintage": "legal"
       }
     },
+    "Armor Wars": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Arni, Humble Scribe": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Arni, Renowned Champion": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Artificial Evolution": {
       "identity": "U",
       "legalities": {
@@ -813,6 +1017,18 @@
         "penny": "legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Artifist Acumen": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -847,6 +1063,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Ashiok, Dream Render": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
@@ -912,6 +1140,18 @@
         "vintage": "legal"
       }
     },
+    "Assimilation Aegis": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Astelli Reclaimer": {
       "identity": "W",
       "legalities": {
@@ -972,6 +1212,30 @@
         "vintage": "legal"
       }
     },
+    "Aurelia, the Law Above": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Aurelia, the Warleader": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Auriok Salvagers": {
       "identity": "W",
       "legalities": {
@@ -1003,6 +1267,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Avacyn, Angel of Horror": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "legal"
@@ -1068,7 +1344,43 @@
         "vintage": "legal"
       }
     },
+    "Awaken the Inferno": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Azog, Moria's Ruin": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Azorius Chancery": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Azorius Signet": {
       "identity": "WU",
       "legalities": {
         "commander": "legal",
@@ -1183,6 +1495,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Balmor, Battlemage Captain": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -1308,6 +1632,18 @@
         "vintage": "legal"
       }
     },
+    "Battlefield Forge": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Battlefield Improvisation": {
       "identity": "W",
       "legalities": {
@@ -1356,6 +1692,18 @@
         "vintage": "legal"
       }
     },
+    "Bedeck // Bedazzle": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Bejeweled Warg": {
       "identity": "G",
       "legalities": {
@@ -1392,6 +1740,18 @@
         "vintage": "legal"
       }
     },
+    "Bender's Waterskin": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Berserk": {
       "identity": "G",
       "legalities": {
@@ -1411,6 +1771,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Bestial Incursion": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -1524,6 +1896,18 @@
         "vintage": "legal"
       }
     },
+    "Birthing Ritual": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Bitter Reunion": {
       "identity": "R",
       "legalities": {
@@ -1608,6 +1992,18 @@
         "vintage": "legal"
       }
     },
+    "Blazing Crescendo": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Blazing Rootwalla": {
       "identity": "R",
       "legalities": {
@@ -1627,6 +2023,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Blessed Ghoul": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -1788,6 +2196,18 @@
         "vintage": "legal"
       }
     },
+    "Bloodline Recollector": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Bloodstained Mire": {
       "identity": "",
       "legalities": {
@@ -1824,6 +2244,18 @@
         "vintage": "legal"
       }
     },
+    "Bloombrute": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Blooming Blast": {
       "identity": "R",
       "legalities": {
@@ -1843,6 +2275,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Blossom-Blessed Angel": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -2172,6 +2616,18 @@
         "vintage": "restricted"
       }
     },
+    "Brainsurge": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Bramble Familiar": {
       "identity": "G",
       "legalities": {
@@ -2244,6 +2700,18 @@
         "vintage": "legal"
       }
     },
+    "Brightclimb Pathway": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Brightglass Gearhulk": {
       "identity": "WG",
       "legalities": {
@@ -2304,6 +2772,30 @@
         "vintage": "legal"
       }
     },
+    "Bubbling Muck": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Budding Insurgent": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Bulk Up": {
       "identity": "R",
       "legalities": {
@@ -2325,6 +2817,18 @@
         "penny": "legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Burnout Bashtronaut": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -2352,6 +2856,18 @@
         "vintage": "legal"
       }
     },
+    "Buster Sword": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Cabal Ritual": {
       "identity": "B",
       "legalities": {
@@ -2361,6 +2877,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Cache Grab": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -2400,6 +2928,18 @@
         "vintage": "legal"
       }
     },
+    "Campus Crier": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Candelabra of Tawnos": {
       "identity": "",
       "legalities": {
@@ -2413,6 +2953,30 @@
       }
     },
     "Candy Trail": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Canopy Vista": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Capital City": {
       "identity": "",
       "legalities": {
         "commander": "legal",
@@ -2484,6 +3048,30 @@
         "vintage": "legal"
       }
     },
+    "Cascade Bluffs": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Cascading Cataracts": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Case of the Crimson Pulse": {
       "identity": "R",
       "legalities": {
@@ -2544,6 +3132,18 @@
         "vintage": "legal"
       }
     },
+    "Cast Away Doubt": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Castle Doom": {
       "identity": "",
       "legalities": {
@@ -2592,6 +3192,18 @@
         "vintage": "legal"
       }
     },
+    "Cauldron Familiar": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Caustic Bronco": {
       "identity": "B",
       "legalities": {
@@ -2601,6 +3213,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Cavalier of Thorns": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -2628,6 +3252,18 @@
         "vintage": "legal"
       }
     },
+    "Caves of Koilos": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Cease // Desist": {
       "identity": "WBG",
       "legalities": {
@@ -2647,6 +3283,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Celestial Armor": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -2760,6 +3408,18 @@
         "vintage": "legal"
       }
     },
+    "Chandra's Emberling": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Chandra, Chill of Compliance": {
       "identity": "U",
       "legalities": {
@@ -2793,6 +3453,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Change the Equation": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -2832,8 +3504,44 @@
         "vintage": "legal"
       }
     },
+    "Charge the Sanctum": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Chart a Course": {
       "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Chief Warg's Company": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Chomping Changeling": {
+      "identity": "G",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -2892,6 +3600,18 @@
         "vintage": "legal"
       }
     },
+    "Cinder Glade": {
+      "identity": "RG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "City of Traitors": {
       "identity": "",
       "legalities": {
@@ -2900,6 +3620,18 @@
         "modern": "not_legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Cityscape Leveler": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -2928,6 +3660,18 @@
         "vintage": "legal"
       }
     },
+    "Clash of Elements": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Clay-Fired Bricks": {
       "identity": "W",
       "legalities": {
@@ -2937,6 +3681,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Clifftop Retreat": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -2976,6 +3732,18 @@
         "vintage": "legal"
       }
     },
+    "Cloud, Midgar Mercenary": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Coalition Relic": {
       "identity": "",
       "legalities": {
@@ -2985,6 +3753,18 @@
         "penny": "legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Codie, Ravenous Codex": {
+      "identity": "WUBRG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -3008,6 +3788,18 @@
         "modern": "legal",
         "penny": "not_legal",
         "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Collector Ouphe": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -3072,6 +3864,18 @@
         "vintage": "legal"
       }
     },
+    "Command the Stage": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Commercial District": {
       "identity": "RG",
       "legalities": {
@@ -3079,6 +3883,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Compel Brutality": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -3120,6 +3936,18 @@
         "vintage": "legal"
       }
     },
+    "Conduit Pylons": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Connecting the Dots": {
       "identity": "R",
       "legalities": {
@@ -3152,6 +3980,18 @@
         "modern": "legal",
         "penny": "not_legal",
         "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Consign to Memory": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -3372,6 +4212,18 @@
         "vintage": "legal"
       }
     },
+    "Craftwork Crusher": {
+      "identity": "RG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Cranial Plating": {
       "identity": "B",
       "legalities": {
@@ -3444,6 +4296,18 @@
         "vintage": "legal"
       }
     },
+    "Cruel Calculations": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Cruelclaw's Heist": {
       "identity": "B",
       "legalities": {
@@ -3480,6 +4344,18 @@
         "vintage": "legal"
       }
     },
+    "Cryotheory Adept": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Cryptic Caves": {
       "identity": "",
       "legalities": {
@@ -3487,6 +4363,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Cryptic Coat": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -3504,6 +4392,18 @@
         "vintage": "legal"
       }
     },
+    "Crystal Barricade": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Crystal Grotto": {
       "identity": "",
       "legalities": {
@@ -3513,6 +4413,30 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Crystal Quarry": {
+      "identity": "WUBRG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Culling Ritual": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -3576,6 +4500,18 @@
         "vintage": "legal"
       }
     },
+    "Curse-Marred Demon": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Cut Down": {
       "identity": "B",
       "legalities": {
@@ -3585,6 +4521,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Cut Propulsion": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -3636,6 +4584,42 @@
         "vintage": "legal"
       }
     },
+    "Damping Sphere": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Danitha, Spear of Agony": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Danitha, Sword of Hope": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Daretti, Scrap Savant": {
       "identity": "R",
       "legalities": {
@@ -3672,6 +4656,18 @@
         "vintage": "legal"
       }
     },
+    "Dark Knight's Greatsword": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Dark Matter Manipulator": {
       "identity": "B",
       "legalities": {
@@ -3696,6 +4692,18 @@
         "vintage": "legal"
       }
     },
+    "Darklight Phoenix": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Darkslick Shores": {
       "identity": "UB",
       "legalities": {
@@ -3704,6 +4712,18 @@
         "modern": "legal",
         "penny": "legal",
         "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Darksteel Angel": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -3717,6 +4737,30 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Darkwater Catacombs": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Dauntless Scrapbot": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -3828,6 +4872,18 @@
         "vintage": "legal"
       }
     },
+    "Dazzling Angel": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Deadly Cover-Up": {
       "identity": "B",
       "legalities": {
@@ -3895,6 +4951,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Deathmark": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -3986,6 +5054,18 @@
     },
     "Deep-Cavern Bat": {
       "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Defend the Rider": {
+      "identity": "G",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -4116,6 +5196,18 @@
         "vintage": "restricted"
       }
     },
+    "Den of the Bugbear": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Denzilore Fatehold": {
       "identity": "WU",
       "legalities": {
@@ -4140,8 +5232,56 @@
         "vintage": "legal"
       }
     },
+    "Desolate Mire": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Desolation Prowler": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Desolation of Smaug": {
       "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Despark": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Desperate Futurescribe": {
+      "identity": "WU",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -4237,6 +5377,18 @@
       }
     },
     "Dimir Aqueduct": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Dimir Signet": {
       "identity": "UB",
       "legalities": {
         "commander": "legal",
@@ -4344,6 +5496,42 @@
         "vintage": "legal"
       }
     },
+    "Disruptive Stormbrood": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Dissection Practice": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Dissection Tools": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Divine Resilience": {
       "identity": "W",
       "legalities": {
@@ -4351,6 +5539,30 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Diviner of Victory": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Divining Duelist": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -4375,6 +5587,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Doctor Doom": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -4476,6 +5700,30 @@
         "vintage": "legal"
       }
     },
+    "Dour Port-Mage": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Dovin's Veto": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Down, Down to Goblin-town": {
       "identity": "B",
       "legalities": {
@@ -4489,6 +5737,30 @@
       }
     },
     "Dowsing Device": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Dracogenesis": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Draconic Visitor": {
       "identity": "R",
       "legalities": {
         "commander": "legal",
@@ -4668,6 +5940,18 @@
         "vintage": "legal"
       }
     },
+    "Drowned Catacomb": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Dryad Arbor": {
       "identity": "G",
       "legalities": {
@@ -4689,6 +5973,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Duelist of the Mind": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -4730,6 +6026,18 @@
     },
     "Dwarven Mauler": {
       "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Dyadrine, Synthesis Amalgam": {
+      "identity": "WG",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -4785,6 +6093,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Eardrum Rattler": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -4884,6 +6204,18 @@
         "vintage": "legal"
       }
     },
+    "Eclipsed Steppe": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Eddymurk Crab": {
       "identity": "U",
       "legalities": {
@@ -4891,6 +6223,30 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Edgar, Ancient Bloodlord": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Edgar, Moonlit Sovereign": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -4920,6 +6276,18 @@
         "vintage": "legal"
       }
     },
+    "Eiganjo, Seat of the Empire": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Elegant Parlor": {
       "identity": "WR",
       "legalities": {
@@ -4934,6 +6302,18 @@
     },
     "Elegy Acolyte": {
       "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Elenda, Saint of Dusk": {
+      "identity": "WB",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -5088,6 +6468,18 @@
         "vintage": "legal"
       }
     },
+    "Emergency Phytomedic": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Emeritus of Abundance": {
       "identity": "G",
       "legalities": {
@@ -5169,6 +6561,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Emrakul, the Promised End": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -5316,6 +6720,18 @@
         "vintage": "legal"
       }
     },
+    "Entrust the Spark": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Environmental Scientist": {
       "identity": "G",
       "legalities": {
@@ -5460,6 +6876,18 @@
         "vintage": "legal"
       }
     },
+    "Eumidian Terrabotanist": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Evendo, Waking Haven": {
       "identity": "G",
       "legalities": {
@@ -5520,6 +6948,18 @@
         "vintage": "legal"
       }
     },
+    "Exemplar of Light": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Exhume": {
       "identity": "B",
       "legalities": {
@@ -5556,6 +6996,18 @@
         "vintage": "legal"
       }
     },
+    "Experimental Synthesizer": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Expressive Iteration": {
       "identity": "UR",
       "legalities": {
@@ -5565,6 +7017,42 @@
         "penny": "not_legal",
         "pioneer": "banned",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Extended Absence": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Extinction Event": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Extrapolate the Impossible": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -5664,6 +7152,18 @@
         "vintage": "legal"
       }
     },
+    "Faerie Miscreant": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Faith's Reward": {
       "identity": "W",
       "legalities": {
@@ -5724,6 +7224,18 @@
         "vintage": "legal"
       }
     },
+    "Fanatical Firebrand": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Fanatical Offering": {
       "identity": "B",
       "legalities": {
@@ -5760,8 +7272,68 @@
         "vintage": "legal"
       }
     },
+    "Fatehold Annex": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Fatehold Charm": {
       "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Fatehold Chronologist": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Fateshaper Aspirant": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Fblthp, Impossibly Lost": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Fblthp, Knows the Way": {
+      "identity": "G",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -5808,6 +7380,30 @@
         "vintage": "legal"
       }
     },
+    "Ferocity of the Hunt": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Ferrous Lake": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Fervent Champion": {
       "identity": "R",
       "legalities": {
@@ -5816,6 +7412,18 @@
         "modern": "legal",
         "penny": "legal",
         "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Fetid Heath": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -5840,6 +7448,18 @@
         "modern": "not_legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Fiery Impulse": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -5925,6 +7545,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Fire-Lit Thicket": {
+      "identity": "RG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -6096,6 +7728,18 @@
         "vintage": "legal"
       }
     },
+    "Flickering Hound": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Flickerwisp": {
       "identity": "W",
       "legalities": {
@@ -6132,6 +7776,30 @@
         "vintage": "legal"
       }
     },
+    "Flock Impostor": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Flooded Grove": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Flooded Strand": {
       "identity": "",
       "legalities": {
@@ -6163,6 +7831,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Flourishing Grapple": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -6300,6 +7980,18 @@
         "vintage": "legal"
       }
     },
+    "Formidable Commons": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Formidable Speaker": {
       "identity": "G",
       "legalities": {
@@ -6343,6 +8035,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Fountainport Bell": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -6408,6 +8112,30 @@
         "vintage": "legal"
       }
     },
+    "Frostbite Pyromental": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Frostcliff Siege": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Full Bore": {
       "identity": "R",
       "legalities": {
@@ -6415,6 +8143,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Fulminous Forte": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -6480,6 +8220,30 @@
         "vintage": "legal"
       }
     },
+    "Gallia, Tragic Host": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Gallia, the Merrymaker": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Galvanic Discharge": {
       "identity": "R",
       "legalities": {
@@ -6504,6 +8268,30 @@
         "vintage": "legal"
       }
     },
+    "Gardenize": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Garnet, Princess of Alexandria": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Garruk, Curse Breaker": {
       "identity": "G",
       "legalities": {
@@ -6518,6 +8306,18 @@
     },
     "Garruk, Veiled Butcher": {
       "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Gathering Place": {
+      "identity": "WG",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -6636,6 +8436,30 @@
         "vintage": "legal"
       }
     },
+    "Generous Revival": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Germinate Recruits": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Germination Practicum": {
       "identity": "G",
       "legalities": {
@@ -6674,6 +8498,42 @@
     },
     "Gev, Scaled Scorch": {
       "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Ghalta the Immovable": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Ghalta the Unstoppable": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Ghitu Lavarunner": {
+      "identity": "R",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -6876,6 +8736,30 @@
         "vintage": "legal"
       }
     },
+    "Glacial Dragonhunt": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Glacial Fortress": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Glamorous Outlaw": {
       "identity": "UBR",
       "legalities": {
@@ -6883,6 +8767,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Glasspool Mimic": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
@@ -7020,6 +8916,30 @@
         "vintage": "legal"
       }
     },
+    "Go Blank": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Go for the Throat": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Goblin Bombardment": {
       "identity": "R",
       "legalities": {
@@ -7063,6 +8983,42 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Gold Pan": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Gold Rush": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Goldvein Hydra": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -7128,6 +9084,18 @@
         "vintage": "legal"
       }
     },
+    "Graft Surgeon": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Grafted Wargear": {
       "identity": "",
       "legalities": {
@@ -7160,6 +9128,42 @@
         "modern": "not_legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Graven Cairns": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Graveyard Trespasser": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Greasefang, Okiba Boss": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -7236,6 +9240,30 @@
         "vintage": "legal"
       }
     },
+    "Greenbelt Rampager": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Greenhouse Propagator": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Grief": {
       "identity": "B",
       "legalities": {
@@ -7269,6 +9297,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Grim Repriser": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -7328,6 +9368,18 @@
         "modern": "not_legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Guardian of New Benalia": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -7392,6 +9444,18 @@
         "vintage": "legal"
       }
     },
+    "Gwen Stacy": {
+      "identity": "WUR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Haliya, Guided by Light": {
       "identity": "W",
       "legalities": {
@@ -7428,12 +9492,60 @@
         "vintage": "legal"
       }
     },
+    "Hallway Heckler": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Hammer of Nazahn": {
       "identity": "",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
         "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Hapatra, the Desert Fang": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Hapatra, the Desert Frost": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Harbinger of the Seas": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
@@ -7584,6 +9696,18 @@
         "vintage": "legal"
       }
     },
+    "Head of the Hunt": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Headliner Scarlett": {
       "identity": "R",
       "legalities": {
@@ -7627,6 +9751,42 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Hearthborn Battler": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Heartless Act": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Heartstring Puller": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -7692,6 +9852,18 @@
         "vintage": "legal"
       }
     },
+    "Hellcat, Undying Vigilante": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Helm of Awakening": {
       "identity": "",
       "legalities": {
@@ -7711,6 +9883,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Herald of Eternal Dawn": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -7764,6 +9948,18 @@
         "vintage": "legal"
       }
     },
+    "Heroes' Hangout": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Hex Magic": {
       "identity": "R",
       "legalities": {
@@ -7785,6 +9981,30 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Hexhaven Battalion": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Hexhaven Dueling Arena": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -7824,6 +10044,18 @@
         "vintage": "legal"
       }
     },
+    "Hide on the Ceiling": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Hidetsugu's Second Rite": {
       "identity": "R",
       "legalities": {
@@ -7845,6 +10077,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "High Tide": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -7905,6 +10149,30 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Hollow Marauder": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Holy Cow": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -7980,6 +10248,18 @@
         "vintage": "legal"
       }
     },
+    "Hunter's Axe": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Hurkyl's Final Meditation": {
       "identity": "U",
       "legalities": {
@@ -8040,6 +10320,18 @@
         "vintage": "legal"
       }
     },
+    "Huskburster Swarm": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Hydro-Man, Fluid Felon": {
       "identity": "U",
       "legalities": {
@@ -8071,6 +10363,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Icy Reception": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -8304,6 +10608,18 @@
         "vintage": "legal"
       }
     },
+    "Innovative Commons": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Inquisition of Kozilek": {
       "identity": "B",
       "legalities": {
@@ -8347,6 +10663,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Inspired Tethermage": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -8436,6 +10764,18 @@
         "vintage": "legal"
       }
     },
+    "Invasion Submersible": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Invasion of Gobakhan": {
       "identity": "W",
       "legalities": {
@@ -8496,6 +10836,18 @@
         "vintage": "legal"
       }
     },
+    "Invoke Despair": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Iridescent Vinelasher": {
       "identity": "B",
       "legalities": {
@@ -8532,6 +10884,18 @@
         "vintage": "legal"
       }
     },
+    "Iroh, Tea Master": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Iron Man Armor": {
       "identity": "",
       "legalities": {
@@ -8551,6 +10915,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Ironheart, Clever Champion": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -8613,6 +10989,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Jace Reawakened": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -8760,6 +11148,30 @@
         "vintage": "legal"
       }
     },
+    "Jiang Yanggu, Alone": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Jiang Yanggu, Never Alone": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Kaito, Bane of Nightmares": {
       "identity": "UB",
       "legalities": {
@@ -8767,6 +11179,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Kaito, Cunning Infiltrator": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -8820,6 +11244,18 @@
         "vintage": "legal"
       }
     },
+    "Karn, Gilded Guardian": {
+      "identity": "WUBRG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Karn, Scion of Urza": {
       "identity": "",
       "legalities": {
@@ -8856,6 +11292,18 @@
         "vintage": "legal"
       }
     },
+    "Kavaron, Memorial World": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Kazuul's Fury": {
       "identity": "R",
       "legalities": {
@@ -8875,6 +11323,30 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Keeper of the Quiet Hour": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Kellan, the Fae-Blooded": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -8916,6 +11388,18 @@
         "vintage": "legal"
       }
     },
+    "Ketramose, the New Dawn": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Ketria Triome": {
       "identity": "URG",
       "legalities": {
@@ -8940,6 +11424,30 @@
         "vintage": "legal"
       }
     },
+    "Kin-Tree Severance": {
+      "identity": "WBG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Kindred Judgment": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "King T'Challa": {
       "identity": "WU",
       "legalities": {
@@ -8949,6 +11457,42 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Kiora of Fire and Ashes": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Kiora of Salt and Sand": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Kiora, Behemoth Beckoner": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -9048,7 +11592,31 @@
         "vintage": "legal"
       }
     },
+    "Konstrari Annex": {
+      "identity": "RG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Konstrari Charm": {
+      "identity": "RG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Konstrari Improviser": {
       "identity": "RG",
       "legalities": {
         "commander": "legal",
@@ -9069,6 +11637,30 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Koth of the Homestead": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Koth, the Geomancer": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -9120,6 +11712,18 @@
         "vintage": "legal"
       }
     },
+    "Kumano Faces Kakkazan": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Kutzil's Flanker": {
       "identity": "W",
       "legalities": {
@@ -9127,6 +11731,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Kwia Vigorbloom": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -9192,6 +11808,18 @@
         "vintage": "legal"
       }
     },
+    "Lair of the Hydra": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Lake-town Mariners": {
       "identity": "U",
       "legalities": {
@@ -9204,6 +11832,18 @@
         "vintage": "legal"
       }
     },
+    "Languish": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Last Chance": {
       "identity": "R",
       "legalities": {
@@ -9213,6 +11853,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Last Gasp": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -9432,6 +12084,18 @@
         "vintage": "restricted"
       }
     },
+    "Lich's Relic": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Life // Death": {
       "identity": "BG",
       "legalities": {
@@ -9564,6 +12228,18 @@
         "vintage": "legal"
       }
     },
+    "Liliana, Dreadhorde General": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Lim-Dûl's Vault": {
       "identity": "UB",
       "legalities": {
@@ -9636,6 +12312,18 @@
         "vintage": "legal"
       }
     },
+    "Living Library": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Llanowar Elves": {
       "identity": "G",
       "legalities": {
@@ -9648,6 +12336,18 @@
         "vintage": "legal"
       }
     },
+    "Llanowar Wastes": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Loamcrafter Faun": {
       "identity": "G",
       "legalities": {
@@ -9657,6 +12357,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Loch Mare": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -9732,6 +12444,18 @@
         "vintage": "legal"
       }
     },
+    "Loot, the Nexus": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Loot, the Pathfinder": {
       "identity": "URG",
       "legalities": {
@@ -9753,6 +12477,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Lord Skitter, Sewer King": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -9804,6 +12540,18 @@
         "vintage": "legal"
       }
     },
+    "Lost in the Maze": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Lotus Bloom": {
       "identity": "",
       "legalities": {
@@ -9852,6 +12600,18 @@
         "vintage": "legal"
       }
     },
+    "Loyal Tutor": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Lumbering Worldwagon": {
       "identity": "G",
       "legalities": {
@@ -9883,6 +12643,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Lupinflower Village": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -9948,6 +12720,18 @@
         "vintage": "not_legal"
       }
     },
+    "Lyra Dawnbringer": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Lyra, Archangel of Dawn": {
       "identity": "W",
       "legalities": {
@@ -9955,6 +12739,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Lyra, Tolarian Archangel": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -9979,6 +12775,30 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Mabel, Bitter Recluse": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Mabel, Valley Hero": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -10080,6 +12900,18 @@
         "vintage": "legal"
       }
     },
+    "Mai, Scornful Striker": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Malcolm, Alluring Scoundrel": {
       "identity": "U",
       "legalities": {
@@ -10101,6 +12933,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Malicious Eclipse": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -10260,6 +13104,30 @@
         "vintage": "legal"
       }
     },
+    "Marwyn, the Clearcutter": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Marwyn, the Preserver": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Masked Bandits": {
       "identity": "BRG",
       "legalities": {
@@ -10279,6 +13147,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Massacre Girl, Most Wanted": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -10320,6 +13200,18 @@
         "vintage": "legal"
       }
     },
+    "Mayhem Devil": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Maze of Ith": {
       "identity": "",
       "legalities": {
@@ -10333,6 +13225,18 @@
       }
     },
     "Mazemind Tome": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Medic's Kitesail": {
       "identity": "",
       "legalities": {
         "commander": "legal",
@@ -10440,6 +13344,18 @@
         "vintage": "legal"
       }
     },
+    "Memory Trap": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Mesa Pegasus": {
       "identity": "W",
       "legalities": {
@@ -10483,6 +13399,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Meticulous Commons": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -10584,6 +13512,30 @@
         "vintage": "legal"
       }
     },
+    "Mind Meanderer": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Mind Roots": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Mind Stone": {
       "identity": "",
       "legalities": {
@@ -10618,6 +13570,18 @@
         "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "restricted"
+      }
+    },
+    "Mindseeker Oculus": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
       }
     },
     "Mine Collapse": {
@@ -10764,6 +13728,18 @@
         "vintage": "legal"
       }
     },
+    "Mockingbird": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Mole Man, Moloid Master": {
       "identity": "G",
       "legalities": {
@@ -10824,6 +13800,30 @@
         "vintage": "restricted"
       }
     },
+    "Monastery Swiftspear": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Monstrous Rage": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "banned",
+        "vintage": "legal"
+      }
+    },
     "Monument to Endurance": {
       "identity": "",
       "legalities": {
@@ -10833,6 +13833,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Moon-Circuit Hacker": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -10881,6 +13893,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Mossfire Valley": {
+      "identity": "RG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -11040,6 +14064,18 @@
         "vintage": "legal"
       }
     },
+    "Multiply by Zero": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Multiversal Passage": {
       "identity": "",
       "legalities": {
@@ -11047,6 +14083,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Murmuring Volume": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -11122,6 +14170,30 @@
         "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "restricted"
+      }
+    },
+    "Mystic Gate": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Mystical Dispute": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
       }
     },
     "Mystical Tutor": {
@@ -11292,6 +14364,18 @@
         "vintage": "legal"
       }
     },
+    "Nighthowl Pursuer": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Ninja of the Hand": {
       "identity": "B",
       "legalities": {
@@ -11313,6 +14397,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "No Admittance": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -11412,6 +14508,18 @@
         "vintage": "legal"
       }
     },
+    "Null Summoner": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Nurturing Peatland": {
       "identity": "BG",
       "legalities": {
@@ -11448,6 +14556,18 @@
         "vintage": "legal"
       }
     },
+    "Nykthos, Shrine to Nyx": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Oath of Druids": {
       "identity": "G",
       "legalities": {
@@ -11467,6 +14587,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Ob Nixilis, the Adversary": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
@@ -11640,6 +14772,18 @@
         "vintage": "legal"
       }
     },
+    "Old-Growth Troll": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Oliphaunt": {
       "identity": "R",
       "legalities": {
@@ -11688,6 +14832,18 @@
         "vintage": "legal"
       }
     },
+    "Omnipresence": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Omniscience": {
       "identity": "U",
       "legalities": {
@@ -11724,6 +14880,18 @@
         "vintage": "legal"
       }
     },
+    "Oni-Cult Anvil": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Opalescence": {
       "identity": "W",
       "legalities": {
@@ -11745,6 +14913,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Opera Love Song": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -11851,6 +15031,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Origin of the Avengers": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -11988,6 +15180,30 @@
         "vintage": "legal"
       }
     },
+    "Overflowing Basin": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Overgrown Farmland": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Overgrown Tomb": {
       "identity": "BG",
       "legalities": {
@@ -12002,6 +15218,18 @@
     },
     "Overlord of the Balemurk": {
       "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Overlord of the Floodpits": {
+      "identity": "U",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -12156,6 +15384,18 @@
         "vintage": "legal"
       }
     },
+    "Paradox Shaper": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Paradoxical Outcome": {
       "identity": "U",
       "legalities": {
@@ -12180,6 +15420,18 @@
         "vintage": "legal"
       }
     },
+    "Parhelion II": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Passageway Seer": {
       "identity": "B",
       "legalities": {
@@ -12192,6 +15444,18 @@
         "vintage": "legal"
       }
     },
+    "Patchwork Banner": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Patchwork Beastie": {
       "identity": "G",
       "legalities": {
@@ -12201,6 +15465,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Path of Peril": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -12252,6 +15528,18 @@
         "vintage": "legal"
       }
     },
+    "Perfected Theory": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Perilous Snare": {
       "identity": "W",
       "legalities": {
@@ -12259,6 +15547,30 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Personify": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Pest Control": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -12360,6 +15672,18 @@
         "vintage": "legal"
       }
     },
+    "Phoenix Fleet Airship": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Phyrexian Altar": {
       "identity": "",
       "legalities": {
@@ -12444,6 +15768,30 @@
         "vintage": "legal"
       }
     },
+    "Pia, Aether Ascetic": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Pia, Determined Rebuilder": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Pick Your Poison": {
       "identity": "G",
       "legalities": {
@@ -12458,6 +15806,18 @@
     },
     "Picklock Prankster": {
       "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Pilfer": {
+      "identity": "B",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -12542,6 +15902,18 @@
     },
     "Plains": {
       "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Plan for All Outcomes": {
+      "identity": "U",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -12648,6 +16020,18 @@
         "vintage": "legal"
       }
     },
+    "Poison Dart Frog": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Political Triumph": {
       "identity": "W",
       "legalities": {
@@ -12732,6 +16116,18 @@
         "vintage": "legal"
       }
     },
+    "Prairie Stream": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Preacher of the Schism": {
       "identity": "B",
       "legalities": {
@@ -12746,6 +16142,18 @@
     },
     "Precise Redaction": {
       "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Predictive Preparations": {
+      "identity": "W",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -12775,6 +16183,30 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Primal Prayers": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Primal Witchstalker": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -12828,6 +16260,18 @@
         "vintage": "legal"
       }
     },
+    "Proctor of Potential": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Professor Dellian Fel": {
       "identity": "BG",
       "legalities": {
@@ -12840,6 +16284,18 @@
         "vintage": "legal"
       }
     },
+    "Professor of Symbology": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Proft's Eidetic Memory": {
       "identity": "U",
       "legalities": {
@@ -12849,6 +16305,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "banned",
+        "vintage": "legal"
+      }
+    },
+    "Proft, Consulting Detective": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -12900,6 +16368,42 @@
         "vintage": "legal"
       }
     },
+    "Prophesied End": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Protege's Awakening": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Prudent Fateseer": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Psychic Frog": {
       "identity": "UB",
       "legalities": {
@@ -12931,6 +16435,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Pyre Rhymer": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -13104,6 +16620,18 @@
         "vintage": "legal"
       }
     },
+    "Radiant Summit": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Raffine's Tower": {
       "identity": "WUB",
       "legalities": {
@@ -13149,6 +16677,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Raise the Past": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -13212,6 +16752,30 @@
         "vintage": "legal"
       }
     },
+    "Rampart Hunter": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Ramunap Ruins": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Rancor": {
       "identity": "G",
       "legalities": {
@@ -13221,6 +16785,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Rank Rat": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -13332,6 +16908,30 @@
         "vintage": "legal"
       }
     },
+    "Ravine Raider": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Razorkin Needlehead": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Razorverge Thicket": {
       "identity": "WG",
       "legalities": {
@@ -13380,6 +16980,30 @@
         "vintage": "legal"
       }
     },
+    "Reckless Rage": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Reckless Ransacking": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Reckoner Bankbuster": {
       "identity": "",
       "legalities": {
@@ -13416,6 +17040,30 @@
         "vintage": "legal"
       }
     },
+    "Recursive Recruitment": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Redcap Melee": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Redshift, Rocketeer Chief": {
       "identity": "RG",
       "legalities": {
@@ -13440,6 +17088,18 @@
         "vintage": "legal"
       }
     },
+    "Refute Destiny": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Relic of Sauron": {
       "identity": "UBR",
       "legalities": {
@@ -13460,6 +17120,18 @@
         "modern": "legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Rending Volley": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -13490,6 +17162,18 @@
     },
     "Repulsive Mutation": {
       "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Repurposed Enforcer": {
+      "identity": "W",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -13536,8 +17220,44 @@
         "vintage": "legal"
       }
     },
+    "Rescue Girl, First Responder": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Rescue Skiff": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Resonating Lute": {
       "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Resplendent Angel": {
+      "identity": "W",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -13644,6 +17364,18 @@
         "vintage": "legal"
       }
     },
+    "Restore with Empathy": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Retraction Helix": {
       "identity": "U",
       "legalities": {
@@ -13680,6 +17412,18 @@
         "vintage": "legal"
       }
     },
+    "Return to the Light Realms": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Reverse Engineer": {
       "identity": "U",
       "legalities": {
@@ -13704,6 +17448,18 @@
         "vintage": "legal"
       }
     },
+    "Rewrite Regrets": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Rhox Faithmender": {
       "identity": "W",
       "legalities": {
@@ -13713,6 +17469,42 @@
         "penny": "legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Ride's End": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Riptide Gearhulk": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Rise of the Deathbringer": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -13749,6 +17541,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Riverglide Pathway": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -13836,8 +17640,32 @@
         "vintage": "legal"
       }
     },
+    "Rogue Refiner": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Roiling Canopy": {
       "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Roiling Dragonstorm": {
+      "identity": "U",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -13884,6 +17712,30 @@
         "vintage": "legal"
       }
     },
+    "Rubblebelt Maverick": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Rugged Prairie": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Ruinous Intrusion": {
       "identity": "G",
       "legalities": {
@@ -13893,6 +17745,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Ruinous Waterbending": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -13956,6 +17820,30 @@
         "vintage": "legal"
       }
     },
+    "Saheeli, Consul of Oversight": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Saheeli, Jewel of Avishkar": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Saheeli, Sublime Artificer": {
       "identity": "UR",
       "legalities": {
@@ -13965,6 +17853,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Samurai's Katana": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -14136,6 +18036,18 @@
         "vintage": "legal"
       }
     },
+    "Scalding Viper": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Scale Up": {
       "identity": "G",
       "legalities": {
@@ -14145,6 +18057,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Scales of Shale": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -14184,6 +18108,18 @@
         "vintage": "legal"
       }
     },
+    "Scorched Geyser": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Scorching Shot": {
       "identity": "R",
       "legalities": {
@@ -14217,6 +18153,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "banned",
+        "vintage": "legal"
+      }
+    },
+    "Screeching Soulbreaker": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -14424,6 +18372,18 @@
         "vintage": "legal"
       }
     },
+    "Sephiroth, Fabled SOLDIER": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Serpent Specialist": {
       "identity": "G",
       "legalities": {
@@ -14484,6 +18444,18 @@
         "vintage": "legal"
       }
     },
+    "Shadowblood Ridge": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Shadowspear": {
       "identity": "",
       "legalities": {
@@ -14516,6 +18488,18 @@
         "modern": "not_legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Shambling Ghast": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -14628,6 +18612,18 @@
         "vintage": "legal"
       }
     },
+    "Shatterwing Pegasus": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "She-Hulk, Jade Defender": {
       "identity": "G",
       "legalities": {
@@ -14700,6 +18696,18 @@
         "vintage": "legal"
       }
     },
+    "Shiko, Paragon of the Way": {
+      "identity": "WUR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Shipwreck Marsh": {
       "identity": "UB",
       "legalities": {
@@ -14709,6 +18717,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Shivan Reef": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -14784,6 +18804,18 @@
         "vintage": "legal"
       }
     },
+    "Shrapnel Blast": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Shredder's Technique": {
       "identity": "B",
       "legalities": {
@@ -14817,6 +18849,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Silence the Echo": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -14892,6 +18936,18 @@
         "vintage": "legal"
       }
     },
+    "Sire of Seven Deaths": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Six": {
       "identity": "G",
       "legalities": {
@@ -14911,6 +18967,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Skilled Battlecarver": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -14948,6 +19016,18 @@
         "modern": "legal",
         "penny": "not_legal",
         "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Skycloud Expanse": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -15024,6 +19104,18 @@
         "vintage": "legal"
       }
     },
+    "Smoldering Marsh": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Smuggler's Copter": {
       "identity": "",
       "legalities": {
@@ -15072,6 +19164,18 @@
         "vintage": "legal"
       }
     },
+    "Snow-Covered Forest": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Snow-Covered Plains": {
       "identity": "W",
       "legalities": {
@@ -15096,6 +19200,30 @@
         "vintage": "legal"
       }
     },
+    "Sodden Verdure": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Sokenzan, Crucible of Defiance": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Sol Ring": {
       "identity": "",
       "legalities": {
@@ -15106,6 +19234,18 @@
         "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "restricted"
+      }
+    },
+    "Solarium Sentry": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
       }
     },
     "Soldevi Machinist": {
@@ -15156,6 +19296,18 @@
         "vintage": "legal"
       }
     },
+    "Something Worth Saving": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Song of Freyalise": {
       "identity": "G",
       "legalities": {
@@ -15201,6 +19353,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Soul-Scar Mage": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -15445,6 +19609,18 @@
       }
     },
     "Spiders-Man, Heroic Horde": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Spinewoods Armadillo": {
       "identity": "G",
       "legalities": {
         "commander": "legal",
@@ -15756,7 +19932,43 @@
         "vintage": "legal"
       }
     },
+    "Stingerback Terror": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Stingerquill Annex": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Stingerquill Charm": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Stingerquill Voxmancer": {
       "identity": "BR",
       "legalities": {
         "commander": "legal",
@@ -15816,6 +20028,18 @@
         "vintage": "legal"
       }
     },
+    "Stoic Sphinx": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Stomping Ground": {
       "identity": "RG",
       "legalities": {
@@ -15836,6 +20060,18 @@
         "modern": "legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Storm the Festival": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -15873,6 +20109,30 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "banned",
+        "vintage": "legal"
+      }
+    },
+    "Stormkeld Vanguard": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Stormwing Entity": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -15960,8 +20220,68 @@
         "vintage": "legal"
       }
     },
+    "Suki, Courageous Rescuer": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Sulfur Falls": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Sulfurous Springs": {
+      "identity": "BR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Summon: Bahamut": {
       "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Summon: Fenrir": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Sun-Blessed Peak": {
+      "identity": "WR",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -16080,6 +20400,18 @@
         "vintage": "legal"
       }
     },
+    "Sungrass Prairie": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Sunken Citadel": {
       "identity": "",
       "legalities": {
@@ -16092,6 +20424,18 @@
         "vintage": "legal"
       }
     },
+    "Sunken Hollow": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Sunken Ruins": {
       "identity": "UB",
       "legalities": {
@@ -16099,6 +20443,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Sunscorched Divide": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "legal"
@@ -16135,6 +20491,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Super Villain Lockup": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -16183,6 +20551,30 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Sureshot Sower": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Surgical Precision": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -16272,6 +20664,18 @@
         "vintage": "legal"
       }
     },
+    "Sygg, Wanderwine Wisdom": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Sylvan Caryatid": {
       "identity": "G",
       "legalities": {
@@ -16356,6 +20760,18 @@
         "vintage": "legal"
       }
     },
+    "Takenuma, Abandoned Mire": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Talisman of Conviction": {
       "identity": "WR",
       "legalities": {
@@ -16428,6 +20844,18 @@
         "vintage": "legal"
       }
     },
+    "Tam's Resistance": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Tamiyo's Safekeeping": {
       "identity": "G",
       "legalities": {
@@ -16485,6 +20913,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Tayam, Luminous Enigma": {
+      "identity": "WBG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -16584,6 +21024,30 @@
         "vintage": "legal"
       }
     },
+    "Temple of Triumph": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Temporary Lockdown": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Temur Battlecrier": {
       "identity": "URG",
       "legalities": {
@@ -16668,6 +21132,30 @@
         "vintage": "legal"
       }
     },
+    "Test of Talents": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Tethermage's Advantage": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Tetzin, Gnome Champion": {
       "identity": "WUR",
       "legalities": {
@@ -16677,6 +21165,30 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Teyo, Diamondblade Mage": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Teyo, Lightshield Expert": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -16725,6 +21237,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Thalia, the Survivor": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -16884,6 +21408,18 @@
         "vintage": "legal"
       }
     },
+    "The Legend of Kuruk": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "The Legend of Roku": {
       "identity": "R",
       "legalities": {
@@ -16929,6 +21465,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "The Mighty Thor, Jane Foster": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -17016,6 +21564,18 @@
         "vintage": "legal"
       }
     },
+    "The Soul Stone": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "The Swarmweaver": {
       "identity": "BG",
       "legalities": {
@@ -17064,6 +21624,18 @@
         "vintage": "legal"
       }
     },
+    "Theoretical Necromancer": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Theorist's Proxy": {
       "identity": "U",
       "legalities": {
@@ -17083,6 +21655,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Theorix Annex": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -17133,6 +21717,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "This Town Ain't Big Enough": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "banned",
         "vintage": "legal"
       }
     },
@@ -17400,6 +21996,18 @@
         "vintage": "legal"
       }
     },
+    "Tiger-Seal": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Time Sieve": {
       "identity": "UB",
       "legalities": {
@@ -17506,6 +22114,30 @@
         "pioneer": "not_legal",
         "standard": "not_legal",
         "vintage": "restricted"
+      }
+    },
+    "Tinybones Joins Up": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Tinybones, the Pickpocket": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
       }
     },
     "Tireless Tracker": {
@@ -17724,6 +22356,18 @@
         "vintage": "legal"
       }
     },
+    "Transformative Commons": {
+      "identity": "UG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Transmogrant's Crown": {
       "identity": "B",
       "legalities": {
@@ -17779,6 +22423,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Traxos, Academy Guardian": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -17916,6 +22572,18 @@
         "vintage": "legal"
       }
     },
+    "Turn // Burn": {
+      "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Turn Inside Out": {
       "identity": "R",
       "legalities": {
@@ -17952,6 +22620,18 @@
         "vintage": "legal"
       }
     },
+    "Twilight Mire": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Twinflame Travelers": {
       "identity": "UR",
       "legalities": {
@@ -17978,6 +22658,18 @@
     },
     "Twinned Vision": {
       "identity": "UR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Twisted Fates": {
+      "identity": "WB",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -18132,6 +22824,18 @@
         "vintage": "legal"
       }
     },
+    "Underground River": {
+      "identity": "UB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Underground Sea": {
       "identity": "UB",
       "legalities": {
@@ -18180,6 +22884,18 @@
         "vintage": "legal"
       }
     },
+    "Undulating Witness": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Unearth": {
       "identity": "B",
       "legalities": {
@@ -18201,6 +22917,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Unflinching Hortimancer": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -18228,6 +22956,18 @@
         "vintage": "legal"
       }
     },
+    "Unidentified Hovership": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "United Battlefront": {
       "identity": "W",
       "legalities": {
@@ -18237,6 +22977,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Unlicensed Hearse": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -18254,6 +23006,18 @@
     },
     "Unstoppable Slasher": {
       "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Unsummon": {
+      "identity": "U",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -18285,6 +23049,18 @@
         "penny": "legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Urban Retreat": {
+      "identity": "WUG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -18444,6 +23220,18 @@
         "vintage": "legal"
       }
     },
+    "Valorous Stance": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Vampire Hexmage": {
       "identity": "B",
       "legalities": {
@@ -18477,6 +23265,30 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Vanishing Verse": {
+      "identity": "WB",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Vastlands Scavenger": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -18540,6 +23352,18 @@
         "vintage": "legal"
       }
     },
+    "Vernal Fen": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
     "Vesuva": {
       "identity": "",
       "legalities": {
@@ -18561,6 +23385,18 @@
         "penny": "not_legal",
         "pioneer": "not_legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Viashino Pyromancer": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -18590,6 +23426,30 @@
     },
     "Vicious Rivalry": {
       "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Vigorbloom Annex": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Vigorbloom Charm": {
+      "identity": "WG",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -18636,6 +23496,18 @@
         "vintage": "legal"
       }
     },
+    "Vinelasher Adept": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Violent Urge": {
       "identity": "R",
       "legalities": {
@@ -18645,6 +23517,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Viridescent Bog": {
+      "identity": "BG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "not_legal",
+        "penny": "not_legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -18660,8 +23544,32 @@
         "vintage": "legal"
       }
     },
+    "Virulent Emissary": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Visage of Dread": {
       "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Vision of Love": {
+      "identity": "R",
       "legalities": {
         "commander": "legal",
         "legacy": "legal",
@@ -18693,6 +23601,18 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "banned",
+        "vintage": "legal"
+      }
+    },
+    "Vivien Reid": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -19020,6 +23940,18 @@
         "vintage": "legal"
       }
     },
+    "Weapons Manufacturing": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Welding Jar": {
       "identity": "",
       "legalities": {
@@ -19116,6 +24048,18 @@
         "vintage": "legal"
       }
     },
+    "Wind-Scarred Crag": {
+      "identity": "WR",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Windbrisk Heights": {
       "identity": "W",
       "legalities": {
@@ -19164,6 +24108,18 @@
         "vintage": "legal"
       }
     },
+    "Winter, Team Player": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Winternight Stories": {
       "identity": "U",
       "legalities": {
@@ -19208,6 +24164,18 @@
         "modern": "legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Witch's Oven": {
+      "identity": "",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -19293,6 +24261,18 @@
         "penny": "legal",
         "pioneer": "legal",
         "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Wooded Bastion": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "not_legal",
+        "standard": "not_legal",
         "vintage": "legal"
       }
     },
@@ -19392,6 +24372,18 @@
         "vintage": "legal"
       }
     },
+    "Wrath of the Bloodmane": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Wrecking Ball Arm": {
       "identity": "",
       "legalities": {
@@ -19404,6 +24396,18 @@
         "vintage": "legal"
       }
     },
+    "Wrecking Gecko": {
+      "identity": "G",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Wrenn and Six": {
       "identity": "RG",
       "legalities": {
@@ -19412,6 +24416,18 @@
         "modern": "legal",
         "penny": "not_legal",
         "pioneer": "not_legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Wrenn's Resolve": {
+      "identity": "R",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
+        "pioneer": "legal",
         "standard": "not_legal",
         "vintage": "legal"
       }
@@ -19449,6 +24465,30 @@
         "penny": "not_legal",
         "pioneer": "legal",
         "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Yargle, Glutton of Urborg": {
+      "identity": "B",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Yargle, Goliath of Otaria": {
+      "identity": "U",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
         "vintage": "legal"
       }
     },
@@ -19512,6 +24552,30 @@
         "vintage": "legal"
       }
     },
+    "Yorion, Sky Nomad": {
+      "identity": "WU",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "banned",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "not_legal",
+        "vintage": "legal"
+      }
+    },
+    "Your Fate Ends Here": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Youthful Valkyrie": {
       "identity": "W",
       "legalities": {
@@ -19524,6 +24588,18 @@
         "vintage": "legal"
       }
     },
+    "Yuna, Hope of Spira": {
+      "identity": "WG",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
     "Yuriko, Hope from the Shadows": {
       "identity": "U",
       "legalities": {
@@ -19531,6 +24607,18 @@
         "legacy": "legal",
         "modern": "legal",
         "penny": "legal",
+        "pioneer": "legal",
+        "standard": "legal",
+        "vintage": "legal"
+      }
+    },
+    "Zack Fair": {
+      "identity": "W",
+      "legalities": {
+        "commander": "legal",
+        "legacy": "legal",
+        "modern": "legal",
+        "penny": "not_legal",
         "pioneer": "legal",
         "standard": "legal",
         "vintage": "legal"
@@ -19609,5 +24697,5 @@
       }
     }
   },
-  "updated": "2026-10-18T21:02:00.694+00:00"
+  "updated": "2026-10-23T09:02:01.173+00:00"
 }

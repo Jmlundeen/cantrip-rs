@@ -197,7 +197,7 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
 
         // Down the wheel, until the last card by name is in view.
         CardState? last = null;
-        for (int turn = 0; turn < 80 && last is null; turn++)
+        for (int turn = 0; turn < 200 && last is null; turn++)
         {
             await page.Page.Mouse.MoveAsync(first.X, first.Y);
             await page.Page.Mouse.WheelAsync(0, 2000);
