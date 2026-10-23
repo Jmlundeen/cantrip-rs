@@ -1,0 +1,62 @@
+# Collective Brutality's "Target opponent loses 2 life and you gain 2 life" with its opponent no longer a legal target
+# (CR 608.2b): Bot1 escalates, giving its own Llanowar Elves -2/-2 and draining Bot2, and Bot2 gains protection from
+# everything with Teferi's Protection in response. The -2/-2 mode keeps the spell resolving and the Elves dies; Bot2 loses
+# nothing, but the gain does not use the target, so Bot1 still gains 2 life (the ruling on escalate's modes: the rest of
+# the mode's instructions still happen).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Swamp
+Llanowar Elves
+Collective Brutality
+Demonic Tutor
+Swamp x10
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Teferi's Protection
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(2; 3)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Bot2)
+Bot1.Choose(Demonic Tutor)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Teferi's Protection.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves = (absent)
+Exile = Teferi's Protection
+Bot1.Life = 22
+Bot2.Life = 20

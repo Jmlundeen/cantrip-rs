@@ -1,0 +1,64 @@
+# Return the Favor with both modes, its copy mode's target gone (CR 608.2b): Bot2 casts two Lightning Bolts at Bot1. Bot1
+# answers with Return the Favor for {R}{R}{1}{1} (Black Lotus and Mox Ruby), copying the first Bolt and changing the target
+# of the second, then, holding priority, Counterspells the first Bolt (Island and Mox Sapphire). The change mode's target
+# is still legal, so Return the Favor resolves: the copy mode, its target illegal, copies nothing (a spell that has left
+# the stack would otherwise be copied as it last was), and the second Bolt is turned to Bot2, the only other legal target.
+# Bot2 takes 3; Bot1 none.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Return the Favor
+Counterspell
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target; Change the target)
+Bot1.Target(Stack.Lightning Bolt#2)
+Bot1.Target(Stack.Lightning Bolt#1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Counterspell.Cast(Stack.Lightning Bolt#2)
+? Stack.Count = 4
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot1.Graveyard = Return the Favor; Counterspell; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Stack.Count = 0

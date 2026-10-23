@@ -18,6 +18,9 @@ fn instant_sorcery_or_ability(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// "Copy target instant spell, sorcery spell, activated ability, or triggered ability. You may choose new targets for the
 /// copy." (CR 707.10, 707.10c) A spell's copy is not cast; an ability's is neither activated nor triggered.
 fn copy_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if !g.target_legal(item, 0) {
+        return Ok(());
+    }
     match item.target(0) {
         Target::Object(spell) => {
             g.copy_spell(spell, item.controller, true)?;

@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.
 /// Asked even when nothing in the hand is eligible: looking at the hand is part of the spell.
 fn strip(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(opponent) = item.target(0).player() else { return Ok(()) };
+    let Some(opponent) = targets::player(g, item, 0) else { return Ok(()) };
     hand::discard_chosen_from_revealed_hand(g, item, opponent, Purpose::Discard, |q, c| {
         let chars = q.chars(c);
         chars.is(CardType::Instant) || chars.is(CardType::Sorcery)
@@ -16,7 +16,7 @@ fn strip(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Target opponent loses 2 life and you gain 2 life.
 fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(opponent) = item.target(0).player() {
+    if let Some(opponent) = targets::player(g, item, 0) {
         g.lose_life(opponent, 2);
     }
     g.gain_life(item.controller, 2);

@@ -134,7 +134,10 @@ pub(crate) fn spliced(state: &GameState, item: &StackItem) -> Vec<CardId> {
 }
 
 /// Runs the chosen modes of a modal item in printed order (CR 700.2d), each as if it were a spell of its own with
-/// its own targets in slot 0 onward; a mode whose every target has become illegal does nothing (CR 608.2b).
+/// its own targets in slot 0 onward. A mode whose targets have all become illegal is still carried out, as long as the
+/// item resolves for another mode's legal target: only the parts of it that would act on an illegal target are not
+/// done, and its other instructions are (CR 608.2b; the rulings on the Commands and on escalate), so each mode's effect
+/// checks its own targets (`targets::object`, `Game::target_legal`).
 pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), Suspend> {
     let mut next = 0usize;
     let mut spec_at = 0usize;
@@ -152,9 +155,6 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
             cx.st().set_item_targets(&mut sub, &targets, &of, &shares);
             spec_at = ends;
             next += n;
-            if targets.iter().any(|&t| t != Target::None) && (0..n).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &sub, slot)) {
-                continue;
-            }
             // Each mode's instructions follow the last mode's (CR 608.2c), which the state triggers have seen done.
             cx.judge_if_due();
             (mode.effect)(cx, &sub)?;
