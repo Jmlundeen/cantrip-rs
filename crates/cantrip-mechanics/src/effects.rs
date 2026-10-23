@@ -753,6 +753,16 @@ pub fn exile_each_opponents_graveyard(g: &mut dyn Game, controller: PlayerId) {
     g.exile_all(&cards);
 }
 
+/// "Exile target player's graveyard" (CR 406.2, 701.13): every card in the graveyard of the ability's first target player in
+/// one move; nothing if that player is no longer a legal target (CR 608.2b). Kutzil's Flanker and Tormod's Crypt print it.
+pub fn exile_first_target_players_graveyard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(player) = crate::targets::player(g, item, 0) {
+        let cards = g.state().zone(Zone::graveyard(player)).to_vec();
+        g.exile_all(&cards);
+    }
+    Ok(())
+}
+
 /// "Exile all creatures" (CR 406.2, 608.2f): every creature on the battlefield, whoever controls it, in one move, tokens too.
 /// How many were exiled (CR 608.2c: the moves made, those a replacement sent elsewhere included), for "X is the number of
 /// creatures exiled this way". Sunfall and Overwrite the Multiverse print it.

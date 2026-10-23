@@ -29,22 +29,10 @@ fn life_and_scry(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     scry(g, item.controller, item.object, 2)
 }
 
-/// Mode 3: "Exile target player's graveyard." Every card in it at once (CR 701.13); nothing if the target player is no
-/// longer a legal target (CR 608.2b).
-fn exile_graveyard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if g.target_legal(item, 0)
-        && let Target::Player(player) = item.target(0)
-    {
-        let cards = g.state().zone(Zone::graveyard(player)).to_vec();
-        g.exile_all(&cards);
-    }
-    Ok(())
-}
-
 static MODAL: ModalDef = modes(&[
     mode(counters, "Put a +1/+1 counter on this creature for each creature that left the battlefield under your control this turn."),
     mode(life_and_scry, "You gain 2 life and scry 2."),
-    mode(exile_graveyard, "Exile target player's graveyard.").targets(&[targets::PLAYER]),
+    mode(effects::exile_first_target_players_graveyard, "Exile target player's graveyard.").targets(&[targets::PLAYER]),
 ]);
 
 pub static CARD: CardDef = CardDef {
