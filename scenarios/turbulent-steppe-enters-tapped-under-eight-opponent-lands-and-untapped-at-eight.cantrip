@@ -1,0 +1,36 @@
+# Turbulent Steppe: "This land enters tapped unless your opponents control eight or more lands." On turn 15 Bot2 has
+# seven lands, so Bot1's Turbulent Steppe enters tapped - the seven lands Bot1 itself controls are not the ones counted. On turn
+# 16, with Bot1's eight lands out, Bot2's own Turbulent Steppe enters untapped (positive control).
+
+[Bot1 Deck]
+Mountain x7
+Turbulent Steppe
+Mountain x12
+
+[Bot2 Deck]
+Plains x7
+Turbulent Steppe
+Plains x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Turbulent Steppe.Play
+Bot2.Hand.Turbulent Steppe.Play
+
+[Expect]
+Turn = 16
+Bot1.Battlefield.Turbulent Steppe.Tapped = true
+Bot2.Battlefield.Turbulent Steppe.Tapped = false
