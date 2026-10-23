@@ -1,0 +1,55 @@
+# The 4-power limit and "you control": Frenzied Baloth (3/2, one under the limit) entering under Kiora draws nothing, and
+# neither does Bot2's Questing Beast (power 4 but not Bot1's). Then Kiora's -1 on turn 3 untaps an opponent's permanent:
+# Bot2's Mox Emerald, tapped for mana on turn 2. Hand: 7 - Lotus, two Moxen, Kiora, Baloth = 2, unchanged by the draws.
+# Controls: kiora-behemoth-beckoner-draws-for-a-creature-with-power-four-and-minus-one-untaps-a-permanent.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Kiora, Behemoth Beckoner
+Frenzied Baloth
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Questing Beast
+Forest x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Kiora, Behemoth Beckoner.Cast
+Bot1.Pass
+Bot1.Hand.Frenzied Baloth.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Questing Beast.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Hand.Count = 2
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Kiora, Behemoth Beckoner.Activate(Ability: Untap target permanent; Target: Bot2.Battlefield.Mox Emerald)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Kiora, Behemoth Beckoner.Counters.Loyalty = 6

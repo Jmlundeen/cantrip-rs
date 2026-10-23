@@ -1,0 +1,47 @@
+# Kiora (7 loyalty) draws when a creature YOU control with power exactly 4 enters: Questing Beast (4/4) is cast after her.
+# Hand: 7 - Lotus, four Moxen, Kiora, Beast = 0, +1 draw. Then -1 untaps target permanent: a tapped Mox Emerald (loyalty 7 - 1 = 6).
+# Contrast: kiora-behemoth-beckoner-draws-nothing-for-power-three-or-an-opponents-creature.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Kiora, Behemoth Beckoner
+Questing Beast
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Kiora, Behemoth Beckoner.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Questing Beast.Cast
+Bot1.Pass
+? Bot1.Battlefield.Mox Emerald#1.Tapped = true
+Bot1.Battlefield.Kiora, Behemoth Beckoner.Activate(Ability: Untap target permanent; Target: Bot1.Battlefield.Mox Emerald#1)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Kiora, Behemoth Beckoner.Counters.Loyalty = 6
+Bot1.Battlefield.Mox Emerald#1.Tapped = false
+Bot1.Battlefield.Mox Emerald#2.Tapped = true
