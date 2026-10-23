@@ -1,0 +1,41 @@
+# "If you cast it": Yathan put onto the battlefield from the graveyard with Reanimate (Entomb put it there) was not cast,
+# so its trigger never happens (CR 603.4): nothing is milled and nothing returned, with Hired Blade sitting in the
+# library as the card that would have been milled. Bot1 pays 4 life for Reanimate (Yathan's mana value). The positive
+# control, cast, is yathan-roadwatcher-mills-four-then-returns-a-three-drop-of-yours-only.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Entomb
+Reanimate
+Swamp
+Swamp
+Swamp
+Yathan Roadwatcher
+Hired Blade
+Hired Blade
+Hired Blade
+Hired Blade
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Yathan Roadwatcher)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Yathan Roadwatcher)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Yathan Roadwatcher
+Bot1.Graveyard = Reanimate; Entomb
+Bot1.Library.Count = 15
+Stack.Count = 0

@@ -1,0 +1,8 @@
+{
+  "name": "Yathan Roadwatcher",
+  "manaCost": "{1}{W}{B}{G}",
+  "type": "Creature — Human Scout",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, if you cast it, mill four cards. When you do, return target creature card with mana value 3 or less from your graveyard to the battlefield."
+}

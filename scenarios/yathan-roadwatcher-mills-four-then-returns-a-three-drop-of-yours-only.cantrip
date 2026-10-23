@@ -1,0 +1,65 @@
+# Cast with exactly {1}{W}{B}{G} from four Moxen, Yathan mills four (CR 701.17) and then its reflexive trigger
+# (CR 603.12) targets among the cards just milled: Hired Blade (mana value 3, exactly the limit) is accepted; Bog Wraith
+# (mana value 4), a milled Island, and a creature in the opponent's graveyard (Bot2 entombed a Misshapen Fiend) are
+# refused while the milled Misshapen Fiend (mana value 2) is a legal target. The Blade enters under Bot1's control.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Yathan Roadwatcher
+Island
+Island
+Island
+Hired Blade
+Bog Wraith
+Island
+Misshapen Fiend
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Entomb
+Island
+Island
+Island
+Island
+Island
+Island
+Misshapen Fiend
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Hand.Entomb.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Search(Misshapen Fiend)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Yathan Roadwatcher.Cast
+? Bot1.Mana = 
+Bot1.Pass
+! Bot1.Target(Bot2.Graveyard.Misshapen Fiend)
+! Bot1.Target(Graveyard.Bog Wraith)
+! Bot1.Target(Graveyard.Island)
+Bot1.Target(Graveyard.Hired Blade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hired Blade.Tapped = false
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard.Count = 3
+Bot1.Graveyard.Bog Wraith.Power = 3
+Bot2.Graveyard = Entomb; Misshapen Fiend

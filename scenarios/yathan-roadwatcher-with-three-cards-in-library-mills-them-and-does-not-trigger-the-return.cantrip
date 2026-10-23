@@ -1,0 +1,40 @@
+# "Mill four cards. When you do, ..." triggers only if four cards were milled (CR 603.12): with a library of three
+# cards, Hired Blade (a legal target) among them, Bot1 mills all three (CR 701.17b) and the reflexive ability never
+# goes on the stack, so the Blade stays in the graveyard (ruling for the same template, Wick's Patrol, 2024-07-26).
+# Positive control: yathan-roadwatcher-mills-four-then-returns-a-three-drop-of-yours-only.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Yathan Roadwatcher
+Island
+Island
+Hired Blade
+Island
+Island
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Yathan Roadwatcher.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 0
+Bot1.Graveyard.Count = 3
+Bot1.Graveyard.Hired Blade.Power = 3
+Bot1.Battlefield.Count = 5
+Stack.Count = 0
