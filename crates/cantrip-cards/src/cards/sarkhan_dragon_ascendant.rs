@@ -21,9 +21,8 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let sarkhan = item.object;
     g.add_counters(sarkhan, CounterKind::PlusOne, 1);
     g.end_sentence();
-    let dragon = g.words(sarkhan).subtype(Subtype::Dragon);
     instruction(g, |g| {
-        g.add_effect(sarkhan, sarkhan, EffectKind::AddSubtype(dragon), Duration::EndOfTurn);
+        effects::becomes_subtype_until_end_of_turn(g, sarkhan, sarkhan, Subtype::Dragon);
         effects::gain_until_end_of_turn(g, sarkhan, sarkhan, Keyword::Flying);
     });
     Ok(())

@@ -708,6 +708,14 @@ pub fn this_gains_indestructible_then_tap(g: &mut dyn Game, item: &StackItem) ->
     Ok(())
 }
 
+/// "`target` becomes a [creature type] in addition to its other types until end of turn" (CR 205.1b, 611.2a, 613.1d): a layer 4
+/// effect from `source` that adds the subtype, read through the words of the source's text (CR 612) so a text-changing effect
+/// changes it. Sarkhan, Dragon Ascendant and Enter the Avatar State print it.
+pub fn becomes_subtype_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId, subtype: Subtype) {
+    let subtype = g.words(source).subtype(subtype);
+    g.add_effect(source, target, EffectKind::AddSubtype(subtype), Duration::EndOfTurn);
+}
+
 /// "`target` gains [a keyword] until end of turn" (CR 611.2a): a layer 6 keyword for the rest of the turn, from the effect's
 /// source. Creeping Tar Pit, Immolation Shaman and Kappa Cannoneer print it inside a longer instruction ("can't be blocked
 /// this turn", "gains menace"); the `this_gains_*` below are the abilities that only give it.
