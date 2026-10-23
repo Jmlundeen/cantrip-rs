@@ -20,6 +20,7 @@ pub mod copy;
 pub mod channel;
 pub mod class;
 pub mod choose;
+pub mod casualty;
 pub mod cipher;
 pub mod chosen_type;
 pub mod hand;
