@@ -1,0 +1,23 @@
+# Clearwater Pathway is a modal double-faced card (CR 712.3) whose faces are both lands: one copy is played as its front
+# face (taps for {U}, not {B}), the other as its back face Murkwater Pathway (taps for {B}, not {U}); neither enters
+# tapped. The pool is checked right after each activation; an exact pool pins each face's colour.
+
+[Bot1 Deck]
+Clearwater Pathway
+Clearwater Pathway
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Clearwater Pathway.Play(Ability: #1)
+Bot1.Battlefield.Clearwater Pathway.Activate
+? Bot1.Mana = {U}
+[T3 Bot1.Main1]
+Bot1.Hand.Clearwater Pathway.Play(Ability: back face)
+Bot1.Battlefield.Murkwater Pathway.Activate
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield = Clearwater Pathway; Murkwater Pathway

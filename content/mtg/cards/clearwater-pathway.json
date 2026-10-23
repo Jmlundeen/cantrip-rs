@@ -1,0 +1,11 @@
+{
+  "name": "Clearwater Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {U}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Murkwater Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {B}."
+  }
+}
