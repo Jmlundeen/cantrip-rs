@@ -1,0 +1,56 @@
+# Browser
+# Guardian of New Benalia (cast on turn 3) attacks on turn 7 beside Campus Crier (3/1, cast on turn 5, so it has been under Bot1's
+# control since the turn began). The page asks about the enlist (CR 702.154a, 508.1g) with a caption that says what tapping a
+# creature does; Bot1 taps Crier, Guardian gets +3/+0 (the enlisted creature's power, not its toughness 1) and deals 2 + 3,
+# and the linked "whenever this creature enlists a creature, scry 2" (CR 702.154c) shows exactly two cards: the Bolt goes to
+# the bottom and the Lotus stays on top. On turn 9 Bot1 attacks again and declines: the +3/+0 ended with turn 7 (Guardian is a
+# 2/2 again), Crier stays untapped, nobody scries, and Bot2 takes only 2.
+
+[Bot1 Deck]
+Plains x5
+Campus Crier
+Guardian of New Benalia
+Plains x3
+Lightning Bolt
+Black Lotus
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Guardian of New Benalia.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Campus Crier.Cast
+[T7 Bot1.Main1]
+Bot1.Attack(Guardian of New Benalia > Bot2)
+? Client.Bot1.Prompt.Title = Guardian of New Benalia has enlist: you may tap a creature you control that isn't attacking, and Guardian of New Benalia gets +X/+0 until end of turn, X its power
+? Client.Bot1.Prompt.Detail = None tapped: Guardian of New Benalia attacks without enlisting  ·  click them on the battlefield
+Bot1.Choose(Campus Crier)
+? Client.Bot1.Confirm = Enlist it
+Bot1.Arrange(Black Lotus | Lightning Bolt)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Guardian of New Benalia.Power = 5
+? Bot1.Battlefield.Campus Crier.Tapped = true
+? Bot2.Life = 15
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Guardian of New Benalia.Power = 2
+Bot1.Attack(Guardian of New Benalia > Bot2)
+? Client.Bot1.Prompt.Title = Guardian of New Benalia has enlist: you may tap a creature you control that isn't attacking, and Guardian of New Benalia gets +X/+0 until end of turn, X its power
+? Client.Bot1.Prompt.Detail = None tapped: Guardian of New Benalia attacks without enlisting  ·  click them on the battlefield
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Client.Bot1.Confirm = Don't enlist
+Bot1.Battlefield.Campus Crier.Tapped = false
+Bot1.Hand = Black Lotus; Plains; Plains; Plains; Plains; Plains
+Bot1.Library.Count = 11

@@ -1,0 +1,44 @@
+# Guardian of New Benalia attacks on turn 5 with Ornithopter (cast on turn 1) and Campus Crier (cast this turn, so it is
+# summoning sick) beside it. Enlist (CR 702.154a) takes a creature that has been under Bot1's control since the turn began: the
+# sick Crier is refused and Ornithopter is accepted. Ornithopter has power 0, so Guardian stays 2/2 and deals 2, but the
+# enlist was paid: Ornithopter is tapped and the "whenever this creature enlists a creature, scry 2" trigger scried two cards,
+# the Bolt and the Lotus, which go to the bottom.
+
+[Bot1 Deck]
+Plains x3
+Ornithopter
+Campus Crier
+Guardian of New Benalia
+Plains x3
+Lightning Bolt
+Black Lotus
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Guardian of New Benalia.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Campus Crier.Cast
+Bot1.Attack(Guardian of New Benalia > Bot2)
+! Bot1.Choose(Campus Crier)
+Bot1.Choose(Ornithopter)
+Bot1.Arrange( | Lightning Bolt; Black Lotus)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Guardian of New Benalia.Power = 2
+? Bot1.Battlefield.Ornithopter.Tapped = true
+? Bot1.Battlefield.Campus Crier.Tapped = false
+
+[Expect]
+Bot2.Life = 18
+Bot1.Library = Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Lightning Bolt; Black Lotus

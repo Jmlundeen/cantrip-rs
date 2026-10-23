@@ -1,0 +1,43 @@
+# Guardian of New Benalia (2/2) is the target of Bot2's Lightning Bolt on turn 4. In response Bot1 discards Campus Crier:
+# Guardian gains indestructible until end of turn and taps (the order of the text, CR 702.12b: lethal damage does not destroy
+# it). It stays on the battlefield with 3 damage marked. On turn 5 the damage is gone, the indestructible with it ("until end of
+# turn", cleanup CR 514.2), and it has untapped.
+
+[Bot1 Deck]
+Plains x3
+Campus Crier
+Guardian of New Benalia
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Mountain x2
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Guardian of New Benalia.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Guardian of New Benalia)
+Bot1.Battlefield.Guardian of New Benalia.Activate
+Bot1.Choose(Campus Crier)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Guardian of New Benalia.Keywords = Indestructible
+? Bot1.Battlefield.Guardian of New Benalia.Tapped = true
+? Bot1.Battlefield.Guardian of New Benalia.Damage = 3
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Guardian of New Benalia.Keywords = (absent)
+Bot1.Battlefield.Guardian of New Benalia.Damage = 0
+Bot1.Battlefield.Guardian of New Benalia.Tapped = false
