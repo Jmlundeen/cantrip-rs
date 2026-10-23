@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::gain_indestructible_until_end_of_turn;
+use cantrip_mechanics::effects::{self, gain_indestructible_until_end_of_turn};
 use cantrip_mechanics::{damage_target, targets};
 use cantrip_oracle as oracle;
 
@@ -24,7 +24,7 @@ fn indestructible(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Target creature gains double strike until end of turn": nothing if the target is no longer legal (CR 608.2b).
 fn double_strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::DoubleStrike);
     }
     Ok(())
 }

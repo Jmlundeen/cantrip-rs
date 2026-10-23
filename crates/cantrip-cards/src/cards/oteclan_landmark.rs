@@ -12,7 +12,7 @@ fn attacking_without_flying(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// "... gains flying until end of turn."
 fn gains_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::Flying);
     }
     Ok(())
 }

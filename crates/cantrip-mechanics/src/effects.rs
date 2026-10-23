@@ -651,13 +651,13 @@ pub fn damage_that_player(g: &mut dyn Game, item: &StackItem, n: u16) -> Result<
 /// "`target` gains hexproof until end of turn" (CR 702.11b, 611.2a): a layer 6 keyword for the rest of the turn, from the
 /// effect's source. Liliana the Faultless, Octopus Form, Shore Up and Snakeskin Veil print it.
 pub fn gain_hexproof_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId) {
-    g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof])), Duration::EndOfTurn);
+    gain_until_end_of_turn(g, source, target, Keyword::Hexproof);
 }
 
 /// "`target` gains lifelink until end of turn" (CR 702.15, 611.2a): a layer 6 keyword for the rest of the turn, from the
 /// effect's source. Gix's Command, Archenemy's Charm, Hardened Academic and Obsessive Pursuit print it.
 pub fn gain_lifelink_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId) {
-    g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Lifelink])), Duration::EndOfTurn);
+    gain_until_end_of_turn(g, source, target, Keyword::Lifelink);
 }
 
 /// "It gains haste" with no duration (CR 611.2a, 613.1f): a layer 6 keyword for as long as the object stays the object it is
@@ -671,7 +671,7 @@ pub fn gain_haste(g: &mut dyn Game, source: ObjectId, object: ObjectId) {
 /// effect's source. Arwen, Mortal Queen, Cecil, Dark Knight, Crumb and Get It, Divine Resilience, Iron Shield Elf, Revitalizing Repast, Ursine
 /// Monstrosity and Boros Charm print it.
 pub fn gain_indestructible_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId) {
-    g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+    gain_until_end_of_turn(g, source, target, Keyword::Indestructible);
 }
 
 /// "This creature gains indestructible until end of turn. Tap it." (CR 702.12b, 611.2a, 701.26a): if the ability's source is
@@ -685,6 +685,37 @@ pub fn this_gains_indestructible_then_tap(g: &mut dyn Game, item: &StackItem) ->
         g.tap(creature);
     }
     Ok(())
+}
+
+/// "`target` gains [a keyword] until end of turn" (CR 611.2a): a layer 6 keyword for the rest of the turn, from the effect's
+/// source. Creeping Tar Pit, Immolation Shaman and Kappa Cannoneer print it inside a longer instruction ("can't be blocked
+/// this turn", "gains menace"); the `this_gains_*` below are the abilities that only give it.
+pub fn gain_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId, keyword: Keyword) {
+    g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[keyword])), Duration::EndOfTurn);
+}
+
+/// "This creature gains [a keyword] until end of turn" (CR 611.2a): the ability's source gains the keyword for the rest of
+/// the turn; an effect on a source that is no longer the object it was does nothing (CR 400.7). Afterthought Sentry, Psychic Frog and Spectacular Spider-Man
+/// ("flying"), Fleeting Spirit ("first strike") and Poison Dart Frog ("deathtouch") print it; the named wrappers below are
+/// the fn pointers an ability's effect takes.
+pub fn this_gains_until_end_of_turn(g: &mut dyn Game, item: &StackItem, keyword: Keyword) -> Result<(), Suspend> {
+    gain_until_end_of_turn(g, item.object, item.object, keyword);
+    Ok(())
+}
+
+/// "This creature gains flying until end of turn" (CR 702.9b): `this_gains_until_end_of_turn` for flying.
+pub fn this_gains_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    this_gains_until_end_of_turn(g, item, Keyword::Flying)
+}
+
+/// "This creature gains first strike until end of turn" (CR 702.7a): `this_gains_until_end_of_turn` for first strike.
+pub fn this_gains_first_strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    this_gains_until_end_of_turn(g, item, Keyword::FirstStrike)
+}
+
+/// "This creature gains deathtouch until end of turn" (CR 702.2b): `this_gains_until_end_of_turn` for deathtouch.
+pub fn this_gains_deathtouch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    this_gains_until_end_of_turn(g, item, Keyword::Deathtouch)
 }
 
 /// "`target` gains hexproof and indestructible until end of turn" (CR 702.11b, 702.12b, 611.2a): both keywords from one

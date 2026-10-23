@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
@@ -7,12 +8,7 @@ use cantrip_oracle as oracle;
 /// planeswalker gets both counters.
 fn shield_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(permanent) = targets::object(g, item, 0) else { return Ok(()) };
-    g.add_effect(
-        item.object,
-        permanent,
-        EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof])),
-        Duration::EndOfTurn,
-    );
+    effects::gain_until_end_of_turn(g, item.object, permanent, Keyword::Hexproof);
     let chars = g.chars(permanent);
     if chars.is(CardType::Creature) {
         g.add_counters(permanent, CounterKind::PlusOne, 1);

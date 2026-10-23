@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn pump_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     instruction(g, |g| {
         for id in effects::pump_creatures_you_control(g, item, 1, 0) {
-            g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, id, Keyword::FirstStrike);
         }
     });
     Ok(())

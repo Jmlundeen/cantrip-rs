@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::{statics, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
@@ -36,12 +37,7 @@ fn activated_a_loyalty_ability(q: &dyn Query, asker: &Asker) -> bool {
 fn untap_and_unblockable(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         g.untap(creature);
-        g.add_effect(
-            item.object,
-            creature,
-            EffectKind::AddKeywords(Keywords::of(&[Keyword::CantBeBlocked])),
-            Duration::EndOfTurn,
-        );
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::CantBeBlocked);
     }
     Ok(())
 }

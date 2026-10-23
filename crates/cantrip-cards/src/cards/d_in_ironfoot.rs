@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::statics::plus_pt;
 use cantrip_mechanics::triggers::{THIS_ATTACKS, THIS_ENTERS};
@@ -47,7 +48,7 @@ fn double_strike_for_equipped(g: &mut dyn Game, item: &StackItem) -> Result<(), 
     let equipped: Vec<ObjectId> = attackers.into_iter().filter(|&creature| equipment.iter().any(|&e| g.attached_to(e) == Some(creature))).collect();
     instruction(g, |g| {
         for creature in equipped {
-            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, creature, Keyword::DoubleStrike);
         }
     });
     Ok(())

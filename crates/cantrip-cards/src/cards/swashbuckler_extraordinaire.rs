@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::tokens::{self, TREASURE};
 use cantrip_mechanics::{choose, targets, triggers};
 use cantrip_oracle as oracle;
@@ -29,7 +30,7 @@ fn double_strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = targets::legal_objects(g, item);
     instruction(g, |g| {
         for creature in creatures {
-            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, creature, Keyword::DoubleStrike);
         }
     });
     Ok(())

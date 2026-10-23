@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::triggers::{DRAGON_YOU_CONTROL_ENTERS, THIS_ENTERS};
 use cantrip_mechanics::{behold, tokens};
 use cantrip_oracle as oracle;
@@ -23,7 +24,7 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let dragon = g.words(sarkhan).subtype(Subtype::Dragon);
     instruction(g, |g| {
         g.add_effect(sarkhan, sarkhan, EffectKind::AddSubtype(dragon), Duration::EndOfTurn);
-        g.add_effect(sarkhan, sarkhan, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, sarkhan, sarkhan, Keyword::Flying);
     });
     Ok(())
 }

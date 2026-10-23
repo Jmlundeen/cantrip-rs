@@ -15,7 +15,7 @@ fn citizen(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn pump_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     instruction(g, |g| {
         for id in effects::pump_creatures_you_control(g, item, 2, 2) {
-            g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::Vigilance])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, id, Keyword::Vigilance);
         }
     });
     Ok(())

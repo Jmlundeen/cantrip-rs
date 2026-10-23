@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
 /// "Creatures you control gain first strike until end of turn. Draw a card." The creatures are those their controller
@@ -8,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     instruction(g, |g| {
         for id in creatures {
-            g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, id, Keyword::FirstStrike);
         }
     });
     g.end_sentence();

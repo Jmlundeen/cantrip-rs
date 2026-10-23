@@ -8,7 +8,7 @@ fn charge_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         instruction(g, |g| {
             g.add_effect(item.object, creature, EffectKind::Pump(2, 0), Duration::EndOfTurn);
-            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, creature, Keyword::FirstStrike);
         });
         g.end_sentence();
         g.add_counters(creature, CounterKind::PlusOne, 1);

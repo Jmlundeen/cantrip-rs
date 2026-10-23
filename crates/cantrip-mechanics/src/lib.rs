@@ -693,13 +693,13 @@ pub fn haste_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: Obj
     if !g.is_on_battlefield(creature) {
         return;
     }
-    g.add_effect(source, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
+    effects::gain_until_end_of_turn(g, source, creature, Keyword::Haste);
 }
 
 /// "[It] gains trample until end of turn" (CR 611.2, 702.19): a continuous effect from the resolving spell or ability's source.
 /// Ancestral Anger, Berserk and Fists of Flame print it.
 pub fn trample_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: ObjectId) {
-    g.add_effect(source, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+    effects::gain_until_end_of_turn(g, source, creature, Keyword::Trample);
 }
 
 /// "The number of artifacts you control": the artifacts `player` controls as it is read (a resolving spell's or ability's X is

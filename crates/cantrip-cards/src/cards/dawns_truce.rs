@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::gift;
 use cantrip_oracle as oracle;
 
@@ -11,7 +12,7 @@ fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     instruction(g, |g| {
         g.add_effect(item.object, item.object, EffectKind::PlayerHexproof, Duration::EndOfTurn);
         for permanent in permanents {
-            g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, permanent, Keyword::Hexproof);
         }
     });
     if item.gift.is_some() {
@@ -20,7 +21,7 @@ fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         let permanents = g.permanents_of(you);
         instruction(g, |g| {
             for permanent in permanents {
-                g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+                effects::gain_until_end_of_turn(g, item.object, permanent, Keyword::Indestructible);
             }
         });
     }

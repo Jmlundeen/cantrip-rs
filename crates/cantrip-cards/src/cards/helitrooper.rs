@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::attach::equip_targeting_this_costs_less;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::THIS_ATTACKS;
@@ -12,7 +13,7 @@ fn another_attacking_creature(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// "... gains flying until end of turn." A target no longer legal (no longer attacking) gains nothing (CR 608.2b).
 fn gains_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::Flying);
     }
     Ok(())
 }

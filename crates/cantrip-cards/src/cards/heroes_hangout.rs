@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::{library, targets};
 use cantrip_oracle as oracle;
 
@@ -17,7 +18,7 @@ fn patrol_night(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     instruction(g, |g| {
         for creature in creatures {
             g.add_effect(item.object, creature, EffectKind::Pump(1, 0), Duration::EndOfTurn);
-            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, creature, Keyword::FirstStrike);
         }
     });
     Ok(())

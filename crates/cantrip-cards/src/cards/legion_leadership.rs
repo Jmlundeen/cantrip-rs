@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::{double, mana, targets};
 use cantrip_oracle as oracle;
 
@@ -10,7 +11,7 @@ fn double(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         // "Double target creature's power and it gains first strike": one instruction (CR 608.2c).
         instruction(g, |g| {
             double::power(g, item.object, creature);
-            g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+            effects::gain_until_end_of_turn(g, item.object, creature, Keyword::FirstStrike);
         });
     }
     Ok(())

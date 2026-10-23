@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     instruction(g, |g| {
         pump(g, item.object, item.object, 3, 3);
-        g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, item.object, Keyword::Menace);
     });
     Ok(())
 }

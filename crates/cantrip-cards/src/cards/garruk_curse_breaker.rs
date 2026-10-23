@@ -23,7 +23,7 @@ fn attackers_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         for creature in creatures {
             if g.is_on_battlefield(creature) {
                 pump(g, item.object, creature, 2, 2);
-                g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+                effects::gain_until_end_of_turn(g, item.object, creature, Keyword::Trample);
             }
         }
     });

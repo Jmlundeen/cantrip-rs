@@ -26,7 +26,7 @@ fn create_ninja(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// both still happen.
 fn evade_and_loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::CantBeBlocked])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::CantBeBlocked);
     }
     effects::loot(g, item)
 }

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::ask_may;
+use cantrip_mechanics::effects::{self, ask_may};
 use cantrip_mechanics::{learn, targets};
 use cantrip_oracle as oracle;
 
@@ -13,7 +13,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_effect(item.object, creature, EffectKind::MustBlock, Duration::EndOfTurn);
     g.end_sentence();
     if ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Reach])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::Reach);
     }
     g.end_sentence();
     learn::learn(g, item)

@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::triggers::CREATURE_SPELL_YOU_CAST;
 use cantrip_mechanics::{targets, web_slinging};
 use cantrip_oracle as oracle;
@@ -8,7 +9,7 @@ use cantrip_oracle as oracle;
 fn seva(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         g.add_counters(creature, CounterKind::PlusOne, 1);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::Flying);
     }
     Ok(())
 }

@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::{delirium, targets};
 use cantrip_oracle as oracle;
 
@@ -9,12 +10,12 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     instruction(g, |g| {
         g.add_effect(item.object, creature, EffectKind::Pump(1, 0), Duration::EndOfTurn);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::FirstStrike);
     });
     // The delirium sentence is a second instruction (CR 608.2c), judged after the first.
     g.end_sentence();
     if delirium(g, item.controller) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])), Duration::EndOfTurn);
+        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::DoubleStrike);
     }
     Ok(())
 }
