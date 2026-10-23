@@ -196,7 +196,8 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    client changed, and the benchmark if the core did.
 10. **Review, then commit.** `review.md` - by someone who did not write it. Then `Card: <Name>` - the content JSON, the
    card file and its scenarios - one card per commit, ending `Closes #N`; core, mechanics and client changes in their
-   own commits before it (`Engine: ...`, `Mechanics: ...`, `Client: ...`), then `card-issues.py log <N> committed
+   own commits before it (`Engine: ...`, `Mechanics: ...`, `Client: ...`), each building on its own - the new card's file
+   goes in the Card commit, since `oracle::` has its constant only once the content JSON is there, then `card-issues.py log <N> committed
    --commit <sha>`. A card agent working for a coordinator does not push; otherwise commit and push as CLAUDE.md says, or open a pull request with the coverage report and the
    review in its description, saying `Closes #N`.
 
