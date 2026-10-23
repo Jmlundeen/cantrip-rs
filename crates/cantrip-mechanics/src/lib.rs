@@ -518,7 +518,7 @@ pub fn exile_all_until_leaves(g: &mut dyn Game, item: &StackItem, mut keep: impl
 }
 
 /// The resolution of "exile target ... until this leaves the battlefield" as a triggered ability's effect: exiles the
-/// slot 0 target (`exile_target_until_leaves`). It is not exiled at all if the source already left (CR 610.3c).
+/// slot 0 target (`exile_target_until_leaves`). It is not exiled at all if the source already left (CR 610.3b).
 /// Portable Hole and Seam Rip use it.
 pub fn exile_target_until_leaves_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     exile_target_until_leaves(g, item, 0);
