@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::{choose, select};
 use cantrip_mechanics::library::{Find, object_names, search_to_battlefield};
 use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
@@ -42,10 +43,17 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !effects::ask_may(g, you, item.object, Purpose::Ask(&EXILE_AND_SEARCH))? {
         return Ok(());
     }
-    // Exactly four of them. The player chooses which four when the graveyard holds more than four (CR 608.2c), but every one
-    // of them is a card with the same name and no other property, and nothing can look at what left afterwards, so the
-    // choice cannot be told apart: the first four are taken without a question.
-    let mut exiled: Vec<ObjectId> = named[..4].to_vec();
+    // The spell's resolving action exiles it and exactly four named cards; when more than four are available, its controller
+    // chooses which four (CR 608.2c).
+    let chosen = if named.len() == 4 {
+        named
+    } else {
+        let rule = Selection::new(select::exactly(4))
+            .with(select::named(g.card_id(&CARD)))
+            .called("cards");
+        choose::select(g, you, item.object, Purpose::Exile, named, rule)?
+    };
+    let mut exiled = chosen;
     exiled.push(item.object);
     let moved = g.exile_all(&exiled);
     // The spell is the last object moved; the search's source is the card it became in exile (CR 400.7).
