@@ -1,0 +1,26 @@
+# Contaminated Landscape: "{T}, Sacrifice this land: Search your library for a basic Plains, Island, or Swamp card, put
+# it onto the battlefield tapped, then shuffle." A Tundra has the Plains and Island types but is not basic (CR 205.4a),
+# so it is not a card the search may find; the Plains is, and enters tapped.
+
+[Bot1 Deck]
+Contaminated Landscape
+Forest x6
+Plains x2
+Tundra
+Swamp
+Island
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Contaminated Landscape.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Contaminated Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Tundra)
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Graveyard = Contaminated Landscape
+Bot1.Battlefield.Plains.Tapped = true
