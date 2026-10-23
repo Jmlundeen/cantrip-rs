@@ -197,6 +197,11 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    --commit <sha>`. A card agent working for a coordinator does not push; otherwise commit and push as CLAUDE.md says, or open a pull request with the coverage report and the
    review in its description, saying `Closes #N`.
 
+   **Before every call for review** - the first one, and again after each round of fixes - run your card's scenarios
+   on the commit as it stands (`cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`, plus
+   `--card` for each card whose file or shared mechanic you changed) and see them all pass. Run only those, never the
+   whole corpus. Put the result line (`N pass, 0 fail`) in your report; a report without it is not ready for review.
+
 ## Scenarios: what a card owes
 
 A scenario (`scenarios/<what-it-proves>.cantrip`; syntax in the `write-game-script` skill and `scenarios/README.md`) is
