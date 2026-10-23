@@ -668,6 +668,20 @@ pub fn you_cast_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Event) -> 
     }
 }
 
+/// "Whenever an opponent casts an instant or sorcery spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10a), by a
+/// player other than the ability's controller, read as it stands on the stack. The spell rides along as the trigger's subject.
+/// Arasta of the Endless Web and Wandering Archaic print it.
+pub fn opponent_casts_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. }
+            if *player != me.controller && (q.chars(*spell).is(CardType::Instant) || q.chars(*spell).is(CardType::Sorcery)) =>
+        {
+            Fired::about(Target::Object(*spell))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a spell from exile" (CR 601.2a, 603.2): the spell's controller is the ability's controller and the zone
 /// it was cast from, recorded on it, is exile. Appa, Steadfast Guardian and Quintorius Kand print it.
 pub fn you_cast_a_spell_from_exile(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
