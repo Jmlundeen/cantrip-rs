@@ -272,6 +272,11 @@ impl Query for Given<'_> {
     fn gift_assumed(&self) -> bool {
         self.gift
     }
+
+    /// As the game it wraps has it: a spell judged as announced has the X and kicker announced (`actions::Announcing`).
+    fn obj(&self, id: ObjectId) -> &Obj {
+        self.q.obj(id)
+    }
 }
 
 /// A read-only `Query` over a state, for checks made outside a frame's run.

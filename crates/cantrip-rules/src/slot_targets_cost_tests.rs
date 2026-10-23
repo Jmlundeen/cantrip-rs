@@ -1,7 +1,7 @@
-//! A spell or ability whose targets are chosen slot by slot (more than one) and whose cost reads them, over test cards: the
-//! total cost is determined once the targets are announced (CR 601.2c, 601.2f, 602.2b), so it may be begun if some legal
-//! choice of them could be paid for, and a choice that leaves the cost unpayable takes it back (CR 601.2h, 733.1).
-
+//! A spell or ability whose cost reads its targets, or what is announced before them, over test cards: the total cost is
+//! determined once the targets are announced (CR 601.2c, 601.2f, 602.2b), after its modes, X, kicker, gift and splices
+//! (CR 601.2b), so it may be begun if some legal announcement of all of them could be paid for, and one that leaves the
+//! cost unpayable takes it back (CR 601.2h, 733.1).
 use crate::actions::priority_options;
 use crate::{Cx, Game, Setup};
 use cantrip_api::*;
@@ -86,9 +86,216 @@ static ENGINE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn player(_: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Player(_))
+}
+
+/// An opponent's permanent, or any permanent once the spell was kicked (as Bloodchief's Thirst reads its kicker).
+fn theirs_unless_kicked(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.obj(id).zone.is(ZoneKind::Battlefield) && (q.obj(asker.source).kicked > 0 || q.obj(id).controller != asker.controller))
+}
+
+/// "This spell costs {4} less to cast if it has two or more targets."
+fn less_for_two(_: &dyn Query, _: ObjectId, _: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
+    if targets.iter().filter(|&&t| t != Target::None).count() >= 2 { CostDelta::less(4) } else { CostDelta::NONE }
+}
+
+/// "Choose one - Target player: you gain 3 life. / {2} - Target permanent: you gain 3 life." (the second a spree-like mode
+/// that costs {2} more).
+static CHOICE_MODES: ModalDef = modes(&[
+    mode(gain_three, "Target player: you gain 3 life.").targets(&[target(player)]),
+    mode(gain_three, "Target permanent: you gain 3 life.").targets(&[target(permanent)]).cost(ManaCost { generic: 2, ..ManaCost::ZERO }),
+]);
+
+/// {4} sorcery, modal: "This spell costs {3} less to cast if it targets a permanent you control."
+static CHOICE: CardDef = CardDef {
+    name: "Slot Test Choice",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: Some(SpellDef::MODAL),
+    modal: Some(&CHOICE_MODES),
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+static X_PERMANENTS: [TargetSpec; 1] = [target(permanent).counted()];
+
+/// {X}{3} sorcery: "This spell costs {3} less to cast if it targets a permanent you control. X target permanents: you gain 3
+/// life."
+static SWARM: CardDef = CardDef {
+    name: "Slot Test Swarm",
+    cost: ManaCost { generic: 3, x: 1, ..ManaCost::ZERO },
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&X_PERMANENTS, gain_three),
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+/// {4} sorcery, kicker {1}: "This spell costs {3} less to cast if it targets a permanent you control. Target permanent an
+/// opponent controls, or if this spell was kicked, any target permanent: you gain 3 life."
+static STRIKE: CardDef = CardDef {
+    name: "Slot Test Strike",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&[target(theirs_unless_kicked)], gain_three),
+    late_targets: true,
+    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, multi: false, waterbend: false }),
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+static ONE_OR_KICKED_TWO: [TargetSpec; 1] = [TargetSpec { if_kicked: Some((2, 2)), ..target(permanent) }];
+
+/// {4} sorcery, kicker {1}: "This spell costs {4} less to cast if it has two or more targets. Target permanent, or if this
+/// spell was kicked, two target permanents: you gain 3 life."
+static DOUBLE: CardDef = CardDef {
+    name: "Slot Test Double",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&ONE_OR_KICKED_TWO, gain_three),
+    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, multi: false, waterbend: false }),
+    own_cost_changes: &[less_for_two],
+    ..CardDef::BLANK
+};
+
+/// An opponent's permanent, or any permanent where the gift is promised (as `gift::promised` reads it).
+fn theirs_unless_promised(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.obj(id).zone.is(ZoneKind::Battlefield)
+        && (q.obj(asker.source).gift.is_some() || q.gift_assumed() || q.obj(id).controller != asker.controller))
+}
+
+fn give_nothing(_: &mut dyn cantrip_api::Game, _: PlayerId) -> Result<(), Suspend> {
+    Ok(())
+}
+
+/// {4} sorcery, gift a card: "This spell costs {3} less to cast if it targets a permanent you control. Target permanent an
+/// opponent controls, or if the gift was promised, any target permanent: you gain 3 life."
+static PROMISE: CardDef = CardDef {
+    name: "Slot Test Promise",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&[target(theirs_unless_promised)], gain_three),
+    gift: Some(GiftDef { kind: Gift::Card, give: give_nothing }),
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+static ONE_OR_TWO: [TargetSpec; 1] = [target(permanent).between(1, 2)];
+
+/// {4} sorcery: "This spell costs {3} less to cast if it targets a permanent you control. You gain 3 life, 2 divided as you
+/// choose among one or two target permanents."
+static SPLIT: CardDef = CardDef {
+    name: "Slot Test Split",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&ONE_OR_TWO, gain_three),
+    divide: Some(Divide { total: 2, of_x: None }),
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+/// {4} Arcane instant: "This spell costs {3} less to cast if it targets a permanent you control. You gain 3 life."
+static RITE: CardDef = CardDef {
+    name: "Slot Test Rite",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Instant]),
+    subtypes: SubtypeSet::of(&[Subtype::Arcane]),
+    spell: spell(&[], gain_three),
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+/// {4} instant: "Target permanent: you gain 3 life. Splice onto Arcane {1}."
+static GRAFT: CardDef = CardDef {
+    name: "Slot Test Graft",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[target(permanent)], gain_three),
+    splice: Some(ManaCost { generic: 1, ..ManaCost::ZERO }),
+    ..CardDef::BLANK
+};
+
+/// "This spell costs {3} less to cast if it was kicked."
+fn less_if_kicked(q: &dyn Query, spell: ObjectId, _: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    if matches!(costed, Costed::Spell(_)) && q.obj(spell).kicked > 0 { CostDelta::less(3) } else { CostDelta::NONE }
+}
+
+/// {4} instant, kicker {1}: "This spell costs {3} less to cast if it was kicked. Target permanent: you gain 3 life."
+static SURGE: CardDef = CardDef {
+    name: "Slot Test Surge",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[target(permanent)], gain_three),
+    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, multi: false, waterbend: false }),
+    own_cost_changes: &[less_if_kicked],
+    ..CardDef::BLANK
+};
+
+/// Wings bestowed: an Aura with "enchant creature" (CR 702.103b), and "This spell costs {3} less to cast if it targets a
+/// permanent you control."
+static WINGS_AURA: CardDef = CardDef {
+    name: "Slot Test Wings",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura]),
+    enchant: Some(target(creature)),
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+/// A {4} creature with bestow {4}.
+static WINGS: CardDef = CardDef {
+    name: "Slot Test Wings",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    bestow: Some(&WINGS_AURA),
+    bestow_cost: FOUR,
+    ..CardDef::BLANK
+};
+
+/// "Choose one - Target player: you gain 3 life. / Target creature: you gain 3 life."
+static DIAL_MODES: ModalDef = modes(&[
+    mode(gain_three, "Target player: you gain 3 life.").targets(&[target(player)]),
+    mode(gain_three, "Target creature: you gain 3 life.").targets(&[target(creature)]),
+]);
+
+/// "{4}: Choose one - ... This ability costs {3} less to activate if it targets a permanent you control."
+static DIAL: CardDef = CardDef {
+    name: "Slot Test Dial",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[modal_ability(cost("{4}"), &DIAL_MODES, "{4}: Choose one.")],
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+static X_CREATURES: [TargetSpec; 1] = [target(creature).counted()];
+
+/// "{X}{3}: X target creatures: you gain 3 life. This ability costs {3} less to activate if it targets a permanent you
+/// control."
+static HIVE: CardDef = CardDef {
+    name: "Slot Test Hive",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(cost("{X}{3}"), gain_three, "{X}{3}: X target creatures: you gain 3 life.").targets(&X_CREATURES)],
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &TOWN, &PAIR, &SINGLE, &ENGINE])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &TOWN, &PAIR, &SINGLE, &ENGINE, &CHOICE, &SWARM, &STRIKE, &DOUBLE, &PROMISE, &SPLIT, &RITE, &GRAFT, &SURGE, &WINGS, &WINGS_AURA, &DIAL, &HIVE])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -240,4 +447,133 @@ fn an_ability_of_up_to_two_targets_is_offered_for_what_a_target_of_its_controlle
     assert_eq!(g.state.player(YOU).life, life + 3);
     let (mut g, engine, _, _) = board(&ENGINE, false);
     assert!(offered(&mut g, engine).is_none(), "only the opponent's Bear: it costs {{4}} at any choice of targets");
+}
+
+#[test]
+fn a_modal_spell_is_offered_for_the_mode_and_target_that_make_it_affordable_with_the_modes_cost() {
+    let (mut g, choice, yours, _) = board(&CHOICE, true);
+    assert!(offered(&mut g, choice).is_none(), "the permanent mode costs {{2}} more: {{3}} at the caster's Bear, {{4}} at a player");
+    add_mana(&mut g, 2);
+    let option = offered(&mut g, choice).expect("{3} casts the permanent mode at the caster's Bear (CR 601.2b-c, 601.2f)");
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Act(Action::of(&option)));
+    let r = next(&mut g);
+    assert!(matches!(r.kind, RequestKind::ChooseModes { .. }), "the modes are asked, got {:?}", r.kind);
+    answer(&mut g, &r, Answer::Modes(vec![1]));
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Targets(vec![Target::Object(yours)]));
+    let life = g.state.player(YOU).life;
+    let r = next(&mut g);
+    pay_and_resolve(&mut g, r);
+    assert_eq!(g.state.player(YOU).life, life + 3);
+    assert_eq!(g.state.player(YOU).pool.total(), 0, "{{3}} was paid");
+    let (mut g, choice, _, _) = board(&CHOICE, false);
+    add_mana(&mut g, 2);
+    assert!(offered(&mut g, choice).is_none(), "no permanent of the caster's: {{4}} or {{6}}");
+}
+
+#[test]
+fn a_spell_of_x_targets_is_offered_for_the_x_whose_targets_make_it_affordable() {
+    let (mut g, swarm, yours, _) = board(&SWARM, true);
+    let option = offered(&mut g, swarm).expect("X 1 at the caster's Bear costs {1} (CR 601.2b-c, 601.2f)");
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Act(Action::of(&option)));
+    let r = next(&mut g);
+    assert!(matches!(r.kind, RequestKind::PayCosts { announcing: true, .. }), "expected the announcement of X, got {:?}", r.kind);
+    answer(&mut g, &r, Answer::Announce(1));
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Targets(vec![Target::Object(yours)]));
+    let life = g.state.player(YOU).life;
+    let r = next(&mut g);
+    pay_and_resolve(&mut g, r);
+    assert_eq!(g.state.player(YOU).life, life + 3);
+    let (mut g, swarm, _, _) = board(&SWARM, false);
+    assert!(offered(&mut g, swarm).is_none(), "X 0 costs {{3}}, and any X with targets the opponent's {{3}} and more");
+}
+
+#[test]
+fn a_spell_whose_kicker_widens_its_target_is_offered_kicked_at_what_makes_it_affordable() {
+    let (mut g, strike, _, _) = board(&STRIKE, true);
+    assert!(offered(&mut g, strike).is_none(), "kicked at the caster's Bear it costs {{2}}");
+    add_mana(&mut g, 1);
+    assert!(offered(&mut g, strike).is_some(), "{{2}} casts it kicked at the caster's Bear (CR 601.2b-c, 601.2f)");
+    let (mut g, strike, _, _) = board(&STRIKE, false);
+    add_mana(&mut g, 1);
+    assert!(offered(&mut g, strike).is_none(), "only the opponent's Bear: {{4}}, or {{5}} kicked");
+}
+
+#[test]
+fn a_spell_whose_kicker_adds_a_target_is_offered_kicked_where_two_targets_make_it_affordable() {
+    let (mut g, double, _, _) = board(&DOUBLE, true);
+    assert!(offered(&mut g, double).is_some(), "kicked with two targets it costs {{1}} (CR 601.2b-c, 601.2f)");
+    let mut g = game();
+    put(&mut g, &BEAR, THEM, Zone::BATTLEFIELD);
+    let double = put(&mut g, &DOUBLE, YOU, Zone::hand(YOU));
+    add_mana(&mut g, 1);
+    assert!(offered(&mut g, double).is_none(), "one permanent: no two different targets, so {{4}}");
+}
+
+#[test]
+fn a_spell_whose_gift_widens_its_target_is_offered_promised_at_what_makes_it_affordable() {
+    let (mut g, promise, _, _) = board(&PROMISE, true);
+    assert!(offered(&mut g, promise).is_some(), "promised, it may target the caster's Bear for {{1}} (CR 702.174m, 601.2f)");
+    let (mut g, promise, _, _) = board(&PROMISE, false);
+    assert!(offered(&mut g, promise).is_none(), "only the opponent's Bear: {{4}}");
+}
+
+#[test]
+fn a_spell_dividing_among_its_targets_is_offered_for_what_its_targets_make_it_cost() {
+    let (mut g, split, _, _) = board(&SPLIT, true);
+    assert!(offered(&mut g, split).is_some(), "{{1}} divides among targets one of which is the caster's (CR 601.2d, 601.2f)");
+    let (mut g, split, _, _) = board(&SPLIT, false);
+    assert!(offered(&mut g, split).is_none(), "only the opponent's Bear: {{4}}");
+}
+
+#[test]
+fn an_arcane_spell_is_offered_for_what_the_targets_of_a_card_spliced_onto_it_make_it_cost() {
+    let (mut g, rite, _, _) = board(&RITE, true);
+    assert!(offered(&mut g, rite).is_none(), "nothing to splice: {{4}}");
+    put(&mut g, &GRAFT, YOU, Zone::hand(YOU));
+    assert!(offered(&mut g, rite).is_none(), "spliced at the caster's Bear it costs {{2}} (CR 702.47a-c, 601.2f)");
+    add_mana(&mut g, 1);
+    assert!(offered(&mut g, rite).is_some(), "{{2}} casts it with the Graft spliced, aimed at the caster's Bear");
+    let (mut g, rite, _, _) = board(&RITE, false);
+    put(&mut g, &GRAFT, YOU, Zone::hand(YOU));
+    add_mana(&mut g, 1);
+    assert!(offered(&mut g, rite).is_none(), "only the opponent's Bear: {{4}}, or {{5}} spliced");
+}
+
+#[test]
+fn a_spell_whose_cost_reads_its_kicker_is_offered_kicked_where_that_is_cheaper() {
+    let (mut g, surge, _, theirs) = board(&SURGE, false);
+    assert!(offered(&mut g, surge).is_none(), "kicked it costs {{2}}");
+    add_mana(&mut g, 1);
+    let option = offered(&mut g, surge).expect("{2} casts it kicked (CR 601.2b, 601.2f)");
+    assert_eq!(option.target_candidates, vec![Target::Object(theirs)]);
+}
+
+#[test]
+fn a_bestowed_aura_is_offered_for_the_creatures_it_could_be_paid_for_at() {
+    let (mut g, wings, yours, _) = board(&WINGS, true);
+    let options: Vec<ActionOption> = priority_options(&cx(&mut g), YOU).into_iter().filter(|o| o.source == Some(wings)).collect();
+    assert_eq!(options.len(), 1, "only bestowed, for {{1}} at the caster's Bear (CR 702.103a, 601.2c, 601.2f)");
+    assert_eq!(options[0].target_candidates, vec![Target::Object(yours)]);
+    let (mut g, wings, _, _) = board(&WINGS, false);
+    assert!(offered(&mut g, wings).is_none(), "only the opponent's Bear: {{4}}");
+}
+
+#[test]
+fn a_modal_ability_is_offered_for_the_mode_and_target_that_make_it_affordable() {
+    let (mut g, dial, _, _) = board(&DIAL, true);
+    assert!(offered(&mut g, dial).is_some(), "{{1}} activates the creature mode at the controller's Bear (CR 602.2b, 601.2b-c)");
+    let (mut g, dial, _, _) = board(&DIAL, false);
+    assert!(offered(&mut g, dial).is_none(), "only the opponent's Bear: {{4}}");
+}
+
+#[test]
+fn an_ability_of_x_targets_is_offered_for_the_x_whose_targets_make_it_affordable() {
+    let (mut g, hive, _, _) = board(&HIVE, true);
+    assert!(offered(&mut g, hive).is_some(), "X 1 at the controller's Bear costs {{1}} (CR 602.2b, 601.2b-c)");
+    let (mut g, hive, _, _) = board(&HIVE, false);
+    assert!(offered(&mut g, hive).is_none(), "X 0 costs {{3}}, and X 1 at the opponent's Bear {{4}}");
 }

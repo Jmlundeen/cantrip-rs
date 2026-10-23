@@ -223,7 +223,9 @@ wrong. A mana ability whose yield is not stated (Sunken Ruins, X costs, Phyrexia
 every cost count as payable. Life, energy and sacrifices that several mana abilities would share are judged for each
 alone: three Mana Confluences at 1 or 2 life count as three mana, so Raffine is offered. And the search's time budget
 falls back to offering the cast on rare heavy boards, as the walk over the target announcements a cost change could
-read does past `ANNOUNCEMENT_BUDGET` (a slot of any number of targets over a dozen candidates, `some_announcement`). A permanent Urza, Lord High Artificer could tap that also has a mana ability
+read does past `ANNOUNCEMENT_BUDGET` (a slot of any number of targets over a dozen candidates, `some_cast`). A kicker's
+or optional cost's parts other than mana are left out of that judgment, which may offer a kicked announcement whose
+life or other cost then can't be paid. A permanent Urza, Lord High Artificer could tap that also has a mana ability
 without {T} counts Urza's tap apart from its own abilities, as if both could be used (`available_without`, `Repeat::Tap`).
 
 The filter lands now share this unstated yield: `lands::filter_two` (Sunken Ruins, Mystic Gate, Fetid Heath, Cascade

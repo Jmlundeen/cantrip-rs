@@ -1048,9 +1048,9 @@ pub fn target_candidates_given(
     candidates(cx, asker, spec, earlier, subject, slot_player, false)
 }
 
-fn candidates(cx: &Cx, asker: &Asker, spec: &TargetSpec, earlier: &[Target], subject: Target, slot_player: Option<PlayerId>, gift: bool) -> Vec<Target> {
-    let s = cx.s();
-    let cx = &crate::resolve::Given { q: cx, earlier, subject, slot_player, gift };
+fn candidates(q: &dyn Query, asker: &Asker, spec: &TargetSpec, earlier: &[Target], subject: Target, slot_player: Option<PlayerId>, gift: bool) -> Vec<Target> {
+    let s = q.state();
+    let cx = &crate::resolve::Given { q, earlier, subject, slot_player, gift };
     let mut out = Vec::new();
     for p in s.seats() {
         let t = Target::Player(p);
@@ -1171,163 +1171,487 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
     with_targets(cx, asker, specs, option)
 }
 
-/// How many target announcements, or choices toward one, `some_announcement` looks at before it stops and answers that one
-/// might be paid for: advice that offers an action whose cost the targets then chosen leave unpayable, and that is taken
-/// back (CR 601.2h, 733.1), never one that withholds an action that could be taken. Reached only by a slot of many targets
-/// among many candidates ("any number of targets" over a dozen) on a spell something could change the cost of.
+/// How many steps - target announcements, choices toward one, and announcements made before the targets - the search for a
+/// payable announcement (`some_cast`, `some_activation`) takes before it stops and answers that one might be paid for:
+/// advice that offers an action whose cost the choices then made leave unpayable, and that is taken back (CR 601.2h,
+/// 733.1), never one that withholds an action that could be taken. Reached only by many choices among many candidates
+/// ("any number of targets" over a dozen) on a spell or ability something could change the cost of.
 const ANNOUNCEMENT_BUDGET: u32 = 4096;
 
-/// Whether some legal announcement of the targets of `specs` (CR 601.2c) has a total cost `covered` holds for, where the
-/// targets are chosen slot by slot once the action has begun (`targets_with_action` false) and something could change its
-/// cost: the total cost is determined from the targets announced (CR 601.2f, 602.2b), so the action may be taken if it
-/// could be paid for at some legal choice of them, the cheapest of them included - This Town Ain't Big Enough ("costs {3}
-/// less to cast if it targets a permanent you control", up to two targets) with only {1}{U}, aimed at a permanent of its
-/// caster's; Fireball ("costs {1} more to cast for each target beyond the first", any number of targets) for its {R} with
-/// one target or none.
-///
-/// The announcements are those `choose_slots` could take, with the targets of each slot different (CR 601.2c), laid out as
-/// it lays them out. `key` is what the cost changes make of an announcement (`deltas`), the only part of the cost the
-/// targets reach: `covered` is asked once for each different one, so only target choices that change what the cost comes to
-/// are paid for again. Past `ANNOUNCEMENT_BUDGET` it answers yes.
-fn some_announcement<K: PartialEq>(
-    cx: &Cx,
-    asker: &Asker,
-    specs: &[TargetSpec],
-    key: &dyn Fn(&[Target]) -> K,
-    covered: &mut dyn FnMut(&[Target]) -> bool,
-) -> bool {
-    struct Announce<'a, K> {
-        cx: &'a Cx<'a>,
-        asker: &'a Asker,
-        slots: Vec<(TargetSpec, Option<PlayerId>, u8)>,
-        key: &'a dyn Fn(&[Target]) -> K,
-        covered: &'a mut dyn FnMut(&[Target]) -> bool,
-        seen: Vec<K>,
-        budget: u32,
-    }
-    /// What looking further came to: an announcement that is paid for, none, or the budget spent.
-    #[derive(PartialEq)]
-    enum Found {
-        Yes,
-        No,
-        Spent,
-    }
-    impl<K: PartialEq> Announce<'_, K> {
-        fn spend(&mut self) -> bool {
-            self.budget = self.budget.saturating_sub(1);
-            self.budget > 0
-        }
+/// What is announced before the targets that the total cost follows from (CR 601.2b, 601.2f): the modes (a mask as
+/// `StackItem::modes` holds them, with their costs, CR 700.2, 702.172a, 702.120a), X, the kicker (the times kicked, or the
+/// X of a kicker with {X}), the optional additional cost, and the mana of the cards spliced onto the spell (CR 702.47a).
+/// `NONE` is the cheapest: what the advice judges before anything is announced.
+/// `spell` is the card as the spell will be once they are announced (`Announcing`), for the cost changes to read.
+#[derive(Clone, Copy)]
+struct Earlier {
+    modes: Option<u32>,
+    x: u16,
+    kicks: u16,
+    paid: bool,
+    splice: ManaCost,
+    spell: Option<Obj>,
+}
 
-        /// The announcement of slot `at` on, after `targets` for the slots before it.
-        fn slot(&mut self, at: usize, targets: &mut Vec<Target>) -> Found {
-            if !self.spend() {
-                return Found::Spent;
+impl Earlier {
+    const NONE: Earlier = Earlier { modes: None, x: 0, kicks: 0, paid: false, splice: ManaCost::ZERO, spell: None };
+}
+
+/// The game as a spell's targets and total cost are judged once what comes before them is announced (CR 601.2b-c, 601.2f):
+/// the card has the X, the kicker, the optional cost and the gift announced, as the spell on the stack will (a filter reads
+/// them: "if this spell was kicked, instead target any creature").
+struct Announcing<'a> {
+    q: &'a dyn Query,
+    spell: ObjectId,
+    obj: Obj,
+}
+
+impl Query for Announcing<'_> {
+    fn state(&self) -> &GameState {
+        self.q.state()
+    }
+
+    fn mana_value(&self, id: ObjectId) -> u32 {
+        self.q.mana_value(id)
+    }
+
+    fn card(&self, id: CardId) -> &'static CardDef {
+        self.q.card(id)
+    }
+
+    fn chars(&self, id: ObjectId) -> Chars {
+        self.q.chars(id)
+    }
+
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        self.q.token_chars(card, copy)
+    }
+
+    fn card_id(&self, def: &'static CardDef) -> CardId {
+        self.q.card_id(def)
+    }
+
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        self.q.lost_all_abilities(id)
+    }
+
+    fn events(&self) -> &[Record] {
+        self.q.events()
+    }
+
+    fn can_target(&self, asker: &Asker, target: Target) -> bool {
+        self.q.can_target(asker, target)
+    }
+
+    fn obj(&self, id: ObjectId) -> &Obj {
+        if id == self.spell { &self.obj } else { self.q.obj(id) }
+    }
+}
+
+/// What looking for a payable announcement came to: one found, none, or the budget spent.
+#[derive(PartialEq, Clone, Copy)]
+enum Found {
+    Yes,
+    No,
+    Spent,
+}
+
+/// The announcements of a spell's or ability's targets (CR 601.2c) for one announcement of what comes before them, as
+/// `choose_slots` takes them: segment by segment (the spell's own slots, then each spliced card's, CR 702.47c), each
+/// segment's slots in order, the targets of a slot different, a slot that chose nothing ("up to") keeping its place with
+/// `Target::None` among several, and a segment's trailing empty slots taking none.
+struct AnnouncementSearch<'a, K> {
+    q: &'a dyn Query,
+    cx: &'a Cx<'a>,
+    asker: &'a Asker,
+    /// Each slot, the opponent it is for, its segment, and how many slots its segment has.
+    slots: Vec<(TargetSpec, Option<PlayerId>, usize, usize)>,
+    counted: u32,
+    gift: bool,
+    key: &'a dyn Fn(&[Target]) -> K,
+    covered: &'a mut dyn FnMut(&[Target]) -> bool,
+    /// What the cost changes made of the announcements judged: `covered` is asked once for each.
+    seen: Vec<K>,
+    budget: &'a mut u32,
+}
+
+impl<K: PartialEq> AnnouncementSearch<'_, K> {
+    fn spend(&mut self) -> bool {
+        *self.budget = self.budget.saturating_sub(1);
+        *self.budget > 0
+    }
+
+    /// The announcement of slot `at` on, after `targets` (its segment from `start`) for the slots before it.
+    fn slot(&mut self, at: usize, targets: &mut Vec<Target>, start: usize) -> Found {
+        if !self.spend() {
+            return Found::Spent;
+        }
+        let mut start = start;
+        if at > 0 && self.slots.get(at).is_none_or(|s| s.2 != self.slots[at - 1].2) {
+            // A segment's trailing slots that chose nothing take no place (`choose_slots`).
+            while targets.len() > start && targets.last() == Some(&Target::None) {
+                targets.pop();
             }
-            let Some(&(spec, slot_player, _)) = self.slots.get(at) else {
-                // Trailing slots that chose nothing take no place (`choose_slots`).
-                let len = targets.iter().rposition(|&t| t != Target::None).map_or(0, |i| i + 1);
-                let key = (self.key)(&targets[..len]);
-                if self.seen.contains(&key) {
-                    return Found::No;
-                }
-                self.seen.push(key);
-                return if (self.covered)(&targets[..len]) { Found::Yes } else { Found::No };
-            };
-            let earlier: &[Target] = if self.slots.len() > 1 { targets } else { &[] };
-            let candidates = target_candidates_given(self.cx, self.asker, &spec, earlier, Target::None, slot_player);
-            let (candidates, total) = within_total(self.cx, &spec, 0, candidates);
-            let (least, most) = spec.bounds(0);
-            if candidates.len() < least as usize || (candidates.is_empty() && spec.required()) {
+            start = targets.len();
+        }
+        let Some(&(spec, slot_player, _, in_segment)) = self.slots.get(at) else {
+            let key = (self.key)(targets);
+            if self.seen.contains(&key) {
                 return Found::No;
             }
-            let count = most.min(cantrip_state::count_u32(candidates.len())) as usize;
-            let least = (least as usize).min(count);
-            let before = targets.len();
-            let mut chosen: Vec<usize> = Vec::with_capacity(count);
-            for n in least..=count {
-                // Each `n` of the candidates, in order (CR 601.2c: different ones).
-                chosen.clear();
-                chosen.extend(0..n);
-                loop {
-                    let within = total.as_ref().is_none_or(|t| chosen.iter().map(|&i| t.values[i]).sum::<u32>() <= t.most);
-                    if within {
-                        targets.extend(chosen.iter().map(|&i| candidates[i]));
-                        if self.slots.len() > 1 && spec.max <= 1 && n == 0 {
-                            targets.push(Target::None);
-                        }
-                        let found = self.slot(at + 1, targets);
-                        targets.truncate(before);
-                        if found != Found::No {
-                            return found;
-                        }
-                    } else if !self.spend() {
-                        return Found::Spent;
+            self.seen.push(key);
+            return if (self.covered)(targets) { Found::Yes } else { Found::No };
+        };
+        let earlier: &[Target] = if in_segment > 1 { &targets[start..] } else { &[] };
+        let candidates = candidates(self.q, self.asker, &spec, earlier, Target::None, slot_player, self.gift);
+        let (candidates, total) = within_total(self.cx, &spec, self.counted, candidates);
+        let (least, most) = spec.bounds(self.counted);
+        if candidates.len() < least as usize || (candidates.is_empty() && spec.required()) {
+            return Found::No;
+        }
+        let count = most.min(cantrip_state::count_u32(candidates.len())) as usize;
+        let least = (least as usize).min(count);
+        let before = targets.len();
+        let mut chosen: Vec<usize> = Vec::with_capacity(count);
+        for n in least..=count {
+            // Each `n` of the candidates, in order (CR 601.2c: different ones).
+            chosen.clear();
+            chosen.extend(0..n);
+            loop {
+                if total.as_ref().is_none_or(|t| chosen.iter().map(|&i| t.values[i]).sum::<u32>() <= t.most) {
+                    targets.extend(chosen.iter().map(|&i| candidates[i]));
+                    if in_segment > 1 && spec.max <= 1 && n == 0 {
+                        targets.push(Target::None);
                     }
-                    // The next `n` of them, if any.
-                    let Some(i) = (0..n).rev().find(|&i| chosen[i] < candidates.len() - n + i) else { break };
-                    chosen[i] += 1;
-                    for j in i + 1..n {
-                        chosen[j] = chosen[j - 1] + 1;
+                    let found = self.slot(at + 1, targets, start);
+                    targets.truncate(before);
+                    if found != Found::No {
+                        return found;
+                    }
+                } else if !self.spend() {
+                    return Found::Spent;
+                }
+                // The next `n` of them, if any.
+                let Some(i) = (0..n).rev().find(|&i| chosen[i] < candidates.len() - n + i) else { break };
+                chosen[i] += 1;
+                for j in i + 1..n {
+                    chosen[j] = chosen[j - 1] + 1;
+                }
+            }
+        }
+        Found::No
+    }
+}
+
+/// Whether some legal announcement of the targets of `segments` after `prefix` (the target announced with the action, if
+/// any), with what was announced before them (`counted`, `kicked`, `gift`, and `q` reading them), has a total cost `covered`
+/// holds for. `key` is what the cost changes make of an announcement (`deltas`), the only part of the cost the targets
+/// reach: `covered` is asked once for each different one.
+#[allow(clippy::too_many_arguments)]
+fn some_announcement<K: PartialEq>(
+    q: &dyn Query,
+    cx: &Cx,
+    asker: &Asker,
+    prefix: &[Target],
+    segments: &[Vec<TargetSpec>],
+    (counted, kicked, gift): (u32, u8, bool),
+    budget: &mut u32,
+    key: &dyn Fn(&[Target]) -> K,
+    covered: &mut dyn FnMut(&[Target]) -> bool,
+) -> Found {
+    let mut slots = Vec::new();
+    for (segment, specs) in segments.iter().enumerate() {
+        let expanded = crate::resolve::expand_specs(cx.s(), asker.controller, specs);
+        let n = expanded.len();
+        slots.extend(expanded.into_iter().map(|(spec, player, _)| (spec.when_kicked(kicked), player, segment, n)));
+    }
+    let mut search = AnnouncementSearch { q, cx, asker, slots, counted, gift, key, covered, seen: Vec::new(), budget };
+    let mut targets = prefix.to_vec();
+    search.slot(0, &mut targets, prefix.len())
+}
+
+/// Whether a slot's number of targets, or the most its targets' mana values may add up to, is counted by X or the kicker
+/// (CR 601.2b-c), unkicked or kicked.
+fn reads_count(spec: &TargetSpec) -> bool {
+    [*spec, spec.when_kicked(1)].iter().any(|s| s.min == TargetSpec::COUNTED || s.max == TargetSpec::COUNTED || s.total_mana_value == Some(TargetSpec::COUNTED))
+}
+
+/// The most X (or times kicked) that could make a difference to the targets of slots counted by it (`reads_count`): the
+/// candidates there are, or their mana values together for a slot limited by its total; past that more only costs more.
+fn count_bound<'a>(cx: &Cx, asker: &Asker, specs: impl Iterator<Item = &'a TargetSpec>) -> u16 {
+    let mut bound = 0u32;
+    for spec in specs.filter(|s| reads_count(s)) {
+        let candidates = target_candidates(cx, asker, &spec.when_kicked(1));
+        let n = if [*spec, spec.when_kicked(1)].iter().any(|s| s.total_mana_value == Some(TargetSpec::COUNTED)) {
+            candidates.iter().map(|&t| if let Target::Object(id) = t { cx.mana_value(id) } else { 0 }).sum::<u32>()
+        } else {
+            cantrip_state::count_u32(candidates.len())
+        };
+        bound = bound.max(n);
+    }
+    bound.min(u32::from(u16::MAX)) as u16
+}
+
+/// The choices of modes `modal` could be cast or activated with, between `range`'s numbers (CR 700.2), as masks: of the
+/// modes that could be chosen now (`eligible_modes`), each once, or for a modal that repeats up to its most each
+/// (CR 700.2d).
+fn mode_masks(cx: &Cx, asker: &Asker, modal: &ModalDef, range: (u8, u8)) -> Vec<u32> {
+    fn go(modal: &ModalDef, eligible: &[u8], at: usize, chosen: u8, mask: u32, (min, max): (u8, u8), out: &mut Vec<u32>) {
+        let Some(&mode) = eligible.get(at) else {
+            if chosen >= min.max(1) {
+                out.push(mask);
+            }
+            return;
+        };
+        let most = if modal.repeat { max.saturating_sub(chosen).min(15) } else { u8::from(chosen < max) };
+        let shift = if modal.repeat { 4 * u32::from(mode) } else { u32::from(mode) };
+        if shift >= 32 {
+            return go(modal, eligible, at + 1, chosen, mask, (min, max), out);
+        }
+        for times in 0..=most {
+            go(modal, eligible, at + 1, chosen + times, mask | (u32::from(times) << shift), (min, max), out);
+        }
+    }
+    let eligible = eligible_modes(cx, asker, modal);
+    let mut out = Vec::new();
+    go(modal, &eligible, 0, 0, 0, range, &mut out);
+    out
+}
+
+/// The orders in which cards in `player`'s hand could be spliced onto the Arcane spell `card` (CR 702.47a-b), none first:
+/// only cards whose spells have targets, since splicing one without adds to the cost and changes nothing a cost change reads.
+fn splice_orders(cx: &Cx, player: PlayerId, card: ObjectId) -> Vec<Vec<ObjectId>> {
+    let mut out = vec![Vec::new()];
+    if !cx.chars(card).has_subtype(Subtype::Arcane) {
+        return out;
+    }
+    let targeted = |c: ObjectId| {
+        let def = cx.card(cx.s().obj(c).card);
+        c != card && def.splice.is_some() && def.spell.is_some_and(|s| !s.targets.is_empty())
+    };
+    let eligible: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| targeted(c)).collect();
+    fn go(eligible: &[ObjectId], now: &mut Vec<ObjectId>, out: &mut Vec<Vec<ObjectId>>) {
+        for &c in eligible {
+            if !now.contains(&c) {
+                now.push(c);
+                out.push(now.clone());
+                go(eligible, now, out);
+                now.pop();
+            }
+        }
+    }
+    go(&eligible, &mut Vec::new(), &mut out);
+    out
+}
+
+/// Whether casting `def` of `asker.source` could be paid for at some legal announcement (CR 601.2b-c, 601.2f): its modes, X,
+/// kicker, optional cost, gift and splices, then the targets they bring, its total cost determined from all of them -
+/// This Town Ain't Big Enough ("costs {3} less to cast if it targets a permanent you control", up to two targets) is
+/// cast for {1}{U} aimed at a permanent of its caster's, and Fireball ("costs {1} more to cast for each target beyond the
+/// first", any number of targets) for its {R} with one target or none. `prefix` is the target announced with the cast, where
+/// it is (`targets_with_cast`): the kicker, optional cost and splices are judged with it, and X at its least, which is all
+/// its target needs. `x_symbols` is the {X} of the cost being paid. Past `ANNOUNCEMENT_BUDGET` it answers yes.
+#[allow(clippy::too_many_arguments)]
+fn some_cast(
+    cx: &Cx,
+    a: &Available,
+    asker: &Asker,
+    def: &'static CardDef,
+    x_symbols: u8,
+    prefix: Option<&[Target]>,
+    budget: &mut u32,
+    covered: &dyn Fn(&[Target], &Earlier) -> bool,
+) -> bool {
+    let (player, card) = (asker.controller, asker.source);
+    let face = face_of(cx, card, def);
+    let splices = splice_orders(cx, player, card);
+    let own = cx.cards().spell_targets_of(def);
+    let open = prefix.is_none();
+    // Promised to each opponent in the game, or not (CR 702.174a-b).
+    let mut gifts: Vec<Option<PlayerId>> = vec![None];
+    if open && def.gift.is_some() {
+        gifts.extend(cx.s().opponents(player).filter(|&p| !cx.s().player(p).lost).map(Some));
+    }
+    let paid: &[bool] = if def.optional_cost.is_some() { &[false, true] } else { &[false] };
+    let mode_specs_all = def.modal.iter().flat_map(|m| m.modes.iter().flat_map(|mode| mode.targets.iter()));
+    let splice_specs = splices.iter().flatten().flat_map(|&c| cx.card(cx.s().obj(c).card).spell.map_or(&[][..], |s| s.targets).iter());
+    let mut bound = count_bound(cx, asker, own.iter().chain(mode_specs_all).chain(splice_specs));
+    // A total divided that X sets (CR 601.2d): as many targets as there are candidates need a total that large.
+    if let Some(divide) = def.divide.filter(|d| d.of_x.is_some() || d.total == TargetSpec::COUNTED)
+        && let Some(spec) = own.first()
+    {
+        let there = cantrip_state::count_u32(target_candidates(cx, asker, spec).len());
+        let total = |x: u16| divide.of_x.map_or(u32::from(x), |f| u32::from(f(x)));
+        bound = bound.max((0..=1000u16).find(|&x| total(x) >= there).unwrap_or(1000));
+    }
+    let kicks = match def.kicker {
+        Some(k) if k.multi || k.cost.x > 0 => 0..=bound.max(1),
+        Some(_) => 0..=1,
+        _ => 0..=0,
+    };
+    // A kicker takes the X announced (CR 601.2b, `cast`); otherwise X from its least, up to what changes the targets.
+    let least = least_x(def.x_cant_be_zero);
+    let xs = if def.kicker.is_some() || x_symbols == 0 { 0..=0 } else if open { least..=bound.max(least) } else { least..=least };
+    for &paid in paid {
+        for kicks in kicks.clone() {
+            for x in xs.clone() {
+                // A kicker with {X} announces X and is kicked when it is not 0 (CR 702.33a, 107.3).
+                let (x, kicked) = match def.kicker {
+                    Some(k) if k.cost.x > 0 => (kicks, u8::from(kicks > 0)),
+                    _ => (x, kicks.min(255) as u8),
+                };
+                let counted = u32::from(if x > 0 { x } else { u16::from(kicked) });
+                let mut obj = *cx.s().obj(card);
+                (obj.x, obj.kicked, obj.paid) = (x, kicked, u32::from(paid));
+                let masks: Vec<Option<u32>> = match def.modal {
+                    Some(modal) if open => {
+                        let range = match modal.when_paid {
+                            Some(range) if paid || kicked > 0 => range,
+                            _ => (modal.min, modal.max),
+                        };
+                        mode_masks(cx, asker, modal, range).into_iter().map(Some).collect()
+                    }
+                    _ => vec![None],
+                };
+                for &gift in &gifts {
+                    obj.gift = gift;
+                    let view = Announcing { q: cx, spell: card, obj };
+                    let key = |targets: &[Target]| deltas_as(cx, &a.changers, player, Costed::Spell(card), face, targets, Some(&obj));
+                    for &mask in &masks {
+                        let mine: Vec<TargetSpec> = match (prefix, def.modal, def.divide) {
+                            (Some(_), _, _) => Vec::new(),
+                            (None, Some(modal), _) => mode_specs(modal, mask.unwrap_or(0)),
+                            (None, None, Some(divide)) => {
+                                let total = match divide.of_x {
+                                    Some(of_x) => u32::from(of_x(x)),
+                                    None if divide.total == TargetSpec::COUNTED => u32::from(x),
+                                    None => divide.total,
+                                };
+                                // Each target is given at least one of the total (CR 601.2d); none, for a total of nothing.
+                                own.iter().map(|s| TargetSpec { min: if total == 0 { 0 } else { s.min }, max: s.max.min(total), ..*s }).collect()
+                            }
+                            (None, None, None) => own.to_vec(),
+                        };
+                        for order in &splices {
+                            let mut segments = vec![mine.clone()];
+                            let mut splice = ManaCost::ZERO;
+                            for &c in order {
+                                let spliced = cx.card(cx.s().obj(c).card);
+                                segments.push(spliced.spell.map_or(Vec::new(), |s| s.targets.to_vec()));
+                                splice = add_cost(splice, spliced.splice.unwrap_or(ManaCost::ZERO));
+                            }
+                            let earlier = Earlier { modes: mask, x, kicks, paid, splice, spell: Some(obj) };
+                            let found = some_announcement(
+                                &view,
+                                cx,
+                                asker,
+                                prefix.unwrap_or(&[]),
+                                &segments,
+                                (counted, kicked, gift.is_some()),
+                                budget,
+                                &key,
+                                &mut |t| covered(t, &earlier),
+                            );
+                            if found != Found::No || *budget == 0 {
+                                return true;
+                            }
+                        }
                     }
                 }
             }
-            Found::No
         }
     }
-    let slots = crate::resolve::expand_specs(cx.s(), asker.controller, specs);
-    let mut search = Announce { cx, asker, slots, key, covered, seen: Vec::new(), budget: ANNOUNCEMENT_BUDGET };
-    search.slot(0, &mut Vec::new()) != Found::No
+    false
+}
+
+/// Whether activating the ability `def` (the `ability` of `asker.source`) for `cost` could be paid for at some legal
+/// announcement (CR 602.2b, 601.2b-c, 601.2f): its modes and X, then the targets they bring. `covered` is asked with the
+/// cost X makes it. Past `ANNOUNCEMENT_BUDGET` it answers yes.
+fn some_activation(
+    cx: &Cx,
+    a: &Available,
+    asker: &Asker,
+    def: &ActivatedDef,
+    ability: AbilityRef,
+    cost: ManaCost,
+    covered: &dyn Fn(ManaCost, &[Target]) -> bool,
+) -> bool {
+    let (player, id) = (asker.controller, asker.source);
+    let key = |targets: &[Target]| deltas(cx, &a.changers, player, Costed::Ability(id, ability), None, targets);
+    let mode_specs_all = def.modal.iter().flat_map(|m| m.modes.iter().flat_map(|mode| mode.targets.iter()));
+    let bound = count_bound(cx, asker, def.targets.iter().chain(mode_specs_all));
+    let least = least_x(def.x_cant_be_zero);
+    // X of the mana cost (CR 107.3a), or of a "−X" loyalty cost (CR 606.4), which costs no mana.
+    let xs = if cost.x > 0 || def.cost.loyalty == Some(LOYALTY_MINUS_X) { least..=bound.max(least) } else { 0..=0 };
+    let masks: Vec<u32> = match def.modal {
+        Some(modal) => mode_masks(cx, asker, modal, (modal.min, modal.max)),
+        None => vec![0],
+    };
+    let mut budget = ANNOUNCEMENT_BUDGET;
+    for x in xs {
+        let mut owed = cost;
+        if cost.x > 0 {
+            owed.generic = owed.generic.saturating_add((u32::from(x) * u32::from(cost.x)).min(255) as u8);
+            owed.x = 0;
+        }
+        for &mask in &masks {
+            let specs = match def.modal {
+                Some(modal) => mode_specs(modal, mask),
+                None => def.targets.to_vec(),
+            };
+            let found = some_announcement(cx, cx, asker, &[], &[specs], (u32::from(x), 0, false), &mut budget, &key, &mut |t| covered(owed, t));
+            if found != Found::No || budget == 0 {
+                return true;
+            }
+        }
+    }
+    false
 }
 
 /// Whether a cast is worth offering, its target candidates kept to those it could be paid for. The total cost is determined
-/// once the targets are announced (CR 601.2c, 601.2f): where something could change the cost, a cast whose target is
-/// announced with it is judged for each candidate (`covered`), and only those it could be paid for are offered; one whose
-/// targets are chosen slot by slot later is offered if some legal choice of them could be paid for
-/// (`some_announcement`). Otherwise it is judged once, with no target.
-fn offer_costed(cx: &Cx, a: &Available, asker: &Asker, def: &'static CardDef, option: &mut ActionOption, covered: impl Fn(&[Target]) -> bool) -> bool {
+/// once the targets are announced (CR 601.2c, 601.2f), after what is announced before them (CR 601.2b): where something
+/// could change the cost, a cast whose one target is announced with it is judged for each candidate (`covered`), with the
+/// cards that could be spliced onto it and their targets, and only those it could be paid for are offered; any other is
+/// offered if some legal announcement could be paid for (`some_cast`). Otherwise it is judged once, with no target.
+fn offer_costed(
+    cx: &Cx,
+    a: &Available,
+    asker: &Asker,
+    def: &'static CardDef,
+    x_symbols: u8,
+    option: &mut ActionOption,
+    covered: impl Fn(&[Target], &Earlier) -> bool,
+) -> bool {
     let changes = !a.changers.is_empty() || !def.own_cost_changes.is_empty() || lasting_changes(cx);
-    if changes && targets_with_cast(cx.cards(), def) {
+    if !changes {
+        return covered(&[], &Earlier::NONE) && offer_spell(cx, asker, def, option);
+    }
+    // A kicker, an optional cost or a splice announced after the target announced with the cast (CR 601.2b-c) may change
+    // what a change reads ("if this spell was kicked") or bring targets of its own.
+    let announces = def.kicker.is_some() || def.optional_cost.is_some() || splice_orders(cx, asker.controller, asker.source).len() > 1;
+    let mut budget = ANNOUNCEMENT_BUDGET;
+    if targets_with_cast(cx.cards(), def) {
         if !offer_spell(cx, asker, def, option) {
             return false;
         }
-        let none_covered = option.targets_optional && covered(&[]);
-        option.target_candidates.retain(|&t| covered(&[t]));
+        let mut judge =
+            |prefix: &[Target]| covered(prefix, &Earlier::NONE) || announces && some_cast(cx, a, asker, def, x_symbols, Some(prefix), &mut budget, &covered);
+        let none_covered = option.targets_optional && judge(&[]);
+        option.target_candidates.retain(|&t| judge(&[t]));
         !option.target_candidates.is_empty() || none_covered
-    } else if changes && targets_in_slots(cx.cards(), def) {
-        let (player, card) = (asker.controller, asker.source);
-        let face = face_of(cx, card, def);
-        let key = |targets: &[Target]| deltas(cx, &a.changers, player, Costed::Spell(card), face, targets);
-        offer_spell(cx, asker, def, option) && some_announcement(cx, asker, cx.cards().spell_targets_of(def), &key, &mut |t| covered(t))
     } else {
-        covered(&[]) && offer_spell(cx, asker, def, option)
+        offer_spell(cx, asker, def, option) && some_cast(cx, a, asker, def, x_symbols, None, &mut budget, &covered)
     }
-}
-
-/// Whether a spell's targets are chosen slot by slot once it has begun to be cast, with nothing announced before them that
-/// they wait on (CR 601.2b-c): more than one slot, or a slot of more than one target, on a spell that is not modal and
-/// has no X, kicker, gift or division its targets are chosen after.
-fn targets_in_slots(cards: &CardTable, def: &'static CardDef) -> bool {
-    def.modal.is_none() && !def.late_targets && def.gift.is_none() && def.divide.is_none() && slots_alone(cards.spell_targets_of(def))
-}
-
-/// Whether target slots are chosen one by one after the action begins (not `targets_with_action`), with bounds that wait on
-/// nothing announced before them: no slot counted by X or by a kicker, nor one a kicker changes (CR 601.2b-c).
-fn slots_alone(specs: &[TargetSpec]) -> bool {
-    !specs.is_empty()
-        && !targets_with_action(specs)
-        && specs.iter().all(|spec| {
-            spec.if_kicked.is_none() && spec.min != TargetSpec::COUNTED && spec.max != TargetSpec::COUNTED && spec.total_mana_value != Some(TargetSpec::COUNTED)
-        })
 }
 
 /// Whether the life the cost changes add to casting `card` as `def` with these targets (CR 118.8, 601.2f: "cost an
 /// additional 3 life") could be paid, with the life its own additional cost asks, from its caster's life total (CR 119.4,
 /// 118.3). Advice, as `least_cost` is.
-fn added_life_payable(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, targets: &[Target]) -> bool {
+fn added_life_payable(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, targets: &[Target], earlier: &Earlier) -> bool {
     if a.changers.is_empty() && def.own_cost_changes.is_empty() && !lasting_changes(cx) {
         return true;
     }
-    let (_, added) = change_total(cx, &a.changers, player, Costed::Spell(card), ManaCost::ZERO, face_of(cx, card, def), targets);
+    let (_, _, added, _, _) = deltas_as(cx, &a.changers, player, Costed::Spell(card), face_of(cx, card, def), targets, earlier.spell.as_ref());
     added == 0 || payable_life(cx, player) >= added as i32 + def.additional_cost.map_or(0, |c| c.life as i32)
 }
 
@@ -1730,9 +2054,10 @@ fn change_any(
     cost: ManaCost,
     face: Option<CardId>,
     targets: &[Target],
+    announced: Option<&Obj>,
     covered: &mut dyn FnMut(ManaCost, u8) -> bool,
 ) -> bool {
-    let (more, whole, _, least, discount) = deltas(cx, sources, player, costed, face, targets);
+    let (more, whole, _, least, discount) = deltas_as(cx, sources, player, costed, face, targets, announced);
     let mut cost = cost;
     cost.generic = (cost.generic as u32 + more).min(255) as u8;
     // Each way the payer could split a reduction by hybrid mana (CR 118.7e).
@@ -1814,13 +2139,35 @@ fn reduced(cost: ManaCost, less: &ManaCost, discount: u32) -> ManaCost {
 /// What the cost changes come to (CR 601.2f): the generic mana they add, the mana they take off, the life they add
 /// (CR 118.8), the least the total may come to (`CostDelta::at_least`), and the "less to one" reduction.
 fn deltas(cx: &Cx, sources: &[ObjectId], player: PlayerId, costed: Costed, face: Option<CardId>, targets: &[Target]) -> (u32, ManaCost, u32, u8, u32) {
+    deltas_as(cx, sources, player, costed, face, targets, None)
+}
+
+/// `deltas` with the spell as `announced` has it, where what comes before its targets is announced (`Announcing`): a change
+/// may read its X or kicker (CR 601.2f).
+fn deltas_as(
+    cx: &Cx,
+    sources: &[ObjectId],
+    player: PlayerId,
+    costed: Costed,
+    face: Option<CardId>,
+    targets: &[Target],
+    announced: Option<&Obj>,
+) -> (u32, ManaCost, u32, u8, u32) {
     let view;
-    let q: &dyn Query = match (face, costed) {
+    let as_face: &dyn Query = match (face, costed) {
         (Some(face), Costed::Spell(spell)) => {
             view = AsFace { cx, spell, face };
             &view
         }
         _ => cx,
+    };
+    let patched;
+    let q: &dyn Query = match (announced, costed) {
+        (Some(obj), Costed::Spell(spell)) => {
+            patched = Announcing { q: as_face, spell, obj: *obj };
+            &patched
+        }
+        _ => as_face,
     };
     // The thing costed is its own source for the changes it carries itself (affinity, channel's reduction).
     let (id, ability) = match costed {
@@ -1967,12 +2314,23 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
 /// The least mana a spell could be cast for with this base cost, for the advice that a cast that cannot be paid is
 /// not offered (CR 601.2, 118.3): X at the least it may be (0, or 1 where it can't be 0), no kicker, the cheapest modes it must choose, Phyrexian symbols paid with
 /// life where the life total allows. `targets` are the candidate it would be announced with, where its target is announced
-/// with the cast, or none (CR 601.2c, 601.2f).
+/// with the cast, or none (CR 601.2c, 601.2f). `earlier` is what is announced before them where it is not the cheapest
+/// (`Earlier::NONE`): the modes, X, kicker, optional cost and splices of an announcement whose targets are judged with it.
 ///
 /// One for each way the hybrid symbols a reduction meets could be announced (`announcements`): the cast may be paid if any is.
 #[allow(clippy::too_many_arguments)]
-fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost, targets: &[Target], covered: &mut dyn FnMut(ManaCost) -> bool) -> bool {
-    least_cost_parts(cx, available, player, card, def, base, targets, &mut |cost, least| covered(at_least(cost, least)))
+fn least_cost(
+    cx: &Cx,
+    available: &Available,
+    player: PlayerId,
+    card: ObjectId,
+    def: &CardDef,
+    base: ManaCost,
+    targets: &[Target],
+    earlier: &Earlier,
+    covered: &mut dyn FnMut(ManaCost) -> bool,
+) -> bool {
+    least_cost_parts(cx, available, player, card, def, base, targets, earlier, &mut |cost, least| covered(at_least(cost, least)))
 }
 
 /// `least_cost` with the least the total may come to (`CostDelta::at_least`, Trinisphere) not yet applied but returned, for a
@@ -1987,6 +2345,7 @@ fn least_cost_parts(
     def: &CardDef,
     base: ManaCost,
     targets: &[Target],
+    earlier: &Earlier,
     covered: &mut dyn FnMut(ManaCost, u8) -> bool,
 ) -> bool {
     // "X can't be 0" (CR 107.3a): X at 1, and no cast at all for a cost where X could only be 0 (CR 107.3b), as `cast`
@@ -1995,6 +2354,17 @@ fn least_cost_parts(
         return false;
     }
     let mut cost = at_least_x(base, def.x_cant_be_zero);
+    // The X announced, where it is more than the least (CR 107.3a, 601.2b).
+    let more_x = u32::from(earlier.x.saturating_sub(least_x(def.x_cant_be_zero)));
+    cost.generic = cost.generic.saturating_add((more_x * u32::from(base.x)).min(255) as u8);
+    // The kicker, the optional additional cost and the cards spliced onto it, where they are announced (CR 601.2b, 601.2f).
+    if let Some(k) = def.kicker.filter(|_| earlier.kicks > 0) {
+        cost = kicker_total(cost, k, earlier.kicks);
+    }
+    if let Some(optional) = def.optional_cost.filter(|_| earlier.paid) {
+        cost = add_cost(cost, optional.cost.mana);
+    }
+    cost = add_cost(cost, earlier.splice);
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
     }
@@ -2009,14 +2379,17 @@ fn least_cost_parts(
     {
         cost = add_cost(cost, cheapest);
     }
-    if let Some(modal) = def.modal {
+    if let (Some(modal), Some(mask)) = (def.modal, earlier.modes) {
+        // The modes announced, with their costs (CR 601.2b, 702.172a, 702.120a).
+        cost = modal_cost(modal, mask, cost);
+    } else if let Some(modal) = def.modal {
         let mut costs: Vec<ManaCost> = modal.modes.iter().map(|m| m.cost).collect();
         costs.sort_by_key(|c| c.mana_value());
         // One mode to choose: the cheapest the player could pay for - Three Steps Ahead's {3} when its {1}{U} would need
         // a second blue.
         if modal.min <= 1
             && let Some(i) = costs.iter().position(|&c| {
-                finish(cx, available, player, card, def, add_cost(cost, c), targets, &mut |total, least| available.covers_for(&at_least(total, least), &spell_kind(cx, available, card, def)))
+                finish(cx, available, player, card, def, add_cost(cost, c), targets, earlier.spell.as_ref(), &mut |total, least| available.covers_for(&at_least(total, least), &spell_kind(cx, available, card, def)))
             })
         {
             costs.swap(0, i);
@@ -2030,7 +2403,7 @@ fn least_cost_parts(
         Some(v @ VariableCost::SacrificeAnyNumber { less_each, .. }) => (variable_candidates(cx, card, player, v).len() as u32 * less_each as u32).min(255) as u8,
         _ => 0,
     };
-    finish(cx, available, player, card, def, cost, targets, &mut |mut cost, least| {
+    finish(cx, available, player, card, def, cost, targets, earlier.spell.as_ref(), &mut |mut cost, least| {
         cost.generic = cost.generic.saturating_sub(off);
         covered(cost, least)
     })
@@ -2047,12 +2420,13 @@ fn finish(
     def: &CardDef,
     mut cost: ManaCost,
     targets: &[Target],
+    announced: Option<&Obj>,
     covered: &mut dyn FnMut(ManaCost, u8) -> bool,
 ) -> bool {
     cost = phyrexian_with_life(cx, player, cost, 0);
     // A face cast from the hand (an Adventure, an Omen, a half, a back face) is judged as that face (CR 715.4, 720.3a,
     // 709.3, 712.8a).
-    change_any(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets, covered)
+    change_any(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets, announced, covered)
 }
 
 /// `cost` with as many of its Phyrexian symbols paid with 2 life each as `player`'s life total allows beside `other_life`
@@ -3514,10 +3888,10 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                     // Its own cost changes, each way a reduction by hybrid mana could be split (CR 118.7e) and the hybrid
                     // symbols it meets announced (CR 601.2b), as `special_action` asks them.
                     let printed = at_least_x(special_action_printed_cost(cx, id, ability, def), def.x_cant_be_zero);
-                    change_any(cx, &a.changers, player, Costed::SpecialAction(id, ability), printed, None, &[], &mut |c, least| judge(at_least(c, least)))
+                    change_any(cx, &a.changers, player, Costed::SpecialAction(id, ability), printed, None, &[], None, &mut |c, least| judge(at_least(c, least)))
                 } else {
                     // Each way the hybrid symbols a reduction meets could be announced (CR 601.2b): covered if any is.
-                    change_any(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets, &mut |c, least| judge(at_least(c, least)))
+                    change_any(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets, None, &mut |c, least| judge(at_least(c, least)))
                 }
             };
             // The total cost is determined once the targets are announced (CR 601.2c, 601.2f, 602.2b), so a change that reads
@@ -3527,12 +3901,13 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             // otherwise the cost is judged once, before any target is looked for.
             let changes = |a: &Available| !a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty();
             let each_target = a.is_some_and(|a| targets_with_activation(def) && !def.special_action && def.modal.is_none() && changes(a));
-            // Targets chosen slot by slot once it has begun (more than one): offered if some legal choice of them could be
-            // paid for (`some_announcement`).
-            let in_slots = a.is_some_and(|a| !def.special_action && def.modal.is_none() && !def.late_targets && slots_alone(def.targets) && changes(a));
-            let key = |targets: &[Target]| a.map(|a| deltas(cx, &a.changers, player, Costed::Ability(id, ability), None, targets));
+            // Targets chosen once it has begun, after its modes and X (CR 601.2b-c by way of 602.2b): offered if some legal
+            // announcement of them could be paid for (`some_activation`).
+            let announced = a.is_some_and(|a| {
+                !def.special_action && (def.modal.is_some() || !def.targets.is_empty()) && !(targets_with_activation(def) && def.modal.is_none()) && changes(a)
+            });
             let judged = |a: &Available, cost: ManaCost| {
-                if in_slots { some_announcement(cx, &asker, def.targets, &key, &mut |t| covered(a, cost, t)) } else { covered(a, cost, &[]) }
+                if announced { some_activation(cx, a, &asker, def, ability, cost, &|c, t| covered(a, c, t)) } else { covered(a, cost, &[]) }
             };
             // The ability for its own cost, and for each cost a static ability lets the player pay rather than its mana cost
             // (CR 118.9, 602.2b: Forge Anew's, Kili's {0} equip), each an option of its own, made by that permanent
@@ -4347,15 +4722,15 @@ impl<'a> Offer<'a> {
         let mut base = base;
         base.generic = base.generic.saturating_add(route.terms.more);
         let base = add_cost(base, route.additional.mana);
-        let covered = |targets: &[Target]| {
+        let covered = |targets: &[Target], earlier: &Earlier| {
             // Mana of any type pays every symbol of it (CR 609.4b), by the permission that casts it.
-            least_cost(cx, a, player, card, face, base, targets, &mut |least| {
+            least_cost(cx, a, player, card, face, base, targets, earlier, &mut |least| {
                 covers_total(cx, a, player, card, face, least, route.additional.exile_from_graveyard, route.terms.any_type)
             })
-                && added_life_payable(cx, a, player, card, face, targets)
+                && added_life_payable(cx, a, player, card, face, targets, earlier)
         };
         let mut option = ActionOption { granted_by: route.by, paid_by, ..ActionOption::on(ActionKind::CastSpell, card, way) };
-        if offer_costed(cx, a, &self.asker(card), face, &mut option, covered) {
+        if offer_costed(cx, a, &self.asker(card), face, base.x, &mut option, covered) {
             options.push(option);
         }
     }
@@ -4588,7 +4963,7 @@ impl<'a> Offer<'a> {
             return;
         }
         let (cx, player, a) = (self.cx, self.player, self.available());
-        if least_cost(cx, a, player, card, def, overload, &[], &mut |cost| covers_total(cx, a, player, card, def, cost, 0, false)) {
+        if least_cost(cx, a, player, card, def, overload, &[], &Earlier::NONE, &mut |cost| covers_total(cx, a, player, card, def, cost, 0, false)) {
             options.push(ActionOption::on(ActionKind::CastSpell, card, WAY_OVERLOAD));
         }
     }
@@ -4614,9 +4989,11 @@ impl<'a> Offer<'a> {
         }
         let a = self.available();
         let mut option = ActionOption::on(ActionKind::CastSpell, card, WAY_BESTOW);
-        if least_cost(cx, a, player, card, bestow, def.bestow_cost, &[], &mut |cost| a.covers_for(&cost, &spell_kind(cx, a, card, bestow)))
-            && offer_spell(cx, &self.asker(card), bestow, &mut option)
-        {
+        // The Aura's target is announced with it, and the total cost follows from it (CR 601.2c, 601.2f): judged for each.
+        let covered = |targets: &[Target], earlier: &Earlier| {
+            least_cost(cx, a, player, card, bestow, def.bestow_cost, targets, earlier, &mut |cost| a.covers_for(&cost, &spell_kind(cx, a, card, bestow)))
+        };
+        if offer_costed(cx, a, &self.asker(card), bestow, def.bestow_cost.x, &mut option, covered) {
             options.push(option);
         }
     }
@@ -4662,12 +5039,12 @@ impl<'a> Offer<'a> {
                     continue;
                 }
                 let a = self.available();
-                let covered = |targets: &[Target]| {
-                    least_cost(cx, a, player, card, face, cost.mana, targets, &mut |least| covers_total(cx, a, player, card, face, least, cost.exile_from_graveyard, false))
-                        && added_life_payable(cx, a, player, card, face, targets)
+                let covered = |targets: &[Target], earlier: &Earlier| {
+                    least_cost(cx, a, player, card, face, cost.mana, targets, earlier, &mut |least| covers_total(cx, a, player, card, face, least, cost.exile_from_graveyard, false))
+                        && added_life_payable(cx, a, player, card, face, targets, earlier)
                 };
                 let mut option = ActionOption { granted_by: Some(way.grant), ..ActionOption::on(ActionKind::CastSpell, card, way_number) };
-                if offer_costed(cx, a, &self.asker(card), face, &mut option, covered) {
+                if offer_costed(cx, a, &self.asker(card), face, cost.mana.x, &mut option, covered) {
                     options.push(option);
                 }
             }
@@ -4836,7 +5213,7 @@ fn reduction_of(cx: &Cx, creature: ObjectId) -> u8 {
 fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, way: &Cost, any_type: bool) -> bool {
     // The way's own reductions (emerge, harmonize) come before the least the total may come to (Trinisphere), as the cast
     // applies them (CR 601.2f).
-    least_cost_parts(cx, a, player, card, def, way.mana, &[], &mut |mut cost, least| {
+    least_cost_parts(cx, a, player, card, def, way.mana, &[], &Earlier::NONE, &mut |mut cost, least| {
         cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, card, way));
         // Mana of any type pays every symbol of it (CR 609.4b), as `cast` pays it.
         if covers_total(cx, a, player, card, def, at_least(cost, least), way.exile_from_graveyard, any_type) {
@@ -4872,7 +5249,7 @@ fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) 
     // The most it could be, however a reduction by hybrid mana is split and hybrid symbols announced (CR 118.7e, 601.2b):
     // asked before either.
     let mut generic = 0u8;
-    change_any(cx, &cost_change_sources(cx), player, Costed::Spell(source), cost.mana, None, &[], &mut |c, least| {
+    change_any(cx, &cost_change_sources(cx), player, Costed::Spell(source), cost.mana, None, &[], None, &mut |c, least| {
         generic = generic.max(at_least(c, least).generic);
         false
     });
