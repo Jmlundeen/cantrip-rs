@@ -502,6 +502,21 @@ impl<'s> Run<'s> {
                 return Ok(Stop::Done);
             }
 
+            // `Bot3.Concede`: the player concedes at once, whoever is asked (CR 104.3a: a player may concede the game at any time),
+            // and the question outstanding is asked again, of the players still in the game.
+            if let Some(ScriptStep::Action(step)) = self.current()
+                && step.verb == ScriptVerb::Concede
+            {
+                let (who, line, text) = (player_of(step.bot), step.line, step.text.clone());
+                if self.game.state.player(who).lost {
+                    return fail(format!("line {line}: {text}: the player has already left the game"));
+                }
+                self.trace.push(format!("T{} {}: line {line} {text}", self.turn(), bot(who)));
+                self.game.concede(who);
+                self.next();
+                continue;
+            }
+
             // `! Bot1.Accept`, `! Bot1.Choose`, a bare `! Bot1.Target` or `! Bot2.Block`...: the player is not asked that kind of question
             // before their next priority (a bare Block: no block is possible, so the declaration is never asked for).
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()

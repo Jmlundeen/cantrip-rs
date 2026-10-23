@@ -216,6 +216,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot1.Battlefield.Urza, Lord High Artificer.Activate(Ability: Add; Tap: Sol Ring)` | choose the untapped permanent paying a mana ability's tap cost |
 | `Bot1.Channel.Activate` | a mana ability the player has of their own (CR 611.2a), named by the card that gave it and no zone: it has no source, so it is offered wherever that card has gone |
 | `Bot1.Battlefield.Squandered Resources.Activate(Sacrifice: Strip Mine; Color: C)` | a cost that sacrifices one of several permanents names which; `Color: C` (or `Colorless`) answers colorless where the ability's type can be it (CR 106.7) |
+| `Bot3.Concede` | the player concedes the game (CR 104.3a: at any time) the moment the cursor reaches the line, whoever is asked; the question outstanding is asked again of the players left. Fails if the player has already left. Place it after the passes that bring the game to the question it is to interrupt |
 | `Bot1.Pass` · `Bot1.PayCost` · `Bot1.Decline` · `Bot1.Undo` · `Bot1.Cancel` | priority, unless-costs, mana undo, cancel a spell or ability at any question before it is on the stack |
 | `Bot1.PayCost(X: 3)` | "you may pay {X}" with X chosen as it is paid (CR 107.3f): X is raised (or lowered) to the number one step at a time, then paid from the pool like any `PayCost` |
 | `Bot1.Accept` · `Bot1.Decline` | a "you may" choice, such as Path to Exile's search (default: decline); `Accept` also pays a payment of life alone (a shockland's 2 life, ward's), which has no mana to make first |

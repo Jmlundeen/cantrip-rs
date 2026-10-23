@@ -227,6 +227,7 @@ pub enum ScriptVerb {
     DrawFirst,
     Mulligan,
     Keep,
+    Concede,
 }
 
 impl ScriptVerb {
@@ -246,7 +247,7 @@ impl ScriptVerb {
         )
     }
 
-    pub const ALL: [ScriptVerb; 31] = [
+    pub const ALL: [ScriptVerb; 32] = [
         ScriptVerb::Play,
         ScriptVerb::Cast,
         ScriptVerb::Activate,
@@ -278,6 +279,7 @@ impl ScriptVerb {
         ScriptVerb::DrawFirst,
         ScriptVerb::Mulligan,
         ScriptVerb::Keep,
+        ScriptVerb::Concede,
     ];
 
     pub fn name(self) -> &'static str {
@@ -313,6 +315,7 @@ impl ScriptVerb {
             ScriptVerb::DrawFirst => "DrawFirst",
             ScriptVerb::Mulligan => "Mulligan",
             ScriptVerb::Keep => "Keep",
+            ScriptVerb::Concede => "Concede",
         }
     }
 
@@ -797,6 +800,12 @@ mod tests {
         assert_eq!(step.positional().collect::<Vec<_>>(), vec!["Bot2.Battlefield.Grizzly Bears#2"]);
         let copy = ActionStep::parse("Bot1.Battlefield.Island#2.Activate", 1).unwrap();
         assert_eq!((copy.card.as_deref(), copy.copy), (Some("Island"), Some(2)));
+    }
+
+    #[test]
+    fn a_concession_is_a_line_of_its_player() {
+        let step = ActionStep::parse("Bot3.Concede", 1).unwrap();
+        assert_eq!((step.verb, step.bot), (ScriptVerb::Concede, 3));
     }
 
     #[test]
