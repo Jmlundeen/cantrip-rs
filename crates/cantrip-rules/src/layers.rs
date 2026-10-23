@@ -2515,6 +2515,8 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
         | EffectKind::Suspected
         | EffectKind::LoseKeywords(_)
         | EffectKind::AddAbility(_)
+        // Read where a legal host is judged (`attach::host_allows`), not by the layers; listed so a spell's is carried.
+        | EffectKind::Enchant(_)
         | EffectKind::MustAttack => Layer::Ability,
         EffectKind::SetPt(..) => Layer::PtSet,
         EffectKind::Pump(..) => Layer::PtModify,

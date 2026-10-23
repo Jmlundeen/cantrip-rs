@@ -387,6 +387,14 @@ would go over unclickable.
   subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
   such a land other than abilities stay: CR 305.7 lists copiable effects among the sources of the abilities it loses,
   against the abilities other effects granted, which it keeps.
+- **An effect that says what a card is as it enters is that from the start (614.12)**: `Game::put_onto_battlefield_as`
+  takes an `EntersAs` ("It's an enchantment", the Enduring cycle; "It's an Aura enchantment with enchant Forest you control
+  and '...'", Old-Growth Troll), carried on `Entering::becomes`. `as_it_would_exist` judges it with those effects, and
+  `move_together` gives them to the new object as it arrives, before its arrival is announced, so nothing that watches
+  creatures enter sees a creature: ordinary continuous effects of `Duration::Indefinite` (types in layer 4, then abilities
+  lost and gained in layer 6, at timestamps in that order). As an Aura it goes through `attach::choose_aura_hosts` as a
+  printed one does (303.4f-g); its enchant ability is `EffectKind::Enchant(card)`, the card's `becomes_aura_enchant`, which
+  `attach::host_allows` reads beside a printed one for every host check (Necromancy's too).
 - **A face-down permanent is what the rule that put it there lists (708.2)**: `Game::put_onto_battlefield_face_down` takes
   `FaceDown::Manifested` (701.40a, a 2/2) or `FaceDown::Cloaked` (701.58a, a 2/2 with ward {2}), and gives the card those
   copiable values (`intrinsic::FACE_DOWN`, `intrinsic::CLOAKED`) before it enters (708.3). On the battlefield they are its

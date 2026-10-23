@@ -46,6 +46,8 @@ mod suspend_haste_tests;
 #[cfg(test)]
 mod entering_judged_tests;
 #[cfg(test)]
+mod enters_as_tests;
+#[cfg(test)]
 mod land_text_tests;
 #[cfg(test)]
 mod leave_game_tests;
@@ -1478,6 +1480,11 @@ impl cantrip_api::Game for Cx<'_> {
             ops::attach(self, aura, new);
         }
         Ok(new)
+    }
+
+    fn put_onto_battlefield_as(&mut self, object: ObjectId, controller: PlayerId, item: &StackItem, what: &'static EntersAs) -> Result<Option<ObjectId>, Suspend> {
+        let becomes = Becomes { what, card: item.ability.card };
+        ops::put_onto_battlefield_becoming(self, object, controller, becomes).map_err(|_| Suspend)
     }
 
     fn sacrifice_and_return(&mut self, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend> {

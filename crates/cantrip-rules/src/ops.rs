@@ -411,6 +411,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         }
         new.timestamp = cx.st().timestamp();
         let new_id = cx.st().push_obj(new);
+        // What the effect putting it there says it is, it is as it arrives (CR 614.12), before anything sees it arrive.
+        if entering && let Some(b) = m.entering.and_then(|e| e.becomes) {
+            enter_as(cx, new_id, b);
+        }
         // The counters it arrives with are on it as it arrives (CR 614.1c), announced after its move.
         let mut put = Vec::new();
         counters::place_arrived(cx, new_id, counts, counts_by, &mut put);
@@ -792,7 +796,8 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     let own = cx.cards().get(cx.cards().face(cx.s().obj(entering.object).card, entering.transformed));
     let may_lose = layers::abilities_may_be_lost(cx.cards(), cx.s())
         || own.statics.iter().any(|s| s.loses_all || s.sets_land_subtypes)
-        || entering.copy.is_some_and(|c| cx.card(c.card).statics.iter().any(|s| s.loses_all || s.sets_land_subtypes));
+        || entering.copy.is_some_and(|c| cx.card(c.card).statics.iter().any(|s| s.loses_all || s.sets_land_subtypes))
+        || entering.becomes.is_some_and(|b| b.what.loses_other_abilities);
     let lost = |cx: &mut Cx, entering: &Entering| may_lose && as_it_would_exist(cx, entering).lost;
     // CR 702.145b: at night a daybound card enters transformed - daybound's static ability, of the permanent as it would
     // exist on the battlefield front face up (CR 614.12), which a "loses all abilities" effect takes.
@@ -887,6 +892,10 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
         // Taken back below with the rest: no point of the game, so nothing for the state triggers.
         cx.st().effects_keep(&keep);
     }
+    // What the effect putting it there says it is (`Entering::becomes`), it would be there.
+    if let Some(b) = entering.becomes {
+        enter_as(cx, id, b);
+    }
     note_statics(cx, id);
     let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
     let lost = layers::lost_all_abilities(cx.cards(), cx.s(), &cx.g.log, id);
@@ -913,6 +922,7 @@ fn judged_entering<T>(cx: &mut Cx, entering: &Entering, counters: bool, f: impl 
     let differs = layers::static_sources_present(cx.cards(), cx.s())
         || cx.cards().statics[cx.cards().face(obj.card, entering.transformed).0 as usize]
         || entering.copy.is_some()
+        || entering.becomes.is_some()
         || obj.copy.is_some()
         || entering.transformed != obj.transformed
         || cx.s().effects.iter().any(|e| e.affected == id)
@@ -1030,7 +1040,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None };
         prepare_entry(cx, &mut entering)?;
         moves.push(Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) });
     }
@@ -1085,9 +1095,86 @@ pub fn put_onto_battlefield_as(
         transformed,
         protector: None,
         instead: None,
+        becomes: None,
     };
     prepare_entry(cx, &mut entering)?;
     Ok(move_together(cx, &[Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }], reason)[0])
+}
+
+/// The continuous effects an effect putting `id` onto the battlefield gives it as it enters (`EntersAs`, CR 614.12, 613.1d,
+/// 613.1f): its types (layer 4), then the abilities it loses and gains (layer 6), each at a timestamp of its own in that
+/// order (CR 613.7a), for as long as it is this object (CR 611.2a, 400.7). Its source is the permanent itself, under its
+/// controller: none of these reads either.
+fn enter_as(cx: &mut Cx, id: ObjectId, b: Becomes) {
+    let controller = cx.s().obj(id).controller;
+    let mut kinds = Vec::new();
+    if let Some(types) = b.what.types {
+        kinds.push(EffectKind::SetTypes(types));
+    }
+    if b.what.aura {
+        kinds.push(EffectKind::AddSubtype(Subtype::Aura));
+    }
+    if b.what.loses_other_abilities {
+        kinds.push(EffectKind::LoseAllAbilities);
+    }
+    if b.what.aura {
+        kinds.push(EffectKind::Enchant(b.card));
+    }
+    kinds.extend(b.what.abilities.iter().map(|&i| EffectKind::AddAbility(AbilityRef::delayed(b.card, i))));
+    for kind in kinds {
+        let timestamp = cx.st().timestamp();
+        cx.st().effect_push(cantrip_state::ContinuousEffect {
+            source: id,
+            controller,
+            timestamp,
+            affected: id,
+            kind,
+            duration: Duration::Indefinite,
+        });
+        // A static ability given to it that affects other objects makes it a source of static abilities.
+        if let EffectKind::AddAbility(ability) = kind
+            && matches!(cx.cards().ability(ability), AbilityDef::Static(s) if !s.own)
+        {
+            cx.st().see_statics();
+        }
+    }
+}
+
+/// Puts one object onto the battlefield as an effect says it is (`Game::put_onto_battlefield_as`, CR 614.12): its entering
+/// replacements judged on it as that (`as_it_would_exist`), as an Aura choosing what it enchants as it enters and staying
+/// where it is with nothing to enchant (CR 303.4f-g), and arriving as that. The permanent, or None if it did not enter.
+pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: PlayerId, becomes: Becomes) -> R<Option<ObjectId>> {
+    if !live(cx.s(), id) {
+        return Ok(None);
+    }
+    let mut entering = Entering {
+        object: id,
+        controller,
+        tapped: false,
+        counters: [0; CounterKind::COUNT],
+        copy: None,
+        prepared: false,
+        chosen_color: None,
+        chosen_subtype: None,
+        chosen_player: None,
+        chosen_card: None,
+        chosen_option: None,
+        attach: None,
+        attach_player: None,
+        x: 0,
+        transformed: false,
+        protector: None,
+        instead: None,
+        becomes: Some(becomes),
+    };
+    prepare_entry(cx, &mut entering)?;
+    let mut moves = vec![Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }];
+    crate::attach::choose_aura_hosts(cx, &mut moves)?;
+    if moves.is_empty() {
+        return Ok(None);
+    }
+    let new = move_together(cx, &moves, ZoneReason::Other)[0];
+    Ok(Some(new).filter(|&n| cx.s().obj(n).zone.is(ZoneKind::Battlefield)))
 }
 
 /// Transforms a permanent (CR 701.27a): its other face is up. The same object, so nothing about it is new (CR 712.18).
@@ -1361,7 +1448,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: false, protector: None, instead: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: false, protector: None, instead: None, becomes: None };
         prepare_entry(cx, &mut entering)?;
         // The token is judged as it would exist on the battlefield (CR 614.12): a token copy as what it copies.
         let copy = entering.copy;
@@ -3367,6 +3454,7 @@ mod tests {
             transformed: false,
             protector: None,
             instead: None,
+            becomes: None,
         }
     }
 

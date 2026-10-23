@@ -97,6 +97,43 @@ pub struct Entering {
     /// It does not enter: it goes to this zone instead (CR 614.12, 614.1a), as Mox Diamond's replacement sends it to the graveyard
     /// when its controller does not discard a land.
     pub instead: Option<Zone>,
+    /// What the effect putting it onto the battlefield says it is as it enters (CR 614.12, 613.1): `Game::put_onto_battlefield_as`.
+    pub becomes: Option<Becomes>,
+}
+
+/// What an effect that puts a card onto the battlefield says it is (CR 614.12: it enters as that, never as what it was;
+/// CR 613.1d, 613.1f): "return it to the battlefield. It's an enchantment. (It's not a creature.)" (the Enduring cycle),
+/// "It's an Aura enchantment with enchant Forest you control and '...'" (Old-Growth Troll; Harold and Bob, First Numens),
+/// "It's an Aura enchantment with enchant creature you control and '...', and it loses all other abilities" (Bronzehide
+/// Lion). Each part is a continuous effect on the permanent from the moment it enters, for as long as it is that object
+/// (CR 611.2a, 400.7), applied in its layer at the effect's timestamp, in this order: types (layer 4), then the abilities
+/// it loses and gains (layer 6). Given by `Game::put_onto_battlefield_as`, which reads the lists below on the card of the
+/// ability doing it (`StackItem::ability`), so a copy's ability gives what the card it copies prints.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct EntersAs {
+    /// "It's an [types]": exactly these card types (CR 205.1a), its subtypes with the types it loses (`EffectKind::SetTypes`).
+    pub types: Option<TypeSet>,
+    /// "It's an Aura ... with enchant [quality]": it is an Aura (CR 303.4, `EffectKind::AddSubtype`) with the enchant ability
+    /// its effect's card describes (`CardDef::becomes_aura_enchant`, `EffectKind::Enchant`). Not cast, it chooses what it
+    /// enchants as it enters, without targeting (CR 303.4f); with nothing it could enchant, it stays where it is (CR 303.4g).
+    pub aura: bool,
+    /// "and it loses all other abilities" (CR 613.1f): every ability it had, before it gains the ones below.
+    pub loses_other_abilities: bool,
+    /// The abilities it gains (CR 613.1f): indexes in its effect's card's `delayed` list (`EffectKind::AddAbility`).
+    pub abilities: &'static [u8],
+}
+
+impl EntersAs {
+    /// It enters as itself: nothing changed.
+    pub const NONE: EntersAs = EntersAs { types: None, aura: false, loses_other_abilities: false, abilities: &[] };
+}
+
+/// An `EntersAs` an effect gives a permanent as it enters (`Entering::becomes`): what it is, and the card whose ability says
+/// so, whose `delayed` abilities and `becomes_aura_enchant` it gains.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Becomes {
+    pub what: &'static EntersAs,
+    pub card: CardId,
 }
 
 /// Where a spell countered by `Game::counter_to` goes instead of its owner's graveyard.
@@ -2333,8 +2370,9 @@ pub struct CardDef {
     /// What an Aura may enchant (CR 303.4a, 702.5): the one target of the Aura spell, and what a legal host is for as
     /// long as it is attached (CR 704.5m).
     pub enchant: Option<TargetSpec>,
-    /// The enchant ability it gains when it becomes an Aura (CR 303.4, 702.5a, 613.1d), by an effect that adds the Aura subtype
-    /// to it: Necromancy's \"enchant creature put onto the battlefield with Necromancy\". It is not an Aura spell, so it targets nothing.
+    /// The enchant ability (CR 702.5a) this card's own effects give an object they make an Aura (CR 303.4, 613.1d, 613.1f),
+    /// granted with `EffectKind::Enchant` of this card: Necromancy's "enchant creature put onto the battlefield with
+    /// Necromancy", Old-Growth Troll's "enchant Forest you control" (`EntersAs::aura`). Not an Aura spell's, so it targets nothing.
     pub becomes_aura_enchant: Option<TargetSpec>,
     /// \"You may cast this spell as though it had flash\" (CR 307.5, 702.8): it may be cast whenever its caster could cast an instant.
     pub cast_as_though_flash: bool,

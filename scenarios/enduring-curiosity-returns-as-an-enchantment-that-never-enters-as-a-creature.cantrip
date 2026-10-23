@@ -1,0 +1,48 @@
+# "Return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)" (CR 614.12): it enters
+# as an enchantment, never as a creature. Bot1's Impact Tremors hits Bot2 for 1 as Enduring Curiosity is cast and enters as a
+# creature on turn 3; Bot2's Lightning Bolt kills it on turn 4 and it comes back an enchantment, which Impact Tremors does not see.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Impact Tremors
+Enduring Curiosity
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Impact Tremors.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Enduring Curiosity.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot2.Life = 19
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Curiosity)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Enduring Curiosity.Types = Enchantment
+Bot2.Life = 19

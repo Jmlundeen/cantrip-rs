@@ -881,6 +881,11 @@ pub enum EffectKind {
     /// `lasting_cost_changes` of `card`, the card whose spell or ability made it, which says which spells and by how much.
     /// About the player, so it reaches spells cast later and outlives its `affected` object, which is only the source.
     SpellCostChange { card: CardId, index: u8, player: PlayerId },
+    /// It has the enchant ability (CR 702.5a, layer 6) that `card` gives the objects its effects make Auras
+    /// (`CardDef::becomes_aura_enchant`): what it may enchant as it enters (CR 303.4f) and for as long as it is attached
+    /// (CR 303.4c, 704.5m). Necromancy's "it becomes an Aura with 'enchant creature put onto the battlefield with
+    /// Necromancy'", Old-Growth Troll's "It's an Aura enchantment with enchant Forest you control" (`EntersAs`).
+    Enchant(CardId),
 }
 
 impl EffectKind {

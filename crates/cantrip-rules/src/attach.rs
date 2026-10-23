@@ -27,10 +27,39 @@ pub fn host_allows(q: &dyn Query, attachment: ObjectId, host: ObjectId, attachin
     }
     if ac.has_subtype(Subtype::Aura) {
         let asker = Asker { source: attachment, controller: q.controller(attachment) };
-        let def = q.card(ac.card);
-        return def.enchant.or(def.becomes_aura_enchant).is_some_and(|spec| (spec.filter)(q, &asker, Target::Object(host)));
+        return enchants_allow(q, attachment, ac.card, &asker, Target::Object(host));
     }
     false
+}
+
+/// Whether the Aura `aura` may enchant `what` by its enchant abilities (CR 303.4c, 702.5a, 704.5m): its card's printed one
+/// (`card`, the card its copiable values are) and each one an effect gave it (`EffectKind::Enchant`: Necromancy,
+/// `EntersAs::aura`). It has one, and each allows it, as each restricts what it can enchant.
+fn enchants_allow(q: &dyn Query, aura: ObjectId, card: CardId, asker: &Asker, what: Target) -> bool {
+    let mut any = false;
+    if let Some(spec) = q.card(card).enchant {
+        if !(spec.filter)(q, asker, what) {
+            return false;
+        }
+        any = true;
+    }
+    for e in &q.state().effects {
+        if e.affected == aura
+            && let EffectKind::Enchant(by) = e.kind
+        {
+            match q.card(by).becomes_aura_enchant {
+                Some(spec) if (spec.filter)(q, asker, what) => any = true,
+                _ => return false,
+            }
+        }
+    }
+    any
+}
+
+/// Whether an Aura with these enchant abilities may enchant `what` (CR 303.4a, 303.4f, 704.5m): it has one, and each allows
+/// it, as each restricts what it can enchant (CR 702.5a).
+fn enchant_allows(specs: &[TargetSpec], q: &dyn Query, asker: &Asker, what: Target) -> bool {
+    !specs.is_empty() && specs.iter().all(|spec| (spec.filter)(q, asker, what))
 }
 
 /// Whether an Aura with "enchant player" can enchant `player` right now (CR 303.4, 704.5m): a player still in the game,
@@ -45,14 +74,14 @@ pub fn player_allows(cx: &Cx, aura: ObjectId, player: PlayerId) -> bool {
     }
     let ac = q.chars(aura);
     let asker = Asker { source: aura, controller: q.controller(aura) };
-    q.card(ac.card).enchant.is_some_and(|spec| (spec.filter)(q, &asker, Target::Player(player)))
+    enchants_allow(q, aura, ac.card, &asker, Target::Player(player))
 }
 
 /// What an Aura card about to enter would enchant (CR 303.4f): the battlefield, then the graveyards, as the C#
-/// engine lists them, leaving out itself and everything entering with it.
-fn aura_hosts(cx: &Cx, aura: ObjectId, spec: &TargetSpec, controller: PlayerId, entering: &[ObjectId]) -> Vec<Target> {
+/// engine lists them, leaving out itself and everything entering with it. Each of its enchant abilities allows it
+/// (`specs`), and it has no protection from the Aura as it would exist (`aura_chars`) under `controller`.
+fn aura_hosts(cx: &Cx, aura: ObjectId, specs: &[TargetSpec], aura_chars: &Chars, controller: PlayerId, entering: &[ObjectId]) -> Vec<Target> {
     let asker = Asker { source: aura, controller };
-    let aura_chars = cx.chars(aura);
     let state = cx.s();
     let mut zones = vec![Zone::BATTLEFIELD];
     zones.extend(state.seats().map(Zone::graveyard));
@@ -60,10 +89,10 @@ fn aura_hosts(cx: &Cx, aura: ObjectId, spec: &TargetSpec, controller: PlayerId, 
     for zone in zones {
         for &id in state.zone(zone) {
             let target = Target::Object(id);
-            if id == aura || entering.contains(&id) || !(spec.filter)(cx, &asker, target) {
+            if id == aura || entering.contains(&id) || !enchant_allows(specs, cx, &asker, target) {
                 continue;
             }
-            if cx.chars(id).protected_from_by(&aura_chars, cx.s().obj(aura).controller) {
+            if cx.chars(id).protected_from_by(aura_chars, controller) {
                 continue;
             }
             hosts.push(target);
@@ -72,30 +101,44 @@ fn aura_hosts(cx: &Cx, aura: ObjectId, spec: &TargetSpec, controller: PlayerId, 
     hosts
 }
 
+/// The enchant abilities a card about to enter has as an Aura (CR 303.4f), if it enters as one: its printed one, or the one
+/// the effect putting it there gives it (`EntersAs::aura`, `CardDef::becomes_aura_enchant`). None if it enters as no Aura.
+fn entering_enchants(cx: &Cx, m: &ops::Moving) -> Option<Vec<TargetSpec>> {
+    let e = m.entering?;
+    let card = e.copy.map(|c| c.card).unwrap_or(cx.s().obj(m.id).card);
+    let printed = cx.card(card).enchant;
+    let given = e.becomes.filter(|b| b.what.aura);
+    if printed.is_none() && given.is_none() {
+        return None;
+    }
+    let mut specs: Vec<TargetSpec> = printed.into_iter().collect();
+    // An effect's Aura with no enchant ability (`becomes_aura_enchant` unset) could enchant nothing (CR 303.4g).
+    specs.extend(given.and_then(|b| cx.card(b.card).becomes_aura_enchant));
+    Some(specs)
+}
+
 /// Auras entering without being cast choose what they enchant, in turn order (CR 303.4f, 101.4); a choice made for
-/// one is no target (hexproof does not matter), and an Aura with nothing to enchant does not enter (CR 303.4g).
+/// one is no target (hexproof does not matter), and an Aura with nothing to enchant does not enter (CR 303.4g). A card an
+/// effect puts there as an Aura (`EntersAs::aura`) is one as it enters.
 pub fn choose_aura_hosts(cx: &mut Cx, moves: &mut Vec<ops::Moving>) -> R<()> {
-    let mut auras: Vec<usize> = (0..moves.len())
-        .filter(|&i| {
-            let card = moves[i].entering.and_then(|e| e.copy).map(|c| c.card).unwrap_or(cx.s().obj(moves[i].id).card);
-            cx.card(card).enchant.is_some()
-        })
-        .collect();
+    let mut auras: Vec<(usize, Vec<TargetSpec>)> =
+        (0..moves.len()).filter_map(|i| entering_enchants(cx, &moves[i]).map(|specs| (i, specs))).collect();
     if auras.is_empty() {
         return Ok(());
     }
     let entering: Vec<ObjectId> = moves.iter().map(|m| m.id).collect();
     let apnap: Vec<PlayerId> = cx.s().apnap().collect();
-    auras.sort_by_key(|&i| {
-        let controller = moves[i].entering.map(|e| e.controller);
+    auras.sort_by_key(|(i, _)| {
+        let controller = moves[*i].entering.map(|e| e.controller);
         apnap.iter().position(|&p| Some(p) == controller)
     });
     let mut dropped = Vec::new();
-    for i in auras {
+    for (i, specs) in auras {
         let Some(mut e) = moves[i].entering else { continue };
-        let card = e.copy.map(|c| c.card).unwrap_or(cx.s().obj(moves[i].id).card);
-        let spec = cx.card(card).enchant.expect("an Aura");
-        let hosts = aura_hosts(cx, moves[i].id, &spec, e.controller, &entering);
+        // Protection is judged against the Aura as it would be on the battlefield (CR 702.16c, 614.12): a creature card
+        // an effect returns as an Aura enchantment is no creature then.
+        let aura_chars = if e.becomes.is_some() { ops::as_it_would_exist(cx, &e).chars } else { cx.chars(moves[i].id) };
+        let hosts = aura_hosts(cx, moves[i].id, &specs, &aura_chars, e.controller, &entering);
         let chosen = match hosts.len() {
             0 => {
                 dropped.push(i);

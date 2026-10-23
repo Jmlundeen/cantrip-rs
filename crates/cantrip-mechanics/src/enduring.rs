@@ -16,14 +16,15 @@ pub fn dies_as_a_creature(q: &dyn Query, source: ObjectId, event: &Event) -> Opt
     }
 }
 
-/// "Return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)": a layer-4
-/// effect with no end (CR 611.2a, 613.1d), for as long as this is the object that returned.
+/// "It's an enchantment. (It's not a creature.)": what it returns as (`EntersAs`), from the moment it enters (CR 614.12).
+static AN_ENCHANTMENT: EntersAs = EntersAs { types: Some(TypeSet::of(&[CardType::Enchantment])), ..EntersAs::NONE };
+
+/// "Return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)": it enters as an
+/// enchantment, never as a creature (CR 614.12), and stays one for as long as it is the object that returned (CR 611.2a,
+/// 613.1d).
 pub fn return_as_enchantment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
     let owner = g.obj(card).owner;
-    let returned = g.put_onto_battlefield(card, owner, false)?;
-    if g.is_on_battlefield(returned) {
-        g.add_effect(item.object, returned, EffectKind::SetTypes(TypeSet::of(&[CardType::Enchantment])), Duration::Indefinite);
-    }
+    g.put_onto_battlefield_as(card, owner, item, &AN_ENCHANTMENT)?;
     Ok(())
 }

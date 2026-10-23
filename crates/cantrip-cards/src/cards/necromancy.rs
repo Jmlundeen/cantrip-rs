@@ -8,11 +8,14 @@ fn enchant_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).entered_with == Some(asker.source))
 }
 
-/// It becomes an Aura with "enchant creature put onto the battlefield with Necromancy": the Aura subtype (CR 613.1d), kept as
-/// long as it is this object, and the enchant ability the card gains with it. Put target creature card from a graveyard onto the
-/// battlefield under your control and attach Necromancy to it, as part of the same move.
+/// It becomes an Aura with "enchant creature put onto the battlefield with Necromancy": the Aura subtype (CR 613.1d) and the
+/// enchant ability (CR 613.1f, `becomes_aura_enchant`), kept as long as it is this object. Put target creature card from a
+/// graveyard onto the battlefield under your control and attach Necromancy to it, as part of the same move.
 fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_effect(item.object, item.object, EffectKind::AddSubtype(Subtype::Aura), Duration::Indefinite);
+    instruction(g, |g| {
+        g.add_effect(item.object, item.object, EffectKind::AddSubtype(Subtype::Aura), Duration::Indefinite);
+        g.add_effect(item.object, item.object, EffectKind::Enchant(item.ability.card), Duration::Indefinite);
+    });
     if let Some(card) = targets::object(g, item, 0) {
         g.put_onto_battlefield_with_aura(card, item.controller, item.object)?;
     }

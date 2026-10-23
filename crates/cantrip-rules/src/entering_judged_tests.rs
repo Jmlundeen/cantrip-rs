@@ -144,6 +144,7 @@ fn entering(id: ObjectId, controller: PlayerId, tapped: bool) -> Entering {
         transformed: false,
         protector: None,
         instead: None,
+        becomes: None,
     }
 }
 

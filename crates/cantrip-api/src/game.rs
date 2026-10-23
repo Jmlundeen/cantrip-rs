@@ -4,7 +4,7 @@
 
 use cantrip_state::*;
 
-use crate::card::{CounterTo, FaceDown, LibraryPlace};
+use crate::card::{CounterTo, EntersAs, FaceDown, LibraryPlace};
 use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef, CauseKind};
 use crate::chars::Chars;
 use crate::history::{History, Record};
@@ -468,6 +468,15 @@ pub trait Game: Query {
     /// enchants "the creature put onto the battlefield with this Aura" (Animate Dead, Necromancy). Returns the new
     /// object; nothing is attached if the Aura has left or the object did not arrive.
     fn put_onto_battlefield_with_aura(&mut self, object: ObjectId, controller: PlayerId, aura: ObjectId) -> Result<ObjectId, Suspend>;
+    /// Puts an object onto the battlefield under `controller` as the effect of `item` says it is (`EntersAs`, CR 614.12):
+    /// it enters as that - an Enduring creature's card "is an enchantment" and never enters as a creature, so nothing that
+    /// watches creatures enter sees it - and stays so for as long as it is that object (CR 611.2a, 400.7). As an Aura
+    /// (`EntersAs::aura`) its controller chooses what it enchants as it enters, a legal object its enchant ability allows,
+    /// without targeting (CR 303.4f); with none it stays where it is (CR 303.4g), and it is put into its owner's graveyard
+    /// once what it enchants is no longer legal (CR 303.4c, 704.5m). The permanent, or None if it did not enter. Old-Growth
+    /// Troll, Harold and Bob, First Numens and Bronzehide Lion return as Auras; Enduring Innocence, Curiosity and Courage
+    /// as enchantments.
+    fn put_onto_battlefield_as(&mut self, object: ObjectId, controller: PlayerId, item: &StackItem, what: &'static EntersAs) -> Result<Option<ObjectId>, Suspend>;
     /// Puts several objects onto the battlefield at once (CR 110.2a), each under the player given.
     fn put_all_onto_battlefield(&mut self, objects: &[(ObjectId, PlayerId)]) -> Result<Vec<ObjectId>, Suspend>;
     /// The same, each with whether it enters tapped: Winds of Abandon puts the basic lands it found onto the battlefield

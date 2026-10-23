@@ -477,6 +477,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     transformed: item.way == WAY_BACK_FACE || item.way == WAY_TRANSFORMED,
                     protector: None,
                     instead: None,
+                    becomes: None,
                 };
                 ops::prepare_entry(cx, &mut entering)?;
                 if let Some(at) = on_stack(cx) {
