@@ -1,0 +1,84 @@
+# Rest in Peace sends the destroyed Ornithopter to exile instead of the graveyard, but it was still destroyed this way
+# (rulings 2017-02-09), so Bot2 still reveals (an Island, then the artifact Mox Pearl) and puts that card onto the
+# battlefield. The Ornithopter stays in exile, with the Lotus and the spell, which Rest in Peace exiles too.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Ruby
+Black Lotus
+Indomitable Creativity
+Island
+Island
+Island
+Swamp
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Ancestral Recall
+Lightning Bolt
+Dark Ritual
+Giant Growth
+Brainstorm
+
+[Bot2 Deck]
+Ornithopter
+Rest in Peace
+Plains
+Plains
+Island x3
+Island
+Island
+Island
+Mox Pearl
+Swamp
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Ancestral Recall
+Lightning Bolt
+Dark Ritual
+Giant Growth
+Brainstorm
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Rest in Peace.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Indomitable Creativity.Cast(X: 1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Black Lotus; Indomitable Creativity; Ornithopter
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Mox Pearl.Tapped = false
+Bot2.Revealed = Island; Mox Pearl
+Bot1.Library = Forest; Counterspell; Mana Leak; Time Walk; Ancestral Recall; Lightning Bolt; Dark Ritual; Giant Growth; Brainstorm
+Bot2.Library != Island; Swamp; Forest; Counterspell; Mana Leak; Time Walk; Ancestral Recall; Lightning Bolt; Dark Ritual; Giant Growth; Brainstorm

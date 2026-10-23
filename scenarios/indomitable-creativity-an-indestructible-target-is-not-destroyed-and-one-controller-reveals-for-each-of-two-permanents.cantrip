@@ -1,0 +1,82 @@
+# Indomitable Creativity with X = 3 on Bot1's own Darksteel Citadel (indestructible, so not destroyed) and Bot2's Ornithopter
+# and Mox Pearl. Only destroyed permanents count (rulings 2017-02-09): Bot1 reveals nothing and is untouched (no Revealed,
+# library unchanged), while Bot2, who controlled both destroyed ones, reveals twice - the second reveal starts from a library
+# that no longer holds the first exiled card (Island, Llanowar Elves; then Island, Island, Ornithopter, both an artifact and a
+# creature - the revealed list is sorted by name) - and both exiled cards enter together under Bot2's control, then Bot2 shuffles.
+
+[Bot1 Deck]
+Darksteel Citadel
+Mountain
+Mox Ruby
+Black Lotus
+Indomitable Creativity
+Island
+Island
+Island
+Swamp
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Ancestral Recall
+Lightning Bolt
+Dark Ritual
+Giant Growth
+Brainstorm
+
+[Bot2 Deck]
+Mox Pearl
+Ornithopter
+Island x5
+Island
+Island
+Llanowar Elves
+Island
+Ornithopter
+Swamp
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Ancestral Recall
+Lightning Bolt
+Dark Ritual
+Giant Growth
+Brainstorm
+
+[Actions]
+Bot1.Hand.Darksteel Citadel.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Darksteel Citadel.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Indomitable Creativity.Cast(X: 3)
+Bot1.Target(Bot1.Battlefield.Darksteel Citadel; Bot2.Battlefield.Ornithopter; Bot2.Battlefield.Mox Pearl)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Darksteel Citadel.Tapped = true
+Bot1.Revealed = (absent)
+Bot1.Library.Count = 10
+Bot2.Battlefield.Mox Pearl = (absent)
+Bot2.Battlefield = Llanowar Elves; Ornithopter
+Bot2.Battlefield.Llanowar Elves.Tapped = false
+Bot2.Graveyard = Mox Pearl; Ornithopter
+Bot2.Revealed = Island; Island; Island; Llanowar Elves; Ornithopter
+Bot2.Library.Count = 12
+Bot1.Library = Swamp; Forest; Counterspell; Mana Leak; Time Walk; Ancestral Recall; Lightning Bolt; Dark Ritual; Giant Growth; Brainstorm
+Bot2.Library != Island; Island; Swamp; Forest; Counterspell; Mana Leak; Time Walk; Ancestral Recall; Lightning Bolt; Dark Ritual; Giant Growth; Brainstorm

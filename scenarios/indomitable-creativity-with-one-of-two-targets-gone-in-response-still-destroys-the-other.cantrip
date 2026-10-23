@@ -1,0 +1,79 @@
+# X is 2 on Bot2's Ornithopter and Mox Pearl; in response Bot2 exiles the Ornithopter with Swords to Plowshares. The spell
+# still resolves for the target that remains (CR 608.2b): the Mox Pearl is destroyed and Bot2 reveals once - the exiled
+# Ornithopter was not "destroyed this way", so it costs no reveal - for the Island and then the creature Llanowar Elves.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Ruby
+Black Lotus
+Indomitable Creativity
+Island
+Island
+Island
+Swamp
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Ancestral Recall
+Lightning Bolt
+Dark Ritual
+Giant Growth
+Brainstorm
+
+[Bot2 Deck]
+Ornithopter
+Mox Pearl
+Swords to Plowshares
+Plains
+Island x3
+Island
+Island
+Llanowar Elves
+Island
+Swamp
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Ancestral Recall
+Lightning Bolt
+Dark Ritual
+Giant Growth
+Brainstorm
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Indomitable Creativity.Cast(X: 2)
+Bot1.Target(Bot2.Battlefield.Ornithopter; Bot2.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Graveyard = Mox Pearl; Swords to Plowshares
+Bot2.Battlefield = Llanowar Elves; Plains
+Bot2.Revealed = Island; Llanowar Elves
+Bot1.Library = Swamp; Forest; Counterspell; Mana Leak; Time Walk; Ancestral Recall; Lightning Bolt; Dark Ritual; Giant Growth; Brainstorm
+Bot2.Library != Island; Island; Swamp; Forest; Counterspell; Mana Leak; Time Walk; Ancestral Recall; Lightning Bolt; Dark Ritual; Giant Growth; Brainstorm

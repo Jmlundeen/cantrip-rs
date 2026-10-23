@@ -1,0 +1,83 @@
+# Indomitable Creativity with X = 2 on Bot1's Ornithopter and Bot2's Mox Pearl: both players lose a permanent, so each
+# reveals from their own library until an artifact or creature card (Bot1: Plains, Mountain, then the artifact Mox Emerald;
+# Bot2: Island, then the land creature Dryad Arbor, which is a creature card) and puts that card onto the battlefield, then
+# shuffles (CR 701.20, 701.24). Each library keeps the revealed non-matching cards. The land is not a legal target while
+# an artifact is (the refusal), the cost is exactly {X}{R}{R}{R} = 5 of the 6 mana available, leaving {R}.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Ornithopter
+Indomitable Creativity
+Mountain
+Island
+Island
+Plains
+Mountain
+Mox Emerald
+Swamp
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Ancestral Recall
+Lightning Bolt
+Dark Ritual
+Giant Growth
+Brainstorm
+
+[Bot2 Deck]
+Mox Pearl
+Island x6
+Island
+Island
+Dryad Arbor
+Swamp
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Ancestral Recall
+Lightning Bolt
+Dark Ritual
+Giant Growth
+Brainstorm
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Indomitable Creativity.Cast(X: 2)
+! Bot1.Target(Bot1.Battlefield.Mountain#1)
+Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Mox Pearl)
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+? Bot1.Revealed = Mox Emerald; Mountain; Plains
+
+[Expect]
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Library.Count = 12
+Bot1.Graveyard = Indomitable Creativity; Ornithopter; Black Lotus
+Bot2.Battlefield.Mox Pearl = (absent)
+Bot2.Battlefield.Dryad Arbor.Tapped = false
+Bot2.Graveyard = Mox Pearl
+Bot2.Revealed = Dryad Arbor; Island
+Bot1.Library != Plains; Mountain; Swamp; Forest; Counterspell; Mana Leak; Time Walk; Ancestral Recall; Lightning Bolt; Dark Ritual; Giant Growth; Brainstorm
+Bot2.Library != Island; Swamp; Forest; Counterspell; Mana Leak; Time Walk; Ancestral Recall; Lightning Bolt; Dark Ritual; Giant Growth; Brainstorm
