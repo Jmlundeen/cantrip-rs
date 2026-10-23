@@ -1610,8 +1610,8 @@ on resolution announces just before it is paid (CR 118.13b), and `pay_mana_used`
 ### Tapped for mana
 
 `Event::TappedForMana { permanent, player, produced }` is recorded when a mana ability with {T} in its cost resolves
-(CR 106.12): `produced` is the mana that ability itself added, every restriction counted, told from the player's pool
-before and after it - so a replacement of its mana counts, and the mana a triggered mana ability adds for the same tap
+(CR 106.12): `produced` is the mana that ability itself added, every restriction counted, told from every player's
+pools before and after it (its tapper's, and another's it adds to) - so a replacement of its mana counts, and the mana a triggered mana ability adds for the same tap
 does not (`actions::tapped_for_mana`).
 
 Replacement effects on that mana (CR 106.12b: Damping Sphere's "produces {C} instead of any other type and amount", Mana

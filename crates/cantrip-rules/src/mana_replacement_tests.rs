@@ -372,6 +372,29 @@ fn mana_an_ability_adds_to_another_players_pool_is_replaced_too() {
     let searchlight = put(&mut g, &SEARCHLIGHT);
     assert_eq!(tap(&mut g, searchlight, None, &[]).0, ManaPool::default());
     assert_eq!(g.state.player(PlayerId(1)).pool, pool(&[(Mana::G, 2)]));
+    assert_eq!(produced_by(&g, searchlight), vec![ManaTally([0, 0, 0, 0, 2, 0])], "the tap produced the mana it sent");
+}
+
+/// CR 106.12a: what a tap produced is all the mana its ability added, to any pool, with no replacement effect about too:
+/// the opponent's {G} is what the Searchlight was tapped for.
+#[test]
+fn a_tap_produces_the_mana_it_adds_to_another_players_pool() {
+    let mut g = game();
+    let searchlight = put(&mut g, &SEARCHLIGHT);
+    assert_eq!(tap(&mut g, searchlight, None, &[]).0, ManaPool::default());
+    assert_eq!(g.state.player(PlayerId(1)).pool, pool(&[(Mana::G, 1)]));
+    assert_eq!(produced_by(&g, searchlight), vec![ManaTally([0, 0, 0, 0, 1, 0])]);
+}
+
+/// What each tap of `permanent` produced, as the history records it (`Event::TappedForMana`).
+fn produced_by(g: &Game, permanent: ObjectId) -> Vec<ManaTally> {
+    g.log
+        .iter()
+        .filter_map(|r| match r.event {
+            Event::TappedForMana { permanent: p, produced, .. } if p == permanent => Some(produced),
+            _ => None,
+        })
+        .collect()
 }
 
 /// A cost that sacrifices the source with its {T} ("{T}, Sacrifice this artifact"): it is still tapped for mana (CR 106.12),

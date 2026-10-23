@@ -7087,9 +7087,10 @@ pub fn activate_mana(
         ops::sacrifice(cx, &[source]);
     }
     let asker = Asker { source, controller: player };
-    // What the ability itself produces (CR 106.12a), told from the pool before and after it: whatever replaced or added to
-    // its mana, and of whatever restriction, but not what the triggered mana abilities it triggers add.
-    let before = if def.cost.tap { mana_held(cx, player) } else { ManaPool::default() };
+    // What the ability itself produces (CR 106.12a), told from every pool before and after it - its tapper's, and another's
+    // it adds to ("that player adds", Spectral Searchlight) - of whatever restriction, but not what the triggered mana
+    // abilities it triggers add. Where a replacement effect could apply, the production says it instead (`produce`).
+    let before = if def.cost.tap { mana_held_everywhere(cx) } else { ManaPool::default() };
     // A permanent tapped for mana produces it as one event a replacement effect may change (CR 106.12b): where one could, the
     // mana the effect adds is held, not added, and proposed whole once the effect is done.
     let replaceable = def.cost.tap && !adds_nothing && crate::replace::mana_may_be_replaced(cx);
@@ -7119,7 +7120,7 @@ pub fn activate_mana(
         let produced = match replaced {
             Some(produced) => produced,
             None => {
-                let after = mana_held(cx, player);
+                let after = mana_held_everywhere(cx);
                 ManaPool(std::array::from_fn(|m| after.0[m].saturating_sub(before.0[m])))
             }
         };
@@ -7180,12 +7181,19 @@ fn sacrificed_names(cx: &Cx, chosen: &[ObjectId], color: Option<Color>, colorles
     if fits { Ok(adds_nothing) } else { Err(Stop::Cancel) }
 }
 
-/// The mana in `player`'s pool, of every restriction and none.
-fn mana_held(cx: &Cx, player: PlayerId) -> ManaPool {
-    let mut held = cx.s().player(player).pool;
-    for (_, pool) in cx.s().restricted_of(player) {
+/// The mana in every player's pool, of every restriction and none, summed: what a mana ability adds to any of them is the
+/// difference it makes.
+fn mana_held_everywhere(cx: &Cx) -> ManaPool {
+    let s = cx.s();
+    let mut held = ManaPool::default();
+    for p in s.seats() {
         for m in 0..6 {
-            held.0[m] = held.0[m].saturating_add(pool.0[m]);
+            held.0[m] = held.0[m].saturating_add(s.player(p).pool.0[m]);
+        }
+    }
+    for r in &s.restricted_mana {
+        for m in 0..6 {
+            held.0[m] = held.0[m].saturating_add(r.pool.0[m]);
         }
     }
     held
@@ -7282,8 +7290,6 @@ pub(crate) fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
 /// produce" is asked of: `colors_from_sacrifice`) asks more than one question of a few answers, the most being Cascading
 /// Cataracts' five colors in any combination, 126 runs (`docs/known-issues.md`, KI-124).
 fn effect_productions(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef, effect: ManaEffect) -> Option<Vec<[u32; 6]>> {
-    /// More runs than this is no mana ability of a land a card prints (KI-124).
-    const MOST_RUNS: usize = 256;
     let unjudged = |why: String| {
         if crate::layers::verifying() {
             panic!("{}: what its mana ability could produce (CR 106.7) can't be judged: {why}", cx.chars(id).name);
@@ -7337,9 +7343,9 @@ fn effect_productions(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDe
             let Some(request) = copy.state.agenda[frame].pending.clone() else {
                 return unjudged("its effect stopped without a question".to_string());
             };
-            let Some(tries) = answers_to_try(&request.kind) else {
-                let kind = format!("{:?}", request.kind);
-                return unjudged(format!("it asks {}", kind.split([' ', '{', '(']).next().unwrap_or("")));
+            let tries = match answers_to_try(&request.kind) {
+                Ok(tries) => tries,
+                Err(why) => return unjudged(why),
             };
             for answer in tries {
                 let mut next = answers.clone();
@@ -7351,23 +7357,26 @@ fn effect_productions(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDe
     Some(out)
 }
 
+/// More runs than this is no mana ability of a land a card prints (KI-124).
+const MOST_RUNS: usize = 256;
+
 /// Every answer to a question a mana ability's effect asks as it adds its mana, where they are few enough to try
 /// (`effect_productions`): colors for each mana (repeats allowed, their order no matter to the mana), "you may", one of
-/// several modes or players. None for any other question.
-fn answers_to_try(kind: &RequestKind) -> Option<Vec<Answer>> {
+/// several modes or players. For any other question, or more colors than `MOST_RUNS` runs could try, why not.
+fn answers_to_try(kind: &RequestKind) -> Result<Vec<Answer>, String> {
     match kind {
         RequestKind::ChooseColors { choices, count, .. } => {
             let colors: Vec<Color> = Color::ALL.into_iter().filter(|&c| choices.has(c)).collect();
             if colors.is_empty() {
-                return None;
+                return Err("it asks a choice of colors among none".to_string());
             }
             // Each multiset of `count` colors, as a non-decreasing run of indices.
             let mut out = Vec::new();
             let mut at = vec![0usize; *count as usize];
             loop {
                 out.push(Answer::Colors(at.iter().map(|&i| colors[i]).collect()));
-                if out.len() > 256 {
-                    return None;
+                if out.len() > MOST_RUNS {
+                    return Err(format!("it asks {count} mana in any combination of {} colors, more than {MOST_RUNS} ways", colors.len()));
                 }
                 let Some(i) = (0..at.len()).rev().find(|&i| at[i] + 1 < colors.len()) else { break };
                 at[i] += 1;
@@ -7376,12 +7385,15 @@ fn answers_to_try(kind: &RequestKind) -> Option<Vec<Answer>> {
                     *j = v;
                 }
             }
-            Some(out)
+            Ok(out)
         }
-        RequestKind::May { .. } => Some(vec![Answer::Yes, Answer::No]),
-        RequestKind::ChooseModes { eligible, count: 1, at_most: 0, .. } => Some(eligible.iter().map(|&i| Answer::Modes(vec![i])).collect()),
-        RequestKind::ChoosePlayer { candidates, .. } => Some(candidates.iter().map(|&p| Answer::Player(p)).collect()),
-        _ => None,
+        RequestKind::May { .. } => Ok(vec![Answer::Yes, Answer::No]),
+        RequestKind::ChooseModes { eligible, count: 1, at_most: 0, .. } => Ok(eligible.iter().map(|&i| Answer::Modes(vec![i])).collect()),
+        RequestKind::ChoosePlayer { candidates, .. } => Ok(candidates.iter().map(|&p| Answer::Player(p)).collect()),
+        other => {
+            let kind = format!("{other:?}");
+            Err(format!("it asks {}, whose answers are not tried", kind.split([' ', '{', '(']).next().unwrap_or("")))
+        }
     }
 }
 
