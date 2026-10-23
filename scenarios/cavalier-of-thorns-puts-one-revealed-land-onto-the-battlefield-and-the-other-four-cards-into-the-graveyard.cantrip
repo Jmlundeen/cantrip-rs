@@ -1,0 +1,42 @@
+# Cavalier of Thorns' enter trigger reveals exactly five cards (the sixth, a Swamp, stays in the library). The land is not
+# optional and Bot1 picks the Mountain: it enters untapped, and the other revealed cards - a second land (the Forest), a
+# creature, an artifact creature and the Island - all go to the graveyard (CR 701.20a, 608.2c). Reach is on the card.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Cavalier of Thorns
+Forest x3
+Llanowar Elves
+Forest
+Mountain
+Ornithopter
+Island
+Swamp x4
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cavalier of Thorns.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Choose()
+Bot1.Choose(Mountain)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.Battlefield.Cavalier of Thorns.Keywords = Reach
+Bot1.Graveyard = Island; Ornithopter; Forest; Llanowar Elves; Black Lotus
+Bot1.Library = Swamp; Swamp; Swamp; Swamp

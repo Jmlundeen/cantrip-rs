@@ -1,0 +1,30 @@
+# With no cards in the library (a seven-card deck, all in the opening hand) the enter trigger reveals nothing and puts
+# nothing anywhere: no land, nothing in the graveyard but the sacrificed Lotus (CR 701.20).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Cavalier of Thorns
+Forest x3
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cavalier of Thorns.Cast
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 0

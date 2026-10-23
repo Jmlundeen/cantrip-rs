@@ -1,0 +1,55 @@
+# The Cavalier's trigger targets the Ornithopter; in response Bot2 taps Ghost Vacuum to exile it. With its only target illegal
+# the ability does not resolve at all (CR 608.2b): Bot1 is not even asked whether to exile the Cavalier, which stays in the
+# graveyard.
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Cavalier of Thorns
+Forest x3
+Llanowar Elves
+Forest
+Mountain
+Ornithopter
+Island
+Swamp x4
+
+[Bot2 Deck]
+Mox Jet
+Swamp
+Black Lotus
+Ghost Vacuum
+Infernal Grasp
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cavalier of Thorns.Cast
+Bot1.Choose(Mountain)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Ghost Vacuum.Cast
+Bot1.Pass
+Bot2.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Cavalier of Thorns)
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Ornithopter)
+! Bot1.Accept
+Bot1.Pass
+[Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Graveyard = Cavalier of Thorns; Island; Forest; Llanowar Elves; Black Lotus
+Bot1.Library = Swamp; Swamp; Swamp; Swamp

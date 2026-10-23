@@ -1,0 +1,56 @@
+# Cavalier of Thorns dies to Bot2's Infernal Grasp on turn 2 (Bot2 sacrificed its own Black Lotus first, so an opponent's
+# graveyard card exists). Its trigger targets another card in Bot1's graveyard only: not the Cavalier itself and not Bot2's
+# Lotus (CR 115.1, 400.7). Accepting exiles the Cavalier and puts the target, the Ornithopter the enter trigger buried,
+# on top of the library. The Island stays in the graveyard.
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Cavalier of Thorns
+Forest x3
+Llanowar Elves
+Forest
+Mountain
+Ornithopter
+Island
+Swamp x4
+
+[Bot2 Deck]
+Mox Jet
+Swamp
+Black Lotus
+Ghost Vacuum
+Infernal Grasp
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cavalier of Thorns.Cast
+Bot1.Choose(Mountain)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Ghost Vacuum.Cast
+Bot1.Pass
+Bot2.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Cavalier of Thorns)
+Bot1.Pass
+! Bot1.Target(Bot1.Graveyard.Cavalier of Thorns)
+! Bot1.Target(Bot2.Graveyard.Black Lotus)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Accept
+[Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Exile = Cavalier of Thorns
+Bot1.Graveyard = Island; Forest; Llanowar Elves; Black Lotus
+Bot1.Library = Ornithopter; Swamp; Swamp; Swamp; Swamp

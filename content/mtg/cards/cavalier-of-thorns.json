@@ -1,0 +1,11 @@
+{
+  "name": "Cavalier of Thorns",
+  "manaCost": "{2}{G}{G}{G}",
+  "type": "Creature — Elemental Knight",
+  "power": 5,
+  "toughness": 6,
+  "oracleText": "Reach\nWhen this creature enters, reveal the top five cards of your library. Put a land card from among them onto the battlefield and the rest into your graveyard.\nWhen this creature dies, you may exile it. If you do, put another target card from your graveyard on top of your library.",
+  "keywords": [
+    "Reach"
+  ]
+}
