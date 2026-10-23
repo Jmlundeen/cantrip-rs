@@ -1,0 +1,43 @@
+# Claim the Firstborn can target a creature its caster already controls (its ruling): Bot1's own Hired Blade attacked and is
+# tapped; Claim in the second main phase untaps it (the Untap sentence) and gives it haste (CR 702.10) until end of turn
+# (CR 611.2a), after which control did not change hands. Bot1 plays Mountain on turn 1, the Blade via Black Lotus.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Black Lotus
+Hired Blade
+Claim the Firstborn
+Mountain x17
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+Bot1.Hand.Hired Blade.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Hired Blade > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Hired Blade.Tapped = true
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Claim the Firstborn.Cast(Bot1.Battlefield.Hired Blade)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hired Blade.Tapped = false
+? Bot1.Battlefield.Hired Blade.Keywords = Flash; Haste
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Hired Blade.Keywords = Flash
+
+[Expect]
+Bot1.Battlefield = Hired Blade; Mountain; Mountain
+Bot1.Graveyard = Claim the Firstborn; Black Lotus
+Bot2.Life = 17

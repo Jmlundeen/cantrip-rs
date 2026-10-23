@@ -1,0 +1,6 @@
+{
+  "name": "Claim the Firstborn",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Gain control of target creature with mana value 3 or less until end of turn. Untap that creature. It gains haste until end of turn."
+}

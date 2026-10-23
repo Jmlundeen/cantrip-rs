@@ -1,0 +1,58 @@
+# Claim the Firstborn: "Gain control of target creature with mana value 3 or less until end of turn. Untap that creature. It
+# gains haste until end of turn." Bot2 has Hired Blade (mana value 3, exactly the limit) and Keral Keep Disciples (mana value
+# 4, one past it), each cast with a Black Lotus. With both legal-looking, Claim refuses the 4 (CR 115.1, 202.3) and takes the
+# Blade, which attacks the turn it came under Bot1's control for it has haste (CR 702.10, 302.6) and is Bot2's again on its
+# turn, without haste (CR 611.2a, 613.1b). Claim costs {R}: Bot1's pool is checked right after the cast.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Claim the Firstborn
+Mountain x17
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Hired Blade
+Keral Keep Disciples
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: B)
+Bot2.Hand.Hired Blade.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: R)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Keral Keep Disciples.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Hand.Claim the Firstborn.Cast(Bot2.Battlefield.Keral Keep Disciples)
+Bot1.Hand.Claim the Firstborn.Cast(Bot2.Battlefield.Hired Blade)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hired Blade.Keywords = Flash; Haste
+Bot1.Attack(Hired Blade > Bot2)
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Hired Blade.Keywords = Flash
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain
+Bot1.Graveyard = Claim the Firstborn
+Bot2.Battlefield = Hired Blade; Keral Keep Disciples; Mountain
+Bot2.Life = 17
+Bot1.Life = 20
