@@ -1,6 +1,6 @@
 # Hexhaven Invigorator: Bot2's Lightning Bolt deals it 3, so its trigger searches for up to 3 land cards - any lands, not
 # only basics (Overgrown Tomb, Mountain, Forest), and never the Lightning Bolt in the library - and they enter tapped
-# (CR 120.2, 701.23, 614.1c). The 6/6 survives with 3 damage. The four Forests it was cast with are untouched.
+# (CR 120.2, 701.23, 614.1d). The 6/6 survives with 3 damage. The four Forests it was cast with are untouched.
 
 [Bot1 Deck]
 Forest

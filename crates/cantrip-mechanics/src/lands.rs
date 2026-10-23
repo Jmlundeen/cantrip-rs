@@ -35,7 +35,7 @@ pub fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtyp
     q.state().battlefield().iter().any(|&id| q.controller(id) == controller && q.chars(id).has_subtype(land_type))
 }
 
-/// "This land enters tapped. As it enters, choose a color." (CR 614.1c, 614.12a): both as it enters, the color kept on the
+/// "This land enters tapped. As it enters, choose a color." (CR 614.1c-d, 614.12a): both as it enters, the color kept on the
 /// permanent (CR 607.2d). Sunken Citadel and Valgavoth's Lair print it.
 pub fn enters_tapped_choosing_a_color(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.tapped = true;
@@ -75,7 +75,7 @@ pub fn enters_tapped_unless_you_control_a_planeswalker(g: &mut dyn Game, enterin
     Ok(())
 }
 
-/// "This land enters tapped unless you control a basic land" (CR 614.1c, 205.4a): the supertype, not a land type, read
+/// "This land enters tapped unless you control a basic land" (CR 614.1d, 205.4a): the supertype, not a land type, read
 /// on the battlefield as it is while the land enters, so the land itself is not counted. Abandoned Air Temple and Agna
 /// Qel'a print it.
 pub fn enters_tapped_unless_you_control_basic_land(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {

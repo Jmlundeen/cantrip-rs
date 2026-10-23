@@ -1,5 +1,5 @@
 # Spider-Woman, Stunning Savior: "Artifacts and creatures your opponents control enter tapped" applies to a token as it is
-# created (CR 614.1c, 111.1). Bot1 casts Spider-Woman and its own Thraben Inspector: Bot1's Clue (an artifact token) enters
+# created (CR 614.1d, 111.1). Bot1 casts Spider-Woman and its own Thraben Inspector: Bot1's Clue (an artifact token) enters
 # untapped. On turn 2 Bot2's Thraben Inspector enters tapped, and so does the Clue it investigates for.
 
 [Bot1 Deck]

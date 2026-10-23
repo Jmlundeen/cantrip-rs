@@ -1,4 +1,4 @@
-# "Enters tapped unless it's your turn" only ever sets tapped (CR 614.1c): it cannot untap a permanent that an instruction puts
+# "Enters tapped unless it's your turn" only ever sets tapped (CR 614.1d): it cannot untap a permanent that an instruction puts
 # onto the battlefield tapped. Raph & Mikey attack on Bot1's own turn and put the first creature card revealed, Horned
 # Loch-Whale, onto the battlefield tapped and attacking; it is Bot1's turn, so the Whale's own clause does nothing, and the
 # Whale stays tapped. (The turn-1 scenario, cast untapped, is the control for the clause itself.)

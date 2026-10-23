@@ -25,7 +25,7 @@ pub static CARD: CardDef = CardDef {
         mana_ability(TAP, add(Mana::W), "{T}: Add {W}."),
         station::ability("Station (Tap another creature you control: Put charge counters equal to its power on this Planet. Station only as a sorcery.)"),
     ],
-    // "This land enters tapped" (CR 614.1c).
+    // "This land enters tapped" (CR 614.1d).
     enters: Some(mana::enters_tapped),
     // The 12+ striation (CR 721.2a): Adagia has this ability while it has twelve or more charge counters on it.
     delayed: &[ability(cost("{3}{W}, {T}"), copy_except_legendary, "{3}{W}, {T}: Create a token that's a copy of target artifact or enchantment you control, except it's legendary. Activate only as a sorcery.")

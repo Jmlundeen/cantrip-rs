@@ -1,4 +1,4 @@
-# Spirebluff Canal: "{T}: Add {U} or {R}." and "enters tapped unless you control two or fewer other lands" (CR 614.1c).
+# Spirebluff Canal: "{T}: Add {U} or {R}." and "enters tapped unless you control two or fewer other lands" (CR 614.1d).
 # It adds red as well as blue (the existing scenario taps it for blue), and white, black, green and colorless are
 # refused. As Bot1's fourth land (three others) it enters tapped and is used the next time it untaps.
 

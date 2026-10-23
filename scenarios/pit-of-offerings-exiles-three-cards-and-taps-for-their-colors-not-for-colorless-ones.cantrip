@@ -1,5 +1,5 @@
 # Pit of Offerings (turn 1): the graveyard holds Lightning Bolt (red), Ancestral Recall (blue) and Mishra's Bauble (colorless). The land
-# enters tapped (CR 614.1c) and its enters trigger exiles all three (up to three target cards, CR 115.1d), linked to it (CR 607.2a). On
+# enters tapped (CR 614.1d) and its enters trigger exiles all three (up to three target cards, CR 115.1d), linked to it (CR 607.2a). On
 # turn 3 "{T}: Add one mana of any of the exiled cards' colors" may add red or blue and nothing else: green is refused beside the red
 # that is taken (the positive control), and colorless is not one of the five colors (ruling 2023-11-10). The Pit is untapped on
 # turn 3 only because it untapped, having entered tapped on turn 1.

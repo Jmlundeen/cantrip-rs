@@ -164,7 +164,7 @@ fn opponents_enter_tapped_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposa
     }
 }
 
-/// "[Creatures / artifacts and creatures / nonbasic lands] your opponents control enter tapped" (CR 614.1c): the
+/// "[Creatures / artifacts and creatures / nonbasic lands] your opponents control enter tapped" (CR 614.1d): the
 /// object is judged as it would exist on the battlefield (CR 614.12), under the player it enters under (CR 110.2a).
 /// `WHICH` is a set of `enter_tapped` bits. Authority of the Consuls (creatures), Spider-Woman, Stunning Savior
 /// (artifacts and creatures) and Archon of Emeria (nonbasic lands) print it.

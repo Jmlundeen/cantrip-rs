@@ -1,6 +1,6 @@
 # With a Forest in play the player chooses which land the Turf returns (CR 603.6a): on turn 3 the Turf itself, leaving the
 # untapped Forest (it still taps for G); on turn 5 the replayed Turf returns the Forest instead and stays. A Turf that
-# stays has entered tapped (CR 614.1c), so its mana ability is refused that turn.
+# stays has entered tapped (CR 614.1d), so its mana ability is refused that turn.
 
 [Bot1 Deck]
 Forest

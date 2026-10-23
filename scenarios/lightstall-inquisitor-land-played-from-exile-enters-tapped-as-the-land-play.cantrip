@@ -1,5 +1,5 @@
 # Lightstall Inquisitor: Bot2 exiles a Forest from its hand and plays it from exile on its turn. "Each land played this way
-# enters tapped" (CR 614.1c), and playing it is Bot2's land play for the turn (CR 305.2): the Forest still in its hand can't
+# enters tapped" (CR 614.1d), and playing it is Bot2's land play for the turn (CR 305.2): the Forest still in its hand can't
 # be played after it. The game ends in that main phase, so the Forest is still tapped.
 
 [Bot1 Deck]

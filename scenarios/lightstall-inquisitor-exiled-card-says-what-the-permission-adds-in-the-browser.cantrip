@@ -2,7 +2,7 @@
 # As a person sees it: Bot2's Lightstall Inquisitor asks Bot1 to exile a card from its hand, and the prompt says so. The
 # Forest Bot1 exiles says over its art what the permission is and what it adds - for as long as it stays in exile, a spell
 # cast this way costs {1} more and a land played this way enters tapped - and the Exile button is lit on Bot1's turn. Bot1
-# clicks it open and plays the Forest from there, and it enters tapped (CR 614.1c).
+# clicks it open and plays the Forest from there, and it enters tapped (CR 614.1d).
 
 [Bot1 Deck]
 Forest

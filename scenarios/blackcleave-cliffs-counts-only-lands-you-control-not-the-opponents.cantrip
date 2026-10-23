@@ -1,4 +1,4 @@
-# "Two or fewer other lands" counts the lands its controller controls (CR 614.1c, 109.4), not every land in the game.
+# "Two or fewer other lands" counts the lands its controller controls (CR 614.1d, 109.4), not every land in the game.
 # On turn five Bot1 controls two lands and Bot2 two more, four other lands in all, and Blackcleave Cliffs still enters
 # untapped; the existing scenario with three of Bot1's own lands is the control that it enters tapped.
 

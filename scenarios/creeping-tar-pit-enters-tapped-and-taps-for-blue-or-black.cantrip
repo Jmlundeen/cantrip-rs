@@ -1,4 +1,4 @@
-# "This land enters tapped" (CR 614.1c): on the turn Bot1 plays Creeping Tar Pit its mana ability is not offered, since
+# "This land enters tapped" (CR 614.1d): on the turn Bot1 plays Creeping Tar Pit its mana ability is not offered, since
 # the {T} cost cannot be paid. On turn 3 it is untapped and adds {B} (chosen), on turn 5 {U}: one mana of either color,
 # never both.
 

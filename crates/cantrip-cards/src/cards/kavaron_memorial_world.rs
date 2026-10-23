@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
         mana_ability(TAP, add(Mana::R), "{T}: Add {R}."),
         station::ability("Station (Tap another creature you control: Put charge counters equal to its power on this Planet. Station only as a sorcery.)"),
     ],
-    // "This land enters tapped" (CR 614.1c).
+    // "This land enters tapped" (CR 614.1d).
     enters: Some(mana::enters_tapped),
     // The 12+ striation (CR 721.2a): an activated ability Kavaron has while it has twelve or more charge counters. Its
     // controller may sacrifice Kavaron itself as the land (it is tapped as a cost first, CR 602.2b).

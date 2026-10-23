@@ -1,4 +1,4 @@
-# "This land enters tapped unless you control a Swamp or a Mountain" (CR 614.1c): Bot1 controls only a Plains on turn 3,
+# "This land enters tapped unless you control a Swamp or a Mountain" (CR 614.1d): Bot1 controls only a Plains on turn 3,
 # so the Encampment enters tapped and cannot tap for {W} (the refusal). The positive control for the Mountain is the
 # scenario where it enters beside one and activates the same turn; the control for the Swamp type is
 # dalkovan-encampment-enters-untapped-beside-a-swamp-by-type.

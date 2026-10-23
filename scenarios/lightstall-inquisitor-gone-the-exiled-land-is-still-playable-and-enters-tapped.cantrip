@@ -1,7 +1,7 @@
 # Lightstall Inquisitor: the permission lasts "for as long as it remains exiled" (CR 611.2), not while the Inquisitor stays.
 # Bot2 exiles a Forest, then on turn 2 plays a Mountain from its hand and Bolts the Inquisitor. On turn 4, with the
 # Inquisitor long in the graveyard, Bot2 still plays the Forest from exile, and the replacement the resolved ability made
-# still has it enter tapped (CR 614.1c).
+# still has it enter tapped (CR 614.1d).
 
 [Bot1 Deck]
 Plains

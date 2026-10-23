@@ -23,7 +23,7 @@ pub static FAITH_GRIEF: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    // "This land enters tapped" (CR 614.1c).
+    // "This land enters tapped" (CR 614.1d).
     enters: Some(mana::enters_tapped),
     abilities: &[mana_ability(TAP, add(Mana::W), "{T}: Add {W}.")],
     adventure: Some(&FAITH_GRIEF),

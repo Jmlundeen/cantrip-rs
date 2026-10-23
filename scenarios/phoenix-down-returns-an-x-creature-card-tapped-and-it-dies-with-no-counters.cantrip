@@ -1,5 +1,5 @@
 # Phoenix Down: Walking Ballista in the graveyard has mana value 0 (X is 0 outside the stack, CR 202.3e), so it is a legal return target for "mana value 4 or less". It returns tapped
-# (CR 614.1c) with no +1/+1 counters, a 0/0 that dies at once to state-based actions (CR 704.5f): it is back in the graveyard and has left the battlefield this turn.
+# (CR 614.1c-d) with no +1/+1 counters, a 0/0 that dies at once to state-based actions (CR 704.5f): it is back in the graveyard and has left the battlefield this turn.
 
 [Bot1 Deck]
 Plains

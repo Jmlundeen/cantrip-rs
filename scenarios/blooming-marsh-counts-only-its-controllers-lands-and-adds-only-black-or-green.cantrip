@@ -1,5 +1,5 @@
 # Blooming Marsh: "This land enters tapped unless you control two or fewer other lands." Only lands its controller
-# controls count (CR 614.1c, "you control"): on turn 7 Bot1 has two other lands while Bot2 has three, and the Marsh
+# controls count (CR 614.1d, "you control"): on turn 7 Bot1 has two other lands while Bot2 has three, and the Marsh
 # enters untapped. It adds {B} or {G} and nothing else: white, blue, red and colorless are refused beside the black
 # it does add (the positive control).
 

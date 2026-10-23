@@ -1,7 +1,7 @@
 # "Return target creature card with mana value 3 or less from your graveyard to the battlefield tapped": Faithless Looting
 # puts Hired Blade (mana value 3, exactly the limit) and Questing Beast (mana value 4, one over) into Bot1's graveyard.
 # Questing Beast is refused as a target and Hired Blade, the positive control for the same cast, is returned
-# tapped (CR 115.1, 601.2c, 110.2a, 614.1c); Questing Beast stays in the graveyard.
+# tapped (CR 115.1, 601.2c, 110.2a, 614.1d); Questing Beast stays in the graveyard.
 
 [Bot1 Deck]
 Mox Ruby

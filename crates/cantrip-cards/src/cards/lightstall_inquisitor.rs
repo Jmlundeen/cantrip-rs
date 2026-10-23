@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// Each opponent, in turn order from the active player (CR 101.4), chooses a card of their own hand (CR 608.2d); the
 /// chosen cards are then exiled together. Each is its owner's to play for as long as it stays in exile (CR 611.2, 400.7):
 /// a spell for its costs and {1} more (CR 601.2f), a land as their land play, at the times the rules allow (CR 305.1,
-/// 305.2, ruling 2025-07-25), entering tapped (CR 614.1c).
+/// 305.2, ruling 2025-07-25), entering tapped (CR 614.1d).
 fn each_opponent_exiles(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
     let mut chosen = Vec::new();

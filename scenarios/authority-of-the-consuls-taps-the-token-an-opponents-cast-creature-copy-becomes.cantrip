@@ -1,5 +1,5 @@
 # A copy of a permanent spell resolves as a token (CR 707.10f, 111.13): it is not created, but it enters the battlefield
-# from the stack like any permanent spell, so "creatures your opponents control enter tapped" applies to it (CR 614.1c).
+# from the stack like any permanent spell, so "creatures your opponents control enter tapped" applies to it (CR 614.1d).
 # Bot2 casts Authority of the Consuls on turn 2. On turn 3 Bot1's Uldaros Theorix exiles the Entombed Ornithopter and the
 # sacrificed Black Lotus and casts copies of both: the Ornithopter token enters tapped and gains Bot2 1 life (Uldaros
 # itself entered tapped and gained the first); the Black Lotus token, not a creature, enters untapped.

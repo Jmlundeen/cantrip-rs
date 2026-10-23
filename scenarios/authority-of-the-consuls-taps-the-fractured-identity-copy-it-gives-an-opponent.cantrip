@@ -1,5 +1,5 @@
 # Authority of the Consuls: "Creatures your opponents control enter tapped" applies to a token created under an opponent
-# by Authority's own controller's spell (CR 614.1c, 111.1, 110.2a): the token is judged as it would exist on the
+# by Authority's own controller's spell (CR 614.1d, 111.1, 110.2a): the token is judged as it would exist on the
 # battlefield, under the player it enters under (CR 614.12). Bot1 casts Authority, then Fractured Identity on its own
 # Ornithopter, so Bot2 creates the token copy: it enters tapped, and its entering gains Bot1 1 life.
 

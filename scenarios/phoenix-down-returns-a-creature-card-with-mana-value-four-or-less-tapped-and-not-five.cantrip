@@ -1,6 +1,6 @@
 # Phoenix Down: "{1}{W}, {T}, Exile this artifact: Choose one - Return target creature card with mana value 4 or less from your graveyard to
 # the battlefield tapped." Thought Scour mills Auriok Salvagers (mana value 4) and Harvester of Misery (5): the Harvester is refused as a
-# target (mana value 5, CR 202.3) while the Salvagers are returned, tapped (CR 614.1c). The Phoenix Down is exiled as a cost, so it is
+# target (mana value 5, CR 202.3) while the Salvagers are returned, tapped (CR 614.1d). The Phoenix Down is exiled as a cost, so it is
 # gone even though the ability is still on the stack.
 
 [Bot1 Deck]

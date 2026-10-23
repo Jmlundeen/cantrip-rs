@@ -1,4 +1,4 @@
-# Flooded Strand finds "a Plains or Island card" and Raffine's Tower is both: Bot1 fetches it and it enters tapped, as printed (a fetched land is put onto the battlefield, not played, and its replacement still applies, CR 614.1c), so it
+# Flooded Strand finds "a Plains or Island card" and Raffine's Tower is both: Bot1 fetches it and it enters tapped, as printed (a fetched land is put onto the battlefield, not played, and its replacement still applies, CR 614.1d), so it
 # cannot be tapped for mana the turn it was fetched (refusal) and can on the next turn (the positive control).
 
 [Bot1 Deck]

@@ -32,7 +32,7 @@ fn mage_siege(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static MAGE_SIEGE: CardDef = CardDef { spell: spell(&[], mage_siege), ..oracle::MAGE_SIEGE };
 
 pub static CARD: CardDef = CardDef {
-    // "This land enters tapped" (CR 614.1c).
+    // "This land enters tapped" (CR 614.1d).
     enters: Some(mana::enters_tapped),
     abilities: &[mana_ability(TAP, add(Mana::R), "{T}: Add {R}.")],
     adventure: Some(&MAGE_SIEGE),

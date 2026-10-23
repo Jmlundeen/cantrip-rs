@@ -1,4 +1,4 @@
-# Overgrown Farmland counts only its controller's other lands (CR 614.1c): played as the first land, with no other land
+# Overgrown Farmland counts only its controller's other lands (CR 614.1d): played as the first land, with no other land
 # under Bot1's control, it enters tapped and cannot be tapped for mana that turn.
 
 [Bot1 Deck]

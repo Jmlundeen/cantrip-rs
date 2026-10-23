@@ -1,7 +1,7 @@
 # Eddymurk Crab: Flash, "This creature enters tapped if it's not your turn", "When this creature enters, tap up to two target creatures."
 # On turn 1 Bot1 casts one Lightning Bolt (so the Crab costs {1} less: {4}{U}{U} = six, exactly the six blue mana of two Mox Sapphires, an Island
 # and a Black Lotus). On Bot2's turn 2, after Bot2 has cast two Llanowar Elves and an Ornithopter, Bot1 flashes the Crab in: it is not Bot1's turn, so it
-# enters tapped (CR 614.1c), and its trigger taps two of the three creatures - three cannot be chosen (up to two) - leaving the third untapped.
+# enters tapped (CR 614.1d), and its trigger taps two of the three creatures - three cannot be chosen (up to two) - leaving the third untapped.
 # (The control, where it is Bot1's own turn and the Crab enters untapped, is the neighbouring scenario.)
 
 [Bot1 Deck]

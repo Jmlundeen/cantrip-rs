@@ -1,4 +1,4 @@
-# Archon of Emeria: "Nonbasic lands your opponents control enter tapped" (CR 614.1c). CR 614.12 judges the land as it would
+# Archon of Emeria: "Nonbasic lands your opponents control enter tapped" (CR 614.1d). CR 614.12 judges the land as it would
 # exist on the battlefield, "taking into account ... continuous effects that already exist and would apply to the permanent":
 # under Blood Moon ("Nonbasic lands are Mountains") Bot2's Taiga would be a Mountain there, but Blood Moon sets only its land
 # subtype (CR 305.7), not its supertypes, so it is still a nonbasic land and enters tapped - whatever its own rules text lost.

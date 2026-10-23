@@ -12,7 +12,7 @@ pub static DWARF: CardDef = CardDef {
     ..token!(Dwarf)
 };
 
-/// "This land enters tapped unless you control an Equipment" (CR 614.1c): read on the battlefield as it is while the land
+/// "This land enters tapped unless you control an Equipment" (CR 614.1d): read on the battlefield as it is while the land
 /// enters.
 fn enters_tapped_unless_equipment(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     if equipment_controlled(g, entering.controller).is_empty() {
