@@ -1,0 +1,60 @@
+# Tomik's granted static ability caps a declaration of attackers on a planeswalker its controller controls at one
+# creature (CR 508.1c). Bot2 has Tomik and Wrenn and Six, so a declaration naming both of Bot1's creatures at Wrenn is
+# refused, while one creature at Wrenn and two at Bot2 is legal: the cap is per target, not on the whole declaration.
+# Wrenn takes 2 from the Changeling and stays at 1 loyalty; Bot2 takes 1 from the Fiend, Ornithopter deals nothing.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Ruby
+Woodland Changeling
+Misshapen Fiend
+Ornithopter
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Tomik, Orzhov Lawmage
+Wrenn and Six
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Hand.Misshapen Fiend.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tomik, Orzhov Lawmage.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack(Woodland Changeling > Wrenn and Six; Misshapen Fiend > Wrenn and Six)
+Bot1.Attack(Woodland Changeling > Wrenn and Six; Misshapen Fiend > Bot2; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Woodland Changeling > Wrenn and Six; Misshapen Fiend > Bot2; Ornithopter > Bot2
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot2.Battlefield.Wrenn and Six.Counters.Loyalty = 1
+Bot2.Battlefield.Tomik, Orzhov Lawmage.Keywords = Flying

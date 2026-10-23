@@ -1,0 +1,65 @@
+# Tomik's static ability is granted to each planeswalker its controller controls, so a planeswalker that has lost all
+# its abilities no longer has the cap (CR 613.1f). Bot2 controls both Tomik and Wrenn and Six; Bot1's Flourishing
+# Grapple strips Wrenn of all abilities until end of turn, and two creatures may now attack Wrenn in one declaration -
+# T5 shows the same declaration refused once the ability is back. The bite is dealt by Ornithopter, power 0, so Wrenn
+# takes only the Changeling's 2 on this turn (3 loyalty to 1) and the other 2 when the ability has returned (dead).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Woodland Changeling
+Ornithopter
+Forest
+Flourishing Grapple
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Tomik, Orzhov Lawmage
+Wrenn and Six
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tomik, Orzhov Lawmage.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Flourishing Grapple.Cast
+Bot1.Target(Bot2.Battlefield.Wrenn and Six)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Attack(Woodland Changeling > Wrenn and Six; Ornithopter > Wrenn and Six)
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Woodland Changeling > Wrenn and Six; Ornithopter > Wrenn and Six
+[T5 Bot1.Main1]
+! Bot1.Attack(Woodland Changeling > Wrenn and Six; Ornithopter > Wrenn and Six)
+Bot1.Attack(Woodland Changeling > Wrenn and Six; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Graveyard = Wrenn and Six; Black Lotus
+Bot2.Battlefield.Tomik, Orzhov Lawmage.Keywords = Flying

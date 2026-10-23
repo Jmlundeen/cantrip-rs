@@ -1,0 +1,11 @@
+{
+  "name": "Tomik, Orzhov Lawmage",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Advisor",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flying\nPlaneswalkers you control have \"No more than one creature can attack this planeswalker each combat.\"\n{T}: Target creature with a +1/+1 counter on it gains flying until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

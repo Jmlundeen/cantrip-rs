@@ -1601,13 +1601,40 @@ impl<'s> Run<'s> {
                     }
                 }
             }
-            RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, .. } => {
+            RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, .. } => {
                 // `! Bot1.Attack()`: declaring no attackers at all is refused, because some creature must attack (CR 508.1d).
                 if action.positional().next().is_none() {
                     if check_answer(&self.game, request, &Answer::Attack(Vec::new())).is_ok() {
                         return fail(format!("line {line} says {text} must not be allowed, but declaring no attackers is"));
                     }
                     return Ok(());
+                }
+                // Several attacks named together are one declaration (CR 508.1a), judged as a whole by the core's validator:
+                // refused when it may not be declared as it is, even though each attack alone is legal - a cap on how many
+                // creatures may attack one target (CR 508.1c) is what such a line proves.
+                if action.positional().count() > 1 {
+                    let on_battlefield: Vec<ObjectId> = self.game.state.battlefield().to_vec();
+                    let mut pairs: Vec<(ObjectId, Target)> = Vec::new();
+                    for spec in action.positional() {
+                        let Some((attacker, target)) = spec.split_once('>') else { break };
+                        let Some(&attacker) = self.objects(action, attacker.trim(), eligible)?.first() else { break };
+                        let target = match bot_id(target.trim()) {
+                            Some(b) if players.contains(&player_of(b)) => Target::Player(player_of(b)),
+                            Some(_) => break,
+                            None => match self.objects(action, target.trim(), &on_battlefield)?.into_iter().find(|f| planeswalkers.contains(f) || battles.contains(f)) {
+                                Some(id) => Target::Object(id),
+                                None => break,
+                            },
+                        };
+                        pairs.push((attacker, target));
+                    }
+                    if pairs.len() == action.positional().count() {
+                        let targets = attack_targets(players, planeswalkers, battles);
+                        if requirements.judge(eligible, &targets, costs, &pairs, false).complete {
+                            return fail(format!("line {line} says {text} must not be allowed, but it is"));
+                        }
+                        return Ok(());
+                    }
                 }
                 for spec in action.positional() {
                     let parts: Vec<&str> = spec.split('>').collect();

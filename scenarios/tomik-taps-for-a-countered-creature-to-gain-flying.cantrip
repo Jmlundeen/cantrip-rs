@@ -1,0 +1,70 @@
+# "{T}: Target creature with a +1/+1 counter on it gains flying until end of turn" (CR 115.1, 122.1, 611.2a). Each player
+# gives its own Woodland Changeling a +1/+1 counter with Snakeskin Veil, so the counter alone is what the target filter
+# reads: Bot2's Ornithopter has none and is refused, while Bot2's Changeling is a legal target for Bot1's Tomik. Tomik taps
+# as the cost, so a second activation is refused that turn; on turn 5 Tomik untaps, the opponent's Changeling has lost its
+# flying at end of turn, and Bot1's own countered Changeling is a legal target. Tomik is cast on turn 1 so it is not
+# summoning sick on turn 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Emerald
+Woodland Changeling
+Snakeskin Veil
+Tomik, Orzhov Lawmage
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Woodland Changeling
+Snakeskin Veil
+Ornithopter
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tomik, Orzhov Lawmage.Cast
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Woodland Changeling)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Woodland Changeling)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Tomik, Orzhov Lawmage.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Tomik, Orzhov Lawmage.Activate(Bot2.Battlefield.Woodland Changeling)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Woodland Changeling.Keywords = Changeling; Flying
+? Bot1.Battlefield.Tomik, Orzhov Lawmage.Tapped = true
+! Bot1.Battlefield.Tomik, Orzhov Lawmage.Activate(Bot1.Battlefield.Woodland Changeling)
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Woodland Changeling.Keywords = Changeling
+Bot1.Battlefield.Tomik, Orzhov Lawmage.Activate(Bot1.Battlefield.Woodland Changeling)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Woodland Changeling.Keywords = Changeling; Flying
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Tomik, Orzhov Lawmage.Tapped = true
+Bot2.Battlefield.Woodland Changeling.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Woodland Changeling.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Keywords = Flying

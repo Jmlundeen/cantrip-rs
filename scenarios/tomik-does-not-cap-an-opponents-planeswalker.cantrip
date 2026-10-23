@@ -1,0 +1,57 @@
+# "Planeswalkers you control" is the planeswalkers of Tomik's controller, so an opponent's planeswalker is not capped:
+# Bot1 controls Tomik and attacks Bot2's Ashiok, Dream Render with two creatures in one declaration (CR 508.1c). Tomik is
+# cast on turn 3 with the moxen untapped again, so it is on the battlefield as the attackers are declared. Ashiok takes
+# 2 + 1 and is left at 2 loyalty; Bot2 is untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Pearl
+Woodland Changeling
+Misshapen Fiend
+Tomik, Orzhov Lawmage
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Ashiok, Dream Render
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Hand.Misshapen Fiend.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ashiok, Dream Render.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tomik, Orzhov Lawmage.Cast
+Bot1.Pass
+Bot1.Attack(Woodland Changeling > Ashiok, Dream Render; Misshapen Fiend > Ashiok, Dream Render)
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Woodland Changeling > Ashiok, Dream Render; Misshapen Fiend > Ashiok, Dream Render
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Battlefield.Ashiok, Dream Render.Counters.Loyalty = 2
+Bot1.Battlefield.Tomik, Orzhov Lawmage.Keywords = Flying

@@ -354,6 +354,10 @@ out: the asked player's own, untapped, with another creature of theirs offered i
 offers still holds as a refusal when no declaration can make it: the rules refuse that attack together with every other
 creature that must attack sent where attacking is free (a creature that must attack a certain player sent at their
 planeswalker while attacking the player costs nothing, CR 508.1d).
+The pairs of one refusal are one declaration, judged by the engine's own check: a cap each attack alone obeys
+holds as a refusal once they are named together - `! Bot1.Attack(Bear > Wrenn; Giant > Wrenn)` for Tomik's "no more
+than one creature can attack this planeswalker" (CR 508.1c). Written as separate refusal lines each would fail, since each attack alone is allowed. The refusal also holds when
+the pairs named fall short of a requirement (a creature that must attack, CR 508.1d), as a refusal of blocks does.
 
 A search, `! Bot1.Search(Plains)`, is checked at that player's next library search, and fails if a Plains is among
 the cards it may find. The card must be in the library searched, or the refusal fails as proving nothing. A search for
