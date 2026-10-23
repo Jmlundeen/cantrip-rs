@@ -749,7 +749,10 @@ fn choose_counter_kind(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &C
 /// The permanents a variable sacrifice may take, or the other cards in the graveyard an exile may take (CR 601.2h).
 fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost) -> Vec<ObjectId> {
     match variable {
-        VariableCost::SacrificeX(filter) | VariableCost::SacrificeOneOrMore(filter) | VariableCost::SacrificeAnyNumber { filter, .. } => {
+        VariableCost::SacrificeX(filter)
+        | VariableCost::SacrificeOneOrMore(filter)
+        | VariableCost::SacrificeAnyNumber { filter, .. }
+        | VariableCost::SacrificeWithPowerX(filter) => {
             let asker = Asker { source, controller: player };
             cx.permanents_of(player).into_iter().filter(|&id| filter(cx, &asker, id)).collect()
         }
@@ -757,6 +760,12 @@ fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: Va
             cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect()
         }
     }
+}
+
+/// Whether a permanent's power is `x` or greater ("a creature with power X or greater", CR 702.153a): one with no power
+/// has none to be.
+fn power_at_least(cx: &Cx, id: ObjectId, x: u32) -> bool {
+    cx.chars(id).power.is_some_and(|p| i64::from(p) >= i64::from(x))
 }
 
 /// How many card types appear among these cards (CR 205.2a).
@@ -775,6 +784,9 @@ fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: Varia
     match variable {
         VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => true,
         VariableCost::SacrificeOneOrMore(_) => !variable_candidates(cx, source, player, variable).is_empty(),
+        // Its power is read as the cost is paid (CR 601.2h), after the mana abilities of CR 601.2g, which may change it: any
+        // permanent that passes the filter may yet pay.
+        VariableCost::SacrificeWithPowerX(_) => !variable_candidates(cx, source, player, variable).is_empty(),
         VariableCost::ExileFromGraveyardWithTypes(n) => {
             types_among(cx, &variable_candidates(cx, source, player, variable)) >= n.max(1) as usize
         }
@@ -804,6 +816,15 @@ fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
                 return Err(Stop::Cancel);
             }
             Ok((ask_cards(cx, player, source, Purpose::SacrificeCost, candidates, x as usize, false)?, Vec::new()))
+        }
+        VariableCost::SacrificeWithPowerX(_) => {
+            // Its power is read as the cost is paid (CR 601.2h): one that has shrunk below X since X was announced does not
+            // pay, and with none that does the announcement is taken back.
+            let eligible: Vec<ObjectId> = candidates.into_iter().filter(|&id| power_at_least(cx, id, x)).collect();
+            if eligible.is_empty() {
+                return Err(Stop::Cancel);
+            }
+            Ok((ask_cards(cx, player, source, Purpose::SacrificeCost, eligible, 1, false)?, Vec::new()))
         }
         VariableCost::SacrificeOneOrMore(_) => {
             if candidates.is_empty() {
@@ -5226,7 +5247,7 @@ fn cast(
         (None, Some(x)) => x,
         (None, None) => way_x,
     };
-    let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. }));
+    let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } | VariableCost::SacrificeWithPowerX(_)));
     // "This spell costs {1} less to cast for each permanent sacrificed this way": generic mana off for each one announced.
     let less_each = match extra.variable {
         Some(VariableCost::SacrificeAnyNumber { less_each, .. }) => less_each,
@@ -5246,6 +5267,10 @@ fn cast(
         // there are (CR 601.2b).
         let cap: u32 = if extra.pay_x_life {
             payable_life(cx, player).clamp(0, 1000) as u32
+        } else if matches!(extra.variable, Some(VariableCost::SacrificeWithPowerX(_))) {
+            // A power read as the cost is paid (CR 601.2h), after the mana abilities that may change it (CR 601.2g): X up
+            // to the most a power can be, the payment refusing one nothing has.
+            i16::MAX as u32
         } else if let Some(variable) = extra.variable.filter(|_| sacrifices_x) {
             let there = u32::try_from(variable_candidates(cx, spell, player, variable).len()).unwrap_or(u32::MAX);
             // An X ("sacrifice X creatures") is a u16 (`StackItem::x`); the number "any number" announces is not.

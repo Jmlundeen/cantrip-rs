@@ -633,6 +633,13 @@ pub enum VariableCost {
     /// Exile any number of other cards from your graveyard with this many card types or more among them (CR 205.2a):
     /// Nethergoyf's escape.
     ExileFromGraveyardWithTypes(u8),
+    /// Sacrifice one permanent you control that passes the filter and has power X or greater, X announced with the spell
+    /// though its mana cost has no {X} (CR 107.3a, 601.2b): casualty X (CR 702.153a), Ob Nixilis, the Adversary's. X is
+    /// the spell's X (CR 107.3i: one value for every X of the object, its `x`). The permanent is chosen as the cost is paid
+    /// (CR 601.2h), its power read then: the mana abilities activated while paying (CR 601.2g) may have changed it, so X is
+    /// announced up to the most a power can be (`i16::MAX`), and the cost is offered while any such permanent is there,
+    /// whatever its power now. With none of power X or greater at payment, the cast is taken back.
+    SacrificeWithPowerX(ObjectFilter),
 }
 
 /// The cost of crew (CR 702.122a) and saddle (CR 702.171a): tap other untapped creatures with total power `power` or
