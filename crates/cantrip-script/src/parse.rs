@@ -28,8 +28,8 @@ pub struct GameScript {
     /// Each player's companion, chosen as the deck was built (a `[Bot1 Companion]` section, one card name): dealt into their
     /// sideboard, and revealed before the game if their deck fulfils its condition (CR 103.2b). Index 0 is Bot1.
     pub companions: Vec<Option<String>>,
-    /// The format's minimum deck size (a `[Minimum Deck Size]` section: `40`, as in Limited, CR 100.2b), when not
-    /// Constructed's sixty (CR 100.2a).
+    /// The format's minimum deck size (a `[Minimum Deck Size]` section: `60` in Constructed, CR 100.2a; `40` in Limited, CR
+    /// 100.2b), when not Freeform's none.
     pub minimum_deck_size: Option<u32>,
     pub steps: Vec<ScriptStep>,
     pub expectations: Vec<Expectation>,

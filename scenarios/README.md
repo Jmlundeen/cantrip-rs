@@ -117,13 +117,14 @@ sideboard holds any number (Magic Tournament Rules). A player with no section ha
 [Bot1 Companion]       the companion Bot1 chose at deck building (CR 702.139a): one card, dealt into its sideboard
 Lurrus of the Dream-Den
 
-[Minimum Deck Size]    the format's minimum deck size, which a companion's condition may name: forty in Limited
-40
+[Minimum Deck Size]    the format's minimum deck size, which a companion's condition may name: sixty in Constructed
+60
 ```
 
 A companion chosen at deck building is revealed before the game, nothing asked, if the deck fulfils its condition (CR 103.2b);
-otherwise it stays a sideboard card. A scenario names no format: it is Freeform, no deck-construction restriction, whose
-minimum deck size is sixty (casual Constructed play, CR 100.2a) unless a `[Minimum Deck Size]` section says otherwise. `Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion` takes the special action that puts the revealed
+otherwise it stays a sideboard card. A scenario names no format: it is Freeform, with no deck-construction restriction and
+no minimum deck size, unless a `[Minimum Deck Size]` section gives one (sixty in Constructed, CR 100.2a; forty in Limited,
+CR 100.2b). `Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion` takes the special action that puts the revealed
 companion into the hand for {3} (CR 116.2g), paid with the mana abilities that follow as a cast is; `BotN.Companion` is the
 card BotN revealed, empty for none. In the browser, `Client.Bot1.Companion` and `OpponentCompanion` are the cards in the
 companion windows, and their `.Corner` where each stands.

@@ -62,12 +62,11 @@ public sealed record DeckFormat(string Key, string Title)
     public int MainSize => IsFreeform ? 0 : IsCommander ? 100 : IsLimited ? LimitedMinimum : 60;
 
     /// <summary>
-    /// The minimum deck size the rules give the game (CR 100.2a-b, 903.5a), which the engine is told and a companion's condition
-    /// may name (Yorion, Sky Nomad): the format's own, and in Freeform sixty. A casual game is Constructed play (CR 100.2a; the
-    /// rulings of Yorion: "sixty cards for Constructed events (such as Standard or casual freeform play)"): that the server
-    /// holds a Freeform deck to no size does not change what the rules call its minimum.
+    /// The minimum deck size of the game (CR 100.2a-b, 903.5a), which the engine is told and a companion's condition may name
+    /// (Yorion, Sky Nomad): the format's own - and none in Freeform, which has no deck size restriction at all (a deck of no
+    /// cards is a Freeform deck), so Yorion's "twenty cards more than the minimum deck size" is twenty there.
     /// </summary>
-    public int MinimumDeckSize => IsFreeform ? 60 : MainSize;
+    public int MinimumDeckSize => MainSize;
 
     /// <summary>The most cards a sideboard has (CR 100.4a); Commander has none, in Limited it is the rest of the pool (CR 100.4b), and Freeform has no limit.</summary>
     public int SideSize => IsCommander ? 0 : IsLimited || IsFreeform ? int.MaxValue : 15;

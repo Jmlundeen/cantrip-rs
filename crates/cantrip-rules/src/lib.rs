@@ -211,7 +211,7 @@ pub struct Setup {
     pub opening_chooser: Option<PlayerId>,
 }
 
-/// A deal with nothing in it, for building on: a Constructed game's minimum deck size (CR 100.2a), every other field empty.
+/// A deal with nothing in it, for building on: a Freeform game, with no minimum deck size, every other field empty.
 impl Default for Setup {
     fn default() -> Setup {
         Setup {
@@ -219,7 +219,7 @@ impl Default for Setup {
             sideboards: Vec::new(),
             basic_lands_outside: Vec::new(),
             companions: Vec::new(),
-            minimum_deck_size: 60,
+            minimum_deck_size: 0,
             seed: 0,
             shuffle: false,
             opening_chooser: None,

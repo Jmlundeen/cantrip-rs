@@ -440,7 +440,7 @@ impl GameState {
             loop_keys: Vec::new(),
             loop_index: LoopIndex::default(),
             outside_supply: Vec::new(),
-            minimum_deck_size: 60,
+            minimum_deck_size: 0,
             statics_seen: false,
             agenda: Vec::new(),
             rng: Rng::new(seed),

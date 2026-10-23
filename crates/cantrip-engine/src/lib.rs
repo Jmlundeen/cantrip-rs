@@ -58,10 +58,10 @@ pub struct Outside<'a> {
     pub minimum_deck_size: u32,
 }
 
-/// Nothing outside the game, in a Constructed game (CR 100.2a).
+/// Nothing outside the game, in a Freeform game: no minimum deck size, as no format names one.
 impl Default for Outside<'_> {
     fn default() -> Self {
-        Outside { sideboards: &[], companions: &[], basic_lands_outside: &[], minimum_deck_size: 60 }
+        Outside { sideboards: &[], companions: &[], basic_lands_outside: &[], minimum_deck_size: 0 }
     }
 }
 

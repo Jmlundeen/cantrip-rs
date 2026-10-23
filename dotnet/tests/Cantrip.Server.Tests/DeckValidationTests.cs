@@ -80,21 +80,22 @@ public sealed class DeckValidationTests
     }
 
     /// <summary>
-    /// Freeform, the default where no format is given, holds a deck to nothing: five cards, ten copies of one, a card banned
-    /// everywhere, a sideboard of thirty - all dealt. Only its companion is still held to its own condition (CR 702.139a), as
-    /// the engine judges it with the rules' minimum deck size, sixty (CR 100.2a).
+    /// Freeform, the default where no format is given, holds a deck to nothing: no cards at all, five, ten copies of one, a card
+    /// banned everywhere, a sideboard of thirty - all dealt. Only its companion is still held to its own condition (CR
+    /// 702.139a), as the engine judges it with the format's minimum deck size, which in Freeform is none.
     /// </summary>
     [Fact]
     public void A_freeform_deck_is_held_to_nothing_but_its_companion()
     {
         DeckFormat freeform = DeckFormat.Freeform;
         var judge = new Judge(fulfilled: true);
+        Assert.Empty(DeckValidation.Problems(Deck("freeform", []), freeform, Catalog, judge));
         Assert.Empty(DeckValidation.Problems(Deck("freeform", Swamps(5)), freeform, Catalog, judge));
         Assert.Empty(DeckValidation.Problems(Deck("freeform", [new("Lightning Bolt", 10), new("Black Lotus", 1)], [new("Swamp", 30)]), freeform, Catalog, judge));
         Assert.Empty(DeckValidation.Problems(Deck("freeform", Swamps(5), companion: "Lurrus of the Dream-Den"), freeform, Catalog, judge));
         Assert.Equal(["Lurrus of the Dream-Den can't be the deck's companion: the deck doesn't fulfil its companion condition."],
             DeckValidation.Problems(Deck("freeform", Swamps(5), companion: "Lurrus of the Dream-Den"), freeform, Catalog, new Judge(fulfilled: false)));
-        Assert.Equal((0, 60), (freeform.MainSize, freeform.MinimumDeckSize));
+        Assert.Equal((0, 0), (freeform.MainSize, freeform.MinimumDeckSize));
         Assert.Same(freeform, DeckFormat.Find("freeform"));
     }
 

@@ -1979,9 +1979,8 @@ is still outside the game - once it is in the game it is a new object (CR 400.7)
 fetched instead is no longer there to take. It is brought in by `bring_into_hand` (CR 400.11b) and stays (CR 702.139c). The
 format's minimum deck size, which Yorion, Sky Nomad's condition names, is `GameState::minimum_deck_size`, which the server says
 outright (`Setup::minimum_deck_size`, the host's `MinimumDeckSize`): sixty in Constructed, forty in Limited or the event's own,
-a hundred in Commander (CR 100.2a-b), and sixty in Freeform - the default format, whose decks the server holds to no restriction,
-but which is casual Constructed play as far as the rules' minimum goes (CR 100.2a; Yorion's rulings name "casual freeform
-play" among the sixty-card events). The server checks every deck against its table's format before dealing it, and each
+a hundred in Commander (CR 100.2a-b), and none in Freeform - the default format, with no deck size restriction at all (a deck of
+no cards is a Freeform deck), so Yorion's "twenty cards more than the minimum" is twenty there. The server checks every deck against its table's format before dealing it, and each
 game of a match after sideboarding (`DeckRules`, shared with the deck editor, and `DeckValidation`).
 The benchmark is unchanged within the noise (2026-10-23, four alternating rounds, engine answering: 9.50, 9.53, 9.37, 9.20 us per decision before and 9.48, 9.32, 9.23, 9.28 us
 after).

@@ -1,0 +1,24 @@
+# Yorion, Sky Nomad: "Companion - Your starting deck contains at least twenty cards more than the minimum deck size." A scenario
+# names no format: it is Freeform, which has no deck size restriction at all and so no minimum deck size. Bot1's twenty Plains
+# are twenty more than none, and the Yorion it chose as its companion is revealed (CR 103.2b); Bot2's nineteen Islands are not,
+# and its Yorion stays a sideboard card.
+
+[Bot1 Deck]
+Plains x20
+
+[Bot1 Companion]
+Yorion, Sky Nomad
+
+[Bot2 Deck]
+Island x19
+
+[Bot2 Companion]
+Yorion, Sky Nomad
+
+[Actions]
+[T1 Bot1.Main1]
+
+[Expect]
+Bot1.Companion = Yorion, Sky Nomad
+Bot2.Companion =
+Bot2.Sideboard = Yorion, Sky Nomad
