@@ -1,0 +1,5 @@
+{
+  "name": "Brushland",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{T}: Add {G} or {W}. This land deals 1 damage to you."
+}

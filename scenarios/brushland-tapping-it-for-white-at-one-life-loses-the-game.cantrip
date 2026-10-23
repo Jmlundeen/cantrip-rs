@@ -1,0 +1,27 @@
+# Brushland: "{T}: Add {G} or {W}. This land deals 1 damage to you." - the damage comes with the mana, as the mana
+# ability resolves (CR 605.3b), and a player at 0 life loses the game (CR 704.5a). Bot1 starts at 1 life, taps the Brushland
+# for {W} on turn 3 and loses to life.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Brushland
+Forest x15
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Brushland.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Brushland.Activate(Ability: {G} or {W}; Color: White)
+? Bot1.Life = 0
+
+[Expect]
+Turn = 3
+Bot1.Life = 0
+Bot1.LostTo = Life
+Bot1.Status = Lost
+Bot2.Life = 20
+Bot1.Battlefield.Brushland.Tapped = true

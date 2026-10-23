@@ -1,0 +1,35 @@
+# Brushland prints two mana abilities (CR 605.1a): "{T}: Add {C}." costs nothing, while "{T}: Add {G} or {W}. This
+# land deals 1 damage to you." deals the damage as it resolves (a mana ability, CR 605.3b) and names its color as it is
+# activated (CR 106.1a). Bot1 taps it for {C} on turn 3 and stays at 20, for {W} on turn 5 and for {G} on turn 7, one damage
+# each. The colored ability refuses red beside the green and white it does add (the {G} activation is the positive control), and the
+# colorless ability takes no color at all.
+
+[Bot1 Deck]
+Brushland
+Forest x15
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Brushland.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Brushland.Activate(Ability: {G} or {W}; Color: Red)
+! Bot1.Battlefield.Brushland.Activate(Ability: {C}; Color: White)
+Bot1.Battlefield.Brushland.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Brushland.Activate(Ability: {G} or {W}; Color: White)
+? Bot1.Mana = {W}
+? Bot1.Life = 19
+[T7 Bot1.Main1]
+Bot1.Battlefield.Brushland.Activate(Ability: {G} or {W}; Color: Green)
+? Bot1.Mana = {G}
+? Bot1.Life = 18
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Brushland.Tapped = true
+Bot1.Life = 18
+Bot2.Life = 20
