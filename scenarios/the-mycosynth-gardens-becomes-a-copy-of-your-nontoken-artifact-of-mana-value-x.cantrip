@@ -1,0 +1,57 @@
+# The Mycosynth Gardens' "{X}, {T}: This land becomes a copy of target nontoken artifact you control with mana value X."
+# With X = 1 and exactly {1} paid (Mox Jet's B, the pool checked empty right after), the only legal targets are Bot1's
+# nontoken artifacts of mana value 1: Sol Ring. Refused, each for its one reason: Bot1's Mox Jet (mana value 0) and Gold Pan
+# (mana value 2) are the wrong value, Bot1's Treasure token is a token, and Bot2's Sol Ring (mana value 1) is not
+# controlled by Bot1. The Gardens becomes a Sol Ring (CR 707.2) that stays tapped from the cost, beside the untapped
+# original (the first Sol Ring is the Gardens, on the battlefield first): no longer a land, so it is an Artifact with no
+# Land type.
+
+[Bot1 Deck]
+The Mycosynth Gardens
+Mox Jet
+Sol Ring
+Gold Pan
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x20
+
+[Actions]
+Bot1.Hand.The Mycosynth Gardens.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: Add {C})
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Gold Pan.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: becomes; X: 1)
+! Bot1.Target(Bot1.Battlefield.Mox Jet; Gold Pan; Treasure Token; Bot2.Battlefield.Sol Ring)
+Bot1.Target(Bot1.Battlefield.Sol Ring)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Gold Pan; Mox Jet; Sol Ring; Sol Ring; Treasure Token
+Bot1.Battlefield.Sol Ring#1.Types = Artifact
+Bot1.Battlefield.Sol Ring#2.Types = Artifact
+Bot1.Battlefield.Sol Ring#1.Subtypes = (absent)
+Bot1.Battlefield.Sol Ring#1.Tapped = true
+Bot1.Battlefield.Sol Ring#2.Tapped = false
+Bot1.Battlefield.Treasure Token.Token = true
+Stack.Count = 0

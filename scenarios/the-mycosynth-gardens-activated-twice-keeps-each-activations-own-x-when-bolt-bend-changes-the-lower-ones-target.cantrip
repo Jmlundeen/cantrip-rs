@@ -1,0 +1,95 @@
+# Each activation of The Mycosynth Gardens has its own X (CR 107.3k), and a target of it is judged with that X wherever it
+# is judged (CR 115.7a, 608.2b), not with the X of another activation of the same land above it. Bot1 activates the Gardens
+# with X = 1 at Sol Ring (Gold Pan, mana value 2, refused), untaps it with Candelabra of Tawnos, and activates it again with
+# X = 2 at Gold Pan (the mana value 1 artifacts refused). Bot2 casts Bolt Bend on the lower activation, the X = 1 one: its
+# other legal targets are Bot1's other nontoken artifacts of mana value 1, Candelabra of Tawnos and Expedition Map, and not
+# Gold Pan, which the X = 2 activation above it would allow; Bot2 picks Expedition Map. The X = 2 activation resolves first
+# (the Gardens becomes a Gold Pan), then the X = 1 one, its new target still legal at X = 1: the Gardens ends a copy of
+# Expedition Map, tapped from the second activation, beside the untapped original.
+
+[Bot1 Deck]
+The Mycosynth Gardens
+Candelabra of Tawnos
+Mox Jet
+Expedition Map
+Island
+Sol Ring
+Gold Pan
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Bolt Bend
+Island x15
+
+[Actions]
+Bot1.Hand.The Mycosynth Gardens.Play
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: Add {C})
+Bot1.Hand.Candelabra of Tawnos.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Expedition Map.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Gold Pan.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: becomes; X: 1)
+! Bot1.Target(Bot1.Battlefield.Gold Pan)
+Bot1.Target(Bot1.Battlefield.Sol Ring)
+? Bot1.Mana =
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 1)
+Bot1.Target(Bot1.Battlefield.The Mycosynth Gardens)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Mycosynth Gardens.Tapped = false
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: becomes; X: 2)
+! Bot1.Target(Bot1.Battlefield.Sol Ring)
+! Bot1.Target(Bot1.Battlefield.Expedition Map)
+! Bot1.Target(Bot1.Battlefield.Candelabra of Tawnos)
+Bot1.Target(Bot1.Battlefield.Gold Pan)
+? Bot1.Mana =
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Bolt Bend.Cast(Stack.The Mycosynth Gardens#2)
+! Bot2.Target(Bot1.Battlefield.Gold Pan)
+Bot2.Target(Bot1.Battlefield.Expedition Map)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Graveyard = Bolt Bend
+Bot1.Battlefield = Candelabra of Tawnos; Expedition Map; Expedition Map; Gold Pan; Island; Mox Jet; Sol Ring; Treasure Token
+Bot1.Battlefield.Expedition Map#1.Types = Artifact
+Bot1.Battlefield.Expedition Map#1.Tapped = true
+Bot1.Battlefield.Expedition Map#2.Tapped = false

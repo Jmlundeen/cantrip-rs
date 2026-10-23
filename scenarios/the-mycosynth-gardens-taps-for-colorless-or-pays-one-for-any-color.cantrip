@@ -1,0 +1,34 @@
+# The Gardens' two mana abilities. "{T}: Add {C}" pays Sol Ring's {1} with nothing left over. "{1}, {T}: Add one mana of
+# any color" (CR 605.1a): Mox Jet's B pays the {1} exactly, the Gardens adds R and the pool is exactly {R} right after (one
+# mana less would not activate, one more would show), which Lightning Bolt then spends on Bot2.
+
+[Bot1 Deck]
+The Mycosynth Gardens
+Mox Jet
+Sol Ring
+Lightning Bolt
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.The Mycosynth Gardens.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: {1}; Color: Red)
+? Bot1.Mana = {R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Mana =

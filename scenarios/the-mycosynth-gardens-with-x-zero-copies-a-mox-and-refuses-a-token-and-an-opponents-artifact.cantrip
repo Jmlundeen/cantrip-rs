@@ -1,0 +1,44 @@
+# X = 0 is a legal X (CR 107.3a): {0}, {T} costs no mana, and the target must be a nontoken artifact Bot1 controls with mana
+# value 0. Bot1's Gold Pan (mana value 2) and Sol Ring (1) are the wrong value, Bot1's Treasure token (mana value 0) is a token,
+# and Bot2's Mox Sapphire (mana value 0) is not Bot1's: all refused. Bot1's Mox Jet is the control: the Gardens becomes a
+# Mox Jet, which is no land (CR 707.2).
+
+[Bot1 Deck]
+The Mycosynth Gardens
+Mox Jet
+Sol Ring
+Gold Pan
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Island x7
+Island x20
+
+[Actions]
+Bot1.Hand.The Mycosynth Gardens.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: Add {C})
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Gold Pan.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: becomes; X: 0)
+! Bot1.Target(Sol Ring; Gold Pan; Treasure Token; Bot2.Battlefield.Mox Sapphire)
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Gold Pan; Mox Jet; Mox Jet; Sol Ring; Treasure Token
+Bot1.Battlefield.Mox Jet#2.Types = Artifact

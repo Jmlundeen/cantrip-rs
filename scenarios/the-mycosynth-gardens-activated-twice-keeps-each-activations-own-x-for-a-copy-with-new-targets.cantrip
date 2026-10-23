@@ -1,0 +1,89 @@
+# Each activation of The Mycosynth Gardens has its own X (CR 107.3k), and a copy of one has the X it copies (CR 707.10): its
+# new targets are chosen with that X (CR 707.10c, 115.7d), not with the X of another activation of the same land above it.
+# Bot1 activates the Gardens with X = 1 at Sol Ring, untaps it with Candelabra of Tawnos, activates it again with X = 2 at
+# Gold Pan, and copies the lower, X = 1 activation with Return the Favor (Black Lotus's {R}{R}{R}), choosing new targets:
+# Bot1's nontoken artifacts of mana value 1 are offered (Candelabra of Tawnos is chosen), not Gold Pan, which the X = 2
+# activation above would allow. The copy resolves first and the Gardens becomes a Candelabra of Tawnos; then the X = 2
+# activation makes it a Gold Pan, and the X = 1 one a Sol Ring.
+
+[Bot1 Deck]
+The Mycosynth Gardens
+Candelabra of Tawnos
+Mox Jet
+Expedition Map
+Island
+Sol Ring
+Gold Pan
+Black Lotus
+Return the Favor
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.The Mycosynth Gardens.Play
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: Add {C})
+Bot1.Hand.Candelabra of Tawnos.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Expedition Map.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Gold Pan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: becomes; X: 1)
+! Bot1.Target(Bot1.Battlefield.Gold Pan)
+Bot1.Target(Bot1.Battlefield.Sol Ring)
+? Bot1.Mana =
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 1)
+Bot1.Target(Bot1.Battlefield.The Mycosynth Gardens)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Mycosynth Gardens.Tapped = false
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.The Mycosynth Gardens.Activate(Ability: becomes; X: 2)
+! Bot1.Target(Bot1.Battlefield.Sol Ring)
+! Bot1.Target(Bot1.Battlefield.Expedition Map)
+! Bot1.Target(Bot1.Battlefield.Candelabra of Tawnos)
+Bot1.Target(Bot1.Battlefield.Gold Pan)
+? Bot1.Mana =
+? Stack.Count = 2
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target)
+Bot1.Target(Stack.The Mycosynth Gardens#2)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Gold Pan)
+Bot1.Target(Bot1.Battlefield.Candelabra of Tawnos)
+? Stack.Count = 3
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Candelabra of Tawnos; Candelabra of Tawnos; Expedition Map; Gold Pan; Island; Mox Jet; Sol Ring; Treasure Token
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Return the Favor; Black Lotus
+Bot1.Battlefield = Candelabra of Tawnos; Expedition Map; Gold Pan; Island; Mox Jet; Sol Ring; Sol Ring; Treasure Token
+Bot1.Battlefield.Sol Ring#1.Types = Artifact
+Bot1.Battlefield.Sol Ring#1.Tapped = true
