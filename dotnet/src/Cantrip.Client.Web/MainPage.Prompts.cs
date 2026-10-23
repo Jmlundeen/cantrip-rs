@@ -711,10 +711,15 @@ public sealed partial class MainPage
         // What this slot is for, where the card says (Jeskai Revelation's two slots, The Theorist's one for each opponent).
         string slot = SlotLabel(client, prompt);
 
-        // "With total mana value X or less" (CR 601.2c): the running total of what is picked, against the limit.
+        // "With total mana value X or less" (CR 601.2c): the running total of what is picked, against the limit; any other
+        // rule of the targets together in its own words ("with different mana values, with mana value 3 or less").
         if (prompt.MaximumTotalManaValue is { } most)
         {
             slot = $"{slot}total mana value {prompt.TotalManaValueOf(_pickedTargets)}, at most {most}  ·  ";
+        }
+        else if (prompt.Words.Count > 0)
+        {
+            slot = $"{slot}{string.Join(", ", prompt.Words)}  ·  ";
         }
 
         Prompt(

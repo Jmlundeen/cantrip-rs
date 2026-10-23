@@ -211,8 +211,9 @@ public sealed partial class MainPage
         // Aiming comes first: while something is being aimed, nothing else on the board is a control.
         if (AimCandidates(client) is not null)
         {
-            // "With total mana value X or less": a candidate that would take the chosen targets over it is no choice now.
-            bool aimable = _targetableObjects.TryGetValue(handle, out TargetMessage? target) && FitsTotal(client, target!);
+            // A slot that judges its targets together ("with total mana value X or less", "each with a different mana
+            // value"): a candidate that would break its rule beside the targets chosen is no choice now.
+            bool aimable = _targetableObjects.TryGetValue(handle, out TargetMessage? target) && FitsTogether(client, target!);
 
             return new CardLook(
                 Selected: aimable && IsPickedTarget(target!),
@@ -586,8 +587,8 @@ public sealed partial class MainPage
                 _pickedTargets.Clear();
             }
 
-            // A target that would take the total mana value over the slot's limit is not added (CR 601.2c).
-            if (_pickedTargets.Count < count && FitsTotal(client, target))
+            // A target the slot's rule of its targets together would refuse beside the others is not added (CR 601.2c).
+            if (_pickedTargets.Count < count && FitsTogether(client, target))
             {
                 _pickedTargets.Add(target);
             }
@@ -611,13 +612,33 @@ public sealed partial class MainPage
 
     /// <summary>
     /// Whether <paramref name="target"/> may be chosen beside the targets already picked: a slot "with total mana value X or
-    /// less" (Fire Lord Sozin's) takes no target that would go over it, one already picked always (picking it again puts it back).
+    /// less" (Fire Lord Sozin's) takes no target that would go over it, and a slot whose rule of its targets together the
+    /// host judges (<see cref="ChooseTargetPromptMessage.Verdict"/>: Agadeem's Awakening's "each have a different mana value
+    /// X or less") only an object its verdict on the objects picked so far says may be added - asked of the host the first
+    /// time those are picked, and nothing offered until it answers (with one to choose, a click trades, so the object is
+    /// judged alone). A player is no card to the rule, and one already picked may always be clicked (to put it back).
     /// </summary>
-    private bool FitsTotal(GameClient client, TargetMessage target) =>
-        _targeting is not null
-        || client.Prompt?.Prompt is not ChooseTargetPromptMessage { MaximumTotalManaValue: not null } asked
-        || IsPickedTarget(target)
-        || asked.Fits(_pickedTargets, target);
+    private bool FitsTogether(GameClient client, TargetMessage target)
+    {
+        if (_targeting is not null || client.Prompt?.Prompt is not ChooseTargetPromptMessage asked || IsPickedTarget(target))
+        {
+            return true;
+        }
+
+        if (asked.MaximumTotalManaValue is not null && !asked.Fits(_pickedTargets, target))
+        {
+            return false;
+        }
+
+        if (asked.Verdict is null || target.IsPlayer)
+        {
+            return true;
+        }
+
+        List<int> picked = [.. _pickedTargets.Where(chosen => !chosen.IsPlayer).Select(chosen => chosen.Object.Value)];
+        SelectionVerdictView? verdict = asked.Count == 1 ? asked.Verdict : CardChoicePresentation.Judged(client, asked, picked);
+        return verdict?.Addable.Contains(target.Object) == true;
+    }
 
     private static bool Same(TargetMessage one, TargetMessage other) =>
         one.Player == other.Player && one.Object == other.Object;

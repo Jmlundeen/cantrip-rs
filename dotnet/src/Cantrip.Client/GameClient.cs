@@ -412,8 +412,10 @@ public sealed class GameClient
     /// host has already called the cards chosen an answer, they are checked (<see cref="Check"/>) and sent once it does. A
     /// selection the host refuses is mended one card at a time from what may be added - the cards proposed first, then the
     /// rest in the question's order - until it is one (<see cref="Settling"/>), so a player that picks without knowing the
-    /// question's rule ("with different names", "total mana value 6 or less") still answers what the rules take. The prompt
-    /// is cleared as soon as this is called, as for any answer.
+    /// question's rule ("with different names", "total mana value 6 or less") still answers what the rules take. A choice of
+    /// targets whose slot judges its targets together (<see cref="ChooseTargetPromptMessage.Verdict"/>: "that each have a
+    /// different mana value X or less") is settled the same way, its object targets the cards and any player chosen kept as
+    /// it is. The prompt is cleared as soon as this is called, as for any answer.
     /// </para>
     /// </summary>
     public void Answer(AnswerPayload answer)
@@ -425,7 +427,16 @@ public sealed class GameClient
             throw new InvalidOperationException("Nothing has been asked.");
         }
 
-        if (Prompt.Prompt is ISelectionPrompt && answer is CardsChosenAnswer chosen && Verdict(chosen.Cards) is not { Complete: true })
+        // The cards the answer picks, for a question judged by a rule: a choice of cards' own, or the objects among the targets of
+        // a slot that judges its targets together (the players chosen kept aside, as the rule does not judge them).
+        (IReadOnlyList<ViewHandle> Cards, List<TargetMessage> Players)? picked = (Prompt.Prompt, answer) switch
+        {
+            (ISelectionPrompt { Judged: true } and not ChooseTargetPromptMessage, CardsChosenAnswer cards) => (cards.Cards, []),
+            (ChooseTargetPromptMessage { Verdict: not null }, TargetsChosenAnswer targets) =>
+                ([.. targets.Targets.Where(target => !target.IsPlayer).Select(target => target.Object)], [.. targets.Targets.Where(target => target.IsPlayer)]),
+            _ => null,
+        };
+        if (picked is { } chosen && Verdict(chosen.Cards) is not { Complete: true })
         {
             // A question whose check was refused before is not settled the same way again, so an automatic seat cannot go
             // round forever: it is answered with the question's own default.
@@ -439,7 +450,7 @@ public sealed class GameClient
                 return;
             }
 
-            _settling = new Settling(Prompt, chosen.Cards);
+            _settling = new Settling(Prompt, chosen.Cards) { Players = chosen.Players };
             Prompt = null;
             Settle();
             return;
@@ -483,7 +494,7 @@ public sealed class GameClient
         string.Join(',', selected.Select(handle => handle.Value).Order());
 
     /// <summary>The request a choice of cards being made is for: the one asked, or the one being settled.</summary>
-    private PromptMessage? Choosing => Prompt is { Prompt: ISelectionPrompt } asked ? asked : _settling?.Asked;
+    private PromptMessage? Choosing => Prompt is { Prompt: ISelectionPrompt { Judged: true } } asked ? asked : _settling?.Asked;
 
     /// <summary>
     /// What the rules said of <paramref name="selected"/> for the choice of cards outstanding (<see cref="ISelectionPrompt"/>):
@@ -582,6 +593,9 @@ public sealed class GameClient
 
         public List<ViewHandle> Proposal { get; } = [.. proposal];
 
+        /// <summary>For a choice of targets, the players among the targets proposed: sent as they are, the rule judging only objects.</summary>
+        public List<TargetMessage> Players { get; init; } = [];
+
         public bool Mending { get; set; }
 
         public List<ViewHandle> Picked { get; } = [];
@@ -676,9 +690,13 @@ public sealed class GameClient
                 Mended($"request {asked.RequestId} ({asked.Prompt.GetType().Name}): proposed {Cards(_settling.Proposal)}, sent {Cards(cards)}");
             }
 
+            List<TargetMessage> players = _settling.Players;
             _settling = null;
             LastAnswered = asked.RequestId;
-            _transport.Send(new AnswerMessage { RequestId = asked.RequestId, Answer = new CardsChosenAnswer { Cards = [.. cards] } });
+            AnswerPayload sent = asked.Prompt is ChooseTargetPromptMessage
+                ? new TargetsChosenAnswer { Targets = [.. players, .. cards.Select(card => new TargetMessage { Object = card })] }
+                : new CardsChosenAnswer { Cards = [.. cards] };
+            _transport.Send(new AnswerMessage { RequestId = asked.RequestId, Answer = sent });
         }
     }
 

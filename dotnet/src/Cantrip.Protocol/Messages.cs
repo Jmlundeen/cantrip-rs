@@ -1335,8 +1335,9 @@ public sealed class ChooseCardsPromptMessage : PromptPayload, ISelectionPrompt
 
 /// <summary>
 /// A question that picks a set of cards by a selection rule (<see cref="ChooseCardsPromptMessage"/>,
-/// <see cref="SearchLibraryPromptMessage"/>): what a client reads of it to let a player pick, every selection after the
-/// first checked with the host (<see cref="CheckSelectionMessage"/>).
+/// <see cref="SearchLibraryPromptMessage"/>, and a <see cref="ChooseTargetPromptMessage"/> whose targets together are
+/// judged): what a client reads of it to let a player pick, every selection after the first checked with the host
+/// (<see cref="CheckSelectionMessage"/>).
 /// </summary>
 public interface ISelectionPrompt
 {
@@ -1349,6 +1350,12 @@ public interface ISelectionPrompt
 
     /// <summary>The rule's verdict on choosing nothing yet.</summary>
     SelectionVerdictView Verdict { get; }
+
+    /// <summary>
+    /// Whether the question is judged by a rule at all: always for a choice of cards and a library search; for a choice of
+    /// targets, only where the slot judges its targets together (<see cref="ChooseTargetPromptMessage.Verdict"/>).
+    /// </summary>
+    bool Judged => true;
 }
 
 /// <summary>How a choice of cards counts them: what its caption says of <c>Count</c>.</summary>
@@ -1391,8 +1398,9 @@ public sealed class SelectionVerdictView
 /// <summary>
 /// "Check this partial selection for the pending question": what the question's selection rule says of the cards a player
 /// has picked so far, asked as the selection changes, answered with a <see cref="SelectionVerdictMessage"/>. Nothing in the
-/// game moves; the answer itself is still checked when it is given. For a <see cref="ChooseCardsPromptMessage"/> or a
-/// <see cref="SearchLibraryPromptMessage"/> only.
+/// game moves; the answer itself is still checked when it is given. For a <see cref="ChooseCardsPromptMessage"/>, a
+/// <see cref="SearchLibraryPromptMessage"/>, or a <see cref="ChooseTargetPromptMessage"/> with a
+/// <see cref="ChooseTargetPromptMessage.Verdict"/> (its object targets picked so far) only.
 /// </summary>
 [MessagePackObject]
 public sealed class CheckSelectionMessage : ClientMessage
@@ -1519,7 +1527,7 @@ public sealed class BlocksVerdictMessage : ServerMessage
 /// one chosen mode of a modal spell it is casting, when <see cref="Ability"/> is the card in its hand.
 /// </summary>
 [MessagePackObject]
-public sealed class ChooseTargetPromptMessage : PromptPayload
+public sealed class ChooseTargetPromptMessage : PromptPayload, ISelectionPrompt
 {
     [Key(0)]
     public int Player { get; set; }
@@ -1592,6 +1600,33 @@ public sealed class ChooseTargetPromptMessage : PromptPayload
     [Key(12)]
     public List<int> ManaValues { get; set; } = [];
 
+    /// <summary>
+    /// What the rule of the slot's targets together asks, each in the words a caption puts after the noun ("with different
+    /// mana values", "with mana value 3 or less"); empty when it asks nothing.
+    /// </summary>
+    [Key(13)]
+    public List<string> Words { get; set; } = [];
+
+    /// <summary>
+    /// For a slot whose targets together are judged ("any number of target creature cards that each have a different mana
+    /// value X or less", CR 601.2c): the rule's verdict on none chosen - whether that is an answer, and which object
+    /// candidates may be picked first. Every other selection of the objects among the targets is asked of the host
+    /// (<see cref="CheckSelectionMessage"/>) as for a choice of cards, and <c>GameClient.Answer</c> settles an answer with it.
+    /// Null for a slot that asks nothing of its targets together.
+    /// </summary>
+    [Key(14)]
+    public SelectionVerdictView? Verdict { get; set; }
+
+    /// <summary>The object candidates, in order: what the rule of the targets together judges (a player is no card to it).</summary>
+    IReadOnlyList<ViewHandle> ISelectionPrompt.Candidates => [.. Candidates.Where(candidate => !candidate.IsPlayer).Select(candidate => candidate.Object)];
+
+    CountKindView ISelectionPrompt.CountKind =>
+        AnyNumber ? CountKindView.AnyNumber : Optional || Minimum > 0 ? CountKindView.UpTo : CountKindView.Exactly;
+
+    SelectionVerdictView ISelectionPrompt.Verdict => Verdict ?? new SelectionVerdictView { Complete = true };
+
+    bool ISelectionPrompt.Judged => Verdict is not null;
+
     /// <summary>The total mana value of <paramref name="chosen"/>, each read at its place among <see cref="Candidates"/>.</summary>
     public int TotalManaValueOf(IEnumerable<TargetMessage> chosen) =>
         TotalManaValue.Of(Keys(), ManaValues, chosen.Select(Key));
@@ -1609,7 +1644,8 @@ public sealed class ChooseTargetPromptMessage : PromptPayload
 
     /// <summary>
     /// No target where that is allowed, and otherwise the first candidates the server offered; with a total mana value, the
-    /// first that fit together within it.
+    /// first that fit together within it; with another rule of the targets together, the first that may be picked first, as
+    /// many as it takes (one asking more of them together is settled with the host as they are picked).
     /// </summary>
     public override AnswerPayload Default() =>
         new TargetsChosenAnswer
@@ -1617,6 +1653,8 @@ public sealed class ChooseTargetPromptMessage : PromptPayload
             Targets = Optional ? []
                 : MaximumTotalManaValue is { } most
                     ? TotalManaValue.FirstFitting(Candidates, ManaValues, Count, most)
+                : Verdict is { } verdict
+                    ? [.. Candidates.Where(candidate => candidate.IsPlayer || verdict.Addable.Contains(candidate.Object)).Take(Count)]
                     : [.. Candidates.Take(Count)],
         };
 }

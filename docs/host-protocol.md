@@ -81,6 +81,15 @@ before sending it - checked, and if refused mended a card at a time from what ma
 included, answers what the rules take. A check the host refuses is answered with an `ErrorMessage` whose `RequestId` names the
 request, so a client reacts only to the error of its own check. Version 203.
 
+**Targets judged together.** A `ChooseTargetPromptMessage` whose slot judges its targets together (`TargetSpec::together`:
+"any number of target creature cards that each have a different mana value X or less") carries its rule's `Words` ("with
+different mana values", "with mana value 3 or less") and its `Verdict` on none chosen over the object candidates; a rule that
+keeps a running total of mana value still sends `MaximumTotalManaValue` and `ManaValues` beside them, display alone. Every
+other selection of the objects among the targets picked is checked as a choice of cards is - `CheckSelectionMessage` with
+their handles, answered with `SelectionVerdictMessage` - a player among the targets being no card to the rule.
+`GameClient.Answer` settles a `TargetsChosenAnswer` to such a prompt with the host before it sends it, the players chosen
+kept as they are. `Verdict` is null for a slot that asks nothing of its targets together. Version 210.
+
 **Checking a declaration of attackers.** A declaration of attackers (`DeclareAttackersPromptMessage`) is judged the same way, by
 the engine's one validator (`AttackRules::judge`, `crates/cantrip-state/src/attacks.rs`): each attacker eligible and attacking
 something offered, and as many of the requirements obeyed as any declaration can attacking for free (CR 508.1d). The prompt's

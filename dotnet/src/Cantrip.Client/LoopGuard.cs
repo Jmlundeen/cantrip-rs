@@ -103,7 +103,7 @@ public sealed class LoopGuard : IAutoPlayer
         return prompt switch
         {
             ChooseTargetPromptMessage { Optional: false, Count: 1, Candidates.Count: > 1 } target
-                when target.MaximumTotalManaValue is null
+                when target.MaximumTotalManaValue is null && target.Verdict is null
                 => new TargetsChosenAnswer { Targets = [target.Candidates[Pick(turn, target.Candidates.Count)]] },
             ChooseCardsPromptMessage { Count: 1, Verdict.Addable.Count: > 1, UpTo: false } cards
                 when cards.Words.Count == 0 && cards.MinimumPower == 0

@@ -303,4 +303,81 @@ public sealed class SelectionSettlingTests
         var chosen = Assert.IsType<CardsChosenAnswer>(prompt.Default());
         Assert.Equal([H(1), H(3)], chosen.Cards);
     }
+
+    /// <summary>"Any number of target creature cards that each have a different mana value" over objects 1 to 3, 1 and 2 sharing one.</summary>
+    private static SelectionVerdictView DifferentManaValues(IReadOnlyList<ViewHandle> picked)
+    {
+        static bool Clash(ViewHandle a, ViewHandle b) => (a.Value, b.Value) is (1, 2) or (2, 1);
+        bool valid = picked.Select((card, i) => picked.Take(i).All(other => !Clash(card, other))).All(ok => ok);
+        List<ViewHandle> addable = [.. new[] { H(1), H(2), H(3) }.Where(card => !picked.Contains(card) && picked.All(other => !Clash(card, other)))];
+        return new SelectionVerdictView { Complete = valid, Addable = addable };
+    }
+
+    private static TargetMessage Seat(int seat) => new() { Player = seat };
+
+    private static TargetMessage Object(int handle) => new() { Object = H(handle) };
+
+    [Fact]
+    public void A_choice_of_targets_judged_together_is_settled_with_the_host_and_keeps_the_players_chosen()
+    {
+        var transport = new Judging(DifferentManaValues);
+        var client = new GameClient(transport);
+        transport.Inbound.Enqueue(new PromptMessage
+        {
+            RequestId = 9,
+            Prompt = new ChooseTargetPromptMessage
+            {
+                Player = 1,
+                Candidates = [Seat(2), Object(1), Object(2), Object(3)],
+                Optional = true,
+                Count = 4,
+                AnyNumber = true,
+                Words = ["with different mana values"],
+                Verdict = DifferentManaValues([]),
+            },
+        });
+        client.Pump();
+
+        // 1 and 2 share a mana value: the host refuses them together, 1 is kept and nothing else joins it.
+        client.Answer(new TargetsChosenAnswer { Targets = [Seat(2), Object(1), Object(2)] });
+        Assert.True(client.IsSettling);
+        for (int i = 0; i < 10 && client.IsSettling; i++) client.Pump();
+
+        var sent = Assert.IsType<TargetsChosenAnswer>(transport.Sent.OfType<AnswerMessage>().Last().Answer);
+        Assert.Equal([(2, 0), (0, 1)], sent.Targets.Select(target => (target.Player, target.Object.Value)));
+        Assert.Contains(transport.Sent.OfType<CheckSelectionMessage>(), check => check.Selected.SequenceEqual([H(1), H(2)]));
+    }
+
+    [Fact]
+    public void A_choice_of_targets_the_slot_does_not_judge_together_is_sent_as_it_is()
+    {
+        var transport = new Judging(_ => throw new InvalidOperationException("nothing is checked"));
+        var client = new GameClient(transport);
+        transport.Inbound.Enqueue(new PromptMessage
+        {
+            RequestId = 9,
+            Prompt = new ChooseTargetPromptMessage { Player = 1, Candidates = [Object(1), Object(2)], Count = 2 },
+        });
+        client.Pump();
+        client.Answer(new TargetsChosenAnswer { Targets = [Object(1), Object(2)] });
+
+        Assert.False(client.IsSettling);
+        Assert.Empty(transport.Sent.OfType<CheckSelectionMessage>());
+        Assert.IsType<TargetsChosenAnswer>(transport.Sent.OfType<AnswerMessage>().Single().Answer);
+    }
+
+    [Fact]
+    public void The_default_answer_of_targets_judged_together_takes_only_what_may_be_picked()
+    {
+        var prompt = new ChooseTargetPromptMessage
+        {
+            Player = 1,
+            Candidates = [Object(1), Object(2), Object(3)],
+            Count = 2,
+            Verdict = new SelectionVerdictView { Complete = false, Addable = [H(2), H(3)] },
+        };
+
+        var chosen = Assert.IsType<TargetsChosenAnswer>(prompt.Default());
+        Assert.Equal([2, 3], chosen.Targets.Select(target => target.Object.Value));
+    }
 }
