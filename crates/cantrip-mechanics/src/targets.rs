@@ -522,7 +522,7 @@ pub fn card_in_an_opponents_graveyard(q: &dyn Query, asker: &Asker, t: Target) -
 /// "Target card from an opponent's graveyard": see `card_in_an_opponents_graveyard`.
 pub const CARD_IN_AN_OPPONENTS_GRAVEYARD: TargetSpec = target(card_in_an_opponents_graveyard);
 
-/// "Target noncreature spell". Spell Pierce and Stubborn Denial print it.
+/// "Target noncreature spell". Spell Pierce, Stubborn Denial, Negate and Dovin's Veto print it.
 pub const NONCREATURE_SPELL: TargetSpec = target(noncreature_spell_filter);
 
 /// "Target [color A] or [color B] spell" (CR 115.1, 105.2): a spell on the stack that is either color, or both. The color

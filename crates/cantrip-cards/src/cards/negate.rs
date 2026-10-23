@@ -1,22 +1,13 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{counter_target, targets};
 use cantrip_oracle as oracle;
 
-/// A noncreature spell on the stack.
-fn noncreature_spell(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id)
-        if q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == id)
-            && !q.chars(id).is(CardType::Creature))
-}
-
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(spell) = targets::object(g, item, 0) {
-        g.counter(spell);
-    }
+    counter_target(g, item, 0);
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(noncreature_spell)], effect),
+    spell: spell(&[targets::NONCREATURE_SPELL], effect),
     ..oracle::NEGATE
 };
