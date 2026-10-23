@@ -55,6 +55,7 @@ A key starting `Client.` is about what the page shows, not the game's state, and
 | `Client.Bot1.Stack`, `.Hand`, `.Battlefield`, `.OpponentBattlefield` | the cards in that row, compared as a set; each with `.Count` |
 | `Client.Bot1.OpponentHand` | the cards known in the opponent's hand: empty when nothing in it has been shown |
 | `Client.Bot1.Button.Undo` | `shown` or `absent`: a button whose label holds the text |
+| `Client.Bot1.Button.No blocks.Enabled` | `true` or `false`: whether the dock's button whose label holds the text can be pressed (a disabled one is drawn but waits, as the blockers' button does for a requirement unmet); `absent` with no such dock button |
 | `Client.Bot1.Arrows` | what the latest resolution's arrows point at: card names, or `player 2` |
 | `Client.Bot1.TargetLabels` | the labels on the arrows from the spell on the stack to its targets, as drawn: which part of the spell each target is for (`Turn; Burn` for a fused split spell's halves), empty where none says |
 | `Client.Bot1.Over` | `true` once the page says the game is over |

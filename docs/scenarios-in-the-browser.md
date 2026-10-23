@@ -85,6 +85,9 @@ fails is the page's.
   box; other prompts fail as not driven yet.
 - A `? Client.` line is judged against the page at the next question the script reaches, so a check of what a prompt says
   follows the answer that causes it and any `Bot1.Pass` that lets it resolve (`Bot1.Pass` then `? Client.Bot1.Prompt.Title = ...`).
+- A dock button's state is `? Client.Bot1.Button.<label>.Enabled = true|false` (the label holds the text; `absent` with no such button), read from
+  the dock list the page publishes under `?test`. It is judged at the question the check reaches, before the answer clicks: the blockers' button
+  reading `No blocks` and disabled while a creature must block is `Button.No blocks.Enabled = false`.
 
 ## Client expectations
 
