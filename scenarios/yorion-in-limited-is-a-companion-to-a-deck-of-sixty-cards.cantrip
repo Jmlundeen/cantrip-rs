@@ -1,0 +1,30 @@
+# Yorion, Sky Nomad: "Companion - Your starting deck contains at least twenty cards more than the minimum deck size." In
+# Limited the minimum is forty (CR 100.2b; the rulings), so in this Limited game - its minimum deck size forty, its sideboards
+# holding the event's basic lands - Bot1's sixty Plains fulfil it and the Yorion it chose as its companion is revealed (CR
+# 103.2b); Bot2's fifty-nine Islands do not.
+
+[Bot1 Deck]
+Plains x60
+
+[Bot1 Companion]
+Yorion, Sky Nomad
+
+[Bot2 Deck]
+Island x59
+
+[Bot2 Companion]
+Yorion, Sky Nomad
+
+[Minimum Deck Size]
+40
+
+[Basic Lands Outside]
+Plains
+Island
+
+[Actions]
+
+[Expect]
+Bot1.Companion = Yorion, Sky Nomad
+Bot2.Companion =
+Bot2.Sideboard = Plains; Island; Yorion, Sky Nomad

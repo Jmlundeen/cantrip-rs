@@ -1,0 +1,23 @@
+# Yorion, Sky Nomad: "Companion - Your starting deck contains at least twenty cards more than the minimum deck size." In
+# Constructed the minimum is sixty (CR 100.2a), so Bot1's deck of eighty Plains fulfils it and the Yorion it chose as its
+# companion is revealed (CR 103.2b); Bot2's of seventy-nine Islands does not, and its Yorion stays a sideboard card.
+
+[Bot1 Deck]
+Plains x80
+
+[Bot1 Companion]
+Yorion, Sky Nomad
+
+[Bot2 Deck]
+Island x79
+
+[Bot2 Companion]
+Yorion, Sky Nomad
+
+[Actions]
+
+[Expect]
+Bot1.Companion = Yorion, Sky Nomad
+Bot1.Revealed = Yorion, Sky Nomad
+Bot2.Companion =
+Bot2.Sideboard = Yorion, Sky Nomad

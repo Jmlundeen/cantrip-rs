@@ -1133,6 +1133,13 @@ mod tests {
         assert_eq!(companions(&islands(&[]), &sideboard, 60).ok().unwrap(), lurrus(true));
         assert_eq!(companions(&islands(&["Lurrus of the Dream-Den"]), &sideboard, 60).ok().unwrap(), lurrus(false));
         assert!(companions(&islands(&[]), &["No Such Card".to_string()], 60).is_err());
+        // Yorion, Sky Nomad's condition names the minimum deck size: eighty cards are twenty more than Constructed's sixty, and
+        // never twenty more than Commander's hundred.
+        let yorion = |fulfilled| vec![CompanionCheckView { card: "Yorion, Sky Nomad".into(), fulfilled }];
+        let eighty = islands(&[]).into_iter().chain(std::iter::repeat_n("Island".to_string(), 20)).collect::<Vec<_>>();
+        assert_eq!(companions(&eighty, &["Yorion, Sky Nomad".to_string()], 60).ok().unwrap(), yorion(true));
+        assert_eq!(companions(&eighty[1..], &["Yorion, Sky Nomad".to_string()], 60).ok().unwrap(), yorion(false));
+        assert_eq!(companions(&eighty, &["Yorion, Sky Nomad".to_string()], 100).ok().unwrap(), yorion(false));
     }
 
     /// A sideboard naming a card the engine does not have refuses the deal, as a deck naming one does: a card that brings a

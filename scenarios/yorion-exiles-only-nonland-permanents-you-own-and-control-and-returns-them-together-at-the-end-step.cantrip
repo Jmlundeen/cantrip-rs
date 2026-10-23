@@ -1,0 +1,86 @@
+# Yorion's enters trigger exiles "any number of other nonland permanents you own and control" and returns "those cards" at the
+# beginning of the next end step. Only the permanents Bot1 both owns and controls may be chosen (CR 108.3, 110.2): not Bot1's
+# Ornithopter (given to Bot2 by Harmless Offering), not Bot2's Mox Ruby (given to Bot1), not a land, not Yorion itself, not
+# Bot2's other permanents. Bot1 chooses a tapped Mox Pearl, a tapped Mox Sapphire and a Spirit token but leaves the Staff
+# of the Storyteller (any number, not all). The moxen return as new objects, untapped (CR 400.7); the token ceased to exist
+# in exile (CR 111.7) and does not return. They return only at the end step: before it all are still in exile.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Harmless Offering
+Island
+Island
+Staff of the Storyteller
+Yorion, Sky Nomad
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Harmless Offering
+Island
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Harmless Offering.Cast
+Bot2.Target(Bot1)
+Bot2.Target(Mox Ruby)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Staff of the Storyteller.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Yorion, Sky Nomad.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Choose(Ornithopter)
+! Bot1.Choose(Mox Ruby)
+! Bot1.Choose(Mox Jet)
+! Bot1.Choose(Mountain)
+! Bot1.Choose(Island#1)
+! Bot1.Choose(Yorion, Sky Nomad)
+Bot1.Choose(Mox Pearl; Mox Sapphire; Spirit)
+? Exile = Mox Pearl; Mox Sapphire
+? Bot1.Battlefield.Mox Pearl = (absent)
+[T5 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Spirit = (absent)
+Bot1.Battlefield.Staff of the Storyteller.Tapped = false
+Bot1.Battlefield.Yorion, Sky Nomad.Tapped = false
+Bot2.Battlefield.Ornithopter.Tapped = false
