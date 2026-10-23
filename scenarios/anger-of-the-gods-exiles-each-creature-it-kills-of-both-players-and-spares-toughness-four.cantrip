@@ -1,0 +1,75 @@
+# Anger of the Gods: "deals 3 damage to each creature. If a creature dealt damage this way would die this turn, exile it
+# instead." Bot1 has an Ornithopter (0/2) and a Spellskite (0/4); Bot2 has a Giant Cindermaw (4/3, exactly lethal), an Ajani
+# Resolute and Moxen, which are no creatures. The Cindermaw and the Ornithopter, whoever controls them, are exiled instead of
+# going to the graveyard (CR 614.1a); the Spellskite survives 3 damage (toughness 4) but, dealt damage this way, is exiled
+# when Lightning Bolt then kills it the same turn (CR 700.4). Ajani keeps all its loyalty.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Jet
+Spellskite
+Ornithopter
+Anger of the Gods
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Giant Cindermaw
+Ajani Resolute
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spellskite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Giant Cindermaw.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Ajani Resolute.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Anger of the Gods.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Spellskite.Damage = 3
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spellskite)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Spellskite = (absent)
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Graveyard = Lightning Bolt; Anger of the Gods
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Mox Ruby; Mox Ruby; Mox Jet; Mox Pearl; Mox Emerald; Ajani Resolute
+Bot2.Battlefield.Ajani Resolute.Counters.Loyalty = 2
+Exile.Count = 3
+Bot1.Life = 20
+Bot2.Life = 20

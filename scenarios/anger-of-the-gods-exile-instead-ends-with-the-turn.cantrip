@@ -1,0 +1,50 @@
+# "If a creature dealt damage this way would die this turn": the replacement lasts only this turn (CR 611.2c, 514.2). Anger of
+# the Gods's 3 damage does not kill the 0/4 Spellskite on turn 3 and wears off at cleanup. On turn 5 two Lightning Bolts kill
+# it (3 + 3 against 4): the replacement is over, so it goes to the graveyard, not to exile.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Jet
+Spellskite
+Anger of the Gods
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spellskite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Anger of the Gods.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Spellskite.Damage = 3
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Spellskite.Damage = 0
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spellskite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spellskite)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Spellskite; Lightning Bolt; Lightning Bolt; Anger of the Gods
+Exile.Count = 0

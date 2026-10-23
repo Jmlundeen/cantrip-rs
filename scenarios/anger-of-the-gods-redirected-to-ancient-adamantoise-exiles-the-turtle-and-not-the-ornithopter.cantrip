@@ -1,0 +1,77 @@
+# Anger of the Gods and Ancient Adamantoise: "All damage that would be dealt to you and other permanents you control is dealt to
+# this creature instead". Anger's 3 damage aimed at Bot1's Ornithopter is dealt to the Adamantoise (CR 614.9), so the
+# Ornithopter was dealt no damage by it and "exile it instead" does not cover it: Infernal Grasp then destroys it and it goes
+# to the graveyard. The Adamantoise, already holding 17 from Fire Covenant, is dealt its own 3 and the Ornithopter's 3 (23 of
+# 20): it would die, so it is exiled instead and its "when this creature dies" trigger never happens - no Treasures.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Ornithopter
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Emerald
+Black Lotus
+Fire Covenant
+Island
+Anger of the Gods
+Infernal Grasp
+Island x10
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Fire Covenant.Cast(X: 17)
+Bot2.Divide(Ancient Adamantoise: 17)
+Bot2.PayCost
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 17
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Anger of the Gods.Cast
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Ornithopter.Damage = 0
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Ancient Adamantoise
+Bot1.Graveyard = Ornithopter; Show and Tell; Black Lotus
+Bot1.Battlefield.Count = 1
+Bot2.Life = 1
+Bot2.Graveyard = Infernal Grasp; Anger of the Gods; Fire Covenant; Black Lotus
