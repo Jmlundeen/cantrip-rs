@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::THIS_ENTERS, effects};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS_OR_LEAVES, effects};
 use cantrip_oracle as oracle;
 
 /// Put a stun counter on up to one target tapped creature.
@@ -12,8 +12,7 @@ fn stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, |g, item| effects::draw(g, item, 1), "When Cryogen Relic enters, draw a card."),
-        triggered(cantrip_mechanics::triggers::THIS_LEAVES, |g, item| effects::draw(g, item, 1), "When Cryogen Relic leaves the battlefield, draw a card."),
+        triggered(THIS_ENTERS_OR_LEAVES, |g, item| effects::draw(g, item, 1), "When Cryogen Relic enters or leaves the battlefield, draw a card."),
         ability(cost("{1}{U}").and(SACRIFICE_THIS), stun, "{1}{U}, Sacrifice Cryogen Relic: Put a stun counter on up to one target tapped creature.")
             .targets(&[up_to_one(targets::TAPPED_CREATURE.filter)]),
     ],

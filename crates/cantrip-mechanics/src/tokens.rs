@@ -224,6 +224,21 @@ pub fn create_food(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend
     Ok(())
 }
 
+/// A 2/2 white Samurai creature token with vigilance. The Wandering Emperor's -1 and Experimental Synthesizer's sacrifice
+/// ability make it.
+pub static SAMURAI: CardDef = CardDef {
+    name: "Samurai",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Samurai]),
+    power: Some(2),
+    toughness: Some(2),
+    keywords: Keywords::of(&[Keyword::Vigilance]),
+    text: "Vigilance",
+    ..CardDef::BLANK
+};
+
 /// A 1/1 white Monk creature token with prowess. Cori-Steel Cutter's flurry and Monastery Mentor make it.
 pub static MONK: CardDef = CardDef {
     name: "Monk",

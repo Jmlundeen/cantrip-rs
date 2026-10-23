@@ -1,5 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{exile_target, targets, tokens};
+use cantrip_mechanics::tokens::{self, SAMURAI};
+use cantrip_mechanics::{exile_target, targets};
 use cantrip_oracle as oracle;
 
 /// As long as The Wandering Emperor entered this turn, you may activate her loyalty abilities any time you could cast
@@ -19,20 +20,6 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     Ok(())
 }
-
-/// A 2/2 white Samurai creature token with vigilance.
-pub static SAMURAI: CardDef = CardDef {
-    name: "Samurai",
-    has_cost: false,
-    colors: Some(ColorSet::of(Color::White)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Samurai]),
-    power: Some(2),
-    toughness: Some(2),
-    keywords: Keywords::of(&[Keyword::Vigilance]),
-    text: "Vigilance",
-    ..CardDef::BLANK
-};
 
 /// -1: create a 2/2 white Samurai creature token with vigilance.
 fn minus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

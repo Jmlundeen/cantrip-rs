@@ -1214,6 +1214,15 @@ pub fn this_enters_or_transforms(q: &dyn Query, source: ObjectId, event: &Event)
     this_enters(q, source, event).or_else(|| this_transforms(q, source, event))
 }
 
+/// "When this permanent enters or leaves the battlefield" (CR 113.2c, 603.2, 603.6a, 603.6c): one triggered ability with two
+/// conditions, its own entering the battlefield or its own leaving it, which looks back for the leaving alone (CR 603.10a;
+/// `CardTable::looks_back` decides it per event). Cryogen Relic, Sewer-veillance Cam and Experimental Synthesizer print it. The
+/// `listens` mask is `ZONE_CHANGE`.
+pub fn this_enters_or_leaves(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    this_enters(q, source, event).or_else(|| this_leaves(q, source, event))
+}
+
+pub const THIS_ENTERS_OR_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_enters_or_leaves);
 pub const THIS_TRANSFORMS: Trigger = when(EventMask::TRANSFORMED, this_transforms);
 pub const THIS_ENTERS_OR_TRANSFORMS: Trigger = when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::TRANSFORMED.0), this_enters_or_transforms);
 

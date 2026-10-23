@@ -13,9 +13,7 @@ fn tap_or_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     labels: choose::TAP_OR_UNTAP,
     abilities: &[
-        triggered(triggers::THIS_ENTERS, tap_or_untap, "When Sewer-veillance Cam enters, you may tap or untap target creature.")
-            .targets(&[targets::CREATURE]),
-        triggered(triggers::THIS_LEAVES, tap_or_untap, "When Sewer-veillance Cam leaves the battlefield, you may tap or untap target creature.")
+        triggered(triggers::THIS_ENTERS_OR_LEAVES, tap_or_untap, "When Sewer-veillance Cam enters or leaves the battlefield, you may tap or untap target creature.")
             .targets(&[targets::CREATURE]),
         ability(cost("{3}{U}").and(SACRIFICE_THIS), |g, item| effects::draw(g, item, 2), "{3}{U}, Sacrifice Sewer-veillance Cam: Draw two cards."),
     ],
