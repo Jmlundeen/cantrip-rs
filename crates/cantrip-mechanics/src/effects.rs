@@ -719,6 +719,12 @@ pub fn this_gains_deathtouch(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     this_gains_until_end_of_turn(g, item, Keyword::Deathtouch)
 }
 
+/// "This creature gains indestructible until end of turn" (CR 702.12b): `this_gains_until_end_of_turn` for indestructible.
+/// Belligerent Regisaur prints it.
+pub fn this_gains_indestructible(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    this_gains_until_end_of_turn(g, item, Keyword::Indestructible)
+}
+
 /// "`target` gains hexproof and indestructible until end of turn" (CR 702.11b, 702.12b, 611.2a): both keywords from one
 /// effect, a layer 6 change for the rest of the turn. Invasion of Gobakhan's Lightshield Array, Spectacular Spider-Man,
 /// Restoration Magic and Defend the Rider print it.
