@@ -32,8 +32,19 @@ fn main() {
         }
     }
     // Cards that are their characteristics alone; a card's own file, pushed first, wins over its entry there.
-    out.push_str("    let named: std::collections::HashSet<&str> = cards.iter().map(|c| c.name).collect();\n");
+    // Only a card's name is a card's: a token named for its subtypes (CR 111.4) never stands for a card.
+    out.push_str("    let named: std::collections::HashSet<&str> = cards.iter().filter(|c| c.oracle).map(|c| c.name).collect();\n");
     out.push_str("    cards.extend(cantrip_oracle::PLAIN.iter().copied().filter(|p| !named.contains(p.name)));\n");
     out.push_str("    cards\n}\n");
+    // Each card file's card with the definitions it brings, for the tests that hold a token to the text that makes it.
+    out.push_str("\n/// Each card file's `CARD`, with its `EXTRA` (empty when it has none).\npub fn files() -> Vec<(&'static CardDef, &'static [&'static CardDef])> {\n    vec![\n");
+    for name in &names {
+        let text = std::fs::read_to_string(dir.join(format!("{name}.rs"))).unwrap();
+        if text.contains("pub static CARD:") {
+            let extra = if text.contains("pub static EXTRA:") { format!("r#{name}::EXTRA") } else { "&[]".to_string() };
+            writeln!(out, "        (&r#{name}::CARD, {extra}),").unwrap();
+        }
+    }
+    out.push_str("    ]\n}\n");
     std::fs::write(std::path::Path::new(&std::env::var("OUT_DIR").unwrap()).join("cards.rs"), out).unwrap();
 }

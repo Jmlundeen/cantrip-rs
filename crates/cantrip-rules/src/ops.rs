@@ -1380,9 +1380,10 @@ fn create_tokens_as(
     create_tokens_batch(cx, &tokens, tapped, copy, with)
 }
 
-/// Token copy values, including text changes in the creating instruction (CR 612.4, 707.2).
-fn token_copy(card: CardId, copy: Option<Copiable>, words: Words) -> Option<Copiable> {
-    if words.is_printed() { copy } else { Some(Copiable { words, ..Copiable::of(card) }) }
+/// Token copy values, including text changes in the creating instruction (CR 612.4, 707.2): the colors and subtypes the
+/// changed text names, and the name of a token named for its subtypes (CR 111.4, 612.2a).
+fn token_copy(cards: &CardTable, card: CardId, copy: Option<Copiable>, words: Words) -> Option<Copiable> {
+    if words.is_printed() { copy } else { Some(Copiable { words, name: cards.get(card).token_name_under(words), ..Copiable::of(card) }) }
 }
 
 /// Creates tokens of several definitions as one instruction (CR 111.1, 101.4): all enter at once, and what watches
@@ -1443,7 +1444,7 @@ fn create_tokens_onto(
     // Replacements inspect copy exceptions and changed text too (CR 614.12).
     let proposed: Vec<(CardId, Option<Copiable>, PlayerId)> = tokens
         .iter()
-        .map(|&(card, controller)| (card, token_copy(card, copy, words), controller))
+        .map(|&(card, controller)| (card, token_copy(cx.cards(), card, copy, words), controller))
         .collect();
     // CR 614.1a: how many of each there are is decided by what would replace the creation, before any of them is made. The
     // token a copy of a permanent spell becomes as it resolves is not created (CR 111.13, 707.10f), so nothing replaces it.

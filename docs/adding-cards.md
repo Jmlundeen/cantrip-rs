@@ -145,6 +145,12 @@ kicker: kicker(mana("{2}{B}")),                                   // `multikicke
 Definitions a card brings with it (a token, a copy's exception) go in `pub static EXTRA: &[&CardDef]` in the same
 file. The generator's constant name is the card name upper-cased with every run of non-alphanumerics as `_`.
 
+A token's name is the text's (CR 111.4), never written by hand: one the text doesn't name is built on
+`token!(Phyrexian Hydra)` instead of `CardDef::BLANK` - its subtypes, once, in the text's order - and is named "Phyrexian
+Hydra Token" (a text change of the creating text renames it with its subtypes, CR 612.2a). Only a token the text names
+("a ... token named Moloid", "create Boo, a legendary ... token") writes `name`, on `CardDef::BLANK`.
+`token_names_match_oracle` holds every token in an `EXTRA` to the text of the card that makes it.
+
 What a `CardDef` can carry (see `crates/cantrip-api/src/card.rs`):
 
 | Field | For |

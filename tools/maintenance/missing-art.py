@@ -10,7 +10,8 @@ names, what card-list.py writes: a decklist, a set).
 Art is matched the way the client does it (CardArt.Slug): the slug of a face or token name against the file names
 under content/*/images/, a predefined token's without its " Token" (CR 111.4: the Treasure token is "Treasure Token",
 drawn with treasure.jpg). A card counts once it has a card file. A card's tokens are read from its Rust file
-(crates/cantrip-cards/src/cards/<card>.rs): the token definitions it declares (a `CardDef` built on `CardDef::BLANK`)
+(crates/cantrip-cards/src/cards/<card>.rs): the token definitions it declares (a `CardDef` built on `token!(..)`, named
+for its subtypes, or on `CardDef::BLANK` with the name its text gives it)
 and the shared ones it names from `cantrip_mechanics::tokens` (`tokens::TREASURE`, `tokens::create_treasure`).
 """
 
@@ -26,8 +27,8 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CARD_CODE = os.path.join(ROOT, "crates", "cantrip-cards", "src", "cards")
 SHARED_TOKENS = os.path.join(ROOT, "crates", "cantrip-mechanics", "src", "tokens.rs")
-# A `CardDef` static built on BLANK, and its name: how a token is declared in Rust.
-TOKEN_DEF = re.compile(r'static\s+([A-Z][A-Z0-9_]*)\s*:\s*CardDef\s*=\s*CardDef\s*\{(.*?)\.\.CardDef::BLANK', re.S)
+# A `CardDef` static built on BLANK or on `token!(..)`, and its name: how a token is declared in Rust.
+TOKEN_DEF = re.compile(r'static\s+([A-Z][A-Z0-9_]*)\s*:\s*CardDef\s*=\s*CardDef\s*\{(.*?)\.\.(?:CardDef::BLANK|token!\(([A-Za-z ]*)\))', re.S)
 
 
 def slug(name):
@@ -126,9 +127,14 @@ def faces(card, alone):
 
 
 def token_names(text):
-    """The tokens a Rust file declares, by static: every `CardDef` built on BLANK but an emblem, which has no art."""
+    """The tokens a Rust file declares, by static: every `CardDef` built on BLANK but an emblem, which has no art, and
+    every one built on `token!(Phyrexian Hydra)`, named for its subtypes (CR 111.4: "Phyrexian Hydra Token"; a subtype
+    written as `AssemblyWorker` is a word of its own for the slug)."""
     names = {}
-    for static, body in TOKEN_DEF.findall(text):
+    for static, body, words in TOKEN_DEF.findall(text):
+        if words.strip():
+            names[static] = " ".join(re.sub(r"(?<=[a-z])(?=[A-Z])", " ", w) for w in words.split()) + " Token"
+            continue
         name = re.search(r'name:\s*"([^"]+)"', body)
         if name and not name.group(1).lower().endswith(" emblem"):
             names[static] = name.group(1)

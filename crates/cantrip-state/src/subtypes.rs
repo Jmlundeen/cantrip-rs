@@ -945,7 +945,7 @@ impl Subtype {
         Subtype::Zubera,
     ];
 
-    pub fn name(self) -> &'static str {
+    pub const fn name(self) -> &'static str {
         match self {
             Subtype::Adventure => "Adventure",
             Subtype::Advisor => "Advisor",

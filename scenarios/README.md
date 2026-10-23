@@ -273,6 +273,14 @@ A permanent is named by the name it shows, so a transformed one is written by it
 `Bot1.Battlefield.Concealing Curtains.Activate` turns it over and `Bot1.Battlefield.Revealing Eye.Attack` plays it
 afterwards. Either face's name reaches the card in a decklist too.
 
+A token is named by its rules name (CR 111.4), in lines and dump keys alike: the name the text that made it gives it
+(`Boo`, `Marit Lage`, `Moloid`, the Roles' `Royal`), and otherwise its subtypes followed by `Token` -
+`Bot1.Battlefield.Spirit Token#2`, `Bot1.Attack(Phyrexian Hydra Token > Bot2)`, `Bot1.Battlefield = Treasure Token;
+Island`. There is no short alias: a token named for its subtypes never shares a name with a card (Phyrexian Hydra the
+card, Phyrexian Hydra Token the token), and the scenario says which. A text change of the text that made it renames it
+with its subtypes (CR 612.2a): Artificial Evolution changing Hydra to Elf makes `Phyrexian Elf Token`s. A trigger or an
+ability picked by its words (`Triggers(Soldier; battle cry)`, `Activate(Ability: Spirit)`) is still picked by its text.
+
 A face-down permanent (CR 708.2a) has no name: `Bot1.Battlefield.#1.Activate` turns the first one face up for its card's mana cost (a
 special action, paid like a spell's cost with the mana abilities that follow), and `#2` the second; its dump keys are
 `Bot1.Battlefield.#1.FaceDown` and `.FaceDownName` (what it really is), or with a lone one `Bot1.Battlefield..FaceDown`.

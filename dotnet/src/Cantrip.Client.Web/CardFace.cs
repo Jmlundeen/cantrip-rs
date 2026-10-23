@@ -204,10 +204,16 @@ public static partial class CardFace
 
     /// <summary>
     /// The names a card's face shows art for: each half's on a split card, which is drawn as its halves, and otherwise its
-    /// own.
+    /// own. A token named for its subtypes (CR 111.4: "Spirit Token", "Treasure Token") is drawn with its subtypes' art,
+    /// which is named without the "Token" (spirit.jpg, treasure.jpg).
     /// </summary>
     public static IEnumerable<string> ArtNames(ObjectView card) =>
-        card.Halves.Count > 0 ? card.Halves.Select(half => half.Name) : [card.Name];
+        card.Halves.Count > 0 ? card.Halves.Select(half => half.Name) : [TokenArtName(card)];
+
+    private static string TokenArtName(ObjectView card) =>
+        card.Kind == ObjectKindView.Token && card.Name.EndsWith(" Token", StringComparison.Ordinal) && card.Name.Length > " Token".Length
+            ? card.Name[..^" Token".Length]
+            : card.Name;
 
     /// <summary>
     /// The art a card's face is drawn with, as one key: its slug, or a split card's halves' slugs together

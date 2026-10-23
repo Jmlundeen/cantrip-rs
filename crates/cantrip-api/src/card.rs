@@ -2208,6 +2208,12 @@ pub struct CardDef {
     /// oracle sets it; everything built on `CardDef::BLANK` leaves it false. A dungeon (CR 309), written in code, is a
     /// card too: `CardTable::card_named` counts it.
     pub oracle: bool,
+    /// A token the creating text doesn't name (CR 111.4): the subtypes that text gives it, in the order it writes them, which
+    /// are its name followed by "Token" ("Phyrexian Hydra Token"). Set by `token!`, which sets `name` and `subtypes` with it,
+    /// so a definition never writes such a name; a text change of the creating text changes the name with the subtypes
+    /// (CR 612.2a, `CardDef::token_name_under`). Empty for every card, and for a token the text names ("create Boo, a
+    /// legendary ... token", "a ... token named Moloid", the Roles and the Walker of CR 111.10).
+    pub token_words: &'static [Subtype],
     pub cost: ManaCost,
     /// Whether it has a mana cost at all (CR 118.6): a card without one cannot be cast for it.
     pub has_cost: bool,
@@ -2564,6 +2570,7 @@ impl CardDef {
     pub const BLANK: CardDef = CardDef {
         name: "",
         oracle: false,
+        token_words: &[],
         cost: ManaCost::ZERO,
         has_cost: true,
         colors: None,
@@ -2799,6 +2806,98 @@ impl CardDef {
         }
     }
 }
+
+/// The length of the name a token with the subtypes `words` has when its creating text doesn't name it (CR 111.4): the
+/// subtypes, a space after each, then "Token". `token!` sizes the name with it.
+pub const fn token_name_len(words: &[Subtype]) -> usize {
+    let mut len = "Token".len();
+    let mut i = 0;
+    while i < words.len() {
+        len += words[i].name().len() + 1;
+        i += 1;
+    }
+    len
+}
+
+/// The bytes of that name (`token_name_len`), built as a constant so `token!` names a token with no code running.
+pub const fn token_name_bytes<const N: usize>(words: &[Subtype]) -> [u8; N] {
+    let mut out = [0u8; N];
+    let mut at = 0;
+    let mut i = 0;
+    while i < words.len() {
+        let word = words[i].name().as_bytes();
+        let mut j = 0;
+        while j < word.len() {
+            out[at] = word[j];
+            at += 1;
+            j += 1;
+        }
+        out[at] = b' ';
+        at += 1;
+        i += 1;
+    }
+    let token = b"Token";
+    let mut j = 0;
+    while j < token.len() {
+        out[at] = token[j];
+        at += 1;
+        j += 1;
+    }
+    out
+}
+
+/// A token definition the creating text doesn't name (CR 111.4), to be completed as any `CardDef` is:
+/// `CardDef { types: .., power: Some(3), ..token!(Phyrexian Hydra) }` is named "Phyrexian Hydra Token" and has the
+/// subtypes Phyrexian and Hydra, written once, in the order the text writes them (`CardDef::token_words`). It has no
+/// mana cost (CR 111.3). A token the text names ("a ... token named Moloid", "create Boo, a legendary ... token") is built
+/// on `CardDef::BLANK` with its `name` instead.
+#[macro_export]
+macro_rules! token {
+    ($($subtype:ident)*) => {{
+        const WORDS: &[$crate::Subtype] = &[$($crate::Subtype::$subtype),*];
+        const NAME: [u8; $crate::token_name_len(WORDS)] = $crate::token_name_bytes(WORDS);
+        $crate::CardDef {
+            name: match ::core::str::from_utf8(&NAME) {
+                Ok(name) => name,
+                Err(_) => panic!("a subtype's name is UTF-8"),
+            },
+            token_words: WORDS,
+            subtypes: $crate::SubtypeSet::of(WORDS),
+            has_cost: false,
+            ..$crate::CardDef::BLANK
+        }
+    }};
+}
+
+/// The names of tokens a text change renamed (`CardDef::token_name_under`), each made once: what play can make of them is
+/// bounded by the token definitions and the words a text change can name.
+static RENAMED_TOKENS: std::sync::Mutex<Vec<&'static str>> = std::sync::Mutex::new(Vec::new());
+
+impl CardDef {
+    /// The name a token of this definition has when the text that creates it has `words` (CR 111.4, 612.2a): a token the
+    /// text doesn't name is named for the subtypes the text names now ("Phyrexian Elf Token" once Artificial Evolution
+    /// changed Hydra to Elf); `None` when that is its own name, or when the text names it (a name is no subtype, CR 612.2).
+    /// Worked out once, as the token is created: its name is part of its copiable values from then on (CR 111.4, 707.2).
+    pub fn token_name_under(&self, words: Words) -> Option<&'static str> {
+        if self.token_words.is_empty() || words.is_printed() || self.token_words.iter().all(|&s| words.subtype(s) == s) {
+            return None;
+        }
+        let mut name = String::new();
+        for &s in self.token_words {
+            name.push_str(words.subtype(s).name());
+            name.push(' ');
+        }
+        name.push_str("Token");
+        let mut names = RENAMED_TOKENS.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        if let Some(&known) = names.iter().find(|&&n| n == name) {
+            return Some(known);
+        }
+        let made: &'static str = Box::leak(name.into_boxed_str());
+        names.push(made);
+        Some(made)
+    }
+}
+
 
 /// Every card the game knows, built once per process and shared, never copied.
 pub struct CardTable {

@@ -1043,7 +1043,8 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     }
     let mut chars = Chars {
         card,
-        name: copy_name.unwrap_or_else(|| renamed(def, words)),
+        // A token's name is its definition's, or the one the changed text that made it gave it (`CardDef::token_name_under`).
+        name: copy_name.unwrap_or(def.name),
         types,
         supertypes: Supertypes { legendary, ..def.supertypes },
         // CR 612.4: a token's subtypes are what the text that made it named.
@@ -1149,18 +1150,6 @@ fn unlock_actions(cards: &CardTable, unlocked: u8, chars: &mut Chars) {
         if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
             chars.abilities[slot] = Some(action);
         }
-    }
-}
-
-/// A token's name under changed text (CR 612.2a): a token named for its creature type ("Spirit") is named for the type
-/// the text names now.
-fn renamed(def: &CardDef, words: Words) -> &'static str {
-    if words.is_printed() {
-        return def.name;
-    }
-    match Subtype::named(def.name) {
-        Some(s) if s.is_creature_type() && def.subtypes.has(s) => words.subtype(s).name(),
-        _ => def.name,
     }
 }
 
