@@ -1,0 +1,45 @@
+# Dovin's Veto counters target noncreature spell. Bot2's Ornithopter is an artifact creature spell, so the Veto is not
+# offered against it (refusal); Sol Ring, a plain artifact, is the positive control and is countered. Bot2 answers the
+# Veto with Negate: "can't be countered" (CR 101.2 / 701.6) leaves the Veto on the stack, so it still counters Sol Ring.
+# The pool is empty right after the cast: exactly {W}{U} was paid (Mox Pearl, Mox Sapphire).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Dovin's Veto
+Island x17
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sol Ring
+Ornithopter
+Negate
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+! Bot1.Hand.Dovin's Veto.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dovin's Veto.Cast(Stack.Sol Ring)
+? Bot1.Mana =
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Negate.Cast(Stack.Dovin's Veto)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Sol Ring; Negate
+Bot1.Graveyard = Dovin's Veto
+Bot2.Battlefield.Count = 4

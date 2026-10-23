@@ -1,0 +1,9 @@
+{
+  "name": "Dovin's Veto",
+  "manaCost": "{W}{U}",
+  "type": "Instant",
+  "oracleText": "This spell can't be countered.\nCounter target noncreature spell.",
+  "keywords": [
+    "CantBeCountered"
+  ]
+}

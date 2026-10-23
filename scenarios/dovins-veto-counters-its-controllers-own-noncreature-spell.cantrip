@@ -1,0 +1,26 @@
+# Dovin's Veto may target a spell its own controller cast ("target noncreature spell" names no controller): Bot1 casts
+# Mox Jet, a noncreature spell, and answers it with the Veto, paying with the two Moxen already in play.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Dovin's Veto
+Mox Jet
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dovin's Veto.Cast(Stack.Mox Jet)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Dovin's Veto; Mox Jet
+Bot1.Battlefield.Count = 2
