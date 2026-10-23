@@ -403,13 +403,12 @@ pub fn grant_activated_abilities_of(view: &dyn LayerQuery, cards: &[CardId], cha
 }
 
 /// "Has [an ability]" (CR 113.6, 613.1f) for the card's delayed ability number 0: a static ability that gives the objects it
-/// affects the ability the card lists first in `delayed` (the card as the source has it now, or the card it copies).
+/// affects the ability the card lists first in `delayed` (the card as the source has it now: the face showing, or the card it copies).
 /// Astrologian's Planisphere, Decaying Soil, Deconstruction Hammer, Footfall Crater, Hexing Squelcher, Innkeeper's Talent,
 /// Kaldra Compleat, Lavaspur Boots, Nadu, Paradise Mantle, Petrified Hamlet, Quicksilver Dagger, Sheltered by Ghosts, Thorin
 /// Oakenshield and Thrumming Stone grant theirs this way.
 pub fn grant_delayed_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copied_card().unwrap_or(o.card);
+    let card = view.cards().current(view.state().obj(source));
     if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
         chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
     }
