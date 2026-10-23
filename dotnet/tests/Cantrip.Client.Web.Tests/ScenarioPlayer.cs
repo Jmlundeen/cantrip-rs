@@ -312,6 +312,8 @@ public sealed class ScenarioPlayer
                     }
                 }
 
+                // The dock's button waits for the host's word on the attack declared (CheckAttacks), as it does for a person.
+                await _page.SettledAsync();
                 await ClickButtonStartingAsync(attack.Attacks.Count == 0 ? "No attack" : "Attack with");
                 return;
 

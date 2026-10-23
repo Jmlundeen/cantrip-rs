@@ -716,7 +716,7 @@ public sealed class GameClient
             Func<int, List<TItem>, ClientMessage> CheckMessage,
             Func<List<TItem>, AnswerPayload> Answer,
             Func<IEnumerable<TItem>, string> Describe,
-            Func<PromptPayload, IReadOnlyList<TItem>, bool> KnownLegal);
+            Func<PromptPayload, IReadOnlyList<TItem>, TVerdict?> Known);
 
         private readonly Dictionary<string, TVerdict> _verdicts = new(StringComparer.Ordinal);
         private readonly HashSet<string> _checking = new(StringComparer.Ordinal);
@@ -750,6 +750,7 @@ public sealed class GameClient
             if (Asked is not { } asked) return null;
             List<TItem> declared = [.. items];
             if (declared.Count == 0) return kind.NoneVerdict(asked.Prompt);
+            if (kind.Known(asked.Prompt, declared) is { } known) return known;
             return _verdictsFor == asked.RequestId && _verdicts.TryGetValue(KeyOf(declared), out TVerdict? verdict) ? verdict : null;
         }
 
@@ -785,7 +786,7 @@ public sealed class GameClient
         /// </summary>
         public bool Takes(PromptMessage asked, IReadOnlyList<TItem> proposal)
         {
-            if (kind.KnownLegal(asked.Prompt, proposal) || (Verdict(proposal) is { } known && kind.Complete(known))) return false;
+            if (Verdict(proposal) is { } known && kind.Complete(known)) return false;
 
             // Cleared before anything is sent, as for any answer.
             client.Prompt = null;
@@ -907,7 +908,7 @@ public sealed class GameClient
         (request, blocks) => new CheckBlocksMessage { RequestId = request, Blocks = blocks },
         blocks => new BlockersDeclaredAnswer { Blocks = blocks },
         blocks => "[" + string.Join(", ", blocks.Select(block => $"{Cards([block.Blocker])} > {Cards([block.Attacker])}")) + "]",
-        (_, _) => false));
+        (_, _) => null));
 
     private Declarations<AttackMessage, AttackVerdictView>? _attacksField;
 
@@ -923,10 +924,19 @@ public sealed class GameClient
         (request, attacks) => new CheckAttacksMessage { RequestId = request, Attacks = attacks },
         attacks => new AttackersDeclaredAnswer { Attacks = attacks },
         attacks => "[" + string.Join(", ", attacks.Select(attack => $"{Cards([attack.Attacker])} > {(attack.TargetPermanent.IsNone ? $"seat {attack.TargetPlayer}" : Cards([attack.TargetPermanent]))}")) + "]",
-        // Where the host says nothing is required, a declaration of attacks it offers, each creature once, is legal as it is.
+        // Where the host says nothing is required, a declaration of attacks it offers, each creature once, is legal as it is,
+        // and costs what its attacks' listed costs add up to: known without asking.
         (prompt, attacks) => prompt is DeclareAttackersPromptMessage { Verdict.Free: true } asked
             && attacks.Select(attack => attack.Attacker).Distinct().Count() == attacks.Count
-            && attacks.All(attack => asked.Verdict.Addable.Exists(offered => AttackKey(offered) == AttackKey(attack)))));
+            && attacks.All(attack => asked.Verdict.Addable.Exists(offered => AttackKey(offered) == AttackKey(attack)))
+                ? new AttackVerdictView
+                {
+                    Complete = true,
+                    Free = true,
+                    Addable = asked.Verdict.Addable.FindAll(offered => !attacks.Any(attack => attack.Attacker == offered.Attacker)),
+                    Cost = asked.TotalCostText(attacks),
+                }
+                : null));
 
     /// <summary>
     /// What the rules made of the declaration of blockers <paramref name="blocks"/> for the declaration outstanding (CR
