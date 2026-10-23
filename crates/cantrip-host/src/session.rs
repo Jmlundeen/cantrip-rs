@@ -552,29 +552,67 @@ impl Session {
     }
 
     /// What the rules make of the declaration of blockers `blocks`, as the seat's handles name them, for the outstanding
-    /// declaration (CR 509.1a-c, `BlockRequirements::judge`): whether it may be declared as it is (`Complete`), why not
-    /// (`Issue`), and the blocks some legal declaration extending it has (`Addable`). The client asks it as its player
-    /// declares; the game does not move, and the answer itself is still checked when it is given.
+    /// declaration (CR 509.1a-d, `BlockRequirements::judge`): whether it may be declared as it is (`Complete`), why not
+    /// (`Issue`), what it costs (`Cost`) and the blocks some legal declaration extending it has (`Addable`). The client asks
+    /// it as its player declares; the game does not move, and the answer itself is still checked when it is given.
     pub fn check_blocks(&mut self, request_id: u32, seat_number: i32, blocks: &[crate::protocol::BlockMessage]) -> Result<Value, Rejection> {
+        let request = self.outstanding_for(request_id, seat_number)?;
+        let RequestKind::DeclareBlockers { allowed, .. } = &request.kind else {
+            return Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of blockers")));
+        };
+        // More blocks than there are blocks to make is no declaration: refused before anything is judged.
+        if blocks.len() > allowed.len() {
+            return Err(Rejection::new("IllegalAnswer", format!("{} blocks, of {} that may be made", blocks.len(), allowed.len())));
+        }
+        let payload = AnswerPayload::BlockersDeclaredAnswer(crate::protocol::BlockersDeclaredAnswer { blocks: blocks.to_vec() });
+        let Answer::Block(pairs) = self.translated(&request, &payload)? else {
+            return Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of blockers")));
+        };
+        let space = &mut self.handles[request.player.index()];
+        let verdict = crate::prompt::blocks_verdict_of(&request, &pairs, space)
+            .ok_or_else(|| Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of blockers")))?;
+        serde_json::to_value(verdict).map_err(|e| Rejection::new("IllegalAnswer", format!("the verdict does not serialize: {e}")))
+    }
+
+    /// What the rules make of the declaration of attackers `attacks`, as the seat's handles name them, for the outstanding
+    /// declaration (CR 508.1a-d, `AttackRules::judge`): whether it may be declared as it is, why not, what it costs and the
+    /// attacks some legal declaration extending it has. Nothing advances.
+    pub fn check_attacks(&mut self, request_id: u32, seat_number: i32, attacks: &[crate::protocol::AttackMessage]) -> Result<Value, Rejection> {
+        let request = self.outstanding_for(request_id, seat_number)?;
+        let RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, .. } = &request.kind else {
+            return Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of attackers")));
+        };
+        // More attacks than creatures that may attack is no declaration: refused before anything is judged.
+        if attacks.len() > eligible.len() || (players.is_empty() && planeswalkers.is_empty() && battles.is_empty() && !attacks.is_empty()) {
+            return Err(Rejection::new("IllegalAnswer", format!("{} attacks, of {} creatures that may attack", attacks.len(), eligible.len())));
+        }
+        let payload = AnswerPayload::AttackersDeclaredAnswer(crate::protocol::AttackersDeclaredAnswer { attacks: attacks.to_vec() });
+        let Answer::Attack(pairs) = self.translated(&request, &payload)? else {
+            return Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of attackers")));
+        };
+        let space = &mut self.handles[request.player.index()];
+        let verdict = crate::prompt::attacks_verdict_of(&request, &pairs, space)
+            .ok_or_else(|| Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of attackers")))?;
+        serde_json::to_value(verdict).map_err(|e| Rejection::new("IllegalAnswer", format!("the verdict does not serialize: {e}")))
+    }
+
+    /// The outstanding request `request_id`, which must be the seat's.
+    fn outstanding_for(&self, request_id: u32, seat_number: i32) -> Result<Request, Rejection> {
         let Some(request) = self.pending().filter(|r| r.id == request_id) else {
             return Err(Rejection::new("StaleReply", format!("request {request_id} is not outstanding")));
         };
         if seat(request.player) != seat_number {
             return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(request.player))));
         }
-        let space = &mut self.handles[request.player.index()];
-        let mut pairs = Vec::with_capacity(blocks.len());
-        for b in blocks {
-            let object = |h: ViewHandle| match space.object(h) {
-                Some(id) if id.index() < self.game.state.objects.len() => Ok(id),
-                _ => Err(Rejection::new("UnknownHandle", format!("handle {} names nothing this seat can see", h.0))),
-            };
-            pairs.push((object(b.blocker)?, object(b.attacker)?));
-        }
-        match crate::prompt::blocks_verdict_of(&request, &pairs, space) {
-            Some(verdict) => Ok(serde_json::to_value(verdict).expect("a verdict serializes")),
-            None => Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of blockers"))),
-        }
+        Ok(request)
+    }
+
+    /// `payload` as the engine's answer to `request`, in the asked seat's handles.
+    fn translated(&self, request: &Request, payload: &AnswerPayload) -> Result<Answer, Rejection> {
+        translate(payload, request, &self.handles[request.player.index()], &self.game).map_err(|e| match e {
+            Untranslatable::UnknownHandle(d) => Rejection::new("UnknownHandle", d),
+            Untranslatable::Illegal(d) => Rejection::new("IllegalAnswer", d),
+        })
     }
 
     /// The seat gives up: it loses, and the game ends if one side is left.

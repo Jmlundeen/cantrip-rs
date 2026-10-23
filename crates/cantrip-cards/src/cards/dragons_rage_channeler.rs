@@ -4,7 +4,7 @@ use cantrip_mechanics::triggers::NONCREATURE_SPELL_YOU_CAST;
 use cantrip_oracle as oracle;
 
 fn must_attack(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.must_attack = true;
+    chars.must_attack += 1;
 }
 
 pub static CARD: CardDef = CardDef {

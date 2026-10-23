@@ -33,8 +33,9 @@ pub struct Chars {
     /// Its "hexproof from [quality]" abilities (CR 702.11d). Each is a hexproof ability (702.11e): what takes hexproof away
     /// takes them, and what lets a player target as though there were no hexproof lets them target past these too.
     pub hexproof_from: HexproofFrom,
-    /// Attacks each combat if able (CR 508.1d).
-    pub must_attack: bool,
+    /// How many times it has "attacks each combat if able" (CR 508.1d): each instance of the ability, printed or gained, is a
+    /// requirement of its own on a declaration of attackers.
+    pub must_attack: u32,
     pub abilities: [Option<AbilityRef>; MAX_ABILITIES],
     /// It has no mana cost (CR 118.6, 707.9b): a copy that says so, whatever the card it copies prints. Its mana
     /// value is 0.
@@ -129,7 +130,7 @@ impl Chars {
         self.protection_colored_spells = false;
         self.protection_everything = false;
         self.hexproof_from = HexproofFrom::NONE;
-        self.must_attack = false;
+        self.must_attack = 0;
         self.abilities = [None; MAX_ABILITIES];
     }
 

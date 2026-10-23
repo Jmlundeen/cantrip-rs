@@ -1059,7 +1059,7 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         protection_colored_spells: false,
         protection_everything: false,
         hexproof_from: worded_hexproof(def.hexproof_from, words),
-        must_attack: false,
+        must_attack: 0,
         abilities,
         no_cost,
         name_set: false,
@@ -1992,7 +1992,7 @@ enum Field {
     Plain(u64),
 }
 
-fn fields(c: &Chars) -> [(&'static str, Field); 17] {
+fn fields(c: &Chars) -> [(&'static str, Field); 18] {
     use std::hash::{Hash, Hasher};
     let plain = |v: &dyn Fn(&mut std::collections::hash_map::DefaultHasher)| {
         let mut h = std::collections::hash_map::DefaultHasher::new();
@@ -2019,10 +2019,10 @@ fn fields(c: &Chars) -> [(&'static str, Field); 17] {
             bits(
                 u64::from(c.protection_colorless)
                     | u64::from(c.protection_colored_spells) << 1
-                    | u64::from(c.protection_everything) << 2
-                    | u64::from(c.must_attack) << 3,
+                    | u64::from(c.protection_everything) << 2,
             ),
         ),
+        ("must_attack", plain(&|h| c.must_attack.hash(h))),
         ("losses", bits(u64::from(c.lost_all) | u64::from(c.text_lost) << 1)),
         ("marks", bits(u64::from(c.spell) | u64::from(c.no_cost) << 1 | u64::from(c.name_set) << 2)),
         ("card", plain(&|h| c.card.hash(h))),
@@ -2162,7 +2162,7 @@ fn contract_pairs(base: Chars, ability: AbilityRef) -> Vec<(Chars, Chars)> {
     vary(&|c| c.protection_colorless = !c.protection_colorless);
     vary(&|c| c.protection_colored_spells = !c.protection_colored_spells);
     vary(&|c| c.protection_everything = !c.protection_everything);
-    vary(&|c| c.must_attack = !c.must_attack);
+    vary(&|c| c.must_attack += 1);
     // losses
     vary(&|c| c.lost_all = !c.lost_all);
     vary(&|c| c.text_lost = !c.text_lost);
@@ -2645,7 +2645,7 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             }
             // A gained "this creature attacks each combat if able" (Carnage, Crimson Chaos). Goad and "attacks that player this
             // combat if able" are effects, not abilities: they are read from the effects as attackers are declared.
-            (Layer::Ability, EffectKind::MustAttack) => chars.must_attack = true,
+            (Layer::Ability, EffectKind::MustAttack) => chars.must_attack += 1,
             // CR 613.4d: power and toughness switch, whatever set and modified them first.
             (Layer::PtSwitch, EffectKind::SwitchPt) => std::mem::swap(&mut chars.power, &mut chars.toughness),
             (Layer::PtModify, EffectKind::Pump(p, t)) => {
@@ -2994,7 +2994,7 @@ mod tests {
             protection_colored_spells: false,
             protection_everything: false,
             hexproof_from: HexproofFrom::NONE,
-            must_attack: false,
+            must_attack: 0,
             abilities,
             no_cost: false,
             name_set: false,

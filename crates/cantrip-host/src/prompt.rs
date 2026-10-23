@@ -646,6 +646,45 @@ pub fn block_verdict_view(verdict: &BlockVerdict, handles: &mut HandleSpace) -> 
     }
 }
 
+fn attack_messages(handles: &mut HandleSpace, attacks: &[(ObjectId, Target)]) -> Vec<AttackMessage> {
+    attacks
+        .iter()
+        .map(|&(a, t)| AttackMessage {
+            attacker: handles.handle(a),
+            target_player: t.player().map_or(0, seat),
+            target_permanent: t.object().map_or(ViewHandle::NONE, |o| handles.handle(o)),
+        })
+        .collect()
+}
+
+/// A verdict on a declaration of attackers as the seat with `handles` sees it.
+pub fn attack_verdict_view(verdict: &AttackVerdict, handles: &mut HandleSpace) -> AttackVerdictView {
+    AttackVerdictView {
+        complete: verdict.complete,
+        addable: attack_messages(handles, &verdict.addable),
+        issue: verdict.issue.as_ref().map(|i| AttackIssueView {
+            creature: handles.handle(i.creature),
+            words: i.words.clone(),
+            other_player: i.other.and_then(|t| t.player()).map_or(0, seat),
+            other_permanent: i.other.and_then(|t| t.object()).map_or(ViewHandle::NONE, |o| handles.handle(o)),
+            rule: i.rule.to_string(),
+        }),
+        cost: if verdict.cost.is_zero() { String::new() } else { verdict.cost.to_string() },
+    }
+}
+
+/// What the rules make of `attacks` for `request`, a declaration of attackers (`AttackRules::judge`), as the seat with
+/// `handles` sees it; none for any other question.
+pub fn attacks_verdict_of(request: &Request, attacks: &[(ObjectId, Target)], handles: &mut HandleSpace) -> Option<AttackVerdictView> {
+    match &request.kind {
+        RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, .. } => Some(attack_verdict_view(
+            &requirements.judge(eligible, &attack_targets(players, planeswalkers, battles), costs, attacks, true),
+            handles,
+        )),
+        _ => None,
+    }
+}
+
 /// What the rules make of `blocks` for `request`, a declaration of blockers (`BlockRequirements::judge`), as the seat with
 /// `handles` sees it; none for any other question.
 pub fn blocks_verdict_of(request: &Request, blocks: &[(ObjectId, ObjectId)], handles: &mut HandleSpace) -> Option<BlockVerdictView> {
@@ -1039,8 +1078,16 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 attackable_planeswalkers: handles_of(handles, planeswalkers),
                 attackable_battles: handles_of(handles, battles),
                 requirements: requirements
+                    .required
                     .iter()
-                    .map(|&a| AttackRequirementMessage { attacker: handles.handle(a), players: Vec::new() })
+                    .map(|r| {
+                        let (target_player, target_permanent, other_than) = match r.aim {
+                            AttackAim::Anything => (0, ViewHandle::NONE, 0),
+                            AttackAim::At(t) => (t.player().map_or(0, seat), t.object().map_or(ViewHandle::NONE, |o| handles.handle(o)), 0),
+                            AttackAim::PlayerOtherThan(p) => (0, ViewHandle::NONE, seat(p)),
+                        };
+                        AttackRequirementMessage { attacker: handles.handle(r.attacker), target_player, target_permanent, other_than }
+                    })
                     .collect(),
                 forbidden: Vec::new(),
                 costs: costs
@@ -1055,6 +1102,12 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     })
                     .collect(),
                 can_pay: if *can_pay == u16::MAX { -1 } else { i32::from(*can_pay) },
+                most_requirements: wire(requirements.most),
+                suggested: attack_messages(handles, &requirements.suggested),
+                verdict: attack_verdict_view(
+                    &requirements.judge(eligible, &attack_targets(players, planeswalkers, battles), costs, &[], true),
+                    handles,
+                ),
             })
         }
         RequestKind::AssignCombatDamage { divisions } => PromptPayload::AssignCombatDamagePromptMessage(AssignCombatDamagePrompt {

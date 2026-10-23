@@ -1,0 +1,61 @@
+# CR 508.1d counts requirements: in a game of three, Bot2 goads Bot1's Ursine Monstrosity through the Arena (CR 701.15b:
+# attack, and attack a player other than Bot2), and the Monstrosity's own ability, its die showing 1, has it attack the first
+# opponent, Bot2, this combat if able. Attacking Bot2 obeys two of the three requirements (attack, attack Bot2), attacking
+# Bot3 two as well (attack, attack a player other than Bot2): both are legal, and declaring no attack, which obeys none, is
+# refused. On turns 4 and 7 its die shows 2 and it attacks Bot3, so Bot2 keeps the initiative. Here it attacks Bot2.
+
+[Bot1 Deck]
+Forest
+Ursine Monstrosity
+Mox Ruby
+Mox Sapphire
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Plains
+Black Lotus
+White Plume Adventurer
+Island
+Plains x20
+
+[Bot3 Deck]
+Island x20
+
+[Dice]
+1; 2; 2; 1
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ursine Monstrosity.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.White Plume Adventurer.Cast
+Bot2.Search(Plains)
+[T5 Bot2.Upkeep]
+Bot2.Modes(Forge)
+Bot2.Target(White Plume Adventurer)
+[T8 Bot2.Upkeep]
+Bot2.Modes(Arena)
+Bot2.Target(Ursine Monstrosity)
+[T10 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Ursine Monstrosity.GoadedBy = Bot2
+? Bot1.Battlefield.Ursine Monstrosity.MustAttack = Bot2
+! Bot1.Attack()
+Bot1.Attack(Ursine Monstrosity > Bot2)
+[T10 Bot1.Blockers]
+? Combat.Attackers = Ursine Monstrosity > Bot2
+[T10 Bot1.Main2]
+
+[Expect]
+Turn = 10
+Bot1.Battlefield.Ursine Monstrosity.Tapped = true

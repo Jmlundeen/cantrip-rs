@@ -6,6 +6,7 @@
 
 use crate::object::*;
 use crate::vocab::*;
+use crate::AttackRules;
 
 /// One unit of work in progress. The engine runs the top frame; a frame that asks a question stops there, holding the
 /// request, and runs again from its start when the answer arrives, with its answers so far replayed (or, for a frame
@@ -411,8 +412,8 @@ pub enum RequestKind {
     /// counters among up to two target creatures". At most `max_targets` of `candidates` (any number when 0), each with a
     /// share of at least 1, adding up to `total`; none at all when the slot is `optional`.
     ChooseDividedTargets { source: ObjectId, candidates: Vec<Target>, total: u32, max_targets: u32, optional: bool },
-    /// Declare attackers (CR 508.1): any of `eligible`, each at one of `players`; every one of `requirements` must
-    /// attack (CR 508.1d).
+    /// Declare attackers (CR 508.1): any of `eligible`, each at one of `players`; `requirements` are the requirements on
+    /// the declaration (CR 508.1d), counted and judged by `AttackRules::judge`.
     /// Who attacks what (CR 508.1): each attacker names a player, a planeswalker a defending player controls, or a battle a defending player protects (`battles`,
     /// CR 310.9b, 508.1b).
     /// `costs` is what each attack that costs something to declare costs (CR 508.1d, 508.1h: "creatures can't attack you
@@ -423,7 +424,7 @@ pub enum RequestKind {
         players: Vec<PlayerId>,
         planeswalkers: Vec<ObjectId>,
         battles: Vec<ObjectId>,
-        requirements: Vec<ObjectId>,
+        requirements: AttackRules,
         costs: Vec<AttackCost>,
         /// Advice while `costs` has any: the most mana the attacking player could pay now (their pool and what their mana
         /// abilities add, `u16::MAX` when that is not known), counting creatures that may yet be tapped by attacking.
@@ -576,11 +577,10 @@ impl RequestKind {
                 add(&[*source]);
                 add(&pools.iter().map(|p| p.object).collect::<Vec<_>>());
             }
-            RequestKind::DeclareAttackers { eligible, requirements, battles, planeswalkers, .. } => {
+            RequestKind::DeclareAttackers { eligible, battles, planeswalkers, .. } => {
                 add(battles);
                 add(planeswalkers);
                 add(eligible);
-                add(requirements);
             }
             RequestKind::AssignCombatDamage { divisions } => {
                 for d in divisions {

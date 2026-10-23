@@ -570,21 +570,9 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
         .chain(planeswalkers.iter().chain(&battles).map(|&id| Target::Object(id)))
         .collect();
     let costs = crate::static_rules::attack_costs(cx, &eligible, &targets);
-    // CR 508.1d: a cost to attack is never a requirement, so a creature that attacks each combat if able need not attack
-    // where every attack open to it costs something.
-    let requirements: Vec<ObjectId> = eligible
-        .iter()
-        .copied()
-        .filter(|&id| {
-            (must_attack(cx, id) && targets.iter().any(|&t| AttackCost::free(&costs, id, t)))
-                // "Attacks that player this combat if able" (CR 508.1d) is a requirement only while it can attack that player
-                // without paying a cost: otherwise it may attack something else, or nothing (Ursine Monstrosity's ruling).
-                || cx.s().effects.iter().any(|e| {
-                    matches!(e.kind, EffectKind::MustAttackPlayer(p)
-                        if e.affected == id && players.contains(&p) && AttackCost::free(&costs, id, Target::Player(p)))
-                })
-        })
-        .collect();
+    // CR 508.1d: the requirements, one for each ability, effect and player they come from, and the most of them a
+    // declaration can obey without paying a cost to attack - a cost is never a requirement.
+    let requirements = attack_rules(cx, &eligible, &targets, &costs);
     let can_pay = if costs.is_empty() { 0 } else { actions::available(cx, active).most_unrestricted() };
     let kind = RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, can_pay };
     let attacks = loop {
@@ -736,11 +724,36 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
     !a.protected_from_by(&b, cx.s().obj(blocker).controller)
 }
 
-/// Whether `id` attacks each combat if able (CR 508.1d): by an ability it has ("this creature attacks each combat if able", one
-/// it gained included), or by goad (CR 701.15b), an effect and no ability, which a creature that loses its abilities is still
-/// under.
-fn must_attack(cx: &Cx, id: ObjectId) -> bool {
-    cx.chars(id).must_attack || cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::Goaded)
+/// The requirements on a declaration of attackers by `eligible` among `targets` (CR 508.1d), one for each source: each
+/// instance of "attacks each combat if able" it has (printed or gained, `Chars::must_attack`); for each player who goaded it,
+/// two (CR 701.15b-c: attack, and attack a player other than that one), goad being an effect and no ability, which a creature
+/// that loses its abilities is still under; and each "attacks that player this combat if able" (`EffectKind::MustAttackPlayer`).
+/// With the most of them any declaration obeys attacking for free, and one that does (`AttackRules::solve`).
+fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[AttackCost]) -> AttackRules {
+    let mut required = Vec::new();
+    for &id in eligible {
+        for _ in 0..cx.chars(id).must_attack {
+            required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
+        }
+        let mut goaders: Vec<PlayerId> = Vec::new();
+        for e in cx.s().effects.iter().filter(|e| e.affected == id) {
+            match e.kind {
+                // The same player goading it again makes no further requirement (CR 701.15d).
+                EffectKind::Goaded if !goaders.contains(&e.controller) => {
+                    goaders.push(e.controller);
+                    required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
+                    required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(e.controller) });
+                }
+                EffectKind::MustAttackPlayer(p) => required.push(RequiredAttack { attacker: id, aim: AttackAim::At(Target::Player(p)) }),
+                _ => {}
+            }
+        }
+    }
+    let mut rules = AttackRules { required, most: 0, suggested: Vec::new() };
+    if !rules.required.is_empty() {
+        (rules.most, rules.suggested) = rules.solve(eligible, targets, costs);
+    }
+    rules
 }
 
 /// "Can't block" (CR 509.1b): from an effect on this creature, or the turn's rule that no creature can.

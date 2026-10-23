@@ -16,8 +16,8 @@ fn table() -> &'static CardTable {
     Box::leak(Box::new(CardTable::new([&FILLER, &BEAR])))
 }
 
-/// P0's Bear under `kind` from P1, then losing all its abilities: the attackers P0 must declare.
-fn required_after_losing_abilities(kind: EffectKind) -> Vec<ObjectId> {
+/// P0's Bear under `kind` from P1, then losing all its abilities: the most requirements P0's declaration must obey.
+fn required_after_losing_abilities(kind: EffectKind) -> u32 {
     let table = table();
     let deck = vec![table.id_of(&FILLER); 30];
     let mut g = Game::new(table, &Setup { decks: vec![deck.clone(), deck], ..Default::default() });
@@ -32,7 +32,7 @@ fn required_after_losing_abilities(kind: EffectKind) -> Vec<ObjectId> {
         g.run();
         let request = g.pending().cloned().expect("a question");
         if let RequestKind::DeclareAttackers { requirements, .. } = &request.kind {
-            return requirements.clone();
+            return requirements.most;
         }
         let answer = match &request.kind {
             RequestKind::Priority { .. } => Answer::Pass,
@@ -45,15 +45,15 @@ fn required_after_losing_abilities(kind: EffectKind) -> Vec<ObjectId> {
 
 #[test]
 fn a_goaded_creature_that_loses_its_abilities_is_still_goaded() {
-    assert_eq!(required_after_losing_abilities(EffectKind::Goaded).len(), 1);
+    assert_eq!(required_after_losing_abilities(EffectKind::Goaded), 2, "attack, and attack a player other than its goader");
 }
 
 #[test]
 fn a_creature_that_must_attack_a_player_and_loses_its_abilities_still_must() {
-    assert_eq!(required_after_losing_abilities(EffectKind::MustAttackPlayer(P1)).len(), 1);
+    assert_eq!(required_after_losing_abilities(EffectKind::MustAttackPlayer(P1)), 1);
 }
 
 #[test]
 fn a_gained_attacks_each_combat_ability_is_lost_with_the_others() {
-    assert!(required_after_losing_abilities(EffectKind::MustAttack).is_empty());
+    assert_eq!(required_after_losing_abilities(EffectKind::MustAttack), 0);
 }

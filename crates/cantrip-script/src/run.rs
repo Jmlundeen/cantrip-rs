@@ -1039,18 +1039,9 @@ impl<'s> Run<'s> {
             RequestKind::ChooseCards { source, cards, rule, .. } => {
                 Answer::Cards(select::first_answer(&self.game, rule, request.player, *source, cards, true).unwrap_or_default())
             }
-            // A creature that attacks each combat if able attacks whether or not the script says so (CR 508.1d): the first
-            // player, planeswalker or battle it may attack without paying a cost to attack, which is never required.
-            RequestKind::DeclareAttackers { requirements, players, planeswalkers, battles, costs, .. } if !players.is_empty() => {
-                let targets: Vec<Target> =
-                    players.iter().map(|&p| Target::Player(p)).chain(planeswalkers.iter().chain(battles).map(|&o| Target::Object(o))).collect();
-                Answer::Attack(
-                    requirements
-                        .iter()
-                        .filter_map(|&r| targets.iter().find(|&&t| AttackCost::free(costs, r, t)).map(|&t| (r, t)))
-                        .collect(),
-                )
-            }
+            // A creature an effect requires to attack attacks whether or not the script says so (CR 508.1d): the engine's own
+            // declaration, which obeys as many requirements as any can without paying a cost to attack.
+            RequestKind::DeclareAttackers { requirements, players, .. } if !players.is_empty() => Answer::Attack(requirements.suggested.clone()),
             RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
             RequestKind::AssignCombatDamage { divisions } => Answer::Shares(DamageDivision::suggested_shares(divisions)),
             // No blocks, or where an effect requires blocks (CR 509.1c) the engine's own declaration, which obeys them.
@@ -1554,10 +1545,9 @@ impl<'s> Run<'s> {
                         }
                     };
                     if offered {
-                        // Offered as a pair, the attack may still be one no declaration can hold: a creature that must attack a
-                        // certain player sent elsewhere while attacking that player is free (CR 508.1d). The declaration of this
-                        // attack, with every other creature that must attack at the first thing it may attack for nothing, is
-                        // asked of the rules; refused, the refusal holds.
+                        // Offered as a pair, the attack may still be one no legal declaration holds: a creature that must attack a
+                        // certain player sent elsewhere while attacking that player is free (CR 508.1d). The rules' validator says
+                        // whether any does (the attacks it offers on no attacks); none does, the refusal holds.
                         let attacker = self.objects(action, parts[0].trim(), eligible)?[0];
                         let target = match bot_id(parts[1]) {
                             Some(b) => Target::Player(player_of(b)),
@@ -1568,20 +1558,14 @@ impl<'s> Run<'s> {
                                     .expect("offered"),
                             ),
                         };
-                        let mut attacks = vec![(attacker, target)];
-                        if let RequestKind::DeclareAttackers { requirements, costs, .. } = &request.kind {
-                            let targets: Vec<Target> = players
-                                .iter()
-                                .map(|&p| Target::Player(p))
-                                .chain(planeswalkers.iter().chain(battles).map(|&o| Target::Object(o)))
-                                .collect();
-                            for &r in requirements.iter().filter(|&&r| r != attacker) {
-                                if let Some(&t) = targets.iter().find(|&&t| AttackCost::free(costs, r, t)) {
-                                    attacks.push((r, t));
-                                }
+                        let extends = match &request.kind {
+                            RequestKind::DeclareAttackers { requirements, costs, .. } => {
+                                let targets = attack_targets(players, planeswalkers, battles);
+                                requirements.judge(eligible, &targets, costs, &[], true).addable.contains(&(attacker, target))
                             }
-                        }
-                        if check_answer(&self.game, request, &Answer::Attack(attacks)).is_ok() {
+                            _ => false,
+                        };
+                        if extends {
                             return fail(format!("line {line} says {text} must not be allowed, but it is"));
                         }
                     }

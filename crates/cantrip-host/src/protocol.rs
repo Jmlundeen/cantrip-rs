@@ -801,8 +801,39 @@ pub struct BlockMessage {
 #[serde(rename_all = "PascalCase")]
 pub struct AttackRequirementMessage {
     pub attacker: ViewHandle,
-    /// Seats it must attack one of; empty for any.
-    pub players: Vec<i32>,
+    /// The seat it must attack, or 0: with `target_permanent` none as well, it must attack, whatever it attacks.
+    pub target_player: i32,
+    /// The planeswalker or battle it must attack, or none.
+    pub target_permanent: ViewHandle,
+    /// A seat it must attack a player other than (a goad's, CR 701.15b), or 0.
+    pub other_than: i32,
+}
+
+/// What the rules make of a declaration of attackers (CR 508.1a-d): whether it may be declared as it is, why not, what it
+/// costs, and the attacks some legal declaration extending it has (docs/host-protocol.md, "Checking a declaration of
+/// attackers").
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct AttackVerdictView {
+    pub complete: bool,
+    pub addable: Vec<AttackMessage>,
+    pub issue: Option<AttackIssueView>,
+    /// What declaring it costs (CR 508.1h), in mana symbols; empty when nothing.
+    #[serde(default)]
+    pub cost: String,
+}
+
+/// Why a declaration of attackers may not be made as it is, to caption as `Creature`, `Words`, then the seat
+/// (`OtherPlayer`) or permanent (`OtherPermanent`) where there is one ("Ursine Monstrosity" "must attack" seat 2), with the
+/// rule's number ("508.1d").
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct AttackIssueView {
+    pub creature: ViewHandle,
+    pub words: String,
+    pub other_player: i32,
+    pub other_permanent: ViewHandle,
+    pub rule: String,
 }
 
 /// What one attack costs to declare (CR 508.1d, 508.1h): `attacker` attacking the seat `target_player`, or
@@ -907,6 +938,16 @@ pub struct DeclareAttackersPrompt {
     pub costs: Vec<AttackCostMessage>,
     /// While `costs` has any, the most mana the player could pay (advice; -1 when it is not known).
     pub can_pay: i32,
+    /// The requirements' most a declaration must obey (CR 508.1d), for showing the player; the host judges (`verdict`).
+    #[serde(default)]
+    pub most_requirements: i32,
+    /// A declaration that obeys that many, the engine's own; empty where nothing is required.
+    #[serde(default)]
+    pub suggested: Vec<AttackMessage>,
+    /// The rules' verdict on declaring no attackers: whether that may be declared, why not, and the attacks that may be
+    /// declared first. Every other declaration is asked of the host (`CheckAttacks`).
+    #[serde(default)]
+    pub verdict: AttackVerdictView,
 }
 
 impl DeclareAttackersPrompt {
@@ -1628,23 +1669,10 @@ impl PromptPayload {
             PromptPayload::DiscardPromptMessage(p) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer {
                 cards: p.hand.iter().take(p.count.max(0) as usize).copied().collect(),
             }),
-            PromptPayload::DeclareAttackersPromptMessage(p) => AnswerPayload::AttackersDeclaredAnswer(AttackersDeclaredAnswer {
-                attacks: p
-                    .requirements
-                    .iter()
-                    .map(|requirement| {
-                        if let Some(&seat) = requirement.players.first() {
-                            AttackMessage { attacker: requirement.attacker, target_player: seat, target_permanent: ViewHandle::NONE }
-                        } else {
-                            p.attacks_for(requirement.attacker).into_iter().next().unwrap_or(AttackMessage {
-                                attacker: requirement.attacker,
-                                target_player: p.attackable_players.first().copied().unwrap_or(0),
-                                target_permanent: ViewHandle::NONE,
-                            })
-                        }
-                    })
-                    .collect(),
-            }),
+            // No attack, or the engine's own declaration where an effect requires attacks (CR 508.1d).
+            PromptPayload::DeclareAttackersPromptMessage(p) => {
+                AnswerPayload::AttackersDeclaredAnswer(AttackersDeclaredAnswer { attacks: p.suggested.clone() })
+            }
             // No blocks, or the engine's own declaration where an effect requires blocks (CR 509.1c).
             PromptPayload::DeclareBlockersPromptMessage(p) => {
                 AnswerPayload::BlockersDeclaredAnswer(BlockersDeclaredAnswer { blocks: p.suggested.clone() })
