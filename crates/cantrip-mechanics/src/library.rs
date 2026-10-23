@@ -216,21 +216,43 @@ pub fn exile_same_name_from_graveyard_hand_and_library(g: &mut dyn Game, searche
 /// owner shuffles (CR 701.23, 406.2). An opponent no longer a legal target means nothing happens (CR 608.2b). Ancient
 /// Vendetta and The Rise of Sozin's chapter II print it.
 pub fn exile_up_to_four_named_from_graveyard_hand_and_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    exile_up_to_four_named(g, item)?;
+    Ok(())
+}
+
+/// "Choose a card name. Search target opponent's graveyard, hand, and library for up to four cards with that name and exile
+/// them. That player shuffles, then draws a card for each card exiled from their hand this way" (CR 701.23, 406.2): the
+/// search of `exile_up_to_four_named_from_graveyard_hand_and_library`, then the owner draws one card for each found card that
+/// actually reached exile from their hand (a replacement may have sent one elsewhere). The Stone Brain prints it; Deadly
+/// Cover-Up and The End draw by the same count (`exile_same_name_from_graveyard_hand_and_library`).
+pub fn exile_up_to_four_named_and_draw_for_each_from_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some((owner, from_hand)) = exile_up_to_four_named(g, item)? {
+        g.draw(owner, from_hand);
+    }
+    Ok(())
+}
+
+/// The search both make: the owner searched and how many cards reached exile from their hand, or `None` when the target
+/// opponent is no longer a legal target (CR 608.2b).
+fn exile_up_to_four_named(g: &mut dyn Game, item: &StackItem) -> Result<Option<(PlayerId, u32)>, Suspend> {
     // Up to this many cards in all, whichever zones they are found in.
     const MOST: u8 = 4;
     let you = item.controller;
-    let Some(owner) = crate::targets::player(g, item, 0) else { return Ok(()) };
+    let Some(owner) = crate::targets::player(g, item, 0) else { return Ok(None) };
     let name = g.ask(you, RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::Any })?;
     // A card has "that name" when it is the card name chosen; with no name chosen nothing has it.
     let named = |q: &dyn Query, c: ObjectId| matches!(name, Answer::Name(Some(wanted)) if object_has_name(q, c, wanted));
     let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner)).iter().copied().filter(|&c| named(g, c)).collect();
     let mut found = crate::choose::cards(g, you, item.object, Purpose::Exile, graveyard, u32::from(MOST), true)?;
+    let in_graveyard = found.len();
     let hand: Vec<ObjectId> = g.state().zone(Zone::hand(owner)).iter().copied().filter(|&c| named(g, c)).collect();
     let remaining = MOST - found.len() as u8;
     found.extend(crate::choose::cards(g, you, item.object, Purpose::Exile, hand, u32::from(remaining), true)?);
+    let cards_found = found.len();
     let remaining = MOST - found.len() as u8;
-    search_to_exile(g, you, owner, item.object, Find::ONE.up_to(u32::from(remaining)), &found, named)?;
-    Ok(())
+    let moved = search_to_exile(g, you, owner, item.object, Find::ONE.up_to(u32::from(remaining)), &found, named)?;
+    let from_hand = moved[in_graveyard..cards_found].iter().filter(|&&c| g.obj(c).zone.is(ZoneKind::Exile)).count() as u32;
+    Ok(Some((owner, from_hand)))
 }
 
 /// "Search your library for [cards], put them into your hand, then shuffle" (CR 701.23): the cards found, as they are
