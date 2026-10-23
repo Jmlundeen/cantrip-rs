@@ -240,7 +240,8 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
   existing cards.
 - **Targets judged together are a set rule** (`TargetSpec::together`, CR 601.2c): "any number of target creature cards
   that each have a different mana value X or less" is a filter for "creature card in your graveyard with mana value X or
-  less" - a quality of each target, reading `q.announced_x()` (none while only asked whether some X could have a target) -
+  less" - a quality of each target, reading `q.announced_x()` (none while only asked whether some X could have a target, and always none in a
+  triggered ability, which announces no X: a trigger's "X or less" quality needs another source of X, never this one) -
   and `TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(filter) }.together(select::DIFFERENT_MANA_VALUES)`; "with
   total mana value X or less" is `.together(select::total_mana_value_at_most(TargetSpec::COUNTED))`, `COUNTED` the X
   announced. Only a rule of the targets together goes there (`select::set_part`; anything else does not compile): a
