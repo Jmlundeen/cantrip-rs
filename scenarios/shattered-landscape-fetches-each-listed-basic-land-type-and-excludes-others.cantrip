@@ -1,0 +1,36 @@
+# Shattered Landscape: each of the three listed basic land types is legal. Reject Forest, reject Tundra because it is nonbasic, then find Mountain, Plains and Swamp; each search puts its land onto the battlefield tapped (CR 205.4a, 305.6, 701.23).
+
+[Bot1 Deck]
+Shattered Landscape x3
+Plains x8
+Forest x8
+Island x8
+Mountain x8
+Swamp x8
+Tundra x2
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shattered Landscape.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Shattered Landscape.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Shattered Landscape.Play
+Bot1.Battlefield.Shattered Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Forest)
+Bot1.Search(Mountain)
+Bot1.Battlefield.Shattered Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Tundra)
+Bot1.Search(Plains)
+Bot1.Battlefield.Shattered Landscape.Activate(Ability: {T}, Sacrifice this land)
+Bot1.Search(Swamp)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Shattered Landscape; Shattered Landscape; Shattered Landscape
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Battlefield.Swamp.Tapped = true
