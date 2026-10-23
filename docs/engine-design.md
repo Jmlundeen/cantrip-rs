@@ -984,10 +984,12 @@ Fortune and Last Chance's "at the beginning of that turn's end step, you lose th
 "You control target player during that player's next turn" (CR 723.1: Mindslaver, Sorin Markov, Worst Fears) is
 `Game::control_next_turn`, a player effect `EffectKind::ControlNextTurn` that waits on the player for the next turn they
 actually take: a skipped turn leaves it waiting (723.1b). As that turn begins (`turn::take_controlled_turn`, after the
-skip is judged) every such effect on the player is used up, and the last one created gives its controller
-`EffectKind::ControlsPlayer` for the turn (723.1a; one on a player themselves gives no one else control, 723.9). That
-lasts through the turn's cleanup and ends as the next turn begins (723.1), or at once when its controller leaves the game
-(CR 800.4a). Emrakul, the Promised End's "after that turn, that player takes an extra turn" is
+skip is judged) every such effect on the player is used up, each whose controller is still in the game becoming an
+`EffectKind::ControlsPlayer` with the timestamp it was created with; `GameState::player_controller` takes the newest
+whose controller is in the game (723.1a; one on a player themselves gives no one else control, 723.9), so when that
+controller leaves during the turn (CR 800.4a ends only theirs) the one it overwrote works on. The control lasts through
+the turn's cleanup and any turn skipped after it - a skip is decided as a turn would begin, which a skipped turn never
+does (CR 614.10, 500.11), so the controller answers it - and ends as the next turn actually begins (723.1). Emrakul, the Promised End's "after that turn, that player takes an extra turn" is
 `Game::control_next_turn_then_extra_turn`: each such effect gives its extra turn as the controlled turn begins, the newest
 extra turn being taken first (CR 500.7), so it comes right after that turn however long the turn waited, and an
 overwritten effect gives its turn too (its rulings).

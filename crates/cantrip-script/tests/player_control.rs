@@ -116,6 +116,46 @@ static WISH: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn extra_turn(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    g.add_extra_turns(item.controller, 1);
+    Ok(())
+}
+
+/// An instant for {0}: "Take an extra turn after this one."
+static EXTRA: CardDef = CardDef { name: "Probe Extra", types: TypeSet::of(&[CardType::Instant]), spell: spell(&[], extra_turn), ..CardDef::BLANK };
+
+fn its_controllers_turn(_: &dyn Query, asker: &Asker, player: PlayerId) -> bool {
+    player == asker.controller
+}
+
+fn nothing_more(_: &mut dyn Rules, _: &Asker) -> Result<(), Suspend> {
+    Ok(())
+}
+
+const SKIP_TURN: Question = Question::new("SkipTurn", "skip this turn?", "", "Skip the turn", "Take the turn").no_default();
+
+/// An artifact for {0}: "If you would begin your turn, you may skip that turn instead." (Time Vault's, without its tapping.)
+static VAULT: CardDef = CardDef {
+    name: "Probe Vault",
+    types: TypeSet::of(&[CardType::Artifact]),
+    turn_begin: &[TurnBeginRule { applies: its_controllers_turn, on_skip: nothing_more, question: &SKIP_TURN, hint: "you skip this turn" }],
+    ..CardDef::BLANK
+};
+
+/// A 2/2 creature for {0} with enlist (CR 702.154).
+static ENLISTER: CardDef = CardDef {
+    name: "Probe Enlister",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    abilities: &[cantrip_mechanics::enlist::ENLIST],
+    ..CardDef::BLANK
+};
+
+/// A 1/1 creature for {0}.
+static BEAR: CardDef =
+    CardDef { name: "Probe Bear", types: TypeSet::of(&[CardType::Creature]), power: Some(1), toughness: Some(1), ..CardDef::BLANK };
+
 /// A basic Mountain: its mana ability is its type's (CR 305.6).
 static MOUNTAIN: CardDef = CardDef {
     name: "Probe Mountain",
@@ -141,7 +181,7 @@ static FILLER: CardDef = CardDef {
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
     TABLE.get_or_init(|| {
-        CardTable::new([&SLAVER, &PROMISE, &SKIP, &DRAIN, &WISH, &MOUNTAIN, &FILLER])
+        CardTable::new([&SLAVER, &PROMISE, &SKIP, &DRAIN, &WISH, &MOUNTAIN, &FILLER, &EXTRA, &VAULT, &ENLISTER, &BEAR])
     })
 }
 
@@ -218,6 +258,8 @@ fn kind_name(kind: &RequestKind) -> &'static str {
         RequestKind::DiscardToHandSize { .. } => "DiscardToHandSize",
         RequestKind::PayCosts { .. } => "PayCosts",
         RequestKind::ChooseCards { .. } => "ChooseCards",
+        RequestKind::May { .. } => "May",
+        RequestKind::ChooseReplacement { .. } => "ChooseReplacement",
         _ => "Other",
     }
 }
@@ -292,7 +334,14 @@ fn play(game: &mut Game, moves: &[Move], mut until: impl FnMut(&Game) -> bool) -
             RequestKind::DiscardToHandSize { count, hand } => {
                 Answer::Cards(hand.iter().copied().take(*count as usize).collect())
             }
-            RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
+            // A Probe Enlister that may attack attacks the first player it may; nothing else does.
+            RequestKind::DeclareAttackers { eligible, players, .. } => Answer::Attack(
+                eligible
+                    .iter()
+                    .filter(|&&c| game.name(c) == "Probe Enlister")
+                    .filter_map(|&c| players.first().map(|&p| (c, Target::Player(p))))
+                    .collect(),
+            ),
             RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),
             RequestKind::ChooseCards {
                 source,
@@ -304,6 +353,7 @@ fn play(game: &mut Game, moves: &[Move], mut until: impl FnMut(&Game) -> bool) -
                     .unwrap_or_default(),
             ),
             RequestKind::May { .. } => Answer::Yes,
+            RequestKind::ChooseReplacement { .. } => Answer::Index(0),
             other => panic!("unexpected question {other:?}"),
         };
         game.answer(request.id, request.player, answer).unwrap();
@@ -608,4 +658,99 @@ fn a_controller_leaving_the_game_gives_the_player_back() {
     let asked = play(&mut game, &[], |g| g.state.turn.number == 3);
     assert_eq!(answerers(&asked, 2, P2), HashSet::from([P2]));
     assert!(game.state.in_game(P3));
+}
+
+/// CR 723.1, 614.10, 500.11: a turn that is skipped never begins, so the control of the turn before still holds while the
+/// skip is decided. Bot1 controls Bot2 in turn 2 and has Bot2 cast Probe Vault and take an extra turn; as that extra turn
+/// would begin, Bot2's "you may skip that turn" is answered by Bot1 (it skips it), and turn 3 is Bot1's.
+#[test]
+fn a_skip_decided_as_the_next_turn_would_begin_is_the_controllers() {
+    let mut game = deal(&[&["Probe Slaver"], &["Probe Vault", "Probe Extra"]], &[]);
+    let moves = [cast(P1, 1, "Probe Slaver", Some(P2)), cast(P2, 2, "Probe Vault", None), cast(P2, 2, "Probe Extra", None)];
+    let asked = play(&mut game, &moves, turn_is(3));
+    assert_eq!(game.state.turn.active, P1, "Bot2's extra turn was skipped");
+    let skip = asked.iter().find(|a| a.kind == "May" && a.player == P2).expect("Bot2 was asked to skip its extra turn");
+    assert_eq!(skip.by, P1);
+    assert_eq!(game.state.player_controller(P2), P2, "the control ended as turn 3 began");
+}
+
+/// The same with an effect that must skip the turn beside the one that may (CR 616.1): which applies first is chosen by Bot2,
+/// so by Bot1.
+#[test]
+fn the_order_of_skips_as_the_next_turn_would_begin_is_the_controllers() {
+    let mut game = deal(&[&["Probe Slaver"], &["Probe Vault", "Probe Extra", "Probe Skip"]], &[]);
+    let moves = [
+        cast(P1, 1, "Probe Slaver", Some(P2)),
+        cast(P2, 2, "Probe Vault", None),
+        cast(P2, 2, "Probe Extra", None),
+        cast(P2, 2, "Probe Skip", Some(P2)),
+    ];
+    let asked = play(&mut game, &moves, turn_is(3));
+    let order = asked.iter().find(|a| a.kind == "ChooseReplacement" && a.player == P2).expect("Bot2 ordered the skips");
+    assert_eq!(order.by, P1);
+}
+
+/// CR 723.1a, 800.4a: the last effect created whose controller is still in the game works. In a game of three Bot1 and then
+/// Bot2 make Bot3 controlled during its next turn, and Bot2 concedes before it: Bot1 controls Bot3 in it.
+#[test]
+fn a_leavers_control_gives_way_to_the_one_before_it() {
+    let mut game = deal(&[&["Probe Slaver"], &["Probe Slaver"], &[]], &[]);
+    let moves = [cast(P1, 1, "Probe Slaver", Some(P3)), cast(P2, 1, "Probe Slaver", Some(P3))];
+    let both = |g: &Game| g.state.stack.is_empty() && g.state.effects.iter().filter(|e| matches!(e.kind, EffectKind::ControlNextTurn { .. })).count() == 2;
+    play(&mut game, &moves, both);
+    game.concede(P2);
+    play(&mut game, &[], |g| g.state.turn.active == P3 && g.state.turn.step() == Step::PrecombatMain);
+    let turn = game.state.turn.number;
+    assert_eq!(game.state.player_controller(P3), P1);
+    let asked = play(&mut game, &[], |g| g.state.turn.number > turn);
+    assert_eq!(answerers(&asked, turn, P3), HashSet::from([P1]));
+}
+
+/// CR 723.1a, 800.4a: Bot2's control of Bot3, the later, works until Bot2 concedes during Bot3's turn; Bot1's, which it
+/// overwrote, works for the rest of that turn.
+#[test]
+fn a_controller_leaving_during_the_turn_leaves_it_to_the_one_before() {
+    let mut game = deal(&[&["Probe Slaver"], &["Probe Slaver"], &[]], &[]);
+    let moves = [cast(P1, 1, "Probe Slaver", Some(P3)), cast(P2, 1, "Probe Slaver", Some(P3))];
+    play(&mut game, &moves, |g| g.state.turn.active == P3 && g.state.turn.step() == Step::PrecombatMain);
+    assert_eq!(game.state.player_controller(P3), P2);
+    let turn = game.state.turn.number;
+    game.concede(P2);
+    assert_eq!(game.state.player_controller(P3), P1);
+    let asked = play(&mut game, &[], |g| g.state.turn.number > turn);
+    assert_eq!(answerers(&asked, turn, P3), HashSet::from([P1]));
+}
+
+/// Judgement call (CR 800.4a): an Emrakul effect whose only controller leaves before the turn gives no control, but the
+/// extra turn after it is not the leaver's and is still taken.
+#[test]
+fn a_leavers_effect_gives_no_control_but_its_extra_turn() {
+    let mut game = deal(&[&[], &["Probe Promise"], &[]], &[]);
+    let waiting = |g: &Game| g.state.stack.is_empty() && g.state.effects.iter().any(|e| matches!(e.kind, EffectKind::ControlNextTurn { .. }));
+    play(&mut game, &[cast(P2, 1, "Probe Promise", Some(P3))], waiting);
+    game.concede(P2);
+    let asked = play(&mut game, &[], |g| g.state.turn.active == P1 && g.state.turn.number > 1);
+    let turns: Vec<(u32, PlayerId)> = {
+        let mut t: Vec<(u32, PlayerId)> = asked.iter().map(|a| (a.turn, a.active)).collect();
+        t.dedup();
+        t
+    };
+    let third: Vec<u32> = turns.iter().filter(|(_, p)| *p == P3).map(|(n, _)| *n).collect();
+    assert_eq!(third.len(), 2, "Bot3 takes its turn and the extra one after it: {turns:?}");
+    for n in third {
+        assert_eq!(answerers(&asked, n, P3), HashSet::from([P3]));
+    }
+}
+
+/// CR 723.5, 508.1g, 702.154a: the optional costs to attack of a controlled player's creatures are that player's decisions,
+/// so the controller's. Bot2 casts Probe Enlister and Probe Bear in turn 2; Bot1 controls Bot2 in turn 4, has the Enlister
+/// attack and enlist the Bear - asked of Bot2, answered by Bot1 - and the Bear is tapped for it.
+#[test]
+fn a_controlled_players_enlist_is_the_controllers() {
+    let mut game = deal(&[&["Filler", "Filler", "Probe Slaver"], &["Probe Enlister", "Probe Bear"]], &[]);
+    let moves = [cast(P2, 2, "Probe Enlister", None), cast(P2, 2, "Probe Bear", None), cast(P1, 3, "Probe Slaver", Some(P2))];
+    let asked = play(&mut game, &moves, turn_is(5));
+    let enlist = asked.iter().find(|a| a.turn == 4 && a.kind == "ChooseCards" && a.player == P2).expect("Bot2 was asked whom to enlist");
+    assert_eq!(enlist.by, P1);
+    assert!(game.log.iter().any(|r| matches!(r.event, Event::PaidToAttack { option: AttackOption::Enlist, .. })), "the Bear was enlisted");
 }

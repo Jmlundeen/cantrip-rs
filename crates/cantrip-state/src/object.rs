@@ -878,16 +878,18 @@ pub enum EffectKind {
     SkipNextTurn(PlayerId),
     /// "[The effect's controller] controls [player] during that player's next turn" (CR 723.1), waiting for it: the next
     /// turn `player` actually takes, so a skipped turn leaves it waiting (723.1b). As that turn begins every such effect on
-    /// the player is used up, and the last one created gives control of them for the turn (723.1a: `ControlsPlayer`).
-    /// `then_extra_turn` is "After that turn, that player takes an extra turn" (Emrakul, the Promised End), which each such
-    /// effect gives, an overwritten one too (Emrakul's ruling), and one whose controller has left the game too. About the
-    /// player, so it outlives its `affected` object, which is only the source. Mindslaver, Sorin Markov, Worst Fears.
+    /// the player is used up, each becoming the control of them for the turn (`ControlsPlayer`), the last created
+    /// whose controller is in the game the one that works (723.1a). `then_extra_turn` is "After that turn, that player
+    /// takes an extra turn" (Emrakul, the Promised End), which each such effect gives, an overwritten one too (Emrakul's
+    /// ruling), and one whose controller has left the game too. About the player, so it outlives its `affected` object,
+    /// which is only the source. Mindslaver, Sorin Markov, Worst Fears.
     ControlNextTurn { player: PlayerId, then_extra_turn: bool },
     /// The effect's controller controls `player` (CR 723): they make every choice and decision `player` is allowed or told
     /// to make (723.5), with `player`'s resources (723.5a), and see what `player` sees of the game (723.4); `player` is still
     /// the active player and controls their objects (723.3). Who is asked is unchanged - the request is `player`'s - and
     /// the host routes it (`GameState::player_controller`). Made by `ControlNextTurn` as that turn begins, it lasts until
-    /// the next turn begins (723.1), and ends at once if its controller leaves the game (CR 800.4a).
+    /// the next turn begins (723.1) - through any turn skipped meanwhile, which never begins - and ends at once if its
+    /// controller leaves the game (CR 800.4a).
     ControlsPlayer(PlayerId),
     /// "The 'legend rule' doesn't apply to permanents [this player] controls" (CR 704.5j, 611.2c) for as long as it lasts:
     /// Hall of Echoes's "this turn". About the player, so it reaches legends that arrive later and outlives its `affected`

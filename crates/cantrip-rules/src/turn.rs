@@ -317,12 +317,8 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
     }
     match turn.step() {
         Step::Untap => {
-            // The control of a player lasts through the turn it was for, cleanup included, and ends as the next turn
-            // begins (CR 723.1): before anything of this one is asked, its skipping included.
-            if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::ControlsPlayer(_))) {
-                cx.st().effects_retain(|e| !matches!(e.kind, EffectKind::ControlsPlayer(_)));
-            }
-            // CR 614.10, 500.11: a turn that would begin may be skipped instead, and then never begins.
+            // CR 614.10, 500.11: a turn that would begin may be skipped instead, and then never begins. The control of a
+            // player is still in force while that is decided: it ends only as the next turn begins (CR 723.1).
             if skip_turn(cx, active)? {
                 // The next player's turn takes its place, under this one's number: as if cleanup had just ended it.
                 cx.st().update_turn(|t| {
@@ -331,7 +327,11 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
                 });
                 return Ok(Flow::Done);
             }
-            // The turn is taken: the effects waiting to control its player during it apply (CR 723.1).
+            // The turn begins: the control of a player for the turn before ends (CR 723.1), lasting through its cleanup and
+            // any turn skipped since, and the effects waiting to control this turn's player during it apply.
+            if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::ControlsPlayer(_))) {
+                cx.st().effects_retain(|e| !matches!(e.kind, EffectKind::ControlsPlayer(_)));
+            }
             take_controlled_turn(cx, active);
             // CR 502: the turn begins; the active player's permanents untap. No one gets priority.
             let number = turn.number;
@@ -389,10 +389,12 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
 }
 
 /// The turn `player` takes now is their "next turn" for every effect waiting to control them during it (CR 723.1, 723.1b: a
-/// skipped turn was not taken, and they wait on): all of them are used up, and the last one created gives its controller
-/// control of the player for this turn (723.1a) - unless that controller has left the game (CR 800.4a). Each that says
-/// "after that turn, that player takes an extra turn" (Emrakul, the Promised End) gives that turn now, the overwritten ones
-/// too: the newest extra turn is taken first (CR 500.7), so it comes right after this one, and before any created earlier.
+/// skipped turn was not taken, and they wait on). Each becomes the control of the player for this turn, keeping the
+/// timestamp it was created with: the last created whose controller is still in the game is the one that works (723.1a,
+/// `GameState::player_controller`), and if that controller leaves during the turn the next newest works on (CR 800.4a ends
+/// only the leaver's). One whose controller has already left gives no control (CR 800.4a). Each that says "after that turn,
+/// that player takes an extra turn" (Emrakul, the Promised End) gives that turn now, the overwritten ones and those of a
+/// controller who has left too: the newest extra turn is taken first (CR 500.7), so it comes right after this one.
 fn take_controlled_turn(cx: &mut Cx, player: PlayerId) {
     let waiting = |e: &ContinuousEffect| matches!(e.kind, EffectKind::ControlNextTurn { player: p, .. } if p == player);
     if !cx.s().effects.iter().any(waiting) {
@@ -400,11 +402,11 @@ fn take_controlled_turn(cx: &mut Cx, player: PlayerId) {
     }
     let pending: Vec<ContinuousEffect> = cx.s().effects.iter().copied().filter(waiting).collect();
     cx.st().effects_retain(|e| !waiting(e));
-    if let Some(last) = pending.iter().max_by_key(|e| e.timestamp)
-        && cx.s().in_game(last.controller)
-    {
-        // Created when the effect it comes from was: what a later one overwrites (CR 723.1a).
-        cx.st().effect_push(ContinuousEffect { kind: EffectKind::ControlsPlayer(player), ..*last });
+    for e in &pending {
+        if cx.s().in_game(e.controller) {
+            // Created when the effect it comes from was: what a later one overwrites (CR 723.1a).
+            cx.st().effect_push(ContinuousEffect { kind: EffectKind::ControlsPlayer(player), ..*e });
+        }
     }
     for e in &pending {
         if matches!(e.kind, EffectKind::ControlNextTurn { then_extra_turn: true, .. }) {
