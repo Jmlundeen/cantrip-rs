@@ -1,0 +1,64 @@
+# Damping Sphere: each spell a player casts costs {1} more for each OTHER spell that player has cast this turn (CR 601.2f).
+# Turn 1 Bot1 casts three Moxen. Turn 3 Bot1 casts Mox Pearl (the first spell this turn: no tax, though three were cast on
+# turn 1) and Damping Sphere (the second, paid with two Moxen; a spell cast before the Sphere arrived counts), then Mox
+# Sapphire as the third spell: {2} more, paid with exactly two Moxen. On turn 4 Bot2 casts Mox Jet (free), Mox Ruby ({1} more)
+# and Mox Emerald ({2} more), each paid exactly; Bot1's Brainstorm cast in between costs only {U} - Bot2's spells are
+# not Bot1's. Each pool is checked right after the cast, in the same step.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Damping Sphere
+Mox Sapphire
+Brainstorm
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Damping Sphere.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mox Sapphire.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Mox Ruby.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Mox Emerald.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainstorm.Cast
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield = Damping Sphere; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot2.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Swamp
+Bot1.Graveyard = Brainstorm

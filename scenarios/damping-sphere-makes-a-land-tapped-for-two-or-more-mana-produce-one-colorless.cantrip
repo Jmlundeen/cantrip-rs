@@ -1,0 +1,44 @@
+# Damping Sphere: "If a land is tapped for two or more mana, it produces {C} instead of any other type and amount" (CR 106.12b,
+# 614.1a). Ancient Tomb ({C}{C}) makes one {C} and still deals its 2 damage (the replacement changes the mana only); a land
+# tapped for one mana (Forest) and a nonland tapped for {C}{C} (Sol Ring) are unaffected. Turn 1 sets up the Sphere (paid by
+# two Moxen); the taps are on turn 3, each pool checked right after the tap in the same step.
+
+[Bot1 Deck]
+Ancient Tomb
+Mox Jet
+Mox Ruby
+Mox Emerald
+Sol Ring
+Damping Sphere
+Forest
+Forest x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Damping Sphere.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {G}{C}{C}
+Bot1.Battlefield.Ancient Tomb.Activate
+? Bot1.Mana = {G}{C}{C}{C}
+? Bot1.Life = 18
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Ancient Tomb.Tapped = true

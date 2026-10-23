@@ -1,0 +1,43 @@
+# Damping Sphere: a land tapped for two or more mana produces {C} "instead of any other type and amount" (CR 614.1a): Gruul
+# Turf's {R}{G} becomes a single {C}, neither {R} nor {G} nor a second mana is added. The Turf comes in on turn 3 (tapped,
+# returning the Forest) and is tapped on turn 5, its {C} paying Mind Stone's draw ability: Damping Sphere taxes spells, not
+# abilities (the pool is empty after, and the card is drawn).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Damping Sphere
+Gruul Turf
+Mind Stone
+Forest x2
+Forest x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Damping Sphere.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Gruul Turf.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Stone.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Gruul Turf.Activate
+? Bot1.Mana = {C}
+Bot1.Battlefield.Mind Stone.Activate(Ability: Sacrifice)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Gruul Turf.Tapped = true
+Bot1.Graveyard = Mind Stone
