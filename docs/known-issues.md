@@ -67,6 +67,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-123](#ki-123-the-ai-crates-knowledge-misjudges-what-a-seat-saw-across-the-control-of-a-player) | The AI crate's knowledge misjudges what a seat saw across the control of a player | Pri-2 | Open |
 | [KI-124](#ki-124-what-a-land-could-produce-is-judged-for-at-most-256-answers-to-its-mana-abilitys-questions) | What a land could produce is judged for at most 256 answers to its mana ability's questions | Pri-3 | Won't fix: beyond practical scale |
 | [KI-125](#ki-125-a-mana-abilitys-row-can-show-what-its-ability-lists-or-the-best-of-several-outcomes-under-replacement-effects-on-its-mana) | A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana | Pri-2 | Open |
+| [KI-127](#ki-127-a-tokens-name-is-not-derived-from-its-types) | A token's name is not derived from its types | Pri-1 | Fix under way |
 
 ## Issues
 
@@ -399,3 +400,17 @@ read it (`AutoMana`, `AutoPlay`, the tactical bot), can be off. A fix is a proto
 color" apart from how much of it the ability adds, or the outcomes listed per color.
 
 **Scenarios.** None: display. `prompt::row_yield_tests` shows which rows fall back.
+
+### KI-127: A token's name is not derived from its types
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix under way | engine | 2026-10-23, reviewing Polukranos Reborn (#220) |
+
+**Notes.** CR 111.4: a token the effect doesn't name is named for its subtypes followed by "Token" ("Phyrexian Hydra
+Token"); CR 612.2a: a text change to the ability that creates it changes those words, and so the name. Token
+definitions carry hand-written names ("Phyrexian Hydra", "Spirit"), and `ops::create_tokens_worded` changes a token's
+colors and subtypes under a text change but not its name, so a token can share a card's name (Phyrexian Hydra) and a
+text-changed token keeps the old one.
+
+**Scenarios.** None yet: Polukranos Reborn's text-change scenario reaches it.
