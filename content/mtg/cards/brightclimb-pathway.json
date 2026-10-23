@@ -1,0 +1,11 @@
+{
+  "name": "Brightclimb Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {W}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Grimclimb Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {B}."
+  }
+}

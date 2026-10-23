@@ -1,0 +1,22 @@
+# Brightclimb Pathway is a modal double-faced card (CR 712.3) whose faces are both lands: one copy is played as its front
+# face (taps for {W}), the other as its back face Grimclimb Pathway (taps for {B}); neither enters tapped.
+
+[Bot1 Deck]
+Brightclimb Pathway
+Brightclimb Pathway
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Brightclimb Pathway.Play(Ability: #1)
+Bot1.Battlefield.Brightclimb Pathway.Activate
+? Bot1.Mana = {W}
+[T3 Bot1.Main1]
+Bot1.Hand.Brightclimb Pathway.Play(Ability: back face)
+Bot1.Battlefield.Grimclimb Pathway.Activate
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield = Brightclimb Pathway; Grimclimb Pathway
