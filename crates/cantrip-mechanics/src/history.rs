@@ -265,3 +265,12 @@ pub fn permanents_dealt_damage_by(history: History, source: ObjectId, since: usi
     }
     dealt
 }
+
+/// "If you cast this spell during your main phase" (CR 505.1, 601.2i): a `CardDef::cast_fact`, 1 if the spell's caster was
+/// the active player in a precombat or postcombat main phase as it became cast, else 0. Read with
+/// `history().fact_as_cast`, so a copy (not cast, CR 707.10) never has it. Tail Swipe, Might of Old Krosa, Haunting Hymn and
+/// the other "Addendum" spells print it.
+pub fn cast_during_your_main_phase(q: &dyn Query, me: &Asker) -> u32 {
+    let turn = q.state().turn;
+    (turn.active == me.controller && turn.step().is_main()) as u32
+}
