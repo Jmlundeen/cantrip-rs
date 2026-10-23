@@ -457,6 +457,12 @@ pub fn nonland_permanent_with_mana_value_at_most<const N: u32>(q: &dyn Query, as
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
 }
 
+/// "Target creature with mana value `N` or less" (CR 115.1, 202.3: X in a mana cost is 0 on the battlefield), whoever
+/// controls it. Requiting Hex (2) and Claim the Firstborn (3) print it.
+pub fn creature_with_mana_value_at_most<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
+}
+
 /// "Target noncreature, nonland permanent" (CR 115.1): a permanent that is neither, so no creature that is also a land.
 /// Archive Arbiter and Witherbloom Command (with a mana value limit) print it.
 pub fn noncreature_nonland_permanent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
