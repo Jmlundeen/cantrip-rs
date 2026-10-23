@@ -1,0 +1,54 @@
+# Ray of Enfeeblement: a white creature gets -4/-4 instead of -4/-1 (a 2/4 dies: toughness exactly 4), a green 2/3 gets only -4/-1 (power -2,
+# toughness 2), so a -4/-4 on everything or -4/-1 on everything is caught. Each cast costs exactly {B}: both black
+# sources are tapped first, so the pool after the first cast holds one B. "Target creature" refuses a player.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ray of Enfeeblement
+Ray of Enfeeblement
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Auriok Salvagers
+Eumidian Terrabotanist
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Auriok Salvagers.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Eumidian Terrabotanist.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Ray of Enfeeblement.Cast(Bot2)
+Bot1.Hand.Ray of Enfeeblement.Cast(Auriok Salvagers)
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot1.Hand.Ray of Enfeeblement.Cast(Eumidian Terrabotanist)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Auriok Salvagers
+Bot2.Battlefield.Eumidian Terrabotanist.Power = -2
+Bot2.Battlefield.Eumidian Terrabotanist.Toughness = 2

@@ -1,0 +1,56 @@
+# Ray of Enfeeblement: the "white" test covers a creature of two colors (white and green, 2/2, dies to -4/-4) and the
+# caster's own white creature (1/2, dies); a colorless 0/2 gets only -4/-1 (toughness 1) and is back to 0/2 on the next
+# turn ("until end of turn").
+
+[Bot1 Deck]
+Plains
+Swamp
+Mox Jet
+Mox Jet
+Thraben Inspector
+Ray of Enfeeblement
+Ray of Enfeeblement
+Ray of Enfeeblement
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Mox Emerald
+Arwen, Mortal Queen
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ray of Enfeeblement.Cast(Thraben Inspector)
+Bot1.Hand.Ray of Enfeeblement.Cast(Arwen, Mortal Queen)
+Bot1.Hand.Ray of Enfeeblement.Cast(Ornithopter)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard = Arwen, Mortal Queen
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
