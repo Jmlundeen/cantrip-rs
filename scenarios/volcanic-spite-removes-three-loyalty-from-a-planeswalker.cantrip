@@ -1,0 +1,38 @@
+# "Target creature, planeswalker, or battle": damage to a planeswalker removes that many loyalty counters (CR 120.3c). Bot2's Liliana of
+# the Veil enters with 3 loyalty; exactly 3 damage puts her in the graveyard (state-based action, CR 704.5i).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Volcanic Spite
+Plains x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Volcanic Spite.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Liliana of the Veil
+Bot1.Hand.Count = 5

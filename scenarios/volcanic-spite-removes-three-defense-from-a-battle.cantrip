@@ -1,0 +1,40 @@
+# "Target creature, planeswalker, or battle": damage to a battle removes that many defense counters (CR 120.3h). Bot2's Invasion of
+# Gobakhan (a Siege, 3 defense) is cast on turn 2 and dealt exactly 3 by Bot1's Volcanic Spite on turn 3: with no defense counters left
+# it is exiled (CR 310.12b). Spite is drawn on turn 3 so Invasion's enter trigger (a nonland card only;
+# Bot1 holds only lands) cannot take it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Plains x5
+Volcanic Spite
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Ruby
+Invasion of Gobakhan
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Invasion of Gobakhan.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot2.Battlefield.Invasion of Gobakhan.Counters.Defense = 3
+Bot1.Hand.Volcanic Spite.Cast(Bot2.Battlefield.Invasion of Gobakhan)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Invasion of Gobakhan
