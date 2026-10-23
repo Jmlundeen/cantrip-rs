@@ -639,7 +639,7 @@ pub fn player_casts_noncreature_spell(q: &dyn Query, _: ObjectId, event: &Event)
     }
 }
 
-/// "Whenever an opponent casts a spell with mana value `N` or less" (CR 601.2i, 603.2, 202.3): a spell cast (not a copy, CR 707.10a,
+/// "Whenever an opponent casts a spell with mana value `N` or less" (CR 601.2i, 603.2, 202.3): a spell cast (not a copy, CR 707.10,
 /// and not an ability) by a player other than the source's controller, with the mana value it has on the stack, where an {X} in
 /// its cost counts as the X chosen for it (CR 202.3e). The ability is about the player who cast it (`StackItem::subject`, "that
 /// player"). Solarium Sentry (2) and Scalding Viper (3) print it.
@@ -654,7 +654,7 @@ pub fn opponent_casts_spell_with_mana_value_at_most<const N: u32>(q: &dyn Query,
 
 pub const A_PLAYER_CASTS_A_NONCREATURE_SPELL: Trigger = when(EventMask::SPELL_CAST, player_casts_noncreature_spell);
 
-/// "Whenever you cast an instant or sorcery spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10a), by this
+/// "Whenever you cast an instant or sorcery spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10), by this
 /// ability's controller, read as it stands on the stack. The spell rides along as the trigger's subject ("that spell").
 /// Colorstorm Stallion's opus and Stormchaser's Talent's third level print it.
 pub fn you_cast_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -668,7 +668,7 @@ pub fn you_cast_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Event) -> 
     }
 }
 
-/// "Whenever an opponent casts an instant or sorcery spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10a), by a
+/// "Whenever an opponent casts an instant or sorcery spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10), by a
 /// player other than the ability's controller, read as it stands on the stack. The spell rides along as the trigger's subject.
 /// Arasta of the Endless Web and Wandering Archaic print it.
 pub fn opponent_casts_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -704,7 +704,7 @@ pub const PROWESS: AbilityDef = triggered(when_asked(EventMask::SPELL_CAST, nonc
 
 /// The instant or sorcery spell `player` cast or copied, if this event is one (CR 601.2i, 707.10): magecraft's trigger event,
 /// and what Veyran, Voice of Duality's "you casting or copying an instant or sorcery spell" names. A copy of a spell is not
-/// cast (CR 707.10a), and a copy of a card that is no spell on the stack is not "copying a spell", so only a copy on the stack
+/// cast (CR 707.10), and a copy of a card that is no spell on the stack is not "copying a spell", so only a copy on the stack
 /// counts. The spell is read as it is on the stack.
 pub fn instant_or_sorcery_cast_or_copied(q: &dyn Query, event: &Event) -> Option<(ObjectId, PlayerId)> {
     let (spell, player) = match *event {

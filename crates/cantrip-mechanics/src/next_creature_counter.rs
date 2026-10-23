@@ -2,7 +2,7 @@
 //! (CR 603.7b, 614.1c, 122.6), the Saga chapter Summon: Fenrir (II) and Kumano Faces Kakkazan (II) print.
 //!
 //! The chapter sets up a delayed triggered ability that triggers once, on the first creature spell its controller casts
-//! (not a copy, CR 707.10a) this turn, read as the spell stands on the stack, and ends with the turn if none is cast. The
+//! (not a copy, CR 707.10) this turn, read as the spell stands on the stack, and ends with the turn if none is cast. The
 //! spell rides along as the trigger's subject, and the trigger's effect makes a replacement effect about it for the turn,
 //! applied as it enters the battlefield from the stack (CR 614.12). A card lists `DELAYED` as its delayed ability 0 and
 //! `ENTERS_WITH_A_COUNTER` as its granted replacement 0, and its chapter calls `chapter`.

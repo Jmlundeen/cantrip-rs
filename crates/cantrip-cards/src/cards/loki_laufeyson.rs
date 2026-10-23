@@ -3,7 +3,7 @@ use cantrip_mechanics::{copy, delayed, power_up, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "When you next cast an instant or sorcery spell with mana value less than or equal to Loki's power this turn": a spell
-/// cast, not copied (CR 707.10a), by the ability's controller (CR 603.7d), whose mana value as it stands on the stack, X
+/// cast, not copied (CR 707.10), by the ability's controller (CR 603.7d), whose mana value as it stands on the stack, X
 /// included (CR 202.3e), is no more than Loki's power at the moment it is cast, as it last was once Loki has left (CR
 /// 608.2h). The spell is the trigger's subject.
 fn next_instant_or_sorcery_within_lokis_power(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {

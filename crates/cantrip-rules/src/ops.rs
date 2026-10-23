@@ -1610,7 +1610,7 @@ pub fn prepared_copy(cx: &mut Cx, permanent: ObjectId) {
 }
 
 /// Copies the spell on the stack (CR 707.10): the copy is a new spell object under `copier`, put onto the stack above
-/// everything with the original's targets, modes, X and kicks. It is not cast (CR 707.10a), so nothing that watches
+/// everything with the original's targets, modes, X and kicks. It is not cast (CR 707.10), so nothing that watches
 /// casts sees it, and it ceases to exist when it leaves the stack. With `new_targets` the copier may choose new
 /// targets (CR 707.10c), slot by slot, each offered every legal choice (the old target among them); a slot with
 /// nothing else it could be is not asked, and an answer that is not legal leaves the old target. Every target of the
@@ -1668,7 +1668,7 @@ pub fn copy_spell_as(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets
     item.serial = 0;
     // A copy is put onto the stack as it is created (CR 707.10, 701.27f).
     item.since = cx.g.log.len() as u32;
-    // A copy is not cast (CR 707.10a).
+    // A copy is not cast (CR 707.10).
     item.cast_known = u32::MAX;
     cx.st().stack_push(item);
     let top = cx.s().stack.len() - 1;
