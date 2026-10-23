@@ -1,0 +1,62 @@
+# A nontoken Clone copying Old-Growth Troll dies as a creature and its card returns as an Aura (the rulings): it is Clone, not
+# the Troll, with the two abilities Old-Growth Troll's text grants the Forest it enchants (the ability is the Troll's, whose
+# words the copy has). Bot1 casts the Troll with Black Lotus on turn 1, then on turn 3 copies it with Clone and
+# destroys the Clone with Infernal Grasp; the returned Clone enchants one Forest, which taps for {G}{G}; the Troll itself stays.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Old-Growth Troll
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Mox Jet
+Clone
+Infernal Grasp
+Forest x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: G)
+Bot1.Hand.Old-Growth Troll.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Old-Growth Troll#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.Forest.Activate(Ability: {T}: Add {G}{G})
+? Bot1.Mana = {G}{G}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Clone.Types = Enchantment
+Bot1.Battlefield.Clone.Subtypes = Aura
+Bot1.Battlefield.Clone.Colors = Blue
+Bot1.Battlefield.Clone.AttachedTo = Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Old-Growth Troll.Types = Creature
+Bot1.Graveyard = Infernal Grasp; Black Lotus

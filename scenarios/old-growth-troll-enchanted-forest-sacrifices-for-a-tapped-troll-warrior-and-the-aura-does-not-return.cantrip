@@ -1,0 +1,56 @@
+# The Forest Old-Growth Troll enchants has "{1}, {T}, Sacrifice this land: Create a tapped 4/4 green Troll Warrior creature
+# token with trample" (CR 613.1f): exactly {1} is paid (a second Mox's mana stays in the pool). The Forest gone, the Aura goes
+# to the graveyard (CR 704.5m) and, no creature, does not return (the trigger's "if it was a creature", CR 603.4).
+# Bot1 casts the Troll with Black Lotus on turn 1 and destroys it with Infernal Grasp on turn 3; it returns on its only Forest.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Old-Growth Troll
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Infernal Grasp
+Forest x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: G)
+Bot1.Hand.Old-Growth Troll.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Old-Growth Troll)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate(Ability: Sacrifice; Spend: G)
+Bot1.Pass
+? Bot1.Mana = {U}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Troll Warrior.Tapped = true
+Bot1.Battlefield.Troll Warrior.Token = true
+Bot1.Battlefield.Troll Warrior.Power = 4
+Bot1.Battlefield.Troll Warrior.Toughness = 4
+Bot1.Battlefield.Troll Warrior.Colors = Green
+Bot1.Battlefield.Troll Warrior.Subtypes = Troll; Warrior
+Bot1.Battlefield.Troll Warrior.Keywords = Trample
+Bot1.Battlefield.Count = 5
+Bot1.Graveyard = Old-Growth Troll; Forest; Infernal Grasp; Black Lotus

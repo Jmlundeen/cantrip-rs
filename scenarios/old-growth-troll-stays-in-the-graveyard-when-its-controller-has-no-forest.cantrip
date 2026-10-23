@@ -1,0 +1,39 @@
+# With no Forest it could enchant, Old-Growth Troll stays in the graveyard (CR 303.4g, the rulings). Bot2's Forest does not
+# count - "Forest you control" is the Troll's controller's. Bot1 casts the Troll with Black Lotus on turn 1 and has no land;
+# Bot2 destroys it on turn 2 with a Forest and Mox Jet, and Bot2's Forest, which it could have chosen, is not enchanted.
+
+[Bot1 Deck]
+Black Lotus
+Old-Growth Troll
+Plains x18
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Infernal Grasp
+Forest x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: G)
+Bot1.Hand.Old-Growth Troll.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Old-Growth Troll)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Target
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Old-Growth Troll; Black Lotus
+Bot2.Battlefield.Count = 2

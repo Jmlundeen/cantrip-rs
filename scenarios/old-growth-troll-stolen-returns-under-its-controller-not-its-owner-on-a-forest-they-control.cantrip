@@ -1,0 +1,54 @@
+# If you control but don't own Old-Growth Troll, you (not its owner) return it when it dies, enchanting a Forest you control
+# (the rulings: it returns under the control of the ability's controller, CR 603.3a). Bot2 owns the Troll and no Forest. Bot1 steals it with Act
+# of Treason and destroys it with Infernal Grasp: it returns under Bot1's control on Bot1's Forest, and Bot2 owns the card.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Act of Treason
+Infernal Grasp
+Forest x13
+
+[Bot2 Deck]
+Black Lotus
+Old-Growth Troll
+Plains x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: G)
+Bot2.Hand.Old-Growth Troll.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Old-Growth Troll)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Old-Growth Troll)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Old-Growth Troll.AttachedTo = Forest
+Bot1.Battlefield.Old-Growth Troll.Types = Enchantment
+Bot2.Battlefield.Count = 0
