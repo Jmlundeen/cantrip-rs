@@ -1,0 +1,6 @@
+{
+  "name": "Go for the Throat",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "Destroy target nonartifact creature."
+}

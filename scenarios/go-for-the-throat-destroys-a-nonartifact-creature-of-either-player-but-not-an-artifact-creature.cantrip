@@ -1,0 +1,41 @@
+# "Destroy target nonartifact creature": Bot1 may not target Bot2's Ornithopter (an artifact creature) but destroys Bot2's Dryad Arbor
+# with one Go for the Throat and its own Dryad Arbor with the other (the Ornithopter is only refused, so it survives). Mana: Mox Jet
+# and Mox Ruby for the first, Black Lotus (black) for the second, checked right after the first cast (CR 115.1, 701.8).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Go for the Throat
+Go for the Throat
+Dryad Arbor
+Swamp x12
+
+[Bot2 Deck]
+Dryad Arbor
+Ornithopter
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Dryad Arbor.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Dryad Arbor.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Go for the Throat.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Go for the Throat.Cast(Bot2.Battlefield.Dryad Arbor)
+? Bot1.Mana = 
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Go for the Throat.Cast(Bot1.Battlefield.Dryad Arbor)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Go for the Throat; Dryad Arbor; Black Lotus; Go for the Throat
+Bot2.Graveyard = Dryad Arbor
+Bot2.Battlefield.Ornithopter.Tapped = false
