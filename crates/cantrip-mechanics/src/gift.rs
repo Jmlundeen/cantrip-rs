@@ -27,13 +27,12 @@ fn give_treasure(g: &mut dyn Game, to: PlayerId) -> Result<(), Suspend> {
 }
 
 fn give_tapped_fish(g: &mut dyn Game, to: PlayerId) -> Result<(), Suspend> {
-    let fish = g.card_id(&tokens::FISH);
-    g.create_tokens(fish, to, 1, true)?;
+    tokens::create_by_rule(g, to, &tokens::FISH, 1, true)?;
     Ok(())
 }
 
 fn give_octopus(g: &mut dyn Game, to: PlayerId) -> Result<(), Suspend> {
-    tokens::create(g, to, &tokens::OCTOPUS, 1)?;
+    tokens::create_by_rule(g, to, &tokens::OCTOPUS, 1, false)?;
     Ok(())
 }
 

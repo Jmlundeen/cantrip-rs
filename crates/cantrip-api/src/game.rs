@@ -534,8 +534,9 @@ pub trait Game: Query {
     fn create_tokens_together(&mut self, tokens: &[(CardId, PlayerId)]) -> Result<Vec<ObjectId>, Suspend>;
     fn create_tokens(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool) -> Result<Vec<ObjectId>, Suspend>;
     /// `create_tokens`, each token entering with these counters (CR 122.6, 111.1): "create a token with two +1/+1
-    /// counters on it".
-    fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend>;
+    /// counters on it", its text having `words` as `create_tokens_worded`'s does (`Words::NONE` for a token a rule defines:
+    /// incubate's Incubator, CR 701.53a).
+    fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i16)], words: Words) -> Result<Vec<ObjectId>, Suspend>;
     /// Creates a delayed triggered ability (CR 603.7), controlled by `controller`, about `subject`.
     fn delayed_trigger(&mut self, when: DelayedWhen, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target);
     /// `delayed_trigger`, carrying the objects the ability is about to the moment it triggers (`event_objects` of its
@@ -729,8 +730,9 @@ pub trait Game: Query {
     /// Creates tokens together whose text has `words` (CR 612.4), tapped when `tapped`, and attacking `attacking` if one is
     /// given (CR 508.4: tapped only if the effect says "tapped and attacking"). Every other
     /// way of creating tokens gives them the words of the text making them, so a text change reaches the colors and
-    /// creature types it names (CR 612.2a); a keyword's own token is the rules' (its reminder text is no rules text),
-    /// so For Mirrodin!'s Rebel is made with `Words::NONE`.
+    /// creature types it names (CR 612.2a); a keyword's own token and a predefined one are the rules' (CR 111.10;
+    /// reminder text is no rules text, CR 207.2a), so For Mirrodin!'s Rebel is made with `Words::NONE`, and so is every
+    /// token `cantrip_mechanics::tokens::create_by_rule` makes.
     fn create_tokens_worded(&mut self, tokens: &[(CardId, PlayerId)], tapped: bool, attacking: Option<Target>, words: Words) -> Result<Vec<ObjectId>, Suspend>;
     /// Creates a token "attached to" `host` (CR 111.1, 303.4): an Aura token enters attached to it, chosen by the effect
     /// and not targeted, so hexproof and shroud do not matter (the Role rulings, 2023-09-01). If the Aura could not legally

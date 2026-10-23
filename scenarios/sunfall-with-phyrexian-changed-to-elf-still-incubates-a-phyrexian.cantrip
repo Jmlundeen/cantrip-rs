@@ -1,0 +1,51 @@
+# Incubate's Incubator and the Phyrexian Token it transforms into are the rules' (CR 701.53a, 111.10i), not words of
+# Sunfall's text: its reminder text is no rules text (CR 207.2a), so a text change reaches no word of it (CR 612.2).
+# Artificial Evolution replaces Phyrexian with Elf in Sunfall's text as it waits on the stack; Sunfall exiles the
+# Ornithopter and makes an Incubator Token with a +1/+1 counter, which paying {2} turns into a 1/1 Phyrexian artifact
+# creature named Phyrexian Token, no Elf.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Sunfall
+Artificial Evolution
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Sunfall.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Sunfall)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Phyrexian)
+Bot1.Modes(Elf)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Incubator Token.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Sapphire; Phyrexian Token
+Bot1.Battlefield.Phyrexian Token.Subtypes = Phyrexian
+Bot1.Battlefield.Phyrexian Token.Types = Artifact; Creature
+Bot1.Battlefield.Phyrexian Token.Power = 1
+Bot1.Battlefield.Phyrexian Token.Counters.PlusOnePlusOne = 1

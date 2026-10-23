@@ -41,7 +41,7 @@ fn jace_tokens(g: &dyn Game, controller: PlayerId) -> Vec<ObjectId> {
 pub fn jace(g: &mut dyn Game, controller: PlayerId, source: ObjectId, n: i16) -> Result<(), Suspend> {
     let mut owned = jace_tokens(g, controller);
     if owned.is_empty() {
-        tokens::create(g, controller, &JACE, 1)?;
+        tokens::create_by_rule(g, controller, &JACE, 1, false)?;
         owned = jace_tokens(g, controller);
     }
     let jace = match owned.as_slice() {

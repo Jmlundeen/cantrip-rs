@@ -86,8 +86,7 @@ pub static TREASURE: CardDef = CardDef {
 
 /// Creates a Treasure token (CR 111.10a) under `controller`.
 pub fn create_treasure(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    let treasure = g.card_id(&TREASURE);
-    g.create_tokens(treasure, controller, 1, false)?;
+    create_by_rule(g, controller, &TREASURE, 1, false)?;
     Ok(())
 }
 
@@ -99,8 +98,7 @@ pub fn treasures_controlled(q: &dyn Query, player: PlayerId) -> Vec<ObjectId> {
 
 /// Creates a tapped Treasure token (CR 111.10a) under `controller`. Generous Plunderer and Death to Our Enemies print it.
 pub fn create_tapped_treasure(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    let treasure = g.card_id(&TREASURE);
-    g.create_tokens(treasure, controller, 1, true)?;
+    create_by_rule(g, controller, &TREASURE, 1, true)?;
     Ok(())
 }
 
@@ -116,8 +114,7 @@ pub static POWERSTONE: CardDef = CardDef {
 /// Creates a tapped Powerstone token (CR 111.10h) under `controller`: "creates a tapped Powerstone token" as the Brothers'
 /// War cards print it (the token itself is not defined as entering tapped).
 pub fn create_tapped_powerstone(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    let powerstone = g.card_id(&POWERSTONE);
-    g.create_tokens(powerstone, controller, 1, true)?;
+    create_by_rule(g, controller, &POWERSTONE, 1, true)?;
     Ok(())
 }
 
@@ -131,8 +128,7 @@ pub static BLOOD: CardDef = CardDef {
 
 /// Investigate (CR 701.16a): create a Clue token. Used by Thraben Inspector and Tireless Tracker.
 pub fn investigate(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    let clue = g.card_id(&CLUE);
-    g.create_tokens(clue, controller, 1, false)?;
+    create_by_rule(g, controller, &CLUE, 1, false)?;
     Ok(())
 }
 
@@ -164,13 +160,12 @@ fn explore_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// A colorless 2/2 Robot artifact creature token. Melded Moxite and Pinnacle Starcage create it. It shares its name with
-/// the 1/1 Robot (Ravenous Robots'), so the card table keeps the definitions apart.
+/// the 1/1 Robot (Ravenous Robots'), a definition of its own.
 pub static ROBOT_2_2: CardDef = CardDef {
     colors: Some(ColorSet::NONE),
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
     power: Some(2),
     toughness: Some(2),
-    shares_name: true,
     ..token!(Robot)
 };
 
@@ -187,8 +182,7 @@ pub static MAP: CardDef = CardDef {
 
 /// Creates a Map token (CR 111.10s) under `controller`.
 pub fn create_map(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    let map = g.card_id(&MAP);
-    g.create_tokens(map, controller, 1, false)?;
+    create_by_rule(g, controller, &MAP, 1, false)?;
     Ok(())
 }
 
@@ -208,8 +202,7 @@ pub static FOOD: CardDef = CardDef {
 
 /// Creates a Food token (CR 111.10b) under `controller`.
 pub fn create_food(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    let food = g.card_id(&FOOD);
-    g.create_tokens(food, controller, 1, false)?;
+    create_by_rule(g, controller, &FOOD, 1, false)?;
     Ok(())
 }
 
@@ -348,7 +341,8 @@ pub static INCUBATOR: CardDef = CardDef {
 /// incubators share it.
 pub fn incubate(g: &mut dyn Game, controller: PlayerId, n: i16) -> Result<(), Suspend> {
     let incubator = g.card_id(&INCUBATOR);
-    g.create_tokens_with_counters(incubator, controller, 1, false, &[(CounterKind::PlusOne, n)])?;
+    // The Incubator is the rule's (CR 701.53a, 111.10i), as are the words of incubate's reminder text (CR 207.2a).
+    g.create_tokens_with_counters(incubator, controller, 1, false, &[(CounterKind::PlusOne, n)], Words::NONE)?;
     Ok(())
 }
 
@@ -406,7 +400,7 @@ pub static HEARTWOOD: CardDef = CardDef {
 
 /// Creates a Heartwood token under `controller`.
 pub fn create_heartwood(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    create(g, controller, &HEARTWOOD, 1)?;
+    create_by_rule(g, controller, &HEARTWOOD, 1, false)?;
     Ok(())
 }
 
@@ -416,6 +410,16 @@ pub fn create_heartwood(g: &mut dyn Game, controller: PlayerId) -> Result<(), Su
 pub fn create(g: &mut dyn Game, controller: PlayerId, def: &'static CardDef, count: u32) -> Result<Vec<ObjectId>, Suspend> {
     let def = g.card_id(def);
     g.create_tokens(def, controller, count, false)
+}
+
+/// Creates `count` tokens of `def` under `controller`, a token whose characteristics a rule defines and no printed text:
+/// a predefined token (CR 111.10: a Treasure, a Clue, a Heartwood) or a keyword's own (job select's Hero, recruit's Human
+/// Soldier, a gift's Fish). A text change of the text making it changes nothing of it (CR 612.2): its color words and
+/// creature types are not that text's, and a keyword's reminder text is no rules text (CR 207.2a). Created together
+/// (CR 101.4), `tapped` as given.
+pub fn create_by_rule(g: &mut dyn Game, controller: PlayerId, def: &'static CardDef, count: u32, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
+    let def = g.card_id(def);
+    g.create_tokens_worded(&vec![(def, controller); count as usize], tapped, None, Words::NONE)
 }
 
 fn fetch_basic_land_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -437,13 +441,13 @@ pub static LANDER: CardDef = CardDef {
 
 /// Creates a Lander token (CR 111.10u) under `controller`.
 pub fn create_lander(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    create(g, controller, &LANDER, 1)?;
+    create_by_rule(g, controller, &LANDER, 1, false)?;
     Ok(())
 }
 
 /// Creates a Blood token (CR 111.10g) under `controller`. Bloodtithe Harvester and Ivora, Insatiable Heir make it.
 pub fn create_blood(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
-    create(g, controller, &BLOOD, 1)?;
+    create_by_rule(g, controller, &BLOOD, 1, false)?;
     Ok(())
 }
 
@@ -479,7 +483,6 @@ pub static SOLDIER: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(1),
     toughness: Some(1),
-    shares_name: true,
     ..token!(Soldier)
 };
 
@@ -535,7 +538,6 @@ pub static SERVO: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
     power: Some(1),
     toughness: Some(1),
-    shares_name: true,
     ..token!(Servo)
 };
 
@@ -545,7 +547,6 @@ pub static WOLF: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(2),
     toughness: Some(2),
-    shares_name: true,
     ..token!(Wolf)
 };
 
@@ -637,7 +638,6 @@ pub static SPIRIT: CardDef = CardDef {
     power: Some(1),
     toughness: Some(1),
     block_rules: &[spirit_blocking],
-    shares_name: true,
     text: "This token can't block or be blocked by non-Spirit creatures.",
     ..token!(Spirit)
 };
@@ -650,7 +650,6 @@ pub static WHITE_FLYING_SPIRIT: CardDef = CardDef {
     power: Some(1),
     toughness: Some(1),
     keywords: Keywords::of(&[Keyword::Flying]),
-    shares_name: true,
     text: "Flying",
     ..token!(Spirit)
 };

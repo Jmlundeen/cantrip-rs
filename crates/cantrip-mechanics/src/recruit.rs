@@ -15,7 +15,7 @@ pub fn recruit(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(
     let chosen = choose_from_hand(g, player, source, 1)?;
     let discarded = g.discard_together(&chosen);
     if discarded.iter().any(|&card| !g.chars(card).is(CardType::Land)) {
-        tokens::create(g, player, &tokens::HUMAN_SOLDIER, 1)?;
+        tokens::create_by_rule(g, player, &tokens::HUMAN_SOLDIER, 1, false)?;
     }
     Ok(())
 }

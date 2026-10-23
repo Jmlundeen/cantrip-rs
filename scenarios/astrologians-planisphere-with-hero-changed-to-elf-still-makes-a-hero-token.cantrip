@@ -1,0 +1,36 @@
+# Job select's Hero is the keyword's (CR 702.182a), not words of Astrologian's Planisphere's text: reminder text is no
+# rules text (CR 207.2a), so a text change reaches no word of it (CR 612.2). Artificial Evolution replaces Hero with Elf
+# in the Planisphere's text while its job select trigger waits on the stack; the token made is still a 1/1 Hero named
+# Hero Token (CR 111.4), and the Planisphere makes it a Wizard as its printed text says.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Astrologian's Planisphere
+Artificial Evolution
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Astrologian's Planisphere.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Astrologian's Planisphere)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Hero)
+Bot1.Modes(Elf)
+
+[Expect]
+Bot1.Battlefield.Astrologian's Planisphere.AttachedTo = Hero Token
+Bot1.Battlefield.Hero Token.Subtypes = Hero; Wizard
+Bot1.Battlefield.Hero Token.Power = 1

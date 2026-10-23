@@ -1586,9 +1586,9 @@ impl cantrip_api::Game for Cx<'_> {
             .map_err(|_| Suspend)
     }
 
-    fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend> {
+    fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i16)], words: Words) -> Result<Vec<ObjectId>, Suspend> {
         let tokens: Vec<(CardId, PlayerId)> = (0..count).map(|_| (def, controller)).collect();
-        ops::create_tokens_batch(self, &tokens, tapped, None, counters).map_err(|_| Suspend)
+        ops::create_tokens_worded(self, &tokens, tapped, None, counters, words, None).map_err(|_| Suspend)
     }
 
     fn create_token_copies(&mut self, of: ObjectId, controller: PlayerId, count: u32) -> Result<Vec<ObjectId>, Suspend> {
