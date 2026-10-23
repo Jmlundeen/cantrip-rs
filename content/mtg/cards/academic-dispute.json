@@ -1,0 +1,6 @@
+{
+  "name": "Academic Dispute",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Target creature blocks this turn if able. You may have it gain reach until end of turn.\nLearn. (You may reveal a Lesson card you own from outside the game and put it into your hand, or discard a card to draw a card.)"
+}

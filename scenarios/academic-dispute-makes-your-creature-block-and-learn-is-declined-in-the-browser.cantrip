@@ -1,0 +1,61 @@
+# Browser
+# What a defender sees of Academic Dispute (CR 509.1c): Bot2's Llanowar Elves attacks on turn 4, and in the declare attackers step
+# Bot1 casts Academic Dispute on their own Monastery Swiftspear. Bot1's page is asked whether it gains reach (yes), then the
+# discard of Learn (declined) and the Lesson from outside the game (declined). The Swiftspear's face says it blocks this turn if able
+# and has Reach; the blockers dock says it must block the Elves and holds its button until it does (its No blocks button is disabled, and the engine refuses no blocks); Bot1 blocks, and the Elves die.
+
+[Bot1 Deck]
+Mountain
+Monastery Swiftspear
+Academic Dispute
+Mountain
+Mountain
+Mountain
+Mountain
+Island x14
+
+[Bot1 Sideboard]
+Firebending Lesson
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Monastery Swiftspear.Cast
+Bot1.Battlefield.Mountain.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Hand.Academic Dispute.Cast(Bot1.Battlefield.Monastery Swiftspear)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Academic Dispute: have the creature gain reach until end of turn?
+? Client.Bot1.Prompt.Detail = Chosen as Academic Dispute resolves
+Bot1.Accept
+? Client.Bot1.Prompt.Title = Academic Dispute: choose up to 1 card to discard
+? Client.Bot1.Prompt.Detail = 0 of 1 chosen  ·  click them in your hand
+Bot1.Choose()
+? Client.Bot1.Prompt.Title = Academic Dispute: choose up to 1 Lesson card you own from outside the game to reveal
+? Client.Bot1.Prompt.Detail = 0 of 1 chosen  ·  from your sideboard, which only you can see
+Bot1.Choose()
+? Client.Bot1.Battlefield.Monastery Swiftspear.Rules = Haste / Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.) / Reach / Blocks this turn if able.
+Bot1.Pass
+? Client.Bot1.Prompt.Detail = Monastery Swiftspear must block
+? Client.Bot1.Button.No blocks.Enabled = false
+! Bot1.Block(Count: 0)
+Bot1.Block(Monastery Swiftspear > Llanowar Elves)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot2.Graveyard = Llanowar Elves
+Bot1.Sideboard = Firebending Lesson

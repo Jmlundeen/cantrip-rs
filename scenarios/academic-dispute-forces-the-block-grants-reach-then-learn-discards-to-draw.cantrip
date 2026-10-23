@@ -1,0 +1,66 @@
+# Academic Dispute on Bot2's Tocatli Honor Guard as Bot1's Swiftspear attacks (turn 3): "Target creature blocks this turn if
+# able" (CR 509.1c) - the Honor Guard may not decline to block, refused with `! Bot2.Block(Count: 0)`, and blocks. "You may have
+# it gain reach until end of turn", accepted, so it has Reach during the turn and not on turn 4. Learn (CR 701.48a): Bot1 discards
+# the spare Mountain and draws, so the sideboard's Lesson stays outside the game. Prowess makes the attacker 2/3 against the 1/3
+# blocker, so neither dies and the Honor Guard can be read on turn 4. On turn 5 the second Swiftspear attacks and Bot2 declines to
+# block: the requirement was for turn 3 only. Mox Ruby is not a creature, so it is not a target.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Monastery Swiftspear
+Monastery Swiftspear
+Academic Dispute
+Mountain
+Mountain
+Island x10
+
+[Bot1 Sideboard]
+Firebending Lesson
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Tocatli Honor Guard
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Monastery Swiftspear.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Monastery Swiftspear.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tocatli Honor Guard.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Monastery Swiftspear > Bot2)
+! Bot1.Hand.Academic Dispute.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Hand.Academic Dispute.Cast(Bot2.Battlefield.Tocatli Honor Guard)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Pass
+Bot1.Accept
+Bot1.Choose(Mountain)
+? Bot1.Sideboard = Firebending Lesson
+? Bot2.Battlefield.Tocatli Honor Guard.Keywords = Reach
+! Bot2.Block(Count: 0)
+Bot2.Block(Tocatli Honor Guard > Monastery Swiftspear)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Tocatli Honor Guard.Keywords = Reach
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Tocatli Honor Guard.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Attack(Monastery Swiftspear > Bot2)
+Bot2.Block(Count: 0)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Sideboard = Firebending Lesson
+Bot1.Graveyard = Academic Dispute; Mountain
+Bot2.Life = 19
+Bot1.Hand.Count = 3

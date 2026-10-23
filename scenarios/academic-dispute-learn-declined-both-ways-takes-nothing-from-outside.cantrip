@@ -1,0 +1,37 @@
+# Learn (CR 701.48a) makes both halves optional: Bot1 casts Academic Dispute on their own Swiftspear, declines the reach, declines the
+# discard and then declines to reveal the Lesson in their sideboard. Firebending Lesson stays outside the game, nothing is drawn or
+# discarded, so the hand is the one it was before, less the spell, and only Academic Dispute is in the graveyard.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Monastery Swiftspear
+Academic Dispute
+Mountain
+Mountain
+Mountain
+Island x10
+
+[Bot1 Sideboard]
+Firebending Lesson
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Monastery Swiftspear.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Academic Dispute.Cast(Bot1.Battlefield.Monastery Swiftspear)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot1.Decline
+Bot1.Choose()
+Bot1.Choose()
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Sideboard = Firebending Lesson
+Bot1.Graveyard = Academic Dispute
+Bot1.Hand = Mountain; Mountain; Mountain

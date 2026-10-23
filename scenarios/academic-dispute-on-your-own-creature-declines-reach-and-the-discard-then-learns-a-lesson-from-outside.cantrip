@@ -1,0 +1,46 @@
+# Academic Dispute on Bot1's own Swiftspear: a creature of either player is a legal target. The reach is declined (the Swiftspear
+# has no Reach), and so is the discard of Learn (CR 701.48a), so Bot1 "didn't discard a card" and may reveal a Lesson card they own
+# from outside the game and put it into their hand: Firebending Lesson, but not Lightning Bolt (not a Lesson) and not Bot2's Price
+# of Freedom (not Bot1's). Nothing was drawn and nothing discarded.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Monastery Swiftspear
+Academic Dispute
+Mountain
+Mountain
+Mountain
+Island x10
+
+[Bot1 Sideboard]
+Firebending Lesson
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Bot2 Sideboard]
+Price of Freedom
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Monastery Swiftspear.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Academic Dispute.Cast(Bot1.Battlefield.Monastery Swiftspear)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot1.Decline
+Bot1.Choose()
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Price of Freedom)
+Bot1.Choose(Firebending Lesson)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Monastery Swiftspear.Keywords = Haste
+
+[Expect]
+Bot1.Sideboard = Lightning Bolt
+Bot2.Sideboard = Price of Freedom
+Bot1.Hand.Firebending Lesson.Colors = Red
+Bot1.Hand.Count = 4
