@@ -127,6 +127,37 @@ pub struct LifeChange {
     pub amount: i32,
 }
 
+/// A permanent tapped for mana producing it (CR 106.12, 106.12b): all the mana the mana ability produces as it resolves,
+/// before any of it is added to a pool. "If [a permanent] is tapped for mana, it produces [mana] instead" changes `mana`,
+/// its type and amount (CR 614.1a); each effect has one opportunity at it (CR 614.5), and the player who tapped it orders
+/// several (CR 616.1). What a triggered mana ability adds (CR 605.1b: "add an additional {G}") is no part of it: those
+/// trigger on the mana as the effects have left it (CR 106.12a). Only a mana ability with {T} in its cost taps a permanent
+/// for mana (CR 106.12), so no other ability's mana is proposed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ManaProduction {
+    /// The permanent tapped for mana, the source of the mana ability (CR 106.3). A cost may have sacrificed it ("{T},
+    /// Sacrifice this artifact: Add one mana of any color"): `Query::chars` then reads it as it last existed on the
+    /// battlefield (CR 608.2h, its last-known information).
+    pub permanent: ObjectId,
+    /// The player who tapped it: who activated the ability, and whose pool the mana goes to (CR 605.3b). "If you tap a
+    /// permanent for mana" (Mana Reflection) is keyed to this.
+    pub player: PlayerId,
+    /// The mana it produces, by type.
+    pub mana: ManaPool,
+    /// What restricts the mana or what it does as it is spent (CR 106.6): a rider of the ability, which stays on all the
+    /// mana it produces, however much and of whatever type (Mana Reflection's ruling).
+    pub restriction: Option<ManaRestriction>,
+    /// The mana lasts until end of combat (CR 106.4, 500.5a), as the ability says.
+    pub lasting: bool,
+}
+
+impl ManaProduction {
+    /// How much mana it produces, of every type.
+    pub fn total(&self) -> u32 {
+        self.mana.total()
+    }
+}
+
 /// A proposed event a replacement effect may reshape.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Proposal {
@@ -138,6 +169,7 @@ pub enum Proposal {
     Damage(DamageEvent),
     TokenCreation(TokenCreation),
     LifeChange(LifeChange),
+    ManaProduction(ManaProduction),
 }
 
 /// The kinds of event a replacement effect watches for, so an effect is asked only about events it could replace.
@@ -150,6 +182,8 @@ pub enum ReplacementKind {
     Damage,
     TokenCreation,
     LifeChange,
+    /// A permanent tapped for mana producing it (CR 106.12b): `Proposal::ManaProduction`.
+    ManaProduction,
 }
 
 impl Proposal {
@@ -162,6 +196,7 @@ impl Proposal {
             Proposal::Damage(_) => ReplacementKind::Damage,
             Proposal::TokenCreation(_) => ReplacementKind::TokenCreation,
             Proposal::LifeChange(_) => ReplacementKind::LifeChange,
+            Proposal::ManaProduction(_) => ReplacementKind::ManaProduction,
         }
     }
 }

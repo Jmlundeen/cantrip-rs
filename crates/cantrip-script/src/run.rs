@@ -2159,8 +2159,14 @@ impl<'s> Run<'s> {
         let Some(source) = option.source else { return true };
         let Some(ability) = g.chars(source).abilities().nth(option.index as usize) else { return true };
         match g.cards.ability(ability) {
+            // What it adds as the replacement effects on a tap for mana leave it (CR 106.12b), in some order: Damping Sphere's
+            // {C} for an Ancient Tomb's {C}{C}, Contamination's {B} for a Forest's {G}.
             AbilityDef::Activated(d) if d.is_mana_ability() && d.adds.total() > 0 => {
-                d.adds.get(color.map_or(Mana::C, |c| c.mana())) > 0
+                let mana = color.map_or(Mana::C, |c| c.mana());
+                match cantrip_engine::replaced_mana_yields(g, g.state.obj(source).controller, source, option.index) {
+                    Some(yields) => yields.iter().any(|(_, outcomes)| outcomes.iter().any(|o| o.get(mana) > 0)),
+                    None => d.adds.get(mana) > 0,
+                }
             }
             // An ability that adds no mana (a land's sacrifice-to-draw) is not one that adds this color.
             AbilityDef::Activated(d) if !d.is_mana_ability() => false,

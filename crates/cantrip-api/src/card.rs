@@ -7,7 +7,7 @@ use crate::chars::Chars;
 use crate::event::{Event, EventMask};
 use crate::history::History;
 use crate::game::{CastTerms, CastWay, Game, Query, Suspend};
-use crate::replace::{GrantedPreventionDef, GrantedReplacementDef, PreventionDef, ReplacementDef};
+use crate::replace::{GrantedPreventionDef, GrantedReplacementDef, PreventionDef, ReplacementDef, ReplacementKind};
 
 /// A spell or ability's effect as it resolves (CR 608.2).
 pub type Effect = fn(&mut dyn Game, &StackItem) -> Result<(), Suspend>;
@@ -2813,6 +2813,10 @@ pub struct CardTable {
     /// look for sources only when one might be.
     pub replaces: Vec<bool>,
     pub any_replaces: bool,
+    /// Which cards have a replacement effect of a static ability on mana a permanent tapped for mana produces (CR 106.12b,
+    /// `ReplacementKind::ManaProduction`): a tap for mana proposes its mana, and its yield is predicted through them, only
+    /// while one of these is on the battlefield.
+    pub mana_replaces: Vec<bool>,
     /// Whether any card limits the spells cast each turn.
     pub any_cast_limit: bool,
     /// Which cards have block rules (CR 509.1b): looked at only for the blocker and the attacker of a possible block.
@@ -3052,6 +3056,8 @@ impl CardTable {
         let any_play_rules = play_rules.iter().any(|&s| s);
         let replaces: Vec<bool> = cards.iter().map(|c| !c.replacements.is_empty() || !c.preventions.is_empty()).collect();
         let any_replaces = replaces.iter().any(|&r| r);
+        let mana_replaces: Vec<bool> =
+            cards.iter().map(|c| c.replacements.iter().any(|r| r.kind == ReplacementKind::ManaProduction)).collect();
         let any_cast_limit = cards.iter().any(|c| c.cast_limit > 0);
         let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty()).collect();
         let pay_with_grants: Vec<bool> = cards.iter().map(|c| !c.grants_pay_with.is_empty()).collect();
@@ -3119,6 +3125,7 @@ impl CardTable {
             any_play_rules,
             replaces,
             any_replaces,
+            mana_replaces,
             any_cast_limit,
             block_rules,
             attack_rules,

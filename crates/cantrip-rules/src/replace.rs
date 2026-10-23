@@ -125,6 +125,7 @@ fn subject_of(proposal: &Proposal) -> Option<ObjectId> {
     match proposal {
         Proposal::ZoneChange(z) => Some(z.object),
         Proposal::Counters(c) => Some(c.object),
+        Proposal::ManaProduction(m) => Some(m.permanent),
         Proposal::DrawInstruction(_)
         | Proposal::Draw(_)
         | Proposal::TokenCreation(_)
@@ -162,6 +163,9 @@ fn affected(cx: &Cx, proposal: &Proposal) -> PlayerId {
         Proposal::Draw(d) => d.player,
         Proposal::TokenCreation(t) => t.controller,
         Proposal::LifeChange(l) => l.player,
+        // "If multiple replacement effects would modify the mana an ability you control produces, choose one to apply"
+        // (Damping Sphere's ruling): the player who tapped the permanent for it.
+        Proposal::ManaProduction(m) => m.player,
     }
 }
 
@@ -531,6 +535,100 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
     }
 }
 
+/// What one effect does to the event, and nothing else: its `apply`, with the "you" it has (`apply` does this and the rest).
+/// For the outcomes an event could have (`mana_outcomes`), which do nothing to the game.
+fn reshape(cx: &Cx, c: &Candidate, proposal: &mut Proposal) {
+    match c.origin {
+        Origin::Printed => {
+            let def = &cx.cards().get(source_card(cx, c.source)).replacements[c.index as usize];
+            let asker = Asker { source: c.source, controller: controller_of(cx, c.source, proposal) };
+            (def.apply)(cx, &asker, proposal);
+        }
+        Origin::Granted(timestamp) => {
+            let Some(e) = cx.s().effects.iter().find(|e| e.timestamp == timestamp) else { return };
+            let def = &cx.cards().get(card_of(cx, c.source)).granted_replacements[c.index as usize];
+            (def.apply)(cx, &Asker { source: c.source, controller: e.controller }, e.affected, proposal);
+        }
+        // No other kind of effect applies to the mana a permanent produces.
+        _ => {}
+    }
+}
+
+/// Whether a replacement effect could apply to the mana a permanent tapped for mana produces (CR 106.12b): a permanent on the
+/// battlefield whose card has one (`CardTable::mana_replaces`), or one a spell or ability made, still lasting. The guard that
+/// keeps a tap for mana, and the advice on what one would produce, free of the production's proposal on nearly every board.
+pub(crate) fn mana_may_be_replaced(cx: &Cx) -> bool {
+    mana_may_be_replaced_in(cx.s(), cx.cards())
+}
+
+/// `mana_may_be_replaced`, of a position.
+pub(crate) fn mana_may_be_replaced_in(s: &GameState, cards: &CardTable) -> bool {
+    s.battlefield().iter().any(|&id| cards.mana_replaces[cards.current(s.obj(id)).0 as usize])
+        || s.effects.iter().any(|e| match e.kind {
+            EffectKind::Replacement(i) | EffectKind::ReplacementRule(i) => {
+                cards.get(cards.current(s.obj(e.source))).granted_replacements[i as usize].kind == ReplacementKind::ManaProduction
+            }
+            _ => false,
+        })
+}
+
+/// The mana a permanent tapped for mana produces (CR 106.12b): what is left of `production` once every replacement effect that
+/// applies has, in the order its player chooses (CR 616.1), each once (CR 614.5).
+pub(crate) fn mana_production(cx: &mut Cx, production: ManaProduction) -> ManaProduction {
+    let mut proposal = Proposal::ManaProduction(production);
+    apply(cx, &mut proposal);
+    match proposal {
+        Proposal::ManaProduction(production) => production,
+        _ => unreachable!("an effect cannot change the kind of the event"),
+    }
+}
+
+/// Every outcome the replacement effects could leave of the mana a permanent tapped for mana would produce (CR 106.12b,
+/// 616.1): each order its player could apply those that apply in, each judged again on the event as the one before left it
+/// (CR 616.1f), and each "you may" taken or declined - `production` itself where none applies. "Taking into account any
+/// applicable replacement effects in any possible order" is what a permanent could produce (CR 106.7). Judged on the board as
+/// it is, as `mana_production` would judge it, and doing nothing: an effect's `then` is not run. What the player has to pay
+/// with (`actions::available`), the types a permanent could produce, and what a mana ability's row says it adds are read from
+/// it, so they agree with the mana the tap produces.
+pub(crate) fn mana_outcomes(cx: &Cx, production: ManaProduction) -> Vec<ManaProduction> {
+    fn walk(cx: &Cx, proposal: Proposal, applied: &mut Vec<Applied>, seen: &mut Vec<(Vec<Applied>, Proposal)>, out: &mut Vec<ManaProduction>) {
+        // The same effects applied, whatever their order, to the same event: the same outcomes from here (doublers alike).
+        let mut key = applied.clone();
+        key.sort();
+        if seen.iter().any(|(a, p)| *a == key && *p == proposal) {
+            return;
+        }
+        seen.push((key, proposal));
+        let found = candidates(cx, &proposal, applied);
+        if found.is_empty() {
+            if let Proposal::ManaProduction(m) = proposal
+                && !out.contains(&m)
+            {
+                out.push(m);
+            }
+            return;
+        }
+        for c in found {
+            applied.push((c.source, c.index, c.origin));
+            // Declined, it has had its opportunity, and the event goes on as it was (CR 614.5, 616.1).
+            let optional = match c.origin {
+                Origin::Printed => cx.cards().get(source_card(cx, c.source)).replacements[c.index as usize].optional.is_some(),
+                _ => false,
+            };
+            if optional {
+                walk(cx, proposal, applied, seen, out);
+            }
+            let mut next = proposal;
+            reshape(cx, &c, &mut next);
+            walk(cx, next, applied, seen, out);
+            applied.pop();
+        }
+    }
+    let mut out = Vec::new();
+    walk(cx, Proposal::ManaProduction(production), &mut cx.lineage.clone(), &mut Vec::new(), &mut out);
+    out
+}
+
 /// Whether a replacement effect might change damage about to be dealt ("it deals that much damage plus 1 instead"): one a
 /// spell or ability made, or a permanent's on the battlefield with a damage replacement. Asked before the damage is
 /// proposed, so it only says the amounts may not stay as they are.
@@ -812,7 +910,7 @@ mod tests {
     /// Has the first player draw `count` cards: their hand, library and life afterwards.
     fn draw(game: &mut Game, count: u32) -> (usize, usize, i32) {
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let mut cx = Cx { g: game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
         crate::ops::draw_cards(&mut cx, ME, count);
         assert!(cx.s().agenda[frame].pending.is_none(), "every question was answered");
         let s = cx.s();

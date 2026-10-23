@@ -1612,7 +1612,20 @@ on resolution announces just before it is paid (CR 118.13b), and `pay_mana_used`
 `Event::TappedForMana { permanent, player, produced }` is recorded when a mana ability with {T} in its cost resolves
 (CR 106.12): `produced` is the mana that ability itself added, every restriction counted, told from the player's pool
 before and after it - so a replacement of its mana counts, and the mana a triggered mana ability adds for the same tap
-does not (`actions::tapped_for_mana`). The triggered mana abilities it triggers (CR 605.1b) resolve at once, and only when
+does not (`actions::tapped_for_mana`).
+
+Replacement effects on that mana (CR 106.12b: Damping Sphere's "produces {C} instead of any other type and amount", Mana
+Reflection's "twice as much of that mana", Contamination's {B}) are `ReplacementKind::ManaProduction` effects over a
+`Proposal::ManaProduction { permanent, player, mana, restriction, lasting }`: while one could apply
+(`replace::mana_may_be_replaced`, a permanent whose card has one - `CardTable::mana_replaces` - or a lasting granted one), the
+mana the ability's effect adds is held (`Cx::producing`) rather than added, proposed whole once the effect is done
+(`actions::produce`, `replace::mana_production`), ordered by the player who tapped it (CR 616.1), each effect once (CR 614.5),
+and what is left added to the pool with the ability's rider (CR 106.6) - before the tap is recorded, so the triggered mana
+abilities it triggers see the mana as replaced (CR 106.12a). Everything that predicts a tap's yield judges it through the
+same effects (`replace::mana_outcomes`: every outcome, in every order the player could choose, each "you may" taken or not,
+no `then` run): what the player has to pay with (`available_without`, one alternative per outcome, its triggers judged on
+it), the types a permanent could produce (CR 106.7, `producible_types`), a mana ability's row (`replaced_mana_yields`, the
+host's `produces`) and the scenario harness's "for {B}". The triggered mana abilities it triggers (CR 605.1b) resolve at once, and only when
 it produced some mana (CR 106.12a); one that asks (`cantrip_mechanics::mana::add_one_mana_of_any_type_that_land_produced`,
 a type of `Label::ManaType`, "Choose which type of mana to add") suspends the activation, which runs again with the
 answer. "One mana of any type that land produced" reads `produced`: Lavaleaper, Mana Flare, and Heartbeat of Spring,

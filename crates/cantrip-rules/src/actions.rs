@@ -1332,8 +1332,46 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     candidates.iter().map(|&t| apply_cost_changes_total(&cx, player, Costed::Ability(source, ability), def.cost.mana, &[t])).collect()
+}
+
+/// What `player` activating the mana ability `index` of `source` would add once the replacement effects on a permanent tapped
+/// for mana have applied (CR 106.12b), for its menu row: for each type its chosen mana may be (None where it chooses none),
+/// every outcome, in each order the player could apply them (`replace::mana_outcomes`) - the same judgment the tap itself and
+/// what the player has to pay with (`available`) make. None where no replacement effect would change what it adds, which is
+/// nearly always, or where it is no mana ability with {T} in its cost or its yield is not stated.
+pub fn replaced_mana_yields(game: &crate::Game, player: PlayerId, source: ObjectId, index: u8) -> Option<Vec<(Option<Mana>, Vec<ManaPool>)>> {
+    if !crate::replace::mana_may_be_replaced_in(&game.state, game.cards) {
+        return None;
+    }
+    let ability = game.chars(source).abilities().nth(index as usize)?;
+    let AbilityDef::Activated(def) = game.cards.ability(ability) else { return None };
+    if !def.is_mana_ability() || !def.cost.tap || def.colors_from_sacrifice || def.adds.0.iter().all(|&n| n == 0) && def.adds_any == 0 {
+        return None;
+    }
+    let mut copy = advice_game(game);
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    let types = if def.adds_any > 0 { any_types(&cx, source, player, def) } else { 0 };
+    let restriction = def.restricted.map(|r| restriction_from(&cx, source, r));
+    let choices: Vec<Option<Mana>> =
+        if def.adds_any > 0 && types != 0 { Mana::ALL.into_iter().filter(|&m| types & (1 << m as u8) != 0).map(Some).collect() } else { vec![None] };
+    let mut changed = false;
+    let yields = choices
+        .into_iter()
+        .map(|chosen| {
+            let mut made = def.adds.0;
+            if let Some(m) = chosen {
+                made[m as usize] = made[m as usize].saturating_add(u32::from(def.adds_any));
+            }
+            let outcomes = replaced_yields(&cx, source, player, made, 0, 0, restriction).map_or_else(|| vec![ManaPool(made)], |o| {
+                changed = true;
+                o.into_iter().map(|p| p.mana).collect()
+            });
+            (chosen, outcomes)
+        })
+        .collect();
+    changed.then_some(yields)
 }
 
 /// The face a cast option casts (CR 709.3, 715.3, 720.3, 712.8a): the card itself, or the face its way number names.
@@ -1378,7 +1416,7 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, option: &ActionOption, c
     };
     let (_, face) = option_face(game, card, option.index);
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     candidates.iter().map(|&t| change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face, &[t])).collect()
 }
 
@@ -1390,7 +1428,7 @@ pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: Pla
     let def = game.cards.get(obj.copied_card().unwrap_or(obj.card));
     let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) else { return None };
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     Some((less_each, variable_candidates(&cx, spell, player, variable).len()))
 }
 
@@ -1425,7 +1463,7 @@ pub fn cast_total(game: &crate::Game, player: PlayerId, option: &ActionOption) -
         return None;
     }
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     let face_id = (!std::ptr::eq(face, whole)).then(|| cx.card_id(face));
     let (total, life) = change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face_id, &[]);
     Some((base, total, life))
@@ -1440,7 +1478,7 @@ pub fn granted_cast_total(game: &crate::Game, player: PlayerId, option: &ActionO
     let cost = granted_cast_cost(game, player, option)?;
     let (_, face) = option_face(game, card, option.index);
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     let mana = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face, &[]);
     Some((cost, mana))
 }
@@ -1456,7 +1494,7 @@ pub fn alternative_cast_total(game: &crate::Game, player: PlayerId, option: &Act
     let cost = alternative.what.cost.cost();
     let (_, face) = option_face(game, card, option.index);
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     let total = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face, &[]);
     Some((cost, total))
 }
@@ -1470,7 +1508,7 @@ pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, option: &ActionOp
     let Some(Through::Way(way)) = through(game, game.cards, player, card, option.granted_by) else { return None };
     let (_, face) = option_face(game, card, option.index);
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     match face {
         Some(face) => (way.what.cost)(&AsFace { cx: &cx, spell: card, face }, &way.asker(), card, player),
         None => (way.what.cost)(&cx, &way.asker(), card, player),
@@ -2053,6 +2091,8 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
     let forbidders = static_rules::activation_forbidders(cx);
     // The triggered mana abilities waiting on a tap (CR 605.1b): nearly always none, and then nothing more is asked.
     let waiting = waiting_mana_triggers(cx);
+    // A replacement effect that could change what a permanent tapped for mana produces (CR 106.12b): nearly always none.
+    let replaceable = crate::replace::mana_may_be_replaced(cx);
     let mut linked: Vec<(u8, u32)> = Vec::new();
     let mut complex: Vec<(Vec<Alternative>, u32)> = Vec::new();
     // Each source's mana abilities, one list kept for all of them.
@@ -2123,6 +2163,39 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
             if alternative.types == 0 {
                 alternative.k = 0;
             }
+            alternative.tapped = def.cost.tap;
+            // What the replacement effects on its mana would leave of it (CR 106.12b), where any would change it: one
+            // alternative for each outcome, with the triggers its tap would trigger judged on that (CR 106.12a).
+            if replaceable
+                && def.cost.tap
+                && let Some(outcomes) = replaced_yields(
+                    cx,
+                    id,
+                    player,
+                    alternative.fixed,
+                    alternative.k,
+                    alternative.types,
+                    def.restricted.map(|r| restriction_from(cx, id, r)),
+                )
+            {
+                for o in outcomes {
+                    let mut replaced = Alternative {
+                        fixed: o.mana.0,
+                        k: 0,
+                        types: 0,
+                        restriction: o.restriction.filter(|&r| r != ManaRestriction::GainsHaste),
+                        ..alternative
+                    };
+                    let types = replaced.produces(None);
+                    if !waiting.is_empty() && types != 0 {
+                        (replaced.extra, replaced.produced) = tap_triggers(cx, &waiting, id, player, types);
+                    }
+                    if !alternatives.contains(&replaced) {
+                        alternatives.push(replaced);
+                    }
+                }
+                continue;
+            }
             // Only a mana ability with {T} in its cost taps the permanent for mana (CR 106.12), and so triggers what waits on
             // a tap.
             if !waiting.is_empty() && def.cost.tap {
@@ -2131,7 +2204,6 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
                     (alternative.extra, alternative.produced) = tap_triggers(cx, &waiting, id, player, types);
                 }
             }
-            alternative.tapped = def.cost.tap;
             if let Some(repeat) = Repeat::of(&def.cost, def.colors_from_sacrifice) {
                 if !defer && matches!(repeat, Repeat::Tap(..)) {
                     return available_as(cx, player, skip, true);
@@ -2408,6 +2480,39 @@ fn waiting_mana_triggers(cx: &Cx) -> Vec<(Asker, &'static TriggeredDef)> {
         }
     }
     waiting
+}
+
+/// What `id`, tapped for mana by `player` with a mana ability that adds `fixed` and `k` mana of one type chosen from `types`
+/// (bits as `Mana` orders them), would produce once the replacement effects on its mana have applied (CR 106.12b): every
+/// outcome, for each type its chosen mana may be, in each order its player could apply them (`replace::mana_outcomes`). None
+/// where no effect would change what it produces, whatever is chosen. A choice that adds nothing produces no mana, and is no
+/// event to replace (CR 106.12b).
+fn replaced_yields(cx: &Cx, id: ObjectId, player: PlayerId, fixed: [u32; 6], k: u32, types: u8, restriction: Option<ManaRestriction>) -> Option<Vec<ManaProduction>> {
+    let mut out: Vec<ManaProduction> = Vec::new();
+    let mut changed = false;
+    let mut each = |made: [u32; 6]| {
+        let production = ManaProduction { permanent: id, player, mana: ManaPool(made), restriction, lasting: false };
+        if production.mana.is_empty() {
+            out.push(production);
+            return;
+        }
+        for o in crate::replace::mana_outcomes(cx, production) {
+            changed |= o != production;
+            if !out.contains(&o) {
+                out.push(o);
+            }
+        }
+    };
+    if k > 0 && types != 0 {
+        for m in (0..6).filter(|&m| types & (1 << m) != 0) {
+            let mut made = fixed;
+            made[m] = made[m].saturating_add(k);
+            each(made);
+        }
+    } else {
+        each(fixed);
+    }
+    changed.then_some(out)
 }
 
 /// What the triggered mana abilities `waiting` would add to `player` as `id` is tapped for mana of one of `types` (CR 605.1b,
@@ -6874,7 +6979,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
         return None;
     }
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);
     (cost != printed).then_some(cost)
@@ -6985,9 +7090,15 @@ pub fn activate_mana(
     // What the ability itself produces (CR 106.12a), told from the pool before and after it: whatever replaced or added to
     // its mana, and of whatever restriction, but not what the triggered mana abilities it triggers add.
     let before = if def.cost.tap { mana_held(cx, player) } else { ManaPool::default() };
+    // A permanent tapped for mana produces it as one event a replacement effect may change (CR 106.12b): where one could, the
+    // mana the effect adds is held, not added, and proposed whole once the effect is done.
+    let replaceable = def.cost.tap && !adds_nothing && crate::replace::mana_may_be_replaced(cx);
+    let mut replaced = None;
     if !adds_nothing {
         // The mana is produced by the ability's source (CR 106.3), whatever has become of it paying the cost.
         let outer = cx.mana_source.replace(source);
+        // Held for this production alone: a mana ability activated inside another's effect has its own.
+        let outer_held = if replaceable { cx.producing.replace((player, Vec::new())) } else { cx.producing.take() };
         let added = match def.mana {
             // What the mana ability does, its activator does (CR 605.3b, 122.6a): the counters it puts are theirs.
             Some(effect) => cx.acting_as(player, |cx| effect(cx, &asker, color)),
@@ -6997,15 +7108,58 @@ pub fn activate_mana(
                 Ok(())
             }
         };
+        let held = std::mem::replace(&mut cx.producing, outer_held);
         cx.mana_source = outer;
         added?;
+        if let Some((_, held)) = held.filter(|_| replaceable) {
+            replaced = Some(produce(cx, player, source, &held));
+        }
     }
     if def.cost.tap {
-        let after = mana_held(cx, player);
-        let produced = ManaPool(std::array::from_fn(|m| after.0[m].saturating_sub(before.0[m])));
+        let produced = match replaced {
+            Some(produced) => produced,
+            None => {
+                let after = mana_held(cx, player);
+                ManaPool(std::array::from_fn(|m| after.0[m].saturating_sub(before.0[m])))
+            }
+        };
         tapped_for_mana(cx, player, source, produced)?;
     }
     Ok(())
+}
+
+/// The mana `source`, tapped for mana by `player`, produces (CR 106.12b): what its mana ability's effect added (`held`),
+/// proposed as one event to the replacement effects, and what they leave of it added to the pool, produced by `source`
+/// (CR 106.3). An ability that added nothing produced no mana: no event. Mana the effect gave a rider (CR 106.6) or made last
+/// (CR 106.4) keeps it, however the effects change its type and amount. What is produced, for its tap (`tapped_for_mana`).
+fn produce(cx: &mut Cx, player: PlayerId, source: ObjectId, held: &[crate::Produced]) -> ManaPool {
+    let mut produced = ManaPool::default();
+    // One event for each rider the mana has. A mana ability's mana has one (every printed one); one that gave some of its
+    // mana a rider and some another would leave the effects nothing to say which rider the mana they make has.
+    let mut riders: Vec<(Option<ManaRestriction>, bool)> = Vec::new();
+    for h in held {
+        if !riders.contains(&(h.restriction, h.lasting)) {
+            riders.push((h.restriction, h.lasting));
+        }
+    }
+    if crate::layers::verifying() {
+        assert!(riders.len() <= 1, "{source:?}'s mana ability produced mana of two riders in one production (CR 106.12b)");
+    }
+    for (restriction, lasting) in riders {
+        let mut mana = ManaPool::default();
+        for h in held.iter().filter(|h| (h.restriction, h.lasting) == (restriction, lasting)) {
+            mana.0[h.mana as usize] += h.amount;
+        }
+        let result = crate::replace::mana_production(cx, ManaProduction { permanent: source, player, mana, restriction, lasting });
+        for m in Mana::ALL {
+            let n = result.mana.get(m);
+            if n > 0 {
+                cx.st().add_mana(player, m, n, source, result.restriction, result.lasting);
+                produced.0[m as usize] += n;
+            }
+        }
+    }
+    produced
 }
 
 /// Whether a mana ability that adds "any type the sacrificed permanent could produce" (CR 106.7) adds nothing, the land
@@ -7068,10 +7222,28 @@ fn activate_player_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, n: u8) 
 fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
     let controller = cx.s().obj(land).controller;
     let (mut colors, mut colorless) = (ColorSet::NONE, false);
+    // "Taking into account any applicable replacement effects in any possible order" (CR 106.7): a tap for mana's (CR 106.12b).
+    let replaceable = crate::replace::mana_may_be_replaced(cx);
     for ability in cx.chars(land).abilities() {
         let Some(def) = activated(cx, ability) else { continue };
         if !def.is_mana_ability() || def.from != ZoneKind::Battlefield {
             continue;
+        }
+        if replaceable && def.cost.tap {
+            let any = if def.any_color { any_types(cx, land, controller, def) } else { 0 };
+            let k = if any != 0 { u32::from(def.adds_any.max(1)) } else { 0 };
+            let restriction = def.restricted.map(|r| restriction_from(cx, land, r));
+            if let Some(outcomes) = replaced_yields(cx, land, controller, def.adds.0, k, any, restriction) {
+                for o in outcomes {
+                    colorless |= o.mana.get(Mana::C) > 0;
+                    for c in Color::ALL {
+                        if o.mana.get(c.mana()) > 0 {
+                            colors = colors.with(c);
+                        }
+                    }
+                }
+                continue;
+            }
         }
         colorless |= def.adds.0[Mana::C as usize] > 0;
         for c in Color::ALL {
@@ -8265,7 +8437,7 @@ mod tests {
     }
 
     fn cx(game: &mut Game) -> Cx<'_> {
-        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
+        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
     }
 
     /// The casts `player` is offered of `card` now: each one's way number, and the permanent whose alternative cost it pays.
@@ -8410,7 +8582,7 @@ mod tests {
         let serial = game.state.stack.last().expect("the resolving ability").serial;
         game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
         assert!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).is_err(), "the cost is asked for");
         let Some(Request { kind: RequestKind::ChooseModes { modes, .. }, .. }) = cx.s().agenda[frame].pending.clone() else { panic!("a choice of costs") };
         assert_eq!(modes, vec![Label::ManaCost, Label::AlternativeCost(genesis, 0)]);
@@ -8418,7 +8590,7 @@ mod tests {
             f.pending = None;
             f.answers = vec![(None, Answer::Modes(vec![1]))];
         });
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).ok(), Some(true));
         let s = cx.s();
         assert_eq!(s.stack.len(), 2);
@@ -8429,7 +8601,7 @@ mod tests {
         let serial = game.state.stack.last().expect("the resolving ability").serial;
         game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
         let free = CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], free).ok(), Some(true));
     }
@@ -8444,7 +8616,7 @@ mod tests {
         let serial = game.state.stack.last().expect("the resolving ability").serial;
         game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
         assert!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).is_err(), "the cost is asked for");
         let Some(Request { kind: RequestKind::ChooseModes { modes, .. }, .. }) = cx.s().agenda[frame].pending.clone() else { panic!("a choice of costs") };
         assert_eq!(modes, vec![Label::AlternativeCost(genesis, 0)]);
@@ -8454,7 +8626,7 @@ mod tests {
         let serial = game.state.stack.last().expect("the resolving ability").serial;
         game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).ok(), Some(false));
         assert!(cx.s().stack.len() == 1);
     }

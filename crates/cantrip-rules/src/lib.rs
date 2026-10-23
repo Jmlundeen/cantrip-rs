@@ -64,6 +64,8 @@ mod look_back_tests;
 #[cfg(test)]
 mod mana_trigger_tests;
 #[cfg(test)]
+mod mana_replacement_tests;
+#[cfg(test)]
 mod must_block_tests;
 #[cfg(test)]
 mod room_door_tests;
@@ -90,7 +92,7 @@ mod validate;
 use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Rng};
 
-pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_face_of, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction};
+pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_face_of, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction, replaced_mana_yields};
 pub use validate::{check as check_answer, distribution_problem, name_problem, selection_verdict, first_choices, attack_targets};
 pub use layers::{ApplyContract, apply_contract_check, chars, control_order, live, summoning_sick};
 
@@ -264,7 +266,7 @@ impl Game {
         } else {
             // A scenario's deal: seven each, in turn order, kept.
             for p in game.state.apnap().collect::<Vec<_>>() {
-                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
                 for _ in 0..7 {
                     ops::draw(&mut cx, p);
                 }
@@ -313,7 +315,7 @@ impl Game {
             }
             // RX-1: a game as long as the engine records is a draw, between two frames, so that no frame is left half done.
             if self.log.len() >= self.max_events {
-                let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+                let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
                 cx.st().set_outcome(Outcome::Draw);
                 cx.record(Event::GameDrawn { reason: DrawReason::EventLimit });
                 return;
@@ -330,7 +332,7 @@ impl Game {
 
             let kind = self.state.agenda[at].kind;
             let (flow, asked_at) = {
-                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
                 let flow = match kind {
                     FrameKind::Opening => turn::opening(&mut cx),
                     FrameKind::BeginStep => turn::begin_step(&mut cx),
@@ -580,7 +582,7 @@ impl Game {
             }
         }
         if now {
-            let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+            let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
             ops::concede(&mut cx, player);
         }
         // A staged run's question to the player who left is made by another, or not at all (CR 800.4f-h).
@@ -827,6 +829,20 @@ pub(crate) struct Cx<'a> {
     /// The player whose replacement effect or mana ability is being carried out (CR 609.1, 605): the player `doer` names,
     /// over the frame's. None outside one.
     pub doer: Option<PlayerId>,
+    /// The mana a permanent tapped for mana is producing (CR 106.12b), held while its mana ability's effect runs so that the
+    /// replacement effects on the production meet all of it before any is added (`actions::activate_mana`): the player whose
+    /// pool it goes to, and each addition. None outside such an ability, and while nothing could replace its mana.
+    pub producing: Option<(PlayerId, Vec<Produced>)>,
+}
+
+/// One addition of mana to a pool held as part of a production (`Cx::producing`): its type, how much, its restriction
+/// (CR 106.6) and whether it lasts until end of combat (CR 106.4).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct Produced {
+    pub mana: Mana,
+    pub amount: u32,
+    pub restriction: Option<ManaRestriction>,
+    pub lasting: bool,
 }
 
 impl<'a> Cx<'a> {
@@ -1150,6 +1166,18 @@ impl<'a> Cx<'a> {
                 None => Cause::Rules,
             },
             _ => Cause::Rules,
+        }
+    }
+
+    /// Holds mana added to `player`'s pool as part of the production of a permanent tapped for mana (`Cx::producing`): whether
+    /// it was, rather than added now.
+    fn hold(&mut self, player: PlayerId, produced: Produced) -> bool {
+        match &mut self.producing {
+            Some((producer, held)) if *producer == player && produced.amount > 0 => {
+                held.push(produced);
+                true
+            }
+            _ => false,
         }
     }
 
@@ -1798,6 +1826,9 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u32) {
+        if self.hold(player, Produced { mana, amount, restriction: None, lasting: false }) {
+            return;
+        }
         let source = self.mana_source();
         self.g.state.add_mana(player, mana, amount, source, None, false);
     }
@@ -1816,11 +1847,17 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_mana_until_end_of_combat(&mut self, player: PlayerId, mana: Mana, amount: u32) {
+        if self.hold(player, Produced { mana, amount, restriction: None, lasting: true }) {
+            return;
+        }
         let source = self.mana_source();
         self.g.state.add_mana(player, mana, amount, source, None, true);
     }
 
     fn add_restricted_mana(&mut self, player: PlayerId, mana: Mana, amount: u32, restriction: ManaRestriction) {
+        if self.hold(player, Produced { mana, amount, restriction: Some(restriction), lasting: false }) {
+            return;
+        }
         let source = self.mana_source();
         self.g.state.add_mana(player, mana, amount, source, Some(restriction), false);
     }

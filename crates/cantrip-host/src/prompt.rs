@@ -282,13 +282,19 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                     m.description = format!("{} (costs {cost})", m.description);
                 }
                 if d.is_mana_ability() {
+                    // What it adds as the replacement effects on a tap for mana leave it (CR 106.12b), where any would change
+                    // it and the row can say it; else what it lists.
+                    let player = game.state.obj(src).controller;
+                    let (fixed, any) = replaced_mana_yields(game, player, src, o.index)
+                        .and_then(|yields| row_yield(&yields))
+                        .unwrap_or((d.adds, u32::from(d.adds_any.max(1))));
                     for mana in Mana::ALL {
-                        for _ in 0..d.adds.get(mana) {
+                        for _ in 0..fixed.get(mana) {
                             m.produces.push(mana_view(mana));
                         }
                     }
                     if !o.color_choices.is_empty() {
-                        m.produces_of_any_one_color = i32::from(d.adds_any.max(1));
+                        m.produces_of_any_one_color = wire(any);
                     }
                     m.cost_text = cost_text_of(&d.cost, def.name);
                     // A mana ability's sacrifice comes with the activation: the engine takes it as a target.
@@ -317,6 +323,42 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
         _ => m.target_candidates = candidates,
     }
     m
+}
+
+/// What a mana ability's row says it adds where replacement effects change what a tap for mana produces
+/// (`replaced_mana_yields`): its fixed mana, and how many of the type its activation names. Of several outcomes, the order
+/// that leaves the most mana, which the player orders the effects for as the tap resolves (CR 616.1). None where the row
+/// can't say it: the outcome of a type named is not that many of the type named and the same fixed mana for every type
+/// (Contamination's {B} whatever color an any-color land names), so the row keeps what the ability lists.
+fn row_yield(yields: &[(Option<Mana>, Vec<ManaPool>)]) -> Option<(ManaPool, u32)> {
+    let best = |outcomes: &[ManaPool]| outcomes.iter().copied().fold(None::<ManaPool>, |b, o| match b {
+        Some(b) if b.total() >= o.total() => Some(b),
+        _ => Some(o),
+    });
+    let outcomes: Vec<(Option<Mana>, ManaPool)> = yields.iter().filter_map(|(c, o)| best(o).map(|o| (*c, o))).collect();
+    match outcomes.as_slice() {
+        [] => None,
+        [(None, o)] => Some((*o, 0)),
+        [(Some(c), o)] => {
+            let k = o.get(*c);
+            let mut fixed = *o;
+            fixed.0[*c as usize] = 0;
+            (k > 0).then_some((fixed, k))
+        }
+        several => {
+            let fixed = ManaPool(std::array::from_fn(|m| several.iter().map(|(_, o)| o.0[m]).min().unwrap_or(0)));
+            let mut k = None;
+            for (c, o) in several {
+                let c = (*c)?;
+                let rest: Vec<(usize, u32)> = (0..6).map(|m| (m, o.0[m] - fixed.0[m])).filter(|&(_, n)| n > 0).collect();
+                match rest.as_slice() {
+                    [(m, n)] if *m == c as usize && k.is_none_or(|k| k == *n) => k = Some(*n),
+                    _ => return None,
+                }
+            }
+            k.map(|k| (fixed, k))
+        }
+    }
 }
 
 /// What an action costs with each candidate target, for its menu row: "{1} targeting Dwarven Mauler, {4} targeting
@@ -1626,5 +1668,31 @@ mod wire_tests {
         assert_eq!(super::wire(300), 300);
         assert_eq!(super::wire(i32::MAX as u32), i32::MAX);
         assert_eq!(super::wire(u32::MAX), i32::MAX);
+    }
+}
+
+#[cfg(test)]
+mod row_yield_tests {
+    use super::*;
+
+    fn pool(of: &[(Mana, u32)]) -> ManaPool {
+        let mut p = ManaPool::default();
+        for &(m, n) in of {
+            p.0[m as usize] += n;
+        }
+        p
+    }
+
+    /// A mana ability's row under replacement effects (CR 106.12b): fixed mana as it is left, the most of several orders;
+    /// "N of the color named" where every color named gives N of it (a doubler on an any-color land); and none where the
+    /// color named changes nothing it adds (Contamination's {B}), for which the row keeps what the ability lists.
+    #[test]
+    fn a_rows_yield_is_said_where_the_row_can_say_it() {
+        let tomb = [(None, vec![pool(&[(Mana::C, 1)]), pool(&[(Mana::C, 2)])])];
+        assert_eq!(row_yield(&tomb), Some((pool(&[(Mana::C, 2)]), 0)));
+        let doubled: Vec<(Option<Mana>, Vec<ManaPool>)> = [Mana::W, Mana::U, Mana::B].into_iter().map(|m| (Some(m), vec![pool(&[(m, 2)])])).collect();
+        assert_eq!(row_yield(&doubled), Some((ManaPool::default(), 2)));
+        let black: Vec<(Option<Mana>, Vec<ManaPool>)> = [Mana::W, Mana::U].into_iter().map(|m| (Some(m), vec![pool(&[(Mana::B, 1)])])).collect();
+        assert_eq!(row_yield(&black), None);
     }
 }
