@@ -508,6 +508,15 @@ pub fn exile_target_until_leaves(g: &mut dyn Game, item: &StackItem, slot: usize
     Some(id)
 }
 
+/// "Exile each/all <permanents> ... until this leaves the battlefield" (CR 610.3, 400.7): every battlefield permanent
+/// `keep` accepts, whoever controls it, chosen as the ability resolves and exiled together as one operation (CR 101.4).
+/// Nothing is exiled at all if the source already left (CR 610.3b). Pinnacle Starcage and Temporary Lockdown print it.
+pub fn exile_all_until_leaves(g: &mut dyn Game, item: &StackItem, mut keep: impl FnMut(&mut dyn Game, ObjectId) -> bool) {
+    let on_battlefield: Vec<ObjectId> = g.state().battlefield().iter().copied().collect();
+    let chosen: Vec<ObjectId> = on_battlefield.into_iter().filter(|&id| keep(&mut *g, id)).collect();
+    g.exile_with(&chosen, item.object, true);
+}
+
 /// The resolution of "exile target ... until this leaves the battlefield" as a triggered ability's effect: exiles the
 /// slot 0 target (`exile_target_until_leaves`). It is not exiled at all if the source already left (CR 610.3c).
 /// Portable Hole and Seam Rip use it.

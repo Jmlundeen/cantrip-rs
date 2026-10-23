@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::exile_all_until_leaves;
 use cantrip_mechanics::tokens::{self, ROBOT_2_2};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
@@ -7,17 +8,10 @@ use cantrip_oracle as oracle;
 /// every one on the battlefield, whoever controls it, exiled together; the ones on the battlefield are chosen as the
 /// ability resolves, by mana value as the game reads it (a token's is 0, an {X} permanent's X is 0).
 fn exile_cheap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let cheap: Vec<ObjectId> = g
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| {
-            let c = g.chars(id);
-            (c.is(CardType::Artifact) || c.is(CardType::Creature)) && g.mana_value(id) <= 2
-        })
-        .collect();
-    g.exile_with(&cheap, item.object, true);
+    exile_all_until_leaves(g, item, |g, id| {
+        let c = g.chars(id);
+        (c.is(CardType::Artifact) || c.is(CardType::Creature)) && g.mana_value(id) <= 2
+    });
     Ok(())
 }
 
