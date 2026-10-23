@@ -1,0 +1,48 @@
+# Knockout Blow: "This spell costs {2} less to cast if it targets a red creature. ... 4 damage to target attacking or
+# blocking creature and you gain 2 life." The total cost is determined once the target is announced (CR 601.2c, 601.2f).
+# On turn 4 Bot2 attacks with the red Samut and the colorless Ornithopter; its red Vengeful Tracker stays home. With only
+# {W}{W} in Bot1's pool, the Ornithopter ({2}{W} in full) is not offered and neither is the idle Tracker (not attacking
+# or blocking); the cast at Samut costs {W}, leaving {W}, and kills it. Bot1 gains 2 life.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Knockout Blow
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Samut, Hazoret's Champion
+Vengeful Tracker
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Samut, Hazoret's Champion.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Vengeful Tracker.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Samut, Hazoret's Champion > Bot1; Ornithopter > Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{W}
+! Bot1.Hand.Knockout Blow.Cast(Bot2.Battlefield.Ornithopter)
+! Bot1.Hand.Knockout Blow.Cast(Bot2.Battlefield.Vengeful Tracker)
+Bot1.Hand.Knockout Blow.Cast(Bot2.Battlefield.Samut, Hazoret's Champion)
+? Bot1.Mana = {W}
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Knockout Blow
+Bot1.Life = 22
+Bot2.Graveyard = Samut, Hazoret's Champion; Black Lotus
+Bot2.Battlefield.Vengeful Tracker.Tapped = false

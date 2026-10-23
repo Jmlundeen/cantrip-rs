@@ -1,0 +1,40 @@
+# Knockout Blow targets a blocking creature too, and a colorless one is not red, so it costs the full {2}{W} (CR 601.2f).
+# Bot1's Samut attacks on turn 3 and Bot2's Ornithopter blocks her; Bot1 taps Plains, Mox Ruby and Mox Pearl for all
+# three mana, the pool is empty right after the cast, and the Ornithopter dies. Samut survives (blocked by a 0 power).
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Samut, Hazoret's Champion
+Knockout Blow
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Samut, Hazoret's Champion.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Samut, Hazoret's Champion > Bot2)
+Bot2.Block(Ornithopter > Samut, Hazoret's Champion)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Knockout Blow.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 22
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Samut, Hazoret's Champion.Damage = 0
