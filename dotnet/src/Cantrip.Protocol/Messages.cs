@@ -2713,8 +2713,10 @@ public sealed class DeclareAttackersPromptMessage : PromptPayload
     public override AnswerPayload Default() => new AttackersDeclaredAnswer { Attacks = [.. Suggested] };
 
     /// <summary>
-    /// Whether the engine's own declaration (<see cref="Suggested"/>) has <paramref name="attacker"/> attack: an effect requires
-    /// it to (CR 508.1d), as the host worked out. Leaving it out is no declaration the rules take.
+    /// Whether the engine's own declaration (<see cref="Suggested"/>) has <paramref name="attacker"/> attack: some requirement
+    /// on it is obeyed by attacking (CR 508.1d), as the host worked out. A suggestion, not a rule: whether a declaration
+    /// leaving it out obeys enough requirements is the host's to judge (<see cref="Verdict"/>, <see cref="CheckAttacksMessage"/>),
+    /// and an answer that does not is mended by <c>GameClient.Answer</c>.
     /// </summary>
     public bool IsRequired(ViewHandle attacker) => Suggested.Exists(attack => attack.Attacker == attacker);
 

@@ -440,7 +440,9 @@ public sealed class RandomPlay : IAutoPlayer
 
         foreach (ViewHandle attacker in prompt.Eligible)
         {
-            // What the host's verdict on no attacks offers it (CR 508.1c-d), and not attacking where nothing requires it to.
+            // What the host's verdict on no attacks offers it (CR 508.1c-d), and staying home where the engine's own declaration
+            // does not have it attack - a preference only: whether the declaration is legal is the host's verdict, and
+            // GameClient.Answer mends one it refuses.
             List<AttackMessage?> choices = [];
 
             if (!prompt.IsRequired(attacker))

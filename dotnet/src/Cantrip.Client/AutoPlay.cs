@@ -71,8 +71,8 @@ public static class AutoPlay
                     Attacks = AttackCosts.Within(
                         attackers,
                         [
-                            // A creature an effect requires to attack where the engine's own declaration sends it (CR 508.1d),
-                            // and any other at the first thing the host's verdict offers it (CR 508.1c).
+                            // Each where the engine's own declaration sends it (CR 508.1d), and any other at the first thing the
+                            // host's verdict offers it (CR 508.1c): a preference, judged by the host as GameClient.Answer settles it.
                             .. attackers.Eligible.Select(creature =>
                                 attackers.SuggestedFor(creature)
                                     ?? attackers.OfferedFor(creature).FirstOrDefault()

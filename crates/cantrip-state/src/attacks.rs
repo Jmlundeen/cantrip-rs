@@ -137,20 +137,25 @@ impl AttackRules {
         }
         if found.is_none() && self.obeyed(attacks) < self.most {
             // An attacker obeying fewer than it could, and a requirement its best attack obeys that its attack does not.
-            found = eligible.iter().find_map(|&a| {
-                let now = attacks.iter().find(|x| x.0 == a).map(|x| x.1);
-                let (best, at) = self.best(a, targets, costs, true);
-                let have = now.map_or(0, |t| self.gain(a, t));
-                let at = at?;
-                (have < best).then(|| {
-                    let r = self.required.iter().find(|r| Self::obeys(r, a, at) && now.is_none_or(|t| !Self::obeys(r, a, t)))?;
-                    match r.aim {
-                        AttackAim::Anything => issue(a, "must attack", None, "508.1d"),
-                        AttackAim::At(t) => issue(a, "must attack", Some(t), "508.1d"),
-                        AttackAim::PlayerOtherThan(p) => issue(a, "must attack a player other than", Some(Target::Player(p)), "508.1d"),
-                    }
-                })?
-            });
+            found = eligible
+                .iter()
+                .find_map(|&a| {
+                    let now = attacks.iter().find(|x| x.0 == a).map(|x| x.1);
+                    let (best, at) = self.best(a, targets, costs, true);
+                    let have = now.map_or(0, |t| self.gain(a, t));
+                    let at = at?;
+                    (have < best).then(|| {
+                        let r = self.required.iter().find(|r| Self::obeys(r, a, at) && now.is_none_or(|t| !Self::obeys(r, a, t)))?;
+                        match r.aim {
+                            AttackAim::Anything => issue(a, "must attack", None, "508.1d"),
+                            AttackAim::At(t) => issue(a, "must attack", Some(t), "508.1d"),
+                            AttackAim::PlayerOtherThan(p) => issue(a, "must attack a player other than", Some(Target::Player(p)), "508.1d"),
+                        }
+                    })?
+                })
+                // Fewer obeyed than the most always leaves some attacker short of its best; should none be found, the
+                // declaration is still refused, never complete by accident.
+                .or_else(|| issue(attacks.first().map_or(ObjectId::NONE, |x| x.0), "must attack", None, "508.1d"));
         }
         let complete = found.is_none();
         let addable = if addable && mendable {

@@ -1223,6 +1223,10 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
             cx.st().delayed_remove(at);
         }
     }
+    // "This combat" ends with its combat phase (`next_step`); one made outside combat ends with the turn at the latest.
+    if cx.s().effects.iter().any(|e| e.duration == Duration::EndOfCombat) {
+        cx.st().effects_retain(|e| e.duration != Duration::EndOfCombat);
+    }
     if cx.s().effects.iter().any(|e| e.duration == Duration::EndOfTurn) {
         // A permanent that was only a copy until end of turn is what it was again (CR 707.2, 611.2b), as far as the copy
         // effects that are left say: the state undoes a copy effect as it removes it (`GameState::effect_remove`).

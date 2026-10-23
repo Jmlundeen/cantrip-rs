@@ -663,7 +663,7 @@ pub fn attack_verdict_view(verdict: &AttackVerdict, handles: &mut HandleSpace) -
         complete: verdict.complete,
         addable: attack_messages(handles, &verdict.addable),
         issue: verdict.issue.as_ref().map(|i| AttackIssueView {
-            creature: handles.handle(i.creature),
+            creature: if i.creature == ObjectId::NONE { ViewHandle::NONE } else { handles.handle(i.creature) },
             words: i.words.clone(),
             other_player: i.other.and_then(|t| t.player()).map_or(0, seat),
             other_permanent: i.other.and_then(|t| t.object()).map_or(ViewHandle::NONE, |o| handles.handle(o)),

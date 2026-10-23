@@ -879,7 +879,8 @@ pub enum Duration {
     /// Until the cleanup step (CR 514.2).
     EndOfTurn,
     /// "This combat" (CR 506.1, 511.3): until the combat phase it began in ends - so an additional combat phase that turn
-    /// (CR 500.8, Aurelia, the Warleader) begins without it. Ursine Monstrosity's "attacks that player this combat if able".
+    /// (CR 500.8, Aurelia, the Warleader) begins without it; one made outside combat ends with the turn's cleanup at the
+    /// latest. Ursine Monstrosity's "attacks that player this combat if able".
     EndOfCombat,
     /// As long as the affected object stays where it is.
     Indefinite,

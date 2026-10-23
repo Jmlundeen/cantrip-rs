@@ -45,3 +45,4 @@ Bot1.Attack(Ursine Monstrosity > Bot2)
 [Expect]
 Turn = 3
 Step = Main2
+Bot1.Battlefield.Ursine Monstrosity.MustAttack = (absent)
