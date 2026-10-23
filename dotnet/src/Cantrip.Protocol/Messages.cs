@@ -2531,6 +2531,14 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(26)]
     public int LeastAnnounced { get; set; }
 
+    /// <summary>
+    /// For an announcement of an X that is not paid in mana: what X governs, in words (casualty X's "the least power of the
+    /// creature you sacrifice", CR 702.153a), which a client captions the announcement with in place of the mana wording.
+    /// Empty for any other.
+    /// </summary>
+    [Key(27)]
+    public string XGoverns { get; set; } = string.Empty;
+
     /// <summary>Giving up on the spell, which is always among the options (CR 733.1).</summary>
     public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
 }

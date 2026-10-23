@@ -397,7 +397,7 @@ public sealed class Decisions
     /// <summary>How large X is, asked once as the spell is announced and paid up to from there.</summary>
     private int X(GameClient client, PayCostsPromptMessage prompt)
     {
-        int reach = Math.Max(0, prompt.MostAffordable);
+        int reach = prompt.XGoverns.Length > 0 ? prompt.MostAnnounced : Math.Max(0, prompt.MostAffordable);
         int most = Math.Min(reach, MostChoices - 1);
         string spell = GameText.Named(client, prompt.Spell);
 
@@ -417,7 +417,9 @@ public sealed class Decisions
         return One(new Question
         {
             Heading = prompt.XRemovesLoyalty ? $"You are activating −X of {spell}. How large is X?" : $"You are casting {spell}. How large is X?",
-            Note = prompt.XRemovesLoyalty
+            Note = prompt.XGoverns.Length > 0
+                ? "X is " + prompt.XGoverns + "; no mana is spent on it."
+                : prompt.XRemovesLoyalty
                 ? "X loyalty counters come off it. It has " + reach.ToString(CultureInfo.InvariantCulture)
                     + "; at 0 loyalty it is put into the graveyard."
                 : prompt.XPaidInLife

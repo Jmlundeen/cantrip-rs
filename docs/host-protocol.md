@@ -60,7 +60,9 @@ times kicked, from the prompt's `LeastAnnounced` to its `MostAnnounced` - one an
 value itself and sends nothing until it is chosen. A value past `MostAnnounced` is refused with `IllegalAnswer`. Its `IncreaseX` and
 `DecreaseX` options still step it one answer at a time, as the bots do. Version 202. `LeastAnnounced` is 1 for an X that
 can't be 0 (CR 107.3a: "X can't be 0"), where the announcement starts at 1, `DecreaseX` stops there, and 0 is refused; else 0.
-Version 204.
+Version 204. `XGoverns` is, for an X that is not paid in mana, what the cost says X governs - casualty X's "the least power of the
+creature you sacrifice" (CR 702.153a) - and empty for any other; a page captions the announcement with it in place of the mana
+wording ("not enough mana for it" would be false of a creature's power). Version 206.
 
 **Checking a selection.** A choice of cards (`ChooseCardsPromptMessage`) and a library search (`SearchLibraryPromptMessage`)
 are judged by the question's selection rule (docs/engine-design.md, "Selection rules"), which the client cannot run: the

@@ -326,6 +326,10 @@ pub enum RequestKind {
         /// The life the total cost asks besides its mana (CR 119.4, 601.2h: "an additional 3 life", "pay X life"), paid with it
         /// once the mana is. Zero while X is announced, and for anything but a spell.
         life: u32,
+        /// While announcing an X that is not paid in mana: what X governs, as the cost words it ("the least power of the
+        /// creature you sacrifice", casualty X, CR 702.153a), for the player to read where "mana for X" would be false.
+        /// Empty for an X that is mana's, life's or a count of loyalty counters, and while paying.
+        governs: &'static str,
     },
     /// A cost paid as a spell or ability resolves (CR 118.12, 608.2d): "[a player] may pay [cost]. If they do, ...", and
     /// "... unless [a player] pays [cost]" (CR 118.12a). One payment of the whole cost, `total` mana and `life` life:

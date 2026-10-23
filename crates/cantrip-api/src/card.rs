@@ -642,6 +642,18 @@ pub enum VariableCost {
     SacrificeWithPowerX(ObjectFilter),
 }
 
+impl VariableCost {
+    /// What the X announced with this cost governs, in words for the player (`RequestKind::PayCosts::governs`), where it is
+    /// not mana's: casualty X's is the least power of the creature sacrificed (CR 702.153a). Empty for the costs whose
+    /// announcement is captioned by what it counts.
+    pub const fn governs(&self) -> &'static str {
+        match self {
+            VariableCost::SacrificeWithPowerX(_) => "the least power of the creature you sacrifice",
+            _ => "",
+        }
+    }
+}
+
 /// The cost of crew (CR 702.122a) and saddle (CR 702.171a): tap other untapped creatures with total power `power` or
 /// more. Summoning sickness does not matter, since it is not their own {T} (CR 302.6).
 #[derive(Clone, Copy)]

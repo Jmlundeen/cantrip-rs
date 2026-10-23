@@ -5281,7 +5281,7 @@ fn cast(
         // An X that can't be 0 starts at 1 (CR 107.3a). A kicker with {X} announces 0 as not kicking it, so a kicked one
         // has X 1 or more as it is.
         let least = if def.kicker.is_none() && less_each == 0 { u32::from(least_x(def.x_cant_be_zero)) } else { 0 };
-        let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, least, cap, false, less_each)?;
+        let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, least, cap, false, less_each, extra.variable.map_or("", |v| v.governs()))?;
         // Every announcement but "any number"'s is within an X's u16 (`cap`).
         let n = announced.min(u32::from(u16::MAX)) as u16;
         if let Some(k) = def.kicker {
@@ -6524,7 +6524,7 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 /// question that raises and lowers the value until confirmed.
 fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, x_symbols: u8, least: u16, cap: u16) -> R<u16> {
     // X itself is a u16 (`StackItem::x`), and `cap` keeps the number within it.
-    announce_x(cx, player, spell, base, None, x_symbols, u32::from(least), u32::from(cap), false, 0).map(|n| n as u16)
+    announce_x(cx, player, spell, base, None, x_symbols, u32::from(least), u32::from(cap), false, 0, "").map(|n| n as u16)
 }
 
 /// The least value X may be announced as (CR 107.3a, 601.2b): 1 for an X that can't be 0 ("X can't be 0"), else 0.
@@ -6553,7 +6553,7 @@ fn at_least_x(mut cost: ManaCost, x_cant_be_zero: bool) -> ManaCost {
 /// and never goes below, `least` (1 for an X that can't be 0, CR 107.3a); with no value from `least` to `cap` there is
 /// nothing that may be announced, and the spell or ability is taken back (CR 601.2b, 733.1).
 #[allow(clippy::too_many_arguments)]
-fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, least: u32, cap: u32, loyalty: bool, less_each: u8) -> R<u32> {
+fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, least: u32, cap: u32, loyalty: bool, less_each: u8, governs: &'static str) -> R<u32> {
     let most: u32 = match kicker {
         Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
         _ => cap,
@@ -6579,7 +6579,7 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         }
         options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         options.push(ActionOption::simple(ActionKind::CancelCasting));
-        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, most, least, loyalty, attackers: Vec::new(), life: 0 };
+        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, most, least, loyalty, attackers: Vec::new(), life: 0, governs };
         match cx.ask_core(player, ask, true)? {
             // The whole value at once, which the request's `least` and `most` bound (`validate::check`).
             Answer::Announce(value) if (least..=most).contains(&value) => return Ok(value),
@@ -6661,7 +6661,7 @@ fn activate(
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
     if def.cost.loyalty == Some(LOYALTY_MINUS_X) {
         let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
-        item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(cap), true, 0)? as u16;
+        item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(cap), true, 0, "")? as u16;
     }
     announce_twobrids(cx, player, source, &mut mana, false)?;
     let life = announce_life(cx, player, source, &mut mana, false)?;
@@ -7808,7 +7808,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life };
+        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life, governs: "" };
         let answer = cx.ask_core(player, ask, true)?;
         match answer {
             Answer::Act(action) => match action.kind {

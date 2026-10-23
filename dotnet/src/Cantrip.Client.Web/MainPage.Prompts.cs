@@ -527,6 +527,29 @@ public sealed partial class MainPage
             return;
         }
 
+        // An X that is not mana's (casualty X, CR 702.153a): the cost says what it governs, and mana is no part of reaching it.
+        if (prompt.XGoverns.Length > 0)
+        {
+            Prompt(
+                $"Choose X for {name}",
+                $"X is {prompt.XGoverns}  ·  {total} in all  ·  targets and paying come next");
+
+            if (announce is not null)
+            {
+                _pass = announce;
+                AddButton("Okay", announce, primary: true).Tooltip = $"Announce X = {x}" + Suffix(PassKey);
+            }
+
+            AddXStepper(prompt, x, kickerPaid, lower, raise);
+
+            if (_actions.Cancel is { } back)
+            {
+                AddCancelButton(() => Send(client, AnswerFor(back)));
+            }
+
+            return;
+        }
+
         bool kicker = prompt.Kicker.Length > 0;
         string reach = prompt.MostAffordable < 0
             ? "not enough mana for it"

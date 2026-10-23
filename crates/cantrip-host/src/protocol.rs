@@ -1129,6 +1129,9 @@ pub struct PayCostsPrompt {
     /// While announcing: the smallest value an `AnnounceAnswer` may announce, and the one the announcement starts at: 1 for
     /// an X that can't be 0 (CR 107.3a, 601.2b), else 0. Zero while paying.
     pub least_announced: i32,
+    /// While announcing an X that is not paid in mana: what X governs, in words ("the least power of the creature you
+    /// sacrifice", casualty X, CR 702.153a), for a caption where "mana for X" would be false. Empty for any other.
+    pub x_governs: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
