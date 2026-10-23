@@ -1,0 +1,39 @@
+# Sheltering Landscape: cycle the second copy for its exact printed cost, using one matching land source for each colored symbol; then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
+
+[Bot1 Deck]
+Sheltering Landscape x2
+Mountain
+Forest
+Plains
+Plains x6
+Island x6
+Forest x6
+Mountain x6
+Swamp x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sheltering Landscape.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sheltering Landscape.Activate(Ability: Cycling)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Battlefield.Sheltering Landscape.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 9
+Bot1.Graveyard = Sheltering Landscape
+Bot1.Battlefield.Sheltering Landscape.Tapped = true
