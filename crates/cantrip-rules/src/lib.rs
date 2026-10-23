@@ -62,6 +62,8 @@ mod left_player_choice_tests;
 #[cfg(test)]
 mod look_back_tests;
 #[cfg(test)]
+mod functioning_zone_tests;
+#[cfg(test)]
 mod mana_trigger_tests;
 #[cfg(test)]
 mod mana_replacement_tests;

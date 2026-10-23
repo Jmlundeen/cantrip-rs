@@ -65,7 +65,7 @@ pub const fn trigger(text: &'static str) -> AbilityDef {
 /// The casualty trigger whose copy the card makes itself, with the exceptions it prints (CR 707.9b): Ob Nixilis, the
 /// Adversary's "The copy isn't legendary and has starting loyalty X" copies with `Game::copy_spell_as`.
 pub const fn trigger_with(text: &'static str, copy: Effect) -> AbilityDef {
-    triggered(when(EventMask::SPELL_CAST, casualty_paid), copy, text).anywhere()
+    triggered(when_this_spell_is_cast(casualty_paid), copy, text)
 }
 
 /// The X announced for the spell whose casualty trigger this is (CR 107.3a): the spell's, on the stack or as it last was

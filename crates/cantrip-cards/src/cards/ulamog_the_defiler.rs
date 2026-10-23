@@ -31,7 +31,6 @@ fn annihilate_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(CAST_THIS_SPELL, exile_half, "When you cast this spell, target opponent exiles the top half of their library, rounded up.")
-            .anywhere()
             .targets(&[targets::OPPONENT]),
         ward_sacrifice::<2>("Ward\u{2014}Sacrifice two permanents."),
         triggered(ANNIHILATOR, annihilate_x, "Ulamog has annihilator X, where X is the number of +1/+1 counters on it."),

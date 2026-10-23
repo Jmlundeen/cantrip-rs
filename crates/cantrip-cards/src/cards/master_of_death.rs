@@ -25,7 +25,7 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, |g, item| effects::surveil(g, item, 2), "When this creature enters, surveil 2."),
         triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, pay_to_return, "At the beginning of your upkeep, if this card is in your graveyard, you may pay 1 life. If you do, return it to your hand.")
             .condition(in_graveyard)
-            .anywhere(),
+            .functions_in(IN_A_GRAVEYARD),
     ],
     ..oracle::MASTER_OF_DEATH
 };

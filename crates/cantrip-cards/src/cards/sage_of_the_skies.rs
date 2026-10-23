@@ -15,7 +15,6 @@ fn copy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, copy_it, "When you cast this spell, if you've cast another spell this turn, copy this spell. (The copy becomes a token.)")
-        .condition(cast_another_spell_this_turn)
-        .anywhere()],
+        .condition(cast_another_spell_this_turn)],
     ..oracle::SAGE_OF_THE_SKIES
 };

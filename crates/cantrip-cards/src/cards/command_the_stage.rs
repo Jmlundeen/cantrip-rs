@@ -38,7 +38,7 @@ fn opponent_was_dealt_noncombat_damage_last_turn(q: &dyn Query, asker: &Asker) -
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], command_the_stage),
     abilities: &[triggered(when(EventMask::STEP_BEGAN, each_upkeep), effects::return_this_to_hand, "At the beginning of each upkeep, if an opponent was dealt noncombat damage last turn, return this card from your graveyard to your hand.")
-        .anywhere()
+        .functions_in(IN_A_GRAVEYARD)
         .condition(opponent_was_dealt_noncombat_damage_last_turn)],
     ..oracle::COMMAND_THE_STAGE
 };

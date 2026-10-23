@@ -21,6 +21,6 @@ pub static CARD: CardDef = CardDef {
         "At the beginning of combat on your turn, if two or more creatures died this turn, return this card from your graveyard to the battlefield.",
     )
     .condition(two_creatures_died_this_turn)
-    .anywhere()],
+    .functions_in(IN_A_GRAVEYARD)],
     ..oracle::DARKLIGHT_PHOENIX
 };

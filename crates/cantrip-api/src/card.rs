@@ -1195,7 +1195,7 @@ impl TriggeredDef {
         asked: None,
         targets: &[],
         effect: no_effect,
-        anywhere: false,
+        functions: crate::ability::ON_THE_BATTLEFIELD,
         condition: None,
         only_if: None,
         once_per_batch: false,
@@ -1272,9 +1272,11 @@ pub struct TriggeredDef {
     pub asked: Option<AskedMatch>,
     pub targets: &'static [TargetSpec],
     pub effect: Effect,
-    /// Functions outside the battlefield too (the ability checks the zone itself), as "at the beginning of your
-    /// upkeep, if this card is in your graveyard" does.
-    pub anywhere: bool,
+    /// The zones it functions in (CR 113.6): the battlefield, unless its trigger condition can't trigger from there and
+    /// functions where it can (CR 113.6k: "when you cast this spell" from the stack, `when_this_spell_is_cast`), or its
+    /// text names the zone (CR 113.6b, 113.6m: `AbilityDef::functions_in`). The engine asks an object's ability only in
+    /// these zones; a matcher never checks its own zone. An emblem's abilities function in the command zone (CR 113.6p).
+    pub functions: ZoneKinds,
     pub condition: Option<TriggerCondition>,
     /// "This ability triggers only if ..." (CR 702.169c, a Case's "Solved — [triggered ability]"): asked with the trigger
     /// event, as part of it, and never again. Not an intervening "if" (CR 603.4), which `condition` is: that is asked again
@@ -2702,7 +2704,7 @@ impl CardDef {
             (!self.preventions.is_empty(), "prevention effects"),
             (self.enters.is_some(), "an enters rule"),
             (self.keywords != Keywords::NONE, "keywords"),
-            (self.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.anywhere)), "a triggered ability that functions outside the battlefield"),
+            (self.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.functions != crate::ability::ON_THE_BATTLEFIELD)), "a triggered ability that functions outside the battlefield"),
             (self.abilities.iter().any(|a| matches!(a, AbilityDef::Static(_))), "a static ability in its abilities"),
             (self.cast_limit > 0, "a cast limit"),
             (!self.cost_changes.is_empty(), "cost changes"),
@@ -2783,9 +2785,9 @@ impl CardDef {
 /// Every card the game knows, built once per process and shared, never copied.
 pub struct CardTable {
     pub cards: Vec<&'static CardDef>,
-    /// Which cards have a triggered ability that functions outside the battlefield, so the rest are never looked at
-    /// there.
-    pub anywhere: Vec<bool>,
+    /// Per card: the zones other than the battlefield that one of its triggered abilities functions in (`TriggeredDef::functions`),
+    /// so a card is looked at only in those, and the rest never outside the battlefield.
+    pub functions_elsewhere: Vec<ZoneKinds>,
     /// Which cards have static abilities: the layers look for sources only among them.
     pub statics: Vec<bool>,
     /// Which cards have a control-changing static ability (CR 613.1b, `Layer::Control`): what tells whether control could
@@ -3015,9 +3017,24 @@ impl CardTable {
                 assert!(!s.everywhere && !s.own && s.layer == Layer::Type, "{}: a static ability that sets land subtypes affects permanents in layer 4", card.name);
             }
         }
-        let anywhere = cards
+        // Where a triggered ability can function outside the battlefield: the zones the engine looks in for one (`settle`). An
+        // ability said to function anywhere else, or a triggered mana ability that functions off the battlefield (CR 605.1b:
+        // tapping a permanent), would never be asked, so neither is made.
+        let elsewhere = ZoneKinds::of(&[ZoneKind::Stack, ZoneKind::Hand, ZoneKind::Graveyard, ZoneKind::Exile]);
+        let functions_elsewhere = cards
             .iter()
-            .map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.anywhere)))
+            .map(|c| {
+                c.abilities.iter().fold(ZoneKinds::NONE, |zones, a| match a {
+                    AbilityDef::Triggered(t) => {
+                        let off = ZoneKinds(t.functions.0 & !crate::ability::ON_THE_BATTLEFIELD.0);
+                        assert!(off.0 & !elsewhere.0 == 0, "{}: a triggered ability functions in a zone the engine never looks in", c.name);
+                        assert!(!t.mana_ability || t.functions == crate::ability::ON_THE_BATTLEFIELD, "{}: a triggered mana ability functions on the battlefield", c.name);
+                        assert!(t.functions.0 != 0, "{}: a triggered ability functions in no zone", c.name);
+                        zones.union(off)
+                    }
+                    _ => zones,
+                })
+            })
             .collect();
         let statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own)).collect();
         let control_statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| s.layer == Layer::Control)).collect();
@@ -3112,7 +3129,7 @@ impl CardTable {
         let mut table = CardTable {
             card_named,
             cards,
-            anywhere,
+            functions_elsewhere,
             statics,
             control_statics,
             look_back,

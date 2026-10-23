@@ -15,7 +15,7 @@ fn untap_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(CAST_THIS_SPELL, untap_lands, "When you cast this spell, untap all lands you control.").anywhere(),
+        triggered(CAST_THIS_SPELL, untap_lands, "When you cast this spell, untap all lands you control."),
         ward_sacrifice::<3>("Ward\u{2014}Sacrifice three permanents."),
         land_until_cast::ability::<0>(
             cost("{3}"),

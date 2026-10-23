@@ -384,8 +384,7 @@ pub const ANNIHILATOR: Trigger = when(EventMask::ATTACKS, this_attacks_defender)
 /// Cascade (CR 702.85a): "When you cast this spell, exile cards from the top of your library until you exile a nonland
 /// card that costs less. You may cast it without paying its mana cost. Put all cards exiled this way that weren't cast
 /// on the bottom of your library in a random order." Bloodbraid Challenger and Bloodbraid Elf print it.
-pub const CASCADE: AbilityDef = triggered(when(EventMask::SPELL_CAST, cast_this_spell), cascade_resolves, "Cascade")
-    .anywhere();
+pub const CASCADE: AbilityDef = triggered(CAST_THIS_SPELL, cascade_resolves, "Cascade");
 
 fn cycle_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
@@ -1168,7 +1167,22 @@ pub const YOU_SCRY_OR_SURVEIL: Trigger = when_asked(EventMask(EventMask::SCRIED.
 pub const YOU_DRAW_A_CARD: Trigger = when_asked(EventMask::DREW, you_draw_a_card);
 pub const AN_OPPONENT_DRAWS_A_CARD: Trigger = when_asked(EventMask::DREW, an_opponent_draws_a_card);
 pub const YOU_GAIN_LIFE: Trigger = when_asked(EventMask::LIFE_CHANGE, you_gain_life);
-pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
+/// "When you cast this spell": functions from the stack (CR 113.6k, `when_this_spell_is_cast`).
+pub const CAST_THIS_SPELL: Trigger = when_this_spell_is_cast(cast_this_spell);
+
+/// "When this card is put into a graveyard from anywhere" (CR 603.6c): its own move into a graveyard, from any zone, which
+/// can't trigger from the battlefield, so it functions from the graveyard it has just reached (CR 113.6k) - and as "from
+/// anywhere" it is never a leaves-the-battlefield ability, even from the battlefield (CR 603.6c, `read_zone_words`).
+/// Emrakul, the Aeons Torn and Worldspine Wurm print it.
+pub const PUT_INTO_A_GRAVEYARD_FROM_ANYWHERE: Trigger =
+    when(EventMask::ZONE_CHANGE, put_into_a_graveyard_from_anywhere).functions_in(IN_A_GRAVEYARD);
+
+fn put_into_a_graveyard_from_anywhere(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. } if *new == source && to.is(ZoneKind::Graveyard) => Fired::PLAIN,
+        _ => None,
+    }
+}
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), this_attacks_or_blocks);
 pub const THIS_DEALT_DAMAGE: Trigger = when(EventMask::DAMAGE, this_dealt_damage);

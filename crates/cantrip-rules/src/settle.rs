@@ -758,6 +758,9 @@ fn consider(
             continue;
         }
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
+            // A permanent's ability functions only if it functions on the battlefield (CR 113.6): "when you cast this spell"
+            // doesn't (CR 113.6k). An emblem's function in the command zone (CR 113.6p).
+            && (!permanent || t.functions.contains(ZoneKind::Battlefield))
             && (later.is_some() || cx.cards().looks_back(ability, event, seen) == look_back)
             && let Some(fired) = if t.chapter > 0 {
                 chapter_reached(source, t.chapter, event)
@@ -1223,9 +1226,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                     }
                 }
             }
-            // Abilities that function in other zones (they say where themselves): only cards that have one are looked at.
-            // A spell on the stack is among them: "when you cast this spell" (storm, replicate; CR 702.40a, 702.56a)
-            // triggers from the stack.
+            // Abilities that function in other zones (`TriggeredDef::functions`, CR 113.6): each asked only in the zones it
+            // functions in, and only of cards that have one there. A spell on the stack is among them: "when you cast this
+            // spell" (storm, replicate; CR 702.40a, 702.56a) functions from the stack (CR 113.6k).
             // A spell may also be given such an ability by a static ability (Thrumming Stone's ripple, CR 613.1f), which only
             // a game that has had static abilities in play can have done.
             let cards = cx.cards();
@@ -1236,13 +1239,17 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                 .flat_map(|p| [Zone::hand(p), Zone::graveyard(p), Zone::exile(p)])
                 .chain(std::iter::once(Zone::STACK))
                 .flat_map(|z| cx.s().zone(z).iter().copied())
-                .filter(|&id| cards.anywhere[cx.s().obj(id).card.0 as usize] || (granted && cx.s().obj(id).zone.is(ZoneKind::Stack)))
+                .filter(|&id| {
+                    let obj = cx.s().obj(id);
+                    cards.functions_elsewhere[obj.card.0 as usize].contains(obj.zone.kind()) || (granted && obj.zone.is(ZoneKind::Stack))
+                })
                 .collect();
             for id in elsewhere {
                 let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
+                let zone = cx.s().obj(id).zone.kind();
                 for ability in chars.abilities() {
                     if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
-                        && t.anywhere
+                        && t.functions.contains(zone)
                         && t.listens.intersects(mask)
                         && let Some(fired) = t.fires(cx, &Asker { source: id, controller: cx.s().obj(id).controller }, event)
                     {

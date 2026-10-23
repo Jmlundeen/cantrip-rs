@@ -27,6 +27,6 @@ pub static CARD: CardDef = CardDef {
         pay_to_return,
         "Whenever you commit a crime, you may pay {B}. If you do, return this card from your graveyard to the battlefield. (Targeting opponents, anything they control, and/or cards in their graveyards is a crime.)",
     )
-    .anywhere()],
+    .functions_in(IN_A_GRAVEYARD)],
     ..oracle::FORSAKEN_MINER
 };

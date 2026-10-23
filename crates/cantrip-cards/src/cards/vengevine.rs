@@ -17,6 +17,6 @@ fn second_creature_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Opti
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::SPELL_CAST, second_creature_spell), may_return_this_card_to_battlefield, "Whenever you cast a spell, if it's the second creature spell you cast this turn, you may return this card from your graveyard to the battlefield.")
-        .anywhere()],
+        .functions_in(IN_A_GRAVEYARD)],
     ..oracle::VENGEVINE
 };

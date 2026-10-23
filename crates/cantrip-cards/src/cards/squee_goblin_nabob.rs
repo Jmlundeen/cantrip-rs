@@ -27,6 +27,6 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::STEP_BEGAN, upkeep_in_graveyard), return_it, "At the beginning of your upkeep, you may return this card from your graveyard to your hand.")
-        .anywhere()],
+        .functions_in(IN_A_GRAVEYARD)],
     ..oracle::SQUEE_GOBLIN_NABOB
 };

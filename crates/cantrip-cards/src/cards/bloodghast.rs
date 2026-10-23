@@ -25,7 +25,7 @@ pub static CARD: CardDef = CardDef {
         may_return_this_card_to_battlefield,
         "Landfall \u{2014} Whenever a land you control enters, you may return this card from your graveyard to the battlefield.",
     )
-    .anywhere()],
+    .functions_in(IN_A_GRAVEYARD)],
     statics: &[static_ability(
         Layer::Ability,
         an_opponent_has_ten_or_less_life,

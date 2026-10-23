@@ -27,8 +27,7 @@ pub static CARD: CardDef = CardDef {
         control_then_extra_turn,
         "When you cast this spell, you gain control of target opponent during that player's next turn. After that turn, that player takes an extra turn.",
     )
-    .targets(&[targets::OPPONENT])
-    .anywhere()],
+    .targets(&[targets::OPPONENT])],
     statics: &[protection::from_type::<{ CardType::Instant as u8 }>("Protection from instants")],
     ..oracle::EMRAKUL_THE_PROMISED_END
 };

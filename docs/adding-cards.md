@@ -110,9 +110,15 @@ abilities: &[
   anything an opponent controls or a card in an opponent's graveyard (never a copy, never a changed target); "if you've
   committed a crime this turn" asks the history for one.
 - **The rest** is a method after the call: `.targets(..)`, `.sorcery_speed()`, `.once_each_turn()`, `.condition(..)`
-  (an activation restriction, or a trigger's intervening "if"), `.modal(..)`, `.anywhere()`, and the
+  (an activation restriction, or a trigger's intervening "if"), `.modal(..)`, and the
   others in `ability.rs`. Whether a trigger looks back in time (CR 603.10) is never written: the rules decide it from
-  the event and the ability's own words (`CardTable::looks_back`). A loyalty ability is already sorcery speed (CR 606.3).
+  the event and the ability's own words (`CardTable::looks_back`). Nor is where a trigger condition functions when it
+  can't trigger from the battlefield (CR 113.6k): "when you cast this spell" is `triggers::CAST_THIS_SPELL` (or
+  `when_this_spell_is_cast(..)` for one that says more) and functions from the stack; "when this card is put into a
+  graveyard from anywhere" is `triggers::PUT_INTO_A_GRAVEYARD_FROM_ANYWHERE`. Only an ability whose own text puts it in a
+  zone says so, `.functions_in(IN_A_GRAVEYARD)`: one that returns "this card from your graveyard" (CR 113.6m) or says
+  "if this card is in your graveyard" (CR 113.6b). The engine asks it there and nowhere else, so its matcher never checks
+  the zone; `tests/functioning_zones_match_text.rs` holds every ability's zones to its words. A loyalty ability is already sorcery speed (CR 606.3).
 - **Shared effects with an argument** are called in place: `triggered(THIS_ENTERS, |g, item| effects::draw(g, item, 1), ..)`.
 
 The rest of a card is written the same way, one constructor each, the rare parts as methods:

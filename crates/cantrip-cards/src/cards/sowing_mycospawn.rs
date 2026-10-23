@@ -30,11 +30,9 @@ pub static CARD: CardDef = CardDef {
     colors: devoid::COLORS,
     kicker: kicker(KICKER_COST),
     abilities: &[
-        triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, search, "When you cast this spell, search your library for a land card, put it onto the battlefield, then shuffle.")
-            .anywhere(),
-        triggered(when(EventMask::SPELL_CAST, cast_this_spell_kicked), exile_land, "When you cast this spell, if it was kicked, exile target land.")
-            .targets(&[targets::LAND])
-            .anywhere(),
+        triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, search, "When you cast this spell, search your library for a land card, put it onto the battlefield, then shuffle."),
+        triggered(when_this_spell_is_cast(cast_this_spell_kicked), exile_land, "When you cast this spell, if it was kicked, exile target land.")
+            .targets(&[targets::LAND]),
     ],
     ..oracle::SOWING_MYCOSPAWN
 };

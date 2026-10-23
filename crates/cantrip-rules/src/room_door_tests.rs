@@ -89,7 +89,7 @@ static COST_DOOR: CardDef = CardDef { name: "Cost Door", cost_changes: &[changes
 static ACTIVATION_DOOR: CardDef = CardDef { name: "Activation Door", activation_rules: &[allows_everything], ..PLAIN_DOOR };
 static ANYWHERE_DOOR: CardDef = CardDef {
     name: "Anywhere Door",
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, whenever_in_a_graveyard), gain_two, "").anywhere()],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, whenever_in_a_graveyard), gain_two, "").functions_in(IN_A_GRAVEYARD)],
     ..PLAIN_DOOR
 };
 static KEYWORD_DOOR: CardDef = CardDef { name: "Keyword Door", keywords: Keywords::of(&[Keyword::Flying]), ..PLAIN_DOOR };

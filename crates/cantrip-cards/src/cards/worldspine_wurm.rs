@@ -42,7 +42,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_DIES, three_wurms, "When this creature dies, create three 5/5 green Wurm creature tokens with trample."),
         triggered(when(EventMask::ZONE_CHANGE, put_into_a_graveyard), shuffle_it_in, "When Worldspine Wurm is put into a graveyard from anywhere, shuffle it into its owner's library.")
-            .anywhere(),
+            .functions_in(IN_A_GRAVEYARD),
     ],
     ..oracle::WORLDSPINE_WURM
 };

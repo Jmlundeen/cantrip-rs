@@ -263,22 +263,59 @@ pub struct Trigger {
     pub matches: TriggerMatch,
     /// The trigger event asked with the ability's controller, in place of `matches` when set (`when_asked`).
     pub asked: Option<AskedMatch>,
+    /// The zones the trigger condition functions in (CR 113.6, 113.6k; `TriggeredDef::functions`): the battlefield, unless
+    /// the condition can't trigger from there.
+    pub functions: ZoneKinds,
 }
 
-/// The trigger of a triggered ability: `when(EventMask::ZONE_CHANGE, this_enters)`.
+/// The trigger of a triggered ability: `when(EventMask::ZONE_CHANGE, this_enters)`. It functions on the battlefield (CR 113.6).
 pub const fn when(listens: EventMask, matches: TriggerMatch) -> Trigger {
-    Trigger { listens, matches, asked: None }
+    Trigger { listens, matches, asked: None, functions: ON_THE_BATTLEFIELD }
+}
+
+/// "When you cast this spell" (CR 601.2i, 603.2): the trigger of the spell's own casting, which `matches` is asked of (the
+/// `SpellCast` event whose `spell` is the source, with anything else the condition says). A spell is cast on the stack, so
+/// the condition can't trigger from the battlefield and functions from the stack (CR 113.6k): every trigger of this form
+/// is made here, so none can be left functioning where its spell never is. Storm, cascade, replicate, ripple and casualty
+/// (CR 702.40a, 702.85a, 702.56a, 702.60a, 702.153a) and Emrakul, the Promised End's "When you cast this spell" use it.
+pub const fn when_this_spell_is_cast(matches: TriggerMatch) -> Trigger {
+    Trigger { listens: EventMask::SPELL_CAST, matches, asked: None, functions: ON_THE_STACK }
+}
+
+/// Where a triggered ability functions unless its trigger condition or its text says otherwise (CR 113.6).
+pub const ON_THE_BATTLEFIELD: ZoneKinds = ZoneKinds::of(&[ZoneKind::Battlefield]);
+/// Where "when you cast this spell" functions (CR 113.6k, `when_this_spell_is_cast`).
+pub const ON_THE_STACK: ZoneKinds = ZoneKinds::of(&[ZoneKind::Stack]);
+/// Where an ability that returns "this card from your graveyard" functions (CR 113.6m), and one that triggers on its own
+/// card being put into a graveyard (CR 113.6k).
+pub const IN_A_GRAVEYARD: ZoneKinds = ZoneKinds::of(&[ZoneKind::Graveyard]);
+
+impl Trigger {
+    /// A trigger condition that can't trigger from the battlefield, which functions in the zones it can trigger from (CR
+    /// 113.6k): a shared matcher's own, as "when this card is put into a graveyard from anywhere" functions from the
+    /// graveyard it was put into (`cantrip_mechanics::triggers::PUT_INTO_A_GRAVEYARD_FROM_ANYWHERE`).
+    pub const fn functions_in(self, zones: ZoneKinds) -> Trigger {
+        Trigger { functions: zones, ..self }
+    }
 }
 
 /// The trigger of a triggered ability whose trigger event says "you": `matches` is told the ability's controller
 /// (`AskedMatch`), which a delayed triggered ability keeps from the spell or ability that created it (CR 603.7d-e).
 pub const fn when_asked(listens: EventMask, matches: AskedMatch) -> Trigger {
-    Trigger { listens, matches: crate::card::no_match, asked: Some(matches) }
+    Trigger { listens, matches: crate::card::no_match, asked: Some(matches), functions: ON_THE_BATTLEFIELD }
 }
 
 /// A triggered ability (CR 603): when `trigger` triggers, `effect` as it resolves.
 pub const fn triggered(trigger: Trigger, effect: Effect, text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, asked: trigger.asked, effect, ..TriggeredDef::BLANK })
+    AbilityDef::Triggered(TriggeredDef {
+        text,
+        listens: trigger.listens,
+        matches: trigger.matches,
+        asked: trigger.asked,
+        functions: trigger.functions,
+        effect,
+        ..TriggeredDef::BLANK
+    })
 }
 
 /// A state-triggered ability (CR 603.8): "when [a game state is true], [effect]". It triggers as soon as `state` holds of
@@ -579,9 +616,12 @@ const fn triggered_def(a: AbilityDef, method: &str) -> TriggeredDef {
 
 /// What only a triggered ability (CR 603) has.
 impl AbilityDef {
-    /// It functions outside the battlefield too; the ability checks the zone itself.
-    pub const fn anywhere(self) -> AbilityDef {
-        AbilityDef::Triggered(TriggeredDef { anywhere: true, ..triggered_def(self, "only a triggered ability functions anywhere this way") })
+    /// It functions only in `zones`, as its own text says (CR 113.6b), or as its effect says by moving its card out of a zone
+    /// (CR 113.6m): "return this card from your graveyard to the battlefield" functions only in the graveyard. What the
+    /// trigger condition decides is the trigger's (`when_this_spell_is_cast`, `Trigger::functions_in`), never the card's.
+    /// The words are held to the declaration (`cantrip-cards/tests/functioning_zones_match_text.rs`).
+    pub const fn functions_in(self, zones: ZoneKinds) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { functions: zones, ..triggered_def(self, "only a triggered ability functions in zones this way") })
     }
 
     /// A "one or more" ability (CR 603.2c): the events of one batch that it matches trigger it once.

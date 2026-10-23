@@ -667,7 +667,14 @@ scenario, `layer_dependency.rs`, the reviewer's order and off-field probes). New
 ### Events and triggers
 
 Triggers are indexed by the kinds of event they listen for (`EventMask`), so an event checks only the triggers that
-could match it. "Leaves the battlefield" look-back (CR 603.10) reads the frozen last-known rows. Whether a triggering
+could match it. Where a triggered ability functions (CR 113.6) is `TriggeredDef::functions`, and the engine asks it in
+those zones only, so no matcher checks its own zone: the battlefield, unless its trigger condition can't trigger from
+there (CR 113.6k) - "when you cast this spell" is made by `when_this_spell_is_cast` and functions from the stack, "when
+this card is put into a graveyard from anywhere" is a shared trigger that functions from the graveyard - or its own text
+names the zone (CR 113.6b, 113.6m: "return this card from your graveyard"), which the card declares with `functions_in`.
+`CardTable::functions_elsewhere` says per card which other zones to look in, and
+`cantrip-cards/tests/functioning_zones_match_text.rs` holds every ability's zones, declared or derived, to its words and
+its card's Oracle text. "Leaves the battlefield" look-back (CR 603.10) reads the frozen last-known rows. Whether a triggering
 looks back is the rules' to say from the event it matched (`CardTable::looks_back`), never a card's: a zone change
 from the battlefield (a sacrifice's included) or from a graveyard, an object all players can see put into a hand or a
 library, a permanent phasing out, an unattachment, a countered spell, a player losing the game. The two things a

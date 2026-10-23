@@ -32,11 +32,10 @@ fn protection(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(CAST_THIS_SPELL, extra_turn, "When you cast this spell, take an extra turn after this one.")
-            .anywhere(),
+        triggered(CAST_THIS_SPELL, extra_turn, "When you cast this spell, take an extra turn after this one."),
         annihilator::<6>("Annihilator 6 (Whenever this creature attacks, defending player sacrifices six permanents.)"),
         triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), shuffle_graveyard_in, "When Emrakul is put into a graveyard from anywhere, its owner shuffles their graveyard into their library.")
-            .anywhere(),
+            .functions_in(IN_A_GRAVEYARD),
     ],
     statics: &[static_ability(Layer::Ability, itself, protection, "Protection from spells that are one or more colors")],
     ..oracle::EMRAKUL_THE_AEONS_TORN

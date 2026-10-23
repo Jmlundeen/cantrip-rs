@@ -62,8 +62,7 @@ fn minus_eleven(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, exile_colored, "When you cast this spell, exile up to one target permanent that's one or more colors.")
-            .targets(&[up_to_one(colored_permanent)])
-            .anywhere(),
+            .targets(&[up_to_one(colored_permanent)]),
         triggered(when(EventMask::SPELL_CAST, colorless_spell_you_cast), exile_colored, "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.")
             .targets(&[up_to_one(colored_permanent)]),
         ability(loyalty(2), plus_two, "+2: You gain 3 life and draw a card."),

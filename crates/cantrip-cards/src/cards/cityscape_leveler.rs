@@ -18,8 +18,7 @@ fn level(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::CAST_THIS_SPELL, level, "When you cast this spell, destroy up to one target nonland permanent. Its controller creates a tapped Powerstone token.")
-            .targets(&[up_to_one(targets::NONLAND_PERMANENT.filter)])
-            .anywhere(),
+            .targets(&[up_to_one(targets::NONLAND_PERMANENT.filter)]),
         triggered(triggers::THIS_ATTACKS, level, "Whenever this creature attacks, destroy up to one target nonland permanent. Its controller creates a tapped Powerstone token.")
             .targets(&[up_to_one(targets::NONLAND_PERMANENT.filter)]),
         unearth::ability(mana("{8}"), "Unearth {8}"),

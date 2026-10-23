@@ -51,7 +51,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         equip(mana("{2}"), "Equip {2}"),
         triggered(when(EventMask::ZONE_CHANGE, one_one_enters), return_and_attach, "Whenever a 1/1 creature you control enters, you may return this card from your graveyard to the battlefield, then attach it to that creature.")
-            .anywhere(),
+            .functions_in(IN_A_GRAVEYARD),
     ],
     statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 2>, "Equipped creature gets +1/+2.")],
     ..oracle::SWORD_OF_THE_MEEK

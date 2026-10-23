@@ -7,14 +7,6 @@
 use crate::{choose, same_name};
 use cantrip_api::*;
 
-/// "When you cast this spell": the spell's own cast, functioning from the stack.
-fn cast_this_spell(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { spell, .. } if *spell == source => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 /// Its controller may reveal the top `N` cards of their library (all of them if there are fewer), may cast any number of
 /// the revealed cards with the same name as the spell without paying their mana costs, one at a time, then puts every
 /// revealed card not cast on the bottom in the order they choose. "The same name" is the spell's as it is now or as it
@@ -70,8 +62,7 @@ fn ripple<const N: usize>(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
 
 /// Ripple `N` itself; `text` is the ability's own text.
 pub const fn trigger<const N: usize>(text: &'static str) -> AbilityDef {
-    triggered(when(EventMask::SPELL_CAST, cast_this_spell), ripple::<N>, text)
-        .anywhere()
+    triggered(crate::triggers::CAST_THIS_SPELL, ripple::<N>, text)
 }
 
 /// What ripple asks: whether to reveal, the cards to cast chosen after.

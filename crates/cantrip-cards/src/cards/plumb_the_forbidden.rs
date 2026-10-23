@@ -25,7 +25,6 @@ pub static CARD: CardDef = CardDef {
     }),
     labels: &["Cast without sacrificing", "Sacrifice one or more creatures"],
     abilities: &[triggered(CAST_THIS_SPELL, copy_for_each, "When you do, copy this spell for each creature sacrificed this way.")
-        .condition(sacrificed_creatures)
-        .anywhere()],
+        .condition(sacrificed_creatures)],
     ..oracle::PLUMB_THE_FORBIDDEN
 };

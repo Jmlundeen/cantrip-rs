@@ -28,6 +28,5 @@ fn copy_per_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// The storm ability itself; `text` is the card's own reminder text.
 pub const fn trigger(text: &'static str) -> AbilityDef {
-    triggered(when(EventMask::SPELL_CAST, cast_this_spell), copy_per_spell, text)
-        .anywhere()
+    triggered(when_this_spell_is_cast(cast_this_spell), copy_per_spell, text)
 }
