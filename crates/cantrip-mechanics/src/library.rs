@@ -355,7 +355,7 @@ pub fn search_to_top(
 pub enum Rest {
     /// On the bottom of the library in a random order (CR 401.4): nobody is asked for an order.
     BottomRandom,
-    /// On the bottom in any order the player chooses, the first lowest.
+    /// On the bottom in any order the player chooses, the first highest of them and the last lowest.
     BottomChosen,
 }
 
@@ -416,14 +416,17 @@ pub fn look_at_top(
     Ok(taken)
 }
 
-/// "Look at the top `count` cards of your library. Put up to `most` [`kind`] cards [with total mana value N or less] from among
-/// them onto the battlefield. Put the rest on the bottom of your library in a random order." (CR 401.2, 401.4): the
-/// player sees every card looked at (a smaller library shows what it has, CR 609.3) and chooses among those `wanted` says
-/// qualify, read where they are (an {X} in the library is 0, CR 202.3e); with `total`, the cards chosen together have mana
-/// values adding up to at most it (`choose::cards_within_total`). The cards chosen enter the battlefield at once, under the
-/// player's control (CR 110.2a), and the others still in the library go to the bottom at random. With nothing qualifying nobody is asked. The
-/// permanents that arrived are returned. Aang, at the Crossroads ("you may put a creature card with mana value 4 or less", one), United
-/// Battlefront and Storm the Festival (up to two), and Michelangelo's Technique (up to two, total mana value 6 or less) print it.
+/// "Look at the top `count` cards of your library. Put up to `most` [`kind`] cards [with total mana value N or less]
+/// from among them onto the battlefield. Put the rest on the bottom of your library in a random order [or
+/// `Rest::BottomChosen`: "in any order"]." (CR 401.2, 401.4): the player sees every card looked at (a smaller library
+/// shows what it has, CR 609.3) and chooses among those `wanted` says qualify, read where they are (an {X} in the
+/// library is 0, CR 202.3e); with `total`, the cards chosen together have mana values adding up to at most it
+/// (`choose::cards_within_total`), without it each card is judged alone. The cards chosen enter the battlefield at
+/// once, under the player's control (CR 110.2a), and the others still in the library go to the bottom, as `rest` says.
+/// With nothing qualifying nobody is asked. The permanents that arrived are returned. Aang, at the Crossroads ("you may
+/// put a creature card with mana value 4 or less", one), United Battlefront and Storm the Festival (up to two), and
+/// Michelangelo's Technique (up to two, total mana value 6 or less) print it with a random order; Collected Company (up
+/// to two) and Mayael the Anima (one) with the player's.
 pub fn look_at_top_onto_battlefield(
     g: &mut dyn Game,
     player: PlayerId,
@@ -433,6 +436,7 @@ pub fn look_at_top_onto_battlefield(
     kind: &'static str,
     wanted: impl Fn(&dyn Query, ObjectId) -> bool,
     total: Option<u32>,
+    rest: Rest,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let looked = top_of_library(g, player, count);
     if looked.is_empty() {
@@ -450,7 +454,14 @@ pub fn look_at_top_onto_battlefield(
         let entering: Vec<(ObjectId, PlayerId)> = chosen.into_iter().map(|c| (c, player)).collect();
         g.put_all_onto_battlefield(&entering)?
     };
-    rest_to_bottom_in_random_order(g, player, &looked);
+    match rest {
+        Rest::BottomRandom => rest_to_bottom_in_random_order(g, player, &looked),
+        Rest::BottomChosen => {
+            let left: Vec<ObjectId> = looked.iter().copied().filter(|&c| is_live(g, c) && g.obj(c).zone == Zone::library(player)).collect();
+            let order = ask_library_order(g, player, source, &left, DestinationKind::LibraryBottom)?;
+            g.arrange_library(player, &[], &order);
+        }
+    }
     Ok(arrived)
 }
 
@@ -549,7 +560,7 @@ pub fn mill_then_reflexive(g: &mut dyn Game, item: &StackItem, count: u32, refle
 }
 
 /// "In any order" (CR 401.4): `player` puts `cards` on one `end` of their library (`DestinationKind::LibraryTop` or
-/// `LibraryBottom`) in the order they choose, the first lowest. Nobody is asked about fewer than two cards. The cards in
+/// `LibraryBottom`) in the order they choose, the first highest and the last lowest. Nobody is asked about fewer than two cards. The cards in
 /// that order, for `put_into_library` or `arrange_library`. Bow of Nylea and Valakut Awakening put cards on the bottom,
 /// Lim-Dul's Vault on either end.
 pub fn ask_library_order(

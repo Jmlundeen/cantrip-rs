@@ -16,7 +16,7 @@ fn eligible(q: &dyn Query, card: ObjectId) -> bool {
 /// has looked at the cards but is asked nothing.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let kind = "noncreature, nonland permanent with mana value 3 or less";
-    library::look_at_top_onto_battlefield(g, item.controller, item.object, 7, 2, kind, eligible, None)?;
+    library::look_at_top_onto_battlefield(g, item.controller, item.object, 7, 2, kind, eligible, None, library::Rest::BottomRandom)?;
     Ok(())
 }
 

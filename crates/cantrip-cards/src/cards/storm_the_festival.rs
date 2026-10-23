@@ -14,7 +14,7 @@ fn eligible(q: &dyn Query, card: ObjectId) -> bool {
 /// them onto the battlefield. Put the rest on the bottom of your library in a random order." The two enter
 /// together; a library of fewer than five shows what it has (CR 609.3).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::look_at_top_onto_battlefield(g, item.controller, item.object, 5, 2, "permanent with mana value 5 or less", eligible, None)?;
+    library::look_at_top_onto_battlefield(g, item.controller, item.object, 5, 2, "permanent with mana value 5 or less", eligible, None, library::Rest::BottomRandom)?;
     Ok(())
 }
 

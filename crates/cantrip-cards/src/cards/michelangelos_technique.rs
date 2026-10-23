@@ -13,7 +13,7 @@ fn creature_card(q: &dyn Query, card: ObjectId) -> bool {
 /// they enter together under your control (CR 110.2a), and the other cards go to the bottom at random (CR 401.4). A
 /// library of fewer than eight shows what it has (CR 609.3).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::look_at_top_onto_battlefield(g, item.controller, item.object, 8, 2, "creature", creature_card, Some(6))?;
+    library::look_at_top_onto_battlefield(g, item.controller, item.object, 8, 2, "creature", creature_card, Some(6), library::Rest::BottomRandom)?;
     Ok(())
 }
 

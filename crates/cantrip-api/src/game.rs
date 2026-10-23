@@ -672,7 +672,7 @@ pub trait Game: Query {
     /// A Class becomes a level (CR 716.2a), announced to what watches it. Nothing if it is not on the battlefield.
     fn set_class_level(&mut self, permanent: ObjectId, level: u8);
     /// Puts cards of a player's library on its top in this order, the first on top (CR 401.4), or on its bottom,
-    /// the first lowest. The cards are already in the library; nothing changes zones.
+    /// the first highest and the last lowest. The cards are already in the library; nothing changes zones.
     fn arrange_library(&mut self, player: PlayerId, top: &[ObjectId], bottom: &[ObjectId]);
     /// Puts cards already in a player's library on its bottom in a random order (CR 401.4), drawn from the game's own
     /// random source: "put the rest on the bottom of your library in a random order". Nothing changes zones.

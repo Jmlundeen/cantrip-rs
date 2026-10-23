@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 ///
 /// A library with fewer cards shows what it has (CR 609.3), and a requirement shrinks with it: the two for the hand
 /// are as many as there are to meet them. Cards going to the hand move first; the rest are put on the bottom in the
-/// order chosen, the first lowest.
+/// order chosen, the first highest and the last lowest.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     look_at_top(g, item.controller, item.object, 5, (2, 2), false, |_| true, Rest::BottomChosen)?;
     Ok(())
