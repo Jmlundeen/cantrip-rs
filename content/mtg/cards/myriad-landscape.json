@@ -1,0 +1,5 @@
+{
+  "name": "Myriad Landscape",
+  "type": "Land",
+  "oracleText": "This land enters tapped.\n{T}: Add {C}.\n{2}, {T}, Sacrifice this land: Search your library for up to two basic land cards that share a land type, put them onto the battlefield tapped, then shuffle."
+}

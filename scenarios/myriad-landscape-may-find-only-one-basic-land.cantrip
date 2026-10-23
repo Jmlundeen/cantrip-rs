@@ -1,0 +1,34 @@
+# The up-to-two search may choose one basic land even when more eligible cards are available (CR 701.23b).
+
+[Bot1 Deck]
+Myriad Landscape
+Mox Pearl
+Mox Sapphire
+Island x4
+Forest x6
+Plains x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Myriad Landscape.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Myriad Landscape.Activate(Ability: {2}, {T}, Sacrifice this land)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana =
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Myriad Landscape
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Forest.Tapped = true
