@@ -11,18 +11,10 @@ fn opponent_second_draw(q: &dyn Query, source: ObjectId, event: &Event) -> Optio
 }
 
 
-/// {3}{U}: Each player draws a card, in turn order from the active player (CR 101.4).
-fn everyone_draws(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
-    for player in g.state().apnap().collect::<Vec<_>>() {
-        g.draw(player, 1);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::DREW, opponent_second_draw), |g, item| cantrip_mechanics::effects::draw(g, item, 1), "Whenever an opponent draws their second card each turn, you draw a card."),
-        ability(cost("{3}{U}"), everyone_draws, "{3}{U}: Each player draws a card."),
+        ability(cost("{3}{U}"), cantrip_mechanics::effects::each_player_draws_a_card, "{3}{U}: Each player draws a card."),
     ],
     ..oracle::FAERIE_MASTERMIND
 };

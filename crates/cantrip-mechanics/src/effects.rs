@@ -195,6 +195,15 @@ pub fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
+/// "Each player draws a card" (CR 121.1, 121.2c): every player still in the game draws one, in turn order from the active
+/// player. Faerie Mastermind and Geier Reach Sanitarium print it.
+pub fn each_player_draws_a_card(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+    for player in g.state().apnap().collect::<Vec<_>>() {
+        g.draw(player, 1);
+    }
+    Ok(())
+}
+
 /// "Draw two cards, then discard a card" (CR 121.1, 701.9): the controller draws two, then chooses a card of their hand, the
 /// two drawn included, and discards it. Overlord of the Floodpits, Roiling Dragonstorm and Wistfulness print it.
 pub fn draw_two_then_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
