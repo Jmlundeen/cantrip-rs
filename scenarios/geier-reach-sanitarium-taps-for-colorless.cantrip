@@ -1,0 +1,21 @@
+# Geier Reach Sanitarium: "{T}: Add {C}." Its colorless mana pays for Sol Ring ({1}); the pool is empty right after.
+
+[Bot1 Deck]
+Geier Reach Sanitarium
+Sol Ring
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Geier Reach Sanitarium.Play
+Bot1.Battlefield.Geier Reach Sanitarium.Activate(Ability: {T}: Add)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield = Geier Reach Sanitarium; Sol Ring
+Bot1.Battlefield.Geier Reach Sanitarium.Tapped = true

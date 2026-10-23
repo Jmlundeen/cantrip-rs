@@ -1,0 +1,39 @@
+# Geier Reach Sanitarium: "{2}, {T}: Each player draws a card, then discards a card." Bot1 pays {2} with Mox Jet and Mox
+# Pearl and taps the land; the pool is empty right after (exactly {2}). Each player draws one (Bot1 Mountain, Bot2
+# Swamp), then each chooses from the whole hand, the drawn card included: Bot1 discards the Mountain it just drew,
+# Bot2 an Island it held; both are discarded together (CR 101.4, 701.9). A second activation is refused: the land is tapped.
+
+[Bot1 Deck]
+Geier Reach Sanitarium
+Mox Jet
+Mox Pearl
+Lightning Bolt
+Forest x3
+Mountain
+Forest x10
+
+[Bot2 Deck]
+Island x7
+Swamp
+Island x10
+
+[Actions]
+Bot1.Hand.Geier Reach Sanitarium.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Geier Reach Sanitarium.Activate(Ability: Each player draws)
+Bot1.Choose(Mountain)
+Bot2.Choose(Island)
+? Bot1.Mana =
+! Bot1.Battlefield.Geier Reach Sanitarium.Activate(Ability: Each player draws)
+
+[Expect]
+Bot1.Graveyard = Mountain
+Bot1.Hand = Forest; Forest; Forest; Lightning Bolt
+Bot2.Graveyard = Island
+Bot2.Hand.Count = 7
+Bot2.Hand = Island; Island; Island; Island; Island; Island; Swamp
+Bot1.Battlefield.Geier Reach Sanitarium.Tapped = true
+Stack.Count = 0
