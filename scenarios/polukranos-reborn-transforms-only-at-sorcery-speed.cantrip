@@ -1,0 +1,38 @@
+# Polukranos Reborn: "{6}{W/P}: Transform Polukranos Reborn. Activate only as a sorcery." Six mana from two Black Lotuses sits in Bot1's pool, but while a fifth Black Lotus (an artifact spell) is on the stack the transform is not offered (CR 602.5d, sorcery timing needs an empty stack); once it has resolved the same activation is offered and used (2 life for the {W/P}): the positive control.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Polukranos Reborn
+Island
+Island x12
+
+[Bot2 Deck]
+Island x7
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Polukranos Reborn.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+! Bot1.Battlefield.Polukranos Reborn.Activate
+Bot1.Pass
+Bot1.Battlefield.Polukranos Reborn.Activate(Ability: Transform)
+Bot1.Modes(1)
+? Bot1.Mana = 
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Polukranos, Engine of Ruin.Power = 6

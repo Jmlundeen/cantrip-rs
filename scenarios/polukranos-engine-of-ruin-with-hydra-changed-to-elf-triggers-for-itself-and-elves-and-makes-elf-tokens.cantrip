@@ -1,0 +1,67 @@
+# Known bug: token names (CR 111.4, 612.2a): a token's name is its subtypes plus "Token", so the changed text makes "Phyrexian Elf Token".
+# The creature type word "Hydra" in Polukranos, Engine of Ruin's text is changed to Elf by Artificial Evolution (CR 612.2): its ability now reads "Polukranos or another nontoken Elf you control", so Bot2's Go for the Throat on Bot1's Mossborn Hydra (a Hydra, no longer one it counts) makes nothing, while a second Go for the Throat on Polukranos itself still triggers it (the "or" names Polukranos) and its tokens are, by the changed text, Phyrexian Elves rather than Hydras (the text that makes them says Elf, CR 612.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Polukranos Reborn
+Mossborn Hydra
+Island
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Artificial Evolution
+Go for the Throat
+Swamp
+Swamp
+Island x2
+Go for the Throat
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Polukranos Reborn.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Hand.Mossborn Hydra.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Battlefield.Polukranos Reborn.Activate(Ability: Transform)
+Bot1.Modes(1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Polukranos, Engine of Ruin)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Pass
+Bot2.Modes(Hydra)
+Bot2.Modes(Elf)
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Mossborn Hydra)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Polukranos, Engine of Ruin)
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Phyrexian Elf Token#1.Token = true
+Bot1.Battlefield.Phyrexian Elf Token#1.Subtypes = Elf; Phyrexian
+Bot1.Battlefield.Phyrexian Elf Token#1.Keywords = Reach
+Bot1.Battlefield.Phyrexian Elf Token#2.Token = true
+Bot1.Battlefield.Phyrexian Elf Token#2.Subtypes = Elf; Phyrexian
+Bot1.Battlefield.Phyrexian Elf Token#2.Keywords = Lifelink

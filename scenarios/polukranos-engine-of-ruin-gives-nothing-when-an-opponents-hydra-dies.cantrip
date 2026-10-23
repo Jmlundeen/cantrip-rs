@@ -1,0 +1,49 @@
+# "A nontoken Hydra you control": with Polukranos, Engine of Ruin on the battlefield, Bot2's own Mossborn Hydra (cast with a Black Lotus on turn 2) dies to its own Go for the Throat on turn 4 - Bot1 gets no tokens, only Polukranos and the Island stay.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Polukranos Reborn
+Island x4
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mossborn Hydra
+Go for the Throat
+Swamp
+Swamp
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Polukranos Reborn.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Battlefield.Polukranos Reborn.Activate(Ability: Transform)
+Bot1.Modes(1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mossborn Hydra.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Go for the Throat.Cast(Bot2.Battlefield.Mossborn Hydra)
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot2.Graveyard.Mossborn Hydra.Power = 0
+Bot2.Battlefield.Count = 2

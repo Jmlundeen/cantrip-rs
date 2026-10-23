@@ -1,0 +1,38 @@
+# Polukranos Reborn transforms for {6}{W/P}: a Plains pays the {W/P} with {W} (CR 107.4f) and two Black Lotuses the {6} exactly, so the pool is empty right after and Bot1 is still at 20 life (the other scenarios pay the 2 life). It comes out as Polukranos, Engine of Ruin, a 6/6 green and white Phyrexian Hydra with reach and lifelink.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Polukranos Reborn
+Plains
+Island x2
+Island x12
+
+[Bot2 Deck]
+Island x7
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Polukranos Reborn.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Battlefield.Polukranos Reborn.Activate(Ability: Transform)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+? Bot1.Mana = 
+? Bot1.Life = 20
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Polukranos, Engine of Ruin.Power = 6
+Bot1.Battlefield.Polukranos, Engine of Ruin.Toughness = 6
+Bot1.Battlefield.Polukranos, Engine of Ruin.Colors = Green; White
+Bot1.Battlefield.Polukranos, Engine of Ruin.Subtypes = Hydra; Phyrexian
+Bot1.Battlefield.Polukranos, Engine of Ruin.Keywords = Lifelink; Reach

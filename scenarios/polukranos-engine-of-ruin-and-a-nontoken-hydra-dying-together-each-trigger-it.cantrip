@@ -1,0 +1,78 @@
+# Polukranos Reborn (GGG) and Mossborn Hydra come down on turn 1 and Polukranos transforms ({6} from two Black Lotuses, the {W/P} paid with 2 life: 20 -> 18, pool empty). Bot2's Wrath of God on turn 2 destroys both at once: Polukranos, Engine of Ruin triggers for itself and for the nontoken Hydra that died with it (CR 603.10a, ruling 2023-04-14), so two triggers make two tokens each - four 3/3 green and white Phyrexian Hydras, two with reach and two with lifelink, all tokens, all Bot1's.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Polukranos Reborn
+Mossborn Hydra
+Island
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Plains
+Wrath of God
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Polukranos Reborn.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Hand.Mossborn Hydra.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Battlefield.Polukranos Reborn.Activate(Ability: Transform)
+Bot1.Modes(1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+? Bot1.Mana = 
+? Bot1.Life = 18
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Wrath of God.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Phyrexian Hydra#1.Token = true
+Bot1.Battlefield.Phyrexian Hydra#1.Colors = Green; White
+Bot1.Battlefield.Phyrexian Hydra#1.Subtypes = Hydra; Phyrexian
+Bot1.Battlefield.Phyrexian Hydra#1.Types = Creature
+Bot1.Battlefield.Phyrexian Hydra#1.Power = 3
+Bot1.Battlefield.Phyrexian Hydra#1.Toughness = 3
+Bot1.Battlefield.Phyrexian Hydra#1.Keywords = Reach
+Bot1.Battlefield.Phyrexian Hydra#2.Token = true
+Bot1.Battlefield.Phyrexian Hydra#2.Colors = Green; White
+Bot1.Battlefield.Phyrexian Hydra#2.Subtypes = Hydra; Phyrexian
+Bot1.Battlefield.Phyrexian Hydra#2.Types = Creature
+Bot1.Battlefield.Phyrexian Hydra#2.Power = 3
+Bot1.Battlefield.Phyrexian Hydra#2.Toughness = 3
+Bot1.Battlefield.Phyrexian Hydra#2.Keywords = Lifelink
+Bot1.Battlefield.Phyrexian Hydra#3.Token = true
+Bot1.Battlefield.Phyrexian Hydra#3.Colors = Green; White
+Bot1.Battlefield.Phyrexian Hydra#3.Subtypes = Hydra; Phyrexian
+Bot1.Battlefield.Phyrexian Hydra#3.Types = Creature
+Bot1.Battlefield.Phyrexian Hydra#3.Power = 3
+Bot1.Battlefield.Phyrexian Hydra#3.Toughness = 3
+Bot1.Battlefield.Phyrexian Hydra#3.Keywords = Reach
+Bot1.Battlefield.Phyrexian Hydra#4.Token = true
+Bot1.Battlefield.Phyrexian Hydra#4.Colors = Green; White
+Bot1.Battlefield.Phyrexian Hydra#4.Subtypes = Hydra; Phyrexian
+Bot1.Battlefield.Phyrexian Hydra#4.Types = Creature
+Bot1.Battlefield.Phyrexian Hydra#4.Power = 3
+Bot1.Battlefield.Phyrexian Hydra#4.Toughness = 3
+Bot1.Battlefield.Phyrexian Hydra#4.Keywords = Lifelink
+Bot1.Graveyard.Count = 6
+Bot1.Life = 18

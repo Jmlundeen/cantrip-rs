@@ -1,0 +1,55 @@
+# "Polukranos or another nontoken Hydra you control dies": "nontoken" qualifies only "another Hydra", so Polukranos itself triggers it as a token. Bot2 transforms its Polukranos on turn 2; Bot1's Fractured Identity on turn 3 exiles it and Bot1 (the player other than its controller) gets a token copy of Polukranos, Engine of Ruin; Bot1's Go for the Throat then kills that token, and its dies ability makes Bot1 the 3/3 green and white reach and lifelink Hydra tokens.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Fractured Identity
+Go for the Throat
+Island x2
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Polukranos Reborn
+Island x3
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Polukranos Reborn.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Pass
+Bot2.Battlefield.Polukranos Reborn.Activate(Ability: Transform)
+Bot2.Modes(1)
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Fractured Identity.Cast(Bot2.Battlefield.Polukranos, Engine of Ruin)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+Bot1.Hand.Go for the Throat.Cast(Bot1.Battlefield.Polukranos, Engine of Ruin)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Battlefield.Phyrexian Hydra#1.Token = true
+Bot1.Battlefield.Phyrexian Hydra#1.Keywords = Reach
+Bot1.Battlefield.Phyrexian Hydra#2.Token = true
+Bot1.Battlefield.Phyrexian Hydra#2.Keywords = Lifelink
+Bot2.Battlefield = Black Lotus; Island
+Exile = Polukranos Reborn

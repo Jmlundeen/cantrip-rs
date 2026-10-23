@@ -1,0 +1,26 @@
+{
+  "name": "Polukranos Reborn",
+  "manaCost": "{G}{G}{G}",
+  "type": "Legendary Creature — Hydra",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Reach\n{6}{W/P}: Transform Polukranos Reborn. Activate only as a sorcery. ({W/P} can be paid with either {W} or 2 life.)",
+  "keywords": [
+    "Reach"
+  ],
+  "backFace": {
+    "name": "Polukranos, Engine of Ruin",
+    "colorIndicator": [
+      "Green",
+      "White"
+    ],
+    "type": "Legendary Creature — Phyrexian Hydra",
+    "power": 6,
+    "toughness": 6,
+    "oracleText": "Reach, lifelink\nWhenever Polukranos or another nontoken Hydra you control dies, create a 3/3 green and white Phyrexian Hydra creature token with reach and a 3/3 green and white Phyrexian Hydra creature token with lifelink.",
+    "keywords": [
+      "Reach",
+      "Lifelink"
+    ]
+  }
+}

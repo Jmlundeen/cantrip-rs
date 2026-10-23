@@ -1,0 +1,31 @@
+# Only the transformed face has the dies ability: Polukranos Reborn, a Hydra with reach, killed by Bot2's Go for the Throat on turn 2 before it ever transforms, leaves Bot1 with no tokens.
+
+[Bot1 Deck]
+Black Lotus
+Polukranos Reborn
+Island x5
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Go for the Throat
+Swamp
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Polukranos Reborn.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Polukranos Reborn.Keywords = Reach
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Polukranos Reborn)
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard.Polukranos Reborn.Power = 4

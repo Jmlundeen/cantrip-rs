@@ -1,0 +1,61 @@
+# Polukranos, Engine of Ruin (cast and transformed on turn 1 as in its Wrath scenario) stays on the battlefield while Bot2's Go for the Throats kill, one at a time: Bot1's Dryad Arbor, a creature but no Hydra, which makes nothing; then Bot1's Mossborn Hydra, a nontoken Hydra, which makes the two tokens; then, on turn 4, one of those tokens, a Hydra but a token, which makes nothing more (CR 700.4: "nontoken" is checked on the creature that died, 603.10a). Polukranos and the second token (lifelink) are left; the first (reach) token was the one killed.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Polukranos Reborn
+Mossborn Hydra
+Dryad Arbor
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Go for the Throat
+Go for the Throat
+Go for the Throat
+Swamp
+Island x3
+Swamp
+Island x12
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Polukranos Reborn.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Hand.Mossborn Hydra.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Battlefield.Polukranos Reborn.Activate(Ability: Transform)
+Bot1.Modes(1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Dryad Arbor)
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Pass
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Mossborn Hydra)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Phyrexian Hydra#1)
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Battlefield.Polukranos, Engine of Ruin.Power = 6
+Bot1.Battlefield.Phyrexian Hydra.Token = true
+Bot1.Battlefield.Phyrexian Hydra.Keywords = Lifelink
+Bot1.Graveyard.Count = 6
