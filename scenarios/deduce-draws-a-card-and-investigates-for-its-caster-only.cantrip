@@ -1,0 +1,38 @@
+# Deduce draws its caster one card and makes one Clue for the caster (CR 701.16a); the opponent gets neither. The cast
+# is paid exactly: {1}{U} from two Islands leaves the pool empty.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Island
+Deduce
+Island
+Island
+Plains
+Mountain
+Forest
+Island x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Deduce.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Island; Clue Token
+Bot1.Hand = Island; Island; Island; Island; Mountain; Plains
+Bot1.Library.Count = 11
+Bot1.Graveyard = Deduce
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 7
