@@ -19,6 +19,9 @@ checked for sufficiency, not exhaustiveness:
   names (and flags a number the current rules don't have) - each rule says what the comment says it does - citations copied from
   older code can name a rule that was renumbered (CR 712.4 is meld cards, not modal double-faced cards);
 - the "never" list, line by line;
+- number widths are decided: `docs/rules-exceptions.md` RX-5 keeps today's widths (mana costs, X, multikicker, counters,
+  power, toughness, damage, player counters) and their existing clamps, so a u8/u16 limit on those is not a finding; a
+  card's own arithmetic that wraps (an i16 doubled) still is;
 - no rules property set by hand (`SKILL.md`, "A card never tells the engine what the rules already decide"): a flag the
   card sets so the engine applies a rule correctly is a core gap, reported, not a card finding to patch;
 - no parallel system (`CLAUDE.md`, "Use the systems that exist"): every new store, cache, flag, record, lookup or helper
