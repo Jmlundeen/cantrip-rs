@@ -1,0 +1,36 @@
+# Deceptive Landscape: each of the three listed basic land types is legal. Reject Island, reject Tundra because it is nonbasic, then find Plains, Swamp and Forest; each search puts its land onto the battlefield tapped (CR 205.4a, 305.6, 701.23).
+
+[Bot1 Deck]
+Deceptive Landscape x3
+Plains x8
+Forest x8
+Island x8
+Mountain x8
+Swamp x8
+Tundra x2
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Deceptive Landscape.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Deceptive Landscape.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Deceptive Landscape.Play
+Bot1.Battlefield.Deceptive Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Island)
+Bot1.Search(Plains)
+Bot1.Battlefield.Deceptive Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Tundra)
+Bot1.Search(Swamp)
+Bot1.Battlefield.Deceptive Landscape.Activate(Ability: {T}, Sacrifice this land)
+Bot1.Search(Forest)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Deceptive Landscape; Deceptive Landscape; Deceptive Landscape
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Battlefield.Swamp.Tapped = true
+Bot1.Battlefield.Forest.Tapped = true
