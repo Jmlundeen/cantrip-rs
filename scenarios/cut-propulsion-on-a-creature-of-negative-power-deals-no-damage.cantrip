@@ -1,0 +1,41 @@
+# A creature with negative power deals itself no damage, not a wrapped or huge amount (CR 107.1b, 120.8). Animate Dead returns Bot1's
+# bolted Ornithopter as -1/2 (it gives -1/-0); Cut Propulsion on it leaves it undamaged and on the battlefield.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Swamp
+Black Lotus
+Ornithopter
+Animate Dead
+Lightning Bolt
+Cut Propulsion
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Animate Dead.Cast(Ornithopter; Spend: B)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cut Propulsion.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = -1
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Graveyard.Count = 3

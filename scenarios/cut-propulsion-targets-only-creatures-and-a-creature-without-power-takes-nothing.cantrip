@@ -1,0 +1,36 @@
+# Cut Propulsion targets only a creature: a Mox Ruby (artifact, not a creature) is refused, while Spellskite (0/4 artifact
+# creature, the positive control) is accepted. A creature with 0 power deals itself no damage (CR 120.8), so Spellskite is
+# undamaged and the spell still resolves to the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Spellskite
+Cut Propulsion
+Island x15
+
+[Bot2 Deck]
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Spellskite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+! Bot1.Hand.Cut Propulsion.Cast(Bot1.Battlefield.Mox Ruby#3)
+Bot1.Hand.Cut Propulsion.Cast(Spellskite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Spellskite.Damage = 0
+Bot1.Graveyard = Cut Propulsion

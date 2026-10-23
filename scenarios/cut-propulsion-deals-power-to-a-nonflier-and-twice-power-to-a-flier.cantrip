@@ -1,0 +1,64 @@
+# Cut Propulsion makes the creature the source of damage to itself: equal to its power, or twice that "instead" if it has flying
+# (CR 120.3, 614.1a). Bot1 hits its own Sentinel of the Nameless City (3/4, no flying) on T3: 3 damage, it survives (not 6, not 0).
+# On T5 it hits Bot2's Traxos, Academy Guardian (1/5, flying): 2 damage, not 1 and not 3 (1 + 2). Each cast pays exactly {2}{R}.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Sentinel of the Nameless City
+Cut Propulsion
+Cut Propulsion
+Island x12
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Traxos, Academy Guardian
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sentinel of the Nameless City.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Battlefield.Mox Sapphire#3.Activate
+Bot2.Battlefield.Mox Sapphire#4.Activate
+Bot2.Hand.Traxos, Academy Guardian.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{R}{G}
+Bot1.Hand.Cut Propulsion.Cast(Sentinel of the Nameless City)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+? Bot1.Battlefield.Sentinel of the Nameless City.Damage = 3
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{R}{G}
+Bot1.Hand.Cut Propulsion.Cast(Traxos, Academy Guardian)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+
+[Expect]
+Bot2.Battlefield.Traxos, Academy Guardian.Damage = 2
+Bot1.Graveyard = Cut Propulsion; Cut Propulsion

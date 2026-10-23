@@ -1,0 +1,36 @@
+# The creature, not the spell, is the source of the damage (CR 120.3, 702.15b): Bot1 casts Cut Propulsion on Bot2's Healer's Hawk
+# (1/1, flying, lifelink). It deals itself 2 (twice its power), dies, and its controller Bot2 gains 2; Bot1, the spell's controller,
+# gains nothing.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Cut Propulsion
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Healer's Hawk
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healer's Hawk.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Cut Propulsion.Cast(Bot2.Battlefield.Healer's Hawk)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Healer's Hawk
+Bot2.Life = 22
+Bot1.Life = 20
