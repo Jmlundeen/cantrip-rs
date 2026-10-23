@@ -8,8 +8,9 @@
 //! CR 508.1d counts requirements: the declaration must obey as many as any declaration that obeys every restriction can
 //! without paying a cost. A goaded creature (CR 701.15b) is under two for each player who goaded it - attack, and attack a
 //! player other than that one - and "attacks that player this combat if able" is one: attacking either of two players may
-//! obey as many as the other, and both are legal. `solve` is the one search; every restriction the engine has is on one
-//! attacker at a time (who may attack, and what), so the most is each attacker's best attack, added up.
+//! obey as many as the other, and both are legal. `solve` is the one search: every restriction on one attacker at a time
+//! (who may attack, and what) makes the most each attacker's best attack, added up, and a cap on how many may attack one
+//! target (CR 508.1c) is filled in that same order, so the suggestion never asks for one creature more than a target allows.
 
 use crate::{AttackCost, ManaCost, ObjectId, PlayerId, Target, count_u32};
 
@@ -32,11 +33,14 @@ pub struct RequiredAttack {
 }
 
 /// The rules of a declaration of attackers past which attacks are allowed (CR 508.1c-d), held in the question so the
-/// game-log tree moves through them: the requirements; the most of them any declaration that obeys every restriction obeys
-/// without paying a cost, which the declaration must obey too; and one such declaration, the engine's suggestion.
+/// game-log tree moves through them: the requirements; the most creatures that may attack each player, planeswalker or
+/// battle, where something caps it; the most of them any declaration that obeys every restriction obeys without paying a
+/// cost, which the declaration must obey too; and one such declaration, the engine's suggestion.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct AttackRules {
     pub required: Vec<RequiredAttack>,
+    /// The most creatures that may attack each capped player, planeswalker or battle (CR 508.1c), one entry each.
+    pub limits: Vec<(Target, u32)>,
     pub most: u32,
     pub suggested: Vec<(ObjectId, Target)>,
 }
@@ -52,8 +56,8 @@ pub struct AttackVerdict {
     pub issue: Option<AttackIssue>,
     /// What declaring it costs (CR 508.1h), zero when nothing.
     pub cost: ManaCost,
-    /// Nothing is required of the declaration (the most is 0): any declaration of `addable` attacks, each creature attacking
-    /// once, is legal, so a client need not ask about each one.
+    /// Nothing is required of the declaration (the most is 0) and nothing caps how many may attack a target: any
+    /// declaration of `addable` attacks, each creature attacking once, is legal, so a client need not ask about each one.
     pub free: bool,
 }
 
@@ -83,17 +87,31 @@ impl AttackRules {
         count_u32(self.required.iter().filter(|r| Self::obeys(r, attacker, at)).count())
     }
 
+    /// How many creatures may attack `at` (CR 508.1c), or `None` when nothing caps it.
+    fn limit(&self, at: Target) -> Option<u32> {
+        self.limits.iter().find(|&&(t, _)| t == at).map(|&(_, n)| n)
+    }
+
+    /// Whether `at`'s cap leaves room for one more attack among `attacks`.
+    fn room(&self, at: Target, attacks: &[(ObjectId, Target)]) -> bool {
+        self.limit(at).is_none_or(|n| count_u32(attacks.iter().filter(|x| x.1 == at).count()) < n)
+    }
+
     /// How many of the requirements a declaration obeys (CR 508.1d).
     pub fn obeyed(&self, attacks: &[(ObjectId, Target)]) -> u32 {
         attacks.iter().map(|&(a, t)| self.gain(a, t)).sum()
     }
 
     /// The best `attacker` can obey: the most any one attack of it among `targets` obeys (and not attacking obeys none),
-    /// with one such attack; with `free_only`, among attacks that cost nothing (CR 508.1d).
-    fn best(&self, attacker: ObjectId, targets: &[Target], costs: &[AttackCost], free_only: bool) -> (u32, Option<Target>) {
+    /// with one such attack; with `free_only`, among attacks that cost nothing (CR 508.1d); passing over an attack that
+    /// `placed` already fills the cap of (CR 508.1c).
+    fn best(&self, attacker: ObjectId, targets: &[Target], costs: &[AttackCost], free_only: bool, placed: &[(ObjectId, Target)]) -> (u32, Option<Target>) {
         let mut best = (0, None);
         for &t in targets {
             if free_only && !AttackCost::free(costs, attacker, t) {
+                continue;
+            }
+            if !self.room(t, placed) {
                 continue;
             }
             let g = self.gain(attacker, t);
@@ -108,9 +126,11 @@ impl AttackRules {
     /// 508.1d), with one that does: each attacker's best free attack.
     pub fn solve(&self, eligible: &[ObjectId], targets: &[Target], costs: &[AttackCost]) -> (u32, Vec<(ObjectId, Target)>) {
         let mut most = 0;
-        let mut suggested = Vec::new();
+        let mut suggested: Vec<(ObjectId, Target)> = Vec::new();
         for &a in eligible {
-            if let (g, Some(t)) = self.best(a, targets, costs, true) {
+            // shortcut: a capped target is filled in eligible order, which can fall short of the most when two creatures'
+            // requirements compete for one capped player; make this an exact assignment if such a card is printed.
+            if let (g, Some(t)) = self.best(a, targets, costs, true, &suggested) {
                 most += g;
                 suggested.push((a, t));
             }
@@ -135,13 +155,27 @@ impl AttackRules {
                 break;
             }
         }
+        // CR 508.1c: more creatures declared attacking one target than its cap allows is illegal, though an effect may
+        // still put another there once they are declared. Nothing extends a declaration already over a cap, so none is
+        // addable.
+        if found.is_none() {
+            for &(t, n) in &self.limits {
+                let mut attacking = attacks.iter().filter(|x| x.1 == t).map(|x| x.0);
+                if let Some(creature) = attacking.nth(n as usize) {
+                    found = issue(creature, "can't attack", Some(t), "508.1c");
+                    mendable = false;
+                    break;
+                }
+            }
+        }
         if found.is_none() && self.obeyed(attacks) < self.most {
             // An attacker obeying fewer than it could, and a requirement its best attack obeys that its attack does not.
             found = eligible
                 .iter()
                 .find_map(|&a| {
                     let now = attacks.iter().find(|x| x.0 == a).map(|x| x.1);
-                    let (best, at) = self.best(a, targets, costs, true);
+                    let placed: Vec<(ObjectId, Target)> = attacks.iter().copied().filter(|x| x.0 != a).collect();
+                    let (best, at) = self.best(a, targets, costs, true, &placed);
                     let have = now.map_or(0, |t| self.gain(a, t));
                     let at = at?;
                     (have < best).then(|| {
@@ -159,16 +193,21 @@ impl AttackRules {
         }
         let complete = found.is_none();
         let addable = if addable && mendable {
-            // Every restriction is on one attacker at a time: an attack may be added where the others not yet attacking can
-            // make up the rest at their best, paying if need be.
+            // Each restriction is on one attacker at a time, and a cap is on how many attack one target (CR 508.1c): an
+            // attack may be added where that target has room and the others not yet attacking can make up the rest at
+            // their best, paying if need be.
             let declared = self.obeyed(attacks);
             let free: Vec<ObjectId> = eligible.iter().copied().filter(|a| !attacks.iter().any(|x| x.0 == *a)).collect();
-            let rest: Vec<(ObjectId, u32)> = free.iter().map(|&a| (a, self.best(a, targets, costs, false).0)).collect();
-            let all: u32 = rest.iter().map(|r| r.1).sum();
             let mut list = Vec::new();
-            for &(a, best) in &rest {
+            for &a in &free {
                 for &t in targets {
-                    if declared + self.gain(a, t) + all - best >= self.most {
+                    if !self.room(t, attacks) {
+                        continue;
+                    }
+                    let mut placed = attacks.to_vec();
+                    placed.push((a, t));
+                    let others: u32 = free.iter().filter(|&&b| b != a).map(|&b| self.best(b, targets, costs, false, &placed).0).sum();
+                    if declared + self.gain(a, t) + others >= self.most {
                         list.push((a, t));
                     }
                 }
@@ -177,7 +216,9 @@ impl AttackRules {
         } else {
             Vec::new()
         };
-        AttackVerdict { complete, addable, issue: found, cost: AttackCost::total(costs, attacks), free: self.most == 0 }
+        // Two attacks of `addable` may still be one too many for a capped target (CR 508.1c), so a capped declaration is
+        // never free of asking.
+        AttackVerdict { complete, addable, issue: found, cost: AttackCost::total(costs, attacks), free: self.most == 0 && self.limits.is_empty() }
     }
 }
 
@@ -186,8 +227,15 @@ mod tests {
     use super::*;
 
     const U: ObjectId = ObjectId(5);
+    const V: ObjectId = ObjectId(6);
     const P2: PlayerId = PlayerId(1);
     const P3: PlayerId = PlayerId(2);
+    /// A planeswalker of P2 that one creature at most may attack (Tomik, Orzhov Lawmage).
+    const W: Target = Target::Object(ObjectId(7));
+
+    fn capped(at: Target) -> AttackRules {
+        AttackRules { limits: vec![(at, 1)], ..Default::default() }
+    }
 
     /// Goaded by P2 and told to attack P2 this combat (three players, Ursine Monstrosity): attacking P2 obeys two of three
     /// (attack, and attack P2), attacking P3 two (attack, and attack a player other than P2); both are legal, and not
@@ -224,5 +272,61 @@ mod tests {
         assert!(r.judge(&[U], &targets, &costs, &[], false).complete);
         let paid = r.judge(&[U], &targets, &costs, &[(U, Target::Player(P2))], false);
         assert!(paid.complete && paid.cost.generic == 2);
+    }
+
+    /// CR 508.1c: a second creature declared attacking a planeswalker no more than one may attack makes the declaration
+    /// illegal, and the issue is the caption's.
+    #[test]
+    fn a_second_attacker_on_a_capped_target_is_illegal() {
+        let targets = [Target::Player(P2), W];
+        let verdict = capped(W).judge(&[U, V], &targets, &[], &[(U, W), (V, W)], false);
+        assert!(!verdict.complete);
+        let issue = verdict.issue.expect("an illegal declaration says why");
+        assert_eq!((issue.creature, issue.words.as_str(), issue.other, issue.rule), (V, "can't attack", Some(W), "508.1c"));
+    }
+
+    /// One creature attacking the capped planeswalker, or another target, is legal.
+    #[test]
+    fn a_capped_target_allows_one_attacker_and_no_cap_on_another() {
+        let targets = [Target::Player(P2), W];
+        assert!(capped(W).judge(&[U, V], &targets, &[], &[(U, W)], false).complete);
+        assert!(capped(W).judge(&[U, V], &targets, &[], &[(U, W), (V, Target::Player(P2))], false).complete);
+        assert!(capped(W).judge(&[U, V], &targets, &[], &[(U, Target::Player(P2)), (V, Target::Player(P2))], false).complete);
+    }
+
+    /// Two creatures may attack one target where nothing caps it.
+    #[test]
+    fn without_a_limit_two_may_attack_one_target() {
+        let targets = [Target::Player(P2), W];
+        assert!(AttackRules::default().judge(&[U, V], &targets, &[], &[(U, W), (V, W)], false).complete);
+    }
+
+    /// Nothing is addable onto a target already at its cap, and what is addable elsewhere still is.
+    #[test]
+    fn addable_never_adds_a_second_attacker_to_a_capped_target() {
+        let targets = [Target::Player(P2), W];
+        let verdict = capped(W).judge(&[U, V], &targets, &[], &[(U, W)], true);
+        assert!(verdict.complete);
+        assert!(verdict.addable.contains(&(V, Target::Player(P2))));
+        assert!(!verdict.addable.contains(&(V, W)));
+        // Two attacks it offers may still be one too many here, so a client has to ask.
+        assert!(!verdict.free);
+    }
+
+    /// The suggestion fills a capped target no further than the cap, even where a requirement would send another there.
+    #[test]
+    fn a_suggestion_never_exceeds_a_limit() {
+        let targets = [Target::Player(P2), W];
+        let mut r = capped(Target::Player(P2));
+        r.required = vec![
+            RequiredAttack { attacker: U, aim: AttackAim::Anything },
+            RequiredAttack { attacker: U, aim: AttackAim::At(Target::Player(P2)) },
+            RequiredAttack { attacker: V, aim: AttackAim::Anything },
+            RequiredAttack { attacker: V, aim: AttackAim::At(Target::Player(P2)) },
+        ];
+        (r.most, r.suggested) = r.solve(&[U, V], &targets, &[]);
+        assert_eq!(r.suggested.iter().filter(|x| x.1 == Target::Player(P2)).count(), 1);
+        assert_eq!(r.most, 3);
+        assert!(r.judge(&[U, V], &targets, &[], &r.suggested, false).complete);
     }
 }

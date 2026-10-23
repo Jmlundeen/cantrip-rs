@@ -995,7 +995,7 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[Att
             }
         }
     }
-    let mut rules = AttackRules { required, most: 0, suggested: Vec::new() };
+    let mut rules = AttackRules { required, limits: Vec::new(), most: 0, suggested: Vec::new() };
     if !rules.required.is_empty() {
         (rules.most, rules.suggested) = rules.solve(eligible, targets, costs);
     }
