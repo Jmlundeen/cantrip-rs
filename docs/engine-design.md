@@ -1115,16 +1115,21 @@ the spell's or ability's own - it is judged for each candidate, and only the can
 offered, with what is announced after it that a change may read or that brings targets of its own (a kicker, an optional
 cost, cards spliced onto it). Any other - several slots or a slot of several targets, a modal spell, targets after X or a
 kicker, a gift, a division, a splice - is offered if some legal announcement could be paid for (`actions::some_cast`,
-`some_activation` for abilities): what comes before the targets is walked (each choice of modes, X up to what changes the
-targets, kicked or not, the optional cost paid or not, the gift promised to each opponent or not, each order of the
+`some_activation` for abilities): what comes before the targets is walked (each choice of modes, as many as the board allows (`modes_up_to`), X up to what changes the
+targets or what an additional cost that pays X life or sacrifices X permanents allows, kicked or not, the optional cost
+paid or not, the gift promised to each opponent or not, each order of the
 cards with targets that could be spliced on), the card judged as it would then be (`Announcing`: a filter or a change
 that reads its X or kicker sees them), then the targets each brings, as `choose_slots` would take them
 (`some_announcement`), each slot's targets different; the payment is judged once for each different thing the cost
 changes make of them (`deltas`), at the total that announcement comes to (`Earlier`: the modes' costs, X, the kicker,
 the optional cost, the splices). So This Town Ain't Big Enough ("{3} less if it targets a permanent you control", up to
-two targets) is offered for {1}{U} with a permanent of its caster's to aim at. Past `ANNOUNCEMENT_BUDGET` steps (a slot
-of any number of targets over a dozen candidates) it is offered, and choices that then leave the cost unpayable take it
-back at the payment (CR 601.2h, 733.1; KI-108). Where nothing could change the cost it is judged once, before any target
+two targets) is offered for {1}{U} with a permanent of its caster's to aim at. The last slot's candidates that no change
+is given (its source, what is costed) are taken as alike, and judged by how many of them are chosen, for as long as the
+changes judged read nothing that could tell them apart (`Watch`: a candidate's characteristics, an object's record, the
+state, the history); once one does, the slot is walked whole. So Fireball ("{1} more for each target beyond the first")
+on a board of twenty creatures is judged at twenty-one announcements, not a million. Past `ANNOUNCEMENT_BUDGET` steps (a
+change that tells apart the candidates of a slot of many targets among more than a dozen) it is offered, and choices that
+then leave the cost unpayable take it back at the payment (CR 601.2h, 733.1; KI-108). Where nothing could change the cost it is judged once, before any target
 is looked for. An activated ability's menu row says what it costs with each candidate where that is not the printed cost
 (`activation_costs`, the host's `option_message`: "Equip {4}. ... (costs {1} targeting Dwarven Mauler)"). Ajani's Response
 ("{3} less if it targets a tapped creature") is a spell that reads its target this way. Dwarven Mauler,

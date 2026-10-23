@@ -1248,6 +1248,88 @@ impl Query for Announcing<'_> {
     }
 }
 
+/// The candidates of a slot that the search takes as alike (`AnnouncementSearch::slot`), and whether a cost change judged
+/// since told any of them apart.
+struct Watching {
+    alike: std::cell::RefCell<Vec<ObjectId>>,
+    told: std::cell::Cell<bool>,
+}
+
+/// The game as the cost changes read it while some candidates are taken as alike (`Watching`): every way a change could tell
+/// one of them from another is noted - asking about one of them (its characteristics, its mana value, whether it may be
+/// targeted), or reading anything that could name one (an object's record, the state, the history). A change that only
+/// counts its targets, or reads the spell it costs, tells none apart (Fireball's "{1} more for each target beyond the
+/// first"). A change compares a target to no object it was not given or did not read, so to tell two alike candidates apart
+/// it must read one of these.
+struct Watch<'a> {
+    q: &'a dyn Query,
+    w: &'a Watching,
+    /// The spell being costed, a card not yet cast: its own record names no candidate.
+    spell: Option<ObjectId>,
+}
+
+impl Watch<'_> {
+    fn note(&self, id: ObjectId) {
+        if self.w.alike.borrow().contains(&id) {
+            self.w.told.set(true);
+        }
+    }
+}
+
+impl Query for Watch<'_> {
+    fn state(&self) -> &GameState {
+        self.w.told.set(true);
+        self.q.state()
+    }
+
+    fn mana_value(&self, id: ObjectId) -> u32 {
+        self.note(id);
+        self.q.mana_value(id)
+    }
+
+    fn card(&self, id: CardId) -> &'static CardDef {
+        self.q.card(id)
+    }
+
+    fn chars(&self, id: ObjectId) -> Chars {
+        self.note(id);
+        self.q.chars(id)
+    }
+
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        self.q.token_chars(card, copy)
+    }
+
+    fn card_id(&self, def: &'static CardDef) -> CardId {
+        self.q.card_id(def)
+    }
+
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        self.note(id);
+        self.q.lost_all_abilities(id)
+    }
+
+    fn events(&self) -> &[Record] {
+        self.w.told.set(true);
+        self.q.events()
+    }
+
+    fn can_target(&self, asker: &Asker, target: Target) -> bool {
+        if let Target::Object(id) = target {
+            self.note(id);
+        }
+        self.q.can_target(asker, target)
+    }
+
+    fn obj(&self, id: ObjectId) -> &Obj {
+        // An object's record may name another (what it is attached to): only the costed card's is taken to name none.
+        if Some(id) != self.spell {
+            self.w.told.set(true);
+        }
+        self.q.obj(id)
+    }
+}
+
 /// What looking for a payable announcement came to: one found, none, or the budget spent.
 #[derive(PartialEq, Clone, Copy)]
 enum Found {
@@ -1257,9 +1339,16 @@ enum Found {
 }
 
 /// The announcements of a spell's or ability's targets (CR 601.2c) for one announcement of what comes before them, as
-/// `choose_slots` takes them: segment by segment (the spell's own slots, then each spliced card's, CR 702.47c), each
-/// segment's slots in order, the targets of a slot different, a slot that chose nothing ("up to") keeping its place with
-/// `Target::None` among several, and a segment's trailing empty slots taking none.
+/// `choose_slots` takes them: segment by segment (the spell's own slots, then each spliced card's in the order spliced,
+/// CR 702.47b, their targets chosen after the spell's own, 702.47d), each segment's slots in order, the targets of a slot
+/// different, a slot that chose nothing ("up to") keeping its place with `Target::None` among several, and a segment's
+/// trailing empty slots taking none.
+///
+/// The last slot's candidates that no cost change could tell apart are taken as alike: objects the changes are not given
+/// (`named`) nor chosen earlier. An announcement with some of them is judged once for each number of them, with the first
+/// that many; while the changes judged read nothing that tells them apart (`Watch`), every other choice of as many is the
+/// same to them. Once one does, the slot is walked whole. So Fireball's targets are judged by how many there are, not by
+/// every set of them.
 struct AnnouncementSearch<'a, K> {
     q: &'a dyn Query,
     cx: &'a Cx<'a>,
@@ -1268,11 +1357,14 @@ struct AnnouncementSearch<'a, K> {
     slots: Vec<(TargetSpec, Option<PlayerId>, usize, usize)>,
     counted: u32,
     gift: bool,
-    key: &'a dyn Fn(&[Target]) -> K,
+    key: &'a dyn Fn(&[Target], &Watching) -> K,
     covered: &'a mut dyn FnMut(&[Target]) -> bool,
     /// What the cost changes made of the announcements judged: `covered` is asked once for each.
     seen: Vec<K>,
     budget: &'a mut u32,
+    /// The objects the cost changes are given (their sources, what is costed): never taken as alike.
+    named: &'a [ObjectId],
+    watching: Watching,
 }
 
 impl<K: PartialEq> AnnouncementSearch<'_, K> {
@@ -1295,7 +1387,7 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
             start = targets.len();
         }
         let Some(&(spec, slot_player, _, in_segment)) = self.slots.get(at) else {
-            let key = (self.key)(targets);
+            let key = (self.key)(targets, &self.watching);
             if self.seen.contains(&key) {
                 return Found::No;
             }
@@ -1312,6 +1404,26 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
         let count = most.min(cantrip_state::count_u32(candidates.len())) as usize;
         let least = (least as usize).min(count);
         let before = targets.len();
+        // The last slot, of no total, with candidates to take as alike: judged by how many of them, while the changes tell
+        // none apart.
+        if at + 1 == self.slots.len() && total.is_none() && !self.watching.told.get() {
+            let alike: Vec<ObjectId> = candidates
+                .iter()
+                .filter_map(|&t| if let Target::Object(id) = t { Some(id) } else { None })
+                .filter(|id| !self.named.contains(id) && !targets.contains(&Target::Object(*id)))
+                .collect();
+            if alike.len() > 1 && count > 1 {
+                let named: Vec<Target> = candidates.iter().copied().filter(|t| !matches!(t, Target::Object(id) if alike.contains(id))).collect();
+                *self.watching.alike.borrow_mut() = alike.clone();
+                let found = self.alike(at, targets, start, &named, &alike, (least, count, in_segment > 1 && spec.max <= 1));
+                self.watching.alike.borrow_mut().clear();
+                targets.truncate(before);
+                if found != Found::No || !self.watching.told.get() {
+                    return found;
+                }
+                // A change told them apart: the slot is walked whole.
+            }
+        }
         let mut chosen: Vec<usize> = Vec::with_capacity(count);
         for n in least..=count {
             // Each `n` of the candidates, in order (CR 601.2c: different ones).
@@ -1341,6 +1453,38 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
         }
         Found::No
     }
+
+    /// The last slot `at` judged with its `alike` candidates taken as alike: each choice of its `named` ones, with the first
+    /// so many of the alike ones to make each number from `least` to `count` (`pad`: a slot of one that chose nothing keeps
+    /// its place). Stops, answering no, once a change tells the alike ones apart.
+    fn alike(&mut self, at: usize, targets: &mut Vec<Target>, start: usize, named: &[Target], alike: &[ObjectId], (least, count, pad): (usize, usize, bool)) -> Found {
+        let before = targets.len();
+        let mut chosen: Vec<usize> = Vec::new();
+        for n in 0..=named.len().min(count) {
+            chosen.clear();
+            chosen.extend(0..n);
+            loop {
+                for k in least.saturating_sub(n)..=(count - n).min(alike.len()) {
+                    targets.extend(chosen.iter().map(|&i| named[i]));
+                    targets.extend(alike[..k].iter().map(|&id| Target::Object(id)));
+                    if pad && n + k == 0 {
+                        targets.push(Target::None);
+                    }
+                    let found = self.slot(at + 1, targets, start);
+                    targets.truncate(before);
+                    if found != Found::No || self.watching.told.get() {
+                        return found;
+                    }
+                }
+                let Some(i) = (0..n).rev().find(|&i| chosen[i] < named.len() - n + i) else { break };
+                chosen[i] += 1;
+                for j in i + 1..n {
+                    chosen[j] = chosen[j - 1] + 1;
+                }
+            }
+        }
+        Found::No
+    }
 }
 
 /// Whether some legal announcement of the targets of `segments` after `prefix` (the target announced with the action, if
@@ -1356,7 +1500,8 @@ fn some_announcement<K: PartialEq>(
     segments: &[Vec<TargetSpec>],
     (counted, kicked, gift): (u32, u8, bool),
     budget: &mut u32,
-    key: &dyn Fn(&[Target]) -> K,
+    named: &[ObjectId],
+    key: &dyn Fn(&[Target], &Watching) -> K,
     covered: &mut dyn FnMut(&[Target]) -> bool,
 ) -> Found {
     let mut slots = Vec::new();
@@ -1365,9 +1510,20 @@ fn some_announcement<K: PartialEq>(
         let n = expanded.len();
         slots.extend(expanded.into_iter().map(|(spec, player, _)| (spec.when_kicked(kicked), player, segment, n)));
     }
-    let mut search = AnnouncementSearch { q, cx, asker, slots, counted, gift, key, covered, seen: Vec::new(), budget };
+    let watching = Watching { alike: std::cell::RefCell::new(Vec::new()), told: std::cell::Cell::new(false) };
+    let mut search = AnnouncementSearch { q, cx, asker, slots, counted, gift, key, covered, seen: Vec::new(), budget, named, watching };
     let mut targets = prefix.to_vec();
     search.slot(0, &mut targets, prefix.len())
+}
+
+/// The objects the cost changes of `costed` are given (`CostChange`'s source, and what is costed): the permanents with cost
+/// changes, the sources of lasting ones, and the costed object. A change may compare a target to these without reading
+/// anything, so they are never taken as alike (`AnnouncementSearch`).
+fn named_by_changes(cx: &Cx, a: &Available, costed: ObjectId) -> Vec<ObjectId> {
+    let mut named = a.changers.clone();
+    named.push(costed);
+    named.extend(cx.s().effects.iter().filter(|e| matches!(e.kind, EffectKind::SpellCostChange { .. })).map(|e| e.source));
+    named
 }
 
 /// Whether a slot's number of targets, or the most its targets' mana values may add up to, is counted by X or the kicker
@@ -1413,35 +1569,47 @@ fn mode_masks(cx: &Cx, asker: &Asker, modal: &ModalDef, range: (u8, u8)) -> Vec<
         }
     }
     let eligible = eligible_modes(cx, asker, modal);
+    // The board may allow more modes than it prints (CR 700.2: Flame of Anor), as `choose_modes` reads it.
+    let (min, mut max) = range;
+    if let Some(up_to) = cx.card(cx.s().obj(asker.source).card).modes_up_to {
+        max = max.max(up_to(cx, asker));
+    }
     let mut out = Vec::new();
-    go(modal, &eligible, 0, 0, 0, range, &mut out);
+    go(modal, &eligible, 0, 0, 0, (min, max), &mut out);
     out
 }
 
-/// The orders in which cards in `player`'s hand could be spliced onto the Arcane spell `card` (CR 702.47a-b), none first:
-/// only cards whose spells have targets, since splicing one without adds to the cost and changes nothing a cost change reads.
-fn splice_orders(cx: &Cx, player: PlayerId, card: ObjectId) -> Vec<Vec<ObjectId>> {
-    let mut out = vec![Vec::new()];
+/// The cards in `player`'s hand that could be spliced onto the Arcane spell `card` (CR 702.47a) and bring targets: one without
+/// adds to the cost and changes nothing a cost change reads.
+fn splice_cards(cx: &Cx, player: PlayerId, card: ObjectId) -> Vec<ObjectId> {
     if !cx.chars(card).has_subtype(Subtype::Arcane) {
-        return out;
+        return Vec::new();
     }
     let targeted = |c: ObjectId| {
         let def = cx.card(cx.s().obj(c).card);
         c != card && def.splice.is_some() && def.spell.is_some_and(|s| !s.targets.is_empty())
     };
-    let eligible: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| targeted(c)).collect();
-    fn go(eligible: &[ObjectId], now: &mut Vec<ObjectId>, out: &mut Vec<Vec<ObjectId>>) {
-        for &c in eligible {
-            if !now.contains(&c) {
-                now.push(c);
-                out.push(now.clone());
-                go(eligible, now, out);
-                now.pop();
+    cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| targeted(c)).collect()
+}
+
+/// `f` for each order of the `cards` that could be spliced (CR 702.47b: each once, in the order chosen), none first, walked
+/// one at a time so the search's budget bounds it: stops at the first answer that is not no.
+fn each_splice_order(cards: &[ObjectId], now: &mut Vec<ObjectId>, f: &mut dyn FnMut(&[ObjectId]) -> Found) -> Found {
+    let found = f(now);
+    if found != Found::No {
+        return found;
+    }
+    for &c in cards {
+        if !now.contains(&c) {
+            now.push(c);
+            let found = each_splice_order(cards, now, f);
+            now.pop();
+            if found != Found::No {
+                return found;
             }
         }
     }
-    go(&eligible, &mut Vec::new(), &mut out);
-    out
+    Found::No
 }
 
 /// Whether casting `def` of `asker.source` could be paid for at some legal announcement (CR 601.2b-c, 601.2f): its modes, X,
@@ -1464,7 +1632,8 @@ fn some_cast(
 ) -> bool {
     let (player, card) = (asker.controller, asker.source);
     let face = face_of(cx, card, def);
-    let splices = splice_orders(cx, player, card);
+    let splices = splice_cards(cx, player, card);
+    let named = named_by_changes(cx, a, card);
     let own = cx.cards().spell_targets_of(def);
     let open = prefix.is_none();
     // Promised to each opponent in the game, or not (CR 702.174a-b).
@@ -1474,7 +1643,7 @@ fn some_cast(
     }
     let paid: &[bool] = if def.optional_cost.is_some() { &[false, true] } else { &[false] };
     let mode_specs_all = def.modal.iter().flat_map(|m| m.modes.iter().flat_map(|mode| mode.targets.iter()));
-    let splice_specs = splices.iter().flatten().flat_map(|&c| cx.card(cx.s().obj(c).card).spell.map_or(&[][..], |s| s.targets).iter());
+    let splice_specs = splices.iter().flat_map(|&c| cx.card(cx.s().obj(c).card).spell.map_or(&[][..], |s| s.targets).iter());
     let mut bound = count_bound(cx, asker, own.iter().chain(mode_specs_all).chain(splice_specs));
     // A total divided that X sets (CR 601.2d): as many targets as there are candidates need a total that large.
     if let Some(divide) = def.divide.filter(|d| d.of_x.is_some() || d.total == TargetSpec::COUNTED)
@@ -1489,9 +1658,28 @@ fn some_cast(
         Some(_) => 0..=1,
         _ => 0..=0,
     };
-    // A kicker takes the X announced (CR 601.2b, `cast`); otherwise X from its least, up to what changes the targets.
+    // A kicker takes the X announced (CR 601.2b, `cast`); otherwise X from its least, up to what changes the targets. X is
+    // announced for the {X} of the cost, or for an additional cost that pays X life or sacrifices X permanents (CR 601.2b,
+    // 107.3), up to the life or permanents there are.
     let least = least_x(def.x_cant_be_zero);
-    let xs = if def.kicker.is_some() || x_symbols == 0 { 0..=0 } else if open { least..=bound.max(least) } else { least..=least };
+    let variable = def.additional_cost.and_then(|c| c.variable);
+    let x_life = def.additional_cost.is_some_and(|c| c.pay_x_life);
+    let x_sacrifices = matches!(variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeWithPowerX(_)));
+    let cap = if x_life {
+        payable_life(cx, player).clamp(0, 1000) as u32
+    } else if let Some(v @ VariableCost::SacrificeX(_)) = variable {
+        cantrip_state::count_u32(variable_candidates(cx, card, player, v).len())
+    } else {
+        u32::from(u16::MAX)
+    };
+    let most = u16::try_from(u32::from(bound.max(least)).min(cap)).unwrap_or(u16::MAX).max(least);
+    let xs = if def.kicker.is_some() || (x_symbols == 0 && !x_life && !x_sacrifices) {
+        0..=0
+    } else if open {
+        least..=most
+    } else {
+        least..=least
+    };
     for &paid in paid {
         for kicks in kicks.clone() {
             for x in xs.clone() {
@@ -1516,7 +1704,9 @@ fn some_cast(
                 for &gift in &gifts {
                     obj.gift = gift;
                     let view = Announcing { q: cx, spell: card, obj };
-                    let key = |targets: &[Target]| deltas_as(cx, &a.changers, player, Costed::Spell(card), face, targets, Some(&obj));
+                    let key = |targets: &[Target], watching: &Watching| {
+                        deltas_watched(cx, &a.changers, player, Costed::Spell(card), face, targets, Some(&obj), Some(watching))
+                    };
                     for &mask in &masks {
                         let mine: Vec<TargetSpec> = match (prefix, def.modal, def.divide) {
                             (Some(_), _, _) => Vec::new(),
@@ -1532,7 +1722,7 @@ fn some_cast(
                             }
                             (None, None, None) => own.to_vec(),
                         };
-                        for order in &splices {
+                        let found = each_splice_order(&splices, &mut Vec::new(), &mut |order| {
                             let mut segments = vec![mine.clone()];
                             let mut splice = ManaCost::ZERO;
                             for &c in order {
@@ -1541,7 +1731,7 @@ fn some_cast(
                                 splice = add_cost(splice, spliced.splice.unwrap_or(ManaCost::ZERO));
                             }
                             let earlier = Earlier { modes: mask, x, kicks, paid, splice, spell: Some(obj) };
-                            let found = some_announcement(
+                            some_announcement(
                                 &view,
                                 cx,
                                 asker,
@@ -1549,12 +1739,13 @@ fn some_cast(
                                 &segments,
                                 (counted, kicked, gift.is_some()),
                                 budget,
+                                &named,
                                 &key,
                                 &mut |t| covered(t, &earlier),
-                            );
-                            if found != Found::No || *budget == 0 {
-                                return true;
-                            }
+                            )
+                        });
+                        if found != Found::No || *budget == 0 {
+                            return true;
                         }
                     }
                 }
@@ -1577,7 +1768,10 @@ fn some_activation(
     covered: &dyn Fn(ManaCost, &[Target]) -> bool,
 ) -> bool {
     let (player, id) = (asker.controller, asker.source);
-    let key = |targets: &[Target]| deltas(cx, &a.changers, player, Costed::Ability(id, ability), None, targets);
+    let key = |targets: &[Target], watching: &Watching| {
+        deltas_watched(cx, &a.changers, player, Costed::Ability(id, ability), None, targets, None, Some(watching))
+    };
+    let named = named_by_changes(cx, a, id);
     let mode_specs_all = def.modal.iter().flat_map(|m| m.modes.iter().flat_map(|mode| mode.targets.iter()));
     let bound = count_bound(cx, asker, def.targets.iter().chain(mode_specs_all));
     let least = least_x(def.x_cant_be_zero);
@@ -1599,7 +1793,7 @@ fn some_activation(
                 Some(modal) => mode_specs(modal, mask),
                 None => def.targets.to_vec(),
             };
-            let found = some_announcement(cx, cx, asker, &[], &[specs], (u32::from(x), 0, false), &mut budget, &key, &mut |t| covered(owed, t));
+            let found = some_announcement(cx, cx, asker, &[], &[specs], (u32::from(x), 0, false), &mut budget, &named, &key, &mut |t| covered(owed, t));
             if found != Found::No || budget == 0 {
                 return true;
             }
@@ -1628,7 +1822,7 @@ fn offer_costed(
     }
     // A kicker, an optional cost or a splice announced after the target announced with the cast (CR 601.2b-c) may change
     // what a change reads ("if this spell was kicked") or bring targets of its own.
-    let announces = def.kicker.is_some() || def.optional_cost.is_some() || splice_orders(cx, asker.controller, asker.source).len() > 1;
+    let announces = def.kicker.is_some() || def.optional_cost.is_some() || !splice_cards(cx, asker.controller, asker.source).is_empty();
     let mut budget = ANNOUNCEMENT_BUDGET;
     if targets_with_cast(cx.cards(), def) {
         if !offer_spell(cx, asker, def, option) {
@@ -2153,6 +2347,22 @@ fn deltas_as(
     targets: &[Target],
     announced: Option<&Obj>,
 ) -> (u32, ManaCost, u32, u8, u32) {
+    deltas_watched(cx, sources, player, costed, face, targets, announced, None)
+}
+
+/// `deltas_as`, the cost changes reading the game through `watching` where it is given (`Watch`): whether any of them told
+/// apart the objects it watches.
+#[allow(clippy::too_many_arguments)]
+fn deltas_watched(
+    cx: &Cx,
+    sources: &[ObjectId],
+    player: PlayerId,
+    costed: Costed,
+    face: Option<CardId>,
+    targets: &[Target],
+    announced: Option<&Obj>,
+    watching: Option<&Watching>,
+) -> (u32, ManaCost, u32, u8, u32) {
     let view;
     let as_face: &dyn Query = match (face, costed) {
         (Some(face), Costed::Spell(spell)) => {
@@ -2162,12 +2372,23 @@ fn deltas_as(
         _ => cx,
     };
     let patched;
-    let q: &dyn Query = match (announced, costed) {
+    let announced_q: &dyn Query = match (announced, costed) {
         (Some(obj), Costed::Spell(spell)) => {
             patched = Announcing { q: as_face, spell, obj: *obj };
             &patched
         }
         _ => as_face,
+    };
+    let watch;
+    let q: &dyn Query = match watching {
+        Some(w) => {
+            watch = Watch { q: announced_q, w, spell: match costed {
+                Costed::Spell(id) => Some(id),
+                _ => None,
+            } };
+            &watch
+        }
+        None => announced_q,
     };
     // The thing costed is its own source for the changes it carries itself (affinity, channel's reduction).
     let (id, ability) = match costed {

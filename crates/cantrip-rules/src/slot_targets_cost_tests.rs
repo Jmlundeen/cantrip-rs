@@ -293,9 +293,102 @@ static HIVE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "This spell costs {1} less to cast for each target you control."
+fn less_for_each_yours(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
+    let yours = targets.iter().filter(|&&t| matches!(t, Target::Object(id) if q.obj(id).controller == player)).count();
+    CostDelta::less(yours.min(255) as u8)
+}
+
+static ANY_CREATURES: [TargetSpec; 1] = [target(creature).between(0, TargetSpec::ANY_NUMBER)];
+
+/// {9} sorcery: "This spell costs {1} less to cast for each target you control. Any number of target creatures: you gain 3
+/// life."
+static BULK: CardDef = CardDef {
+    name: "Slot Test Bulk",
+    cost: ManaCost { generic: 9, ..ManaCost::ZERO },
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&ANY_CREATURES, gain_three),
+    own_cost_changes: &[less_for_each_yours],
+    ..CardDef::BLANK
+};
+
+/// Fireball's "This spell costs {1} more to cast for each target beyond the first."
+fn more_per_extra_target(_: &dyn Query, _: ObjectId, _: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta {
+    let chosen = targets.iter().filter(|t| **t != Target::None).count();
+    match costed {
+        Costed::Spell(_) => CostDelta::more(chosen.saturating_sub(1).min(255) as u8),
+        _ => CostDelta::NONE,
+    }
+}
+
+/// {1} sorcery: "This spell costs {1} more to cast for each target beyond the first. Any number of target creatures: you
+/// gain 3 life."
+static VOLLEY: CardDef = CardDef {
+    name: "Slot Test Volley",
+    cost: ManaCost { generic: 1, ..ManaCost::ZERO },
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&ANY_CREATURES, gain_three),
+    own_cost_changes: &[more_per_extra_target],
+    ..CardDef::BLANK
+};
+
+/// Two modes where the board allows it (as Flame of Anor's "if you control a Wizard"): here, while its caster controls a
+/// creature.
+fn two_with_a_creature(q: &dyn Query, asker: &Asker) -> u8 {
+    if q.state().battlefield().iter().any(|&id| q.obj(id).controller == asker.controller && q.chars(id).is(CardType::Creature)) { 2 } else { 1 }
+}
+
+/// "Choose one. (Two while you control a creature.) - Target player: you gain 3 life. / Target creature: you gain 3 life."
+static PAIRS_MODES: ModalDef = modes(&[
+    mode(gain_three, "Target player: you gain 3 life.").targets(&[target(player)]),
+    mode(gain_three, "Target creature: you gain 3 life.").targets(&[target(creature)]),
+]);
+
+/// {4} sorcery, modal, "This spell costs {4} less to cast if it has two or more targets."
+static PAIRS: CardDef = CardDef {
+    name: "Slot Test Pairs",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: Some(SpellDef::MODAL),
+    modal: Some(&PAIRS_MODES),
+    modes_up_to: Some(two_with_a_creature),
+    own_cost_changes: &[less_for_two],
+    ..CardDef::BLANK
+};
+
+static X_DIVIDED: [TargetSpec; 1] = [target(creature).between(1, TargetSpec::ANY_NUMBER)];
+
+/// {4} instant, Fire Covenant's shape: "As an additional cost to cast this spell, pay X life. This spell costs {3} less to
+/// cast if it targets a permanent you control. You gain 3 life, X divided as you choose among any number of target
+/// creatures."
+static COVENANT: CardDef = CardDef {
+    name: "Slot Test Covenant",
+    cost: FOUR,
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&X_DIVIDED, gain_three),
+    additional_cost: Some(Cost { pay_x_life: true, ..Cost::NONE }),
+    divide: Some(Divide { total: TargetSpec::COUNTED, of_x: None }),
+    own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+/// "{9}: Any number of target creatures: you gain 3 life. This ability costs {1} less to activate for each target you
+/// control."
+static GRID: CardDef = CardDef {
+    name: "Slot Test Grid",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(cost("{9}"), gain_three, "{9}: Any number of target creatures: you gain 3 life.").targets(&ANY_CREATURES)],
+    own_cost_changes: &[less_for_each_yours],
+    ..CardDef::BLANK
+};
+
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &TOWN, &PAIR, &SINGLE, &ENGINE, &CHOICE, &SWARM, &STRIKE, &DOUBLE, &PROMISE, &SPLIT, &RITE, &GRAFT, &SURGE, &WINGS, &WINGS_AURA, &DIAL, &HIVE])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &TOWN, &PAIR, &SINGLE, &ENGINE, &CHOICE, &SWARM, &STRIKE, &DOUBLE, &PROMISE, &SPLIT, &RITE, &GRAFT, &SURGE, &WINGS, &WINGS_AURA, &DIAL, &HIVE, &BULK, &VOLLEY, &PAIRS, &COVENANT, &GRID])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -576,4 +669,61 @@ fn an_ability_of_x_targets_is_offered_for_the_x_whose_targets_make_it_affordable
     assert!(offered(&mut g, hive).is_some(), "X 1 at the controller's Bear costs {{1}} (CR 602.2b, 601.2b-c)");
     let (mut g, hive, _, _) = board(&HIVE, false);
     assert!(offered(&mut g, hive).is_none(), "X 0 costs {{3}}, and X 1 at the opponent's Bear {{4}}");
+}
+
+/// `n` more Bears of the opponent's.
+fn their_bears(g: &mut Game, n: usize) {
+    for _ in 0..n {
+        put(g, &BEAR, THEM, Zone::BATTLEFIELD);
+    }
+}
+
+#[test]
+fn past_the_budget_an_action_whose_targets_change_its_cost_is_offered() {
+    // Three of the opponent's creatures: every announcement is judged, and none costs less than {9}.
+    let (mut g, bulk, _, _) = board(&BULK, false);
+    their_bears(&mut g, 2);
+    assert!(offered(&mut g, bulk).is_none(), "every choice of the opponent's creatures costs {{9}}");
+    // Fifteen: more choices than the budget allows, each told apart by the change, so it is offered rather than withheld
+    // (KI-108), and choosing them takes the cast back at the payment (CR 601.2h, 733.1).
+    let (mut g, bulk, _, _) = board(&BULK, false);
+    their_bears(&mut g, 14);
+    assert!(offered(&mut g, bulk).is_some(), "past ANNOUNCEMENT_BUDGET the search answers that it might be paid for");
+    // The same for an ability (CR 602.2b).
+    let (mut g, grid, _, _) = board(&GRID, false);
+    their_bears(&mut g, 2);
+    assert!(offered(&mut g, grid).is_none(), "every choice of the opponent's creatures costs {{9}}");
+    let (mut g, grid, _, _) = board(&GRID, false);
+    their_bears(&mut g, 14);
+    assert!(offered(&mut g, grid).is_some(), "past ANNOUNCEMENT_BUDGET it is offered");
+}
+
+#[test]
+fn a_spell_that_counts_its_targets_is_judged_by_how_many_on_a_board_of_many() {
+    let (mut g, volley, _, _) = board(&VOLLEY, false);
+    their_bears(&mut g, 19);
+    g.state.update_player(YOU, |p| p.pool = Default::default());
+    assert!(offered(&mut g, volley).is_none(), "no mana: {{1}} at the least, whatever is chosen among twenty creatures");
+    add_mana(&mut g, 1);
+    assert!(offered(&mut g, volley).is_some(), "{{1}} casts it at one creature or none");
+}
+
+#[test]
+fn a_modal_spell_is_offered_for_the_modes_the_board_allows_beyond_its_printed_number() {
+    let (mut g, pairs, _, _) = board(&PAIRS, true);
+    g.state.update_player(YOU, |p| p.pool = Default::default());
+    assert!(offered(&mut g, pairs).is_some(), "both modes, two targets: {{0}} (CR 700.2, 601.2f)");
+    let mut g = game();
+    put(&mut g, &BEAR, THEM, Zone::BATTLEFIELD);
+    let pairs = put(&mut g, &PAIRS, YOU, Zone::hand(YOU));
+    add_mana(&mut g, 3);
+    assert!(offered(&mut g, pairs).is_none(), "no creature of the caster's: one mode, one target, {{4}}");
+}
+
+#[test]
+fn a_spell_whose_x_is_paid_in_life_is_offered_for_the_x_whose_targets_make_it_affordable() {
+    let (mut g, covenant, _, _) = board(&COVENANT, true);
+    assert!(offered(&mut g, covenant).is_some(), "X 1, paid in life, at the caster's Bear: {{1}} (CR 601.2b-d, 601.2f)");
+    let (mut g, covenant, _, _) = board(&COVENANT, false);
+    assert!(offered(&mut g, covenant).is_none(), "only the opponent's Bear: {{4}}");
 }
