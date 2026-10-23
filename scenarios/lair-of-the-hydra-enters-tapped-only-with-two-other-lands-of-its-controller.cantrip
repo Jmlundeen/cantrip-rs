@@ -1,0 +1,29 @@
+# Lair of the Hydra: "If you control two or more other lands, this land enters tapped" (CR 614.1c). On turn 3 Bot1 has one
+# other land (a Forest) and Bot2 has an Island, which does not count ("you control"): the first Lair enters untapped and
+# taps for {G}. On turn 5 Bot1 has two other lands (Forest, first Lair): the second Lair enters tapped.
+
+[Bot1 Deck]
+Forest
+Lair of the Hydra
+Lair of the Hydra
+Forest x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Lair of the Hydra.Play
+? Bot1.Battlefield.Lair of the Hydra.Tapped = false
+Bot1.Battlefield.Lair of the Hydra.Activate(Ability: Add)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Hand.Lair of the Hydra.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Lair of the Hydra#1.Tapped = false
+Bot1.Battlefield.Lair of the Hydra#2.Tapped = true

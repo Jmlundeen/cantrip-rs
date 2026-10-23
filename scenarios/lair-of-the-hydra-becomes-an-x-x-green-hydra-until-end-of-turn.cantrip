@@ -1,0 +1,36 @@
+# Lair of the Hydra animated with X = 2 on turn 3 (paid {2}{G} with three Moxen): until end of turn a 2/2 green Hydra
+# land creature (CR 613.1d, 613.4b, 107.3a), and on turn 4 it is a plain colorless land again (CR 514.2).
+
+[Bot1 Deck]
+Lair of the Hydra
+Mox Emerald
+Mox Ruby
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lair of the Hydra.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Lair of the Hydra.Activate(Ability: Until end of turn; X: 2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Lair of the Hydra.Types = Land; Creature
+? Bot1.Battlefield.Lair of the Hydra.Subtypes = Hydra
+? Bot1.Battlefield.Lair of the Hydra.Colors = Green
+? Bot1.Battlefield.Lair of the Hydra.Power = 2
+? Bot1.Battlefield.Lair of the Hydra.Toughness = 2
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Lair of the Hydra.Types = Land
+Bot1.Battlefield.Lair of the Hydra.Colors = (absent)
+Bot1.Battlefield.Lair of the Hydra.Power = (absent)

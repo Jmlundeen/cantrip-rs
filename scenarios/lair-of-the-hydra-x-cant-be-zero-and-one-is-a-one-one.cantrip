@@ -1,0 +1,31 @@
+# Lair of the Hydra: with only its own {G} to pay with the ability is not offered, since X can't be 0 and it can't be
+# paid at X = 1. With two Moxen as well, X = 0 is refused and X = 1 makes a 1/1.
+
+[Bot1 Deck]
+Lair of the Hydra
+Mox Emerald
+Mox Ruby
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lair of the Hydra.Play
+[T1 Bot1.Main1]
+! Bot1.Battlefield.Lair of the Hydra.Activate(Ability: Until end of turn)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Lair of the Hydra.Activate(Ability: Until end of turn; X: 1)
+! Bot1.Battlefield.Lair of the Hydra.Activate(Ability: Until end of turn; X: 0)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Lair of the Hydra.Power = 1
+? Bot1.Battlefield.Lair of the Hydra.Toughness = 1
+
+[Expect]
+Bot1.Battlefield.Lair of the Hydra.Types = Land; Creature
