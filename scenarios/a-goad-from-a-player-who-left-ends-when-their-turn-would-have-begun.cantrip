@@ -1,0 +1,65 @@
+# CR 800.4m: when a player leaves the game, an effect lasting "until that player's next turn" lasts until that turn would
+# have begun - neither ending as they leave nor lasting forever. In a game of three, Bot2 takes the initiative with White
+# Plume Adventurer, ventures to the Arena on turn 8 and goads Bot1's Llanowar Elves until Bot2's next turn (CR 701.15a).
+# Bot3's Lightning Bolt takes Bot2, at 1 life, out of the game on turn 9. On turn 10 the Elves are still goaded: declaring
+# no attack is refused, and they attack Bot3. Turn 11 would have been Bot2's; it doesn't begin (CR 800.4k), and the goad ends
+# then, so on turn 12 Bot1 may declare no attack.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Plains
+Black Lotus
+White Plume Adventurer
+Island
+Plains x20
+
+[Bot3 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Life]
+Bot2: 1
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.White Plume Adventurer.Cast
+Bot2.Search(Plains)
+[T3 Bot3.Main1]
+Bot3.Hand.Mountain.Play
+[T5 Bot2.Upkeep]
+Bot2.Modes(Forge)
+Bot2.Target(White Plume Adventurer)
+[T8 Bot2.Upkeep]
+Bot2.Modes(Arena)
+Bot2.Target(Llanowar Elves)
+[T9 Bot3.Main1]
+Bot3.Battlefield.Mountain.Activate
+Bot3.Hand.Lightning Bolt.Cast(Bot2)
+[T10 Bot1.DeclareAttackers]
+? Bot2.Status = Lost
+? Bot1.Battlefield.Llanowar Elves.GoadedBy = Bot2
+! Bot1.Attack()
+Bot1.Attack(Llanowar Elves > Bot3)
+[T12 Bot1.DeclareAttackers]
+Bot1.Attack()
+[T12 Bot1.Main2]
+
+[Expect]
+Turn = 12
+ActivePlayer = Bot1
+Bot3.Life = 19
+Bot1.Battlefield.Llanowar Elves.Tapped = false

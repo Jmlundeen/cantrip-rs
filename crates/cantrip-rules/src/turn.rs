@@ -127,6 +127,8 @@ fn next_turn_taker(s: &mut GameState, after: PlayerId) -> PlayerId {
             taker = Some(t);
             break;
         }
+        // The extra turn of a player who has left would have begun now (CR 800.4k-m).
+        turn_would_have_begun(s, t.player);
     }
     if queue.len() != s.extra_turns.len() {
         s.set_extra_turns(queue);
@@ -145,7 +147,15 @@ fn next_turn_taker(s: &mut GameState, after: PlayerId) -> PlayerId {
             if rotation.is_some() {
                 s.update_turn(|t| t.rotation = None);
             }
-            (next_in_game(s, rotation.unwrap_or(after)), 0)
+            let from = rotation.unwrap_or(after);
+            let next = next_in_game(s, from);
+            // Each player passed over has left: their turn would have begun now (CR 800.4k-m).
+            let mut skipped = s.next_player(from);
+            while skipped != next && skipped != from {
+                turn_would_have_begun(s, skipped);
+                skipped = s.next_player(skipped);
+            }
+            (next, 0)
         }
     };
     if s.turn.extra != extra {
@@ -167,6 +177,22 @@ fn next_turn_taker(s: &mut GameState, after: PlayerId) -> PlayerId {
         }
     }
     player
+}
+
+/// A player who has left the game would have begun a turn now, which doesn't begin (CR 800.4k): the effects that last until
+/// their next turn - "until your next turn", and the delayed abilities that last as long - end now, as they would have as
+/// it began (CR 800.4m: they neither expire as the player leaves nor last forever). Goad from a player who has left
+/// ("until your next turn", CR 701.15a) ends here, as do Sparas Adjudicators' "can't attack or block until its controller's
+/// next turn".
+fn turn_would_have_begun(s: &mut GameState, p: PlayerId) {
+    if s.effects.iter().any(|e| e.duration == Duration::UntilNextTurnOf(p)) {
+        s.effects_retain(|e| e.duration != Duration::UntilNextTurnOf(p));
+    }
+    for at in (0..s.delayed.len()).rev() {
+        if s.delayed[at].when == DelayedWhen::UntilNextTurnOf(p) {
+            s.delayed_remove(at);
+        }
+    }
 }
 
 /// The start of the game (CR 103): who goes first, the opening hands, mulligans.
