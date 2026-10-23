@@ -3,8 +3,8 @@
 //! activation cost. A flag a card can forget is a rules deviation waiting to happen, so this test holds the flags to the
 //! card's Oracle text (`CardDef::text`, generated from its JSON), line by line, reminder text left out:
 //!
-//! - a line that is the sentence alone ("X can't be 0.") governs the X of the spell's mana cost: the card's own flag, and
-//!   its mana cost has an {X};
+//! - a spell's line ("X can't be 0.", Mind Grind's "... revealed this way into their graveyard. X can't be 0.") governs
+//!   the X of its mana cost, where the mana cost has an {X}: the card's own flag;
 //! - "Kicker {X}. X can't be 0." governs the kicker's X: the card's own flag, and its kicker has an {X};
 //! - an activated ability's line ("{X}{G}: ... X can't be 0.") governs that ability's X: the ability whose text says it
 //!   has the flag, and its activation cost has an {X} in mana;
@@ -51,18 +51,19 @@ fn lines(text: &str) -> Vec<String> {
         .collect()
 }
 
-fn governs(line: &str) -> Governs {
-    if line == "x can't be 0." {
-        Governs::ManaCost
-    } else if line == "kicker {x}. x can't be 0." {
-        Governs::Kicker
-    } else if line.starts_with('\u{2022}') || line.starts_with("suspend") || line.contains("this way") {
-        Governs::Uncovered
-    } else if line.find(": ").is_some_and(|colon| line[..colon].contains("{x}") && !line[..colon].contains('"')) {
-        Governs::Ability
-    } else {
-        Governs::Uncovered
+/// What X `line` governs, for a card whose mana cost has an {X} or not (`mana_x`).
+fn governs(line: &str, mana_x: bool) -> Governs {
+    if line.starts_with("kicker {x}") {
+        return Governs::Kicker;
     }
+    if line.starts_with('\u{2022}') || line.starts_with("suspend") || line.contains("if you cast this spell this way") {
+        return Governs::Uncovered;
+    }
+    // An activated ability's line: its cost before ": " (not a quoted ability another object gets).
+    if let Some(colon) = line.find(": ").filter(|&colon| !line[..colon].contains('"')) {
+        return if line[..colon].contains("{x}") { Governs::Ability } else { Governs::Uncovered };
+    }
+    if mana_x { Governs::ManaCost } else { Governs::Uncovered }
 }
 
 #[test]
@@ -72,7 +73,7 @@ fn x_cant_be_zero_is_declared_exactly_where_the_oracle_text_says_it() {
     let mut said = 0;
     for card in table.cards.iter() {
         let says: Vec<(String, Governs)> = lines(card.text).into_iter().filter(|l| l.contains(WORDS)).map(|l| {
-            let g = governs(&l);
+            let g = governs(&l, card.cost.x > 0);
             (l, g)
         }).collect();
         said += says.len();
@@ -85,9 +86,6 @@ fn x_cant_be_zero_is_declared_exactly_where_the_oracle_text_says_it() {
         let kicker = says.iter().any(|(_, g)| *g == Governs::Kicker);
         if card.x_cant_be_zero != (spell || kicker) {
             wrong.push(format!("{}: CardDef::x_cant_be_zero is {}, the Oracle text {}", card.name, card.x_cant_be_zero, if spell || kicker { "says it" } else { "doesn't" }));
-        }
-        if spell && card.cost.x == 0 {
-            wrong.push(format!("{}: \"X can't be 0\" with no {{X}} in its mana cost", card.name));
         }
         if kicker && !card.kicker.is_some_and(|k| k.cost.x > 0) {
             wrong.push(format!("{}: \"Kicker {{X}}. X can't be 0.\" with no kicker {{X}}", card.name));
@@ -117,16 +115,21 @@ fn x_cant_be_zero_is_declared_exactly_where_the_oracle_text_says_it() {
 
 #[test]
 fn each_x_cant_be_zero_line_is_read_as_the_x_it_governs() {
-    for (line, governs_x) in [
-        ("X can't be 0.", Governs::ManaCost),
-        ("Kicker {X}. X can't be 0. (You may pay an additional {X} as you cast this spell.)", Governs::Kicker),
-        ("{X}{G}: Until end of turn, this land becomes an X/X green Hydra creature. It's still a land. X can't be 0.", Governs::Ability),
-        ("{X}, {T}: Target opponent mills a card, then repeats this process. X can't be 0.", Governs::Ability),
-        ("\u{2022} Put X +1/+1 counters on target creature. X can't be 0.", Governs::Uncovered),
-        ("Suspend X\u{2014}{X}{W}{W}. X can't be 0.", Governs::Uncovered),
-        ("Flashback\u{2014}{3}{R}, Remove X loyalty counters from among planeswalkers you control. If you cast this spell this way, X can't be 0.", Governs::Uncovered),
-        ("{2}{B}, Sacrifice X artifacts: Return target creature card with power X or less from your graveyard to the battlefield. X can't be 0.", Governs::Uncovered),
+    for (line, mana_x, governs_x) in [
+        ("X can't be 0.", true, Governs::ManaCost),
+        // Mind Grind.
+        ("Each opponent reveals cards from the top of their library until they reveal X land cards, then puts all cards revealed this way into their graveyard. X can't be 0.", true, Governs::ManaCost),
+        ("Kicker {X}. X can't be 0. (You may pay an additional {X} as you cast this spell.)", false, Governs::Kicker),
+        ("{X}{G}: Until end of turn, this land becomes an X/X green Hydra creature. It's still a land. X can't be 0.", false, Governs::Ability),
+        // Helm of Obedience.
+        ("{X}, {T}: Target opponent mills a card, then repeats this process until a creature card or X cards have been put into their graveyard this way, whichever comes first. If one or more creature cards were put into that graveyard this way, sacrifice this artifact and put one of them onto the battlefield under your control. X can't be 0.", false, Governs::Ability),
+        ("Waterbend {X}: Creatures you control have base power and toughness X/X until end of turn. X can't be 0. Activate only during your turn.", false, Governs::Ability),
+        ("\u{2022} Put X +1/+1 counters on target creature. X can't be 0.", false, Governs::Uncovered),
+        ("Suspend X\u{2014}{X}{W}{W}. X can't be 0.", false, Governs::Uncovered),
+        ("Flashback\u{2014}{3}{R}, Remove X loyalty counters from among planeswalkers you control. If you cast this spell this way, X can't be 0.", true, Governs::Uncovered),
+        ("{2}{B}, Sacrifice X artifacts: Return target creature card with power X or less from your graveyard to the battlefield. X can't be 0.", false, Governs::Uncovered),
+        ("Draw X cards. X can't be 0.", false, Governs::Uncovered),
     ] {
-        assert_eq!(governs(&lines(line)[0]), governs_x, "{line}");
+        assert_eq!(governs(&lines(line)[0], mana_x), governs_x, "{line}");
     }
 }
