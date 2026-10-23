@@ -106,6 +106,19 @@ if defined BUILD (
   if errorlevel 1 set "BUILDFAILED=1"
 )
 
+rem The .NET tests that play a table spawn the cantrip-native-host the cards profile last built, which nothing above
+rem builds: a stale one plays without a card added since (a browser scenario's table then publishes nothing).
+if defined BUILD if not defined BUILDFAILED (
+  pushd "%ROOT%"
+  if defined DETAILED (
+    cargo build --profile cards -p cantrip-host --quiet
+  ) else (
+    cargo build --profile cards -p cantrip-host --quiet >> "%LOG%-build.txt" 2>&1
+  )
+  if errorlevel 1 set "BUILDFAILED=1"
+  popd
+)
+
 if defined BUILDFAILED (
   set "RESULT=1"
   goto report
