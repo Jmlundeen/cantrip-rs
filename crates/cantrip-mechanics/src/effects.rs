@@ -341,14 +341,25 @@ pub fn each_opponent_loses_1_life(g: &mut dyn Game, item: &StackItem) -> Result<
     Ok(())
 }
 
-/// "Target player loses 1 life and you gain 1 life" (CR 119.3), and "target opponent ...": the first target, a player, whichever
-/// its slot allows; with it gone the ability does not resolve (CR 608.2b), so nothing is gained. Blood Artist prints it of a
-/// player; Blood Hustler and Down, Down to Goblin-town of an opponent.
-pub fn target_player_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(player) = item.target(0) else { return Ok(()) };
-    g.lose_life(player, 1);
-    g.gain_life(item.controller, 1);
+/// "Target player loses `n` life and you gain `n` life" (CR 119.3), and "target opponent ...": the first target, a player,
+/// whichever its slot allows. A target no longer legal loses nothing (CR 608.2b), while the gain, which does not use it, is
+/// still made when the resolution goes on without it (a mode of a modal spell whose other target is legal); an ability with that
+/// target alone never resolves. Collective Brutality and Witherbloom Command print it with 2 of a target opponent, and
+/// `target_player_loses_1_life_you_gain_1` of 1.
+pub fn target_player_loses_life_you_gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspend> {
+    if g.target_legal(item, 0)
+        && let Target::Player(player) = item.target(0)
+    {
+        g.lose_life(player, n);
+    }
+    g.gain_life(item.controller, n);
     Ok(())
+}
+
+/// "Target player loses 1 life and you gain 1 life" (CR 119.3), and "target opponent ...": `target_player_loses_life_you_gain_life`
+/// of 1. Blood Artist prints it of a player; Blood Hustler and Down, Down to Goblin-town of an opponent.
+pub fn target_player_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    target_player_loses_life_you_gain_life(g, item, 1)
 }
 
 /// "[This source] deals `n` damage to each opponent" (CR 120.3, 102.2): one damage event for each opponent still in the game,

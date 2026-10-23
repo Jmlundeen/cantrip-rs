@@ -14,22 +14,13 @@ fn strip(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Target opponent loses 2 life and you gain 2 life.
-fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(opponent) = targets::player(g, item, 0) {
-        g.lose_life(opponent, 2);
-    }
-    g.gain_life(item.controller, 2);
-    Ok(())
-}
-
 /// Escalate (CR 702.120): discard a card for each mode chosen beyond the first.
 const MODES: &[ModeDef] = &[
     mode(strip, "Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.")
         .targets(&[targets::OPPONENT]),
     mode(effects::target_creature_gets::<-2, -2>, "Target creature gets -2/-2 until end of turn.")
         .targets(&[targets::CREATURE]),
-    mode(drain, "Target opponent loses 2 life and you gain 2 life.")
+    mode(|g, item| effects::target_player_loses_life_you_gain_life(g, item, 2), "Target opponent loses 2 life and you gain 2 life.")
         .targets(&[targets::OPPONENT]),
 ];
 
