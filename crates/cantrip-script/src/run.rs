@@ -506,6 +506,7 @@ impl<'s> Run<'s> {
             // before their next priority (a bare Block: no block is possible, so the declaration is never asked for).
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
                 && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::Colors | ScriptVerb::Name) && action.positional().next().is_some())
+                    && !(matches!(action.verb, ScriptVerb::Choose) && action.text.contains('('))
                     && !(matches!(action.verb, ScriptVerb::Arrange) && !action.raw_arguments.trim().is_empty()))
                     || (matches!(action.verb, ScriptVerb::Target | ScriptVerb::Modes | ScriptVerb::Block)
                         && action.positional().next().is_none()
@@ -1713,6 +1714,10 @@ impl<'s> Run<'s> {
                         }
                         return Ok(());
                     }
+                }
+                // `! Bot1.Choose()`: choosing nothing is an answer the question must refuse (a mandatory "put a land card").
+                if matches!(request.kind, RequestKind::ChooseCards { .. }) && action.positional().next().is_none() && check_answer(&self.game, request, &Answer::Cards(Vec::new())).is_ok() {
+                    return fail(format!("line {line} says {text} must not be an answer the question accepts, but it is"));
                 }
                 for spec in action.positional() {
                     if self.objects(action, spec.trim(), &everything)?.is_empty() {
