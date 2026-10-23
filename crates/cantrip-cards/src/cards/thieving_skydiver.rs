@@ -25,7 +25,9 @@ fn take_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
+    // "Kicker {X}. X can't be 0." (CR 107.3a): announcing 0 is not kicking it, so a kicked one has X 1 or more.
     kicker: kicker(mana("{X}")),
+    x_cant_be_zero: true,
     abilities: &[triggered(THIS_ENTERS, take_and_attach, "When this creature enters, if it was kicked, gain control of target artifact with mana value X or less. If that artifact is an Equipment, attach it to this creature.")
         .targets(&[target(artifact_with_value_at_most_x)])
         .condition(was_kicked)],
