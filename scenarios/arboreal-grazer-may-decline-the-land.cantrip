@@ -1,0 +1,26 @@
+# Arboreal Grazer, "you may": with a land card in hand (a Plains) Bot1 is asked and chooses none; the Plains stays in hand.
+
+[Bot1 Deck]
+Forest
+Arboreal Grazer
+Plains
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Arboreal Grazer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Arboreal Grazer; Forest
+Bot1.Hand = Forest; Lightning Bolt; Lightning Bolt; Lightning Bolt; Plains

@@ -1,0 +1,36 @@
+# Arboreal Grazer: "you may put a land card from your hand onto the battlefield tapped." Bot1 plays its Forest for the turn, taps
+# it for the Grazer; the hand holds an Island, a Plains and a Lightning Bolt. Bot1 chooses the Island: it enters tapped, the
+# Plains stays, the Bolt (not a land card) is refused, and the land drop was already used - putting it is not playing it
+# (CR 305.2), LandsPlayed stays 1. Reach is shown on the permanent. Forest cost {G} is checked exactly.
+
+[Bot1 Deck]
+Forest
+Arboreal Grazer
+Island
+Plains
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Arboreal Grazer.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Island)
+? Bot1.Battlefield.Island.Tapped = true
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Arboreal Grazer; Forest; Island
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Arboreal Grazer.Keywords = Reach
+Bot1.Hand = Lightning Bolt; Lightning Bolt; Lightning Bolt; Plains
+Bot1.LandsPlayed = 1
