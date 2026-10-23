@@ -121,7 +121,8 @@ pub struct EntersAs {
     pub aura: bool,
     /// "and it loses all other abilities" (CR 613.1f): every ability it had, before it gains the ones below.
     pub loses_other_abilities: bool,
-    /// The abilities it gains (CR 613.1f): indexes in its effect's card's `delayed` list (`EffectKind::AddAbility`).
+    /// The abilities it gains (CR 613.1f): indexes in its effect's card's `delayed` list (`EffectKind::AddAbility`). An index
+    /// past that list names no ability and gives none.
     pub abilities: &'static [u8],
 }
 

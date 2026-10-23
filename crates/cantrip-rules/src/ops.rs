@@ -1123,7 +1123,11 @@ fn enter_as(cx: &mut Cx, id: ObjectId, b: Becomes) {
     if b.what.aura && cx.card(b.card).becomes_aura_enchant.is_some() {
         kinds.push(EffectKind::Enchant(b.card));
     }
-    kinds.extend(b.what.abilities.iter().map(|&i| EffectKind::AddAbility(AbilityRef::delayed(b.card, i))));
+    // Only abilities its card lists: an index past its `delayed` list names no ability, and gives none.
+    let listed = cx.card(b.card).delayed.len();
+    kinds.extend(
+        b.what.abilities.iter().filter(|&&i| usize::from(i) < listed).map(|&i| EffectKind::AddAbility(AbilityRef::delayed(b.card, i))),
+    );
     for kind in kinds {
         let timestamp = cx.st().timestamp();
         cx.st().effect_push(cantrip_state::ContinuousEffect {

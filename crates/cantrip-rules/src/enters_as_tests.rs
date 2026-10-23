@@ -108,6 +108,9 @@ static CURSE: CardDef = CardDef {
 /// "It's an Aura enchantment" with the enchant ability of the effect's card and no other ability.
 static AS_BARE_AURA: EntersAs = EntersAs { aura: true, ..EntersAs::NONE };
 
+/// An Aura enchantment that names an ability its card does not list.
+static AS_AURA_NAMING_TOO_MUCH: EntersAs = EntersAs { aura: true, abilities: &[3], ..EntersAs::NONE };
+
 static AS_ENCHANTMENT: EntersAs = EntersAs { types: Some(TypeSet::of(&[CardType::Enchantment])), ..EntersAs::NONE };
 
 static AS_AURA: EntersAs = EntersAs { aura: true, abilities: &[0], ..EntersAs::NONE };
@@ -355,4 +358,22 @@ fn an_aura_with_no_enchant_ability_may_enchant_anything() {
     assert!(!chars.abilities().any(|a| a.is_enchant()), "Bear gives no enchant ability");
     let hosts = crate::attach::aura_hosts(&c, card, &chars, YOU, &[card]);
     assert_eq!(hosts, vec![Target::Object(forest), Target::Object(theirs), Target::Player(YOU), Target::Player(THEM)]);
+}
+
+/// An `EntersAs` naming a `delayed` ability its card does not list gives nothing for it, and the card still enters as the
+/// rest says: no effect is made for an ability that does not exist.
+#[test]
+fn an_ability_its_card_does_not_list_is_not_given() {
+    let mut g = game();
+    let forest = put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
+    let source = put(&mut g, &TWO_ENCHANTS, YOU, Zone::graveyard(YOU));
+    let card = put(&mut g, &BEAR, YOU, Zone::graveyard(YOU));
+    let ability = AbilityRef { card: g.cards.id_of(&TWO_ENCHANTS), index: 0 };
+    let item = crate::actions::stack_item(StackKind::Triggered, source, ability, YOU, &[]);
+    let aura =
+        cantrip_api::Game::put_onto_battlefield_as(&mut cx(&mut g), card, YOU, &item, &AS_AURA_NAMING_TOO_MUCH).expect("one host").expect("it entered");
+    assert_eq!(g.state.obj(aura).attached_to, Some(forest));
+    assert!(!g.state.effects.iter().any(|e| matches!(e.kind, EffectKind::AddAbility(_))));
+    let chars = cx(&mut g).chars(aura);
+    assert!(chars.has_subtype(Subtype::Aura));
 }
