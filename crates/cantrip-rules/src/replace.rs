@@ -33,7 +33,7 @@ pub(crate) enum Origin {
     /// A prevention effect a spell or ability made (CR 611.2, 615, `EffectKind::Prevention`), named by that effect's
     /// timestamp: one of its source card's `granted_preventions`.
     GrantedPrevention(u32),
-    /// "Each land played this way enters tapped" (CR 305.1, 614.1c, `PlayGrant::enters_tapped`): the replacement the effect
+    /// "Each land played this way enters tapped" (CR 305.1, 614.1d, `PlayGrant::enters_tapped`): the replacement the effect
     /// that gave a permission to play the land made, of the land played by it.
     PlayedTapped,
 }
@@ -58,7 +58,7 @@ const PROTECTION_HINT: &str = "protection prevents the damage";
 /// What a permission's "enters tapped" says it does, for the player who orders it with others (CR 616.1).
 const PLAYED_TAPPED_HINT: &str = "a land played this way enters tapped";
 
-/// "Each land played this way enters tapped" (CR 305.1, 614.1c): a land played by a permission that says so, entering
+/// "Each land played this way enters tapped" (CR 305.1, 614.1d): a land played by a permission that says so, entering
 /// untapped as the proposal stands. Judged before the land moves, while it is still where it was played from and the
 /// permission is there to read: the land play keeps only the permission it was made by (`actions::act`).
 fn played_tapped_applies(cx: &Cx, z: &ZoneChange) -> bool {
@@ -307,7 +307,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
     {
         found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::Madness });
     }
-    // A permission's "each land played this way enters tapped" (CR 614.1c), ordered with the rest (CR 616.1): it is of the
+    // A permission's "each land played this way enters tapped" (CR 614.1d), ordered with the rest (CR 616.1): it is of the
     // land itself, which is what the player ordering them is shown.
     if let Proposal::ZoneChange(z) = proposal
         && !applied.contains(&(z.object, 0, Origin::PlayedTapped))
@@ -487,7 +487,7 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                     z.madness = true;
                 }
             }
-            // CR 614.1c: it enters tapped.
+            // CR 614.1d: it enters tapped.
             Origin::PlayedTapped => {
                 if let Proposal::ZoneChange(z) = proposal {
                     z.tapped = true;

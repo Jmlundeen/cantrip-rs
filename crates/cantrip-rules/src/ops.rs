@@ -1489,7 +1489,7 @@ fn create_tokens_onto(
             }
         }
         // A token enters the battlefield as it is created (CR 111.1): the replacements of a permanent's entry apply to it
-        // as to any other's (CR 614.1c), "enters tapped" and the counters one gives as it arrives.
+        // as to any other's (CR 614.1c-d), "enters tapped" and the counters one gives as it arrives.
         let proposed = ZoneChange {
             object: id,
             from: if spell.is_some() { Zone::STACK } else { Zone::GONE },

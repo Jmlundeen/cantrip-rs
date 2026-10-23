@@ -73,7 +73,7 @@ static HUMBLE: CardDef = CardDef {
 };
 static GROWN: CardDef = CardDef { name: "Judged Grown", statics: &[], ..HUMBLE };
 
-/// "This creature enters tapped", a replacement of its own that functions from every zone (CR 113.6b, 614.1c).
+/// "This creature enters tapped", a replacement of its own that functions from every zone (CR 113.6b, 614.1d).
 fn this_enters(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z) if z.object == asker.source && z.to.is(ZoneKind::Battlefield))
 }
