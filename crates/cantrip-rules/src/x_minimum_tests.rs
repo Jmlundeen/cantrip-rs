@@ -45,6 +45,19 @@ static GRIND: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A {X}{U} sorcery that may be cast for {X}{R} instead, a way of its own whose {X} is announced (CR 118.9, 107.3a): with no
+/// word on X, and with "X can't be 0".
+static SPLASH: CardDef = CardDef {
+    name: "X Test Splash",
+    cost: mana("{X}{U}"),
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&[], nothing),
+    ways: &[way(of_mana(mana("{X}{R}")), ZoneKind::Hand, "You may pay {X}{R} rather than pay this spell's mana cost.")],
+    ..CardDef::BLANK
+};
+
+static SURGE: CardDef = CardDef { name: "X Test Surge", x_cant_be_zero: true, ..SPLASH };
+
 /// The same sorcery with no word on X.
 static SIFT: CardDef = CardDef {
     name: "X Test Sift",
@@ -125,7 +138,7 @@ static SIFT_CASTER: CardDef = CardDef { name: "X Test Sift Caster", types: TypeS
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
     let table: &'static CardTable = Box::leak(Box::new(CardTable::new([
-        &FILLER, &LAIR, &DEN, &GRIND, &SIFT, &SMITH, &CHAINER, &BINDER, &BEAR, &FREE_CASTER, &GRIND_CASTER, &SIFT_CASTER,
+        &FILLER, &LAIR, &DEN, &GRIND, &SIFT, &SPLASH, &SURGE, &SMITH, &CHAINER, &BINDER, &BEAR, &FREE_CASTER, &GRIND_CASTER, &SIFT_CASTER,
     ])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
@@ -324,4 +337,45 @@ fn a_cast_as_an_effect_resolves_offers_no_cost_with_no_x_for_an_x_that_cant_be_0
     add_mana(&mut g, &[Mana::U, Mana::C]);
     let r = resolve(&mut g, &GRIND_CASTER);
     assert!(matches!(r.kind, RequestKind::PayCosts { announcing: true, x: 1, least: 1, .. }), "expected X announced from 1, got {:?}", r.kind);
+}
+
+/// Casts `card` the way numbered `way` and gives back the question that follows.
+fn cast_way(g: &mut Game, card: ObjectId, way: u8) -> Request {
+    let r = next(g);
+    let RequestKind::Priority { options } = &r.kind else { panic!("expected priority, got {:?}", r.kind) };
+    let option = options.iter().find(|o| o.source == Some(card) && o.index == way).expect("that way is offered").clone();
+    g.answer(r.id, r.player, Answer::Act(Action::of(&option))).expect("a legal answer");
+    next(g)
+}
+
+#[test]
+fn an_alternative_cost_of_the_cards_own_with_x_announces_x() {
+    // No word on X: {R} pays its {X}{R} way with X 0, and X is announced, from 0.
+    let mut g = game();
+    let splash = put(&mut g, &SPLASH, Zone::hand(YOU));
+    add_mana(&mut g, &[Mana::R, Mana::C, Mana::C]);
+    assert_eq!(offered(&mut g, splash), vec![1]);
+    let r = cast_way(&mut g, splash, 1);
+    let RequestKind::PayCosts { announcing: true, x: 0, least: 0, total, .. } = &r.kind else { panic!("expected X announced, got {:?}", r.kind) };
+    assert_eq!((total.x, total.symbols[Mana::R as usize]), (1, 1), "the way's {{X}}{{R}}");
+    g.answer(r.id, r.player, Answer::Announce(2)).expect("2 may be announced");
+    let r = next(&mut g);
+    if let RequestKind::PayCosts { options, .. } = &r.kind {
+        let confirm = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).expect("the pool pays it").clone();
+        g.answer(r.id, r.player, Answer::Act(Action::of(&confirm))).expect("a legal answer");
+        next(&mut g);
+    }
+    assert_eq!(g.state.stack.last().map(|i| i.x), Some(2), "X is 2 on the stack");
+    assert_eq!(g.state.player(YOU).pool.total(), 0, "{{2}}{{R}} paid");
+
+    // "X can't be 0": its {X}{R} way is a cost with an {X}, so it may be cast that way, with X from 1 - not for {R}.
+    let mut g = game();
+    let surge = put(&mut g, &SURGE, Zone::hand(YOU));
+    add_mana(&mut g, &[Mana::R]);
+    assert!(offered(&mut g, surge).is_empty(), "{{R}} pays X as 0 only");
+    add_mana(&mut g, &[Mana::C]);
+    assert_eq!(offered(&mut g, surge), vec![1]);
+    let r = cast_way(&mut g, surge, 1);
+    assert!(matches!(r.kind, RequestKind::PayCosts { announcing: true, x: 1, least: 1, .. }), "expected X announced from 1, got {:?}", r.kind);
+    assert!(g.answer(r.id, r.player, Answer::Announce(0)).is_err());
 }

@@ -5132,6 +5132,9 @@ fn cast(
     // The {X} a granted way's cost has: the card's, where the cost is or includes its mana cost; none where it is cast
     // without paying its mana cost (CR 107.3b).
     let granted_x = granted.map(|_| cost.mana.x);
+    // The {X} of the cost this way pays: the face's mana cost, or the card's own alternative cost (CR 118.9: flashback,
+    // overload, bestow, a way of its own), X included (CR 107.3a).
+    let way_x = cost.mana.x;
     cost.life = cost.life.saturating_add(u16::from(life));
     cost.mana.generic = cost.mana.generic.saturating_add(more);
 
@@ -5212,8 +5215,8 @@ fn cast(
     // CR 601.2b: X, and how many times it is kicked, are announced, and the total cost follows (CR 601.2f).
     // CR 107.3a, 601.2b: X is announced for a cost that includes it. A way that casts the face itself (an Adventure,
     // CR 715.3b; an Omen, CR 720.3b; a back face, CR 712.8a; one half of a split card, CR 709.3) pays that face's own mana
-    // cost, X included;
-    // an alternative cost is not that cost, so X is 0 (CR 107.3b).
+    // cost, X included; a way of the card's own that is an alternative cost (CR 118.9) pays that cost, its {X} announced as
+    // any cost's is (CR 107.3a), and one with no {X} has X 0 (CR 107.3b).
     // A way a permanent grants (Lurrus, Underworld Breach's escape, mayhem) casts the face for its mana cost, or a cost that
     // includes it, so X is announced (CR 107.3a); one that casts it without paying its mana cost leaves X 0
     // (CR 107.3b). Cast without paying its mana cost (`instead`, CR 118.9), X is 0 (CR 107.3b).
@@ -5221,8 +5224,7 @@ fn cast(
     let x_symbols = match (instead, granted_x) {
         (Some(instead), _) => instead.x,
         (None, Some(x)) => x,
-        (None, None) if way == 0 || matches!(way, WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_FUSED) => def.cost.x,
-        (None, None) => 0,
+        (None, None) => way_x,
     };
     let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. }));
     // "This spell costs {1} less to cast for each permanent sacrificed this way": generic mana off for each one announced.
