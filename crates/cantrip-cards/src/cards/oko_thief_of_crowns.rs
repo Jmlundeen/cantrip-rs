@@ -9,7 +9,8 @@ fn food(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Target artifact or creature loses all abilities and becomes a green Elk creature with base power and toughness
-/// 3/3": for good. The card types are replaced (and the subtypes of the lost ones go with them), Elk is added.
+/// 3/3": for good. The card types are replaced, the subtypes of the lost ones going with them (CR 205.1a), and its creature
+/// types are replaced by Elk (the ruling: "It's just a green Elk"), so an artifact's types go and a creature's are Elk alone.
 fn elk(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(target) = targets::object(g, item, 0) else { return Ok(()) };
     let source = item.object;
@@ -17,6 +18,7 @@ fn elk(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     instruction(g, |g| {
         g.add_effect(source, target, EffectKind::LoseAllAbilities, Duration::Indefinite);
         g.add_effect(source, target, EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
+        g.add_effect(source, target, EffectKind::LoseAllCreatureTypes, Duration::Indefinite);
         g.add_effect(source, target, EffectKind::AddSubtype(words.subtype(Subtype::Elk)), Duration::Indefinite);
         g.add_effect(source, target, EffectKind::SetColors(words.colors(ColorSet::of(Color::Green))), Duration::Indefinite);
         g.add_effect(source, target, EffectKind::SetPt(3, 3), Duration::Indefinite);

@@ -18,8 +18,8 @@ const ASK: Question = Question::new(
 /// "You may have The Irencrag become a legendary Equipment artifact named Everflame, Heroes' Legacy. If you do, it gains
 /// equip {3} and 'Equipped creature gets +3/+3' and loses all other abilities." With no duration, for as long as it stays
 /// on the battlefield (the ruling, CR 611.2a). The name is set by a text-changing effect (CR 612.8, layer 3), so it has no
-/// other name; "becomes a legendary Equipment artifact" sets its card types to artifact alone and adds the Equipment type
-/// (layer 4; it is legendary already); and in layer 6 it loses its abilities and then gains the two, which come later
+/// other name; "becomes a legendary Equipment artifact" sets its card types to artifact alone and its artifact types to
+/// Equipment alone (CR 205.1a, layer 4; it is legendary already); and in layer 6 it loses its abilities and then gains the two, which come later
 /// (CR 613.7). "The Irencrag" is this object (CR 201.5): one that has left the battlefield is a new object and is not
 /// changed (CR 400.7).
 fn become_everflame(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -32,6 +32,7 @@ fn become_everflame(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     instruction(g, |g| {
         g.add_effect(me, me, EffectKind::SetName(EVERFLAME), forever);
         g.add_effect(me, me, EffectKind::SetTypes(TypeSet::of(&[CardType::Artifact])), forever);
+        g.add_effect(me, me, EffectKind::LoseSubtypesOf(CardType::Artifact), forever);
         g.add_effect(me, me, EffectKind::AddSubtype(Subtype::Equipment), forever);
     });
     // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).

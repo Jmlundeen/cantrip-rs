@@ -2507,6 +2507,7 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
         | EffectKind::LoseAllCreatureTypes
         | EffectKind::AddAllCreatureTypes
         | EffectKind::SetCreatureType(_)
+        | EffectKind::LoseSubtypesOf(_)
         | EffectKind::SetTypes(_) => Layer::Type,
         EffectKind::SetColors(_) => Layer::Color,
         EffectKind::LoseAllAbilities
@@ -2615,10 +2616,17 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
                 let creature = chars.is(CardType::Creature) || chars.is(CardType::Kindred);
                 chars.subtypes = if creature { kept.with(s) } else { kept };
             }
-            // CR 613.1d: set types replace every card type, and the subtypes with them.
+            // CR 205.1a, 613.1d: set types replace every card type but an instant's or sorcery's, which it keeps; a subtype
+            // stays if it belongs to a card type the object still has, and goes with the types it lost.
             (Layer::Type, EffectKind::SetTypes(types)) => {
-                chars.types = types;
-                chars.subtypes = SubtypeSet::NONE;
+                let spell = TypeSet(chars.types.0 & TypeSet::of(&[CardType::Instant, CardType::Sorcery]).0);
+                chars.types = TypeSet(types.0 | spell.0);
+                let kept = chars.types;
+                chars.subtypes = chars.subtypes.iter().filter(|s| s.card_types().0 & kept.0 != 0).fold(SubtypeSet::NONE, SubtypeSet::with);
+            }
+            // CR 205.1a: the subtypes of one card type's set go, to be replaced.
+            (Layer::Type, EffectKind::LoseSubtypesOf(t)) => {
+                chars.subtypes = chars.subtypes.iter().filter(|s| !s.card_types().has(t)).fold(SubtypeSet::NONE, SubtypeSet::with);
             }
             // CR 105.3: "becomes white and blue" is what it is now, not what it is as well.
             (Layer::Color, EffectKind::SetColors(colors)) => chars.colors = colors,

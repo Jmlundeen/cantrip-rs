@@ -2,14 +2,14 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// Each stage replaces the creature's subtypes and base power and toughness (CR 613.1d), where a later effect wins
-/// by its timestamp: setting its card types to what they already are clears the subtypes an earlier stage added, and
-/// the new ones follow. Figure of Fable is only ever a creature, so its card types do not change.
+/// Each stage replaces the creature's creature types and base power and toughness (CR 205.1a, 613.1d), where a later effect
+/// wins by its timestamp: it loses the creature types it had, an earlier stage's among them, and the new ones follow. Its
+/// card types do not change, so an artifact type Mycosynth Lattice gives it stays.
 fn become_kithkin(g: &mut dyn Game, source: ObjectId, kind: Subtype, power: i16, toughness: i16) {
     let words = g.words(source);
     // "It becomes a Kithkin [...] with base power and toughness [P]/[T]": one instruction (CR 608.2c).
     instruction(g, |g| {
-        g.add_effect(source, source, EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
+        g.add_effect(source, source, EffectKind::LoseAllCreatureTypes, Duration::Indefinite);
         g.add_effect(source, source, EffectKind::AddSubtype(words.subtype(Subtype::Kithkin)), Duration::Indefinite);
         g.add_effect(source, source, EffectKind::AddSubtype(words.subtype(kind)), Duration::Indefinite);
         g.add_effect(source, source, EffectKind::SetPt(power, toughness), Duration::Indefinite);

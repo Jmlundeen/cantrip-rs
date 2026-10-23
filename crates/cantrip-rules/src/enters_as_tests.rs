@@ -50,7 +50,25 @@ static TROLL: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-static AS_AURA: EntersAs = EntersAs { types: Some(TypeSet::of(&[CardType::Enchantment])), aura: true, abilities: &[0], ..EntersAs::NONE };
+/// An Enchantment Creature - Saga Troll that returns as the Troll does.
+static SAGA_TROLL: CardDef = CardDef {
+    name: "Enters As Saga Troll",
+    types: TypeSet::of(&[CardType::Enchantment, CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Saga, Subtype::Troll]),
+    ..TROLL
+};
+
+/// A Sorcery - Lesson.
+static LESSON: CardDef = CardDef {
+    name: "Enters As Lesson",
+    types: TypeSet::of(&[CardType::Sorcery]),
+    subtypes: SubtypeSet::of(&[Subtype::Lesson]),
+    ..CardDef::BLANK
+};
+
+static AS_ENCHANTMENT: EntersAs = EntersAs { types: Some(TypeSet::of(&[CardType::Enchantment])), ..EntersAs::NONE };
+
+static AS_AURA: EntersAs = EntersAs { aura: true, abilities: &[0], ..EntersAs::NONE };
 
 /// "Whenever a creature enters, ...": what would see the returning card if it entered as a creature.
 fn a_creature_enters(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
@@ -68,7 +86,7 @@ static WATCHER: CardDef = CardDef {
 };
 
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &FOREST, &TROLL, &WATCHER])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &FOREST, &TROLL, &WATCHER, &SAGA_TROLL, &LESSON])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -188,4 +206,43 @@ fn an_aura_that_becomes_a_creature_falls_off() {
     cantrip_api::Game::add_effect(&mut cx(&mut g), aura, aura, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
     assert!(crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(false));
     assert!(!g.state.battlefield().contains(&aura));
+}
+
+/// "It's an enchantment" keeps the subtypes of the card type it still has (CR 205.1a): an Enchantment Creature - Saga Troll
+/// returns an Enchantment - Saga, its creature type gone with the creature type.
+#[test]
+fn set_types_keep_the_subtypes_of_a_type_it_still_has() {
+    let mut g = game();
+    let card = put(&mut g, &SAGA_TROLL, YOU, Zone::graveyard(YOU));
+    let ability = AbilityRef { card: g.cards.id_of(&SAGA_TROLL), index: 0 };
+    let item = crate::actions::stack_item(StackKind::Triggered, card, ability, YOU, &[]);
+    let back = cantrip_api::Game::put_onto_battlefield_as(&mut cx(&mut g), card, YOU, &item, &AS_ENCHANTMENT).expect("nothing asked");
+    let chars = cx(&mut g).chars(back.expect("it entered"));
+    assert_eq!(chars.types, TypeSet::of(&[CardType::Enchantment]));
+    assert_eq!(chars.subtypes, SubtypeSet::of(&[Subtype::Saga]));
+}
+
+/// "It's an Aura enchantment" sets its enchantment type too (CR 205.1a): the Saga Troll returns an Enchantment - Aura alone.
+#[test]
+fn an_aura_enchantment_has_no_other_enchantment_type() {
+    let mut g = game();
+    put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &SAGA_TROLL, YOU, Zone::graveyard(YOU));
+    let ability = AbilityRef { card: g.cards.id_of(&SAGA_TROLL), index: 0 };
+    let item = crate::actions::stack_item(StackKind::Triggered, card, ability, YOU, &[]);
+    let back = cantrip_api::Game::put_onto_battlefield_as(&mut cx(&mut g), card, YOU, &item, &AS_AURA).expect("one host");
+    let chars = cx(&mut g).chars(back.expect("it entered"));
+    assert_eq!(chars.types, TypeSet::of(&[CardType::Enchantment]));
+    assert_eq!(chars.subtypes, SubtypeSet::of(&[Subtype::Aura]));
+}
+
+/// An instant or sorcery whose card types are set keeps that type and its spell types (CR 205.1a).
+#[test]
+fn set_types_leave_a_sorcery_a_sorcery() {
+    let mut g = game();
+    let lesson = put(&mut g, &LESSON, YOU, Zone::BATTLEFIELD);
+    cantrip_api::Game::add_effect(&mut cx(&mut g), lesson, lesson, EffectKind::SetTypes(TypeSet::of(&[CardType::Artifact])), Duration::Indefinite);
+    let chars = cx(&mut g).chars(lesson);
+    assert_eq!(chars.types, TypeSet::of(&[CardType::Artifact, CardType::Sorcery]));
+    assert_eq!(chars.subtypes, SubtypeSet::of(&[Subtype::Lesson]));
 }

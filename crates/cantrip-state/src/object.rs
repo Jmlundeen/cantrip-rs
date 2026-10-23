@@ -748,8 +748,14 @@ pub enum EffectKind {
     SwitchPt,
     /// Its power and toughness become these (CR 613.4b), layer 7b: "it becomes a 0/0 creature".
     SetPt(i16, i16),
-    /// Is exactly these card types (CR 613.1d), layer 4; the subtypes it had belonged to the types it lost.
+    /// Is exactly these card types (CR 205.1a, 613.1d), layer 4: an instant or sorcery stays one, and the subtypes it had stay
+    /// only where they belong to a card type it still has (`Subtype::card_types`). An effect that also names its subtypes
+    /// ("becomes an Equipment artifact") sets them with `LoseSubtypesOf` and `AddSubtype` after it.
     SetTypes(TypeSet),
+    /// It loses every subtype of this card type's set (CR 205.1a, 613.1d), layer 4, at its timestamp: what an effect that
+    /// sets its subtypes of that kind does before adding them - "becomes an Equipment artifact" (The Irencrag), "It's an
+    /// Aura enchantment" (`EntersAs::aura`). Its card types stay. Creature types are `LoseAllCreatureTypes`.
+    LoseSubtypesOf(CardType),
     /// Is exactly these colors (CR 105.3, 613.1e), layer 5.
     SetColors(ColorSet),
     /// "Loses all abilities" (CR 613.1f), layer 6: at its timestamp, so what is granted later is kept.

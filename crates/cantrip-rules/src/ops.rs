@@ -1108,11 +1108,13 @@ pub fn put_onto_battlefield_as(
 fn enter_as(cx: &mut Cx, id: ObjectId, b: Becomes) {
     let controller = cx.s().obj(id).controller;
     let mut kinds = Vec::new();
-    if let Some(types) = b.what.types {
-        kinds.push(EffectKind::SetTypes(types));
-    }
+    // "It's an Aura enchantment": an enchantment alone, whose enchantment type is Aura alone (CR 205.1a).
     if b.what.aura {
+        kinds.push(EffectKind::SetTypes(TypeSet::of(&[CardType::Enchantment])));
+        kinds.push(EffectKind::LoseSubtypesOf(CardType::Enchantment));
         kinds.push(EffectKind::AddSubtype(Subtype::Aura));
+    } else if let Some(types) = b.what.types {
+        kinds.push(EffectKind::SetTypes(types));
     }
     if b.what.loses_other_abilities {
         kinds.push(EffectKind::LoseAllAbilities);

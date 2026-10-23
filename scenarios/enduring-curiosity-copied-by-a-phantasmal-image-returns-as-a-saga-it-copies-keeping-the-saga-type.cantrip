@@ -1,0 +1,65 @@
+# "It's an enchantment" sets its card types and keeps the subtypes of the one it still has (CR 205.1a): Bot1's Phantasmal
+# Image copies Enduring Curiosity on turn 3. On turn 4 Bot2's Lightning Bolt targets the Image, which sacrifices itself; the
+# copy's ability returns the Phantasmal Image card as an enchantment, and it enters as a copy of Bot2's Summon: Fenrir (an
+# Enchantment Creature - Saga Wolf): an Enchantment - Saga, its Wolf and Illusion types gone with the creature type.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Enduring Curiosity
+Phantasmal Image
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Summon: Fenrir
+Mox Ruby
+Lightning Bolt
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Enduring Curiosity.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Summon: Fenrir.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Enduring Curiosity)
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Curiosity#2)
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Summon: Fenrir)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Summon: Fenrir.Types = Enchantment
+Bot1.Battlefield.Summon: Fenrir.Subtypes = Saga
+Bot1.Battlefield.Enduring Curiosity.Types = Enchantment; Creature

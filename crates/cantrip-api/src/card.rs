@@ -106,16 +106,18 @@ pub struct Entering {
 /// "It's an Aura enchantment with enchant Forest you control and '...'" (Old-Growth Troll; Harold and Bob, First Numens),
 /// "It's an Aura enchantment with enchant creature you control and '...', and it loses all other abilities" (Bronzehide
 /// Lion). Each part is a continuous effect on the permanent from the moment it enters, for as long as it is that object
-/// (CR 611.2a, 400.7), applied in its layer at the effect's timestamp, in this order: types (layer 4), then the abilities
+/// (CR 611.2a, 400.7), applied in its layer at the effect's timestamp, in this order: types and subtypes (layer 4), then the abilities
 /// it loses and gains (layer 6). Given by `Game::put_onto_battlefield_as`, which reads the lists below on the card of the
 /// ability doing it (`StackItem::ability`), so a copy's ability gives what the card it copies prints.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct EntersAs {
-    /// "It's an [types]": exactly these card types (CR 205.1a), its subtypes with the types it loses (`EffectKind::SetTypes`).
+    /// "It's an [types]": exactly these card types (CR 205.1a), keeping the subtypes of those it still has
+    /// (`EffectKind::SetTypes`). Not read with `aura`.
     pub types: Option<TypeSet>,
-    /// "It's an Aura ... with enchant [quality]": it is an Aura (CR 303.4, `EffectKind::AddSubtype`) with the enchant ability
-    /// its effect's card describes (`CardDef::becomes_aura_enchant`, `EffectKind::Enchant`). Not cast, it chooses what it
-    /// enchants as it enters, without targeting (CR 303.4f); with nothing it could enchant, it stays where it is (CR 303.4g).
+    /// "It's an Aura enchantment ... with enchant [quality]": an enchantment alone whose one enchantment type is Aura (CR
+    /// 205.1a, 303.4), with the enchant ability its effect's card describes (`CardDef::becomes_aura_enchant`,
+    /// `EffectKind::Enchant`). Not cast, it chooses what it enchants as it enters, without targeting (CR 303.4f); with
+    /// nothing it could enchant, it stays where it is (CR 303.4g).
     pub aura: bool,
     /// "and it loses all other abilities" (CR 613.1f): every ability it had, before it gains the ones below.
     pub loses_other_abilities: bool,

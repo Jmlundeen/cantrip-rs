@@ -4,7 +4,7 @@
 //! when the rules add a subtype. The oracle build script (crates/cantrip-oracle/build.rs) fails, naming the card and
 //! the subtype, if a card prints one that is not here. Planar types (205.3n) are left out: planes are not played.
 
-use crate::vocab::Mana;
+use crate::vocab::{CardType, Mana, TypeSet};
 
 pub const SUBTYPE_WORDS: usize = 8;
 
@@ -1426,6 +1426,23 @@ impl Subtype {
         }
     }
 
+    /// The card types whose subtype this is (CR 205.3d, 205.3g-q): a creature type belongs to creatures and Kindreds
+    /// (CR 205.3m, 308.3), a spell type to instants and sorceries (CR 205.3k), each other kind to its one card type. A
+    /// dungeon type belongs to no card type an object can have. What a type-setting effect keeps of an object's subtypes
+    /// (CR 205.1a): those of a card type it still has.
+    pub fn card_types(self) -> TypeSet {
+        match self {
+            Subtype::Attraction | Subtype::Blood | Subtype::Bobblehead | Subtype::Book | Subtype::Clue | Subtype::Contraption | Subtype::Equipment | Subtype::Food | Subtype::Fortification | Subtype::Gold | Subtype::Heartwood | Subtype::Incubator | Subtype::Infinity | Subtype::Junk | Subtype::Lander | Subtype::Map | Subtype::Mutagen | Subtype::Powerstone | Subtype::Spacecraft | Subtype::Stone | Subtype::Treasure | Subtype::Vehicle | Subtype::Vibranium => TypeSet::of(&[CardType::Artifact]),
+            Subtype::Aura | Subtype::Background | Subtype::Cartouche | Subtype::Case | Subtype::Class | Subtype::Curse | Subtype::Plan | Subtype::Role | Subtype::Room | Subtype::Rune | Subtype::Saga | Subtype::Shard | Subtype::Shrine => TypeSet::of(&[CardType::Enchantment]),
+            Subtype::Cave | Subtype::Desert | Subtype::Forest | Subtype::Gate | Subtype::Island | Subtype::Lair | Subtype::Locus | Subtype::Mine | Subtype::Mountain | Subtype::Plains | Subtype::Planet | Subtype::PowerPlant | Subtype::Sphere | Subtype::Swamp | Subtype::Tower | Subtype::Town | Subtype::Urzas => TypeSet::of(&[CardType::Land]),
+            Subtype::Ajani | Subtype::Aminatou | Subtype::Angrath | Subtype::Arlinn | Subtype::Ashiok | Subtype::Bahamut | Subtype::Basri | Subtype::Bolas | Subtype::Calix | Subtype::Chandra | Subtype::Comet | Subtype::Dack | Subtype::Dakkon | Subtype::Daretti | Subtype::Davriel | Subtype::Dellian | Subtype::Dihada | Subtype::Domri | Subtype::Dovin | Subtype::Ellywick | Subtype::Elminster | Subtype::Elspeth | Subtype::Estrid | Subtype::Freyalise | Subtype::Garruk | Subtype::Gideon | Subtype::Grist | Subtype::Guff | Subtype::Huatli | Subtype::Jace | Subtype::Jared | Subtype::Jaya | Subtype::Jeska | Subtype::Kaito | Subtype::Karn | Subtype::Kasmina | Subtype::Kaya | Subtype::Kiora | Subtype::Koth | Subtype::Liliana | Subtype::Lolth | Subtype::Lukka | Subtype::Minsc | Subtype::Mordenkainen | Subtype::Nahiri | Subtype::Narset | Subtype::Niko | Subtype::Nissa | Subtype::Nixilis | Subtype::Oko | Subtype::Quintorius | Subtype::Ral | Subtype::Rowan | Subtype::Saheeli | Subtype::Samut | Subtype::Sarkhan | Subtype::Serra | Subtype::Sivitri | Subtype::Sorin | Subtype::Szat | Subtype::Tamiyo | Subtype::Tasha | Subtype::Teferi | Subtype::Teyo | Subtype::Tezzeret | Subtype::Tibalt | Subtype::Tyvar | Subtype::Ugin | Subtype::Urza | Subtype::Venser | Subtype::Vivien | Subtype::Vraska | Subtype::Vronos | Subtype::Will | Subtype::Windgrace | Subtype::Wrenn | Subtype::Xenagos | Subtype::Yanggu | Subtype::Yanling | Subtype::Zariel => TypeSet::of(&[CardType::Planeswalker]),
+            Subtype::Adventure | Subtype::Arcane | Subtype::Lesson | Subtype::Omen | Subtype::Trap => TypeSet::of(&[CardType::Instant, CardType::Sorcery]),
+            Subtype::Siege => TypeSet::of(&[CardType::Battle]),
+            Subtype::Undercity => TypeSet::NONE,
+            _ => TypeSet::of(&[CardType::Creature, CardType::Kindred]),
+        }
+    }
+
     /// A creature type (CR 205.3m), as opposed to a land, artifact, enchantment, planeswalker or spell type.
     pub fn is_creature_type(self) -> bool {
         matches!(
@@ -1765,5 +1782,22 @@ impl Subtype {
 
     pub fn named(name: &str) -> Option<Subtype> {
         Subtype::ALL.iter().copied().find(|s| s.name().eq_ignore_ascii_case(name))
+    }
+}
+
+#[cfg(test)]
+mod card_type_tests {
+    use super::*;
+
+    /// Every subtype is of the kind CR 205.3 lists it under: the creature types and no other are creatures' (CR 205.3d).
+    #[test]
+    fn every_subtype_belongs_to_the_card_types_of_its_list() {
+        for s in Subtype::ALL {
+            assert_eq!(s.card_types().has(CardType::Creature), s.is_creature_type(), "{}", s.name());
+        }
+        assert!(Subtype::Saga.card_types().has(CardType::Enchantment));
+        assert!(Subtype::Equipment.card_types().has(CardType::Artifact));
+        assert!(Subtype::Forest.card_types().has(CardType::Land));
+        assert!(Subtype::Lesson.card_types().has(CardType::Sorcery));
     }
 }

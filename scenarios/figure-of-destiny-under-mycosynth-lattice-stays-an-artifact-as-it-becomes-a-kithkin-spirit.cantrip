@@ -1,0 +1,45 @@
+# "This creature becomes a Kithkin Spirit" sets its creature types and changes no card type (CR 205.1a): under Bot1's
+# Mycosynth Lattice, Figure of Destiny is an artifact creature, and it stays one as it becomes a 2/2 Kithkin Spirit on turn 3.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mycosynth Lattice
+Figure of Destiny
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Figure of Destiny.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Kithkin Spirit with)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Figure of Destiny.Types = Creature; Artifact
+Bot1.Battlefield.Figure of Destiny.Subtypes = Kithkin; Spirit
+Bot1.Battlefield.Figure of Destiny.Power = 2
