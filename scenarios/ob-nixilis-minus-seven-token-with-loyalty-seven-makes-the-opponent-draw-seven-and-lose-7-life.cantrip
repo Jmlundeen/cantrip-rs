@@ -1,0 +1,62 @@
+# Ob Nixilis, the Adversary cast with casualty X = 7, sacrificing Sire of Seven Deaths (power 7, cast on turn 1 with the five
+# Moxen and Black Lotus): the copy is a token with starting loyalty 7 (CR 707.10f, 707.9b), and its -7 -
+# "Target player draws seven cards and loses 7 life" - targets Bot2 and takes the token to 0 loyalty, so it dies. The original,
+# loyalty 3, cannot pay it. Bot2: 20 - 7 = 13 life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Black Lotus
+Sire of Seven Deaths
+Ob Nixilis, the Adversary
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sire of Seven Deaths.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast(X: 7)
+Bot1.Modes(Casualty X)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ob Nixilis, the Adversary#1.Counters.Loyalty = 7
+! Bot1.Battlefield.Ob Nixilis, the Adversary#2.Activate(Ability: Target player)
+Bot1.Battlefield.Ob Nixilis, the Adversary#1.Activate(Ability: Target player; Target: Bot2)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 13
+Bot2.Hand.Count = 14
+Bot1.Life = 20
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 3
+Bot1.Battlefield.Ob Nixilis, the Adversary.Supertypes = Legendary

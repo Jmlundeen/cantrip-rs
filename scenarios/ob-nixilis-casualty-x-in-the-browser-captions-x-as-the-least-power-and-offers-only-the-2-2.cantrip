@@ -1,0 +1,56 @@
+# Browser
+# Bot1 casts Ob Nixilis, the Adversary in the browser with a 2/2 (Woodland Changeling) and a 1/1 (Dryad Arbor) out. The additional cost is
+# offered as "Cast without casualty" beside "Casualty X: ..."; after choosing casualty the X announcement is captioned for what X is -
+# the least power of the creature sacrificed (CR 702.153a) - with no mana wording ("not enough mana for it" would be false: X is no mana's).
+# X is stepped to 2 and announced, and the sacrifice offers only the 2/2. Both Obs end on the battlefield, the token with loyalty 2 and the
+# original, legendary, with 3.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Woodland Changeling
+Dryad Arbor
+Ob Nixilis, the Adversary
+Island x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast(X: 2)
+? Client.Bot1.Prompt.Modes = Cast without casualty; Casualty X: sacrifice a creature with power X or greater
+Bot1.Modes(Casualty X)
+? Client.Bot1.Prompt.Title = Choose X for Ob Nixilis, the Adversary
+? Client.Bot1.Prompt.Detail = X is the least power of the creature you sacrifice  ·  {1}{B}{R} in all  ·  targets and paying come next
+! Bot1.Choose(Dryad Arbor)
+Bot1.Choose(Woodland Changeling)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Woodland Changeling
+Bot1.Battlefield.Ob Nixilis, the Adversary#1.Counters.Loyalty = 2
+Bot1.Battlefield.Ob Nixilis, the Adversary#1.Token = true
+Bot1.Battlefield.Ob Nixilis, the Adversary#2.Counters.Loyalty = 3
+Bot1.Battlefield.Ob Nixilis, the Adversary#2.Supertypes = Legendary
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature

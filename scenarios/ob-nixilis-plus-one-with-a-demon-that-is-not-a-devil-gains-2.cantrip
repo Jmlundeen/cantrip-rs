@@ -1,0 +1,42 @@
+# Ob Nixilis, the Adversary +1: "If you control a Demon or Devil, you gain 2 life" is true for a Demon that is not a Devil
+# (Demon Wall, an artifact creature - Demon Wall): Bot1 gains 2 although Bot2, who declines to discard, loses 2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ob Nixilis, the Adversary
+Demon Wall
+Island x13
+
+[Bot2 Deck]
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast
+Bot1.Modes(Cast without casualty)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Demon Wall.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ob Nixilis, the Adversary.Activate(Ability: +1)
+Bot1.Pass
+Bot2.Decline
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 4

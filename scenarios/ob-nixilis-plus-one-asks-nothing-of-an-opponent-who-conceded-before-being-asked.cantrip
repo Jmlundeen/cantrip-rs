@@ -1,0 +1,51 @@
+# Ob Nixilis, the Adversary +1 in a three-player game: "Each opponent loses 2 life unless they discard a card." Bot2 is asked
+# first (turn order from Bot1); while that question is outstanding Bot3 concedes (CR 104.3a: a player may concede at any time)
+# and leaves the game (CR 800.4a), so it is asked nothing and loses no life - the refusal of its Decline holds - while Bot2
+# discards a card and keeps its 20 life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ob Nixilis, the Adversary
+Island x13
+
+[Bot2 Deck]
+Mountain x14
+
+[Bot3 Deck]
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast
+Bot1.Modes(Cast without casualty)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Ob Nixilis, the Adversary.Activate(Ability: +1)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot3.Concede
+Bot2.Accept
+Bot2.Choose(Mountain)
+! Bot3.Decline
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot3.Status = Lost
+Bot3.Life = 20
+Bot2.Life = 20
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 1
+Bot1.Life = 20
+Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 4

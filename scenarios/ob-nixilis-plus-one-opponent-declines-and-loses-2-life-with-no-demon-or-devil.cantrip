@@ -1,0 +1,38 @@
+# Ob Nixilis, the Adversary +1: "Each opponent loses 2 life unless they discard a card." Bot2 declines (the default) and loses 2
+# life, keeping its hand; Bot1 controls no Demon or Devil, so gains nothing. Cast without casualty, Ob has loyalty 3 and +1 makes 4.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ob Nixilis, the Adversary
+Island x13
+
+[Bot2 Deck]
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast
+Bot1.Modes(Cast without casualty)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ob Nixilis, the Adversary.Activate(Ability: +1)
+Bot1.Pass
+Bot2.Decline
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 4
+Bot1.Battlefield.Ob Nixilis, the Adversary.Supertypes = Legendary

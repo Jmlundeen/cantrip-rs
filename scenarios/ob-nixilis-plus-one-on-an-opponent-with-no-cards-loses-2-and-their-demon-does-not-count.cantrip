@@ -1,0 +1,63 @@
+# Ob Nixilis, the Adversary +1: Bot2 has played its whole hand (a Woodland Changeling among it, a Demon and Devil of its
+# own), so nothing is asked of it: it loses 2 life. "If you control a Demon or Devil" is about Bot1, who controls none, so
+# Bot2's Changeling gives Bot1 no life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ob Nixilis, the Adversary
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Woodland Changeling
+Mountain
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast
+Bot1.Modes(Cast without casualty)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 0
+Bot1.Battlefield.Ob Nixilis, the Adversary.Activate(Ability: +1)
+Bot1.Pass
+Bot2.Pass
+! Bot2.Decline
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot2.Hand.Count = 0
+Bot2.Battlefield.Woodland Changeling.Types = Creature
+Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 4

@@ -1,0 +1,49 @@
+# Ob Nixilis, the Adversary: the -2 makes a 1/1 red Devil (loyalty 3 -> 1); on the next turn the +1 (-> 2) has Bot2 choose to
+# discard a card rather than lose 2 life, so Bot2 keeps its 20 life, and "if you control a Demon or Devil" is true for the
+# Devil token: Bot1 gains 2 (22). Bot2's hand: 7 after its turn-2 draw and cleanup discard, 6 after the +1.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ob Nixilis, the Adversary
+Island x13
+
+[Bot2 Deck]
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast
+Bot1.Modes(Cast without casualty)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ob Nixilis, the Adversary.Activate(Ability: Create)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 1
+? Bot1.Life = 20
+Bot1.Battlefield.Ob Nixilis, the Adversary.Activate(Ability: +1)
+Bot1.Pass
+Bot2.Accept
+Bot2.Choose(Mountain)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 2
+Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 2
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Devil.Colors = Red
+Bot1.Battlefield.Devil.Power = 1
+Bot1.Battlefield.Devil.Toughness = 1

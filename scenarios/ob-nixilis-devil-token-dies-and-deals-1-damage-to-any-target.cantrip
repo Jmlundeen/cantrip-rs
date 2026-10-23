@@ -1,0 +1,44 @@
+# Ob Nixilis, the Adversary -2 makes a 1/1 red Devil with "When this token dies, it deals 1 damage to any target." Bot2's
+# Lightning Bolt kills it on turn 2 and Bot1 aims the trigger at Bot2 (a player: "any target"): 20 -> 19. Ob is at 3 - 2 = 1.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ob Nixilis, the Adversary
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast
+Bot1.Modes(Cast without casualty)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ob Nixilis, the Adversary.Activate(Ability: Create)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Devil)
+Bot1.Target(Bot2)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 1
+Bot1.Battlefield.Devil = (absent)

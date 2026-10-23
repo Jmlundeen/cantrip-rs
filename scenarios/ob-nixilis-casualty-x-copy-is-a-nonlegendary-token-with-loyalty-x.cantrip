@@ -1,0 +1,50 @@
+# Ob Nixilis, the Adversary: casualty X (CR 702.153a) announced as 2 and paid by sacrificing Woodland Changeling (a 2/2, power exactly 2).
+# The casualty trigger copies the spell (CR 707.10) and the copy "isn't legendary and has starting loyalty X" (CR 707.9b): it
+# becomes a token as it resolves (CR 707.10f) with loyalty 2, while the original, legendary, enters with its own 3. Both stay
+# on the battlefield (the legend rule only looks at legendary permanents).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Woodland Changeling
+Swamp
+Mountain
+Ob Nixilis, the Adversary
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ob Nixilis, the Adversary.Cast(X: 2)
+Bot1.Modes(Casualty X)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Woodland Changeling
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Ob Nixilis, the Adversary#1.Token = true
+Bot1.Battlefield.Ob Nixilis, the Adversary#1.Counters.Loyalty = 2
+Bot1.Battlefield.Ob Nixilis, the Adversary#1.Supertypes = (absent)
+Bot1.Battlefield.Ob Nixilis, the Adversary#2.Counters.Loyalty = 3
+Bot1.Battlefield.Ob Nixilis, the Adversary#2.Supertypes = Legendary
+Bot1.Battlefield.Ob Nixilis, the Adversary#2.Token = (absent)
