@@ -167,6 +167,32 @@ pub fn zero_loyalty_stays(cx: &Cx, planeswalker: ObjectId) -> bool {
     })
 }
 
+/// How many creatures may attack each of `targets`, a player, planeswalker or battle, in a declaration of attackers (CR
+/// 508.1c): the smallest a static ability of a permanent on the battlefield that has its abilities (CR 613.1f) says of
+/// it (`CardDef::attack_limits`), with no entry for a target nothing caps. Asked as attackers are declared, only of the
+/// players, planeswalkers and battles that may be attacked then.
+pub fn attack_limits(cx: &Cx, targets: &[Target]) -> Vec<(Target, u32)> {
+    let rules: Vec<(ObjectId, PlayerId, &'static CardDef)> = sources(cx, |d| !d.attack_limits.is_empty()).collect();
+    if rules.is_empty() {
+        return Vec::new();
+    }
+    targets
+        .iter()
+        .filter_map(|&target| {
+            let mut limit = None;
+            for &(id, controller, def) in &rules {
+                let asker = Asker { source: id, controller, by: None, spell: false };
+                for rule in def.attack_limits {
+                    if let Some(n) = rule(cx, &asker, target) {
+                        limit = Some(limit.map_or(n, |most: u32| most.min(n)));
+                    }
+                }
+            }
+            limit.map(|n| (target, n))
+        })
+        .collect()
+}
+
 /// Whether a static ability of a permanent on the battlefield says the "legend rule" doesn't apply to `legend` (CR 704.5j,
 /// `CardDef::legend_rule_exempt`: Mirror Gallery), while that permanent has its abilities (CR 613.1f): once it leaves, the
 /// rule applies the next time state-based actions are checked (Mirror Gallery's ruling). Asked only of a legendary

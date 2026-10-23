@@ -974,7 +974,8 @@ fn maximum_blockers(cx: &Cx, attacker: ObjectId, rule_sources: &[ObjectId]) -> u
 /// two (CR 701.15b-c: attack, and attack a player other than that one), goad being an effect and no ability, which a creature
 /// that loses its abilities is still under; and each "attacks [that player or permanent] if able" in force now
 /// (`EffectKind::MustAttackAt`, `in_force`).
-/// With the most of them any declaration obeys attacking for free, and one that does (`AttackRules::solve`).
+/// With the cap on how many may attack each of `targets` a static ability sets (CR 508.1c); with the most of them any
+/// declaration obeys attacking for free, and one that does (`AttackRules::solve`).
 fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[AttackCost]) -> AttackRules {
     let mut required = Vec::new();
     for &id in eligible {
@@ -995,7 +996,7 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[Att
             }
         }
     }
-    let mut rules = AttackRules { required, limits: Vec::new(), most: 0, suggested: Vec::new() };
+    let mut rules = AttackRules { required, limits: crate::static_rules::attack_limits(cx, targets), most: 0, suggested: Vec::new() };
     if !rules.required.is_empty() {
         (rules.most, rules.suggested) = rules.solve(eligible, targets, costs);
     }
