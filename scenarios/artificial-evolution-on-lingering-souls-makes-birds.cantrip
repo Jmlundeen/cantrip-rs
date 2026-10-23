@@ -36,8 +36,8 @@ Bot1.Modes(Bird)
 [Expect]
 Turn = 6
 Stack.Count = 0
-Bot2.Battlefield = Plains; Plains; Plains; Bird; Bird
-Bot2.Battlefield.Bird#1.Subtypes = Bird
-Bot2.Battlefield.Bird#2.Subtypes = Bird
-Bot2.Battlefield.Bird#1.Colors = White
-Bot2.Battlefield.Bird#2.Keywords = Flying
+Bot2.Battlefield = Bird Token; Bird Token; Plains; Plains; Plains
+Bot2.Battlefield.Bird Token#1.Subtypes = Bird
+Bot2.Battlefield.Bird Token#2.Subtypes = Bird
+Bot2.Battlefield.Bird Token#1.Colors = White
+Bot2.Battlefield.Bird Token#2.Keywords = Flying

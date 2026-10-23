@@ -50,12 +50,12 @@ Bot2.Pass
 [Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield = Construct; Mox Pearl; Mox Ruby; Oni-Cult Anvil; Plains
-Bot1.Battlefield.Construct.Power = 1
-Bot1.Battlefield.Construct.Toughness = 1
-Bot1.Battlefield.Construct.Types = Artifact; Creature
-Bot1.Battlefield.Construct.Subtypes = Construct
-Bot1.Battlefield.Construct.Token = true
+Bot1.Battlefield = Construct Token; Mox Pearl; Mox Ruby; Oni-Cult Anvil; Plains
+Bot1.Battlefield.Construct Token.Power = 1
+Bot1.Battlefield.Construct Token.Toughness = 1
+Bot1.Battlefield.Construct Token.Types = Artifact; Creature
+Bot1.Battlefield.Construct Token.Subtypes = Construct
+Bot1.Battlefield.Construct Token.Token = true
 Bot1.Battlefield.Oni-Cult Anvil.Tapped = true
 Bot1.Graveyard = Disenchant; Mox Jet; Mox Emerald
 Bot2.Life = 19

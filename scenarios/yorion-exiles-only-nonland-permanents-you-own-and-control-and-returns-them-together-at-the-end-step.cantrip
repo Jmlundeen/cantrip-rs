@@ -69,7 +69,7 @@ Bot1.Pass
 ! Bot1.Choose(Mountain)
 ! Bot1.Choose(Island#1)
 ! Bot1.Choose(Yorion, Sky Nomad)
-Bot1.Choose(Mox Pearl; Mox Sapphire; Spirit)
+Bot1.Choose(Mox Pearl; Mox Sapphire; Spirit Token)
 ? Exile = Mox Pearl; Mox Sapphire
 ? Bot1.Battlefield.Mox Pearl = (absent)
 [T5 Bot1.End]
@@ -80,7 +80,7 @@ Turn = 5
 Exile.Count = 0
 Bot1.Battlefield.Mox Pearl.Tapped = false
 Bot1.Battlefield.Mox Sapphire.Tapped = false
-Bot1.Battlefield.Spirit = (absent)
+Bot1.Battlefield.Spirit Token = (absent)
 Bot1.Battlefield.Staff of the Storyteller.Tapped = false
 Bot1.Battlefield.Yorion, Sky Nomad.Tapped = false
 Bot2.Battlefield.Ornithopter.Tapped = false

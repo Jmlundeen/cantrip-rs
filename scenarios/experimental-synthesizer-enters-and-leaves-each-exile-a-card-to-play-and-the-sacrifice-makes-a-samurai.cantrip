@@ -40,13 +40,13 @@ Bot1.Exile.Mountain.Play
 [T3 Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield = Mountain; Mox Emerald; Mox Jet; Mox Ruby; Mox Sapphire; Samurai
-Bot1.Battlefield.Samurai.Colors = White
-Bot1.Battlefield.Samurai.Power = 2
-Bot1.Battlefield.Samurai.Toughness = 2
-Bot1.Battlefield.Samurai.Keywords = Vigilance
-Bot1.Battlefield.Samurai.Subtypes = Samurai
-Bot1.Battlefield.Samurai.Token = true
+Bot1.Battlefield = Mountain; Mox Emerald; Mox Jet; Mox Ruby; Mox Sapphire; Samurai Token
+Bot1.Battlefield.Samurai Token.Colors = White
+Bot1.Battlefield.Samurai Token.Power = 2
+Bot1.Battlefield.Samurai Token.Toughness = 2
+Bot1.Battlefield.Samurai Token.Keywords = Vigilance
+Bot1.Battlefield.Samurai Token.Subtypes = Samurai
+Bot1.Battlefield.Samurai Token.Token = true
 Bot1.Battlefield.Mox Sapphire.Tapped = false
 Bot1.LandsPlayed = 1
 Bot1.Graveyard = Experimental Synthesizer

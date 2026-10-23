@@ -77,8 +77,8 @@ Bot1.Pass
 Bot2.Pass
 
 [Expect]
-Bot1.Battlefield = Construct; Mox Jet; Mox Pearl; Mox Ruby
-Bot1.Battlefield.Construct.Power = 1
+Bot1.Battlefield = Construct Token; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Battlefield.Construct Token.Power = 1
 Bot1.Graveyard = Oni-Cult Anvil; Strip Mine; Disenchant; Disenchant; Mox Sapphire
 Bot2.Battlefield.Count = 0
 Bot2.Life = 19

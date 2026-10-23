@@ -45,12 +45,12 @@ Bot1.Pass
 [Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield.Troll Warrior.Tapped = true
-Bot1.Battlefield.Troll Warrior.Token = true
-Bot1.Battlefield.Troll Warrior.Power = 4
-Bot1.Battlefield.Troll Warrior.Toughness = 4
-Bot1.Battlefield.Troll Warrior.Colors = Green
-Bot1.Battlefield.Troll Warrior.Subtypes = Troll; Warrior
-Bot1.Battlefield.Troll Warrior.Keywords = Trample
+Bot1.Battlefield.Troll Warrior Token.Tapped = true
+Bot1.Battlefield.Troll Warrior Token.Token = true
+Bot1.Battlefield.Troll Warrior Token.Power = 4
+Bot1.Battlefield.Troll Warrior Token.Toughness = 4
+Bot1.Battlefield.Troll Warrior Token.Colors = Green
+Bot1.Battlefield.Troll Warrior Token.Subtypes = Troll; Warrior
+Bot1.Battlefield.Troll Warrior Token.Keywords = Trample
 Bot1.Battlefield.Count = 5
 Bot1.Graveyard = Old-Growth Troll; Forest; Infernal Grasp; Black Lotus

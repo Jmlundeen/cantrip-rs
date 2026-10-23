@@ -32,7 +32,7 @@ Bot2.Pass
 [T2 Bot2.Main1]
 Bot2.Hand.Mountain.Play
 Bot2.Battlefield.Mountain.Activate
-Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Devil)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Devil Token)
 Bot1.Target(Bot2)
 [T3 Bot1.Upkeep]
 
@@ -41,4 +41,4 @@ Bot2.Life = 19
 Bot1.Life = 20
 Bot1.Graveyard.Count = 0
 Bot1.Battlefield.Ob Nixilis, the Adversary.Counters.Loyalty = 1
-Bot1.Battlefield.Devil = (absent)
+Bot1.Battlefield.Devil Token = (absent)

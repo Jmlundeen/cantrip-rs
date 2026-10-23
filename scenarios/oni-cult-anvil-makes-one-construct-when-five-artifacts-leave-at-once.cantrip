@@ -47,6 +47,6 @@ Bot2.Pass
 [Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield = Construct; Oni-Cult Anvil
-Bot1.Battlefield.Construct.Power = 1
+Bot1.Battlefield = Construct Token; Oni-Cult Anvil
+Bot1.Battlefield.Construct Token.Power = 1
 Bot1.Graveyard.Count = 6
