@@ -1,0 +1,36 @@
+# Turbulent Moor: "This land enters tapped unless your opponents control eight or more lands." On turn 15 Bot2 has
+# seven lands, so Bot1's Turbulent Moor enters tapped - the seven lands Bot1 itself controls are not the ones counted. On turn
+# 16, with Bot1's eight lands out, Bot2's own Turbulent Moor enters untapped (positive control).
+
+[Bot1 Deck]
+Plains x7
+Turbulent Moor
+Plains x12
+
+[Bot2 Deck]
+Swamp x7
+Turbulent Moor
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Turbulent Moor.Play
+Bot2.Hand.Turbulent Moor.Play
+
+[Expect]
+Turn = 16
+Bot1.Battlefield.Turbulent Moor.Tapped = true
+Bot2.Battlefield.Turbulent Moor.Tapped = false
