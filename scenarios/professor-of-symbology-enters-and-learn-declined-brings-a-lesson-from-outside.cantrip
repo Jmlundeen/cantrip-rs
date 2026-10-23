@@ -1,0 +1,43 @@
+# Professor of Symbology's learn with the discard declined: Bot1 may then reveal a Lesson card they own from outside the game
+# (CR 701.48a, 400.11b). Firebending Lesson comes into hand; Lightning Bolt (not a Lesson) and Bot2's Price of Freedom (not
+# Bot1's) are refused. Nothing is discarded or drawn.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Professor of Symbology
+Mountain
+Island
+Island
+Island
+Forest
+Island x10
+
+[Bot1 Sideboard]
+Firebending Lesson
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Bot2 Sideboard]
+Price of Freedom
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Professor of Symbology.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Choose()
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Price of Freedom)
+Bot1.Choose(Firebending Lesson)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Sideboard = Lightning Bolt
+Bot2.Sideboard = Price of Freedom
+Bot1.Hand = Firebending Lesson; Island; Island; Island; Mountain

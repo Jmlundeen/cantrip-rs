@@ -1,0 +1,8 @@
+{
+  "name": "Professor of Symbology",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Kor Cleric",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "When this creature enters, learn. (You may reveal a Lesson card you own from outside the game and put it into your hand, or discard a card to draw a card.)"
+}

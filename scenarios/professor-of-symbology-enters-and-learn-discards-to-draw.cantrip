@@ -1,0 +1,35 @@
+# Professor of Symbology's enters trigger learns (CR 701.48a): Bot1 discards Mountain (the one card that is not an Island) and draws the next
+# card, Forest. Because a card was discarded, no Lesson may be brought in from outside (the Lesson stays in the sideboard).
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Professor of Symbology
+Mountain
+Island
+Island
+Island
+Forest
+Island x10
+
+[Bot1 Sideboard]
+Firebending Lesson
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Professor of Symbology.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Choose(Mountain)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Professor of Symbology.Power = 2
+Bot1.Graveyard = Mountain
+Bot1.Hand = Forest; Island; Island; Island
+Bot1.Sideboard = Firebending Lesson
