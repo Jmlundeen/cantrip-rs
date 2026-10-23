@@ -369,8 +369,10 @@ fn nonland_permanent_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
 }
 
-fn nonland_permanent_an_opponent_controls_mv2_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    nonland_permanent_an_opponent_controls_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= 2)
+/// "Target nonland permanent an opponent controls with mana value `N` or less" (CR 115.1, 202.3: X on the battlefield is 0).
+/// Portable Hole and Seam Rip (2) and Thundering Broodwagon (4) print it.
+pub fn nonland_permanent_an_opponent_controls_with_mana_value_at_most<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    nonland_permanent_an_opponent_controls_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
 }
 
 fn creature_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -476,7 +478,7 @@ pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS: TargetSpec =
 /// "Target nonland permanent an opponent controls with mana value 2 or less" (CR 115.1, 202.3: X on the battlefield is
 /// 0). Portable Hole and Seam Rip print it.
 pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS_WITH_MANA_VALUE_2_OR_LESS: TargetSpec =
-    target(nonland_permanent_an_opponent_controls_mv2_filter);
+    target(nonland_permanent_an_opponent_controls_with_mana_value_at_most::<2>);
 fn creature_or_planeswalker_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_or_planeswalker_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
 }
