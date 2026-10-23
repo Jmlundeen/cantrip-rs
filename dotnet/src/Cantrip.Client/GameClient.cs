@@ -743,6 +743,22 @@ public sealed class GameClient
         "[" + string.Join(", ", blocks.Select(block => $"{Cards([block.Blocker])} > {Cards([block.Attacker])}")) + "]";
 
     /// <summary>
+    /// The host refused a check of a choice of cards being settled. Nothing unsettled is ever sent: a question no longer
+    /// outstanding, or not this seat's, has nothing to answer; otherwise the cards are not sent and the question is asked of
+    /// this client again, the error kept in <see cref="Errors"/>, for its player to choose anew.
+    /// </summary>
+    private void RefusedSelectionCheck(Settling settling, ErrorMessage error)
+    {
+        _checking.Clear();
+        _settling = null;
+        Mended($"a check of request {settling.Asked.RequestId} was refused ({error.Code}: {error.Detail}); the proposal {Cards(settling.Proposal)} is not sent");
+        if (error.Code is not (ErrorCode.StaleReply or ErrorCode.NotYourTurnToAnswer) && Table?.Phase != TablePhase.Abandoned)
+        {
+            Prompt = settling.Asked;
+        }
+    }
+
+    /// <summary>
     /// The host refused a check of a declaration being settled. Nothing unsettled is ever sent: a question no longer outstanding,
     /// or not this seat's, has nothing to answer; otherwise the declaration is not sent and the question is asked of this client
     /// again, the error kept in <see cref="Errors"/>, for its player to declare anew.
@@ -1107,14 +1123,10 @@ public sealed class GameClient
                 _errors.Add(error);
 
                 // The check of this answer's own question refused while it was being settled (the error names the request it is
-                // about; any other error is not this answer's): the answer meant goes as it is, for the host to judge.
+                // about; any other error is not this answer's): nothing unsettled is sent.
                 if (_settling is { } settling && _checking.Count > 0 && error.RequestId == settling.Asked.RequestId)
                 {
-                    _checking.Clear();
-                    _settling = null;
-                    LastAnswered = settling.Asked.RequestId;
-                    Mended($"a check of request {settling.Asked.RequestId} was refused ({error.Code}: {error.Detail}); sending the proposal as it is: {Cards(settling.Proposal)}");
-                    _transport.Send(new AnswerMessage { RequestId = settling.Asked.RequestId, Answer = new CardsChosenAnswer { Cards = settling.Proposal } });
+                    RefusedSelectionCheck(settling, error);
                 }
 
                 if (_blockSettling is { } declaring && _checkingBlocks.Count > 0 && error.RequestId == declaring.Asked.RequestId)

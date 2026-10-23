@@ -178,18 +178,27 @@ public sealed class SelectionSettlingTests
         Assert.Null(Answered(transport));
     }
 
-    [Fact]
-    public void The_check_of_its_own_request_refused_sends_the_proposal_as_it_is()
+    /// <summary>
+    /// The check of its own request refused never lets the unsettled proposal go: nothing is sent. A question no longer
+    /// outstanding (or not this seat's) is dropped; any other refusal puts the question back to be answered anew.
+    /// </summary>
+    [Theory]
+    [InlineData(ErrorCode.StaleReply, false)]
+    [InlineData(ErrorCode.NotYourTurnToAnswer, false)]
+    [InlineData(ErrorCode.UnknownHandle, true)]
+    [InlineData(ErrorCode.IllegalAnswer, true)]
+    public void The_check_of_its_own_request_refused_sends_nothing(ErrorCode code, bool askedAgain)
     {
         (GameClient client, Judging transport) = Asked(TwoWithDifferentNames);
         client.Answer(new CardsChosenAnswer { Cards = [H(2), H(4)] });
         transport.Inbound.Clear();
-        transport.Inbound.Enqueue(Refusal(7));
+        transport.Inbound.Enqueue(new ErrorMessage { Code = code, Detail = "refused", RequestId = 7 });
         client.Pump();
 
         Assert.False(client.IsSettling);
-        Assert.Equal([H(2), H(4)], Answered(transport));
+        Assert.Null(Answered(transport));
         Assert.Single(client.Mends);
+        Assert.Equal(askedAgain, client.Prompt?.RequestId == 7);
     }
 
     [Fact]
