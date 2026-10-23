@@ -1616,7 +1616,7 @@ does not (`actions::tapped_for_mana`).
 
 Replacement effects on that mana (CR 106.12b: Damping Sphere's "produces {C} instead of any other type and amount", Mana
 Reflection's "twice as much of that mana", Contamination's {B}) are `ReplacementKind::ManaProduction` effects over a
-`Proposal::ManaProduction { permanent, player, mana, restriction, lasting }`: while one could apply
+`Proposal::ManaProduction { permanent, player, to, mana, restriction, lasting }` (`player` the tapper, `to` whose pool): while one could apply
 (`replace::mana_may_be_replaced`, a permanent whose card has one - `CardTable::mana_replaces` - or a lasting granted one), the
 mana the ability's effect adds is held (`Cx::producing`) rather than added, proposed whole once the effect is done
 (`actions::produce`, `replace::mana_production`), ordered by the player who tapped it (CR 616.1), each effect once (CR 614.5),

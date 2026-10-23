@@ -125,6 +125,8 @@ fn subject_of(proposal: &Proposal) -> Option<ObjectId> {
     match proposal {
         Proposal::ZoneChange(z) => Some(z.object),
         Proposal::Counters(c) => Some(c.object),
+        // The permanent tapped for mana. Its own `own_everywhere` effects are looked at where a cost has moved it (a
+        // sacrificed Treasure's): no printed card has one of this kind, which would function from its new zone here.
         Proposal::ManaProduction(m) => Some(m.permanent),
         Proposal::DrawInstruction(_)
         | Proposal::Draw(_)

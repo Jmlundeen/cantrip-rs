@@ -830,15 +830,17 @@ pub(crate) struct Cx<'a> {
     /// over the frame's. None outside one.
     pub doer: Option<PlayerId>,
     /// The mana a permanent tapped for mana is producing (CR 106.12b), held while its mana ability's effect runs so that the
-    /// replacement effects on the production meet all of it before any is added (`actions::activate_mana`): the player whose
-    /// pool it goes to, and each addition. None outside such an ability, and while nothing could replace its mana.
-    pub producing: Option<(PlayerId, Vec<Produced>)>,
+    /// replacement effects on the production meet all of it before any is added (`actions::activate_mana`): each addition,
+    /// to whichever player's pool (Spectral Searchlight's "that player adds"). None outside such an ability, and while nothing
+    /// could replace its mana.
+    pub producing: Option<Vec<Produced>>,
 }
 
-/// One addition of mana to a pool held as part of a production (`Cx::producing`): its type, how much, its restriction
-/// (CR 106.6) and whether it lasts until end of combat (CR 106.4).
+/// One addition of mana to a pool held as part of a production (`Cx::producing`): the player whose pool it goes to, its type,
+/// how much, its restriction (CR 106.6) and whether it lasts until end of combat (CR 106.4).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct Produced {
+    pub to: PlayerId,
     pub mana: Mana,
     pub amount: u32,
     pub restriction: Option<ManaRestriction>,
@@ -1169,11 +1171,11 @@ impl<'a> Cx<'a> {
         }
     }
 
-    /// Holds mana added to `player`'s pool as part of the production of a permanent tapped for mana (`Cx::producing`): whether
-    /// it was, rather than added now.
-    fn hold(&mut self, player: PlayerId, produced: Produced) -> bool {
+    /// Holds mana added to a pool as part of the production of a permanent tapped for mana (`Cx::producing`), whoever's pool
+    /// it goes to: whether it was, rather than added now.
+    fn hold(&mut self, produced: Produced) -> bool {
         match &mut self.producing {
-            Some((producer, held)) if *producer == player && produced.amount > 0 => {
+            Some(held) if produced.amount > 0 => {
                 held.push(produced);
                 true
             }
@@ -1826,7 +1828,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u32) {
-        if self.hold(player, Produced { mana, amount, restriction: None, lasting: false }) {
+        if self.hold(Produced { to: player, mana, amount, restriction: None, lasting: false }) {
             return;
         }
         let source = self.mana_source();
@@ -1847,7 +1849,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_mana_until_end_of_combat(&mut self, player: PlayerId, mana: Mana, amount: u32) {
-        if self.hold(player, Produced { mana, amount, restriction: None, lasting: true }) {
+        if self.hold(Produced { to: player, mana, amount, restriction: None, lasting: true }) {
             return;
         }
         let source = self.mana_source();
@@ -1855,7 +1857,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_restricted_mana(&mut self, player: PlayerId, mana: Mana, amount: u32, restriction: ManaRestriction) {
-        if self.hold(player, Produced { mana, amount, restriction: Some(restriction), lasting: false }) {
+        if self.hold(Produced { to: player, mana, amount, restriction: Some(restriction), lasting: false }) {
             return;
         }
         let source = self.mana_source();

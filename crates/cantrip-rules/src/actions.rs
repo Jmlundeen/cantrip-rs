@@ -2491,7 +2491,7 @@ fn replaced_yields(cx: &Cx, id: ObjectId, player: PlayerId, fixed: [u32; 6], k: 
     let mut out: Vec<ManaProduction> = Vec::new();
     let mut changed = false;
     let mut each = |made: [u32; 6]| {
-        let production = ManaProduction { permanent: id, player, mana: ManaPool(made), restriction, lasting: false };
+        let production = ManaProduction { permanent: id, player, to: player, mana: ManaPool(made), restriction, lasting: false };
         if production.mana.is_empty() {
             out.push(production);
             return;
@@ -7098,7 +7098,7 @@ pub fn activate_mana(
         // The mana is produced by the ability's source (CR 106.3), whatever has become of it paying the cost.
         let outer = cx.mana_source.replace(source);
         // Held for this production alone: a mana ability activated inside another's effect has its own.
-        let outer_held = if replaceable { cx.producing.replace((player, Vec::new())) } else { cx.producing.take() };
+        let outer_held = if replaceable { cx.producing.replace(Vec::new()) } else { cx.producing.take() };
         let added = match def.mana {
             // What the mana ability does, its activator does (CR 605.3b, 122.6a): the counters it puts are theirs.
             Some(effect) => cx.acting_as(player, |cx| effect(cx, &asker, color)),
@@ -7111,7 +7111,7 @@ pub fn activate_mana(
         let held = std::mem::replace(&mut cx.producing, outer_held);
         cx.mana_source = outer;
         added?;
-        if let Some((_, held)) = held.filter(|_| replaceable) {
+        if let Some(held) = held.filter(|_| replaceable) {
             replaced = Some(produce(cx, player, source, &held));
         }
     }
@@ -7129,32 +7129,35 @@ pub fn activate_mana(
 }
 
 /// The mana `source`, tapped for mana by `player`, produces (CR 106.12b): what its mana ability's effect added (`held`),
-/// proposed as one event to the replacement effects, and what they leave of it added to the pool, produced by `source`
-/// (CR 106.3). An ability that added nothing produced no mana: no event. Mana the effect gave a rider (CR 106.6) or made last
-/// (CR 106.4) keeps it, however the effects change its type and amount. What is produced, for its tap (`tapped_for_mana`).
+/// proposed as one event to the replacement effects, and what they leave of it added to the pool it was going to, produced by
+/// `source` (CR 106.3) - the tapper's, or another player's ("that player adds", Spectral Searchlight), whose mana the effects
+/// keyed to the tapper ("if you tap a permanent for mana") still change. An ability that added nothing produced no mana: no
+/// event. Mana the effect gave a rider (CR 106.6) or made last (CR 106.4) keeps it, however the effects change its type and
+/// amount. What is produced, into every pool, for its tap (`tapped_for_mana`, CR 106.12a).
 fn produce(cx: &mut Cx, player: PlayerId, source: ObjectId, held: &[crate::Produced]) -> ManaPool {
     let mut produced = ManaPool::default();
-    // One event for each rider the mana has. A mana ability's mana has one (every printed one); one that gave some of its
-    // mana a rider and some another would leave the effects nothing to say which rider the mana they make has.
-    let mut riders: Vec<(Option<ManaRestriction>, bool)> = Vec::new();
+    // One event for each pool and rider the mana has. A mana ability's mana goes to one pool with one rider (every printed
+    // one); one that gave some of its mana a rider and some another, or sent it to two pools, would leave the effects nothing
+    // to say which rider or pool the mana they make has.
+    let mut parts: Vec<(PlayerId, Option<ManaRestriction>, bool)> = Vec::new();
     for h in held {
-        if !riders.contains(&(h.restriction, h.lasting)) {
-            riders.push((h.restriction, h.lasting));
+        if !parts.contains(&(h.to, h.restriction, h.lasting)) {
+            parts.push((h.to, h.restriction, h.lasting));
         }
     }
     if crate::layers::verifying() {
-        assert!(riders.len() <= 1, "{source:?}'s mana ability produced mana of two riders in one production (CR 106.12b)");
+        assert!(parts.len() <= 1, "{source:?}'s mana ability produced mana of two riders or to two pools in one production (CR 106.12b)");
     }
-    for (restriction, lasting) in riders {
+    for (to, restriction, lasting) in parts {
         let mut mana = ManaPool::default();
-        for h in held.iter().filter(|h| (h.restriction, h.lasting) == (restriction, lasting)) {
+        for h in held.iter().filter(|h| (h.to, h.restriction, h.lasting) == (to, restriction, lasting)) {
             mana.0[h.mana as usize] += h.amount;
         }
-        let result = crate::replace::mana_production(cx, ManaProduction { permanent: source, player, mana, restriction, lasting });
+        let result = crate::replace::mana_production(cx, ManaProduction { permanent: source, player, to, mana, restriction, lasting });
         for m in Mana::ALL {
             let n = result.mana.get(m);
             if n > 0 {
-                cx.st().add_mana(player, m, n, source, result.restriction, result.lasting);
+                cx.st().add_mana(result.to, m, n, source, result.restriction, result.lasting);
                 produced.0[m as usize] += n;
             }
         }

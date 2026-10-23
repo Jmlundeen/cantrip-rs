@@ -124,9 +124,48 @@ static ROCK: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "{T}: Choose a player. That player adds {G}": the opponent, here.
+fn the_opponent_adds_g(g: &mut dyn cantrip_api::Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    g.add_mana(PlayerId(1 - asker.controller.0), Mana::G, 1);
+    Ok(())
+}
+static SEARCHLIGHT: CardDef = CardDef {
+    name: "Mana Replacement Searchlight",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[mana_ability(TAP, add_by(the_opponent_adds_g), "{T}: Choose a player. That player adds {G}.")],
+    ..CardDef::BLANK
+};
+/// "{T}, Sacrifice this artifact: Add three mana of any one color."
+static LOTUS: CardDef = CardDef {
+    name: "Mana Replacement Lotus",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[mana_ability(TAP.and(SACRIFICE_THIS), add_any_color(3), "{T}, Sacrifice this artifact: Add three mana of any one color.")],
+    ..CardDef::BLANK
+};
+/// "{T}: Add {U}{U}, {U}{B}, or {B}{B}": the two colors chosen as the mana is added, a question the tap asks as it resolves.
+fn two_of_blue_and_black(g: &mut dyn cantrip_api::Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    let choices = ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Black).0);
+    let Answer::Colors(colors) =
+        g.ask(asker.controller, RequestKind::ChooseColors { source: asker.source, choices, count: 2, purpose: ColorUse::AddMana })?
+    else {
+        return Ok(());
+    };
+    for c in colors {
+        g.add_mana(asker.controller, c.mana(), 1);
+    }
+    Ok(())
+}
+static RUINS: CardDef = CardDef {
+    name: "Mana Replacement Ruins",
+    types: TypeSet::of(&[CardType::Land]),
+    abilities: &[mana_ability(TAP, add_by(two_of_blue_and_black), "{T}: Add {U}{U}, {U}{B}, or {B}{B}.")],
+    ..CardDef::BLANK
+};
+
 fn game() -> Game {
-    let table: &'static CardTable =
-        Box::leak(Box::new(CardTable::new([&FILLER, &SPHERE, &REFLECTION, &CONTAMINATION, &FLARE, &TOMB, &GROVE, &TOWER, &ROCK])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([
+        &FILLER, &SPHERE, &REFLECTION, &CONTAMINATION, &FLARE, &TOMB, &GROVE, &TOWER, &ROCK, &SEARCHLIGHT, &LOTUS, &RUINS,
+    ])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -322,4 +361,47 @@ fn a_mana_abilitys_row_is_told_the_replaced_mana() {
     assert!(yields.iter().all(|(_, o)| o == &vec![pool(&[(Mana::C, 1)])]), "{yields:?}");
     // Offered still, and named a color as before.
     assert!(priority_options(&cx(&mut g), YOU).iter().any(|o| o.source == Some(tower) && !o.color_choices.is_empty()));
+}
+
+/// CR 106.12b: the whole production is the event, whoever's pool it goes to. Tapped by you for an opponent's {G}, "if you tap a
+/// permanent for mana" doubles it, into the opponent's pool; yours gets none.
+#[test]
+fn mana_an_ability_adds_to_another_players_pool_is_replaced_too() {
+    let mut g = game();
+    put(&mut g, &REFLECTION);
+    let searchlight = put(&mut g, &SEARCHLIGHT);
+    assert_eq!(tap(&mut g, searchlight, None, &[]).0, ManaPool::default());
+    assert_eq!(g.state.player(PlayerId(1)).pool, pool(&[(Mana::G, 2)]));
+}
+
+/// A cost that sacrifices the source with its {T} ("{T}, Sacrifice this artifact"): it is still tapped for mana (CR 106.12),
+/// so its three red are doubled, read as it last existed (CR 608.2h).
+#[test]
+fn a_source_sacrificed_to_its_own_mana_ability_is_still_tapped_for_mana() {
+    let mut g = game();
+    put(&mut g, &REFLECTION);
+    let lotus = put(&mut g, &LOTUS);
+    assert_eq!(tap(&mut g, lotus, Some(Color::Red), &[]).0, pool(&[(Mana::R, 6)]));
+    assert!(!g.state.battlefield().contains(&lotus), "it was sacrificed");
+}
+
+/// A filter land's colors are chosen as the mana is added, a question asked in the middle of the production: the activation is
+/// run again with the answer, and the {U}{B} chosen is doubled whole.
+#[test]
+fn a_question_asked_in_the_middle_of_a_production_is_replayed_and_the_whole_production_replaced() {
+    let mut g = game();
+    put(&mut g, &REFLECTION);
+    let ruins = put(&mut g, &RUINS);
+    g.run();
+    let r = g.pending().cloned().expect("a question");
+    let RequestKind::Priority { options } = &r.kind else { panic!("priority") };
+    let option = options.iter().find(|o| o.source == Some(ruins)).cloned().expect("its mana ability is offered");
+    g.answer(r.id, r.player, Answer::Act(Action::of(&option))).expect("a legal answer");
+    g.run();
+    let r = g.pending().cloned().expect("the colors are asked");
+    assert!(matches!(r.kind, RequestKind::ChooseColors { count: 2, .. }), "{:?}", r.kind);
+    assert_eq!(g.state.player(YOU).pool, ManaPool::default(), "nothing is added before the colors are chosen");
+    g.answer(r.id, r.player, Answer::Colors(vec![Color::Blue, Color::Black])).expect("a legal answer");
+    g.run();
+    assert_eq!(g.state.player(YOU).pool, pool(&[(Mana::U, 2), (Mana::B, 2)]));
 }

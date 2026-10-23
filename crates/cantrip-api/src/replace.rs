@@ -139,9 +139,12 @@ pub struct ManaProduction {
     /// Sacrifice this artifact: Add one mana of any color"): `Query::chars` then reads it as it last existed on the
     /// battlefield (CR 608.2h, its last-known information).
     pub permanent: ObjectId,
-    /// The player who tapped it: who activated the ability, and whose pool the mana goes to (CR 605.3b). "If you tap a
-    /// permanent for mana" (Mana Reflection) is keyed to this.
+    /// The player who tapped it, who activated the ability (CR 605.3b). "If you tap a permanent for mana" (Mana Reflection)
+    /// is keyed to this.
     pub player: PlayerId,
+    /// The player whose pool the mana goes to: the tapper's, or the one the ability names ("that player adds", Spectral
+    /// Searchlight).
+    pub to: PlayerId,
     /// The mana it produces, by type.
     pub mana: ManaPool,
     /// What restricts the mana or what it does as it is spent (CR 106.6): a rider of the ability, which stays on all the
