@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Claims;
 using Cantrip.Art;
-using Cantrip.Client.Decks;
+using Cantrip.Decks;
 using Cantrip.Discord;
 using Cantrip.Server;
 using Cantrip.Server.Events;

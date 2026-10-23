@@ -705,7 +705,8 @@ public sealed class ScenarioPlayer
                 return;
             }
 
-            case ActionKindView.PlayLand or ActionKindView.CastSpell or ActionKindView.ActivateAbility or ActionKindView.TurnFaceUp or ActionKindView.UnlockDoor:
+            case ActionKindView.PlayLand or ActionKindView.CastSpell or ActionKindView.ActivateAbility or ActionKindView.TurnFaceUp or ActionKindView.UnlockDoor
+                or ActionKindView.TakeCompanion:
             {
                 // `Menu` is the menu this action opens: none, for a card with one thing to do - never one an earlier card opened.
                 _lastMenu = string.Empty;
@@ -863,7 +864,8 @@ public sealed class ScenarioPlayer
         List<(int Seat, bool Graveyard, float X, float Y)> openers = [];
         foreach (PlayerState player in state.Players ?? [])
         {
-            openers.AddRange((player.Zones ?? []).Where(z => z.Text.StartsWith("Exile", StringComparison.Ordinal)).Select(z => (player.Seat, false, z.X, z.Y)));
+            // Exile, and a sideboard (the button reads "Companion" while a companion waits there, CR 702.139a).
+            openers.AddRange((player.Zones ?? []).Where(z => OutsideOrExile(z.Text)).Select(z => (player.Seat, false, z.X, z.Y)));
             if (player.GraveyardX > 0)
             {
                 openers.Add((player.Seat, true, player.GraveyardX, player.GraveyardY));
@@ -938,12 +940,16 @@ public sealed class ScenarioPlayer
             return;
         }
 
-        if (player?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Exile", StringComparison.Ordinal) && z.Open) is { } button)
+        if (player?.Zones?.FirstOrDefault(z => OutsideOrExile(z.Text) && z.Open) is { } button)
         {
             await _page.Page.Mouse.ClickAsync(button.X, button.Y);
             await _page.SettledAsync();
         }
     }
+
+    /// <summary>A zone button that opens exile or a sideboard: what a card a player clicks may be in, but for the piles.</summary>
+    private static bool OutsideOrExile(string text) =>
+        text.StartsWith("Exile", StringComparison.Ordinal) || text.StartsWith("Sideboard", StringComparison.Ordinal);
 
     private async Task ClickHandleAsync(int handle)
     {
@@ -1193,7 +1199,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3), .Halves (a split card's halves as drawn, like Turn; Burn; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Sideboard.Caption, .Tooltip, OpponentSideboard.Caption; Graveyard.Lit, .Note; Button.<label> (shown or absent), Button.<label>.Enabled (true or false: whether the dock's button can be pressed; absent with none), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the menu the last card action opened; empty when it opened none), Targeting (the dock's title / line while the last card action's targets were picked), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); TargetLabels (the labels on the arrows from the spell on the stack to its targets, like Turn; Burn); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3), .Halves (a split card's halves as drawn, like Turn; Burn; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Sideboard.Caption, .Tooltip, OpponentSideboard.Caption, .Tooltip; Companion, OpponentCompanion (the card in each companion window, empty with none) and their .Corner (bottom-left, top-left); Graveyard.Lit, .Note; Button.<label> (shown or absent), Button.<label>.Enabled (true or false: whether the dock's button can be pressed; absent with none), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the menu the last card action opened; empty when it opened none), Targeting (the dock's title / line while the last card action's targets were picked), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); TargetLabels (the labels on the arrows from the spell on the stack to its targets, like Turn; Burn); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
 
     private string? Read(string what, TableState state)
     {
@@ -1218,6 +1224,12 @@ public sealed class ScenarioPlayer
             "Sideboard.Caption" => Sideboard(me)?.Text ?? string.Empty,
             "Sideboard.Tooltip" => Sideboard(me)?.Tooltip ?? string.Empty,
             "OpponentSideboard.Caption" => Sideboard(them)?.Text ?? string.Empty,
+            "OpponentSideboard.Tooltip" => Sideboard(them)?.Tooltip ?? string.Empty,
+            // The companion windows (CR 103.2b): the card in each, and the corner of its half it stands in.
+            "Companion" => string.Join("; ", state.Cards.Where(c => c.Visible && c.Place == "companion").Select(c => c.Name)),
+            "OpponentCompanion" => string.Join("; ", state.Cards.Where(c => c.Visible && c.Place == "opponent-companion").Select(c => c.Name)),
+            "Companion.Corner" => state.Companions?.FirstOrDefault(c => c.Whose == "mine")?.Corner ?? string.Empty,
+            "OpponentCompanion.Corner" => state.Companions?.FirstOrDefault(c => c.Whose == "opponent")?.Corner ?? string.Empty,
             "Graveyard.Lit" => (me?.GraveyardLit ?? false) ? "true" : "false",
             "Graveyard.Note" => me?.GraveyardNote ?? string.Empty,
             "Stack" => Names("stack"),

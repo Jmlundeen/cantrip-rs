@@ -43,6 +43,7 @@ public sealed class EventTransportTests : IDisposable
 
     private static Task<GameServer> Host(EventStore store, string id) => GameServer.StartAsync(new GameServerOptions
     {
+        Format = Cantrip.Decks.DeckFormat.Limited(),
         Port = 0,
         Players = 2,
         ContentRoot = RepoRoot.ContentRoot,
@@ -90,6 +91,7 @@ public sealed class EventTransportTests : IDisposable
         var clock = new Clock();
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Players = 2,
             ContentRoot = RepoRoot.ContentRoot,
@@ -164,6 +166,7 @@ public sealed class EventTransportTests : IDisposable
         await portraits.SaveAsync("bob", [1, 2, 3]);
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Players = 2,
             ContentRoot = RepoRoot.ContentRoot,

@@ -1,0 +1,57 @@
+# Lurrus of the Dream-Den: "Companion - Each permanent card in your starting deck has mana value 2 or less." Bot1 chose Lurrus
+# as its companion when it built its deck, and the deck's permanents are Swamps, Moxen and an Ornithopter, so Lurrus is
+# revealed before the game with nothing asked (CR 103.2b); another Lurrus is a plain sideboard card. Once during the game, any
+# time it has priority during its own main phase with the stack empty, Bot1 may pay {3} and put the companion into its hand
+# (CR 702.139a, 116.2g): not with one mana, not in its end step, not in Bot2's main phase, not with Ornithopter on the stack.
+# Taken, it is in the game, and the other Lurrus, never revealed, can't be taken.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Swamp
+Swamp
+Swamp x20
+
+[Bot1 Sideboard]
+Lurrus of the Dream-Den
+
+[Bot1 Companion]
+Lurrus of the Dream-Den
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+? Bot1.Companion = Lurrus of the Dream-Den
+? Bot1.Revealed = Lurrus of the Dream-Den
+Bot1.Hand.Swamp.Play
+! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T1 Bot1.End]
+! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+[T2 Bot2.Main1]
+! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+Bot1.Pass
+Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+
+[Expect]
+Bot1.Companion = Lurrus of the Dream-Den
+Bot1.Sideboard = Lurrus of the Dream-Den
+Bot1.Hand = Swamp; Swamp; Swamp; Lurrus of the Dream-Den
+Bot1.Battlefield = Ornithopter; Mox Jet; Mox Pearl; Mox Sapphire; Swamp
+Bot1.Battlefield.Mox Sapphire.Tapped = false

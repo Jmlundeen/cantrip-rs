@@ -25,6 +25,12 @@ pub struct GameScript {
     /// A Limited game's basic lands (a `[Basic Lands Outside]` section, one name a line): every sideboard holds any number
     /// of each (`Setup::basic_lands_outside`).
     pub basic_lands_outside: Vec<String>,
+    /// Each player's companion, chosen as the deck was built (a `[Bot1 Companion]` section, one card name): dealt into their
+    /// sideboard, and revealed before the game if their deck fulfils its condition (CR 103.2b). Index 0 is Bot1.
+    pub companions: Vec<Option<String>>,
+    /// The format's minimum deck size (a `[Minimum Deck Size]` section: `40`, as in Limited, CR 100.2b), when not
+    /// Constructed's sixty (CR 100.2a).
+    pub minimum_deck_size: Option<u32>,
     pub steps: Vec<ScriptStep>,
     pub expectations: Vec<Expectation>,
     /// Whether the game starts as a real one does (CR 103).
@@ -201,6 +207,8 @@ pub enum ScriptVerb {
     Activate,
     Foretell,
     Suspend,
+    /// Pay {3} and put the revealed companion into the hand (CR 116.2g): `Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion`.
+    TakeCompanion,
     Pass,
     PayCost,
     Decline,
@@ -247,12 +255,13 @@ impl ScriptVerb {
         )
     }
 
-    pub const ALL: [ScriptVerb; 32] = [
+    pub const ALL: [ScriptVerb; 33] = [
         ScriptVerb::Play,
         ScriptVerb::Cast,
         ScriptVerb::Activate,
         ScriptVerb::Foretell,
         ScriptVerb::Suspend,
+        ScriptVerb::TakeCompanion,
         ScriptVerb::Pass,
         ScriptVerb::PayCost,
         ScriptVerb::Decline,
@@ -289,6 +298,7 @@ impl ScriptVerb {
             ScriptVerb::Activate => "Activate",
             ScriptVerb::Foretell => "Foretell",
             ScriptVerb::Suspend => "Suspend",
+            ScriptVerb::TakeCompanion => "TakeCompanion",
             ScriptVerb::Pass => "Pass",
             ScriptVerb::PayCost => "PayCost",
             ScriptVerb::Decline => "Decline",
@@ -334,7 +344,7 @@ impl ScriptVerb {
     }
 
     pub fn needs_card(self) -> bool {
-        matches!(self, ScriptVerb::Play | ScriptVerb::Cast | ScriptVerb::Activate | ScriptVerb::Foretell | ScriptVerb::Suspend)
+        matches!(self, ScriptVerb::Play | ScriptVerb::Cast | ScriptVerb::Activate | ScriptVerb::Foretell | ScriptVerb::Suspend | ScriptVerb::TakeCompanion)
     }
 }
 
@@ -521,8 +531,8 @@ impl ScriptStep {
         }
         if let Some(rest) = line.strip_prefix('!') {
             let action = ActionStep::parse(rest.trim(), number)?;
-            if !matches!(action.verb, ScriptVerb::Play | ScriptVerb::Cast | ScriptVerb::Activate | ScriptVerb::Foretell | ScriptVerb::Suspend | ScriptVerb::Block | ScriptVerb::Attack | ScriptVerb::Search | ScriptVerb::Accept | ScriptVerb::Modes | ScriptVerb::Target | ScriptVerb::Undo | ScriptVerb::PayCost | ScriptVerb::RemoveCounters) && !action.verb.is_question() {
-                return Err(ParseError("a refusal (!) names a Play, Cast, Activate, Foretell, Suspend, Block, Attack, Search, Accept, Modes, Target, Undo or PayCost that must not be offered, as ! Bot1.Hand.Island.Play, ! Bot2.Block(Bear > Ox), ! Bot1.Search(Plains), ! Bot1.Accept, ! Bot1.Modes(1; 2), ! Bot1.Target(Island), ! Bot1.Undo or ! Bot1.PayCost".into()));
+            if !matches!(action.verb, ScriptVerb::Play | ScriptVerb::Cast | ScriptVerb::Activate | ScriptVerb::Foretell | ScriptVerb::Suspend | ScriptVerb::TakeCompanion | ScriptVerb::Block | ScriptVerb::Attack | ScriptVerb::Search | ScriptVerb::Accept | ScriptVerb::Modes | ScriptVerb::Target | ScriptVerb::Undo | ScriptVerb::PayCost | ScriptVerb::RemoveCounters) && !action.verb.is_question() {
+                return Err(ParseError("a refusal (!) names a Play, Cast, Activate, Foretell, Suspend, TakeCompanion, Block, Attack, Search, Accept, Modes, Target, Undo or PayCost that must not be offered, as ! Bot1.Hand.Island.Play, ! Bot2.Block(Bear > Ox), ! Bot1.Search(Plains), ! Bot1.Accept, ! Bot1.Modes(1; 2), ! Bot1.Target(Island), ! Bot1.Undo or ! Bot1.PayCost".into()));
             }
             return Ok(ScriptStep::Refused { line: number, text: line.to_string(), action });
         }
@@ -610,6 +620,8 @@ enum Section {
     None,
     Deck(usize),
     Sideboard(usize),
+    Companion(usize),
+    MinimumDeckSize,
     BasicLandsOutside,
     Actions,
     Expect,
@@ -654,6 +666,20 @@ impl GameScript {
                         }
                         script.sideboards[seat].push(parse_deck_entry(line, number)?)
                     }
+                    Section::Companion(seat) => {
+                        if script.companions.len() <= seat {
+                            script.companions.resize(seat + 1, None);
+                        }
+                        let entry = parse_deck_entry(line, number)?;
+                        if entry.copies != 1 || script.companions[seat].is_some() {
+                            return Err(ParseError("a [Bot1 Companion] section names one card: the companion chosen as the deck was built".into()));
+                        }
+                        script.companions[seat] = Some(entry.card);
+                    }
+                    Section::MinimumDeckSize => match line.parse::<u32>() {
+                        Ok(n) if script.minimum_deck_size.is_none() => script.minimum_deck_size = Some(n),
+                        _ => return Err(ParseError("a [Minimum Deck Size] section gives one number, as 40".into())),
+                    },
                     Section::BasicLandsOutside => {
                         let entry = parse_deck_entry(line, number)?;
                         if entry.copies != 1 {
@@ -706,6 +732,7 @@ impl GameScript {
             .flat_map(|i| self.decklist(i))
             .chain((0..self.sideboards.len()).flat_map(|i| self.sideboard(i)))
             .chain(self.basic_lands_outside.iter().cloned())
+            .chain(self.companions.iter().flatten().cloned())
             .collect()
     }
 
@@ -724,11 +751,16 @@ fn section_header(line: &str) -> Option<Section> {
         "[LIFE]" => Some(Section::Life),
         "[EVENT LIMIT]" => Some(Section::EventLimit),
         "[BASIC LANDS OUTSIDE]" => Some(Section::BasicLandsOutside),
+        "[MINIMUM DECK SIZE]" => Some(Section::MinimumDeckSize),
         other => {
             let rest = other.strip_prefix("[BOT")?;
             if let Some(seat) = rest.strip_suffix(" SIDEBOARD]") {
                 let seat = seat.parse::<usize>().ok()?;
                 return (1..=4).contains(&seat).then_some(Section::Sideboard(seat - 1));
+            }
+            if let Some(seat) = rest.strip_suffix(" COMPANION]") {
+                let seat = seat.parse::<usize>().ok()?;
+                return (1..=4).contains(&seat).then_some(Section::Companion(seat - 1));
             }
             let seat = rest.strip_suffix(" DECK]")?.parse::<usize>().ok()?;
             (1..=4).contains(&seat).then_some(Section::Deck(seat - 1))

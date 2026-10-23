@@ -19,6 +19,7 @@ public sealed class WholeGameTests(WebClient web)
         string decks = Path.Combine(WebClient.Root, "decks");
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Seed = 1,
             ContentRoot = WebClient.Content,
@@ -65,6 +66,7 @@ public sealed class WholeGameTests(WebClient web)
         string decks = Path.Combine(WebClient.Root, "decks");
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Seed = 1,
             ContentRoot = WebClient.Content,

@@ -67,7 +67,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-123](#ki-123-the-ai-crates-knowledge-misjudges-what-a-seat-saw-across-the-control-of-a-player) | The AI crate's knowledge misjudges what a seat saw across the control of a player | Pri-2 | Open |
 | [KI-124](#ki-124-what-a-land-could-produce-is-judged-for-at-most-256-answers-to-its-mana-abilitys-questions) | What a land could produce is judged for at most 256 answers to its mana ability's questions | Pri-3 | Won't fix: beyond practical scale |
 | [KI-125](#ki-125-a-mana-abilitys-row-can-show-what-its-ability-lists-or-the-best-of-several-outcomes-under-replacement-effects-on-its-mana) | A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana | Pri-2 | Open |
-| [KI-126](#ki-126-companion-is-not-built) | Companion is not built | Pri-1 | Fix under way |
 
 ## Issues
 
@@ -400,19 +399,3 @@ read it (`AutoMana`, `AutoPlay`, the tactical bot), can be off. A fix is a proto
 color" apart from how much of it the ability adds, or the outcomes listed per color.
 
 **Scenarios.** None: display. `prompt::row_yield_tests` shows which rows fall back.
-
-### KI-126: Companion is not built
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix under way | engine / host / client | 2026-10-22, reviewing Yorion, Sky Nomad (#210) |
-
-**Notes.** CR 702.139, 103.2b and 116.2g: a player may reveal a card with companion from outside the game before the game
-if their deck meets its condition, and once per game, during their own main phase with the stack empty, pay {3} to put it
-into their hand. None of it exists: no pregame reveal or condition check, no special action (`ActionKind` has none;
-`ActionKindView::TakeCompanion` is never produced and `answer.rs` refuses it), and the deck editor and server check no
-companion condition. Lurrus of the Dream-Den is implemented with a comment saying the deck builder owns it, which is
-false; Yorion, Sky Nomad waits on this. A card with companion in the main deck plays correctly (the ability does nothing
-there).
-
-**Scenarios.** None yet: Lurrus of the Dream-Den and Yorion, Sky Nomad reach it.

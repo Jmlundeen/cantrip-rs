@@ -15,7 +15,7 @@ header; most pass every argument on to the script behind them.
 
 | | |
 |---|---|
-| `play-game.cmd` | a local table: each seat's deck, and whether you, a bot or a language model plays it |
+| `play-game.cmd` | a local table: each seat's deck, and whether you, a bot or a language model plays it; `-Format` the format the decks are checked against (freeform, no restriction, by default) |
 | `play-vs-bot.cmd` | you against the tactical bot, which your own browser tab plays (`docs/tactical-bot.md`) |
 | `play-vs-llm.cmd` | you against a language model (OpenRouter) |
 | `play-release-build.cmd` | you against a bot in the shipping Release build of the web client |

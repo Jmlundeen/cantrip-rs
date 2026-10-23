@@ -293,9 +293,9 @@ public sealed class GameClient
 
     /// <summary>
     /// Sends this seat's deck as it now stands - the places in its pool of the main deck's cards and the basic lands
-    /// added - and with <paramref name="submit"/> says it is the deck to play.
+    /// added, and its companion's place (-1 for none, CR 702.139a) - and with <paramref name="submit"/> says it is the deck to play.
     /// </summary>
-    public void BuildDeck(IEnumerable<int> main, IReadOnlyDictionary<string, int> basics, bool submit)
+    public void BuildDeck(IEnumerable<int> main, IReadOnlyDictionary<string, int> basics, bool submit, int companion = -1)
     {
         ArgumentNullException.ThrowIfNull(main);
         ArgumentNullException.ThrowIfNull(basics);
@@ -310,6 +310,7 @@ public sealed class GameClient
             Main = [.. main],
             Basics = [.. basics.Select(land => new BasicLandCount { Name = land.Key, Count = land.Value })],
             Submit = submit,
+            Companion = companion,
         });
     }
 

@@ -84,6 +84,7 @@ pub(crate) fn action_kind_view(kind: ActionKind) -> ActionKindView {
         ActionKind::DecreaseX => ActionKindView::DecreaseX,
         ActionKind::TapToPay => ActionKindView::TapToPay,
         ActionKind::ExileToPay => ActionKindView::ExileToPay,
+        ActionKind::TakeCompanion => ActionKindView::TakeCompanion,
     }
 }
 

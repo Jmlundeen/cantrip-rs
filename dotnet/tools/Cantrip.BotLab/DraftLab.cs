@@ -624,7 +624,8 @@ internal static class DraftLab
                 Main = [.. main], Basics = [.. basics.Select(basic => new BasicLandCount { Name = basic.Key, Count = basic.Value })], Submit = true,
             };
 
-            if (PoolDecks.Built(new EventDeck(), pool.Count, submitted, cube.Basics, Minimum).Refusal is { } refusal)
+            // The draft bot names no companion, so the server's check of the format asks nothing more than the size.
+            if (PoolDecks.Built(new EventDeck(), pool.Count, submitted, cube.Basics, Minimum, _ => null).Refusal is { } refusal)
             {
                 throw new InvalidOperationException($"Seat {seat} ({seats[seat - 1].Kind}) built a deck the server would refuse: {refusal}");
             }
@@ -1166,8 +1167,9 @@ internal static class DraftLab
             bool swapped = game % 2 == 1;
             DeckList deckA = AsDeckList(cube, first, named(pod, first));
             DeckList deckB = AsDeckList(cube, second, named(pod, second));
+            // Drafted decks are Limited's, with the lab's minimum (CR 100.2b).
             MatchResult result = Match.Play(
-                content, swapped ? [deckB, deckA] : [deckA, deckB], seed + (ulong)(index * 7919), [pilot(), pilot()], sample: false);
+                content, swapped ? [deckB, deckA] : [deckA, deckB], Cantrip.Decks.DeckFormat.Limited(Minimum), seed + (ulong)(index * 7919), [pilot(), pilot()], sample: false);
 
             if (!result.Finished)
             {

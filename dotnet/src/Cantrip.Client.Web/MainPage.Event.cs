@@ -181,6 +181,7 @@ public sealed partial class MainPage
         (_mainBoard, _ => null),
         (_sideBoard, _ => new CardLook(Note: "In your sideboard.")),
         (_commandBoard, _ => new CardLook(Note: "Your commander.")),
+        (_companionBoard, _ => new CardLook(Note: "Your companion: a sideboard card, revealed before each game.")),
         (_searchBoard, _ => null),
     ];
 
@@ -1084,7 +1085,8 @@ public sealed partial class MainPage
         // The server's deck is the deck only when it has caught up; otherwise the page's own sideboard stands.
         HashSet<int>? main = fromServer ? [.. building.Main] : null;
         ShowPool(building.EventId, building.Pool, main ?? (IReadOnlyCollection<int>)[.. _arrangement?.Main ?? []],
-            [.. building.Basics.Select(land => (land, _deckBasics.GetValueOrDefault(land.Name)))]);
+            [.. building.Basics.Select(land => (land, _deckBasics.GetValueOrDefault(land.Name)))],
+            fromServer ? building.Companion : _arrangement?.Companion.FirstOrDefault(-1) ?? -1);
     }
 
     /// <summary>Brings the basic lands, Submit and what is said about the deck up to date with the deck as laid out.</summary>
@@ -1173,7 +1175,7 @@ public sealed partial class MainPage
             return;
         }
 
-        client.BuildDeck(arrangement.Main, _deckBasics, submit);
+        client.BuildDeck(arrangement.Main, _deckBasics, submit, arrangement.Companion.FirstOrDefault(-1));
         _deckSubmitted = submit;
         ShowDeck(client, fromServer: false);
     }

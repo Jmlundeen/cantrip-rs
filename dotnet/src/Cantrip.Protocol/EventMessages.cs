@@ -167,6 +167,12 @@ public sealed class DeckBuildingMessage : ServerMessage
     /// <summary>What the deck is being built for, when it is not the event's deck: "Sideboarding for game 2 - you lead 1-0".</summary>
     [Key(9)] public string Title { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The place in <see cref="Pool"/> of the card chosen as the deck's companion (CR 702.139a), a sideboard card in a column
+    /// of its own; -1 for none. The server refuses to take a deck as submitted whose companion's condition it doesn't fulfil.
+    /// </summary>
+    [Key(10)] public int Companion { get; set; } = -1;
+
     public override string Describe() => $"deck building, change {Change}{(Submitted ? ", submitted" : string.Empty)}";
 }
 
@@ -224,6 +230,10 @@ public sealed class BuildDeckMessage : ClientMessage
     [Key(1)] public List<int> Main { get; set; } = [];
     [Key(2)] public List<BasicLandCount> Basics { get; set; } = [];
     [Key(3)] public bool Submit { get; set; }
+
+    /// <summary>The place in the pool of the card chosen as the deck's companion (CR 702.139a), not in the main deck; -1 for none.</summary>
+    [Key(4)] public int Companion { get; set; } = -1;
+
     public override string Describe() => Submit ? $"submit the deck, change {Change}" : $"build the deck, change {Change}";
 }
 

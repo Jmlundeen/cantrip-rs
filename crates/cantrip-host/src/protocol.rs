@@ -442,6 +442,9 @@ pub struct PlayerSummaryView {
     /// The seat making this player's choices and decisions now (CR 723.5), while another player controls them; 0 while
     /// they make their own. Public, as the effect is.
     pub controlled_by: i32,
+    /// The companion this player revealed before the game (CR 103.2b), while it is still outside the game, revealed: an
+    /// object of every seat's view, in its owner's sideboard. None once it has been put into the game, or with none revealed.
+    pub companion: ViewHandle,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -2190,4 +2193,13 @@ mod tests {
         let total: i32 = chosen.cards.iter().map(|c| [-4, 2][if *c == ViewHandle(3) { 0 } else { 1 }]).sum();
         assert!(total >= 1);
     }
+}
+
+/// A card with companion in a deck's sideboard, and whether the deck fulfils its condition (CR 702.139a, 103.2b): the host's
+/// answer to `Companions`, which the deck editor shows.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct CompanionCheckView {
+    pub card: String,
+    pub fulfilled: bool,
 }

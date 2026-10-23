@@ -1953,10 +1953,38 @@ sideboard as in the deck. `cantrip_mechanics::outside::may_put_card_into_hand` i
 put a card you own from outside the game into your hand", asked as `Purpose::PutIntoHand` over the sideboard's cards, which
 the client captions as coming from outside the game. Not built, because no card in content needs them: a revealed fetch of
 a quality (Burning Wish, Living Wish, Karn, the Great Creator), learn (CR 701.48: a Lesson card from outside the game,
-revealed, `Subtype::Lesson`, which would bring it in with this same verb), casting from outside the game (Spawnsire of
-Ulamog), and a companion (CR 702.139), which would start in the sideboard and be put into the hand by a special action. The
+revealed, `Subtype::Lesson`, which would bring it in with this same verb), and casting from outside the game (Spawnsire of
+Ulamog). A companion is below. The
 benchmark is unchanged within the noise (2026-10-16, alternating: 57.4 (an outlier), 12.06, 14.10 us before and 13.87,
 12.45, 11.12 us after).
+
+### Companion
+
+Companion (CR 702.139) is a keyword ability that functions outside the game. A card with it declares its condition,
+`CardDef::companion`, a `CompanionCondition` over the `StartingDeck` (its cards and the format's minimum deck size, CR
+702.139b), and a test (`companion_matches_oracle`) holds every card whose text has a "Companion -" line to declaring one;
+what several conditions say alike is `cantrip_mechanics::companion` (`each_permanent_card`: Lurrus of the Dream-Den, Zirda,
+the Dawnwaker). The player's choice to reveal a companion (CR 103.2b) is made at deck building: a deck names its companion
+(`Setup::companions`), dealt into the sideboard beside the rest, and the server refuses a deck whose companion has no
+companion or whose condition the deck does not fulfil (`DeckValidation`, asking the host's `Companions`, which runs the
+card's own condition through `eligible_companions`). `Game::new` judges the condition against the library as dealt and keeps
+the companion to reveal (`Player::companion_to_reveal`); once the starting player is known (CR 103.1) the opening reveals each
+in turn order (`turn::reveal_companions`): `Player::companion` and an `Event::Revealed`, nothing asked of anyone, so no question
+or its absence says anything of a sideboard. One whose condition the deck does not fulfil is a sideboard card, unrevealed. The
+revealed card stays outside the game, and every seat sees it there (`revealed_companion`, `visibility::observable`). Once
+during the game, with priority in a main phase of their turn and the stack empty, its owner may pay {3} and put it into their
+hand (`ActionKind::TakeCompanion`, CR 116.2g): a special action, no ability, so nothing that changes or forbids activations
+touches it and mana for abilities only can't pay it; offered only where the {3} can be paid, and only while the revealed card
+is still outside the game - once it is in the game it is a new object (CR 400.7), so the action is had once, and a card a wish
+fetched instead is no longer there to take. It is brought in by `bring_into_hand` (CR 400.11b) and stays (CR 702.139c). The
+format's minimum deck size, which Yorion, Sky Nomad's condition names, is `GameState::minimum_deck_size`, which the server says
+outright (`Setup::minimum_deck_size`, the host's `MinimumDeckSize`): sixty in Constructed, forty in Limited or the event's own,
+a hundred in Commander (CR 100.2a-b), and sixty in Freeform - the default format, whose decks the server holds to no restriction,
+but which is casual Constructed play as far as the rules' minimum goes (CR 100.2a; Yorion's rulings name "casual freeform
+play" among the sixty-card events). The server checks every deck against its table's format before dealing it, and each
+game of a match after sideboarding (`DeckRules`, shared with the deck editor, and `DeckValidation`).
+The benchmark is unchanged within the noise (2026-10-23, four alternating rounds, engine answering: 9.50, 9.53, 9.37, 9.20 us per decision before and 9.48, 9.32, 9.23, 9.28 us
+after).
 
 ### Keyword counters
 

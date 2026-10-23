@@ -22,6 +22,7 @@ public sealed class GoingBackTests(WebClient web)
         DeckList islands = DeckList.Load(DeckList.Find(decks, "demo/2-white-blue"));
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Players = 2,
             ContentRoot = WebClient.Content,
@@ -99,6 +100,7 @@ public sealed class GoingBackTests(WebClient web)
             Cantrip.Server.Events.DraftPod pod = Cantrip.Server.Events.DraftPod.Open(store, created.Record.Id, ContentCache.Get(WebClient.Content));
             await using GameServer server = await GameServer.StartAsync(new GameServerOptions
             {
+                Format = Cantrip.Decks.DeckFormat.Limited(),
                 Port = 0,
                 Players = 2,
                 ContentRoot = WebClient.Content,

@@ -1,3 +1,4 @@
+using Cantrip.Decks;
 using Cantrip.Discord;
 using Cantrip.Server;
 using Cantrip.Server.Events;
@@ -152,17 +153,28 @@ catch (Exception error) when (error is IOException or InvalidOperationException 
     return 1;
 }
 
-// The Standard gauntlet's decks: every list under decks/standard whose cards the engine has.
+// The Standard gauntlet's decks: every list under decks/standard whose cards the engine has and that is legal in Standard,
+// as the server checks every deck it deals (DeckValidation).
 List<DeckList> standard = [];
 if (Directory.Exists(Path.Combine(decks, "standard")))
 {
     int unplayable = 0;
+    List<string> illegal = [];
     foreach (string path in Directory.GetFiles(Path.Combine(decks, "standard"), "*.txt").Order(StringComparer.Ordinal))
     {
         try
         {
             DeckList candidate = DeckList.Load(path);
             candidate.Resolve([ContentCache.Get(content).Cards]);
+            DeckFormat standardFormat = DeckFormat.Find(DeckFormat.StandardKey)!;
+            IReadOnlyList<string> problems = Cantrip.Server.Decks.DeckValidation.Problems(Cantrip.Server.Decks.DeckValidation.Of(candidate, standardFormat), standardFormat,
+                Cantrip.Server.Decks.DeckCatalog.ByName(content), Cantrip.Server.Rules.RulesHostFactory.Native);
+            if (problems.Count > 0)
+            {
+                illegal.Add($"{candidate.Name}: {problems[0]}");
+                continue;
+            }
+
             standard.Add(candidate);
         }
         catch (Exception error) when (error is IOException or InvalidOperationException or FormatException)
@@ -171,7 +183,9 @@ if (Directory.Exists(Path.Combine(decks, "standard")))
         }
     }
 
-    Console.WriteLine($"{standard.Count} Standard deck(s) for the gauntlet{(unplayable == 0 ? string.Empty : $"; {unplayable} with cards the engine lacks left out")}.");
+    Console.WriteLine($"{standard.Count} Standard deck(s) for the gauntlet{(unplayable == 0 ? string.Empty : $"; {unplayable} with cards the engine lacks left out")}"
+        + $"{(illegal.Count == 0 ? string.Empty : $"; {illegal.Count} not legal in Standard left out")}.");
+    foreach (string line in illegal) Console.WriteLine($"  {line}");
 }
 
 // Drafts, when there is somewhere to keep them.

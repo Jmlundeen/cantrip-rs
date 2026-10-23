@@ -343,6 +343,32 @@ public sealed class LeagueTests : IDisposable
     }
 
     /// <summary>
+    /// Sideboarding for the next game of a match (CR 100.4) submits the deck again, and the server checks it again before that
+    /// game is dealt: too few cards is refused, and so is a companion that has no companion (CR 702.139a); the deck as the
+    /// rules allow is taken.
+    /// </summary>
+    [Fact]
+    public void Sideboarding_for_the_next_game_checks_the_deck_again_its_companion_with_it()
+    {
+        League league = Make(rules => rules.GamesToWin = 2);
+        Enter(league, "ann");
+        Enter(league, "ben");
+        MatchGame first = Pair(league, "ann", "ben");
+        Dealt(first);
+        first.GameEnded(abandoned: false, [1], "won");
+        MatchGame second = Assert.Single(league.TablesToOpen());
+        second.Opened(new Uri("ws://localhost:9302/game"));
+
+        BuildDeckMessage Deck(int change, int spells, int companion) => new()
+        {
+            Change = change, Main = [.. Enumerable.Range(0, spells)], Basics = [new BasicLandCount { Name = "Mountain", Count = 18 }], Submit = true, Companion = companion,
+        };
+        Assert.Equal("A deck needs at least 40 cards; this one has 39.", second.Receive(1, Deck(1, 21, -1)));
+        Assert.Contains("has no companion ability, so it can't be the deck's companion", second.Receive(1, Deck(2, 22, 22)), StringComparison.Ordinal);
+        Assert.Null(second.Receive(1, Deck(3, 22, -1)));
+    }
+
+    /// <summary>
     /// A player whose match clock runs out loses the whole match, whatever the score (docs/events.md, "Clocks"): Ann, a game
     /// up in a best of three, runs out of time in game two, and Ben wins the match - its game two too - with no third game,
     /// and their runs count it as his win and her loss.

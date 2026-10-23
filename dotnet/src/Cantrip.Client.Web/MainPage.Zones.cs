@@ -507,18 +507,14 @@ public sealed partial class MainPage
         }
 
         // A sideboard holds the cards a player owns outside the game (CR 400.11a): only its owner may look at it, so only its
-        // owner's rail has the button. A companion waits there too (CR 702.139).
+        // owner's rail has the button. A revealed companion waits there too, and has a window of its own over the battlefield
+        // (LayOutCompanion), where it is taken.
         IReadOnlyList<ObjectView> sideboard = client.Zone(ZoneKindView.Sideboard, seat);
         if (sideboard.Count > 0)
         {
-            bool offered = sideboard.Any(card => _actions.For(card.Handle).Count > 0);
             buttons.Add(new PlayerRail.ZoneButtonSpec(
-                offered ? $"Companion  {sideboard.Count}" : $"Sideboard  {sideboard.Count}",
-                seat == client.Seat
-                    ? offered
-                        ? "Your companion is waiting outside the game. Click to look, and to put it into your hand for {3}"
-                        : "Your sideboard: the cards you own outside the game. Only you can see them"
-                    : $"The card {name} revealed as their companion",
+                $"Sideboard  {sideboard.Count}",
+                "Your sideboard: the cards you own outside the game. Only you can see them",
                 _peek == (ZoneKindView.Sideboard, seat),
                 () => { TogglePeek(ZoneKindView.Sideboard, seat); RedrawNow(); }));
         }

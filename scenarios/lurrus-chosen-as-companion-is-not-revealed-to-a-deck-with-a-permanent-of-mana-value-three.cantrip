@@ -1,0 +1,46 @@
+# Lurrus of the Dream-Den: "Companion - Each permanent card in your starting deck has mana value 2 or less." A companion is
+# revealed before the game only if the starting deck fulfils its condition (CR 103.2b). Bot1 chose Lurrus, but its deck holds
+# a Lurrus of its own, a permanent card with mana value 3 (the companion ability does nothing in the deck, but the card is
+# still a permanent card of it), so Bot1's is not revealed: it is a sideboard card, and Bot1 has no companion to take, though
+# it has the mana. Bot2's deck of Islands fulfils it. In a real start the starting player is chosen first (CR 103.1) and the
+# companions are revealed after (CR 103.2b), with nothing asked of anyone.
+
+[Bot1 Deck]
+Swamp x7
+Lurrus of the Dream-Den
+Swamp x20
+
+[Bot1 Companion]
+Lurrus of the Dream-Den
+
+[Bot2 Deck]
+Island x27
+
+[Bot2 Companion]
+Lurrus of the Dream-Den
+
+[Opening]
+Chooser: Bot1
+
+[Actions]
+Bot1.DrawFirst
+! Bot1.Choose
+? Bot1.Companion =
+? Bot2.Companion = Lurrus of the Dream-Den
+Bot2.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+Bot2.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Island#3.Activate
+Bot1.Hand.Swamp.Play
+! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+
+[Expect]
+Bot1.Companion =
+Bot1.Sideboard = Lurrus of the Dream-Den
+Bot2.Companion = Lurrus of the Dream-Den
+Bot2.Sideboard =

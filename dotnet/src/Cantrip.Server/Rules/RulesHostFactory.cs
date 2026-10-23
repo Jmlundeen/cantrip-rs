@@ -6,7 +6,12 @@ namespace Cantrip.Server.Rules;
 /// The cards the seat owns outside the game (CR 100.4, 400.11a): what "a card you own from outside the game" chooses among
 /// (North Wind Avatar). A card the host does not know is refused here, as in the deck.
 /// </param>
-public sealed record RulesSeat(string Name, IReadOnlyList<string> Deck, IReadOnlyList<string> Sideboard)
+/// <param name="Companion">
+/// The card chosen as the seat's companion at deck building (CR 702.139a), dealt into its sideboard beside the cards there
+/// and revealed before the game (CR 103.2b); null for none. The server has refused a deck whose companion's condition it
+/// does not fulfil (<see cref="Cantrip.Server.Decks.DeckValidation"/>).
+/// </param>
+public sealed record RulesSeat(string Name, IReadOnlyList<string> Deck, IReadOnlyList<string> Sideboard, string? Companion = null)
 {
     public RulesSeat(string name, IReadOnlyList<string> deck) : this(name, deck, [])
     {
@@ -23,6 +28,13 @@ public sealed class RulesGameOptions
 
     /// <summary>The seat that chooses who goes first instead of one picked at random (CR 103.1); null for random.</summary>
     public int? Chooser { get; init; }
+
+    /// <summary>
+    /// The minimum deck size of the table's format (CR 100.2a: sixty in Constructed; 100.2b: forty in Limited, or the event's
+    /// own), which the engine is told outright and a companion's condition may name (Yorion, Sky Nomad). A scenario's is its
+    /// own.
+    /// </summary>
+    public required int MinimumDeckSize { get; init; }
 
     /// <summary>Whether the decks are shuffled. False deals them in order, which is what a scenario wants.</summary>
     public bool Shuffle { get; init; } = true;
@@ -46,6 +58,14 @@ public interface IRulesHostFactory
     /// </summary>
     /// <exception cref="InvalidOperationException">A deck names a card the rules do not know.</exception>
     IRulesHost Create(IReadOnlyList<RulesSeat> seats, ulong seed, RulesGameOptions options);
+
+    /// <summary>
+    /// Whether a starting deck fulfils the condition of <paramref name="companion"/>'s companion ability (CR 702.139a), the
+    /// format's minimum deck size being <paramref name="minimumDeckSize"/>: the rules engine's judgement, which the server
+    /// asks before it deals a deck with a companion. False for a card with no companion.
+    /// </summary>
+    bool CompanionFulfilled(IReadOnlyList<string> deck, string companion, int minimumDeckSize) =>
+        NativeRulesHost.Companions(NativeHostProcess.Shared, deck, [companion], minimumDeckSize) is [{ Fulfilled: true }];
 }
 
 /// <summary>
@@ -74,4 +94,7 @@ public sealed class NativeRulesHostFactory : IRulesHostFactory
 
     public IRulesHost Create(IReadOnlyList<RulesSeat> seats, ulong seed, RulesGameOptions options) =>
         NativeRulesHost.NewGame(_transport ?? NativeHostProcess.Shared, seats, seed, options);
+
+    public bool CompanionFulfilled(IReadOnlyList<string> deck, string companion, int minimumDeckSize) =>
+        NativeRulesHost.Companions(_transport ?? NativeHostProcess.Shared, deck, [companion], minimumDeckSize) is [{ Fulfilled: true }];
 }

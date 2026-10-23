@@ -53,6 +53,7 @@ public sealed class QueueTableTests(WebClient web) : IDisposable
 
     private Task<GameServer> Host(QueueTable table, Uri? art = null) => GameServer.StartAsync(new GameServerOptions
     {
+        Format = Cantrip.Decks.DeckFormat.Limited(),
         Port = 0, Players = 2, ContentRoot = WebClient.Content, Event = table, TimeProvider = _clock,
 
         // Everyone's picture but Larry's, who keeps the stand-in.

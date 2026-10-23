@@ -554,6 +554,9 @@ impl<'a> Projector<'a> {
         // "You control target player during that player's next turn" (CR 723.1): the control now, and each effect still
         // waiting for the player's next turn, about the player and on no object. The last created is the one that will work
         // (723.1a); each that gives an extra turn after it gives it whichever works.
+        if let Some(companion) = revealed_companion(s, p) {
+            summary.companion = handles.handle(companion);
+        }
         let controller = s.player_controller(p);
         if controller != p {
             summary.controlled_by = seat(controller);
@@ -820,6 +823,10 @@ impl<'a> Projector<'a> {
         if contents_visible {
             contents.retain(|id| visible.contains(id));
             view.contents = contents.into_iter().map(|id| handles.handle(id)).collect();
+        } else if kind == ZoneKind::Sideboard {
+            // Another player's sideboard is closed, but the companion they revealed is in it for everyone to see (CR 103.2b):
+            // its contents are that card alone, the count still the whole of it.
+            view.contents = revealed_companion(s, owner).into_iter().map(|id| handles.handle(id)).collect();
         }
         view
     }

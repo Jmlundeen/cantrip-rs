@@ -18,6 +18,7 @@ public sealed class PlayerMenuTests(WebClient web)
         DeckList islands = DeckList.Load(DeckList.Find(Path.Combine(WebClient.Root, "decks"), "demo/2-white-blue"));
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Players = 2,
             ContentRoot = WebClient.Content,

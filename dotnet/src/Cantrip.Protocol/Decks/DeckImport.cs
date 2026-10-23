@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Cantrip.Client.Decks;
+namespace Cantrip.Decks;
 
 /// <summary>
 /// A deck read from a decklist as Magic Online or Arena export it, for the deck editor to import: one card per line,
@@ -9,8 +9,9 @@ namespace Cantrip.Client.Decks;
 /// <c>4 Lightning Bolt (M10) 146</c>, <c>[M10]</c>, <c>*F*</c>.
 /// <para>
 /// Arena heads its sections: <c>Commander</c>, <c>Companion</c>, <c>Deck</c>, <c>Sideboard</c>, and an <c>About</c>
-/// whose <c>Name</c> line names the deck; a companion begins the game outside it (CR 702.139), so it goes to the
-/// sideboard, and a <c>Maybeboard</c> is left out. Magic Online heads nothing: the sideboard is what comes after the first
+/// whose <c>Name</c> line names the deck; the <c>Companion</c> section's card is the deck's companion (CR 702.139a,
+/// <see cref="SavedDeck.Companion"/>), a sideboard card in a column of its own - Arena lists it under <c>Sideboard</c> as
+/// well, and it is one card, not two - and a <c>Maybeboard</c> is left out. Magic Online heads nothing: the sideboard is what comes after the first
 /// blank line, or after a <c>SB:</c> prefix. Lines starting with <c>#</c> or <c>//</c> are comments.
 /// </para>
 /// <para>
@@ -20,7 +21,7 @@ namespace Cantrip.Client.Decks;
 /// </summary>
 public static partial class DeckImport
 {
-    private enum Section { Commanders, Main, Side, Skipped, About }
+    private enum Section { Commanders, Main, Side, Companion, Skipped, About }
 
     /// <summary>What reading a decklist gives: the deck with the cards the engine plays, and the names it does not, as written.</summary>
     public sealed record Result(SavedDeck Deck, IReadOnlyList<string> Unsupported)
@@ -51,6 +52,7 @@ public static partial class DeckImport
         ArgumentNullException.ThrowIfNull(find);
 
         var deck = new SavedDeck();
+        var companions = new SavedDeck();
         List<string> unsupported = [];
         Section section = Section.Main;
         bool headed = false;
@@ -90,7 +92,7 @@ public static partial class DeckImport
                 else if (section is not (Section.About or Section.Skipped) && !Category().IsMatch(line))
                 {
                     // A name with no count is one copy, as a plain decklist has it.
-                    Add(deck, section, line, 1, find, unsupported);
+                    Add(section == Section.Companion ? companions : deck, section, line, 1, find, unsupported);
                     anyCard = true;
                 }
 
@@ -104,8 +106,26 @@ public static partial class DeckImport
                 continue;
             }
 
-            Add(deck, sideboarded ? Section.Side : section, counted.Groups[2].Value, copies, find, unsupported);
+            Add(section == Section.Companion ? companions : deck, sideboarded ? Section.Side : section, counted.Groups[2].Value, copies, find, unsupported);
             anyCard = true;
+        }
+
+        // The companion is the deck's (CR 702.139a), in its own column: Arena lists it under Sideboard too, and it is one card,
+        // not two, so a copy of it there is taken out. A second card under Companion is a sideboard card.
+        if (companions.Side.FirstOrDefault() is { } companion)
+        {
+            deck.Companion = companion.Card;
+            int had = deck.Side.FindIndex(entry => entry.Card == companion.Card);
+            if (had >= 0)
+            {
+                deck.Side[had] = deck.Side[had] with { Count = deck.Side[had].Count - 1 };
+                if (deck.Side[had].Count == 0) deck.Side.RemoveAt(had);
+            }
+
+            foreach (DeckEntry extra in companions.Side.Skip(1).Prepend(companion with { Count = companion.Count - 1 }).Where(entry => entry.Count > 0))
+            {
+                deck.Side.Add(extra);
+            }
         }
 
         return new Result(deck, unsupported);
@@ -154,7 +174,8 @@ public static partial class DeckImport
         {
             "commander" or "commanders" => Section.Commanders,
             "deck" or "main" or "maindeck" or "main deck" or "mainboard" => Section.Main,
-            "sideboard" or "side" or "companion" => Section.Side,
+            "sideboard" or "side" => Section.Side,
+            "companion" => Section.Companion,
             "maybeboard" or "considering" => Section.Skipped,
             "about" => Section.About,
             _ => null,
@@ -182,7 +203,7 @@ public static partial class DeckImport
         List<DeckEntry> into = section switch
         {
             Section.Commanders => deck.Commanders,
-            Section.Side => deck.Side,
+            Section.Side or Section.Companion => deck.Side,
             _ => deck.Main,
         };
         int had = into.FindIndex(entry => entry.Card == card);

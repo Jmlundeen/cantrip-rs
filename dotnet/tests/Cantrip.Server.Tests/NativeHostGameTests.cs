@@ -76,7 +76,7 @@ public sealed class NativeHostGameTests
             new("Bob", [.. Copies("Forest", 20), .. Copies("Goblin Engineer", 20)]),
         ];
 
-        using var session = new GameSession(NativeRulesHost.NewGame(transport, seats, seed: 20261009, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(transport, seats, seed: 20261009, new RulesGameOptions { MinimumDeckSize = 60 }));
 
         List<(GameClient Client, RandomPlay Bot)> players = [];
         foreach (PlayerId seat in session.Seats)
@@ -205,7 +205,7 @@ public sealed class NativeHostGameTests
             DeckList deck = DeckList.Load(path);
             List<string> cards = [.. deck.Entries.SelectMany(entry => Enumerable.Repeat(entry.Card, entry.Copies))];
 
-            using IRulesHost game = NativeRulesHost.NewGame(process, [new RulesSeat("A", cards), new RulesSeat("B", cards)], 1, new RulesGameOptions());
+            using IRulesHost game = NativeRulesHost.NewGame(process, [new RulesSeat("A", cards), new RulesSeat("B", cards)], 1, new RulesGameOptions { MinimumDeckSize = 60 });
             Assert.Equal(2, game.Seats.Count);
         }
     }

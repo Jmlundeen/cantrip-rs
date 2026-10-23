@@ -1318,6 +1318,14 @@ pub struct Player {
     /// The player's speed (CR 702.179): none until a rule or effect sets it (CR 702.179b), 1 once they control a
     /// permanent with start your engines! (CR 704.5aa), and up from there to 4. Nothing decreases it.
     pub speed: Option<u8>,
+    /// The card with companion this player revealed from outside the game before the game began (CR 103.2b): their chosen
+    /// companion, public while it stays there (CR 702.139a). Once it has been put into their hand - by the special action
+    /// (CR 116.2g) or by anything else that brings it in - it is a new object (CR 400.7) and this names what it was, so the
+    /// action, offered only while this card is still outside the game, is taken at most once.
+    pub companion: Option<ObjectId>,
+    /// The companion chosen as the deck was built whose condition the starting deck fulfils, dealt into the sideboard and
+    /// revealed once the starting player is known (CR 103.2b), when it becomes `companion`. None from then on.
+    pub companion_to_reveal: Option<ObjectId>,
 }
 
 /// Mana in a player's pool with a restriction on what it may be spent on (CR 106.6): one entry per player and

@@ -143,6 +143,8 @@ it - and a double-click moves a card between main deck and sideboard. A card car
 until it is put down, goes in among the others by its own top edge against theirs (where it is seen to be, not where
 the pointer is), and flies from where it was let go. The heading counts the pool, or the deck, as
 "Your pool: 41 cards (7 Land, 34 Non-land, 19 Creatures)", with a card-size slider beside it, kept in localStorage.
+Beside the sideboard is the **Companion** column (CR 702.139a), shown in the deck editor and in an event's deck building where the pool has a card with companion: a card with companion dropped there is the deck's companion, a sideboard card of its own, sent with the deck and chosen anew at each game's sideboarding; the server refuses a deck whose companion's condition it doesn't fulfil. In a game, a revealed companion (CR 103.2b) waits in a small **Companion** window over the battlefield - the bottom left of the player's own half, the top left of an opponent's - and clicking the player's own offers "{3}: Put [card] in hand." at sorcery timing (CR 116.2g); taken, its window goes.
+
 Which column a card is in is the page's alone and starts again on a reload; what is in the sideboard is sent as it
 changes once decks are built, and a sideboard made during the draft becomes the deck's starting one. Each card keeps
 one handle from the pile it is drafted from to its column, so a pile taken flies into place, a card taken blind flies
@@ -200,7 +202,7 @@ prints it, with its Scryfall legalities and color identity (`content/mtg/legalit
 
 The header has the deck list's toggle, the deck's name, its format (Standard, Pioneer, Modern, Legacy, Vintage,
 Commander, Penny Dreadful), **Save**, **New deck**, **Import deck**, whether the deck is legal and why not (`DeckRules`, in
-`Cantrip.Client/Decks`, checked as the deck changes), and **All decks**, back to the site's deck library. On the left, collapsible, are the player's saved decks by
+`Cantrip.Protocol/Decks`, checked as the deck changes, and the server's check from `/decks/api/check` once it answers), and **All decks**, back to the site's deck library. On the left, collapsible, are the player's saved decks by
 format, the one open lit, each with a bin; signed out, a way to log in with Discord instead. On top is the search: a box
 matching name, type line and rules text, then Type, the colors W U B R G and C (any of those lit), Mana value and Sort,
 over results in rows - only cards legal in the deck's format, and for Commander, once a commander is chosen, only cards
@@ -211,9 +213,9 @@ columns (`MainPage.Pool.cs`): lands, mana values 0 to 7+, the sideboard pulled o
 command zone beside it, which takes only a card that may be a commander - alone, or paired with the one there (partner,
 partner with, friends forever, choose a Background, Doctor's companion).
 
-**Import deck** asks for a decklist pasted as Magic Online or Arena export it (`DeckImport`, in `Cantrip.Client/Decks`):
+**Import deck** asks for a decklist pasted as Magic Online or Arena export it (`DeckImport`, in `Cantrip.Protocol/Decks`):
 counts and names, sets, collector numbers and foil marks ignored; Arena's `Commander`, `Companion`, `Deck` and `Sideboard`
-headings (a companion to the sideboard, a `Maybeboard` left out, `About`'s `Name` naming the deck), or Magic Online's
+headings (a companion to the Companion column, a `Maybeboard` left out, `About`'s `Name` naming the deck), or Magic Online's
 sideboard after the first blank line or `SB:`. Names match the catalog ignoring case, a split or double-faced card by its
 faces or its front alone. The deck opens as a new one, not saved - for Commander if it names a commander, else in the
 format chosen. When the list names cards the engine does not play, they are listed first, with **Import anyway**

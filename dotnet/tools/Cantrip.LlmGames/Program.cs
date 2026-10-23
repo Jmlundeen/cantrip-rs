@@ -24,15 +24,38 @@ namespace Cantrip.LlmGames;
 /// </summary>
 public static class Program
 {
+    /// <summary>The format the decks are played in (<c>--format</c>, <see cref="HostAndPlay.FormatFrom"/>): Freeform unless named.</summary>
+    public static Cantrip.Decks.DeckFormat Format { get; private set; } = Cantrip.Decks.DeckFormat.Freeform;
+
+    /// <summary>The format the command line names, or null - for none, or for one there is not, said.</summary>
+    private static Cantrip.Decks.DeckFormat? FormatOf(string[] args)
+    {
+        try
+        {
+            return HostAndPlay.FormatFrom(args);
+        }
+        catch (ArgumentException error)
+        {
+            Console.Error.WriteLine(error.Message);
+            return null;
+        }
+    }
+
     public static int Main(string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);
-
         if (args.Contains("--help") || args.Contains("-h"))
         {
             Help();
             return 0;
         }
+
+        if (FormatOf(args) is not { } format)
+        {
+            return 2;
+        }
+
+        Format = format;
 
         string root = FindRoot();
         int games = Number(args, "--games", 1);
@@ -241,6 +264,8 @@ public static class Program
           --games N        how many games to play (default 1)
           --players N      seats per game, 2 to 4 (default 2)
           --deck NAME      a deck, once per seat (default: the demo decks). A path, or a name under decks\
+          --format KEY     the format the decks are played in: a constructed format's key, or limited
+                           with --min-deck N (default: freeform, no deck-construction restriction)
           --model ID       the OpenRouter model (default deepseek/deepseek-v4-pro-0813). Cheaper ones, which
                            play legally but weigh combat poorly: google/gemini-2.5-flash-lite,
                            qwen/qwen3.7-flash, deepseek/deepseek-v4-flash

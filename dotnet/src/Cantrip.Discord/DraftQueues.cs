@@ -686,6 +686,7 @@ public sealed class DraftQueues : IAsyncDisposable
             {
                 GameServer server = await GameServer.StartAsync(new GameServerOptions
                 {
+                    Format = Cantrip.Decks.DeckFormat.Limited(),
                     Port = port,
                     Players = settings.Seats,
                     ContentRoot = _options.ContentRoot,

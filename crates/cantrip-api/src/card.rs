@@ -2185,6 +2185,20 @@ pub struct OpeningHandAction {
     pub exile_from_hand: u8,
 }
 
+/// A player's starting deck, as a companion's condition reads it (CR 702.139b): their deck once any sideboard cards are set
+/// aside (CR 103.2a), before it is shuffled into their library.
+pub struct StartingDeck<'a> {
+    pub player: PlayerId,
+    /// Its cards, in no order that means anything.
+    pub cards: &'a [ObjectId],
+    /// The minimum deck size of the game's format (CR 100.2a, 100.2b): "the minimum deck size" a condition may name.
+    pub minimum_size: u32,
+}
+
+/// The condition of a companion ability (CR 702.139a): whether a starting deck fulfils it, so that its owner may reveal the card
+/// from outside the game before the game begins (CR 103.2b). Built by `cantrip_mechanics::companion`.
+pub type CompanionCondition = fn(&dyn Query, &StartingDeck) -> bool;
+
 /// A card: characteristics from the Oracle data, behavior as code.
 #[derive(Clone, Copy)]
 pub struct CardDef {
@@ -2371,6 +2385,9 @@ pub struct CardDef {
     pub granted_miracles: &'static [GrantedMiracle],
     /// What it may do from an opening hand (CR 103.6a): begin the game on the battlefield.
     pub opening_hand: Option<OpeningHandAction>,
+    /// Its companion ability's condition (CR 702.139a), which functions outside the game: the core asks it before the game
+    /// begins of the card in its owner's sideboard (CR 103.2b). None for a card without companion.
+    pub companion: Option<CompanionCondition>,
     /// Its back face (CR 711): the characteristics of the object when it is transformed. A double-faced card's
     /// back face is not a card of its own: nothing can be drawn or cast as it.
     pub back: Option<&'static CardDef>,
@@ -2615,6 +2632,7 @@ impl CardDef {
         exile_casts: &[],
         granted_miracles: &[],
         opening_hand: None,
+        companion: None,
         back: None,
         back_land: false,
         basic_land_types: &[],

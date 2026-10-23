@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::history;
+use cantrip_mechanics::{companion, history};
 use cantrip_oracle as oracle;
 
 /// "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from your graveyard": a way
@@ -17,8 +17,13 @@ fn cast_cheap_permanent(q: &dyn Query, asker: &Asker, card: ObjectId, player: Pl
     (!history::permission_used_this_turn(q, asker.source)).then(|| Cost::mana(q.card(c.card).cost))
 }
 
-/// Companion is a start-of-game action the deck builder owns (CR 702.139).
+/// "Companion - Each permanent card in your starting deck has mana value 2 or less" (CR 702.139a).
+fn cheap_permanents(q: &dyn Query, deck: &StartingDeck) -> bool {
+    companion::each_permanent_card(q, deck, |card| q.mana_value(card) <= 2)
+}
+
 pub static CARD: CardDef = CardDef {
+    companion: Some(cheap_permanents),
     granted_ways: &[GrantedWay { text: "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from your graveyard.", cost: cast_cheap_permanent, permission: true, ..GrantedWay::CAST }],
     ..oracle::LURRUS_OF_THE_DREAM_DEN
 };

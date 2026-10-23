@@ -7,7 +7,7 @@ pub mod undo;
 pub mod visibility;
 
 pub use cantrip_api::*;
-pub use cantrip_rules::{Game, Rejected, Setup, activation_costs, ApplyContract, apply_contract_check, alternative_cast_total, cast_costs, cast_face_of, cast_total, exile_cast_texts, granted_cast_cost, life_for_cast, chars, check_answer, attack_targets, describe, distribution_problem, first_choices, selection_verdict, live, name_problem, summoning_sick, granted_cast_total, special_action_costs, sacrifices_for_reduction, replaced_mana_yields};
+pub use cantrip_rules::{Game, Rejected, Setup, activation_costs, eligible_companions, revealed_companion, ApplyContract, apply_contract_check, alternative_cast_total, cast_costs, cast_face_of, cast_total, exile_cast_texts, granted_cast_cost, life_for_cast, chars, check_answer, attack_targets, describe, distribution_problem, first_choices, selection_verdict, live, name_problem, summoning_sick, granted_cast_total, special_action_costs, sacrifices_for_reduction, replaced_mana_yields};
 
 /// The simplest legal distribution of looked-at cards (the C# `CardDistribution.Greedy`): each destination's
 /// minimum first, in order, then each takes what it accepts up to its maximum, cards in the order looked at.
@@ -44,20 +44,30 @@ pub fn card(name: &str) -> Option<CardId> {
 
 /// A game from decklists of names, top of the library first.
 pub fn deal(decks: &[Vec<String>], seed: u64, shuffle: bool, opening_chooser: Option<PlayerId>) -> Result<Game, String> {
-    deal_with(decks, &[], &[], seed, shuffle, opening_chooser)
+    deal_with(decks, &Outside::default(), seed, shuffle, opening_chooser)
 }
 
-/// A game from decklists of names, top of the library first, with each seat's sideboard - the cards it owns outside the
-/// game (CR 100.4, 400.11a) - and, for a Limited game, the basic lands a sideboard holds any number of (`Setup`).
-pub fn deal_with(
-    decks: &[Vec<String>],
-    sideboards: &[Vec<String>],
-    basic_lands_outside: &[String],
-    seed: u64,
-    shuffle: bool,
-    opening_chooser: Option<PlayerId>,
-) -> Result<Game, String> {
-    deal_on(cards(), decks, sideboards, basic_lands_outside, seed, shuffle, opening_chooser)
+/// What a deal has beyond its decks, by card name (`Setup`): each seat's sideboard - the cards it owns outside the game (CR
+/// 100.4, 400.11a) - and companion chosen at deck building (CR 702.139a), the basic lands a Limited sideboard holds any number
+/// of, and the format's minimum deck size (CR 100.2a-b).
+#[derive(Clone, Copy, Debug)]
+pub struct Outside<'a> {
+    pub sideboards: &'a [Vec<String>],
+    pub companions: &'a [Option<String>],
+    pub basic_lands_outside: &'a [String],
+    pub minimum_deck_size: u32,
+}
+
+/// Nothing outside the game, in a Constructed game (CR 100.2a).
+impl Default for Outside<'_> {
+    fn default() -> Self {
+        Outside { sideboards: &[], companions: &[], basic_lands_outside: &[], minimum_deck_size: 60 }
+    }
+}
+
+/// A game from decklists of names, top of the library first, and what each seat has outside the game (`Outside`).
+pub fn deal_with(decks: &[Vec<String>], outside: &Outside, seed: u64, shuffle: bool, opening_chooser: Option<PlayerId>) -> Result<Game, String> {
+    deal_on(cards(), decks, outside, seed, shuffle, opening_chooser)
 }
 
 /// `deal_with` on a card table of the caller's: every card and some test-only ones, for a Rust test that plays a scenario
@@ -65,26 +75,23 @@ pub fn deal_with(
 pub fn deal_on(
     table: &'static CardTable,
     decks: &[Vec<String>],
-    sideboards: &[Vec<String>],
-    basic_lands_outside: &[String],
+    outside: &Outside,
     seed: u64,
     shuffle: bool,
     opening_chooser: Option<PlayerId>,
 ) -> Result<Game, String> {
-    let ids = |names: &[String]| -> Result<Vec<CardId>, String> {
-        names
-            .iter()
-            .map(|name| {
-                // Either face of a double-faced card names it (CR 711.1); a deck holds the front.
-                let id = table.find(name).ok_or_else(|| format!("no card is named \"{name}\""))?;
-                Ok(table.fronts[id.0 as usize].unwrap_or(id))
-            })
-            .collect()
+    let id = |name: &String| -> Result<CardId, String> {
+        // Either face of a double-faced card names it (CR 711.1); a deck holds the front.
+        let id = table.find(name).ok_or_else(|| format!("no card is named \"{name}\""))?;
+        Ok(table.fronts[id.0 as usize].unwrap_or(id))
     };
+    let ids = |names: &[String]| -> Result<Vec<CardId>, String> { names.iter().map(id).collect() };
     let setup = Setup {
         decks: decks.iter().map(|d| ids(d)).collect::<Result<_, _>>()?,
-        sideboards: sideboards.iter().map(|d| ids(d)).collect::<Result<_, _>>()?,
-        basic_lands_outside: ids(basic_lands_outside)?,
+        sideboards: outside.sideboards.iter().map(|d| ids(d)).collect::<Result<_, _>>()?,
+        basic_lands_outside: ids(outside.basic_lands_outside)?,
+        companions: outside.companions.iter().map(|c| c.as_ref().map(id).transpose()).collect::<Result<_, _>>()?,
+        minimum_deck_size: outside.minimum_deck_size,
         seed,
         shuffle,
         opening_chooser,

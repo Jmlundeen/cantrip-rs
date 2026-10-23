@@ -67,6 +67,7 @@ public sealed class DraftTests(WebClient web)
         DraftPod pod = DraftPod.Open(store, created.Record.Id, ContentCache.Get(WebClient.Content));
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Players = 2,
             ContentRoot = WebClient.Content,
@@ -203,6 +204,7 @@ public sealed class DraftTests(WebClient web)
         DraftPod pod = DraftPod.Open(store, created.Record.Id, ContentCache.Get(WebClient.Content));
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Players = 2,
             ContentRoot = WebClient.Content,

@@ -111,7 +111,7 @@ fn a_whole_game_over_stdio() {
     let dealt = host.call(json!({
         "Cmd": "NewGame",
         "Seats": [ { "Name": "North", "Deck": deck() }, { "Name": "South", "Deck": deck() } ],
-        "Seed": 7, "Shuffle": true, "FirstPlayer": 1,
+        "Seed": 7, "Shuffle": true, "FirstPlayer": 1, "MinimumDeckSize": 40,
     }));
     let game = expect_ok(&dealt)["GameId"].as_u64().unwrap();
     assert_eq!(expect_ok(&dealt)["Decklists"]["1"].as_array().unwrap().len(), 40);
@@ -176,7 +176,7 @@ fn stale_and_foreign_answers_are_refused() {
     let dealt = host.call(json!({
         "Cmd": "NewGame",
         "Seats": [ { "Name": "North", "Deck": deck() }, { "Name": "South", "Deck": deck() } ],
-        "Seed": 1, "Shuffle": true, "FirstPlayer": 1,
+        "Seed": 1, "Shuffle": true, "FirstPlayer": 1, "MinimumDeckSize": 40,
     }));
     let game = expect_ok(&dealt)["GameId"].as_u64().unwrap();
     let step = host.call(json!({ "Cmd": "Start", "GameId": game }));

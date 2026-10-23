@@ -3,7 +3,9 @@ using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Threading.Channels;
 using Cantrip.Core;
+using Cantrip.Decks;
 using Cantrip.Protocol;
+using Cantrip.Server.Decks;
 using Cantrip.Server.Events;
 using Cantrip.Server.Rules;
 using MessagePack;
@@ -22,6 +24,14 @@ public sealed class GameServerOptions
     public required string ContentRoot { get; init; }
     /// <summary>Allowlisted deck catalog, selected by name rather than a client-supplied path.</summary>
     public IReadOnlyList<DeckList> Decks { get; init; } = [];
+
+    /// <summary>
+    /// The format the table's games are played in (<see cref="DeckFormat"/>): every deck is checked against it before it is
+    /// chosen and again before it is dealt (<see cref="DeckValidation"/>), and the engine is told its minimum deck size.
+    /// Freeform - no deck-construction restriction - unless the table says another: an event's tables say Limited, the
+    /// Discord bot's constructed games their format.
+    /// </summary>
+    public DeckFormat Format { get; init; } = DeckFormat.Freeform;
     /// <summary>Explicit test/tool bootstrap only. Normal hosting requires selection and readiness.</summary>
     public bool AutoStart { get; init; }
 
@@ -162,6 +172,7 @@ public sealed class GameServer : IAsyncDisposable
         if (seat < 1 || seat > _options.Players) throw new ArgumentOutOfRangeException(nameof(seat), "No such seat at this table.");
         if (!ValidName(name)) throw new ArgumentException("A name is 1–32 printable characters.", nameof(name));
         if (!_decks.ContainsKey(deck)) throw new ArgumentException($"'{deck}' is not in this table's catalog.", nameof(deck));
+        if (DeckProblem(deck) is { } problem) throw new ArgumentException(problem, nameof(deck));
         byte[] ticket = RandomNumberGenerator.GetBytes(32);
         if (!_reservations.TryAdd(seat, new Reservation(ticket, name.Trim(), deck, discord, portrait)))
             throw new InvalidOperationException($"Seat {seat} is already reserved.");
@@ -439,6 +450,11 @@ public sealed class GameServer : IAsyncDisposable
                     Refuse(connection, ErrorCode.InvalidSetup, "Choose a name of 1–32 printable characters and a catalog deck.");
                     break;
                 }
+                if (DeckProblem(configure.Deck!) is { } refused)
+                {
+                    Refuse(connection, ErrorCode.InvalidSetup, refused);
+                    break;
+                }
                 member.Name = configure.Name.Trim();
                 member.Deck = configure.Deck!; // The catalog check above excludes null and empty IDs.
                 BroadcastTable();
@@ -455,6 +471,11 @@ public sealed class GameServer : IAsyncDisposable
                 if (ready.Ready && !_options.AutoStart && !_decks.ContainsKey(member.Deck))
                 {
                     Refuse(connection, ErrorCode.InvalidSetup, "Choose a deck before becoming ready.");
+                    break;
+                }
+                if (ready.Ready && _decks.ContainsKey(member.Deck) && DeckProblem(member.Deck) is { } illegal)
+                {
+                    Refuse(connection, ErrorCode.InvalidSetup, illegal);
                     break;
                 }
                 member.Ready = ready.Ready;
@@ -915,7 +936,7 @@ public sealed class GameServer : IAsyncDisposable
             .Select(seat => new RulesSeat(_members.TryGetValue(seat, out Member? member) ? member.Name : $"Bot{seat}", []))];
         try
         {
-            var session = new GameSession(_options.Rules.Create(seats, _options.Seed, new RulesGameOptions { Scenario = scenario }));
+            var session = new GameSession(_options.Rules.Create(seats, _options.Seed, new RulesGameOptions { Scenario = scenario, MinimumDeckSize = _options.Format.MinimumDeckSize }));
             session.ScenarioProgressed += progress => ScenarioProgressed?.Invoke(progress);
             session.Start();
             _session = session;
@@ -1106,10 +1127,41 @@ public sealed class GameServer : IAsyncDisposable
         static List<string> Named(IReadOnlyList<DeckListEntry> entries) =>
             [.. entries.SelectMany(entry => Enumerable.Repeat(entry.Card, entry.Copies))];
 
+        // The server's check, once more before the deal: a deck it would refuse is never dealt.
+        foreach (Member member in members)
+        {
+            if (DeckProblem(member.Deck) is { } problem) throw new InvalidOperationException(problem);
+        }
+
         List<RulesSeat> named = [.. members.Select((member, index) =>
-            new RulesSeat(names[index], Named(_decks[member.Deck].Entries), Named(_decks[member.Deck].Sideboard)))];
-        return _options.Rules.Create(named, _options.Seed, new RulesGameOptions());
+            new RulesSeat(names[index], Named(_decks[member.Deck].Entries), Named(_decks[member.Deck].Sideboard), _decks[member.Deck].Companion))];
+        return _options.Rules.Create(named, _options.Seed, new RulesGameOptions { MinimumDeckSize = _options.Format.MinimumDeckSize });
     }
+
+    /// <summary>
+    /// What the server finds wrong with a catalog deck for the table's format (<see cref="DeckValidation"/>), its first problem
+    /// said with the deck's name; null for a deck it deals. Judged once for each deck.
+    /// </summary>
+    private string? DeckProblem(string deck)
+    {
+        if (_deckProblems.TryGetValue(deck, out string? known))
+        {
+            return known;
+        }
+
+        (IReadOnlyList<string> problems, bool unanswered) = DeckValidation.Check(DeckValidation.Of(_decks[deck], _options.Format), _options.Format,
+            DeckCatalog.ByName(_options.ContentRoot), _options.Rules);
+        string? problem = problems.Count == 0 ? null : $"{deck} can't be played in {_options.Format.Title}: {problems[0]}";
+        // A deck the engine could not answer for is refused this time only.
+        if (!unanswered)
+        {
+            _deckProblems[deck] = problem;
+        }
+
+        return problem;
+    }
+
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, string?> _deckProblems = new(StringComparer.Ordinal);
 
     private void BroadcastTable()
     {

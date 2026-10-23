@@ -113,6 +113,21 @@ Wind Avatar). Only its owner may look at it (`BotN.Sideboard` is the dump's, whi
 in the game until it ends; a basic land of `[Basic Lands Outside]` brought in leaves another of it outside, since a Limited
 sideboard holds any number (Magic Tournament Rules). A player with no section has nothing outside the game.
 
+```
+[Bot1 Companion]       the companion Bot1 chose at deck building (CR 702.139a): one card, dealt into its sideboard
+Lurrus of the Dream-Den
+
+[Minimum Deck Size]    the format's minimum deck size, which a companion's condition may name: forty in Limited
+40
+```
+
+A companion chosen at deck building is revealed before the game, nothing asked, if the deck fulfils its condition (CR 103.2b);
+otherwise it stays a sideboard card. A scenario names no format: it is Freeform, no deck-construction restriction, whose
+minimum deck size is sixty (casual Constructed play, CR 100.2a) unless a `[Minimum Deck Size]` section says otherwise. `Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion` takes the special action that puts the revealed
+companion into the hand for {3} (CR 116.2g), paid with the mana abilities that follow as a cast is; `BotN.Companion` is the
+card BotN revealed, empty for none. In the browser, `Client.Bot1.Companion` and `OpponentCompanion` are the cards in the
+companion windows, and their `.Corner` where each stands.
+
 ## A real start: `[Opening]`
 
 ```
@@ -209,6 +224,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot1.Hand.Wheel of Fortune.Cast` with `{R}{R}{R}{B}` floating | when the pool could pay in more than one way, the engine asks which mana; a script takes the first kind offered, which is the engine's own preference (restricted mana, then colourless, then colours the cost does not name) |
 | `Bot1.Battlefield.Chromatic Star.Activate(Color: Red; Spend: B)` | `Spend:` (on any cast or activation) names the pool mana to put towards a cost the pool could pay in more than one way, one per question in the order asked, comma-separated — a symbol (`W U B R G C`) for unrestricted mana, or the symbol and what restricts it (`R GainsHaste`, `C ArtifactSpells`, `R InstantOrSorcerySpells`, `B PlaneswalkerSpells`, `U Abilities`, `U LandAbilities`, `C ArtifactAbilities`, and for subtypes `R DragonSpells`, `G DragonOrOmenSpells`, `G ElfCreatureSpells`, `G ElfCreatureSpells, CantBeCountered`, `G NoTypeCreatureSpells` for a chosen type never chosen, `U NoncreatureSpells`, `B ManaValue4OrGreaterSpells`, `G ManaValue5OrGreaterOrXSpells`, `R ElementalSpellsOrAbilities`, `G ElementalCreatureSpellsOrAbilities`, `R CreatureSpells`, `G CreatureAbilities`, `R SpellsFromExile`, `C NotSpellsFromHand`; the dump writes `Mana` the same way), or for ordinary mana a rule tells apart by the permanent that produced it (CR 106.3) the symbol and `from` that permanent (`W from Barracks of the Thousand`; a bare `W` is then the mana no rule tells apart) — for a spell's cost, a mana ability's own mana cost (CR 602.2b), or an "unless pays" cost on `PayCost(Spend: B, R)`; unsaid takes the first kind offered |
 | `Bot1.Battlefield.Island.Activate` | activate an ability, including a mana ability while paying |
+| `Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion` | pay {3} and put the companion Bot1 revealed into its hand (CR 116.2g), then pay with lines as for a cast; also in a refusal |
 | `Bot1.Battlefield.Cathar Commando.Activate(Bot2.Battlefield.Sol Ring)` | arguments are targets, as for `Cast` |
 | `Bot1.Battlefield.Tundra.Activate(Ability: {U})` | pick one of several abilities by part of its text |
 | `Bot1.Battlefield.Basking Rootwalla.Activate(Ability: #2)` | pick the source's Nth ability, mana abilities first, where two read the same — one it prints and an identical one it acquired (CR 602.5c); for a cast, the card's Nth own way (`#1` its mana cost), not one paying an alternative cost another permanent gives; also in a refusal |
@@ -447,6 +463,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Looked`, the cards the player has looked at, in the order they looked (a look at one card of a hand, Urza's Bauble),
   once they have looked at any and absent until then
 - `BotN.Hand`, `.Library`, `.Graveyard`, `.Battlefield`, `.Emblems` (CR 114, from the command zone), each with `.Count`
+- `BotN.Companion`: the card the player revealed as their companion before the game (CR 103.2b), wherever it has gone since;
+  empty for a player who revealed none.
 - `BotN.Sideboard` (with `.Count`): the cards the player owns outside the game (CR 400.11a), in the order the sideboard lists
   them - what `[BotN Sideboard]` and `[Basic Lands Outside]` gave them, less what has been brought into the game - and
   `BotN.Sideboard.<Name>.Colors` for each (CR 400.11c: nothing but its own characteristic-defining abilities changes them)

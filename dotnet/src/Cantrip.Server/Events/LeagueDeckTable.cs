@@ -130,7 +130,8 @@ public sealed class LeagueDeckTable : ITableEvent
             if (message is not BuildDeckMessage build) return "That is not something to do at this table.";
             if (Done || seat != 1) return "Your deck is not being changed now.";
             _change = build.Change;
-            (EventDeck? deck, string? refusal) = PoolDecks.Built(_run.Deck, _run.Pool.Count, build, _league.Cards.Basics, _league.MinimumDeck);
+            (EventDeck? deck, string? refusal) = PoolDecks.Built(_run.Deck, _run.Pool.Count, build, _league.Cards.Basics, _league.MinimumDeck,
+                built => _league.Cards.Refusal(_run.Pool, built, _league.MinimumDeck));
             if (deck is null) return refusal;
             _league.DeckChanged(_run, deck);
             if (deck.Submitted)

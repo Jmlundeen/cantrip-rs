@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Cantrip.Protocol;
 
-namespace Cantrip.Client.Decks;
+namespace Cantrip.Decks;
 
 /// <summary>
 /// Whether a deck is legal for its format, and why not: the deck construction rules (CR 100.2a, 100.4a), each card's
@@ -9,30 +9,50 @@ namespace Cantrip.Client.Decks;
 /// be paired (partner, partner with, friends forever, choose a Background, Doctor's companion) - a hundred cards, one of
 /// each but the basic lands, and every card within the commanders' color identity.
 /// <para>
-/// A deck is checked as the player edits it, in the page, from the catalog alone: nothing here refuses a deck, it says
-/// what is wrong, and a deck is saved however it stands.
+/// A deck's companion (CR 702.139), chosen as it is built, is a card of its sideboard in a column of its own - in Commander
+/// the one card a deck may have outside its hundred. It must have companion, and the deck must fulfil its condition: the
+/// player's choice to reveal it before each game (CR 103.2b), made at deck building, so a deck that doesn't is refused.
+/// </para>
+/// <para>
+/// The server's check and the deck editor's are this one: the server refuses a deck these find anything wrong with before it
+/// deals a game with it (`DeckValidation`), and the editor shows the same as the deck changes. Whether a deck fulfils its
+/// companion's condition (CR 702.139a) is the rules engine's to judge: the server asks it and passes the answer in.
 /// </para>
 /// </summary>
 public static partial class DeckRules
 {
-    /// <summary>Everything wrong with a deck for its format, in the order a player would fix it; empty for a legal deck.</summary>
+    /// <summary>Everything wrong with a deck for the format it names, in the order a player would fix it; empty for a legal deck.</summary>
     /// <param name="cards">The catalog by card name; a card it does not have is one the engine does not play.</param>
-    public static IReadOnlyList<string> Problems(SavedDeck deck, IReadOnlyDictionary<string, CatalogCard> cards)
+    /// <param name="companionFulfilled">Whether the deck fulfils its companion's condition, as the rules engine judged it; null unjudged.</param>
+    public static IReadOnlyList<string> Problems(SavedDeck deck, IReadOnlyDictionary<string, CatalogCard> cards, bool? companionFulfilled = null)
     {
         ArgumentNullException.ThrowIfNull(deck);
-        ArgumentNullException.ThrowIfNull(cards);
-        List<string> problems = [];
         if (DeckFormat.Find(deck.Format) is not { } format)
         {
-            problems.Add($"\"{deck.Format}\" is not a format a deck is built for.");
-            return problems;
+            return [$"\"{deck.Format}\" is not a format a deck is built for."];
         }
 
+        return Problems(deck, format, cards, companionFulfilled);
+    }
+
+    /// <summary>Everything wrong with a deck for a format, in the order a player would fix it; empty for a legal deck.</summary>
+    public static IReadOnlyList<string> Problems(SavedDeck deck, DeckFormat format, IReadOnlyDictionary<string, CatalogCard> cards, bool? companionFulfilled = null)
+    {
+        ArgumentNullException.ThrowIfNull(deck);
+        ArgumentNullException.ThrowIfNull(format);
+        ArgumentNullException.ThrowIfNull(cards);
+        List<string> problems = [];
+        string companion = deck.Companion?.Trim() ?? string.Empty;
         int main = deck.Main.Sum(entry => entry.Count);
-        int side = deck.Side.Sum(entry => entry.Count);
+        // A companion is a card of the sideboard (CR 400.11a), in its own column.
+        int side = deck.Side.Sum(entry => entry.Count) + (companion.Length > 0 ? 1 : 0);
         int commanders = deck.Commanders.Sum(entry => entry.Count);
 
-        if (format.IsCommander)
+        if (format.IsFreeform)
+        {
+            // No deck-construction restriction (Freeform): nothing of size, sideboard, legality or copies.
+        }
+        else if (format.IsCommander)
         {
             problems.AddRange(CommanderProblems(deck, cards));
             if (main + commanders != format.MainSize)
@@ -40,9 +60,10 @@ public static partial class DeckRules
                 problems.Add($"A Commander deck is exactly {format.MainSize} cards with its commander: this one is {main + commanders}.");
             }
 
-            if (side > 0)
+            // A companion is not one of the hundred (CR 702.139d, the Commander rulings): the one card a deck may have outside them.
+            if (deck.Side.Sum(entry => entry.Count) > 0)
             {
-                problems.Add("A Commander deck has no sideboard.");
+                problems.Add("A Commander deck has no sideboard, but for its companion.");
             }
         }
         else
@@ -59,12 +80,13 @@ public static partial class DeckRules
 
             if (side > format.SideSize)
             {
-                problems.Add($"A sideboard is at most {format.SideSize} cards: this one is {side}.");
+                problems.Add($"A sideboard is at most {format.SideSize} cards, its companion included: this one is {side}.");
             }
         }
 
-        // Each card by name, across the deck, the sideboard and the command zone.
-        foreach (IGrouping<string, DeckEntry> named in deck.Commanders.Concat(deck.Main).Concat(deck.Side)
+        // Each card by name, across the deck, the sideboard, the companion and the command zone.
+        IEnumerable<DeckEntry> chosen = companion.Length > 0 ? [new DeckEntry(companion, 1)] : [];
+        foreach (IGrouping<string, DeckEntry> named in deck.Commanders.Concat(deck.Main).Concat(deck.Side).Concat(chosen)
             .GroupBy(entry => entry.Card, StringComparer.Ordinal).OrderBy(group => group.Key, StringComparer.Ordinal))
         {
             int copies = named.Sum(entry => entry.Count);
@@ -74,7 +96,8 @@ public static partial class DeckRules
                 continue;
             }
 
-            string legality = card.LegalityIn(format.Key);
+            // A Limited deck's cards are its pool's (CR 100.2b), and Freeform holds a deck to nothing: no format's legality.
+            string legality = format.IsLimited || format.IsFreeform ? Legality.Legal : card.LegalityIn(format.Key);
             if (legality == Legality.Banned)
             {
                 problems.Add($"{named.Key} is banned in {format.Title}.");
@@ -90,6 +113,19 @@ public static partial class DeckRules
                 problems.Add(legality == Legality.Restricted
                     ? $"{named.Key} is restricted in {format.Title}: one copy at most, not {copies}."
                     : $"{named.Key}: {copies} copies, more than the {most} a {format.Title} deck may have.");
+            }
+        }
+
+        // The companion (CR 702.139a): a card with companion, whose condition the deck fulfils as the engine judges it.
+        if (companion.Length > 0 && cards.TryGetValue(companion, out CatalogCard? chosenCard))
+        {
+            if (!HasCompanion(chosenCard))
+            {
+                problems.Add($"{companion} has no companion ability, so it can't be the deck's companion.");
+            }
+            else if (companionFulfilled == false)
+            {
+                problems.Add($"{companion} can't be the deck's companion: the deck doesn't fulfil its companion condition.");
             }
         }
 
@@ -178,6 +214,33 @@ public static partial class DeckRules
         return second.Companion && IsDoctor(a);
     }
 
+    /// <summary>
+    /// Whether a card has companion (CR 702.139a): a line of its rules text is "Companion — [condition]". Not a Doctor's
+    /// companion, which is a partner ability (CR 702.124m) and says nothing of a sideboard.
+    /// </summary>
+    public static bool HasCompanion(CatalogCard card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        return HasCompanion(card.Card);
+    }
+
+    /// <inheritdoc cref="HasCompanion(CatalogCard)"/>
+    public static bool HasCompanion(ObjectView card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        return card.OracleText.Split('\n').Any(line => CompanionLine().IsMatch(line.Trim()));
+    }
+
+    /// <summary>
+    /// The starting deck a companion's condition is judged by, each card once per copy (CR 702.139b): the deck without its
+    /// sideboard, and in Commander with its commanders, which are part of it until the game sets them aside (CR 103.2c).
+    /// </summary>
+    public static IReadOnlyList<string> StartingDeck(SavedDeck deck)
+    {
+        ArgumentNullException.ThrowIfNull(deck);
+        return [.. deck.Commanders.Concat(deck.Main).SelectMany(entry => Enumerable.Repeat(entry.Card, Math.Max(0, entry.Count)))];
+    }
+
     /// <summary>The colors a deck's cards are held to: every color in its commanders' identities (CR 903.4).</summary>
     public static HashSet<ColorView> IdentityOf(IEnumerable<CatalogCard> commanders)
     {
@@ -198,7 +261,9 @@ public static partial class DeckRules
     {
         ArgumentNullException.ThrowIfNull(card);
         ArgumentNullException.ThrowIfNull(format);
-        return Legality.Allows(card.LegalityIn(format.Key)) && (!format.IsCommander || identity is null || Within(card, identity));
+        // Freeform and Limited hold no card to a format's legality.
+        return (format.IsFreeform || format.IsLimited || Legality.Allows(card.LegalityIn(format.Key)))
+            && (!format.IsCommander || identity is null || Within(card, identity));
     }
 
     private static IEnumerable<string> CommanderProblems(SavedDeck deck, IReadOnlyDictionary<string, CatalogCard> cards)
@@ -240,6 +305,12 @@ public static partial class DeckRules
             .Where(name => cards.TryGetValue(name, out CatalogCard? card) && !Within(card, identity)).Order(StringComparer.Ordinal))
         {
             yield return $"{outside} is outside the commander's color identity.";
+        }
+
+        // The companion is held to it as the deck is (the Commander rules for companions; CR 903.4).
+        if (deck.Companion is { Length: > 0 } companion && cards.TryGetValue(companion, out CatalogCard? chosen) && !Within(chosen, identity))
+        {
+            yield return $"The companion {companion} is outside the commander's color identity.";
         }
     }
 
@@ -300,4 +371,7 @@ public static partial class DeckRules
 
     [GeneratedRegex(@"^Partner\s*[—-]\s*(.+)$", RegexOptions.CultureInvariant)]
     private static partial Regex PartnerKind();
+
+    [GeneratedRegex(@"^Companion\s*[—-]", RegexOptions.CultureInvariant)]
+    private static partial Regex CompanionLine();
 }

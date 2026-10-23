@@ -38,7 +38,8 @@ public sealed partial class MainPage : Page
 
     private const double DockWidth = 300;
 
-    private sealed record HalfViews(Grid Panel, PlayerRail Rail, ScrollViewer Scroll, CardBoardElement Board, Canvas Badges, bool Top, GraveyardDock Graveyard);
+    private sealed record HalfViews(Grid Panel, PlayerRail Rail, ScrollViewer Scroll, CardBoardElement Board, Canvas Badges, bool Top, GraveyardDock Graveyard,
+        Border Companion, CardBoardElement CompanionBoard);
 
     private GameClient? _gameClient;
     private MembershipMessage? _resuming;
@@ -255,7 +256,7 @@ public sealed partial class MainPage : Page
         Grid.SetColumnSpan(_deckLoading, 2);
         Root.Children.Add(_deckLoading);
 
-        foreach (CardBoardElement board in (CardBoardElement[])[_opponentHalf.Board, _myHalf.Board, _handBoard, _stackBoard, _opponentHalf.Graveyard.Board, _myHalf.Graveyard.Board])
+        foreach (CardBoardElement board in (CardBoardElement[])[_opponentHalf.Board, _myHalf.Board, _handBoard, _stackBoard, _opponentHalf.Graveyard.Board, _myHalf.Graveyard.Board, _opponentHalf.CompanionBoard, _myHalf.CompanionBoard])
         {
             board.CardClicked += handle =>
             {
@@ -374,6 +375,8 @@ public sealed partial class MainPage : Page
         (_stackBoard, LookOn),
         (_opponentHalf.Graveyard.Board, LookOn),
         (_myHalf.Graveyard.Board, LookOn),
+        (_opponentHalf.CompanionBoard, LookOn),
+        (_myHalf.CompanionBoard, LookOn),
         (_opponentHalf.Rail.LibraryBoard, _ => new CardLook(Note: _opponentHalf.Rail.LibraryNote)),
         (_opponentHalf.Rail.GraveyardBoard, _ => new CardLook(Note: _opponentHalf.Rail.GraveyardNote)),
         (_myHalf.Rail.LibraryBoard, _ => new CardLook(Note: _myHalf.Rail.LibraryNote)),
@@ -935,7 +938,34 @@ public sealed partial class MainPage : Page
         Grid.SetColumn(scroll, 2);
         half.Children.Add(scroll);
 
-        return new HalfViews(half, rail, scroll, board, badges, top, graveyard);
+        // The companion this player revealed before the game (CR 103.2b), waiting outside the game: a small window over the
+        // corner of their battlefield nearest the rail - the bottom left of the player's own, the top left of an opponent's.
+        // Its card is clicked to take it (CR 116.2g). Shown only while there is one.
+        var companionBoard = new CardBoardElement(CompanionCardWidth, BoardRows.CardHeight(CompanionCardWidth)) { Slides = false };
+        companionBoard.SetCellSize(CompanionCardWidth, BoardRows.CardHeight(CompanionCardWidth));
+        companionBoard.Width = CompanionCardWidth;
+        companionBoard.Height = BoardRows.CardHeight(CompanionCardWidth);
+        var companionContent = new StackPanel { Spacing = 4 };
+        companionContent.Children.Add(new TextBlock { Text = "Companion", FontSize = 12, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = Theme.Brush(Theme.FgSoft) });
+        companionContent.Children.Add(companionBoard);
+        var companion = new Border
+        {
+            Background = Theme.Brush(Theme.Panel),
+            BorderBrush = Theme.Brush(Theme.Line),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(6),
+            Margin = new Thickness(8),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = top ? VerticalAlignment.Top : VerticalAlignment.Bottom,
+            Visibility = Visibility.Collapsed,
+            Child = companionContent,
+        };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(companion, top ? "Opponent's companion" : "Your companion");
+        Grid.SetColumn(companion, 2);
+        half.Children.Add(companion);
+
+        return new HalfViews(half, rail, scroll, board, badges, top, graveyard, companion, companionBoard);
     }
 
     private static ScrollViewer Scroller(FrameworkElement board) => new()
@@ -1599,6 +1629,8 @@ public sealed partial class MainPage : Page
 
         LayOutHalf(client, _opponentHalf, theirs, _opponentCombat, aligned, cardWidth);
         LayOutHalf(client, _myHalf, mine, _myCombat, aligned, cardWidth);
+        LayOutCompanion(client, _opponentHalf, opponent);
+        LayOutCompanion(client, _myHalf, client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat));
 
         // A spell being paid for is on the stack already (CR 601.2a), and so is an ability (CR 602.2a): its source stays
         // where it is.
@@ -1615,6 +1647,28 @@ public sealed partial class MainPage : Page
         RememberPlaces();
         PaintTargetArrows(client);
         PaintSelection(client);
+    }
+
+    /// <summary>The width a companion is drawn at in its window: small, beside the battlefield's cards.</summary>
+    private const float CompanionCardWidth = 72f;
+
+    /// <summary>
+    /// The companion window over a half: the card the player revealed as their companion (CR 103.2b) while it waits outside
+    /// the game, clickable as any card is - its owner's offers taking it for {3} at sorcery timing (CR 116.2g). Gone once it has
+    /// been taken, or with none revealed.
+    /// </summary>
+    private void LayOutCompanion(GameClient client, HalfViews half, PlayerSummaryView? player)
+    {
+        ObjectView? card = player is { Companion.IsNone: false } ? client.Object(player.Companion) : null;
+        if (card is null)
+        {
+            half.Companion.Visibility = Visibility.Collapsed;
+            half.CompanionBoard.SetCells([]);
+            return;
+        }
+
+        half.Companion.Visibility = Visibility.Visible;
+        half.CompanionBoard.SetCells([Cell(client, card, 0, 0, tapped: false)]);
     }
 
     /// <summary>

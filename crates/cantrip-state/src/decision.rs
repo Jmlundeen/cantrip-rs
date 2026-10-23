@@ -144,6 +144,9 @@ pub enum ActionKind {
     TapToPay,
     /// While paying (CR 601.2h): exile this card from the graveyard to pay for delve (CR 702.66a).
     ExileToPay,
+    /// Pay {3} and put the companion its player revealed before the game into their hand from outside the game (CR
+    /// 702.139a, 116.2g): a special action, at sorcery timing, once a game. `source` is the card outside the game.
+    TakeCompanion,
 }
 
 /// Which way of paying with something other than mana a `TapToPay` or `ExileToPay` option is (its `index`).

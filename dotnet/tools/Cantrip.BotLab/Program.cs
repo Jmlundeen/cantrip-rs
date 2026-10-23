@@ -1,3 +1,4 @@
+using Cantrip.Client.Embedded;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
@@ -18,6 +19,12 @@ namespace Cantrip.BotLab;
 /// </summary>
 public static class Program
 {
+    /// <summary>
+    /// The format the given decks are played in (<c>--format</c>, <see cref="HostAndPlay.FormatFrom"/>): Freeform unless the
+    /// command line names one. A draft's decks are Limited by what they are.
+    /// </summary>
+    public static Cantrip.Decks.DeckFormat Format { get; private set; } = Cantrip.Decks.DeckFormat.Freeform;
+
     public static int Main(string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);
@@ -30,6 +37,15 @@ public static class Program
 
         string root = FindRoot();
         Parallelism = Math.Clamp(Number(args, "--parallel", Parallelism), 1, 64);
+        try
+        {
+            Format = HostAndPlay.FormatFrom(args);
+        }
+        catch (ArgumentException error)
+        {
+            Console.Error.WriteLine(error.Message);
+            return 2;
+        }
 
         // --versus DIR: the --a seat always plays a deck of --decks and the --b seat one of these, each pair of games
         // the next of each: how one kind of deck is played against another, with the pilot of one side changed.
@@ -311,7 +327,7 @@ public static class Program
             }
 
             Task<MatchResult> playing = Task.Run(() => Match.Play(
-                Path.Combine(root, "content"), seated, shuffle, players,
+                Path.Combine(root, "content"), seated, Format, shuffle, players,
                 sample: false, story: true, limit: Number(args, "--limit", 0)));
 
             if (patience > 0 && !playing.Wait(TimeSpan.FromSeconds(patience)))
@@ -605,7 +621,7 @@ public static class Program
             bool swapped = game % 2 == 1;
             (List<DeckList> seated, List<IAutoPlayer> players) = Seating(decks, game, a, b);
 
-            MatchResult result = Match.Play(content, seated, seed + (ulong)(game / 2), players, sample, hands: hands);
+            MatchResult result = Match.Play(content, seated, Format, seed + (ulong)(game / 2), players, sample, hands: hands);
 
             if (!result.Finished)
             {
@@ -852,6 +868,8 @@ public static class Program
                                 NAME+weight=value sets a weight of it: tactical+policy.holdcounter=0;
                                 champion, referee or champion:NAME is a frozen build of an earlier tactical seat
             --deck NAME         once for a mirror, twice for a matchup (default: rw-aggro)
+            --format KEY        the format the decks are played in: a constructed format's key, or limited
+                                with --min-deck N (default: freeform, no deck-construction restriction)
             --decks DIR         every decklist in a folder, each played as a mirror (more than once: the folders together);
                                 --match TEXT keeps the files named so,
                                 --has TEXT the decks with a card named so (as often as wanted: every one of them; A|B for either)

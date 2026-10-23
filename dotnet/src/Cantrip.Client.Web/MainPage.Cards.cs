@@ -375,7 +375,9 @@ public sealed partial class MainPage
             return;
         }
 
-        if (rows.Count == 1
+        // Taking a companion (CR 116.2g) is offered as its menu row, "{3}: Put [card] in hand.", even alone: the card in the
+        // companion window says nothing else of what a click on it does.
+        if (rows.Count == 1 && rows[0].Option.Kind != ActionKindView.TakeCompanion
             && (!CardActions.IsIrreversibleActivation(rows[0].Option) || CardActions.AsksBeforeActivating(rows[0].Option)))
         {
             Take(client, rows[0].Option, rows[0].Color, rows[0].Combination, rows[0].Sacrifice);

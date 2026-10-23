@@ -86,6 +86,7 @@ public sealed class PodHost : IAsyncDisposable
     {
         GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0, Players = seats, ContentRoot = contentRoot, Event = table, TimeProvider = time ?? TimeProvider.System, ListenAddress = listen,
             Portraits = portraits, Art = art, Rules = rules ?? RulesHostFactory.Native,
         }).ConfigureAwait(false);

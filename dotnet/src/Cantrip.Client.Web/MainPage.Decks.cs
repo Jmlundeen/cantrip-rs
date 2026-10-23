@@ -2,7 +2,7 @@ using System.Net;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Text.Json;
-using Cantrip.Client.Decks;
+using Cantrip.Decks;
 using Cantrip.Client.Presentation;
 using Cantrip.Protocol;
 using Microsoft.UI.Xaml.Automation;
@@ -50,6 +50,11 @@ public sealed partial class MainPage
     private const string DeckListOpenKey = "deck-list-open";
 
     private static readonly HttpClient DeckHttp = new();
+
+    /// <summary>The deck (its <see cref="Snapshot"/>) the site was last asked to check, the one it answered for, and what it found.</summary>
+    private string _checkAsked = string.Empty;
+    private string _checkJudged = string.Empty;
+    private IReadOnlyList<string> _checked = [];
 
     private static readonly string[] TypeNames = ["Any type", "Creature", "Instant", "Sorcery", "Artifact", "Enchantment", "Planeswalker", "Land", "Battle", "Legendary", "Can be a commander"];
     private static readonly string[] ManaNames = ["Any", "0", "1", "2", "3", "4", "5", "6", "7+"];
@@ -696,6 +701,11 @@ public sealed partial class MainPage
             for (int copy = 0; copy < entry.Count; copy++) arrangement.Side.Add(AddCard(entry.Card));
         }
 
+        if (deck.Companion is { Length: > 0 } companion)
+        {
+            arrangement.Companion.Add(AddCard(companion));
+        }
+
         _arrangement = arrangement;
         _poolCards = _editorCards;
         _poolIsDeck = true;
@@ -733,6 +743,7 @@ public sealed partial class MainPage
         Commanders = Entries(_arrangement?.Command ?? []),
         Main = Entries(_arrangement?.Columns.SelectMany(column => column) ?? []),
         Side = Entries(_arrangement?.Side ?? []),
+        Companion = _arrangement is { Companion: [int companion, ..] } ? _editorCards[companion].Name : string.Empty,
     };
 
     private List<DeckEntry> Entries(IEnumerable<int> places) =>
@@ -743,7 +754,7 @@ public sealed partial class MainPage
     /// <summary>What telling a change from the saved deck goes by: everything but where in the columns each card is.</summary>
     private static string Snapshot(SavedDeck deck)
     {
-        var plain = new SavedDeck { Name = deck.Name, Format = deck.Format, Commanders = deck.Commanders, Main = deck.Main, Side = deck.Side };
+        var plain = new SavedDeck { Name = deck.Name, Format = deck.Format, Commanders = deck.Commanders, Main = deck.Main, Side = deck.Side, Companion = deck.Companion };
         return JsonSerializer.Serialize(plain, DeckJson.Default.SavedDeck);
     }
 
@@ -764,7 +775,7 @@ public sealed partial class MainPage
         _saveButton.Caption = unsaved || _editingId.Length == 0 ? "Save" : "Saved";
 
         SavedDeck deck = CurrentDeck();
-        IReadOnlyList<string> problems = _catalog is null ? [] : DeckRules.Problems(deck, _catalogByName);
+        IReadOnlyList<string> problems = EditorProblems(deck);
         string state = _catalogFailure ?? (_catalog is null
             ? "Loading the cards..."
             : problems.Count == 0 ? $"Legal in {_editingFormat.Title}" : $"Not legal in {_editingFormat.Title}: {problems.Count} problem{(problems.Count == 1 ? string.Empty : "s")}");
@@ -799,6 +810,55 @@ public sealed partial class MainPage
 
         _flights.Settle();
         DeckEdited();
+    }
+
+    /// <summary>
+    /// What is wrong with the deck: the server's check (<c>/decks/api/check</c>, the one that counts - its companion's
+    /// condition judged by the rules engine) once it has answered for the deck as it is now, and until then the same rules
+    /// checked here from the catalog. The site is asked again whenever the deck changes.
+    /// </summary>
+    private IReadOnlyList<string> EditorProblems(SavedDeck deck)
+    {
+        if (_catalog is null)
+        {
+            return [];
+        }
+
+        string snapshot = Snapshot(deck);
+        if (snapshot != _checkAsked)
+        {
+            _checkAsked = snapshot;
+            _ = CheckDeckAsync(deck, snapshot);
+        }
+
+        return snapshot == _checkJudged ? _checked : DeckRules.Problems(deck, _catalogByName);
+    }
+
+    private async Task CheckDeckAsync(SavedDeck deck, string snapshot)
+    {
+        try
+        {
+            using var body = new StringContent(JsonSerializer.Serialize(deck, DeckJson.Default.SavedDeck), Encoding.UTF8, "application/json");
+            using HttpResponseMessage response = await DeckHttp.PostAsync(DeckApi("check"), body);
+            if (!response.IsSuccessStatusCode || snapshot != _checkAsked)
+            {
+                return;
+            }
+
+            DeckCheck? check = JsonSerializer.Deserialize(await response.Content.ReadAsStringAsync(), DeckJson.Default.DeckCheck);
+            if (snapshot != _checkAsked || check is null)
+            {
+                return;
+            }
+
+            _checked = check.Problems;
+            _checkJudged = snapshot;
+            DeckEdited();
+        }
+        catch (Exception error) when (error is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            // Unanswered: the editor shows its own check, as before the site answers.
+        }
     }
 
     private async Task<bool> SaveDeckAsync()
@@ -974,7 +1034,7 @@ public sealed partial class MainPage
         _searchInDeck = new Dictionary<string, int>(StringComparer.Ordinal);
         if (_arrangement is { } arrangement)
         {
-            foreach (int place in arrangement.Columns.SelectMany(column => column).Concat(arrangement.Side).Concat(arrangement.Command))
+            foreach (int place in arrangement.Columns.SelectMany(column => column).Concat(arrangement.Side).Concat(arrangement.Command).Concat(arrangement.Companion))
             {
                 _searchInDeck[_editorCards[place].Name] = _searchInDeck.GetValueOrDefault(_editorCards[place].Name) + 1;
             }

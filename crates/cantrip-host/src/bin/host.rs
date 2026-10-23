@@ -28,6 +28,10 @@ enum Request {
         /// A Limited game's basic lands, which each sideboard holds any number of (`Setup::basic_lands_outside`).
         #[serde(rename = "BasicLandsOutside", default)]
         basic_lands_outside: Vec<String>,
+        /// The format's minimum deck size, which the server knows from the table's format (`Setup::minimum_deck_size`, CR
+        /// 100.2a-b): always said, never inferred. A scenario's is its own.
+        #[serde(rename = "MinimumDeckSize", default)]
+        minimum_deck_size: Option<u32>,
         /// A `.cantrip` scenario to play instead of a dealt game: its decks, order and dice are the scenario's, and the
         /// seats named in `Driven` are answered by the table, every other by the script (docs/scenarios-in-the-browser.md).
         #[serde(rename = "Scenario", default)]
@@ -99,6 +103,15 @@ enum Request {
         #[serde(rename = "Name")]
         name: String,
     },
+    /// Which cards with companion in a sideboard the deck fulfils the condition of (CR 702.139a), for the deck editor.
+    Companions {
+        #[serde(rename = "Deck")]
+        deck: Vec<String>,
+        #[serde(rename = "Sideboard", default)]
+        sideboard: Vec<String>,
+        #[serde(rename = "MinimumDeckSize")]
+        minimum_deck_size: u32,
+    },
     Close {
         #[serde(rename = "GameId")]
         game_id: u32,
@@ -128,6 +141,10 @@ struct SeatSpec {
     /// The cards the seat owns outside the game (CR 100.4, 400.11a).
     #[serde(rename = "Sideboard", default)]
     sideboard: Vec<String>,
+    /// The companion chosen as the deck was built (CR 702.139a): dealt into the sideboard beside it, and revealed before the
+    /// game if the deck fulfils its condition (CR 103.2b). The server has refused a deck whose companion it doesn't.
+    #[serde(rename = "Companion", default)]
+    companion: Option<String>,
 }
 
 struct Host {
@@ -146,13 +163,19 @@ fn ok(value: Value) -> Value {
 impl Host {
     fn handle(&mut self, request: Request) -> Value {
         match request {
-            Request::NewGame { seats, seed, shuffle, first_player, chooser, basic_lands_outside, scenario } => {
+            Request::NewGame { seats, seed, shuffle, first_player, chooser, basic_lands_outside, minimum_deck_size, scenario } => {
                 let made = match scenario {
                     Some(spec) => Session::scenario(&spec.text, &spec.name, seats.into_iter().map(|s| s.name).collect(), &spec.driven),
+                    None if minimum_deck_size.is_none() => {
+                        Err(Rejection::new("InvalidSetup", "a dealt game says its format's minimum deck size (MinimumDeckSize)"))
+                    }
                     None => {
+                        let companions = seats.iter().map(|s| s.companion.clone()).collect();
                         let deal = Deal {
                             seats: seats.into_iter().map(|s| (s.name, s.deck, s.sideboard)).collect(),
                             basic_lands_outside,
+                            companions,
+                            minimum_deck_size: minimum_deck_size.unwrap_or_default(),
                             seed,
                             shuffle,
                             first_player,
@@ -183,6 +206,10 @@ impl Host {
                 let card = cantrip_engine_card(&name);
                 ok(json!({ "Card": card }))
             }
+            Request::Companions { deck, sideboard, minimum_deck_size } => match cantrip_host::session::companions(&deck, &sideboard, minimum_deck_size) {
+                Ok(checks) => ok(json!({ "Companions": checks })),
+                Err(r) => rejected(r),
+            },
             Request::Close { game_id } => {
                 self.games.remove(&game_id);
                 ok(json!({}))

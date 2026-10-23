@@ -140,6 +140,30 @@ public sealed class MatchmakerTests
         }
     }
 
+    /// <summary>
+    /// The server checks a deck against its table's format before seating anyone with it (DeckValidation): a forty-card deck
+    /// offered for Standard is refused, saying why, and the table opened for it is closed again rather than left running.
+    /// </summary>
+    [Fact]
+    public async Task A_deck_its_format_refuses_seats_nobody_and_leaves_no_table_open()
+    {
+        await using var matchmaker = new Matchmaker(new MatchmakerOptions
+        {
+            ContentRoot = RepoRoot.ContentRoot,
+            Deck = RwAggro.Value,
+            Formats = new Dictionary<string, IReadOnlyList<DeckList>> { ["standard"] = [RwAggro.Value] },
+            Ports = FreePorts(1),
+        });
+
+        Seating refused = await matchmaker.HostAsync(Alice, "standard", "rw-aggro");
+        Assert.Null(refused.Game);
+        Assert.StartsWith("rw-aggro can't be played in Standard: A Standard deck is at least 60 cards", refused.Refusal, StringComparison.Ordinal);
+        Assert.Empty(matchmaker.Games("standard"));
+        Assert.Null(matchmaker.GameOf(Alice.Id));
+        // The port is free again: a practice game, Limited, opens on it.
+        Assert.NotNull((await matchmaker.HostAsync(Alice)).Game);
+    }
+
     [Fact]
     public async Task A_constructed_games_players_each_sit_down_with_the_deck_they_chose_from_its_formats_list()
     {
@@ -148,21 +172,21 @@ public sealed class MatchmakerTests
         {
             ContentRoot = RepoRoot.ContentRoot,
             Deck = RwAggro.Value,
-            Formats = new Dictionary<string, IReadOnlyList<DeckList>> { ["standard"] = [RwAggro.Value, reanimator] },
+            Formats = new Dictionary<string, IReadOnlyList<DeckList>> { ["limited"] = [RwAggro.Value, reanimator] },
             Ports = FreePorts(2),
         });
 
         Assert.NotNull((await matchmaker.HostAsync(Alice, "modern", "rw-aggro")).Refusal);
-        Assert.NotNull((await matchmaker.HostAsync(Alice, "standard", "legend-rule-test")).Refusal);
-        Seating hosted = await matchmaker.HostAsync(Alice, "standard", "ub-reanimator");
+        Assert.NotNull((await matchmaker.HostAsync(Alice, "limited", "legend-rule-test")).Refusal);
+        Seating hosted = await matchmaker.HostAsync(Alice, "limited", "ub-reanimator");
         HostedGame game = hosted.Game!;
-        Assert.Equal(("standard", GameStage.Open), (game.Format, game.Stage));
+        Assert.Equal(("limited", GameStage.Open), (game.Format, game.Stage));
         Assert.Same(game, matchmaker.GameOf(Alice.Id));
 
         // A game hosted from Discord is no game of the format's.
         Seating discord = await matchmaker.HostAsync(Carol);
         Assert.Null(discord.Game!.Format);
-        Assert.Equal([game], matchmaker.Games("standard"));
+        Assert.Equal([game], matchmaker.Games("limited"));
 
         // A seat wants a deck from the list; the host asking again gets their own seat back, deck or none.
         Assert.NotNull((await matchmaker.JoinAsync(game.Id, Bob)).Refusal);

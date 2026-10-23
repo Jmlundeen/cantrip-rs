@@ -20,10 +20,12 @@ public sealed class LobbyNamesTests
         DeckList deck = DeckList.LoadDirectory(RepoRoot.DemoDecks).First();
         await using GameServer ticketed = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0, Players = 2, ContentRoot = RepoRoot.ContentRoot, RequireTickets = true, Decks = [deck],
         });
         await using GameServer open = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0, Players = 2, ContentRoot = RepoRoot.ContentRoot, Decks = [deck],
         });
 

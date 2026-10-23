@@ -1,3 +1,4 @@
+using Cantrip.Decks;
 using Cantrip.Protocol;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Automation;
@@ -47,6 +48,12 @@ public sealed partial class MainPage
         /// <summary>The commanders, for a Commander deck in the deck editor: in the command zone, neither deck nor sideboard.</summary>
         public List<int> Command = [];
 
+        /// <summary>
+        /// The deck's companion (CR 702.139a), at most one: a card of the sideboard in a column of its own, revealed before each
+        /// game whose deck fulfils its condition (CR 103.2b).
+        /// </summary>
+        public List<int> Companion = [];
+
         /// <summary>The pool cards of the main deck, without the basic lands.</summary>
         public IEnumerable<int> Main => Columns.SelectMany(column => column).Where(place => !IsBasic(place));
 
@@ -63,6 +70,7 @@ public sealed partial class MainPage
 
             Side.Remove(place);
             Command.Remove(place);
+            Companion.Remove(place);
         }
 
         public bool InSide(int place) => Side.Contains(place);
@@ -70,7 +78,7 @@ public sealed partial class MainPage
         /// <summary>Moves every pool card to its new place in the pool, by <paramref name="to"/>; one with none (-1) leaves.</summary>
         public void Renumber(Func<int, int> to)
         {
-            foreach (List<int> places in Columns.Append(Side))
+            foreach (List<int> places in Columns.Append(Side).Append(Companion))
             {
                 List<int> moved = [.. places.Select(place => IsBasic(place) ? place : to(place)).Where(place => place >= 0)];
                 places.Clear();
@@ -122,6 +130,11 @@ public sealed partial class MainPage
     private readonly CardBoardElement _commandBoard = new(PoolCardWidth, Tall(PoolCardWidth)) { Slides = true, HidesCarried = true, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
     private Border _commandColumn = null!;
     private TextBlock _commandLabel = null!;
+
+    /// <summary>The companion column, beside the sideboard: the deck's companion, a sideboard card of its own (CR 702.139a).</summary>
+    private readonly CardBoardElement _companionBoard = new(PoolCardWidth, Tall(PoolCardWidth)) { Slides = true, HidesCarried = true, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
+    private Border _companionColumn = null!;
+    private TextBlock _companionLabel = null!;
     private DockButton _sideToggle = null!;
     private TextBlock _sideLabel = null!;
 
@@ -168,6 +181,7 @@ public sealed partial class MainPage
         view.Children.Add(heading);
 
         var body = new Grid { ColumnSpacing = 10 };
+        body.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         body.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         body.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         body.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -232,6 +246,28 @@ public sealed partial class MainPage
         Grid.SetColumn(_commandColumn, 1);
         body.Children.Add(_commandColumn);
 
+        // The companion (CR 702.139a): a card with companion dropped here is the deck's, revealed before each game.
+        _companionLabel = EventText("Companion", 13, Theme.FgSoft, semibold: true);
+        var companion = new Grid { RowSpacing = 6 };
+        companion.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        companion.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        companion.Children.Add(_companionLabel);
+        Grid.SetRow(_companionBoard, 1);
+        companion.Children.Add(_companionBoard);
+        _companionColumn = new Border
+        {
+            Background = Theme.Brush(Theme.Panel),
+            BorderBrush = Theme.Brush(Theme.Line),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(6),
+            Visibility = Visibility.Collapsed,
+            Child = companion,
+        };
+        AutomationProperties.SetName(_companionColumn, "Companion");
+        Grid.SetColumn(_companionColumn, 2);
+        body.Children.Add(_companionColumn);
+
         _mainScroll = new ScrollViewer
         {
             HorizontalScrollMode = ScrollMode.Auto,
@@ -240,7 +276,7 @@ public sealed partial class MainPage
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Content = new Grid { Children = { _mainBoard, _poolHeadings } },
         };
-        Grid.SetColumn(_mainScroll, 2);
+        Grid.SetColumn(_mainScroll, 3);
         body.Children.Add(_mainScroll);
 
         _mainScroll.SizeChanged += (_, _) => LayOutPool();
@@ -254,6 +290,9 @@ public sealed partial class MainPage
         _dropZones.Add(new DropZone(_sideBoard, handle => (InPool(handle) && !IsBasic(handle.Value)) || InPack(handle) || InSearch(handle), (handle, slot) => PutInSide(handle, slot), SideSlot, SideBar));
         _mainBoard.CardClicked += handle => PoolClicked(_mainBoard, handle);
         _sideBoard.CardClicked += handle => PoolClicked(_sideBoard, handle);
+        MakeDraggable(_companionBoard);
+        _companionBoard.CardClicked += handle => PoolClicked(_companionBoard, handle);
+        _dropZones.Add(new DropZone(_companionBoard, CanCompanion, (handle, _) => PutInCompanion(handle)));
 
         _poolView = view;
         return view;
@@ -263,7 +302,8 @@ public sealed partial class MainPage
     /// Shows a pool: the cards in pool order, which are in the main deck when the server says so (deck building) or as
     /// this page has them (the draft), and the basic lands added.
     /// </summary>
-    private void ShowPool(string eventId, IReadOnlyList<ObjectView> cards, IReadOnlyCollection<int>? serverMain, IReadOnlyList<(BasicLandView Land, int Count)> basics)
+    private void ShowPool(string eventId, IReadOnlyList<ObjectView> cards, IReadOnlyCollection<int>? serverMain, IReadOnlyList<(BasicLandView Land, int Count)> basics,
+        int serverCompanion = -1)
     {
         // A card that left the pool - a Cogwork Librarian put into a pack - leaves a gap every later card closes up: each
         // keeps where it was laid out, found by the card and which copy of it it is.
@@ -293,8 +333,22 @@ public sealed partial class MainPage
         PlaceBasics(arrangement);
 
         arrangement.Side.RemoveAll(place => place >= cards.Count);
+        arrangement.Companion.RemoveAll(place => place >= cards.Count);
 
-        HashSet<int> placed = [.. arrangement.Main, .. arrangement.Side];
+        // The server's companion is the deck's (CR 702.139a): it goes in its column, and one the server has not goes back to
+        // the sideboard.
+        if (serverMain is not null && !arrangement.Companion.SequenceEqual(serverCompanion >= 0 && serverCompanion < cards.Count ? [serverCompanion] : []))
+        {
+            arrangement.Side.AddRange(arrangement.Companion);
+            arrangement.Companion.Clear();
+            if (serverCompanion >= 0 && serverCompanion < cards.Count)
+            {
+                arrangement.Remove(serverCompanion);
+                arrangement.Companion.Add(serverCompanion);
+            }
+        }
+
+        HashSet<int> placed = [.. arrangement.Main, .. arrangement.Side, .. arrangement.Companion];
         Dictionary<string, int> copies = new(StringComparer.Ordinal);
         bool added = false;
         for (int place = 0; place < cards.Count; place++)
@@ -320,7 +374,7 @@ public sealed partial class MainPage
                     (side ? arrangement.Side : arrangement.Columns[DefaultColumn(cards[place])]).Add(place);
                 }
             }
-            else if (serverMain is not null && side != arrangement.InSide(place))
+            else if (serverMain is not null && side != (arrangement.InSide(place) || arrangement.Companion.Contains(place)))
             {
                 // The server's deck is the deck: a card it has on the other side than this page goes there.
                 arrangement.Remove(place);
@@ -506,6 +560,7 @@ public sealed partial class MainPage
             : []);
 
         LayOutCommand(arrangement, handled, width, height, step);
+        LayOutCompanionColumn(arrangement, handled, width, height);
         _poolLabel.Text = DeckEditorShown ? EditorSummary(arrangement) : PoolSummary(arrangement);
         DeckChanged();
         FlyPool();
@@ -523,6 +578,73 @@ public sealed partial class MainPage
     }
 
     private bool InPool(ViewHandle handle) => !_deckSubmitted && _poolPlaces.ContainsKey(handle.Value);
+
+    /// <summary>
+    /// The companion column (CR 702.139a): always in the deck editor, and in an event's deck building where the pool has a card
+    /// with companion or the deck a companion. Empty, it is a narrow strip to drop one on, so the columns stand nearly where
+    /// they would without it; with a companion it is a card wide.
+    /// </summary>
+    private void LayOutCompanionColumn(PoolArrangement arrangement, List<ObjectView> handled, float width, float height)
+    {
+        bool shown = DeckEditorShown || (_poolIsDeck && (arrangement.Companion.Count > 0 || _poolCards.Any(DeckRules.HasCompanion)));
+        _companionColumn.Visibility = shown ? Visibility.Visible : Visibility.Collapsed;
+        if (!shown)
+        {
+            _companionBoard.SetCells([]);
+            return;
+        }
+
+        bool empty = arrangement.Companion.Count == 0;
+        float boardWidth = empty ? CompanionStripWidth - 14 : width;
+        _companionColumn.Width = boardWidth + 14;
+        _companionBoard.SetCellSize(width, height);
+        _companionBoard.Width = boardWidth;
+        _companionBoard.Height = height;
+        _companionBoard.SetCells([.. arrangement.Companion.Select(place => new CardBoardElement.BoardCell(handled[place], 0, 0, Tapped: false, Clickable: !_deckSubmitted))]);
+        _companionLabel.Text = "Companion";
+        ToolTipService.SetToolTip(_companionColumn, empty
+            ? "Companion: drop a card with companion here to make it the deck's companion, a sideboard card revealed before each game"
+            : "The deck's companion: a sideboard card, revealed before each game if the deck fulfils its condition");
+    }
+
+    /// <summary>How wide the companion column is with no companion in it: room for its name, and a card dropped on it.</summary>
+    private const float CompanionStripWidth = 92f;
+
+    /// <summary>A card held, as printed: one of the deck's, or a search result.</summary>
+    private ObjectView? HeldCard(ViewHandle handle) =>
+        _poolPlaces.TryGetValue(handle.Value, out int place) && place < _poolCards.Count && !IsBasic(place) ? _poolCards[place]
+        : DeckEditorShown ? CatalogOf(handle)?.Card : null;
+
+    /// <summary>Whether a card held could be the deck's companion: a card with companion (CR 702.139a), of the pool or the search.</summary>
+    private bool CanCompanion(ViewHandle handle) =>
+        (InPool(handle) || InSearch(handle)) && (DeckEditorShown || _poolIsDeck) && HeldCard(handle) is { } card && DeckRules.HasCompanion(card);
+
+    /// <summary>
+    /// Makes a card the deck's companion: out of wherever it was, into the column; the companion it replaces goes to the
+    /// sideboard, of which a companion is a card all along (CR 400.11a).
+    /// </summary>
+    private void PutInCompanion(ViewHandle handle)
+    {
+        if (_arrangement is not { } arrangement)
+        {
+            return;
+        }
+
+        arrangement.Side.AddRange(arrangement.Companion);
+        arrangement.Companion.Clear();
+        if (InSearch(handle))
+        {
+            AddFromSearch(handle, held => held.Companion, 0);
+            return;
+        }
+
+        if (_poolPlaces.TryGetValue(handle.Value, out int place))
+        {
+            arrangement.Remove(place);
+            arrangement.Companion.Add(place);
+            PoolMoved(sideChanged: true);
+        }
+    }
 
     /// <summary>The slot a point in the columns is: which column, and where among its other cards, as column * 1000 + row.</summary>
     private int ColumnSlot(ViewHandle carried, Point at)
@@ -666,7 +788,7 @@ public sealed partial class MainPage
             return;
         }
 
-        if (arrangement.InSide(place) || arrangement.Command.Contains(place))
+        if (arrangement.InSide(place) || arrangement.Command.Contains(place) || arrangement.Companion.Contains(place))
         {
             arrangement.Remove(place);
             arrangement.Columns[DefaultColumn(_poolCards[place])].Add(place);
@@ -725,7 +847,7 @@ public sealed partial class MainPage
 
         (DeckEditorShown ? _deckPanel : _eventPanel).UpdateLayout();
         List<CardFlights.Placed> placed = [];
-        foreach (CardBoardElement board in (CardBoardElement[])[_pileBoard, _gridBoard, _mainBoard, _sideBoard, _commandBoard, _searchBoard])
+        foreach (CardBoardElement board in (CardBoardElement[])[_pileBoard, _gridBoard, _mainBoard, _sideBoard, _commandBoard, _companionBoard, _searchBoard])
         {
             if (board.XamlRoot is null || board.ActualWidth <= 0 || !IsShown(board))
             {

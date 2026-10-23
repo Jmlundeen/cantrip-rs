@@ -362,6 +362,7 @@ public sealed class BoosterDraftTests(WebClient web) : IDisposable
             if (table is not BoosterPod) return await loopback(table, seats);
             GameServer server = await GameServer.StartAsync(new GameServerOptions
             {
+                Format = Cantrip.Decks.DeckFormat.Limited(),
                 Port = 0, Players = seats, ContentRoot = WebClient.Content, Event = table, Return = new ReturnPage(new Uri(Home), "your page"),
             });
             return (server, new Uri($"ws://127.0.0.1:{server.Port}/game"));

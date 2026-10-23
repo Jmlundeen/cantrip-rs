@@ -77,7 +77,7 @@ public static partial class Soak
             Parallel.For(0, each, new ParallelOptions { MaxDegreeOfParallelism = parallelism }, game =>
             {
                 (List<DeckList> seated, List<IAutoPlayer> players) = Program.Seating(decks, game, seatA, seatB);
-                MatchResult result = Match.Play(content, seated, seed + (ulong)(game / 2), players, sample: false);
+                MatchResult result = Match.Play(content, seated, Program.Format, seed + (ulong)(game / 2), players, sample: false);
                 Interlocked.Increment(ref played);
 
                 if (!result.Finished)

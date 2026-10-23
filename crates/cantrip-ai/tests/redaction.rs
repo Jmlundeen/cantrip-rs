@@ -127,6 +127,8 @@ fn deal(case: &Case, variant: Option<(PlayerId, InfoMode, u64)>) -> Game {
         decks,
         sideboards: case.sideboards.clone(),
         basic_lands_outside: case.basic_lands_outside.clone(),
+        companions: Vec::new(),
+        minimum_deck_size: 60,
         // Another generator for B: a shuffle the seat cannot see comes out otherwise.
         seed: if variant.is_some() { 2 } else { 1 },
         shuffle: false,
@@ -931,4 +933,46 @@ fn a_world_dealt_mid_cast_keeps_its_cards_when_the_cast_is_cancelled() {
 
     world.goto(root);
     assert!(world.state == dealt.0 && world.log == dealt.1, "back at the fork's root, the world as dealt");
+}
+
+/// A world dealt for Bot1 while Bot1 chooses who goes first, before any companion is revealed (CR 103.2b): two games that
+/// differ only in the companion Bot2 chose at deck building - a Lurrus of the Dream-Den its deck of Islands fulfils, or the
+/// same Lurrus a plain sideboard card - give the same world, and once the starting player is chosen neither world reveals
+/// anything of Bot2's: what Bot2 chose is Bot2's alone until it is revealed.
+#[test]
+fn a_companion_not_yet_revealed_is_not_in_another_seats_world() {
+    let lurrus = ids(&["Lurrus of the Dream-Den".to_string()])[0];
+    let swamps = ids(&vec!["Swamp".to_string(); 40]);
+    let islands = ids(&vec!["Island".to_string(); 40]);
+    let game = |chosen: bool| {
+        let setup = Setup {
+            decks: vec![swamps.clone(), islands.clone()],
+            sideboards: vec![vec![], if chosen { vec![] } else { vec![lurrus] }],
+            companions: vec![None, chosen.then_some(lurrus)],
+            shuffle: false,
+            opening_chooser: Some(PlayerId(0)),
+            ..Setup::default()
+        };
+        let mut game = Game::new(cards(), &setup);
+        game.run();
+        assert!(matches!(game.pending().map(|r| &r.kind), Some(RequestKind::ChooseStartingPlayer { .. })));
+        game
+    };
+    let (a, b) = (game(true), game(false));
+    assert_eq!(a.state.player(PlayerId(1)).companion_to_reveal.is_some(), true, "Bot2's companion is to be revealed in game A");
+    let world = |g: &Game| {
+        let mut world = g.fork_for_search();
+        world.reseed(5);
+        determinize(&mut world, &Knowledge::of(g, PlayerId(0)), PlayerId(0), InfoMode::Hidden, prior(), &mut Rng::new(5));
+        world
+    };
+    let (mut wa, mut wb) = (world(&a), world(&b));
+    assert_eq!(wa.state.players, wb.state.players, "the worlds' players differ before the reveal");
+    assert_eq!(canon(&wa), canon(&wb));
+    for w in [&mut wa, &mut wb] {
+        let request = w.pending().expect("who goes first").id;
+        w.answer(request, PlayerId(0), Answer::Player(PlayerId(0))).expect("Bot1 goes first");
+    }
+    assert_eq!(canon_of(&wa, false), canon_of(&wb, false), "a world revealed what Bot2 chose");
+    assert_eq!(wa.state.player(PlayerId(1)).companion, None);
 }

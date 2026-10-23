@@ -48,6 +48,7 @@ public sealed class TableClockTests(ITestOutputHelper output)
         DeckList deck = Deck();
         GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0, Players = players, ContentRoot = RepoRoot.ContentRoot, Decks = [deck], AutoStart = true, TimeProvider = clock,
             PlayerClock = playerClock ?? MatchClocks.DefaultPlayerClock, Rules = rules ?? RulesHostFactory.Native,
         });
@@ -213,6 +214,7 @@ public sealed class TableClockTests(ITestOutputHelper output)
         var hosted = new Event { Clocks = { [1] = TimeSpan.FromMinutes(10) } };
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0, Players = 2, ContentRoot = RepoRoot.ContentRoot, Event = hosted, TimeProvider = clock,
         });
         await Until(() => hosted.Used.Count == 2 || hosted.Ended is not null);
@@ -235,7 +237,7 @@ public sealed class TableClockTests(ITestOutputHelper output)
         if (NoHost()) return;
         var clock = new Clock();
         using Cantrip.Client.Embedded.HostedGame hosted = Cantrip.Client.Embedded.HostAndPlay.StartTable(
-            RulesHostFactory.Native, [Deck()], 7, ["Ann", "Bob"], clock);
+            RulesHostFactory.Native, [Deck()], Cantrip.Decks.DeckFormat.Limited(), 7, ["Ann", "Bob"], clock);
         List<GameClient> clients = [.. hosted.Seats.Order().Select(seat =>
         {
             var client = new GameClient(hosted.TransportFor(seat));
@@ -266,6 +268,7 @@ public sealed class TableClockTests(ITestOutputHelper output)
         var hosted = new Event { Clocks = { [1] = TimeSpan.Zero } };
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0, Players = 2, ContentRoot = RepoRoot.ContentRoot, Event = hosted, TimeProvider = clock,
         });
         TableResult result = await FinishedAsync(server);
@@ -286,6 +289,7 @@ public sealed class TableClockTests(ITestOutputHelper output)
         var hosted = new Event();
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0, Players = 2, ContentRoot = RepoRoot.ContentRoot, Event = hosted, TimeProvider = clock, Rules = new JumpingRules(clock, TimeSpan.Zero),
         });
         var address = new Uri($"ws://127.0.0.1:{server.Port}/game");
@@ -374,7 +378,7 @@ public sealed class TableClockTests(ITestOutputHelper output)
         {
             Dealt++;
             List<string> cards = [.. Deck().Entries.SelectMany(entry => Enumerable.Repeat(entry.Card, entry.Copies))];
-            return (rules ?? RulesHostFactory.Native).Create([.. names.Select(name => new RulesSeat(name, cards))], 7, new RulesGameOptions());
+            return (rules ?? RulesHostFactory.Native).Create([.. names.Select(name => new RulesSeat(name, cards))], 7, new RulesGameOptions { MinimumDeckSize = 60 });
         }
 
         public void DealFailed(string why) => throw new InvalidOperationException(why);

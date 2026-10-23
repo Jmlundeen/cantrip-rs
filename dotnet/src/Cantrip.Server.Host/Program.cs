@@ -7,8 +7,12 @@ using Microsoft.AspNetCore.Builder;
 
 // A player-hosted server. Players choose names/decks/sets and explicitly ready over a loopback WebSocket.
 //
-// Usage: cantrip-server [--port N] [--players N] [--seed N] [--content PATH] [--decks PATH] [--deck NAME]...
-//                       [--auto-start] [--art-port N] [--art-cache PATH] [--art-log] [--clock MINUTES]
+// Usage: cantrip-server --format KEY [--min-deck N] [--port N] [--players N] [--seed N] [--content PATH] [--decks PATH]
+//                       [--deck NAME]... [--auto-start] [--art-port N] [--art-cache PATH] [--art-log] [--clock MINUTES]
+//
+// --format names the format the table's decks are played in, which the server checks every deck against before it is
+// chosen and dealt and tells the engine the minimum deck size of: freeform (the default: no deck-construction restriction),
+// standard, pioneer, modern, legacy, vintage, commander, penny, or limited (with --min-deck, forty by default).
 //
 // Every table has chess clocks (docs/events.md, "Clocks"): each player's runs while the game waits on them, and whoever's
 // runs out loses (--clock, an hour by default).
@@ -96,6 +100,17 @@ catch (Exception error) when (error is IOException or InvalidOperationException 
     return 1;
 }
 
+string? formatKey = StringArg(args, "--format");
+Cantrip.Decks.DeckFormat? format = formatKey is null ? Cantrip.Decks.DeckFormat.Freeform
+    : formatKey == Cantrip.Decks.DeckFormat.LimitedKey ? Cantrip.Decks.DeckFormat.Limited(IntArg(args, "--min-deck", 40))
+    : Cantrip.Decks.DeckFormat.Find(formatKey);
+if (format is null)
+{
+    Console.Error.WriteLine($"There is no format '{formatKey}': "
+        + string.Join(", ", Cantrip.Decks.DeckFormat.All.Select(each => each.Key)) + ", or limited [--min-deck N].");
+    return 1;
+}
+
 foreach (DeckList deck in catalog)
 {
     Console.WriteLine($"Available deck: {deck.Name} ({deck.Count} cards).");
@@ -116,6 +131,7 @@ if (art is not null)
 
 await using GameServer server = await GameServer.StartAsync(new GameServerOptions
 {
+    Format = format,
     Port = port,
     Players = players,
     Seed = seed,
@@ -289,6 +305,7 @@ static async Task<int> HostEventAsync(string[] args, string content)
 
     await using GameServer server = await GameServer.StartAsync(new GameServerOptions
     {
+        Format = Cantrip.Decks.DeckFormat.Limited(),
         Port = port,
         Players = pod.Seats,
         ContentRoot = content,
@@ -374,7 +391,7 @@ static async Task<int> HostBoosterAsync(string[] args, string content, EventStor
     {
         if (podOpened) return await anyPort(table, seats);
         podOpened = true;
-        GameServer server = await GameServer.StartAsync(new GameServerOptions { Port = port, Players = seats, ContentRoot = content, Event = table, Art = ArtAddress(art) });
+        GameServer server = await GameServer.StartAsync(new GameServerOptions { Format = Cantrip.Decks.DeckFormat.Limited(), Port = port, Players = seats, ContentRoot = content, Event = table, Art = ArtAddress(art) });
         return (server, new Uri($"ws://localhost:{server.Port}/game"));
     });
 

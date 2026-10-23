@@ -45,6 +45,7 @@ public sealed class WebSocketTransportTests
 
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0,
             Players = 2,
             Seed = 4,

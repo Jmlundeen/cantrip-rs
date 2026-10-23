@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Cantrip.Client.Decks;
+namespace Cantrip.Decks;
 
 /// <summary>Some copies of a card, by the name it is printed with, as a decklist names them.</summary>
 public sealed record DeckEntry(string Card, int Count);
@@ -25,12 +25,26 @@ public sealed class SavedDeck
 
     public List<DeckEntry> Side { get; set; } = [];
 
+    /// <summary>
+    /// The card chosen as the deck's companion (CR 702.139a), by name, or empty for none: a sideboard card of its own (CR
+    /// 400.11a), revealed before each game whose starting deck fulfils its condition (CR 103.2b). Chosen anew each game of a
+    /// match, as the sideboard is.
+    /// </summary>
+    public string Companion { get; set; } = string.Empty;
+
     /// <summary>When it was last saved; the server's to set.</summary>
     public DateTimeOffset Updated { get; set; }
 }
 
 /// <summary>A saved deck as the list of a player's decks shows it.</summary>
 public sealed record DeckSummary(string Id, string Name, string Format, int Cards, DateTimeOffset Updated);
+
+/// <summary>
+/// What the server finds wrong with a deck for its format (<see cref="DeckRules.Problems(SavedDeck, DeckFormat, IReadOnlyDictionary{string, CatalogCard}, bool?)"/>),
+/// its companion's condition judged by the rules engine: the site's answer to <c>/decks/api/check</c>. Empty for a deck
+/// the server would deal.
+/// </summary>
+public sealed record DeckCheck(List<string> Problems);
 
 /// <summary>What saving a deck answers: the deck as kept (with its id), or why it was not.</summary>
 public sealed record DeckSaved(SavedDeck? Deck, string? Refusal);
@@ -43,4 +57,5 @@ public sealed record DeckSaved(SavedDeck? Deck, string? Refusal);
 [JsonSerializable(typeof(SavedDeck))]
 [JsonSerializable(typeof(List<DeckSummary>))]
 [JsonSerializable(typeof(DeckSaved))]
+[JsonSerializable(typeof(DeckCheck))]
 public sealed partial class DeckJson : JsonSerializerContext;

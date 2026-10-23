@@ -1,4 +1,4 @@
-using Cantrip.Client.Decks;
+using Cantrip.Decks;
 using Xunit;
 
 namespace Cantrip.Client.Tests;
@@ -41,7 +41,29 @@ public sealed class DeckImportTests
         Assert.Equal("Red Burn", read.Deck.Name);
         Assert.Equal(["1 Balin, Loremaster"], Listed(read.Deck.Commanders));
         Assert.Equal(["4 Lightning Bolt", "20 Mountain", "1 Bedeck // Bedazzle"], Listed(read.Deck.Main));
-        Assert.Equal(["1 Lurrus of the Dream-Den", "2 Smash to Smithereens"], Listed(read.Deck.Side));
+        Assert.Equal(["2 Smash to Smithereens"], Listed(read.Deck.Side));
+        Assert.Equal("Lurrus of the Dream-Den", read.Deck.Companion);
+    }
+
+    /// <summary>Arena lists the companion under Companion and again under Sideboard: it is the deck's companion, one card (CR 702.139a).</summary>
+    [Fact]
+    public void An_Arena_companion_listed_in_the_sideboard_too_is_one_card()
+    {
+        DeckImport.Result read = DeckImport.Read("""
+            Companion
+            1 Lurrus of the Dream-Den (IKO) 226
+
+            Deck
+            20 Mountain (ANA) 59
+
+            Sideboard
+            2 Smash to Smithereens (ALA) 117
+            1 Lurrus of the Dream-Den (IKO) 226
+            """, Find);
+
+        Assert.Equal(["2 Smash to Smithereens"], Listed(read.Deck.Side));
+        Assert.Equal("Lurrus of the Dream-Den", read.Deck.Companion);
+        Assert.Equal(["20 Mountain"], Listed(read.Deck.Main));
     }
 
     [Fact]

@@ -1,7 +1,7 @@
 using Cantrip.Protocol;
 using MessagePack;
 
-namespace Cantrip.Client.Decks;
+namespace Cantrip.Decks;
 
 /// <summary>
 /// Every card a constructed deck can be built from - every card the engine plays - as printed, with where it is legal

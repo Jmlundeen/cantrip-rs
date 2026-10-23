@@ -74,6 +74,8 @@ fn kind_of(kind: ActionKindView) -> Result<ActionKind, Untranslatable> {
         ActionKindView::TurnFaceUp => ActionKind::ActivateAbility,
         // Unlocking a Room's door is the intrinsic ability it was offered as (CR 709.5e).
         ActionKindView::UnlockDoor => ActionKind::ActivateAbility,
+        // Taking a companion is a special action of its own (CR 116.2g).
+        ActionKindView::TakeCompanion => ActionKind::TakeCompanion,
         other => return Err(Untranslatable::Illegal(format!("{other:?} is not something this engine offers"))),
     })
 }

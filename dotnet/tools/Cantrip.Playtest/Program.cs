@@ -1,3 +1,4 @@
+using Cantrip.Client.Embedded;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Cantrip.Server;
@@ -16,15 +17,38 @@ namespace Cantrip.Playtest;
 /// </summary>
 public static class Program
 {
+    /// <summary>The format the decks are played in (<c>--format</c>, <see cref="HostAndPlay.FormatFrom"/>): Freeform unless named.</summary>
+    public static Cantrip.Decks.DeckFormat Format { get; private set; } = Cantrip.Decks.DeckFormat.Freeform;
+
+    /// <summary>The format the command line names, or null - for none, or for one there is not, said.</summary>
+    private static Cantrip.Decks.DeckFormat? FormatOf(string[] args)
+    {
+        try
+        {
+            return HostAndPlay.FormatFrom(args);
+        }
+        catch (ArgumentException error)
+        {
+            Console.Error.WriteLine(error.Message);
+            return null;
+        }
+    }
+
     public static int Main(string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);
-
         if (args.Contains("--help") || args.Contains("-h"))
         {
             Help();
             return 0;
         }
+
+        if (FormatOf(args) is not { } format)
+        {
+            return 2;
+        }
+
+        Format = format;
 
         string root = FindRoot();
         int games = Number(args, "--games", 100);
@@ -317,6 +341,8 @@ public static class Program
           --seed N         the first shuffle; game n is dealt from seed + n (default: a new one each run)
           --bot-seed N     the first seat's draws; each game and seat is offset from it (default: a new one each run)
           --deck NAME      a deck, once per seat (default: the demo decks, made of cards the native engine has).
+          --format KEY     the format the decks are played in: a constructed format's key, or limited
+                           with --min-deck N (default: freeform, no deck-construction restriction)
                            A path, or a name under decks\\
           --verbose        one line per game rather than a summary
           --help           this

@@ -1,0 +1,31 @@
+# Lutri, the Spellchaser: "Companion - Each nonland card in your starting deck has a different name." Bot1's nonland cards are a
+# Lightning Bolt, a Counterspell and a Brainstorm, and its many Islands are lands, so the Lutri Bot1 chose as its companion is
+# revealed (CR 103.2b). Bot2's deck has two Lightning Bolts, which share a name (CR 201.2a), so Bot2's is not.
+
+[Bot1 Deck]
+Island x4
+Lightning Bolt
+Counterspell
+Brainstorm
+Island x20
+
+[Bot1 Companion]
+Lutri, the Spellchaser
+
+[Bot2 Deck]
+Island x5
+Lightning Bolt
+Counterspell
+Lightning Bolt
+Island x20
+
+[Bot2 Companion]
+Lutri, the Spellchaser
+
+[Actions]
+
+[Expect]
+Bot1.Companion = Lutri, the Spellchaser
+Bot1.Revealed = Lutri, the Spellchaser
+Bot2.Companion =
+Bot2.Sideboard = Lutri, the Spellchaser

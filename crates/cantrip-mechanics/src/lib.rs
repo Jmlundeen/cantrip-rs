@@ -16,6 +16,7 @@ pub mod backup;
 pub mod dash;
 pub mod discover;
 pub mod combat;
+pub mod companion;
 pub mod copy;
 pub mod channel;
 pub mod class;

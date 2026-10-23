@@ -1,0 +1,50 @@
+# Browser
+# Companion in the browser (CR 103.2b, 702.139a, 116.2g). Both players chose Lurrus of the Dream-Den as their companion when
+# they built their decks, and both decks fulfil its condition, so both are revealed before the game with nothing asked. Bot1's
+# page shows its own in a Companion window at the bottom left of its battlefield, and Bot2's at the top left of Bot2's; neither
+# is in a sideboard button of Bot2's rail. With Black Lotus out, Bot1 clicks its Lurrus, which offers "{3}: Put Lurrus of the
+# Dream-Den in hand.", takes it paying with the Lotus, and its window is gone.
+
+[Bot1 Deck]
+Black Lotus
+Swamp x19
+
+[Bot1 Sideboard]
+Lightning Bolt
+
+[Bot1 Companion]
+Lurrus of the Dream-Den
+
+[Bot2 Deck]
+Island x20
+
+[Bot2 Sideboard]
+Counterspell
+
+[Bot2 Companion]
+Lurrus of the Dream-Den
+
+[Actions]
+? Client.Bot1.Companion = Lurrus of the Dream-Den
+? Client.Bot1.Companion.Corner = bottom-left
+? Client.Bot1.OpponentCompanion = Lurrus of the Dream-Den
+? Client.Bot1.OpponentCompanion.Corner = top-left
+? Client.Bot1.OpponentSideboard.Caption =
+? Client.Bot1.Sideboard.Caption = Sideboard  2
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+? Client.Bot1.Menu = {3}: Put Lurrus of the Dream-Den in hand.
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+? Client.Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Lurrus of the Dream-Den
+? Client.Bot1.Companion =
+? Client.Bot1.OpponentCompanion = Lurrus of the Dream-Den
+? Client.Bot1.Sideboard.Caption = Sideboard  1
+? Client.Bot1.Log.Has = You put [Lurrus of the Dream-Den] into your hand from outside the game.
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Companion = Lurrus of the Dream-Den
+Bot1.Sideboard = Lightning Bolt
+Bot2.Companion = Lurrus of the Dream-Den
+Bot2.Sideboard = Counterspell; Lurrus of the Dream-Den

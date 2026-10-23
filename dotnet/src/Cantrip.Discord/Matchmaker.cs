@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using Cantrip.Protocol;
+using Cantrip.Decks;
 using Cantrip.Server;
 using Cantrip.Server.Events;
 using Cantrip.Server.Host;
@@ -218,11 +219,15 @@ public sealed class Matchmaker : IAsyncDisposable
     {
         ArgumentNullException.ThrowIfNull(host);
         IReadOnlyList<DeckList> decks = [_options.Deck];
+        // A game hosted from Discord plays the bot's practice deck, in Freeform: no deck-construction restriction.
+        DeckFormat played = DeckFormat.Freeform;
         if (format is not null)
         {
-            if (!_options.Formats.TryGetValue(format, out IReadOnlyList<DeckList>? formatDecks)) return Seating.Refused($"There are no {format} games here.");
+            if (!_options.Formats.TryGetValue(format, out IReadOnlyList<DeckList>? formatDecks) || DeckFormat.Find(format) is not { } known)
+                return Seating.Refused($"There are no {format} games here.");
             if (formatDecks.FirstOrDefault(each => each.Name == deck) is null) return Seating.Refused("Choose a deck from the list.");
             decks = formatDecks;
+            played = known;
         }
 
         await _gate.WaitAsync().ConfigureAwait(false);
@@ -248,6 +253,7 @@ public sealed class Matchmaker : IAsyncDisposable
                         Seed = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8)),
                         ContentRoot = _options.ContentRoot,
                         Decks = decks,
+                        Format = played,
                         RequireTickets = true,
                         ListenAddress = _options.ListenAddress,
                         TimeProvider = _options.TimeProvider,
@@ -277,7 +283,17 @@ public sealed class Matchmaker : IAsyncDisposable
             var address = _options.TableAddress?.Invoke(server.Port) ?? new Uri($"ws://{_options.PublicHost}:{server.Port}/game");
             game = new HostedGame(id, host with { Name = SeatName(host.Name) }, port, address, server, _options.TimeProvider.GetUtcNow(), format);
             PlayerFace hostFace = FaceOf(game.Host);
-            ticket = server.Reserve(1, game.Host.Name, format is null ? _options.Deck.Name : deck!, hostFace.Discord ?? string.Empty, hostFace.Picture ?? string.Empty);
+            try
+            {
+                ticket = server.Reserve(1, game.Host.Name, format is null ? _options.Deck.Name : deck!, hostFace.Discord ?? string.Empty, hostFace.Picture ?? string.Empty);
+            }
+            catch (ArgumentException refused)
+            {
+                // The server refused the deck for the table's format (DeckValidation): the table goes, and nobody is seated.
+                await server.DisposeAsync().ConfigureAwait(false);
+                return Seating.Refused(refused.Message);
+            }
+
             game.Seat(host.Id, ticket);
             _games.Add(id, game);
             Watch(game);
@@ -313,9 +329,20 @@ public sealed class Matchmaker : IAsyncDisposable
             if (game.Format is { } format && !_options.Formats[format].Any(each => each.Name == deck))
                 return Seating.Refused("Choose a deck from the list.", game);
 
-            game.Guest = player with { Name = SeatName(player.Name) };
-            PlayerFace guest = FaceOf(game.Guest);
-            string ticket = game.Server.Reserve(2, game.Guest.Name, game.Format is null ? _options.Deck.Name : deck!, guest.Discord ?? string.Empty, guest.Picture ?? string.Empty);
+            DiscordPlayer seated = player with { Name = SeatName(player.Name) };
+            PlayerFace guest = FaceOf(seated);
+            string ticket;
+            try
+            {
+                ticket = game.Server.Reserve(2, seated.Name, game.Format is null ? _options.Deck.Name : deck!, guest.Discord ?? string.Empty, guest.Picture ?? string.Empty);
+            }
+            catch (ArgumentException refused)
+            {
+                // The server refused the deck for the table's format (DeckValidation): the seat stays free.
+                return Seating.Refused(refused.Message, game);
+            }
+
+            game.Guest = seated;
             game.Seat(player.Id, ticket);
             game.Stage = GameStage.Seated;
             seating = new Seating(game, ticket, 2, null);

@@ -205,7 +205,13 @@ impl<'s> Run<'s> {
         let decks: Vec<Vec<String>> = (0..script.decks.len()).map(|i| script.decklist(i)).collect();
         let sideboards: Vec<Vec<String>> = (0..script.sideboards.len()).map(|i| script.sideboard(i)).collect();
         let chooser = if script.opening { Some(PlayerId((script.chooser.max(1) - 1) as u8)) } else { None };
-        let mut game = deal_on(table, &decks, &sideboards, &script.basic_lands_outside, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
+        let outside = Outside {
+            sideboards: &sideboards,
+            companions: &script.companions,
+            basic_lands_outside: &script.basic_lands_outside,
+            minimum_deck_size: script.minimum_deck_size.unwrap_or(Outside::default().minimum_deck_size),
+        };
+        let mut game = deal_on(table, &decks, &outside, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
         // CANTRIP_VERIFY=1: every rollback is checked to restore the state exactly.
         game.verify = std::env::var_os("CANTRIP_VERIFY").is_some();
         game.state.force_rolls(&script.dice);
@@ -310,7 +316,7 @@ fn player_of(bot: i32) -> PlayerId {
 fn answers(verb: ScriptVerb, kind: &RequestKind) -> bool {
     use ScriptVerb as V;
     match verb {
-        V::Play | V::Cast | V::Activate | V::Foretell | V::Suspend | V::Pass => matches!(kind, RequestKind::Priority { .. }),
+        V::Play | V::Cast | V::Activate | V::Foretell | V::Suspend | V::TakeCompanion | V::Pass => matches!(kind, RequestKind::Priority { .. }),
         V::PayCost => matches!(kind, RequestKind::PayCosts { .. }),
         V::Undo => matches!(kind, RequestKind::Priority { .. } | RequestKind::PayCosts { .. }),
         V::Accept | V::Decline => matches!(kind, RequestKind::May { .. } | RequestKind::UnlessPays { .. }),
@@ -894,7 +900,7 @@ impl<'s> Run<'s> {
             _ => None,
         };
         match (&request.kind, act) {
-            (RequestKind::Priority { .. }, Some(ActionKind::CastSpell | ActionKind::ActivateAbility)) => {
+            (RequestKind::Priority { .. }, Some(ActionKind::CastSpell | ActionKind::ActivateAbility | ActionKind::TakeCompanion)) => {
                 self.colors = colors_of(step)?;
                 let x = x_of(step)?;
                 let mut casting = Casting::new(request.player, x, spend_of(step)?);
@@ -1135,7 +1141,7 @@ impl<'s> Run<'s> {
             {
                 self.choose_target(step, candidates, *least, *count)?
             }
-            (V::Play | V::Cast | V::Activate | V::Foretell | V::Suspend, _) => match options {
+            (V::Play | V::Cast | V::Activate | V::Foretell | V::Suspend | V::TakeCompanion, _) => match options {
                 Some(options) => self.match_option(step, options)?,
                 None => None,
             },
@@ -2101,6 +2107,8 @@ impl<'s> Run<'s> {
             ScriptVerb::Activate => ActionKind::ActivateAbility,
             // A special action (CR 116.2) is an ability of the card that is done at once, named by its keyword.
             ScriptVerb::Foretell | ScriptVerb::Suspend => ActionKind::ActivateAbility,
+            // Taking a companion is the player's special action of its own (CR 116.2g), the card outside the game its source.
+            ScriptVerb::TakeCompanion => ActionKind::TakeCompanion,
             _ => return Ok(Vec::new()),
         };
         let g = &self.game;

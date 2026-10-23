@@ -572,7 +572,8 @@ public sealed class BoosterPod : ITableEvent, IMatchHost
         if (_record.Stage != EventStage.DeckBuilding) return "Decks are not being built.";
         EventParticipant participant = _record.AtSeat(seat)!;
         _changes[seat] = build.Change;
-        (EventDeck? deck, string? refusal) = PoolDecks.Built(participant.Deck, participant.Pool.Count, build, _cards.Basics, _record.MinimumDeck);
+        (EventDeck? deck, string? refusal) = PoolDecks.Built(participant.Deck, participant.Pool.Count, build, _cards.Basics, _record.MinimumDeck,
+            built => _cards.Refusal(participant.Pool, built, _record.MinimumDeck));
         if (deck is null) return refusal;
         participant.Deck = deck;
         if (_record.Participants.All(each => each.Deck.Submitted))

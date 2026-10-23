@@ -149,6 +149,12 @@ public sealed class EventDeck
     /// <summary>Basic lands added, by name, which nobody drafts and anyone may add as many of as they like.</summary>
     public Dictionary<string, int> Basics { get; set; } = [];
 
+    /// <summary>
+    /// The place in the pool of the card chosen as the deck's companion (CR 702.139a), or -1 for none: a card of the
+    /// sideboard, revealed before each game (CR 103.2b). Chosen anew each game of a match, as the rest of the sideboard is.
+    /// </summary>
+    public int Companion { get; set; } = -1;
+
     /// <summary>Whether the player has said this is their deck. The round is dealt once everyone has.</summary>
     public bool Submitted { get; set; }
 

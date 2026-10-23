@@ -89,12 +89,41 @@ struct Told {
     told: std::ops::Range<u64>,
 }
 
+/// The cards with companion in `sideboard`, in its order, each with whether `deck` - a starting deck, its cards by name -
+/// fulfils its condition (CR 702.139a-b, 103.2b), `minimum` being the format's minimum deck size: the rules' own judgement of
+/// what a deck could reveal, for the deck editor. A card the engine does not have is refused, as a deal refuses it.
+pub fn companions(deck: &[String], sideboard: &[String], minimum: u32) -> Result<Vec<CompanionCheckView>, Rejection> {
+    let cards = cards();
+    let id = |name: &String| {
+        card(name)
+            .map(|id| cards.fronts[id.0 as usize].unwrap_or(id))
+            .ok_or_else(|| Rejection::new("InvalidSetup", format!("{name} is not a card the engine has")))
+    };
+    let deck = deck.iter().map(id).collect::<Result<Vec<_>, _>>()?;
+    let outside = sideboard.iter().map(id).collect::<Result<Vec<_>, _>>()?;
+    let setup = Setup { decks: vec![deck, Vec::new()], sideboards: vec![outside], minimum_deck_size: minimum, shuffle: false, ..Setup::default() };
+    let game = Game::new(cards, &setup);
+    let player = PlayerId(0);
+    let fulfilled = eligible_companions(&game, player);
+    Ok(game
+        .state
+        .zone(Zone::sideboard(player))
+        .iter()
+        .filter(|&&id| cards.get(game.state.obj(id).card).companion.is_some())
+        .map(|&id| CompanionCheckView { card: game.name(id).to_string(), fulfilled: fulfilled.contains(&id) })
+        .collect())
+}
+
 /// Dealing a game: the seats' names and decks, and the conditions beyond the seed.
 pub struct Deal {
     /// Each seat's name, deck (top first) and sideboard: the cards it owns outside the game (CR 100.4, 400.11a).
     pub seats: Vec<(String, Vec<String>, Vec<String>)>,
     /// A Limited game's basic lands, which each sideboard holds any number of (`Setup::basic_lands_outside`).
     pub basic_lands_outside: Vec<String>,
+    /// Each seat's companion, chosen as its deck was built (`Setup::companions`), by seat; a seat past the end has none.
+    pub companions: Vec<Option<String>>,
+    /// The format's minimum deck size, as the server says (`Setup::minimum_deck_size`, CR 100.2a-b).
+    pub minimum_deck_size: u32,
     pub seed: u64,
     pub shuffle: bool,
     pub first_player: Option<i32>,
@@ -150,7 +179,26 @@ impl Session {
             .iter()
             .map(|c| card(c).ok_or_else(|| Rejection::new("InvalidSetup", format!("the basic land {c} is not a card the engine has"))))
             .collect::<Result<Vec<_>, _>>()?;
-        let setup = Setup { decks, sideboards, basic_lands_outside, seed: deal.seed, shuffle: deal.shuffle, opening_chooser };
+        let mut companions = Vec::new();
+        for (at, companion) in deal.companions.iter().enumerate() {
+            let name = deal.seats.get(at).map_or("", |s| s.0.as_str());
+            companions.push(match companion {
+                None => None,
+                Some(c) => Some(card(c).map(|id| cards.fronts[id.0 as usize].unwrap_or(id)).ok_or_else(|| {
+                    Rejection::new("InvalidSetup", format!("{name}'s companion {c} is not a card the engine has"))
+                })?),
+            });
+        }
+        let setup = Setup {
+            decks,
+            sideboards,
+            basic_lands_outside,
+            companions,
+            minimum_deck_size: deal.minimum_deck_size,
+            seed: deal.seed,
+            shuffle: deal.shuffle,
+            opening_chooser,
+        };
         let mut game = Game::new(cards, &setup);
         prepare(&mut game);
         game.run();
@@ -726,7 +774,7 @@ mod tests {
 
     fn deal(first: &[&str], filler: &str, count: usize) -> Deal {
         let deck = |top: &[&str]| top.iter().map(|c| c.to_string()).chain(std::iter::repeat_n(filler.to_string(), count)).collect::<Vec<_>>();
-        Deal { seats: vec![("North".into(), deck(first), Vec::new()), ("South".into(), deck(&[]), Vec::new())], basic_lands_outside: Vec::new(), seed: 1, shuffle: false, first_player: Some(1), chooser: None }
+        Deal { seats: vec![("North".into(), deck(first), Vec::new()), ("South".into(), deck(&[]), Vec::new())], basic_lands_outside: Vec::new(), companions: Vec::new(), minimum_deck_size: 60, seed: 1, shuffle: false, first_player: Some(1), chooser: None }
     }
 
     /// A game whose South is controlled by North during South's next turn (CR 723.1): the effect put in place before the
@@ -1001,6 +1049,90 @@ mod tests {
         assert!(!hidden.contents_visible && hidden.contents.is_empty());
         assert!(!theirs.objects.iter().any(|o| o.name == "Lightning Bolt" || o.name == "Counterspell"));
         assert_eq!(sideboard(&theirs, 2).count, 0);
+    }
+
+    /// Companion (CR 103.2b, 702.139a, 116.2g): North chose Lurrus of the Dream-Den as its companion at deck building, and
+    /// its deck - a Black Lotus and Islands - fulfils its condition, so it is revealed before the game with nothing asked: South
+    /// sees it in North's sideboard, alone of it. Once the Lotus is out North is offered `TakeCompanion` for {3}, and taking it
+    /// puts Lurrus into North's hand; it is offered no more.
+    #[test]
+    fn a_revealed_companion_is_shown_to_both_seats_and_taken_for_three() {
+        let mut dealt = deal(&["Black Lotus"], "Island", 30);
+        dealt.seats[0].2 = vec!["Lightning Bolt".into()];
+        dealt.companions = vec![Some("Lurrus of the Dream-Den".into())];
+        let mut session = Session::new(dealt).ok().unwrap();
+        let sideboard = |view: &PlayerView| view.zones.iter().find(|z| z.kind == Some(ZoneKindView::Sideboard) && z.owner == 1).cloned().unwrap();
+        let name_of = |view: &PlayerView, h: ViewHandle| view.objects.iter().find(|o| o.handle == h).map(|o| o.name.clone());
+        let mut step = session.step();
+        let (mut taken, mut allow_cast) = (false, true);
+        for _ in 0..200 {
+            let r = &step["Requests"][0];
+            let prompt: PromptPayload = serde_json::from_value(r["Prompt"].clone()).unwrap();
+            let (id, seat) = (r["RequestId"].as_u64().unwrap() as u32, r["Seat"].as_i64().unwrap() as i32);
+            assert!(!matches!(prompt, PromptPayload::ChooseCardsPromptMessage(_)), "nothing is asked of a companion");
+            let answer = match &prompt {
+                PromptPayload::PriorityPromptMessage(p) if seat == 1 && p.options.iter().any(|o| o.kind == ActionKindView::TakeCompanion) => {
+                    assert!(!taken, "offered only once");
+                    let take = p.options.iter().find(|o| o.kind == ActionKindView::TakeCompanion).unwrap();
+                    assert_eq!(take.description, "{3}: Put Lurrus of the Dream-Den in hand.");
+                    // South sees the revealed card in North's sideboard, and nothing else of it.
+                    let south = session.view(2).ok().unwrap();
+                    let theirs = sideboard(&south);
+                    assert_eq!((theirs.count, theirs.contents_visible), (2, false));
+                    assert_eq!(theirs.contents.iter().map(|&h| name_of(&south, h)).collect::<Vec<_>>(), [Some("Lurrus of the Dream-Den".to_string())]);
+                    assert!(!south.objects.iter().any(|o| o.name == "Lightning Bolt"));
+                    taken = true;
+                    AnswerPayload::TakeActionAnswer(TakeActionAnswer::take(take))
+                }
+                PromptPayload::PriorityPromptMessage(_) if taken && seat == 1 => break,
+                // The {3} is paid with the Lotus's three mana.
+                PromptPayload::PayCostsPromptMessage(p) if taken && let Some(lotus) = p.options.iter().find(|o| o.produces_of_any_one_color == 3) => {
+                    let mut answer = TakeActionAnswer::take(lotus);
+                    answer.color = Some(ColorView::Blue);
+                    AnswerPayload::TakeActionAnswer(answer)
+                }
+                _ => choose(&prompt, &mut allow_cast),
+            };
+            step = match session.answer(id, seat, &answer) {
+                Ok(step) => step,
+                Err(_) => session.answer(id, seat, &prompt.default_answer()).ok().expect("the default answer is taken"),
+            };
+        }
+        assert!(taken, "the companion was never offered");
+        let north = session.view(1).ok().unwrap();
+        let hand = north.zones.iter().find(|z| z.kind == Some(ZoneKindView::Hand) && z.owner == 1).unwrap();
+        assert!(hand.contents.iter().any(|&h| name_of(&north, h).as_deref() == Some("Lurrus of the Dream-Den")), "in North's hand");
+        assert_eq!(sideboard(&north).count, 1, "the Lightning Bolt is left outside the game");
+        let south = session.view(2).ok().unwrap();
+        assert!(sideboard(&south).contents.is_empty(), "nothing of North's sideboard is shown any more");
+    }
+
+    /// A companion whose condition the deck does not fulfil - a Lurrus of the deck's own is a permanent card with mana value
+    /// 3 - is not revealed (CR 103.2b): South sees North's sideboard closed with nothing in it, and North is never offered it.
+    #[test]
+    fn an_unfulfilled_companion_is_a_hidden_sideboard_card() {
+        let mut dealt = deal(&["Black Lotus", "Lurrus of the Dream-Den"], "Island", 30);
+        dealt.companions = vec![Some("Lurrus of the Dream-Den".into())];
+        let mut session = Session::new(dealt).ok().unwrap();
+        let south = session.view(2).ok().unwrap();
+        let theirs = south.zones.iter().find(|z| z.kind == Some(ZoneKindView::Sideboard) && z.owner == 1).unwrap();
+        assert_eq!((theirs.count, theirs.contents.len()), (1, 0));
+        assert!(!south.objects.iter().any(|o| o.name == "Lurrus of the Dream-Den" && o.zone == Some(ZoneKindView::Sideboard)));
+        let step = session.step();
+        assert!(!options_of(&step).iter().any(|o| o.kind == ActionKindView::TakeCompanion));
+    }
+
+    /// The server's question before it deals a deck with a companion (CR 702.139a): which cards with companion in the sideboard the deck fulfils the condition
+    /// of, judged by the cards' own conditions. A Lightning Bolt has no companion and is not listed; a deck of Islands fulfils
+    /// Lurrus of the Dream-Den's, one with a Lurrus of its own (a permanent card with mana value 3) does not.
+    #[test]
+    fn the_server_is_told_which_companions_a_deck_fulfils() {
+        let islands = |extra: &[&str]| extra.iter().map(|c| c.to_string()).chain(std::iter::repeat_n("Island".to_string(), 60)).collect::<Vec<_>>();
+        let sideboard = vec!["Lightning Bolt".to_string(), "Lurrus of the Dream-Den".to_string()];
+        let lurrus = |fulfilled| vec![CompanionCheckView { card: "Lurrus of the Dream-Den".into(), fulfilled }];
+        assert_eq!(companions(&islands(&[]), &sideboard, 60).ok().unwrap(), lurrus(true));
+        assert_eq!(companions(&islands(&["Lurrus of the Dream-Den"]), &sideboard, 60).ok().unwrap(), lurrus(false));
+        assert!(companions(&islands(&[]), &["No Such Card".to_string()], 60).is_err());
     }
 
     /// A sideboard naming a card the engine does not have refuses the deal, as a deck naming one does: a card that brings a

@@ -29,7 +29,7 @@ public sealed class AuthorityTests
 
     private static GameSession Session()
     {
-        var session = new GameSession(NativeRulesHost.NewGame(new ScriptedHost(), Seats, 5, new RulesGameOptions()));
+        var session = new GameSession(NativeRulesHost.NewGame(new ScriptedHost(), Seats, 5, new RulesGameOptions { MinimumDeckSize = 60 }));
         session.Start();
         return session;
     }
@@ -145,7 +145,7 @@ public sealed class AuthorityTests
     public void A_client_cannot_answer_through_another_clients_transport()
     {
         // The transport binds a seat, so a client has no way to speak as someone else even if it tried.
-        using var session = new GameSession(NativeRulesHost.NewGame(new ScriptedHost(), Seats, 5, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(new ScriptedHost(), Seats, 5, new RulesGameOptions { MinimumDeckSize = 60 }));
         var second = new GameClient(new LoopbackTransport(session, Two));
 
         session.Start();

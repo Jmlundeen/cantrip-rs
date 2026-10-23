@@ -16,6 +16,29 @@ namespace Cantrip.Client.Embedded;
 public static class HostAndPlay
 {
     /// <summary>
+    /// The format a tool's games are played in, from its command line: <c>--format KEY</c> - a constructed format's key, or
+    /// <c>limited</c> with <c>--min-deck N</c> (forty by default) - and Freeform, with no deck-construction restriction at
+    /// all, when it names none (<see cref="Cantrip.Decks.DeckFormat.Freeform"/>). Its minimum deck size is what the engine is told.
+    /// </summary>
+    /// <exception cref="ArgumentException">A format no deck is built for.</exception>
+    public static Cantrip.Decks.DeckFormat FormatFrom(IReadOnlyList<string> args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+        string? key = null;
+        int minimum = 40;
+        for (int i = 0; i + 1 < args.Count; i++)
+        {
+            if (args[i] == "--format") key = args[i + 1];
+            if (args[i] == "--min-deck" && int.TryParse(args[i + 1], out int n)) minimum = n;
+        }
+
+        if (key is null) return Cantrip.Decks.DeckFormat.Freeform;
+        if (key == Cantrip.Decks.DeckFormat.LimitedKey) return Cantrip.Decks.DeckFormat.Limited(minimum);
+        return Cantrip.Decks.DeckFormat.Find(key) ?? throw new ArgumentException($"There is no format '{key}'.", nameof(args));
+    }
+
+
+    /// <summary>
     /// Starts a game from decks named one per seat on the rules engine <paramref name="rules"/> deals: the decks' card
     /// names as written, dealt round again where there are more seats than decks, as a server's table deals them
     /// (<c>GameServer.BuildTable</c>).
@@ -37,6 +60,7 @@ public static class HostAndPlay
     public static HostedGame StartTable(
         IRulesHostFactory rules,
         IReadOnlyList<DeckList> decks,
+        Cantrip.Decks.DeckFormat format,
         ulong seed,
         IReadOnlyList<string> playerNames,
         TimeProvider? time = null,
@@ -44,6 +68,7 @@ public static class HostAndPlay
     {
         ArgumentNullException.ThrowIfNull(rules);
         ArgumentNullException.ThrowIfNull(decks);
+        ArgumentNullException.ThrowIfNull(format);
         ArgumentNullException.ThrowIfNull(playerNames);
 
         if (decks.Count == 0)
@@ -55,9 +80,10 @@ public static class HostAndPlay
             [.. entries.SelectMany(entry => Enumerable.Repeat(entry.Card, entry.Copies))];
 
         List<RulesSeat> seats = [.. playerNames.Select((name, index) =>
-            new RulesSeat(name, Named(decks[index % decks.Count].Entries), Named(decks[index % decks.Count].Sideboard)))];
+            new RulesSeat(name, Named(decks[index % decks.Count].Entries), Named(decks[index % decks.Count].Sideboard), decks[index % decks.Count].Companion))];
 
-        IRulesHost game = rules.Create(seats, seed, new RulesGameOptions());
+        // The engine is told the format's minimum deck size, as a server's table tells it (CR 100.2a-b).
+        IRulesHost game = rules.Create(seats, seed, new RulesGameOptions { MinimumDeckSize = format.MinimumDeckSize });
 
         var clocks = new HostedClocks(time ?? TimeProvider.System, playerClock ?? MatchClocks.DefaultPlayerClock);
         return Host(new GameSession(game), Listed(decks), clocks);
@@ -166,4 +192,5 @@ public sealed class HostedGame : IDisposable
 
         _session.Dispose();
     }
+
 }

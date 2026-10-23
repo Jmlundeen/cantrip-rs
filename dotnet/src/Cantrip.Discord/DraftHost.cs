@@ -509,6 +509,7 @@ public sealed class DraftHost : IAsyncDisposable
             {
                 draft.Server = await GameServer.StartAsync(new GameServerOptions
                 {
+                    Format = Cantrip.Decks.DeckFormat.Limited(),
                     Port = candidate,
                     Players = pod.Seats,
                     ContentRoot = _options.ContentRoot,

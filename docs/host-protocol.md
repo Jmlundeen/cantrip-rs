@@ -13,7 +13,7 @@ Requests and replies (a reply is `{"Ok": {...}}` or `{"Rejected": {"Code": "..."
 
 | Request | Reply |
 | --- | --- |
-| `{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island", ...],"Sideboard":["Negate", ...]}, ...],"Seed":123,"Shuffle":true,"FirstPlayer":1,"Chooser":null,"BasicLandsOutside":[]}` | `{"GameId":1,"Decklists":{"1":[ObjectView, ...], ...}}` - decks are card names, top first when unshuffled; `Sideboard` is the cards the seat owns outside the game (CR 100.4, 400.11a), which only that seat sees (`ZoneKindView.Sideboard`, a zone per seat in each view) and which a card that brings one into the game chooses among (North Wind Avatar); `BasicLandsOutside` makes it a Limited game, every sideboard holding any number of those basic lands; `FirstPlayer` fixes who goes first, `Chooser` asks that seat instead (CR 103.1); a printed `ObjectView` per deck card, in deck order, for the welcome. A card the engine has not ported, in a deck or a sideboard, is `Rejected` with `InvalidSetup`, naming it, as is a deal of fewer than two seats or more than eight (`MAX_SEATS`) |
+| `{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island", ...],"Sideboard":["Negate", ...],"Companion":"Lurrus of the Dream-Den"}, ...],"Seed":123,"Shuffle":true,"FirstPlayer":1,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":60}` | `{"GameId":1,"Decklists":{"1":[ObjectView, ...], ...}}` - decks are card names, top first when unshuffled; `Sideboard` is the cards the seat owns outside the game (CR 100.4, 400.11a), which only that seat sees (`ZoneKindView.Sideboard`, a zone per seat in each view) and which a card that brings one into the game chooses among (North Wind Avatar); `Companion` (or null) is the seat's companion chosen at deck building, dealt into its sideboard and revealed before the game (below); `BasicLandsOutside` gives a Limited game's sideboards any number of those basic lands; `MinimumDeckSize` is the format's minimum deck size, which the server says from the table's format (CR 100.2a-b) and a deal without is `Rejected` with `InvalidSetup`; `FirstPlayer` fixes who goes first, `Chooser` asks that seat instead (CR 103.1); a printed `ObjectView` per deck card, in deck order, for the welcome. A card the engine has not ported, in a deck or a sideboard, is `Rejected` with `InvalidSetup`, naming it, as is a deal of fewer than two seats or more than eight (`MAX_SEATS`) |
 | `{"Cmd":"NewGame","Seats":[{"Name":"You","Deck":[]}, ...],"Seed":1,"Scenario":{"Name":"...","Text":"...","Driven":[1]}}` | the same: a table playing a `.cantrip` scenario, its decks, order and dice the scenario's; the `Driven` seats are answered by the table and every other by the script, and each step carries a `Scenario` object (`docs/scenarios-in-the-browser.md`) |
 | `{"Cmd":"Start","GameId":1}` | a step |
 | `{"Cmd":"Answer","GameId":1,"RequestId":7,"Seat":1,"Answer":{AnswerPayload}}` | a step, or `Rejected` with `IllegalAnswer`, `StaleReply`, `UnknownHandle` or `NotYourTurnToAnswer`, after which the request is still outstanding |
@@ -23,6 +23,7 @@ Requests and replies (a reply is `{"Ok": {...}}` or `{"Rejected": {"Code": "..."
 | `{"Cmd":"Concede","GameId":1,"Seat":1}` | a step |
 | `{"Cmd":"View","GameId":1,"Seat":1}` | `{"View":PlayerView}` - the seat's current view, for resynchronising a client |
 | `{"Cmd":"Oracle","Name":"Lightning Bolt"}` | `{"Card":ObjectView}` or `{"Card":null}` - a card as printed |
+| `{"Cmd":"Companions","Deck":["Swamp", ...],"Sideboard":["Lurrus of the Dream-Den", ...],"MinimumDeckSize":60}` | `{"Companions":[{"Card":"Lurrus of the Dream-Den","Fulfilled":true}]}` - each card with companion in the sideboard, in its order, and whether the deck (a starting deck, CR 702.139b) fulfils its condition: the rules' judgement, which the server asks before it deals a deck with a companion (`DeckValidation`). A card the engine has not ported is `Rejected` with `InvalidSetup` |
 | `{"Cmd":"Close","GameId":1}` | `{}` |
 
 A **step** is what one advance of the game produced:
@@ -139,6 +140,17 @@ who controls whom (`PlayerSummaryView.ControlledBy`, and a line in `PendingEffec
 player's next turn), and the controlling seat's view holds what the controlled player sees (CR 723.4): their hand
 (`ContentsVisible`), the faces they know, what their questions name - not their sideboard. Conceding is each seat's own (CR
 723.6). Nothing in a prompt is specific to the card that gave control, so a later one needs no protocol change. Version 208.
+
+**Companion.** A seat's companion is chosen at deck building (`Companion` on its seat; CR 702.139a) and the server has
+checked the deck against its format before the deal, the companion's condition with the `Companions` command. Before the
+game, once the starting player is known, each seat's companion whose condition the starting deck fulfils is revealed, with
+nothing asked of anyone (CR 103.2b), so nothing a seat sees says what another chose; one whose condition it does not fulfil
+stays a hidden sideboard card. A revealed companion stays in its owner's sideboard, revealed: every seat's view holds it as an
+object, names it as `PlayerSummaryView.Companion` (none once it is in the game), and another seat's `Sideboard` zone, closed
+(`ContentsVisible` false, the whole `Count`), lists it alone in `Contents`. Once a game, with priority in a main phase of
+their turn and the stack empty, its owner is offered a `TakeCompanion` option on it (CR 116.2g), described "{3}: Put [card]
+in hand."; taking it pays {3} as a special action and puts the card into their hand, where it is a card like any other (CR
+702.139c). Version 209.
 
 A draw the players agree to (`docs/rules-exceptions.md`, RX-4) is not a request of the host's: the offer and the answers to it
 are the server's (`GameSession.OfferDraw`, `AnswerDraw`, over the C# protocol's `OfferDrawMessage`, `AnswerDrawMessage` and

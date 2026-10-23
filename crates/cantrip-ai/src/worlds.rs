@@ -58,6 +58,13 @@ pub fn determinize(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: InfoMod
         return;
     }
     debug_assert_eq!(k.seat(), seat, "a world is dealt from the seat's own knowledge");
+    // Another seat's companion, chosen at deck building, is theirs alone until it is revealed (CR 103.2b): a world neither
+    // reveals it nor keeps it, and the card is a sideboard card like any other of theirs.
+    for p in game.state.seats().collect::<Vec<_>>() {
+        if p != seat && game.state.player(p).companion_to_reveal.is_some() {
+            game.state.forget_companion_to_reveal(p);
+        }
+    }
     let s = &game.state;
     let players = s.players.len();
     let extra = match game.pending() {

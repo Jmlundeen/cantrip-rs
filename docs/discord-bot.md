@@ -151,13 +151,20 @@ listed under Recent events as dropped. A table still filling is left with **Leav
 `/decks/api/catalog`, open to anyone, is every
 card the engine plays as printed (`CardOracle`), with its color identity and its legality in each format the editor
 builds for (Standard, Pioneer, Modern, Legacy, Vintage, Commander, Penny Dreadful), as MessagePack (`CardCatalogView`,
-`Cantrip.Client.Decks`); the legality is `content/<dataset>/legality.json`, made from Scryfall's bulk data by
+`Cantrip.Decks`, in `Cantrip.Protocol`, built by the server's `DeckCatalog`); the legality is `content/<dataset>/legality.json`, made from Scryfall's bulk data by
 `tools/maintenance/fetch-legality.py` and run again as formats move. A signed-in player's decks are theirs alone:
 `/decks/api/list` (each deck's name, format and card count, by format then name), `/decks/api/deck/{id}`, POST
 `/decks/api/save` (a `SavedDeck`; no id makes a new deck) and POST `/decks/api/delete` `{id}`. They are kept as
 `decks/{player}/{deck}.json` in the data directory, in the API's own shape (`DeckJson`). A deck is saved however it
 stands - legality is the editor's to show (`DeckRules`), never a reason to refuse - and refused only when malformed: an
-unknown format, no name or one over 100 characters, a count outside 1 to 999. The menu bar's Decks and the player's page lead to it.
+unknown format, no name or one over 100 characters, a count outside 1 to 999. POST `/decks/api/check` (a `SavedDeck`, signed
+in) answers what the server finds wrong with it for its format (`DeckCheck`): the same check it makes of every deck before it
+deals it (`DeckValidation` - `DeckRules`, shared with the editor, and the rules engine's judgement of the companion's condition,
+CR 702.139a), which the editor shows as the deck's problems once it answers. A deck's companion is `SavedDeck.Companion`, in a
+column of its own. Every table has a format (`GameServerOptions.Format`): Freeform - no deck-construction restriction, only a
+companion's own condition - unless it says another, as an event's tables say Limited with the event's minimum, the bot's
+constructed games their format, and the standalone server's lobby `--format`: a deck is checked when it is chosen or reserved and again before the deal, an event's when it is submitted and at
+each game of a match after sideboarding, and the Standard gauntlet leaves out a list not legal in Standard. The menu bar's Decks and the player's page lead to it.
 
 `/draft` on the bot's site is the queues on the web, open to anyone (`QueueSite`, its page `queue.html`): a section for
 each kind of draft - booster, grid, Winston - with every queue and what it drafts, every table still taking players and

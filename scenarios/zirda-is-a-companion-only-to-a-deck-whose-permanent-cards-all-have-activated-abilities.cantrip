@@ -1,0 +1,31 @@
+# Zirda, the Dawnwaker: "Companion - Each permanent card in your starting deck has an activated ability." Bot1's permanent cards
+# are Forests (whose mana ability their basic land type gives them, CR 305.6, an activated ability: the rulings), Llanowar Elves
+# and a Mox Emerald (mana abilities are activated abilities, CR 605.1a); its Lightning Bolt is no permanent card. Both chose
+# Zirda as their companion: Bot1's is revealed before the game (CR 103.2b); Bot2's Ornithopter has no activated ability, so
+# Bot2's stays a sideboard card.
+
+[Bot1 Deck]
+Forest x5
+Llanowar Elves
+Mox Emerald
+Lightning Bolt
+Forest x20
+
+[Bot1 Companion]
+Zirda, the Dawnwaker
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x20
+
+[Bot2 Companion]
+Zirda, the Dawnwaker
+
+[Actions]
+
+[Expect]
+Bot1.Companion = Zirda, the Dawnwaker
+Bot1.Revealed = Zirda, the Dawnwaker
+Bot2.Companion =
+Bot2.Sideboard = Zirda, the Dawnwaker

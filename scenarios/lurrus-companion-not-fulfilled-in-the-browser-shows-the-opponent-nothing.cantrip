@@ -1,0 +1,30 @@
+# Browser
+# A companion whose condition the deck does not fulfil is not revealed (CR 103.2b), and nothing is said of it: Bot2 chose
+# Lurrus of the Dream-Den, but its deck holds a Lurrus of its own, a permanent card with mana value 3. Bot1's page shows no
+# companion window for Bot2 and no button into Bot2's sideboard; Bot1's own companion, fulfilled, is in its window.
+
+[Bot1 Deck]
+Swamp x20
+
+[Bot1 Companion]
+Lurrus of the Dream-Den
+
+[Bot2 Deck]
+Island x7
+Lurrus of the Dream-Den
+Island x12
+
+[Bot2 Companion]
+Lurrus of the Dream-Den
+
+[Actions]
+? Client.Bot1.Companion = Lurrus of the Dream-Den
+? Client.Bot1.OpponentCompanion =
+? Client.Bot1.OpponentCompanion.Corner =
+? Client.Bot1.OpponentSideboard.Caption =
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Companion = Lurrus of the Dream-Den
+Bot2.Companion =
+Bot2.Sideboard = Lurrus of the Dream-Den

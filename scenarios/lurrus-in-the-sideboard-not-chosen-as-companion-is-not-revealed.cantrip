@@ -1,0 +1,23 @@
+# Lurrus of the Dream-Den in a sideboard is a companion only if it was chosen as one when the deck was built (CR 103.2b: the
+# player reveals it; here, at deck building). Bot1's deck of Swamps would fulfil its condition, but Bot1 chose no companion:
+# the Lurrus is a sideboard card, nothing is revealed, and there is no companion to take, though Bot1 has the mana.
+
+[Bot1 Deck]
+Black Lotus
+Swamp x26
+
+[Bot1 Sideboard]
+Lurrus of the Dream-Den
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+? Bot1.Companion =
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+
+[Expect]
+Bot1.Companion =
+Bot1.Sideboard = Lurrus of the Dream-Den

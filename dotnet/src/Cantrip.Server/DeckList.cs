@@ -10,8 +10,10 @@ public sealed record DeckListEntry(string Card, int Copies, int Line);
 /// <summary>
 /// A deck read from a plain-text decklist: one card per line, <c>4 Lightning Bolt</c>, or just the name for one copy.
 /// Blank lines and lines starting with <c>#</c> are ignored. A line reading <c>Sideboard</c> on its own ends the deck
-/// and starts the sideboard, whose cards begin the game outside it — which for now means a companion (CR 702.139) and
-/// nothing else, since nothing in a game reaches into a sideboard.
+/// and starts the sideboard, whose cards begin the game outside it (CR 100.4, 400.11a): what a card that brings one in chooses
+/// among (North Wind Avatar). A line reading <c>Companion</c> names, on the next line, the deck's companion (CR 702.139a): a
+/// sideboard card of its own, revealed before the game (CR 103.2b) - the server refuses the deck if it doesn't fulfil the
+/// companion's condition.
 /// <para>
 /// A data file rather than code, and kept outside <c>content</c>: cards are content the game ships, while a deck is
 /// something a player makes, so decks are headed for user data. Cards are named rather than given by id for the same
@@ -36,6 +38,9 @@ public sealed class DeckList
     /// almost every decklist.
     /// </summary>
     public IReadOnlyList<DeckListEntry> Sideboard { get; init; } = [];
+
+    /// <summary>The card after the <c>Companion</c> line: the deck's companion (CR 702.139a), or null for none.</summary>
+    public string? Companion { get; init; }
 
     public int Count => Entries.Sum(entry => entry.Copies);
 
@@ -92,6 +97,8 @@ public sealed class DeckList
         List<DeckListEntry> sideboard = [];
         string[] lines = text.Split('\n');
         bool afterSideboardLine = false;
+        bool companionNext = false;
+        string? companion = null;
 
         for (int index = 0; index < lines.Length; index++)
         {
@@ -108,8 +115,24 @@ public sealed class DeckList
                 continue;
             }
 
-            List<DeckListEntry> into = afterSideboardLine ? sideboard : entries;
             int number = index + 1;
+            if (string.Equals(line, "Companion", StringComparison.OrdinalIgnoreCase))
+            {
+                companionNext = companion is null ? true : throw new FormatException($"{source} line {number}: a deck has one companion.");
+                continue;
+            }
+
+            if (companionNext)
+            {
+                // "1 Lurrus of the Dream-Den" or the name alone: one card.
+                Match one = Counted.Match(line);
+                companion = !one.Success ? line : one.Groups[1].Value == "1" ? one.Groups[2].Value.Trim()
+                    : throw new FormatException($"{source} line {number}: a companion is one card.");
+                companionNext = false;
+                continue;
+            }
+
+            List<DeckListEntry> into = afterSideboardLine ? sideboard : entries;
             if (Counted.Match(line) is { Success: true } counted)
             {
                 int copies = int.Parse(counted.Groups[1].Value, CultureInfo.InvariantCulture);
@@ -123,7 +146,12 @@ public sealed class DeckList
             }
         }
 
-        return new DeckList { Name = name, Source = source, Entries = entries, Sideboard = sideboard };
+        if (companionNext)
+        {
+            throw new FormatException($"{source}: the Companion line names no card after it.");
+        }
+
+        return new DeckList { Name = name, Source = source, Entries = entries, Sideboard = sideboard, Companion = companion };
     }
 
     /// <summary>

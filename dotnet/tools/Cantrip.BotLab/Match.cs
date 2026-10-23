@@ -86,12 +86,12 @@ public static class Match
     /// <param name="hands">Whether to record which cards each seat held, for saying which of them a seat wins with.</param>
     /// <param name="record">A log the engine keeps every answer in, to replay the game without the session (<see cref="Bench"/>).</param>
     public static MatchResult Play(
-        string contentRoot, IReadOnlyList<DeckList> decks, ulong seed, IReadOnlyList<IAutoPlayer> players, bool sample, bool story = false, int limit = 0,
+        string contentRoot, IReadOnlyList<DeckList> decks, Cantrip.Decks.DeckFormat format, ulong seed, IReadOnlyList<IAutoPlayer> players, bool sample, bool story = false, int limit = 0,
         bool hands = false)
     {
         try
         {
-            return Game(contentRoot, decks, seed, players, sample, story, limit > 0 ? limit : AnswerLimit, hands);
+            return Game(contentRoot, decks, format, seed, players, sample, story, limit > 0 ? limit : AnswerLimit, hands);
         }
         catch (Exception error)
         {
@@ -100,9 +100,9 @@ public static class Match
     }
 
     private static MatchResult Game(
-        string contentRoot, IReadOnlyList<DeckList> decks, ulong seed, IReadOnlyList<IAutoPlayer> players, bool sample, bool story, int limit, bool hands)
+        string contentRoot, IReadOnlyList<DeckList> decks, Cantrip.Decks.DeckFormat format, ulong seed, IReadOnlyList<IAutoPlayer> players, bool sample, bool story, int limit, bool hands)
     {
-        using HostedGame hosted = HostAndPlay.StartTable(RulesHostFactory.Native, decks, seed, [.. decks.Select((_, seat) => $"Bot {seat + 1}")]);
+        using HostedGame hosted = HostAndPlay.StartTable(RulesHostFactory.Native, decks, format, seed, [.. decks.Select((_, seat) => $"Bot {seat + 1}")]);
 
         List<(GameClient Client, IAutoPlayer Bot)> seats = [];
         foreach (int seat in hosted.Seats)

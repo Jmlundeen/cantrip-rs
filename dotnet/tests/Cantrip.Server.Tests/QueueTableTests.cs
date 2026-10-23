@@ -266,6 +266,7 @@ public sealed class QueueTableTests : IDisposable
         QueueTable table = Table();
         await using GameServer server = await GameServer.StartAsync(new GameServerOptions
         {
+            Format = Cantrip.Decks.DeckFormat.Limited(),
             Port = 0, Players = 2, ContentRoot = RepoRoot.ContentRoot, Event = table, TimeProvider = _clock,
         });
 

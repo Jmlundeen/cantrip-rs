@@ -26,10 +26,10 @@ public sealed class NativeRulesHostTests
     public void A_deal_asks_the_host_for_a_new_game_and_lists_each_deck_for_the_welcome()
     {
         var host = new ScriptedHost();
-        NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions());
+        NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 });
 
         Assert.Equal(
-            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island","Island","Lightning Bolt"],"Sideboard":["Counterspell"]},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[]}],"Seed":123,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[]}""",
+            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island","Island","Lightning Bolt"],"Sideboard":["Counterspell"],"Companion":null},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[],"Companion":null}],"Seed":123,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":60}""",
             Assert.Single(host.Requests));
         Assert.Equal(1, rules.GameId);
         Assert.Equal([1, 2], rules.Seats);
@@ -47,7 +47,7 @@ public sealed class NativeRulesHostTests
         var host = new ScriptedHost { RefuseDeal = ("InvalidSetup", "No such card: Wish.") };
 
         RulesRejectedException refused = Assert.Throws<RulesRejectedException>(
-            () => NativeRulesHost.NewGame(host, Seats, 1, new RulesGameOptions()));
+            () => NativeRulesHost.NewGame(host, Seats, 1, new RulesGameOptions { MinimumDeckSize = 60 }));
 
         Assert.Equal(ErrorCode.InvalidSetup, refused.Code);
         Assert.Equal("No such card: Wish.", refused.Detail);
@@ -57,7 +57,7 @@ public sealed class NativeRulesHostTests
     public void Starting_publishes_the_opening_through_the_session_as_the_engine_would()
     {
         var host = new ScriptedHost();
-        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }));
         session.Start();
 
         Assert.Equal("""{"Cmd":"Start","GameId":1}""", host.Requests[1]);
@@ -101,7 +101,7 @@ public sealed class NativeRulesHostTests
     public void An_answer_is_sent_as_the_doc_writes_it_and_the_next_step_published()
     {
         var host = new ScriptedHost();
-        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }));
         session.Start();
         session.Drain(One);
         session.Drain(Two);
@@ -120,7 +120,7 @@ public sealed class NativeRulesHostTests
     public void A_rejection_is_an_error_and_the_same_question_again()
     {
         var host = new ScriptedHost();
-        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }));
         session.Start();
         session.Drain(One);
 
@@ -143,7 +143,7 @@ public sealed class NativeRulesHostTests
     public void Conceding_is_offered_only_when_it_ends_the_game_and_ends_it()
     {
         var host = new ScriptedHost();
-        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }));
 
         Assert.False(session.CanConcede(Two));
         session.Start();
@@ -167,7 +167,7 @@ public sealed class NativeRulesHostTests
     public void Resynchronising_asks_the_host_for_the_seats_view_and_sends_everything_printed_so_far()
     {
         var host = new ScriptedHost();
-        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }));
         session.Start();
         session.Drain(Two);
 
@@ -187,7 +187,7 @@ public sealed class NativeRulesHostTests
     public void A_card_is_asked_for_as_printed_once()
     {
         var host = new ScriptedHost();
-        NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions());
+        NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 });
 
         Assert.Equal("Island", rules.Oracle("Island")!.Name);
         Assert.Equal("Island", rules.Oracle("Island")!.Name);
@@ -201,7 +201,7 @@ public sealed class NativeRulesHostTests
     public void Disposing_closes_the_game_in_the_host()
     {
         var host = new ScriptedHost();
-        var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions()));
+        var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }));
 
         session.Dispose();
         session.Dispose();
@@ -213,7 +213,7 @@ public sealed class NativeRulesHostTests
     public void A_resumed_game_is_dealt_again_and_given_its_answers_again()
     {
         var host = new ScriptedHost();
-        NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions(), history: [new RulesAnswer(1, new PassAnswer())]);
+        NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }, history: [new RulesAnswer(1, new PassAnswer())]);
         using var session = new GameSession(rules);
 
         session.Start();
@@ -234,7 +234,7 @@ public sealed class NativeRulesHostTests
     public void A_history_that_does_not_replay_fails_loudly()
     {
         var host = new ScriptedHost();
-        NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions(), history: [new RulesAnswer(1, new CardsChosenAnswer())]);
+        NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }, history: [new RulesAnswer(1, new CardsChosenAnswer())]);
 
         Assert.Throws<InvalidOperationException>(rules.Start);
     }
@@ -243,7 +243,7 @@ public sealed class NativeRulesHostTests
     public void Events_the_host_numbers_keep_their_numbers()
     {
         var host = new ScriptedHost { Numbered = true };
-        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }));
         session.Start();
 
         EventsMessage events = Assert.Single(session.Drain(One).OfType<EventsMessage>());
@@ -255,7 +255,7 @@ public sealed class NativeRulesHostTests
     public void A_card_choice_the_host_sends_bare_gets_its_wording_facts_from_the_view()
     {
         var host = new ScriptedHost { Opening = ScriptedHost.DiscardStep };
-        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions()));
+        using var session = new GameSession(NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 }));
         session.Start();
 
         PromptMessage prompt = Assert.Single(session.Drain(One).OfType<PromptMessage>());
@@ -270,7 +270,7 @@ public sealed class NativeRulesHostTests
     public void The_factory_deals_on_the_transport_it_is_given()
     {
         var host = new ScriptedHost();
-        IRulesHost rules = new NativeRulesHostFactory(host).Create(Seats, 9, new RulesGameOptions { FirstPlayer = 2, Shuffle = false });
+        IRulesHost rules = new NativeRulesHostFactory(host).Create(Seats, 9, new RulesGameOptions { MinimumDeckSize = 60, FirstPlayer = 2, Shuffle = false });
 
         Assert.IsType<NativeRulesHost>(rules);
         Assert.Contains("\"Seed\":9,\"Shuffle\":false,\"FirstPlayer\":2", Assert.Single(host.Requests), StringComparison.Ordinal);

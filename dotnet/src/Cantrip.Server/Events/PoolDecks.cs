@@ -1,6 +1,9 @@
 using Cantrip.Cards.Model;
 using Cantrip.Datasets;
+using Cantrip.Decks;
 using Cantrip.Protocol;
+using Cantrip.Server.Decks;
+using Cantrip.Server.Rules;
 
 namespace Cantrip.Server.Events;
 
@@ -22,10 +25,16 @@ public static class PoolDecks
             ?? throw new InvalidOperationException($"No loaded card is the basic land {name}."), StringComparer.Ordinal);
     }
 
-    /// <summary>A deck as a seat sent it, checked against its pool.</summary>
+    /// <summary>
+    /// A deck as a seat sent it, checked against its pool; one submitted - for the event, or for the next game of a match
+    /// after sideboarding - is checked too by <paramref name="check"/>, the server's check of the deck for the format
+    /// (<see cref="Refusal"/>), and refused if it finds anything wrong.
+    /// </summary>
     /// <returns>The deck, or why it cannot be.</returns>
-    public static (EventDeck? Deck, string? Refusal) Built(EventDeck current, int poolSize, BuildDeckMessage build, IReadOnlyDictionary<string, CardId> basics, int minimum)
+    public static (EventDeck? Deck, string? Refusal) Built(EventDeck current, int poolSize, BuildDeckMessage build, IReadOnlyDictionary<string, CardId> basics, int minimum,
+        Func<EventDeck, string?> check)
     {
+        ArgumentNullException.ThrowIfNull(check);
         ArgumentNullException.ThrowIfNull(current);
         ArgumentNullException.ThrowIfNull(build);
         ArgumentNullException.ThrowIfNull(basics);
@@ -51,13 +60,53 @@ public static class PoolDecks
             }
         }
 
+        // The companion is a card of the sideboard (CR 400.11a): of the pool, and not in the main deck.
+        if (build.Companion != -1 && (build.Companion < 0 || build.Companion >= poolSize || build.Main.Contains(build.Companion)))
+        {
+            return (null, "The companion is a card of your sideboard.");
+        }
+
         int size = build.Main.Count + lands.Values.Sum();
         if (build.Submit && size < minimum)
         {
             return (null, $"A deck needs at least {minimum} cards; this one has {size}.");
         }
 
-        return (new EventDeck { Main = [.. build.Main.Order()], Basics = lands, Submitted = build.Submit, Revision = current.Revision + 1 }, null);
+        var deck = new EventDeck { Main = [.. build.Main.Order()], Basics = lands, Companion = build.Companion, Submitted = build.Submit, Revision = current.Revision + 1 };
+        return build.Submit && check(deck) is { } refusal ? (null, refusal) : (deck, null);
+    }
+
+    /// <summary>
+    /// What is wrong with a deck built from a pool, for Limited with the event's minimum (CR 100.2b): the server's check
+    /// (<see cref="DeckValidation"/>), its companion's condition judged by the rules engine. Null for a deck it deals.
+    /// </summary>
+    /// <param name="nameOf">A card as the rules name it.</param>
+    /// <param name="card">A card of the pool, by its id, as printed.</param>
+    public static string? Refusal(IReadOnlyList<string> pool, EventDeck deck, int minimum, IReadOnlyDictionary<string, CardId> basics,
+        Func<CardId, string> nameOf, Func<string, ObjectView> card, IRulesHostFactory rules)
+    {
+        ArgumentNullException.ThrowIfNull(pool);
+        ArgumentNullException.ThrowIfNull(deck);
+        ArgumentNullException.ThrowIfNull(basics);
+        ArgumentNullException.ThrowIfNull(nameOf);
+        ArgumentNullException.ThrowIfNull(card);
+        ArgumentNullException.ThrowIfNull(rules);
+        static List<DeckEntry> Entries(IEnumerable<string> names) =>
+            [.. names.GroupBy(name => name, StringComparer.Ordinal).Select(group => new DeckEntry(group.Key, group.Count()))];
+        var saved = new SavedDeck
+        {
+            Format = DeckFormat.LimitedKey,
+            Main = Entries(Cards(pool, deck, basics).Select(nameOf)),
+            Side = Entries(Sideboard(pool, deck).Select(nameOf)),
+            Companion = deck.Companion >= 0 && deck.Companion < pool.Count ? nameOf(new CardId(pool[deck.Companion])) : string.Empty,
+        };
+        Dictionary<string, CatalogCard> cards = new(StringComparer.Ordinal);
+        foreach (CardId id in pool.Select(each => new CardId(each)).Concat(basics.Values))
+        {
+            cards.TryAdd(nameOf(id), new CatalogCard { Card = card(id.Value) });
+        }
+
+        return DeckValidation.Problems(saved, DeckFormat.Limited(minimum), cards, rules).FirstOrDefault();
     }
 
     /// <summary>The cards of a deck, the pool's first and then the basic lands.</summary>
@@ -73,12 +122,20 @@ public static class PoolDecks
         ];
     }
 
-    /// <summary>The pool's cards not in the main deck.</summary>
+    /// <summary>The pool's cards neither in the main deck nor its companion.</summary>
     public static List<CardId> Sideboard(IReadOnlyList<string> pool, EventDeck deck)
     {
         ArgumentNullException.ThrowIfNull(pool);
         ArgumentNullException.ThrowIfNull(deck);
-        return [.. pool.Where((_, place) => !deck.Main.Contains(place)).Select(id => new CardId(id))];
+        return [.. pool.Where((_, place) => !deck.Main.Contains(place) && place != deck.Companion).Select(id => new CardId(id))];
+    }
+
+    /// <summary>The deck's companion (CR 702.139a), as a card id, or null for none.</summary>
+    public static CardId? Companion(IReadOnlyList<string> pool, EventDeck deck)
+    {
+        ArgumentNullException.ThrowIfNull(pool);
+        ArgumentNullException.ThrowIfNull(deck);
+        return deck.Companion >= 0 && deck.Companion < pool.Count ? new CardId(pool[deck.Companion]) : null;
     }
 
     /// <summary>
@@ -120,6 +177,6 @@ public static class PoolDecks
             basics[most] = basics.GetValueOrDefault(most) + short_ - given;
         }
 
-        return new EventDeck { Main = [.. deck.Main], Basics = basics, Submitted = true, Revision = deck.Revision + 1 };
+        return new EventDeck { Main = [.. deck.Main], Basics = basics, Companion = deck.Companion, Submitted = true, Revision = deck.Revision + 1 };
     }
 }

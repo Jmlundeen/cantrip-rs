@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 208;
+    public const int ProtocolVersion = 209;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -192,6 +192,15 @@ public sealed class PlayerSummaryView
     /// </summary>
     [Key(22)]
     public int ControlledBy { get; set; }
+
+    /// <summary>
+    /// The companion this player revealed before the game (CR 103.2b, 702.139a), while it waits outside the game, revealed to
+    /// everyone: an object of the view, in its owner's sideboard. Once during the game, at sorcery timing, its owner may pay
+    /// {3} to put it into their hand (CR 116.2g, <see cref="ActionKindView.TakeCompanion"/>). None once it is in the game, or
+    /// with none revealed.
+    /// </summary>
+    [Key(23)]
+    public ViewHandle Companion { get; set; }
 
     public override string ToString() => $"seat {Seat} '{Name}' {Life} life";
 }

@@ -313,7 +313,7 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
 
         // A click on no card lets them go.
         aclazotz = await DeckCardAsync(page, "Aclazotz, Deepest Betrayal");
-        await page.Page.Mouse.ClickAsync(aclazotz.X + (aclazotz.W * 2), aclazotz.Y);
+        await page.Page.Mouse.ClickAsync(aclazotz.X - (aclazotz.W * 2), aclazotz.Y);
         editor = await EditorAsync(page, state => state.DeckEditor!.Picked!.Count == 0);
 
         // Over the search, a drag from no card across a card draws no rectangle, picks nothing and moves nothing.
@@ -373,6 +373,49 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
         Assert.True(editor.Unsaved);
         await page.PictureAsync("imported");
         Assert.Empty(page.Errors);
+    }
+
+    /// <summary>
+    /// A companion imported from Arena's Companion section is the deck's (CR 702.139a), in the Companion column beside the
+    /// sideboard, and the editor shows the server's check of the deck (<c>/decks/api/check</c>), the rules engine judging the
+    /// companion's condition: sixty Swamps fulfil Lurrus of the Dream-Den's, and with a Lurrus of the deck's own, a permanent
+    /// card with mana value 3, they don't - a problem, for the server would refuse the deck.
+    /// </summary>
+    [Fact]
+    public async Task An_imported_companion_is_in_its_column_and_the_server_judges_its_condition()
+    {
+        await using TablePage page = await TablePage.OpenAsync(web.Browser, new Uri(_site.Urls.First() + "/"), "decks", WebClient.Pictures(nameof(DeckEditorTests) + "-companion"),
+            headers: [new(AsHeader, "4646")]);
+        await EditorAsync(page, state => state.DeckEditor is { Results: > 0 });
+
+        await ImportAsync(page, "Companion\n1 Lurrus of the Dream-Den (IKO) 226\n\nDeck\n60 Swamp (ANA) 59\n");
+        DeckEditorState editor = await EditorAsync(page, state => state.DeckEditor is { Checked: true, Companion.Length: > 0 });
+        Assert.Equal("Lurrus of the Dream-Den", editor.Companion);
+        Assert.Empty(editor.Side);
+        Assert.Contains((await page.SettledAsync()).Cards, card => card.Row == "companion" && card.Name == "Lurrus of the Dream-Den" && card.Visible);
+        Assert.DoesNotContain(editor.Problems, problem => problem.Contains("companion", StringComparison.Ordinal));
+        await page.PictureAsync("fulfilled");
+
+        await ImportAsync(page, "Companion\n1 Lurrus of the Dream-Den (IKO) 226\n\nDeck\n59 Swamp (ANA) 59\n1 Lurrus of the Dream-Den (IKO) 226\n");
+        editor = await EditorAsync(page, state => state.DeckEditor is { Checked: true } checkedDeck && checkedDeck.Main.Contains("1 Lurrus of the Dream-Den"));
+        Assert.Contains("Lurrus of the Dream-Den can't be the deck's companion: the deck doesn't fulfil its companion condition.", editor.Problems);
+        await page.PictureAsync("not-fulfilled");
+        Assert.Empty(page.Errors);
+    }
+
+    private static async Task ImportAsync(TablePage page, string list)
+    {
+        await page.ClickAsync("Import deck", "button");
+        // A deck with changes not saved asks first: they are let go.
+        if ((await EditorAsync(page, state => state.DeckEditor!.Asking)).Question != "Import a deck")
+        {
+            await page.ClickAsync("Discard", "button");
+        }
+
+        await EditorAsync(page, state => state.DeckEditor!.Question == "Import a deck");
+        await page.TypeAsync("Deck list", list);
+        await page.ClickAsync("Import", "button");
+        await EditorAsync(page, state => !state.DeckEditor!.Asking);
     }
 
     private static async Task<CardState> DeckCardAsync(TablePage page, string name)

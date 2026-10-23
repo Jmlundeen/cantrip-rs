@@ -67,6 +67,9 @@ pub struct GameState {
     /// lands), of which each player always has one more outside the game (`Zone::sideboard`): one brought into the game is
     /// replaced there. Empty for a constructed game. Fixed at the deal, so no part of the journal.
     pub outside_supply: Vec<CardId>,
+    /// The minimum deck size of the game's format (CR 100.2a: sixty cards in Constructed; 100.2b: forty in Limited), which a
+    /// companion's condition may name (Yorion, Sky Nomad). Fixed at the deal.
+    pub minimum_deck_size: u32,
     /// Whether an object whose card has static abilities has ever been made in this game, or a hone counter put on a
     /// permanent (CR 122.1j): until one has, the layers skip looking for static sources, and hone counters, at all. Only
     /// ever set, so it can be stale only towards looking.
@@ -437,6 +440,7 @@ impl GameState {
             loop_keys: Vec::new(),
             loop_index: LoopIndex::default(),
             outside_supply: Vec::new(),
+            minimum_deck_size: 60,
             statics_seen: false,
             agenda: Vec::new(),
             rng: Rng::new(seed),
@@ -1402,6 +1406,22 @@ impl GameState {
         }
         self.epoch += 1;
         self.chars_epoch += 1;
+    }
+
+    /// Forgets the companion `player` chose at deck building and will reveal once the starting player is known
+    /// (`Player::companion_to_reveal`), for a search's world dealt to another seat: never on a real game. Until it is
+    /// revealed (CR 103.2b) nobody else knows it, so a world neither reveals it nor keeps it. Not journalled, as
+    /// `restamp_hidden` is not, and the journal's stored copies of the player are rewritten too.
+    pub fn forget_companion_to_reveal(&mut self, player: PlayerId) {
+        self.players[player.index()].companion_to_reveal = None;
+        for entry in self.journal.entries.iter_mut() {
+            if let Undo::Player(p, stored) = entry
+                && *p == player
+            {
+                stored.companion_to_reveal = None;
+            }
+        }
+        self.epoch += 1;
     }
 
     /// Gives a hidden object another timestamp, for a search's world: never on a real game. Not journalled, as

@@ -96,7 +96,7 @@ fn deal(hand: &[&str]) -> Game {
     deck.extend(hand.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))));
     deck.extend(std::iter::repeat(filler).take(30 - deck.len()));
     let other = vec![filler; 30];
-    let mut game = Game::new(table(), &Setup { decks: vec![deck, other], seed: 1, shuffle: false, opening_chooser: None, sideboards: Vec::new(), basic_lands_outside: Vec::new() });
+    let mut game = Game::new(table(), &Setup { decks: vec![deck, other], seed: 1, shuffle: false, opening_chooser: None, sideboards: Vec::new(), basic_lands_outside: Vec::new(), ..Setup::default() });
     game.verify = true;
     game.run();
     game

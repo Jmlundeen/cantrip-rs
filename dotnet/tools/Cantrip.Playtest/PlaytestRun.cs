@@ -148,7 +148,7 @@ public sealed class PlaytestRun
     {
         List<string> names = [.. Enumerable.Range(1, players).Select(seat => $"Bot {seat}")];
 
-        using HostedGame hosted = HostAndPlay.StartTable(RulesHostFactory.Native, order, seed, names);
+        using HostedGame hosted = HostAndPlay.StartTable(RulesHostFactory.Native, order, Program.Format, seed, names);
 
         List<(GameClient Client, LoopGuard Bot)> seats = [];
         foreach (int seat in hosted.Seats)

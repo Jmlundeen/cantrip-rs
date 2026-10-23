@@ -69,7 +69,7 @@ public sealed class Table
     {
         List<string> names = [.. Enumerable.Range(1, players).Select(seat => $"Bot {seat}")];
 
-        using HostedGame hosted = HostAndPlay.StartTable(RulesHostFactory.Native, _decks, seed, names);
+        using HostedGame hosted = HostAndPlay.StartTable(RulesHostFactory.Native, _decks, Program.Format, seed, names);
 
         List<(GameClient Client, IAutoPlayer Bot)> seats = [];
         List<LlmPlay> thinking = [];

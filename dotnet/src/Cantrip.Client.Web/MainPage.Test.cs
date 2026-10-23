@@ -2,7 +2,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Text.Json;
 using Cantrip.Client;
-using Cantrip.Client.Decks;
+using Cantrip.Decks;
 using Cantrip.Client.Presentation;
 using Cantrip.Protocol;
 using Microsoft.UI.Xaml.Media;
@@ -263,6 +263,29 @@ public sealed partial class MainPage
             json.WriteNumber("shown", _log.Extent.Shown);
             json.WriteEndObject();
 
+            // The companion windows (CR 103.2b): which corner of its half each stands in, while it is shown.
+            json.WriteStartArray("companions");
+            if (ready)
+            {
+                foreach ((HalfViews half, string whose) in (ReadOnlySpan<(HalfViews, string)>)[(_myHalf, "mine"), (_opponentHalf, "opponent")])
+                {
+                    if (half.Companion.Visibility != Visibility.Visible || half.Companion.XamlRoot is null || half.Panel.ActualWidth <= 0)
+                    {
+                        continue;
+                    }
+
+                    Rect box = half.Companion.TransformToVisual(half.Panel).TransformBounds(new Rect(0, 0, half.Companion.ActualWidth, half.Companion.ActualHeight));
+                    string corner = (box.Y + (box.Height / 2) < half.Panel.ActualHeight / 2 ? "top" : "bottom")
+                        + "-" + (box.X + (box.Width / 2) < half.Panel.ActualWidth / 2 ? "left" : "right");
+                    json.WriteStartObject();
+                    json.WriteString("whose", whose);
+                    json.WriteString("corner", corner);
+                    json.WriteEndObject();
+                }
+            }
+
+            json.WriteEndArray();
+
             json.WriteStartArray("cards");
             if (ready)
             {
@@ -276,7 +299,7 @@ public sealed partial class MainPage
                     GeneralTransform toPage = board.TransformToVisual(Root);
                     // An event's rows by name: a booster pack's cards are told from the pool's by it, not by where they are.
                     string row = board == _pileBoard ? "pack" : board == _gridBoard ? "grid" : board == _mainBoard ? "pool" : board == _sideBoard ? "sideboard"
-                        : board == _commandBoard ? "commander" : board == _searchBoard ? "search" : string.Empty;
+                        : board == _commandBoard ? "commander" : board == _companionBoard ? "companion" : board == _searchBoard ? "search" : string.Empty;
                     // The table's rows by name, as a scenario's client checks read them (docs/scenarios-in-the-browser.md).
                     string place = board == _stackBoard ? "stack"
                         : board == _handBoard ? "hand"
@@ -285,6 +308,8 @@ public sealed partial class MainPage
                         : board == _myHalf.Graveyard.Board ? "graveyard"
                         : board == _opponentHalf.Graveyard.Board ? "opponent-graveyard"
                         : board == _choiceBoard ? "choice"
+                        : board == _myHalf.CompanionBoard ? "companion"
+                        : board == _opponentHalf.CompanionBoard ? "opponent-companion"
                         : string.Empty;
                     foreach ((ObjectView card, Rect box, bool visible, Point? lower, Point? raise) in board.Targets())
                     {
@@ -527,12 +552,15 @@ public sealed partial class MainPage
             json.WriteEndObject();
         }
         json.WriteStartArray("problems");
-        foreach (string problem in _catalog is null ? [] : DeckRules.Problems(deck, _catalogByName))
+        foreach (string problem in _catalog is null ? [] : Snapshot(deck) == _checkJudged ? _checked : DeckRules.Problems(deck, _catalogByName))
         {
             json.WriteStringValue(problem);
         }
 
         json.WriteEndArray();
+        // Whether those are the server's check of the deck as it is now (/decks/api/check), and the deck's companion.
+        json.WriteBoolean("checked", Snapshot(deck) == _checkJudged);
+        json.WriteString("companion", deck.Companion);
         foreach ((string zone, List<DeckEntry> entries) in (ReadOnlySpan<(string, List<DeckEntry>)>)[("commanders", deck.Commanders), ("main", deck.Main), ("side", deck.Side)])
         {
             json.WriteStartArray(zone);

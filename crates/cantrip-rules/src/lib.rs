@@ -96,8 +96,9 @@ mod validate;
 use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Rng};
 
-pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_face_of, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction, replaced_mana_yields};
+pub use actions::{activation_costs, revealed_companion, alternative_cast_total, cast_costs, cast_face_of, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction, replaced_mana_yields};
 pub use validate::{check as check_answer, distribution_problem, name_problem, selection_verdict, first_choices, attack_targets};
+pub use turn::eligible_companions;
 pub use layers::{ApplyContract, apply_contract_check, chars, control_order, live, summoning_sick};
 
 /// One game: the state, what has happened, and the card table it is played with.
@@ -184,7 +185,7 @@ impl Clone for Game {
 }
 
 /// What dealing a game needs.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct Setup {
     /// Each seat's deck, top of the library first.
     pub decks: Vec<Vec<CardId>>,
@@ -194,6 +195,13 @@ pub struct Setup {
     /// In a Limited game, the basic land cards the event supplies: a Limited sideboard holds any number of each (Magic
     /// Tournament Rules; North Wind Avatar's ruling), so each seat always has one of each outside the game. Empty otherwise.
     pub basic_lands_outside: Vec<CardId>,
+    /// Each seat's companion, chosen as the deck was built: a card with companion it owns outside the game, dealt into its
+    /// sideboard beside the cards there (CR 400.11a). It is revealed before the game if the starting deck fulfils its
+    /// condition (CR 103.2b); otherwise it is a sideboard card like any other. A seat with no entry, or None, has none.
+    pub companions: Vec<Option<CardId>>,
+    /// The minimum deck size of the game's format, as the server that deals it says (CR 100.2a: sixty in Constructed; 100.2b:
+    /// forty in Limited): what a companion's condition reads as "the minimum deck size" (Yorion, Sky Nomad).
+    pub minimum_deck_size: u32,
     pub seed: u64,
     /// Shuffle the libraries and play the real start of a game (CR 103): who goes first, mulligans. Without it the
     /// libraries stay in the order given, the first seat goes first and both opening hands are dealt and kept, as a
@@ -201,6 +209,22 @@ pub struct Setup {
     pub shuffle: bool,
     /// With `shuffle` off: still ask who goes first and offer mulligans (a scenario's `[Opening]`), this seat choosing.
     pub opening_chooser: Option<PlayerId>,
+}
+
+/// A deal with nothing in it, for building on: a Constructed game's minimum deck size (CR 100.2a), every other field empty.
+impl Default for Setup {
+    fn default() -> Setup {
+        Setup {
+            decks: Vec::new(),
+            sideboards: Vec::new(),
+            basic_lands_outside: Vec::new(),
+            companions: Vec::new(),
+            minimum_deck_size: 60,
+            seed: 0,
+            shuffle: false,
+            opening_chooser: None,
+        }
+    }
 }
 
 /// An answer the engine refused. The game is as it was, the request still outstanding.
@@ -236,6 +260,8 @@ impl Game {
         let players = setup.decks.len();
         let mut state = GameState::new(players, setup.seed);
         state.outside_supply = setup.basic_lands_outside.clone();
+        state.minimum_deck_size = setup.minimum_deck_size;
+        let mut companions: Vec<(PlayerId, ObjectId)> = Vec::new();
         for (seat, deck) in setup.decks.iter().enumerate() {
             let p = PlayerId(seat as u8);
             // A shuffled library is dealt in its shuffled order, so that an object's id says nothing of where its card
@@ -249,6 +275,11 @@ impl Game {
             for (card, zone) in library.chain(sideboard).collect::<Vec<_>>() {
                 let id = state.push_obj(Obj::new(card, p, zone));
                 state.zone_push(zone, id);
+            }
+            if let Some(&Some(card)) = setup.companions.get(seat) {
+                let id = state.push_obj(Obj::new(card, p, Zone::sideboard(p)));
+                state.zone_push(Zone::sideboard(p), id);
+                companions.push((p, id));
             }
         }
 
@@ -265,6 +296,13 @@ impl Game {
         });
 
         let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE };
+        // CR 103.2b: the companion chosen as the deck was built is revealed once the starting player is known, if the starting
+        // deck - the library as dealt - fulfils its condition; one that doesn't is a sideboard card, and nothing is said of it.
+        for (p, id) in companions {
+            if turn::eligible_companions(&game, p).contains(&id) {
+                game.state.update_player(p, |pl| pl.companion_to_reveal = Some(id));
+            }
+        }
         if real {
             game.state.frame_push(Frame::new(FrameKind::Opening));
         } else {
@@ -277,9 +315,11 @@ impl Game {
                 game.state.update_player(p, |pl| pl.kept = true);
             }
             game.log.clear();
-            // CR 103.6a: a card in a hand that may begin the game on the battlefield is asked before the first turn.
+            // CR 103.6a: a card in a hand that may begin the game on the battlefield is asked before the first turn, and CR
+            // 103.2b: a companion is revealed.
             let begins = game.state.seats().any(|p| {
                 game.state.zone(Zone::hand(p)).iter().any(|&id| cards.get(game.state.obj(id).card).opening_hand.is_some())
+                    || game.state.player(p).companion_to_reveal.is_some()
             });
             if begins {
                 game.state.frame_push(Frame::new(FrameKind::Opening));

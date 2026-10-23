@@ -1,10 +1,12 @@
 using System.Text.Json;
-using Cantrip.Client.Decks;
+using Cantrip.Decks;
 using Cantrip.Datasets;
 using Cantrip.Projection;
 using Cantrip.Protocol;
 using Cantrip.Server;
+using Cantrip.Server.Decks;
 using Cantrip.Server.Events;
+using Cantrip.Server.Rules;
 using MessagePack;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +27,12 @@ public sealed class DeckSiteOptions
     public required SiteSignInOptions SignIn { get; init; }
 
     public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
+
+    /// <summary>
+    /// The rules engine that judges a deck's companion (<see cref="IRulesHostFactory.CompanionFulfilled"/>) as the server checks
+    /// a deck (<see cref="DeckValidation"/>): the shared sidecar's unless a test gives another.
+    /// </summary>
+    public IRulesHostFactory Rules { get; init; } = RulesHostFactory.Native;
 }
 
 /// <summary>
@@ -40,6 +48,8 @@ public sealed class DeckSiteOptions
 /// /decks/api/deck/{id}       one of them (SavedDeck)
 /// /decks/api/save            POST a SavedDeck: kept, legal or not; an empty id is a new deck (DeckSaved)
 /// /decks/api/delete          POST {id}: gone
+/// /decks/api/check           POST a SavedDeck: what the server finds wrong with it for its format, as it checks every deck it
+///                            deals (DeckValidation), its companion's condition judged by the rules engine (DeckCheck)
 /// </code>
 /// Decks are kept in the data directory as <c>decks/{player}/{deck}.json</c>, in the API's own shape (<see cref="DeckJson"/>).
 /// A deck is refused only for being malformed - an unknown format, no name, an absurd count - never for being illegal:
@@ -59,7 +69,7 @@ public static class DeckSite
         ArgumentNullException.ThrowIfNull(app);
         ArgumentNullException.ThrowIfNull(options);
         var decks = new DeckStore(options.Store, options.TimeProvider);
-        var catalog = new Lazy<byte[]>(() => MessagePackSerializer.Serialize(DeckCatalog.Build(options.ContentRoot)));
+        var catalog = new Lazy<byte[]>(() => MessagePackSerializer.Serialize(DeckCatalog.For(options.ContentRoot)));
 
         // The library is the site's page; the editor is the web client, opened on a deck, or a new one in a format.
         app.MapGet($"/{Route}", (HttpContext context) => SiteChrome.For(context).Page(context, Library.Value, SiteSection.Decks));
@@ -108,6 +118,28 @@ public static class DeckSite
 
             DeckSaved saved = deck is null ? new DeckSaved(null, "That is not a deck.") : decks.Save(account.Id, deck);
             return Json(context, saved, DeckJson.Default.DeckSaved);
+        });
+
+        // The server's check of a deck, as it checks every deck it deals: the editor shows what it says.
+        app.MapPost($"/{Route}/api/check", async (HttpContext context) =>
+        {
+            if (Account(context) is null) return Results.Unauthorized();
+            if (!context.Request.HasJsonContentType()) return Results.StatusCode(StatusCodes.Status415UnsupportedMediaType);
+            SavedDeck? deck;
+            try
+            {
+                deck = await JsonSerializer.DeserializeAsync(context.Request.Body, DeckJson.Default.SavedDeck, context.RequestAborted).ConfigureAwait(false);
+            }
+            catch (JsonException)
+            {
+                deck = null;
+            }
+
+            if (deck is null || DeckStore.MalformedCards(deck) is not null) return Results.BadRequest();
+            List<string> problems = DeckFormat.Find(deck.Format) is { } format
+                ? [.. DeckValidation.Problems(deck, format, DeckCatalog.ByName(options.ContentRoot), options.Rules)]
+                : [$"\"{deck.Format}\" is not a format a deck is built for."];
+            return Json(context, new DeckCheck(problems), DeckJson.Default.DeckCheck);
         });
 
         app.MapPost($"/{Route}/api/delete", (HttpContext context, DeleteRequest delete) =>
@@ -219,6 +251,12 @@ internal sealed class DeckStore(EventStore store, TimeProvider? clock = null)
         string name = deck.Name?.Trim() ?? string.Empty;
         if (name.Length == 0) return "A deck needs a name.";
         if (name.Length > 100) return "A deck's name is at most 100 characters.";
+        return MalformedCards(deck);
+    }
+
+    /// <summary>Why a deck's cards are no cards at all - too many entries, a card with no name, an absurd count - or null.</summary>
+    internal static string? MalformedCards(SavedDeck deck)
+    {
         List<DeckEntry> entries = [.. deck.Commanders ?? [], .. deck.Main ?? [], .. deck.Side ?? []];
         if (entries.Count > MostEntries) return $"A deck lists at most {MostEntries} cards.";
         foreach (DeckEntry entry in entries)
@@ -232,68 +270,4 @@ internal sealed class DeckStore(EventStore store, TimeProvider? clock = null)
         deck.Side ??= [];
         return null;
     }
-}
-
-/// <summary>The catalog the deck editor is built from: every content card as printed, with its datasets' legality data.</summary>
-internal static class DeckCatalog
-{
-    private const string FileName = "legality.json";
-
-    public static CardCatalogView Build(string contentRoot)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(contentRoot);
-        ContentLibrary content = ContentCache.Get(contentRoot);
-        var oracle = new CardOracle(content.Cards);
-        (string date, Dictionary<string, LegalityEntry> legal) = Read(contentRoot);
-
-        var catalog = new CardCatalogView { LegalityDate = date };
-        foreach (Cantrip.Cards.Model.CardDefinition card in content.Cards.InOrder())
-        {
-            if (oracle.Oracle(card.Id) is not { } view) continue;
-            LegalityEntry? entry = legal.GetValueOrDefault(view.Name);
-            catalog.Cards.Add(new CatalogCard
-            {
-                Card = view,
-                Identity = [.. (entry?.Identity ?? string.Empty).Select(Color).OfType<ColorView>()],
-                Legalities = entry?.Legalities is { } legalities ? new Dictionary<string, string>(legalities, StringComparer.Ordinal) : [],
-            });
-        }
-
-        return catalog;
-    }
-
-    /// <summary>One card of a <c>legality.json</c>.</summary>
-    private sealed record LegalityEntry(string? Identity, Dictionary<string, string>? Legalities);
-
-    private sealed record LegalityFile(string? Updated, Dictionary<string, LegalityEntry>? Cards);
-
-    /// <summary>Every dataset's legality data, merged: the newest date, and each card by name.</summary>
-    private static (string Date, Dictionary<string, LegalityEntry> Cards) Read(string contentRoot)
-    {
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        Dictionary<string, LegalityEntry> cards = new(StringComparer.Ordinal);
-        string date = string.Empty;
-        string root = Path.GetFullPath(contentRoot);
-        IEnumerable<string> datasets = Directory.Exists(root) ? Directory.EnumerateDirectories(root).Where(DatasetDescriptor.IsDataset).Order(StringComparer.Ordinal) : [];
-        foreach (string dataset in datasets)
-        {
-            string path = Path.Combine(dataset, FileName);
-            if (!File.Exists(path)) continue;
-            LegalityFile? file = JsonSerializer.Deserialize<LegalityFile>(File.ReadAllText(path), options);
-            if (file?.Updated is { } updated && string.CompareOrdinal(updated, date) > 0) date = updated;
-            foreach ((string name, LegalityEntry entry) in file?.Cards ?? []) cards.TryAdd(name, entry);
-        }
-
-        return (date, cards);
-    }
-
-    private static ColorView? Color(char letter) => letter switch
-    {
-        'W' => ColorView.White,
-        'U' => ColorView.Blue,
-        'B' => ColorView.Black,
-        'R' => ColorView.Red,
-        'G' => ColorView.Green,
-        _ => null,
-    };
 }

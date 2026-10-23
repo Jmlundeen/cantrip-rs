@@ -43,6 +43,9 @@ param(
     [int] $Port = 7777,
     [string] $Model,
     [int] $Clock = 0,
+    # The format the decks are played in, which the server checks them against: freeform (no deck-construction restriction),
+    # limited, or a constructed format's key - standard, pioneer, modern, legacy, vintage, commander, penny.
+    [string] $Format = 'freeform',
     [switch] $Defaults,
     [switch] $SimpleBot,
     [switch] $NoBuild
@@ -205,7 +208,7 @@ Write-Host "Seed $Seed, port $Port (art on $($Port + 1))$(if ($SimpleBot) { ', d
 Write-Host 'Rules: native (the cantrip-native-host sidecar; its log is in the server window)'
 Write-Host ''
 
-$serverArgs = "run --project `"$serverProject`" --no-build -- --port $Port --players 2 --seed $Seed " +
+$serverArgs = "run --project `"$serverProject`" --no-build -- --format $Format --port $Port --players 2 --seed $Seed " +
     "--auto-start --deck `"$($decks[1])`" --deck `"$($decks[2])`"" + $(if ($Clock -gt 0) { " --clock $Clock" } else { '' })
 
 # In a window of its own that stays open after the game, because the server log is where you find out why it ended.

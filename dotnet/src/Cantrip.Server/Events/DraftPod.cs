@@ -732,11 +732,14 @@ public sealed class DraftPod : ITableEvent
             List<RulesSeat> seats = [.. _record.Participants.OrderBy(participant => participant.Seat).Select((participant, index) => new RulesSeat(
                 index < names.Count ? names[index] : participant.Name,
                 [.. DeckOf(participant).Select(card => NameOf(card))],
-                [.. participant.Pool.Where((_, place) => !participant.Deck.Main.Contains(place)).Select(id => NameOf(new CardId(id)))]))];
+                [.. PoolDecks.Sideboard(participant.Pool, participant.Deck).Select(NameOf)],
+                // The companion, checked as the deck was submitted; one in a deck the server submitted for a player out of
+                // time is dealt all the same, and the engine leaves it unrevealed if the deck doesn't fulfil it (CR 103.2b).
+                PoolDecks.Companion(participant.Pool, participant.Deck) is { } companion ? NameOf(companion) : null))];
 
             // A Limited sideboard is the rest of the pool and any number of basic lands (CR 100.4b; Magic Tournament Rules).
             IRulesHost game = (rules ?? RulesHostFactory.Native).Create(seats, seed,
-                new RulesGameOptions { BasicLandsOutside = [.. PoolDecks.BasicLands.Select(name => NameOf(_basics[name]))] });
+                new RulesGameOptions { BasicLandsOutside = [.. PoolDecks.BasicLands.Select(name => NameOf(_basics[name]))], MinimumDeckSize = _record.MinimumDeck });
 
             if (next)
             {
@@ -1112,7 +1115,8 @@ public sealed class DraftPod : ITableEvent
         // Dealt with, applied or not, so the client knows its own changes have all come back.
         _changes[seat] = build.Change;
 
-        (EventDeck? deck, string? refusal) = PoolDecks.Built(participant.Deck, participant.Pool.Count, build, _basics, _record.MinimumDeck);
+        (EventDeck? deck, string? refusal) = PoolDecks.Built(participant.Deck, participant.Pool.Count, build, _basics, _record.MinimumDeck,
+            built => PoolDecks.Refusal(participant.Pool, built, _record.MinimumDeck, _basics, NameOf, Card, RulesHostFactory.Native));
         if (deck is null)
         {
             return refusal;

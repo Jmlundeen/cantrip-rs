@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using Cantrip.Art;
-using Cantrip.Client.Decks;
+using Cantrip.Decks;
 using Cantrip.Protocol;
 using Cantrip.Server;
 using Cantrip.Server.Events;
@@ -89,7 +89,7 @@ public sealed class SiteTests : IDisposable
     public async Task The_play_page_lists_each_formats_decks_and_its_games_by_their_players_names_alone()
     {
         await using Fixture fixture = await Fixture.StartAsync(_data, signIn: false);
-        Seating hosted = await fixture.Games.HostAsync(new DiscordPlayer(1001, "Alice"), "standard", "ub-reanimator");
+        Seating hosted = await fixture.Games.HostAsync(new DiscordPlayer(1001, "Alice"), "limited", "ub-reanimator");
         Assert.Null(hosted.Refusal);
         await fixture.Games.HostAsync(new DiscordPlayer(1002, "Bob"));
 
@@ -101,7 +101,7 @@ public sealed class SiteTests : IDisposable
         using JsonDocument board = JsonDocument.Parse(text);
         JsonElement value = board.RootElement.GetProperty("value");
         JsonElement format = Assert.Single(value.GetProperty("formats").EnumerateArray());
-        Assert.Equal("standard", format.GetProperty("key").GetString());
+        Assert.Equal("limited", format.GetProperty("key").GetString());
         Assert.Equal(["rw-aggro", "ub-reanimator"], format.GetProperty("decks").EnumerateArray().Select(deck => deck.GetProperty("name").GetString()).Order());
 
         // Alice's game, waiting, with her name and not her deck; Bob's game from Discord is not the page's.
@@ -113,7 +113,7 @@ public sealed class SiteTests : IDisposable
 
         foreach ((string path, string body) in new[]
         {
-            ("constructed/api/host", """{"format":"standard","deck":"rw-aggro"}"""),
+            ("constructed/api/host", """{"format":"limited","deck":"rw-aggro"}"""),
             ("constructed/api/join", $$"""{"game":"{{hosted.Game.Id}}","deck":"rw-aggro"}"""),
             ("constructed/api/cancel", $$"""{"game":"{{hosted.Game.Id}}"}"""),
         })
@@ -175,7 +175,7 @@ public sealed class SiteTests : IDisposable
         // Alice, signed in, at a table that is filling and in a game of her own; Bob, in neither.
         QueueSeating table = await fixture.Queues.CreateTableAsync(new QueueSettings { Cube = "rw-aggro", Cards = 18, MinimumDeck = 20 }, new DiscordPlayer(1001, "Alice"));
         Assert.Null(table.Refusal);
-        Seating game = await fixture.Games.HostAsync(new DiscordPlayer(1001, "Alice"), "standard", "ub-reanimator");
+        Seating game = await fixture.Games.HostAsync(new DiscordPlayer(1001, "Alice"), "limited", "ub-reanimator");
         Assert.Null(game.Refusal);
 
         string alice = JsonSerializer.Serialize(HomeSite.Board(fixture.Home, new WebAccount(1001, "Alice", null)), new JsonSerializerOptions(JsonSerializerDefaults.Web));
@@ -224,7 +224,8 @@ public sealed class SiteTests : IDisposable
         Assert.Equal([ColorView.White, ColorView.Blue, ColorView.Green], aang.Identity.Order());
         Assert.Equal(Legality.Legal, aang.LegalityIn("commander"));
         Assert.NotNull(aang.Card.OtherFace);
-        Assert.Equal(DeckFormat.All.Select(format => format.Key).Order(), aang.Legalities.Keys.Order());
+        // Every format but Freeform, which holds no card to a list, has its legality data.
+        Assert.Equal(DeckFormat.All.Where(format => !format.IsFreeform).Select(format => format.Key).Order(), aang.Legalities.Keys.Order());
 
         // A player's decks are theirs: signed out, none.
         foreach (string path in new[] { "decks/api/list", "decks/api/deck/deck-1" })
@@ -560,7 +561,7 @@ public sealed class SiteTests : IDisposable
             {
                 ContentRoot = RepoRoot.ContentRoot,
                 Deck = rwAggro,
-                Formats = new Dictionary<string, IReadOnlyList<DeckList>> { ["standard"] = [rwAggro, DeckList.Load(DeckList.Find(decks, "ub-reanimator"))] },
+                Formats = new Dictionary<string, IReadOnlyList<DeckList>> { ["limited"] = [rwAggro, DeckList.Load(DeckList.Find(decks, "ub-reanimator"))] },
                 Ports = ports[4..],
             });
 

@@ -213,6 +213,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
         }
     }
     let order: Vec<PlayerId> = cx.s().apnap().collect();
+    reveal_companions(cx, &order);
     if !dealt {
         for &p in &order {
             for _ in 0..7 {
@@ -302,6 +303,37 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
         }
     }
     Ok(Flow::Done)
+}
+
+/// CR 103.2b, 702.139a: once the starting player is known, each player in turn order, the starting player first, reveals the
+/// companion they chose as their deck was built, if their starting deck fulfils its condition (`Game::new` judged it as the
+/// deck was dealt). The card stays outside the game, revealed (`Player::companion`). Nothing is asked: the choice was made at
+/// deck building, so no question - or its absence - says anything of a player's sideboard.
+fn reveal_companions(cx: &mut Cx, order: &[PlayerId]) {
+    for &p in order {
+        let Some(card) = cx.s().player(p).companion_to_reveal else { continue };
+        cx.st().update_player(p, |pl| pl.companion_to_reveal = None);
+        // A player who has left reveals nothing (CR 800.4a).
+        if cx.s().player(p).lost {
+            continue;
+        }
+        cx.st().update_player(p, |pl| pl.companion = Some(card));
+        cx.record(Event::Revealed { player: p, card });
+    }
+}
+
+/// The cards with companion `player` owns outside the game whose condition their starting deck - their library and hand, before
+/// the game begins - fulfils, the game's format's minimum deck size being the one a condition names (`GameState::minimum_deck_size`,
+/// CR 702.139a-b, 103.2b).
+pub fn eligible_companions(q: &dyn Query, player: PlayerId) -> Vec<ObjectId> {
+    let s = q.state();
+    let outside = s.zone(Zone::sideboard(player));
+    if !outside.iter().any(|&id| q.card(s.obj(id).card).companion.is_some()) {
+        return Vec::new();
+    }
+    let cards: Vec<ObjectId> = s.zone(Zone::library(player)).iter().chain(s.zone(Zone::hand(player))).copied().collect();
+    let deck = StartingDeck { player, cards: &cards, minimum_size: s.minimum_deck_size };
+    outside.iter().copied().filter(|&id| q.card(s.obj(id).card).companion.is_some_and(|condition| condition(q, &deck))).collect()
 }
 
 fn push_priority(cx: &mut Cx) {

@@ -211,7 +211,9 @@ public sealed class MatchGame : ITableEvent
             if (!Sideboarding || seat is not (1 or 2)) return "Decks are not being changed now.";
             string player = Match.Players[seat - 1];
             _changes[seat] = build.Change;
-            (EventDeck? deck, string? refusal) = PoolDecks.Built(Match.Decks[player], _pod.PoolOf(Match, player).Count, build, _pod.Cards.Basics, _pod.MinimumDeck);
+            // Sideboarding (CR 100.4): the deck for the next game is checked again as it is submitted, its companion with it.
+            (EventDeck? deck, string? refusal) = PoolDecks.Built(Match.Decks[player], _pod.PoolOf(Match, player).Count, build, _pod.Cards.Basics, _pod.MinimumDeck,
+                built => _pod.Cards.Refusal(_pod.PoolOf(Match, player), built, _pod.MinimumDeck));
             if (deck is null) return refusal;
             Match.Decks[player] = deck;
             _version++;
@@ -236,7 +238,7 @@ public sealed class MatchGame : ITableEvent
             GameRecord? record = Match.Games.FirstOrDefault(game => game.Number == Number);
             ulong seed = record?.Seed ?? _pod.SeedFor(Match, Number);
             IRulesHost game = _pod.Cards.NewGame([.. Match.Players.Select((player, index) =>
-                (index < names.Count ? names[index] : _pod.NameOf(player), _pod.PoolOf(Match, player), Match.Decks[player]))], seed, rules);
+                (index < names.Count ? names[index] : _pod.NameOf(player), _pod.PoolOf(Match, player), Match.Decks[player]))], seed, _pod.MinimumDeck, rules);
             if (record is null)
             {
                 Match.Games.Add(new GameRecord { Number = Number, Seed = seed, Started = _pod.Now });

@@ -306,13 +306,18 @@ public sealed record TableState(
     IReadOnlyList<DockButtonState>? Dock = null,
     IReadOnlyList<string>? Combat = null,
     DeckEditorState? DeckEditor = null,
-    IReadOnlyList<string>? TargetLabels = null);
+    IReadOnlyList<string>? TargetLabels = null,
+    IReadOnlyList<CompanionWindowState>? Companions = null);
+
+/// <summary>A companion window over a half of the table: whose it is ("mine" or "opponent") and which corner it stands in.</summary>
+public sealed record CompanionWindowState(string Whose, string Corner);
 
 /// <summary>
 /// The deck editor (<c>?decks</c>) as the page publishes it: the deck's id, name and format, whether it has changes not
 /// saved, the question asked over it and what it says, its status line and problems, how many cards the search finds and how many of them
 /// are laid out (only the rows near the view are), each zone's
-/// cards ("2 Mountain"), the player's saved decks ("standard: Red Test (2)") and where the command zone is.
+/// cards ("2 Mountain"), the player's saved decks ("standard: Red Test (2)"), where the command zone is, and what it says of the
+/// deck's companions once the site has judged them.
 /// </summary>
 public sealed record DeckEditorState(
     string Id,
@@ -333,7 +338,9 @@ public sealed record DeckEditorState(
     int LaidOut = 0,
     IReadOnlyList<string>? Picked = null,
     Spot? Marquee = null,
-    string AskDetail = "");
+    string AskDetail = "",
+    bool Checked = false,
+    string Companion = "");
 
 /// <summary>A button of the dock, in the order the dock offers them, and whether it can be pressed.</summary>
 public sealed record DockButtonState(string Label, bool Enabled);

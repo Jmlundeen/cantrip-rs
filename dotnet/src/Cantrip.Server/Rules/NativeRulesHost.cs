@@ -79,7 +79,7 @@ public sealed class NativeRulesHost : IRulesHost
         }
 
         var host = new NativeRulesHost(transport, seats, history ?? []);
-        var named = seats.Select(seat => new { seat.Name, seat.Deck, seat.Sideboard }).ToList();
+        var named = seats.Select(seat => new { seat.Name, seat.Deck, seat.Sideboard, seat.Companion }).ToList();
         NewGameReply dealt = host.Send<NewGameReply>(options.Scenario is { } scenario
             ? new
             {
@@ -97,6 +97,7 @@ public sealed class NativeRulesHost : IRulesHost
                 options.FirstPlayer,
                 options.Chooser,
                 options.BasicLandsOutside,
+                options.MinimumDeckSize,
             });
 
         host.GameId = dealt.GameId;
@@ -389,13 +390,31 @@ public sealed class NativeRulesHost : IRulesHost
     }
 
     /// <summary>
+    /// The cards with companion in <paramref name="sideboard"/>, in its order, each with whether <paramref name="deck"/> - a
+    /// starting deck, by card name - fulfils its condition (CR 702.139a, 103.2b), <paramref name="minimumDeckSize"/> being the
+    /// format's minimum deck size (CR 100.2a): the engine's own judgement, for the deck editor, which has no rules of its own.
+    /// </summary>
+    /// <exception cref="RulesRejectedException">A card the engine does not have.</exception>
+    public static IReadOnlyList<(string Card, bool Fulfilled)> Companions(
+        IHostTransport transport, IReadOnlyList<string> deck, IReadOnlyList<string> sideboard, int minimumDeckSize)
+    {
+        ArgumentNullException.ThrowIfNull(transport);
+        ArgumentNullException.ThrowIfNull(deck);
+        ArgumentNullException.ThrowIfNull(sideboard);
+        CompanionsReply reply = Exchange<CompanionsReply>(transport, new { Cmd = "Companions", Deck = deck, Sideboard = sideboard, MinimumDeckSize = minimumDeckSize });
+        return [.. reply.Companions.Select(check => (check.Card, check.Fulfilled))];
+    }
+
+    /// <summary>
     /// One exchange: the request as a JSON line, the reply's <c>Ok</c> read as <typeparamref name="TReply"/>, or its
     /// <c>Rejected</c> thrown.
     /// </summary>
-    private TReply Send<TReply>(object request)
+    private TReply Send<TReply>(object request) => Exchange<TReply>(_transport, request);
+
+    private static TReply Exchange<TReply>(IHostTransport transport, object request)
     {
         string line = ProtocolJson.Serialize(request);
-        string reply = _transport.Exchange(line);
+        string reply = transport.Exchange(line);
 
         using JsonDocument document = JsonDocument.Parse(reply);
         JsonElement root = document.RootElement;
@@ -515,5 +534,17 @@ public sealed class NativeRulesHost : IRulesHost
     private sealed class OracleReply
     {
         public ObjectView? Card { get; set; }
+    }
+
+    private sealed class CompanionsReply
+    {
+        public List<CompanionReply> Companions { get; set; } = [];
+    }
+
+    private sealed class CompanionReply
+    {
+        public string Card { get; set; } = string.Empty;
+
+        public bool Fulfilled { get; set; }
     }
 }

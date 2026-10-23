@@ -1,4 +1,4 @@
-using Cantrip.Client.Decks;
+using Cantrip.Decks;
 using Cantrip.Protocol;
 using Xunit;
 
@@ -60,7 +60,7 @@ public sealed class DeckRulesTests
         Assert.Empty(DeckRules.Problems(Deck("modern", [new("Forest", 200)], [new("Lightning Bolt", 4), new("Forest", 11)]), cards));
 
         Assert.Contains("A Modern deck is at least 60 cards: this one is 59.", DeckRules.Problems(Deck("modern", [new("Grizzly Bears", 4), new("Forest", 55)]), cards));
-        Assert.Contains("A sideboard is at most 15 cards: this one is 16.", DeckRules.Problems(Deck("modern", Sixty(), [new("Forest", 16)]), cards));
+        Assert.Contains("A sideboard is at most 15 cards, its companion included: this one is 16.", DeckRules.Problems(Deck("modern", Sixty(), [new("Forest", 16)]), cards));
     }
 
     [Fact]
@@ -124,8 +124,75 @@ public sealed class DeckRulesTests
             DeckRules.Problems(Deck("commander", [new("Grizzly Bears", 1), new("Llanowar Elves", 1), new("Forest", 98)], commanders: commander), cards));
         Assert.Contains("Grizzly Bears: 2 copies, more than the 1 a Commander deck may have.",
             DeckRules.Problems(Deck("commander", [new("Grizzly Bears", 2), new("Forest", 97)], commanders: commander), cards));
-        Assert.Contains("A Commander deck has no sideboard.",
+        Assert.Contains("A Commander deck has no sideboard, but for its companion.",
             DeckRules.Problems(Deck("commander", [new("Grizzly Bears", 1), new("Forest", 98)], [new("Llanowar Elves", 1)], commander), cards));
+    }
+
+    private static readonly CatalogCard Lurrus = Card("Lurrus of the Dream-Den", legendary: true, identity: [ColorView.White, ColorView.Black],
+        text: "Companion — Each permanent card in your starting deck has mana value 2 or less. (If this card is your chosen companion, you may put it into your hand from outside the game for {3} as a sorcery.)\nLifelink");
+
+    /// <summary>A Doctor's companion is a partner ability (CR 702.124m), not companion (CR 702.139a).</summary>
+    private static readonly CatalogCard Rose = Card("Rose Tyler", legendary: true, identity: [ColorView.White],
+        text: "Doctor's companion (You can have two commanders if the other is the Doctor.)");
+
+    /// <summary>
+    /// Companion (CR 702.139a) is read from a line of the rules text, and a Doctor's companion is not it. The deck's companion
+    /// is a card of its sideboard in a column of its own: it counts toward the sideboard's fifteen and the copies of its name,
+    /// must have companion, and the deck must fulfil its condition as the rules engine judges it (passed in) - otherwise it
+    /// is a problem, for the server refuses such a deck. In Commander it is the one card outside the hundred, and the deck
+    /// the condition is judged by has the commanders in it (CR 702.139b).
+    /// </summary>
+    [Fact]
+    public void A_companion_must_have_companion_and_a_deck_that_fulfils_its_condition()
+    {
+        Assert.True(DeckRules.HasCompanion(Lurrus));
+        Assert.False(DeckRules.HasCompanion(Rose));
+        Assert.False(DeckRules.HasCompanion(Bolt));
+
+        Dictionary<string, CatalogCard> cards = Catalog(Omnath, Bear, Forest, Lurrus, Rose, Bolt);
+        SavedDeck With(string format, List<DeckEntry> main, string companion, List<DeckEntry>? side = null, List<DeckEntry>? commanders = null)
+        {
+            SavedDeck deck = Deck(format, main, side, commanders);
+            deck.Companion = companion;
+            return deck;
+        }
+
+        SavedDeck modern = With("modern", Sixty(), "Lurrus of the Dream-Den");
+        Assert.Empty(DeckRules.Problems(modern, cards));
+        Assert.Empty(DeckRules.Problems(modern, cards, companionFulfilled: true));
+        Assert.Equal(["Lurrus of the Dream-Den can't be the deck's companion: the deck doesn't fulfil its companion condition."],
+            DeckRules.Problems(modern, cards, companionFulfilled: false));
+        Assert.Equal(["Rose Tyler has no companion ability, so it can't be the deck's companion."],
+            DeckRules.Problems(With("modern", Sixty(), "Rose Tyler"), cards));
+        Assert.Equal(["A sideboard is at most 15 cards, its companion included: this one is 16."],
+            DeckRules.Problems(With("modern", Sixty(), "Lurrus of the Dream-Den", [new("Forest", 15)]), cards));
+        Assert.Equal(["Lurrus of the Dream-Den: 5 copies, more than the 4 a Modern deck may have."],
+            DeckRules.Problems(With("modern", [.. Sixty(), new("Lurrus of the Dream-Den", 4)], "Lurrus of the Dream-Den"), cards));
+
+        List<DeckEntry> commander = [new("Omnath, Locus of Mana", 1)];
+        SavedDeck hundred = With("commander", [new("Grizzly Bears", 1), new("Forest", 98)], "Lurrus of the Dream-Den", commanders: commander);
+        Assert.Contains("A Commander deck has no sideboard, but for its companion.",
+            DeckRules.Problems(With("commander", [new("Grizzly Bears", 1), new("Forest", 98)], "Lurrus of the Dream-Den", [new("Lightning Bolt", 1)], commander), cards));
+        Assert.Equal(["Omnath, Locus of Mana", "Grizzly Bears", .. Enumerable.Repeat("Forest", 98)], DeckRules.StartingDeck(hundred));
+        // Lurrus is white and black; a green commander's deck can't have it as its companion.
+        Assert.Contains("The companion Lurrus of the Dream-Den is outside the commander's color identity.", DeckRules.Problems(hundred, cards));
+    }
+
+    /// <summary>
+    /// Limited (CR 100.2b): at least the event's minimum, no limit to copies or the sideboard, and no format's legality - the
+    /// cards are the pool's - but the same companion rule.
+    /// </summary>
+    [Fact]
+    public void A_Limited_deck_is_held_to_its_minimum_and_its_companion_alone()
+    {
+        Dictionary<string, CatalogCard> cards = Catalog(Bear, Forest, Lurrus,
+            Card("Banned Bear", legalities: Formats.ToDictionary(format => format, _ => Legality.Banned)));
+        SavedDeck deck = Deck(DeckFormat.LimitedKey, [new("Grizzly Bears", 9), new("Banned Bear", 6), new("Forest", 25)], [new("Grizzly Bears", 30)]);
+        Assert.Empty(DeckRules.Problems(deck, DeckFormat.Limited(40), cards));
+        Assert.Equal(["A Limited deck is at least 41 cards: this one is 40."], DeckRules.Problems(deck, DeckFormat.Limited(41), cards));
+        deck.Companion = "Lurrus of the Dream-Den";
+        Assert.Equal(["Lurrus of the Dream-Den can't be the deck's companion: the deck doesn't fulfil its companion condition."],
+            DeckRules.Problems(deck, DeckFormat.Limited(40), cards, companionFulfilled: false));
     }
 
     [Fact]
@@ -221,5 +288,17 @@ public sealed class DeckRulesTests
     {
         Assert.Contains("Only a Commander deck has a commander.",
             DeckRules.Problems(Deck("modern", Sixty(), commanders: [new("Omnath, Locus of Mana", 1)]), Catalog(Bear, Forest, Omnath)));
+    }
+
+    /// <summary>Freeform, offered in the deck editor, shows no problem with any deck: any size, any copies, any card the engine plays.</summary>
+    [Fact]
+    public void A_freeform_deck_has_no_problems_whatever_it_holds()
+    {
+        CatalogCard banned = Card("Banned Bear", legalities: Formats.ToDictionary(format => format, _ => Legality.Banned));
+        Dictionary<string, CatalogCard> cards = Catalog(Bear, Forest, Bolt, banned);
+        Assert.Contains(DeckFormat.Freeform, DeckFormat.All);
+        Assert.Empty(DeckRules.Problems(Deck(DeckFormat.FreeformKey, [new("Grizzly Bears", 10), new("Banned Bear", 1)], [new("Lightning Bolt", 30)]), cards));
+        Assert.True(DeckRules.Fits(banned, DeckFormat.Freeform, null));
+        Assert.Equal(["No Such Card is not a card the engine plays."], DeckRules.Problems(Deck(DeckFormat.FreeformKey, [new("No Such Card", 1)]), cards));
     }
 }

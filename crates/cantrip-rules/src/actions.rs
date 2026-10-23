@@ -31,8 +31,40 @@ pub fn priority_options(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
     if sorcery_timing(cx, player) {
         land_plays(cx, player, &mut options);
         castable(cx, player, &available, false, &mut options);
+        take_companion_option(cx, player, &available, &mut options);
     }
     options
+}
+
+/// What taking a companion costs (CR 702.139a, 116.2g).
+const COMPANION_COST: ManaCost = generic(3);
+
+/// The companion `player` revealed before the game (CR 103.2b, 702.139a), while it is still outside the game, where it stays
+/// revealed: once it has been put into their hand it is a new object (CR 400.7), so the special action is had once a game (CR
+/// 116.2g).
+pub fn revealed_companion(state: &GameState, player: PlayerId) -> Option<ObjectId> {
+    let card = state.player(player).companion?;
+    (live(state, card) && state.obj(card).zone == Zone::sideboard(player)).then_some(card)
+}
+
+/// Taking the companion (CR 702.139a, 116.2g): "any time you have priority and the stack is empty, but only during a main phase
+/// of your turn" - sorcery timing, which the caller has judged - for {3}, offered only where the player could pay it, as a
+/// special action whose cost they cannot meet is not (`activated_options`). It is no ability (CR 116.1): nothing that changes
+/// or forbids activating abilities touches it, and mana that may only be spent on abilities or spells can't pay for it
+/// (CR 106.6).
+fn take_companion_option(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, options: &mut Vec<ActionOption>) {
+    let Some(card) = revealed_companion(cx.s(), player) else { return };
+    if available.get_or_init(|| self::available(cx, player)).covers_for(&COMPANION_COST, &ManaPayment::Other) {
+        options.push(ActionOption::on(ActionKind::TakeCompanion, card, 0));
+    }
+}
+
+/// The special action (CR 116.2g): {3} paid, and the card put into its owner's hand from outside the game (CR 400.11b), where
+/// it stays in the game until it ends (CR 702.139c).
+fn take_companion(cx: &mut Cx, player: PlayerId, card: ObjectId) -> R<()> {
+    pay_mana(cx, player, card, COMPANION_COST)?;
+    ops::bring_into_hand(cx, &[card]);
+    Ok(())
 }
 
 /// Whether a spell with split second is on the stack (CR 702.61a): read from the printed cards of what is on the stack,
@@ -5630,6 +5662,8 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
                 None => format!("{printed} ({})", permission_name(cards, state, g)).into(),
             }
         }
+        // The special action of a companion (CR 116.2g): what it costs and which card it brings in.
+        ActionKind::TakeCompanion => format!("{COMPANION_COST}: Put {} in hand.", cards.get(state.obj(source).card).name).into(),
         _ => describe_way(cards, state, log, option, source).into(),
     }
 }
@@ -5841,6 +5875,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 activate(cx, player, source, ability, action.index, &action.targets, action.granted_by, action.paid_by)?;
             }
         }
+        ActionKind::TakeCompanion => take_companion(cx, player, source)?,
         _ => unreachable!("not a priority action"),
     }
     // Whoever acted receives priority again, and the run of passes is broken (CR 117.3c).

@@ -71,4 +71,14 @@ public sealed class DeckListTests
 
         Assert.Contains("d.txt line 2: no loaded card is named \"Not A Real Card\"", error.Message, StringComparison.Ordinal);
     }
+
+    /// <summary>A <c>Companion</c> line names the deck's companion on the next line; one with nothing after it is an error, never no companion.</summary>
+    [Fact]
+    public void A_companion_line_names_the_next_card_and_one_naming_none_is_an_error()
+    {
+        Assert.Equal("Lurrus of the Dream-Den", DeckList.Parse("lurrus", "60 Swamp\nCompanion\n1 Lurrus of the Dream-Den\n", "test").Companion);
+        Assert.Null(DeckList.Parse("plain", "60 Swamp\n", "test").Companion);
+        Assert.Throws<FormatException>(() => DeckList.Parse("cut", "60 Swamp\nCompanion\n", "test"));
+        Assert.Throws<FormatException>(() => DeckList.Parse("two", "60 Swamp\nCompanion\n2 Lurrus of the Dream-Den\n", "test"));
+    }
 }
