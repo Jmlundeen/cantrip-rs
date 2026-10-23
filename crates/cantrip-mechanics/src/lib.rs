@@ -62,6 +62,7 @@ pub mod delayed;
 pub mod effects;
 pub mod foretell;
 pub mod kicker;
+pub mod learn;
 pub mod level_up;
 pub mod lands;
 pub mod land_until_cast;
