@@ -3030,6 +3030,13 @@ impl CardTable {
                         assert!(off.0 & !elsewhere.0 == 0, "{}: a triggered ability functions in a zone the engine never looks in", c.name);
                         assert!(!t.mana_ability || t.functions == crate::ability::ON_THE_BATTLEFIELD, "{}: a triggered mana ability functions on the battlefield", c.name);
                         assert!(t.functions.0 != 0, "{}: a triggered ability functions in no zone", c.name);
+                        // An instant or sorcery is never a permanent: its abilities function on the stack (CR 113.6), so one
+                        // left on the battlefield alone could never trigger.
+                        assert!(
+                            !(c.types.has(CardType::Instant) || c.types.has(CardType::Sorcery)) || t.functions != crate::ability::ON_THE_BATTLEFIELD,
+                            "{}: an instant's or sorcery's triggered ability functions only on the battlefield (CR 113.6)",
+                            c.name
+                        );
                         zones.union(off)
                     }
                     _ => zones,

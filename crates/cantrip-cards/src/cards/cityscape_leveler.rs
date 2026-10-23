@@ -15,12 +15,21 @@ fn level(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::tokens::create_tapped_powerstone(g, controller)
 }
 
+/// "When you cast this spell and whenever this creature attacks": one ability with two trigger conditions (CR 603.2), the
+/// first functioning from the stack and the second from the battlefield (CR 113.6k).
+fn cast_or_attacks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    triggers::cast_this_spell(q, source, event).or_else(|| triggers::this_attacks(q, source, event))
+}
+
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::CAST_THIS_SPELL, level, "When you cast this spell, destroy up to one target nonland permanent. Its controller creates a tapped Powerstone token.")
-            .targets(&[up_to_one(targets::NONLAND_PERMANENT.filter)]),
-        triggered(triggers::THIS_ATTACKS, level, "Whenever this creature attacks, destroy up to one target nonland permanent. Its controller creates a tapped Powerstone token.")
-            .targets(&[up_to_one(targets::NONLAND_PERMANENT.filter)]),
+        triggered(
+            when(EventMask(EventMask::SPELL_CAST.0 | EventMask::ATTACKS.0), cast_or_attacks)
+                .functions_in(ZoneKinds(ON_THE_STACK.0 | ON_THE_BATTLEFIELD.0)),
+            level,
+            "When you cast this spell and whenever this creature attacks, destroy up to one target nonland permanent. Its controller creates a tapped Powerstone token.",
+        )
+        .targets(&[up_to_one(targets::NONLAND_PERMANENT.filter)]),
         unearth::ability(mana("{8}"), "Unearth {8}"),
     ],
     delayed: &[unearth::EXILE],

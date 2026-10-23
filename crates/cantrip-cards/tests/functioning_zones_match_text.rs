@@ -12,42 +12,112 @@ use cantrip_api::*;
 /// 702.85a cascade, 702.153a casualty), whose ability text may be the keyword alone.
 const CAST_KEYWORDS: [&str; 5] = ["storm", "replicate", "ripple", "cascade", "casualty"];
 
-/// The zones the words of a triggered ability say it functions in (CR 113.6), for a card named `name`:
+/// The zones the words of a triggered ability say it functions in (CR 113.6), for a card named `name`: the union over its
+/// trigger conditions (CR 113.6k: "when you cast this spell and whenever this creature attacks" has two, functioning in
+/// different zones), each of which functions
 ///
-/// - the stack, for an ability that says "this spell" - only a spell is one (CR 113.6k: "when you cast this spell", and a
-///   reflexive "when you do" of an additional cost paid to cast it) - or is a keyword whose trigger is its cast;
-/// - a graveyard, for one that triggers on its own card being put into a graveyard other than from the battlefield ("when
-///   this card is put into a graveyard from anywhere", "... into your graveyard from your library": CR 113.6k);
-/// - the zone it names for its own card, "this card from your graveyard", "if this card is in your graveyard", and the
-///   like for a hand and exile (CR 113.6b, 113.6m);
-/// - otherwise the battlefield (CR 113.6).
+/// - on the stack, if it is the spell's own cast: "when you cast this spell", a reflexive "when you do" of an additional
+///   cost paid to cast it ("... copy this spell"), or a keyword whose trigger is its cast (CR 113.6k);
+/// - in every zone a discarded card can wind up in, if it is the card's own cycling or discarding (CR 702.29c);
+/// - in a graveyard, if it is the card's own move into a graveyard other than from the battlefield ("when this card is put
+///   into a graveyard from anywhere", "... into your graveyard from your library": CR 113.6k);
+/// - in the zone the ability names for its own card, "this card from your graveyard", "if this card is in your graveyard"
+///   and the like for a hand and exile (CR 113.6b, 113.6m) - unless the condition itself puts the card into that zone
+///   ("when this creature dies, return this card from your graveyard": CR 113.6m's exception, a leaves-the-battlefield
+///   ability that functions on the battlefield);
+/// - otherwise on the battlefield (CR 113.6).
 fn said_zones(text: &str, name: &str) -> ZoneKinds {
     let text = without_reminders(&text.to_ascii_lowercase().replace('\u{2014}', "-"));
     let name = name.to_ascii_lowercase();
-    let condition = text.split(", ").next().unwrap_or_default();
-    let condition = condition.split(" - ").last().unwrap_or_default();
-    if condition.contains("cast this spell")
-        || (condition == "when you do" && text.contains("this spell"))
-        || CAST_KEYWORDS.iter().any(|k| text.starts_with(k))
-    {
+    if CAST_KEYWORDS.iter().any(|k| text.starts_with(k)) {
         return ON_THE_STACK;
     }
-    for verb in [" is put into a graveyard", " is put into your graveyard"] {
-        if let Some(at) = condition.find(verb) {
-            let subject = condition[..at].trim_start_matches("whenever ").trim_start_matches("when ");
-            let itself = subject.starts_with("this ") || (!subject.is_empty() && name.starts_with(subject));
-            if itself && !condition[at..].contains("from the battlefield") {
+    let condition = text.split(", ").next().unwrap_or_default();
+    let condition = condition.split(" - ").last().unwrap_or_default();
+    let mut conditions = vec![condition.to_string()];
+    for joint in [" and whenever ", " and when ", " or whenever "] {
+        conditions = conditions.iter().flat_map(|c| c.split(joint).map(str::to_string).collect::<Vec<_>>()).collect();
+    }
+    conditions.iter().fold(ZoneKinds::NONE, |zones, c| zones.union(condition_zones(c, &text, &name)))
+}
+
+/// Every zone a card discarded to pay a cost can wind up in, a replacement effect's included (CR 702.29c, 614.1).
+const WHERE_A_DISCARD_ENDS: ZoneKinds =
+    ZoneKinds::of(&[ZoneKind::Graveyard, ZoneKind::Exile, ZoneKind::Library, ZoneKind::Hand, ZoneKind::Battlefield]);
+
+/// Whether the subject of `condition` before `at` is the ability's own object: "this creature", "this card", or its card's
+/// name (or the start of it, "Emrakul").
+fn itself(condition: &str, at: usize, name: &str) -> bool {
+    let subject = condition[..at].trim_start_matches("whenever ").trim_start_matches("when ").trim();
+    subject.starts_with("this ") || (!subject.is_empty() && name.starts_with(subject))
+}
+
+/// The zones one trigger condition functions in (`said_zones`); `text` is the whole ability's.
+fn condition_zones(condition: &str, text: &str, name: &str) -> ZoneKinds {
+    if condition.contains("cast this spell") || (condition == "when you do" && text.contains("this spell")) {
+        return ON_THE_STACK;
+    }
+    if ["cycle this card", "discard this card", "cycle or discard this card"].iter().any(|w| condition.contains(&format!("you {w}"))) {
+        return WHERE_A_DISCARD_ENDS;
+    }
+    // The zones the condition itself puts its own object into (CR 113.6m's exception).
+    let mut put_into = ZoneKinds::NONE;
+    for (verb, zone) in [
+        (" dies", ZoneKind::Graveyard),
+        (" is put into a graveyard", ZoneKind::Graveyard),
+        (" is put into your graveyard", ZoneKind::Graveyard),
+        (" is put into exile", ZoneKind::Exile),
+        (" is exiled", ZoneKind::Exile),
+        (" is put into your hand", ZoneKind::Hand),
+        (" is put into its owner's hand", ZoneKind::Hand),
+        (" is returned to", ZoneKind::Hand),
+    ] {
+        if let Some(at) = condition.find(verb)
+            && itself(condition, at, name)
+        {
+            if zone == ZoneKind::Graveyard && verb != " dies" && !condition[at..].contains("from the battlefield") {
                 return IN_A_GRAVEYARD;
             }
+            put_into = put_into.with(zone);
         }
     }
     let mut zones = ZoneKinds::NONE;
     for (words, zone) in [("your graveyard", ZoneKind::Graveyard), ("your hand", ZoneKind::Hand), ("exile", ZoneKind::Exile)] {
-        if text.contains(&format!("this card from {words}")) || text.contains(&format!("this card is in {words}")) {
+        if !put_into.contains(zone) && (text.contains(&format!("this card from {words}")) || text.contains(&format!("this card is in {words}"))) {
             zones = zones.with(zone);
         }
     }
     if zones == ZoneKinds::NONE { ON_THE_BATTLEFIELD } else { zones }
+}
+
+/// The reader's own cases, each a printed form.
+#[test]
+fn the_reader_reads_the_printed_forms() {
+    let both = ZoneKinds(ON_THE_STACK.0 | ON_THE_BATTLEFIELD.0);
+    for (text, name, zones) in [
+        ("When you cast this spell, take an extra turn after this one.", "Emrakul, the Aeons Torn", ON_THE_STACK),
+        ("When you do, copy this spell for each creature sacrificed this way.", "Plumb the Forbidden", ON_THE_STACK),
+        ("Cascade", "Bloodbraid Elf", ON_THE_STACK),
+        ("When you cast this spell and whenever this creature attacks, destroy up to one target nonland permanent.", "Cityscape Leveler", both),
+        ("When Emrakul is put into a graveyard from anywhere, its owner shuffles their graveyard into their library.", "Emrakul, the Aeons Torn", IN_A_GRAVEYARD),
+        ("When this card is put into your graveyard from your library, create a 2/2 black Zombie creature token.", "Test", IN_A_GRAVEYARD),
+        ("When this creature is put into a graveyard from the battlefield, you gain 2 life.", "Test", ON_THE_BATTLEFIELD),
+        ("Whenever another card is put into a graveyard from anywhere, exile it.", "Planar Void", ON_THE_BATTLEFIELD),
+        ("Whenever you cast a spell, if it's the second creature spell you cast this turn, you may return this card from your graveyard to the battlefield.", "Vengevine", IN_A_GRAVEYARD),
+        ("At the beginning of your upkeep, if this card is in your graveyard, you may pay 1 life. If you do, return it to your hand.", "Master of Death", IN_A_GRAVEYARD),
+        // CR 113.6m's exception: the condition puts the card into the graveyard, so it functions where it triggers from.
+        ("When this creature dies, return this card from your graveyard to the battlefield.", "Test", ON_THE_BATTLEFIELD),
+        ("When Test dies, return this card from your graveyard to your hand.", "Test", ON_THE_BATTLEFIELD),
+        ("Whenever another creature dies, return this card from your graveyard to the battlefield.", "Test", IN_A_GRAVEYARD),
+        // CR 702.29c: from whatever zone the card winds up in.
+        ("When you cycle this card, draw a card.", "Test", WHERE_A_DISCARD_ENDS),
+        ("When you cycle or discard this card, you gain 1 life.", "Test", WHERE_A_DISCARD_ENDS),
+        ("Whenever you cycle or discard another card, scry 1.", "Test", ON_THE_BATTLEFIELD),
+        ("Offspring {2} (You may pay an additional {2} as you cast this spell.)", "Pawpatch Recruit", ON_THE_BATTLEFIELD),
+        ("Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", "Ugin, Eye of the Storms", ON_THE_BATTLEFIELD),
+    ] {
+        assert_eq!(names(said_zones(text, name)), names(zones), "{text}");
+    }
 }
 
 /// The text without its reminder text, which says what a keyword does rather than being an ability (CR 207.2).
