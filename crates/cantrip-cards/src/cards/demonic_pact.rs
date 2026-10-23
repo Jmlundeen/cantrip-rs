@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "This enchantment deals 4 damage to any target and you gain 4 life."
 fn damage_and_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    effects::damage_target_and_gain_life(g, item, 4)
+    effects::damage_target_and_gain_life(g, item, 4, 4)
 }
 
 /// "Target opponent discards two cards": their choice (CR 701.9). With its only target illegal the ability does not resolve at

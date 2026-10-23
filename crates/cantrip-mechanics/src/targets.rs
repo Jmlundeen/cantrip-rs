@@ -603,6 +603,21 @@ pub const fn creature_of_either_color<const A: u8, const B: u8>() -> TargetSpec 
     target(creature_of_either_color_filter::<A, B>)
 }
 
+/// "This spell costs {N} less to cast if it targets a [color] [creature / spell]" (CR 601.2c, 601.2f): judged once the target is
+/// announced, as the total cost is determined; generic mana only (CR 118.7a). The color word is that of the casting spell's own
+/// text (CR 612); `C` is a `Color` as `u8` (a value past the five colors does not compile). It checks the target's color only: its
+/// object type (creature, spell) comes from the card's own target spec. The target's color is its color as it is then (on the stack, for a spell). Mystical
+/// Dispute (a blue spell) and Knockout Blow (a red creature) print it.
+pub fn less_if_it_targets_color<const N: u8, const C: u8>(q: &dyn Query, source: ObjectId, _: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
+    const { assert!(C < 5) };
+    let color = q.words(source).color(Color::ALL[C as usize]);
+    if targets.iter().filter_map(|t| t.object()).any(|object| q.chars(object).colors.has(color)) {
+        CostDelta::less(N)
+    } else {
+        CostDelta::NONE
+    }
+}
+
 /// Whether a target is a card of one of these types in the asker's own graveyard ("target creature card in your
 /// graveyard", CR 115.1). Eternal Witness takes any card (`types` empty); Recurring Nightmare and Metamorphosis Fanatic
 /// take a creature card.

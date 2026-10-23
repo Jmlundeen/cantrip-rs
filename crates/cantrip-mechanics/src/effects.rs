@@ -593,13 +593,14 @@ pub fn return_first_target_to_battlefield(g: &mut dyn Game, item: &StackItem) ->
     Ok(())
 }
 
-/// "[This source] deals `n` damage to any target and you gain `n` life" (CR 120.3, 119.1): the first target, if it is still
-/// legal (CR 608.2b), is dealt the damage by the resolving object (as it last was if it has left, CR 113.7a), and the
-/// controller gains the life. Lightning Helix, Phlage, Titan of Fire's Fury and Demonic Pact print it.
-pub fn damage_target_and_gain_life(g: &mut dyn Game, item: &StackItem, n: u16) -> Result<(), Suspend> {
+/// "[This source] deals `damage` damage to [a target] and you gain `life` life" (CR 120.3, 119.1): the first target, if it is
+/// still legal (CR 608.2b), is dealt the damage by the resolving object (as it last was if it has left, CR 113.7a), and the
+/// controller gains the life. Which targets are allowed is the card's own spell or ability. Lightning Helix, Phlage, Titan of
+/// Fire's Fury and Demonic Pact print it with equal amounts; Knockout Blow deals 4 and gains 2.
+pub fn damage_target_and_gain_life(g: &mut dyn Game, item: &StackItem, damage: u16, life: i32) -> Result<(), Suspend> {
     if g.target_legal(item, 0) {
-        g.damage(item.object, item.target(0), n);
-        g.gain_life(item.controller, i32::from(n));
+        g.damage(item.object, item.target(0), damage);
+        g.gain_life(item.controller, life);
     }
     Ok(())
 }
