@@ -1,0 +1,40 @@
+# Cast in Bot1's own beginning of combat (T3): your turn but not a main phase, so no +1/+1 and the 1/1s kill each other.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Tail Swipe
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Snakeskin Veil
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Tail Swipe.Cast
+Bot1.Target(Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Elvish Mystic; Tail Swipe

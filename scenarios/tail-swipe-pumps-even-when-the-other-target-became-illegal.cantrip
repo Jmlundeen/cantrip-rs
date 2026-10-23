@@ -1,0 +1,47 @@
+# In response Bot2 gives its Llanowar Elves hexproof (Snakeskin Veil): that target is illegal as Tail Swipe resolves, so
+# the creatures do not fight (CR 701.14b), but the other target is still legal and gets +1/+1 (CR 608.2b): the Mystic is
+# a 2/2 with no damage, and the Elves (a 2/2 from Veil's counter) have none either.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Tail Swipe
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Snakeskin Veil
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Tail Swipe.Cast
+Bot1.Target(Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Llanowar Elves)
+[Expect]
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Battlefield.Elvish Mystic.Damage = 0
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Llanowar Elves.Power = 2
+Bot1.Graveyard = Tail Swipe

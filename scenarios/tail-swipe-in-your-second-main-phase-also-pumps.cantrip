@@ -1,0 +1,44 @@
+# Cast in Bot1's postcombat main phase (T3): that is a main phase of Bot1's too, so the Mystic (1/1) is a 2/2 as it
+# fights Llanowar Elves (1/1) and survives with 1 damage (CR 505.1).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Tail Swipe
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Snakeskin Veil
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main2]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Tail Swipe.Cast
+Bot1.Target(Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Battlefield.Elvish Mystic.Damage = 1
