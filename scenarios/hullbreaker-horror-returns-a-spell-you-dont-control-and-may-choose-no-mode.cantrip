@@ -1,0 +1,75 @@
+# Hullbreaker Horror: "choose up to one" - Opt's cast chooses no mode at all (Modes()), so its trigger leaves the stack at
+# once (CR 603.3c, 700.2b) and only Opt is there. Bot2 then casts two Shocks; Bot1's own Lightning Bolt cast chooses the
+# first mode, "Return target spell you don't control": three spells are on the stack, so the target is asked, and
+# Bot1's own Bolt is refused (CR 109.5) while one Shock is returned to Bot2's hand (not countered). Bot2's casts did not
+# trigger the Horror (only your casts do). Bot1 takes 2 from the other Shock, Bot2 takes 3 from the Bolt.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Black Lotus
+Hullbreaker Horror
+Lightning Bolt
+Opt
+Island x16
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Shock
+Shock
+Mountain x3
+Mountain x2
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hullbreaker Horror.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Modes()
+? Stack = Opt
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Hand.Shock.Cast(Bot1)
+? Stack = Shock; Shock; Opt
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Modes(1; 2)
+Bot1.Modes(1)
+! Bot1.Target(Stack.Lightning Bolt)
+Bot1.Target(Stack.Shock)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 18
+Bot2.Life = 17
+Bot2.Hand = Mountain; Mountain; Mountain; Mountain; Shock

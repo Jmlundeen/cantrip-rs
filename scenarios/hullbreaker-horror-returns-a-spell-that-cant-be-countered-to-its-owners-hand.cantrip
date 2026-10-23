@@ -1,0 +1,65 @@
+# Hullbreaker Horror's first mode returns the spell to its owner's hand; it does not counter it (CR 701.6, 400.3), so
+# Bot2's Abrupt Decay, which can't be countered, goes back to Bot2's hand all the same. Bot1 has the Horror from turn 1;
+# on turn 3 it casts Opt, Bot2 responds with Abrupt Decay at Bot1's Mox Ruby, and Bot1's Lightning Bolt cast chooses
+# mode 1 aimed at the Decay. The Decay never resolves: Bot1's Mox Ruby stays and the stack ends empty.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Black Lotus
+Hullbreaker Horror
+Lightning Bolt
+Opt
+Island x16
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Abrupt Decay
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hullbreaker Horror.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Modes()
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Mox Ruby)
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot2.Hand = Abrupt Decay; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot2.Graveyard.Count = 0

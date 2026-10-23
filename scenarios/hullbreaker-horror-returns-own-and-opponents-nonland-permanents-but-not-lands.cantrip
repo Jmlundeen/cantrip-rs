@@ -1,0 +1,68 @@
+# Hullbreaker Horror: "Whenever you cast a spell, choose up to one" - the second mode, "Return target nonland permanent
+# to its owner's hand". Bot1 casts the Horror on turn 1 (Black Lotus and four Moxen). On turn 3 Mox Sapphire's cast
+# returns Bot1's own Mox Emerald (your own is a legal target) and Opt's cast returns Bot2's Mox Jet; Bot2's Mountain, a
+# land, is refused as a target of the second cast, which also has no spell of Bot2's to target, so the first mode is not
+# offered (Modes(1) refused).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Black Lotus
+Hullbreaker Horror
+Opt
+Mox Sapphire
+Island x16
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Mountain x5
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hullbreaker Horror.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Mox Emerald; Opt
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+! Bot1.Modes(1)
+Bot1.Modes(2)
+! Bot1.Target(Bot2.Battlefield.Mountain)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield = Mountain
+Bot2.Hand = Mountain; Mountain; Mountain; Mountain; Mountain; Mountain; Mox Jet
+Bot1.Hand = Island; Mox Emerald
