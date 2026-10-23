@@ -2061,11 +2061,15 @@ obey as many as any declaration can attacking for free (a cost is never a requir
 goader may attack the goader or another player, each obeying two of three. `AttackRules::judge` (`cantrip_state::attacks`) is
 the one validator - complete, issue, addable, cost - that the core, the scenario harness and the host (`CheckAttacks`) use,
 and `GameClient.Answer` settles every declaration of attackers with the host. A restriction on one attacker at a time lets
-`AttackRules::solve` add up each attacker's best free attack; a cap on how many creatures may attack one player,
-planeswalker or battle (CR 508.1c, `CardDef::attack_limits`, Tomik's "No more than one creature can attack this
-planeswalker each combat") is carried in `AttackRules::limits`, refused by `judge` and filled in the same order by `solve`,
-so the suggestion never asks for one creature more; a restriction on the attack as a whole would make it a search like
-blocks'. The board is searched for these only as attackers are declared. The
+`AttackRules::solve` add up each attacker's best free attack. A cap on how many creatures may attack one player,
+planeswalker or battle (CR 508.1c, `CardDef::attack_limits`: Tomik, Orzhov Lawmage's and The Eternal Wanderer's "No more
+than one creature can attack this planeswalker each combat", Judoon Enforcers', Mirri, Weatherlight Duelist's while
+tapped) is a restriction on the declaration as a whole, so it makes `solve` the search blocks' is: the most is an exact
+assignment of each creature's attack, best first, cut by what the creatures still to come could obey, and a creature that
+must attack a capped target is not displaced by one that need not. `AttackRules::limits` carries each target's cap (the
+smallest where two apply), `judge` refuses a declaration over one (508.1c) and the most it is measured against counts them,
+and `addable` asks for each attack whether some declaration extending the declaration with it still reaches that most. The
+board is searched for these only as attackers are declared. The
 benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
 
 Optional costs to attack (CR 508.1g) are a static ability of the attacker and the "when you do" ability linked to it (CR

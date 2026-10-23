@@ -14,6 +14,8 @@ mod token_faces_tests;
 #[cfg(test)]
 mod attack_effect_tests;
 #[cfg(test)]
+mod attack_limit_tests;
+#[cfg(test)]
 mod attack_option_tests;
 #[cfg(test)]
 mod attacking_tokens_tests;

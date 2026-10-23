@@ -2158,8 +2158,16 @@ pub type AttackCostRule = fn(&dyn Query, &Asker, ObjectId, Target) -> Option<Man
 /// planeswalker and battle a creature could attack; `None` when this ability limits none, else the most that may attack
 /// it, the smallest where several abilities limit the same target. It caps the declaration alone: an effect can still put
 /// another creature onto the battlefield attacking that target, or change what an already-attacking creature attacks (the
-/// ruling on Tomik, Orzhov Lawmage; CR 508.1d's example "No more than one creature can attack each turn"). "No more than
-/// one creature can attack this planeswalker each combat" (Tomik, Orzhov Lawmage).
+/// ruling on Tomik, Orzhov Lawmage; CR 508.1d's example "No more than one creature can attack each turn").
+///
+/// What the target itself is, and what it has, is the rule's to check, not the core's: the core reads a rule only while
+/// its source has its abilities. A cap an ability gives the target - Tomik, Orzhov Lawmage's "Planeswalkers you control
+/// have 'No more than one creature can attack this planeswalker each combat.'" - must ask the target whether it has lost
+/// all its abilities (`q.lost_all_abilities(target)` for a `Target::Object`), since a planeswalker that has none has no
+/// such ability (CR 613.1f), and any condition on the source is the rule's too, as Mirri, Weatherlight Duelist's is on
+/// her being tapped. The same cap printed on the permanent it protects (The Eternal Wanderer) needs neither.
+/// Printed: The Eternal Wanderer and Tomik's granted form (a planeswalker); Judoon Enforcers and, while tapped, Mirri,
+/// Weatherlight Duelist (the source's controller).
 pub type AttackLimitRule = fn(&dyn Query, &Asker, Target) -> Option<u32>;
 
 /// What a [`TargetingRule`] changes about targeting.
@@ -2879,7 +2887,9 @@ pub struct CardDef {
     /// Its static abilities that make attacking cost something (CR 508.1d, 508.1h), while it is on the battlefield.
     pub attack_costs: &'static [AttackCostRule],
     /// Its static abilities that limit how many creatures may attack a player, planeswalker or battle (CR 508.1c), while
-    /// it is on the battlefield with its abilities.
+    /// it is on the battlefield with its abilities: Judoon Enforcers' and, while she is tapped, Mirri, Weatherlight
+    /// Duelist's "No more than one creature can attack you each combat"; The Eternal Wanderer's and Tomik, Orzhov
+    /// Lawmage's granted "No more than one creature can attack this planeswalker each combat" (`AttackLimitRule`).
     pub attack_limits: &'static [AttackLimitRule],
     /// Its static abilities that let creatures attack as though they didn't have defender (CR 702.3b, 609.4), while it is
     /// on the battlefield with its abilities. Asked only of a creature with defender as attackers are declared.
