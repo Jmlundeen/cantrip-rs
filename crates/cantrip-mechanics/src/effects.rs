@@ -17,6 +17,20 @@ pub fn enters_with_minus_one_counters<const N: i16>(_: &mut dyn Game, entering: 
     Ok(())
 }
 
+/// "Destroy all nonland permanents with mana value `limit` or less" (CR 701.8a): every such permanent on the battlefield,
+/// destroyed at once. The permanents it destroyed, for what the rest of the text does with them. Culling Ritual (2) and
+/// Pest Control (1) print it.
+pub fn destroy_nonland_permanents_with_mana_value_at_most(g: &mut dyn Game, limit: u32) -> Vec<ObjectId> {
+    let doomed: Vec<ObjectId> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| !g.chars(id).is(CardType::Land) && g.mana_value(id) <= limit)
+        .collect();
+    g.destroy_all(&doomed)
+}
+
 /// "Creatures you control get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): the creatures `item`'s controller
 /// controls as it resolves, and no creature that enters later. The creatures, for what the rest of the sentence does to them
 /// ("and gain haste", "untap those creatures"). Assault Formation, Eagles of the North, Fatehold Charm, Haze of Rage, Jeskai
