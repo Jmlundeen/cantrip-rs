@@ -66,6 +66,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-122](#ki-122-a-declaration-taken-back-for-an-enlisted-creature-tapped-for-mana-says-nothing) | A declaration taken back for an enlisted creature tapped for mana says nothing | Pri-2 | Open |
 | [KI-123](#ki-123-the-ai-crates-knowledge-misjudges-what-a-seat-saw-across-the-control-of-a-player) | The AI crate's knowledge misjudges what a seat saw across the control of a player | Pri-2 | Open |
 | [KI-124](#ki-124-what-a-land-could-produce-is-judged-for-at-most-256-answers-to-its-mana-abilitys-questions) | What a land could produce is judged for at most 256 answers to its mana ability's questions | Pri-3 | Won't fix: beyond practical scale |
+| [KI-125](#ki-125-a-mana-abilitys-row-can-show-what-its-ability-lists-or-the-best-of-several-outcomes-under-replacement-effects-on-its-mana) | A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana | Pri-2 | Open |
 
 ## Issues
 
@@ -370,3 +371,25 @@ is Cascading Cataracts, five mana in any combination of colors, 126 runs; a filt
 mana in any combination of five colors (330) on one land's ability, or two such questions on one, is what would reach it.
 
 **Scenarios.** None: no printed card reaches it.
+
+### KI-125: A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host, client | 2026-10-22, building replacement effects on a tap for mana (CR 106.12b) |
+
+**Notes.** The host's row for a mana ability (`prompt.rs`, `row_yield` over `replaced_mana_yields`) says what a tap would
+produce once the replacement effects on its mana apply, where its `produces` and `produces_of_any_one_color` can say it:
+fixed mana, and N of the color the activation names. Two cases they can't:
+- the color named changes nothing the ability adds (Contamination's or Infernal Darkness's {B} for an any-color land): the
+  activation must still name a color, and the client names one only while `ProducesOfAnyOneColor > 0`, so the row keeps
+  what the ability lists ("1 of W/U/B/R/G");
+- the order the player chooses the effects in gives different mana (Damping Sphere and Mana Reflection on Ancient Tomb:
+  {C}{C} or {C}): the row shows the outcome with the most mana.
+
+The engine is exact in both: the mana produced, the order asked (CR 616.1) and what the player has to pay with
+(`available_without`) all go through the same effects. Only what the row says, and the client's auto-tapping hints that
+read it (`AutoMana`, `AutoPlay`, the tactical bot), can be off. A fix is a protocol field for "the activation names a
+color" apart from how much of it the ability adds, or the outcomes listed per color.
+
+**Scenarios.** None: display. `prompt::row_yield_tests` shows which rows fall back.
