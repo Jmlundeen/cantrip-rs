@@ -181,7 +181,8 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
 7. **Coverage:** `python tools/maintenance/card-coverage.py "Card Name"` reports every line of the card's file
    executed (from a bash shell call it so, not through `tools\card-coverage.cmd`, whose quoting `cmd //c` breaks; a
    file of statics alone has no lines to measure). A line no scenario can reach is wrong code or a
-   missing scenario, never an exception.
+   missing scenario, never an exception. A lone target's guard is `let Some(x) = targets::object(..) else { return Ok(()) };`:
+   wrapped in `if let`, its closing brace is a line no scenario runs, since a spell whose only target is illegal never resolves.
 8. **The client.** Everything the card puts into the game must be shown, every question it asks captioned truly, and
    every action it offers clickable with its cost. A card that only uses prompts, actions and state the client already
    has needs no client change and no browser test. One that adds a prompt, an action, a cost display or a piece of
