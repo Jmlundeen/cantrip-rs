@@ -2429,9 +2429,6 @@ pub struct CardDef {
     /// A permanent of this card whose controller sacrifices it at the beginning of the cleanup step when this says so (CR 514.1, 603.7):
     /// Necromancy's \"if you cast it any time a sorcery couldn't have been cast\".
     pub sacrifice_at_cleanup: Option<fn(&dyn Query, ObjectId) -> bool>,
-    /// A token definition that other token definitions share a name with (three Golems that differ in a keyword): the
-    /// card table keeps such definitions apart instead of merging definitions of one name.
-    pub shares_name: bool,
     /// Splice onto Arcane (CR 702.47): the cost paid to add this card's spell effect to an Arcane spell as it is cast. The
     /// spell ability it adds must have no targets.
     pub splice: Option<ManaCost>,
@@ -2652,7 +2649,6 @@ impl CardDef {
         start_your_engines: false,
         face_down: false,
         sacrifice_at_cleanup: None,
-        shares_name: false,
         splice: None,
         dungeon: &[],
         cast_rules: &[],
@@ -3364,12 +3360,18 @@ impl CardTable {
     }
 
     /// The first card of a name, in the order the registry gave (a card's own definition before the Aura face it has while
-    /// bestowed, which shares its name).
+    /// bestowed, which shares its name). A card's definition (`CardDef::oracle`, a dungeon) comes before a token's that
+    /// has its name (Ajani Resolute's token named Ajani's Pridemate): a name finds a token only where no card has it.
     pub fn find(&self, name: &str) -> Option<CardId> {
+        let is_card = |card: &CardDef| card.oracle || !card.dungeon.is_empty();
         let first = self.cards.partition_point(|card| card.name < name);
-        (self.cards.get(first).is_some_and(|card| card.name == name).then_some(first))
-            .or_else(|| self.cards.iter().position(|card| card.name.eq_ignore_ascii_case(name)))
-            .map(|i| CardId(i as u16))
+        let same = self.cards[first..].iter().take_while(|card| card.name == name).count();
+        let exact = (same > 0).then(|| (first..first + same).find(|&i| is_card(self.cards[i])).unwrap_or(first));
+        let any_case = || {
+            let named = |card: &&&CardDef| card.name.eq_ignore_ascii_case(name);
+            self.cards.iter().position(|card| named(&card) && is_card(card)).or_else(|| self.cards.iter().position(|card| named(&card)))
+        };
+        exact.or_else(any_case).map(|i| CardId(i as u16))
     }
 
     /// What `ability`'s trigger condition says that its event can't show (`read_zone_words`).

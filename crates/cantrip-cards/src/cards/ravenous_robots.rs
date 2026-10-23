@@ -8,7 +8,6 @@ pub static ROBOT: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
     power: Some(1),
     toughness: Some(1),
-    shares_name: true,
     ..token!(Robot)
 };
 

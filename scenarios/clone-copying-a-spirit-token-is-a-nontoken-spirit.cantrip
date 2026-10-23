@@ -1,6 +1,6 @@
 # A token's copiable values are the characteristics the effect that made it defined (CR 111.4, 707.2; the card's ruling),
 # and being a token is not one of them. On turn 1 Bot1 casts Lingering Souls for two 1/1 white Spirit creature tokens
-# with flying, then Clone, copying the first: the Clone is a Spirit named Spirit, a white 1/1 Creature - Spirit with
+# with flying, then Clone, copying the first: the Clone is a Spirit named Spirit Token (the name is copied, CR 111.4), a white 1/1 Creature - Spirit with
 # flying and no mana cost, and a card, not a token.
 
 [Bot1 Deck]

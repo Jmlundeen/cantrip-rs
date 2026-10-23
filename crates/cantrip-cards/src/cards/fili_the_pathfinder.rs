@@ -8,7 +8,6 @@ pub static DWARF: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(2),
     toughness: Some(2),
-    shares_name: true,
     ..token!(Dwarf)
 };
 

@@ -204,16 +204,16 @@ public static partial class CardFace
 
     /// <summary>
     /// The names a card's face shows art for: each half's on a split card, which is drawn as its halves, and otherwise its
-    /// own. A token named for its subtypes (CR 111.4: "Spirit Token", "Treasure Token") is drawn with its subtypes' art,
-    /// which is named without the "Token" (spirit.jpg, treasure.jpg).
+    /// own. A name of a token named for its subtypes (CR 111.4: "Spirit Token", "Treasure Token") is drawn with its subtypes'
+    /// art, which is named without the "Token" (spirit.jpg, treasure.jpg); so is anything with that name, a token or not (a
+    /// Clone copying a Spirit Token is a nontoken "Spirit Token", CR 707.2). No card's name ends in "Token".
     /// </summary>
     public static IEnumerable<string> ArtNames(ObjectView card) =>
-        card.Halves.Count > 0 ? card.Halves.Select(half => half.Name) : [TokenArtName(card)];
+        card.Halves.Count > 0 ? card.Halves.Select(half => half.Name) : [ArtName(card.Name)];
 
-    private static string TokenArtName(ObjectView card) =>
-        card.Kind == ObjectKindView.Token && card.Name.EndsWith(" Token", StringComparison.Ordinal) && card.Name.Length > " Token".Length
-            ? card.Name[..^" Token".Length]
-            : card.Name;
+    /// <summary>The name whose art a face named <paramref name="name"/> is drawn with: a token's subtypes without "Token".</summary>
+    public static string ArtName(string name) =>
+        name.EndsWith(" Token", StringComparison.Ordinal) && name.Length > " Token".Length ? name[..^" Token".Length] : name;
 
     /// <summary>
     /// The art a card's face is drawn with, as one key: its slug, or a split card's halves' slugs together
@@ -570,10 +570,10 @@ public static partial class CardFace
         // on a close look: their art is asked for with this face's, so that look does not open on them without.
         foreach (ObjectView other in card.AlsoPrinted())
         {
-            _ = CardArt.Fetch(other.Name, ArtPixels(other, width, pixelScale));
+            _ = CardArt.Fetch(ArtName(other.Name), ArtPixels(other, width, pixelScale));
         }
 
-        if (CardArt.Get(card.Name, ArtPixels(card, width, pixelScale)) is { } bitmap)
+        if (CardArt.Get(ArtName(card.Name), ArtPixels(card, width, pixelScale)) is { } bitmap)
         {
             // A few legacy assets are scans of a whole card: recover the printed art aperture first. Only for a wide art
             // box, since a tall one - a Saga's - is made for tall art.
@@ -1302,7 +1302,7 @@ public static partial class CardFace
     /// </summary>
     private static void DrawArtist(SKCanvas canvas, ObjectView card, Layout layout, SKColor ink, SKColor shadow)
     {
-        if (CardArt.Artist(card.Name) is not { Length: > 0 } artist)
+        if (CardArt.Artist(ArtName(card.Name)) is not { Length: > 0 } artist)
         {
             return;
         }

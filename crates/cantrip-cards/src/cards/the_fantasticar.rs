@@ -14,7 +14,6 @@ pub static CONSTRUCT: CardDef = CardDef {
     power: Some(4),
     toughness: Some(4),
     keywords: Keywords::of(&[Keyword::Flying, Keyword::Haste]),
-    shares_name: true,
     text: "Flying, haste",
     ..token!(Construct)
 };

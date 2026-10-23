@@ -83,6 +83,10 @@ pub fn deal_on(
     let id = |name: &String| -> Result<CardId, String> {
         // Either face of a double-faced card names it (CR 711.1); a deck holds the front.
         let id = table.find(name).ok_or_else(|| format!("no card is named \"{name}\""))?;
+        // A deck holds cards, never a token or an emblem, whose name is no card's (CR 201.4, 111.4: "Spirit Token").
+        if !table.card_named[id.0 as usize] {
+            return Err(format!("no card is named \"{name}\" (a token's or an emblem's name is no card's)"));
+        }
         Ok(table.fronts[id.0 as usize].unwrap_or(id))
     };
     let ids = |names: &[String]| -> Result<Vec<CardId>, String> { names.iter().map(id).collect() };

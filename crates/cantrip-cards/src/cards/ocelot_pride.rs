@@ -10,7 +10,6 @@ pub static CAT: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(1),
     toughness: Some(1),
-    shares_name: true,
     ..token!(Cat)
 };
 

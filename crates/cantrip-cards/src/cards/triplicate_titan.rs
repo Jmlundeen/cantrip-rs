@@ -8,7 +8,6 @@ const fn golem(keyword: Keyword, text: &'static str) -> CardDef {
         toughness: Some(3),
         keywords: Keywords::of(&[keyword]),
         text,
-        shares_name: true,
         ..token!(Golem)
     }
 }
