@@ -1,0 +1,60 @@
+# "When this Vehicle enters, destroy target nonland permanent an opponent controls with mana value 4 or less": Bot2's
+# Bog Wraith (mana value exactly 4) is destroyed, the positive control, while it and Bot2's Mox Sapphire (mana value 0) are both legal, so the choice is asked, and Bot2's Swamp (a land) and Bot1's own Mox
+# Jet are refused as targets. The cast costs exactly {2}{B}{B}{G}{G}: Swamp, Jet, Emerald and the Lotus's three green
+# are six mana and the pool is empty right after the cast (CR 202.1, 601.2h); a Swamp is left untapped.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Black Lotus
+Thundering Broodwagon
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Bog Wraith
+Mox Sapphire
+Swamp x3
+Swamp x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Bog Wraith.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Thundering Broodwagon.Cast
+? Bot1.Mana = 
+Bot1.Pass
+! Bot1.Target(Bot2.Battlefield.Swamp)
+! Bot1.Target(Mox Jet)
+Bot1.Target(Bog Wraith)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Bog Wraith; Black Lotus
+Bot2.Battlefield.Mox Sapphire.Types = Artifact
+Bot1.Battlefield.Thundering Broodwagon.Keywords = Menace; Reach
+Bot1.Battlefield.Swamp#2.Tapped = False
+Bot2.Battlefield.Swamp.Tapped = True

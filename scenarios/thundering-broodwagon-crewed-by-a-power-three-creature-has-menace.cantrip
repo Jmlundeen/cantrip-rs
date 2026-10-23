@@ -1,0 +1,60 @@
+# Crew 3 (CR 702.122): Sureshot Sower (power 3) taps to crew the Broodwagon, which attacks as a 6/5 with menace (CR 702.111b)
+# and reach. Bot2's lone Eyetwitch may not block it (the refusal), and the two together may (the positive control); the
+# Broodwagon kills both and survives with 2 damage.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Black Lotus
+Thundering Broodwagon
+Sureshot Sower
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Swamp
+Mox Pearl
+Eyetwitch
+Healer's Hawk
+Swamp x3
+Swamp x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Thundering Broodwagon.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Eyetwitch.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sureshot Sower.Cast
+Bot1.Pass
+Bot1.Battlefield.Thundering Broodwagon.Activate(Ability: Crew 3)
+Bot1.Attack(Thundering Broodwagon > Bot2)
+! Bot2.Block(Eyetwitch > Thundering Broodwagon)
+Bot2.Block(Eyetwitch > Thundering Broodwagon; Healer's Hawk > Thundering Broodwagon)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Swamp
+Bot1.Battlefield.Thundering Broodwagon.Damage = 2
+Bot1.Battlefield.Thundering Broodwagon.Keywords = Menace; Reach
+Bot1.Battlefield.Sureshot Sower.Tapped = True

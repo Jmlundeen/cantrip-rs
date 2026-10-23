@@ -1,0 +1,27 @@
+# Cycling {2} (CR 702.29): two Swamps pay exactly, the pool is empty right after the activation, the Broodwagon is
+# discarded and a card is drawn (no enters trigger: it never reached the battlefield).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Thundering Broodwagon
+Swamp x4
+Mountain
+Swamp x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Thundering Broodwagon.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Thundering Broodwagon
+Bot1.Hand.Count = 6

@@ -1,0 +1,12 @@
+{
+  "name": "Thundering Broodwagon",
+  "manaCost": "{2}{B}{B}{G}{G}",
+  "type": "Artifact — Vehicle",
+  "power": 6,
+  "toughness": 5,
+  "oracleText": "Reach, menace\nWhen this Vehicle enters, destroy target nonland permanent an opponent controls with mana value 4 or less.\nCrew 3\nCycling {2} ({2}, Discard this card: Draw a card.)",
+  "keywords": [
+    "Reach",
+    "Menace"
+  ]
+}

@@ -1,0 +1,59 @@
+# The limit "mana value 4 or less" is exact: Bot2's Yargle, Glutton of Urborg (mana value 5) is refused as the target while
+# Bot2's Mox Sapphire (mana value 0) is legal, the positive control, and is the one destroyed. Yargle stays on the
+# battlefield (CR 202.3, 115.1).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Black Lotus
+Thundering Broodwagon
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Yargle, Glutton of Urborg
+Mox Sapphire
+Swamp x2
+Swamp x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Yargle, Glutton of Urborg.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Thundering Broodwagon.Cast
+Bot1.Pass
+! Bot1.Target(Yargle, Glutton of Urborg)
+! Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Target(Mox Sapphire)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield.Yargle, Glutton of Urborg.Types = Creature
+Bot2.Graveyard = Mox Sapphire; Black Lotus
+Bot1.Battlefield.Mox Jet.Types = Artifact

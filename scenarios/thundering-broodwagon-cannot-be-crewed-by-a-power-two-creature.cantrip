@@ -1,0 +1,39 @@
+# Crew 3 (CR 702.122): a lone Woodland Changeling (power 2) cannot crew the Broodwagon, so the activation is refused. Its control,
+# Sureshot Sower with power exactly 3, crews it in thundering-broodwagon-crewed-by-a-power-three-creature-has-menace.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Black Lotus
+Thundering Broodwagon
+Woodland Changeling
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Thundering Broodwagon.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+! Bot1.Battlefield.Thundering Broodwagon.Activate(Ability: Crew 3)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Woodland Changeling.Tapped = False
+Bot1.Battlefield.Thundering Broodwagon.Types = Artifact
