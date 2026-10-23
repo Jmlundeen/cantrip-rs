@@ -1,0 +1,56 @@
+# An Aura with "enchant player" put onto the battlefield without being cast enchants a player its controller chooses as it
+# enters (CR 303.4f: "a legal object or player"), without targeting. Bot1 casts Curse of Opulence on Bot2 on turn 1 and Bot2
+# Disenchants it on turn 2. At the beginning of Bot1's end step on turn 3, Yuna returns it from the graveyard; Bot1 may have it
+# enchant either player (! Bot1's own Forest is no player, and not offered) and chooses Bot2.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Pearl
+Curse of Opulence
+Sol Ring
+Black Lotus
+Yuna, Hope of Spira
+Forest x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Curse of Opulence.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Curse of Opulence)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Yuna, Hope of Spira.Cast
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Target(Bot1.Graveyard.Curse of Opulence)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Forest)
+Bot1.Target(Bot2)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Curse of Opulence.AttachedTo = Bot2
+Bot1.Battlefield.Curse of Opulence.Counters.Finality = 1
+Bot1.Graveyard = Black Lotus

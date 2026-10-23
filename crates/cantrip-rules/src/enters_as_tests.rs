@@ -66,6 +66,48 @@ static LESSON: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A plain creature card: what an effect puts onto the battlefield as an Aura of another card's words.
+static BEAR: CardDef = CardDef {
+    name: "Enters As Bear",
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Bear]),
+    power: Some(2),
+    toughness: Some(2),
+    ..CardDef::BLANK
+};
+
+fn creature_on_the_battlefield(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.is_on_battlefield(id) && q.chars(id).is(CardType::Creature))
+}
+
+/// An Aura that prints "enchant creature" and whose effect makes another card an Aura with "enchant Forest you control".
+static TWO_ENCHANTS: CardDef = CardDef {
+    name: "Enters As Two Enchants",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura]),
+    enchant: Some(target(creature_on_the_battlefield)),
+    becomes_aura_enchant: Some(target(forest_you_control)),
+    abilities: &[triggered(cantrip_api::when(EventMask::ZONE_CHANGE, never), nothing, "When this dies, return a creature card as an Aura.")],
+    ..CardDef::BLANK
+};
+
+/// "Enchant opponent" (CR 303.4, 702.5d): a player, one its controller's opponent.
+fn opponent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Player(p) if p != asker.controller && !q.state().player(p).lost)
+}
+
+/// An Aura Curse with "enchant opponent".
+static CURSE: CardDef = CardDef {
+    name: "Enters As Curse",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura, Subtype::Curse]),
+    enchant: Some(target(opponent)),
+    ..CardDef::BLANK
+};
+
+/// "It's an Aura enchantment" with the enchant ability of the effect's card and no other ability.
+static AS_BARE_AURA: EntersAs = EntersAs { aura: true, ..EntersAs::NONE };
+
 static AS_ENCHANTMENT: EntersAs = EntersAs { types: Some(TypeSet::of(&[CardType::Enchantment])), ..EntersAs::NONE };
 
 static AS_AURA: EntersAs = EntersAs { aura: true, abilities: &[0], ..EntersAs::NONE };
@@ -86,7 +128,7 @@ static WATCHER: CardDef = CardDef {
 };
 
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &FOREST, &TROLL, &WATCHER, &SAGA_TROLL, &LESSON])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &FOREST, &TROLL, &WATCHER, &SAGA_TROLL, &LESSON, &BEAR, &TWO_ENCHANTS, &CURSE])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -245,4 +287,72 @@ fn set_types_leave_a_sorcery_a_sorcery() {
     let chars = cx(&mut g).chars(lesson);
     assert_eq!(chars.types, TypeSet::of(&[CardType::Artifact, CardType::Sorcery]));
     assert_eq!(chars.subtypes, SubtypeSet::of(&[Subtype::Lesson]));
+}
+
+/// A card that prints one enchant ability and gives another keeps them apart (CR 702.5a): the Bear its effect returns as an
+/// Aura has the enchant ability the effect gives, "enchant Forest you control", not the card's own "enchant creature".
+#[test]
+fn a_given_enchant_is_never_the_cards_printed_one() {
+    let mut g = game();
+    let forest = put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
+    put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let source = put(&mut g, &TWO_ENCHANTS, YOU, Zone::graveyard(YOU));
+    let card = put(&mut g, &BEAR, YOU, Zone::graveyard(YOU));
+    let ability = AbilityRef { card: g.cards.id_of(&TWO_ENCHANTS), index: 0 };
+    let item = crate::actions::stack_item(StackKind::Triggered, source, ability, YOU, &[]);
+    let aura = cantrip_api::Game::put_onto_battlefield_as(&mut cx(&mut g), card, YOU, &item, &AS_BARE_AURA).expect("one host").expect("it entered");
+    assert_eq!(g.state.obj(aura).attached_to, Some(forest));
+    let given = AbilityRef::enchant_given(g.cards.id_of(&TWO_ENCHANTS));
+    let abilities: Vec<AbilityRef> = cx(&mut g).chars(aura).abilities().filter(|a| a.is_enchant()).collect();
+    assert_eq!(abilities, vec![given]);
+}
+
+/// An Aura with "enchant player" put onto the battlefield without being cast is attached to a player its enchant ability
+/// allows (CR 303.4f: "a legal object or player"): the Curse enchants the opponent.
+#[test]
+fn an_aura_put_onto_the_battlefield_can_enchant_a_player() {
+    let mut g = game();
+    put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &CURSE, YOU, Zone::graveyard(YOU));
+    let curse = cantrip_api::Game::put_onto_battlefield(&mut cx(&mut g), card, YOU, false).expect("one host");
+    let o = *g.state.obj(curse);
+    assert!(g.state.battlefield().contains(&curse));
+    assert_eq!((o.attached_to, o.attached_player), (None, Some(THEM)));
+    assert!(!crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(true), "attached legally, it stays");
+}
+
+/// An Aura with no enchant ability as it enters - one an effect makes an Aura with none to give - is restricted by none
+/// (CR 702.5a): every object and every player is a legal choice for it, but itself (CR 303.4d) and what enters with it.
+#[test]
+fn an_aura_with_no_enchant_ability_may_enchant_anything() {
+    let mut g = game();
+    let forest = put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
+    let theirs = put(&mut g, &FOREST, THEM, Zone::BATTLEFIELD);
+    let card = put(&mut g, &BEAR, YOU, Zone::graveyard(YOU));
+    let entering = Entering {
+        object: card,
+        controller: YOU,
+        tapped: false,
+        counters: [0; CounterKind::COUNT],
+        copy: None,
+        prepared: false,
+        chosen_color: None,
+        chosen_subtype: None,
+        chosen_player: None,
+        chosen_card: None,
+        chosen_option: None,
+        attach: None,
+        attach_player: None,
+        x: 0,
+        transformed: false,
+        protector: None,
+        instead: None,
+        becomes: Some(Becomes { what: &AS_BARE_AURA, card: g.cards.id_of(&BEAR) }),
+    };
+    let mut c = cx(&mut g);
+    let chars = crate::ops::as_it_would_exist(&mut c, &entering).chars;
+    assert!(chars.has_subtype(Subtype::Aura) && !chars.is(CardType::Creature));
+    assert!(!chars.abilities().any(|a| a.is_enchant()), "Bear gives no enchant ability");
+    let hosts = crate::attach::aura_hosts(&c, card, &chars, YOU, &[card]);
+    assert_eq!(hosts, vec![Target::Object(forest), Target::Object(theirs), Target::Player(YOU), Target::Player(THEM)]);
 }

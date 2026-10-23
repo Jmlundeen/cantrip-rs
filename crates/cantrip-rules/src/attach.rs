@@ -36,9 +36,10 @@ pub fn host_allows(q: &dyn Query, attachment: ObjectId, host: ObjectId, attachin
 /// card's printed one and each an effect gave it (`EffectKind::Enchant`: Necromancy, `EntersAs::aura`). A "loses all
 /// abilities" takes them as it takes any ability (CR 613.1f).
 fn enchants<'a>(q: &'a dyn Query, chars: &'a Chars) -> impl Iterator<Item = TargetSpec> + 'a {
-    chars.abilities().filter(|a| a.is_enchant()).filter_map(move |a| {
-        let def = q.card(a.card);
-        def.enchant.or(def.becomes_aura_enchant)
+    chars.abilities().filter_map(move |a| match a.index {
+        AbilityRef::ENCHANT => q.card(a.card).enchant,
+        AbilityRef::ENCHANT_GIVEN => q.card(a.card).becomes_aura_enchant,
+        _ => None,
     })
 }
 
@@ -64,11 +65,12 @@ pub fn player_allows(cx: &Cx, aura: ObjectId, player: PlayerId) -> bool {
     !ac.is(CardType::Creature) && enchants_allow(q, &ac, &asker, Target::Player(player))
 }
 
-/// What an Aura card about to enter would enchant (CR 303.4f): the battlefield, then the graveyards, as the C#
-/// engine lists them, leaving out itself and everything entering with it. Judged on the Aura as it would exist there
+/// What an Aura card about to enter would enchant (CR 303.4f: "a legal object or player"): the battlefield, then the
+/// graveyards, as the C# engine lists them, leaving out itself and everything entering with it; then the players, in turn
+/// order, still in the game and without protection from its controller (CR 702.16k). Judged on the Aura as it would exist there
 /// (`aura_chars`, CR 614.12) under `controller`: each of its enchant abilities allows it, and it has no protection from the
 /// Aura. An Aura that would be a creature can enchant nothing (CR 303.4d).
-fn aura_hosts(cx: &Cx, aura: ObjectId, aura_chars: &Chars, controller: PlayerId, entering: &[ObjectId]) -> Vec<Target> {
+pub(crate) fn aura_hosts(cx: &Cx, aura: ObjectId, aura_chars: &Chars, controller: PlayerId, entering: &[ObjectId]) -> Vec<Target> {
     if aura_chars.is(CardType::Creature) {
         return Vec::new();
     }
@@ -87,6 +89,13 @@ fn aura_hosts(cx: &Cx, aura: ObjectId, aura_chars: &Chars, controller: PlayerId,
                 continue;
             }
             hosts.push(target);
+        }
+    }
+    for p in state.apnap() {
+        if enchants_allow(cx, aura_chars, &asker, Target::Player(p))
+            && crate::layers::player_protection(cx.cards(), state, &cx.g.log, p, controller).is_none()
+        {
+            hosts.push(Target::Player(p));
         }
     }
     hosts
@@ -144,6 +153,7 @@ pub fn choose_aura_hosts(cx: &mut Cx, moves: &mut Vec<ops::Moving>) -> R<()> {
             }
         };
         e.attach = chosen.object();
+        e.attach_player = chosen.player();
         moves[i].entering = Some(e);
     }
     dropped.sort_unstable();

@@ -1119,7 +1119,8 @@ fn enter_as(cx: &mut Cx, id: ObjectId, b: Becomes) {
     if b.what.loses_other_abilities {
         kinds.push(EffectKind::LoseAllAbilities);
     }
-    if b.what.aura {
+    // The enchant ability its card describes; a card that describes none gives none.
+    if b.what.aura && cx.card(b.card).becomes_aura_enchant.is_some() {
         kinds.push(EffectKind::Enchant(b.card));
     }
     kinds.extend(b.what.abilities.iter().map(|&i| EffectKind::AddAbility(AbilityRef::delayed(b.card, i))));

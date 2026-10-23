@@ -1345,9 +1345,11 @@ impl AbilityRef {
     pub const EXTRA_LOYALTY_ALLOWED: u8 = 123;
     /// A spell itself, in the history's record that it resolved (`Event::Resolved`, CR 608.2): no ability of the card.
     pub const SPELL: u8 = 122;
-    /// An enchant ability (CR 702.5a) an object has, as one of its abilities (CR 613.1f): the card's printed `enchant`, or
-    /// the `becomes_aura_enchant` its effects give (`EffectKind::Enchant`).
+    /// An enchant ability (CR 702.5a) an object has, as one of its abilities (CR 613.1f): the card's printed `enchant`.
     pub const ENCHANT: u8 = 121;
+    /// An enchant ability an effect gave an object (`EffectKind::Enchant`): the `becomes_aura_enchant` of the card whose
+    /// effect it is, never its printed `enchant`.
+    pub const ENCHANT_GIVEN: u8 = 120;
 
     pub fn granted_way(card: CardId, k: usize) -> AbilityRef {
         debug_assert!(k < Self::BAND as usize);
@@ -1415,13 +1417,19 @@ impl AbilityRef {
         self.index == AbilityRef::SPELL
     }
 
-    /// The enchant ability `card` prints or gives (`ENCHANT`).
+    /// The enchant ability `card` prints (`ENCHANT`).
     pub fn enchant(card: CardId) -> AbilityRef {
         AbilityRef { card, index: AbilityRef::ENCHANT }
     }
 
+    /// The enchant ability `card`'s effects give (`ENCHANT_GIVEN`).
+    pub fn enchant_given(card: CardId) -> AbilityRef {
+        AbilityRef { card, index: AbilityRef::ENCHANT_GIVEN }
+    }
+
+    /// An enchant ability, printed or given.
     pub fn is_enchant(self) -> bool {
-        self.index == AbilityRef::ENCHANT
+        self.index == AbilityRef::ENCHANT || self.index == AbilityRef::ENCHANT_GIVEN
     }
 
     pub fn miracle(card: CardId) -> AbilityRef {

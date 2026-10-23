@@ -3270,7 +3270,8 @@ impl CardTable {
 }
 
 /// An enchant ability (CR 702.5a) as one of an object's abilities (`AbilityRef::enchant`): a static ability that restricts
-/// what the Aura can enchant, `CardDef::enchant` or `becomes_aura_enchant` of its card, read where a legal host is judged, and that generates no continuous effect
+/// what the Aura can enchant - its card's `CardDef::enchant` (`AbilityRef::enchant`) or, given, `becomes_aura_enchant`
+/// (`AbilityRef::enchant_given`) - read where a legal host is judged, and that generates no continuous effect
 /// (it applies in no layer). Lost as every ability is (CR 613.1f).
 pub static ENCHANT_ABILITY: AbilityDef = AbilityDef::Static(StaticDef { text: "Enchant", layer: Layer::End, own: true, ..StaticDef::BLANK });
 

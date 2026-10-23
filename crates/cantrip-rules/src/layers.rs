@@ -2661,7 +2661,7 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             // abilities" takes.
             (Layer::Ability, EffectKind::Enchant(card)) => {
                 if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-                    chars.abilities[slot] = Some(AbilityRef::enchant(card));
+                    chars.abilities[slot] = Some(AbilityRef::enchant_given(card));
                 }
             }
             // A gained "this creature attacks each combat if able" (Carnage, Crimson Chaos). Goad and "attacks that player this
