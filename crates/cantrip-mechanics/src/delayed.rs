@@ -133,6 +133,17 @@ pub fn return_subject_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Resu
     Ok(())
 }
 
+/// "Return those cards to the battlefield under their owners' control": the cards the delayed ability carries
+/// (`at_next_end_step_about`) that are still the cards they were and still in exile (CR 603.7c, 400.7: one that left exile is a
+/// new object, a token has ceased to exist, CR 111.7), put onto the battlefield together (CR 101.4), each under its owner's
+/// control (CR 110.2a). Yorion, Sky Nomad and Hide on the Ceiling print it at the next end step.
+pub fn return_exiled_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let cards = crate::library::still_exiled(g, g.event_objects(item));
+    let entering: Vec<(ObjectId, PlayerId)> = cards.into_iter().map(|c| (c, g.obj(c).owner)).collect();
+    g.put_all_onto_battlefield(&entering)?;
+    Ok(())
+}
+
 /// "Return it to your hand": the delayed ability's subject, if it is still the object it was on the battlefield (CR 603.7c,
 /// 400.7); it goes to its owner's hand (CR 400.3), and `return_to_hand` leaves an object that has changed zones alone.
 /// Anzrag's Rampage prints it at the next end step.
