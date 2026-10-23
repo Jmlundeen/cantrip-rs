@@ -1,0 +1,49 @@
+# Prismari Command, modes 2 and 3 split between the players: Bot2 draws two and discards two of its own choice (not Bot1's), while
+# the Treasure is Bot1's own and Bot2 gets none. Four Moxen are tapped first so the pool shows the cost is exactly {1}{U}{R}: the
+# one Mox Emerald mana left over stays (CR 601.2h).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Emerald
+Prismari Command
+Island x3
+Island x14
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Prismari Command.Cast
+Bot1.Modes(2; 3)
+Bot1.Target(Bot2)
+Bot1.Target(Bot1)
+Bot1.Pass
+? Bot1.Mana = {G}
+Bot2.Choose(Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot2.Hand = Lightning Bolt; Counterspell; Island; Island; Island; Island; Island
+Bot2.Graveyard = Island; Island
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Mox Sapphire; Treasure Token
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Prismari Command

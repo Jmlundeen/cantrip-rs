@@ -1,0 +1,47 @@
+# Prismari Command, modes 1 and 4 on turn 3: 2 damage to Bot1 itself (any target includes you), and destroys Bot2 Mox Pearl
+# only; Bot2 other Mox and Bot1 own Moxen are untouched. The damage is exactly 2: 18 life.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Prismari Command
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Prismari Command.Cast
+Bot1.Modes(1; 4)
+Bot1.Target(Bot1)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot2.Battlefield = Mox Emerald
+Bot2.Graveyard = Mox Pearl
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire
+Stack.Count = 0
