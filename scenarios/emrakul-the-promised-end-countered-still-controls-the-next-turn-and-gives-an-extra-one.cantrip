@@ -1,0 +1,74 @@
+# Emrakul, the Promised End is countered on turn 7: its trigger is on the stack above the spell and was put there by casting it, so it still resolves
+# (the ruling: it resolves even if that spell is countered). Bot2's Counterspell (two Islands) counters the spell; Emrakul goes to the graveyard, yet Bot2 is
+# controlled by Bot1 on turn 8 and takes an extra turn 9, then Bot1 plays turn 10.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Ruby
+Tarfire
+Haywire Mite
+Duress
+Black Lotus
+Island
+Island
+Emrakul, the Promised End
+Island x10
+
+[Bot2 Deck]
+Mox Pearl
+Island
+Island
+Counterspell
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Hand.Tarfire.Cast(Bot1.Battlefield.Haywire Mite)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Choose(Mox Pearl)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Emrakul, the Promised End.Cast
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Emrakul, the Promised End)
+[T7 Bot1.Main2]
+? Bot2.NextTurnControlledBy = Bot1+extra
+[T8 Bot2.Main1]
+? Bot2.ControlledBy = Bot1
+[T9 Bot2.Main1]
+? ActivePlayer = Bot2
+? Bot2.ControlledBy = (absent)
+[T10 Bot1.Main1]
+
+[Expect]
+Turn = 10
+Bot1.Graveyard = Emrakul, the Promised End; Black Lotus; Duress; Haywire Mite; Tarfire
+Bot1.Battlefield.Count = 5

@@ -1,0 +1,84 @@
+# Emrakul, the Promised End, resolved on turn 7: "When you cast this spell, you gain control of target opponent during that player's next turn. After that
+# turn, that player takes an extra turn." Bot2 (an instant and a sorcery in hand) is refused a Lightning Bolt on it - protection from instants - yet may
+# Bolt Bot1 (the control, so the refusal is the protection). Bot2's turn 8 is decided by Bot1 (ControlledBy), where Flame Slash, a sorcery, is allowed to
+# target Emrakul and deals 4; the extra turn 9 is Bot2's again, no longer controlled, and Bot1 is next on turn 10.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Ruby
+Tarfire
+Haywire Mite
+Duress
+Black Lotus
+Island
+Island
+Emrakul, the Promised End
+Island x10
+
+[Bot2 Deck]
+Mox Pearl
+Mountain
+Mountain
+Lightning Bolt
+Flame Slash
+Island x3
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Hand.Tarfire.Cast(Bot1.Battlefield.Haywire Mite)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Choose(Mox Pearl)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Emrakul, the Promised End.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.NextTurnControlledBy = Bot1+extra
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Emrakul, the Promised End)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T8 Bot2.Main1]
+? Bot2.ControlledBy = Bot1
+? Bot2.NextTurnControlledBy = (absent)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Flame Slash.Cast(Bot1.Battlefield.Emrakul, the Promised End)
+[T8 Bot2.Main2]
+? Bot1.Battlefield.Emrakul, the Promised End.Damage = 4
+[T9 Bot2.Main1]
+? ActivePlayer = Bot2
+? Bot2.ControlledBy = (absent)
+[T10 Bot1.Main1]
+
+[Expect]
+Turn = 10
+ActivePlayer = Bot1
+Bot1.Life = 19
+Bot1.Battlefield.Emrakul, the Promised End.Keywords = Flying; Trample

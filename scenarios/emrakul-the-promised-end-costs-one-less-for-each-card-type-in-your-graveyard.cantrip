@@ -1,0 +1,87 @@
+# Emrakul, the Promised End: "This spell costs {1} less to cast for each card type among cards in your graveyard." Four cards reach Bot1's
+# graveyard on turn 1: Tarfire (Kindred Instant), Haywire Mite (Artifact Creature) killed by it, Duress (Sorcery), and on turn 7 the sacrificed Black
+# Lotus (Artifact again). That is five types - kindred, instant, artifact, creature, sorcery - from four cards (a card of two types counts both,
+# a type twice counts once; the Lotus adds nothing): {13} less five is {8}. Bot2's graveyard holds an enchantment (Duress takes its Rancor), a type
+# Bot1's lacks, and it does not count ("your graveyard"). Bot1 taps exactly eight mana (Mountain, two Islands, Mox Jet, Mox Pearl, Black Lotus
+# {R}{R}{R}) and the pool is empty after the cast, so the discount is neither six nor four. The Emrakul that resolves has flying and trample.
+# On turn 10 Deconstruction Hammer equipped to it gives "{3}, {T}, Sacrifice ...": an ability of Emrakul, not a spell, so the five types in the
+# graveyard (the Hammer adds none) discount it by nothing and it costs exactly {3}: the pool is empty after paying three.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Pearl
+Tarfire
+Haywire Mite
+Duress
+Black Lotus
+Island
+Island
+Emrakul, the Promised End
+Deconstruction Hammer
+Island x10
+
+[Bot2 Deck]
+Rancor
+Sol Ring
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Tarfire.Cast(Bot1.Battlefield.Haywire Mite)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Choose(Rancor)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Emrakul, the Promised End.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[T10 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Bot1.Battlefield.Emrakul, the Promised End)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Emrakul, the Promised End.Activate(Bot2.Battlefield.Sol Ring)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Deconstruction Hammer; Black Lotus; Duress; Haywire Mite; Tarfire
+Bot1.Battlefield.Emrakul, the Promised End.Keywords = Flying; Trample
+Bot1.Battlefield.Emrakul, the Promised End.Power = 13
+Bot1.Battlefield.Emrakul, the Promised End.Tapped = true
+Bot2.Battlefield.Count = 1
