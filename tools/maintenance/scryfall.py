@@ -2,6 +2,9 @@
 its official rulings, by name.
 
     python tools/maintenance/scryfall.py "Card Name"     # each face's cost, type line, stats and Oracle text; rulings
+    python tools/maintenance/scryfall.py --text "regex"  # every printed card whose Oracle text matches (any face,
+                                                         # case-insensitive), with the matching line: whether a
+                                                         # wording is printed on a second card, implemented or not
 
     import scryfall
     scryfall.card("Card Name")   # {"name", "layout", "faces": [{"name", "mana_cost", "type_line", "power", "toughness",
@@ -145,10 +148,35 @@ def card(name):
     return _load().get(name.lower())
 
 
+def search_text(pattern):
+    """(name, matching line) for every printed card (paper, not playtest, Alchemy or un-set) whose Oracle text matches
+    the case-insensitive regex, on any face; each card once, sorted by name."""
+    import re
+    rx = re.compile(pattern, re.IGNORECASE)
+    hits = {}
+    for d in oracle_cards():
+        if d.get("set_type") in ("funny", "playtest", "memorabilia", "alchemy") or d["name"] in hits:
+            continue
+        for f in d.get("card_faces") or [d]:
+            line = next((l for l in f.get("oracle_text", "").split("\n") if rx.search(l)), None)
+            if line is not None:
+                hits[d["name"]] = line
+                break
+    return sorted(hits.items())
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     if len(sys.argv) < 2:
         sys.exit(__doc__)
+    if sys.argv[1] == "--text":
+        if len(sys.argv) < 3:
+            sys.exit("--text needs a regex")
+        hits = search_text(sys.argv[2])
+        for name, line in hits:
+            print(f"{name}: {line}")
+        print(f"{len(hits)} printed card{'' if len(hits) == 1 else 's'}")
+        return
     found = card(sys.argv[1])
     if found is None:
         sys.exit(f"no card named {sys.argv[1]!r} on Scryfall")

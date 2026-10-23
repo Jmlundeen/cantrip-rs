@@ -151,7 +151,10 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    different code). Search by hand only for lines marked `new`: `crates/cantrip-api/src/game.rs` (the verbs) and
    `crates/cantrip-mechanics/src` (the keyword modules, `targets`, `triggers`, `library`, `lands`, `effects`,
    `tokens`, `delayed`, `copy`, `hand`, `chosen_type`, `history`, `combat`, `replacements`), starting from the nearest
-   abilities listed. `ability-index.py --text "..."` looks up any text. Most cards need nothing new.
+   abilities listed. `ability-index.py --text "..."` looks up any text. Most cards need nothing new. Whether a
+   wording is printed on a second card - the test for sharing it - is asked of the whole printed pool, not only the
+   cards implemented: `python tools/maintenance/scryfall.py --text "regex"` lists every printed card whose Oracle text
+   matches.
 4. **Write the card.** Behaviour by struct update over the generated constant (`CardDef { spell: Some(..),
    ..oracle::LIGHTNING_BOLT }`). Ask questions with `g.ask(..)` in the order the rules ask them, offering options in
    the order the engine and the implemented cards do. Doc comments quote the Oracle sentence each function implements
