@@ -116,6 +116,11 @@ def scryfall_report(card, index):
     return "\n".join(lines)
 
 
+# A cost the card's own file declares (an activated ability's, or a keyword's like flashback or cycling): reviews kept
+# finding one a cheaper cost would still pass, because the mana sat in the pool and nothing checked what was left.
+COST_POINT = ("the cost '{m}': paid exactly - the pool checked empty right after paying, so one less fails - and each"
+              " colored symbol pinned (refused with one too few sources of that color, enough in all)")
+
 # The words of Oracle text a scenario most often fails to pin down, each with what pins it. Found by what reviews sent
 # back: an amount no expectation checked, one player's side never shown, a value read after an effect changed it.
 TEST_POINTS = [
@@ -139,6 +144,10 @@ TEST_POINTS = [
     (r"\bunless\b[^.]*\bpays?\b", "'unless ... pays': paid exactly (the effect doesn't happen) and unpayable (it does)"),
     (r"\bcosts? \{[^}]+\}(?:\{[^}]+\})* (?:less|more)\b",
      "the cost change: the pool checked right after the cast, both with and without the condition"),
+    (r"^[^:\"]*\{[^}]+\}[^:\"]*(?=:)", COST_POINT),
+    (r"\bas an additional cost to cast\b[^.]*",
+     "'{m}': the cast refused when it can't be paid, with the mana there to pay the rest (a refusal for want of"
+     " mana proves nothing), beside the allowed cast"),
     (r"\b(?:sacrificed|exiled|destroyed|discarded|that) (?:creature|permanent|card)'s (?:power|toughness|mana value)\b",
      "'{m}': read as it last existed - change it with an effect first and show the result follows"),
     (r"\bcreate (?:two|three|four|five|x|\d+)\b|\bfor each\b", "'{m}': all made / done at once, as one event (never a loop)"),
@@ -156,10 +165,14 @@ def test_points(abilities):
     for i, ab in enumerate(abilities, 1):
         text = re.sub(r"\([^)]*\)", "", ab.text)
         if ab.keyword is not None:
-            line = f"  [{i}] {ab.text}: shown at least once (a keyword's file entry runs no lines)"
-            if line not in seen:
-                seen.add(line)
-                out.append(line)
+            lines = [f"  [{i}] {ab.text}: shown at least once (a keyword's file entry runs no lines)"]
+            cost = re.search(r"\{[^}]+\}(?:\{[^}]+\})*", text)
+            if cost:  # flashback {7}{G}{G}{G}, cycling {2}: the card's file declares the cost, so it is the card's to pin
+                lines.append(f"  [{i}] " + COST_POINT.format(m=cost.group(0)))
+            for line in lines:
+                if line not in seen:
+                    seen.add(line)
+                    out.append(line)
             continue
         before = len(out)
         for pattern, what in TEST_POINTS:
