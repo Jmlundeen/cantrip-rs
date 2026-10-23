@@ -16,3 +16,17 @@ pub fn from_color<const COLOR: u8>(view: &dyn LayerQuery, source: ObjectId, char
 pub const fn from<const COLOR: u8>(text: &'static str) -> StaticDef {
     static_ability(Layer::Ability, itself, from_color::<COLOR>, text)
 }
+
+/// "Protection from [card type]" (CR 702.16a, layer 6) as a static ability's `StaticDef::apply`, `TYPE` a `CardType` as `u8`:
+/// it can't be the target of, enchanted or equipped by, blocked by, or dealt damage by a source of that type (CR 702.16b-e, `Chars::protection_types`). Hexdrinker's level
+/// ability applies it under a condition of its own; Emrakul, the Promised End prints it outright (`from_type`).
+pub fn from_type_apply<const TYPE: u8>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    if let Some(&t) = CardType::ALL.iter().find(|&&t| t as u8 == TYPE) {
+        chars.protection_types = chars.protection_types.with(t);
+    }
+}
+
+/// The permanent's own "protection from [card type]" (CR 702.16a): Emrakul, the Promised End's "protection from instants".
+pub const fn from_type<const TYPE: u8>(text: &'static str) -> StaticDef {
+    static_ability(Layer::Ability, itself, from_type_apply::<TYPE>, text)
+}
