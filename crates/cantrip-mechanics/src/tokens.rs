@@ -113,6 +113,26 @@ pub fn create_tapped_treasure(g: &mut dyn Game, controller: PlayerId) -> Result<
     Ok(())
 }
 
+/// A colorless Powerstone artifact token with "{T}: Add {C}. This mana can't be spent to cast a nonartifact spell."
+/// (CR 111.10h, 106.6). Cityscape Leveler makes it.
+pub static POWERSTONE: CardDef = CardDef {
+    name: "Powerstone Token",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Artifact]),
+    subtypes: SubtypeSet::of(&[Subtype::Powerstone]),
+    abilities: &[mana_ability(TAP, add_n(Mana::C, 1).only_for(ManaRestriction::NotNonartifactSpells), "{T}: Add {C}. This mana can't be spent to cast a nonartifact spell.")],
+    text: "{T}: Add {C}. This mana can't be spent to cast a nonartifact spell.",
+    ..CardDef::BLANK
+};
+
+/// Creates a tapped Powerstone token (CR 111.10h) under `controller`: "creates a tapped Powerstone token" as the Brothers'
+/// War cards print it (the token itself is not defined as entering tapped).
+pub fn create_tapped_powerstone(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
+    let powerstone = g.card_id(&POWERSTONE);
+    g.create_tokens(powerstone, controller, 1, true)?;
+    Ok(())
+}
+
 fn any_card(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
     true
 }
