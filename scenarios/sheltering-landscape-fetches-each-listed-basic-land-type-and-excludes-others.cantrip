@@ -1,0 +1,36 @@
+# Sheltering Landscape: each of the three listed basic land types is legal. Reject Island, reject Tundra because it is nonbasic, then find Mountain, Forest and Plains; each search puts its land onto the battlefield tapped (CR 205.4a, 305.6, 701.23).
+
+[Bot1 Deck]
+Sheltering Landscape x3
+Plains x8
+Forest x8
+Island x8
+Mountain x8
+Swamp x8
+Tundra x2
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sheltering Landscape.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Sheltering Landscape.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Sheltering Landscape.Play
+Bot1.Battlefield.Sheltering Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Island)
+Bot1.Search(Mountain)
+Bot1.Battlefield.Sheltering Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Tundra)
+Bot1.Search(Forest)
+Bot1.Battlefield.Sheltering Landscape.Activate(Ability: {T}, Sacrifice this land)
+Bot1.Search(Plains)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Sheltering Landscape; Sheltering Landscape; Sheltering Landscape
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Plains.Tapped = true
