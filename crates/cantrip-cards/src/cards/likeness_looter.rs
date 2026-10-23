@@ -3,16 +3,15 @@ use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "Target creature card in your graveyard with mana value X" (CR 107.3a, 202.3). X is announced before the target is
-/// chosen (CR 601.2b-c by way of 602.2b: `targets_after_x`) and the activation is on the stack by then (CR 602.2a), so the
-/// X is that of this source's copy ability topmost on the stack: the one being announced, or the one resolving when its
-/// target is judged again (CR 608.2b). Before any is announced every creature card there is allowed, since some X would
-/// allow it. A card with {X} in its mana cost has X of 0 there (the ruling, CR 107.3).
+/// chosen (CR 601.2b-c by way of 602.2b: `targets_after_x`), each activation's own (CR 107.3k), and judged again as it
+/// resolves (CR 608.2b). Before it is announced every creature card there is allowed, since some X would allow it. A card
+/// with {X} in its mana cost has X of 0 there (the ruling, CR 107.3).
 fn creature_card_with_mana_value_x(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Target::Object(card) = t else { return false };
     if !targets::card_in_your_graveyard(q, asker, t, &[CardType::Creature]) {
         return false;
     }
-    targets::announced_x(q, asker.source).is_none_or(|x| q.mana_value(card) == x)
+    targets::mana_value_is_x(q, card)
 }
 
 /// "{X}: This creature becomes a copy of target creature card in your graveyard with mana value X, except it has flying

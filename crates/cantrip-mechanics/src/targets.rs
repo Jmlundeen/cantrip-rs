@@ -225,18 +225,15 @@ pub fn controlled_by_slot_opponent(q: &dyn Query, id: ObjectId) -> bool {
     permanent(q, id) && Some(q.controller(id)) == q.slot_opponent()
 }
 
-/// The X of the topmost activated ability of `source` on the stack that announces X before its targets (`targets_after_x`;
-/// CR 107.3a, 602.2b): the one being announced, or the topmost when a target is judged, which is not the item judged when
-/// two such activations with different X are on the stack (CR 107.3k) - the core's `Asker` does not yet carry the judged
-/// item's X. `None` when none is on the stack, when a filter is asked what some X would allow. Likeness Looter and The
-/// Mycosynth Gardens target "with mana value X" through it.
-pub fn announced_x(q: &dyn Query, source: ObjectId) -> Option<u32> {
-    q.state()
-        .stack
-        .iter()
-        .rev()
-        .find(|i| i.kind == StackKind::Activated && i.object == source && q.activated_ability(i.ability).is_some_and(|d| d.late_targets))
-        .map(|item| item.x as u32)
+/// "With mana value X" in a target filter (CR 107.3a, 202.3): `id`'s mana value is the X announced for the spell or ability
+/// whose target is judged (`Query::announced_x`): its own X, as it is announced, as it is judged again on resolution
+/// (CR 608.2b) and as its targets change (CR 115.7), never another activation's of the same source (CR 107.3k). Before X
+/// is announced, when it is only asked whether some announcement could have a legal target, anything is, since some X would
+/// allow it; so the slot is chosen after X (`late_targets`, `targets_after_x`, CR 601.2b-c). An object with {X} in its
+/// mana cost has X of 0 off the stack, which `Query::mana_value` gives. Repeal, Likeness Looter and The Mycosynth Gardens
+/// print it.
+pub fn mana_value_is_x(q: &dyn Query, id: ObjectId) -> bool {
+    q.announced_x().is_none_or(|x| q.mana_value(id) == x)
 }
 
 /// The object a resolving item targeted in `slot`, if the target is still legal (CR 608.2b) and is an object (not a

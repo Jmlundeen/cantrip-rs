@@ -7,11 +7,7 @@ use cantrip_oracle as oracle;
 /// nonland permanent is allowed, since some X would allow it.
 fn nonland_permanent_with_mana_value_x(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Target::Object(id) = t else { return false };
-    if !(targets::NONLAND_PERMANENT.filter)(q, asker, t) {
-        return false;
-    }
-    let spell = q.obj(asker.source);
-    !spell.zone.is(ZoneKind::Stack) || q.mana_value(id) == spell.x as u32
+    (targets::NONLAND_PERMANENT.filter)(q, asker, t) && targets::mana_value_is_x(q, id)
 }
 
 /// Return target nonland permanent with mana value X to its owner's hand. Draw a card.

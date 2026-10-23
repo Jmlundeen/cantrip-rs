@@ -505,7 +505,7 @@ shapes have an example:
   no color to choose is still offered and adds nothing (CR 106.5).
 - **Layers and rules**: `Layer::PtSwitch` / `EffectKind::SwitchPt` (CR 613.4d), `EffectKind::PlayerProtectionFromEverything`
   (CR 702.16j), `CardDef.unpreventable_damage` (CR 615.12), `CardDef.cause_rules` (what an opponent's spells and
-  abilities can't make you discard, sacrifice or search, CR 101.2: `CauseKind`), `Query::event_subject` for a trigger's target filter, and
+  abilities can't make you discard, sacrifice or search, CR 101.2: `CauseKind`), `Query::event_subject` for a trigger's target filter, `Query::announced_x` (`targets::mana_value_is_x`) for a target "with mana value X" of a spell or an activated ability, each its own X (CR 107.3k), and
   miracle (`CardDef.miracle`, CR 702.94), and miracle a permanent gives cards in a hand (`CardDef.granted_miracles`): a card
   with several miracle abilities is revealed with the one its player chooses (`Label::Miracle`), and only that one's linked
   ability triggers, carrying which it was (`Miracle::data`, CR 607.5), so its cost still holds once the permanent has gone

@@ -1741,7 +1741,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
             }
             // A slot sees what the slots before it now target (CR 601.2c: "another target creature").
             let earlier = if item.target_count > 1 { &targets[..run.start] } else { &[][..] };
-            let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, item.subject, slot_player);
+            let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, item.subject, slot_player, crate::resolve::announced_x(&item));
             // "With total mana value X or less" holds of the new targets together (CR 115.7d, 601.2c), X as it was.
             let (candidates, total) = crate::actions::within_total(cx, &spec, u32::from(item.x), candidates);
             if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
@@ -1829,7 +1829,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         }
         let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return Ok(()) };
         let others: Vec<Target> =
-            crate::actions::target_candidates_given(cx, &asker, &spec, &all[..slot], item.subject, slot_player)
+            crate::actions::target_candidates_given(cx, &asker, &spec, &all[..slot], item.subject, slot_player, crate::resolve::announced_x(&item))
                 .into_iter()
                 .filter(|&t| t != all[slot] && fits_total(cx, &item, &all, slot, &spec, t))
                 .collect();
@@ -1902,7 +1902,7 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
     // before it.
     let legal = |cx: &Cx, list: &[Target], slot: usize| -> bool {
         let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return false };
-        crate::actions::target_candidates_given(cx, &asker, &spec, &list[..slot], item.subject, slot_player).contains(&list[slot])
+        crate::actions::target_candidates_given(cx, &asker, &spec, &list[..slot], item.subject, slot_player, crate::resolve::announced_x(&item)).contains(&list[slot])
             && fits_total(cx, &item, list, slot, &spec, list[slot])
     };
     let changeable: Vec<usize> = (0..count)

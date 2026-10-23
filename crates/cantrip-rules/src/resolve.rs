@@ -209,7 +209,13 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     let q = Reader { cards, state, events };
     // A slot of its own sees what the slots before it chose (CR 601.2c).
     let earlier = if item.target_count > 1 { &state.targets(item)[..slot] } else { &[][..] };
-    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false }, &asker, target) && layers::can_target(cards, state, events, &asker, target)
+    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false, x: announced_x(item) }, &asker, target) && layers::can_target(cards, state, events, &asker, target)
+}
+
+/// The X announced for a spell or an activated ability on the stack (CR 107.3a, 601.2b, 602.2b), its own (CR 107.3k): what
+/// its targets are judged with (`Query::announced_x`). A triggered ability announces none.
+pub fn announced_x(item: &StackItem) -> Option<u16> {
+    (item.kind != StackKind::Triggered).then_some(item.x)
 }
 
 /// A `Query` that also says what the earlier target slots chose, for the filter of a later one.
@@ -222,6 +228,8 @@ pub struct Given<'a> {
     pub slot_player: Option<PlayerId>,
     /// The targets are judged as if the spell's gift were promised (`Query::gift_assumed`).
     pub gift: bool,
+    /// The X announced for the spell or ability whose targets these are (`Query::announced_x`, `announced_x`).
+    pub x: Option<u16>,
 }
 
 impl Query for Given<'_> {
@@ -271,6 +279,10 @@ impl Query for Given<'_> {
 
     fn gift_assumed(&self) -> bool {
         self.gift
+    }
+
+    fn announced_x(&self) -> Option<u32> {
+        self.x.map(u32::from)
     }
 
     /// As the game it wraps has it: a spell judged as announced has the X and kicker announced (`actions::Announcing`).

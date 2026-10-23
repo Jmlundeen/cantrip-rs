@@ -514,6 +514,7 @@ fn choose_trigger_targets(
                 if slots.len() > 1 { &targets[start..] } else { &[] },
                 trigger.subject,
                 *slot_player,
+                None,
             );
             // A bound that is the "that many" of a reflexive ability (CR 603.12), or else the number of times the source
             // was kicked, or its X (CR 702.33d, 107.3m).
@@ -656,7 +657,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         if left_the_game(cx, trigger.controller) {
             return Ok(());
         }
-        match crate::actions::ask_divided(cx, trigger.controller, trigger.source, spec, total, false)? {
+        match crate::actions::ask_divided(cx, trigger.controller, trigger.source, spec, total, None, false)? {
             crate::actions::Divided::Chosen(chosen, given) => {
                 targets = chosen;
                 shares = given;

@@ -292,6 +292,16 @@ pub trait Query {
         Target::None
     }
 
+    /// The X announced for the spell or activated ability whose target is being chosen or checked (CR 107.3a, 601.2b,
+    /// 602.2b), for the filter of a target "with mana value X": that spell's or ability's own, as it is announced, as it is
+    /// judged again on resolution (CR 608.2b) and as its targets are changed or chosen anew (CR 115.7), never another
+    /// activation's of the same source (CR 107.3k). `None` outside a target filter, for a triggered ability, and while it
+    /// is only asked whether some announcement could have a legal target, before X is announced: the filter then allows
+    /// what some X would.
+    fn announced_x(&self) -> Option<u32> {
+        None
+    }
+
     /// The cards in exile that were exiled with `by` (CR 607.2a): what its linked abilities refer to. A permanent that
     /// left and came back is a new object (CR 400.7) with none; in exile order.
     fn exiled_with(&self, by: ObjectId) -> Vec<ObjectId> {

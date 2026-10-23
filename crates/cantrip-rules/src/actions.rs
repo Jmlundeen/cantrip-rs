@@ -10,6 +10,7 @@ use cantrip_state::Span;
 
 use crate::layers::{self, live, summoning_sick};
 use crate::{Cx, Flow, R, Stop, counters, ops, static_rules};
+use crate::resolve::announced_x;
 
 pub fn sorcery_timing(cx: &Cx, player: PlayerId) -> bool {
     let s = cx.s();
@@ -1058,17 +1059,19 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOp
 
 /// The candidates for one target slot (CR 601.2c), in a stable order: players in turn order, then objects on the
 /// battlefield, the stack and in graveyards.
+/// No X has been announced (`Query::announced_x`): what some announcement could target.
 pub fn target_candidates(cx: &Cx, asker: &Asker, spec: &TargetSpec) -> Vec<Target> {
-    target_candidates_given(cx, asker, spec, &[], Target::None, None)
+    target_candidates_given(cx, asker, spec, &[], Target::None, None, None)
 }
 
 /// The candidates for a slot of a spell as if its gift were promised (`Query::gift_assumed`), without promising it.
 fn target_candidates_if_promised(cx: &Cx, asker: &Asker, spec: &TargetSpec) -> Vec<Target> {
-    candidates(cx, asker, spec, &[], Target::None, None, true)
+    candidates(cx, asker, spec, &[], Target::None, None, None, true)
 }
 
 /// The candidates for a slot after the slots before it chose `earlier` (CR 601.2c); `slot_player` is the opponent the slot
-/// is for when it is one of a `TargetSpec::EACH_OPPONENT`.
+/// is for when it is one of a `TargetSpec::EACH_OPPONENT`; `x` the X announced for the spell or ability they are for
+/// (`resolve::announced_x`), none before it is.
 pub fn target_candidates_given(
     cx: &Cx,
     asker: &Asker,
@@ -1076,13 +1079,24 @@ pub fn target_candidates_given(
     earlier: &[Target],
     subject: Target,
     slot_player: Option<PlayerId>,
+    x: Option<u16>,
 ) -> Vec<Target> {
-    candidates(cx, asker, spec, earlier, subject, slot_player, false)
+    candidates(cx, asker, spec, earlier, subject, slot_player, x, false)
 }
 
-fn candidates(q: &dyn Query, asker: &Asker, spec: &TargetSpec, earlier: &[Target], subject: Target, slot_player: Option<PlayerId>, gift: bool) -> Vec<Target> {
+#[allow(clippy::too_many_arguments)]
+fn candidates(
+    q: &dyn Query,
+    asker: &Asker,
+    spec: &TargetSpec,
+    earlier: &[Target],
+    subject: Target,
+    slot_player: Option<PlayerId>,
+    x: Option<u16>,
+    gift: bool,
+) -> Vec<Target> {
     let s = q.state();
-    let cx = &crate::resolve::Given { q, earlier, subject, slot_player, gift };
+    let cx = &crate::resolve::Given { q, earlier, subject, slot_player, gift, x };
     let mut out = Vec::new();
     for p in s.seats() {
         let t = Target::Player(p);
@@ -1429,7 +1443,7 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
             return if (self.covered)(targets) { Found::Yes } else { Found::No };
         };
         let earlier: &[Target] = if in_segment > 1 { &targets[start..] } else { &[] };
-        let candidates = candidates(self.q, self.asker, &spec, earlier, Target::None, slot_player, self.gift);
+        let candidates = candidates(self.q, self.asker, &spec, earlier, Target::None, slot_player, None, self.gift);
         let (candidates, total) = within_total(self.cx, &spec, self.counted, candidates);
         let (least, most) = spec.bounds(self.counted);
         if candidates.len() < least as usize || (candidates.is_empty() && spec.required()) {
@@ -6257,7 +6271,7 @@ fn cast(
     let mut targets: Vec<Target> = targets.to_vec();
     let mut of: Vec<u8> = Vec::new();
     if let Some(modal) = def.modal {
-        (targets, of) = choose_slots(cx, player, spell, &mode_specs(modal, mask), counted, item.kicked)?;
+        (targets, of) = choose_slots(cx, player, spell, &mode_specs(modal, mask), counted, item.kicked, announced_x(&item))?;
         set_item_targets(cx, &targets, &of);
     } else if let Some(divide) = def.divide
         && let Some(spec) = specs.first()
@@ -6268,7 +6282,7 @@ fn cast(
             None if divide.total == TargetSpec::COUNTED => u32::from(item.x),
             None => divide.total,
         };
-        match ask_divided(cx, player, spell, spec, total, true)? {
+        match ask_divided(cx, player, spell, spec, total, announced_x(&item), true)? {
             Divided::Chosen(chosen, shares) => {
                 targets = chosen;
                 set_item_targets(cx, &targets, &[]);
@@ -6279,7 +6293,7 @@ fn cast(
             Divided::Impossible => return Err(Stop::Cancel),
         }
     } else if (resolving || !targets_with_cast(cx.cards(), def)) && !specs.is_empty() {
-        (targets, of) = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
+        (targets, of) = choose_slots(cx, player, spell, specs, counted, item.kicked, announced_x(&item))?;
         set_item_targets(cx, &targets, &of);
     }
 
@@ -6295,7 +6309,7 @@ fn cast(
         for spliced in spliced {
             let specs = cx.card(spliced).spell.map_or(&[][..], |s| s.targets);
             if !specs.is_empty() {
-                let (chosen, chosen_of) = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
+                let (chosen, chosen_of) = choose_slots(cx, player, spell, specs, counted, item.kicked, announced_x(&item))?;
                 of.extend(chosen_of.iter().map(|&s| next + s));
                 all.extend(chosen);
             }
@@ -6857,7 +6871,9 @@ pub(crate) fn within_total(cx: &Cx, spec: &TargetSpec, counted: u32, candidates:
 /// chosen for two slots). A slot that chose nothing ("up to") keeps its place with `Target::None` among the slots, so
 /// every target stays at the index of its slot (CR 601.2c, 115.1), as far as the last one that chose. Each target comes
 /// with the index of the spec it was chosen for (`StackItem::spec_of`), so a slot of several targets may stand anywhere.
-fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u32, kicked: u8) -> R<(Vec<Target>, Vec<u8>)> {
+/// `x` is the X announced for the spell or ability (`resolve::announced_x`), which its filters read.
+#[allow(clippy::too_many_arguments)]
+fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u32, kicked: u8, x: Option<u16>) -> R<(Vec<Target>, Vec<u8>)> {
     let asker = Asker { source, controller: player };
     let slots = crate::resolve::expand_specs(cx.s(), player, specs);
     let mut targets = Vec::new();
@@ -6868,7 +6884,7 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
         let before = targets.len();
         'slot: {
             let candidates =
-                target_candidates_given(cx, &asker, spec, if slots.len() > 1 { &targets } else { &[] }, Target::None, *slot_player);
+                target_candidates_given(cx, &asker, spec, if slots.len() > 1 { &targets } else { &[] }, Target::None, *slot_player, x);
             let (candidates, total) = within_total(cx, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
             // Fewer legal targets than the slot's minimum is not a legal announcement (CR 601.2c, 602.2b): given up whole.
@@ -6926,13 +6942,14 @@ pub(crate) enum Divided {
 
 /// Asks for the targets of a slot that divides a total among them, and each target's share (CR 601.2d), in one
 /// question, as the C# engine does: a total of nothing is not asked; with no candidate an optional slot takes no
-/// target. `may_cancel` is for a spell or ability still being announced.
-pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec: &TargetSpec, total: u32, may_cancel: bool) -> R<Divided> {
+/// target. `may_cancel` is for a spell or ability still being announced; `x` is the X announced for it
+/// (`resolve::announced_x`).
+pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec: &TargetSpec, total: u32, x: Option<u16>, may_cancel: bool) -> R<Divided> {
     if total == 0 {
         return Ok(Divided::Skipped);
     }
     let asker = Asker { source, controller: player };
-    let candidates = target_candidates(cx, &asker, spec);
+    let candidates = target_candidates_given(cx, &asker, spec, &[], Target::None, None, x);
     if candidates.is_empty() {
         return Ok(if spec.min == 0 { Divided::Skipped } else { Divided::Impossible });
     }
@@ -7547,13 +7564,13 @@ fn activate(
     let mut targets: Vec<Target> = targets.to_vec();
     if let Some(modal) = def.modal {
         let of;
-        (targets, of) = choose_slots(cx, player, source, &mode_specs(modal, mask), u32::from(item.x), 0)?;
+        (targets, of) = choose_slots(cx, player, source, &mode_specs(modal, mask), u32::from(item.x), 0, announced_x(&item))?;
         set_item_targets(cx, &targets, &of);
     } else if !targets_with_activation(def) && !def.targets.is_empty() {
         // CR 601.2c by way of 602.2b: slots that are not announced with the action are chosen now, after X (a slot
         // counted by X, as Candelabra of Tawnos's "untap X target lands", reads the X just announced).
         let of;
-        (targets, of) = choose_slots(cx, player, source, def.targets, u32::from(item.x), 0)?;
+        (targets, of) = choose_slots(cx, player, source, def.targets, u32::from(item.x), 0, announced_x(&item))?;
         set_item_targets(cx, &targets, &of);
     }
     // CR 601.2f by way of 602.2b: the total cost, with what increases or reduces it, once the targets are announced: a
