@@ -1,0 +1,36 @@
+# Turbulent Fen: "This land enters tapped unless your opponents control eight or more lands." On turn 15 Bot2 has
+# seven Forests and Ornithopter, so it controls eight permanents but only seven lands: land is one of the card types
+# (CR 205.2a), so Fen enters tapped. A count of every permanent would see eight and leave it untapped.
+
+[Bot1 Deck]
+Swamp x7
+Turbulent Fen
+Swamp x12
+
+[Bot2 Deck]
+Forest x7
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Turbulent Fen.Play
+
+[Expect]
+Turn = 15
+Bot1.Battlefield.Turbulent Fen.Tapped = true
+Bot2.Battlefield.Ornithopter.Tapped = false

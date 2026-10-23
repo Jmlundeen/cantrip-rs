@@ -1,0 +1,38 @@
+# "This land enters tapped unless your opponents control eight or more lands" counts every opponent's lands together.
+# Three players: on turn 10 Bot2 and Bot3 have three lands each, six in all, so Bot1's Turbulent Fen enters tapped; on
+# turn 13 they have four each, eight in all, so its Turbulent Moor enters untapped. A count of one opponent's lands
+# (four) or of its controller's own (four) would tap the Moor.
+
+[Bot1 Deck]
+Swamp x3
+Turbulent Fen
+Turbulent Moor
+Swamp x14
+
+[Bot2 Deck]
+Forest x12
+
+[Bot3 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot3.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot3.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot3.Hand.Island.Play
+Bot1.Hand.Turbulent Fen.Play
+? Bot1.Battlefield.Turbulent Fen.Tapped = true
+Bot2.Hand.Forest.Play
+Bot3.Hand.Island.Play
+Bot1.Hand.Turbulent Moor.Play
+? Bot1.Battlefield.Turbulent Moor.Tapped = false
+
+[Expect]
+Turn = 13
+Bot2.Battlefield.Count = 4
+Bot3.Battlefield.Count = 4
