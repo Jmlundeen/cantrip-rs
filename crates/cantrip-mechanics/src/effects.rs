@@ -604,8 +604,16 @@ pub fn change_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
 }
 
 /// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event
-/// for every creature on the battlefield as the effect is carried out (CR 608.2c), dealt simultaneously (CR 120.2, 603.2c).
+/// for every creature on the battlefield as the effect is carried out (CR 608.2c), dealt simultaneously (CR 120.2b, 603.2c).
 pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
+    damage_each_creature_dealt(g, item, n);
+}
+
+/// `damage_each_creature`, answering which creatures were actually dealt damage by it (CR 120.3), for "a creature dealt
+/// damage this way" (Anger of the Gods, Pyroclasm's kin). They are read from the damage events the resolution recorded, so a
+/// creature whose damage was prevented is not among them and one a redirection sent the damage to (CR 614.9, Ancient
+/// Adamantoise) is, once however many times it was dealt damage.
+pub fn damage_each_creature_dealt(g: &mut dyn Game, item: &StackItem, n: u16) -> Vec<ObjectId> {
     let hits: Vec<(ObjectId, Target, u16)> = g
         .state()
         .battlefield()
@@ -614,7 +622,17 @@ pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
         .filter(|&id| g.chars(id).is(CardType::Creature))
         .map(|id| (item.object, Target::Object(id), n))
         .collect();
+    let before = g.history().head() as usize;
     g.damage_together(&hits);
+    let mut dealt: Vec<ObjectId> = Vec::new();
+    for r in &g.history().all()[before..] {
+        if let Event::Damage { source, target: Target::Object(id), amount, .. } = r.event {
+            if source == item.object && amount > 0 && !dealt.contains(&id) && g.chars(id).is(CardType::Creature) {
+                dealt.push(id);
+            }
+        }
+    }
+    dealt
 }
 
 /// "[This] deals `n` damage to that player": the player a trigger fired about (`Fired::about(Target::Player(..))`, its
