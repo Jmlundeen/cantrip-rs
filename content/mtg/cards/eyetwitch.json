@@ -1,0 +1,11 @@
+{
+  "name": "Eyetwitch",
+  "manaCost": "{B}",
+  "type": "Creature — Eye Bat",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\nWhen this creature dies, learn. (You may reveal a Lesson card you own from outside the game and put it into your hand, or discard a card to draw a card.)",
+  "keywords": [
+    "Flying"
+  ]
+}

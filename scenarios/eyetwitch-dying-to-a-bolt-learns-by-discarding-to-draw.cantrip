@@ -1,0 +1,40 @@
+# Bot2's Lightning Bolt kills Bot1's Eyetwitch (1/1, flying). "When this creature dies, learn" (CR 701.48a): Bot1 discards
+# Mountain (the one card that is not an Island) and draws the next card, Forest; because a card was discarded no Lesson may
+# be brought in from outside, so the Lesson stays in the sideboard. Eyetwitch is in its owner's graveyard before the trigger.
+
+[Bot1 Deck]
+Swamp
+Eyetwitch
+Mountain
+Island
+Island
+Island
+Forest
+Island x10
+
+[Bot1 Sideboard]
+Firebending Lesson
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Eyetwitch.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Eyetwitch.Keywords = Flying
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Eyetwitch)
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose(Mountain)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Mountain; Eyetwitch
+Bot1.Hand = Forest; Island; Island; Island; Island
+Bot1.Sideboard = Firebending Lesson
