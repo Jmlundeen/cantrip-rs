@@ -1,0 +1,36 @@
+# Turbulent Fen: "This land enters tapped unless your opponents control eight or more lands." On turn 15 Bot2 has
+# seven lands, so Bot1's Turbulent Fen enters tapped - the seven lands Bot1 itself controls are not the ones counted. On turn
+# 16, with Bot1's eight lands out, Bot2's own Turbulent Fen enters untapped (positive control).
+
+[Bot1 Deck]
+Swamp x7
+Turbulent Fen
+Swamp x12
+
+[Bot2 Deck]
+Forest x7
+Turbulent Fen
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Turbulent Fen.Play
+Bot2.Hand.Turbulent Fen.Play
+
+[Expect]
+Turn = 16
+Bot1.Battlefield.Turbulent Fen.Tapped = true
+Bot2.Battlefield.Turbulent Fen.Tapped = false

@@ -1,0 +1,25 @@
+# Turbulent Fen: "({T}: Add {B} or {G}.)" by its Swamp and Forest land types (CR 305.6): turn 5 it taps for
+# {B}, turn 7 for {G}.
+
+[Bot1 Deck]
+Swamp
+Turbulent Fen
+Swamp x12
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Turbulent Fen.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Turbulent Fen.Activate(Ability: {B})
+? Bot1.Mana = {B}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Turbulent Fen.Activate(Ability: {G})
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Turbulent Fen.Tapped = true
