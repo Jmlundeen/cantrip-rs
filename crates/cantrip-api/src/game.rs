@@ -519,6 +519,11 @@ pub trait Game: Query {
     /// Copies a spell on the stack (CR 707.10) for `copier`, not cast; with `new_targets` the copier may choose new
     /// targets (CR 707.10c). The copy, or nothing if the spell is not on the stack.
     fn copy_spell(&mut self, spell: ObjectId, copier: PlayerId, new_targets: bool) -> Result<Option<ObjectId>, Suspend>;
+    /// `copy_spell` with exceptions (CR 707.9, 707.9b): the copy has `values` as its copiable values, the spell's own
+    /// (`Query::copiable_values`) with the exceptions applied - "the copy isn't legendary and has starting loyalty X" is
+    /// `g.copiable_values(spell).nonlegendary().with_loyalty(x)`. A copy of a permanent spell becomes a token with them as it
+    /// resolves (CR 707.10f).
+    fn copy_spell_as(&mut self, spell: ObjectId, copier: PlayerId, new_targets: bool, values: Copiable) -> Result<Option<ObjectId>, Suspend>;
     /// Copies the activated or triggered ability on the stack that `ability` names (`Target::Ability`) for `copier` (CR
     /// 707.10), with the original's source; an activated one that has left the stack is copied as it last was there. With
     /// `new_targets` the copier may choose new targets (CR 707.10c). The copy's serial, or nothing.

@@ -7,7 +7,7 @@ use cantrip_api::*;
 pub fn symbols_of(q: &dyn Query, id: ObjectId, color: Color) -> u32 {
     let mana = color.mana();
     let values = q.copiable_values(id);
-    if values.no_cost {
+    if values.has_no_cost() {
         return 0;
     }
     let cost = q.card(values.card).cost;

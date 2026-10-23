@@ -43,3 +43,40 @@ fn a_copy_of_a_spell_made_uncounterable_and_hasty_by_its_mana_is_neither() {
     assert!(!copied.cant_be_countered && !copied.gains_haste, "the copy keeps what only the original's mana gave it");
     assert_eq!(game.state.stack.len(), 2);
 }
+
+static WALKER: CardDef = CardDef {
+    name: "Copy Test Walker",
+    types: TypeSet::of(&[CardType::Planeswalker]),
+    supertypes: Supertypes { basic: false, legendary: true, snow: false },
+    loyalty: Some(3),
+    ..CardDef::BLANK
+};
+
+/// "The copy isn't legendary and has starting loyalty X" (CR 707.9b): the copy has the exceptions as its copiable values
+/// on the stack, keeps them as the token it becomes (CR 707.10f), and enters with that loyalty (CR 306.5b). The original
+/// is untouched.
+#[test]
+fn a_copy_of_a_spell_with_exceptions_has_them_on_the_stack_and_as_its_token() {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&WALKER])));
+    let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    let spell = game.state.push_obj(Obj::new(table.id_of(&WALKER), YOU, Zone::STACK));
+    game.state.zone_push(Zone::STACK, spell);
+    game.state.stack_push(stack_item(StackKind::Spell, spell, AbilityRef { card: table.id_of(&WALKER), index: u8::MAX }, YOU, &[]));
+    game.state.update_turn(|t| {
+        t.active = YOU;
+        t.priority = YOU;
+        t.set_step(Step::PrecombatMain);
+    });
+    let values = cantrip_api::Query::copiable_values(&game, spell).nonlegendary().with_loyalty(5);
+    let copy = ops::copy_spell_as(&mut cx(&mut game), spell, YOU, false, Some(values)).ok().flatten().expect("the spell is copied");
+    let chars = |game: &Game, id| crate::layers::chars(game.cards, &game.state, &game.log, id);
+    assert!(chars(&game, spell).supertypes.legendary, "the original is still legendary");
+    assert!(!chars(&game, copy).supertypes.legendary, "the copy isn't legendary on the stack");
+    let at = game.state.stack.len() - 1;
+    let item = game.state.stack[at];
+    assert_eq!(item.object, copy);
+    ops::resolve_copy_as_token(&mut cx(&mut game), &item, at).expect("the copy resolves");
+    let token = *game.state.battlefield().iter().find(|&&id| game.state.obj(id).token).expect("the copy became a token");
+    assert!(!chars(&game, token).supertypes.legendary);
+    assert_eq!(game.state.obj(token).counters(CounterKind::Loyalty), 5, "it enters with the excepted loyalty");
+}

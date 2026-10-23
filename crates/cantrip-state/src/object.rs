@@ -347,15 +347,11 @@ impl ExtraAbility {
 pub struct Copiable {
     pub card: CardId,
     /// Card types added by exceptions: Phyrexian Metamorph is an artifact in addition to its other types. With
-    /// `types_stated`, every card type it has but a kept instant or sorcery (CR 205.1a).
+    /// its types stated (`types_stated`), every card type it has but a kept instant or sorcery (CR 205.1a).
     pub extra_types: TypeSet,
     /// Subtypes added by exceptions, as Phantasmal Image is an Illusion in addition to its other types. With
-    /// `types_stated`, every subtype it has.
+    /// its types stated, every subtype it has.
     pub extra_subtypes: SubtypeSet,
-    /// "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the exception states what it is, so its card types and
-    /// subtypes are `extra_types` and `extra_subtypes` instead of the copied card's, and a characteristic-defining
-    /// ability that defines them (Changeling) is not copied (CR 707.9d). See `Copiable::typed`.
-    pub types_stated: bool,
     /// Abilities added by exceptions, in order, each distinct ability once with the number of its instances (CR 113.2c):
     /// a Thespian's Stage that copies a Stage-copy, or itself, has one more instance of the Stage's ability each time.
     pub extra_abilities: [ExtraAbility; Copiable::EXTRA_ABILITIES],
@@ -366,12 +362,14 @@ pub struct Copiable {
     pub colors: Option<ColorSet>,
     /// "Except it's 4/4" (CR 707.9b, 707.9d): its power and toughness, whatever the copied card has or defines.
     pub pt: Option<(i16, i16)>,
-    /// "Except it has no mana cost" (CR 707.9b): its mana value is 0 and it cannot be cast for a cost.
-    pub no_cost: bool,
     /// "Except its name is X" (CR 707.9b): its name, whatever the copied card is called.
     pub name: Option<&'static str>,
-    /// "Except it's legendary" (CR 707.9b): legendary in addition to the supertypes the copied card has.
-    pub legendary: bool,
+    /// The exceptions that are a yes or no, one bit each (`Copiable::STATED_*`): read and set through `types_stated`,
+    /// `has_no_cost`, `legendary_stated`, `stated_loyalty` and their builders. Packed, with `loyalty`, into the three bytes
+    /// the values had to spare, so an `Obj` pays nothing for the rare exceptions.
+    pub stated: u8,
+    /// "Except it has starting loyalty X": the loyalty, when `stated` has `STATED_LOYALTY`, and 0 otherwise.
+    pub loyalty: i16,
     /// The words of its text changed from the card's (CR 612.4, 612.2a): a token made by an ability whose text was
     /// changed has the colors and creature types the changed text names, and so does a copy of it.
     pub words: Words,
@@ -384,16 +382,51 @@ impl Copiable {
             card,
             extra_types: TypeSet::NONE,
             extra_subtypes: SubtypeSet::NONE,
-            types_stated: false,
             extra_abilities: [ExtraAbility::NONE; Copiable::EXTRA_ABILITIES],
             extra_keywords: Keywords::NONE,
             colors: None,
             pt: None,
-            no_cost: false,
             name: None,
-            legendary: false,
+            stated: 0,
+            loyalty: 0,
             words: Words::NONE,
         }
+    }
+
+    /// "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the exception states what it is (`typed`).
+    pub const STATED_TYPES: u8 = 1;
+    /// "Except it has no mana cost" (`costless`).
+    pub const STATED_NO_COST: u8 = 1 << 1;
+    /// "Except it's legendary" or "except it isn't legendary" (`legendary`, `nonlegendary`); which is `LEGENDARY`.
+    pub const STATED_LEGENDARY: u8 = 1 << 2;
+    pub const LEGENDARY: u8 = 1 << 3;
+    /// "Except it has starting loyalty X" (`with_loyalty`).
+    pub const STATED_LOYALTY: u8 = 1 << 4;
+
+    /// "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the exception states what it is, so its card types and
+    /// subtypes are `extra_types` and `extra_subtypes` instead of the copied card's, and a characteristic-defining
+    /// ability that defines them (Changeling) is not copied (CR 707.9d). See `Copiable::typed`.
+    pub fn types_stated(&self) -> bool {
+        self.stated & Copiable::STATED_TYPES != 0
+    }
+
+    /// "Except it has no mana cost" (CR 707.9b): its mana value is 0 and it cannot be cast for a cost.
+    pub fn has_no_cost(&self) -> bool {
+        self.stated & Copiable::STATED_NO_COST != 0
+    }
+
+    /// "Except it's legendary" (`Some(true)`) or "except it isn't legendary" (`Some(false)`, CR 707.9b, 205.4): whether it
+    /// has the legendary supertype, whatever the copied card has; its other supertypes are the card's. `None` keeps the
+    /// card's. A later exception overrides an earlier one: a copy of a copy is what the copy is, then this copy's exceptions
+    /// (CR 707.9b).
+    pub fn legendary_stated(&self) -> Option<bool> {
+        (self.stated & Copiable::STATED_LEGENDARY != 0).then_some(self.stated & Copiable::LEGENDARY != 0)
+    }
+
+    /// "Except it has starting loyalty X" (CR 707.9b, 306.5b): its printed loyalty, which a planeswalker enters with as
+    /// loyalty counters, whatever the copied card prints. Ob Nixilis, the Adversary's copy.
+    pub fn stated_loyalty(&self) -> Option<i16> {
+        (self.stated & Copiable::STATED_LOYALTY != 0).then_some(self.loyalty)
     }
 
     /// "Except its name is X."
@@ -406,14 +439,12 @@ impl Copiable {
     pub fn has_exceptions(&self) -> bool {
         self.extra_types.0 != 0
             || !self.extra_subtypes.is_empty()
-            || self.types_stated
+            || self.stated != 0
             || self.extra_abilities[0].instances > 0
             || self.extra_keywords.0 != 0
             || self.colors.is_some()
             || self.pt.is_some()
             || self.name.is_some()
-            || self.no_cost
-            || self.legendary
             || !self.words.is_printed()
     }
 
@@ -436,7 +467,7 @@ impl Copiable {
     pub fn typed(mut self, types: TypeSet, subtypes: SubtypeSet) -> Copiable {
         self.extra_types = types;
         self.extra_subtypes = subtypes;
-        self.types_stated = true;
+        self.stated |= Copiable::STATED_TYPES;
         self
     }
 
@@ -496,13 +527,27 @@ impl Copiable {
 
     /// "Except it has no mana cost."
     pub fn costless(mut self) -> Copiable {
-        self.no_cost = true;
+        self.stated |= Copiable::STATED_NO_COST;
         self
     }
 
     /// "Except it's legendary" (CR 707.9b, 205.4): the supertype added to whatever the copied card has.
     pub fn legendary(mut self) -> Copiable {
-        self.legendary = true;
+        self.stated |= Copiable::STATED_LEGENDARY | Copiable::LEGENDARY;
+        self
+    }
+
+    /// "Except it isn't legendary" (CR 707.9b, 205.4): the supertype taken from whatever the copied card has, its other
+    /// supertypes kept.
+    pub fn nonlegendary(mut self) -> Copiable {
+        self.stated = (self.stated | Copiable::STATED_LEGENDARY) & !Copiable::LEGENDARY;
+        self
+    }
+
+    /// "Except it has starting loyalty N" (CR 707.9b, 306.5b): the loyalty it is printed with.
+    pub fn with_loyalty(mut self, loyalty: i16) -> Copiable {
+        self.stated |= Copiable::STATED_LOYALTY;
+        self.loyalty = loyalty;
         self
     }
 }
@@ -1838,6 +1883,21 @@ mod tests {
 #[cfg(test)]
 mod copiable_tests {
     use super::*;
+
+    /// Every `Obj` holds an `Option<Copiable>`, so a copy's exceptions are packed: the yes-or-no ones and a stated loyalty
+    /// take three bytes, and an object pays nothing for them. Each reads back as it was set, a later one over an earlier.
+    #[test]
+    fn the_rare_exceptions_cost_an_object_nothing_and_read_back() {
+        assert!(std::mem::size_of::<Option<Copiable>>() <= 160, "Option<Copiable> is {} bytes", std::mem::size_of::<Option<Copiable>>());
+        let plain = Copiable::of(CardId(1));
+        assert!(!plain.has_exceptions() && plain.legendary_stated().is_none() && plain.stated_loyalty().is_none());
+        let ob = plain.nonlegendary().with_loyalty(0);
+        assert!(ob.has_exceptions() && !ob.types_stated() && !ob.has_no_cost());
+        assert_eq!((ob.legendary_stated(), ob.stated_loyalty()), (Some(false), Some(0)));
+        let again = ob.legendary().with_loyalty(-3).costless();
+        assert_eq!((again.legendary_stated(), again.stated_loyalty(), again.has_no_cost()), (Some(true), Some(-3), true));
+        assert_eq!(again.nonlegendary().legendary_stated(), Some(false));
+    }
 
     /// A seventh distinct ability added by exceptions to a copy that holds six: not taken, the six and their counts left as
     /// they were, and no panic (it panicked).

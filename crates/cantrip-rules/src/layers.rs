@@ -1006,15 +1006,15 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
 fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     let def = cards.get(card);
     let (extra_types, extra_subtypes, extra_keywords, colors, pt, no_cost, copy_name, words) = match copy {
-        Some(c) => (c.extra_types, c.extra_subtypes, c.extra_keywords, c.colors, c.pt, c.no_cost, c.name, c.words),
+        Some(c) => (c.extra_types, c.extra_subtypes, c.extra_keywords, c.colors, c.pt, c.has_no_cost(), c.name, c.words),
         None => (TypeSet::NONE, SubtypeSet::NONE, Keywords::NONE, None, None, false, None, Words::NONE),
     };
-    // "Except it's legendary" (CR 707.9b).
-    let legendary = copy.is_some_and(|c| c.legendary);
+    // "Except it's legendary" or "except it isn't legendary" (CR 707.9b).
+    let legendary = copy.and_then(|c| c.legendary_stated()).unwrap_or(def.supertypes.legendary);
     // "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the types and subtypes the exception states, instead of the
     // card's; an instant or sorcery stays one, with its spell types. Changeling, which defines the subtypes it replaced,
     // is not copied (CR 707.9d), though an exception may give it again.
-    let stated = copy.is_some_and(|c| c.types_stated);
+    let stated = copy.is_some_and(|c| c.types_stated());
     let (types, subtypes, printed_keywords) = if stated {
         let spell = TypeSet(def.types.0 & TypeSet::of(&[CardType::Instant, CardType::Sorcery]).0);
         let spell_types = if spell.0 != 0 {
@@ -1041,7 +1041,7 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         card,
         name: copy_name.unwrap_or_else(|| renamed(def, words)),
         types,
-        supertypes: Supertypes { legendary: def.supertypes.legendary || legendary, ..def.supertypes },
+        supertypes: Supertypes { legendary, ..def.supertypes },
         // CR 612.4: a token's subtypes are what the text that made it named.
         subtypes,
         // CR 707.9b: a copy that says what it is gets that, not what the card it copies is (707.9d). A token's color

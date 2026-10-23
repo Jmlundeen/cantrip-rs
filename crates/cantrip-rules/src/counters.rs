@@ -154,7 +154,9 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
 pub fn intrinsic(cards: &CardTable, obj: &Obj, counts: &mut [i16; CounterKind::COUNT]) {
     let card = obj.copied_card().unwrap_or_else(|| cards.face(obj.card, obj.transformed));
     let def = cards.get(card);
-    if let Some(loyalty) = def.loyalty {
+    // A copy effect's exception may state its loyalty (CR 707.9b: "has starting loyalty X"); a face-down permanent has
+    // the values it is face down as, and none of a copy's.
+    if let Some(loyalty) = obj.copiable().and_then(|c| c.stated_loyalty()).or(def.loyalty) {
         counts[CounterKind::Loyalty as usize] += loyalty;
     }
     if let Some(defense) = def.defense {

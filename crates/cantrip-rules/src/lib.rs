@@ -1545,6 +1545,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::copy_spell(self, spell, copier, new_targets).map_err(|_| Suspend)
     }
 
+    fn copy_spell_as(&mut self, spell: ObjectId, copier: PlayerId, new_targets: bool, values: Copiable) -> Result<Option<ObjectId>, Suspend> {
+        ops::copy_spell_as(self, spell, copier, new_targets, Some(values)).map_err(|_| Suspend)
+    }
+
     fn copy_ability(&mut self, ability: Target, copier: PlayerId, new_targets: bool) -> Result<Option<u32>, Suspend> {
         ops::copy_ability(self, ability, copier, new_targets).map_err(|_| Suspend)
     }

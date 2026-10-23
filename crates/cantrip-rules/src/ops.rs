@@ -1509,6 +1509,14 @@ pub fn prepared_copy(cx: &mut Cx, permanent: ObjectId) {
 /// copy, kept or new, becomes a target of it. Nothing if the spell was never on the stack or `copier` has left the game.
 /// A copy of a permanent spell becomes a token as it resolves (CR 707.10f): `resolve_copy_as_token`.
 pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: bool) -> R<Option<ObjectId>> {
+    copy_spell_as(cx, spell, copier, new_targets, None)
+}
+
+/// `copy_spell`, the copy having `values` as its copiable values where they are given: the spell's own
+/// (`Query::copiable_values`) with the exceptions of the copy effect (CR 707.9, 707.9b: "the copy isn't legendary and has
+/// starting loyalty X"). They are the copy's from the moment it is created, on the stack and as the token a copy of a
+/// permanent spell becomes (CR 707.10f), and a copy of it copies them (CR 707.9b).
+pub fn copy_spell_as(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: bool, values: Option<Copiable>) -> R<Option<ObjectId>> {
     // A spell that has left the stack is copied as it last was on it (CR 707.10, 608.2h): the copy keeps its targets,
     // X and modes.
     let mut item = match cx.s().stack.iter().position(|i| i.kind == StackKind::Spell && i.object == spell) {
@@ -1542,6 +1550,9 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
     (obj.card_copy, obj.prepared_from, obj.prepared, obj.became) = (true, None, false, None);
     // A new object, with no counters (CR 707.2: counters are not copied).
     obj.clear_counters();
+    if let Some(values) = values {
+        obj.copy = Some(values);
+    }
     let copy = cx.st().push_obj(obj);
     cx.st().zone_push(Zone::STACK, copy);
     item.object = copy;

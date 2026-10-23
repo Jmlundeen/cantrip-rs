@@ -1145,7 +1145,8 @@ impl<'a> Projector<'a> {
             class_level: if on_battlefield { i32::from(obj.class_level) } else { 0 },
             // A token whose text was changed as it was made has copiable values of its own and is no copy (CR 612.4).
             is_copy: obj.copiable().is_some_and(|c| Copiable { words: Words::NONE, ..c } != Copiable::of(obj.card)) || obj.card_copy,
-            starting_counter: if on_battlefield { None } else { def.loyalty.map(i32::from) },
+            // A copy's exception may state its loyalty (CR 707.9b: "has starting loyalty X").
+            starting_counter: if on_battlefield { None } else { obj.copiable().and_then(|c| c.stated_loyalty()).or(def.loyalty).map(i32::from) },
             other_face: def.back.map(|back| Box::new(printed(back))),
             // A split card as it is printed, its halves side by side (CR 709.1). On the stack a half cast alone is that half
             // only, whose definition has no halves (CR 709.3b), and a fused split spell is both (CR 702.102b).
