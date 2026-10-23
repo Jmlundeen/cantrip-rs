@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_api::ZoneKind::Graveyard;
 use cantrip_mechanics::{effects, tokens};
 use cantrip_oracle as oracle;
 
@@ -18,9 +17,9 @@ fn command_the_stage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 }
 
 /// "At the beginning of each upkeep" (CR 503.1a): any player's upkeep.
-fn each_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+fn each_upkeep(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::StepBegan { step: Step::Upkeep } if q.obj(source).zone.is(Graveyard) => Fired::PLAIN,
+        Event::StepBegan { step: Step::Upkeep } => Fired::PLAIN,
         _ => None,
     }
 }
@@ -38,6 +37,7 @@ fn opponent_was_dealt_noncombat_damage_last_turn(q: &dyn Query, asker: &Asker) -
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], command_the_stage),
     abilities: &[triggered(when(EventMask::STEP_BEGAN, each_upkeep), effects::return_this_to_hand, "At the beginning of each upkeep, if an opponent was dealt noncombat damage last turn, return this card from your graveyard to your hand.")
+        // It returns this card from the graveyard, so it functions only there (CR 113.6m).
         .functions_in(IN_A_GRAVEYARD)
         .condition(opponent_was_dealt_noncombat_damage_last_turn)],
     ..oracle::COMMAND_THE_STAGE

@@ -5,13 +5,12 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("ReturnAndAttach", "return it to the battlefield attached to that creature?", "", "Return it", "Leave it");
 
-/// "Whenever a 1/1 creature you control enters": it functions from its owner's graveyard (CR 113.6k), which is the one
-/// zone its effect moves the card out of. The creature is read as it stands on the battlefield (CR 603.6a), counters and
+/// "Whenever a 1/1 creature you control enters". The creature is read as it stands on the battlefield (CR 603.6a), counters and
 /// static effects included; "that creature" is carried as the trigger's subject.
 fn one_one_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     let Event::ZoneChange { new, to, .. } = event else { return None };
     let sword = q.obj(source);
-    if !to.is(ZoneKind::Battlefield) || !is_live(q, source) || sword.zone != Zone::graveyard(sword.owner) {
+    if !to.is(ZoneKind::Battlefield) || !is_live(q, source) {
         return None;
     }
     let entered = q.obj(*new);
@@ -51,6 +50,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         equip(mana("{2}"), "Equip {2}"),
         triggered(when(EventMask::ZONE_CHANGE, one_one_enters), return_and_attach, "Whenever a 1/1 creature you control enters, you may return this card from your graveyard to the battlefield, then attach it to that creature.")
+            // It returns this card from the graveyard, so it functions only there (CR 113.6m).
             .functions_in(IN_A_GRAVEYARD),
     ],
     statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 2>, "Equipped creature gets +1/+2.")],

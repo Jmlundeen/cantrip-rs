@@ -4,15 +4,10 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("ReturnToHand", "return it from your graveyard to your hand?", "", "Return it", "Leave it");
 
-/// "At the beginning of your upkeep": its owner's, while it is in a graveyard.
-fn upkeep_in_graveyard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    let obj = q.obj(source);
+/// "At the beginning of your upkeep": its owner's.
+fn your_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::StepBegan { step: Step::Upkeep }
-            if q.state().turn.active == obj.owner && obj.zone.is(ZoneKind::Graveyard) =>
-        {
-            Fired::PLAIN
-        }
+        Event::StepBegan { step: Step::Upkeep } if q.state().turn.active == q.obj(source).owner => Fired::PLAIN,
         _ => None,
     }
 }
@@ -26,7 +21,8 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::STEP_BEGAN, upkeep_in_graveyard), return_it, "At the beginning of your upkeep, you may return this card from your graveyard to your hand.")
+    abilities: &[triggered(when(EventMask::STEP_BEGAN, your_upkeep), return_it, "At the beginning of your upkeep, you may return this card from your graveyard to your hand.")
+        // It returns this card from the graveyard, so it functions only there (CR 113.6m).
         .functions_in(IN_A_GRAVEYARD)],
     ..oracle::SQUEE_GOBLIN_NABOB
 };

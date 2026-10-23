@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::THIS_DIES;
+use cantrip_mechanics::triggers::{PUT_INTO_A_GRAVEYARD_FROM_ANYWHERE, THIS_DIES};
 use cantrip_oracle as oracle;
 
 /// The 5/5 green Wurm creature token with trample it makes.
@@ -22,15 +22,6 @@ fn three_wurms(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "When this card is put into a graveyard from anywhere" (CR 603.6c, 603.10a): its own move into a graveyard, from any
-/// zone. It functions from the graveyard it has just reached.
-fn put_into_a_graveyard(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. } if *new == source && to.is(ZoneKind::Graveyard) => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 /// "Shuffle it into its owner's library": the card that triggered it goes there if it is still where it was put (CR 400.7), and
 /// the library is shuffled either way (CR 701.24c); the core does both.
 fn shuffle_it_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -41,8 +32,7 @@ fn shuffle_it_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_DIES, three_wurms, "When this creature dies, create three 5/5 green Wurm creature tokens with trample."),
-        triggered(when(EventMask::ZONE_CHANGE, put_into_a_graveyard), shuffle_it_in, "When Worldspine Wurm is put into a graveyard from anywhere, shuffle it into its owner's library.")
-            .functions_in(IN_A_GRAVEYARD),
+        triggered(PUT_INTO_A_GRAVEYARD_FROM_ANYWHERE, shuffle_it_in, "When Worldspine Wurm is put into a graveyard from anywhere, shuffle it into its owner's library."),
     ],
     ..oracle::WORLDSPINE_WURM
 };
