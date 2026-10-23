@@ -758,6 +758,7 @@ impl<'a> Projector<'a> {
     fn until_text(&self, duration: Duration) -> String {
         match duration {
             Duration::EndOfTurn => " this turn".to_string(),
+            Duration::EndOfCombat => " this combat".to_string(),
             Duration::UntilNextTurnOf(q) if q == self.viewer => " until your next turn".to_string(),
             Duration::UntilNextTurnOf(q) => format!(" until {}'s next turn", self.names.get(q.index()).cloned().unwrap_or_default()),
             Duration::WhileTapped => " for as long as it remains tapped".to_string(),

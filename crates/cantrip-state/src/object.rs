@@ -878,6 +878,9 @@ pub enum Shield {
 pub enum Duration {
     /// Until the cleanup step (CR 514.2).
     EndOfTurn,
+    /// "This combat" (CR 506.1, 511.3): until the combat phase it began in ends - so an additional combat phase that turn
+    /// (CR 500.8, Aurelia, the Warleader) begins without it. Ursine Monstrosity's "attacks that player this combat if able".
+    EndOfCombat,
     /// As long as the affected object stays where it is.
     Indefinite,
     /// "For as long as [the source] remains on the battlefield" (CR 611.2b): it ends when the effect's source is no

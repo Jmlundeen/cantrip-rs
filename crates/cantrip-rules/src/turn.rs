@@ -61,6 +61,10 @@ pub fn next_step(game: &mut Game) {
     // CR 724.1d: a turn ended during combat removes every creature and planeswalker from combat as the step ends, as
     // the end of the combat phase does.
     if turn.number > 0 && combat_ends {
+        // "This combat" effects end with the combat phase (CR 511.3), before an additional one begins.
+        if s.effects.iter().any(|e| e.duration == Duration::EndOfCombat) {
+            s.effects_retain(|e| e.duration != Duration::EndOfCombat);
+        }
         s.set_attackers(Vec::new());
         s.set_blocks(Vec::new());
         s.update_turn(|t| {

@@ -1,0 +1,47 @@
+# Ursine Monstrosity's "this creature attacks that player this combat if able" lasts this combat only (CR 506.1, 511.3; its
+# ruling): Aurelia, the Warleader attacks for the first time and gives Bot1 an additional combat phase, and as that one
+# begins the requirement of the first combat is gone - the Monstrosity's beginning-of-combat ability makes a new one, so it
+# is under one requirement to attack Bot2, not two. After the second combat it is under none.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Ursine Monstrosity
+Black Lotus
+Aurelia, the Warleader
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ursine Monstrosity.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aurelia, the Warleader.Cast
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Ursine Monstrosity.MustAttack = Bot2
+Bot1.Attack(Aurelia, the Warleader > Bot2; Ursine Monstrosity > Bot2)
+Bot1.Attack(Ursine Monstrosity > Bot2)
+? Combat.Attackers = Ursine Monstrosity > Bot2
+? Bot1.Battlefield.Ursine Monstrosity.MustAttack = Bot2
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Step = Main2

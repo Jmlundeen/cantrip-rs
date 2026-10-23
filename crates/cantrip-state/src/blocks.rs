@@ -164,6 +164,7 @@ impl BlockRequirements {
         let on_attacker: Vec<ObjectId> = self.required.iter().filter(|r| r.blocker.is_none()).filter_map(|r| r.attacker).collect();
         let through: Vec<Vec<usize>> =
             targets.iter().map(|&t| (0..on_attacker.len()).filter(|&k| self.blocks_through(t, on_attacker[k])).collect()).collect();
+        let meets: Vec<Vec<usize>> = (0..on_attacker.len()).map(|k| (0..targets.len()).filter(|&t| through[t].contains(&k)).collect()).collect();
         let mut counts = vec![0u32; targets.len()];
         let mut met = vec![0u32; on_attacker.len()];
         let mut fixed_gain = 0;
@@ -228,6 +229,7 @@ impl BlockRequirements {
             able_after: &'a [Vec<u32>],
             by_target: &'a [Vec<(usize, u32)>],
             through: &'a [Vec<usize>],
+            meets: &'a [Vec<usize>],
             enough: Option<u32>,
             counts: Vec<u32>,
             met: Vec<u32>,
@@ -256,7 +258,14 @@ impl BlockRequirements {
                         break;
                     }
                 }
-                by_blocker.min(by_room) + count_u32(self.met.iter().filter(|&&n| n == 0).count())
+                // A requirement on an attacker not yet obeyed counts only where a creature still to come may block an attacker
+                // that obeys it, with room for one more blocker.
+                let open = (0..self.met.len())
+                    .filter(|&k| {
+                        self.met[k] == 0 && self.meets[k].iter().any(|&t| self.counts[t] < self.limits[t].1 && self.able_after[i][t] > 0)
+                    })
+                    .count();
+                by_blocker.min(by_room) + count_u32(open)
             }
 
             fn done(&self) -> bool {
@@ -264,19 +273,26 @@ impl BlockRequirements {
             }
 
             fn go(&mut self, i: usize, obeyed: u32) {
+                // An attacker blocked by fewer than it may be needs that many more of the creatures still to come.
+                if self.counts.iter().zip(self.limits).enumerate().any(|(t, (&n, &(least, _)))| n > 0 && n < least && self.able_after[i][t] < least - n) {
+                    return;
+                }
+                // A whole declaration is judged by what it obeys, nothing more.
+                if i == self.blockers.len() {
+                    let better = match self.enough {
+                        Some(n) => obeyed >= n,
+                        None => self.best.as_ref().is_none_or(|(n, _)| obeyed > *n),
+                    };
+                    if better {
+                        self.best = Some((obeyed, self.chosen.clone()));
+                    }
+                    return;
+                }
                 let reach = obeyed + self.bound(i);
                 match self.enough {
                     Some(n) if reach < n => return,
                     None if self.best.as_ref().is_some_and(|(n, _)| reach <= *n) => return,
                     _ => {}
-                }
-                // An attacker blocked by fewer than it may be needs that many more of the creatures still to come.
-                if self.counts.iter().zip(self.limits).enumerate().any(|(t, (&n, &(least, _)))| n > 0 && n < least && self.able_after[i][t] < least - n) {
-                    return;
-                }
-                if i == self.blockers.len() {
-                    self.best = Some((obeyed, self.chosen.clone()));
-                    return;
                 }
                 for k in 0..self.blockers[i].1.len() {
                     let (t, gain) = self.blockers[i].1[k];
@@ -312,6 +328,7 @@ impl BlockRequirements {
             able_after: &able_after,
             by_target: &by_target,
             through: &through,
+            meets: &meets,
             enough: enough.map(|n| n.saturating_sub(fixed_gain)),
             counts,
             met,
@@ -459,5 +476,109 @@ mod tests {
         assert!(!verdict.complete);
         assert_eq!(verdict.addable.len(), 18 * 6, "each creature not blocking, onto each attacker not yet blocked");
         assert!(started.elapsed() < std::time::Duration::from_secs(5), "took {:?}", started.elapsed());
+    }
+
+    /// Two attackers that must be blocked if able, one creature able to block either: it blocks one and obeys one, so no
+    /// blocks at all is refused (the most is 1, not 0).
+    #[test]
+    fn requirements_on_two_attackers_one_creature_can_meet_one() {
+        let allowed = [(X, A), (X, B)];
+        let on = |a| RequiredBlock { blocker: None, attacker: Some(a) };
+        let r = rules(vec![on(A), on(B)], vec![(A, 1, u32::MAX), (B, 1, u32::MAX)], &allowed);
+        assert_eq!(r.most, 1);
+        let none = r.judge(&allowed, &[], true);
+        assert!(!none.complete);
+        assert_eq!(none.addable, vec![(X, A), (X, B)]);
+        assert!(r.judge(&allowed, &[(X, A)], false).complete && r.judge(&allowed, &[(X, B)], false).complete);
+    }
+
+    /// Every way of blocking, over small random boards (allowed blocks, fewest and most blockers, bands, costs, and
+    /// requirements of every kind, some on the same creature twice): `solve`'s most is the most any free legal declaration
+    /// obeys, a declaration is complete exactly when it is legal, and `addable` offers exactly the blocks some legal
+    /// declaration extending it has - never one that none does.
+    #[test]
+    fn the_verdict_matches_every_declaration_on_small_boards() {
+        let mut seed: u64 = 0x9E37_79B9_7F4A_7C15;
+        let mut next = |n: u64| {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed % n
+        };
+        for _ in 0..400 {
+            let blockers: Vec<ObjectId> = (0..1 + next(4)).map(|i| ObjectId(10 + i as u32)).collect();
+            let attackers: Vec<ObjectId> = (0..1 + next(3)).map(|i| ObjectId(1 + i as u32)).collect();
+            let allowed: Vec<(ObjectId, ObjectId)> =
+                blockers.iter().flat_map(|&b| attackers.iter().map(move |&a| (b, a))).filter(|_| true).collect::<Vec<_>>();
+            let allowed: Vec<(ObjectId, ObjectId)> = allowed.into_iter().filter(|_| next(4) != 0).collect();
+            let limits: Vec<(ObjectId, u32, u32)> = attackers
+                .iter()
+                .map(|&a| {
+                    let least = 1 + u32::from(next(4) == 0);
+                    let most = match next(3) {
+                        0 => 1,
+                        1 => 2,
+                        _ => u32::MAX,
+                    };
+                    (a, least, most)
+                })
+                .collect();
+            let mut required = Vec::new();
+            for _ in 0..next(5) {
+                let b = blockers[next(blockers.len() as u64) as usize];
+                let a = attackers[next(attackers.len() as u64) as usize];
+                required.push(match next(3) {
+                    0 => RequiredBlock { blocker: Some(b), attacker: None },
+                    1 => RequiredBlock { blocker: None, attacker: Some(a) },
+                    _ => RequiredBlock { blocker: Some(b), attacker: Some(a) },
+                });
+            }
+            let bands = if attackers.len() > 1 && next(4) == 0 { vec![(attackers[0], 1), (attackers[1], 1)] } else { Vec::new() };
+            let costs: Vec<BlockCost> = allowed
+                .iter()
+                .filter(|_| next(6) == 0)
+                .map(|&(b, a)| BlockCost { blocker: b, attacker: a, cost: ManaCost { generic: 1, ..ManaCost::ZERO }, source: ObjectId(99) })
+                .collect();
+            let mut r = BlockRequirements { required, bands, limits, costs, ..Default::default() };
+            // Every declaration: each blocker blocks one allowed attacker or none.
+            let mut all: Vec<Vec<(ObjectId, ObjectId)>> = vec![Vec::new()];
+            for &b in &blockers {
+                let mut more = Vec::new();
+                for d in &all {
+                    more.push(d.clone());
+                    for &(bb, a) in allowed.iter().filter(|p| p.0 == b) {
+                        let mut e = d.clone();
+                        e.push((bb, a));
+                        more.push(e);
+                    }
+                }
+                all = more;
+            }
+            let plain = r.clone();
+            let fits = |d: &[(ObjectId, ObjectId)]| {
+                attackers.iter().all(|&a| {
+                    let n = count_u32(d.iter().filter(|x| x.1 == a).count());
+                    let (least, most) = plain.limits_of(a);
+                    n == 0 || (least <= n && n <= most)
+                })
+            };
+            let most = all.iter().filter(|d| fits(d) && d.iter().all(|&(b, a)| plain.free(b, a))).map(|d| plain.obeyed(d)).max().unwrap_or(0);
+            r.most = r.solve(&allowed, &[], None, true).map_or(0, |s| s.0);
+            assert_eq!(r.most, most, "{r:?} over {allowed:?}");
+            let legal = |d: &[(ObjectId, ObjectId)]| fits(d) && plain.obeyed(d) >= most;
+            for d in all.iter().filter(|d| d.len() <= 2) {
+                let verdict = r.judge(&allowed, d, true);
+                assert_eq!(verdict.complete, legal(d), "{d:?} under {r:?}");
+                let wanted: Vec<(ObjectId, ObjectId)> = allowed
+                    .iter()
+                    .copied()
+                    .filter(|&(b, a)| {
+                        !d.iter().any(|x| x.0 == b)
+                            && all.iter().any(|l| l.contains(&(b, a)) && d.iter().all(|x| l.contains(x)) && legal(l))
+                    })
+                    .collect();
+                assert_eq!(verdict.addable, wanted, "addable to {d:?} under {r:?} over {allowed:?}");
+            }
+        }
     }
 }

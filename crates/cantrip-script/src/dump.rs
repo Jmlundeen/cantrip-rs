@@ -523,6 +523,19 @@ impl StateDump {
                         let names: Vec<String> = goaders.iter().map(|n| format!("Bot{n}")).collect();
                         d.set(format!("{key}.GoadedBy"), names.join("; "));
                     }
+                    // The players it must attack this combat if able (CR 508.1d), one for each such effect.
+                    let mut must: Vec<String> = s
+                        .effects
+                        .iter()
+                        .filter_map(|e| match e.kind {
+                            EffectKind::MustAttackPlayer(p) if e.affected == id => Some(format!("Bot{}", p.0 + 1)),
+                            _ => None,
+                        })
+                        .collect();
+                    if !must.is_empty() {
+                        must.sort();
+                        d.set(format!("{key}.MustAttack"), must.join("; "));
+                    }
                     if let Some(chosen) = obj.marks.chosen_player {
                         d.set(format!("{key}.ChosenPlayer"), chosen.0 + 1);
                     }
