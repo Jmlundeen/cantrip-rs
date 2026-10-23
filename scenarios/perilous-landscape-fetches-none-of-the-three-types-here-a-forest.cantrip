@@ -1,0 +1,26 @@
+# Perilous Landscape: "{T}, Sacrifice this land: Search your library for a basic Island, Mountain, or Plains card".
+# A Forest is basic but has none of the three land types, so it is not a card the search may find; the Mountain is, and
+# enters tapped.
+
+[Bot1 Deck]
+Perilous Landscape
+Forest x6
+Island x2
+Tundra
+Mountain
+Plains
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Perilous Landscape.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Perilous Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Forest)
+Bot1.Search(Mountain)
+
+[Expect]
+Bot1.Graveyard = Perilous Landscape
+Bot1.Battlefield.Mountain.Tapped = true
