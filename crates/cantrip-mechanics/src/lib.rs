@@ -223,8 +223,22 @@ pub fn each_opponent_sacrifices(
     count: u8,
     kind: fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<(), Suspend> {
+    each_opponent_sacrifices_choices(g, controller, source, count, kind).map(|_| ())
+}
+
+/// As `each_opponent_sacrifices`, returning who chose what (the old objects): an opponent missing from it sacrificed nothing,
+/// having no permanent of the kind or being unable to be made to (CR 101.2), which "each opponent who can't" asks. Momentum
+/// Breaker ("each opponent who can't discards a card") and Skull Storm ("each opponent who can't loses half their life")
+/// print it.
+pub fn each_opponent_sacrifices_choices(
+    g: &mut dyn Game,
+    controller: PlayerId,
+    source: ObjectId,
+    count: u8,
+    kind: fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<(PlayerId, ObjectId)>, Suspend> {
     let players: Vec<PlayerId> = g.state().apnap().filter(|&p| p != controller).collect();
-    sacrifice_together(g, &players, source, count, kind).map(|_| ())
+    sacrifice_together(g, &players, source, count, kind)
 }
 
 /// "Each player sacrifices `count` [kind] of their choice" (CR 701.21a, 101.4): as `each_opponent_sacrifices` but for every
