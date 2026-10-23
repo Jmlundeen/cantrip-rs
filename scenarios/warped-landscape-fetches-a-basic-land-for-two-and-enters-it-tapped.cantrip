@@ -1,0 +1,35 @@
+# Warped Landscape taps for {C}; its {2} search may find any basic land tapped, while a nonbasic land is not a legal find (CR 205.4a, 305.6, 701.23).
+
+[Bot1 Deck]
+Warped Landscape
+Mox Pearl
+Mox Sapphire
+Island x4
+Forest x6
+Tundra
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Warped Landscape.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Warped Landscape.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Warped Landscape.Activate(Ability: {2}, {T}, Sacrifice this land)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana =
+! Bot1.Search(Tundra)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Warped Landscape
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Forest.Tapped = true
