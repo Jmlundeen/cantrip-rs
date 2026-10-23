@@ -537,6 +537,17 @@ pub fn mill_then_put_onto_battlefield(
     Ok(())
 }
 
+/// "Mill `count` cards. When you do, [`reflexive`]" (CR 701.17, 603.12): the reflexive ability triggers when the controller
+/// milled that many cards, which they cannot if the library holds fewer (CR 701.17b: they mill what they can, and
+/// nothing triggers) or a replacement effect kept a card from being milled. It chooses its target as it goes on the
+/// stack, the milled cards included. Primal Witchstalker, Yathan Roadwatcher, Wick's Patrol, The Last Ronin (II) and
+/// Kraven's Last Hunt (I) print it.
+pub fn mill_then_reflexive(g: &mut dyn Game, item: &StackItem, count: u32, reflexive: AbilityRef) {
+    if g.mill(item.controller, count).len() as u32 == count {
+        g.reflexive_trigger(item.object, item.controller, reflexive, Target::None);
+    }
+}
+
 /// "In any order" (CR 401.4): `player` puts `cards` on one `end` of their library (`DestinationKind::LibraryTop` or
 /// `LibraryBottom`) in the order they choose, the first lowest. Nobody is asked about fewer than two cards. The cards in
 /// that order, for `put_into_library` or `arrange_library`. Bow of Nylea and Valakut Awakening put cards on the bottom,
