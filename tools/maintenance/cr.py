@@ -30,7 +30,7 @@ def _rules():
     lines = open(files[-1], encoding="utf-8-sig").read().splitlines()
     where = {}
     for i, line in enumerate(lines):
-        m = re.match(r"^(\d{3}(?:\.\d+[a-z]?)?)\.? ", line)
+        m = re.match(r"^(\d{3}(?:\.\d+[a-z]{0,2})?)\.? ", line)
         if m:
             where[m.group(1)] = i  # the body comes after the contents, so the last line of a number wins
     return lines, where
@@ -43,7 +43,9 @@ def rule(number):
     if number not in where:
         return None
     out = []
-    pattern = re.compile(r"^" + re.escape(number) + r"(?:[a-z]|\.\d+[a-z]?)?\.? ")
+    # A subrule past z is two letters (CR 704.5aa); a subrule has no subrules of its own.
+    subrules = "" if number[-1].isalpha() else r"(?:[a-z]{1,2}|\.\d+[a-z]{0,2})?"
+    pattern = re.compile(r"^" + re.escape(number) + subrules + r"\.? ")
     for line in lines[where[number]:]:
         if not line.strip():
             continue
@@ -105,8 +107,8 @@ def check(paths, show=False):
     bad = 0
     for path in paths:
         for n, line in enumerate(open(path, encoding="utf-8", errors="replace"), 1):
-            for m in re.finditer(r"\bCR\s+(\d{3}(?:\.\d+[a-z]?)?(?:\s*[-,]\s*\d{3}(?:\.\d+[a-z]?)?)*)", line):
-                for number in re.findall(r"\d{3}(?:\.\d+[a-z]?)?", m.group(1)):
+            for m in re.finditer(r"\bCR\s+(\d{3}(?:\.\d+[a-z]{0,2})?(?:\s*[-,]\s*\d{3}(?:\.\d+[a-z]{0,2})?)*)", line):
+                for number in re.findall(r"\d{3}(?:\.\d+[a-z]{0,2})?", m.group(1)):
                     if number not in where:
                         bad += 1
                         print(f"{path}:{n}: CR {number} is no rule of the current Comprehensive Rules")
