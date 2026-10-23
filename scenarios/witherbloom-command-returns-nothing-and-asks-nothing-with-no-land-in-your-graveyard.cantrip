@@ -1,0 +1,50 @@
+# Witherbloom Command, modes 1 and 4, with no land card in Bot1's graveyard (Faithless Looting and two discarded Mind Stones are
+# there, none a land): "you return a land card from your graveyard" has nothing to return, so no choice is asked (the mill is of
+# Bot2, whose milled Plains is not Bot1's to return) and the rest of the spell is made: Bot2 still mills three and loses 2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Witherbloom Command
+Faithless Looting
+Mind Stone
+Mind Stone
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x7
+Plains
+Plains
+Plains
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Mind Stone#1; Mind Stone#2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Command.Cast
+Bot1.Modes(1; 4)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 3
+Bot2.Life = 18
+Bot1.Life = 22
+Bot1.Hand = Island; Island
+Bot1.Graveyard = Witherbloom Command; Faithless Looting; Mind Stone; Mind Stone

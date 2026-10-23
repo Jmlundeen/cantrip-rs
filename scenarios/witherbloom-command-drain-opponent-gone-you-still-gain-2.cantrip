@@ -1,0 +1,56 @@
+# Witherbloom Command's "Target opponent loses 2 life and you gain 2 life" with its opponent no longer a legal target
+# (CR 608.2b): Bot1 destroys its own Mox Ruby and drains Bot2, and Bot2 gains protection from everything with Teferi's
+# Protection in response. The destroy mode keeps the spell resolving; Bot2 loses nothing, but the gain does not use the
+# target, so Bot1 still gains 2 life (the rulings on the Commands: the rest of the mode's instructions still happen).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Witherbloom Command
+Island x14
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Teferi's Protection
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Command.Cast
+Bot1.Modes(2; 4)
+Bot1.Target(Mox Ruby)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Teferi's Protection.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mox Ruby = (absent)
+Exile = Teferi's Protection
+Bot1.Life = 22
+Bot2.Life = 20

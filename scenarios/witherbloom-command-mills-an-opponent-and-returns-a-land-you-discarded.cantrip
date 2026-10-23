@@ -1,0 +1,55 @@
+# Witherbloom Command, modes 1 and 4: Bot1 discards Swamp and Forest to Faithless Looting, then casts it with the mill mode on
+# Bot2 and the drain mode on Bot2. Bot2 mills three (Plains, Mountain and Forest, which sit in ITS graveyard and are not Bot1's to
+# return); Bot1 returns one land card from ITS OWN graveyard - the Swamp - leaving the Forest there. Bot2 loses exactly 2, Bot1
+# (starting at 20) gains exactly 2, so Bot1 is at 22 and Bot2 at 18; Bot2's life shows "each" is not applied to Bot1.
+# Bot1 pays {B}{G} with the Moxen, shown by the pool being empty of them.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Witherbloom Command
+Faithless Looting
+Swamp
+Forest
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x7
+Plains
+Mountain
+Forest
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Swamp; Forest)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Command.Cast
+Bot1.Modes(1; 4)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+? Bot1.Mana = 
+Bot1.Pass
+! Bot1.Choose(Mountain)
+Bot1.Choose(Swamp)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Hand = Island; Island; Swamp
+Bot1.Graveyard = Witherbloom Command; Faithless Looting; Forest
+Bot2.Graveyard = Forest; Mountain; Plains
+Bot2.Library.Count = 10

@@ -1,0 +1,77 @@
+# Witherbloom Command, modes 2 and 3: Bot1 destroys Bot2's Mind Stone (mana value 2, the limit) and gives Bot2's Woodland Changeling
+# -3/-1 until end of turn. Refused as the destroy target: Bot1's own Crucible of Worlds (mana value 3, one past the limit) and
+# the Woodland Changeling (a creature, with mana value 2). The Mongrel (2/2) ends at -1/1, which a -2 or -2/-2 would not match, and is
+# back at 2/2 on the next turn (CR 514.2: until end of turn). Bot1's pool is checked empty right after the cast.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Witherbloom Command
+Crucible of Worlds
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mind Stone
+Woodland Changeling
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Crucible of Worlds.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Command.Cast
+Bot1.Modes(2; 3)
+! Bot1.Target(Crucible of Worlds)
+! Bot1.Target(Woodland Changeling)
+Bot1.Target(Mind Stone)
+Bot1.Target(Woodland Changeling)
+? Bot1.Mana = 
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Woodland Changeling.Power = -1
+? Bot2.Battlefield.Woodland Changeling.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Mind Stone = (absent)
+Bot2.Graveyard = Mind Stone
+Bot2.Battlefield.Woodland Changeling.Power = 2
+Bot2.Battlefield.Woodland Changeling.Toughness = 2
+Bot1.Battlefield.Crucible of Worlds.Tapped = false
