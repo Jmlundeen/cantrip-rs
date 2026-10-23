@@ -1,0 +1,11 @@
+{
+  "name": "Blightstep Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {B}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Searstep Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {R}."
+  }
+}

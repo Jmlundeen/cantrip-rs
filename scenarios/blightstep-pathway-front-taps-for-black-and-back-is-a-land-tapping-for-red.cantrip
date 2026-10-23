@@ -1,0 +1,23 @@
+# Blightstep Pathway is a modal double-faced card (CR 712.3) whose faces are both lands: one copy is played as its front
+# face (taps for {B}, not {R}), the other as its back face Searstep Pathway (taps for {R}, not {B}); neither enters
+# tapped. The pool is checked right after each activation, and a refusal pins each face's colour.
+
+[Bot1 Deck]
+Blightstep Pathway
+Blightstep Pathway
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Blightstep Pathway.Play(Ability: #1)
+Bot1.Battlefield.Blightstep Pathway.Activate
+? Bot1.Mana = {B}
+[T3 Bot1.Main1]
+Bot1.Hand.Blightstep Pathway.Play(Ability: back face)
+Bot1.Battlefield.Searstep Pathway.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield = Blightstep Pathway; Searstep Pathway
