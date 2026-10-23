@@ -1,0 +1,25 @@
+# Turbulent Moor: "({T}: Add {W} or {B}.)" by its Plains and Swamp land types (CR 305.6): turn 5 it taps for
+# {W}, turn 7 for {B}.
+
+[Bot1 Deck]
+Plains
+Turbulent Moor
+Plains x12
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Turbulent Moor.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Turbulent Moor.Activate(Ability: {W})
+? Bot1.Mana = {W}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Turbulent Moor.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Turbulent Moor.Tapped = true
