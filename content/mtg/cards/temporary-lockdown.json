@@ -1,0 +1,6 @@
+{
+  "name": "Temporary Lockdown",
+  "manaCost": "{1}{W}{W}",
+  "type": "Enchantment",
+  "oracleText": "When this enchantment enters, exile each nonland permanent with mana value 2 or less until this enchantment leaves the battlefield."
+}

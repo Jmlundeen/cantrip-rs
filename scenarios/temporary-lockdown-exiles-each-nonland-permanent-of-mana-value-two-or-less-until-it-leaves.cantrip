@@ -1,0 +1,89 @@
+# Temporary Lockdown enters on turn 7 and exiles every nonland permanent of mana value 2 or less, whoever controls it:
+# Bot1's Ornithopter (0) and Mesa Pegasus (2, exactly at the limit) and Bot2's Misshapen Fiend (2), and a 1-mana enchantment each (Sigarda's Aid, Scavenger's Talent): neither a creature nor an artifact. Spider-Man (3) and
+# Hired Blade (3), just past the limit, stay, and so do the lands and the Lockdown itself (CR 610.3). On turn 9 Bot1
+# disenchants the Lockdown and the three exiled cards come back at once, under their owners' control (CR 610.3).
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Ornithopter
+Mesa Pegasus
+Spider-Man, Web-Slinger
+Sigarda's Aid
+Plains
+Plains
+Temporary Lockdown
+Disenchant
+Plains x10
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Misshapen Fiend
+Hired Blade
+Swamp
+Scavenger's Talent
+Swamp x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sigarda's Aid.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Scavenger's Talent.Cast
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Mesa Pegasus.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Misshapen Fiend.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Spider-Man, Web-Slinger.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Swamp#3.Activate
+Bot2.Hand.Hired Blade.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Temporary Lockdown.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Exile = Mesa Pegasus; Misshapen Fiend; Ornithopter; Scavenger's Talent; Sigarda's Aid
+? Bot1.Battlefield = Plains; Plains; Plains; Plains; Spider-Man, Web-Slinger; Temporary Lockdown
+? Bot2.Battlefield = Hired Blade; Swamp; Swamp; Swamp
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Disenchant.Cast(Temporary Lockdown)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard = Disenchant; Temporary Lockdown
+Bot1.Battlefield = Mesa Pegasus; Ornithopter; Plains; Plains; Plains; Plains; Plains; Sigarda's Aid; Spider-Man, Web-Slinger
+Bot2.Battlefield = Hired Blade; Misshapen Fiend; Scavenger's Talent; Swamp; Swamp; Swamp
