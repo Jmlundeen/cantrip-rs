@@ -1,0 +1,6 @@
+{
+  "name": "Dark Betrayal",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Destroy target black creature."
+}
