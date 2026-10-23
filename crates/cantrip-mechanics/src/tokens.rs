@@ -114,7 +114,7 @@ pub fn create_tapped_treasure(g: &mut dyn Game, controller: PlayerId) -> Result<
 }
 
 /// A colorless Powerstone artifact token with "{T}: Add {C}. This mana can't be spent to cast a nonartifact spell."
-/// (CR 111.10h, 106.6). Cityscape Leveler makes it.
+/// (CR 111.10h, 106.6). Cityscape Leveler, Excavation Explosion, Fallaji Excavation and Thran Spider make it.
 pub static POWERSTONE: CardDef = CardDef {
     name: "Powerstone Token",
     has_cost: false,
