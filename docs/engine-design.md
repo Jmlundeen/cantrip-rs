@@ -393,8 +393,11 @@ would go over unclickable.
   `move_together` gives them to the new object as it arrives, before its arrival is announced, so nothing that watches
   creatures enter sees a creature: ordinary continuous effects of `Duration::Indefinite` (types in layer 4, then abilities
   lost and gained in layer 6, at timestamps in that order). As an Aura it goes through `attach::choose_aura_hosts` as a
-  printed one does (303.4f-g); its enchant ability is `EffectKind::Enchant(card)`, the card's `becomes_aura_enchant`, which
-  `attach::host_allows` reads beside a printed one for every host check (Necromancy's too).
+  printed one does (303.4f-g); its enchant ability is `EffectKind::Enchant(card)`, the card's `becomes_aura_enchant` (Necromancy's too).
+- **Enchant abilities are abilities (702.5a)**: a printed one and a given one are each an `AbilityRef::enchant(card)` among
+  the object's abilities (layer 6), so "loses all abilities" takes them (613.1f). `attach::host_allows`, `player_allows` and
+  `choose_aura_hosts` read them off the characteristics: each must allow the host (702.5c), one that has none is restricted
+  by none, and an Aura that is a creature enchants nothing (303.4d).
 - **A face-down permanent is what the rule that put it there lists (708.2)**: `Game::put_onto_battlefield_face_down` takes
   `FaceDown::Manifested` (701.40a, a 2/2) or `FaceDown::Cloaked` (701.58a, a 2/2 with ward {2}), and gives the card those
   copiable values (`intrinsic::FACE_DOWN`, `intrinsic::CLOAKED`) before it enters (708.3). On the battlefield they are its

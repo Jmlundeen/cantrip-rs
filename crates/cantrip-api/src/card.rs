@@ -3241,6 +3241,9 @@ impl CardTable {
         if ability.is_miracle() {
             return &MIRACLE_ABILITY;
         }
+        if ability.is_enchant() {
+            return &ENCHANT_ABILITY;
+        }
         let card = self.get(ability.card);
         if ability.is_delayed() {
             &card.delayed[(ability.index - AbilityRef::DELAYED) as usize]
@@ -3263,6 +3266,11 @@ impl CardTable {
         CardId(self.cards.iter().position(|c| std::ptr::eq(*c, def)).expect("a definition in the table") as u16)
     }
 }
+
+/// An enchant ability (CR 702.5a) as one of an object's abilities (`AbilityRef::enchant`): a static ability that restricts
+/// what the Aura can enchant, `CardDef::enchant` or `becomes_aura_enchant` of its card, read where a legal host is judged, and that generates no continuous effect
+/// (it applies in no layer). Lost as every ability is (CR 613.1f).
+pub static ENCHANT_ABILITY: AbilityDef = AbilityDef::Static(StaticDef { text: "Enchant", layer: Layer::End, own: true, ..StaticDef::BLANK });
 
 /// Madness's linked triggered ability (CR 702.35a), the core's own: "when this card is exiled this way, its owner may
 /// cast it by paying [its madness cost] rather than its mana cost; if they don't, they put it into their graveyard."

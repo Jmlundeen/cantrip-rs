@@ -930,7 +930,8 @@ impl<'a> Projector<'a> {
                 || copy.is_some_and(|copy| copy.adds_ability(ability))
         };
         for ability in c.abilities.iter().flatten().copied() {
-            if ability.card != cards.intrinsic && !printed(ability) {
+            // An enchant ability (CR 702.5a) is on the card's text, or in the words of the effect that gave it.
+            if ability.card != cards.intrinsic && !ability.is_enchant() && !printed(ability) {
                 view.granted_abilities.push(AbilityTextView { text: cards.ability(ability).text().to_string(), spent: false });
             }
         }

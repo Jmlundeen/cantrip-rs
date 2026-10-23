@@ -161,3 +161,31 @@ fn it_falls_off_when_its_host_is_no_longer_legal() {
     let now = g.state.obj(aura).became.expect("it moved");
     assert_eq!(g.state.obj(now).zone, Zone::graveyard(YOU));
 }
+
+/// Its enchant ability is one of its abilities (CR 702.5a, 613.1f): once a later effect takes all its abilities, nothing
+/// restricts what it enchants, and a Forest no longer its controller's is not illegal on that ground (CR 303.4c, 704.5m).
+#[test]
+fn an_aura_that_lost_its_enchant_stays_when_its_host_stops_matching() {
+    let mut g = game();
+    let forest = put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &TROLL, YOU, Zone::graveyard(YOU));
+    let aura = return_as_aura(&mut g, card).expect("it entered");
+    cantrip_api::Game::add_effect(&mut cx(&mut g), aura, aura, EffectKind::LoseAllAbilities, Duration::Indefinite);
+    assert!(!cx(&mut g).chars(aura).abilities().any(|a| a.is_enchant()), "the enchant ability is lost with the rest");
+    cantrip_api::Game::add_effect(&mut cx(&mut g), forest, forest, EffectKind::Control(THEM), Duration::Indefinite);
+    assert!(!crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(true));
+    assert!(g.state.battlefield().contains(&aura));
+    assert_eq!(g.state.obj(aura).attached_to, Some(forest));
+}
+
+/// An Aura that is also a creature can enchant nothing (CR 303.4d): made a creature, it is put into its owner's graveyard.
+#[test]
+fn an_aura_that_becomes_a_creature_falls_off() {
+    let mut g = game();
+    put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &TROLL, YOU, Zone::graveyard(YOU));
+    let aura = return_as_aura(&mut g, card).expect("it entered");
+    cantrip_api::Game::add_effect(&mut cx(&mut g), aura, aura, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
+    assert!(crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(false));
+    assert!(!g.state.battlefield().contains(&aura));
+}

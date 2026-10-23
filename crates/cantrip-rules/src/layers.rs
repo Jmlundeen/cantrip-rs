@@ -1037,6 +1037,10 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         abilities[n] = Some(extra);
         n += 1;
     }
+    // An Aura's printed enchant ability (CR 702.5a), after the abilities its text lists so their positions stay.
+    if def.enchant.is_some() && n < MAX_ABILITIES {
+        abilities[n] = Some(AbilityRef::enchant(card));
+    }
     let mut chars = Chars {
         card,
         name: copy_name.unwrap_or_else(|| renamed(def, words)),
@@ -2515,7 +2519,6 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
         | EffectKind::Suspected
         | EffectKind::LoseKeywords(_)
         | EffectKind::AddAbility(_)
-        // Read where a legal host is judged (`attach::host_allows`), not by the layers; listed so a spell's is carried.
         | EffectKind::Enchant(_)
         | EffectKind::MustAttack => Layer::Ability,
         EffectKind::SetPt(..) => Layer::PtSet,
@@ -2644,6 +2647,13 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             (Layer::Ability, EffectKind::AddAbility(ability)) => {
                 if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
                     chars.abilities[slot] = Some(ability);
+                }
+            }
+            // An enchant ability an effect gives (CR 702.5a, 613.1f): one of its abilities, which a later "loses all
+            // abilities" takes.
+            (Layer::Ability, EffectKind::Enchant(card)) => {
+                if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
+                    chars.abilities[slot] = Some(AbilityRef::enchant(card));
                 }
             }
             // A gained "this creature attacks each combat if able" (Carnage, Crimson Chaos). Goad and "attacks that player this
