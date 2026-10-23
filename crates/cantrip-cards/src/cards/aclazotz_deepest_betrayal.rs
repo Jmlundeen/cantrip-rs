@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::{THIS_ATTACKS, THIS_DIES};
-use cantrip_mechanics::{effects, each_discards_a_card, tokens};
+use cantrip_mechanics::{effects, tokens};
 use cantrip_oracle as oracle;
 
 /// "Whenever Aclazotz attacks, each opponent discards a card. For each opponent who can't, you draw a card." Each
@@ -14,7 +14,7 @@ fn each_opponent_discards(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
         .iter()
         .filter(|&&p| g.state().zone(Zone::hand(p)).is_empty() || !may_cause(&*g, you, p, CauseKind::Discard))
         .count();
-    each_discards_a_card(g, &opponents, item.object)?;
+    effects::each_opponent_discards_a_card(g, item)?;
     for _ in 0..cant {
         g.draw(you, 1);
     }

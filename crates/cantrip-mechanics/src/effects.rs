@@ -392,6 +392,15 @@ pub fn add_one_mana_of_any_color(g: &mut dyn Game, item: &StackItem) -> Result<(
     Ok(())
 }
 
+/// "Each opponent discards a card" (CR 701.9, 101.4): each opponent still in the game chooses in turn order from the active player (APNAP) and the cards are
+/// discarded together; one with no card in hand does not discard. Rank Rat, Aclazotz, Deepest Betrayal and Hopeless Nightmare
+/// print it.
+pub fn each_opponent_discards_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
+    crate::each_discards_a_card(g, &opponents, item.object)?;
+    Ok(())
+}
+
 /// "Sacrifice this [permanent]" (CR 701.21): the ability's source. City of Traitors and Carnage, Crimson Chaos print it.
 pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.sacrifice(&[item.object]);
