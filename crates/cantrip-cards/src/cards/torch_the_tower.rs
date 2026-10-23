@@ -5,15 +5,25 @@ use cantrip_oracle as oracle;
 
 /// "Torch the Tower deals 2 damage to target creature or planeswalker. If this spell was bargained, instead it deals 3
 /// damage to that permanent and you scry 1. If a permanent dealt damage by Torch the Tower would die this turn, exile it
-/// instead." The replacement is the spell's own effect (CR 611.2c, 614.1a) on a permanent it dealt damage to: none when
-/// the damage was prevented, and for any way the permanent would die, not only lethal damage (CR 700.4). With its one
+/// instead." The replacement is the spell's own effect (CR 611.2c, 614.1a) on each permanent it actually dealt damage to (CR 120.3,
+/// read from the damage events, so a redirection, CR 614.9, names the permanent it went to): none when the damage was prevented, and for any way the permanent would die, not only lethal damage (CR 700.4). With its one
 /// target illegal the spell does not resolve (CR 608.2b), so there is no scry either.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(permanent) = targets::object(g, item, 0) else { return Ok(()) };
     let bargained = bargain::bargained(item);
-    if g.damage(item.object, Target::Object(permanent), if bargained { 3 } else { 2 }) > 0 {
-        exile_if_it_would_die(g, item.object, 0, permanent);
-    }
+    let before = g.history().head() as usize;
+    g.damage(item.object, Target::Object(permanent), if bargained { 3 } else { 2 });
+    let dealt_to = |r: &Record| match r.event {
+        Event::Damage { source, target: Target::Object(id), amount, .. } if source == item.object && amount > 0 => Some(id),
+        _ => None,
+    };
+    let dealt: Vec<ObjectId> = g.history().all()[before..].iter().filter_map(dealt_to).collect();
+    g.end_sentence();
+    instruction(g, |g| {
+        for id in dealt {
+            exile_if_it_would_die(g, item.object, 0, id);
+        }
+    });
     if bargained {
         scry(g, item.controller, item.object, 1)?;
     }
