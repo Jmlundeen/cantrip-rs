@@ -1,0 +1,40 @@
+# True Ancestry returns the chosen permanent card from your graveyard to your hand and creates a Clue (an artifact token) for the price of
+# {1}{G} exactly (one Mox's mana is left over). Lightning Bolt in the same graveyard is no permanent card, so it is refused as a target
+# while the Ornithopter is a legal one (CR 115.1, 400.3, 111.10f).
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Jet
+Ornithopter
+Lightning Bolt
+True Ancestry
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.True Ancestry.Cast(Graveyard.Lightning Bolt)
+Bot1.Hand.True Ancestry.Cast(Graveyard.Ornithopter; Spend: G, G)
+Bot1.Pass
+? Bot1.Mana = {B}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Ornithopter
+Bot1.Graveyard = True Ancestry; Lightning Bolt
+Bot1.Battlefield.Clue Token.Types = Artifact
+Bot1.Battlefield.Count = 5

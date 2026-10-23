@@ -1,0 +1,45 @@
+# "Up to one target permanent card from your graveyard": with no target chosen True Ancestry still creates its Clue, and a permanent card in
+# the opponent's graveyard is refused as a target while one in Bot1's own graveyard is legal (CR 115.1, 608.2b). Bot1's own Ornithopter is
+# Bolted on turn 1 and stays in the graveyard; Bot2's is Bolted on turn 3, and neither card moves.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+True Ancestry
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.True Ancestry.Cast(Bot2.Graveyard.Ornithopter)
+Bot1.Hand.True Ancestry.Cast()
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = True Ancestry; Lightning Bolt; Ornithopter; Lightning Bolt
+Bot2.Graveyard = Ornithopter
+Bot1.Hand = Forest
+Bot1.Battlefield.Clue Token.Types = Artifact
