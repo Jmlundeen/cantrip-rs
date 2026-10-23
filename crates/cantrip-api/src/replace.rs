@@ -234,7 +234,7 @@ pub struct ReplacementDef {
     pub apply: ReplacementApply,
     /// Game operations the effect performs as it applies (see [`ReplacementThen`]).
     pub then: Option<ReplacementThen>,
-    /// "You may ... instead" (CR 614.1a): the affected player is asked this as the effect would apply, and declining it
+    /// "You may ... instead" (CR 614.1a): the effect's "you", its source's controller (CR 109.5), is asked this as the effect would apply, and declining it
     /// leaves the event as it was, for the other effects (CR 616.1). Dredge's and Abundance's.
     pub optional: Option<&'static Question>,
     /// It functions only while its card is in a graveyard (CR 113.6, 702.52a: dredge), "you" being the card's owner, and

@@ -882,7 +882,7 @@ impl ReplacementDef {
         ReplacementDef { then: Some(then), ..self }
     }
 
-    /// "You may ... instead" (CR 614.1a): the affected player is asked `question` as the effect would apply.
+    /// "You may ... instead" (CR 614.1a): the effect's "you", its source's controller (CR 109.5), is asked `question` as the effect would apply.
     pub const fn optional(self, question: &'static Question) -> ReplacementDef {
         ReplacementDef { optional: Some(question), ..self }
     }

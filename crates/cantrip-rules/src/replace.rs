@@ -390,10 +390,13 @@ fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
     }
 }
 
-/// Whether the affected player takes an optional effect ("you may ... instead", CR 614.1a) as it would apply. When the
-/// question has no answer yet the run goes on as if they did and is replayed with the answer (see `Cx::ask_core`).
-fn takes(cx: &mut Cx, proposal: &Proposal, source: ObjectId, question: &'static Question) -> bool {
-    !matches!(cx.ask_core(affected(cx, proposal), RequestKind::May { source, purpose: Purpose::Ask(question) }, false), Ok(Answer::No))
+/// Whether `you` take an optional effect ("you may ... instead", CR 614.1a) as it would apply: the effect's "you", the
+/// controller of its source (CR 109.5) - or for one functioning from a graveyard, its owner - who need not be the affected
+/// player who orders the effects (CR 616.1): "if a creature an opponent controls would die, you may exile it instead" is the
+/// effect's controller's choice. When the question has no answer yet the run goes on as if they did and is replayed with the
+/// answer (see `Cx::ask_core`).
+fn takes(cx: &mut Cx, you: PlayerId, source: ObjectId, question: &'static Question) -> bool {
+    !matches!(cx.ask_core(you, RequestKind::May { source, purpose: Purpose::Ask(question) }, false), Ok(Answer::No))
 }
 
 /// Runs what an effect does to the game as it applies (`ReplacementThen`): the modified event, every part of which meets only
@@ -438,13 +441,13 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
             Origin::Printed => {
                 let def = &cx.cards().get(source_card(cx, source)).replacements[index as usize];
                 let (apply, then, optional, in_graveyard) = (def.apply, def.then, def.optional, def.in_graveyard);
+                let controller = if in_graveyard { cx.s().obj(source).owner } else { controller_of(cx, source, proposal) };
                 // Declined, it has had its opportunity, and the event goes on as it was (CR 614.5, 616.1).
                 if let Some(question) = optional
-                    && !takes(cx, proposal, source, question)
+                    && !takes(cx, controller, source, question)
                 {
                     continue;
                 }
-                let controller = if in_graveyard { cx.s().obj(source).owner } else { controller_of(cx, source, proposal) };
                 let asker = Asker { source, controller };
                 let before = *proposal;
                 apply(&*cx, &asker, proposal);
@@ -889,6 +892,17 @@ mod tests {
             .in_graveyard()],
         ..CardDef::BLANK
     };
+    fn an_opponent_would_draw(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+        matches!(proposal, Proposal::Draw(d) if d.player != asker.controller)
+    }
+    static SKIP: Question = Question::new("Skip", "have that draw not happen?", "", "Skip", "Let it");
+    /// "If an opponent would draw a card, you may have them draw nothing instead."
+    static DENIER: CardDef = CardDef {
+        name: "Denier",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        replacements: &[replacement(ReplacementKind::Draw, an_opponent_would_draw, instead, "draws nothing instead").optional(&SKIP)],
+        ..CardDef::BLANK
+    };
     static LIMITER: CardDef =
         CardDef { name: "Limiter", types: TypeSet::of(&[CardType::Enchantment]), cant_draw: &[one_each_turn], ..CardDef::BLANK };
 
@@ -896,7 +910,7 @@ mod tests {
     /// library, and a frame whose run is given `answers`.
     fn game(cards: &[(&'static CardDef, Zone)], answers: Vec<Answer>) -> Game {
         let table: &'static CardTable =
-            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER])));
+            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER])));
         let deck: Vec<CardId> = std::iter::repeat_n(table.id_of(&FILLER), 17).collect();
         let mut game = Game::new(table, &crate::Setup { decks: vec![deck, Vec::new()], ..Default::default() });
         for &(def, to) in cards {
@@ -963,5 +977,19 @@ mod tests {
         assert_eq!(draw(&mut game, 1), (8, 9, 20));
         let mut game = self::game(&[(&GRAVE_GAINER, Zone::graveyard(ME))], vec![Answer::No]);
         assert_eq!(draw(&mut game, 1), (8, 9, 20));
+    }
+
+    /// CR 109.5: "you may ... instead" is the choice of the effect's controller, not of the affected player (CR 616.1 gives
+    /// that one only the order). Your effect on an opponent's draw asks you, and taken, they draw nothing.
+    #[test]
+    fn an_optional_replacement_is_chosen_by_its_controller_not_the_affected_player() {
+        let mut game = game(&[(&DENIER, Zone::BATTLEFIELD)], Vec::new());
+        let them = PlayerId(1);
+        let frame = game.state.agenda.len() - 1;
+        game.state.update_frame(frame, |f| f.answers = vec![(Some(ME), Answer::Yes)]);
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+        crate::ops::draw_cards(&mut cx, them, 1);
+        assert!(cx.s().agenda[frame].pending.is_none(), "the controller's answer was the one asked for");
+        assert!(cx.s().zone(Zone::hand(them)).is_empty(), "the draw was replaced");
     }
 }
