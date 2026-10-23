@@ -350,6 +350,12 @@ pub fn scry(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspend>
     crate::scry(g, item.controller, item.object, n)
 }
 
+/// "Scry 2" (CR 701.22) for the ability's controller, as a function the ability takes whole. Candy Trail, Giant's Boulder,
+/// Oteclan Landmark, Planetarium of Wan Shi Tong, Simulacrum Synthesizer, Stormwing Entity and Guardian of New Benalia print it.
+pub fn scry_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    scry(g, item, 2)
+}
+
 /// "You become the monarch" (CR 725.1). Aragorn, King of Gondor and Court of Garenbrig print it.
 pub fn become_monarch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.become_monarch(item.controller);

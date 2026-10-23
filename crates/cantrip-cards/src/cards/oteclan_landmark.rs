@@ -1,12 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::{THIS_ATTACKS, THIS_ENTERS};
-use cantrip_mechanics::{craft, scry, targets};
+use cantrip_mechanics::{craft, effects, targets};
 use cantrip_oracle as oracle;
-
-/// "When this artifact enters, scry 2." (CR 701.22)
-fn scry_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    scry(g, item.controller, item.object, 2)
-}
 
 /// "Target attacking creature without flying": attacking now (CR 506.3), and judged again as the ability resolves (CR
 /// 608.2b), so one that has gained flying since is no longer a legal target.
@@ -30,7 +25,7 @@ pub static BACK: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, scry_two, "When this artifact enters, scry 2."),
+        triggered(THIS_ENTERS, effects::scry_two, "When this artifact enters, scry 2."),
         craft::ability(mana("{2}{W}"), &craft::ARTIFACT, "Craft with artifact {2}{W}"),
     ],
     back: Some(&BACK),

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::{self, THIS_ENTERS};
-use cantrip_mechanics::scry;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
 /// "This spell costs {2}{U} less to cast if you've cast an instant or sorcery spell this turn." (CR 601.2f.) Asked of
@@ -13,13 +13,8 @@ fn less_after_an_instant_or_sorcery(q: &dyn Query, _: ObjectId, player: PlayerId
     }
 }
 
-/// "When this creature enters, scry 2." (CR 701.22.)
-fn scry_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    scry(g, item.controller, item.object, 2)
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggers::PROWESS, triggered(THIS_ENTERS, scry_two, "When this creature enters, scry 2.")],
+    abilities: &[triggers::PROWESS, triggered(THIS_ENTERS, effects::scry_two, "When this creature enters, scry 2.")],
     own_cost_changes: &[less_after_an_instant_or_sorcery],
     ..oracle::STORMWING_ENTITY
 };

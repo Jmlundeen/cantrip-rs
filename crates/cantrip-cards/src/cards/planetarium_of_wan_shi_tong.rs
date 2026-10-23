@@ -1,16 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::ask_may;
-use cantrip_mechanics::{scry, top_of_library, triggers};
+use cantrip_mechanics::effects::{self, ask_may};
+use cantrip_mechanics::{top_of_library, triggers};
 use cantrip_oracle as oracle;
 
 /// The triggered ability, second in the card's list: what "do this only once each turn" is recorded against.
 fn look_ability(q: &dyn Query, source: ObjectId) -> AbilityRef {
     AbilityRef { card: q.chars(source).card, index: 1 }
-}
-
-/// "{1}, {T}: Scry 2." (CR 701.22)
-fn scry_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    scry(g, item.controller, item.object, 2)
 }
 
 /// "Whenever you scry or surveil" (CR 701.22d, 701.25d: once the scry or surveil is complete, whatever made its
@@ -50,7 +45,7 @@ fn look_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        ability(cost("{1}, {T}"), scry_two, "{1}, {T}: Scry 2."),
+        ability(cost("{1}, {T}"), effects::scry_two, "{1}, {T}: Scry 2."),
         triggered(when_asked(EventMask(EventMask::SCRIED.0 | EventMask::SURVEILLED.0), you_scry_or_surveil_not_yet_cast), look_and_cast, "Whenever you scry or surveil, look at the top card of your library. You may cast that card without paying its mana cost. Do this only once each turn. (Look at the card after you scry or surveil.)"),
     ],
     ..oracle::PLANETARIUM_OF_WAN_SHI_TONG
