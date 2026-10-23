@@ -116,8 +116,9 @@ fn refusal(game: &Game, rule: &Selection, n: usize) -> String {
 /// What the rule of a question that picks a set of cards says of `selected`, given as the cards it picks among: whether
 /// they are an answer and which of the cards may be added to them (`Verdict`). The question a client checks a partial
 /// selection against as its player picks (the host's `Check`): a choice of cards and a library search judge by their rule
-/// (`Selection`, the same check `check` makes of an answer), and a cost's tapping for power, collecting evidence and
-/// crafting by theirs. `None` for any other question.
+/// (`Selection`, the same check `check` makes of an answer), a target slot whose targets together are judged by the rule
+/// of its targets together (`TargetSpec::together`, its objects the cards: a player chosen is no card to check), and a
+/// cost's tapping for power, collecting evidence and crafting by theirs. `None` for any other question.
 pub fn selection_verdict(game: &Game, request: &Request, selected: &[ObjectId]) -> Option<(Vec<ObjectId>, Verdict)> {
     let unchosen = |cards: &[ObjectId]| Bits::of(cards.len(), |i| !selected.contains(&cards[i]));
     let among = |cards: &[ObjectId]| distinct(selected) && selected.iter().all(|c| cards.contains(c));
@@ -126,6 +127,19 @@ pub fn selection_verdict(game: &Game, request: &Request, selected: &[ObjectId]) 
         RequestKind::ChooseCards { cards, rule, .. } | RequestKind::SearchLibrary { library: cards, rule, .. } => {
             let verdict = select::judge(game, rule, &Choice { chooser: request.player, source, candidates: cards, selected });
             (cards.clone(), verdict)
+        }
+        // The slot's own count beside its rule (CR 601.2c): complete within `least` to `count`, and nothing addable past it.
+        RequestKind::ChooseTarget { candidates, least, count, together, .. } if !together.is_empty() => {
+            let objects: Vec<ObjectId> = candidates.iter().filter_map(|t| if let Target::Object(id) = *t { Some(id) } else { None }).collect();
+            let chosen: Vec<Target> = selected.iter().map(|&c| Target::Object(c)).collect();
+            let judged = select::judge_targets(game, together.as_slice(), request.player, source, candidates, &chosen);
+            let n = selected.len();
+            let room = n < *count as usize;
+            let addable = Bits::of(objects.len(), |i| {
+                room && candidates.iter().position(|&t| t == Target::Object(objects[i])).is_some_and(|at| judged.addable.get(at))
+            });
+            let complete = among(&objects) && judged.complete && n >= *least as usize && n <= *count as usize;
+            (objects, Verdict { complete, addable })
         }
         // Harmonize's creature is up to one (CR 702.180a).
         RequestKind::TapForPower { purpose: Purpose::TapToReduce, cards, .. } => {
@@ -192,14 +206,16 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 Ok(())
             }
         }
-        (RequestKind::ChooseTarget { candidates, least, count, total, .. }, Answer::Targets(targets)) => {
+        (RequestKind::ChooseTarget { source, candidates, least, count, together, .. }, Answer::Targets(targets)) => {
             let n = targets.len();
             if !distinct(targets) || !targets.iter().all(|t| candidates.contains(t)) {
                 no("not among the candidates")
             } else if n > *count as usize || n < *least as usize {
                 no(format!("{n} chosen, {least} to {count} wanted (CR 601.2c)"))
-            } else if let Some(t) = total.as_ref().filter(|t| !t.allows(candidates, targets)) {
-                no(format!("total mana value {}, {} or less wanted (CR 601.2c, 202.3)", t.of(candidates, targets), t.most))
+            } else if !select::judge_targets(game, together.as_slice(), request.player, *source, candidates, targets).complete {
+                // The rule of the slot's targets together judges them as it judged each pick (`selection_verdict`).
+                let words: Vec<String> = together.as_slice().iter().filter(|p| !p.words.is_empty()).map(|p| p.worded(&|id| game.cards.get(CardId(id as u16)).name.to_string())).collect();
+                no(format!("targets that are not {} together (CR 601.2c)", words.join(", ")))
             } else {
                 Ok(())
             }

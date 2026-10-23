@@ -1,7 +1,7 @@
 //! The ready-made selection rules (`cantrip_mechanics::select`) judged on a real game of test-only cards, and the core
 //! refusing an answer its question's rule refuses (`cantrip_api::select`, docs/engine-design.md "Selection rules"): the
 //! counts, the qualities of each card, "with different names" (CR 201.2b, a split card sharing a name with a card named for
-//! either half, CR 201.2a) and "with total mana value N or less" (CR 202.3).
+//! either half, CR 201.2a), "with different mana values" and "with total mana value N or less" (CR 202.3).
 
 use std::sync::OnceLock;
 
@@ -153,6 +153,20 @@ fn a_total_mana_value_limits_the_cards_together() {
     assert!(!verdict(&game, &three, &[fire, ice]).0);
     assert!(verdict(&game, &three, &[bear]).0);
     assert_eq!(three.words(&|n| n.to_string()), vec!["with total mana value 3 or less".to_string()]);
+}
+
+/// "With different mana values" (CR 202.3): two 2s are refused together, a 2 and a 3 taken, and once a 2 is chosen the
+/// other 2 may not be added.
+#[test]
+fn different_mana_values_keep_the_cards_apart() {
+    let game = game(&["Probe Fire", "Probe Ice", "Probe Bear"]);
+    let (fire, ice, bear) = (of(&game, "Probe Fire"), of(&game, "Probe Ice"), of(&game, "Probe Bear"));
+    let rule = select::cards(select::up_to(3)).with(select::DIFFERENT_MANA_VALUES);
+    assert!(!verdict(&game, &rule, &[fire, ice]).0);
+    assert!(verdict(&game, &rule, &[fire, bear]).0);
+    let after_fire = verdict(&game, &rule, &[fire]).1;
+    assert!(after_fire.contains(&"Probe Bear") && !after_fire.contains(&"Probe Ice"));
+    assert_eq!(rule.words(&|n| n.to_string()), vec!["with different mana values".to_string()]);
 }
 
 /// The first answer reached by taking the first addable card each time: the most a rule allows, or the fewest it needs.

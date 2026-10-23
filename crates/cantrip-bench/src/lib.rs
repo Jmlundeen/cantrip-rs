@@ -191,16 +191,26 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             let n = if up_to { random.below(count + 1) } else { count };
             Answer::Cards(fitting(game, request, random.some(&eligible, n)))
         }
-        RequestKind::ChooseTarget { candidates, least, count, total, .. } => {
+        RequestKind::ChooseTarget { source, candidates, least, count, together, .. } => {
             let n = *least as usize + random.below((*count - *least) as usize + 1);
             let chosen = random.some(candidates, n);
-            // "With total mana value X or less": a random choice over it is cut back to the targets that fit, in the order drawn.
-            match total {
-                Some(t) => {
-                    let values: Vec<u32> = chosen.iter().map(|c| t.values[candidates.iter().position(|e| e == c).unwrap_or(0)]).collect();
-                    Answer::Targets(TotalAtMost { values, most: t.most }.first_fitting(&chosen, chosen.len()))
+            // A slot whose targets together are judged ("with total mana value X or less"): a random choice is cut back to the
+            // targets its rule allows, each added in the order drawn while it may be, and topped up to the fewest it takes.
+            if together.is_empty() {
+                Answer::Targets(chosen)
+            } else {
+                let parts = together.as_slice();
+                let mut kept: Vec<Target> = Vec::new();
+                for t in chosen {
+                    let verdict = cantrip_engine::select::judge_targets(game, parts, request.player, *source, candidates, &kept);
+                    if candidates.iter().position(|&c| c == t).is_some_and(|i| verdict.addable.get(i)) {
+                        kept.push(t);
+                    }
                 }
-                None => Answer::Targets(chosen),
+                if kept.len() < *least as usize {
+                    kept = cantrip_engine::select::first_targets(game, parts, request.player, *source, candidates, *least as usize).unwrap_or_default();
+                }
+                Answer::Targets(kept)
             }
         }
         RequestKind::ChooseModes { eligible, count, .. } => Answer::Modes(random.some(eligible, *count as usize)),

@@ -467,20 +467,48 @@ pub struct TargetSpec {
     /// targets when the spell or the ability's source was kicked, in place of `min` and `max`. The kicker is announced
     /// before the targets are chosen, so the slot is asked once it is known (`TargetSpec::when_kicked`).
     pub if_kicked: Option<(u32, u32)>,
-    /// "Any number of target creature cards with total mana value X or less" (CR 601.2c, 603.3d, 202.3): the targets
-    /// chosen for the slot together have mana values adding up to at most this, judged as they are chosen (and as they
-    /// are chosen anew, CR 115.7). `COUNTED` is the slot's count: the X announced, or what a reflexive ability was given
-    /// (`Game::reflexive_trigger_counted`). A candidate worth more than the limit
-    /// by itself is no legal target. Once
-    /// chosen, each target is checked on its own as the spell or ability resolves (CR 608.2b): one gone leaves the
-    /// others. `None` limits nothing.
-    pub total_mana_value: Option<u32>,
+    /// The rule of the slot's targets together (CR 601.2c, 603.3d, 115.1): "any number of target creature cards with total
+    /// mana value X or less" (`select::total_mana_value_at_most`), "that each have a different mana value X or less"
+    /// (`select::DIFFERENT_MANA_VALUES` with `select::mana_value_at_most`), "with different names"
+    /// (`select::DIFFERENT_NAMES`) - the parts of `cantrip_mechanics::select`, which a choice of cards and a library search
+    /// are judged by too (docs/engine-design.md, "Selection rules"). Every part must allow a candidate for it to be added to
+    /// the targets chosen, and call them complete for them to be chosen; a part whose number is `COUNTED` reads the slot's
+    /// count (the X announced, or what a reflexive ability was given, `Game::reflexive_trigger_counted`). A candidate no part
+    /// allows by itself is no legal target. The targets are judged together as they are chosen, as they are changed or chosen
+    /// anew (CR 115.7), and again as the spell or ability resolves (CR 608.2b): a set the rule no longer allows, a target
+    /// that has left read as it last was, makes every target of the slot illegal (Nethroi, Apex of Death's and Run Away
+    /// Together's rulings). The parts judge the objects among the targets; a player chosen for the slot is neither judged
+    /// nor counted by them. Empty asks nothing.
+    ///
+    /// A part must be downward-closed - any of the targets of a set it allows are allowed too - as every part of
+    /// `cantrip_mechanics::select` is: the core then offers exactly the candidates that keep the choice legal.
+    pub together: &'static [Part],
 }
 
 impl TargetSpec {
-    /// The most the slot's targets' mana values may add up to (`total_mana_value`), with `counted` read for `COUNTED`.
-    pub fn total_limit(&self, counted: u32) -> Option<u32> {
-        self.total_mana_value.map(|v| if v == TargetSpec::COUNTED { counted } else { v })
+    /// The rule of the slot's targets together (`together`), with `counted` read for a part whose number is `COUNTED`.
+    pub fn together_at(&self, counted: u32) -> Parts {
+        if self.together.iter().any(|p| p.n == TargetSpec::COUNTED) {
+            Parts::Shared(
+                self.together
+                    .iter()
+                    .map(|&p| {
+                        let mut p = p;
+                        if p.n == TargetSpec::COUNTED {
+                            p.n = counted;
+                        }
+                        p
+                    })
+                    .collect(),
+            )
+        } else {
+            Parts::Static(self.together)
+        }
+    }
+
+    /// Whether a part of the rule of its targets together reads the slot's count (`COUNTED`).
+    pub fn together_counted(&self) -> bool {
+        self.together.iter().any(|p| p.n == TargetSpec::COUNTED)
     }
 
     /// The same slot with `label` as what it is for.

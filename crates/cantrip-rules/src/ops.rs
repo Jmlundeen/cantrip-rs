@@ -1756,9 +1756,13 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
             // A slot sees what the slots before it now target (CR 601.2c: "another target creature").
             let earlier = if item.target_count > 1 { &targets[..run.start] } else { &[][..] };
             let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, item.subject, slot_player, crate::resolve::announced_x(&item));
-            // "With total mana value X or less" holds of the new targets together (CR 115.7d, 601.2c), X as it was.
-            let (candidates, total) = crate::actions::within_total(cx, &spec, u32::from(item.x), candidates);
+            // The rule of the slot's targets together holds of the new targets (CR 115.7d, 601.2c), X as it was.
+            let (candidates, together) = crate::actions::within_together(cx, &asker, &spec, u32::from(item.counted), candidates);
             if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
+                continue;
+            }
+            // No as many targets the rule allows together: nothing could be chosen anew, and the targets stay.
+            if !crate::actions::enough_together(cx, &asker, &together, &candidates, cantrip_state::count_u32(current.len())) {
                 continue;
             }
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player,
@@ -1769,14 +1773,14 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
                 least: cantrip_state::count_u32(current.len()),
                 count: cantrip_state::count_u32(current.len()),
                 any_number: false,
-                total: total.clone(),
+                together: together.clone(),
             };
             // Each target of a slot is a different object or player (CR 115.3), and a legal one (CR 115.7d).
             if let Answer::Targets(chosen) = cx.ask_core(chooser, ask, false)?
                 && chosen.len() == current.len()
                 && chosen.iter().all(|t| candidates.contains(t))
                 && chosen.iter().enumerate().all(|(i, t)| !chosen[..i].contains(t))
-                && total.as_ref().is_none_or(|t| t.allows(&candidates, &chosen))
+                && select::targets_together(cx, together.as_slice(), asker.controller, asker.source, &chosen)
             {
                 targets[run].copy_from_slice(&chosen);
                 changed = true;
@@ -1791,18 +1795,17 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
     Ok(item)
 }
 
-/// Whether target `slot` of `item`, its targets being `targets`, changed to `to` keeps the targets of its slot within the slot's total mana value
-/// (`TargetSpec::total_mana_value`, CR 115.7a, 601.2c), the X the item was put on the stack with; true for a slot with none.
-fn fits_total(cx: &Cx, item: &StackItem, targets: &[Target], slot: usize, spec: &TargetSpec, to: Target) -> bool {
-    let Some(most) = spec.total_limit(u32::from(item.x)) else { return true };
-    let value = |t: Target| match t {
-        Target::Object(id) => cx.mana_value(id),
-        _ => 0,
-    };
+/// Whether target `slot` of `item`, its targets being `targets`, changed to `to` keeps the targets of its slot as the rule of
+/// its targets together allows (`TargetSpec::together`, CR 115.7a, 601.2c), with the count they were chosen with; true
+/// for a slot with none.
+fn fits_together(cx: &Cx, item: &StackItem, targets: &[Target], slot: usize, spec: &TargetSpec, to: Target) -> bool {
+    if spec.together.is_empty() {
+        return true;
+    }
     let run = cx.s().spec_targets(item, cx.s().spec(item, slot) as usize);
-    // Added up in a u64, so no number of u32 mana values overflows it.
-    let total: u64 = run.map(|i| u64::from(if i == slot { value(to) } else { value(targets.get(i).copied().unwrap_or(Target::None)) })).sum();
-    total <= u64::from(most)
+    let set: Vec<Target> =
+        run.map(|i| if i == slot { to } else { targets.get(i).copied().unwrap_or(Target::None) }).filter(|&t| t != Target::None).collect();
+    select::targets_together(cx, spec.together_at(u32::from(item.counted)).as_slice(), item.controller, item.object, &set)
 }
 
 /// `chooser` may choose new targets for a spell on the stack (CR 115.7d): Sudden Substitution's "then the spell's controller
@@ -1845,7 +1848,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         let others: Vec<Target> =
             crate::actions::target_candidates_given(cx, &asker, &spec, &all[..slot], item.subject, slot_player, crate::resolve::announced_x(&item))
                 .into_iter()
-                .filter(|&t| t != all[slot] && fits_total(cx, &item, &all, slot, &spec, t))
+                .filter(|&t| t != all[slot] && fits_together(cx, &item, &all, slot, &spec, t))
                 .collect();
         if others.is_empty() {
             return Ok(());
@@ -1854,9 +1857,9 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
     }
     let mut changed = all.clone();
     for (slot, others) in options.into_iter().enumerate() {
-        // A slot with a total mana value judges each new target with the ones already changed (CR 115.7a, 601.2c).
+        // A slot whose targets together are judged judges each new target with the ones already changed (CR 115.7a, 601.2c).
         let others: Vec<Target> = match crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) {
-            Some((spec, _)) if spec.total_mana_value.is_some() => others.into_iter().filter(|&t| fits_total(cx, &item, &changed, slot, &spec, t)).collect(),
+            Some((spec, _)) if !spec.together.is_empty() => others.into_iter().filter(|&t| fits_together(cx, &item, &changed, slot, &spec, t)).collect(),
             _ => others,
         };
         if others.is_empty() {
@@ -1865,7 +1868,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         let new = if others.len() == 1 {
             others[0]
         } else {
-            let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
+            let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: Parts::NONE,
                 source: item.object,
                 purpose: Purpose::Targets,
                 candidates: others.clone(),
@@ -1917,7 +1920,7 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
     let legal = |cx: &Cx, list: &[Target], slot: usize| -> bool {
         let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return false };
         crate::actions::target_candidates_given(cx, &asker, &spec, &list[..slot], item.subject, slot_player, crate::resolve::announced_x(&item)).contains(&list[slot])
-            && fits_total(cx, &item, list, slot, &spec, list[slot])
+            && fits_together(cx, &item, list, slot, &spec, list[slot])
     };
     let changeable: Vec<usize> = (0..count)
         .filter(|&slot| {
@@ -1961,7 +1964,7 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
             let ask = RequestKind::ChooseTarget {
                 label: "The target to change to this creature",
                 slot_player: None,
-                total: None,
+                together: Parts::NONE,
                 source: to,
                 purpose: Purpose::ChangeTargetTo,
                 candidates: candidates.clone(),
@@ -2820,7 +2823,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     if candidates.is_empty() {
         return Ok(());
     }
-    let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
+    let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: Parts::NONE,
         source,
         purpose: Purpose::Targets,
         count: cantrip_state::count_u32(candidates.len()),

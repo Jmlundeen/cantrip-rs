@@ -538,13 +538,10 @@ fn choose_trigger_targets(
                 *slot_player,
                 None,
             );
-            // A bound that is the "that many" of a reflexive ability (CR 603.12), or else the number of times the source
-            // was kicked, or its X (CR 702.33d, 107.3m).
-            let source = cx.s().obj(trigger.source);
-            let counted = u32::from(trigger.count.unwrap_or(if source.x > 0 { source.x } else { source.kicked as u16 }));
-            let (candidates, total) = crate::actions::within_total(cx, spec, counted, candidates);
+            let counted = u32::from(trigger_counted(cx, trigger));
+            let (candidates, together) = crate::actions::within_together(cx, &asker, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
-            if candidates.len() < least as usize {
+            if !crate::actions::enough_together(cx, &asker, &together, &candidates, least) {
                 // Fewer legal targets than the slot's minimum: it is removed from the stack (CR 603.3d, 601.2c).
                 return Ok(false);
             }
@@ -560,7 +557,7 @@ fn choose_trigger_targets(
                 targets.push(candidates[0]);
                 break 'slot;
             }
-            if all_of_few && least > 0 && candidates.len() <= least as usize && total.is_none() {
+            if all_of_few && least > 0 && candidates.len() <= least as usize && together.is_empty() {
                 targets.extend(candidates);
                 break 'slot;
             }
@@ -581,7 +578,7 @@ fn choose_trigger_targets(
                 count,
                 // "Any number of targets" (CR 115.1d) is said so, not as "up to" the candidates there are.
                 any_number: spec.is_any_number(),
-                total,
+                together,
             };
             // The ability's controller chooses its targets (CR 603.3d), unless it says that player does: the one it is about.
             let chooser = match trigger.subject {
@@ -611,6 +608,13 @@ fn choose_trigger_targets(
 fn left_the_game(cx: &mut Cx, player: PlayerId) -> bool {
     cx.concessions_here();
     cx.s().player(player).lost
+}
+
+/// What a triggered ability's target slots' `TargetSpec::COUNTED` read (`StackItem::counted`): the "that many" of a reflexive
+/// ability (CR 603.12), or else its source's X, or the number of times the source was kicked (CR 702.33d, 107.3m).
+fn trigger_counted(cx: &Cx, trigger: &PendingTrigger) -> u16 {
+    let source = cx.s().obj(trigger.source);
+    trigger.count.unwrap_or(if source.x > 0 { source.x } else { u16::from(source.kicked) })
 }
 
 fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
@@ -700,6 +704,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         inline_spec_of: [0; cantrip_state::INLINE_TARGETS],
         x: trigger.count.unwrap_or(0),
         kicked: 0,
+        counted: trigger_counted(cx, &trigger),
         paid: 0,
         modes: mask,
         way: 0,

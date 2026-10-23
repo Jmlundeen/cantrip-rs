@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::exile_up_to_four_named_from_graveyard_hand_and_library;
 use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT;
-use cantrip_mechanics::{effects, exile_and_return_transformed, firebending, targets};
+use cantrip_mechanics::{effects, exile_and_return_transformed, firebending, select, targets};
 use cantrip_oracle as oracle;
 
 /// III: "Exile this Saga, then return it to the battlefield transformed under your control": the ability's controller's,
@@ -59,7 +59,7 @@ pub static BACK: CardDef = CardDef {
     ],
     delayed: &[delayed_trigger(reanimate, "When you do, put any number of target creature cards with total mana value X or less from that player's graveyard onto the battlefield under your control.")
         .targets(&[TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(creature_card_in_that_players_graveyard) }
-            .total_mana_value_at_most(TargetSpec::COUNTED)
+            .together(&[select::total_mana_value_at_most(TargetSpec::COUNTED)])
             .labelled("Creature cards from that player's graveyard to put onto the battlefield under your control")])],
     ..oracle::FIRE_LORD_SOZIN
 };

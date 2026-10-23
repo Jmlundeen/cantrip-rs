@@ -683,17 +683,17 @@ pub const fn spell(targets: &'static [TargetSpec], effect: Effect) -> Option<Spe
 
 /// One target that passes the filter (CR 115.1).
 pub const fn target(filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 1, max: 1, filter, label: "", if_kicked: None, total_mana_value: None }
+    TargetSpec { min: 1, max: 1, filter, label: "", if_kicked: None, together: &[] }
 }
 
 /// "Up to one target" (CR 115.1d).
 pub const fn up_to_one(filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 0, max: 1, filter, label: "", if_kicked: None, total_mana_value: None }
+    TargetSpec { min: 0, max: 1, filter, label: "", if_kicked: None, together: &[] }
 }
 
 /// "Up to N targets" (CR 115.1d).
 pub const fn up_to(n: u32, filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 0, max: n, filter, label: "", if_kicked: None, total_mana_value: None }
+    TargetSpec { min: 0, max: n, filter, label: "", if_kicked: None, together: &[] }
 }
 
 impl TargetSpec {
@@ -718,10 +718,10 @@ impl TargetSpec {
         TargetSpec { if_kicked: Some((min, max)), ..self }
     }
 
-    /// "With total mana value `most` or less" (CR 601.2c, 202.3): the targets chosen for the slot together; `COUNTED` reads
-    /// the slot's count, "total mana value X or less" (`TargetSpec::total_mana_value`).
-    pub const fn total_mana_value_at_most(self, most: u32) -> TargetSpec {
-        TargetSpec { total_mana_value: Some(most), ..self }
+    /// The same slot, its targets together judged by `parts` (`TargetSpec::together`, CR 601.2c, 115.1): "any number of target
+    /// creature cards with total mana value X or less" is `.together(&[select::total_mana_value_at_most(TargetSpec::COUNTED)])`.
+    pub const fn together(self, parts: &'static [Part]) -> TargetSpec {
+        TargetSpec { together: parts, ..self }
     }
 }
 

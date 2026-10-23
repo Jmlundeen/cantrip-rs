@@ -46,6 +46,8 @@ mod slot_targets_cost_tests;
 #[cfg(test)]
 mod x_minimum_tests;
 #[cfg(test)]
+mod together_targets_tests;
+#[cfg(test)]
 mod suspend_haste_tests;
 #[cfg(test)]
 mod entering_judged_tests;

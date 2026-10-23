@@ -924,17 +924,20 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::ChooseTarget { source, purpose, candidates, optional, least, count, any_number, label, slot_player, total } => {
+        RequestKind::ChooseTarget { source, purpose, candidates, optional, least, count, any_number, label, slot_player, together } => {
             let source_handle = source_handle(game, handles, *source);
+            // A rule of the slot's targets together that keeps a running total of mana value (CR 202.3): its most, and each
+            // candidate's mana value, read where it is (an {X} in a graveyard is 0, CR 202.3e).
+            let tally = together.as_slice().iter().find(|p| p.tally == cantrip_engine::select::Tally::ManaValueAtMost).map(|p| p.n);
+            let value = |t: &Target| match *t {
+                Target::Object(id) if tally.is_some() => wire(game.mana_value(id)),
+                _ => 0,
+            };
             // Each candidate the wire can carry, with its mana value when the targets are limited to a total of them.
-            let sent: Vec<(TargetMessage, i32)> = candidates
-                .iter()
-                .enumerate()
-                .filter_map(|(i, t)| {
-                    let value = total.as_ref().map_or(0, |t| wire(t.values.get(i).copied().unwrap_or(0)));
-                    target_message(handles, *t).map(|m| (m, value))
-                })
-                .collect();
+            let sent: Vec<(TargetMessage, i32)> = candidates.iter().filter_map(|t| target_message(handles, *t).map(|m| (m, value(t)))).collect();
+            // The rule's words and its verdict on none chosen; every other selection is asked of the host (`Check`).
+            let words = together.as_slice().iter().filter(|p| !p.words.is_empty()).map(|p| p.worded(&|id| game.cards.get(CardId(id as u16)).name.to_string())).collect();
+            let verdict = if together.is_empty() { None } else { Some(verdict_view(game, request, handles)) };
             PromptPayload::ChooseTargetPromptMessage(ChooseTargetPrompt {
                 player,
                 ability: source_handle,
@@ -942,8 +945,10 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 text: (*label).to_string(),
                 // "With total mana value X or less" (CR 601.2c, 202.3): each candidate's mana value, index for index, and the
                 // most the targets chosen may add up to.
-                mana_values: if total.is_some() { sent.iter().map(|&(_, v)| v).collect() } else { Vec::new() },
-                maximum_total_mana_value: total.as_ref().map(|t| wire(t.most)),
+                mana_values: if tally.is_some() { sent.iter().map(|&(_, v)| v).collect() } else { Vec::new() },
+                maximum_total_mana_value: tally.map(wire),
+                words,
+                verdict,
                 candidates: sent.into_iter().map(|(m, _)| m).collect(),
                 optional: *optional,
                 count: wire(*count),
@@ -1451,13 +1456,27 @@ mod tests {
         assert_eq!((found.count, found.count_kind), (1, CountKindView::AsManyAsCan));
     }
 
+    fn total_mana_value(q: &dyn Query, choice: &cantrip_engine::select::Choice, most: u32) -> cantrip_engine::select::Verdict {
+        let total: u32 = choice.selected.iter().map(|&c| q.mana_value(c)).sum();
+        let addable = cantrip_engine::select::Bits::of(choice.candidates.len(), |i| q.mana_value(choice.candidates[i]) + total <= most);
+        cantrip_engine::select::Verdict { complete: total <= most, addable }
+    }
+
+    fn different_mana_values(q: &dyn Query, choice: &cantrip_engine::select::Choice, _: u32) -> cantrip_engine::select::Verdict {
+        let chosen: Vec<u32> = choice.selected.iter().map(|&c| q.mana_value(c)).collect();
+        let addable = cantrip_engine::select::Bits::of(choice.candidates.len(), |i| !chosen.contains(&q.mana_value(choice.candidates[i])));
+        cantrip_engine::select::Verdict { complete: chosen.iter().enumerate().all(|(i, v)| !chosen[..i].contains(v)), addable }
+    }
+
     /// "Any number of target creature cards with total mana value X or less" reaches the client as the limit and each
-    /// candidate's mana value, index for index; the default answer takes the first candidates that fit together.
+    /// candidate's mana value, index for index, with the rule's words and its verdict on none chosen; the default answer takes
+    /// the first candidates that fit together.
     #[test]
     fn targets_within_a_total_mana_value_send_the_limit_and_each_candidates_value() {
+        use cantrip_engine::select::{SelectFn, Tally, tallied};
         let (game, hand) = game_with(&["Llanowar Elves", "Ornithopter", "Guerrilla Gorilla"]);
         let seat = game.state.seats().next().expect("a seat");
-        let ask = |total: Option<TotalAtMost>| {
+        let ask = |together: Parts| {
             let request = Request {
                 id: 1,
                 player: seat,
@@ -1471,7 +1490,7 @@ mod tests {
                     any_number: true,
                     label: "",
                     slot_player: None,
-                    total,
+                    together,
                 },
                 may_cancel: false,
             };
@@ -1480,15 +1499,53 @@ mod tests {
                 other => panic!("{other:?}"),
             }
         };
-        let limited = ask(Some(TotalAtMost { values: vec![1, 0, 2], most: 1 }));
+        let total = tallied(&(total_mana_value as SelectFn), 1, "with total mana value {n} or less", Tally::ManaValueAtMost);
+        let limited = ask(Parts::Shared(vec![total].into()));
         assert_eq!((limited.maximum_total_mana_value, limited.mana_values.clone()), (Some(1), vec![1, 0, 2]));
+        assert_eq!(limited.words, vec!["with total mana value 1 or less".to_string()]);
+        assert_eq!(limited.verdict.as_ref().map(|v| (v.complete, v.addable.len())), Some((true, 2)), "Guerrilla Gorilla (2) is no target alone");
         let AnswerPayload::TargetsChosenAnswer(default) = PromptPayload::ChooseTargetPromptMessage(limited.clone()).default_answer() else {
             panic!("a targets answer")
         };
         // Llanowar Elves (1) and Ornithopter (0) fit within 1; Guerrilla Gorilla (2) would not.
         assert_eq!(default.targets.len(), 2);
-        let free = ask(None);
-        assert_eq!((free.maximum_total_mana_value, free.mana_values), (None, Vec::new()));
+        let free = ask(Parts::NONE);
+        assert_eq!((free.maximum_total_mana_value, free.mana_values, free.verdict), (None, Vec::new(), None));
+    }
+
+    /// A slot whose targets must each have a different mana value sends no total, only the rule's words and verdict; the
+    /// host's check of a selection says which candidates may still be added (Llanowar Elves and Birds of Paradise share 1).
+    #[test]
+    fn targets_with_different_mana_values_are_checked_by_the_host() {
+        use cantrip_engine::select::{SelectFn, part};
+        let (game, hand) = game_with(&["Llanowar Elves", "Birds of Paradise", "Guerrilla Gorilla"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let request = Request {
+            id: 1,
+            player: seat,
+            kind: RequestKind::ChooseTarget {
+                source: hand[0],
+                purpose: Purpose::Targets,
+                candidates: hand[..3].iter().map(|&c| Target::Object(c)).collect(),
+                optional: true,
+                least: 0,
+                count: 3,
+                any_number: true,
+                label: "",
+                slot_player: None,
+                together: Parts::Shared(vec![part(&(different_mana_values as SelectFn), 0, "with different mana values")].into()),
+            },
+            may_cancel: false,
+        };
+        let mut handles = HandleSpace::new();
+        let PromptPayload::ChooseTargetPromptMessage(p) = prompt(&game, &request, &mut handles).expect("a prompt").0 else { panic!("targets") };
+        assert_eq!((p.maximum_total_mana_value, p.words.clone()), (None, vec!["with different mana values".to_string()]));
+        assert_eq!(p.verdict.as_ref().map(|v| v.addable.len()), Some(3));
+        let after_elves = verdict_of(&game, &request, &[hand[0]], &mut handles).expect("a target slot judged together");
+        assert_eq!(after_elves.addable, vec![handles.handle(hand[2])], "Birds of Paradise has the Elves' mana value");
+        assert!(after_elves.complete);
+        let both = verdict_of(&game, &request, &[hand[0], hand[1]], &mut handles).expect("a verdict");
+        assert!(!both.complete, "two of mana value 1");
     }
 
     /// A choice between the words a card's text offers (CR 607.2f) is captioned with every word, in the card's words and

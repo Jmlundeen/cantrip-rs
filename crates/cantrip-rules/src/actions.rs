@@ -1142,8 +1142,20 @@ fn targets_with_activation(def: &ActivatedDef) -> bool {
 
 /// Whether every required slot has at least its minimum number of legal targets (CR 601.2c): fewer is no legal announcement, so the
 /// spell or ability is not offered.
+/// A slot whose targets together are judged (`TargetSpec::together`) needs that many the rule allows together, judged before X
+/// is announced with its parts' `COUNTED` unread, so as large as any X could make it.
 pub(crate) fn slots_satisfiable(cx: &Cx, asker: &Asker, specs: &[TargetSpec]) -> bool {
-    specs.iter().all(|spec| !spec.required() || target_candidates(cx, asker, spec).len() >= spec.min as usize)
+    specs.iter().all(|spec| {
+        if !spec.required() {
+            return true;
+        }
+        let candidates = target_candidates(cx, asker, spec);
+        if spec.together.is_empty() {
+            candidates.len() >= spec.min as usize
+        } else {
+            select::first_targets(cx, spec.together, asker.controller, asker.source, &candidates, spec.min as usize).is_some()
+        }
+    })
 }
 
 /// Fills in an option's targets; false when a required slot has no candidate, so the option is not offered.
@@ -1152,7 +1164,8 @@ fn with_targets(cx: &Cx, asker: &Asker, specs: &[TargetSpec], option: &mut Actio
         return slots_satisfiable(cx, asker, specs);
     }
     for spec in specs {
-        let candidates = target_candidates(cx, asker, spec);
+        // A target the rule of the slot's targets together refuses by itself is none (`TargetSpec::together`).
+        let candidates = select::targets_allowed(cx, spec.together, asker.controller, asker.source, target_candidates(cx, asker, spec));
         if candidates.is_empty() && spec.required() {
             return false;
         }
@@ -1399,7 +1412,6 @@ enum Found {
 /// every set of them.
 struct AnnouncementSearch<'a, K> {
     q: &'a dyn Query,
-    cx: &'a Cx<'a>,
     asker: &'a Asker,
     /// Each slot, the opponent it is for, its segment, and how many slots its segment has.
     slots: Vec<(TargetSpec, Option<PlayerId>, usize, usize)>,
@@ -1444,7 +1456,7 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
         };
         let earlier: &[Target] = if in_segment > 1 { &targets[start..] } else { &[] };
         let candidates = candidates(self.q, self.asker, &spec, earlier, Target::None, slot_player, None, self.gift);
-        let (candidates, total) = within_total(self.cx, &spec, self.counted, candidates);
+        let (candidates, together) = within_together(self.q, self.asker, &spec, self.counted, candidates);
         let (least, most) = spec.bounds(self.counted);
         if candidates.len() < least as usize || (candidates.is_empty() && spec.required()) {
             return Found::No;
@@ -1452,9 +1464,9 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
         let count = most.min(cantrip_state::count_u32(candidates.len())) as usize;
         let least = (least as usize).min(count);
         let before = targets.len();
-        // The last slot, of no total, with candidates to take as alike: judged by how many of them, while the changes tell
-        // none apart.
-        if at + 1 == self.slots.len() && total.is_none() && !self.watching.told.get() {
+        // The last slot, of no rule of its targets together, with candidates to take as alike: judged by how many of them,
+        // while the changes tell none apart.
+        if at + 1 == self.slots.len() && together.is_empty() && !self.watching.told.get() {
             let alike: Vec<ObjectId> = candidates
                 .iter()
                 .filter_map(|&t| if let Target::Object(id) = t { Some(id) } else { None })
@@ -1473,12 +1485,18 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
             }
         }
         let mut chosen: Vec<usize> = Vec::with_capacity(count);
+        let mut picked: Vec<Target> = Vec::new();
         for n in least..=count {
             // Each `n` of the candidates, in order (CR 601.2c: different ones).
             chosen.clear();
             chosen.extend(0..n);
             loop {
-                if total.as_ref().is_none_or(|t| chosen.iter().map(|&i| t.values[i]).sum::<u32>() <= t.most) {
+                let allowed = together.is_empty() || {
+                    picked.clear();
+                    picked.extend(chosen.iter().map(|&i| candidates[i]));
+                    select::targets_together(self.q, together.as_slice(), self.asker.controller, self.asker.source, &picked)
+                };
+                if allowed {
                     targets.extend(chosen.iter().map(|&i| candidates[i]));
                     if in_segment > 1 && spec.max <= 1 && n == 0 {
                         targets.push(Target::None);
@@ -1559,7 +1577,7 @@ fn some_announcement<K: PartialEq>(
         slots.extend(expanded.into_iter().map(|(spec, player, _)| (spec.when_kicked(kicked), player, segment, n)));
     }
     let watching = Watching { alike: std::cell::RefCell::new(Vec::new()), told: std::cell::Cell::new(false) };
-    let mut search = AnnouncementSearch { q, cx, asker, slots, counted, gift, key, covered, seen: Vec::new(), budget, named, watching };
+    let mut search = AnnouncementSearch { q, asker, slots, counted, gift, key, covered, seen: Vec::new(), budget, named, watching };
     let mut targets = prefix.to_vec();
     search.slot(0, &mut targets, prefix.len())
 }
@@ -1574,19 +1592,21 @@ fn named_by_changes(cx: &Cx, a: &Available, costed: ObjectId) -> Vec<ObjectId> {
     named
 }
 
-/// Whether a slot's number of targets, or the most its targets' mana values may add up to, is counted by X or the kicker
-/// (CR 601.2b-c), unkicked or kicked.
+/// Whether a slot's number of targets, or a part of the rule of its targets together ("with total mana value X or less",
+/// "mana value X or less"), is counted by X or the kicker (CR 601.2b-c), unkicked or kicked.
 fn reads_count(spec: &TargetSpec) -> bool {
-    [*spec, spec.when_kicked(1)].iter().any(|s| s.min == TargetSpec::COUNTED || s.max == TargetSpec::COUNTED || s.total_mana_value == Some(TargetSpec::COUNTED))
+    [*spec, spec.when_kicked(1)].iter().any(|s| s.min == TargetSpec::COUNTED || s.max == TargetSpec::COUNTED || s.together_counted())
 }
 
 /// The most X (or times kicked) that could make a difference to the targets of slots counted by it (`reads_count`): the
-/// candidates there are, or their mana values together for a slot limited by its total; past that more only costs more.
+/// candidates there are, or their mana values together for a slot whose rule of its targets together reads it - a mana
+/// value of the targets' (each at most X, or all of them together), which no X past their total changes; past that more
+/// only costs more. A part reading X as anything but a mana value (a total power) must widen this bound.
 fn count_bound<'a>(cx: &Cx, asker: &Asker, specs: impl Iterator<Item = &'a TargetSpec>) -> u16 {
     let mut bound = 0u32;
     for spec in specs.filter(|s| reads_count(s)) {
         let candidates = target_candidates(cx, asker, &spec.when_kicked(1));
-        let n = if [*spec, spec.when_kicked(1)].iter().any(|s| s.total_mana_value == Some(TargetSpec::COUNTED)) {
+        let n = if spec.together_counted() {
             candidates.iter().map(|&t| if let Target::Object(id) = t { cx.mana_value(id) } else { 0 }).sum::<u32>()
         } else {
             cantrip_state::count_u32(candidates.len())
@@ -5911,6 +5931,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         inline_spec_of: [0; cantrip_state::INLINE_TARGETS],
         x: 0,
         kicked: 0,
+        counted: 0,
         paid: 0,
         modes: 0,
         way: 0,
@@ -6262,12 +6283,13 @@ fn cast(
         item.gift = Some(to);
         cx.st().update_obj(spell, |o| o.gift = Some(to));
     }
+    // CR 601.2c: targets slot by slot, where they were not announced with the action; a slot counted by X or by the
+    // times it was kicked is judged by what was announced.
+    item.counted = if item.x > 0 { item.x } else { u16::from(item.kicked) };
+    let counted = u32::from(item.counted);
     item.since = cx.g.log.len() as u32;
     cx.st().stack_push(item);
 
-    // CR 601.2c: targets slot by slot, where they were not announced with the action; a slot counted by X or by the
-    // times it was kicked is judged by what was announced.
-    let counted = u32::from(if item.x > 0 { item.x } else { u16::from(item.kicked) });
     let mut targets: Vec<Target> = targets.to_vec();
     let mut of: Vec<u8> = Vec::new();
     if let Some(modal) = def.modal {
@@ -6853,18 +6875,24 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
     }
 }
 
-/// A slot "with total mana value N or less" (`TargetSpec::total_mana_value`; CR 601.2c, 603.3d, 202.3), `counted` its
-/// count: the candidates less any worth more than the limit by itself, which no legal choice could include, and the limit
-/// with each remaining candidate's mana value, index for index, for the question (the core refuses an answer over it).
-/// A slot without one keeps its candidates and asks nothing of them.
-pub(crate) fn within_total(cx: &Cx, spec: &TargetSpec, counted: u32, candidates: Vec<Target>) -> (Vec<Target>, Option<TotalAtMost>) {
-    let Some(most) = spec.total_limit(counted) else { return (candidates, None) };
-    let value = |t: Target| match t {
-        Target::Object(id) => cx.mana_value(id),
-        _ => 0,
-    };
-    let (kept, values): (Vec<Target>, Vec<u32>) = candidates.into_iter().map(|t| (t, value(t))).filter(|&(_, v)| v <= most).unzip();
-    (kept, Some(TotalAtMost { values, most }))
+/// A slot whose targets together are judged (`TargetSpec::together`; CR 601.2c, 603.3d, 115.1), `counted` its count: the
+/// candidates less any the rule refuses by itself, which no legal choice could include, and the rule with its numbers read
+/// for the question (the core refuses an answer it does not call complete). A slot without one keeps its candidates and
+/// asks nothing of them.
+pub(crate) fn within_together(q: &dyn Query, asker: &Asker, spec: &TargetSpec, counted: u32, candidates: Vec<Target>) -> (Vec<Target>, Parts) {
+    if spec.together.is_empty() {
+        return (candidates, Parts::NONE);
+    }
+    let together = spec.together_at(counted);
+    let kept = select::targets_allowed(q, together.as_slice(), asker.controller, asker.source, candidates);
+    (kept, together)
+}
+
+/// Whether a slot judged by `together` has a legal choice of `least` targets among `candidates` (CR 601.2c): as many
+/// candidates, and for a rule of its targets together, that many it allows together.
+pub(crate) fn enough_together(q: &dyn Query, asker: &Asker, together: &Parts, candidates: &[Target], least: u32) -> bool {
+    candidates.len() >= least as usize
+        && (together.is_empty() || least == 0 || select::first_targets(q, together.as_slice(), asker.controller, asker.source, candidates, least as usize).is_some())
 }
 
 /// Each target slot's targets, asked in slot order (CR 601.2c), each a target of the slot's own (a player may be
@@ -6885,10 +6913,10 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
         'slot: {
             let candidates =
                 target_candidates_given(cx, &asker, spec, if slots.len() > 1 { &targets } else { &[] }, Target::None, *slot_player, x);
-            let (candidates, total) = within_total(cx, spec, counted, candidates);
+            let (candidates, together) = within_together(cx, &asker, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
             // Fewer legal targets than the slot's minimum is not a legal announcement (CR 601.2c, 602.2b): given up whole.
-            if candidates.len() < least as usize {
+            if !enough_together(cx, &asker, &together, &candidates, least) {
                 return Err(Stop::Cancel);
             }
             if candidates.is_empty() {
@@ -6911,7 +6939,7 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
                 count,
                 // "Any number of targets" (CR 115.1d) is said so, not as "up to" the candidates there are.
                 any_number: spec.is_any_number(),
-                total,
+                together,
             };
             match cx.ask_core(player, ask, true)? {
                 Answer::Targets(chosen) => targets.extend(chosen),
@@ -7557,7 +7585,8 @@ fn activate(
     }
     announce_twobrids(cx, player, source, &mut mana, false)?;
     let life = announce_life(cx, player, source, &mut mana, false)?;
-    // CR 602.2a, 701.27f: put on the stack now, before its costs are paid.
+    // CR 602.2a, 701.27f: put on the stack now, before its costs are paid; a slot counted by X reads the X announced.
+    item.counted = item.x;
     item.since = cx.g.log.len() as u32;
     cx.st().stack_push(item);
 

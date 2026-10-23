@@ -190,7 +190,9 @@ fn run_fused(cx: &mut Cx, item: &StackItem, left: &'static CardDef, right: &'sta
 }
 
 /// Whether target `slot` of an item is still legal (CR 608.2b): the target is still what it was, the slot's filter
-/// still takes it, and nothing forbids the source to target it.
+/// still takes it, nothing forbids the source to target it, and for a slot whose targets together are judged
+/// (`TargetSpec::together`), the rule still allows the slot's targets together - each read as it is, or as it last was if
+/// it has left (Run Away Together's ruling) - or none of them is legal (Nethroi, Apex of Death's ruling).
 pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], item: &StackItem, slot: usize) -> bool {
     let target = state.target(item, slot);
     // A slot that chose no target (an "up to" slot) has nothing to be legal (CR 601.2c).
@@ -209,7 +211,17 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     let q = Reader { cards, state, events };
     // A slot of its own sees what the slots before it chose (CR 601.2c).
     let earlier = if item.target_count > 1 { &state.targets(item)[..slot] } else { &[][..] };
-    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false, x: announced_x(item) }, &asker, target) && layers::can_target(cards, state, events, &asker, target)
+    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false, x: announced_x(item) }, &asker, target)
+        && layers::can_target(cards, state, events, &asker, target)
+        && (spec.together.is_empty() || together_legal(&q, state, item, slot, &spec))
+}
+
+/// Whether the targets of the slot target `slot` of `item` was chosen for are still allowed together by `spec`'s rule
+/// (`TargetSpec::together`, CR 608.2b), its numbers read with the count its targets were chosen with (`StackItem::counted`).
+fn together_legal(q: &dyn Query, state: &GameState, item: &StackItem, slot: usize, spec: &TargetSpec) -> bool {
+    let run = state.spec_targets(item, state.spec(item, slot) as usize);
+    let targets: Vec<Target> = state.targets(item)[run].iter().copied().filter(|&t| t != Target::None).collect();
+    select::targets_together(q, spec.together_at(u32::from(item.counted)).as_slice(), item.controller, item.object, &targets)
 }
 
 /// The X announced for a spell or an activated ability on the stack (CR 107.3a, 601.2b, 602.2b), its own (CR 107.3k): what

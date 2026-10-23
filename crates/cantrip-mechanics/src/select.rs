@@ -15,7 +15,12 @@
 //!   fail to find is `as_many_as_can(1)`; "a [quality] card" may be left unfound (CR 701.23b), `up_to(1)`.
 //! - **Qualities of each card:** [`BASIC_LAND`], [`LAND`], [`CREATURE`], [`ARTIFACT`], [`NONLAND`], [`mana_value_at_most`],
 //!   [`named`].
-//! - **Rules of the cards together:** [`DIFFERENT_NAMES`] (CR 201.2b), [`total_mana_value_at_most`] (CR 202.3).
+//! - **Rules of the cards together:** [`DIFFERENT_NAMES`] (CR 201.2b), [`DIFFERENT_MANA_VALUES`] (CR 202.3),
+//!   [`total_mana_value_at_most`] (CR 202.3).
+//! - **Targets together:** every part here judges a target slot's targets too (`TargetSpec::together`, CR 601.2c): "any
+//!   number of target creature cards with total mana value X or less" is
+//!   `.together(&[select::total_mana_value_at_most(TargetSpec::COUNTED)])`, a part's `TargetSpec::COUNTED` read as the
+//!   slot's count (the X announced).
 //! - **Putting them together:** `Selection::new(count).with(part).with(part).called("noun")`, or a whole rule
 //!   `.taking(count)` and `.with(part)` more: `basic_land_cards(up_to(x)).with(DIFFERENT_NAMES)`.
 //!
@@ -98,7 +103,9 @@ pub const NONLAND: Part = part(&(nonland as SelectFn), 0, "");
 pub const ARTIFACT: Part = part(&(artifact as SelectFn), 0, "");
 
 /// "With mana value `most` or less" (CR 202.3), each card's read where it is (an {X} in a library or graveyard is 0, CR
-/// 202.3e). Trinket Mage (an artifact card, 1) and Green Sun's Zenith (a green creature card, X) search for it.
+/// 202.3e). Trinket Mage (an artifact card, 1) and Green Sun's Zenith (a green creature card, X) search for it; Agadeem's
+/// Awakening's targets "each have a different mana value X or less" (with `DIFFERENT_MANA_VALUES`, `most` the slot's
+/// `TargetSpec::COUNTED`).
 pub const fn mana_value_at_most(most: u32) -> Part {
     part(&(mana_value as SelectFn), most, "with mana value {n} or less")
 }
@@ -126,6 +133,19 @@ fn different_names(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
 /// search for cards with different names.
 pub const DIFFERENT_NAMES: Part = part(&(different_names as SelectFn), 0, "with different names");
 
+fn different_mana_values(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    let chosen: Vec<u32> = choice.selected.iter().map(|&c| q.mana_value(c)).collect();
+    let complete = chosen.iter().enumerate().all(|(i, v)| !chosen[..i].contains(v));
+    let addable = Bits::of(choice.candidates.len(), |i| !chosen.contains(&q.mana_value(choice.candidates[i])));
+    Verdict { complete, addable }
+}
+
+/// "With different mana values" (CR 202.3): no two of the cards chosen have the same mana value, each read where it is (an
+/// {X} in a library or graveyard is 0, CR 202.3e). Long Rest's "X target cards with different mana values" and Agadeem's
+/// Awakening's "any number of target creature cards that each have a different mana value X or less" (with
+/// `mana_value_at_most(TargetSpec::COUNTED)`) print it of targets.
+pub const DIFFERENT_MANA_VALUES: Part = part(&(different_mana_values as SelectFn), 0, "with different mana values");
+
 fn total_mana_value(q: &dyn Query, choice: &Choice, most: u32) -> Verdict {
     let total: u64 = choice.selected.iter().map(|&c| u64::from(q.mana_value(c))).sum();
     let left = u64::from(most).saturating_sub(total);
@@ -134,7 +154,8 @@ fn total_mana_value(q: &dyn Query, choice: &Choice, most: u32) -> Verdict {
 
 /// "With total mana value `most` or less" (CR 202.3): the mana values of the cards chosen, each read where it is (an {X} in
 /// a library or graveyard is 0, CR 202.3e), add up to at most `most`. Michelangelo's Technique (up to two, 6), Lively Dirge
-/// (up to two, 4) and Ao, the Dawn Sky (any number, 4) print it.
+/// (up to two, 4) and Ao, the Dawn Sky (any number, 4) print it of cards chosen; The Rise of Sozin's Fire Lord Sozin
+/// (any number, X), Patch Up (up to three, 3) and Kairi, the Swirling Sky (any number, 6) of targets.
 pub const fn total_mana_value_at_most(most: u32) -> Part {
     tallied(&(total_mana_value as SelectFn), most, "with total mana value {n} or less", Tally::ManaValueAtMost)
 }

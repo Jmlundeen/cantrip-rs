@@ -689,6 +689,11 @@ pub struct StackItem {
     pub x: u16,
     /// How many times it was kicked (CR 702.33).
     pub kicked: u8,
+    /// What its target slots' `TargetSpec::COUNTED` read as they were chosen (CR 601.2c, 603.3d): a spell's X, or else the
+    /// times it was kicked; an activated ability's X; a triggered ability's count it was given (`PendingTrigger::count`), or
+    /// else its source's X or times kicked. Read again as its targets are judged together anew (`TargetSpec::together`, CR
+    /// 115.7, 608.2b).
+    pub counted: u16,
     /// How many times its `optional_cost` was paid (CR 601.2b, 707.10: a copy has the same).
     pub paid: u32,
     /// Which way it was cast (0 for the mana cost, n for the nth alternative cost), or activated.

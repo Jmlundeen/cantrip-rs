@@ -369,11 +369,12 @@ pub enum RequestKind {
     /// `least` to `count` targets are chosen (a range, "one or two target creatures", CR 601.2c); `optional` is `least == 0`.
     /// Targets for an ability as it goes on the stack, or any other "choose a [thing]" the C# engine asks as targets.
     /// `label` is what the slot is for as its card words it (`TargetSpec::label`, empty when it has nothing to add), and
-    /// `slot_player` the opponent whose slot it is when the ability has one for each opponent. `total`, when the targets
-    /// chosen together are limited to a total mana value ("any number of target creature cards with total mana value X or
-    /// less", `TargetSpec::total_mana_value`), is that limit, its values index for index with `candidates`: the core refuses
-    /// a choice whose mana values add up to more.
-    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u32, count: u32, any_number: bool, label: &'static str, slot_player: Option<PlayerId>, total: Option<TotalAtMost> },
+    /// `slot_player` the opponent whose slot it is when the ability has one for each opponent. `together` is the rule of the
+    /// slot's targets together (`TargetSpec::together`: "with total mana value X or less", "that each have a different mana
+    /// value X or less"), its parts' numbers read (`TargetSpec::COUNTED` as the slot's count), none for a slot that asks
+    /// nothing of them together: `cantrip_api::select::judge_targets` judges a choice by it, the core refuses one it does not
+    /// call complete, and a client asks it which candidates may be added as the player picks (the host's `Check`).
+    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u32, count: u32, any_number: bool, label: &'static str, slot_player: Option<PlayerId>, together: Parts },
     /// One or more of these labelled options (a pile, a mode), by index.
     /// `count` to `at_most` of them when `at_most` is more than `count` (zero `count` is "up to"). `affordable` is
     /// the eligible modes whose own cost the chooser could pay as well, advice for a default; `additional_cost`
@@ -872,49 +873,6 @@ impl DamageDivision {
     }
 }
 
-/// "[Cards] with total mana value N or less" (CR 202.3): the mana values of the cards chosen together add up to at most
-/// `most`. `values` is each eligible card's mana value, index for index with the question's `eligible`, read as it is asked
-/// (where the card is: an {X} in a library or graveyard counts as 0, CR 202.3e), so whoever answers needs to know no card.
-/// Michelangelo's Technique, Lively Dirge and Ao, the Dawn Sky print it of cards chosen; Fire Lord Sozin of targets
-/// (`RequestKind::ChooseTarget::total`, its values index for index with the candidates).
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct TotalAtMost {
-    pub values: Vec<u32>,
-    pub most: u32,
-}
-
-impl TotalAtMost {
-    /// The total mana value of `chosen`, each read at its index in `eligible` (a card not eligible adds nothing).
-    /// Added up in a u64, so no number of u32 values overflows it.
-    pub fn of<T: PartialEq>(&self, eligible: &[T], chosen: &[T]) -> u64 {
-        chosen
-            .iter()
-            .filter_map(|c| eligible.iter().position(|e| e == c))
-            .map(|i| u64::from(self.values.get(i).copied().unwrap_or(0)))
-            .sum()
-    }
-
-    /// Whether `chosen` is within the limit.
-    pub fn allows<T: PartialEq>(&self, eligible: &[T], chosen: &[T]) -> bool {
-        self.of(eligible, chosen) <= u64::from(self.most)
-    }
-
-    /// The first of `eligible`, in order, that fit together within the limit, at most `count` of them: an answer always
-    /// accepted, for a player who answers without reading the cards.
-    pub fn first_fitting<T: Clone>(&self, eligible: &[T], count: usize) -> Vec<T> {
-        let mut left = u32::from(self.most);
-        let mut taken = Vec::new();
-        for (i, card) in eligible.iter().enumerate() {
-            let value = u32::from(self.values.get(i).copied().unwrap_or(0));
-            if taken.len() < count && value <= left {
-                left -= value;
-                taken.push(card.clone());
-            }
-        }
-        taken
-    }
-}
-
 /// How many cards a choice of cards takes: the count of its `Selection`, which its caption words ("up to two").
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Count {
@@ -956,8 +914,8 @@ impl Count {
     }
 }
 
-/// One part of a selection rule (`Selection`): a validator over the cards chosen so far, with the one number it is
-/// parameterised by. The validator is a `cantrip_api::select::SelectFn` - a plain function, never a closure, so the rule is
+/// One part of a selection rule (`Selection`), or of the rule of a target slot's targets together (`TargetSpec::together`):
+/// a validator over the cards chosen so far, with the one number it is parameterised by. The validator is a `cantrip_api::select::SelectFn` - a plain function, never a closure, so the rule is
 /// data that the game-log tree moves through and replays like any other (`Game::goto`) - held here as `dyn Any`, because
 /// this crate can't name the `Query` it reads the game through; `cantrip_api::select` makes parts and runs them. Two parts
 /// are the same when they hold the same function with the same number and words.
@@ -1037,6 +995,14 @@ pub enum Parts {
 }
 
 impl Parts {
+    /// No parts: a rule that asks nothing.
+    pub const NONE: Parts = Parts::Static(&[]);
+
+    /// Whether it has no part.
+    pub fn is_empty(&self) -> bool {
+        self.as_slice().is_empty()
+    }
+
     /// The parts, in order.
     pub fn as_slice(&self) -> &[Part] {
         match self {
@@ -1465,16 +1431,3 @@ pub enum Answer {
     Index(u8),
 }
 
-#[cfg(test)]
-mod total_tests {
-    use super::*;
-
-    /// Mana values that add up past `u32::MAX` are not taken as fitting within a limit: the sum does not wrap.
-    #[test]
-    fn a_total_past_u32_does_not_wrap_under_the_limit() {
-        let t = TotalAtMost { values: vec![u32::MAX, 2], most: 5 };
-        assert_eq!(t.of(&[1, 2], &[1, 2]), u64::from(u32::MAX) + 2);
-        assert!(!t.allows(&[1, 2], &[1, 2]));
-        assert!(t.allows(&[1, 2], &[2]));
-    }
-}

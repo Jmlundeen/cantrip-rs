@@ -1757,6 +1757,7 @@ mod tests {
             inline_spec_of: [0; INLINE_TARGETS],
             x: 0,
             kicked: 0,
+            counted: 0,
             paid: 0,
             way: 0,
             modes: 0,

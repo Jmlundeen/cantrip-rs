@@ -22,7 +22,7 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let chosen = if candidates.len() == 1 {
         candidates[0]
     } else {
-        let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
+        let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: Parts::NONE,
             source: item.object,
             purpose: Purpose::Targets,
             candidates: candidates.iter().map(|&id| Target::Object(id)).collect(),

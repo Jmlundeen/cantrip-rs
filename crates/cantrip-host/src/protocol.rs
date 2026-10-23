@@ -1242,10 +1242,18 @@ pub struct ChooseTargetPrompt {
     pub any_number: bool,
     pub for_player: i32,
     /// "Any number of target creature cards with total mana value X or less" (CR 601.2c, 202.3): the most the chosen
-    /// targets' `mana_values` may add up to; none when the slot asks nothing of them.
+    /// targets' `mana_values` may add up to, a running total the rule keeps for the player (`Tally`, display alone); none
+    /// when the slot asks nothing of them.
     pub maximum_total_mana_value: Option<i32>,
     /// Each candidate's mana value, index for index, when `maximum_total_mana_value` is set; empty otherwise.
     pub mana_values: Vec<i32>,
+    /// What the rule of the slot's targets together asks, each in the words a caption puts after the noun ("with different
+    /// mana values", "with mana value 3 or less"); empty when it asks nothing.
+    pub words: Vec<String>,
+    /// For a slot whose targets together are judged (`TargetSpec::together`), the rule's verdict on none chosen: whether that
+    /// is an answer, and which object candidates may be picked first. Every pick after is asked of the host (`Check`), as a
+    /// choice of cards is. None for a slot that asks nothing of its targets together.
+    pub verdict: Option<SelectionVerdictView>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1748,6 +1756,10 @@ impl PromptPayload {
                 } else if let Some(most) = p.maximum_total_mana_value {
                     // "With total mana value X or less": the first candidates that fit together, in order.
                     first_fitting(&p.candidates, &p.mana_values, p.count, most)
+                } else if let Some(verdict) = &p.verdict {
+                    // A rule of the targets together: the first that may be picked, as many as it takes; one asking more of
+                    // them together is settled by asking the host as they are picked (`Check`).
+                    p.candidates.iter().filter(|c| c.player != 0 || verdict.addable.contains(&c.object)).take(p.count.max(0) as usize).cloned().collect()
                 } else {
                     p.candidates.iter().take(p.count.max(0) as usize).cloned().collect()
                 },

@@ -238,6 +238,12 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
   the core judges the answer, and the client each pick, by the rule. The older `choose::{card, cards, card_from, cards_from,
   cards_from_kind, any_number_of, cards_within_total}`, `search_library` and `library::Find` / `search_to_*` are kept for
   existing cards.
+- **Targets judged together are the same parts** (`TargetSpec::together`, CR 601.2c): "any number of target creature cards
+  that each have a different mana value X or less" is
+  `TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(filter) }.together(&[select::DIFFERENT_MANA_VALUES, select::mana_value_at_most(TargetSpec::COUNTED)])`,
+  `COUNTED` the X announced; "with total mana value 3 or less" is `.together(&[select::total_mana_value_at_most(3)])`. The core
+  offers, checks and rechecks the set on resolution (CR 608.2b); the card reads its legal targets as for any slot
+  (`targets::legal_objects`).
 
 **The questions** (`RequestKind`, `crates/cantrip-state/src/decision.rs`), and the script verb that answers each:
 

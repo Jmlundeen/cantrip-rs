@@ -14,13 +14,18 @@
 //! A selection holding a card that is not a listed candidate is refused by `judge` before any part is run (`complete: false`,
 //! nothing addable): parts read the characteristics of the cards they are given.
 //!
+//! The same parts judge a target slot's targets together (`TargetSpec::together`: "with total mana value X or less", "that
+//! each have a different mana value X or less"): `judge_targets` runs them over the objects among the targets chosen so far,
+//! and the core checks targets with it as they are chosen, changed and chosen anew (CR 601.2c, 115.7) and as the spell or
+//! ability resolves (CR 608.2b).
+//!
 //! The ready-made rules and parts new cards use are `cantrip_mechanics::select`; a card with a rule of its own writes a
 //! `SelectFn` and makes it a part with `part`.
 
 pub use cantrip_state::{Count, Part, Parts, Selection, Tally};
 
 use crate::Query;
-use cantrip_state::{ObjectId, PlayerId};
+use cantrip_state::{ObjectId, PlayerId, Target};
 
 /// A question's cards, and the ones chosen so far, as a part of its rule judges them.
 #[derive(Clone, Copy, Debug)]
@@ -201,6 +206,89 @@ pub fn first_answer(q: &dyn Query, rule: &Selection, chooser: PlayerId, source: 
             _ => return verdict.complete.then_some(selected),
         }
     }
+}
+
+/// The object a target is, if it is one.
+fn object(t: &Target) -> Option<ObjectId> {
+    match *t {
+        Target::Object(id) => Some(id),
+        _ => None,
+    }
+}
+
+/// What the rule of a target slot's targets together (`TargetSpec::together`, its numbers read by
+/// `TargetSpec::together_at`) says of `selected`, the targets chosen so far among `candidates`, chosen by `chooser` for the
+/// spell or ability of `source` (CR 601.2c, 115.7, 608.2b): whether every part calls them complete, and which candidates not
+/// chosen every part allows to be added (`Verdict::addable`, by their places among `candidates`). The parts are run over the
+/// objects among them alone, in their order (`Choice`); a player is no card for them to judge, so one is always addable
+/// and counts for nothing. The count is the slot's own (`ChooseTarget::least`, `count`), not judged here.
+pub fn judge_targets(q: &dyn Query, parts: &[Part], chooser: PlayerId, source: ObjectId, candidates: &[Target], selected: &[Target]) -> Verdict {
+    let objects: Vec<ObjectId> = candidates.iter().filter_map(object).collect();
+    let chosen: Vec<ObjectId> = selected.iter().filter_map(object).collect();
+    let choice = Choice { chooser, source, candidates: &objects, selected: &chosen };
+    let mut allowed = Bits::new(objects.len(), true);
+    let mut complete = true;
+    for part in parts {
+        let verdict = validator(part)(q, &choice, part.n);
+        allowed.and(&verdict.addable);
+        complete &= verdict.complete;
+    }
+    let mut at = 0;
+    let addable = Bits::of(candidates.len(), |i| {
+        let open = !selected.contains(&candidates[i]);
+        match candidates[i] {
+            Target::Object(_) => {
+                at += 1;
+                open && allowed.get(at - 1)
+            }
+            _ => open,
+        }
+    });
+    Verdict { complete, addable }
+}
+
+/// Whether `selected`, every one of them a target the slot could take, are complete by the rule of its targets together.
+pub fn targets_together(q: &dyn Query, parts: &[Part], chooser: PlayerId, source: ObjectId, selected: &[Target]) -> bool {
+    parts.is_empty() || judge_targets(q, parts, chooser, source, selected, selected).complete
+}
+
+/// The candidates a target slot whose targets together are judged by `parts` could take at all: each that the rule allows
+/// as a target by itself, in their order (CR 601.2c: one it allows with no other is no legal target).
+pub fn targets_allowed(q: &dyn Query, parts: &[Part], chooser: PlayerId, source: ObjectId, candidates: Vec<Target>) -> Vec<Target> {
+    if parts.is_empty() {
+        return candidates;
+    }
+    let verdict = judge_targets(q, parts, chooser, source, &candidates, &[]);
+    candidates.into_iter().enumerate().filter(|&(i, _)| verdict.addable.get(i)).map(|(_, t)| t).collect()
+}
+
+/// The first `n` of `candidates`, in their order, that `parts` call complete together: the answer of a player who takes the
+/// first targets offered, and whether a slot of at least `n` targets has a legal choice at all (CR 601.2c). `None` when no
+/// `n` of them are. Searched a candidate at a time from what may be added, which reaches every set downward-closed parts
+/// allow (`TargetSpec::together`).
+pub fn first_targets(q: &dyn Query, parts: &[Part], chooser: PlayerId, source: ObjectId, candidates: &[Target], n: usize) -> Option<Vec<Target>> {
+    fn go(q: &dyn Query, parts: &[Part], chooser: PlayerId, source: ObjectId, candidates: &[Target], n: usize, from: usize, chosen: &mut Vec<Target>) -> bool {
+        let verdict = judge_targets(q, parts, chooser, source, candidates, chosen);
+        if chosen.len() == n {
+            return verdict.complete;
+        }
+        let need = n - chosen.len();
+        for i in from..candidates.len() {
+            if candidates.len() - i < need {
+                break;
+            }
+            if verdict.addable.get(i) {
+                chosen.push(candidates[i]);
+                if go(q, parts, chooser, source, candidates, n, i + 1, chosen) {
+                    return true;
+                }
+                chosen.pop();
+            }
+        }
+        false
+    }
+    let mut chosen = Vec::with_capacity(n);
+    (candidates.len() >= n && go(q, parts, chooser, source, candidates, n, 0, &mut chosen)).then_some(chosen)
 }
 
 #[cfg(test)]

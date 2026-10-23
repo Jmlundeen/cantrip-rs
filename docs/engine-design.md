@@ -256,15 +256,28 @@ through `library::look_at_top_onto_battlefield` (which Aang, at the Crossroads a
 and Lively Dirge asks it from the graveyard; Ao, the Dawn Sky prints it too. "With different names" (CR 201.2b: each has a
 name and no two share one, a split card sharing each half's name, CR 201.2a) is `select::DIFFERENT_NAMES`.
 
-Targets can carry the same limit (CR 601.2c, 603.3d): "any number of target creature cards with total mana value X or less" is
-a `TargetSpec` with `total_mana_value` (`TargetSpec::total_mana_value_at_most`, `COUNTED` for X), and wherever targets are
-chosen - a cast or activation (`actions::choose_slots`), a triggered ability going on the stack (`settle::choose_trigger_targets`),
-new targets for a copy (CR 115.7d) and a changed target (CR 115.7a) - `actions::within_total` takes out every candidate worth
-more than the limit by itself and hands the question its `ChooseTarget::total`, which the validator checks as it does a
-card choice's. The total is judged as the targets are chosen; as the spell or ability resolves each target is checked on its
-own (CR 608.2b), so one gone leaves the rest. Fire Lord Sozin's reflexive ability is the slot that has it, X the count it was
-given (`Game::reflexive_trigger_counted`); the client keeps the running total in the caption and leaves a candidate that
-would go over unclickable.
+A target slot's targets together are judged by the same parts (CR 601.2c, 603.3d, 115.1): `TargetSpec::together` is a list
+of them, and a part whose number is `TargetSpec::COUNTED` reads the slot's count - the X announced, or the count a reflexive
+ability was given (`Game::reflexive_trigger_counted`), kept on the item as `StackItem::counted`. "Any number of target
+creature cards with total mana value X or less" (Fire Lord Sozin) is
+`.together(&[select::total_mana_value_at_most(TargetSpec::COUNTED)])`; "any number of target creature cards that each have a
+different mana value X or less" (Agadeem's Awakening) is
+`.together(&[select::DIFFERENT_MANA_VALUES, select::mana_value_at_most(TargetSpec::COUNTED)])`; "X target cards with
+different mana values" (Long Rest) is `.counted().together(&[select::DIFFERENT_MANA_VALUES])`; "up to six target creature
+cards with different names" (Behold the Sinister Six!) is `.together(&[select::DIFFERENT_NAMES])`.
+`cantrip_api::select::judge_targets` runs the parts over the objects among the targets (a player is no card to them, always
+addable and judged by nothing). Wherever targets are chosen - a cast or activation (`actions::choose_slots`), a triggered
+ability going on the stack (`settle::choose_trigger_targets`), the announcement search that offers a spell
+(`AnnouncementSearch`), new targets for a copy (CR 115.7d) and a changed target (CR 115.7a, `ops::fits_together`) -
+`actions::within_together` takes out every candidate the rule refuses by itself, `actions::enough_together` asks whether
+the slot's fewest targets can be chosen together at all (a count no set reaches is no legal announcement, CR 601.2c), and
+the question carries the rule (`ChooseTarget::together`), by which the validator checks the answer and the host's `Check`
+judges each pick, as for a card choice. The targets are judged together again as the spell or ability resolves (CR
+608.2b, `resolve::target_legal`): a set the rule no longer allows - a target gone read as it last was - makes every target of
+the slot illegal (Nethroi, Apex of Death's and Run Away Together's rulings). A part must be downward-closed (any of the
+targets of a set it allows are allowed too), as every part in `select` is, so that the candidates offered are exactly those
+that keep the choice legal. The client keeps a total part's running total in the caption (`Tally`), shows any other part's
+words, and offers only the candidates the host's verdict on those picked says may be added.
 
 ### Characteristics
 
