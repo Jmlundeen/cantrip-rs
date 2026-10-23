@@ -1,0 +1,22 @@
+# Hengegate Pathway is a modal double-faced card (CR 712.3) whose faces are both lands: one copy is played as its front
+# face (taps for {W}), the other as its back face Mistgate Pathway (taps for {U}); neither enters tapped.
+
+[Bot1 Deck]
+Hengegate Pathway
+Hengegate Pathway
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Hengegate Pathway.Play(Ability: #1)
+Bot1.Battlefield.Hengegate Pathway.Activate
+? Bot1.Mana = {W}
+[T3 Bot1.Main1]
+Bot1.Hand.Hengegate Pathway.Play(Ability: back face)
+Bot1.Battlefield.Mistgate Pathway.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield = Hengegate Pathway; Mistgate Pathway

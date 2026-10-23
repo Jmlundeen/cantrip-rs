@@ -1,0 +1,11 @@
+{
+  "name": "Hengegate Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {W}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Mistgate Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {U}."
+  }
+}
