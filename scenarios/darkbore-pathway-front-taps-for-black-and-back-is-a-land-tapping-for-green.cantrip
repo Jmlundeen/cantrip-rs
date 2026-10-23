@@ -1,0 +1,23 @@
+# Darkbore Pathway is a modal double-faced card (CR 712.3) whose faces are both lands: one copy is played as its front
+# face (taps for {B}, not {G}), the other as its back face Slitherbore Pathway (taps for {G}, not {B}); neither enters
+# tapped. The pool is checked right after each activation, and a refusal pins each face's colour.
+
+[Bot1 Deck]
+Darkbore Pathway
+Darkbore Pathway
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Darkbore Pathway.Play(Ability: #1)
+Bot1.Battlefield.Darkbore Pathway.Activate
+? Bot1.Mana = {B}
+[T3 Bot1.Main1]
+Bot1.Hand.Darkbore Pathway.Play(Ability: back face)
+Bot1.Battlefield.Slitherbore Pathway.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield = Darkbore Pathway; Slitherbore Pathway

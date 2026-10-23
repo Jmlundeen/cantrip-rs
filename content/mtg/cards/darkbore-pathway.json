@@ -1,0 +1,11 @@
+{
+  "name": "Darkbore Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {B}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Slitherbore Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {G}."
+  }
+}
