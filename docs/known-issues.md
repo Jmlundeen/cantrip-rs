@@ -63,6 +63,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-118](#ki-118-a-fix-agents-report-can-be-empty-or-claim-work-its-commit-does-not-hold) | A fix agent's report can be empty or claim work its commit does not hold | Pri-3 | Open |
 | [KI-119](#ki-119-a-triggered-abilitys-text-in-a-card-file-is-not-always-its-oracle-text) | A triggered ability's text in a card file is not always its Oracle text | Pri-2 | Open |
 | [KI-121](#ki-121-the-host-never-marks-a-kicker-x-as-variable) | The host never marks a kicker {X} as variable | Pri-2 | Open |
+| [KI-122](#ki-122-a-declaration-taken-back-for-an-enlisted-creature-tapped-for-mana-says-nothing) | A declaration taken back for an enlisted creature tapped for mana says nothing | Pri-2 | Open |
 
 ## Issues
 
@@ -317,5 +318,18 @@ say so.
 false. The web client reads it for a kicker {X} (`Announcement.TotalAt`, the stepper's labels in
 `MainPage.Prompts.cs`), so Thieving Skydiver's kicker is shown as a fixed kicker: its totals and button captions are
 likely wrong. The engine's announcement itself is right; what is paid and put on the stack does not change.
+
+**Scenarios.** None: display.
+
+### KI-122: A declaration taken back for an enlisted creature tapped for mana says nothing
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client | 2026-10-22, reviewing optional costs to attack (CR 508.1g-j) |
+
+**Notes.** While the mana costs to attack are paid (CR 508.1i), the payment offers the mana abilities of a creature
+chosen to be enlisted. Using one is legal and makes the declaration illegal, so the engine takes it back and asks for
+attackers again (CR 508.1, 733.1) - correctly, but the page starts the declaration over without saying why. The page
+should say the enlisted creature was tapped.
 
 **Scenarios.** None: display.
