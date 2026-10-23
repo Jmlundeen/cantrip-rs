@@ -1,0 +1,60 @@
+# The Stone Brain: "{2}, {T}, Exile The Stone Brain: Choose a card name. Search target opponent's graveyard, hand, and library for
+# up to four cards with that name and exile them. That player shuffles, then draws a card for each card exiled from their hand
+# this way." Bot2 holds an Ornithopter in its graveyard (discarded to hand size on turn 2), three in its hand and one in its
+# library. Bot1 names Ornithopter, takes the graveyard one, two of the three in the hand (leaving one, as the ruling allows) and
+# the library one: four in all. Bot2 draws two cards, one for each card exiled from the hand, not three (the graveyard and library
+# cards do not count) and not four. Three sources are tapped for the {2}, so one mana stays in the pool.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+The Stone Brain
+Swamp
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Island
+Island
+Ornithopter
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Stone Brain.Cast
+Bot1.Pass
+[T2 Bot2.Cleanup]
+Bot2.Discard(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.The Stone Brain.Activate(Bot2)
+? Bot1.Mana = {B}
+Bot1.Name(Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Ornithopter; Ornithopter)
+Bot1.Search(Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Ornithopter; Ornithopter; Ornithopter; The Stone Brain
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Island; Island; Island; Island; Island; Island; Ornithopter
+Bot2.Library.Count = 8
+Bot1.Battlefield.The Stone Brain = (absent)
