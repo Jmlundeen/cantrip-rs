@@ -1,0 +1,73 @@
+# Extinction Event exiles every player's creatures whose mana value is of the chosen quality, at once: choosing Odd
+# here exiles both Haywire Mites (1) and leaves both Spellskites (2), Bot2's Ornithopter (0), Sol Ring and the Moxen
+# (zero is even). A noncreature of the chosen quality (Sol Ring, mana value 1; Mox Ruby, 0) stays, and an exiled
+# creature does not die (Haywire Mite's "when this dies" gains no life). It costs {3}{B}, all four paid by tapping
+# exactly Sol Ring, Mox Ruby and Mox Jet, leaving the pool empty (CR 608.2d the choice at resolution, CR 406.2).
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Ruby
+Mox Jet
+Spellskite
+Haywire Mite
+Extinction Event
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Spellskite
+Haywire Mite
+Ornithopter
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Spellskite.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Haywire Mite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Extinction Event.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Modes(Odd)
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Sol Ring; Spellskite; Swamp
+Bot2.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Ornithopter; Spellskite
+Exile = Haywire Mite; Haywire Mite
+Bot1.Graveyard = Extinction Event
+Bot1.Life = 20
+Bot2.Life = 20

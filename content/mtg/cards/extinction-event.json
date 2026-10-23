@@ -1,0 +1,6 @@
+{
+  "name": "Extinction Event",
+  "manaCost": "{3}{B}",
+  "type": "Sorcery",
+  "oracleText": "Choose odd or even. Exile each creature with mana value of the chosen quality. (Zero is even.)"
+}
