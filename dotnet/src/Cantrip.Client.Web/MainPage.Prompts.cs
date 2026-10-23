@@ -218,6 +218,12 @@ public sealed partial class MainPage
                 FillAssignDamage(client, assign);
                 break;
 
+            // This seat's player is controlled by another (CR 723): that player makes its decisions this turn, and the page
+            // says so rather than that it waits for itself.
+            case null when client.Me is { ControlledBy: > 0 } me && me.ControlledBy != client.Seat:
+                Prompt(Moment(client), $"{NameOf(client, me.ControlledBy)} controls you this turn and makes your decisions");
+                break;
+
             case null:
                 // Nobody holds priority while another player is answering a prompt of their own, so the wait is named
                 // after the other player rather than after nobody.
@@ -349,7 +355,7 @@ public sealed partial class MainPage
 
             // Web-slinging (CR 702.188a), Urban Retreat: the creature returned must be tapped once the mana is paid, so while none of the
             // player's creatures is, the caption says how one becomes tapped; a payment that leaves none is taken back.
-            if (_tappedAfterMana && !client.BattlefieldOf(client.Seat).Any(card => card.Tapped && card.CardTypes.Contains(CardTypeView.Creature)))
+            if (_tappedAfterMana && !client.BattlefieldOf(client.ActingSeat).Any(card => card.Tapped && card.CardTypes.Contains(CardTypeView.Creature)))
             {
                 how = $"{how}  ·  tap a creature for mana: it will be the one returned";
             }
@@ -1551,8 +1557,8 @@ public sealed partial class MainPage
         Handle = new ViewHandle(-(((client.Prompt?.RequestId ?? 0) * 64) + index + 1)),
         Zone = ZoneKindView.Stack,
         Kind = ObjectKindView.AbilityOnStack,
-        Owner = client.Seat,
-        Controller = client.Seat,
+        Owner = client.ActingSeat,
+        Controller = client.ActingSeat,
         Name = client.Object(prompt.Sources[index])?.Name ?? "An ability",
         OracleText = index < prompt.Texts.Count ? prompt.Texts[index] : string.Empty,
     };
@@ -2485,6 +2491,12 @@ public sealed partial class MainPage
 
     private void Prompt(string title, string? detail = null)
     {
+        // A decision of a player this seat controls (CR 723.5) says whose it is: "you" in it is that player.
+        if (_gameClient is { Prompt.ForSeat: > 0 } controlling)
+        {
+            title = $"Deciding for {NameOf(controlling, controlling.Prompt!.ForSeat)}  ·  {title}";
+        }
+
         _promptTitle.Text = title;
         _promptDetail.Text = detail ?? string.Empty;
         _promptDetail.Visibility = detail is { Length: > 0 } ? Visibility.Visible : Visibility.Collapsed;

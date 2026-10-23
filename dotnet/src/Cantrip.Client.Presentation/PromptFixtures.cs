@@ -375,6 +375,8 @@ public static class PromptFixtures
         "assign-damage",
         "player-aura",
         "waiting",
+        "priority-controlling",
+        "controlled-waiting",
         "game-over",
     ];
 
@@ -466,6 +468,8 @@ public static class PromptFixtures
             {
                 RequestId = request, Prompt = payload, MayCancel = Announcing.Contains(name),
                 Presentation = Presentation(payload, view, name),
+                // Asked of the player this seat controls (CR 723.5): their decision, sent to this seat.
+                ForSeat = name == "priority-controlling" ? Rival : 0,
             });
         }
 
@@ -529,6 +533,35 @@ public static class PromptFixtures
             case "waiting":
                 // Nothing is being asked of this seat: the other player is answering something of their own.
                 view.PriorityPlayer = Rival;
+                return null;
+
+            case "priority-controlling":
+                // This seat controls Bot 2 during Bot 2's turn (CR 723: Mindslaver): Bot 2 is the active player and holds
+                // priority, its hand is this seat's to see (CR 723.4), and its priority is asked of this seat (CR 723.5), with
+                // Bot 2's own land and Plains to play.
+                view.ActivePlayer = Rival;
+                view.PriorityPlayer = Rival;
+                view.Players[1].ControlledBy = Viewer;
+                view.Players[1].PendingEffects = ["You control them during their turn."];
+                TheirHand(view);
+                return new PriorityPromptMessage
+                {
+                    Player = Rival,
+                    Options =
+                    [
+                        new ActionOptionMessage { Kind = ActionKindView.PlayLand, Source = new ViewHandle(TheirHandCardTwo) },
+                        new ActionOptionMessage
+                        {
+                            Kind = ActionKindView.ActivateAbility, Source = new ViewHandle(TheirPlains), Produces = [ManaTypeView.White],
+                            Description = "{T}: Add {W}.", CostText = "{T}",
+                        },
+                    ],
+                };
+
+            case "controlled-waiting":
+                // This seat's own turn, controlled by Bot 2 (CR 723): nothing is asked of this seat, and Bot 2 answers for it.
+                view.Players[0].ControlledBy = Rival;
+                view.Players[0].PendingEffects = ["Bot 2 controls you during your turn."];
                 return null;
 
             case "player-aura":

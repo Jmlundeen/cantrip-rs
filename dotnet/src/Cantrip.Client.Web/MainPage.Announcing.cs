@@ -47,7 +47,7 @@ public sealed partial class MainPage
     private int ManaForX(GameClient client) => PoolMana(client) + _planned.Sum(ManaFrom);
 
     private static int PoolMana(GameClient client) =>
-        client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Mana.Sum() ?? 0;
+        client.View?.Players.FirstOrDefault(player => player.Seat == client.ActingSeat)?.Mana.Sum() ?? 0;
 
     /// <summary>
     /// Plans a source for X, or takes it back off the plan, and sets X to what the mana now reaches: the stepper changes it

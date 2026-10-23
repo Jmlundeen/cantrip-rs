@@ -339,6 +339,14 @@ public sealed class LlmPlay : IAutoPlayer
     {
         var text = new StringBuilder(GameText.Position(client));
 
+        // A decision of a player this seat controls (CR 723.5): "you" in the question below is that player.
+        if (client.Prompt is { ForSeat: > 0 } forOther)
+        {
+            text.Append("\n\nThe question below is ")
+                .Append(GameText.Whose(client, forOther.ForSeat))
+                .Append(" to answer, and you answer it for them: \"you\" in it means them, and what it costs is paid with their cards and mana.");
+        }
+
         if (_log.Count > 0)
         {
             text.Append("\n\nSince you last acted:");

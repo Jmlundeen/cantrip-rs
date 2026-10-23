@@ -282,6 +282,16 @@ pointer; once they are sent, the arrows run on to the edge of what they were sen
 state's `selected` is how many creatures are picked up, and `arrows` is in `doing` while those are being drawn in.
 `CombatSelectionTests` works both through the prompt fixtures.
 
+## Controlling another player
+
+While this seat controls another player (CR 723: Mindslaver, Emrakul, the Promised End), that player's questions come to
+this page with `PromptMessage.ForSeat`, and `GameClient.ActingSeat` is the player each is for: the dock's title says
+"Deciding for Bot 2", the pass button and auto-pass read the turn as that player's, and their cards, pool and land
+drops are clicked as this seat's own would be. Their hand, which this seat may look into then (CR 723.4), is face up in
+the fan on their rail, and a click opens it to play from. Both rails carry the fact ("You control them during their
+turn."), and the controlled seat's dock says who makes its decisions instead of waiting on itself. The fixtures
+`priority-controlling` and `controlled-waiting` show both pages (`PlayerControlTests`).
+
 ## How faces reach the screen
 
 A face is recorded, not rasterized (`Faces.cs`). `CardFace.Draw` is played into an `SKPicture`, which keeps the

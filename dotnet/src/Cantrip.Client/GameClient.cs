@@ -126,6 +126,18 @@ public sealed class GameClient
     public bool IsWaitingOnMe => Prompt is not null;
 
     /// <summary>
+    /// The seat whose decision the outstanding prompt is: this seat, or a player it controls (CR 723.5,
+    /// <see cref="PromptMessage.ForSeat"/>), whose resources pay for what it decides (CR 723.5a) - "you" in the prompt is that
+    /// player. This seat with nothing asked.
+    /// </summary>
+    public int ActingSeat => Prompt is { ForSeat: > 0 } prompt ? prompt.ForSeat : Seat;
+
+    /// <summary>
+    /// The seat this one controls now (CR 723), whose hand and hidden cards it sees and whose questions it answers, or zero.
+    /// </summary>
+    public int ControlledSeat => View?.Players.FirstOrDefault(player => player.ControlledBy == Seat && player.Seat != Seat)?.Seat ?? 0;
+
+    /// <summary>
     /// Applies everything the transport has received. Called once per frame by the renderer.
     /// </summary>
     /// <returns>How many messages were applied, so a caller can tell whether anything changed.</returns>
@@ -324,11 +336,14 @@ public sealed class GameClient
     /// <summary>Whether this seat is still in the game being played.</summary>
     private bool InGame => !IsOver && View?.Players.FirstOrDefault(player => player.Seat == Seat) is { Status: PlayerStatusView.Active };
 
-    /// <summary>Whether this seat holds priority now: what it is asked is a priority prompt.</summary>
+    /// <summary>Whether this seat holds priority now: what it is asked is a priority prompt, its own or a player's it controls.</summary>
     public bool HasPriority => Prompt?.Prompt is PriorityPromptMessage;
 
-    /// <summary>Whether this seat may offer a draw now: it is in the game, it has priority, and no offer stands.</summary>
-    public bool CanOfferDraw => InGame && HasPriority && DrawOffer is null;
+    /// <summary>
+    /// Whether this seat may offer a draw now: it is in the game, it has priority of its own - not a controlled player's,
+    /// which the offer would pass (CR 723.5b) - and no offer stands.
+    /// </summary>
+    public bool CanOfferDraw => InGame && HasPriority && Prompt is { ForSeat: 0 } && DrawOffer is null;
 
     /// <summary>
     /// Whether another player's draw offer is waiting on this seat's first answer: it has neither accepted nor declined it.

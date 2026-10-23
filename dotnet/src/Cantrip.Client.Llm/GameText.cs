@@ -35,6 +35,18 @@ public static class GameText
         text.Append(CultureInfo.InvariantCulture, $"Turn {view.Turn}, {Step(view.Step)}.");
         text.Append(CultureInfo.InvariantCulture, $" It is {Whose(client, view.ActivePlayer)} turn.");
 
+        // Control of a player (CR 723): the controller makes every decision of theirs, with their cards and mana, and sees
+        // their hand; the controlled player makes none.
+        if (client.ControlledSeat is > 0 and var controlled)
+        {
+            text.Append(CultureInfo.InvariantCulture,
+                $" You control {Seat(client, controlled)} this turn: you make every decision they would make, paying with their cards and mana, and you see their hand. Their permanents stay theirs.");
+        }
+        else if (client.Me is { ControlledBy: > 0 } me && me.ControlledBy != client.Seat)
+        {
+            text.Append(CultureInfo.InvariantCulture, $" {Seat(client, me.ControlledBy)} controls you this turn and makes your decisions.");
+        }
+
         if (view.DayNight != DayNightView.Neither)
         {
             text.Append(CultureInfo.InvariantCulture, $" It is {view.DayNight.ToString().ToLowerInvariant()}.");
@@ -58,6 +70,11 @@ public static class GameText
         }
 
         Pile(text, $"\n{Owner(client, client.Seat)} hand", [.. client.MyHand().Select(card => Card(client, card))]);
+
+        if (client.ControlledSeat is > 0 and var theirs)
+        {
+            Pile(text, $"\n{Owner(client, theirs)} hand", [.. client.Zone(ZoneKindView.Hand, theirs).Select(card => Card(client, card))]);
+        }
 
         foreach (PlayerSummaryView player in view.Players)
         {

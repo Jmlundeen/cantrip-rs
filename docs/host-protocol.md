@@ -28,7 +28,7 @@ Requests and replies (a reply is `{"Ok": {...}}` or `{"Rejected": {"Code": "..."
 A **step** is what one advance of the game produced:
 
 ```
-{"Requests":[{"RequestId":7,"Seat":1,"Prompt":{PromptPayload},"MayCancel":false}, ...],
+{"Requests":[{"RequestId":7,"Seat":1,"ForSeat":1,"Prompt":{PromptPayload},"MayCancel":false}, ...],
  "Views":{"1":{PlayerView},"2":{PlayerView}},
  "Events":{"1":[GameEventView, ...],"2":[...]},
  "Finished":false,"Outcome":"InProgress","WinningTeam":0}
@@ -129,6 +129,16 @@ activation through the game-log tree (`Game::goto`), each seat's handles back wi
 Diamond shows the hand), and one that triggered anything (Chromatic Star draws). Any other answer - casting a spell
 included - a concession, or anything else happening clears what can be taken back. An undo is an answer like any other,
 so a resumed game replays it.
+
+**Controlling another player.** While a player controls another (CR 723: Mindslaver, Emrakul, the Promised End), every
+question asked of the controlled player goes to the controlling seat: a request's `Seat` is the seat that answers it and
+`ForSeat` the seat whose decision it is (the same seat but for this), its prompt in the answering seat's handles, and an
+answer, check or undo from any other seat is `NotYourTurnToAnswer`. The server passes it on as `PromptMessage.ForSeat` (zero
+for the seat's own), and never lets the controlling seat offer a draw with the controlled player's priority. Each view says
+who controls whom (`PlayerSummaryView.ControlledBy`, and a line in `PendingEffects`, as for an effect still waiting for the
+player's next turn), and the controlling seat's view holds what the controlled player sees (CR 723.4): their hand
+(`ContentsVisible`), the faces they know, what their questions name - not their sideboard. Conceding is each seat's own (CR
+723.6). Nothing in a prompt is specific to the card that gave control, so a later one needs no protocol change. Version 208.
 
 A draw the players agree to (`docs/rules-exceptions.md`, RX-4) is not a request of the host's: the offer and the answers to it
 are the server's (`GameSession.OfferDraw`, `AnswerDraw`, over the C# protocol's `OfferDrawMessage`, `AnswerDrawMessage` and

@@ -280,9 +280,13 @@ public sealed class GameSession : IDisposable
             ? new Dictionary<int, int> { [offer.Offerer] = asked }
             : new Dictionary<int, int>();
 
-    /// <summary>The request a seat is asked priority by, if that is what it is being asked.</summary>
+    /// <summary>
+    /// The request a seat is asked its own priority by, if that is what it is being asked: not the priority of a player it
+    /// controls (CR 723.5b: a draw is not the controlled player's to offer, and the offer would pass their priority).
+    /// </summary>
     private int? PriorityAsked(int seat) =>
-        _published.Where(published => published.Value.Seat.Value == seat && published.Value.Message.Prompt is PriorityPromptMessage)
+        _published.Where(published => published.Value.Seat.Value == seat && published.Value.Message.ForSeat == 0
+                && published.Value.Message.Prompt is PriorityPromptMessage)
             .Select(published => (int?)published.Key)
             .FirstOrDefault();
 
@@ -855,6 +859,7 @@ public sealed class GameSession : IDisposable
                 Prompt = request.Prompt,
                 MayCancel = request.MayCancel,
                 Presentation = request.Presentation,
+                ForSeat = request.ForSeat == request.Seat ? 0 : request.ForSeat,
             };
 
             _published[request.RequestId] = (seat, prompt);

@@ -776,7 +776,17 @@ public sealed class PromptMessage : ServerMessage
     [Key(3)]
     public PromptPresentationContext? Presentation { get; set; }
 
-    public override string Describe() => $"prompt {RequestId}: {Prompt.GetType().Name}";
+    /// <summary>
+    /// The seat whose decision this is when it is not this client's own: a player this seat controls (CR 723.5), whose
+    /// choices it makes with that player's resources (CR 723.5a). The prompt is in this client's handles and the options are
+    /// that player's - "you" in them is that player. Zero for this seat's own decision.
+    /// </summary>
+    [Key(4)]
+    public int ForSeat { get; set; }
+
+    public override string Describe() => ForSeat == 0
+        ? $"prompt {RequestId}: {Prompt.GetType().Name}"
+        : $"prompt {RequestId}: {Prompt.GetType().Name} for seat {ForSeat}";
 }
 
 [MessagePackObject]

@@ -979,6 +979,30 @@ once that turn has ended without the step (an effect ended it, CR 724.1e) or wil
 Fortune and Last Chance's "at the beginning of that turn's end step, you lose the game" is
 `cantrip_mechanics::delayed::extra_turn_then_lose`.
 
+### Controlling another player
+
+"You control target player during that player's next turn" (CR 723.1: Mindslaver, Sorin Markov, Worst Fears) is
+`Game::control_next_turn`, a player effect `EffectKind::ControlNextTurn` that waits on the player for the next turn they
+actually take: a skipped turn leaves it waiting (723.1b). As that turn begins (`turn::take_controlled_turn`, after the
+skip is judged) every such effect on the player is used up, and the last one created gives its controller
+`EffectKind::ControlsPlayer` for the turn (723.1a; one on a player themselves gives no one else control, 723.9). That
+lasts through the turn's cleanup and ends as the next turn begins (723.1), or at once when its controller leaves the game
+(CR 800.4a). Emrakul, the Promised End's "after that turn, that player takes an extra turn" is
+`Game::control_next_turn_then_extra_turn`: each such effect gives its extra turn as the controlled turn begins, the newest
+extra turn being taken first (CR 500.7), so it comes right after that turn however long the turn waited, and an
+overwritten effect gives its turn too (its rulings).
+
+The engine changes nothing else: every request is still asked of the controlled player, who stays the active player and
+controls their objects (723.3), and pays with their own resources (723.5a). Who answers is
+`GameState::player_controller(player)` (723.5, 723.8), which the host routes by (`visibility::answering`: the request goes
+to that seat with `ForSeat`, in that seat's handles, docs/host-protocol.md) and the scenario harness drives by (a script's
+lines still answer as the player asked). What a seat sees follows `GameState::sees_as` (723.4): the controller looks into
+the controlled player's hand, knows the faces they know, sees the top of their library when they may, and is shown what
+their questions name - never the cards they own outside the game, which they therefore can't be made to choose from while
+controlled (`Query::outside_the_game` is empty then). Conceding stays the seat's own (723.6). Word of Command and
+Opposition Agent (723.2) control a player for other durations and are not built; they would be a `ControlsPlayer` of their
+own duration.
+
 ### Phasing
 
 A permanent's phased-in or phased-out status (CR 110.5, 702.26) is `Marks::phased`, a `Phased` saying how it phased out: under

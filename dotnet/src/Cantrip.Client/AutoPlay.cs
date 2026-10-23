@@ -14,6 +14,10 @@ namespace Cantrip.Client;
 /// it goes through the same client interface a human does, so it cannot accidentally be granted anything a real
 /// client would not have.
 /// </para>
+/// <para>
+/// A decision of a player this seat controls (CR 723.5) it makes as that player would (<see cref="GameClient.ActingSeat"/>):
+/// their main phase, their creatures and lands, their opponents. Legal either way, and the turn keeps moving.
+/// </para>
 /// </summary>
 public static class AutoPlay
 {
@@ -263,8 +267,8 @@ public static class AutoPlay
     /// <summary>Whether a candidate is an opponent or something an opponent controls.</summary>
     private static bool Theirs(GameClient client, TargetMessage candidate) =>
         candidate.IsPlayer
-            ? candidate.Player != client.Seat
-            : client.Object(candidate.Object) is { } target && target.Controller != client.Seat;
+            ? candidate.Player != client.ActingSeat
+            : client.Object(candidate.Object) is { } target && target.Controller != client.ActingSeat;
 
     /// <summary>The fewest blockers the prompt says this attacker needs: 2 for menace, otherwise usually 1.</summary>
     private static int Minimum(DeclareBlockersPromptMessage prompt, ViewHandle attacker)
@@ -291,7 +295,7 @@ public static class AutoPlay
 
         bool myMainPhase = view is not null
             && view.Step == TurnStepView.PrecombatMain
-            && view.ActivePlayer == client.Seat;
+            && view.ActivePlayer == client.ActingSeat;
 
         if (!myMainPhase)
         {
@@ -622,13 +626,13 @@ public static class AutoPlay
         ArgumentNullException.ThrowIfNull(client);
         ArgumentNullException.ThrowIfNull(prompt);
 
-        if (client.BattlefieldOf(client.Seat).Any(card => card.CardTypes.Contains(CardTypeView.Creature) && card.Tapped))
+        if (client.BattlefieldOf(client.ActingSeat).Any(card => card.CardTypes.Contains(CardTypeView.Creature) && card.Tapped))
         {
             return null;
         }
 
         List<ActionOptionMessage> creatures = [.. prompt.Options.Where(option => option.Kind == ActionKindView.ActivateAbility
-            && client.Object(option.Source) is { } source && source.CardTypes.Contains(CardTypeView.Creature) && !source.Tapped && source.Controller == client.Seat)];
+            && client.Object(option.Source) is { } source && source.CardTypes.Contains(CardTypeView.Creature) && !source.Tapped && source.Controller == client.ActingSeat)];
 
         foreach (ActionOptionMessage option in creatures)
         {
@@ -913,7 +917,7 @@ public static class AutoPlay
         ArgumentNullException.ThrowIfNull(prompt);
 
         int lands = client.View?.Objects.Count(o =>
-            o.Zone == ZoneKindView.Battlefield && o.Controller == client.Seat && o.CardTypes.Contains(CardTypeView.Land)) ?? 0;
+            o.Zone == ZoneKindView.Battlefield && o.Controller == client.ActingSeat && o.CardTypes.Contains(CardTypeView.Land)) ?? 0;
 
         bool wantsLand = lands < 4;
         int last = prompt.Destinations.Count - 1;
@@ -984,8 +988,8 @@ public static class AutoPlay
 
     /// <summary>Whether a candidate is an opponent or something an opponent controls, read straight off the view.</summary>
     private static bool IsOpponents(GameClient client, TargetMessage candidate) => candidate.IsPlayer
-        ? candidate.Player != client.Seat
-        : client.Object(candidate.Object)?.Controller is { } controller && controller != client.Seat;
+        ? candidate.Player != client.ActingSeat
+        : client.Object(candidate.Object)?.Controller is { } controller && controller != client.ActingSeat;
 }
 
 /// <summary>A seat played automatically through its own client and transport.</summary>

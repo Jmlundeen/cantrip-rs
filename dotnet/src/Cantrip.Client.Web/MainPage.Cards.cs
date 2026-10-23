@@ -243,7 +243,7 @@ public sealed partial class MainPage
 
             // Discarding to hand size asks for a number of cards: once that many are picked the rest of the hand stops
             // being clickable. With one to discard, clicking another card trades rather than adding.
-            DiscardPromptMessage discard when card.Zone == ZoneKindView.Hand && card.ZoneOwner == client.Seat =>
+            DiscardPromptMessage discard when card.Zone == ZoneKindView.Hand && card.ZoneOwner == client.ActingSeat =>
                 new CardLook(
                     Selected: _picked.Contains(handle),
                     Actionable: _picked.Contains(handle) || _selection.CanPick(discard.Count),
@@ -314,7 +314,7 @@ public sealed partial class MainPage
                 new CardLook(Actionable: true, Clicked: () => Choose(client, offered)),
 
             DeclareAttackersPromptMessage or DeclareBlockersPromptMessage =>
-                new CardLook(Dimmed: card.Controller == client.Seat && card.CardTypes.Contains(CardTypeView.Creature)),
+                new CardLook(Dimmed: card.Controller == client.ActingSeat && card.CardTypes.Contains(CardTypeView.Creature)),
 
             // A permanent whose counters a cost may take (CR 118.3): a click takes one more of them, and it says how many are taken.
             RemoveCountersPromptMessage remove when remove.Pools.Any(pool => pool.Object == card.Handle) =>
@@ -340,7 +340,7 @@ public sealed partial class MainPage
     }
 
     private static bool InTable(GameClient client, ObjectView card, ZoneKindView table) =>
-        card.Zone == table && (table != ZoneKindView.Hand || card.ZoneOwner == client.Seat);
+        card.Zone == table && (table != ZoneKindView.Hand || card.ZoneOwner == client.ActingSeat);
 
     private string? PutBackAnnotation(ChooseCardsPromptMessage prompt, int handle) =>
         prompt.Purpose is CardChoicePurposeView.PutOnTop or CardChoicePurposeView.Splice

@@ -30,6 +30,10 @@ Bot1.Graveyard = Counterspell
 
 Bot1 goes first and libraries are not shuffled, unless the script has an `[Opening]` section (below).
 
+A line answers for the player it names, as the rules ask that player: while another player controls them (CR 723:
+Mindslaver), `Bot2.Hand.Shock.Cast(Bot2)` is still Bot2's line, though Bot1 makes the choice; a table drives it from
+the seat answering (Bot1's, when Bot1 is a page).
+
 A game of three or four players names more decks, `[Bot3 Deck]` and `[Bot4 Deck]`, and everything that names a player
 (`Bot3.Hand.Island.Play`, `Bot1.ChoosePlayer(Bot4)`, `Bot3.Life`) takes them in turn order after Bot2. The first player of a
 game of more than two draws on their first turn (CR 103.8a). A script with no `[Bot3 Deck]` is the duel it always was.

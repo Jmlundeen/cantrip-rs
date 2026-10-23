@@ -379,7 +379,12 @@ public sealed partial class MainPage
     private void UpdateRail(GameClient client, PlayerRail rail, PlayerSummaryView player, bool active, bool priority)
     {
         int seat = player.Seat;
-        List<ObjectView> known = seat == client.Seat ? [] : [.. client.NamedIn(ZoneKindView.Hand, seat)];
+        // Another player's hand this seat may look into - a player it controls (CR 723.4) - is face up in their fan, every card
+        // of it; any other, only the cards known in it.
+        List<ObjectView> known = seat == client.Seat ? []
+            : client.View?.Zones.FirstOrDefault(zone => zone.Kind == ZoneKindView.Hand && zone.Owner == seat) is { ContentsVisible: true }
+                ? [.. client.Zone(ZoneKindView.Hand, seat)]
+                : [.. client.NamedIn(ZoneKindView.Hand, seat)];
 
         rail.Update(
             player,
@@ -536,7 +541,7 @@ public sealed partial class MainPage
     /// </summary>
     private List<PlayerRail.ManaChipSpec> ManaChips(GameClient client, PlayerSummaryView player)
     {
-        PayCostsPromptMessage? paying = player.Seat == client.Seat && client.Prompt?.Prompt is PayCostsPromptMessage pay ? pay : null;
+        PayCostsPromptMessage? paying = player.Seat == client.ActingSeat && client.Prompt?.Prompt is PayCostsPromptMessage pay ? pay : null;
         List<PlayerRail.ManaChipSpec> chips = [];
 
         for (int type = 0; type < player.Mana.Length; type++)

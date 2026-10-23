@@ -129,4 +129,37 @@ public sealed class GameTextTests
         // Tapping shows up in the position itself; a line for it would bury the ones that do not.
         Assert.Null(GameText.Line(client, new TapChangedEvent { Object = Handle(5), Tapped = true }));
     }
+
+    /// <summary>
+    /// While this seat controls the other player (CR 723), the position says so and lists their hand, which it may see then
+    /// (CR 723.4); a question of theirs is said to be theirs, answered for them.
+    /// </summary>
+    [Fact]
+    public void A_controlled_players_turn_is_said_with_their_hand()
+    {
+        var wrath = Card(9, "Wrath of God", "{2}{W}{W}");
+        wrath.Zone = ZoneKindView.Hand;
+        wrath.ZoneOwner = Them;
+
+        var transport = new Held();
+        var client = new GameClient(transport);
+        PlayerView view = View(wrath);
+        view.ActivePlayer = Them;
+        view.PriorityPlayer = Them;
+        view.Players[1].ControlledBy = Me;
+        ZoneView theirs = view.Zones.Single(zone => zone.Kind == ZoneKindView.Hand && zone.Owner == Them);
+        (theirs.ContentsVisible, theirs.Contents, theirs.Count) = (true, [Handle(9)], 1);
+
+        transport.Inbound.Enqueue(new WelcomeMessage { Seat = Me, PlayerNames = ["Bot 1", "Bot 2"] });
+        transport.Inbound.Enqueue(new StateMessage { View = view });
+        transport.Inbound.Enqueue(new PromptMessage { RequestId = 1, Prompt = new PriorityPromptMessage { Player = Them }, ForSeat = Them });
+        client.Pump();
+
+        Assert.Equal(Them, client.ActingSeat);
+        Assert.Equal(Them, client.ControlledSeat);
+        string text = GameText.Position(client);
+        Assert.Contains("You control Opponent this turn", text, StringComparison.Ordinal);
+        Assert.Contains("Opponent's hand", text, StringComparison.Ordinal);
+        Assert.Contains("Wrath of God", text, StringComparison.Ordinal);
+    }
 }

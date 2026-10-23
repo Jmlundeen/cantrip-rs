@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 207;
+    public const int ProtocolVersion = 208;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -183,6 +183,15 @@ public sealed class PlayerSummaryView
     /// </summary>
     [Key(21)]
     public int? Speed { get; set; }
+
+    /// <summary>
+    /// The seat making this player's choices and decisions now, while another player controls them (CR 723: Mindslaver,
+    /// Emrakul, the Promised End) - every question asked of this player goes to that seat (<see cref="PromptMessage.ForSeat"/>),
+    /// though this player is still the active player and controls their objects (CR 723.3). Zero while they make their own.
+    /// Public, as the effect is.
+    /// </summary>
+    [Key(22)]
+    public int ControlledBy { get; set; }
 
     public override string ToString() => $"seat {Seat} '{Name}' {Life} life";
 }

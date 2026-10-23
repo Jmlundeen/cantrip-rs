@@ -357,7 +357,8 @@ public sealed class NativeRulesHost : IRulesHost
                 request.Seat,
                 prompt,
                 request.MayCancel,
-                request.Presentation ?? PromptPresentation.Describe(prompt, request.MayCancel, _views.GetValueOrDefault(request.Seat))));
+                request.Presentation ?? PromptPresentation.Describe(prompt, request.MayCancel, _views.GetValueOrDefault(request.Seat)),
+                request.ForSeat == request.Seat ? 0 : request.ForSeat));
         }
 
         return new RulesStep(requests, reply.Views, events, _sequence, reply.Finished, Progress(reply.Scenario));
@@ -494,6 +495,9 @@ public sealed class NativeRulesHost : IRulesHost
         public int RequestId { get; set; }
 
         public int Seat { get; set; }
+
+        /// <summary>The seat whose decision it is: <see cref="Seat"/>, or a player that seat controls (CR 723.5).</summary>
+        public int ForSeat { get; set; }
 
         public PromptPayload? Prompt { get; set; }
 

@@ -68,6 +68,29 @@ public sealed class PromptPresentationTests
     public void A_cost_by_target_is_read_out_of_the_actions_description(string description, string costs) =>
         Assert.Equal(costs, CardActions.CostsByTarget(new ActionOptionMessage { Description = description }));
 
+    /// <summary>
+    /// A priority of the player this seat controls (CR 723.5): the client says whose decision it is, offers no draw with it
+    /// (CR 723.5b), and the automatic seat plays it as that player's own main phase - their land, from their hand.
+    /// </summary>
+    [Fact]
+    public void A_controlled_players_priority_is_answered_as_theirs()
+    {
+        var transport = new FixtureTransport(PromptFixtures.Build("priority-controlling"));
+        var client = new GameClient(transport);
+        client.Pump();
+
+        Assert.Equal((PromptFixtures.Rival, PromptFixtures.Rival), (client.ActingSeat, client.ControlledSeat));
+        Assert.True(client.HasPriority);
+        Assert.False(client.CanOfferDraw);
+        Assert.Equal(4, client.Zone(ZoneKindView.Hand, PromptFixtures.Viewer).Count);
+        Assert.Equal(2, client.Zone(ZoneKindView.Hand, PromptFixtures.Rival).Count);
+
+        Assert.True(AutoPlay.Act(client));
+        TakeActionAnswer played = Assert.IsType<TakeActionAnswer>(Assert.IsType<AnswerMessage>(transport.Sent.Last()).Answer);
+        Assert.Equal(ActionKindView.PlayLand, played.Kind);
+        Assert.Equal(PromptFixtures.Rival, client.Object(played.Source)?.Owner);
+    }
+
     [Fact]
     public void Player_aura_board_fixture_names_its_attached_player_through_the_wire()
     {

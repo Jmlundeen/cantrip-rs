@@ -250,7 +250,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         if (prompt.Cards.Count == 0) return null;
         List<ObjectView?> cards = [.. prompt.Cards.Select(client.Object)];
         if (cards.All(card => card?.Zone == ZoneKindView.Battlefield)) return ZoneKindView.Battlefield;
-        return cards.All(card => card?.Zone == ZoneKindView.Hand && card.ZoneOwner == client.Seat) ? ZoneKindView.Hand : null;
+        return cards.All(card => card?.Zone == ZoneKindView.Hand && card.ZoneOwner == client.ActingSeat) ? ZoneKindView.Hand : null;
     }
 
     public static string Origins(GameClient client, IReadOnlyList<ViewHandle> cards, PromptPresentationContext? context)

@@ -2105,12 +2105,13 @@ public sealed partial class MainPage : Page
             return;
         }
 
-        bool myTurn = view.ActivePlayer == client.Seat;
+        // The priority of a player this seat controls (CR 723.5) is passed as that player's own: it is their turn.
+        bool myTurn = view.ActivePlayer == client.ActingSeat;
         if (AutoPass.Wanted(new PriorityBoard
         {
             Prompt = priority,
             Stack = stack,
-            Seat = client.Seat,
+            Seat = client.ActingSeat,
             MyTurn = myTurn,
             Step = view.Step,
             Attacked = view.Combat.Attackers.Count > 0,
@@ -2177,9 +2178,10 @@ public sealed partial class MainPage : Page
             return "Resolve";
         }
 
-        bool mine = view.ActivePlayer == client.Seat;
+        // For a player this seat controls (CR 723.5), as that player: their turn, their creatures.
+        bool mine = view.ActivePlayer == client.ActingSeat;
         bool canAttack = client.Zone(ZoneKindView.Battlefield, 0).Any(card =>
-            card.Controller == client.Seat
+            card.Controller == client.ActingSeat
             && card.CardTypes.Contains(CardTypeView.Creature)
             && !card.Tapped
             && !card.SummoningSick);

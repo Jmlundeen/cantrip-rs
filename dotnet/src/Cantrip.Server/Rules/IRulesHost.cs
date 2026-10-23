@@ -126,14 +126,20 @@ public sealed record RulesStep(
 
 /// <summary>One question outstanding, in the handle space of the seat it is for.</summary>
 /// <param name="RequestId">The host's id for it, echoed back with the answer. Never reused within a game.</param>
+/// <param name="Seat">The seat that answers it.</param>
 /// <param name="MayCancel">Asked while the seat is still announcing something it may give up (<see cref="PromptMessage.MayCancel"/>).</param>
 /// <param name="Presentation">Wording facts for the client, or null where there are none (<see cref="PromptMessage.Presentation"/>).</param>
+/// <param name="ForSeat">
+/// The seat whose decision it is, when another seat controls that player and answers for them (CR 723.5); zero, or
+/// <paramref name="Seat"/> itself, for the seat's own (<see cref="PromptMessage.ForSeat"/>).
+/// </param>
 public sealed record RulesRequest(
     int RequestId,
     int Seat,
     PromptPayload Prompt,
     bool MayCancel,
-    PromptPresentationContext? Presentation);
+    PromptPresentationContext? Presentation,
+    int ForSeat = 0);
 
 /// <summary>An answer a seat gave, as it gave it.</summary>
 public sealed record RulesAnswer(int Seat, AnswerPayload Answer);

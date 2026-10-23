@@ -463,6 +463,7 @@ public sealed partial class MainPage
             null => string.Empty,
             ModesChosenAnswer modes => $"{nameof(ModesChosenAnswer)} {string.Join(",", modes.Modes)}",
             AnnounceAnswer announced => $"{nameof(AnnounceAnswer)} {announced.Value}",
+            TakeActionAnswer action => $"{nameof(TakeActionAnswer)} {action.Kind} {action.Source.Value}",
             BlockersDeclaredAnswer blocks => $"{nameof(BlockersDeclaredAnswer)} {string.Join(",", blocks.Blocks.Select(b => $"{b.Blocker.Value}>{b.Attacker.Value}"))}".TrimEnd(),
             CountersRemovedAnswer removed =>
                 $"{nameof(CountersRemovedAnswer)} {string.Join("; ", removed.Removals.Select(r => $"{r.Object.Value} {r.Counter} {r.Count}"))}".TrimEnd(),
