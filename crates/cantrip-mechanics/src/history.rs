@@ -249,3 +249,19 @@ pub fn permission_used_this_turn(q: &dyn Query, source: ObjectId) -> bool {
         _ => false,
     })
 }
+
+/// The permanents `source` dealt damage to (CR 120.3) in the records from index `since` on (`history().head()` noted before
+/// the damage), each once, in the order dealt: read from the damage events, so damage that was prevented names none and a
+/// redirection (CR 614.9, Ancient Adamantoise) names the permanent the damage was dealt to, not the one aimed at. Anger of
+/// the Gods, Redcap Melee and Torch the Tower print "dealt damage this way" about them.
+pub fn permanents_dealt_damage_by(history: History, source: ObjectId, since: usize) -> Vec<ObjectId> {
+    let mut dealt: Vec<ObjectId> = Vec::new();
+    for r in &history.all()[since..] {
+        if let Event::Damage { source: s, target: Target::Object(id), amount, .. } = r.event {
+            if s == source && amount > 0 && !dealt.contains(&id) {
+                dealt.push(id);
+            }
+        }
+    }
+    dealt
+}

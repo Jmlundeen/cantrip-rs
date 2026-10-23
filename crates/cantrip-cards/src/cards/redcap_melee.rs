@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{sacrifice_chosen, targets};
+use cantrip_mechanics::{history, sacrifice_chosen, targets};
 use cantrip_oracle as oracle;
 
 /// "Redcap Melee deals 4 damage to target creature or planeswalker. If a nonred permanent is dealt damage this way, you
@@ -11,9 +11,7 @@ fn melee(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let before = g.history().head() as usize;
     g.damage(item.object, item.target(0), 4);
     let red = g.words(item.object).color(Color::Red);
-    // Damage to a player, or from another source, names no permanent this spell dealt damage to.
-    let dealt_to = |r: &Record| match r.event { Event::Damage { source, target: Target::Object(id), amount, .. } if source == item.object && amount > 0 => Some(id), _ => None };
-    let nonred_dealt = g.history().all()[before..].iter().filter_map(dealt_to).any(|id| !g.chars(id).colors.has(red));
+    let nonred_dealt = history::permanents_dealt_damage_by(g.history(), item.object, before).into_iter().any(|id| !g.chars(id).colors.has(red));
     if nonred_dealt {
         sacrifice_chosen(g, item.controller, item.object, 1, |c| c.is(CardType::Land))?;
     }

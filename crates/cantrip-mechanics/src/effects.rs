@@ -624,14 +624,8 @@ pub fn damage_each_creature_dealt(g: &mut dyn Game, item: &StackItem, n: u16) ->
         .collect();
     let before = g.history().head() as usize;
     g.damage_together(&hits);
-    let mut dealt: Vec<ObjectId> = Vec::new();
-    for r in &g.history().all()[before..] {
-        if let Event::Damage { source, target: Target::Object(id), amount, .. } = r.event {
-            if source == item.object && amount > 0 && !dealt.contains(&id) && g.chars(id).is(CardType::Creature) {
-                dealt.push(id);
-            }
-        }
-    }
+    let mut dealt = crate::history::permanents_dealt_damage_by(g.history(), item.object, before);
+    dealt.retain(|&id| g.chars(id).is(CardType::Creature));
     dealt
 }
 
