@@ -1,0 +1,6 @@
+{
+  "name": "Tormod's Crypt",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "{T}, Sacrifice this artifact: Exile target player's graveyard."
+}

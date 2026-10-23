@@ -1,0 +1,38 @@
+# Tormod's Crypt: "{T}, Sacrifice this artifact: Exile target player's graveyard." Bot1 casts the Crypt for {0} on turn 1;
+# on turn 3 Bolts Bot2's Ornithopter (so each player has a graveyard), then taps and sacrifices the Crypt (the cost, CR
+# 602.2b) targeting Bot2: Bot2's graveyard is exiled, Bot1's own (the Bolt, the Crypt) stays.
+
+[Bot1 Deck]
+Mountain
+Tormod's Crypt
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Tormod's Crypt.Activate(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard =
+Exile = Ornithopter
+Bot1.Graveyard = Tormod's Crypt; Lightning Bolt
+Bot1.Battlefield.Count = 2
