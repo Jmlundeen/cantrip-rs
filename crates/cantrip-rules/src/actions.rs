@@ -1800,7 +1800,7 @@ fn least_cost_parts(
 ) -> bool {
     // "X can't be 0" (CR 107.3a): X at 1, and no cast at all for a cost where X could only be 0 (CR 107.3b), as `cast`
     // refuses it.
-    if def.x_cant_be_zero && def.cost.x > 0 && base.x == 0 {
+    if x_only_zero(def.x_cant_be_zero, def.cost.x, base.x) {
         return false;
     }
     let mut cost = at_least_x(base, def.x_cant_be_zero);
@@ -3220,6 +3220,11 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             if !can_pay_activation(cx, id, player, &def.cost) {
                 continue;
             }
+            // An X that can't be 0 counting targets there are none of ("X target ...", CR 107.3a, 601.2c): nothing may be
+            // announced, and the activation would only be taken back.
+            if def.x_cant_be_zero && def.cost.mana.x > 0 && x_target_cap(cx, &asker, def) < least_x(true) {
+                continue;
+            }
             // An activation whose mana cost the player cannot meet is not offered, as a spell they cannot afford is not
             // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
             let owed = if def.special_action { special_action_cost(cx, player, id, ability, def) } else { def.cost.mana };
@@ -3274,7 +3279,11 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             let alternatives: Vec<(Grant, ManaCost)> = if alternative_sources.is_empty() || def.special_action {
                 Vec::new()
             } else {
-                static_rules::activation_alternatives(cx, &alternative_sources, player, id, def).into_iter().filter(|&(_, c)| c != owed).collect()
+                // An alternative cost with no {X} for an ability whose X can't be 0 leaves no X to announce (CR 107.3a, 118.9).
+                static_rules::activation_alternatives(cx, &alternative_sources, player, id, def)
+                    .into_iter()
+                    .filter(|&(_, c)| c != owed && !x_only_zero(def.x_cant_be_zero, def.cost.mana.x, c.x))
+                    .collect()
             };
             let ways = || {
                 std::iter::once((None, owed))
@@ -5226,7 +5235,7 @@ fn cast(
     let mut sacrificed_any_number: u32 = 0;
     // "X can't be 0" (CR 107.3a): cast where X can only be 0 (CR 107.3b: without paying its mana cost, or for an
     // alternative cost with no {X}), there is no X it may be cast with, and it can't be cast (Mind Grind's ruling).
-    if def.x_cant_be_zero && def.cost.x > 0 && x_symbols == 0 {
+    if x_only_zero(def.x_cant_be_zero, def.cost.x, x_symbols) {
         return Err(Stop::Cancel);
     }
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
@@ -5806,6 +5815,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
                             || (w.from == obj.zone.kind() && obj.zone.player == player);
                         open && w.condition.is_none_or(|c| c(&*cx, &asker))
                             && can_pay_other(cx, card, player, &w.cost)
+                            && !x_only_zero(face.x_cant_be_zero, face.cost.x, w.cost.mana.x)
                     })
                     .map(|(n, _)| (n + 1) as u8)
                     .collect()
@@ -5816,6 +5826,8 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
             let alternatives: Vec<Given<SpellAlternative>> = alternatives_for(&*cx, cx.cards(), &all, player, card, face, way == 0)
                 .into_iter()
                 .filter(|a| can_pay_other(cx, card, player, &a.what.cost.cost()))
+                // An X that can't be 0 has nothing to be for a cost with no {X} (CR 107.3a-b): not a choice.
+                .filter(|a| !x_only_zero(face.x_cant_be_zero, face.cost.x, a.what.cost.cost().mana.x))
                 .collect();
             (ways, alternatives)
         };
@@ -6493,6 +6505,14 @@ pub(crate) const fn least_x(x_cant_be_zero: bool) -> u16 {
     x_cant_be_zero as u16
 }
 
+/// Whether a cost paid for something whose X can't be 0 (CR 107.3a) leaves no X that may be announced: the printed cost
+/// has an {X} (`printed_x`), but the cost paid has none (`paid_x`), so X could only be 0 (CR 107.3b for a spell cast
+/// without paying its mana cost or for an alternative cost with no {X}; the same for an ability's alternative cost, CR
+/// 118.9 by way of 602.2b). Such a cast or activation can't be made (Mind Grind's ruling).
+pub(crate) const fn x_only_zero(x_cant_be_zero: bool, printed_x: u8, paid_x: u8) -> bool {
+    x_cant_be_zero && printed_x > 0 && paid_x == 0
+}
+
 /// `cost` as the least it could be announced to come to: each {X} as the least X may be (`least_x`), in generic mana.
 /// The `x` symbols are kept, for mana that pays for spells of a mana value at an X that brings it there
 /// (`Available::covers_for`).
@@ -6547,6 +6567,17 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
     }
 }
 
+/// The most an activation's X may be announced as where it counts targets ("untap X target lands"): no more than the legal
+/// targets there are (CR 601.2c, 602.2b).
+fn x_target_cap(cx: &Cx, asker: &Asker, def: &ActivatedDef) -> u16 {
+    def.targets
+        .iter()
+        .filter(|spec| spec.min == TargetSpec::COUNTED)
+        .map(|spec| u16::try_from(target_candidates(cx, asker, spec).len()).unwrap_or(u16::MAX))
+        .min()
+        .unwrap_or(u16::MAX)
+}
+
 /// Activating a non-mana ability (CR 602.2): on the stack, then its costs.
 #[allow(clippy::too_many_arguments)]
 fn activate(
@@ -6581,6 +6612,10 @@ fn activate(
             Some(alternative) => mana = alternative,
             None => return Err(Stop::Cancel),
         }
+        // An alternative cost with no {X} leaves an X that can't be 0 nothing to be (CR 107.3a, 118.9).
+        if x_only_zero(def.x_cant_be_zero, def.cost.mana.x, mana.x) {
+            return Err(Stop::Cancel);
+        }
     }
 
     // CR 602.2b, 601.2b: a modal ability's modes first, then X, then the Phyrexian symbols paid with life.
@@ -6591,14 +6626,7 @@ fn activate(
     }
     if mana.x > 0 {
         // "X target lands" cannot be announced past the legal targets there are (CR 601.2c, 602.2b).
-        let asker = Asker { source, controller: player };
-        let cap = def
-            .targets
-            .iter()
-            .filter(|spec| spec.min == TargetSpec::COUNTED)
-            .map(|spec| u16::try_from(target_candidates(cx, &asker, spec).len()).unwrap_or(u16::MAX))
-            .min()
-            .unwrap_or(u16::MAX);
+        let cap = x_target_cap(cx, &Asker { source, controller: player }, def);
         let n = announce(cx, player, source, mana, mana.x, least_x(def.x_cant_be_zero), cap)?;
         mana.generic = mana.generic.saturating_add((u32::from(n) * u32::from(mana.x)).min(255) as u8);
         item.x = n;
