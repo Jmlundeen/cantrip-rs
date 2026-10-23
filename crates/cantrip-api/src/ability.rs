@@ -807,7 +807,7 @@ pub const fn control_changing(affects: StaticAffects, text: &'static str) -> Sta
 
 /// A static ability an effect gives an object (CR 613.1f), to be granted with `EffectKind::AddAbility` from the card's
 /// `delayed` list: the object itself is its source, so "you" and "your" are its controller's (CR 113.6, 109.5), and it
-/// applies in `layer` (which must be `Layer::PtDefine` or later) at the later of the object's timestamp and the
+/// applies in `layer` (`Layer::Ability`, ordered with the other layer 6 effects by `appear`, or `Layer::PtDefine` and later; never layers 1-5) at the later of the object's timestamp and the
 /// granting effect's (CR 613.7a). It stops when the object loses the ability (CR 613.1f) or the effect ends.
 /// Ms. Marvel, Kamala Khan grants herself "base power is equal to the number of cards in your hand"; any card that
 /// gives a creature a quoted static ability about its characteristics can.
@@ -817,8 +817,8 @@ pub const fn granted_static(layer: Layer, apply: StaticApply, text: &'static str
 
 /// A static ability an effect gives an object (CR 613.1f) that affects the objects `affects` accepts, the object that
 /// has it as the source (CR 113.6): The Irencrag's "it gains 'Equipped creature gets +3/+3'". Granted with
-/// `EffectKind::AddAbility` from the card's `delayed` list, it applies in `layer` (layer 7 or later, after the abilities
-/// are settled) at the later of the object's timestamp and the granting effect's (CR 613.7a), while the object is on the
+/// `EffectKind::AddAbility` from the card's `delayed` list, it applies in `layer` (`Layer::Ability`, ordered with the other layer 6 effects by `appear`, or `Layer::PtDefine` and later;
+/// never layers 1-5) at the later of the object's timestamp and the granting effect's (CR 613.7a), while the object is on the
 /// battlefield and still has the ability.
 pub const fn granted_static_ability(layer: Layer, affects: StaticAffects, apply: StaticApply, text: &'static str) -> AbilityDef {
     AbilityDef::Static(StaticDef { text, layer, affects, apply, ..StaticDef::BLANK })
