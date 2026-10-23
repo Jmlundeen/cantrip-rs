@@ -1143,17 +1143,17 @@ fn targets_with_activation(def: &ActivatedDef) -> bool {
 /// Whether every required slot has at least its minimum number of legal targets (CR 601.2c): fewer is no legal announcement, so the
 /// spell or ability is not offered.
 /// A slot whose targets together are judged (`TargetSpec::together`) needs that many the rule allows together, judged before X
-/// is announced with its parts' `COUNTED` unread, so as large as any X could make it.
+/// is announced with its rule's `COUNTED` unread, so as large as any X could make it.
 pub(crate) fn slots_satisfiable(cx: &Cx, asker: &Asker, specs: &[TargetSpec]) -> bool {
     specs.iter().all(|spec| {
         if !spec.required() {
             return true;
         }
         let candidates = target_candidates(cx, asker, spec);
-        if spec.together.is_empty() {
+        if spec.together.is_none() {
             candidates.len() >= spec.min as usize
         } else {
-            select::first_targets(cx, spec.together, asker.controller, asker.source, &candidates, spec.min as usize).is_some()
+            select::first_targets(cx, spec.together.as_ref(), asker.controller, asker.source, &candidates, spec.min as usize).is_some()
         }
     })
 }
@@ -1165,7 +1165,7 @@ fn with_targets(cx: &Cx, asker: &Asker, specs: &[TargetSpec], option: &mut Actio
     }
     for spec in specs {
         // A target the rule of the slot's targets together refuses by itself is none (`TargetSpec::together`).
-        let candidates = select::targets_allowed(cx, spec.together, asker.controller, asker.source, target_candidates(cx, asker, spec));
+        let candidates = select::targets_allowed(cx, spec.together.as_slice(), asker.controller, asker.source, target_candidates(cx, asker, spec));
         if candidates.is_empty() && spec.required() {
             return false;
         }
@@ -1466,7 +1466,7 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
         let before = targets.len();
         // The last slot, of no rule of its targets together, with candidates to take as alike: judged by how many of them,
         // while the changes tell none apart.
-        if at + 1 == self.slots.len() && together.is_empty() && !self.watching.told.get() {
+        if at + 1 == self.slots.len() && together.is_none() && !self.watching.told.get() {
             let alike: Vec<ObjectId> = candidates
                 .iter()
                 .filter_map(|&t| if let Target::Object(id) = t { Some(id) } else { None })
@@ -1491,7 +1491,7 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
             chosen.clear();
             chosen.extend(0..n);
             loop {
-                let allowed = together.is_empty() || {
+                let allowed = together.is_none() || {
                     picked.clear();
                     picked.extend(chosen.iter().map(|&i| candidates[i]));
                     select::targets_together(self.q, together.as_slice(), self.asker.controller, self.asker.source, &picked)
@@ -6879,9 +6879,9 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
 /// candidates less any the rule refuses by itself, which no legal choice could include, and the rule with its numbers read
 /// for the question (the core refuses an answer it does not call complete). A slot without one keeps its candidates and
 /// asks nothing of them.
-pub(crate) fn within_together(q: &dyn Query, asker: &Asker, spec: &TargetSpec, counted: u32, candidates: Vec<Target>) -> (Vec<Target>, Parts) {
-    if spec.together.is_empty() {
-        return (candidates, Parts::NONE);
+pub(crate) fn within_together(q: &dyn Query, asker: &Asker, spec: &TargetSpec, counted: u32, candidates: Vec<Target>) -> (Vec<Target>, Option<Part>) {
+    if spec.together.is_none() {
+        return (candidates, None);
     }
     let together = spec.together_at(counted);
     let kept = select::targets_allowed(q, together.as_slice(), asker.controller, asker.source, candidates);
@@ -6890,9 +6890,9 @@ pub(crate) fn within_together(q: &dyn Query, asker: &Asker, spec: &TargetSpec, c
 
 /// Whether a slot judged by `together` has a legal choice of `least` targets among `candidates` (CR 601.2c): as many
 /// candidates, and for a rule of its targets together, that many it allows together.
-pub(crate) fn enough_together(q: &dyn Query, asker: &Asker, together: &Parts, candidates: &[Target], least: u32) -> bool {
+pub(crate) fn enough_together(q: &dyn Query, asker: &Asker, together: &Option<Part>, candidates: &[Target], least: u32) -> bool {
     candidates.len() >= least as usize
-        && (together.is_empty() || least == 0 || select::first_targets(q, together.as_slice(), asker.controller, asker.source, candidates, least as usize).is_some())
+        && (together.is_none() || least == 0 || select::first_targets(q, together.as_ref(), asker.controller, asker.source, candidates, least as usize).is_some())
 }
 
 /// Each target slot's targets, asked in slot order (CR 601.2c), each a target of the slot's own (a player may be

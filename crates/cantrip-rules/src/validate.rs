@@ -129,7 +129,7 @@ pub fn selection_verdict(game: &Game, request: &Request, selected: &[ObjectId]) 
             (cards.clone(), verdict)
         }
         // The slot's own count beside its rule (CR 601.2c): complete within `least` to `count`, and nothing addable past it.
-        RequestKind::ChooseTarget { candidates, least, count, together, .. } if !together.is_empty() => {
+        RequestKind::ChooseTarget { candidates, least, count, together, .. } if together.is_some() => {
             let objects: Vec<ObjectId> = candidates.iter().filter_map(|t| if let Target::Object(id) = *t { Some(id) } else { None }).collect();
             let chosen: Vec<Target> = selected.iter().map(|&c| Target::Object(c)).collect();
             let judged = select::judge_targets(game, together.as_slice(), request.player, source, candidates, &chosen);
@@ -212,7 +212,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 no("not among the candidates")
             } else if n > *count as usize || n < *least as usize {
                 no(format!("{n} chosen, {least} to {count} wanted (CR 601.2c)"))
-            } else if !select::judge_targets(game, together.as_slice(), request.player, *source, candidates, targets).complete {
+            } else if together.is_some() && !select::judge_targets(game, together.as_slice(), request.player, *source, candidates, targets).complete {
                 // The rule of the slot's targets together judges them as it judged each pick (`selection_verdict`).
                 let words: Vec<String> = together.as_slice().iter().filter(|p| !p.words.is_empty()).map(|p| p.worded(&|id| game.cards.get(CardId(id as u16)).name.to_string())).collect();
                 no(format!("targets that are not {} together (CR 601.2c)", words.join(", ")))

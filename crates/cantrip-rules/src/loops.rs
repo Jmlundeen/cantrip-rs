@@ -639,7 +639,7 @@ mod tests {
             any_number: false,
             label: "",
             slot_player: None,
-            together: Parts::NONE,
+            together: None,
         };
         assert!(forced(&choose(vec![Target::Object(ObjectId(1))], false)));
         assert!(!forced(&choose(vec![Target::Object(ObjectId(1))], true)), "choosing none is another answer");
@@ -655,7 +655,7 @@ mod tests {
             any_number: false,
             label: "",
             slot_player: None,
-            together: Parts::NONE,
+            together: None,
         };
         assert!(!forced(&one_or_two));
         assert!(!forced(&RequestKind::May { source: ObjectId(0), purpose: Purpose::Optional }));

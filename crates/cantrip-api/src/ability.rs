@@ -683,17 +683,17 @@ pub const fn spell(targets: &'static [TargetSpec], effect: Effect) -> Option<Spe
 
 /// One target that passes the filter (CR 115.1).
 pub const fn target(filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 1, max: 1, filter, label: "", if_kicked: None, together: &[] }
+    TargetSpec { min: 1, max: 1, filter, label: "", if_kicked: None, together: None }
 }
 
 /// "Up to one target" (CR 115.1d).
 pub const fn up_to_one(filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 0, max: 1, filter, label: "", if_kicked: None, together: &[] }
+    TargetSpec { min: 0, max: 1, filter, label: "", if_kicked: None, together: None }
 }
 
 /// "Up to N targets" (CR 115.1d).
 pub const fn up_to(n: u32, filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 0, max: n, filter, label: "", if_kicked: None, together: &[] }
+    TargetSpec { min: 0, max: n, filter, label: "", if_kicked: None, together: None }
 }
 
 impl TargetSpec {
@@ -718,10 +718,13 @@ impl TargetSpec {
         TargetSpec { if_kicked: Some((min, max)), ..self }
     }
 
-    /// The same slot, its targets together judged by `parts` (`TargetSpec::together`, CR 601.2c, 115.1): "any number of target
-    /// creature cards with total mana value X or less" is `.together(&[select::total_mana_value_at_most(TargetSpec::COUNTED)])`.
-    pub const fn together(self, parts: &'static [Part]) -> TargetSpec {
-        TargetSpec { together: parts, ..self }
+    /// The same slot, its targets together judged by the set rule `rule` (`TargetSpec::together`, CR 601.2c, 115.1): "any
+    /// number of target creature cards with total mana value X or less" is
+    /// `.together(select::total_mana_value_at_most(TargetSpec::COUNTED))`. A quality of each target is the filter's, never
+    /// this: a rule that is not a set rule (`select::set_part`) does not compile here.
+    pub const fn together(self, rule: Part) -> TargetSpec {
+        assert!(rule.is_set_rule(), "a target slot's rule of its targets together is a set rule (select::set_part); a quality of each target is the slot's filter");
+        TargetSpec { together: Some(rule), ..self }
     }
 }
 

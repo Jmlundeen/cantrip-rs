@@ -63,7 +63,7 @@ pub fn enter_as_copy_of_one_of(
     let chosen = if candidates.len() == 1 {
         candidates[0]
     } else {
-        let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: Parts::NONE,
+        let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: None,
             source: entering,
             purpose: Purpose::CopyWhich,
             candidates: candidates.iter().map(|&id| Target::Object(id)).collect(),

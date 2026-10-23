@@ -1,14 +1,16 @@
 //! A target slot whose targets together are judged (`TargetSpec::together`, CR 601.2c, 115.1), over test cards and test
-//! parts: "any number of target creature cards that each have a different mana value X or less" (Agadeem's Awakening's
-//! wording), "X target cards with different mana values" (Long Rest's) and "up to three target creature cards with total
-//! mana value 3 or less" (Patch Up's). A candidate the rule refuses alone is not offered, a set it refuses is refused and one
+//! set rules: "any number of target creature cards that each have a different mana value X or less" (Agadeem's Awakening's
+//! wording: "X or less" the slot's filter, reading the X announced, and "different mana values" its rule), "X target cards
+//! with different mana values" (Long Rest's) and "up to three target creature cards with total mana value 3 or less" (Patch
+//! Up's). A candidate the rule refuses alone is not offered, a set it refuses is refused and one
 //! it allows taken, the host's check offers only what keeps the set legal, a count no set the rule allows reaches is no
 //! legal announcement, and the set is judged again as the spell resolves (CR 608.2b): one the rule no longer allows makes
 //! every target of the slot illegal (Nethroi, Apex of Death's ruling: "Return any number of target creature cards with total
 //! power 10 or less", a power defined by a characteristic-defining ability growing), a target gone read as it last was (Run
-//! Away Together's).
+//! Away Together's), where a target that loses a quality of its own is illegal alone. Whether a slot's fewest targets can be
+//! chosen together is found exactly and quickly, however many cards there are.
 use crate::{Game, Setup};
-use cantrip_api::select::{Bits, Choice, SelectFn, Verdict, part, tallied};
+use cantrip_api::select::{Bits, Choice, LargestFn, SelectFn, Verdict, largest_distinct, largest_within, set_part, set_tallied};
 use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Tally};
 
@@ -21,6 +23,20 @@ const fn creature(name: &'static str, cost: ManaCost) -> CardDef {
 }
 
 static ONE: CardDef = creature("Together Test One", ManaCost { generic: 1, ..ManaCost::ZERO });
+
+/// Ten creature cards of mana values 0 to 9, for a graveyard of many.
+static RANGE: [CardDef; 10] = [
+    creature("Together Test Range 0", ManaCost::ZERO),
+    creature("Together Test Range 1", ManaCost { generic: 1, ..ManaCost::ZERO }),
+    creature("Together Test Range 2", ManaCost { generic: 2, ..ManaCost::ZERO }),
+    creature("Together Test Range 3", ManaCost { generic: 3, ..ManaCost::ZERO }),
+    creature("Together Test Range 4", ManaCost { generic: 4, ..ManaCost::ZERO }),
+    creature("Together Test Range 5", ManaCost { generic: 5, ..ManaCost::ZERO }),
+    creature("Together Test Range 6", ManaCost { generic: 6, ..ManaCost::ZERO }),
+    creature("Together Test Range 7", ManaCost { generic: 7, ..ManaCost::ZERO }),
+    creature("Together Test Range 8", ManaCost { generic: 8, ..ManaCost::ZERO }),
+    creature("Together Test Range 9", ManaCost { generic: 9, ..ManaCost::ZERO }),
+];
 static OTHER_ONE: CardDef = creature("Together Test Other One", ManaCost { generic: 1, ..ManaCost::ZERO });
 static TWO: CardDef = creature("Together Test Two", ManaCost { generic: 2, ..ManaCost::ZERO });
 static THREE: CardDef = creature("Together Test Three", ManaCost { generic: 3, ..ManaCost::ZERO });
@@ -48,10 +64,6 @@ fn different_mana_values(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
     Verdict { complete, addable: Bits::of(choice.candidates.len(), |i| !chosen.contains(&q.mana_value(choice.candidates[i]))) }
 }
 
-fn mana_value_at_most(q: &dyn Query, choice: &Choice, most: u32) -> Verdict {
-    Verdict::each(choice, |c| q.mana_value(c) <= most)
-}
-
 fn total_mana_value(q: &dyn Query, choice: &Choice, most: u32) -> Verdict {
     let total: u64 = choice.selected.iter().map(|&c| u64::from(q.mana_value(c))).sum();
     let left = u64::from(most).saturating_sub(total);
@@ -64,13 +76,38 @@ fn total_power(q: &dyn Query, choice: &Choice, most: u32) -> Verdict {
     Verdict { complete: total <= i64::from(most), addable: Bits::of(choice.candidates.len(), |i| total + power(choice.candidates[i]) <= i64::from(most)) }
 }
 
-const DIFFERENT: Part = part(&(different_mana_values as SelectFn), 0, "with different mana values");
-static TOTAL_POWER_AT_MOST_TWO: [Part; 1] = [part(&(total_power as SelectFn), 2, "with total power {n} or less")];
-static EACH_DIFFERENT_AT_MOST_X: [Part; 2] = [DIFFERENT, part(&(mana_value_at_most as SelectFn), TargetSpec::COUNTED, "with mana value {n} or less")];
-static TOTAL_AT_MOST_THREE: [Part; 1] = [tallied(&(total_mana_value as SelectFn), 3, "with total mana value {n} or less", Tally::ManaValueAtMost)];
+fn largest_different(q: &dyn Query, choice: &Choice, _: u32) -> Vec<ObjectId> {
+    largest_distinct(choice, |c| q.mana_value(c))
+}
+
+fn largest_total(q: &dyn Query, choice: &Choice, most: u32) -> Vec<ObjectId> {
+    largest_within(choice, |c| u64::from(q.mana_value(c)), u64::from(most))
+}
+
+fn largest_power(q: &dyn Query, choice: &Choice, most: u32) -> Vec<ObjectId> {
+    // Every test card's power is at least 0.
+    largest_within(choice, |c| u64::try_from(q.chars(c).power.unwrap_or(0)).unwrap_or(0), u64::from(most))
+}
+
+const DIFFERENT: Part = set_part(&(different_mana_values as SelectFn), &(largest_different as LargestFn), 0, "with different mana values");
+const TOTAL_POWER_AT_MOST_TWO: Part = set_part(&(total_power as SelectFn), &(largest_power as LargestFn), 2, "with total power {n} or less");
+const TOTAL_AT_MOST_THREE: Part =
+    set_tallied(&(total_mana_value as SelectFn), &(largest_total as LargestFn), 3, "with total mana value {n} or less", Tally::ManaValueAtMost);
 
 fn creature_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if q.obj(id).zone == Zone::graveyard(asker.controller) && q.chars(id).is(CardType::Creature))
+}
+
+/// A creature card in your graveyard with mana value X or less: a quality of each target, the filter's, reading the X
+/// announced (none while it is only asked whether some X could have a target: any).
+fn creature_card_x_or_less(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_card_in_your_graveyard(q, asker, t) && matches!(t, Target::Object(id) if q.announced_x().is_none_or(|x| q.mana_value(id) <= x))
+}
+
+/// A creature card in your graveyard with power X or less.
+fn creature_card_power_x_or_less(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_card_in_your_graveyard(q, asker, t)
+        && matches!(t, Target::Object(id) if q.announced_x().is_none_or(|x| i64::from(q.chars(id).power.unwrap_or(0)) <= i64::from(x)))
 }
 
 fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -91,7 +128,7 @@ fn return_legal(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), S
 }
 
 static AWAKENING_TARGETS: [TargetSpec; 1] =
-    [TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(creature_card_in_your_graveyard) }.together(&EACH_DIFFERENT_AT_MOST_X)];
+    [TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(creature_card_x_or_less) }.together(DIFFERENT)];
 
 /// {X} sorcery: "Return from your graveyard to the battlefield any number of target creature cards that each have a different
 /// mana value X or less."
@@ -104,7 +141,7 @@ static AWAKENING: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-static REST_TARGETS: [TargetSpec; 1] = [target(card_in_your_graveyard).counted().together(&[DIFFERENT])];
+static REST_TARGETS: [TargetSpec; 1] = [target(card_in_your_graveyard).counted().together(DIFFERENT)];
 
 /// {X} sorcery: "Return X target cards with different mana values from your graveyard to the battlefield."
 static REST: CardDef = CardDef {
@@ -116,7 +153,56 @@ static REST: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-static PATCH_TARGETS: [TargetSpec; 1] = [up_to(3, creature_card_in_your_graveyard).together(&TOTAL_AT_MOST_THREE)];
+static PATCH_TARGETS: [TargetSpec; 1] = [up_to(3, creature_card_in_your_graveyard).together(TOTAL_AT_MOST_THREE)];
+
+static GATHER_TARGETS: [TargetSpec; 1] =
+    [TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(creature_card_power_x_or_less) }.together(DIFFERENT)];
+
+/// {X} sorcery: "Return any number of target creature cards with power X or less and different mana values from your
+/// graveyard to the battlefield."
+static GATHER: CardDef = CardDef {
+    name: "Together Test Gather",
+    cost: ManaCost { x: 1, ..ManaCost::ZERO },
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&GATHER_TARGETS, return_legal),
+    ..CardDef::BLANK
+};
+
+static SOZIN_TARGETS: [TargetSpec; 1] = [TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(creature_card_in_your_graveyard) }
+    .together(set_tallied(&(total_mana_value as SelectFn), &(largest_total as LargestFn), TargetSpec::COUNTED, "with total mana value {n} or less", Tally::ManaValueAtMost))];
+
+/// {X} instant: "Return any number of target creature cards with total mana value X or less from your graveyard to the
+/// battlefield."
+static SOZIN: CardDef = CardDef {
+    name: "Together Test Sozin",
+    cost: ManaCost { x: 1, ..ManaCost::ZERO },
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&SOZIN_TARGETS, return_legal),
+    ..CardDef::BLANK
+};
+
+/// "Choose new targets for target spell" (CR 115.7d), its controller choosing.
+fn new_targets(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(Target::Object(spell)) = g.state().targets(item).first().copied() {
+        g.choose_new_targets(spell, item.controller)?;
+    }
+    Ok(())
+}
+
+fn spell_on_stack(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.obj(id).zone.is(ZoneKind::Stack))
+}
+
+/// {0} instant: "You may choose new targets for target spell." (Redirect's kind, CR 115.7d.)
+static REDIRECT: CardDef = CardDef {
+    name: "Together Test Redirect",
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[target(spell_on_stack)], new_targets),
+    ..CardDef::BLANK
+};
 
 /// {0} sorcery: "Return up to three target creature cards with total mana value 3 or less from your graveyard to the
 /// battlefield."
@@ -129,7 +215,7 @@ static PATCH: CardDef = CardDef {
 };
 
 static REUNION_TARGETS: [TargetSpec; 1] =
-    [TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(creature_card_in_your_graveyard) }.together(&TOTAL_POWER_AT_MOST_TWO)];
+    [TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(creature_card_in_your_graveyard) }.together(TOTAL_POWER_AT_MOST_TWO)];
 
 /// {0} sorcery: "Return any number of target creature cards with total power 2 or less from your graveyard to the
 /// battlefield." (Nethroi, Apex of Death's and Reunion of the House's wording, at 2.)
@@ -152,7 +238,7 @@ static DRAW: CardDef = CardDef { name: "Together Test Draw", has_cost: true, typ
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
     let table: &'static CardTable =
-        Box::leak(Box::new(CardTable::new([&FILLER, &ONE, &OTHER_ONE, &TWO, &THREE, &FIVE, &STAR, &AWAKENING, &REST, &PATCH, &REUNION, &DRAW])));
+        Box::leak(Box::new(CardTable::new(RANGE.iter().chain([&FILLER, &ONE, &OTHER_ONE, &TWO, &THREE, &FIVE, &STAR, &AWAKENING, &REST, &PATCH, &REUNION, &DRAW, &GATHER, &SOZIN, &REDIRECT]))));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -258,9 +344,9 @@ fn a_candidate_the_rule_refuses_alone_is_not_offered() {
     let (mut g, awakening, [one, other_one, two, three]) = board(&AWAKENING, 2);
     let r = cast(&mut g, awakening, Some(2));
     let RequestKind::ChooseTarget { candidates, together, .. } = &r.kind else { panic!("expected the targets, got {:?}", r.kind) };
-    assert_eq!(*candidates, objects(&[one, other_one, two]), "Three's mana value is over X 2");
+    assert_eq!(*candidates, objects(&[one, other_one, two]), "Three's mana value is over X 2: the filter, reading X, refuses it");
     assert!(!candidates.contains(&Target::Object(three)));
-    assert_eq!(together.as_slice()[1].n, 2, "the part of COUNTED reads the X announced");
+    assert_eq!(together.map(|p| p.words), Some("with different mana values"));
 }
 
 #[test]
@@ -293,7 +379,7 @@ fn the_check_as_the_player_picks_offers_only_what_keeps_the_set_legal() {
     let (mut plain, card, _) = board(&PATCH, 0);
     let r = cast(&mut plain, card, None);
     let RequestKind::ChooseTarget { together, .. } = &r.kind else { panic!("expected the targets, got {:?}", r.kind) };
-    assert!(!together.is_empty());
+    assert!(together.is_some());
 }
 
 #[test]
@@ -389,4 +475,88 @@ fn a_count_no_set_the_rule_allows_reaches_is_no_legal_announcement() {
     let r = cast(&mut g, rest, Some(3));
     assert!(matches!(r.kind, RequestKind::Priority { .. }), "expected the cast taken back, got {:?}", r.kind);
     assert_eq!(g.state.obj(rest).zone, Zone::hand(YOU));
+}
+
+#[test]
+fn a_target_that_loses_a_quality_of_its_own_is_illegal_alone() {
+    let mut g = game();
+    let graveyard = Zone::graveyard(YOU);
+    let star = put(&mut g, &STAR, graveyard);
+    let two = put(&mut g, &TWO, graveyard);
+    let gather = put(&mut g, &GATHER, Zone::hand(YOU));
+    let draw = put(&mut g, &DRAW, Zone::hand(YOU));
+    g.state.add_mana(YOU, Mana::C, 1, ObjectId(0), None, false);
+    let r = cast(&mut g, gather, Some(1));
+    // The Star's power is 1 (the Draw in hand), Two's 1: both have power X 1 or less, and different mana values.
+    answer(&mut g, &r, Answer::Targets(objects(&[star, two])));
+    let r = next(&mut g);
+    let r = pay(&mut g, r);
+    let RequestKind::Priority { options } = &r.kind else { panic!("expected priority, got {:?}", r.kind) };
+    let option = options.iter().find(|o| o.source == Some(draw)).expect("the Draw is offered").clone();
+    answer(&mut g, &r, Answer::Act(Action::of(&option)));
+    let r = next(&mut g);
+    // Two cards drawn: the Star's power is 2, over X. It alone is illegal (CR 608.2b); Two, still within the filter and with
+    // a mana value of its own, is returned.
+    pay_and_resolve(&mut g, r);
+    assert_eq!(zone_of(&g, star), ZoneKind::Graveyard);
+    assert_eq!(zone_of(&g, two), ZoneKind::Battlefield);
+}
+
+#[test]
+fn whether_a_count_can_be_reached_together_is_found_at_once_among_many_cards() {
+    // Fifty cards, five of each of ten mana values, and X 11 of them with different mana values: no such set, which a search
+    // through the sets of different mana values (6^10 of them) would take minutes to rule out. X 10 has one.
+    for (x, reachable) in [(11, false), (10, true)] {
+        let mut g = game();
+        for _ in 0..5 {
+            for def in &RANGE {
+                put(&mut g, def, Zone::graveyard(YOU));
+            }
+        }
+        let rest = put(&mut g, &REST, Zone::hand(YOU));
+        g.state.add_mana(YOU, Mana::C, x, ObjectId(0), None, false);
+        let r = cast(&mut g, rest, Some(x));
+        if reachable {
+            let RequestKind::ChooseTarget { candidates, least, .. } = &r.kind else { panic!("expected the targets, got {:?}", r.kind) };
+            assert_eq!((candidates.len(), *least), (50, 10));
+            let (_, none) = crate::validate::selection_verdict(&g, &r, &[]).expect("a slot judged together");
+            assert!(!none.complete && none.addable.ones().count() == 50);
+        } else {
+            assert!(matches!(r.kind, RequestKind::Priority { .. }), "X 11 has no legal choice, got {:?}", r.kind);
+            assert_eq!(g.state.obj(rest).zone, Zone::hand(YOU));
+        }
+    }
+}
+
+#[test]
+fn new_targets_for_a_spell_are_judged_together_with_the_count_it_was_cast_with() {
+    let (mut g, sozin, [one, other_one, two, three]) = board(&SOZIN, 3);
+    let redirect = put(&mut g, &REDIRECT, Zone::hand(YOU));
+    let r = cast(&mut g, sozin, Some(3));
+    answer(&mut g, &r, Answer::Targets(objects(&[one, two])));
+    let r = next(&mut g);
+    let r = pay(&mut g, r);
+    let on_stack = g.state.stack[0].object;
+    assert_eq!(g.state.stack[0].counted, 3, "the count its targets were chosen with (StackItem::counted)");
+    let RequestKind::Priority { options } = &r.kind else { panic!("expected priority, got {:?}", r.kind) };
+    let option = options.iter().find(|o| o.source == Some(redirect)).expect("the Redirect is offered").clone();
+    let mut action = Action::of(&option);
+    action.targets = vec![Target::Object(on_stack)];
+    answer(&mut g, &r, Answer::Act(action));
+    let mut r = next(&mut g);
+    r = pay(&mut g, r);
+    // Passed until the Redirect resolves and asks for the Sozin's new targets (CR 115.7d), its total X 3 as it was cast.
+    while !matches!(r.kind, RequestKind::ChooseTarget { .. }) {
+        assert!(matches!(r.kind, RequestKind::Priority { .. }), "expected priority, got {:?}", r.kind);
+        answer(&mut g, &r, Answer::Pass);
+        r = next(&mut g);
+    }
+    let RequestKind::ChooseTarget { together, .. } = &r.kind else { unreachable!() };
+    assert_eq!(together.map(|p| p.n), Some(3));
+    assert!(g.answer(r.id, r.player, Answer::Targets(objects(&[three, one]))).is_err(), "total 4, over X 3");
+    answer(&mut g, &r, Answer::Targets(objects(&[other_one, two])));
+    let r = next(&mut g);
+    pass_until_resolved(&mut g, r);
+    assert_eq!((zone_of(&g, other_one), zone_of(&g, two)), (ZoneKind::Battlefield, ZoneKind::Battlefield));
+    assert_eq!(zone_of(&g, one), ZoneKind::Graveyard);
 }

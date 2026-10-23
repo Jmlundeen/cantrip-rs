@@ -1799,7 +1799,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
 /// its targets together allows (`TargetSpec::together`, CR 115.7a, 601.2c), with the count they were chosen with; true
 /// for a slot with none.
 fn fits_together(cx: &Cx, item: &StackItem, targets: &[Target], slot: usize, spec: &TargetSpec, to: Target) -> bool {
-    if spec.together.is_empty() {
+    if spec.together.is_none() {
         return true;
     }
     let run = cx.s().spec_targets(item, cx.s().spec(item, slot) as usize);
@@ -1859,7 +1859,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
     for (slot, others) in options.into_iter().enumerate() {
         // A slot whose targets together are judged judges each new target with the ones already changed (CR 115.7a, 601.2c).
         let others: Vec<Target> = match crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) {
-            Some((spec, _)) if !spec.together.is_empty() => others.into_iter().filter(|&t| fits_together(cx, &item, &changed, slot, &spec, t)).collect(),
+            Some((spec, _)) if spec.together.is_some() => others.into_iter().filter(|&t| fits_together(cx, &item, &changed, slot, &spec, t)).collect(),
             _ => others,
         };
         if others.is_empty() {
@@ -1868,7 +1868,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         let new = if others.len() == 1 {
             others[0]
         } else {
-            let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: Parts::NONE,
+            let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: None,
                 source: item.object,
                 purpose: Purpose::Targets,
                 candidates: others.clone(),
@@ -1964,7 +1964,7 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
             let ask = RequestKind::ChooseTarget {
                 label: "The target to change to this creature",
                 slot_player: None,
-                together: Parts::NONE,
+                together: None,
                 source: to,
                 purpose: Purpose::ChangeTargetTo,
                 candidates: candidates.clone(),
@@ -2823,7 +2823,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     if candidates.is_empty() {
         return Ok(());
     }
-    let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: Parts::NONE,
+    let ask = RequestKind::ChooseTarget { label: "", slot_player: None, together: None,
         source,
         purpose: Purpose::Targets,
         count: cantrip_state::count_u32(candidates.len()),

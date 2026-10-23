@@ -557,7 +557,7 @@ fn choose_trigger_targets(
                 targets.push(candidates[0]);
                 break 'slot;
             }
-            if all_of_few && least > 0 && candidates.len() <= least as usize && together.is_empty() {
+            if all_of_few && least > 0 && candidates.len() <= least as usize && together.is_none() {
                 targets.extend(candidates);
                 break 'slot;
             }

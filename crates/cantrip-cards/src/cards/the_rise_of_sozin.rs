@@ -59,7 +59,7 @@ pub static BACK: CardDef = CardDef {
     ],
     delayed: &[delayed_trigger(reanimate, "When you do, put any number of target creature cards with total mana value X or less from that player's graveyard onto the battlefield under your control.")
         .targets(&[TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(creature_card_in_that_players_graveyard) }
-            .together(&[select::total_mana_value_at_most(TargetSpec::COUNTED)])
+            .together(select::total_mana_value_at_most(TargetSpec::COUNTED))
             .labelled("Creature cards from that player's graveyard to put onto the battlefield under your control")])],
     ..oracle::FIRE_LORD_SOZIN
 };

@@ -213,7 +213,7 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     let earlier = if item.target_count > 1 { &state.targets(item)[..slot] } else { &[][..] };
     (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false, x: announced_x(item) }, &asker, target)
         && layers::can_target(cards, state, events, &asker, target)
-        && (spec.together.is_empty() || together_legal(&q, state, item, slot, &spec))
+        && (spec.together.is_none() || together_legal(&q, state, item, slot, &spec))
 }
 
 /// Whether the targets of the slot target `slot` of `item` was chosen for are still allowed together by `spec`'s rule

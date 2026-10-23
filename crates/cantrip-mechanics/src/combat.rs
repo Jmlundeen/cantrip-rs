@@ -46,7 +46,7 @@ pub fn choose_among(g: &mut dyn Game, you: PlayerId, source: ObjectId, candidate
         0 => None,
         1 => Some(candidates[0]),
         _ => {
-            let ask = RequestKind::ChooseTarget { label: "Choose what it attacks as it enters attacking: a player, a planeswalker or a battle.", slot_player: None, together: Parts::NONE,
+            let ask = RequestKind::ChooseTarget { label: "Choose what it attacks as it enters attacking: a player, a planeswalker or a battle.", slot_player: None, together: None,
                 source,
                 purpose: Purpose::EnterAttacking,
                 candidates: candidates.to_vec(),

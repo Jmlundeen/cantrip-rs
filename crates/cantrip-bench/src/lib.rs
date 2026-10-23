@@ -196,7 +196,7 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             let chosen = random.some(candidates, n);
             // A slot whose targets together are judged ("with total mana value X or less"): a random choice is cut back to the
             // targets its rule allows, each added in the order drawn while it may be, and topped up to the fewest it takes.
-            if together.is_empty() {
+            if together.is_none() {
                 Answer::Targets(chosen)
             } else {
                 let parts = together.as_slice();
@@ -208,7 +208,7 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
                     }
                 }
                 if kept.len() < *least as usize {
-                    kept = cantrip_engine::select::first_targets(game, parts, request.player, *source, candidates, *least as usize).unwrap_or_default();
+                    kept = cantrip_engine::select::first_targets(game, together.as_ref(), request.player, *source, candidates, *least as usize).unwrap_or_default();
                 }
                 Answer::Targets(kept)
             }

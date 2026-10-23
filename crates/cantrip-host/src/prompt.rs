@@ -937,7 +937,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             let sent: Vec<(TargetMessage, i32)> = candidates.iter().filter_map(|t| target_message(handles, *t).map(|m| (m, value(t)))).collect();
             // The rule's words and its verdict on none chosen; every other selection is asked of the host (`Check`).
             let words = together.as_slice().iter().filter(|p| !p.words.is_empty()).map(|p| p.worded(&|id| game.cards.get(CardId(id as u16)).name.to_string())).collect();
-            let verdict = if together.is_empty() { None } else { Some(verdict_view(game, request, handles)) };
+            let verdict = if together.is_none() { None } else { Some(verdict_view(game, request, handles)) };
             PromptPayload::ChooseTargetPromptMessage(ChooseTargetPrompt {
                 player,
                 ability: source_handle,
@@ -1476,7 +1476,7 @@ mod tests {
         use cantrip_engine::select::{SelectFn, Tally, tallied};
         let (game, hand) = game_with(&["Llanowar Elves", "Ornithopter", "Guerrilla Gorilla"]);
         let seat = game.state.seats().next().expect("a seat");
-        let ask = |together: Parts| {
+        let ask = |together: Option<Part>| {
             let request = Request {
                 id: 1,
                 player: seat,
@@ -1500,7 +1500,7 @@ mod tests {
             }
         };
         let total = tallied(&(total_mana_value as SelectFn), 1, "with total mana value {n} or less", Tally::ManaValueAtMost);
-        let limited = ask(Parts::Shared(vec![total].into()));
+        let limited = ask(Some(total));
         assert_eq!((limited.maximum_total_mana_value, limited.mana_values.clone()), (Some(1), vec![1, 0, 2]));
         assert_eq!(limited.words, vec!["with total mana value 1 or less".to_string()]);
         assert_eq!(limited.verdict.as_ref().map(|v| (v.complete, v.addable.len())), Some((true, 2)), "Guerrilla Gorilla (2) is no target alone");
@@ -1509,7 +1509,7 @@ mod tests {
         };
         // Llanowar Elves (1) and Ornithopter (0) fit within 1; Guerrilla Gorilla (2) would not.
         assert_eq!(default.targets.len(), 2);
-        let free = ask(Parts::NONE);
+        let free = ask(None);
         assert_eq!((free.maximum_total_mana_value, free.mana_values, free.verdict), (None, Vec::new(), None));
     }
 
@@ -1533,7 +1533,7 @@ mod tests {
                 any_number: true,
                 label: "",
                 slot_player: None,
-                together: Parts::Shared(vec![part(&(different_mana_values as SelectFn), 0, "with different mana values")].into()),
+                together: Some(part(&(different_mana_values as SelectFn), 0, "with different mana values")),
             },
             may_cancel: false,
         };

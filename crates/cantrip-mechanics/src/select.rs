@@ -17,10 +17,12 @@
 //!   [`named`].
 //! - **Rules of the cards together:** [`DIFFERENT_NAMES`] (CR 201.2b), [`DIFFERENT_MANA_VALUES`] (CR 202.3),
 //!   [`total_mana_value_at_most`] (CR 202.3).
-//! - **Targets together:** every part here judges a target slot's targets too (`TargetSpec::together`, CR 601.2c): "any
-//!   number of target creature cards with total mana value X or less" is
-//!   `.together(&[select::total_mana_value_at_most(TargetSpec::COUNTED)])`, a part's `TargetSpec::COUNTED` read as the
-//!   slot's count (the X announced).
+//! - **Targets together:** a rule of the cards together is a set rule (`set_part`, with a `LargestFn` that finds a largest
+//!   set it allows), and judges a target slot's targets together too (`TargetSpec::together`, CR 601.2c): "any number of
+//!   target creature cards with total mana value X or less" is `.together(select::total_mana_value_at_most(TargetSpec::COUNTED))`,
+//!   `TargetSpec::COUNTED` read as the slot's count (the X announced). A quality of each target ("with mana value X or
+//!   less") is the slot's filter's, reading `Query::announced_x`, never `together`.
+//! - **Every part is downward-closed** (`Part`): any of the cards of a set it allows are allowed too.
 //! - **Putting them together:** `Selection::new(count).with(part).with(part).called("noun")`, or a whole rule
 //!   `.taking(count)` and `.with(part)` more: `basic_land_cards(up_to(x)).with(DIFFERENT_NAMES)`.
 //!
@@ -30,7 +32,7 @@
 //! one number it takes is its data. A rule only one card prints stays in that card's file; one a second printed card uses
 //! exactly as written moves here, its doc comment naming both cards, as for any shared mechanic.
 
-pub use cantrip_api::select::{part, tallied};
+pub use cantrip_api::select::{LargestFn, part, set_part, set_tallied, tallied};
 use cantrip_api::select::Tally;
 use cantrip_api::*;
 
@@ -103,9 +105,9 @@ pub const NONLAND: Part = part(&(nonland as SelectFn), 0, "");
 pub const ARTIFACT: Part = part(&(artifact as SelectFn), 0, "");
 
 /// "With mana value `most` or less" (CR 202.3), each card's read where it is (an {X} in a library or graveyard is 0, CR
-/// 202.3e). Trinket Mage (an artifact card, 1) and Green Sun's Zenith (a green creature card, X) search for it; Agadeem's
-/// Awakening's targets "each have a different mana value X or less" (with `DIFFERENT_MANA_VALUES`, `most` the slot's
-/// `TargetSpec::COUNTED`).
+/// 202.3e). Trinket Mage (an artifact card, 1) and Green Sun's Zenith (a green creature card, X) search for it. Of targets,
+/// it is the slot's filter's to ask (`TargetSpec::together`): Agadeem's Awakening's "mana value X or less" reads
+/// `Query::announced_x` there.
 pub const fn mana_value_at_most(most: u32) -> Part {
     part(&(mana_value as SelectFn), most, "with mana value {n} or less")
 }
@@ -130,8 +132,109 @@ fn different_names(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
 
 /// "With different names" (CR 201.2b): each card chosen has a name, and no two of them a name in common - a split card
 /// shares a name with a card named for either half (CR 201.2a, `same_name`). Fblthp, Knows the Way and Gifts Ungiven
-/// search for cards with different names.
-pub const DIFFERENT_NAMES: Part = part(&(different_names as SelectFn), 0, "with different names");
+/// search for cards with different names; Behold the Sinister Six! targets "up to six target creature cards with different
+/// names".
+pub const DIFFERENT_NAMES: Part = set_part(&(different_names as SelectFn), &(largest_different_names as LargestFn), 0, "with different names");
+
+/// A largest set of cards with different names: the most cards no two of which share a name. A card's names are its own
+/// (CR 201.2a: a split card's halves', a Room's doors'), and no name is two printed cards', so the cards that share names fall
+/// into groups each within the names of one printed card (two for a split card or a Room, five at most): a largest set is
+/// the largest of each group together, each found by trying the sets of names the group's cards have.
+fn largest_different_names(q: &dyn Query, choice: &Choice, _: u32) -> Vec<ObjectId> {
+    let cards: Vec<(usize, Vec<&'static str>)> =
+        choice.candidates.iter().enumerate().map(|(i, &c)| (i, crate::library::object_names(q, c))).filter(|(_, names)| !names.is_empty()).collect();
+    // The names, and the group each is in, joined through the cards that have several.
+    let mut names: Vec<&'static str> = Vec::new();
+    for (_, own) in &cards {
+        for &name in own {
+            if !names.contains(&name) {
+                names.push(name);
+            }
+        }
+    }
+    fn root(group: &mut [usize], mut i: usize) -> usize {
+        while group[i] != i {
+            group[i] = group[group[i]];
+            i = group[i];
+        }
+        i
+    }
+    let index = |name: &str| names.iter().position(|&n| n == name).unwrap_or(0);
+    let mut group: Vec<usize> = (0..names.len()).collect();
+    for (_, own) in &cards {
+        for pair in own.windows(2) {
+            let (a, b) = (root(&mut group, index(pair[0])), root(&mut group, index(pair[1])));
+            group[a] = b;
+        }
+    }
+    let mut kept: Vec<usize> = Vec::new();
+    for r in 0..names.len() {
+        if root(&mut group, r) != r {
+            continue;
+        }
+        // The group's names, and each different set of them a card has (with the first such card), as sets of their places.
+        let members: Vec<usize> = (0..names.len()).filter(|&i| root(&mut group, i) == r).collect();
+        let mut sets: Vec<(Vec<usize>, usize)> = Vec::new();
+        for (i, own) in &cards {
+            if root(&mut group, index(own[0])) != r {
+                continue;
+            }
+            let mut set: Vec<usize> = own.iter().filter_map(|&name| members.iter().position(|&x| x == index(name))).collect();
+            set.sort();
+            set.dedup();
+            if !sets.iter().any(|(s, _)| *s == set) {
+                sets.push((set, *i));
+            }
+        }
+        kept.extend(most_apart(&sets, members.len()));
+    }
+    kept.sort();
+    kept.into_iter().map(|i| choice.candidates[i]).collect()
+}
+
+/// The cards of the most of `sets` (sets of a group's `names` places, each with its card) no two of which share a name: each
+/// tried in turn with what it leaves, remembered by the names used - as many tries as there are sets of names among the
+/// group's cards, which the one printed card the group's names are bounds (CR 201.2a).
+fn most_apart(sets: &[(Vec<usize>, usize)], names: usize) -> Vec<usize> {
+    type Memo = std::collections::HashMap<(usize, Vec<bool>), usize>;
+    fn go(sets: &[(Vec<usize>, usize)], at: usize, used: &mut Vec<bool>, memo: &mut Memo) -> usize {
+        if at == sets.len() {
+            return 0;
+        }
+        if let Some(&n) = memo.get(&(at, used.clone())) {
+            return n;
+        }
+        let skip = go(sets, at + 1, used, memo);
+        let take = if sets[at].0.iter().all(|&n| !used[n]) {
+            sets[at].0.iter().for_each(|&n| used[n] = true);
+            let n = 1 + go(sets, at + 1, used, memo);
+            sets[at].0.iter().for_each(|&n| used[n] = false);
+            n
+        } else {
+            0
+        };
+        let best = skip.max(take);
+        memo.insert((at, used.clone()), best);
+        best
+    }
+    let mut memo = Memo::new();
+    let mut used = vec![false; names];
+    let mut chosen = Vec::new();
+    for at in 0..sets.len() {
+        if !sets[at].0.iter().all(|&n| !used[n]) {
+            continue;
+        }
+        let best = go(sets, at, &mut used, &mut memo);
+        sets[at].0.iter().for_each(|&n| used[n] = true);
+        let taking = 1 + go(sets, at + 1, &mut used, &mut memo);
+        if taking == best {
+            chosen.push(sets[at].1);
+        } else {
+            sets[at].0.iter().for_each(|&n| used[n] = false);
+        }
+    }
+    chosen
+}
 
 fn different_mana_values(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
     let chosen: Vec<u32> = choice.selected.iter().map(|&c| q.mana_value(c)).collect();
@@ -142,9 +245,20 @@ fn different_mana_values(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
 
 /// "With different mana values" (CR 202.3): no two of the cards chosen have the same mana value, each read where it is (an
 /// {X} in a library or graveyard is 0, CR 202.3e). Long Rest's "X target cards with different mana values" and Agadeem's
-/// Awakening's "any number of target creature cards that each have a different mana value X or less" (with
-/// `mana_value_at_most(TargetSpec::COUNTED)`) print it of targets.
-pub const DIFFERENT_MANA_VALUES: Part = part(&(different_mana_values as SelectFn), 0, "with different mana values");
+/// Awakening's "any number of target creature cards that each have a different mana value X or less" (its "X or less" the
+/// slot's filter's) print it of targets.
+pub const DIFFERENT_MANA_VALUES: Part =
+    set_part(&(different_mana_values as SelectFn), &(largest_different_mana_values as LargestFn), 0, "with different mana values");
+
+/// A largest set with different mana values: the first card of each mana value.
+fn largest_different_mana_values(q: &dyn Query, choice: &Choice, _: u32) -> Vec<ObjectId> {
+    cantrip_api::select::largest_distinct(choice, |c| q.mana_value(c))
+}
+
+/// A largest set within a total mana value: the cards of the smallest mana values while they fit.
+fn largest_within_total(q: &dyn Query, choice: &Choice, most: u32) -> Vec<ObjectId> {
+    cantrip_api::select::largest_within(choice, |c| u64::from(q.mana_value(c)), u64::from(most))
+}
 
 fn total_mana_value(q: &dyn Query, choice: &Choice, most: u32) -> Verdict {
     let total: u64 = choice.selected.iter().map(|&c| u64::from(q.mana_value(c))).sum();
@@ -157,7 +271,7 @@ fn total_mana_value(q: &dyn Query, choice: &Choice, most: u32) -> Verdict {
 /// (up to two, 4) and Ao, the Dawn Sky (any number, 4) print it of cards chosen; The Rise of Sozin's Fire Lord Sozin
 /// (any number, X), Patch Up (up to three, 3) and Kairi, the Swirling Sky (any number, 6) of targets.
 pub const fn total_mana_value_at_most(most: u32) -> Part {
-    tallied(&(total_mana_value as SelectFn), most, "with total mana value {n} or less", Tally::ManaValueAtMost)
+    set_tallied(&(total_mana_value as SelectFn), &(largest_within_total as LargestFn), most, "with total mana value {n} or less", Tally::ManaValueAtMost)
 }
 
 /// "A card", any of them, which a search with no quality takes if there is one (CR 701.23b): Demonic Tutor, Vampiric Tutor,

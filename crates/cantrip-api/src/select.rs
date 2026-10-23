@@ -14,10 +14,11 @@
 //! A selection holding a card that is not a listed candidate is refused by `judge` before any part is run (`complete: false`,
 //! nothing addable): parts read the characteristics of the cards they are given.
 //!
-//! The same parts judge a target slot's targets together (`TargetSpec::together`: "with total mana value X or less", "that
-//! each have a different mana value X or less"): `judge_targets` runs them over the objects among the targets chosen so far,
-//! and the core checks targets with it as they are chosen, changed and chosen anew (CR 601.2c, 115.7) and as the spell or
-//! ability resolves (CR 608.2b).
+//! A set rule (`set_part`: "with total mana value X or less", "with different mana values") judges a target slot's targets
+//! together too (`TargetSpec::together`): `judge_targets` runs it over the objects among the targets chosen so far, the
+//! core checks targets with it as they are chosen, changed and chosen anew (CR 601.2c, 115.7) and as the spell or ability
+//! resolves (CR 608.2b), and its `LargestFn` says, exactly and quickly, whether a slot's fewest targets can be chosen
+//! together at all (`first_targets`). A quality of each target is the slot's filter's, never a set rule.
 //!
 //! The ready-made rules and parts new cards use are `cantrip_mechanics::select`; a card with a rule of its own writes a
 //! `SelectFn` and makes it a part with `part`.
@@ -141,11 +142,14 @@ impl Verdict {
 }
 
 /// A part's validator: what it says of `choice` (the question's cards and those chosen so far), given its number. Read
-/// the game through `q` and nothing else, so that the same position always gets the same verdict.
+/// the game through `q` and nothing else, so that the same position always gets the same verdict. It must be
+/// downward-closed (`Part`): any of the cards of a set it calls complete are a set it calls complete, and a card it calls
+/// addable to some cards is addable to any of them.
 pub type SelectFn = fn(q: &dyn Query, choice: &Choice, n: u32) -> Verdict;
 
 /// A part made of `judge`, with its number and its words (`Part::words`). Called with the function as a constant
-/// reference, `part(&(my_rule as SelectFn), 0, "with ...")`, which the compiler keeps for the whole program.
+/// reference, `part(&(my_rule as SelectFn), 0, "with ...")`, which the compiler keeps for the whole program. `judge` must be
+/// downward-closed (`SelectFn`, `Part`). A rule of the cards together that a target slot asks is a `set_part`.
 pub const fn part(judge: &'static SelectFn, n: u32, words: &'static str) -> Part {
     Part::erased(judge, n, words, Tally::Nothing)
 }
@@ -262,33 +266,82 @@ pub fn targets_allowed(q: &dyn Query, parts: &[Part], chooser: PlayerId, source:
     candidates.into_iter().enumerate().filter(|&(i, _)| verdict.addable.get(i)).map(|(_, t)| t).collect()
 }
 
-/// The first `n` of `candidates`, in their order, that `parts` call complete together: the answer of a player who takes the
-/// first targets offered, and whether a slot of at least `n` targets has a legal choice at all (CR 601.2c). `None` when no
-/// `n` of them are. Searched a candidate at a time from what may be added, which reaches every set downward-closed parts
-/// allow (`TargetSpec::together`).
-pub fn first_targets(q: &dyn Query, parts: &[Part], chooser: PlayerId, source: ObjectId, candidates: &[Target], n: usize) -> Option<Vec<Target>> {
-    fn go(q: &dyn Query, parts: &[Part], chooser: PlayerId, source: ObjectId, candidates: &[Target], n: usize, from: usize, chosen: &mut Vec<Target>) -> bool {
-        let verdict = judge_targets(q, parts, chooser, source, candidates, chosen);
-        if chosen.len() == n {
-            return verdict.complete;
-        }
-        let need = n - chosen.len();
-        for i in from..candidates.len() {
-            if candidates.len() - i < need {
-                break;
-            }
-            if verdict.addable.get(i) {
-                chosen.push(candidates[i]);
-                if go(q, parts, chooser, source, candidates, n, i + 1, chosen) {
-                    return true;
-                }
-                chosen.pop();
-            }
-        }
-        false
+/// `n` of `candidates` that `together`, a set rule (`Part::is_set_rule`), calls complete together, in the candidates'
+/// order: the answer of a player who takes targets the rules allow, and whether a slot of at least `n` targets has a legal
+/// choice at all (CR 601.2c). `None` when no `n` of them are. Exact and polynomial: each part's own `LargestFn` finds one of
+/// the largest sets it allows, and, the part being downward-closed, any `n` of those are allowed too. A slot's rule is one
+/// part (`TargetSpec::together`): no polynomial search finds a set several set rules all allow in general. Players among the candidates are no cards to the rule and always count.
+pub fn first_targets(q: &dyn Query, together: Option<&Part>, chooser: PlayerId, source: ObjectId, candidates: &[Target], n: usize) -> Option<Vec<Target>> {
+    if candidates.len() < n {
+        return None;
     }
-    let mut chosen = Vec::with_capacity(n);
-    (candidates.len() >= n && go(q, parts, chooser, source, candidates, n, 0, &mut chosen)).then_some(chosen)
+    let kept: Vec<Target> = match together {
+        None => candidates.to_vec(),
+        Some(part) => {
+            let objects: Vec<ObjectId> = candidates.iter().filter_map(object).collect();
+            let choice = Choice { chooser, source, candidates: &objects, selected: &[] };
+            let largest = largest_of(part)(q, &choice, part.n);
+            candidates.iter().copied().filter(|t| object(t).is_none_or(|id| largest.contains(&id))).collect()
+        }
+    };
+    (kept.len() >= n).then(|| kept[..n].to_vec())
+}
+
+/// A set rule's search for one of the largest sets it allows (`Part::is_set_rule`): of `choice.candidates`, with nothing
+/// chosen, the cards of a largest set the part allows, in their order, given its number. Exact, in time polynomial in the
+/// number of cards. Read the game through `q` and nothing else.
+pub type LargestFn = fn(q: &dyn Query, choice: &Choice, n: u32) -> Vec<ObjectId>;
+
+/// A rule of the cards together (a set rule): `part`, with its `LargestFn`, so that it can judge a target slot's targets
+/// together (`TargetSpec::together`) as well as a choice of cards. Downward-closed, as every part is (`Part`).
+pub const fn set_part(judge: &'static SelectFn, largest: &'static LargestFn, n: u32, words: &'static str) -> Part {
+    Part::erased_set(judge, largest, n, words, Tally::Nothing)
+}
+
+/// `set_part`, with what a client keeps count of for the player as the cards are chosen (`Tally`).
+pub const fn set_tallied(judge: &'static SelectFn, largest: &'static LargestFn, n: u32, words: &'static str, tally: Tally) -> Part {
+    Part::erased_set(judge, largest, n, words, tally)
+}
+
+/// The `LargestFn` a set rule's part holds.
+fn largest_of(part: &Part) -> LargestFn {
+    *part
+        .largest()
+        .and_then(|l| l.downcast_ref::<LargestFn>())
+        .expect("a target slot's rule is a set rule holding a LargestFn (cantrip_api::select::set_part; TargetSpec::together)")
+}
+
+/// For a rule that no two cards share a `key` ("with different mana values"): the first card of each key, in order - as
+/// many as there are keys, the most such a rule allows.
+pub fn largest_distinct<K: PartialEq>(choice: &Choice, key: impl Fn(ObjectId) -> K) -> Vec<ObjectId> {
+    let mut seen: Vec<K> = Vec::new();
+    let mut kept = Vec::new();
+    for &card in choice.candidates {
+        let k = key(card);
+        if !seen.contains(&k) {
+            seen.push(k);
+            kept.push(card);
+        }
+    }
+    kept
+}
+
+/// For a rule that the cards' `value`s add up to at most `most` ("with total mana value N or less"): the cards of the
+/// smallest values while they fit, back in the question's order - as many as any set within the total holds.
+pub fn largest_within(choice: &Choice, value: impl Fn(ObjectId) -> u64, most: u64) -> Vec<ObjectId> {
+    let mut by_value: Vec<(u64, usize)> = choice.candidates.iter().enumerate().map(|(i, &c)| (value(c), i)).collect();
+    by_value.sort();
+    let mut total = 0u64;
+    let mut kept: Vec<usize> = Vec::new();
+    for (v, i) in by_value {
+        if total + v > most {
+            break;
+        }
+        total += v;
+        kept.push(i);
+    }
+    kept.sort();
+    kept.into_iter().map(|i| choice.candidates[i]).collect()
 }
 
 #[cfg(test)]

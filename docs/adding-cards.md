@@ -238,12 +238,14 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
   the core judges the answer, and the client each pick, by the rule. The older `choose::{card, cards, card_from, cards_from,
   cards_from_kind, any_number_of, cards_within_total}`, `search_library` and `library::Find` / `search_to_*` are kept for
   existing cards.
-- **Targets judged together are the same parts** (`TargetSpec::together`, CR 601.2c): "any number of target creature cards
-  that each have a different mana value X or less" is
-  `TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(filter) }.together(&[select::DIFFERENT_MANA_VALUES, select::mana_value_at_most(TargetSpec::COUNTED)])`,
-  `COUNTED` the X announced; "with total mana value 3 or less" is `.together(&[select::total_mana_value_at_most(3)])`. The core
-  offers, checks and rechecks the set on resolution (CR 608.2b); the card reads its legal targets as for any slot
-  (`targets::legal_objects`).
+- **Targets judged together are a set rule** (`TargetSpec::together`, CR 601.2c): "any number of target creature cards
+  that each have a different mana value X or less" is a filter for "creature card in your graveyard with mana value X or
+  less" - a quality of each target, reading `q.announced_x()` (none while only asked whether some X could have a target) -
+  and `TargetSpec { min: 0, max: TargetSpec::ANY_NUMBER, ..target(filter) }.together(select::DIFFERENT_MANA_VALUES)`; "with
+  total mana value X or less" is `.together(select::total_mana_value_at_most(TargetSpec::COUNTED))`, `COUNTED` the X
+  announced. Only a rule of the targets together goes there (`select::set_part`; anything else does not compile): a
+  quality of each target is the filter's, so that a target that loses it is illegal alone. The core offers, checks and
+  rechecks the set on resolution (CR 608.2b); the card reads its legal targets as for any slot (`targets::legal_objects`).
 
 **The questions** (`RequestKind`, `crates/cantrip-state/src/decision.rs`), and the script verb that answers each:
 

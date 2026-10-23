@@ -370,11 +370,11 @@ pub enum RequestKind {
     /// Targets for an ability as it goes on the stack, or any other "choose a [thing]" the C# engine asks as targets.
     /// `label` is what the slot is for as its card words it (`TargetSpec::label`, empty when it has nothing to add), and
     /// `slot_player` the opponent whose slot it is when the ability has one for each opponent. `together` is the rule of the
-    /// slot's targets together (`TargetSpec::together`: "with total mana value X or less", "that each have a different mana
-    /// value X or less"), its parts' numbers read (`TargetSpec::COUNTED` as the slot's count), none for a slot that asks
+    /// slot's targets together (`TargetSpec::together`, a set rule: "with total mana value X or less", "with different mana
+    /// values"), its number read (`TargetSpec::COUNTED` as the slot's count), none for a slot that asks
     /// nothing of them together: `cantrip_api::select::judge_targets` judges a choice by it, the core refuses one it does not
     /// call complete, and a client asks it which candidates may be added as the player picks (the host's `Check`).
-    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u32, count: u32, any_number: bool, label: &'static str, slot_player: Option<PlayerId>, together: Parts },
+    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u32, count: u32, any_number: bool, label: &'static str, slot_player: Option<PlayerId>, together: Option<Part> },
     /// One or more of these labelled options (a pile, a mode), by index.
     /// `count` to `at_most` of them when `at_most` is more than `count` (zero `count` is "up to"). `affordable` is
     /// the eligible modes whose own cost the chooser could pay as well, advice for a default; `additional_cost`
@@ -914,8 +914,13 @@ impl Count {
     }
 }
 
-/// One part of a selection rule (`Selection`), or of the rule of a target slot's targets together (`TargetSpec::together`):
-/// a validator over the cards chosen so far, with the one number it is parameterised by. The validator is a `cantrip_api::select::SelectFn` - a plain function, never a closure, so the rule is
+/// One part of a selection rule (`Selection`), or the rule of a target slot's targets together (`TargetSpec::together`):
+/// a validator over the cards chosen so far, with the one number it is parameterised by.
+///
+/// **Every part is downward-closed**: any of the cards of a set it allows are a set it allows too (a quality of each card,
+/// "with different names", a total that only grows as cards are added). The core relies on it - adding only addable cards
+/// reaches every allowed set, and a set's reachability is the size of the largest one (`largest`) - so a part that is not
+/// (one that asks for a total of at least N, or for the cards to share a quality) is no part, and is written another way. The validator is a `cantrip_api::select::SelectFn` - a plain function, never a closure, so the rule is
 /// data that the game-log tree moves through and replays like any other (`Game::goto`) - held here as `dyn Any`, because
 /// this crate can't name the `Query` it reads the game through; `cantrip_api::select` makes parts and runs them. Two parts
 /// are the same when they hold the same function with the same number and words.
@@ -931,6 +936,12 @@ pub struct Part {
     pub words: &'static str,
     /// What a client keeps count of for the player as the cards are chosen, beside the words: nothing, or a running total.
     pub tally: Tally,
+    /// For a rule of the cards together (a set rule: "with different mana values", "with total mana value N or less"), a
+    /// `cantrip_api::select::LargestFn` that finds one of the largest sets it allows among any cards, exactly and in
+    /// polynomial time: what decides whether a target slot's fewest targets can be chosen together at all (CR 601.2c). A
+    /// target slot's rule must have it (`TargetSpec::together`); a quality of each card alone has none (it is the slot's
+    /// filter's to ask).
+    largest: Option<&'static (dyn std::any::Any + Send + Sync)>,
 }
 
 /// What a client keeps count of for a part of a selection rule as the cards are chosen (`Part::tally`): display alone,
@@ -948,7 +959,30 @@ impl Part {
     /// `tallied`, which are the ways to make a part.
     #[doc(hidden)]
     pub const fn erased(judge: &'static (dyn std::any::Any + Send + Sync), n: u32, words: &'static str, tally: Tally) -> Part {
-        Part { judge, n, words, tally }
+        Part { judge, n, words, tally, largest: None }
+    }
+
+    /// A set rule's part: `erased`, with its `cantrip_api::select::LargestFn` (`cantrip_api::select::set_part`).
+    #[doc(hidden)]
+    pub const fn erased_set(
+        judge: &'static (dyn std::any::Any + Send + Sync),
+        largest: &'static (dyn std::any::Any + Send + Sync),
+        n: u32,
+        words: &'static str,
+        tally: Tally,
+    ) -> Part {
+        Part { judge, n, words, tally, largest: Some(largest) }
+    }
+
+    /// Whether it is a rule of the cards together that can say how large a set it allows (`largest`).
+    pub const fn is_set_rule(&self) -> bool {
+        self.largest.is_some()
+    }
+
+    /// Its `cantrip_api::select::LargestFn`, as `dyn Any`, for a set rule.
+    #[doc(hidden)]
+    pub fn largest(&self) -> Option<&'static (dyn std::any::Any + Send + Sync)> {
+        self.largest
     }
 
     /// The validator, as `dyn Any`: `cantrip_api::select` knows its type.

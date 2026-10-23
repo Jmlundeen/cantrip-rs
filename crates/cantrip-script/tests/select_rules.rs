@@ -169,6 +169,25 @@ fn different_mana_values_keep_the_cards_apart() {
     assert_eq!(rule.words(&|n| n.to_string()), vec!["with different mana values".to_string()]);
 }
 
+/// How many cards a set rule allows together at most (`cantrip_api::select::first_targets`, a set rule's `LargestFn`): with
+/// different names, the split card Fire // Ice shares a name with both Fire and Ice, so of the four, Fire, Ice and the Bear
+/// (three, not the split card with the Bear's two); with different mana values, one of each mana value; within a
+/// total of 4, the smallest first (2 and 2).
+#[test]
+fn a_set_rule_says_how_many_cards_it_allows_together_at_most() {
+    use cantrip_api::select::first_targets;
+    let game = game(&["Probe Fire // Probe Ice", "Probe Fire", "Probe Ice", "Probe Bear"]);
+    let cards: Vec<Target> =
+        ["Probe Fire // Probe Ice", "Probe Fire", "Probe Ice", "Probe Bear"].iter().map(|n| Target::Object(of(&game, n))).collect();
+    let most = |rule: &Part| (0..=cards.len()).rev().find(|&n| first_targets(&game, Some(rule), YOU, ObjectId::NONE, &cards, n).is_some());
+    assert_eq!(most(&DIFFERENT_NAMES), Some(3));
+    let three = first_targets(&game, Some(&DIFFERENT_NAMES), YOU, ObjectId::NONE, &cards, 3).expect("three with different names");
+    assert!(!three.contains(&cards[0]), "the split card shares a name with each half");
+    assert_eq!(most(&select::DIFFERENT_MANA_VALUES), Some(2), "the test table's split card, Fire and Ice are worth 2 each, the Bear 3");
+    assert_eq!(most(&select::total_mana_value_at_most(4)), Some(2));
+    assert_eq!(most(&select::total_mana_value_at_most(1)), Some(0));
+}
+
 /// The first answer reached by taking the first addable card each time: the most a rule allows, or the fewest it needs.
 #[test]
 fn the_first_answer_takes_what_may_be_added_in_order() {

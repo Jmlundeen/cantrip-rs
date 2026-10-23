@@ -1084,8 +1084,8 @@ impl<'s> Run<'s> {
             }
             // The fewest it takes; for a slot whose targets together are judged ("with total mana value X or less"), the first
             // of them that its rule allows together.
-            RequestKind::ChooseTarget { source, candidates, least, together, .. } if !together.is_empty() => Answer::Targets(
-                cantrip_engine::select::first_targets(&self.game, together.as_slice(), request.player, *source, candidates, *least as usize).unwrap_or_default(),
+            RequestKind::ChooseTarget { source, candidates, least, together, .. } if together.is_some() => Answer::Targets(
+                cantrip_engine::select::first_targets(&self.game, together.as_ref(), request.player, *source, candidates, *least as usize).unwrap_or_default(),
             ),
             RequestKind::ChooseTarget { candidates, least, .. } => {
                 Answer::Targets(candidates.iter().take(*least as usize).copied().collect())
