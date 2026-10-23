@@ -1,0 +1,72 @@
+# "Whenever an opponent casts an instant or sorcery spell, create a 1/2 green Spider creature token with reach" (CR 603.2,
+# 601.2i). Bot1 casts Arasta (exactly {2}{G}{G}: Black Lotus's three green and Mox Emerald's one leave the pool empty) and
+# then its own Giant Growth: no Spider for its own instant. Bot2 casts a Mox Ruby (artifact), an Ornithopter (creature),
+# a Lightning Bolt (instant) and a Boltwave (sorcery): a Spider for each of the last two and none for the first two.
+# Bot1 has two Spiders, Bot2 none; both are 1/2 green with reach.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Arasta of the Endless Web
+Giant Growth
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Boltwave
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Arasta of the Endless Web.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Arasta of the Endless Web)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Arasta of the Endless Web.Power = 6
+? Bot1.Battlefield.Count = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mountain.Play
+? Bot1.Battlefield.Count = 3
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+? Bot2.Mana =
+Bot2.Pass
+Bot2.Pass
+Bot2.Hand.Boltwave.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+? Bot2.Mana =
+Bot2.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 14
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Spider Token#1.Power = 1
+Bot1.Battlefield.Spider Token#1.Toughness = 2
+Bot1.Battlefield.Spider Token#1.Colors = Green
+Bot1.Battlefield.Spider Token#1.Keywords = Reach
+Bot1.Battlefield.Spider Token#2.Power = 1
+Bot1.Battlefield.Arasta of the Endless Web.Keywords = Reach
+Bot2.Battlefield.Count = 3

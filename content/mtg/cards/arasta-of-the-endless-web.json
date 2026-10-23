@@ -1,0 +1,11 @@
+{
+  "name": "Arasta of the Endless Web",
+  "manaCost": "{2}{G}{G}",
+  "type": "Legendary Enchantment Creature — Spider",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "Reach\nWhenever an opponent casts an instant or sorcery spell, create a 1/2 green Spider creature token with reach.",
+  "keywords": [
+    "Reach"
+  ]
+}
