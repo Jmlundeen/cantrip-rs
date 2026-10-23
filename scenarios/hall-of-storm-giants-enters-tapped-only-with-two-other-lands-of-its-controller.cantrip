@@ -1,0 +1,29 @@
+# Hall of Storm Giants: "If you control two or more other lands, this land enters tapped" (CR 614.1d). On turn 3 Bot1 has one
+# other land (an Island) and Bot2 has an Island, which does not count ("you control"): the first Hall enters untapped and
+# taps for {U}. On turn 5 Bot1 has two other lands (Island, first Hall): the second Hall enters tapped.
+
+[Bot1 Deck]
+Island
+Hall of Storm Giants
+Hall of Storm Giants
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Hall of Storm Giants.Play
+? Bot1.Battlefield.Hall of Storm Giants.Tapped = false
+Bot1.Battlefield.Hall of Storm Giants.Activate(Ability: Add)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Hand.Hall of Storm Giants.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hall of Storm Giants#1.Tapped = false
+Bot1.Battlefield.Hall of Storm Giants#2.Tapped = true

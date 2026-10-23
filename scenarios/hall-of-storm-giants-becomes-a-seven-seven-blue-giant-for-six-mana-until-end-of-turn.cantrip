@@ -1,0 +1,49 @@
+# Hall of Storm Giants is played on turn 1 and an Island on turn 3, where Bot1 taps five Moxen and the Island (exactly {5}{U},
+# the pool left empty) to animate it: until end of turn a 7/7 blue Giant land creature (CR 613.1d, 613.4b) that, controlled
+# since the turn began, attacks for 7. On turn 4 the effect is gone.
+
+[Bot1 Deck]
+Hall of Storm Giants
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Hall of Storm Giants.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Hall of Storm Giants.Activate(Ability: Until end of turn)
+? Bot1.Mana = 
+Bot1.Attack(Hall of Storm Giants > Bot2)
+? Bot1.Battlefield.Hall of Storm Giants.Types = Land; Creature
+? Bot1.Battlefield.Hall of Storm Giants.Subtypes = Giant
+? Bot1.Battlefield.Hall of Storm Giants.Colors = Blue
+? Bot1.Battlefield.Hall of Storm Giants.Power = 7
+? Bot1.Battlefield.Hall of Storm Giants.Toughness = 7
+[T3 Bot1.Main2]
+? Bot2.Life = 13
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 13
+Bot1.Battlefield.Hall of Storm Giants.Types = Land
+Bot1.Battlefield.Hall of Storm Giants.Colors = (absent)
