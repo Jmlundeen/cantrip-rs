@@ -1,0 +1,36 @@
+# Perilous Landscape: each of the three listed basic land types is legal. Reject Swamp, reject Tundra because it is nonbasic, then find Island, Mountain and Plains; each search puts its land onto the battlefield tapped (CR 205.4a, 305.6, 701.23).
+
+[Bot1 Deck]
+Perilous Landscape x3
+Plains x8
+Forest x8
+Island x8
+Mountain x8
+Swamp x8
+Tundra x2
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Perilous Landscape.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Perilous Landscape.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Perilous Landscape.Play
+Bot1.Battlefield.Perilous Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Swamp)
+Bot1.Search(Island)
+Bot1.Battlefield.Perilous Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Tundra)
+Bot1.Search(Mountain)
+Bot1.Battlefield.Perilous Landscape.Activate(Ability: {T}, Sacrifice this land)
+Bot1.Search(Plains)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Perilous Landscape; Perilous Landscape; Perilous Landscape
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Plains.Tapped = true
