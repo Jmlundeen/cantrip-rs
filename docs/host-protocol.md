@@ -90,6 +90,14 @@ two per goader) - with `MostRequirements`, the engine's own declaration `Suggest
 answered with `AttacksVerdictMessage { RequestId, Attacks, Verdict }`. `GameClient.Answer` settles every declaration of
 attackers with the host as it does blocks, and a client offers the attacks the verdict does. Version 205.
 
+**Optional costs to attack.** Once a declaration of attackers is sent and its creatures tapped (CR 508.1f), the attacking
+seat is asked about each optional cost to attack its attackers have (CR 508.1g), one question at a time, before any cost is
+paid: enlist (CR 702.154a) as a `ChooseCardsPromptMessage` whose `Purpose` is `Enlist` and `Source` the attacker - up to
+one of the creatures it may tap, none chosen paying nothing - and "you may exert this creature as it attacks" (CR 701.43d)
+as a yes-or-no `MayPromptMessage` whose question's verb is `Exert`. A creature chosen for one enlist ability is not offered
+for another. Then the costs are locked in and paid (CR 508.1h-j); a creature to be enlisted that was tapped for mana
+meanwhile makes the declaration illegal, and the declaration of attackers is asked again (CR 733.1). Version 207.
+
 **Checking a declaration of blockers.** A declaration of blockers (`DeclareBlockersPromptMessage`) is judged by one validator
 in the engine (`BlockRequirements::judge`, `crates/cantrip-state/src/blocks.rs`) against every restriction, requirement and
 cost (CR 509.1a-d): each block allowed, each creature blocking as many attackers as it may, each attacker within its fewest

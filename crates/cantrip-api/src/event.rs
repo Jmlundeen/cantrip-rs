@@ -47,6 +47,13 @@ pub enum Event {
     AbilityActivated { source: ObjectId, ability: AbilityRef, player: PlayerId, by: Grant },
     /// A creature was declared as an attacker (CR 508.1).
     Attacks { attacker: ObjectId, defender: Target },
+    /// An optional cost to attack (CR 508.1g) was paid as `attacker` was declared an attacker (CR 508.1j): the cost of the
+    /// `instance`th of the attacker's abilities that are `ability` (counted from 0 in the order it has them; two of one card's
+    /// enlist are two instances, CR 702.154d), which is `option`. `tapped` is the creature the cost tapped - for enlist the
+    /// creature enlisted (CR 702.154c: `attacker` enlists it) - or `ObjectId::NONE`. Emitted with the declaration's `Attacks`;
+    /// the linked "when you do" ability (CR 607.2h, `TriggeredDef::attack_option`) of that instance triggers on it, the core
+    /// owning that trigger, and "whenever this creature enlists a creature" reads it.
+    PaidToAttack { attacker: ObjectId, option: AttackOption, ability: AbilityRef, instance: u8, tapped: ObjectId },
     /// A Class became a level (CR 716.2a).
     ClassLevel { object: ObjectId, level: u8 },
     /// A card was cycled (CR 702.29c).
@@ -304,6 +311,7 @@ impl Event {
             | Event::Done { source, .. } => source == object,
             Event::CrimeCommitted { by, .. } => by == object,
             Event::Attacks { attacker, .. } | Event::Unblocked { attacker, .. } => attacker == object,
+            Event::PaidToAttack { attacker, tapped, .. } => attacker == object || tapped == object,
             Event::Blocks { blocker, attacker, .. } => blocker == object || attacker == object,
             Event::ClassLevel { object: o, .. }
             | Event::CountersPut { object: o, .. }
@@ -398,6 +406,8 @@ impl EventMask {
     pub const RANDOMIZED: EventMask = EventMask(1 << 55);
     /// A permanent phased out (CR 702.26): recorded in the history; no ability triggers on it yet.
     pub const PHASED_OUT: EventMask = EventMask(1 << 56);
+    /// An optional cost to attack was paid (CR 508.1g, 508.1j).
+    pub const PAID_TO_ATTACK: EventMask = EventMask(1 << 57);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -445,6 +455,7 @@ impl EventMask {
             Event::Discarded { .. } => EventMask::DISCARDED,
             Event::Cycled { .. } => EventMask::CYCLED,
             Event::Attacks { .. } => EventMask::ATTACKS,
+            Event::PaidToAttack { .. } => EventMask::PAID_TO_ATTACK,
             Event::ClassLevel { .. } => EventMask::CLASS_LEVEL,
             Event::Searched { .. } => EventMask::SEARCHED,
             Event::Drew { .. } => EventMask::DREW,

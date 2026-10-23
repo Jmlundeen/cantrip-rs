@@ -340,6 +340,13 @@ public enum CardChoicePurposeView
 
     /// <summary>The chosen card is exiled by an effect and becomes plotted (CR 702.170a, 702.170d): its owner may cast it as a sorcery on a later turn without paying its mana cost (Jace Reawakened). Something gained, not given up; choosing nothing, where the prompt is "up to", declines.</summary>
     Plot = 34,
+
+    /// <summary>
+    /// The creature the source's enlist ability taps as the source attacks (CR 702.154a, 508.1g): up to one untapped creature
+    /// you control that isn't attacking and has haste or has been yours since the turn began. Choosing none pays nothing;
+    /// choosing one, the source gets +X/+0 until end of turn, X that creature's power.
+    /// </summary>
+    Enlist = 35,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

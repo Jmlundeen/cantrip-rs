@@ -24,7 +24,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             or CardChoicePurposeView.Untap or CardChoicePurposeView.Keep or CardChoicePurposeView.TapToPay
             or CardChoicePurposeView.Tap or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode
             or CardChoicePurposeView.Blight or CardChoicePurposeView.TapToReduce or CardChoicePurposeView.PutCounters
-            or CardChoicePurposeView.PreventDamageFrom or CardChoicePurposeView.Band;
+            or CardChoicePurposeView.PreventDamageFrom or CardChoicePurposeView.Band or CardChoicePurposeView.Enlist;
         // Banding (CR 702.22c): at most one creature without banding in a band.
         int withoutBanding = picked.Count(h => prompt.WithoutBanding.Exists(w => w.Value == h));
         // A mulligan's bottoming is asked by the rules and has no source; an effect's (Valakut Awakening) names its own.
@@ -120,6 +120,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             // Banding (CR 702.22c, 508.1e): the attackers that attack in a band with the source.
             : prompt.Purpose == CardChoicePurposeView.Band
                 ? $"{source} has banding: choose attacking creatures to band with it, or none"
+            // Enlist (CR 702.154a, 508.1g): an optional cost of the attacker's, paid by tapping a creature that isn't attacking.
+            : prompt.Purpose == CardChoicePurposeView.Enlist
+                ? $"{source} has enlist: you may tap a creature you control that isn't attacking, and {source} gets +X/+0 until end of turn, X its power"
             // Sylvan Library: the cards each later paid for or put back, not the ones that go back.
             : prompt.Purpose == CardChoicePurposeView.PayLifeOrPutOnTop
                 ? $"{source}: choose {prompt.Count} cards in your hand drawn this turn - for each, pay {prompt.Life} life or put it on top of your library"
@@ -136,6 +139,11 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             ? withoutBanding > 1
                 ? $"A band may have only one creature without banding  ·  {withoutBanding} chosen{where}"
                 : $"{picked.Count} chosen  ·  any with banding, at most one without; the band is blocked as one, and you divide the damage of what blocks it{where}"
+            // Enlist: what the creature chosen gives, by its power now (the bonus reads it as it resolves, CR 608.2h).
+            : prompt.Purpose == CardChoicePurposeView.Enlist
+            ? picked.Count == 0
+                ? $"None tapped: {source} attacks without enlisting{where}"
+                : $"Tapping {Enlisted(client, picked)} gives {source} +X/+0 until end of turn, X its power as the bonus resolves{where}"
             // Plot (CR 702.170d): what becoming plotted lets its owner do, said before the card is chosen.
             : prompt.Purpose == CardChoicePurposeView.Plot
             ? $"{picked.Count} of {prompt.Count} chosen  ·  a plotted card may be cast as a sorcery on a later turn without paying its mana cost{where}"
@@ -188,6 +196,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Reveal => picked.Count == 0 ? "Reveal nothing" : "Reveal it",
             CardChoicePurposeView.Plot => picked.Count == 0 ? "Plot nothing" : picked.Count == 1 ? "Exile and plot it" : $"Exile and plot {picked.Count}",
             CardChoicePurposeView.PreventDamageFrom => "Prevent its damage first",
+            CardChoicePurposeView.Enlist => picked.Count == 0 ? "Don't enlist" : "Enlist it",
             CardChoicePurposeView.Band => picked.Count == 0 ? "No band" : picked.Count == 1 ? "Band with it" : $"Band with {picked.Count}",
             CardChoicePurposeView.PayLifeOrPutOnTop => picked.Count == 1 ? "Choose it" : "Choose them",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
@@ -279,7 +288,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.PutOntoBattlefield => PromptActionView.PutOntoBattlefield,
         CardChoicePurposeView.PutIntoHand => PromptActionView.PutIntoHand,
         CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree => PromptActionView.Cast,
-        CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap => PromptActionView.Tap,
+        CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap or CardChoicePurposeView.Enlist => PromptActionView.Tap,
         CardChoicePurposeView.OrderSimultaneous => PromptActionView.OrderReplacement,
         CardChoicePurposeView.Destroy => PromptActionView.Destroy,
         CardChoicePurposeView.Vote => PromptActionView.Vote,
@@ -330,6 +339,13 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         PromptActionView.Plot => "exile and plot",
         _ => "choose",
     };
+
+    /// <summary>The creature picked to be enlisted, by name and its power now: "Grizzly Bears (power 2)".</summary>
+    private static string Enlisted(GameClient client, IReadOnlyList<int> picked)
+    {
+        ObjectView? creature = client.Object(new ViewHandle(picked[0]));
+        return creature is null ? "it" : $"{creature.Name} (power {creature.Power ?? 0})";
+    }
 
     /// <summary>A material named by its quality, more than one: "artifacts", "creatures", "Caves".</summary>
     private static string Plural(string kind) => kind.EndsWith('y') ? kind[..^1] + "ies" : kind + "s";

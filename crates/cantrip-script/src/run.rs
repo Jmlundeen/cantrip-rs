@@ -1050,6 +1050,8 @@ impl<'s> Run<'s> {
             // Craft's materials (CR 702.167a): the fewest it takes, the first offered - the permanents before the graveyard.
             RequestKind::Craft { cards, minimum, .. } => Answer::Cards(cards.iter().take(*minimum as usize).copied().collect()),
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand[hand.len() - *count as usize..].to_vec()),
+            // An optional cost to attack (CR 508.1g) is paid only where the script says so: enlist nothing.
+            RequestKind::ChooseCards { purpose: Purpose::Enlist, .. } => Answer::Cards(Vec::new()),
             // The first cards offered, as many as the rule lets be taken one after another.
             RequestKind::ChooseCards { source, cards, rule, .. } => {
                 Answer::Cards(select::first_answer(&self.game, rule, request.player, *source, cards, true).unwrap_or_default())

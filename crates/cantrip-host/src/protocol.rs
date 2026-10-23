@@ -273,6 +273,10 @@ pub enum CardChoicePurposeView {
     /// A card an effect exiles that becomes plotted (CR 702.170a, 702.170d): its owner may cast it as a sorcery on a later turn
     /// without paying its mana cost (Jace Reawakened). Something gained, not given up.
     Plot,
+    /// The creature `Source`'s enlist ability taps as `Source` attacks (CR 702.154a, 508.1g): up to one untapped creature its
+    /// controller controls that isn't attacking. Choosing none pays nothing; choosing one, `Source` gets +X/+0 until end of turn,
+    /// X that creature's power.
+    Enlist,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

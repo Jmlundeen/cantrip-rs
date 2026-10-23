@@ -179,6 +179,13 @@ impl Chars {
         self.abilities.iter().flatten().copied()
     }
 
+    /// Which instance of its ability the `nth` of `abilities()` is: how many before it are that same ability (0 for the
+    /// first). Two instances of one ability work apart where the rules say so (CR 702.154d, `Event::PaidToAttack`).
+    pub fn instance(&self, nth: usize) -> u8 {
+        let Some(this) = self.abilities().nth(nth) else { return 0 };
+        u8::try_from(self.abilities().take(nth).filter(|a| *a == this).count()).unwrap_or(u8::MAX)
+    }
+
     pub fn ability_count(&self) -> usize {
         self.abilities.iter().flatten().count()
     }

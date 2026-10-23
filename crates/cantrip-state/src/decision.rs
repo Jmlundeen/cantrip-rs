@@ -730,6 +730,22 @@ impl AttackCost {
     }
 }
 
+/// An optional cost to attack (CR 508.1g): a cost a player may pay "as" a creature attacks, chosen once the attackers are
+/// chosen and tapped (CR 508.1f), locked in with every other cost to attack (CR 508.1h) and paid with them (CR 508.1j). The
+/// ability that makes it is a static ability of the attacker, and the triggered ability printed with it ("When you do,
+/// ...") is linked to it (CR 607.2h) and triggers when it is paid: the engine keeps both as that one triggered ability
+/// (`TriggeredDef::attack_option`), so each instance has its own cost and its own trigger (CR 702.154d).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum AttackOption {
+    /// Enlist (CR 702.154a-c): tap up to one untapped creature the attacking player controls that they didn't choose to attack
+    /// with and that either has haste or has been under their control continuously since the turn began. A creature tapped
+    /// for one enlist ability can't be tapped for another (the rulings): each is tapped for one at most.
+    Enlist,
+    /// "You may exert this creature as it attacks" (CR 701.43d): it won't untap during its controller's next untap step
+    /// (CR 701.43a).
+    Exert,
+}
+
 /// The rules of a declaration of blockers past which blocks are allowed (CR 509.1b-d), held in the question so the game-log
 /// tree moves through them: each attacker's fewest and most blockers (menace, "can't be blocked by more than one creature");
 /// each requirement an effect puts on the declaration (CR 509.1c), among the blocks the restrictions allow; what blocks cost
@@ -1224,6 +1240,9 @@ pub enum Purpose {
     /// The other attacking creatures that attack in a band with the request's source, a creature with banding (CR 702.22c,
     /// 508.1e): any number with banding and at most one without, all attacking what it attacks. None chosen is no band.
     Band,
+    /// The creature an attacking creature's enlist ability taps (CR 702.154a, 508.1g), the request's source being that attacker:
+    /// up to one, none chosen being the cost not paid.
+    Enlist,
     Discard,
     Sacrifice,
     /// A card chosen from a revealed hand (Duress).

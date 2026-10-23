@@ -1211,6 +1211,7 @@ impl TriggeredDef {
         subject_chooses_targets: false,
         ward: false,
         on_sacrifice: false,
+        attack_option: None,
     };
 }
 
@@ -1322,6 +1323,13 @@ pub struct TriggeredDef {
     /// you sacrifice a land" (Baloth Prime, Tireless Tracker). A rule that stops a creature dying from causing abilities to
     /// trigger leaves it alone (Hushbringer's rulings: "whenever you sacrifice a creature" still triggers).
     pub on_sacrifice: bool,
+    /// The optional cost to attack (CR 508.1g) this ability is linked to (CR 607.2h): enlist's (CR 702.154a-b), or "you may
+    /// exert this creature as it attacks" (CR 701.43d). The static ability that offers the cost and this "when you do"
+    /// ability are kept as one, so each instance of the pair offers its own cost and triggers only on its own payment (CR
+    /// 702.154d): an attacker with it is offered the cost as attackers are declared (`turn::declare_attackers`), and it
+    /// triggers on that instance's `Event::PaidToAttack` - the core owns the trigger, `listens` and `matches` are not used.
+    /// Its subject is the creature the cost tapped (enlist's), or none.
+    pub attack_option: Option<AttackOption>,
 }
 
 #[derive(Clone, Copy)]

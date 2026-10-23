@@ -743,7 +743,7 @@ fn consider(
         Some(None) => return,
         None => (layers::chars(cx.cards(), cx.s(), &cx.g.log, source), cx.s().obj(source).controller),
     };
-    for ability in chars.abilities() {
+    for (nth, ability) in chars.abilities().enumerate() {
         // A state trigger (CR 603.8) triggers as soon as its state is true, so it is asked after every event, of the board as
         // it is now (never of a look-back pass), as well as each time a player would receive priority (`state_triggers`).
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
@@ -759,7 +759,15 @@ fn consider(
         }
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
             && (later.is_some() || cx.cards().looks_back(ability, event, seen) == look_back)
-            && let Some(fired) = if t.chapter > 0 { chapter_reached(source, t.chapter, event) } else if t.listens.intersects(mask) { t.fires(cx, &Asker { source, controller }, event) } else { None }
+            && let Some(fired) = if t.chapter > 0 {
+                chapter_reached(source, t.chapter, event)
+            } else if t.attack_option.is_some() {
+                paid_to_attack(source, ability, chars.instance(nth), event)
+            } else if t.listens.intersects(mask) {
+                t.fires(cx, &Asker { source, controller }, event)
+            } else {
+                None
+            }
         {
             if let Some(condition) = t.condition
                 && !condition(cx, &Asker { source, controller })
@@ -897,6 +905,18 @@ pub(crate) fn state_triggers_now(cx: &mut Cx) {
         cx.st().trigger_push(trigger);
     }
     cx.state_judged();
+}
+
+/// The "when you do" ability linked to an optional cost to attack (CR 607.2h, 508.1g; `TriggeredDef::attack_option`)
+/// triggers when that cost is paid: the payment of this instance of this ability of `source`, and no other (CR 702.154d).
+/// About the creature the cost tapped, if it tapped one.
+fn paid_to_attack(source: ObjectId, ability: AbilityRef, instance: u8, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::PaidToAttack { attacker, ability: paid, instance: nth, tapped, .. } if attacker == source && paid == ability && nth == instance => {
+            Fired::about(if tapped == ObjectId::NONE { Target::None } else { Target::Object(tapped) })
+        }
+        _ => None,
+    }
 }
 
 /// A Saga's chapter ability (CR 714.2b) triggers when lore counters are put on it and their number becomes at least

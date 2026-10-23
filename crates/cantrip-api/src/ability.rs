@@ -307,6 +307,14 @@ pub const fn modal_triggered(trigger: Trigger, modes: &'static ModalDef, text: &
     AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, asked: trigger.asked, modal: Some(modes), ..TriggeredDef::BLANK })
 }
 
+/// An optional cost to attack and the triggered ability linked to it (CR 508.1g, 607.2h): "As this creature attacks, you
+/// may [pay `option`]. When you do, [`effect`]." - enlist (CR 702.154a) and "you may exert this creature as it attacks.
+/// When you do, ..." (CR 701.43d). The core offers the cost as attackers are declared and owns the trigger
+/// (`TriggeredDef::attack_option`); `cantrip_mechanics::enlist` and `cantrip_mechanics::exert` build it for cards.
+pub const fn paid_as_it_attacks(option: AttackOption, effect: Effect, text: &'static str) -> AbilityDef {
+    AbilityDef::Triggered(TriggeredDef { text, listens: EventMask::PAID_TO_ATTACK, attack_option: Some(option), effect, ..TriggeredDef::BLANK })
+}
+
 /// A delayed triggered ability (CR 603.7), listed in a card's `delayed`: the effect that created it says when it
 /// triggers (`Game::delayed_trigger`), and `effect` is what it does then.
 pub const fn delayed_trigger(effect: Effect, text: &'static str) -> AbilityDef {

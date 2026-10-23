@@ -616,6 +616,8 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
                 ops::tap(cx, id);
             }
         }
+        // CR 508.1g: the optional costs to attack the active player chooses to pay.
+        let options = choose_attack_options(cx, active, &attacks)?;
         let RequestKind::DeclareAttackers { costs, .. } = &kind else { unreachable!() };
         // CR 508.1h: the total cost to attack, locked in now; mana abilities activated while paying it (CR 508.1i) change
         // nothing of it. CR 508.1j: it is paid all at once.
@@ -638,9 +640,22 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
                 Err(stop) => return Err(stop),
             }
         }
-        break (attacks, bands);
+        // CR 508.1j: the optional costs are paid with the rest. A creature to be tapped that a mana ability tapped, or that is
+        // gone, can't be: the declaration is illegal and taken back (CR 508.1, 733.1).
+        if !options.iter().all(|o| o.tapped == ObjectId::NONE || enlistable_now(cx, active, o.tapped)) {
+            cx.st().revert(mark);
+            cx.g.log.truncate(log_mark);
+            continue;
+        }
+        for o in &options {
+            match o.option {
+                AttackOption::Enlist => ops::tap(cx, o.tapped),
+                AttackOption::Exert => ops::exert(cx, o.attacker),
+            }
+        }
+        break (attacks, bands, options);
     };
-    let (attacks, bands) = attacks;
+    let (attacks, bands, options) = attacks;
     let mut attackers = Vec::new();
     for ((id, target), band) in attacks.into_iter().zip(bands) {
         attackers.push(Attacker { band, ..Attacker::new(id, target) });
@@ -651,11 +666,98 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     // One batch (CR 603.2c): "whenever one or more creatures attack" triggers once; "whenever you attack" after the
     // creatures' own abilities (CR 508.1m).
     let mut events: Vec<Event> = attackers.iter().map(|a| Event::Attacks { attacker: a.id, defender: a.target }).collect();
+    // The optional costs paid (CR 508.1g, 508.1j): what their linked "when you do" abilities trigger on (CR 607.2h), in the
+    // same batch, so they go on the stack with the attack triggers, before blockers are declared.
+    events.extend(options.iter().map(|o| Event::PaidToAttack { attacker: o.attacker, option: o.option, ability: o.ability, instance: o.instance, tapped: o.tapped }));
     if attacked {
         events.push(Event::AttackersDeclared { player: active, count: count_u32(attackers.len()) });
     }
     cx.emit_batch(&events, None);
     Ok(())
+}
+
+/// "You may exert this creature as it attacks" (CR 701.43d), asked of the attacking player for each instance an attacker has.
+const EXERT_IT: Question = Question::new(
+    "Exert",
+    "exert it as it attacks?",
+    "An exerted creature won't untap during your next untap step",
+    "Exert it",
+    "Don't exert it",
+)
+.no_default();
+
+/// One optional cost to attack chosen to be paid (CR 508.1g): the attacker, which instance of which of its abilities it is
+/// (`Event::PaidToAttack`), and the creature it taps, if any.
+#[derive(Clone, Copy)]
+struct AttackOptionPaid {
+    attacker: ObjectId,
+    option: AttackOption,
+    ability: AbilityRef,
+    instance: u8,
+    tapped: ObjectId,
+}
+
+/// The optional costs to attack (CR 508.1g) the active player chooses to pay for the creatures they chose to attack with,
+/// once those are tapped (CR 508.1f) and before the total cost is locked in (CR 508.1h): each instance of each attacker's
+/// (`TriggeredDef::attack_option`), in the order the attacks were declared and the attacker has them, asked one at a time.
+/// Enlist (CR 702.154a) is asked as a choice of up to one creature among those it may tap - none being the cost not paid -
+/// and not when there is none; a creature chosen for one enlist ability is not offered for another (the rulings). Exert
+/// (CR 701.43d) is a yes or no. Asked of the attackers as they are now: an attacker that lost its abilities is offered none.
+fn choose_attack_options(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) -> R<Vec<AttackOptionPaid>> {
+    let mut paid: Vec<AttackOptionPaid> = Vec::new();
+    for &(attacker, _) in attacks {
+        let chars = cx.chars(attacker);
+        let offered: Vec<(AbilityRef, u8, AttackOption)> = chars
+            .abilities()
+            .enumerate()
+            .filter_map(|(nth, a)| match cx.cards().ability(a) {
+                AbilityDef::Triggered(t) => t.attack_option.map(|o| (a, chars.instance(nth), o)),
+                _ => None,
+            })
+            .collect();
+        for (ability, instance, option) in offered {
+            let tapped = match option {
+                AttackOption::Exert => {
+                    let ask = RequestKind::May { source: attacker, purpose: Purpose::Ask(&EXERT_IT) };
+                    if cx.ask_rule(active, ask)? != Some(Answer::Yes) {
+                        continue;
+                    }
+                    ObjectId::NONE
+                }
+                AttackOption::Enlist => {
+                    let cards: Vec<ObjectId> = cx
+                        .s()
+                        .battlefield()
+                        .iter()
+                        .copied()
+                        .filter(|&id| !attacks.iter().any(|a| a.0 == id) && !paid.iter().any(|p| p.tapped == id) && enlistable_now(cx, active, id))
+                        .collect();
+                    if cards.is_empty() {
+                        continue;
+                    }
+                    let ask = RequestKind::ChooseCards { source: attacker, purpose: Purpose::Enlist, cards, rule: Box::new(Selection::new(Count::UpTo(1)).called("creature")) };
+                    match cx.ask_rule(active, ask)? {
+                        Some(Answer::Cards(chosen)) if chosen.len() == 1 => chosen[0],
+                        _ => continue,
+                    }
+                }
+            };
+            paid.push(AttackOptionPaid { attacker, option, ability, instance, tapped });
+        }
+    }
+    Ok(paid)
+}
+
+/// Whether `id` may be tapped for an enlist ability of a creature `player` attacks with (CR 702.154a), past not attacking and
+/// not being tapped for another: an untapped creature `player` controls that has haste or has been under their control
+/// continuously since the turn began.
+fn enlistable_now(cx: &Cx, player: PlayerId, id: ObjectId) -> bool {
+    let obj = cx.s().obj(id);
+    obj.zone == Zone::BATTLEFIELD
+        && obj.controller == player
+        && !obj.tapped
+        && cx.chars(id).is(CardType::Creature)
+        && !summoning_sick(cx.cards(), cx.s(), &cx.g.log, id)
 }
 
 /// The attacking bands the active player announces (CR 508.1e, 702.22c), one band number for each of `attacks` (0 for none).

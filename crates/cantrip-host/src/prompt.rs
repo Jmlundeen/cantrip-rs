@@ -371,6 +371,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
     use CardChoicePurposeView as V;
     match purpose {
         Purpose::Band => V::Band,
+        Purpose::Enlist => V::Enlist,
         Purpose::Discard => {
             if opening {
                 V::PutOnBottom

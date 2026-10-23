@@ -59,7 +59,7 @@ internal static class PromptPresentation
     /// </summary>
     private static bool IsCost(CardChoicePurposeView purpose) => purpose is
         CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.TapToReduce
-        or CardChoicePurposeView.Craft;
+        or CardChoicePurposeView.Craft or CardChoicePurposeView.Enlist;
 
     /// <summary>The zones the cards are in, as the view the seat holds places them; a card not in it says nothing.</summary>
     private static List<PromptOriginView> Origins(IEnumerable<ViewHandle> cards, PlayerView? view)
@@ -95,7 +95,7 @@ internal static class PromptPresentation
         CardChoicePurposeView.PutOntoBattlefield => PromptActionView.PutOntoBattlefield,
         CardChoicePurposeView.PutIntoHand => PromptActionView.PutIntoHand,
         CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree => PromptActionView.Cast,
-        CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap => PromptActionView.Tap,
+        CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap or CardChoicePurposeView.Enlist => PromptActionView.Tap,
         CardChoicePurposeView.OrderSimultaneous => PromptActionView.OrderReplacement,
         CardChoicePurposeView.Destroy => PromptActionView.Destroy,
         CardChoicePurposeView.Vote => PromptActionView.Vote,

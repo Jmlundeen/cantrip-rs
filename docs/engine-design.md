@@ -1710,6 +1710,19 @@ attacker at a time, so `AttackRules::solve` adds up each attacker's best free at
 would make it a search like blocks'. The board is searched for these only as attackers are declared. The
 benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
 
+Optional costs to attack (CR 508.1g) are a static ability of the attacker and the "when you do" ability linked to it (CR
+607.2h), kept as one triggered ability (`paid_as_it_attacks`, `TriggeredDef::attack_option`: `AttackOption::Enlist`, CR
+702.154; `AttackOption::Exert`, CR 701.43d), so each instance has its own cost and its own trigger (CR 702.154d). Once the
+chosen creatures are tapped, `turn::choose_attack_options` asks about each instance each attacker has now (lost abilities
+offer none), in declaration order: enlist as a choice of up to one creature (`Purpose::Enlist`: untapped, controlled by the
+attacking player, not attacking, free of summoning sickness, and not chosen for another enlist), exert as a yes or no. The
+choices are locked in with the mandatory costs (508.1h); after the mana is paid (508.1i) each creature to be enlisted must
+still be untapped, or the declaration is illegal and taken back as an unpaid one is; then each is tapped and each exerted
+attacker exerted (508.1j). `Event::PaidToAttack` (attacker, option, which instance of which ability, the creature tapped) is
+emitted in the declaration's batch, so the linked ability - whose trigger the core owns (`settle::paid_to_attack`) - goes on
+the stack with the attack triggers, about the creature enlisted; "whenever this creature enlists a creature"
+(`cantrip_mechanics::enlist::THIS_ENLISTS`) reads the same event. Enlist's +X/+0 reads X as it resolves (CR 608.2h).
+
 ### Blocked by at most one creature
 
 "Can't be blocked by more than one creature" (CR 509.1b) is `Keyword::CantBeBlockedByMoreThanOne`, an evasion ability, so
@@ -2007,9 +2020,10 @@ Known gaps:
   Spider-Sense from the graveyard under Yawgmoth's Will is a scenario, and sneak's instant-speed way likewise), unless its
   text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost); a cast
   made while an effect resolves paying its costs is offered the card's own ways open from where it is too (`Label::Way`).
-- Costs to attack are mana only: one that asks for life (Sivitri, Dragon Master's +1), a Phyrexian symbol paid with life
-  (Norn's Annex), tapping or sacrificing, and optional costs to attack (CR 508.1g: exert, enlist, which the engine has
-  as other things) are not built, nor anything that changes a cost to attack. No card in content needs them.
+- Mandatory costs to attack are mana only: one that asks for life (Sivitri, Dragon Master's +1), a Phyrexian symbol paid
+  with life (Norn's Annex), tapping or sacrificing is not built, nor anything that changes a cost to attack. Optional costs
+  to attack are enlist and exert (above); one with a condition of its own ("if it hasn't been exerted this turn, you may
+  exert it", Combat Celebrant) or a mana part would extend `AttackOption`. No card in content needs them.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
 - Several permanents one effect puts
   onto the battlefield enter together (`ops::put_onto_battlefield`, `Game::put_all_onto_battlefield*`: Show and Tell,
