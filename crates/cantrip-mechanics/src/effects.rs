@@ -187,6 +187,17 @@ pub fn target_player_draws(g: &mut dyn Game, item: &StackItem, slot: usize, n: u
     }
 }
 
+/// "Target player draws N cards, then discards N cards" (CR 121.1, 701.9): the player the item targeted in `slot`, if the target is
+/// still legal (CR 608.2b), draws, then chooses that many cards of their hand and discards them. Dack Fayden and Prismari Command
+/// print it.
+pub fn target_player_draws_then_discards(g: &mut dyn Game, item: &StackItem, slot: usize, n: u32) -> Result<(), Suspend> {
+    if let Some(player) = crate::targets::player(g, item, slot) {
+        g.draw(player, n);
+        crate::discard_chosen(g, player, item.object, n)?;
+    }
+    Ok(())
+}
+
 /// "Draw a card, then discard a card" (CR 121.1, 701.9): the controller draws, then chooses a card of their hand and
 /// discards it. Currency Converter and Sphinx of False Conclusions print it.
 pub fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

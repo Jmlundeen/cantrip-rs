@@ -31,12 +31,9 @@ fn two_damage_to_each_creature(g: &mut dyn Game, item: &StackItem) -> Result<(),
     Ok(())
 }
 
-/// "Target player creates two Treasure tokens" (CR 111.10a): both tokens at once, under that player's control.
+/// "Target player creates two Treasure tokens" (see `tokens::target_player_creates_treasures`).
 fn two_treasures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = targets::player(g, item, 0) else { return Ok(()) };
-    let treasure = g.card_id(&tokens::TREASURE);
-    g.create_tokens(treasure, player, 2, false)?;
-    Ok(())
+    tokens::target_player_creates_treasures(g, item, 0, 2)
 }
 
 static MODAL: ModalDef = modes(&[

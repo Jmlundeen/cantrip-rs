@@ -1,13 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::{discard_chosen, targets, tokens};
+use cantrip_mechanics::{effects, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// +1: target player draws two cards, then discards two cards (their choice, asked unless the hand is empty).
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = item.target(0).player() else { return Ok(()) };
-    g.draw(player, 2);
-    discard_chosen(g, player, item.object, 2)?;
-    Ok(())
+    effects::target_player_draws_then_discards(g, item, 0, 2)
 }
 
 /// -2: gain control of target artifact (CR 108.4), with no duration: nothing ever gives it back.

@@ -661,6 +661,15 @@ pub fn create_a_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
     create_treasure(g, item.controller)
 }
 
+/// "Target player creates N Treasure tokens" (CR 111.10a): all at once, under the player the item targeted in `slot`, if that
+/// target is still legal (CR 608.2b). Ashling's Command (two) and Prismari Command (one) print it.
+pub fn target_player_creates_treasures(g: &mut dyn Game, item: &StackItem, slot: usize, n: u32) -> Result<(), Suspend> {
+    if let Some(player) = crate::targets::player(g, item, slot) {
+        create_by_rule(g, player, &TREASURE, n, false)?;
+    }
+    Ok(())
+}
+
 /// The 0/0 black Goblin Army creature token amass Goblins makes when its controller has no Army (CR 701.47a). Down, Down to
 /// Goblin Town and Azog, Moria's Ruin amass Goblins.
 pub static GOBLIN_ARMY: CardDef = CardDef {
