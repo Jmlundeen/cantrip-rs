@@ -48,7 +48,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         // sacrifice an effect asks (Words of Wind, an edict) pays for nothing.
         bool cost = context?.Cause == PromptCauseView.Cost || context is null
             && (prompt.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.TapToReduce
-                    or CardChoicePurposeView.Craft
+                    or CardChoicePurposeView.Craft or CardChoicePurposeView.Enlist
                 || client.Prompt is { MayCancel: true } && prompt.Purpose is not (CardChoicePurposeView.Splice
                     or CardChoicePurposeView.KeepLegend or CardChoicePurposeView.OrderSimultaneous or CardChoicePurposeView.PreventDamageFrom));
         // Behold and blight name the cost in their own verb ("to behold", "to blight"): "to pay for it" would add nothing.

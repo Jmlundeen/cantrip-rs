@@ -9,6 +9,11 @@ use cantrip_api::*;
 /// "You may exert this creature as it attacks. When you do, `effect`": `text` is the paragraph as printed. The ability's
 /// targets, if any, are chosen as it is put on the stack, after the attackers are declared; with none legal it is removed
 /// from the stack, and exerting was still allowed (Glorybringer's ruling, CR 603.3d).
+///
+/// A condition on the exert itself - Combat Celebrant's "if this creature hasn't been exerted this turn, you may exert it" -
+/// can't be written with `.condition(..)`: that is the trigger's intervening "if" (CR 603.4), so the exert would still be
+/// offered and paid and only the trigger kept off, a rules deviation. It needs a condition on the `AttackOption` the core
+/// offers, which is not built yet.
 pub const fn as_it_attacks(effect: Effect, text: &'static str) -> AbilityDef {
     paid_as_it_attacks(AttackOption::Exert, effect, text)
 }
