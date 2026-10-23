@@ -1,0 +1,6 @@
+{
+  "name": "Fires of Victory",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "Kicker {2}{U} (You may pay an additional {2}{U} as you cast this spell.)\nIf this spell was kicked, draw a card. Fires of Victory deals damage to target creature or planeswalker equal to the number of cards in your hand."
+}

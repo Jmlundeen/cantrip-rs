@@ -1,0 +1,49 @@
+# Unkicked Fires of Victory ({1}{R}, only Ruby and Jet tapped, nothing left over) draws nothing: on turn 3 Bot1 holds Fires,
+# Fires, an Island and the drawn Island, casting one leaves 3, so its own Spellskite (0/4) takes 3 (CR 608.2c). Its target
+# may be your own creature or the opponent's, but not a player or a noncreature artifact (CR 115.1, 115.2): the refusals sit
+# beside the accepted cast while Bot2's Spellskite gives a second legal target.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Spellskite
+Fires of Victory
+Fires of Victory
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Spellskite
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spellskite.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Spellskite.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Fires of Victory.Cast(Bot2)
+! Bot1.Hand.Fires of Victory.Cast(Bot1)
+! Bot1.Hand.Fires of Victory.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fires of Victory.Cast(Bot1.Battlefield.Spellskite)
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Spellskite.Damage = 3
+Bot2.Battlefield.Spellskite.Damage = 0

@@ -1,0 +1,49 @@
+# Kicked Fires of Victory ({1}{R} + kicker {2}{U} = 5 mana, all five Moxen and nothing left over) draws a card first, then
+# deals damage equal to the cards in hand: on turn 3 Bot1 holds Fires, Fires and the drawn Island; casting one leaves 2,
+# the kicker draw makes 3, so Bot2's Spellskite (0/4) takes 3 - not the 2 it would take counting before the draw (CR 702.33e,
+# 608.2c). Bot2's own hand is not what is counted: it holds more cards.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Fires of Victory
+Fires of Victory
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Spellskite
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Spellskite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fires of Victory.Cast(Bot2.Battlefield.Spellskite; Kicked: 1)
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Spellskite.Damage = 3
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Fires of Victory
+Bot2.Battlefield.Spellskite.Damage = 3

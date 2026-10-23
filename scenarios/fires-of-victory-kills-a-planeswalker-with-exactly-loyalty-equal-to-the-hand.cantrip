@@ -1,0 +1,32 @@
+# Fires of Victory may target a planeswalker (damage to it removes that many loyalty counters, CR 120.3c): Bot1 holds
+# Fires, Fires and three Islands after its Moxen, draws one more on turn 3 and casting leaves 5 cards, so Bot2's Narset,
+# Parter of Veils (loyalty 5) takes exactly 5 and is put into the graveyard (CR 704.5i). One fewer would leave it alive.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Fires of Victory
+Fires of Victory
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fires of Victory.Cast(Bot2.Battlefield.Narset, Parter of Veils)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Narset, Parter of Veils; Black Lotus
