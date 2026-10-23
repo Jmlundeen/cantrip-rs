@@ -4,16 +4,13 @@ use cantrip_oracle as oracle;
 
 /// The 3/3 blue Angel creature token with flying.
 pub static ANGEL: CardDef = CardDef {
-    name: "Angel",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Angel]),
     power: Some(3),
     toughness: Some(3),
     keywords: Keywords::of(&[Keyword::Flying]),
     text: "Flying",
-    ..CardDef::BLANK
+    ..token!(Angel)
 };
 
 fn make_angel(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

@@ -4,14 +4,11 @@ use cantrip_oracle as oracle;
 
 /// A 5/3 green Elemental creature token.
 pub static ELEMENTAL: CardDef = CardDef {
-    name: "Elemental",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Green)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Elemental]),
     power: Some(5),
     toughness: Some(3),
-    ..CardDef::BLANK
+    ..token!(Elemental)
 };
 
 /// "Return target land card from your graveyard to the battlefield", if it is still a legal target.

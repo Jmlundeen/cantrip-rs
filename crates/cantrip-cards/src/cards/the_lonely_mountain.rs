@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 2/2 red Dwarf creature token it makes.
 pub static DWARF: CardDef = CardDef {
-    name: "Dwarf",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Dwarf]),
     power: Some(2),
     toughness: Some(2),
-    ..CardDef::BLANK
+    ..token!(Dwarf)
 };
 
 /// "This land enters tapped unless you control an Equipment" (CR 614.1c): read on the battlefield as it is while the land

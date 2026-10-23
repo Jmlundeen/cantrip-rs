@@ -6,15 +6,12 @@ use cantrip_oracle as oracle;
 
 /// The 2/1 white Insect creature token with flying it makes.
 pub static INSECT: CardDef = CardDef {
-    name: "Insect",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Insect]),
     power: Some(2),
     toughness: Some(1),
     keywords: Keywords::of(&[Keyword::Flying]),
-    ..CardDef::BLANK
+    ..token!(Insect)
 };
 
 pub static EXTRA: &[&CardDef] = &[&INSECT];

@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 2/1 black Skeleton creature token this Case makes.
 pub static SKELETON: CardDef = CardDef {
-    name: "Skeleton",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Black)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Skeleton]),
     power: Some(2),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Skeleton)
 };
 
 pub static EXTRA: &[&CardDef] = &[&SKELETON];

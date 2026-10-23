@@ -18,14 +18,11 @@ fn exile_discarded(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static ROGUE: CardDef = CardDef {
-    name: "Rogue",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Black)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Rogue]),
     power: Some(2),
     toughness: Some(2),
-    ..CardDef::BLANK
+    ..token!(Rogue)
 };
 
 /// "Put a card exiled with this artifact into its owner's graveyard. If it's a land card, create a Treasure token. If

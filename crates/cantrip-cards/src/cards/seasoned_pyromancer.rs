@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 red Elemental creature token it makes.
 pub static ELEMENTAL: CardDef = CardDef {
-    name: "Elemental",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Elemental]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Elemental)
 };
 
 /// Discard two cards (all of a shorter hand) as one action, draw two, then an Elemental for each nonland card

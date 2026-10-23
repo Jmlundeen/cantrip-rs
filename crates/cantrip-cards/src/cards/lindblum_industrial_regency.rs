@@ -12,16 +12,13 @@ fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// The 0/1 black Wizard creature token with "Whenever you cast a noncreature spell, this token deals 1 damage to each
 /// opponent."
 pub static WIZARD: CardDef = CardDef {
-    name: "Wizard",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Black)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Wizard]),
     power: Some(0),
     toughness: Some(1),
     abilities: &[triggered(NONCREATURE_SPELL_YOU_CAST, ping, "Whenever you cast a noncreature spell, this token deals 1 damage to each opponent.")],
     text: "Whenever you cast a noncreature spell, this token deals 1 damage to each opponent.",
-    ..CardDef::BLANK
+    ..token!(Wizard)
 };
 
 /// Mage Siege: "Create a 0/1 black Wizard creature token with ..." (CR 111.1).

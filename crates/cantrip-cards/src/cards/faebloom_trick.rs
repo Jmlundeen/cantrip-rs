@@ -4,16 +4,13 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 blue Faerie creature token with flying (colors and creature type are those of the text that makes it, CR 612.4).
 pub static FAERIE: CardDef = CardDef {
-    name: "Faerie",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Faerie]),
     power: Some(1),
     toughness: Some(1),
     keywords: Keywords::of(&[Keyword::Flying]),
     text: "Flying",
-    ..CardDef::BLANK
+    ..token!(Faerie)
 };
 
 /// "Create two 1/1 blue Faerie creature tokens with flying. When you do, tap target creature an opponent controls."

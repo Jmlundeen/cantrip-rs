@@ -12,14 +12,11 @@ const COPY: Question = Question::new(
 
 /// The 1/1 green Insect creature token it makes.
 pub static INSECT: CardDef = CardDef {
-    name: "Insect",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Green)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Insect]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Insect)
 };
 
 const STATICS: &[StaticDef] = &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 1>, "Enchanted creature gets +1/+1.")];

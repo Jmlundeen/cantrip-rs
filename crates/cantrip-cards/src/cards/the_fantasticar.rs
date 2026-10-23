@@ -10,16 +10,13 @@ const ASK_2: Question = Question::new("SacrificeForTokens", "sacrifice it?", "If
 /// A 4/4 colorless Construct artifact creature token with flying and haste. Other Constructs of the same name are
 /// different definitions (Urza's, Retrofitter Foundry's).
 pub static CONSTRUCT: CardDef = CardDef {
-    name: "Construct",
-    has_cost: false,
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Construct]),
     power: Some(4),
     toughness: Some(4),
     keywords: Keywords::of(&[Keyword::Flying, Keyword::Haste]),
     shares_name: true,
     text: "Flying, haste",
-    ..CardDef::BLANK
+    ..token!(Construct)
 };
 
 /// You may have The Fantasticar become an artifact creature until end of turn.

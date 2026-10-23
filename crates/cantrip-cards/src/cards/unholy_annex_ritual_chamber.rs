@@ -10,16 +10,13 @@ use cantrip_oracle as oracle;
 
 /// The 6/6 black Demon creature token with flying.
 pub static DEMON: CardDef = CardDef {
-    name: "Demon",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Black)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Demon]),
     power: Some(6),
     toughness: Some(6),
     keywords: Keywords::of(&[Keyword::Flying]),
     text: "Flying",
-    ..CardDef::BLANK
+    ..token!(Demon)
 };
 
 /// Unholy Annex: "At the beginning of your end step, draw a card. If you control a Demon, each opponent loses 2 life and

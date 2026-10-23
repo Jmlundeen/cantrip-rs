@@ -5,16 +5,13 @@ use cantrip_oracle as oracle;
 
 /// A 4/4 red Scorpion Dragon creature token with flying and haste.
 pub static SCORPION_DRAGON: CardDef = CardDef {
-    name: "Scorpion Dragon",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Scorpion, Subtype::Dragon]),
     power: Some(4),
     toughness: Some(4),
     keywords: Keywords::of(&[Keyword::Flying, Keyword::Haste]),
     text: "Flying, haste",
-    ..CardDef::BLANK
+    ..token!(Scorpion Dragon)
 };
 
 /// "Create a tapped Treasure token."

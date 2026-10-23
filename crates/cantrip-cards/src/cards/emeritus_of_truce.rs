@@ -5,16 +5,13 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 white and black Inkling creature token with flying.
 pub static INKLING: CardDef = CardDef {
-    name: "Inkling",
-    has_cost: false,
     colors: Some(ColorSet(ColorSet::of(Color::White).0 | ColorSet::of(Color::Black).0)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Inkling]),
     power: Some(1),
     toughness: Some(1),
     keywords: Keywords::of(&[Keyword::Flying]),
     text: "Flying",
-    ..CardDef::BLANK
+    ..token!(Inkling)
 };
 
 /// Target player creates the Inkling. Then, counting with it (CR 608.2c), if an opponent controls more creatures

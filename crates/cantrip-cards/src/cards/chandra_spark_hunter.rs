@@ -34,15 +34,12 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// The 3/2 colorless Vehicle artifact token with crew 1.
 pub static VEHICLE: CardDef = CardDef {
-    name: "Vehicle",
-    has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
-    subtypes: SubtypeSet::of(&[Subtype::Vehicle]),
     power: Some(3),
     toughness: Some(2),
     abilities: &[crew(1, "Crew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)")],
     text: "Crew 1",
-    ..CardDef::BLANK
+    ..token!(Vehicle)
 };
 
 fn three_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

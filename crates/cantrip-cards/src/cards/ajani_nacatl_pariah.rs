@@ -6,14 +6,11 @@ const ASK: Question = Question::new("ExileAndReturn", "exile Ajani, then return 
 
 /// The 2/1 white Cat Warrior token both faces make.
 pub static CAT_WARRIOR: CardDef = CardDef {
-    name: "Cat Warrior",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Cat, Subtype::Warrior]),
     power: Some(2),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Cat Warrior)
 };
 
 fn create_cat(g: &mut dyn Game, controller: PlayerId) -> Result<bool, Suspend> {

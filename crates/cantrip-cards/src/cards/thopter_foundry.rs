@@ -4,15 +4,12 @@ use cantrip_oracle as oracle;
 
 /// A 1/1 blue Thopter artifact creature token with flying.
 pub static THOPTER: CardDef = CardDef {
-    name: "Thopter",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Thopter]),
     power: Some(1),
     toughness: Some(1),
     keywords: Keywords::of(&[Keyword::Flying]),
-    ..CardDef::BLANK
+    ..token!(Thopter)
 };
 
 fn make_thopter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

@@ -5,16 +5,13 @@ use cantrip_oracle as oracle;
 /// The 6/6 red Dragon creature token with flying. The words of the Saga's text make its color and creature type
 /// (CR 612.4, 111.4), so nothing here reads them.
 static DRAGON: CardDef = CardDef {
-    name: "Dragon",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Dragon]),
     power: Some(6),
     toughness: Some(6),
     keywords: Keywords::of(&[Keyword::Flying]),
     text: "Flying",
-    ..CardDef::BLANK
+    ..token!(Dragon)
 };
 
 /// "Create a Treasure token. Then if you control four or more Treasures, sacrifice this Saga. If you do, create a 6/6 red

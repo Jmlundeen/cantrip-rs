@@ -4,13 +4,10 @@ use cantrip_oracle as oracle;
 
 /// A 1/1 colorless Construct artifact creature token.
 pub static CONSTRUCT: CardDef = CardDef {
-    name: "Construct",
-    has_cost: false,
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Construct]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Construct)
 };
 
 /// "Whenever one or more artifacts you control leave the battlefield during your turn" (CR 603.6c, 603.10a, 603.2c): an

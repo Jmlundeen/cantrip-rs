@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 2/2 black Skeleton Pirate creature token.
 pub static SKELETON_PIRATE: CardDef = CardDef {
-    name: "Skeleton Pirate",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Black)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Skeleton, Subtype::Pirate]),
     power: Some(2),
     toughness: Some(2),
-    ..CardDef::BLANK
+    ..token!(Skeleton Pirate)
 };
 
 const ASK: Question = Question::new("ReturnToHand", "pay {cost} to return {subject} to its owner's hand?", "", "Pay {cost}", "Leave it");

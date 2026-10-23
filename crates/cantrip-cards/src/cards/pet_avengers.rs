@@ -4,15 +4,12 @@ use cantrip_oracle as oracle;
 
 /// The 3/2 white Hero creature token with vigilance.
 pub static HERO: CardDef = CardDef {
-    name: "Hero",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Hero]),
     power: Some(3),
     toughness: Some(2),
     keywords: Keywords::of(&[Keyword::Vigilance]),
-    ..CardDef::BLANK
+    ..token!(Hero)
 };
 
 /// "Put a +1/+1 counter on this creature and create a 3/2 white Hero creature token with vigilance."

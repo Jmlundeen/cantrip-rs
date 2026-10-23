@@ -3,16 +3,13 @@ use cantrip_oracle as oracle;
 
 const fn golem(keyword: Keyword, text: &'static str) -> CardDef {
     CardDef {
-        name: "Golem",
-        has_cost: false,
         types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-        subtypes: SubtypeSet::of(&[Subtype::Golem]),
         power: Some(3),
         toughness: Some(3),
         keywords: Keywords::of(&[keyword]),
         text,
         shares_name: true,
-        ..CardDef::BLANK
+        ..token!(Golem)
     }
 }
 

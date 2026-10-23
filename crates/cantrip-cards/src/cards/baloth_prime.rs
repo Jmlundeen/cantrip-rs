@@ -12,14 +12,11 @@ fn enters_stunned(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspe
 
 /// The tapped 4/4 green Beast creature token it makes.
 pub static BEAST: CardDef = CardDef {
-    name: "Beast",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Green)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Beast]),
     power: Some(4),
     toughness: Some(4),
-    ..CardDef::BLANK
+    ..token!(Beast)
 };
 
 /// "Whenever you sacrifice a land": a land of yours moved from the battlefield to a graveyard as a sacrifice.

@@ -7,16 +7,13 @@ use cantrip_oracle as oracle;
 
 /// The 2/2 red Goblin Shaman token chapter I makes.
 pub static GOBLIN_SHAMAN: CardDef = CardDef {
-    name: "Goblin Shaman",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Goblin, Subtype::Shaman]),
     power: Some(2),
     toughness: Some(2),
     abilities: &[triggered(cantrip_mechanics::triggers::THIS_ATTACKS, create_a_treasure, "Whenever this token attacks, create a Treasure token.")],
     text: "Whenever this token attacks, create a Treasure token.",
-    ..CardDef::BLANK
+    ..token!(Goblin Shaman)
 };
 
 fn chapter_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

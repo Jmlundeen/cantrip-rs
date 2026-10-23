@@ -4,15 +4,12 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 colorless Robot artifact creature token. It shares its name with the other Robot token (Melded Moxite's).
 pub static ROBOT: CardDef = CardDef {
-    name: "Robot",
-    has_cost: false,
     colors: Some(ColorSet::NONE),
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Robot]),
     power: Some(1),
     toughness: Some(1),
     shares_name: true,
-    ..CardDef::BLANK
+    ..token!(Robot)
 };
 
 fn make_a_robot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

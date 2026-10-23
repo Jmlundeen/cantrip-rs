@@ -5,16 +5,13 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 green and white Kithkin creature token (CR 111.4).
 pub static KITHKIN: CardDef = CardDef {
-    name: "Kithkin",
-    has_cost: false,
     // White (bit 0) and green (bit 4).
     colors: Some(ColorSet(0b10001)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Kithkin]),
     power: Some(1),
     toughness: Some(1),
     shares_name: true,
-    ..CardDef::BLANK
+    ..token!(Kithkin)
 };
 
 /// +1: "Create a 1/1 green and white Kithkin creature token."

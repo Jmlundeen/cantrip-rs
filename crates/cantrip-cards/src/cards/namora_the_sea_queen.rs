@@ -4,14 +4,11 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 blue Merfolk creature token.
 pub static MERFOLK: CardDef = CardDef {
-    name: "Merfolk",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Merfolk]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Merfolk)
 };
 
 /// "Put a +1/+1 counter on Namora. Create two 1/1 blue Merfolk creature tokens."

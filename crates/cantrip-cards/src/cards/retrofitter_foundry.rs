@@ -7,13 +7,10 @@ pub use cantrip_mechanics::tokens::THOPTER;
 
 /// A 4/4 colorless Construct artifact creature token.
 pub static CONSTRUCT: CardDef = CardDef {
-    name: "Construct",
-    has_cost: false,
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Construct]),
     power: Some(4),
     toughness: Some(4),
-    ..CardDef::BLANK
+    ..token!(Construct)
 };
 
 fn is_servo(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {

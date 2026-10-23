@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 2/2 green Cat creature token.
 pub static CAT: CardDef = CardDef {
-    name: "Cat",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Green)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Cat]),
     power: Some(2),
     toughness: Some(2),
-    ..CardDef::BLANK
+    ..token!(Cat)
 };
 
 /// "Create two 2/2 green Cat creature tokens", together.

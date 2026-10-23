@@ -25,14 +25,11 @@ fn artifacts_and_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, cha
 /// The white Gnome Soldier artifact creature token both faces make, with "This creature's power and toughness are each equal
 /// to the number of artifacts and/or creatures you control."
 pub static GNOME_SOLDIER: CardDef = CardDef {
-    name: "Gnome Soldier",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Gnome, Subtype::Soldier]),
     statics: &[characteristic_defining(Layer::PtDefine, artifacts_and_creatures_you_control, GNOME_SOLDIER_TEXT).lost_pt(0, 0)],
     text: GNOME_SOLDIER_TEXT,
-    ..CardDef::BLANK
+    ..token!(Gnome Soldier)
 };
 
 /// "Create a white Gnome Soldier artifact creature token with ..." (CR 111.1).

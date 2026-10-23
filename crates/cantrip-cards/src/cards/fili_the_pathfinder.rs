@@ -4,15 +4,12 @@ use cantrip_oracle as oracle;
 
 /// The 2/2 red Dwarf creature token it makes.
 pub static DWARF: CardDef = CardDef {
-    name: "Dwarf",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Dwarf]),
     power: Some(2),
     toughness: Some(2),
     shares_name: true,
-    ..CardDef::BLANK
+    ..token!(Dwarf)
 };
 
 pub static EXTRA: &[&CardDef] = &[&DWARF];

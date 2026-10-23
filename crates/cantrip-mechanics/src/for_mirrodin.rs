@@ -8,14 +8,11 @@ use cantrip_api::*;
 
 /// The 2/2 red Rebel creature token For Mirrodin! makes.
 pub static REBEL: CardDef = CardDef {
-    name: "Rebel",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Rebel]),
     power: Some(2),
     toughness: Some(2),
-    ..CardDef::BLANK
+    ..token!(Rebel)
 };
 
 /// An Equipment that has left the battlefield attaches to nothing, and a token that was not created is not there to be

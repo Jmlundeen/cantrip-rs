@@ -5,16 +5,13 @@ use cantrip_oracle as oracle;
 
 /// The 8/8 blue Leviathan creature token with hexproof.
 pub static LEVIATHAN: CardDef = CardDef {
-    name: "Leviathan",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Leviathan]),
     power: Some(8),
     toughness: Some(8),
     keywords: Keywords::of(&[Keyword::Hexproof]),
     text: "Hexproof",
-    ..CardDef::BLANK
+    ..token!(Leviathan)
 };
 
 fn make_leviathan(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

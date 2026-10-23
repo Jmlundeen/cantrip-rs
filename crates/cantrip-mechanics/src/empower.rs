@@ -17,18 +17,15 @@ fn draw_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// The blue Jace planeswalker token empower Jace makes, entering with no loyalty counters. Its card lists it in its `EXTRA`.
 pub static JACE: CardDef = CardDef {
-    name: "Jace",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Planeswalker]),
-    subtypes: SubtypeSet::of(&[Subtype::Jace]),
     loyalty: Some(0),
     abilities: &[
         ability(loyalty(-1), surveil_one, "\u{2212}1: Surveil 1."),
         ability(loyalty(-3), draw_a_card, "\u{2212}3: Draw a card."),
     ],
     text: "\u{2212}1: Surveil 1.\n\u{2212}3: Draw a card.",
-    ..CardDef::BLANK
+    ..token!(Jace)
 };
 
 fn jace_tokens(g: &dyn Game, controller: PlayerId) -> Vec<ObjectId> {

@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 3/2 red and white Spirit creature token its +1 makes.
 pub static SPIRIT: CardDef = CardDef {
-    name: "Spirit",
-    has_cost: false,
     colors: Some(ColorSet(ColorSet::of(Color::Red).0 | ColorSet::of(Color::White).0)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Spirit]),
     power: Some(3),
     toughness: Some(2),
-    ..CardDef::BLANK
+    ..token!(Spirit)
 };
 
 /// "Whenever you cast a spell from exile, Quintorius Kand deals 2 damage to each opponent and you gain 2 life." Both happen

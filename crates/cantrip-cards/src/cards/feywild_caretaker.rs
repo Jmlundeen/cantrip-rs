@@ -4,16 +4,13 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 blue Faerie Dragon creature token with flying.
 pub static FAERIE_DRAGON: CardDef = CardDef {
-    name: "Faerie Dragon",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Faerie, Subtype::Dragon]),
     power: Some(1),
     toughness: Some(1),
     keywords: Keywords::of(&[Keyword::Flying]),
     text: "Flying",
-    ..CardDef::BLANK
+    ..token!(Faerie Dragon)
 };
 
 /// "If you have the initiative" (CR 603.4): asked as the ability would trigger and again as it resolves.

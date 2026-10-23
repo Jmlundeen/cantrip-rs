@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 white Human creature token it makes.
 pub static HUMAN: CardDef = CardDef {
-    name: "Human",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Human]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Human)
 };
 
 /// "Adeline's power is equal to the number of creatures you control" (CR 604.3, layer 7a): a characteristic-defining

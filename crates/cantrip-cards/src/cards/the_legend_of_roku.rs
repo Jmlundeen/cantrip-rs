@@ -24,17 +24,14 @@ const FIREBENDING_4: AbilityDef = firebending::trigger::<4>("Firebending 4 (When
 
 /// The 4/4 red Dragon with flying and firebending 4.
 pub static DRAGON: CardDef = CardDef {
-    name: "Dragon",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Dragon]),
     power: Some(4),
     toughness: Some(4),
     keywords: Keywords::of(&[Keyword::Flying]),
     abilities: &[FIREBENDING_4],
     text: "Flying\nFirebending 4",
-    ..CardDef::BLANK
+    ..token!(Dragon)
 };
 
 fn make_dragon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

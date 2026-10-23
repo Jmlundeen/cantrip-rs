@@ -9,13 +9,10 @@ use crate::{tokens, triggers};
 
 /// The 1/1 colorless Hero creature token job select makes.
 pub static HERO: CardDef = CardDef {
-    name: "Hero",
-    has_cost: false,
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Hero]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Hero)
 };
 
 /// "Create a 1/1 colorless Hero creature token, then attach this to it." An Equipment that has left the battlefield attaches

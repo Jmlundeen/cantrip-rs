@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 2/1 blue Ninja creature token Kaito and his emblem make.
 pub static NINJA: CardDef = CardDef {
-    name: "Ninja",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Ninja]),
     power: Some(2),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Ninja)
 };
 
 /// "Create a 2/1 blue Ninja creature token."

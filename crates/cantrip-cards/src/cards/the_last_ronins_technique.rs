@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 white Ninja Turtle Spirit creature token.
 pub static NINJA_TURTLE_SPIRIT: CardDef = CardDef {
-    name: "Ninja Turtle Spirit",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Ninja, Subtype::Turtle, Subtype::Spirit]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Ninja Turtle Spirit)
 };
 
 /// "Create three 1/1 white Ninja Turtle Spirit creature tokens. If this spell's sneak cost was paid, they enter tapped and

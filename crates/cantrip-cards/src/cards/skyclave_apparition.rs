@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// A blue Illusion creature token: the generic definition, its size X/X given as it is made (`illusion_for_owner`).
 pub static ILLUSION: CardDef = CardDef {
-    name: "Illusion",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Blue)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Illusion]),
     power: Some(0),
     toughness: Some(0),
-    ..CardDef::BLANK
+    ..token!(Illusion)
 };
 
 /// "Nonland, nontoken permanent you don't control with mana value 4 or less."

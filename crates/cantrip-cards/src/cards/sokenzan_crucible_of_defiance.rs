@@ -4,14 +4,11 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 colorless Spirit creature token this card makes (CR 111.1): no abilities of its own.
 static SPIRIT: CardDef = CardDef {
-    name: "Spirit",
-    has_cost: false,
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Spirit]),
     power: Some(1),
     toughness: Some(1),
     shares_name: true,
-    ..CardDef::BLANK
+    ..token!(Spirit)
 };
 
 /// "Create two 1/1 colorless Spirit creature tokens. They gain haste until end of turn" (CR 111.1, 611.2): both tokens,

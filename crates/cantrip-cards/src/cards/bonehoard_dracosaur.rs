@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 3/1 red Dinosaur creature token it makes.
 pub static DINOSAUR: CardDef = CardDef {
-    name: "Dinosaur",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Dinosaur]),
     power: Some(3),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Dinosaur)
 };
 
 /// "Exile the top two cards of your library. You may play them this turn (CR 305.1, 601.3: a land too). If you exiled a

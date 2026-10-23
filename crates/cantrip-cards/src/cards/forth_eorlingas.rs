@@ -3,16 +3,13 @@ use cantrip_oracle as oracle;
 
 /// The 2/2 red Human Knight creature token with trample and haste.
 pub static HUMAN_KNIGHT: CardDef = CardDef {
-    name: "Human Knight",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Human, Subtype::Knight]),
     power: Some(2),
     toughness: Some(2),
     keywords: Keywords::of(&[Keyword::Trample, Keyword::Haste]),
     text: "Trample, haste",
-    ..CardDef::BLANK
+    ..token!(Human Knight)
 };
 
 /// Create X Human Knights as one instruction (CR 111.1, 101.4), then the delayed ability that lasts the turn

@@ -16,14 +16,11 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// The 2/2 white Ox creature token.
 pub static OX: CardDef = CardDef {
-    name: "Ox",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Ox]),
     power: Some(2),
     toughness: Some(2),
-    ..CardDef::BLANK
+    ..token!(Ox)
 };
 
 pub static EXTRA: &[&CardDef] = &[&OX];

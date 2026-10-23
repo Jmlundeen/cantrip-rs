@@ -28,15 +28,12 @@ fn attacks_while_you_have_most_life(q: &dyn Query, me: &Asker, event: &Event) ->
 
 /// A 1/1 white Vampire creature token with lifelink.
 static VAMPIRE: CardDef = CardDef {
-    name: "Vampire",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Vampire]),
     power: Some(1),
     toughness: Some(1),
     keywords: Keywords::of(&[Keyword::Lifelink]),
-    ..CardDef::BLANK
+    ..token!(Vampire)
 };
 
 /// "Create a 1/1 white Vampire creature token with lifelink."

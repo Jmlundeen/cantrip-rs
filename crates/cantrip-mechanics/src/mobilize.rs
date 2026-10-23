@@ -8,14 +8,11 @@ use cantrip_api::*;
 
 /// The 1/1 red Warrior creature token mobilize makes.
 pub static WARRIOR: CardDef = CardDef {
-    name: "Warrior",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Warrior]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Warrior)
 };
 
 /// `N` tapped and attacking Warriors, then sacrificed together at the beginning of the next end step (CR 603.7c, 701.21a).

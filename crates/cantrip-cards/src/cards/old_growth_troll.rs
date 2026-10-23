@@ -11,15 +11,12 @@ fn forest_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 
 /// A 4/4 green Troll Warrior creature token with trample.
 static TROLL_WARRIOR: CardDef = CardDef {
-    name: "Troll Warrior",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Green)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Troll, Subtype::Warrior]),
     power: Some(4),
     toughness: Some(4),
     keywords: Keywords::of(&[Keyword::Trample]),
-    ..CardDef::BLANK
+    ..token!(Troll Warrior)
 };
 
 /// "Enchanted Forest has '{T}: Add {G}{G}' and '{1}, {T}, Sacrifice this land: ...'" (CR 303.4, 613.1f): this card's delayed

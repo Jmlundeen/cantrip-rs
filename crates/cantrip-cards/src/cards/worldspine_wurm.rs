@@ -5,15 +5,12 @@ use cantrip_oracle as oracle;
 
 /// The 5/5 green Wurm creature token with trample it makes.
 pub static WURM: CardDef = CardDef {
-    name: "Wurm",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Green)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Wurm]),
     power: Some(5),
     toughness: Some(5),
     keywords: Keywords::of(&[Keyword::Trample]),
-    ..CardDef::BLANK
+    ..token!(Wurm)
 };
 
 /// "When this creature dies, create three 5/5 green Wurm creature tokens with trample."

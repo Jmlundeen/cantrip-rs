@@ -7,16 +7,13 @@ const DISCARD: Question = Question::new("DiscardInsteadOfLosingLife", "discard a
 
 /// The 1/1 red Devil creature token with "When this token dies, it deals 1 damage to any target."
 pub static DEVIL: CardDef = CardDef {
-    name: "Devil",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Red)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Devil]),
     power: Some(1),
     toughness: Some(1),
     abilities: &[triggered(THIS_DIES, devil_dies, "When this token dies, it deals 1 damage to any target.").targets(&[targets::ANY])],
     text: "When this token dies, it deals 1 damage to any target.",
-    ..CardDef::BLANK
+    ..token!(Devil)
 };
 
 /// "It deals 1 damage to any target": dealt by the token as it last existed (CR 603.10a, 608.2h).

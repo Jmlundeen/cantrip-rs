@@ -18,16 +18,13 @@ fn plus_one_for_each_other_rat(q: &dyn LayerQuery, source: ObjectId, chars: &mut
 
 /// The 1/1 black Rat creature token with "This token gets +1/+1 for each other Rat you control." (CR 111.1).
 pub static RAT: CardDef = CardDef {
-    name: "Rat",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Black)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Rat]),
     power: Some(1),
     toughness: Some(1),
     statics: &[static_ability(Layer::PtModify, itself, plus_one_for_each_other_rat, "This token gets +1/+1 for each other Rat you control.")],
     text: "This token gets +1/+1 for each other Rat you control.",
-    ..CardDef::BLANK
+    ..token!(Rat)
 };
 
 /// The creatures exiled under an opponent of `player`'s control this turn (CR 614.1a): every move this turn from the

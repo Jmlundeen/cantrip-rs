@@ -6,15 +6,12 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 white Cat creature token it makes.
 pub static CAT: CardDef = CardDef {
-    name: "Cat",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::White)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Cat]),
     power: Some(1),
     toughness: Some(1),
     shares_name: true,
-    ..CardDef::BLANK
+    ..token!(Cat)
 };
 
 /// Create a 1/1 white Cat creature token. Then, if you have the city's blessing, for each token you control that entered this

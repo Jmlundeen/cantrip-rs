@@ -4,14 +4,11 @@ use cantrip_oracle as oracle;
 
 /// A 1/1 green Squirrel creature token.
 pub static SQUIRREL: CardDef = CardDef {
-    name: "Squirrel",
-    has_cost: false,
     colors: Some(ColorSet::of(Color::Green)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Squirrel]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Squirrel)
 };
 
 fn loyalty(g: &mut dyn Game, comet: ObjectId, delta: i16) {

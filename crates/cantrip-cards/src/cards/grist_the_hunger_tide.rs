@@ -5,14 +5,11 @@ use cantrip_oracle as oracle;
 
 /// The 1/1 black and green Insect creature token the +1 makes.
 pub static INSECT: CardDef = CardDef {
-    name: "Insect",
-    has_cost: false,
     colors: Some(ColorSet(0b10100)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Insect]),
     power: Some(1),
     toughness: Some(1),
-    ..CardDef::BLANK
+    ..token!(Insect)
 };
 
 /// "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types": a
