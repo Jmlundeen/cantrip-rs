@@ -86,7 +86,7 @@ something offered, and as many of the requirements obeyed as any declaration can
 two per goader) - with `MostRequirements`, the engine's own declaration `Suggested`, and the `Verdict` on no attacks
 (`Complete`, `Issue`, `Addable`, `Cost`). Any other declaration is asked with `CheckAttacksMessage { RequestId, Attacks }`,
 answered with `AttacksVerdictMessage { RequestId, Attacks, Verdict }`. `GameClient.Answer` settles every declaration of
-attackers with the host as it does blocks, and a client offers the attacks the verdict does. Version 204.
+attackers with the host as it does blocks, and a client offers the attacks the verdict does. Version 205.
 
 **Checking a declaration of blockers.** A declaration of blockers (`DeclareBlockersPromptMessage`) is judged by one validator
 in the engine (`BlockRequirements::judge`, `crates/cantrip-state/src/blocks.rs`) against every restriction, requirement and
@@ -108,7 +108,7 @@ the blocks meant first and the engine's own declaration (`Suggested`) next; a ch
 question is asked again unless it is no longer outstanding - and answered with the engine's own declaration if it is
 answered so again, so an automatic seat never goes round forever. So no client works out a requirement, restriction or cost itself,
 and a new one changes the engine alone. `MinimumBlockers`, `MaximumBlockers`, `Requirements` and `MostRequirements` are for
-showing the player. The answer is still checked when it is given. Version 204.
+showing the player. The answer is still checked when it is given. Version 205.
 
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed
