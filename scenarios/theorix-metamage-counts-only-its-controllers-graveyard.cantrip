@@ -1,0 +1,48 @@
+# Threshold counts the creature controller's graveyard, not its opponent's (CR 109.5, 207.2c, 611.3a).
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Theorix Metamage
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Theorix Metamage
+Dark Ritual x4
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Theorix Metamage.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Theorix Metamage.Cast
+Bot2.Pass
+Bot2.Exile.Omit Variables.Cast
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 1
+Bot2.Graveyard.Count = 7
+Bot1.Battlefield.Theorix Metamage.Power = 2
+Bot1.Battlefield.Theorix Metamage.Toughness = 3
+Bot1.Battlefield.Theorix Metamage.Keywords = (absent)
+Bot2.Battlefield.Theorix Metamage.Power = 3
+Bot2.Battlefield.Theorix Metamage.Toughness = 3
+Bot2.Battlefield.Theorix Metamage.Keywords = Flying

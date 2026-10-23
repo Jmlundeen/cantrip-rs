@@ -1,0 +1,56 @@
+# Threshold follows the current controller's graveyard when control changes (CR 109.5, 611.3a).
+[Bot1 Deck]
+Mox Sapphire x5
+Mind Control
+Island x22
+
+[Bot2 Deck]
+Mox Jet
+Theorix Metamage
+Dark Ritual x4
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Theorix Metamage.Cast
+Bot2.Pass
+Bot2.Exile.Omit Variables.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Theorix Metamage.Power = 3
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Battlefield.Mox Sapphire#4.Activate
+Bot1.Battlefield.Mox Sapphire#5.Activate
+Bot1.Hand.Mind Control.Cast(Bot2.Battlefield.Theorix Metamage)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 7
+Bot1.Battlefield.Theorix Metamage.Power = 2
+Bot1.Battlefield.Theorix Metamage.Toughness = 3
+Bot1.Battlefield.Theorix Metamage.Keywords = (absent)
