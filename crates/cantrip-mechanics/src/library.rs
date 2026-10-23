@@ -395,13 +395,13 @@ pub fn look_at_top(
 }
 
 /// "Look at the top `count` cards of your library. Put up to `most` [`kind`] cards [with total mana value N or less] from among
-/// them onto the battlefield. Put the rest on the bottom of your library in a random order." (CR 401.2, 110.2a, 401.4): the
+/// them onto the battlefield. Put the rest on the bottom of your library in a random order." (CR 401.2, 401.4): the
 /// player sees every card looked at (a smaller library shows what it has, CR 609.3) and chooses among those `wanted` says
 /// qualify, read where they are (an {X} in the library is 0, CR 202.3e); with `total`, the cards chosen together have mana
-/// values adding up to at most it (`choose::cards_within_total`). The cards chosen enter together under the player's control
-/// (CR 110.2a), and the others still in the library go to the bottom at random. With nothing qualifying nobody is asked. The
+/// values adding up to at most it (`choose::cards_within_total`). The cards chosen enter the battlefield at once, under the
+/// player's control (CR 110.2a), and the others still in the library go to the bottom at random. With nothing qualifying nobody is asked. The
 /// permanents that arrived are returned. Aang, at the Crossroads ("you may put a creature card with mana value 4 or less", one), United
-/// Battlefront (up to two) and Michelangelo's Technique (up to two, total mana value 6 or less) print it.
+/// Battlefront and Storm the Festival (up to two), and Michelangelo's Technique (up to two, total mana value 6 or less) print it.
 pub fn look_at_top_onto_battlefield(
     g: &mut dyn Game,
     player: PlayerId,
