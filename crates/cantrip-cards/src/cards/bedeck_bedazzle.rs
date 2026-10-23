@@ -1,15 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, destroy_target, pump, targets};
+use cantrip_mechanics::{effects, damage_target, destroy_target, targets};
 use cantrip_oracle as oracle;
-
-/// Bedeck: "Target creature gets +3/-3 until end of turn" (CR 611.2): a creature with toughness 3 or less dies to the state-based
-/// actions; nothing happens if the target has become illegal (CR 608.2b).
-fn bedeck(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, 3, -3);
-    }
-    Ok(())
-}
 
 /// "Target opponent or planeswalker" (CR 115.1, 109.5): a player other than the spell's controller, or a planeswalker on the
 /// battlefield, whoever controls it.
@@ -25,7 +16,7 @@ fn bedazzle(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static BEDECK: CardDef = CardDef { spell: spell(&[targets::CREATURE], bedeck), ..oracle::BEDECK };
+pub static BEDECK: CardDef = CardDef { spell: spell(&[targets::CREATURE], effects::target_creature_gets::<3, -3>), ..oracle::BEDECK };
 
 pub static BEDAZZLE: CardDef = CardDef {
     spell: spell(

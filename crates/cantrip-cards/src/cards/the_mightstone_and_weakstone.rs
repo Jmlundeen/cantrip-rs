@@ -1,17 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, pump, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{effects, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
-
-fn minus_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, -5, -5);
-    }
-    Ok(())
-}
 
 static MODAL: ModalDef = modes(&[
     mode(|g, item| effects::draw(g, item, 2), "Draw two cards."),
-    mode(minus_five, "Target creature gets -5/-5 until end of turn.")
+    mode(effects::target_creature_gets::<-5, -5>, "Target creature gets -5/-5 until end of turn.")
         .targets(&[targets::CREATURE]),
 ]);
 

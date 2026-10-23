@@ -17,6 +17,17 @@ pub fn enters_with_minus_one_counters<const N: i16>(_: &mut dyn Game, entering: 
     Ok(())
 }
 
+/// "Target creature gets +`P`/+`T` until end of turn" (CR 611.2a), the creature being the ability's first target; nothing
+/// if it is no longer a legal target as the spell or ability resolves (CR 608.2b). Bedeck // Bedazzle, Collective
+/// Brutality, Dismember, Fervent Champion, Giant Growth, Grim Bauble, Harvester of Misery, Icy Reception, Last Gasp,
+/// Locust Spray, Proft, Stab, The Mightstone and Weakstone, Theorix Charm, Umezawa's Jitte and Shambling Ghast print it.
+pub fn target_creature_gets<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = crate::targets::object(g, item, 0) {
+        crate::pump(g, item.object, creature, P, T);
+    }
+    Ok(())
+}
+
 /// "Destroy all nonland permanents with mana value `limit` or less" (CR 701.8a): every such permanent on the battlefield,
 /// destroyed at once. The permanents it destroyed, for what the rest of the text does with them. Culling Ritual (2) and
 /// Pest Control (1) print it.

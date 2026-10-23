@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::equip_targeting_this_costs_less;
 use cantrip_mechanics::triggers::THIS_ATTACKS;
-use cantrip_mechanics::{pump, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "Another target attacking Knight you control" (CR 115.1, 506.4): a creature of the Knight type (a word of this
@@ -12,18 +12,10 @@ fn another_attacking_knight_you_control(q: &dyn Query, asker: &Asker, t: Target)
         && matches!(t, Target::Object(id) if id != asker.source && q.is_attacking(id) && q.chars(id).has_subtype(knight))
 }
 
-/// "... gets +1/+0 until end of turn." A target no longer legal gets nothing (CR 608.2b).
-fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(knight) = targets::object(g, item, 0) {
-        pump(g, item.object, knight, 1, 0);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
         THIS_ATTACKS,
-        plus_one,
+        effects::target_creature_gets::<1, 0>,
         "Whenever this creature attacks, another target attacking Knight you control gets +1/+0 until end of turn.",
     )
     .targets(&[target(another_attacking_knight_you_control)])],

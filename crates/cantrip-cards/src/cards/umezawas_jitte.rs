@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::equip;
-use cantrip_mechanics::{pump, targets};
+use cantrip_mechanics::{effects, pump, targets};
 use cantrip_oracle as oracle;
 
 /// "Whenever equipped creature deals combat damage": a creature the Jitte is attached to dealing more than 0 combat
@@ -29,17 +29,9 @@ fn pump_equipped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Target creature gets -1/-1 until end of turn.
-fn shrink_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, -1, -1);
-    }
-    Ok(())
-}
-
 static MODAL: ModalDef = modes(&[
     mode(pump_equipped, "Equipped creature gets +2/+2 until end of turn."),
-    mode(shrink_target, "Target creature gets -1/-1 until end of turn.")
+    mode(effects::target_creature_gets::<-1, -1>, "Target creature gets -1/-1 until end of turn.")
         .targets(&[targets::CREATURE]),
     mode(|g, item| cantrip_mechanics::effects::gain_life(g, item, 2), "You gain 2 life."),
 ]);

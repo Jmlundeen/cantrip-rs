@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{counter_unless_pays, pump, targets};
+use cantrip_mechanics::{effects, counter_unless_pays, targets};
 use cantrip_oracle as oracle;
 
 /// "Target creature or legendary spell" (CR 115.1): a spell on the stack that is a creature spell or a legendary spell.
@@ -15,21 +15,13 @@ fn counter_unless_paid(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     Ok(())
 }
 
-/// "Target creature gets -5/-0 until end of turn" (CR 613.4, 611.2a).
-fn shrink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, -5, 0);
-    }
-    Ok(())
-}
-
 static MODAL: ModalDef = modes(&[
     mode(
         counter_unless_paid,
         "Counter target creature or legendary spell unless its controller pays {3}.",
     )
     .targets(&[target(creature_or_legendary_spell)]),
-    mode(shrink, "Target creature gets -5/-0 until end of turn.").targets(&[targets::CREATURE]),
+    mode(effects::target_creature_gets::<-5, 0>, "Target creature gets -5/-0 until end of turn.").targets(&[targets::CREATURE]),
 ]);
 
 pub static CARD: CardDef = CardDef {

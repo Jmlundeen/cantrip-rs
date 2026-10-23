@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::escalate;
-use cantrip_mechanics::{pump, targets, hand};
+use cantrip_mechanics::{effects, targets, hand};
 use cantrip_oracle as oracle;
 
 /// Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.
@@ -11,14 +11,6 @@ fn strip(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         let chars = q.chars(c);
         chars.is(CardType::Instant) || chars.is(CardType::Sorcery)
     })?;
-    Ok(())
-}
-
-/// Target creature gets -2/-2 until end of turn.
-fn shrink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        pump(g, item.object, creature, -2, -2);
-    }
     Ok(())
 }
 
@@ -35,7 +27,7 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 const MODES: &[ModeDef] = &[
     mode(strip, "Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.")
         .targets(&[targets::OPPONENT]),
-    mode(shrink, "Target creature gets -2/-2 until end of turn.")
+    mode(effects::target_creature_gets::<-2, -2>, "Target creature gets -2/-2 until end of turn.")
         .targets(&[targets::CREATURE]),
     mode(drain, "Target opponent loses 2 life and you gain 2 life.")
         .targets(&[targets::OPPONENT]),
