@@ -1,0 +1,29 @@
+# Pest Control's Cycling {2}: on turn 3 Bot1 pays two lands, discards it from hand and draws the card after the
+# turn's draw (Ornithopter, ninth in the deck, after the turn 3 draw). CR 702.29a.
+
+[Bot1 Deck]
+Plains
+Swamp
+Pest Control
+Forest x3
+Forest
+Forest
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Pest Control.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Pest Control
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Ornithopter

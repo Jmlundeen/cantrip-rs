@@ -1,0 +1,56 @@
+# Pest Control destroys every nonland permanent with mana value 1 or less. Each player has a mana value 0 permanent
+# (Ornithopter, Mox Pearl) and a mana value 1 one (Sol Ring, Voltaic Key): destroyed, so a limit read as < fails; each
+# has a mana value 2 creature (Woodland Changeling, just past the limit: survives) and lands (survive), so a filter
+# that spared nothing or read only one side fails. CR 701.8, 202.3.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Ornithopter
+Woodland Changeling
+Plains
+Swamp
+Pest Control
+Forest x12
+
+[Bot2 Deck]
+Island
+Forest
+Mox Pearl
+Voltaic Key
+Woodland Changeling
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Voltaic Key.Cast
+Bot2.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Island.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Pest Control.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Plains; Swamp; Woodland Changeling
+Bot2.Battlefield = Forest; Island; Woodland Changeling
+Bot1.Graveyard.Count = 3
+Bot2.Graveyard.Count = 2
