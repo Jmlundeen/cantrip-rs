@@ -1,0 +1,35 @@
+# "Up to two" allows none: This Town Ain't Big Enough cast with no target costs the full {4}{U} (CR 601.2f), though Bot1
+# controls an Ornithopter, the discount follows the chosen targets, not the permanents on the table.
+# Five mana from Black Lotus, an Island and Mox Sapphire; the pool is empty right after, and nothing is returned.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Ornithopter
+This Town Ain't Big Enough
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{U}{U}{U}{U}
+Bot1.Hand.This Town Ain't Big Enough.Cast
+Bot1.Target()
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire; Ornithopter
+Bot1.Graveyard = This Town Ain't Big Enough; Black Lotus

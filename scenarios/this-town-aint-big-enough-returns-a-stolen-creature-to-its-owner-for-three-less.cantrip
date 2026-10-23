@@ -1,0 +1,43 @@
+# "A permanent you control" is control, not ownership (CR 110.2): Act of Treason steals Bot2's Ornithopter, so a This Town
+# Ain't Big Enough aimed at it costs {1}{U} (CR 601.2f) - the pool is empty right after paying just two - and returns it
+# to its owner's hand, Bot2's, not Bot1's (CR 400.3).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Act of Treason
+This Town Ain't Big Enough
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{U}
+Bot1.Hand.This Town Ain't Big Enough.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire
+Bot2.Battlefield = Forest
+Bot2.Hand = Forest; Forest; Forest; Forest; Forest; Forest; Ornithopter
+Bot1.Hand = Island; Island; Island

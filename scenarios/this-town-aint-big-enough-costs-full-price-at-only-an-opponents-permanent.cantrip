@@ -1,0 +1,43 @@
+# This Town Ain't Big Enough costs {4}{U} when it targets nothing of the caster's (CR 601.2f). Bot1 has five blue
+# mana (Black Lotus, an Island, Mox Sapphire): the cast at Bot2's Ornithopter alone takes all five, leaving the pool
+# empty, and returns only that one target ("up to two" allows one). Bot1's own Ornithopter stays.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Ornithopter
+This Town Ain't Big Enough
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana = {U}{U}{U}{U}
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{U}{U}{U}{U}
+Bot1.Hand.This Town Ain't Big Enough.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire; Ornithopter
+Bot2.Battlefield = Forest
+Bot2.Hand = Forest; Forest; Forest; Forest; Forest; Forest; Ornithopter
+Bot1.Graveyard = This Town Ain't Big Enough; Black Lotus

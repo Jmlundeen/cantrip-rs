@@ -1,0 +1,42 @@
+# This Town Ain't Big Enough: "This spell costs {3} less to cast if it targets a permanent you control." With only {U}{U}
+# in Bot1's pool, a cast at Bot1's own Ornithopter and Bot2's together (the cost is worked out once the targets are
+# chosen, CR 601.2c, 601.2f) costs {1}{U}: the pool is empty right after, and both return to their owners' hands. Bot2's Forest is a land, so it is no legal target.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+This Town Ain't Big Enough
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{U}
+Bot1.Hand.This Town Ain't Big Enough.Cast
+! Bot1.Target(Bot2.Battlefield.Forest)
+! Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Ornithopter; Bot1.Battlefield.Mox Sapphire)
+Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire
+Bot1.Hand = Island; Island; Island; Island; Ornithopter
+Bot2.Battlefield = Forest
+Bot2.Hand = Forest; Forest; Forest; Forest; Forest; Forest; Ornithopter
+Bot1.Graveyard = This Town Ain't Big Enough
