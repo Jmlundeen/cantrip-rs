@@ -795,6 +795,16 @@ pub fn creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> 
     }
 }
 
+/// "Whenever a creature you control with power 4 or greater enters" (CR 603.6a): any creature, this one included, under your
+/// control as it entered, whose power as it entered is 4 or more - the static abilities that apply to it and the counters it
+/// entered with count (the 2019-05-03 ruling on Kiora, Behemoth Beckoner). Garruk, Curse Breaker and Kiora, Behemoth
+/// Beckoner print it.
+pub fn creature_with_power_four_or_more_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    creature_you_control_enters(q, me, event)?;
+    let Event::ZoneChange { new, .. } = event else { return None };
+    if q.chars(*new).power.is_some_and(|p| p >= 4) { Fired::PLAIN } else { None }
+}
+
 /// "Whenever a legendary creature you control enters" (CR 603.6a): any legendary creature, this one included, under your
 /// control as it entered. The Irencrag and Tinybones Joins Up print it.
 pub fn legendary_creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -1182,6 +1192,7 @@ pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, 
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
+pub const CREATURE_WITH_POWER_FOUR_OR_MORE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_with_power_four_or_more_you_control_enters);
 pub const CREATURE_YOU_CONTROL_ATTACKS: Trigger = when_asked(EventMask::ATTACKS, creature_you_control_attacks);
 pub const DRAGON_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, dragon_you_control_enters);
 pub const OPPONENTS_CREATURE_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, opponents_creature_enters);

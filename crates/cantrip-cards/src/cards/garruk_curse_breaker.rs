@@ -1,22 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, pump, targets, tokens};
+use cantrip_mechanics::{effects, pump, targets, tokens, triggers};
 use cantrip_oracle as oracle;
-
-/// "Whenever a creature you control with power 4 or greater enters" (CR 603.6a): a creature under its controller's control
-/// as it entered, whose power as it entered is 4 or more.
-fn big_creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield)
-                && q.controller(*new) == me.controller
-                && q.chars(*new).is(CardType::Creature)
-                && q.chars(*new).power.is_some_and(|p| p >= 4) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
 
 /// "Whenever one or more creatures attack one of your opponents" (CR 508.1, 603.2c): the creatures declared as attackers
 /// of one opponent are one batch, a different batch for each opponent attacked (`data[1]` is the player). Any creature
@@ -63,7 +47,7 @@ fn minus_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when_asked(EventMask::ZONE_CHANGE, big_creature_you_control_enters), |g, item| effects::draw(g, item, 1), "Whenever a creature you control with power 4 or greater enters, draw a card."),
+        triggered(triggers::CREATURE_WITH_POWER_FOUR_OR_MORE_YOU_CONTROL_ENTERS, |g, item| effects::draw(g, item, 1), "Whenever a creature you control with power 4 or greater enters, draw a card."),
         ability(loyalty(2), effects::untap_targets, "+2: Untap up to two target lands.").targets(&[targets::LAND.between(0, 2)]),
         ability(loyalty(-3), create_beast, "\u{2212}3: Create a 4/4 green Beast creature token with trample."),
         ability(loyalty(-4), minus_four, "\u{2212}4: Until your next turn, whenever one or more creatures attack one of your opponents, those creatures get +2/+2 and gain trample until end of turn."),
