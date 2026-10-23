@@ -1,0 +1,55 @@
+# Collected Company (turn 1, exactly {3}{G} from Forest and three Moxen) looks at the top six: Hired Blade (mana value 3, the
+# boundary), Bog Wraith (4, just past it), Ornithopter (0), Giant Cindermaw (3, a third eligible), Island and Lightning Bolt. The
+# seventh, Harbinger of the Seas (3), is not looked at, so it is refused as well. Up to two creature cards with mana value 3 or
+# less enter together (each card's own value, not their total: Hired Blade and Giant Cindermaw add up to 6); the other four go to the bottom in the order the player says,
+# as listed from the top of that group down, and Harbinger of the Seas stays on top.
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Mox Ruby
+Collected Company
+Island
+Island
+Hired Blade
+Bog Wraith
+Ornithopter
+Giant Cindermaw
+Island
+Lightning Bolt
+Harbinger of the Seas
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Collected Company.Cast
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Choose(Bog Wraith)
+! Bot1.Choose(Island)
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Harbinger of the Seas)
+! Bot1.Choose(Hired Blade; Ornithopter; Giant Cindermaw)
+Bot1.Choose(Hired Blade; Giant Cindermaw)
+Bot1.Arrange(Island; Bog Wraith; Ornithopter; Lightning Bolt)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Hired Blade; Bog Wraith; Ornithopter; Giant Cindermaw; Island; Lightning Bolt
+Bot1.Battlefield = Forest; Mox Pearl; Mox Jet; Mox Ruby; Hired Blade; Giant Cindermaw
+Bot1.Graveyard = Collected Company
+Bot1.Library = Harbinger of the Seas; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Bog Wraith; Ornithopter; Lightning Bolt

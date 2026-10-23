@@ -1,0 +1,46 @@
+# "Up to two" includes fewer: Collected Company takes only Hired Blade although Ornithopter, also eligible, could have come
+# too; Ornithopter goes to the bottom with the rest, in the order the player says - the opposite of the
+# order in the other scenario, so an ignored answer shows.
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Mox Ruby
+Collected Company
+Island
+Island
+Hired Blade
+Bog Wraith
+Ornithopter
+Giant Cindermaw
+Island
+Lightning Bolt
+Harbinger of the Seas
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Collected Company.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Choose(Hired Blade)
+Bot1.Arrange(Lightning Bolt; Ornithopter; Island; Giant Cindermaw; Bog Wraith)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Pearl; Mox Jet; Mox Ruby; Hired Blade
+Bot1.Library = Harbinger of the Seas; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Lightning Bolt; Ornithopter; Island; Giant Cindermaw; Bog Wraith
