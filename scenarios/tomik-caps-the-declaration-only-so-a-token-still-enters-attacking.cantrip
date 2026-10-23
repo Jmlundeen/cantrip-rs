@@ -1,0 +1,47 @@
+# Tomik's ability caps the declaration of attackers alone (the card's ruling): an effect can still put another creature
+# onto the battlefield attacking a planeswalker you control that one creature is already attacking. Bot2 has Tomik and
+# Wrenn and Six. Bot1 declares Adeline, Resplendent Cathar alone at Wrenn - one attacker, legal - and Adeline's "whenever
+# you attack" makes a Human token (CR 508.4) that Bot1 chooses to put into play attacking Wrenn too. Wrenn, at 3 loyalty,
+# takes Adeline's 2 plus the Human's 1 and dies.
+
+[Bot1 Deck]
+Black Lotus
+Adeline, Resplendent Cathar
+Plains x18
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Tomik, Orzhov Lawmage
+Wrenn and Six
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Adeline, Resplendent Cathar.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tomik, Orzhov Lawmage.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Adeline, Resplendent Cathar > Wrenn and Six)
+Bot1.Target(Bot2.Battlefield.Wrenn and Six)
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Adeline, Resplendent Cathar > Wrenn and Six; Human Token > Wrenn and Six
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Wrenn and Six; Black Lotus

@@ -1,0 +1,60 @@
+# A copy of Tomik (Phantasmal Image) has Tomik's abilities (CR 707.2), so it grants its controller's planeswalkers the cap
+# and the grant is the copy's own. Bot2 casts Tomik, then Phantasmal Image copying it, and the legend rule (CR 704.5j) keeps
+# the Image and puts the original in the graveyard: only the copy can be the source of the cap on Wrenn and Six, so two
+# creatures at Wrenn are refused while one at Wrenn and one at Bot2 is legal.
+
+[Bot1 Deck]
+Woodland Changeling
+Ornithopter
+Mox Jet
+Mox Emerald
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Tomik, Orzhov Lawmage
+Phantasmal Image
+Wrenn and Six
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tomik, Orzhov Lawmage.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Phantasmal Image.Cast
+Bot2.Accept
+Bot2.Target(Bot2.Battlefield.Tomik, Orzhov Lawmage)
+Bot2.Choose(Tomik, Orzhov Lawmage#2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack(Woodland Changeling > Wrenn and Six; Ornithopter > Wrenn and Six)
+Bot1.Attack(Woodland Changeling > Wrenn and Six; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Tomik, Orzhov Lawmage; Black Lotus
+Bot2.Battlefield.Wrenn and Six.Counters.Loyalty = 1

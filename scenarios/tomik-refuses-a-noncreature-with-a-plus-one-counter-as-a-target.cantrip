@@ -1,0 +1,47 @@
+# Probe: "target creature with a +1/+1 counter" refuses a noncreature permanent with one. Bot1's Mutavault, animated, takes a
+# +1/+1 counter from Snakeskin Veil on turn 1; on turn 3 it is a land with the counter and Tomik may not target it, while
+# Bot1's countered Woodland Changeling is a legal target.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mutavault
+Snakeskin Veil
+Tomik, Orzhov Lawmage
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tomik, Orzhov Lawmage.Cast
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Mutavault)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Mutavault.Counters.PlusOnePlusOne = 1
+! Bot1.Battlefield.Tomik, Orzhov Lawmage.Activate(Bot1.Battlefield.Mutavault)
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tomik, Orzhov Lawmage.Activate(Bot1.Battlefield.Mutavault)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mutavault.Keywords = Flying

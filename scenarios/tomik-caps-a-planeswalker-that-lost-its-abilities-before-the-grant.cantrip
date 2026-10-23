@@ -1,0 +1,68 @@
+# Tomik's cap is an ability granted to the planeswalker, and layer 6 applies in timestamp order (CR 613.1f, 613.7): a
+# "loses all abilities" older than the grant leaves the planeswalker the granted ability. Bot1's Flourishing Grapple strips
+# Wrenn and Six of all abilities first; only then does Bot2 flicker Tomik with Ephemerate, so the grant comes after the loss
+# and Wrenn is capped at one attacker all the same: the declaration naming both creatures at Wrenn is refused. (With the
+# loss newer than the grant, see tomik-does-not-cap-a-planeswalker-that-lost-its-abilities.) Wrenn takes 2 from the
+# Changeling and ends at 1 loyalty; Ornithopter attacks Bot2 instead.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Woodland Changeling
+Ornithopter
+Forest
+Flourishing Grapple
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Tomik, Orzhov Lawmage
+Wrenn and Six
+Ephemerate
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tomik, Orzhov Lawmage.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Flourishing Grapple.Cast
+Bot1.Target(Bot2.Battlefield.Wrenn and Six)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Ephemerate.Cast(Bot2.Battlefield.Tomik, Orzhov Lawmage)
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+Bot1.Pass
+! Bot1.Attack(Woodland Changeling > Wrenn and Six; Ornithopter > Wrenn and Six)
+Bot1.Attack(Woodland Changeling > Wrenn and Six; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield.Wrenn and Six.Counters.Loyalty = 1
