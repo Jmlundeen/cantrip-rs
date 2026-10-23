@@ -1,0 +1,37 @@
+# Turbulent Fen: on turn 17 Bot2 has seven Forests and Dryad Arbor, a land that is also a creature, so it controls
+# eight lands: an object with more than one card type satisfies the criteria for any of them (CR 205.2b), so Dryad
+# Arbor is counted as a land and Fen enters untapped. A count that skipped land creatures would see seven and tap it.
+
+[Bot1 Deck]
+Swamp x8
+Turbulent Fen
+Swamp x11
+
+[Bot2 Deck]
+Forest x14
+Dryad Arbor
+Forest x6
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Dryad Arbor.Play
+Bot1.Hand.Turbulent Fen.Play
+
+[Expect]
+Turn = 17
+Bot1.Battlefield.Turbulent Fen.Tapped = false
+Bot2.Battlefield.Dryad Arbor.Tapped = false

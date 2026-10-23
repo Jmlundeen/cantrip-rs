@@ -1,0 +1,44 @@
+# Turbulent Fen's ruling: "If this land enters the battlefield at the same time as any number of lands your opponents
+# control, those other lands are not counted when determining if this land enters the battlefield tapped or untapped."
+# Show and Tell puts Bot1's Fen and Bot2's eighth Forest onto the battlefield at once, and each entering permanent is
+# judged against the game before any of them moves (CR 614.12, 101.4): Bot2 controls seven lands at that moment, so
+# Fen enters tapped. A count that saw the Forest arriving beside it would find eight and leave Fen untapped.
+
+[Bot1 Deck]
+Turbulent Fen
+Show and Tell
+Island x5
+Island x12
+
+[Bot2 Deck]
+Forest x7
+Forest x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+[T15 Bot1.Main1]
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Turbulent Fen)
+Bot2.Choose(Forest)
+
+[Expect]
+Turn = 15
+Bot1.Battlefield.Turbulent Fen.Tapped = true
+Bot1.Battlefield.Count = 8
+Bot2.Battlefield.Count = 8
