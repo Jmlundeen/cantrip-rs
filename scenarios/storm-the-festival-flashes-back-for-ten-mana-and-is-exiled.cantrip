@@ -1,0 +1,84 @@
+# Storm the Festival is cast from the hand on turn 1 (Black Lotus for {G}{G}{G}, three Moxen for the {3}) and takes one of the five
+# Ornithopters it looks at (up to two includes fewer). Its flashback cost is {7}{G}{G}{G} (CR 702.34a): on turn 9 Bot1 has ten mana
+# but only two of it green, and the cast is refused (not even offered; {8}{G}{G} would be); only once a Mox Emerald is cast on turn 11 is it
+# offered. It is paid with exactly ten of the eleven mana (the pool is empty right after, so a cheaper cost shows), takes a Mirror
+# Gallery from the next five cards, and, being flashed back, is exiled instead of going to the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Storm the Festival
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Sol Ring
+Ornithopter x5
+Forest x2
+Island x2
+Mox Emerald
+Mirror Gallery
+Island x4
+Island x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Storm the Festival.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire; Sol Ring; Ornithopter
+? Bot1.Graveyard = Storm the Festival; Black Lotus
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Graveyard.Storm the Festival.Cast
+Bot1.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Storm the Festival.Cast(Ability: Flashback)
+? Bot1.Mana = 
+Bot1.Pass
+Bot1.Choose(Mirror Gallery)
+Bot1.Pass
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Exile = Storm the Festival
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Mirror Gallery.ManaValue = 5

@@ -1,0 +1,44 @@
+# Storm the Festival (turn 1, paid by Black Lotus and three Moxen) looks at the top five cards: Forest, Woodland Changeling, Lightning Bolt and
+# two Islands. A land card and a creature card that is not an artifact are both permanent cards (CR 110.4), so both may be put onto the
+# battlefield (together), while the instant may not be.
+
+[Bot1 Deck]
+Black Lotus
+Storm the Festival
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Island
+Forest
+Woodland Changeling
+Lightning Bolt
+Island x2
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Storm the Festival.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Forest; Woodland Changeling)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Forest; Woodland Changeling
+Bot1.Graveyard = Storm the Festival; Black Lotus
