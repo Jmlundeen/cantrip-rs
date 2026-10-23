@@ -1,0 +1,25 @@
+# Turbulent Springs: "({T}: Add {U} or {R}.)" by its Island and Mountain land types (CR 305.6): turn 5 it taps for
+# {U}, turn 7 for {R}.
+
+[Bot1 Deck]
+Island
+Turbulent Springs
+Island x12
+
+[Bot2 Deck]
+Mountain x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Turbulent Springs.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Turbulent Springs.Activate(Ability: {U})
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Turbulent Springs.Activate(Ability: {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Turbulent Springs.Tapped = true

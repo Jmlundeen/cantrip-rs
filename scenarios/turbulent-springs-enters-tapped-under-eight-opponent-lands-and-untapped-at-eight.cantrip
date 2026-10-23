@@ -1,0 +1,36 @@
+# Turbulent Springs: "This land enters tapped unless your opponents control eight or more lands." On turn 15 Bot2 has
+# seven lands, so Bot1's Turbulent Springs enters tapped - the seven lands Bot1 itself controls are not the ones counted. On turn
+# 16, with Bot1's eight lands out, Bot2's own Turbulent Springs enters untapped (positive control).
+
+[Bot1 Deck]
+Island x7
+Turbulent Springs
+Island x12
+
+[Bot2 Deck]
+Mountain x7
+Turbulent Springs
+Mountain x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Turbulent Springs.Play
+Bot2.Hand.Turbulent Springs.Play
+
+[Expect]
+Turn = 16
+Bot1.Battlefield.Turbulent Springs.Tapped = true
+Bot2.Battlefield.Turbulent Springs.Tapped = false
