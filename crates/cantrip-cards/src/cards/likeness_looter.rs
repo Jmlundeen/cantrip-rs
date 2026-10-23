@@ -12,10 +12,7 @@ fn creature_card_with_mana_value_x(q: &dyn Query, asker: &Asker, t: Target) -> b
     if !targets::card_in_your_graveyard(q, asker, t, &[CardType::Creature]) {
         return false;
     }
-    let announced = q.state().stack.iter().rev().find(|i| {
-        i.kind == StackKind::Activated && i.object == asker.source && q.activated_ability(i.ability).is_some_and(|d| d.late_targets)
-    });
-    announced.is_none_or(|item| q.mana_value(card) == item.x as u32)
+    targets::announced_x(q, asker.source).is_none_or(|x| q.mana_value(card) == x)
 }
 
 /// "{X}: This creature becomes a copy of target creature card in your graveyard with mana value X, except it has flying

@@ -225,6 +225,20 @@ pub fn controlled_by_slot_opponent(q: &dyn Query, id: ObjectId) -> bool {
     permanent(q, id) && Some(q.controller(id)) == q.slot_opponent()
 }
 
+/// The X of the topmost activated ability of `source` on the stack that announces X before its targets (`targets_after_x`;
+/// CR 107.3a, 602.2b): the one being announced, or the topmost when a target is judged, which is not the item judged when
+/// two such activations with different X are on the stack (CR 107.3k) - the core's `Asker` does not yet carry the judged
+/// item's X. `None` when none is on the stack, when a filter is asked what some X would allow. Likeness Looter and The
+/// Mycosynth Gardens target "with mana value X" through it.
+pub fn announced_x(q: &dyn Query, source: ObjectId) -> Option<u32> {
+    q.state()
+        .stack
+        .iter()
+        .rev()
+        .find(|i| i.kind == StackKind::Activated && i.object == source && q.activated_ability(i.ability).is_some_and(|d| d.late_targets))
+        .map(|item| item.x as u32)
+}
+
 /// The object a resolving item targeted in `slot`, if the target is still legal (CR 608.2b) and is an object (not a
 /// player). Every effect that acts on "target [thing]" begins here rather than pairing `target_legal` with a pattern
 /// match. Used by `destroy_target`, `exile_target` and by most of the cards that act on one target.
