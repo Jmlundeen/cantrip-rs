@@ -353,6 +353,10 @@ def main():
     print(cr_report(card, abilities, index))
 
     print("\n=== Prior art: the implemented cards that already do each ability (tools/maintenance/ability-index.py)")
+    print("    Read each listed card's code for the line. Where it already does what yours would - the same steps, only")
+    print("    its numbers, its verb at the end or its own object left out differing - that part is not written again: it")
+    print("    moves into one shared function in cantrip-mechanics, in a `Mechanics:` commit before the card, and both")
+    print("    cards call it (SKILL.md, \"Share what is the same\"). Reviews send back every card that skips this.")
     print(index.report(index.Index(exclude=[name]), abilities) or "  (no rules text)")
 
     print("\n=== Test points: each needs an expectation that fails if the card gets it wrong (list the line that catches")
