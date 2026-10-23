@@ -1112,11 +1112,18 @@ are chosen (`actions::cast`, `activate`), and the payment asks for that total, w
 Whether an action is worth offering is judged before anything is announced: where its one target is announced with the
 action (equip, most single-target spells) and something could change the cost - a cost changer on the battlefield, or
 the spell's or ability's own - it is judged for each candidate, and only the candidates it could be paid for are
-offered; otherwise the cost is judged once, before any target is looked for, as before. An activated ability's menu row
+offered. Where its targets are chosen slot by slot once it has begun (several slots, or a slot of several targets) with
+nothing announced first that they wait on, it is offered if some legal announcement of them could be paid for
+(`actions::some_announcement`): the announcements `choose_slots` could take are walked, each slot's targets different,
+and the payment is judged once for each different thing the cost changes make of them (`deltas`), so This Town Ain't
+Big Enough ("{3} less if it targets a permanent you control", up to two targets) is offered for {1}{U} with a permanent
+of its caster's to aim at. Past `ANNOUNCEMENT_BUDGET` steps (a slot of any number of targets over a dozen candidates) it
+is offered, and targets that then leave the cost unpayable take it back at the payment (CR 601.2h, 733.1; KI-108).
+Otherwise the cost is judged once, before any target is looked for. An activated ability's menu row
 says what it costs with each candidate where that is not the printed cost (`activation_costs`, the host's
-`option_message`: "Equip {4}. ... (costs {1} targeting Dwarven Mauler)"). Where the
-targets are chosen later (several slots, a modal spell), a change that reads them is not counted in that advice, so a
-reduction that only a target would bring does not make the action offered: no card in content has one. Ajani's Response
+`option_message`: "Equip {4}. ... (costs {1} targeting Dwarven Mauler)"). Where the targets wait on something announced
+before them (a modal spell's modes, X, a kicker, a gift, a division, splicing), a change that reads them is not yet counted
+in that advice. Ajani's Response
 ("{3} less if it targets a tapped creature") is a spell that reads its target this way. Dwarven Mauler,
 Helitrooper and Fervent Champion ("equip abilities you activate that target this creature cost {N} less"), Dragonfire
 Blade ("{1} less for each color of the creature it targets") and Ghostfire Blade ("{2} less if it targets a colorless

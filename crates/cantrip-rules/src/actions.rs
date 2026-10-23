@@ -1171,21 +1171,153 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
     with_targets(cx, asker, specs, option)
 }
 
+/// How many target announcements, or choices toward one, `some_announcement` looks at before it stops and answers that one
+/// might be paid for: advice that offers an action whose cost the targets then chosen leave unpayable, and that is taken
+/// back (CR 601.2h, 733.1), never one that withholds an action that could be taken. Reached only by a slot of many targets
+/// among many candidates ("any number of targets" over a dozen) on a spell something could change the cost of.
+const ANNOUNCEMENT_BUDGET: u32 = 4096;
+
+/// Whether some legal announcement of the targets of `specs` (CR 601.2c) has a total cost `covered` holds for, where the
+/// targets are chosen slot by slot once the action has begun (`targets_with_action` false) and something could change its
+/// cost: the total cost is determined from the targets announced (CR 601.2f, 602.2b), so the action may be taken if it
+/// could be paid for at some legal choice of them, the cheapest of them included - This Town Ain't Big Enough ("costs {3}
+/// less to cast if it targets a permanent you control", up to two targets) with only {1}{U}, aimed at a permanent of its
+/// caster's; Fireball ("costs {1} more to cast for each target beyond the first", any number of targets) for its {R} with
+/// one target or none.
+///
+/// The announcements are those `choose_slots` could take, with the targets of each slot different (CR 601.2c), laid out as
+/// it lays them out. `key` is what the cost changes make of an announcement (`deltas`), the only part of the cost the
+/// targets reach: `covered` is asked once for each different one, so only target choices that change what the cost comes to
+/// are paid for again. Past `ANNOUNCEMENT_BUDGET` it answers yes.
+fn some_announcement<K: PartialEq>(
+    cx: &Cx,
+    asker: &Asker,
+    specs: &[TargetSpec],
+    key: &dyn Fn(&[Target]) -> K,
+    covered: &mut dyn FnMut(&[Target]) -> bool,
+) -> bool {
+    struct Announce<'a, K> {
+        cx: &'a Cx<'a>,
+        asker: &'a Asker,
+        slots: Vec<(TargetSpec, Option<PlayerId>, u8)>,
+        key: &'a dyn Fn(&[Target]) -> K,
+        covered: &'a mut dyn FnMut(&[Target]) -> bool,
+        seen: Vec<K>,
+        budget: u32,
+    }
+    /// What looking further came to: an announcement that is paid for, none, or the budget spent.
+    #[derive(PartialEq)]
+    enum Found {
+        Yes,
+        No,
+        Spent,
+    }
+    impl<K: PartialEq> Announce<'_, K> {
+        fn spend(&mut self) -> bool {
+            self.budget = self.budget.saturating_sub(1);
+            self.budget > 0
+        }
+
+        /// The announcement of slot `at` on, after `targets` for the slots before it.
+        fn slot(&mut self, at: usize, targets: &mut Vec<Target>) -> Found {
+            if !self.spend() {
+                return Found::Spent;
+            }
+            let Some(&(spec, slot_player, _)) = self.slots.get(at) else {
+                // Trailing slots that chose nothing take no place (`choose_slots`).
+                let len = targets.iter().rposition(|&t| t != Target::None).map_or(0, |i| i + 1);
+                let key = (self.key)(&targets[..len]);
+                if self.seen.contains(&key) {
+                    return Found::No;
+                }
+                self.seen.push(key);
+                return if (self.covered)(&targets[..len]) { Found::Yes } else { Found::No };
+            };
+            let earlier: &[Target] = if self.slots.len() > 1 { targets } else { &[] };
+            let candidates = target_candidates_given(self.cx, self.asker, &spec, earlier, Target::None, slot_player);
+            let (candidates, total) = within_total(self.cx, &spec, 0, candidates);
+            let (least, most) = spec.bounds(0);
+            if candidates.len() < least as usize || (candidates.is_empty() && spec.required()) {
+                return Found::No;
+            }
+            let count = most.min(cantrip_state::count_u32(candidates.len())) as usize;
+            let least = (least as usize).min(count);
+            let before = targets.len();
+            let mut chosen: Vec<usize> = Vec::with_capacity(count);
+            for n in least..=count {
+                // Each `n` of the candidates, in order (CR 601.2c: different ones).
+                chosen.clear();
+                chosen.extend(0..n);
+                loop {
+                    let within = total.as_ref().is_none_or(|t| chosen.iter().map(|&i| t.values[i]).sum::<u32>() <= t.most);
+                    if within {
+                        targets.extend(chosen.iter().map(|&i| candidates[i]));
+                        if self.slots.len() > 1 && spec.max <= 1 && n == 0 {
+                            targets.push(Target::None);
+                        }
+                        let found = self.slot(at + 1, targets);
+                        targets.truncate(before);
+                        if found != Found::No {
+                            return found;
+                        }
+                    } else if !self.spend() {
+                        return Found::Spent;
+                    }
+                    // The next `n` of them, if any.
+                    let Some(i) = (0..n).rev().find(|&i| chosen[i] < candidates.len() - n + i) else { break };
+                    chosen[i] += 1;
+                    for j in i + 1..n {
+                        chosen[j] = chosen[j - 1] + 1;
+                    }
+                }
+            }
+            Found::No
+        }
+    }
+    let slots = crate::resolve::expand_specs(cx.s(), asker.controller, specs);
+    let mut search = Announce { cx, asker, slots, key, covered, seen: Vec::new(), budget: ANNOUNCEMENT_BUDGET };
+    search.slot(0, &mut Vec::new()) != Found::No
+}
+
 /// Whether a cast is worth offering, its target candidates kept to those it could be paid for. The total cost is determined
-/// once the target is announced (CR 601.2c, 601.2f): where it is announced with the cast and something could change the
-/// cost, the cast is judged for each candidate (`covered`), and only those it could be paid for are offered; otherwise it is
-/// judged once, with no target.
+/// once the targets are announced (CR 601.2c, 601.2f): where something could change the cost, a cast whose target is
+/// announced with it is judged for each candidate (`covered`), and only those it could be paid for are offered; one whose
+/// targets are chosen slot by slot later is offered if some legal choice of them could be paid for
+/// (`some_announcement`). Otherwise it is judged once, with no target.
 fn offer_costed(cx: &Cx, a: &Available, asker: &Asker, def: &'static CardDef, option: &mut ActionOption, covered: impl Fn(&[Target]) -> bool) -> bool {
-    if targets_with_cast(cx.cards(), def) && (!a.changers.is_empty() || !def.own_cost_changes.is_empty() || lasting_changes(cx)) {
+    let changes = !a.changers.is_empty() || !def.own_cost_changes.is_empty() || lasting_changes(cx);
+    if changes && targets_with_cast(cx.cards(), def) {
         if !offer_spell(cx, asker, def, option) {
             return false;
         }
         let none_covered = option.targets_optional && covered(&[]);
         option.target_candidates.retain(|&t| covered(&[t]));
         !option.target_candidates.is_empty() || none_covered
+    } else if changes && targets_in_slots(cx.cards(), def) {
+        let (player, card) = (asker.controller, asker.source);
+        let face = face_of(cx, card, def);
+        let key = |targets: &[Target]| deltas(cx, &a.changers, player, Costed::Spell(card), face, targets);
+        offer_spell(cx, asker, def, option) && some_announcement(cx, asker, cx.cards().spell_targets_of(def), &key, &mut |t| covered(t))
     } else {
         covered(&[]) && offer_spell(cx, asker, def, option)
     }
+}
+
+/// Whether a spell's targets are chosen slot by slot once it has begun to be cast, with nothing announced before them that
+/// they wait on (CR 601.2b-c): more than one slot, or a slot of more than one target, on a spell that is not modal and
+/// has no X, kicker, gift or division its targets are chosen after.
+fn targets_in_slots(cards: &CardTable, def: &'static CardDef) -> bool {
+    def.modal.is_none() && !def.late_targets && def.gift.is_none() && def.divide.is_none() && slots_alone(cards.spell_targets_of(def))
+}
+
+/// Whether target slots are chosen one by one after the action begins (not `targets_with_action`), with bounds that wait on
+/// nothing announced before them: no slot counted by X or by a kicker, nor one a kicker changes (CR 601.2b-c).
+fn slots_alone(specs: &[TargetSpec]) -> bool {
+    !specs.is_empty()
+        && !targets_with_action(specs)
+        && specs.iter().all(|spec| {
+            spec.if_kicked.is_none() && spec.min != TargetSpec::COUNTED && spec.max != TargetSpec::COUNTED && spec.total_mana_value != Some(TargetSpec::COUNTED)
+        })
 }
 
 /// Whether the life the cost changes add to casting `card` as `def` with these targets (CR 118.8, 601.2f: "cost an
@@ -3393,12 +3525,15 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             // with the action could be: only those the cost could then be paid for are offered. Only where something could
             // change the cost - a cost changer on the battlefield, or the ability's or card's own - since nearly nothing does;
             // otherwise the cost is judged once, before any target is looked for.
-            let each_target = a.is_some_and(|a| {
-                targets_with_activation(def)
-                    && !def.special_action
-                    && def.modal.is_none()
-                    && (!a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty())
-            });
+            let changes = |a: &Available| !a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty();
+            let each_target = a.is_some_and(|a| targets_with_activation(def) && !def.special_action && def.modal.is_none() && changes(a));
+            // Targets chosen slot by slot once it has begun (more than one): offered if some legal choice of them could be
+            // paid for (`some_announcement`).
+            let in_slots = a.is_some_and(|a| !def.special_action && def.modal.is_none() && !def.late_targets && slots_alone(def.targets) && changes(a));
+            let key = |targets: &[Target]| a.map(|a| deltas(cx, &a.changers, player, Costed::Ability(id, ability), None, targets));
+            let judged = |a: &Available, cost: ManaCost| {
+                if in_slots { some_announcement(cx, &asker, def.targets, &key, &mut |t| covered(a, cost, t)) } else { covered(a, cost, &[]) }
+            };
             // The ability for its own cost, and for each cost a static ability lets the player pay rather than its mana cost
             // (CR 118.9, 602.2b: Forge Anew's, Kili's {0} equip), each an option of its own, made by that permanent
             // (`ActionOption::paid_by`).
@@ -3414,7 +3549,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             let ways = || {
                 std::iter::once((None, owed))
                     .chain(alternatives.iter().map(|&(g, c)| (Some(g), c)))
-                    .filter(|&(_, cost)| a.is_none_or(|a| each_target || covered(a, cost, &[])))
+                    .filter(|&(_, cost)| a.is_none_or(|a| each_target || judged(a, cost)))
             };
             if ways().next().is_none() {
                 continue;
