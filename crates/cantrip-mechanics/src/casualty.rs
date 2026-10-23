@@ -8,8 +8,16 @@
 //! A card with casualty gives `optional::<N>()` or `X` as its `optional_cost`, two labels for the announcement ("cast
 //! without casualty", then paying it) as its `labels`, and `trigger(text)` among its `abilities`. A copy made with
 //! exceptions ("the copy isn't legendary and has starting loyalty X") is `trigger_with(text, effect)`, its effect the card's
-//! own copy, made with `Game::copy_spell_as` and the X announced, `x(item)`. One instance of casualty a card prints is all
-//! `CardDef::optional_cost` holds; several instances (CR 702.153b) would need one optional cost each.
+//! own copy, made with `Game::copy_spell_as` and the X announced, `x(q, item)`.
+//!
+//! Casualty here is the card's own printed instance, its one `CardDef::optional_cost`. Granted casualty (Anhelo, the
+//! Painter: "The first instant or sorcery spell you cast each turn has casualty 2") is not built, and needs:
+//!
+//! - casualty given to a spell by another object, its cost announced and its trigger triggering as a printed one's;
+//! - several instances on one spell (CR 702.153b): each paid separately, and each trigger copying for its own payment only,
+//!   not for any other instance's - one optional cost and one `paid` for each;
+//! - casualty X beside a kicker: the spell's X and the times it is kicked are announced apart (CR 601.2b), where today one
+//!   announcement is either the kicks or the X.
 
 use cantrip_api::*;
 
