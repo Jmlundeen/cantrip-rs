@@ -1,0 +1,26 @@
+# Contaminated Landscape: "{T}, Sacrifice this land: Search your library for a basic Plains, Island, or Swamp card".
+# A Forest is basic but has none of the three land types, so it is not a card the search may find; the Swamp is, and
+# enters tapped.
+
+[Bot1 Deck]
+Contaminated Landscape
+Forest x6
+Plains x2
+Tundra
+Swamp
+Island
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Contaminated Landscape.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Contaminated Landscape.Activate(Ability: {T}, Sacrifice this land)
+! Bot1.Search(Forest)
+Bot1.Search(Swamp)
+
+[Expect]
+Bot1.Graveyard = Contaminated Landscape
+Bot1.Battlefield.Swamp.Tapped = true
