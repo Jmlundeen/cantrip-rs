@@ -422,7 +422,7 @@ pub fn untap_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Untap [N] target [permanents]" (CR 701.26, 608.2b): each target that is still legal as the ability resolves. Argothian
-/// Elder, Candelabra of Tawnos and Garruk, Curse Breaker print it (for lands).
+/// Elder, Candelabra of Tawnos and Garruk, Curse Breaker (for lands), Formidable Speaker and Kiora, Behemoth Beckoner print it.
 pub fn untap_targets(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for permanent in crate::targets::legal_objects(g, item) {
         g.untap(permanent);
