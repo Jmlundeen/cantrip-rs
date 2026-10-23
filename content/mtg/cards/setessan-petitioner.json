@@ -1,0 +1,8 @@
+{
+  "name": "Setessan Petitioner",
+  "manaCost": "{1}{G}{G}",
+  "type": "Creature — Human Druid",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature enters, you gain life equal to your devotion to green. (Each {G} in the mana costs of permanents you control counts toward your devotion to green.)"
+}

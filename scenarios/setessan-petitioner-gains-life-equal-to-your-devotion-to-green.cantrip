@@ -1,0 +1,51 @@
+# Setessan Petitioner: "you gain life equal to your devotion to green", counted as the trigger resolves. Bot1 controls
+# Oko ({1}{G}{U}: one green, the blue symbol does not count), a Food token (no cost: none), and the Petitioner itself
+# ({1}{G}{G}: two) = 3; Bot2's Llanowar Elves ({G}) is not counted. 20 + 3 = 23.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Oko, Thief of Crowns
+Setessan Petitioner
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Food)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Setessan Petitioner.Cast
+? Bot1.Life = 20
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 20
