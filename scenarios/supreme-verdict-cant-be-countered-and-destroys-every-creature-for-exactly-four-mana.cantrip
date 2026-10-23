@@ -1,0 +1,44 @@
+# Supreme Verdict ({1}{W}{W}{U}, CR 101.2, 701.8): Bot1 pays exactly four mana (Black Lotus's three white and a Mox
+# Sapphire), so the pool is empty after the cast. Bot2's Counterspell targets it and does nothing: "can't be countered".
+# "Destroy all creatures" kills both players' Ornithopters; the Mox, a noncreature artifact, stays.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Supreme Verdict
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Supreme Verdict.Cast
+? Bot1.Mana =
+? Stack = Supreme Verdict
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Supreme Verdict)
+? Stack = Counterspell; Supreme Verdict
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire
+Bot1.Graveyard = Supreme Verdict; Ornithopter; Black Lotus
+Bot2.Battlefield = Mox Sapphire; Island
+Bot2.Graveyard = Ornithopter; Counterspell
+Stack.Count = 0
