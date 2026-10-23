@@ -2153,6 +2153,15 @@ pub type AttackRule = fn(&dyn Query, ObjectId, ObjectId) -> bool;
 /// `cantrip_mechanics::statics` has the shared ones.
 pub type AttackCostRule = fn(&dyn Query, &Asker, ObjectId, Target) -> Option<ManaCost>;
 
+/// A static ability that says how many creatures may attack a given player, planeswalker or battle in one declaration of
+/// attackers (CR 508.1c): asked, while the object that has it is on the battlefield with its abilities, of every player,
+/// planeswalker and battle a creature could attack; `None` when this ability limits none, else the most that may attack
+/// it, the smallest where several abilities limit the same target. It caps the declaration alone: an effect can still put
+/// another creature onto the battlefield attacking that target, or change what an already-attacking creature attacks (the
+/// ruling on Tomik, Orzhov Lawmage; CR 508.1d's example "No more than one creature can attack each turn"). "No more than
+/// one creature can attack this planeswalker each combat" (Tomik, Orzhov Lawmage).
+pub type AttackLimitRule = fn(&dyn Query, &Asker, Target) -> Option<u32>;
+
 /// What a [`TargetingRule`] changes about targeting.
 #[derive(Clone, Copy, Debug)]
 pub enum TargetingRuleKind {
@@ -2869,6 +2878,9 @@ pub struct CardDef {
     pub attack_rules: &'static [AttackRule],
     /// Its static abilities that make attacking cost something (CR 508.1d, 508.1h), while it is on the battlefield.
     pub attack_costs: &'static [AttackCostRule],
+    /// Its static abilities that limit how many creatures may attack a player, planeswalker or battle (CR 508.1c), while
+    /// it is on the battlefield with its abilities.
+    pub attack_limits: &'static [AttackLimitRule],
     /// Its static abilities that let creatures attack as though they didn't have defender (CR 702.3b, 609.4), while it is
     /// on the battlefield with its abilities. Asked only of a creature with defender as attackers are declared.
     pub attacks_despite_defender: &'static [AttackDespiteDefenderRule],
@@ -3105,6 +3117,7 @@ impl CardDef {
         block_requirements: &[],
         attack_rules: &[],
         attack_costs: &[],
+        attack_limits: &[],
         attacks_despite_defender: &[],
         targeting_rules: &[],
         player_keywords: &[],
@@ -3196,6 +3209,7 @@ impl CardDef {
             (!self.block_requirements.is_empty(), "block requirements"),
             (!self.attack_rules.is_empty(), "attack rules"),
             (!self.attack_costs.is_empty(), "attack costs"),
+            (!self.attack_limits.is_empty(), "attack limits"),
             (!self.attacks_despite_defender.is_empty(), "attacking despite defender"),
             (!self.targeting_rules.is_empty(), "targeting rules"),
             (!self.player_keywords.is_empty(), "player keywords"),

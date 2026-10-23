@@ -2060,9 +2060,12 @@ cleanup comes, whoever controls the creature afterwards, `turn::spend_next_turn_
 obey as many as any declaration can attacking for free (a cost is never a requirement): a goaded creature told to attack its
 goader may attack the goader or another player, each obeying two of three. `AttackRules::judge` (`cantrip_state::attacks`) is
 the one validator - complete, issue, addable, cost - that the core, the scenario harness and the host (`CheckAttacks`) use,
-and `GameClient.Answer` settles every declaration of attackers with the host. Every restriction the engine has is on one
-attacker at a time, so `AttackRules::solve` adds up each attacker's best free attack; a restriction on the attack as a whole
-would make it a search like blocks'. The board is searched for these only as attackers are declared. The
+and `GameClient.Answer` settles every declaration of attackers with the host. A restriction on one attacker at a time lets
+`AttackRules::solve` add up each attacker's best free attack; a cap on how many creatures may attack one player,
+planeswalker or battle (CR 508.1c, `CardDef::attack_limits`, Tomik's "No more than one creature can attack this
+planeswalker each combat") is carried in `AttackRules::limits`, refused by `judge` and filled in the same order by `solve`,
+so the suggestion never asks for one creature more; a restriction on the attack as a whole would make it a search like
+blocks'. The board is searched for these only as attackers are declared. The
 benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
 
 Optional costs to attack (CR 508.1g) are a static ability of the attacker and the "when you do" ability linked to it (CR
