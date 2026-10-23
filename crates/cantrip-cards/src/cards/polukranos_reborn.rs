@@ -4,15 +4,12 @@ use cantrip_oracle as oracle;
 
 /// The 3/3 green and white Phyrexian Hydra creature token with reach (CR 111.3, 111.4).
 pub static HYDRA_REACH: CardDef = CardDef {
-    name: "Phyrexian Hydra",
-    has_cost: false,
     colors: Some(ColorSet(ColorSet::of(Color::Green).0 | ColorSet::of(Color::White).0)),
     types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Phyrexian, Subtype::Hydra]),
     power: Some(3),
     toughness: Some(3),
     keywords: Keywords::of(&[Keyword::Reach]),
-    ..CardDef::BLANK
+    ..token!(Phyrexian Hydra)
 };
 
 /// The 3/3 green and white Phyrexian Hydra creature token with lifelink.

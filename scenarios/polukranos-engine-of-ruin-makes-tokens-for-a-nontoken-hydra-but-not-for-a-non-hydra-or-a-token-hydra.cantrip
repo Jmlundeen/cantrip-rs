@@ -48,7 +48,7 @@ Bot2.Battlefield.Swamp.Activate
 Bot2.Pass
 [T4 Bot2.Main1]
 Bot2.Hand.Swamp.Play
-Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Phyrexian Hydra#1)
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Phyrexian Hydra Token#1)
 Bot2.Battlefield.Swamp#1.Activate
 Bot2.Battlefield.Swamp#2.Activate
 [T4 Bot2.Main2]
@@ -56,6 +56,6 @@ Bot2.Battlefield.Swamp#2.Activate
 [Expect]
 Bot1.Battlefield.Count = 2
 Bot1.Battlefield.Polukranos, Engine of Ruin.Power = 6
-Bot1.Battlefield.Phyrexian Hydra.Token = true
-Bot1.Battlefield.Phyrexian Hydra.Keywords = Lifelink
+Bot1.Battlefield.Phyrexian Hydra Token.Token = true
+Bot1.Battlefield.Phyrexian Hydra Token.Keywords = Lifelink
 Bot1.Graveyard.Count = 6

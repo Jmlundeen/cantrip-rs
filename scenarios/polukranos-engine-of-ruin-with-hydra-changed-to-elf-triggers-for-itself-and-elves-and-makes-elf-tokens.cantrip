@@ -1,4 +1,3 @@
-# Known bug: token names (CR 111.4, 612.2a): a token's name is its subtypes plus "Token", so the changed text makes "Phyrexian Elf Token".
 # The creature type word "Hydra" in Polukranos, Engine of Ruin's text is changed to Elf by Artificial Evolution (CR 612.2): its ability now reads "Polukranos or another nontoken Elf you control", so Bot2's Go for the Throat on Bot1's Mossborn Hydra (a Hydra, no longer one it counts) makes nothing, while a second Go for the Throat on Polukranos itself still triggers it (the "or" names Polukranos) and its tokens are, by the changed text, Phyrexian Elves rather than Hydras (the text that makes them says Elf, CR 612.2).
 
 [Bot1 Deck]

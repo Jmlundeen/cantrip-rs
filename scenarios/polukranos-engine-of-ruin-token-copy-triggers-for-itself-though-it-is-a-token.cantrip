@@ -47,9 +47,9 @@ Bot1.Battlefield.Black Lotus.Activate(Color: Black)
 
 [Expect]
 Bot1.Battlefield.Count = 2
-Bot1.Battlefield.Phyrexian Hydra#1.Token = true
-Bot1.Battlefield.Phyrexian Hydra#1.Keywords = Reach
-Bot1.Battlefield.Phyrexian Hydra#2.Token = true
-Bot1.Battlefield.Phyrexian Hydra#2.Keywords = Lifelink
+Bot1.Battlefield.Phyrexian Hydra Token#1.Token = true
+Bot1.Battlefield.Phyrexian Hydra Token#1.Keywords = Reach
+Bot1.Battlefield.Phyrexian Hydra Token#2.Token = true
+Bot1.Battlefield.Phyrexian Hydra Token#2.Keywords = Lifelink
 Bot2.Battlefield = Black Lotus; Island
 Exile = Polukranos Reborn
