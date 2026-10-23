@@ -1,0 +1,47 @@
+# Hopeless Nightmare: on entering, the lone opponent discards a card and loses 2 life (CR 701.9, 119.3) - Bot2 20 -> 18, one
+# Island in the graveyard. "{2}{B}: Sacrifice this enchantment" is paid exactly with a Black Lotus (three black, pool empty
+# right after); put into the graveyard from the battlefield (CR 603.10a) it scries 2: Bot1 sees Lightning Bolt and
+# Counterspell, keeps Counterspell on top and bottoms the Bolt (CR 701.22).
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Hopeless Nightmare
+Island x4
+Lightning Bolt
+Counterspell
+Mountain
+Plains
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Hopeless Nightmare.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot2.Life = 18
+? Bot2.Graveyard.Count = 1
+? Bot1.Battlefield = Black Lotus; Hopeless Nightmare; Swamp
+Bot1.Battlefield.Hopeless Nightmare.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Arrange(Counterspell | Lightning Bolt)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot2.Graveyard.Count = 1
+Bot2.Hand.Count = 6
+Bot1.Graveyard = Hopeless Nightmare; Black Lotus
+Bot1.Battlefield = Swamp
+Bot1.Library = Counterspell; Mountain; Plains; Forest; Lightning Bolt
+Stack.Count = 0

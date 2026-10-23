@@ -1,0 +1,54 @@
+# Hopeless Nightmare ruling (2023-09-01): the opponent loses 2 life even if unable to discard. Bot2 empties its hand on turn 2
+# (a land and seven free artifacts, the turn-2 draw included), then Bot1 casts the enchantment on turn 3: nothing is asked of
+# Bot2, its graveyard stays empty, and it still loses 2 life (20 -> 18).
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Swamp
+Hopeless Nightmare
+Swamp x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Lotus Petal
+Black Lotus
+Plains x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Hopeless Nightmare.Cast
+Bot1.Pass
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 0
+Bot2.Graveyard.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield.Hopeless Nightmare.Tapped = false
+Stack.Count = 0
