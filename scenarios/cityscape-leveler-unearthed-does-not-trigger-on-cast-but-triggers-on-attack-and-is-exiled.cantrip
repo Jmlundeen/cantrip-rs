@@ -1,0 +1,64 @@
+# Unearth {8} (CR 702.84a) is an activated ability, not a cast (ruling 2022-10-14), so "when you cast this spell" does not
+# trigger: while the unearth ability waits on the stack, nothing is above it. The unearthed Leveler has haste, attacks, and its attack
+# trigger destroys Mox Jet (Bot2 creates a tapped Powerstone); it is exiled at the beginning of the next end step.
+# Set-up: Faithless Looting discards the Leveler on turn 1; five Moxen and three lands pay {8} on turn 5.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Faithless Looting
+Cityscape Leveler
+Mountain x10
+
+[Bot2 Deck]
+Mox Jet
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Cityscape Leveler; Mountain)
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Graveyard.Cityscape Leveler.Activate
+? Bot1.Mana = 
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Attack(Cityscape Leveler > Bot2)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Powerstone Token.Tapped = True
+[T6 Bot2.Upkeep]
+
+[Expect]
+Turn = 6
+Exile = Cityscape Leveler
+Bot2.Battlefield.Mox Jet = (absent)
+Bot2.Battlefield.Powerstone Token.Types = Artifact
+Bot2.Life = 12

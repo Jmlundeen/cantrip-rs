@@ -1,0 +1,64 @@
+# "Destroy up to one target nonland permanent. Its controller creates a tapped Powerstone token." The second sentence does
+# not depend on the first: the attack trigger targets Bot2's Nutrient Block (indestructible, CR 702.12b), which survives
+# (CR 701.8), and Bot2 still creates the tapped Powerstone.
+# On turn 4 that Powerstone's {C} cannot pay the generic {1} of a nonartifact spell (CR 106.6): with Mox Jet's {B} and the
+# Powerstone's {C} in the pool, Demonic Tutor ({1}{B}) is refused (Bot2 has no land and no other source). Cast with no target on turn 1 as in the other scenarios.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Cityscape Leveler
+Island x12
+
+[Bot2 Deck]
+Nutrient Block
+Mox Jet
+Demonic Tutor
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cityscape Leveler.Cast
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Nutrient Block.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Cityscape Leveler > Bot2)
+Bot1.Target(Bot2.Battlefield.Nutrient Block)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Powerstone Token.Activate
+Bot2.Battlefield.Mox Jet.Activate
+! Bot2.Hand.Demonic Tutor.Cast
+
+[Expect]
+Turn = 4
+Bot2.Battlefield.Nutrient Block.Tapped = False
+Bot2.Battlefield.Powerstone Token.Tapped = True
+Bot1.Battlefield.Powerstone Token = (absent)

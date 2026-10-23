@@ -1,0 +1,68 @@
+# Cityscape Leveler: cast with no target ("up to one", CR 601.2c - nothing is destroyed and no Powerstone is made), then
+# "whenever this creature attacks" (CR 508.1m, 603.2) on turn 3 targets Bot2's Mox Pearl, an opponent's nonland permanent
+# (Bot2's Island is a land and is refused; Bot2's Mox Jet is no worse a target but is left alone). The Mox dies and Bot2, its
+# controller, creates the tapped Powerstone. Bot2 untaps on turn 4: the Powerstone's {C} pays for Sol Ring ({1}, an artifact
+# spell, CR 106.6), 8 trample damage went through on turn 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Cityscape Leveler
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Sol Ring
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cityscape Leveler.Cast
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Cityscape Leveler > Bot2)
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Powerstone Token.Tapped = True
+[T4 Bot2.Main1]
+Bot2.Battlefield.Powerstone Token.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Powerstone Token = (absent)
+Bot2.Battlefield.Mox Pearl = (absent)
+Bot2.Battlefield.Mox Jet.Tapped = False
+Bot2.Battlefield.Sol Ring.Tapped = False
+Bot2.Battlefield.Powerstone Token.Tapped = True
+Bot2.Life = 12

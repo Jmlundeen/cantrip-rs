@@ -1,0 +1,46 @@
+# Cityscape Leveler's cast trigger (CR 603.2, 701.8): "destroy up to one target nonland permanent. Its controller creates a
+# tapped Powerstone token." Cast for {8} from Black Lotus and five Moxen on turn 1, its trigger targets Bot1's own tapped
+# Mox Pearl (your own permanent is a legal target; the controller is the caster). The Mox is destroyed, the Leveler
+# resolves after it, and Bot1 has a tapped Powerstone and the Leveler (8/8 trample) on the battlefield.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Cityscape Leveler
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cityscape Leveler.Cast
+Bot1.Target(Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Powerstone Token.Tapped = True
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Mox Pearl; Black Lotus
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Cityscape Leveler.Power = 8
+Bot1.Battlefield.Powerstone Token.Tapped = True

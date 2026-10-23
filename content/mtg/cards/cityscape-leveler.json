@@ -1,0 +1,11 @@
+{
+  "name": "Cityscape Leveler",
+  "manaCost": "{8}",
+  "type": "Artifact Creature — Construct",
+  "power": 8,
+  "toughness": 8,
+  "oracleText": "Trample\nWhen you cast this spell and whenever this creature attacks, destroy up to one target nonland permanent. Its controller creates a tapped Powerstone token.\nUnearth {8}",
+  "keywords": [
+    "Trample"
+  ]
+}
