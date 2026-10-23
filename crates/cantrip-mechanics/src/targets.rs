@@ -457,6 +457,18 @@ pub fn nonland_permanent_with_mana_value_at_most<const N: u32>(q: &dyn Query, as
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
 }
 
+/// "Target noncreature, nonland permanent" (CR 115.1): a permanent that is neither, so no creature that is also a land.
+/// Archive Arbiter and Witherbloom Command (with a mana value limit) print it.
+pub fn noncreature_nonland_permanent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if !q.chars(id).is(CardType::Creature))
+}
+
+/// "Target noncreature, nonland permanent with mana value `N` or less" (CR 115.1, 202.3: X in a mana cost is 0 on the
+/// battlefield), whoever controls it. Witherbloom Command (2) and Molten Collapse (1) print it.
+pub fn noncreature_nonland_permanent_with_mana_value_at_most<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    noncreature_nonland_permanent(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
+}
+
 /// "Target permanent with mana value `N` or greater" (CR 115.1, 202.3: X in a mana cost is 0 on the battlefield, a copy has
 /// its copiable mana value, a face-down permanent 0): any permanent, land or not, whoever controls it. Despark (4) and
 /// Kin-Tree Severance (3) print it.

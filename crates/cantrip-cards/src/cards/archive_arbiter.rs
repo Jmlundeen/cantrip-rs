@@ -3,11 +3,6 @@ use cantrip_mechanics::{destroy_target, effects, targets};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
-/// "A noncreature, nonland permanent" (CR 115.1): a permanent that is neither, so no creature that is also a land.
-fn noncreature_nonland(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if targets::permanent(q, id) && !q.chars(id).is(CardType::Creature) && !q.chars(id).is(CardType::Land))
-}
-
 /// Mode 0: destroy target noncreature, nonland permanent.
 fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     destroy_target(g, item, 0);
@@ -15,7 +10,7 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 static MODAL: ModalDef = modes(&[
-    mode(destroy_it, "Destroy target noncreature, nonland permanent.").targets(&[target(noncreature_nonland)]),
+    mode(destroy_it, "Destroy target noncreature, nonland permanent.").targets(&[target(targets::noncreature_nonland_permanent)]),
     mode(|g, item| effects::gain_life(g, item, 4), "You gain 4 life."),
 ]);
 
