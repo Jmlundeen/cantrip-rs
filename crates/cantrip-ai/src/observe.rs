@@ -35,7 +35,7 @@ pub fn observe_indexed(game: &Game, knowledge: &Knowledge, seat: PlayerId, mode:
     let s = &game.state;
     let request = game.pending();
     let extra = match request {
-        Some(r) if r.player == seat => request_objects(r),
+        Some(r) if cantrip_engine::visibility::answering(game, r) == seat => request_objects(r),
         _ => HashSet::new(),
     };
     let view = View { game, knowledge, seat, full: mode == InfoMode::Full, visible: observable(game, seat, &extra) };
@@ -85,7 +85,7 @@ pub fn observe_indexed(game: &Game, knowledge: &Knowledge, seat: PlayerId, mode:
         request: request.map(|r| RequestObs {
             player: r.player.0,
             kind: kind_name(&r.kind),
-            candidates: if r.player == seat {
+            candidates: if cantrip_engine::visibility::answering(game, r) == seat {
                 let mut c: Vec<u32> = request_objects(r).iter().filter_map(|id| refs.get(id).copied()).collect();
                 c.sort_unstable();
                 c.dedup();
@@ -232,7 +232,7 @@ impl View<'_> {
                 let s = &self.game.state;
                 let source = s.obj(item.object);
                 // Named for its source where the seat could see that: a card it can see now, or last saw.
-                let public = self.sees(item.object) || (!live(s, item.object) && (self.full || (looks_into(self.seat, source.zone) && knows_face(s, self.seat, item.object))));
+                let public = self.sees(item.object) || (!live(s, item.object) && (self.full || (looks_into(s, self.seat, source.zone) && knows_face(s, self.seat, item.object))));
                 let name = if !public {
                     String::new()
                 } else if live(s, item.object) && !source.face_down {
@@ -325,7 +325,7 @@ impl View<'_> {
                     return true;
                 }
                 let zone = s.obj(id).zone;
-                !zone.kind().is_hidden() || looks_into(self.seat, zone)
+                !zone.kind().is_hidden() || looks_into(s, self.seat, zone)
             })
             .map(|(&id, &i)| (id, i))
             .collect();

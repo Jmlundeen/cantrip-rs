@@ -129,7 +129,7 @@ impl Knowledge {
     /// The seat was shown this card: it knows it where it is hidden, and has seen it.
     fn learn(&mut self, game: &Game, id: ObjectId) {
         let zone = game.state.obj(id).zone;
-        if !looks_into(self.seat, zone) && zone.kind().is_hidden() {
+        if !looks_into(&game.state, self.seat, zone) && zone.kind().is_hidden() {
             self.known.insert(id, zone.is(ZoneKind::Library));
         }
         self.see(game, id);
@@ -140,13 +140,13 @@ impl Knowledge {
         let me = self.seat;
         let stored = self.known.remove(&old);
         let traced = self.traced.remove(&old);
-        let sees_from = looks_into(me, from) && !from.is(ZoneKind::Gone);
-        let sees_new = looks_into(me, to) && knows_face(s, me, new);
+        let sees_from = looks_into(s, me, from) && !from.is(ZoneKind::Gone);
+        let sees_new = looks_into(s, me, to) && knows_face(s, me, new);
         // It can tell which object left: it sees the zone, or knows the library card's place.
         let follows = sees_from || from.is(ZoneKind::Gone) || stored == Some(true);
         let identity = follows && (stored.is_some() || (sees_from && knows_face(s, me, old)));
         if follows {
-            if identity && !looks_into(me, to) && to.kind().is_hidden() {
+            if identity && !looks_into(s, me, to) && to.kind().is_hidden() {
                 // Put on top or at the bottom is a place it knows; shuffled in or at random, the events that follow say not.
                 self.known.insert(new, to.is(ZoneKind::Library));
             }

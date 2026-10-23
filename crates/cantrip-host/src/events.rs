@@ -384,7 +384,7 @@ impl Teller<'_> {
         if self.extra.contains(&id) {
             return true;
         }
-        id.index() < s.objects.len() && live(s, id) && looks_into(self.viewer, s.obj(id).zone)
+        id.index() < s.objects.len() && live(s, id) && looks_into(s, self.viewer, s.obj(id).zone)
     }
 
     /// Minted for what the viewer can observe now, looked up for what they cannot.
@@ -412,7 +412,7 @@ impl Teller<'_> {
             }
             Proto::Moved { old, new, from, to, reason } => {
                 let owner = self.game.state.obj(*new).owner;
-                let to_seen = looks_into(self.viewer, Zone { player: if matches!(to.kind(), ZoneKind::Hand) { owner } else { to.player }, ..*to });
+                let to_seen = looks_into(&self.game.state, self.viewer, Zone { player: if matches!(to.kind(), ZoneKind::Hand) { owner } else { to.player }, ..*to });
                 let existing = self.handles.existing(*old);
                 self.mentioned.insert(*old);
                 self.mentioned.insert(*new);

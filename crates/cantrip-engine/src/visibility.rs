@@ -21,11 +21,13 @@ pub fn is_ability_key(id: ObjectId) -> bool {
     id.0 & 0x8000_0000 != 0
 }
 
-/// Whether `viewer` may look into a zone.
-pub fn looks_into(viewer: PlayerId, zone: Zone) -> bool {
+/// Whether `viewer` may look into a zone: a hand is its player's, and the player controlling them (CR 723.4).
+pub fn looks_into(state: &GameState, viewer: PlayerId, zone: Zone) -> bool {
     match zone.kind() {
-        // A player may look at their own sideboard at any time (CR 400.11a; North Wind Avatar's ruling); nobody else may.
-        ZoneKind::Hand | ZoneKind::Sideboard => zone.player == viewer,
+        ZoneKind::Hand => state.sees_as(viewer, zone.player),
+        // A player may look at their own sideboard at any time (CR 400.11a; North Wind Avatar's ruling); nobody else may,
+        // not even the player controlling them: it is outside the game (CR 723.4).
+        ZoneKind::Sideboard => zone.player == viewer,
         ZoneKind::Library | ZoneKind::Gone => false,
         _ => true,
     }
@@ -75,8 +77,17 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
     let mut visible = HashSet::new();
     for p in s.seats() {
         if p == viewer {
-            visible.extend(s.zone(Zone::hand(p)).iter().copied());
             visible.extend(s.zone(Zone::sideboard(p)).iter().copied());
+        }
+        if s.sees_as(viewer, p) {
+            visible.extend(s.zone(Zone::hand(p)).iter().copied());
+            // "You may look at the top card of your library any time" (CR 401.2): its player sees it while a permanent says
+            // so, and so does the player controlling them (CR 723.4).
+            if game.may_look_at_library_top(p)
+                && let Some(&top) = s.zone(Zone::library(p)).first()
+            {
+                visible.insert(top);
+            }
         }
         visible.extend(s.zone(Zone::graveyard(p)).iter().copied());
         visible.extend(s.zone(Zone::exile(p)).iter().copied());
@@ -84,12 +95,6 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
     visible.extend(s.battlefield().iter().copied());
     visible.extend(s.zone(Zone::PHASED_OUT).iter().copied());
     visible.extend(s.zone(Zone::COMMAND).iter().copied());
-    // "You may look at the top card of your library any time" (CR 401.2): its player sees it while a permanent says so.
-    if game.may_look_at_library_top(viewer)
-        && let Some(&top) = s.zone(Zone::library(viewer)).first()
-    {
-        visible.insert(top);
-    }
     visible.extend(stack_entries(s).iter().map(StackEntry::key));
     for &id in extra {
         if !is_ability_key(id) && (id.index() < s.objects.len()) && live(s, id) {
@@ -100,16 +105,17 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
 }
 
 /// Whether `viewer` may see what a face-down object really is (CR 708.5, 406.3): its controller on the battlefield,
-/// those who saw it go there anywhere else. True of an object that is face up.
+/// those who saw it go there anywhere else - and the player controlling any of them (CR 723.4). True of an object that is
+/// face up.
 pub fn knows_face(state: &GameState, viewer: PlayerId, id: ObjectId) -> bool {
     let obj = state.obj(id);
     if !obj.face_down {
         return true;
     }
     if obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut) {
-        obj.controller == viewer
+        state.sees_as(viewer, obj.controller)
     } else {
-        obj.seen_by & (1 << viewer.0) != 0
+        state.seats().any(|p| obj.seen_by & (1 << p.0) != 0 && state.sees_as(viewer, p))
     }
 }
 
@@ -133,7 +139,13 @@ pub fn publishable(game: &Game) -> usize {
 }
 
 /// Whether what `seat` sees must wait: another player is part way through a run (announcing, paying) whose log can
-/// still be cut back, so that seat keeps what it was last shown.
+/// still be cut back, so that seat keeps what it was last shown. The run is seen by the player asked and by the player
+/// answering for them (CR 723.5).
 pub fn deferred(game: &Game, seat: PlayerId) -> bool {
-    publishable(game) < game.log.len() && !game.is_over() && game.pending().is_some_and(|r| r.player != seat)
+    publishable(game) < game.log.len() && !game.is_over() && game.pending().is_some_and(|r| !game.state.sees_as(seat, r.player))
+}
+
+/// The seat that answers `request`: the player it is asked of, or the player controlling them (CR 723.5).
+pub fn answering(game: &Game, request: &Request) -> PlayerId {
+    game.state.player_controller(request.player)
 }

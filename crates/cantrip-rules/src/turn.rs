@@ -317,6 +317,11 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
     }
     match turn.step() {
         Step::Untap => {
+            // The control of a player lasts through the turn it was for, cleanup included, and ends as the next turn
+            // begins (CR 723.1): before anything of this one is asked, its skipping included.
+            if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::ControlsPlayer(_))) {
+                cx.st().effects_retain(|e| !matches!(e.kind, EffectKind::ControlsPlayer(_)));
+            }
             // CR 614.10, 500.11: a turn that would begin may be skipped instead, and then never begins.
             if skip_turn(cx, active)? {
                 // The next player's turn takes its place, under this one's number: as if cleanup had just ended it.
@@ -326,6 +331,8 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
                 });
                 return Ok(Flow::Done);
             }
+            // The turn is taken: the effects waiting to control its player during it apply (CR 723.1).
+            take_controlled_turn(cx, active);
             // CR 502: the turn begins; the active player's permanents untap. No one gets priority.
             let number = turn.number;
             cx.st().update_player(active, |p| {
@@ -379,6 +386,33 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
     }
     push_priority(cx);
     Ok(Flow::Done)
+}
+
+/// The turn `player` takes now is their "next turn" for every effect waiting to control them during it (CR 723.1, 723.1b: a
+/// skipped turn was not taken, and they wait on): all of them are used up, and the last one created gives its controller
+/// control of the player for this turn (723.1a) - unless that controller has left the game (CR 800.4a). Each that says
+/// "after that turn, that player takes an extra turn" (Emrakul, the Promised End) gives that turn now, the overwritten ones
+/// too: the newest extra turn is taken first (CR 500.7), so it comes right after this one, and before any created earlier.
+fn take_controlled_turn(cx: &mut Cx, player: PlayerId) {
+    let waiting = |e: &ContinuousEffect| matches!(e.kind, EffectKind::ControlNextTurn { player: p, .. } if p == player);
+    if !cx.s().effects.iter().any(waiting) {
+        return;
+    }
+    let pending: Vec<ContinuousEffect> = cx.s().effects.iter().copied().filter(waiting).collect();
+    cx.st().effects_retain(|e| !waiting(e));
+    if let Some(last) = pending.iter().max_by_key(|e| e.timestamp)
+        && cx.s().in_game(last.controller)
+    {
+        // Created when the effect it comes from was: what a later one overwrites (CR 723.1a).
+        cx.st().effect_push(ContinuousEffect { kind: EffectKind::ControlsPlayer(player), ..*last });
+    }
+    for e in &pending {
+        if matches!(e.kind, EffectKind::ControlNextTurn { then_extra_turn: true, .. }) {
+            cantrip_api::Game::add_extra_turn(cx, player);
+        }
+    }
+    // An effect that begins changes the game with no event (CR 603.8).
+    cx.state_changed();
 }
 
 /// What the effect that makes a player skip their next turn does, for the player who orders it with an optional skip of the

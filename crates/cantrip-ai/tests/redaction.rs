@@ -205,7 +205,7 @@ fn witness(game: &Game, seat: PlayerId) -> Vec<String> {
     let s = &game.state;
     let request = game.pending();
     let extra = match request {
-        Some(r) if r.player == seat => request_objects(r),
+        Some(r) if cantrip_engine::visibility::answering(game, r) == seat => request_objects(r),
         _ => Default::default(),
     };
     let visible = observable(game, seat, &extra);
@@ -278,7 +278,7 @@ impl Trail {
                 Event::Randomized { player, .. } => format!("randomized {}", player.0),
                 Event::TurnedFaceUp { permanent, .. } => format!("face up {}", name(permanent)),
                 Event::ZoneChange { old, new, from, to, .. } => {
-                    let sees = |zone: Zone| looks_into(seat, zone) && !zone.is(ZoneKind::Gone);
+                    let sees = |zone: Zone| looks_into(&game.state, seat, zone) && !zone.is(ZoneKind::Gone);
                     let what = if (sees(from) && knows_face(&game.state, seat, old)) || (sees(to) && knows_face(&game.state, seat, new)) { name(new) } else { "?" };
                     format!("moved {what} {:?}{} {:?}{}", from.kind(), from.player.0, to.kind(), to.player.0)
                 }
@@ -314,7 +314,7 @@ fn mapper<'a>(
         let zone = a.state.obj(id).zone;
         let at = a.state.zone(zone).iter().position(|&x| x == id)?;
         let there = b.state.zone(zone);
-        let hidden = zone.kind().is_hidden() && !looks_into(seat, zone);
+        let hidden = zone.kind().is_hidden() && !looks_into(&a.state, seat, zone);
         let at = if rotate && hidden && !there.is_empty() { (at + 1) % there.len() } else { at };
         there.get(at).copied()
     }

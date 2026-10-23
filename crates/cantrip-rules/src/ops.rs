@@ -3331,10 +3331,17 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
         }
     }
     cease_together(cx, &owned);
-    // The effects that gave them control of objects end (CR 800.4a), and control is settled again (CR 613.1b).
-    if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Control(p) if p == player)) {
+    // The effects that gave them control of objects or of players end (CR 800.4a, 723), and control is settled again (CR
+    // 613.1b). One still waiting for a turn ends as it would apply (`turn::take_controlled_turn`), as what else it does
+    // (an extra turn for the player it was about) is not the leaver's.
+    let gave = |e: &ContinuousEffect| match e.kind {
+        EffectKind::Control(p) => p == player,
+        EffectKind::ControlsPlayer(_) => e.controller == player,
+        _ => false,
+    };
+    if cx.s().effects.iter().any(gave) {
         let effects_before = cx.s().effects.len();
-        cx.st().effects_retain(|e| !matches!(e.kind, EffectKind::Control(p) if p == player));
+        cx.st().effects_retain(|e| !gave(e));
         // An effect that ends changes the game with no event (CR 603.8).
         if cx.s().effects.len() < effects_before {
             cx.state_changed();

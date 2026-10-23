@@ -61,7 +61,7 @@ pub fn determinize(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: InfoMod
     let s = &game.state;
     let players = s.players.len();
     let extra = match game.pending() {
-        Some(r) if r.player == seat => request_objects(r),
+        Some(r) if cantrip_engine::visibility::answering(game, r) == seat => request_objects(r),
         _ => HashSet::new(),
     };
     let visible = observable(game, seat, &extra);
@@ -88,7 +88,7 @@ pub fn determinize(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: InfoMod
     // A row that is no longer the object (it became another) was seen if it was shown, or was where the seat looks.
     let row_seen = |id: ObjectId| {
         let zone = s.obj(id).zone;
-        shown.contains(&id) || (looks_into(seat, zone) && knows_face(s, seat, id))
+        shown.contains(&id) || (looks_into(s, seat, zone) && knows_face(s, seat, id))
     };
 
     // The hidden objects, by zone slot then place in the zone (the unseen ones are dealt by their places once the

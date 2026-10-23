@@ -47,6 +47,10 @@ def rule(number):
     for line in lines[where[number]:]:
         if not line.strip():
             continue
+        # An example belongs to the rule above it (CR 723.4's "Example: ..."): the rule goes on after it.
+        if line.startswith("Example:"):
+            out.append(line)
+            continue
         if not pattern.match(line):
             break
         out.append(line)

@@ -251,7 +251,13 @@ pub trait Query {
     /// The cards `player` owns outside the game (CR 400.11, 108.3b) - in a match, their sideboard (CR 100.4, 400.11a) - in
     /// the order the sideboard lists them: what "a card you own from outside the game" chooses among. Nothing else in the
     /// game sees them (CR 400.11c).
+    ///
+    /// While another player controls `player` (CR 723), there is nothing: the controller can't see those cards (723.4), so
+    /// they can't have the player choose any of them (Emrakul, the Promised End's ruling).
     fn outside_the_game(&self, player: PlayerId) -> Vec<ObjectId> {
+        if self.state().player_controller(player) != player {
+            return Vec::new();
+        }
         self.state().zone(Zone::sideboard(player)).to_vec()
     }
 
@@ -623,6 +629,22 @@ pub trait Game: Query {
             }
             Ok(())
         });
+    }
+    /// "You control target player during that player's next turn" (CR 723.1), made by the resolving spell or ability `item`:
+    /// its controller makes every choice and decision `player` would make during the next turn `player` actually takes
+    /// (723.5; a skipped turn is not it, 723.1b), paying with `player`'s resources (723.5a) and seeing what `player` sees of
+    /// the game (723.4). The last such effect created on a player is the one that works (723.1a); one on themselves gives
+    /// no one else control (723.9). It waits on the player, not on `item`'s source. Mindslaver, Sorin Markov, Worst Fears.
+    fn control_next_turn(&mut self, item: &StackItem, player: PlayerId) {
+        let kind = EffectKind::ControlNextTurn { player, then_extra_turn: false };
+        self.add_player_effect(item.controller, item.object, kind, Duration::Indefinite);
+    }
+    /// The same, and "After that turn, that player takes an extra turn" (Emrakul, the Promised End): the extra turn comes
+    /// right after the controlled turn, however long that turn waits (its rulings), and is given even when a later effect
+    /// overwrites this one's control (723.1a).
+    fn control_next_turn_then_extra_turn(&mut self, item: &StackItem, player: PlayerId) {
+        let kind = EffectKind::ControlNextTurn { player, then_extra_turn: true };
+        self.add_player_effect(item.controller, item.object, kind, Duration::Indefinite);
     }
     /// "[Kind of] spells [player] casts this turn cost ... less / more to cast" (CR 611.2a/c, 601.2f), made by the resolving
     /// spell or ability `item`: the `index`th of the `lasting_cost_changes` of its card (the face that is up, for a permanent's

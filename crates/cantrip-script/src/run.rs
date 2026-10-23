@@ -693,7 +693,8 @@ impl<'s> Run<'s> {
                 continue;
             }
 
-            if driven.contains(&request.player) {
+            // A driven seat answers for a player it controls (CR 723.5).
+            if driven.contains(&self.game.state.player_controller(request.player)) {
                 let decision = self.intend(&request)?;
                 self.asked = Some((request.clone(), decision));
                 return Ok(Stop::Asked(request));

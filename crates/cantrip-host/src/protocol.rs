@@ -439,6 +439,9 @@ pub struct PlayerSummaryView {
     pub has_enduring_story: bool,
     /// The player's speed (CR 702.179), 1 to 4; none while they have no speed (CR 702.179b). Public.
     pub speed: Option<i32>,
+    /// The seat making this player's choices and decisions now (CR 723.5), while another player controls them; 0 while
+    /// they make their own. Public, as the effect is.
+    pub controlled_by: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

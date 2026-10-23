@@ -491,6 +491,28 @@ impl GameState {
         !self.players[p.index()].lost
     }
 
+    /// The player who makes `player`'s choices and decisions now (CR 723.5): the one controlling them, by the last effect
+    /// created that gives control of them (CR 723.1a), or `player` themselves (723.8, 723.9). Only the routing of
+    /// questions and what a seat sees follow it: every request is still asked of `player`, who keeps their objects and
+    /// stays the active player (723.3).
+    pub fn player_controller(&self, player: PlayerId) -> PlayerId {
+        let mut by = player;
+        let mut latest = None;
+        for e in &self.effects {
+            if e.kind == EffectKind::ControlsPlayer(player) && latest.is_none_or(|t| e.timestamp > t) && self.in_game(e.controller) {
+                latest = Some(e.timestamp);
+                by = e.controller;
+            }
+        }
+        by
+    }
+
+    /// Whether `viewer` sees what `player` sees of the game now (CR 723.4): `player` themselves, or the player controlling
+    /// them.
+    pub fn sees_as(&self, viewer: PlayerId, player: PlayerId) -> bool {
+        viewer == player || self.player_controller(player) == viewer
+    }
+
     /// The players still in the game in turn order starting from the active one (APNAP, CR 101.4, 800.4a).
     pub fn apnap(&self) -> impl Iterator<Item = PlayerId> + use<> {
         self.turn_order_from(self.turn.active)

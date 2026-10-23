@@ -103,6 +103,11 @@ pub struct Deal {
 
 impl Session {
     pub fn new(deal: Deal) -> Result<Session, Rejection> {
+        Session::prepared(deal, |_| {})
+    }
+
+    /// A dealt game, `prepare`d before it begins: a test's way into a position no deal reaches.
+    fn prepared(deal: Deal, prepare: impl FnOnce(&mut Game)) -> Result<Session, Rejection> {
         if deal.seats.len() < 2 {
             return Err(Rejection::new("InvalidSetup", "a game needs at least two seats"));
         }
@@ -147,6 +152,7 @@ impl Session {
             .collect::<Result<Vec<_>, _>>()?;
         let setup = Setup { decks, sideboards, basic_lands_outside, seed: deal.seed, shuffle: deal.shuffle, opening_chooser };
         let mut game = Game::new(cards, &setup);
+        prepare(&mut game);
         game.run();
         let seats = deal.seats.len();
         let mut session = Session {
@@ -256,7 +262,7 @@ impl Session {
     fn scenario_step(&mut self) -> Option<Value> {
         let scenario = self.scenario.as_mut()?;
         let expected = scenario.expected.as_ref().map(|e| {
-            let p = e.request.player;
+            let p = answering(&self.game, &e.request);
             let answer = match &e.intent {
                 Intent::Undo => Value::Null,
                 Intent::Answer(a) => {
@@ -283,7 +289,7 @@ impl Session {
         let intent = if undo {
             Intent::Undo
         } else {
-            Intent::Answer(translate(payload, request, &self.handles[request.player.index()], &self.game).map_err(|e| match e {
+            Intent::Answer(translate(payload, request, &self.handles[answering(&self.game, request).index()], &self.game).map_err(|e| match e {
                 Untranslatable::UnknownHandle(d) => Rejection::new("UnknownHandle", d),
                 Untranslatable::Illegal(d) => Rejection::new("IllegalAnswer", d),
             })?)
@@ -388,15 +394,16 @@ impl Session {
         let seats: Vec<PlayerId> = self.game.state.seats().collect();
         for &p in &seats {
             let mut extra = revealed.clone();
-            // Cards a player looked at are shown to that player alone.
+            // Cards a player looked at are shown to that player alone, and to the player controlling them (CR 723.4).
             for proto in &protos {
                 if let Proto::Looked { player, cards } = proto
-                    && *player == p
+                    && self.game.state.sees_as(p, *player)
                 {
                     extra.extend(cards.iter().copied());
                 }
             }
-            if let Some(request) = pending.as_ref().filter(|r| r.player == p) {
+            // What a request names is shown to the player it is asked of, and to the player answering it for them.
+            if let Some(request) = pending.as_ref().filter(|r| self.game.state.sees_as(p, r.player)) {
                 extra.extend(request_objects(request));
             }
             self.extra[p.index()] = extra;
@@ -426,7 +433,9 @@ impl Session {
 
         let mut requests = Vec::new();
         if let Some(request) = pending {
-            let index = request.player.index();
+            // Asked of its player, answered by the seat controlling them (CR 723.5), in that seat's handles.
+            let answering = answering(&self.game, &request);
+            let index = answering.index();
             let undo = self.undoable.offered(request.player);
             match prompt(&self.game, &request, &mut self.handles[index]) {
                 Ok((mut payload, may_cancel)) => {
@@ -438,7 +447,8 @@ impl Session {
                     }
                     requests.push(json!({
                     "RequestId": request.id,
-                    "Seat": seat(request.player),
+                    "Seat": seat(answering),
+                    "ForSeat": seat(request.player),
                     "Prompt": payload,
                     "MayCancel": may_cancel,
                     }));
@@ -473,8 +483,8 @@ impl Session {
         if request.id != request_id {
             return Err(Rejection::new("StaleReply", format!("request {request_id} is not outstanding")));
         }
-        if seat(request.player) != seat_number {
-            return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(request.player))));
+        if seat(answering(&self.game, &request)) != seat_number {
+            return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(answering(&self.game, &request)))));
         }
         if self.scenario.is_some() {
             return self.answer_scenario(&request, payload);
@@ -482,7 +492,7 @@ impl Session {
         if let AnswerPayload::TakeActionAnswer(TakeActionAnswer { kind: ActionKindView::UndoManaAbility, .. }) = payload {
             return self.undo(request.player);
         }
-        let answer = translate(payload, &request, &self.handles[request.player.index()], &self.game).map_err(|e| match e {
+        let answer = translate(payload, &request, &self.handles[answering(&self.game, &request).index()], &self.game).map_err(|e| match e {
             Untranslatable::UnknownHandle(d) => Rejection::new("UnknownHandle", d),
             Untranslatable::Illegal(d) => Rejection::new("IllegalAnswer", d),
         })?;
@@ -534,10 +544,10 @@ impl Session {
         let Some(request) = self.pending().filter(|r| r.id == request_id) else {
             return Err(Rejection::new("StaleReply", format!("request {request_id} is not outstanding")));
         };
-        if seat(request.player) != seat_number {
-            return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(request.player))));
+        if seat(answering(&self.game, &request)) != seat_number {
+            return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(answering(&self.game, &request)))));
         }
-        let space = &mut self.handles[request.player.index()];
+        let space = &mut self.handles[answering(&self.game, &request).index()];
         let mut ids = Vec::with_capacity(selected.len());
         for &h in selected {
             match space.object(h) {
@@ -568,7 +578,7 @@ impl Session {
         let Answer::Block(pairs) = self.translated(&request, &payload)? else {
             return Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of blockers")));
         };
-        let space = &mut self.handles[request.player.index()];
+        let space = &mut self.handles[answering(&self.game, &request).index()];
         let verdict = crate::prompt::blocks_verdict_of(&request, &pairs, space)
             .ok_or_else(|| Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of blockers")))?;
         serde_json::to_value(verdict).map_err(|e| Rejection::new("IllegalAnswer", format!("the verdict does not serialize: {e}")))
@@ -590,7 +600,7 @@ impl Session {
         let Answer::Attack(pairs) = self.translated(&request, &payload)? else {
             return Err(Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of attackers")));
         };
-        let space = &mut self.handles[request.player.index()];
+        let space = &mut self.handles[answering(&self.game, &request).index()];
         let verdict = crate::prompt::attacks_verdict_of(&request, &pairs, space)
             .ok_or_else(|| Rejection::new("IllegalAnswer", format!("request {request_id} is not a declaration of attackers")))?;
         serde_json::to_value(verdict).map_err(|e| Rejection::new("IllegalAnswer", format!("the verdict does not serialize: {e}")))
@@ -601,15 +611,15 @@ impl Session {
         let Some(request) = self.pending().filter(|r| r.id == request_id) else {
             return Err(Rejection::new("StaleReply", format!("request {request_id} is not outstanding")));
         };
-        if seat(request.player) != seat_number {
-            return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(request.player))));
+        if seat(answering(&self.game, &request)) != seat_number {
+            return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(answering(&self.game, &request)))));
         }
         Ok(request)
     }
 
     /// `payload` as the engine's answer to `request`, in the asked seat's handles.
     fn translated(&self, request: &Request, payload: &AnswerPayload) -> Result<Answer, Rejection> {
-        translate(payload, request, &self.handles[request.player.index()], &self.game).map_err(|e| match e {
+        translate(payload, request, &self.handles[answering(&self.game, request).index()], &self.game).map_err(|e| match e {
             Untranslatable::UnknownHandle(d) => Rejection::new("UnknownHandle", d),
             Untranslatable::Illegal(d) => Rejection::new("IllegalAnswer", d),
         })
@@ -717,6 +727,95 @@ mod tests {
     fn deal(first: &[&str], filler: &str, count: usize) -> Deal {
         let deck = |top: &[&str]| top.iter().map(|c| c.to_string()).chain(std::iter::repeat_n(filler.to_string(), count)).collect::<Vec<_>>();
         Deal { seats: vec![("North".into(), deck(first), Vec::new()), ("South".into(), deck(&[]), Vec::new())], basic_lands_outside: Vec::new(), seed: 1, shuffle: false, first_player: Some(1), chooser: None }
+    }
+
+    /// A game whose South is controlled by North during South's next turn (CR 723.1): the effect put in place before the
+    /// game begins, as no card here makes it.
+    fn controlled_south() -> Session {
+        let (north, south) = (PlayerId(0), PlayerId(1));
+        Session::prepared(deal(&[], "Forest", 30), |game| {
+            let source = game.state.zone(Zone::library(north))[0];
+            let timestamp = game.state.timestamp();
+            game.state.effect_push(ContinuousEffect {
+                source,
+                controller: north,
+                timestamp,
+                affected: source,
+                kind: EffectKind::ControlNextTurn { player: south, then_extra_turn: false },
+                duration: Duration::Indefinite,
+            });
+        })
+        .ok()
+        .unwrap()
+    }
+
+    /// CR 723.5, 723.4: every question of South's in its controlled turn goes to seat 1 with `ForSeat` 2, in seat 1's handles,
+    /// and seat 2 answering it is refused; seat 1 sees South's hand then, and both views say who controls South. Before and
+    /// after that turn, South answers for itself and its hand is its own.
+    #[test]
+    fn a_controlled_players_questions_go_to_the_seat_controlling_them() {
+        let south = PlayerId(1);
+        let mut session = controlled_south();
+        let mut step = session.step();
+        let mut allow_cast = true;
+        let mut controlled = 0;
+        let hand_of = |view: &Value, owner: i64| {
+            view["Zones"].as_array().unwrap().iter().find(|z| z["Kind"] == "Hand" && z["Owner"] == owner).unwrap()["Contents"].as_array().unwrap().len()
+        };
+        for _ in 0..2_000 {
+            let turn = session.game.state.turn.number;
+            if turn == 3 {
+                break;
+            }
+            let r = step["Requests"][0].clone();
+            let (id, seat, for_seat) = (r["RequestId"].as_u64().unwrap() as u32, r["Seat"].as_i64().unwrap() as i32, r["ForSeat"].as_i64().unwrap());
+            let prompt: PromptPayload = serde_json::from_value(r["Prompt"].clone()).unwrap();
+            let south_controlled = turn == 2;
+            if for_seat == 2 {
+                assert_eq!(seat, if south_controlled { 1 } else { 2 }, "turn {turn}: South's question goes to {seat}");
+            } else {
+                assert_eq!(seat, for_seat as i32, "North answers its own");
+            }
+            let shown = |seat: &str| step["Views"][seat]["Players"][1]["ControlledBy"].as_i64().unwrap();
+            if south_controlled {
+                controlled += 1;
+                assert_eq!((shown("1"), shown("2")), (1, 1));
+                assert_eq!(hand_of(&step["Views"]["1"], 2), session.game.state.zone(Zone::hand(south)).len(), "North sees South's hand");
+                if for_seat == 2 {
+                    let refused = session.answer(id, 2, &prompt.default_answer());
+                    assert!(refused.is_err_and(|r| r.code == "NotYourTurnToAnswer"));
+                }
+            } else {
+                assert_eq!((shown("1"), shown("2")), (0, 0));
+                assert_eq!(hand_of(&step["Views"]["1"], 2), 0, "turn {turn}: South's hand is South's");
+            }
+            let answer = choose(&prompt, &mut allow_cast);
+            step = match session.answer(id, seat, &answer) {
+                Ok(step) => step,
+                Err(_) => session.answer(id, seat, &prompt.default_answer()).ok().expect("the default answer is taken"),
+            };
+        }
+        assert!(controlled > 0, "South's turn was played");
+        assert_eq!(session.game.state.player_controller(south), south);
+    }
+
+    /// CR 723.6: a controlled player may concede, and the controller can't concede for them: seat 2 concedes during its
+    /// controlled turn and loses.
+    #[test]
+    fn a_controlled_player_concedes_for_themselves() {
+        let (north, south) = (PlayerId(0), PlayerId(1));
+        let mut session = controlled_south();
+        let mut step = session.step();
+        let mut allow_cast = true;
+        while session.game.state.player_controller(south) != north {
+            let r = step["Requests"][0].clone();
+            let (id, seat) = (r["RequestId"].as_u64().unwrap() as u32, r["Seat"].as_i64().unwrap() as i32);
+            let prompt: PromptPayload = serde_json::from_value(r["Prompt"].clone()).unwrap();
+            step = session.answer(id, seat, &choose(&prompt, &mut allow_cast)).ok().unwrap();
+        }
+        let over = session.concede(2).ok().unwrap();
+        assert_eq!(over["Outcome"], "TeamWon");
+        assert_eq!(over["WinningTeam"], 1);
     }
 
     /// A game deals as many seats as a set of seats holds (`MAX_SEATS`, a bit each in `Obj::seen_by`): eight are dealt,

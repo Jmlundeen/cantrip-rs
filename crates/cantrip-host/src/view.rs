@@ -459,6 +459,11 @@ impl<'a> Projector<'a> {
         view
     }
 
+    /// A player as the subject of a sentence: "You" for the viewer, else their name.
+    fn player_name(&self, p: PlayerId) -> String {
+        if p == self.viewer { "You".to_string() } else { self.names.get(p.index()).cloned().unwrap_or_else(|| format!("Player {}", p.0 + 1)) }
+    }
+
     fn summarise(&self, p: PlayerId, handles: &mut HandleSpace) -> PlayerSummaryView {
         let game = self.game;
         let s = &game.state;
@@ -545,6 +550,26 @@ impl<'a> Projector<'a> {
             let (who, whose) = if p == self.viewer { ("You", "your") } else { ("They", "their") };
             let turns = if skips == 1 { "turn".to_string() } else { format!("{skips} turns") };
             summary.pending_effects.push(format!("{who} skip {whose} next {turns}."));
+        }
+        // "You control target player during that player's next turn" (CR 723.1): the control now, and each effect still
+        // waiting for the player's next turn, about the player and on no object. The last created is the one that will work
+        // (723.1a); each that gives an extra turn after it gives it whichever works.
+        let controller = s.player_controller(p);
+        if controller != p {
+            summary.controlled_by = seat(controller);
+            let (who, whose) = if p == self.viewer { ("you", "your") } else { ("them", "their") };
+            let verb = if controller == self.viewer { "control" } else { "controls" };
+            summary.pending_effects.push(format!("{} {verb} {who} during {whose} turn.", self.player_name(controller)));
+        }
+        for e in s.effects.iter() {
+            if let EffectKind::ControlNextTurn { player, then_extra_turn } = e.kind
+                && player == p
+            {
+                let (who, whose, they) = if p == self.viewer { ("you", "your", "you take") } else { ("them", "their", "they take") };
+                let verb = if e.controller == self.viewer { "control" } else { "controls" };
+                let extra = if then_extra_turn { format!(" After that turn, {they} an extra turn.") } else { String::new() };
+                summary.pending_effects.push(format!("{} {verb} {who} during {whose} next turn.{extra}", self.player_name(e.controller)));
+            }
         }
         // "The 'legend rule' doesn't apply to permanents you control this turn" (CR 704.5j, 611.2c): a rule about the player, on
         // no object.
@@ -784,7 +809,7 @@ impl<'a> Projector<'a> {
         };
         let count = contents.len() as i32;
         let zone = Zone::new(kind, owner);
-        let contents_visible = looks_into(self.viewer, zone);
+        let contents_visible = looks_into(s, self.viewer, zone);
         let mut view = ZoneView {
             kind: Some(zone_kind_view(kind)),
             owner: zone_owner(zone),

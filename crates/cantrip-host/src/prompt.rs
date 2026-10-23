@@ -58,7 +58,7 @@ fn source_name(game: &Game, viewer: PlayerId, id: ObjectId) -> String {
         return String::new();
     }
     let zone = game.state.obj(id).zone;
-    if zone.is(ZoneKind::Gone) || crate::view::looks_into(viewer, zone) { game.name(id).to_string() } else { String::new() }
+    if zone.is(ZoneKind::Gone) || crate::view::looks_into(&game.state, viewer, zone) { game.name(id).to_string() } else { String::new() }
 }
 
 fn target_message(handles: &mut HandleSpace, target: Target) -> Option<TargetMessage> {
