@@ -32,7 +32,7 @@ setlocal
 
 set "ROOT=%~dp0.."
 
-dotnet build "%ROOT%\tools\Cantrip.LlmGames\Cantrip.LlmGames.csproj" -v q --nologo || exit /b 1
-dotnet run --project "%ROOT%\tools\Cantrip.LlmGames\Cantrip.LlmGames.csproj" --no-build -v q -- %*
+dotnet build "%ROOT%\dotnet\tools\Cantrip.LlmGames\Cantrip.LlmGames.csproj" -v q --nologo || exit /b 1
+dotnet run --project "%ROOT%\dotnet\tools\Cantrip.LlmGames\Cantrip.LlmGames.csproj" --no-build -v q -- %*
 
 endlocal & exit /b %ERRORLEVEL%

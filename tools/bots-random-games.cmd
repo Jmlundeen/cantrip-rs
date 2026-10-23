@@ -28,7 +28,7 @@ setlocal
 
 set "ROOT=%~dp0.."
 
-dotnet build "%ROOT%\tools\Cantrip.Playtest\Cantrip.Playtest.csproj" -v q --nologo || exit /b 1
-dotnet run --project "%ROOT%\tools\Cantrip.Playtest\Cantrip.Playtest.csproj" --no-build -v q -- %*
+dotnet build "%ROOT%\dotnet\tools\Cantrip.Playtest\Cantrip.Playtest.csproj" -v q --nologo || exit /b 1
+dotnet run --project "%ROOT%\dotnet\tools\Cantrip.Playtest\Cantrip.Playtest.csproj" --no-build -v q -- %*
 
 endlocal & exit /b %ERRORLEVEL%
