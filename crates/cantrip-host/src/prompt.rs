@@ -639,7 +639,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::Priority { options } => {
             PromptPayload::PriorityPromptMessage(PriorityPrompt { player, options: options_messages(game, handles, options) })
         }
-        RequestKind::PayCosts { source, total, remaining, options, announcing, x, most, loyalty, attackers, life } => {
+        RequestKind::PayCosts { source, total, remaining, options, announcing, x, most, least, loyalty, attackers, life } => {
             let def = game.cards.get(game.state.obj(*source).card);
             let kicker = def.kicker;
             let spends_no_mana = game.chars(*source).has(Keyword::CantSpendManaToCast);
@@ -671,6 +671,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 },
                 sacrifice_reduces: sacrifices.map_or(0, |(each, _)| i32::from(each)),
                 most_announced: wire(*most),
+                least_announced: wire(*least),
                 x_removes_loyalty: *loyalty,
                 spends_no_mana,
                 attackers: handles_of(handles, attackers),

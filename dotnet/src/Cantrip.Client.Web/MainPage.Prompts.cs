@@ -475,7 +475,7 @@ public sealed partial class MainPage
         bool kickerPaid = Announcement.KickerPaid(prompt, x);
         string total = Announcement.TotalAt(prompt, x);
         Action? announce = _actions.Confirm is null ? null : () => Send(client, new AnnounceAnswer { Value = x });
-        Action? lower = x > 0 ? () => StepAnnounced(prompt, x - 1) : null;
+        Action? lower = x > prompt.LeastAnnounced ? () => StepAnnounced(prompt, x - 1) : null;
         Action? raise = x < prompt.MostAnnounced ? () => StepAnnounced(prompt, x + 1) : null;
 
         // A "−X" loyalty cost (CR 606.4, 107.3): X loyalty counters come off the permanent, up to its loyalty; no mana.

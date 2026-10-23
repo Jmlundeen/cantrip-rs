@@ -9,11 +9,15 @@ namespace Cantrip.Client;
 /// </summary>
 public static class Announcement
 {
-    /// <summary>The value the page starts from and steps within: the prompt's own, never past what may be announced.</summary>
+    /// <summary>
+    /// The value the page starts from and steps within: the prompt's own, never under nor past what may be announced (an X
+    /// that can't be 0 starts at 1).
+    /// </summary>
     public static int Clamp(PayCostsPromptMessage prompt, int value)
     {
         ArgumentNullException.ThrowIfNull(prompt);
-        return Math.Clamp(value, 0, Math.Max(0, prompt.MostAnnounced));
+        int least = Math.Max(0, prompt.LeastAnnounced);
+        return Math.Clamp(value, least, Math.Max(least, prompt.MostAnnounced));
     }
 
     /// <summary>Whether the value announced is a kicker paid (CR 702.33): a kicker with {X} in it is paid for any X but none.</summary>

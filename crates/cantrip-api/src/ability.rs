@@ -555,6 +555,11 @@ impl AbilityDef {
         AbilityDef::Activated(ActivatedDef { equip: true, ..activated(self, "only an activated ability equips") })
     }
 
+    /// "X can't be 0" (CR 107.3a, 602.2b): the X of its activation cost is announced as 1 or more.
+    pub const fn x_cant_be_zero(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { x_cant_be_zero: true, ..activated(self, "only an activated ability announces an X") })
+    }
+
 }
 
 const fn triggered_def(a: AbilityDef, method: &str) -> TriggeredDef {

@@ -1050,6 +1050,9 @@ pub struct PayCostsPrompt {
     /// legal targets an "X target" spell has, once for a kicker paid at most once; how much could be paid for is
     /// `most_affordable`. Zero while paying.
     pub most_announced: i32,
+    /// While announcing: the smallest value an `AnnounceAnswer` may announce, and the one the announcement starts at: 1 for
+    /// an X that can't be 0 (CR 107.3a, 601.2b), else 0. Zero while paying.
+    pub least_announced: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1356,7 +1359,7 @@ pub struct PassAnswer {}
 pub struct CancelAnnouncementAnswer {}
 
 /// The value of X, or how many times the spell is kicked, announced at once (CR 601.2b): an answer to a pay-costs prompt
-/// that `announces_x_or_kicks`, from zero to its `most_announced`.
+/// that `announces_x_or_kicks`, from its `least_announced` to its `most_announced`.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct AnnounceAnswer {

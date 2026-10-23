@@ -175,8 +175,14 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         | (RequestKind::UnlessPays { options, .. }, Answer::Act(action)) => {
             if options.iter().any(|o| fits(o, action)) { Ok(()) } else { no("that action is not one of the options") }
         }
-        (RequestKind::PayCosts { announcing: true, most, .. }, Answer::Announce(value)) => {
-            if value <= most { Ok(()) } else { no(format!("{value} announced, {most} at most (CR 601.2b)")) }
+        (RequestKind::PayCosts { announcing: true, most, least, .. }, Answer::Announce(value)) => {
+            if value > most {
+                no(format!("{value} announced, {most} at most (CR 601.2b)"))
+            } else if value < least {
+                no(format!("{value} announced, {least} at least (CR 107.3a, 601.2b)"))
+            } else {
+                Ok(())
+            }
         }
         (RequestKind::ChooseCards { cards: candidates, rule, .. }, Answer::Cards(cards)) | (RequestKind::SearchLibrary { library: candidates, rule, .. }, Answer::Cards(cards)) => {
             // The question's own rule judges the answer, as it judged each pick (`selection_verdict`).

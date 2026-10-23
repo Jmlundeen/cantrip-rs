@@ -38,6 +38,8 @@ mod mode_counts_tests;
 #[cfg(test)]
 mod special_action_cost_tests;
 #[cfg(test)]
+mod x_minimum_tests;
+#[cfg(test)]
 mod suspend_haste_tests;
 #[cfg(test)]
 mod entering_judged_tests;

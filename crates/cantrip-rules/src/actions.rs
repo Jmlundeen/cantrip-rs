@@ -1774,7 +1774,7 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
 }
 
 /// The least mana a spell could be cast for with this base cost, for the advice that a cast that cannot be paid is
-/// not offered (CR 601.2, 118.3): X at 0, no kicker, the cheapest modes it must choose, Phyrexian symbols paid with
+/// not offered (CR 601.2, 118.3): X at the least it may be (0, or 1 where it can't be 0), no kicker, the cheapest modes it must choose, Phyrexian symbols paid with
 /// life where the life total allows. `targets` are the candidate it would be announced with, where its target is announced
 /// with the cast, or none (CR 601.2c, 601.2f).
 ///
@@ -1798,7 +1798,12 @@ fn least_cost_parts(
     targets: &[Target],
     covered: &mut dyn FnMut(ManaCost, u8) -> bool,
 ) -> bool {
-    let mut cost = base;
+    // "X can't be 0" (CR 107.3a): X at 1, and no cast at all for a cost where X could only be 0 (CR 107.3b), as `cast`
+    // refuses it.
+    if def.x_cant_be_zero && def.cost.x > 0 && base.x == 0 {
+        return false;
+    }
+    let mut cost = at_least_x(base, def.x_cant_be_zero);
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
     }
@@ -2424,7 +2429,8 @@ fn tap_triggers(cx: &Cx, waiting: &[(Asker, &'static TriggeredDef)], id: ObjectI
 fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPayment {
     let whole = cx.card(cx.s().obj(card).card);
     let back = !def.has_cost && whole.back.is_some_and(|b| std::ptr::eq(b, def));
-    let mana_value = if back { whole.cost.mana_value() } else { def.cost.mana_value() };
+    // At the least X may be announced as (CR 202.3e), as `least_cost` judges it.
+    let mana_value = if back { whole.cost.mana_value() } else { def.cost.mana_value() + u32::from(def.cost.x) * u32::from(least_x(def.x_cant_be_zero)) };
     let (types, legendary, x) = (def.types, def.supertypes.legendary, def.cost.x > 0);
     // Cast from where the card is (CR 601.2a).
     let from = cx.s().obj(card).zone.kind();
@@ -3217,7 +3223,8 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             // An activation whose mana cost the player cannot meet is not offered, as a spell they cannot afford is not
             // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
             let owed = if def.special_action { special_action_cost(cx, player, id, ability, def) } else { def.cost.mana };
-            let judged = owed.x == 0 && owed.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend;
+            // An {X} is judged at the least it may be announced as (CR 107.3a, 601.2b): 0, or 1 where X can't be 0.
+            let judged = at_least_x(owed, def.x_cant_be_zero).mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend;
             // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
             // Nor may it be spent for mana by another's ability (sacrificed to an altar, tapped by Urza) while paying it.
             let own = (judged
@@ -3228,6 +3235,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
             let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes } };
             let covered = |a: &Available, owed: ManaCost, targets: &[Target]| {
+                let owed = at_least_x(owed, def.x_cant_be_zero);
                 // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
                 // touch it; what changes its own cost is already in `owed` (`special_action_cost`), which `special_action`
                 // pays. A cost of nothing is judged too: an increase still applies to it (CR 118.9d, 601.2f).
@@ -3242,7 +3250,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 if def.special_action {
                     // Its own cost changes, each way a reduction by hybrid mana could be split (CR 118.7e) and the hybrid
                     // symbols it meets announced (CR 601.2b), as `special_action` asks them.
-                    let printed = special_action_printed_cost(cx, id, ability, def);
+                    let printed = at_least_x(special_action_printed_cost(cx, id, ability, def), def.x_cant_be_zero);
                     change_any(cx, &a.changers, player, Costed::SpecialAction(id, ability), printed, None, &[], &mut |c, least| judge(at_least(c, least)))
                 } else {
                     // Each way the hybrid symbols a reduction meets could be announced (CR 601.2b): covered if any is.
@@ -5216,6 +5224,11 @@ fn cast(
     // How many permanents "sacrifice any number of" announces (Rottenmouth Viper): no X (its mana cost has none, CR
     // 107.3), up to every permanent that could be sacrificed (CR 601.2b), kept here for the reduction and the sacrifice.
     let mut sacrificed_any_number: u32 = 0;
+    // "X can't be 0" (CR 107.3a): cast where X can only be 0 (CR 107.3b: without paying its mana cost, or for an
+    // alternative cost with no {X}), there is no X it may be cast with, and it can't be cast (Mind Grind's ruling).
+    if def.x_cant_be_zero && def.cost.x > 0 && x_symbols == 0 {
+        return Err(Stop::Cancel);
+    }
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
         let base = cost.mana;
         // X paid in life is announced up to the life there is (CR 119.4), and X creatures sacrificed up to the creatures
@@ -5229,7 +5242,10 @@ fn cast(
         } else {
             1000
         };
-        let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, cap, false, less_each)?;
+        // An X that can't be 0 starts at 1 (CR 107.3a). A kicker with {X} announces 0 as not kicking it, so a kicked one
+        // has X 1 or more as it is.
+        let least = if def.kicker.is_none() && less_each == 0 { u32::from(least_x(def.x_cant_be_zero)) } else { 0 };
+        let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, least, cap, false, less_each)?;
         // Every announcement but "any number"'s is within an X's u16 (`cap`).
         let n = announced.min(u32::from(u16::MAX)) as u16;
         if let Some(k) = def.kicker {
@@ -6467,20 +6483,38 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 
 /// Announcing X or the number of times a spell is kicked (CR 601.2b), as the C# engine asks it: a pay-costs
 /// question that raises and lowers the value until confirmed.
-fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16) -> R<u16> {
+fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, x_symbols: u8, least: u16, cap: u16) -> R<u16> {
     // X itself is a u16 (`StackItem::x`), and `cap` keeps the number within it.
-    announce_x(cx, player, spell, base, kicker, x_symbols, u32::from(cap), false, 0).map(|n| n as u16)
+    announce_x(cx, player, spell, base, None, x_symbols, u32::from(least), u32::from(cap), false, 0).map(|n| n as u16)
+}
+
+/// The least value X may be announced as (CR 107.3a, 601.2b): 1 for an X that can't be 0 ("X can't be 0"), else 0.
+pub(crate) const fn least_x(x_cant_be_zero: bool) -> u16 {
+    x_cant_be_zero as u16
+}
+
+/// `cost` as the least it could be announced to come to: each {X} as the least X may be (`least_x`), in generic mana.
+/// The `x` symbols are kept, for mana that pays for spells of a mana value at an X that brings it there
+/// (`Available::covers_for`).
+fn at_least_x(mut cost: ManaCost, x_cant_be_zero: bool) -> ManaCost {
+    cost.generic = cost.generic.saturating_add(cost.x.saturating_mul(least_x(x_cant_be_zero) as u8));
+    cost
 }
 
 /// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`), and how much generic mana
-/// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`).
+/// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`). The value starts at,
+/// and never goes below, `least` (1 for an X that can't be 0, CR 107.3a); with no value from `least` to `cap` there is
+/// nothing that may be announced, and the spell or ability is taken back (CR 601.2b, 733.1).
 #[allow(clippy::too_many_arguments)]
-fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u32, loyalty: bool, less_each: u8) -> R<u32> {
+fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, least: u32, cap: u32, loyalty: bool, less_each: u8) -> R<u32> {
     let most: u32 = match kicker {
         Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
         _ => cap,
     };
-    let mut n: u32 = 0;
+    if least > most {
+        return Err(Stop::Cancel);
+    }
+    let mut n: u32 = least;
     loop {
         let mut total = base;
         match kicker {
@@ -6493,15 +6527,15 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         if n < most {
             options.push(ActionOption::simple(ActionKind::IncreaseX));
         }
-        if n > 0 {
+        if n > least {
             options.push(ActionOption::simple(ActionKind::DecreaseX));
         }
         options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         options.push(ActionOption::simple(ActionKind::CancelCasting));
-        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, most, loyalty, attackers: Vec::new(), life: 0 };
+        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, most, least, loyalty, attackers: Vec::new(), life: 0 };
         match cx.ask_core(player, ask, true)? {
-            // The whole value at once, which the request's `most` bounds (`validate::check`).
-            Answer::Announce(value) if value <= most => return Ok(value),
+            // The whole value at once, which the request's `least` and `most` bound (`validate::check`).
+            Answer::Announce(value) if (least..=most).contains(&value) => return Ok(value),
             Answer::Act(a) => match a.kind {
                 ActionKind::IncreaseX => n += 1,
                 ActionKind::DecreaseX => n -= 1,
@@ -6565,14 +6599,14 @@ fn activate(
             .map(|spec| u16::try_from(target_candidates(cx, &asker, spec).len()).unwrap_or(u16::MAX))
             .min()
             .unwrap_or(u16::MAX);
-        let n = announce(cx, player, source, mana, None, mana.x, cap)?;
+        let n = announce(cx, player, source, mana, mana.x, least_x(def.x_cant_be_zero), cap)?;
         mana.generic = mana.generic.saturating_add((u32::from(n) * u32::from(mana.x)).min(255) as u8);
         item.x = n;
     }
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
     if def.cost.loyalty == Some(LOYALTY_MINUS_X) {
         let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
-        item.x = announce_x(cx, player, source, mana, None, 0, u32::from(cap), true, 0)? as u16;
+        item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(cap), true, 0)? as u16;
     }
     announce_twobrids(cx, player, source, &mut mana, false)?;
     let life = announce_life(cx, player, source, &mut mana, false)?;
@@ -6853,7 +6887,7 @@ pub fn activate_mana(
     // An {X} in the cost is announced first (CR 107.3a, 601.2b, 605.3a) and kept on the source for the effect to read.
     let mut mana = def.cost.mana;
     if mana.x > 0 {
-        let n = announce(cx, player, source, mana, None, mana.x, 1000)?;
+        let n = announce(cx, player, source, mana, mana.x, least_x(def.x_cant_be_zero), 1000)?;
         mana.generic = mana.generic.saturating_add((n as u32 * mana.x as u32).min(255) as u8);
         mana.x = 0;
         cx.st().update_obj(source, |o| o.x = n);
@@ -7719,7 +7753,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life };
+        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life };
         let answer = cx.ask_core(player, ask, true)?;
         match answer {
             Answer::Act(action) => match action.kind {

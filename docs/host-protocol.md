@@ -54,9 +54,11 @@ source and index, and refused where several do. The rows themselves say what tel
 than its mana cost (Lurrus of the Dream-Den)", "Mystic Forge"). The C# protocol is version 194 for this.
 
 A pay-costs prompt that `AnnouncesXOrKicks` (CR 601.2b) is answered with an `AnnounceAnswer` whose `Value` is the X, or the
-times kicked, from 0 to the prompt's `MostAnnounced` - one answer however high it goes, so a page steps the value itself and
-sends nothing until it is chosen. A value past `MostAnnounced` is refused with `IllegalAnswer`. Its `IncreaseX` and
-`DecreaseX` options still step it one answer at a time, as the bots do. Version 202.
+times kicked, from the prompt's `LeastAnnounced` to its `MostAnnounced` - one answer however high it goes, so a page steps the
+value itself and sends nothing until it is chosen. A value past `MostAnnounced` is refused with `IllegalAnswer`. Its `IncreaseX` and
+`DecreaseX` options still step it one answer at a time, as the bots do. Version 202. `LeastAnnounced` is 1 for an X that
+can't be 0 (CR 107.3a: "X can't be 0"), where the announcement starts at 1, `DecreaseX` stops there, and 0 is refused; else 0.
+Version 204.
 
 **Checking a selection.** A choice of cards (`ChooseCardsPromptMessage`) and a library search (`SearchLibraryPromptMessage`)
 are judged by the question's selection rule (docs/engine-design.md, "Selection rules"), which the client cannot run: the

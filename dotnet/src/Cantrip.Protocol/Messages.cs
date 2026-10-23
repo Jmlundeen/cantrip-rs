@@ -2433,6 +2433,13 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(25)]
     public int MostAnnounced { get; set; }
 
+    /// <summary>
+    /// For the announcement: the smallest value an <see cref="AnnounceAnswer"/> may announce, and the one it starts at: 1 for
+    /// an X that can't be 0 (CR 107.3a, 601.2b), else 0. Zero while paying.
+    /// </summary>
+    [Key(26)]
+    public int LeastAnnounced { get; set; }
+
     /// <summary>Giving up on the spell, which is always among the options (CR 733.1).</summary>
     public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
 }
@@ -2914,8 +2921,8 @@ public sealed class CancelAnnouncementAnswer : AnswerPayload;
 
 /// <summary>
 /// The value of X, or how many times the spell is kicked, announced at once (CR 601.2b): an answer to a
-/// <see cref="PayCostsPromptMessage"/> that <see cref="PayCostsPromptMessage.AnnouncesXOrKicks"/>, from zero to its
-/// <see cref="PayCostsPromptMessage.MostAnnounced"/>, in place of stepping to it with IncreaseX and DecreaseX.
+/// <see cref="PayCostsPromptMessage"/> that <see cref="PayCostsPromptMessage.AnnouncesXOrKicks"/>, from its
+/// <see cref="PayCostsPromptMessage.LeastAnnounced"/> to its <see cref="PayCostsPromptMessage.MostAnnounced"/>, in place of stepping to it with IncreaseX and DecreaseX.
 /// </summary>
 [MessagePackObject]
 public sealed class AnnounceAnswer : AnswerPayload

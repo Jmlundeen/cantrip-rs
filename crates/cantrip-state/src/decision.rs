@@ -313,6 +313,9 @@ pub enum RequestKind {
         x: u32,
         /// While announcing: the largest value that may be announced (`Answer::Announce`). Zero while paying.
         most: u32,
+        /// While announcing: the smallest value that may be announced, 1 for an X that can't be 0 (CR 107.3a, 601.2b), else
+        /// 0. Zero while paying.
+        least: u32,
         /// The X being announced is a "−X" loyalty cost's (CR 606.4, 107.3): it removes that many loyalty counters from
         /// `source`, up to the loyalty it has, and costs no mana.
         loyalty: bool,

@@ -9,8 +9,8 @@ namespace Cantrip.Client.Tests;
 /// </summary>
 public sealed class AnnouncementTests
 {
-    private static PayCostsPromptMessage Asked(string total, int x = 0, int most = 1000) =>
-        new() { Total = total, Remaining = total, HasX = true, X = x, AnnouncesXOrKicks = true, MostAnnounced = most };
+    private static PayCostsPromptMessage Asked(string total, int x = 0, int most = 1000, int least = 0) =>
+        new() { Total = total, Remaining = total, HasX = true, X = x, AnnouncesXOrKicks = true, MostAnnounced = most, LeastAnnounced = least };
 
     [Theory]
     [InlineData("{X}{R}", 0, 3, "{X}{3}{R}")]
@@ -77,6 +77,14 @@ public sealed class AnnouncementTests
     {
         Assert.Equal(0, Announcement.Clamp(Asked("{X}{R}", most: 2), -1));
         Assert.Equal(2, Announcement.Clamp(Asked("{X}{R}", most: 2), 3));
+    }
+
+    [Fact]
+    public void An_x_that_cannot_be_0_is_kept_at_1_or_more()
+    {
+        Assert.Equal(1, Announcement.Clamp(Asked("{X}{G}", x: 1, least: 1), 0));
+        Assert.Equal(1, Announcement.XPaidBy(Asked("{X}{G}", x: 1, least: 1), 1));
+        Assert.Equal(3, Announcement.Clamp(Asked("{X}{G}", x: 1, least: 1), 3));
     }
 
     [Theory]
