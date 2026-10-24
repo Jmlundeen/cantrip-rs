@@ -822,6 +822,16 @@ pub fn exile_all_creatures(g: &mut dyn Game) -> usize {
     g.exile_all(&creatures).len()
 }
 
+/// "Exile all graveyards" (CR 406.2): every card in every graveyard, each to its owner's exile zone, in one move (CR 608.2c).
+/// Rest in Peace and Farewell print it.
+pub fn exile_all_graveyards(g: &mut dyn Game) {
+    let mut cards: Vec<ObjectId> = Vec::new();
+    for owner in g.state().seats() {
+        cards.extend(g.state().zone(Zone::graveyard(owner)).iter().copied());
+    }
+    g.exile_all(&cards);
+}
+
 /// "Gain control of target creature until end of turn. Untap that creature. It gains haste until end of turn." (CR 613.1b,
 /// 611.2a, 702.10): the resolving spell's first target, if it is still legal (CR 608.2b), which it returns. Act of Treason
 /// and Vengeful Possession print it (Threaten, Traitorous Blood with trample too); one the caster already controls is

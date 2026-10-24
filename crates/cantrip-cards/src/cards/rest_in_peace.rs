@@ -1,15 +1,11 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
-/// "When this enchantment enters, exile all graveyards." Every card in every graveyard is exiled at once (CR 406.2, 101.4),
-/// each to its owner's exile zone.
+/// "When this enchantment enters, exile all graveyards."
 fn exile_graveyards(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
-    let mut cards: Vec<ObjectId> = Vec::new();
-    for owner in g.state().seats() {
-        cards.extend(g.state().zone(Zone::graveyard(owner)).iter().copied());
-    }
-    g.exile_all(&cards);
+    effects::exile_all_graveyards(g);
     Ok(())
 }
 
