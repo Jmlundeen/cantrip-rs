@@ -5,14 +5,12 @@
 
 use cantrip_api::*;
 
-/// Double the number of `kind` counters on each of `permanents`, each one's count read before any is doubled.
+/// Double the number of `kind` counters on each of `permanents`, each one's count read before any is doubled, and all the
+/// counters put on at once (CR 608.2, 101.4: one event, CR 603.2c).
 pub fn counters(g: &mut dyn Game, permanents: &[ObjectId], kind: CounterKind) {
-    let counts: Vec<(ObjectId, i16)> = permanents.iter().map(|&id| (id, g.obj(id).counters(kind))).collect();
-    for (id, n) in counts {
-        if n > 0 {
-            g.add_counters(id, kind, n);
-        }
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> =
+        permanents.iter().map(|&id| (id, kind, g.obj(id).counters(kind))).filter(|&(_, _, n)| n > 0).collect();
+    g.add_counters_together(&puts);
 }
 
 /// Double the number of `kind` counters on each creature `player` controls.

@@ -9,11 +9,8 @@ fn recruit(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cadets = tokens::create(g, item.controller, &tokens::CADET, 2)?;
     if g.obj(item.object).cast_from == Some(ZoneKind::Graveyard) {
         let counters = (g.state().zone(Zone::graveyard(item.controller)).len() / 3) as i16;
-        if counters > 0 {
-            for cadet in cadets {
-                g.add_counters(cadet, CounterKind::PlusOne, counters);
-            }
-        }
+        let puts: Vec<(ObjectId, CounterKind, i16)> = cadets.into_iter().map(|cadet| (cadet, CounterKind::PlusOne, counters)).collect();
+        g.add_counters_together(&puts);
     }
     Ok(())
 }

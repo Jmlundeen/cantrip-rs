@@ -18,9 +18,8 @@ fn share(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let others: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| id != this && g.chars(id).is(CardType::Creature)).collect();
-    for id in others {
-        g.add_counters(id, CounterKind::PlusOne, 1);
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> = others.into_iter().map(|id| (id, CounterKind::PlusOne, 1)).collect();
+    g.add_counters_together(&puts);
     Ok(())
 }
 

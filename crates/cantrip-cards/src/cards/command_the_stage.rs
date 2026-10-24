@@ -8,11 +8,13 @@ use cantrip_oracle as oracle;
 fn command_the_stage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cadets = tokens::create(g, item.controller, &tokens::CADET, 1)?;
     let wizard = g.words(item.object).subtype(Subtype::Wizard);
-    for token in g.permanents_of(item.controller) {
-        if !cadets.contains(&token) && g.obj(token).token && g.chars(token).has_subtype(wizard) {
-            g.add_counters(token, CounterKind::PlusOne, 1);
-        }
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> = g
+        .permanents_of(item.controller)
+        .into_iter()
+        .filter(|&token| !cadets.contains(&token) && g.obj(token).token && g.chars(token).has_subtype(wizard))
+        .map(|token| (token, CounterKind::PlusOne, 1))
+        .collect();
+    g.add_counters_together(&puts);
     Ok(())
 }
 

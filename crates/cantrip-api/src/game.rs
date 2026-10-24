@@ -859,6 +859,14 @@ pub trait Game: Query {
     /// effect applying, or the player doing the action - and through the replacement effects of counters being put
     /// (CR 614.1a). A negative `amount` takes that many off instead (`remove_counters`).
     fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16);
+    /// Puts counters on several objects, or of several kinds on one, as one instruction of the effect being carried out does
+    /// (CR 608.2, 101.4, 122.6): one simultaneous event, which "whenever one or more counters are put on one or more ..." sees
+    /// once (CR 603.2c). Each entry is `amount` counters of a kind on an object; entries for one object are one placement on
+    /// it, its replacements applying once. Each object's counters go through the replacement effects of counters being put on it (CR 614.1a), all of them
+    /// before any is put on; then they are put on and announced together. Put by the player `add_counters` names; an object
+    /// that has changed zones (CR 400.7) or an amount of none or fewer gets none. "Put a +1/+1 counter on each creature you
+    /// control", proliferate's permanents, "two +1/+1 counters and a flying counter on it".
+    fn add_counters_together(&mut self, counters: &[(ObjectId, CounterKind, i16)]);
     /// Removes up to `amount` counters of one kind from an object (CR 122.1) and says how many came off: none from an
     /// object that has changed zones (CR 400.7). It answers "if you do" and "for each counter removed this way", as Dawn of a
     /// New Age and Coalition Relic ask.

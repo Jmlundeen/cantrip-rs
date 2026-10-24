@@ -636,16 +636,18 @@ pub fn damage_divided(g: &mut dyn Game, item: &StackItem) {
 /// Puts on each target of the resolving item its own share of the counters it was divided into (CR 601.2d, 122.1):
 /// "distribute N [kind] counters among [targets]". The shares were fixed as the spell or ability was put on the stack, a
 /// target that has since become illegal is left out and its counters are lost (CR 608.2b). That each target gets at least
-/// one is the announcement's rule (the core's `Divide`), not asked again here. Court of Garenbrig and Elusive
-/// Otter's Grove's Bounty print it.
+/// one is the announcement's rule (the core's `Divide`), not asked again here. The counters are put on all the targets at
+/// once (CR 608.2, 101.4: one event, CR 603.2c). Court of Garenbrig and Elusive Otter's Grove's Bounty print it.
 pub fn counters_divided(g: &mut dyn Game, item: &StackItem, kind: CounterKind) {
+    let mut puts: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
     for slot in 0..item.target_count as usize {
         if let Some(object) = targets::object(g, item, slot)
             && g.state().share(item, slot) > 0
         {
-            g.add_counters(object, kind, i16::try_from(g.state().share(item, slot)).unwrap_or(i16::MAX));
+            puts.push((object, kind, i16::try_from(g.state().share(item, slot)).unwrap_or(i16::MAX)));
         }
     }
+    g.add_counters_together(&puts);
 }
 
 /// A one-color choice (CR 105.1), asked of `player`.

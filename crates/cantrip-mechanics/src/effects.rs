@@ -108,16 +108,20 @@ pub fn pump_and_trample_creatures_you_control(g: &mut dyn Game, item: &StackItem
     creatures
 }
 
-/// "Put `n` `kind` counters on each creature you control": on the creatures `player` controls as it is read, one after the
-/// other. The creatures, for what the rest of the sentence does to "those creatures". Abandoned Air Temple, Elspeth,
-/// Storm Slayer, Anduril, Narsil Reforged, Gavony Township, Germination Practicum, Ouroboroid and The Theorist, Jace
-/// Beleren print it.
+/// "Put `n` `kind` counters on each creature you control": on the creatures `player` controls as it is read, all of them at
+/// once (CR 608.2, 101.4: one event, CR 603.2c). The creatures, for what the rest of the sentence does to "those
+/// creatures". Abandoned Air Temple, Elspeth, Storm Slayer, Anduril, Narsil Reforged, Gavony Township, Germination
+/// Practicum, Ouroboroid and The Theorist, Jace Beleren print it.
 pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kind: CounterKind, n: i16) -> Vec<ObjectId> {
     let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for &id in &creatures {
-        g.add_counters(id, kind, n);
-    }
+    counters_on_each(g, &creatures, kind, n);
     creatures
+}
+
+/// `n` `kind` counters on each of `objects`, all of them at once (CR 608.2, 101.4).
+fn counters_on_each(g: &mut dyn Game, objects: &[ObjectId], kind: CounterKind, n: i16) {
+    let puts: Vec<(ObjectId, CounterKind, i16)> = objects.iter().map(|&id| (id, kind, n)).collect();
+    g.add_counters_together(&puts);
 }
 
 /// "Put a +1/+1 counter on [this permanent]" (CR 122.1), the ability's source: none once it has left the battlefield, as a

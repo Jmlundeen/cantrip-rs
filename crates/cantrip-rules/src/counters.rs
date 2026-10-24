@@ -33,48 +33,89 @@ pub fn put(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16, by: Player
     put_all(cx, id, counts, by, how);
 }
 
-/// Counters of several kinds put on `id` together by `by` (CR 122.6): on a permanent, as many as the replacement effects
-/// of counters being put leave (CR 614.1a); on a card in another zone, as many as it can have (CR 101.2), which no
-/// replacement of counters put on a permanent sees. Phased-out permanents cannot be affected (CR 702.26b).
-/// Each kind put is announced, with `by`.
+/// Counters of several kinds put on `id` together by `by` (CR 122.6): one placement of `put_together`, announced as one
+/// event however many kinds it has.
 pub fn put_all(cx: &mut Cx, id: ObjectId, counts: [i16; CounterKind::COUNT], by: PlayerId, how: How) {
-    if !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) || counts.iter().all(|&n| n <= 0) {
-        return;
+    put_together(cx, &[Placement { object: id, counts, by }], how);
+}
+
+/// Counters put on one object as one result (CR 122.6), of each kind, and the player who puts them (CR 122.6a): all one
+/// instruction puts on it, or one source's damage dealt as counters (CR 120.3d), each its own though one player puts both.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Placement {
+    pub object: ObjectId,
+    pub counts: [i16; CounterKind::COUNT],
+    pub by: PlayerId,
+}
+
+/// Counters put on several objects by one instruction, or of several kinds on one (CR 608.2, 101.4): one simultaneous
+/// event, which a "one or more" ability sees once (CR 603.2c, 122.6). Each placement is its own: the replacement effects of
+/// counters being put apply to each (CR 614.1a), so two on one object - two infect sources' damage, CR 120.3d - are each
+/// replaced ("that many plus one" adds one to each), and the caller makes what one instruction puts on an object one
+/// placement (`Game::add_counters_together`). Each object's counters are first what the replacement effects of counters being put on it leave (CR 614.1a,
+/// 616.1), every object's worked out before any counter goes on (CR 614.6: a replacement modifies the event before it
+/// happens); then they are all put on, and all announced together.
+pub fn put_together(cx: &mut Cx, placements: &[Placement], how: How) {
+    let events = place_together(cx, placements, how);
+    if !events.is_empty() {
+        cx.emit_batch(&events, None);
     }
-    let on_battlefield = cx.s().obj(id).zone.is(ZoneKind::Battlefield);
-    let counts = if on_battlefield {
-        let controller = cx.s().obj(id).controller;
-        replace::counters(cx, id, controller, by, false, how == How::Effect, counts)
-    } else {
-        counts
-    };
-    // A replacement's continuation may move or phase out the recipient before the placement finishes.
-    if !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) || counts.iter().all(|&n| n <= 0) {
-        return;
+}
+
+/// `put_together`, the events handed back for the caller to announce with the rest of a simultaneous event: the counters
+/// damage is dealt as (CR 120.3d) are announced with the damage (CR 510.2, 603.2c).
+pub fn place_together(cx: &mut Cx, placements: &[Placement], how: How) -> Vec<Event> {
+    let mut merged: Vec<Placement> = placements
+        .iter()
+        .filter(|p| p.counts.iter().any(|&n| n > 0))
+        .map(|p| Placement { counts: p.counts.map(|n| n.max(0)), ..*p })
+        .collect();
+    // Phased-out permanents cannot be affected (CR 702.26b); an object gone from its zone is another (CR 400.7).
+    let can = |cx: &Cx, id: ObjectId| live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut);
+    // On a permanent, as many as the replacement effects of counters being put leave (CR 614.1a); on a card in another
+    // zone, as many as it can have (CR 101.2), which no replacement of counters put on a permanent sees.
+    for m in &mut merged {
+        if !can(cx, m.object) {
+            m.counts = [0; CounterKind::COUNT];
+            continue;
+        }
+        if cx.s().obj(m.object).zone.is(ZoneKind::Battlefield) {
+            let controller = cx.s().obj(m.object).controller;
+            m.counts = replace::counters(cx, m.object, controller, m.by, false, how == How::Effect, m.counts);
+        }
     }
-    cx.st().update_obj(id, |o| o.put_path_add(&counts));
-    // The layers look for hone counters from now on (CR 122.1j).
-    if counts[CounterKind::Hone as usize] > 0 {
-        cx.st().see_statics();
-    }
-    // CR 613.7c: a counter gets a timestamp as it is put on, and every counter of its kind already there gets the same one;
-    // the ability a keyword counter gives applies in layer 6 at it (CR 613.1f, 122.1b).
-    if on_battlefield {
-        for k in CounterKind::KEYWORDS {
-            if counts[k as usize] > 0 {
-                cx.st().stamp_counters(id, k);
+    let mut events = Vec::new();
+    for m in &merged {
+        // A replacement's continuation may move or phase out a recipient before the placement finishes.
+        if !can(cx, m.object) || m.counts.iter().all(|&n| n <= 0) {
+            continue;
+        }
+        let (id, counts) = (m.object, m.counts);
+        cx.st().update_obj(id, |o| o.put_path_add(&counts));
+        // The layers look for hone counters from now on (CR 122.1j).
+        if counts[CounterKind::Hone as usize] > 0 {
+            cx.st().see_statics();
+        }
+        // CR 613.7c: a counter gets a timestamp as it is put on, and every counter of its kind already there gets the same
+        // one; the ability a keyword counter gives applies in layer 6 at it (CR 613.1f, 122.1b).
+        if cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+            for k in CounterKind::KEYWORDS {
+                if counts[k as usize] > 0 {
+                    cx.st().stamp_counters(id, k);
+                }
+            }
+        }
+        // The counters that were put are announced (CR 121.1, 122.6a), for a Saga's chapters (CR 714.2b) and for "whenever
+        // counters are put on this", as many as the replacements left, with the player who put them.
+        for kind in CounterKind::ALL {
+            let amount = counts[kind as usize];
+            if amount > 0 {
+                let total = cx.s().obj(id).counters(kind);
+                events.push(Event::CountersPut { object: id, kind, amount, total, by: m.by });
             }
         }
     }
-    // The counters that were put are announced (CR 121.1, 122.6a), for a Saga's chapters (CR 714.2b) and for "whenever
-    // counters are put on this", as many as the replacements left, with the player who put them.
-    for kind in CounterKind::ALL {
-        let amount = counts[kind as usize];
-        if amount > 0 {
-            let total = cx.s().obj(id).counters(kind);
-            cx.emit(Event::CountersPut { object: id, kind, amount, total, by });
-        }
-    }
+    events
 }
 
 /// Takes up to `n` counters of one kind off `id` (CR 122.1): what a cost removes (CR 118.3), what an effect removes, and

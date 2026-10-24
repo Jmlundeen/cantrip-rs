@@ -38,12 +38,9 @@ fn equipment_attached_to(g: &dyn Game, zack: ObjectId) -> Vec<ObjectId> {
 fn sacrifice_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
-    for kind in CounterKind::ALL {
-        let n = g.obj(item.object).counters(kind);
-        if n > 0 {
-            g.add_counters(creature, kind, n);
-        }
-    }
+    // Every kind together, one event (CR 608.2, 122.6).
+    let puts: Vec<(ObjectId, CounterKind, i16)> = CounterKind::ALL.into_iter().map(|kind| (creature, kind, g.obj(item.object).counters(kind))).collect();
+    g.add_counters_together(&puts);
     let equipment = equipment_attached_to(g, item.object);
     let chosen = match equipment.as_slice() {
         [] => None,

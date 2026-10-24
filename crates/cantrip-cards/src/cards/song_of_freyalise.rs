@@ -22,9 +22,8 @@ fn grant_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// turn.
 fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = creatures_you_control(g, item.controller);
-    for &id in &creatures {
-        g.add_counters(id, CounterKind::PlusOne, 1);
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> = creatures.iter().map(|&id| (id, CounterKind::PlusOne, 1)).collect();
+    g.add_counters_together(&puts);
     g.end_sentence();
     let keywords = Keywords::of(&[Keyword::Vigilance, Keyword::Trample, Keyword::Indestructible]);
     instruction(g, |g| {

@@ -11,11 +11,7 @@ fn make_tokens(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Mode 1: "Put a +1/+1 counter on each creature you control", the creatures read as the ability resolves, which is
 /// before the spell that triggered it (CR 603.3), so that spell's creature gets none.
 fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for id in creatures {
-        g.add_counters(id, CounterKind::PlusOne, 1);
-    }
+    cantrip_mechanics::effects::counters_on_creatures_you_control(g, item.controller, CounterKind::PlusOne, 1);
     Ok(())
 }
 

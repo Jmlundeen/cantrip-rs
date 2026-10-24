@@ -7,11 +7,7 @@ use cantrip_oracle as oracle;
 fn destroy_and_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     destroy_target(g, item, 0);
     let Some(player) = targets::player(g, item, 1) else { return Ok(()) };
-    for id in g.permanents_of(player) {
-        if g.chars(id).is(CardType::Creature) {
-            g.add_counters(id, CounterKind::PlusOne, 1);
-        }
-    }
+    cantrip_mechanics::effects::counters_on_creatures_you_control(g, player, CounterKind::PlusOne, 1);
     Ok(())
 }
 

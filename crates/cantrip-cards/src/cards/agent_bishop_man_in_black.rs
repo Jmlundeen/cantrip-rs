@@ -4,9 +4,9 @@ use cantrip_oracle as oracle;
 
 /// "Each of up to two target creatures" (CR 601.2c): one slot, up to two targets; each still legal gets a counter.
 fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in targets::legal_objects(g, item) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> =
+        targets::legal_objects(g, item).into_iter().map(|creature| (creature, CounterKind::PlusOne, 1)).collect();
+    g.add_counters_together(&puts);
     Ok(())
 }
 

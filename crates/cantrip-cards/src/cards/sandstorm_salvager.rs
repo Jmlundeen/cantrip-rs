@@ -16,9 +16,8 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .into_iter()
         .filter(|&id| g.obj(id).token && g.chars(id).is(CardType::Creature))
         .collect();
-    for &token in &tokens {
-        g.add_counters(token, CounterKind::PlusOne, 1);
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> = tokens.iter().map(|&token| (token, CounterKind::PlusOne, 1)).collect();
+    g.add_counters_together(&puts);
     g.end_sentence();
     instruction(g, |g| {
         for &token in &tokens {

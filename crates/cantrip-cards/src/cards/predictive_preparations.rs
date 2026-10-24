@@ -5,9 +5,9 @@ use cantrip_oracle as oracle;
 /// "Put a +1/+1 counter on each of one or two target creatures": one counter on each target still legal as the spell
 /// resolves (CR 608.2b, 115.1d).
 fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in targets::legal_objects(g, item) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> =
+        targets::legal_objects(g, item).into_iter().map(|creature| (creature, CounterKind::PlusOne, 1)).collect();
+    g.add_counters_together(&puts);
     Ok(())
 }
 

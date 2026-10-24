@@ -24,12 +24,9 @@ fn pass_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // A lone target that is no longer legal stops the whole ability (CR 608.2b), so this always finds one.
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let counters = g.obj(item.object).counter_array();
-    for kind in CounterKind::ALL {
-        let n = counters[kind as usize];
-        if n > 0 {
-            g.add_counters(creature, kind, n);
-        }
-    }
+    // Every kind together, one event (CR 608.2, 122.6).
+    let puts: Vec<(ObjectId, CounterKind, i16)> = CounterKind::ALL.into_iter().map(|kind| (creature, kind, counters[kind as usize])).collect();
+    g.add_counters_together(&puts);
     Ok(())
 }
 

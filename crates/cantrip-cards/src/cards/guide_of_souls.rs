@@ -36,8 +36,7 @@ fn attacking_creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// other types, with no duration (CR 205.1b, 611.2a).
 fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    g.add_counters(creature, CounterKind::PlusOne, 2);
-    g.add_counters(creature, CounterKind::Flying, 1);
+    g.add_counters_together(&[(creature, CounterKind::PlusOne, 2), (creature, CounterKind::Flying, 1)]);
     g.add_effect(item.object, creature, EffectKind::AddSubtype(g.words(item.object).subtype(Subtype::Angel)), Duration::Indefinite);
     Ok(())
 }

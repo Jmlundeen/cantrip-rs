@@ -24,9 +24,8 @@ fn tap_them_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     for &id in &them {
         g.tap(id);
     }
-    for id in them {
-        g.add_counters(id, CounterKind::Stun, 1);
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> = them.into_iter().map(|id| (id, CounterKind::Stun, 1)).collect();
+    g.add_counters_together(&puts);
     Ok(())
 }
 

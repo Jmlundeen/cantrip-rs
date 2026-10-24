@@ -11,11 +11,12 @@ fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for &creature in &creatures {
         g.tap(creature);
     }
-    for creature in creatures {
-        if g.obj(creature).controller != item.controller {
-            g.add_counters(creature, CounterKind::Stun, 1);
-        }
-    }
+    let puts: Vec<(ObjectId, CounterKind, i16)> = creatures
+        .into_iter()
+        .filter(|&creature| g.obj(creature).controller != item.controller)
+        .map(|creature| (creature, CounterKind::Stun, 1))
+        .collect();
+    g.add_counters_together(&puts);
     Ok(())
 }
 

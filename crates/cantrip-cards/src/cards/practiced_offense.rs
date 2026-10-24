@@ -10,11 +10,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
         && let Target::Player(player) = item.target(0)
     {
-        let creatures: Vec<ObjectId> =
-            g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-        for creature in creatures {
-            g.add_counters(creature, CounterKind::PlusOne, 1);
-        }
+        cantrip_mechanics::effects::counters_on_creatures_you_control(g, player, CounterKind::PlusOne, 1);
     }
     if let Some(creature) = targets::object(g, item, 1) {
         let card = g.obj(item.object).card;

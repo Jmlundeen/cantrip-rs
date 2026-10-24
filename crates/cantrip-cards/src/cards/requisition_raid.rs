@@ -13,11 +13,7 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// (CR 608.2c).
 fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(player) = targets::player(g, item, 0) else { return Ok(()) };
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for creature in creatures {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
+    cantrip_mechanics::effects::counters_on_creatures_you_control(g, player, CounterKind::PlusOne, 1);
     Ok(())
 }
 

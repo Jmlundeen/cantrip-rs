@@ -1084,7 +1084,7 @@ permanents too (514.2). Events: `PhasedOut`, `PhasedIn` (recorded; nothing trigg
 (`Game::phase_out_until_leaves`) use it; the host shows a phased-out permanent with the battlefield, marked
 `ObjectView::phased_out`, and the script dump lists them as `BotN.PhasedOut`.
 
-Counters and phasing (CR 702.26b-d): `counters::put_all` excludes phased-out recipients before replacements and rechecks
+Counters and phasing (CR 702.26b-d): `counters::put_together` excludes phased-out recipients before replacements and rechecks
 presence after their continuations; removal rejects phased-out recipients too. Existing counters remain through phasing;
 normal placements on cards in other zones still work. Identity liveness is unchanged, so phasing does not become a zone
 change or erase a source's history. A failed counter placement never stops the rest of a card's effect.
@@ -1486,6 +1486,17 @@ for a permanent entering, its controller (CR 122.6a) - its intrinsic loyalty, de
 714.3a) included, a token copy's too. The storage is private to `cantrip-state` (`Obj::counters`, `Player::poison`,
 `energy`, `experience`); reading and removing are open, and the one adder, `put_path_add`, is called from the put path
 alone, which a test (`only_the_put_path_puts_counters`) holds to. No scenario writes counters either: they are played on.
+
+Counters one instruction puts on several objects, or of several kinds on one, are one simultaneous event (CR 608.2, 101.4,
+122.6): `counters::put_together` (card code's `Game::add_counters_together`) takes every placement - what one
+instruction puts on an object is one (`add_counters_together` makes it so), and each source's damage dealt as counters is
+its own (CR 120.3d) - applies the replacement effects of counters being put to each (CR 614.1a) before any counter goes on, then puts them all on and announces every `CountersPut` in one `emit_batch`, so "whenever one or more
+counters are put on one or more ..." triggers once (CR 603.2c). `put` and `put_all` are one placement of it.
+Proliferate's permanents, the turn's lore counters on each Saga (CR 714.3c) and the -1/-1 counters infect's damage is dealt
+as (`DamageBatch::finish`, announced with the damage, CR 120.3d, 510.2) go through it; so do the shared effects that put
+counters on each of several permanents (`effects::counters_on_creatures_you_control`,
+`double::counters`, `counters_divided`). A card never loops
+`add_counters` over objects or kinds its one instruction names together.
 
 Counters that would be put on a permanent are one `Proposal::Counters` (CR 122.6, 614.1a), whose `CounterPlacement` says who puts
 them (`putter`, CR 122.6a: "if you would put", Innkeeper's Talent) and whether an effect does (`effect`: "if an effect would put",
@@ -2140,7 +2151,7 @@ after).
 A keyword counter gives its permanent the keyword it is named for (CR 122.1b): flying, first strike, double strike,
 deathtouch, decayed, haste, hexproof, indestructible, lifelink, menace, reach, shadow, trample and vigilance
 (`CounterKind::KEYWORDS`). The ability is a layer-6 effect (CR 613.1f) with the timestamp of its counters: each counter
-gets one as it is put on, and every counter of its kind already there gets the same (CR 613.7c). `counters::put_all`
+gets one as it is put on, and every counter of its kind already there gets the same (CR 613.7c). `counters::put_together`
 stamps the kind (`GameState::counter_stamps`, written only when a keyword counter is put on a permanent, and empty in
 nearly every game); a kind the permanent entered with has the permanent's own timestamp. `layers::keyword_counters` puts
 each kind the object has among its layer-6 effects as "gains [keyword]" at that timestamp, so "loses all abilities" takes

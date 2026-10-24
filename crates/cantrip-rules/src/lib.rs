@@ -102,6 +102,8 @@ mod play_permission_tests;
 #[cfg(test)]
 mod preparation_tests;
 #[cfg(test)]
+mod counters_together_tests;
+#[cfg(test)]
 mod remove_up_to_tests;
 #[cfg(test)]
 mod room_copy_tests;
@@ -2086,6 +2088,23 @@ impl cantrip_api::Game for Cx<'_> {
         }
         let by = self.doer();
         counters::put(self, object, kind, amount, by, counters::How::Effect);
+    }
+
+    fn add_counters_together(&mut self, puts: &[(ObjectId, CounterKind, i16)]) {
+        let by = self.doer();
+        // What the one instruction puts on an object is one placement on it, every kind together (CR 122.6, 608.2).
+        let mut placements: Vec<counters::Placement> = Vec::with_capacity(puts.len());
+        for &(object, kind, amount) in puts.iter().filter(|&&(_, _, amount)| amount > 0) {
+            match placements.iter_mut().find(|p| p.object == object) {
+                Some(p) => p.counts[kind as usize] += amount,
+                None => {
+                    let mut counts = [0; CounterKind::COUNT];
+                    counts[kind as usize] = amount;
+                    placements.push(counters::Placement { object, counts, by });
+                }
+            }
+        }
+        counters::put_together(self, &placements, counters::How::Effect);
     }
 
     fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) -> i16 {

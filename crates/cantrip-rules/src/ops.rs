@@ -2545,15 +2545,16 @@ pub fn mill_together(cx: &mut Cx, mills: &[(PlayerId, u32)]) -> Vec<ObjectId> {
 /// Deals damage (CR 120): marked on a creature, removed as loyalty from a planeswalker, lost as life by a player.
 /// Protection prevents damage from sources of its colors (CR 702.16e).
 pub fn damage(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat: bool) -> u16 {
-    match deal_damage(cx, source, target, amount, combat) {
-        Some(event) => {
-            cx.emit(event);
-            match event {
-                Event::Damage { amount, .. } => amount,
-                _ => 0,
-            }
-        }
-        None => 0,
+    let mut batch = DamageBatch::default();
+    let event = deal_damage_with(cx, source, target, amount, combat, &mut batch);
+    let mut events: Vec<Event> = event.into_iter().collect();
+    batch.finish(cx, &mut events);
+    if !events.is_empty() {
+        cx.emit_batch(&events, None);
+    }
+    match event {
+        Some(Event::Damage { amount, .. }) => amount,
+        _ => 0,
     }
 }
 
@@ -2576,7 +2577,7 @@ pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16
             None => {}
         }
     }
-    batch.gain_lifelink(cx);
+    batch.finish(cx, &mut events);
     cx.emit_batch(&events, None);
     dealt
 }
@@ -2663,16 +2664,6 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
     order
 }
 
-/// Deals damage as `damage` does, but hands back the event for the caller to announce, so that damage dealt
-/// simultaneously (combat damage, CR 510.2) can be announced as one batch (CR 603.2c): "whenever equipped creature
-/// deals combat damage" triggers once however many recipients there are.
-pub fn deal_damage(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat: bool) -> Option<Event> {
-    let mut batch = DamageBatch::default();
-    let event = deal_damage_with(cx, source, target, amount, combat, &mut batch);
-    batch.gain_lifelink(cx);
-    event
-}
-
 /// What one simultaneous damage event (CR 120.2, 510.2) has done so far, across its assignments.
 #[derive(Default)]
 pub struct DamageBatch {
@@ -2686,6 +2677,9 @@ pub struct DamageBatch {
     /// long as you have 0 or less life"): judged once, as the event begins for that player, since all of it is dealt at once
     /// (CR 120.2, 510.2) - a life total the event itself takes to 0 makes none of it poison.
     as_infect: Vec<(PlayerId, bool)>,
+    /// The -1/-1 counters its damage is dealt to creatures as (CR 702.90c, 120.3d): put on together once all of it is dealt,
+    /// and announced with it (CR 510.2, 603.2c).
+    counters: Vec<counters::Placement>,
 }
 
 impl DamageBatch {
@@ -2700,17 +2694,26 @@ impl DamageBatch {
         infect
     }
 
+    /// What the event's damage results in once it is all dealt (CR 120.3): the -1/-1 counters it is dealt to creatures as,
+    /// put on together, their announcements added to the damage's `events` (CR 120.3d, 603.2c), then the life its lifelink
+    /// sources gain (`gain_lifelink`).
+    pub fn finish(&mut self, cx: &mut Cx, events: &mut Vec<Event>) {
+        let placements = std::mem::take(&mut self.counters);
+        events.extend(counters::place_together(cx, &placements, counters::How::Effect));
+        self.gain_lifelink(cx);
+    }
+
     /// The life the event's sources with lifelink cause their controllers to gain (CR 120.3f), once the damage is all
     /// dealt: one gain for each source.
-    pub fn gain_lifelink(&mut self, cx: &mut Cx) {
+    fn gain_lifelink(&mut self, cx: &mut Cx) {
         for (_, controller, amount) in std::mem::take(&mut self.lifelink) {
             change_life(cx, controller, amount.min(i32::MAX as u32) as i32);
         }
     }
 }
 
-/// `deal_damage` as one assignment of a simultaneous event, `batch`. The life its lifelink sources gain is gained by
-/// `DamageBatch::gain_lifelink` once every assignment has been dealt.
+/// Damage as `damage` deals it, as one assignment of a simultaneous event, `batch`. The life its lifelink sources gain is gained by
+/// `DamageBatch::finish` once every assignment has been dealt, and so are the counters it is dealt as.
 pub fn deal_damage_with(
     cx: &mut Cx,
     source: ObjectId,
@@ -2776,8 +2779,9 @@ pub fn deal_damage_with(
                     // damage dealt, so deathtouch counts (CR 702.2b). Put as an effect's: infect is a static ability (CR 702.90a),
                     // static abilities create effects (CR 609.1), and it is infect's effect, not the turn-based action dealing
                     // combat damage, that puts the counters (CR 120.3d) - so "if an effect would put counters" applies.
-                    let amount = amount.min(i16::MAX as u16) as i16;
-                    counters::put(cx, id, CounterKind::MinusOne, amount, source_controller, counters::How::Effect);
+                    let mut counts = [0; CounterKind::COUNT];
+                    counts[CounterKind::MinusOne as usize] = amount.min(i16::MAX as u16) as i16;
+                    batch.counters.push(counters::Placement { object: id, counts, by: source_controller });
                     cx.st().update_obj(id, |o| o.deathtouched |= deathtouch);
                 } else {
                     if heal_marked {
@@ -3158,6 +3162,9 @@ pub fn end_lapsed_durations(cx: &mut Cx, id: ObjectId) {
 /// Season) nor one that uses the stack.
 pub fn add_lore_counters(cx: &mut Cx) {
     let active = cx.s().turn.active;
+    let mut lore = [0; CounterKind::COUNT];
+    lore[CounterKind::Lore as usize] = 1;
+    let mut placements = Vec::new();
     for id in cx.s().battlefield().to_vec() {
         if cx.s().obj(id).controller != active {
             continue;
@@ -3166,9 +3173,11 @@ pub fn add_lore_counters(cx: &mut Cx) {
         if chars.has_subtype(Subtype::Saga)
             && chars.abilities().any(|a| matches!(cx.cards().ability(a), AbilityDef::Triggered(t) if t.chapter > 0))
         {
-            counters::put(cx, id, CounterKind::Lore, 1, active, counters::How::TurnBased);
+            placements.push(counters::Placement { object: id, counts: lore, by: active });
         }
     }
+    // "A lore counter on each Saga": one action, all of them at once (CR 714.3c, 101.4).
+    counters::put_together(cx, &placements, counters::How::TurnBased);
 }
 
 /// A player gets energy counters, put by `by` (CR 107.14, 122.6), or pays them with a negative `delta` (CR 122.1).
@@ -3227,15 +3236,18 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
             _ => (t, [0; CounterKind::COUNT], counters::PlayerCounts::default()),
         })
         .collect();
-    for (target, had, counts) in plan {
+    // The permanents' counters are one event, each permanent's of every kind and all of them together (CR 701.34a, 608.2,
+    // 603.2c).
+    let placements: Vec<counters::Placement> = plan
+        .iter()
+        .filter_map(|&(target, had, _)| match target {
+            Target::Object(object) => Some(counters::Placement { object, counts: had.map(|n| i16::from(n > 0)), by: player }),
+            _ => None,
+        })
+        .collect();
+    counters::put_together(cx, &placements, counters::How::Effect);
+    for (target, _, counts) in plan {
         match target {
-            Target::Object(id) => {
-                for kind in CounterKind::ALL {
-                    if had[kind as usize] > 0 && live(cx.s(), id) {
-                        counters::put(cx, id, kind, 1, player, counters::How::Effect);
-                    }
-                }
-            }
             Target::Player(p) => {
                 for counts in [
                     counters::PlayerCounts { poison: counts.poison, ..Default::default() },
