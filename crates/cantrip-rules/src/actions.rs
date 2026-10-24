@@ -8071,7 +8071,7 @@ fn activate(
         return Err(Stop::Cancel);
     }
     if life > 0 {
-        ops::change_life(cx, player, -(life as i32));
+        ops::change_life(cx, player, -life_paid(life));
     }
     // The costs are paid together (CR 601.2h by way of 602.2b), so {T} is paid on the permanent before any other part of
     // the cost moves it: it was tapped as it left (CR 118.3), its last-known information says so (CR 608.2h), and

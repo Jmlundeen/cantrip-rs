@@ -898,9 +898,11 @@ ruling). The shared effects are in `cantrip_mechanics::replacements`. A cost's p
 not on what a replacement makes of the loss. A cost paid as an effect resolves - "you may pay {W}{B} and 2 life. When you
 do", "counter it unless its controller pays {3}", a shockland's "you may pay 2 life" (CR 118.12, 608.2d) - is one payment,
 `Game::may_pay` (`actions::may_pay`, asked as `RequestKind::UnlessPays` with its `life` and the card's `Question`): the
-life amounts in `Cost` and `RequestKind::UnlessPays` are `u32`, preserving variable payments above 65,535 (Niv-Mizzet, Ghost Counsel). Affordability compares the full cost to the signed player total before payment; an amount above that total is refused, without narrowing. The payer is not asked without the life (`actions::can_pay_life`), may activate mana abilities while there is mana to pay (CR
+payer is not asked without the life (`actions::can_pay_life`), may activate mana abilities while there is mana to pay (CR
 605.3a), and may pay once the pool covers the mana and the life total still covers the life, so a mana ability that costs
-life (Mana Confluence) can leave only declining. A cost with other parts - "sacrifice a creature", "discard a card",
+life (Mana Confluence) can leave only declining. The life a cost pays is a `u32` in `Cost` and in the request, so a
+variable amount ("pay that much life", Niv-Mizzet, Ghost Counsel) is kept whole however large, and it is compared with the
+life total at full width: more life than the payer has is never payable, and nothing narrows it on the way. A cost with other parts - "sacrifice a creature", "discard a card",
 "return a tapped creature you control", energy, counters - is paid the same way: paying is offered only while every part
 can be paid now (`resolution_rest_payable`, judged as an activated ability's is), the permanents and cards are chosen once
 the payer chooses to pay, after the mana abilities (CR 601.2g-h), with the questions a spell's or an ability's cost asks,
