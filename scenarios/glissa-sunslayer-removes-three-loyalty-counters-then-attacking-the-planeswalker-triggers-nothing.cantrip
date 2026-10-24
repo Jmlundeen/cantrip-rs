@@ -1,0 +1,51 @@
+# Glissa Sunslayer's third mode: "Remove up to three counters from target permanent." Bot2's Karn, Scion of Urza (4 mana: a
+# Black Lotus and a Plains, on its turn 2) has 5 loyalty; Bot1 removes exactly three, leaving 2 (not 1). On turn 5 Glissa
+# attacks the planeswalker instead of the player: combat damage to a planeswalker is no combat damage to a player, so her
+# trigger does not happen (no hand change) and Karn dies.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Glissa Sunslayer
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Karn, Scion of Urza
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glissa Sunslayer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Karn, Scion of Urza.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Glissa Sunslayer > Bot2)
+Bot1.Modes(Remove up to three counters)
+Bot1.Target(Bot2.Battlefield.Karn, Scion of Urza)
+! Bot1.RemoveCounters(Karn, Scion of Urza: Loyalty 4)
+Bot1.RemoveCounters(Karn, Scion of Urza: Loyalty 3)
+? Bot2.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 2
+[T5 Bot1.Main1]
+Bot1.Attack(Glissa Sunslayer > Karn, Scion of Urza)
+[T5 Bot1.CombatDamage]
+! Bot1.Modes
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Karn, Scion of Urza = (absent)
+Bot2.Life = 17
+Bot1.Hand.Count = 5

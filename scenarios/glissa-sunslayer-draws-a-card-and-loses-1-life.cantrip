@@ -1,0 +1,31 @@
+# Glissa Sunslayer's first mode: "You draw a card and lose 1 life." Cast turn 1 off two Moxen and a Forest, she connects on
+# turn 3 and Bot1 chooses the draw mode: exactly one card (hand 4 after the turn-3 draw, then 5) and exactly 1 life (19);
+# Bot2 took her 3 combat damage (17).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Glissa Sunslayer
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glissa Sunslayer.Cast
+Bot1.Attack(Glissa Sunslayer)
+Bot1.Modes(You draw a card)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 19
+Bot1.Hand.Count = 5

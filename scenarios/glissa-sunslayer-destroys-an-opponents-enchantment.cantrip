@@ -1,0 +1,41 @@
+# Glissa Sunslayer's second mode: "Destroy target enchantment." Bot2 controls Deafening Silence and an Ornithopter; with
+# the Ornithopter (an artifact creature) not a legal target, the opponent's enchantment is the only one and is destroyed.
+# Bot2 casts the Silence (a noncreature spell) and then the Ornithopter, a creature spell it does not limit.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Glissa Sunslayer
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Plains
+Deafening Silence
+Ornithopter
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glissa Sunslayer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Deafening Silence.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Glissa Sunslayer)
+Bot1.Modes(Destroy target enchantment)
+
+[Expect]
+Bot2.Battlefield.Deafening Silence = (absent)
+Bot2.Graveyard = Deafening Silence
+Bot2.Battlefield.Ornithopter.Tapped = false
+Bot1.Hand.Count = 4

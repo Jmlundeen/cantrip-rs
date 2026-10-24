@@ -1,0 +1,46 @@
+# Glissa Sunslayer has first strike and deathtouch: Bot2's Pet Avengers (a 4/4, Lotus for green plus a Forest on its turn 2)
+# blocks her on turn 3. Her 3 first-strike deathtouch damage destroys the 4/4 (3 is below its toughness) before it deals
+# damage, so she survives; no combat damage was dealt to a player, so her trigger never happens (no mode is asked).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Glissa Sunslayer
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Pet Avengers
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glissa Sunslayer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Pet Avengers.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Glissa Sunslayer)
+Bot2.Block(Pet Avengers > Glissa Sunslayer)
+[T3 Bot1.CombatDamage]
+! Bot1.Modes
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Pet Avengers = (absent)
+Bot2.Graveyard = Pet Avengers; Black Lotus
+Bot1.Battlefield.Glissa Sunslayer.Damage = 0
+Bot2.Life = 20
+Bot1.Hand.Count = 4

@@ -1,0 +1,49 @@
+# Glissa Sunslayer's third mode on a creature, with "up to three" taking fewer: Bot2's Ornithopter has a flying, a first
+# strike and a lifelink counter (from its Abigale); Bot1 removes two of the three kinds and the first strike counter stays.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Glissa Sunslayer
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Abigale, Eloquent First-Year
+Ornithopter
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glissa Sunslayer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Abigale, Eloquent First-Year.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Ornithopter.Counters.Flying = 1
+[T3 Bot1.Main1]
+Bot1.Attack(Glissa Sunslayer)
+Bot1.Modes(Remove up to three counters)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.RemoveCounters(Ornithopter: Flying 1; Ornithopter: Lifelink 1)
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.Flying = (absent)
+Bot2.Battlefield.Ornithopter.Counters.Lifelink = (absent)
+Bot2.Battlefield.Ornithopter.Counters.FirstStrike = 1

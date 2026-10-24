@@ -1,0 +1,45 @@
+# Glissa Sunslayer's second mode may target an enchantment of her own controller: Bot1 casts Deafening Silence on turn 3, then
+# Glissa connects and Bot1 destroys that one while Bot2's Deafening Silence stays. Bot2's Ornithopter (not an enchantment) is refused as a target.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Glissa Sunslayer
+Deafening Silence
+Plains x2
+Plains x10
+
+[Bot2 Deck]
+Plains
+Deafening Silence
+Ornithopter
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glissa Sunslayer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Deafening Silence.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Deafening Silence.Cast
+Bot1.Attack(Glissa Sunslayer)
+Bot1.Modes(Destroy target enchantment)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Deafening Silence)
+
+[Expect]
+Bot1.Battlefield.Deafening Silence = (absent)
+Bot1.Graveyard = Deafening Silence
+Bot2.Battlefield.Deafening Silence.Types = Enchantment

@@ -1,0 +1,12 @@
+{
+  "name": "Glissa Sunslayer",
+  "manaCost": "{1}{B}{G}",
+  "type": "Legendary Creature — Phyrexian Zombie Elf",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "First strike, deathtouch\nWhenever Glissa Sunslayer deals combat damage to a player, choose one —\n• You draw a card and lose 1 life.\n• Destroy target enchantment.\n• Remove up to three counters from target permanent.",
+  "keywords": [
+    "FirstStrike",
+    "Deathtouch"
+  ]
+}
