@@ -1,0 +1,49 @@
+# Mirrex: "{3}, {T}: Create a 1/1 colorless Phyrexian Mite artifact creature token with toxic 1 and 'This token can't
+# block.'" With only two Moxen beside it, two mana, it can't be activated (Mirrex's own {T} is the cost's, not its mana);
+# with a third it is, paid exactly, the pool empty after. The Mite attacks on turn 3: 1 damage, and toxic 1 gives Bot2 a
+# poison counter besides (CR 702.164c, 120.3g).
+
+[Bot1 Deck]
+Mirrex
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mirrex.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+! Bot1.Battlefield.Mirrex.Activate(Ability: Create)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mirrex.Activate(Ability: Create)
+? Bot1.Mana = 
+? Bot1.Battlefield.Mirrex.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Phyrexian Mite Token.Types = Artifact; Creature
+? Bot1.Battlefield.Phyrexian Mite Token.Subtypes = Mite; Phyrexian
+? Bot1.Battlefield.Phyrexian Mite Token.Colors = (absent)
+? Bot1.Battlefield.Phyrexian Mite Token.Power = 1
+? Bot1.Battlefield.Phyrexian Mite Token.Toughness = 1
+? Bot1.Battlefield.Phyrexian Mite Token.Keywords = CantBlock
+? Bot1.Battlefield.Phyrexian Mite Token.Toxic = 1
+[T3 Bot1.Main1]
+Bot1.Attack(Phyrexian Mite Token > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot2.Poison = 1
+Bot1.Poison = 0
+Bot1.Battlefield = Mirrex; Mox Pearl; Mox Jet; Mox Ruby; Phyrexian Mite Token

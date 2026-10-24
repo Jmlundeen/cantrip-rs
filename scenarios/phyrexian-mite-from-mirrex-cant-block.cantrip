@@ -1,0 +1,41 @@
+# The Phyrexian Mite Mirrex makes has "This token can't block." (CR 509.1b): when Bot2's Glistener Elf attacks on turn 4,
+# Bot1's untapped Mite is not offered as a blocker, and the Elf's infect damage gives Bot1 a poison counter.
+
+[Bot1 Deck]
+Mirrex
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island x16
+
+[Bot2 Deck]
+Forest
+Glistener Elf
+Island x18
+
+[Actions]
+Bot1.Hand.Mirrex.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mirrex.Activate(Ability: Create)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Glistener Elf.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Glistener Elf > Bot1)
+! Bot1.Block(Phyrexian Mite Token > Glistener Elf)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Poison = 1
+Bot1.Life = 20
+Bot2.Battlefield = Forest; Glistener Elf

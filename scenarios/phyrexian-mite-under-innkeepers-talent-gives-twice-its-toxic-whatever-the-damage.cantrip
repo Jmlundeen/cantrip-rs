@@ -1,0 +1,51 @@
+# Toxic's poison counters are put by the creature's controller (CR 702.164c), so Innkeeper's Talent's level 3, "If you would
+# put one or more counters on a permanent or player, put twice that many ... instead", doubles them (the ruling: Vorinclex
+# can apply). Their number is the total toxic value, whatever the damage (the ruling): Bot1's Phyrexian Mite from Mirrex,
+# 3/3 with the two +1/+1 counters the Talent's combat trigger puts on it (doubled), deals Bot2 3 damage on turn 5 and gives
+# 2 poison counters - toxic 1, doubled - not 3 or 6.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Innkeeper's Talent
+Mox Emerald
+Mox Ruby
+Plains
+Mirrex
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+[T3 Bot1.Main2]
+Bot1.Hand.Mirrex.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mirrex.Activate(Ability: Create)
+[T5 Bot1.Main1]
+Bot1.Attack(Phyrexian Mite Token > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Phyrexian Mite Token.Power = 3
+Bot2.Life = 17
+Bot2.Poison = 2

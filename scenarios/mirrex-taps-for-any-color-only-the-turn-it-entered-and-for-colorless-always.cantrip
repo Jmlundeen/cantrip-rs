@@ -1,0 +1,26 @@
+# Mirrex: "{T}: Add {C}." and "{T}: Add one mana of any color. Activate only if this land entered this turn." (CR 602.5b).
+# Played on turn 1, it taps for one blue mana, and once tapped offers neither ability (the {T} of each cost). On turn 3 it
+# entered two turns ago: "any color" is no longer offered, and "{T}: Add {C}" adds one colorless mana.
+
+[Bot1 Deck]
+Mirrex
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mirrex.Play
+Bot1.Battlefield.Mirrex.Activate(Ability: any color; Color: Blue)
+? Bot1.Mana = {U}
+! Bot1.Battlefield.Mirrex.Activate(Ability: Add {C})
+! Bot1.Battlefield.Mirrex.Activate(Ability: any color)
+[T3 Bot1.Main1]
+? Bot1.Mana = 
+! Bot1.Battlefield.Mirrex.Activate(Ability: any color)
+Bot1.Battlefield.Mirrex.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mirrex.Tapped = true
