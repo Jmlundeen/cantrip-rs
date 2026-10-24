@@ -635,9 +635,12 @@ public sealed partial class MainPage
         (ManaSpendFilterView.ManaValueSpells, _) => $"mana value {manaValue}+",
         (ManaSpendFilterView.ManaValueOrXSpells, _) => $"mana value {manaValue}+ or X",
         (ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells or ManaSpendFilterView.SubtypeSpellsOrAbilities
-            or ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities, _) when subtypes.Count == 0 => "no type chosen",
+            or ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities or ManaSpendFilterView.SubtypeSpellsOrAbilitiesOfPermanents, _)
+            when subtypes.Count == 0 => "no type chosen",
         (ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities, _) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} creatures & abilities",
         (ManaSpendFilterView.SubtypeSpellsOrAbilities, _) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells & abilities",
+        (ManaSpendFilterView.SubtypeSpellsOrAbilitiesOfPermanents, _) =>
+            $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells & battlefield {CardActions.Subtypes(subtypes).ToLowerInvariant()} abilities",
         (ManaSpendFilterView.SubtypeSpells, ManaSpendEffectView.CantBeCountered) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells · uncounterable",
         (ManaSpendFilterView.SubtypeSpells, _) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells",
         (ManaSpendFilterView.SubtypeCreatureSpells, ManaSpendEffectView.CantBeCountered) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} creatures · uncounterable",
@@ -654,6 +657,10 @@ public sealed partial class MainPage
         (ManaSpendFilterView.LandAbilities, _) => "land abilities",
         (ManaSpendFilterView.ArtifactAbilities, _) => "artifact abilities",
         (ManaSpendFilterView.CreatureAbilities, _) => "creature abilities",
+        (ManaSpendFilterView.AbilitiesOfArtifacts, _) => "battlefield artifact abilities",
+        (ManaSpendFilterView.CreatureSpellsOrAbilitiesOfCreatures, _) => "creatures & battlefield creature abilities",
+        (ManaSpendFilterView.CreatureSpellsOrAbilities, _) => "creatures & creature abilities",
+        (ManaSpendFilterView.ArtifactSpellsOrAbilitiesOfArtifacts, _) => "artifacts & battlefield artifact abilities",
         (_, ManaSpendEffectView.GainsHaste) => "haste",
         (_, ManaSpendEffectView.CantBeCountered) => "uncounterable",
         _ => "restricted",
@@ -681,6 +688,12 @@ public sealed partial class MainPage
                 $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} creature spells or activate abilities of {CardActions.Subtypes(subtypes)} creature sources.",
             ManaSpendFilterView.SubtypeSpellsOrAbilities =>
                 $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} spells or activate abilities of {CardActions.Subtypes(subtypes)} sources.",
+            ManaSpendFilterView.SubtypeSpellsOrAbilitiesOfPermanents when subtypes.Count == 0 =>
+                "Spend this mana only to cast a spell of the chosen type or activate an ability of a permanent of the chosen type. "
+                + "No type was chosen, so it can't be spent on anything.",
+            ManaSpendFilterView.SubtypeSpellsOrAbilitiesOfPermanents =>
+                $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} spells or activate abilities of {CardActions.Subtypes(subtypes)} "
+                + "permanents on the battlefield.",
             ManaSpendFilterView.CreatureSpells => "Spend this mana only to cast creature spells.",
             ManaSpendFilterView.InstantOrSorcerySpells => "Spend this mana only to cast instant or sorcery spells.",
             ManaSpendFilterView.ActivatedAbilities => "Spend this mana only to activate abilities.",
@@ -693,6 +706,14 @@ public sealed partial class MainPage
             ManaSpendFilterView.LandAbilities => "Spend this mana only to activate abilities of land sources.",
             ManaSpendFilterView.ArtifactAbilities => "Spend this mana only to activate abilities of artifact sources.",
             ManaSpendFilterView.CreatureAbilities => "Spend this mana only to activate abilities of creature sources.",
+            ManaSpendFilterView.AbilitiesOfArtifacts =>
+                "Spend this mana only to activate abilities of artifacts on the battlefield.",
+            ManaSpendFilterView.CreatureSpellsOrAbilitiesOfCreatures =>
+                "Spend this mana only to cast creature spells or activate abilities of creatures on the battlefield.",
+            ManaSpendFilterView.CreatureSpellsOrAbilities =>
+                "Spend this mana only to cast creature spells or activate abilities of creature sources.",
+            ManaSpendFilterView.ArtifactSpellsOrAbilitiesOfArtifacts =>
+                "Spend this mana only to cast artifact spells or activate abilities of artifacts on the battlefield.",
             _ => "This mana may only be spent on certain things.",
         };
 

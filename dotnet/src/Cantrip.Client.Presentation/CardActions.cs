@@ -621,6 +621,7 @@ public sealed class CardActions
         ManaSpendFilterView.SubtypeSpells => $"{Subtypes(subtypes)} spells",
         ManaSpendFilterView.SubtypeCreatureSpells => $"{Subtypes(subtypes)} creature spells",
         ManaSpendFilterView.SubtypeSpellsOrAbilities => $"{Subtypes(subtypes)} spells and abilities of {Subtypes(subtypes)} sources",
+        ManaSpendFilterView.SubtypeSpellsOrAbilitiesOfPermanents => $"{Subtypes(subtypes)} spells and abilities of {Subtypes(subtypes)} permanents",
         ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities =>
             $"{Subtypes(subtypes)} creature spells and abilities of {Subtypes(subtypes)} creature sources",
         ManaSpendFilterView.CreatureSpells => "creature spells",
@@ -635,6 +636,10 @@ public sealed class CardActions
         ManaSpendFilterView.LandAbilities => "abilities of land sources",
         ManaSpendFilterView.ArtifactAbilities => "abilities of artifact sources",
         ManaSpendFilterView.CreatureAbilities => "abilities of creature sources",
+        ManaSpendFilterView.AbilitiesOfArtifacts => "abilities of artifacts on the battlefield",
+        ManaSpendFilterView.CreatureSpellsOrAbilitiesOfCreatures => "creature spells and abilities of creatures on the battlefield",
+        ManaSpendFilterView.CreatureSpellsOrAbilities => "creature spells and abilities of creature sources",
+        ManaSpendFilterView.ArtifactSpellsOrAbilitiesOfArtifacts => "artifact spells and abilities of artifacts on the battlefield",
         _ => "anything",
     };
 
