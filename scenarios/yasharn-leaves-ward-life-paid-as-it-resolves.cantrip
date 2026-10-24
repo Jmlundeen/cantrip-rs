@@ -1,0 +1,51 @@
+# Yasharn, Implacable Earth stops paying life to cast spells or activate abilities, but not a payment a resolving ability
+# asks for (the ruling: "Other things may still cause players to pay life ... such as a resolving spell or ability"; CR
+# 118.12). With Bot1's Yasharn on the battlefield, Bot2 targets Bot1's Gev, Scaled Scorch ("Ward--Pay 2 life") with
+# Lightning Bolt and pays the 2 life as the ward trigger resolves: 20 to 18, the Bolt resolves and Gev, a 3/2, dies.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Yasharn, Implacable Earth
+Mox Jet
+Mox Ruby
+Gev, Scaled Scorch
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Yasharn, Implacable Earth.Cast
+Bot1.Pass
+Bot1.Search()
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gev, Scaled Scorch.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gev, Scaled Scorch)
+Bot2.Accept
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Gev, Scaled Scorch; Black Lotus
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Yasharn, Implacable Earth
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,38 @@
+# Yasharn, Implacable Earth's enters trigger: "search your library for a basic Forest card and a basic Plains card, reveal
+# those cards, put them into your hand, then shuffle" (CR 701.23, 701.20a). Bot1's library holds two basic Forests, a basic
+# Plains, a Breeding Pool (a Forest, but not basic) and Islands. The search refuses the Breeding Pool, an Island, and two
+# Forests at once (one of each, never two of one); it takes a Forest and the Plains, which are revealed and reach the hand,
+# while the other Forest and the Breeding Pool stay in the library, which is shuffled (its Islands no longer on top).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Yasharn, Implacable Earth
+Island x4
+Forest
+Breeding Pool
+Forest
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Yasharn, Implacable Earth.Cast
+Bot1.Pass
+! Bot1.Search(Breeding Pool)
+! Bot1.Search(Island)
+! Bot1.Search(Forest; Forest)
+Bot1.Search(Forest; Plains)
+
+[Expect]
+Bot1.Hand = Forest; Island; Island; Island; Island; Plains
+Bot1.Revealed = Forest; Plains
+Bot1.Library = Island; Forest; Island; Island; Island; Breeding Pool; Island; Island; Island; Island; Island; Island

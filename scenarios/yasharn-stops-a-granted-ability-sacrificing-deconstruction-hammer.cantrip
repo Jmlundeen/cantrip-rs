@@ -1,0 +1,75 @@
+# Yasharn, Implacable Earth's "Players can't ... sacrifice nonland permanents to ... activate abilities" (CR 101.2, 602.2b)
+# reaches a cost that sacrifices the permanent that granted the ability (CR 201.5a): Bot2's Yasharn stops Bot1's
+# Ornithopter, equipped with Deconstruction Hammer, activating "{3}, {T}, Sacrifice Deconstruction Hammer" at Bot2's Sol
+# Ring, though the mana is there. Bot1 then exiles Yasharn with Swords to Plowshares, and the same ability is activated
+# with the same mana (the positive control): the Hammer is sacrificed and the Sol Ring destroyed.
+
+[Bot1 Deck]
+Ornithopter
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Deconstruction Hammer
+Swords to Plowshares
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Yasharn, Implacable Earth
+Island
+Sol Ring
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Yasharn, Implacable Earth.Cast
+Bot2.Pass
+Bot2.Search()
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+! Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Sol Ring)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Yasharn, Implacable Earth)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Exile = Yasharn, Implacable Earth
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Sol Ring)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Sol Ring; Black Lotus
+Bot1.Graveyard = Deconstruction Hammer; Swords to Plowshares
+Bot1.Battlefield.Ornithopter.Tapped = true

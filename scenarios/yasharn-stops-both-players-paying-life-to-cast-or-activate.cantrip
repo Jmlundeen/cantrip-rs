@@ -1,0 +1,53 @@
+# Yasharn, Implacable Earth: "Players can't pay life ... to cast spells or activate abilities" (CR 101.2, 118.3, 601.2h,
+# 602.2b). Before Yasharn, Bot1 casts Gitaxian Probe paying its {U/P} with 2 life (the positive control: 20 to 18). With
+# Yasharn on the battlefield, Bot1's second Probe can't be cast with no blue mana (the 2 life can't be paid), and its
+# opponent Bot2 is bound too: its untapped Mana Confluence ("{T}, Pay 1 life", a mana ability) is not offered, nor is its
+# own Probe. On turn 3 Bot1 casts the Probe with an Island's blue: a Phyrexian symbol still has its mana to pay it, so the
+# spell is cast, and no life is paid.
+
+[Bot1 Deck]
+Gitaxian Probe
+Black Lotus
+Mox Pearl
+Yasharn, Implacable Earth
+Gitaxian Probe
+Island x2
+Island x10
+
+[Bot2 Deck]
+Mana Confluence
+Gitaxian Probe
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Modes(1)
+Bot1.Pass
+? Bot1.Life = 18
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Yasharn, Implacable Earth.Cast
+Bot1.Pass
+Bot1.Search()
+! Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mana Confluence.Play
+! Bot2.Battlefield.Mana Confluence.Activate
+! Bot2.Hand.Gitaxian Probe.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot1.Graveyard = Gitaxian Probe; Black Lotus; Gitaxian Probe
+Bot2.Battlefield.Mana Confluence.Tapped = false
+Bot2.Hand = Gitaxian Probe; Island; Island; Island; Island; Island; Island

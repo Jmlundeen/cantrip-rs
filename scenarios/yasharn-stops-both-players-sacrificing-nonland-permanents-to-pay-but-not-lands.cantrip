@@ -1,0 +1,80 @@
+# Yasharn, Implacable Earth: "Players can't ... sacrifice nonland permanents to cast spells or activate abilities" (CR 101.2,
+# 118.3, 601.2h, 602.2b). Bot1 sacrifices its Black Lotus for mana before Yasharn arrives (the positive control); with
+# Yasharn out, its Mishra's Bauble ("{T}, Sacrifice this artifact") can't be activated, while Zuran Orb's "Sacrifice a land"
+# still can, with the Forest (20 to 22 life). Bot2 is bound too: its Black Lotus can't be activated, nor can Village Rites
+# ("sacrifice a creature") be cast with its Ornithopter there, while Crop Rotation's "sacrifice a land" is paid with its
+# Forest. Its Diabolic Edict then makes Bot1 sacrifice Yasharn as it resolves - a sacrifice no cost asks for, which Yasharn
+# never stopped (the ruling) - and with Yasharn gone the Lotus is activated and Village Rites cast, the Ornithopter sacrificed.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Yasharn, Implacable Earth
+Zuran Orb
+Mishra's Bauble
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Ornithopter
+Black Lotus
+Crop Rotation
+Diabolic Edict
+Village Rites
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+? Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Yasharn, Implacable Earth.Cast
+Bot1.Pass
+Bot1.Search()
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Pass
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+! Bot1.Battlefield.Mishra's Bauble.Activate(Bot2)
+Bot1.Battlefield.Zuran Orb.Activate
+Bot1.Choose(Forest)
+[T2 Bot2.Main1]
+? Bot1.Life = 22
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+! Bot2.Battlefield.Black Lotus.Activate
+! Bot2.Hand.Village Rites.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Crop Rotation.Cast
+Bot2.Choose(Forest)
+Bot2.Search(Island)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Diabolic Edict.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Yasharn, Implacable Earth; Forest; Black Lotus
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Village Rites.Cast
+Bot2.Choose(Ornithopter)
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Mishra's Bauble; Mox Pearl; Zuran Orb
+Bot1.Battlefield.Mishra's Bauble.Tapped = false
+Bot1.Graveyard = Yasharn, Implacable Earth; Forest; Black Lotus
+Bot2.Graveyard = Village Rites; Ornithopter; Black Lotus; Diabolic Edict; Crop Rotation; Forest
+Bot2.Battlefield = Island; Mox Jet

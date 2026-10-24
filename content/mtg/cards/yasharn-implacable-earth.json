@@ -1,0 +1,8 @@
+{
+  "name": "Yasharn, Implacable Earth",
+  "manaCost": "{2}{G}{W}",
+  "type": "Legendary Creature — Elemental Boar",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "When Yasharn enters, search your library for a basic Forest card and a basic Plains card, reveal those cards, put them into your hand, then shuffle.\nPlayers can't pay life or sacrifice nonland permanents to cast spells or activate abilities."
+}

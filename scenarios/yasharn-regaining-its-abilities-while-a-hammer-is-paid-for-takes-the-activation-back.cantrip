@@ -1,0 +1,79 @@
+# Known bug: an effect "for as long as [its source] remains on the battlefield" outlasts its source until the state-based check, not ending as the source leaves (CR 611.2b; KI-126).
+# Yasharn, Implacable Earth's ban is judged as the cost is paid (CR 601.2h by way of 602.2b), not only as the ability is
+# begun. Bot2's Yasharn has lost all its abilities to Bot1's The Wondrous Wasp ("for as long as The Wondrous Wasp remains
+# on the battlefield"), so Bot1's Ornithopter, equipped with Deconstruction Hammer, may begin "{3}, {T}, Sacrifice
+# Deconstruction Hammer" at Bot2's Sol Ring. Bot1 pays the {3} with Ashnod's Altar, sacrificing the Wasp, and a Mox Pearl:
+# with the Wasp gone Yasharn has its ability again, the Hammer can't be sacrificed, and the activation is taken back
+# (CR 601.2h: unpayable costs can't be paid; CR 733.1). The Hammer stays, the Ornithopter untapped, and the Sol Ring
+# survives. Today the Wasp's effect lasts until the state-based check, so Yasharn has no ability while the cost is paid.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Deconstruction Hammer
+Ashnod's Altar
+The Wondrous Wasp
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Yasharn, Implacable Earth
+Island
+Sol Ring
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ashnod's Altar.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Yasharn, Implacable Earth.Cast
+Bot2.Pass
+Bot2.Search()
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Wondrous Wasp.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Yasharn, Implacable Earth)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Yasharn, Implacable Earth.Tapped = true
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Sol Ring)
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: The Wondrous Wasp)
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island; Mox Pearl; Sol Ring; Yasharn, Implacable Earth
+Bot1.Battlefield.Deconstruction Hammer.Tapped = false
+Bot1.Battlefield.Ornithopter.Tapped = false
