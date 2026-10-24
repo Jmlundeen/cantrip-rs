@@ -1,0 +1,58 @@
+# Tam, the Possibility counts planeswalker types among planeswalkers you control, and only those (CR 205.3j, 306.3).
+# The Aetherspark is a planeswalker whose subtype is Equipment, an artifact type, not a planeswalker type; Wrenn and Six
+# is a Wrenn. X is one, so the ability asks once, and the refusal after the one answer holds (a second question would
+# be asked if Equipment counted). Wrenn and Six's three loyalty counters become four; The Aetherspark's four stay.
+# Tam's reduction paid The Aetherspark's {4} with three Moxen.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Tam, the Possibility
+Wrenn and Six
+The Aetherspark
+Island x11
+
+[Bot2 Deck]
+Opt x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tam, the Possibility.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Aetherspark.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Tam, the Possibility.Activate
+Bot1.Target(Bot1.Battlefield.Wrenn and Six)
+! Bot1.Target
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Wrenn and Six.Counters.Loyalty = 4
+Bot1.Battlefield.The Aetherspark.Counters.Loyalty = 4

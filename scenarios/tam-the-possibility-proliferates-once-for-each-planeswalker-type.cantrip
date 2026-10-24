@@ -1,8 +1,11 @@
 # Tam, the Possibility: "{W}{U}{B}{R}{G}, {T}: Proliferate X times, where X is the number of planeswalker types among
 # planeswalkers you control." Wrenn and Six (type Wrenn) and Oko, Thief of Crowns (type Oko) are two types, so X is two:
 # the ability asks twice, and both choices go to Wrenn and Six, whose three loyalty counters become five (CR 701.34a).
-# Oko is not chosen, so it stays at four. Tam's own cost reduction paid for Oko's {1}{G}{U} with just {G}{U}. Bot2's
-# Island is a permanent somebody else controls, so it is no planeswalker type of yours.
+# Oko is not chosen, so it stays at four. Tam's own cost reduction paid for Oko's {1}{G}{U} with just {G}{U}. Bot2
+# controls Narset, Parter of Veils (type Narset, five loyalty counters): a planeswalker among those "you control" counts
+# for its controller only, so X stays two and the refusal after the two answers holds (a third question would be asked
+# if Narset counted). The activation costs exactly {W}{U}{B}{R}{G} and taps Tam: six mana is made, so the pool left
+# right after is the one spare {G}, and Tam is tapped.
 
 [Bot1 Deck]
 Forest
@@ -20,8 +23,9 @@ Island
 Island x8
 
 [Bot2 Deck]
-Island
-Opt x19
+Island x3
+Narset, Parter of Veils
+Island x16
 
 [Actions]
 Bot1.Hand.Forest.Play
@@ -42,22 +46,36 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Wrenn and Six.Cast
 Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
 [T5 Bot1.Main1]
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Oko, Thief of Crowns.Cast
 Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Island#3.Activate
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Pass
 [T7 Bot1.Main1]
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Tam, the Possibility.Activate
+? Bot1.Mana = {G}
+? Bot1.Battlefield.Tam, the Possibility.Tapped = true
 Bot1.Target(Bot1.Battlefield.Wrenn and Six)
 Bot1.Target(Bot1.Battlefield.Wrenn and Six)
+! Bot1.Target
 [T7 Bot1.Main2]
 
 [Expect]
 Bot1.Battlefield.Wrenn and Six.Counters.Loyalty = 5
 Bot1.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 4
+Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 5

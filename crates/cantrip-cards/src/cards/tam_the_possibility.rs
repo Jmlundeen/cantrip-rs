@@ -16,7 +16,7 @@ fn planeswalker_spells_cost_one_less(q: &dyn Query, source: ObjectId, player: Pl
 
 /// "{W}{U}{B}{R}{G}, {T}: Proliferate X times, where X is the number of planeswalker types among planeswalkers you
 /// control." (CR 701.34a, 205.3j, 306.3): each distinct planeswalker type among the planeswalkers its controller controls
-/// as the ability resolves, counted once however many planeswalkers have it. X is fixed as the ability resolves (CR 608.2c),
+/// as the ability resolves, counted once however many planeswalkers have it. X is fixed as the ability resolves (CR 608.2h),
 /// then that many separate proliferate actions happen, one after another: they are one effect resolving, so no player
 /// receives priority between them.
 fn proliferate_for_each_planeswalker_type(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
