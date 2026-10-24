@@ -156,19 +156,40 @@ pub fn search_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, sour
 /// each player shuffle. A player who has left the game by their turn to choose does not search (CR 800.4a). Winds of Abandon
 /// (the players who lost creatures) and Field of Ruin (each player) print it.
 pub fn each_searches_basic_lands_together(g: &mut dyn Game, searchers: &[(PlayerId, u32)], source: ObjectId, tapped: bool) -> Result<(), Suspend> {
+    searches_together(g, searchers, source, tapped, None)
+}
+
+/// `each_searches_basic_lands_together` for "may search": each player in turn order is asked whether to first and then
+/// chooses, all of one player's choices before the next player's (CR 101.4, 101.4c). A player who declines neither searches
+/// nor shuffles; the lands found still enter in one event. Krenko's Buzzcrusher (each destroyed land's controller
+/// may search, tapped), Old-Growth Dryads (each opponent may search, tapped) and New Frontiers (each player may search,
+/// tapped) print it; it is kept beside `each_searches_basic_lands_together` so the order of the players' choices is decided
+/// in one place.
+pub fn each_may_search_basic_lands_together(g: &mut dyn Game, searchers: &[(PlayerId, u32)], source: ObjectId, tapped: bool) -> Result<(), Suspend> {
+    searches_together(g, searchers, source, tapped, Some(if tapped { &FETCH_BASIC_TAPPED } else { &FETCH_BASIC }))
+}
+
+fn searches_together(g: &mut dyn Game, searchers: &[(PlayerId, u32)], source: ObjectId, tapped: bool, ask: Option<&'static Question>) -> Result<(), Suspend> {
     let order: Vec<PlayerId> = g.state().apnap().filter(|p| searchers.iter().any(|&(s, _)| s == *p)).collect();
     let destination = if tapped { SearchDestination::BattlefieldTapped } else { SearchDestination::Battlefield };
     let mut lands: Vec<(ObjectId, PlayerId, bool)> = Vec::new();
+    let mut searched: Vec<PlayerId> = Vec::new();
     for &player in &order {
         if !crate::players::reached(g, player) {
             continue;
         }
+        if let Some(question) = ask {
+            if !ask_may_search(g, player, source, question)? {
+                continue;
+            }
+        }
         let count: u32 = searchers.iter().filter(|&&(s, _)| s == player).map(|&(_, n)| n).sum();
         let found = crate::library::search(g, player, player, source, destination, select::basic_land_cards(select::up_to(count)))?;
         lands.extend(found.into_iter().map(|land| (land, player, tapped)));
+        searched.push(player);
     }
     g.put_all_onto_battlefield_as(&lands)?;
-    for &player in &order {
+    for &player in &searched {
         g.shuffle(player);
     }
     Ok(())
