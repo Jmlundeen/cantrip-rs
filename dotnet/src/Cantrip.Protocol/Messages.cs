@@ -1220,6 +1220,14 @@ public sealed class ChooseCardsPromptMessage : PromptPayload, ISelectionPrompt
     public List<int> Powers { get; set; } = [];
 
     /// <summary>
+    /// For <see cref="CardChoicePurposeView.TapToReduce"/> (harmonize, CR 702.180a): each of <see cref="Powers"/> is the most
+    /// tapping that creature could take off the generic mana of the total cost, which X, a kicker or the targets announced
+    /// after the creature is chosen may still change (CR 601.2b-f); false when it is exactly what tapping it takes off.
+    /// </summary>
+    [Key(25)]
+    public bool PowersUpTo { get; set; }
+
+    /// <summary>
     /// The total mana value the chosen cards must add up to, as collect evidence's "total mana value N or greater"
     /// (CR 701.59a); zero for a choice that asks nothing of it. <c>Cantrip.Core.Decisions.TotalManaValue</c> is the rule.
     /// </summary>

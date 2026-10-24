@@ -9,7 +9,7 @@
 //! | `PayCosts`             | `PayCostsPromptMessage` (announcing X/kicks sets `AnnouncesXOrKicks`)              |
 //! | `UnlessPays`           | `UnlessPaysPromptMessage`                                                          |
 //! | `ChooseCards`          | `ChooseCardsPromptMessage`                                                         |
-//! | `TapForPower`          | `ChooseCardsPromptMessage` (purpose `TapToPay`, `Powers`, `MinimumPower`; harmonize's: `TapToReduce`, up to one) |
+//! | `TapForPower`          | `ChooseCardsPromptMessage` (purpose `TapToPay`, `Powers`, `MinimumPower`; harmonize's: `TapToReduce`, up to one, `PowersUpTo`) |
 //! | `Craft`                | `ChooseCardsPromptMessage` (purpose `Craft`, the quality as `Kind`, `Minimum` for "one or more")               |
 //! | `ChooseTarget`         | `ChooseTargetPromptMessage`                                                        |
 //! | `ChooseModes`          | `ChooseModesPromptMessage`                                                         |
@@ -880,8 +880,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::TapForPower { source, purpose, cards, powers, minimum } => {
-            // Harmonize's creature (CR 702.180a) is up to one, and `powers` is what tapping each takes off the cost.
+        RequestKind::TapForPower { source, purpose, cards, powers, minimum, up_to } => {
+            // Harmonize's creature (CR 702.180a) is up to one, and `powers` is what tapping each takes off the cost: exactly, or
+            // with `up_to` the most it could, the total not settled yet (CR 702.180b, 601.2b).
             let reduce = *purpose == Purpose::TapToReduce;
             PromptPayload::ChooseCardsPromptMessage(ChooseCardsPrompt {
                 player,
@@ -896,6 +897,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 minimum_power: i32::from(*minimum),
                 // Signed: a negative power takes from the total (CR 107.1b).
                 powers: powers.iter().map(|&p| i32::from(p)).collect(),
+                powers_up_to: *up_to,
                 ..Default::default()
             })
         }

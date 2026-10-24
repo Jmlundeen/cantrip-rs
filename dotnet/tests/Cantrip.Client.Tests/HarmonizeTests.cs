@@ -89,6 +89,22 @@ public sealed class HarmonizeTests
     }
 
     [Fact]
+    public void A_cost_not_settled_yet_says_up_to_the_power_never_an_exact_amount()
+    {
+        // Nature's Rhythm's harmonize {X}{G}{G}{G}{G}: the creature is chosen before X is announced (CR 702.180b, 601.2b), so
+        // the host says each power is the most tapping it could take off (`PowersUpTo`), and the caption must not promise
+        // exactly that - nor 0, the generic mana the cost has before X.
+        ObjectView elves = Creature(10, "Llanowar Elves", 1);
+        GameClient client = Seated([WildRide(), elves]);
+        ChooseCardsPromptMessage prompt = Choice((10, 1));
+        prompt.PowersUpTo = true;
+
+        CardChoicePresentation tapped = Judged(client, prompt, [10]);
+        Assert.Equal("Tap it (up to -1)", tapped.Confirm);
+        Assert.StartsWith("Tapping it takes up to 1 off the generic mana of the cost", tapped.Detail);
+    }
+
+    [Fact]
     public void A_creature_of_power_zero_is_tapped_without_promising_a_reduction()
     {
         ObjectView thopter = Creature(10, "Ornithopter", 0);

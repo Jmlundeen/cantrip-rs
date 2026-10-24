@@ -409,7 +409,11 @@ pub enum RequestKind {
     /// Tap any number of untapped creatures with total power `minimum` or more (CR 702.122a crew, CR 702.171a saddle):
     /// any subset of `cards` whose `powers` (what each counts as towards the total, CR 702.122b) add up to it. A negative
     /// power is added as it is (CR 107.1b), taking from the total.
-    TapForPower { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, powers: Vec<i16>, minimum: u8 },
+    ///
+    /// Harmonize's creature (`Purpose::TapToReduce`, CR 702.180a) is up to one, and `powers` is what tapping each takes off the
+    /// generic mana of the total cost: exactly, or, with `up_to`, the most it could take, the total not yet settled as the
+    /// creature is chosen (CR 702.180b, 601.2b: X, a kicker and the targets come after it).
+    TapForPower { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, powers: Vec<i16>, minimum: u8, up_to: bool },
     /// Collect evidence N (CR 701.59a): exile any subset of `cards` (the player's graveyard) whose `values` (their mana
     /// values) add up to `minimum` or more.
     CollectEvidence { source: ObjectId, cards: Vec<ObjectId>, values: Vec<u8>, minimum: u8 },

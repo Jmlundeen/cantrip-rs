@@ -502,7 +502,7 @@ fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatu
 fn choose_tappers(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     let Some(t) = cost.tap_creatures else { return Ok(Vec::new()) };
     let (cards, powers) = tap_candidates(cx, source, player, &t);
-    let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToPay, cards, powers, minimum: t.power };
+    let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToPay, cards, powers, minimum: t.power, up_to: false };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -5693,12 +5693,13 @@ fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &C
 /// Chooses the creature a cost taps to reduce its mana (CR 702.180b, 601.2b): up to one untapped creature, asked as the cost
 /// is chosen, before any target. Nothing is asked when there is no creature to tap.
 ///
-/// The prompt says what tapping each creature takes off: its power, but never more than the generic mana the total cost has as far
-/// as it is known now (the cost changes in play applied), since colored mana does not come down (CR 601.2f).
-///
-/// That total is read here, before X and kicker are announced (CR 601.2b), so a future harmonize card with X or a kicker must
-/// recompute it once they are, or the caption's min(power, generic) understates what comes off.
-fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Option<ObjectId>> {
+/// The prompt says what tapping each creature takes off: its power, but never more than the generic mana the total cost will
+/// have (CR 702.180a), since colored mana does not come down (CR 601.2f). That total is only settled once X, a kicker, the
+/// modes a payment decides, splicing and the targets are announced (CR 601.2b-f), all after this question: while any of them
+/// could still change it, or the hybrid symbols could be announced into different generic mana (CR 107.4e, 118.7e), the most
+/// tapping it could take is its power, and the prompt says "up to" (`up_to`). Settled, the cost changes in play are applied
+/// and the prompt says exactly min(power, generic).
+fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, later: bool, targeted: bool) -> R<Option<ObjectId>> {
     if !cost.tap_to_reduce {
         return Ok(None);
     }
@@ -5706,16 +5707,22 @@ fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) 
     if eligible.is_empty() {
         return Ok(None);
     }
-    // Before any target is chosen (CR 601.2b), so a change that reads the targets is not in it.
-    // The most it could be, however a reduction by hybrid mana is split and hybrid symbols announced (CR 118.7e, 601.2b):
-    // asked before either.
-    let mut generic = 0u8;
-    change_any(cx, &cost_change_sources(cx), player, Costed::Spell(source), cost.mana, None, &[], None, &mut |c, least| {
-        generic = generic.max(at_least(c, least).generic);
+    // Before any target is chosen (CR 601.2b), so a change that reads the targets is not in it: `targeted` is a spell with
+    // targets that a cost change (its own, or one in play) could read. Every way a reduction by hybrid mana is split and the
+    // hybrid symbols are announced (CR 118.7e, 601.2b), asked after it, comes to the same generic mana, or it is unsettled
+    // too. The least the total may come to (Trinisphere) is applied after the reduction (CR 601.2f), so not here.
+    let (mut most, mut fewest) = (0u8, u8::MAX);
+    change_any(cx, &cost_change_sources(cx), player, Costed::Spell(source), cost.mana, None, &[], None, &mut |c, _least| {
+        most = most.max(c.generic);
+        fewest = fewest.min(c.generic);
         false
     });
-    let powers = eligible.iter().map(|&c| i16::from(reduction_of(cx, c).min(generic))).collect();
-    let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToReduce, cards: eligible, powers, minimum: 0 };
+    let up_to = later || most != fewest || targeted;
+    let powers = eligible
+        .iter()
+        .map(|&c| i16::from(if up_to { reduction_of(cx, c) } else { reduction_of(cx, c).min(most) }))
+        .collect();
+    let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToReduce, cards: eligible, powers, minimum: 0, up_to };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards.first().copied()),
         _ => Err(Stop::Cancel),
@@ -6311,8 +6318,16 @@ fn cast(
         cx.st().update_obj(spell, |o| o.paid = 1);
     }
 
-    // CR 702.180b, 601.2b: the creature harmonize taps is chosen as the harmonize cost is, before any target.
-    let reducer = choose_reducer(cx, player, spell, &cost)?;
+    // CR 702.180b, 601.2b: the creature harmonize taps is chosen as the harmonize cost is, before any target. What is announced
+    // after it could still change the generic mana its power comes off (CR 601.2b-f): X, a kicker, the modes a payment
+    // decides, splicing onto Arcane, a cost its targets define, and the targets themselves where a cost change could read them.
+    let later = cost.mana.x > 0
+        || def.kicker.is_some()
+        || modes_after_costs
+        || def.cost_of_targets.is_some()
+        || cx.chars(spell).has_subtype(Subtype::Arcane);
+    let targeted = !specs.is_empty() && (!cost_change_sources(cx).is_empty() || !def.own_cost_changes.is_empty() || lasting_changes(cx));
+    let reducer = choose_reducer(cx, player, spell, &cost, later, targeted)?;
 
     // CR 601.2b: X, and how many times it is kicked, are announced, and the total cost follows (CR 601.2f).
     // CR 107.3a, 601.2b: X is announced for a cost that includes it. A way that casts the face itself (an Adventure,

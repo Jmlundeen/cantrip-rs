@@ -150,7 +150,10 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             : prompt.Purpose == CardChoicePurposeView.TapToReduce
             ? picked.Count == 0
                 ? $"None tapped: the full cost is paid{where}"
-                : $"Tapping it takes {power} off the generic mana of the cost (never colored mana){where}"
+                // Up to its power while X, a kicker or the targets, announced after it, could still change the total (CR 601.2b-f).
+                : prompt.PowersUpTo
+                    ? $"Tapping it takes up to {power} off the generic mana of the cost: its power, as much as the total cost has once it is determined (never colored mana){where}"
+                    : $"Tapping it takes {power} off the generic mana of the cost (never colored mana){where}"
             : prompt.MinimumPower > 0
             ? $"{picked.Count} chosen  ·  total power {power} of {prompt.MinimumPower}{where}"
             : prompt.MinimumManaValue > 0
@@ -174,7 +177,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.ReturnToHand => picked.Count == 1 ? "Return it" : $"Return {picked.Count}",
             CardChoicePurposeView.Untap => picked.Count == 0 ? "Untap nothing" : $"Untap {picked.Count}",
             CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap => picked.Count == 1 ? "Tap it" : $"Tap {picked.Count}",
-            CardChoicePurposeView.TapToReduce => picked.Count == 0 ? "Tap nothing" : power > 0 ? $"Tap it (-{power})" : "Tap it",
+            CardChoicePurposeView.TapToReduce => picked.Count == 0 ? "Tap nothing"
+                : power > 0 ? prompt.PowersUpTo ? $"Tap it (up to -{power})" : $"Tap it (-{power})" : "Tap it",
             CardChoicePurposeView.PutOntoBattlefield => picked.Count == 0 ? "Put nothing" : "Put onto the battlefield",
             CardChoicePurposeView.PutIntoHand => picked.Count == 0 ? "Take nothing"
                 : forAnother ? "Put into their hand" : "Put into your hand",

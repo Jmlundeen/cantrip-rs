@@ -1164,6 +1164,10 @@ pub struct ChooseCardsPrompt {
     pub kind: String,
     pub minimum_power: i32,
     pub powers: Vec<i32>,
+    /// For `TapToReduce` (harmonize, CR 702.180a): each of `powers` is the most tapping that creature could take off the
+    /// generic mana of the total cost, which X, a kicker or the targets announced after it may still change (CR 601.2b-f);
+    /// false when it is exactly what it takes off.
+    pub powers_up_to: bool,
     pub minimum_mana_value: i32,
     pub mana_values: Vec<i32>,
     pub maximum_mana_value: i32,
