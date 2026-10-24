@@ -5,8 +5,9 @@ use cantrip_oracle as oracle;
 /// "Reveal the top five cards of your library. An opponent separates those cards into two piles. Put one pile into your
 /// hand and the other into your graveyard." Reveal to every player (CR 701.20a); form piles without moving the cards,
 /// either possibly empty (CR 700.3a, 700.3c-d). Follow the instructions in order and choose the opponent and kept pile
-/// during resolution (CR 608.2c-d), without targeting the opponent (CR 115.10a). With no opponent, everything opens in the
-/// second pile; a library with fewer than five cards shows what it has (CR 609.3). The piles go to hand and graveyard
+/// during resolution (CR 608.2c-d), without targeting the opponent (CR 115.10a). A caster always has an opponent here: with
+/// every opponent gone the game is over (CR 104.2a), so "no separator" is unreachable, and `choose::separate` merely keeps
+/// it from crashing. A library with fewer than five cards shows what it has (CR 609.3). The piles go to hand and graveyard
 /// together, each card seen by all as it moves, since the reveal lasts through the instruction about them (CR 701.20a).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
