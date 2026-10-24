@@ -1,15 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::statics::have_haste;
-use cantrip_mechanics::{tokens, triggers};
+use cantrip_mechanics::{lands, statics, tokens, triggers};
 use cantrip_oracle as oracle;
-
-/// "Thopters you control have haste" (CR 613.1f, layer 6, 702.10a): every Thopter under the source's controller's
-/// control as the layers compute it, whoever owns it, and after the earlier layers have made it one; the creature type
-/// read through Saheeli's own words (CR 612).
-fn thopters_you_control(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    let s = q.state();
-    so_far.has_subtype(q.words(source).subtype(Subtype::Thopter)) && s.obj(affected).controller == s.obj(source).controller
-}
 
 /// "Whenever you cast a noncreature spell, create a 1/1 colorless Thopter artifact creature token with flying."
 fn make_a_thopter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -25,7 +17,7 @@ pub static CARD: CardDef = CardDef {
     )],
     statics: &[static_ability(
         Layer::Ability,
-        thopters_you_control,
+        statics::your_of_subtype::<{ lands::sub(Subtype::Thopter) }>,
         have_haste,
         "Thopters you control have haste.",
     )],

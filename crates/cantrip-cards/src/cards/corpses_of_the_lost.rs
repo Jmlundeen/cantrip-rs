@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::statics::{have_haste, plus_pt};
-use cantrip_mechanics::{targets, tokens, triggers};
+use cantrip_mechanics::{lands, statics, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// The 2/2 black Skeleton Pirate creature token.
@@ -13,12 +13,6 @@ pub static SKELETON_PIRATE: CardDef = CardDef {
 };
 
 const ASK: Question = Question::new("ReturnToHand", "pay {cost} to return {subject} to its owner's hand?", "", "Pay {cost}", "Leave it");
-
-/// "Skeletons you control" (CR 613.1f): creatures under the controller's control with the creature type Skeleton as
-/// the text of this card reads it (CR 612).
-fn your_skeletons(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    so_far.has_subtype(q.words(source).subtype(Subtype::Skeleton)) && q.state().obj(affected).controller == q.state().obj(source).controller
-}
 
 /// "Create a 2/2 black Skeleton Pirate creature token."
 fn skeleton_pirate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -58,8 +52,8 @@ pub static CARD: CardDef = CardDef {
         .condition(descended_this_turn),
     ],
     statics: &[
-        static_ability(Layer::PtModify, your_skeletons, plus_pt::<1, 0>, "Skeletons you control get +1/+0 and have haste."),
-        static_ability(Layer::Ability, your_skeletons, have_haste, "Skeletons you control get +1/+0 and have haste."),
+        static_ability(Layer::PtModify, statics::your_of_subtype::<{ lands::sub(Subtype::Skeleton) }>, plus_pt::<1, 0>, "Skeletons you control get +1/+0 and have haste."),
+        static_ability(Layer::Ability, statics::your_of_subtype::<{ lands::sub(Subtype::Skeleton) }>, have_haste, "Skeletons you control get +1/+0 and have haste."),
     ],
     ..oracle::CORPSES_OF_THE_LOST
 };

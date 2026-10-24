@@ -87,8 +87,30 @@ pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// `Subtype` as `u16` (`lands::sub`). The subtype is a word of the source's text (CR 612.2). Astrologian's Planisphere
 /// (Wizard), Dark Knight's Greatsword (Knight), Samurai's Katana (Samurai) and Laughing Jasper Flint (Mercenary) print it.
 pub fn also_a<const SUBTYPE: u16>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let printed = Subtype::ALL.into_iter().find(|&s| s as u16 == SUBTYPE).expect("a subtype's number");
-    chars.subtypes = chars.subtypes.with(view.words(source).subtype(printed));
+    if let Some(word) = subtype_word(view, source, SUBTYPE) {
+        chars.subtypes = chars.subtypes.with(word);
+    }
+}
+
+/// The subtype a `Subtype as u16` number names, as `source`'s text has that word now (CR 612.2); `None` for a number that
+/// names no subtype. `also_a`, `your_of_subtype` and `other_of_subtype_you_control` read their `SUBTYPE` through it.
+fn subtype_word(view: &dyn LayerQuery, source: ObjectId, n: u16) -> Option<Subtype> {
+    Subtype::ALL.into_iter().find(|&s| s as u16 == n).map(|printed| view.words(source).subtype(printed))
+}
+
+/// "[Subtype]s you control" (CR 613.1f, layer 6) as `StaticDef::affects`, `SUBTYPE` a `Subtype` as `u16` (`lands::sub`): every
+/// permanent under the source's controller's control that is that creature type as the earlier layers made it, the source
+/// itself among them, the type read through the words of the source's text (CR 612.2). Corpses of the Lost (Skeletons) and
+/// Saheeli, Jewel of Avishkar (Thopters) print it.
+pub fn your_of_subtype<const SUBTYPE: u16>(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    subtype_word(q, source, SUBTYPE).is_some_and(|word| so_far.has_subtype(word))
+        && q.state().obj(affected).controller == q.state().obj(source).controller
+}
+
+/// "Other [subtype]s you control" (CR 613.1f, layer 6): `your_of_subtype` without the source itself. Coppercoat Vanguard
+/// (Humans), Lyra Dawnbringer (Angels) and Magda, Brazen Outlaw (Dwarves) print it.
+pub fn other_of_subtype_you_control<const SUBTYPE: u16>(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    affected != source && your_of_subtype::<SUBTYPE>(q, source, affected, so_far)
 }
 
 /// "... can't be countered" (CR 101.2, layer 6) as the `StaticDef::apply` of a static ability that covers spells on the
