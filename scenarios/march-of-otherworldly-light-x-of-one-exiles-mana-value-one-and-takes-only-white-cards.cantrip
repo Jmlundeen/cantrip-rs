@@ -1,0 +1,42 @@
+# March of Otherworldly Light with one white card exiled and X = 1: {1}{W} less {2} is {W} (CR 601.2f, 118.7a: never below
+# the colored mana), which the one Plains pays. Only white cards may be exiled for it - Lightning Bolt, red, is refused. The
+# target is chosen once X is announced (CR 601.2b-c): Sol Ring, mana value 1, is exactly at "X or less"; Mind Stone, mana
+# value 2, one past it, is refused, and so is an Island, a land and no artifact, creature or enchantment.
+
+[Bot1 Deck]
+Plains
+March of Otherworldly Light
+Swords to Plowshares
+Lightning Bolt
+Island x16
+
+[Bot2 Deck]
+Island
+Sol Ring
+Mind Stone
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.March of Otherworldly Light.Cast(X: 1)
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Swords to Plowshares)
+! Bot1.Target(Bot2.Battlefield.Mind Stone)
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Swords to Plowshares; Sol Ring
+Bot1.Graveyard = March of Otherworldly Light
+Bot2.Battlefield = Island; Mind Stone

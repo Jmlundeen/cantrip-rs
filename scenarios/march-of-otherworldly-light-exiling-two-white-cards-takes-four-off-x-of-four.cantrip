@@ -1,0 +1,46 @@
+# March of Otherworldly Light: "As an additional cost to cast this spell, you may exile any number of white cards from your
+# hand. This spell costs {2} less to cast for each card exiled this way." Bot1 chooses two white cards as it casts it (CR
+# 601.2b) - Swords to Plowshares and Lightning Helix, a red and white card, white all the same - before X, which the
+# announcement then starts at 4, the X their reduction pays for; the line says no X, so 4 is announced. The total cost
+# {4}{W} comes down by {2} for each card exiled (CR 601.2f), so the one Plains' {W} pays it exactly, and the pool is empty
+# right after the cast. Its mana value on the stack is X plus 1, 5, whatever was paid (the ruling). It exiles
+# Bot2's Mind Stone (mana value 2, X or less).
+
+[Bot1 Deck]
+Plains
+March of Otherworldly Light
+Swords to Plowshares
+Lightning Helix
+Island x16
+
+[Bot2 Deck]
+Island
+Sol Ring
+Mind Stone
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+? Bot1.Mana = {W}
+Bot1.Hand.March of Otherworldly Light.Cast
+Bot1.Choose(Swords to Plowshares; Lightning Helix)
+Bot1.Target(Bot2.Battlefield.Mind Stone)
+? Bot1.Mana =
+? Exile = Swords to Plowshares; Lightning Helix
+? Stack.March of Otherworldly Light.X = 4
+? Stack.March of Otherworldly Light.ManaValue = 5
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Swords to Plowshares; Lightning Helix; Mind Stone
+Bot1.Graveyard = March of Otherworldly Light
+Bot2.Battlefield = Island; Sol Ring

@@ -1,0 +1,48 @@
+# Thalia, Guardian of Thraben makes March of Otherworldly Light cost {1} more. With only a Plains untapped and no white card in
+# hand, Bot1 can't cast it even for X = 0 ({1}{W}). Once it draws Swords to Plowshares it can: exiling it takes {2} off the
+# total cost after the tax is added (CR 601.2f: the total is the cost plus increases less reductions, never below {0}), so
+# X = 1 costs {1}{1}{W} less {2}, just {W} - a reduction taken before the tax would leave {1}{W}, more than the Plains pays.
+# Announced without a value, X would start at 2, what the reduction pays for, so this one is said. The Ornithopter is exiled.
+
+[Bot1 Deck]
+Plains
+March of Otherworldly Light
+Ornithopter
+Lightning Bolt
+Island
+Island
+Island
+Island
+Swords to Plowshares
+Island x11
+
+[Bot2 Deck]
+Plains
+Plains
+Thalia, Guardian of Thraben
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T5 Bot1.Upkeep]
+! Bot1.Hand.March of Otherworldly Light.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.March of Otherworldly Light.Cast(X: 1)
+Bot1.Choose(Swords to Plowshares)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile = Swords to Plowshares; Ornithopter
+Bot1.Graveyard = March of Otherworldly Light

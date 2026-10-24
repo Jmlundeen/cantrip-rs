@@ -1,0 +1,34 @@
+# March of Otherworldly Light cast exiling no card ("you may"): nothing comes off, so X = 1 costs {1}{W} in full (CR 601.2f),
+# both Plains' mana, and the pool is empty after. The white card in hand stays there. Bot1 may target its own artifact: the
+# Ornithopter (mana value 0) is exiled.
+
+[Bot1 Deck]
+Plains
+Plains
+March of Otherworldly Light
+Ornithopter
+Swords to Plowshares
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+? Bot1.Mana = {W}{W}
+Bot1.Hand.March of Otherworldly Light.Cast(X: 1)
+Bot1.Choose()
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Graveyard = March of Otherworldly Light
+Bot1.Hand = Island; Island; Island; Swords to Plowshares
