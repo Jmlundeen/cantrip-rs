@@ -9245,9 +9245,9 @@ fn pay_during_resolution(
     if !can_pay_life(cx, payer, life_of(x)) {
         return Ok(None);
     }
-    // CR 118.13b: how a monocolored hybrid symbol is paid is chosen immediately before the cost is paid. No cost paid during
-    // a resolution has a Phyrexian symbol (none is printed), so none is announced here.
-    // A cost paid a number of times is announced as it is paid, that many times over (`pay_mana`).
+    // CR 118.13b: how a monocolored hybrid symbol is paid is chosen immediately before the cost is paid. A cost paid a number
+    // of times is announced as it is paid, that many times over (`pay_mana`). A Phyrexian symbol is announced as the payer
+    // pays (`pay_announced`): a spell's mana cost another player pays (Ice Cave) may have one.
     let announced;
     let cost = if cost.mana.twobrid != [0; 5] && times.is_none() {
         let mut mana = cost.mana;
@@ -9282,7 +9282,7 @@ fn pay_during_resolution(
             if total != ManaCost::ZERO || x.is_some() {
                 options = mana_options_while_paying(cx, payer, source, Paying::Other);
             }
-            if total == ManaCost::ZERO || !matches!(ways(&pool, &total), Ways::None) {
+            if total == ManaCost::ZERO || pool_pays(&pool, &total, payable_life(cx, payer) - i32::from(life)) {
                 options.push(ActionOption::simple(ActionKind::PayCost));
             }
         }
@@ -9337,7 +9337,7 @@ fn pay_during_resolution(
             ActionKind::DecreaseX => x = x.map(|n| n.saturating_sub(1)),
             ActionKind::PayCost => {
                 let (mark, log_mark) = (cx.s().mark(), cx.g.log.len());
-                match pay_resolution_cost(cx, payer, source, cost, total, life, x.unwrap_or(0)) {
+                match pay_announced(cx, payer, source, cost, total, life, x.unwrap_or(0)) {
                     Ok(()) => return Ok(Some(x.unwrap_or(0))),
                     // A choice given up: nothing was paid, and the payer is asked again.
                     Err(Stop::Cancel) => {
@@ -9350,6 +9350,52 @@ fn pay_during_resolution(
             _ => return Ok(None),
         }
     }
+}
+
+/// Whether `pool` pays `owed` now, however its symbols that can be paid in more than one way are paid (CR 118.13): each
+/// Phyrexian symbol with its color or 2 life, at most `life_room` life between them (CR 107.4f), and each monocolored hybrid
+/// symbol with its color or {2} (CR 107.4e). Symbols of one kind and color are alike, so each choice is how many of them
+/// are paid each way.
+pub(crate) fn pool_pays(pool: &ManaPool, owed: &ManaCost, life_room: i32) -> bool {
+    fn go(pool: &ManaPool, rest: ManaCost, life_room: i32, at: usize) -> bool {
+        if at == 10 {
+            return !matches!(ways(pool, &rest), Ways::None);
+        }
+        let (color, phyrexian) = (at % 5, at < 5);
+        let n = if phyrexian { rest.phyrexian[color] } else { rest.twobrid[color] };
+        let mana = Color::ALL[color].mana() as usize;
+        // `other` of them paid the other way: with 2 life, or with {2}.
+        (0..=n).any(|other| {
+            let mut next = rest;
+            let Some(symbols) = next.symbols[mana].checked_add(n - other) else { return false };
+            next.symbols[mana] = symbols;
+            let room = if phyrexian {
+                next.phyrexian[color] = 0;
+                life_room - 2 * i32::from(other)
+            } else {
+                next.twobrid[color] = 0;
+                let Some(generic) = other.checked_mul(2).and_then(|two| next.generic.checked_add(two)) else { return false };
+                next.generic = generic;
+                life_room
+            };
+            room >= 0 && go(pool, next, room, at + 1)
+        })
+    }
+    go(pool, *owed, life_room, 0)
+}
+
+/// Pays a resolution's cost with `total` its mana and `life` its life: its Phyrexian symbols are announced first, each
+/// paid with its color or 2 life, immediately before the cost is paid (CR 118.13b, 107.4f), and the life they take is paid
+/// with the rest. A choice of more life than the payer can pay gives the payment up, to be asked again.
+fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mut total: ManaCost, mut life: u16, x: u16) -> R<()> {
+    if total.phyrexian != [0; 5] {
+        let extra = announce_life(cx, payer, source, &mut total, false, None)?;
+        life = life.checked_add(u16::from(extra)).ok_or(Stop::Cancel)?;
+        if !can_pay_life(cx, payer, life) {
+            return Err(Stop::Cancel);
+        }
+    }
+    pay_resolution_cost(cx, payer, source, cost, total, life, x)
 }
 
 /// Chooses what the parts of a resolution's cost other than mana and life take, then pays the whole (CR 118.3, 601.2h):

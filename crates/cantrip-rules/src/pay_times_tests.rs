@@ -197,3 +197,18 @@ fn paying_three_times_may_choose_every_mode() {
     next(&mut g);
     assert_eq!(g.state.stack.len(), 1);
 }
+
+/// Whether the pool pays a cost whose symbols may be paid more than one way (CR 118.13): a {2/G} paid twice over by {2}{2},
+/// {G}{2} or {G}{G} - so whether "pay" is offered never reads an unannounced symbol as free - and a {G/P} with {G} or 2 life.
+#[test]
+fn the_pool_pays_a_cost_of_symbols_paid_more_than_one_way_only_with_enough_of_some_way() {
+    let pool = |c: u32, g: u32| ManaPool([0, 0, 0, 0, g, c]);
+    let twice = mana("{2/G}").times(2).expect("fits");
+    assert!(crate::actions::pool_pays(&pool(4, 0), &twice, 0), "{{2}}{{2}}");
+    assert!(crate::actions::pool_pays(&pool(2, 1), &twice, 0), "{{G}}{{2}}");
+    assert!(crate::actions::pool_pays(&pool(0, 2), &twice, 0), "{{G}}{{G}}");
+    assert!(!crate::actions::pool_pays(&pool(3, 0), &twice, 0), "three colorless pay neither way");
+    assert!(!crate::actions::pool_pays(&pool(1, 0), &mana("{G/P}"), 1), "no {{G}} and no 2 life");
+    assert!(crate::actions::pool_pays(&pool(0, 0), &mana("{G/P}"), 2), "2 life");
+    assert!(crate::actions::pool_pays(&pool(0, 1), &mana("{G/P}"), 0), "{{G}}");
+}

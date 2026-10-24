@@ -102,6 +102,12 @@ fn discard_and_energy(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result
     may_pay_with(g, item, discard(1, |_, _, _| true).and(Cost { energy: 1, ..Cost::NONE }))
 }
 
+/// "You may pay {B/P}. If you do, you gain 5 life." - a Phyrexian symbol in a cost paid as a spell resolves, as Ice Cave's
+/// payer meets one in a spell's mana cost: paid with {B} or 2 life (CR 107.4f, 118.13b).
+fn phyrexian_cost(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    may_pay_with(g, item, cost("{B/P}"))
+}
+
 /// A loyalty cost, which no resolving spell asks for (CR 606.4): never paid.
 fn loyalty_cost(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
     may_pay_with(g, item, Cost { loyalty: Some(-1), ..Cost::NONE })
@@ -110,6 +116,7 @@ fn loyalty_cost(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), S
 static OFFER: CardDef = CardDef { name: "Cost Test Offer", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], sacrifice_one), ..CardDef::BLANK };
 static RECALL: CardDef = CardDef { name: "Cost Test Recall", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], return_tapped), ..CardDef::BLANK };
 static TITHE: CardDef = CardDef { name: "Cost Test Tithe", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], discard_and_energy), ..CardDef::BLANK };
+static TOLL: CardDef = CardDef { name: "Cost Test Toll", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], phyrexian_cost), ..CardDef::BLANK };
 static VOW: CardDef = CardDef { name: "Cost Test Vow", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], loyalty_cost), ..CardDef::BLANK };
 
 /// "Whenever a card is put into a hand or a library, you gain 2 life" (CR 603.10a: it looks back for a card all players can
@@ -182,7 +189,7 @@ static STOWER: CardDef = CardDef {
 
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &DORK, &SEER, &GAZER, &RETURNER, &OFFER, &RECALL, &TITHE, &VOW, &RECOILER, &LIBRARIAN, &RITE, &GRAFT, &STOWER])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &DORK, &SEER, &GAZER, &RETURNER, &OFFER, &RECALL, &TITHE, &VOW, &RECOILER, &LIBRARIAN, &RITE, &GRAFT, &STOWER, &TOLL])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -527,4 +534,49 @@ fn a_card_revealed_for_a_spell_being_cast_is_looked_back_on_as_a_mana_ability_mo
             || g.state.stack.iter().any(|i| i.kind == StackKind::Triggered && i.object == librarian);
         assert_eq!(triggered, spliced, "the Librarian looks back only on a card all players could see");
     }
+}
+
+/// A Phyrexian symbol in a cost paid as a spell resolves is paid with its color or 2 life, chosen immediately before the cost
+/// is paid (CR 107.4f, 118.13b): with no mana, paying is offered and takes 2 life; with {B} the payer may pay it with the
+/// mana instead; with neither {B} nor 2 life to pay, only declining is offered.
+#[test]
+fn a_phyrexian_symbol_in_a_cost_paid_as_a_spell_resolves_is_paid_with_its_color_or_two_life() {
+    // No mana: 2 life.
+    let mut g = game();
+    let toll = put(&mut g, &TOLL, Zone::hand(YOU));
+    let r = cast_to_payment(&mut g, toll);
+    let pay = pays(&r).expect("2 life pays it");
+    answer(&mut g, &r, Answer::Act(Action::of(&pay)));
+    let r = next(&mut g);
+    match &r.kind {
+        RequestKind::ChooseModes { modes, at_most, .. } => {
+            assert_eq!(modes, &vec![Label::PayLife(Color::Black)]);
+            assert_eq!(*at_most, 1);
+        }
+        other => panic!("expected the choice of life for {{B/P}}, got {other:?}"),
+    }
+    answer(&mut g, &r, Answer::Modes(vec![0]));
+    next(&mut g);
+    assert_eq!(g.state.player(YOU).life, 20 - 2 + 5, "2 life paid, 5 gained");
+
+    // {B} in the pool: paid with the mana, no life.
+    let mut g = game();
+    let toll = put(&mut g, &TOLL, Zone::hand(YOU));
+    g.state.add_mana(YOU, Mana::B, 1, toll, None, false);
+    let r = cast_to_payment(&mut g, toll);
+    let pay = pays(&r).expect("{B} pays it");
+    answer(&mut g, &r, Answer::Act(Action::of(&pay)));
+    let r = next(&mut g);
+    assert!(matches!(r.kind, RequestKind::ChooseModes { .. }), "how {{B/P}} is paid is asked: {:?}", r.kind);
+    answer(&mut g, &r, Answer::Modes(Vec::new()));
+    next(&mut g);
+    assert_eq!(g.state.player(YOU).life, 25, "no life paid");
+    assert_eq!(g.state.player(YOU).pool.get(Mana::B), 0, "the {{B}} was spent");
+
+    // Neither {B} nor 2 life: only declining.
+    let mut g = game();
+    let toll = put(&mut g, &TOLL, Zone::hand(YOU));
+    g.state.update_player(YOU, |p| p.life = 1);
+    let r = cast_to_payment(&mut g, toll);
+    assert!(pays(&r).is_none(), "a {{B/P}} with no {{B}} and 1 life can't be paid");
 }
