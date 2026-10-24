@@ -2,8 +2,8 @@
 # discards that card. Empower Jace 1." Bot2 holds Llanowar Elves (a creature), an Island and a Lightning Bolt. The Island
 # is refused because the card must be nonland (CR 110.4a counts a land as a permanent card, so only "nonland" excludes
 # it), the Bolt because an instant is no permanent card at all (CR 110.4a); the Elves are taken, Bot2 discards only them,
-# and with no Jace token yet empower Jace makes one with one loyalty counter (CR 701.71a). The two Swamps pay for the
-# spell and the Mox Jet.
+# and with no Jace token yet empower Jace makes one with one loyalty counter (CR 701.71a). The Swamp and the Mox Jet pay for the
+# spell.
 
 [Bot1 Deck]
 Swamp
@@ -31,7 +31,7 @@ Bot1.Choose(Llanowar Elves)
 
 [Expect]
 Bot1.Graveyard = Solve for Disappointment
-Bot1.Battlefield.Jace.Token = true
-Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot1.Battlefield.Jace Token.Token = true
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 1
 Bot2.Graveyard = Llanowar Elves
 Bot2.Hand.Count = 6

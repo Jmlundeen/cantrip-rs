@@ -24,6 +24,6 @@ Bot1.Pass
 
 [Expect]
 Bot1.Graveyard = Solve for Disappointment
-Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 1
 Bot2.Graveyard.Count = 0
 Bot2.Hand.Count = 7
