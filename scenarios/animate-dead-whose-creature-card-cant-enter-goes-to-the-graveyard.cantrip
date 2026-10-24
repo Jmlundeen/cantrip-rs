@@ -1,0 +1,38 @@
+# Animate Dead: as its enters ability resolves, it loses "enchant creature card in a graveyard" and gains "enchant creature
+# put onto the battlefield with Animate Dead" (CR 613.1f) - whether or not the card then returns. Bot1 casts Grafdigger's
+# Cage ("Creature cards in graveyards ... can't enter the battlefield"), loots a Guerrilla Gorilla away and casts Animate
+# Dead on it: the Gorilla can't enter and stays in the graveyard, and Animate Dead, still attached to it but no longer
+# able to enchant a card in a graveyard, is put into its owner's graveyard by the state-based actions (CR 303.4c, 704.5m).
+# Its leaves-the-battlefield trigger sacrifices nothing.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Mox Jet
+Black Lotus
+Grafdigger's Cage
+Animate Dead
+Swamp
+Guerrilla Gorilla
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Guerrilla Gorilla; Swamp)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grafdigger's Cage.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Animate Dead.Cast(Guerrilla Gorilla)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Grafdigger's Cage; Mountain; Mox Jet
+Bot1.Graveyard = Animate Dead; Black Lotus; Faithless Looting; Swamp; Guerrilla Gorilla
