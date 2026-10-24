@@ -389,7 +389,7 @@ pub static GOLD: CardDef = CardDef {
     ..token!(Gold)
 };
 
-/// A red and green Heartwood artifact token with "{T}: Add {R} or {G}." (CR 111.10x). Aerid Konstrari makes it.
+/// A red and green Heartwood artifact token with "{T}: Add {R} or {G}." (CR 111.10x). Aerid Konstrari, Heartwood Crafter, Konstrari Improviser and Hungering Puppetbeast make it.
 pub static HEARTWOOD: CardDef = CardDef {
     colors: Some(ColorSet(0b11000)),
     types: TypeSet::of(&[CardType::Artifact]),

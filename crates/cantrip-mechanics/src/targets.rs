@@ -786,6 +786,12 @@ pub mod filters {
     pub fn artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         q.chars(id).is(CardType::Artifact)
     }
+    /// "Another artifact" (CR 109.1, 701.21a): an artifact other than the source of the cost. The permanents a cost can
+    /// sacrifice are the paying player's own, so no controller check is needed. Hungering Puppetbeast, Legion Extruder and
+    /// Repurposing Bay sacrifice one.
+    pub fn another_artifact(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+        id != asker.source && artifact(q, asker, id)
+    }
     /// A nontoken artifact. Thopter Foundry sacrifices one.
     pub fn nontoken_artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         super::is_nontoken_artifact(q, id)

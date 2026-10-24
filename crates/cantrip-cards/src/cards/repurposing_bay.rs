@@ -1,11 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{search_to_battlefield, Find};
+use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
-
-/// "Another artifact" (CR 109.1) as a sacrifice cost: an artifact the player controls other than the Bay itself.
-fn another_artifact(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    id != asker.source && q.chars(id).is(CardType::Artifact)
-}
 
 /// "Search your library for an artifact card with mana value equal to 1 plus the sacrificed artifact's mana value, put that card
 /// onto the battlefield, then shuffle" (CR 701.23, 202.3): the sacrificed artifact is read as it last was on the battlefield
@@ -21,7 +17,7 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[ability(cost("{2}, {T}").and(sacrifice(1, another_artifact)), search, "{2}, {T}, Sacrifice another artifact: Search your library for an artifact card with mana value equal to 1 plus the sacrificed artifact's mana value, put that card onto the battlefield, then shuffle. Activate only as a sorcery.")
+    abilities: &[ability(cost("{2}, {T}").and(sacrifice(1, targets::filters::another_artifact)), search, "{2}, {T}, Sacrifice another artifact: Search your library for an artifact card with mana value equal to 1 plus the sacrificed artifact's mana value, put that card onto the battlefield, then shuffle. Activate only as a sorcery.")
         .sorcery_speed()],
     ..oracle::REPURPOSING_BAY
 };
