@@ -1,0 +1,55 @@
+# Choosing no target ("up to one", CR 115.1d) is allowed and the ability still resolves: Harpooner gets +1/+0 (one creature
+# card, the Ornithopter bolted on turn 1, in Bot1's graveyard) and no fight is asked. Targets the filter refuses: Bot1's own
+# flyer (Ornithopter) and Bot2's creature without flying (Llanowar Elves); only Bot2's Soulbreaker is a candidate.
+
+[Bot1 Deck]
+Mountain
+Forest
+Mox Ruby
+Ornithopter
+Ornithopter
+Lightning Bolt
+Mountain
+Kraul Harpooner
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Screeching Soulbreaker
+Llanowar Elves
+Forest
+Swamp x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#1)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Screeching Soulbreaker.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Kraul Harpooner.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target()
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Kraul Harpooner.Power = 4
+Bot1.Battlefield.Kraul Harpooner.Toughness = 2
+Bot1.Battlefield.Kraul Harpooner.Damage = 0
+Bot2.Battlefield.Screeching Soulbreaker.Damage = 0
+Bot1.Battlefield.Ornithopter.Damage = 0

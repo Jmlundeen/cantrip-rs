@@ -1,0 +1,55 @@
+# The fight is a "may" chosen as the ability resolves (ruling 2018-10-05): declined, Harpooner still gets +X/+0 (4 power) and
+# neither creature is damaged. The pump is until end of turn only (CR 611.2a): on Bot2's turn it is back to 3.
+
+[Bot1 Deck]
+Mountain
+Forest
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain
+Kraul Harpooner
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Screeching Soulbreaker
+Ornithopter
+Swamp x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Screeching Soulbreaker.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Kraul Harpooner.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Target(Bot2.Battlefield.Screeching Soulbreaker)
+Bot1.Decline
+[Bot1.Main2]
+? Bot1.Battlefield.Kraul Harpooner.Power = 4
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Kraul Harpooner.Power = 3
+Bot1.Battlefield.Kraul Harpooner.Damage = 0
+Bot2.Battlefield.Screeching Soulbreaker.Damage = 0
+Bot2.Graveyard = Ornithopter; Black Lotus

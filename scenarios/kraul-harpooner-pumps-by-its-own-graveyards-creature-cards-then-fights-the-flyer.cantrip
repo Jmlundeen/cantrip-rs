@@ -1,0 +1,56 @@
+# Undergrowth: X counts creature cards (Ornithopter, an artifact creature) in Bot1's graveyard only (1: Bot2's graveyard holds a
+# creature card too and the Bolts do not count), is read as the ability resolves (CR 608.2h), and the pump comes before the fight
+# (CR 608.2c): 3+1 = 4 power kills the 1/4 Soulbreaker exactly, and Harpooner takes its 1 damage. Reach is on the card (CR 702.17).
+
+[Bot1 Deck]
+Mountain
+Forest
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain
+Kraul Harpooner
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Screeching Soulbreaker
+Ornithopter
+Swamp x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Screeching Soulbreaker.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Kraul Harpooner.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Target(Bot2.Battlefield.Screeching Soulbreaker)
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Kraul Harpooner.Power = 4
+Bot1.Battlefield.Kraul Harpooner.Toughness = 2
+Bot1.Battlefield.Kraul Harpooner.Damage = 1
+Bot1.Battlefield.Kraul Harpooner.Keywords = Reach
+Bot2.Graveyard = Screeching Soulbreaker; Ornithopter; Black Lotus
+Bot2.Battlefield.Screeching Soulbreaker = (absent)
+Bot1.Graveyard.Count = 3
