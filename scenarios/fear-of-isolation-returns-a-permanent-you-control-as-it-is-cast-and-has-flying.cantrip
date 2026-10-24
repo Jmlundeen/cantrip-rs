@@ -1,0 +1,50 @@
+# "As an additional cost to cast this spell, return a permanent you control to its owner's hand" (CR 118.8) needs a
+# permanent of your own to return. Turn two Bot2 puts an Ornithopter on the battlefield: an opponent's permanent does not
+# do. Turn three Bot1 casts a Black Lotus and taps it for {U}{U}{U}, which sacrifices it, so with the mana in the pool
+# but no permanent left on Bot1's side the Fear is refused (a cast refused for want of mana would prove nothing).
+# Turn five Bot1 plays an Island and casts a Mox Sapphire, taps both for exactly {1}{U} and casts the Fear, returning the
+# tapped Mox to its hand as the cost: the pool is empty right after, the Fear has flying, and Bot2's Ornithopter stays.
+
+[Bot1 Deck]
+Black Lotus
+Island
+Mox Sapphire
+Fear of Isolation
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+! Bot1.Hand.Fear of Isolation.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fear of Isolation.Cast
+Bot1.Choose(Mox Sapphire)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Fear of Isolation; Island
+Bot1.Battlefield.Fear of Isolation.Keywords = Flying
+Bot1.Hand = Island; Island; Island; Island; Island; Mox Sapphire
+Bot2.Battlefield = Ornithopter
