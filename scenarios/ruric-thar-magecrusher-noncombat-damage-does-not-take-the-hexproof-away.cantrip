@@ -1,6 +1,6 @@
 # "... as long as they haven't dealt combat damage yet": only combat damage counts. Pyroclasm deals two to every
 # creature (CR 120.3e) without targeting, so hexproof does not stop it, but the damage is noncombat and the hexproof stays:
-# Bot2's Unsummon is still refused afterwards. "Yet" lasts the whole game, not one turn.
+# Bot2's Unsummon is still refused afterwards.
 
 [Bot1 Deck]
 Forest

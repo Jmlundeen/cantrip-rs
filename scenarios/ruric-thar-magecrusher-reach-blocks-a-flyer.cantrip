@@ -1,5 +1,6 @@
 # Reach (CR 702.17) lets Ruric Thar, Magecrusher block a creature with flying: Bot2's Ornithopter attacks on turn four and
-# is blocked, dying to the seven damage. Ruric Thar takes none and stays untapped.
+# is blocked, dying to the seven damage. Ruric Thar takes none and stays untapped. That damage went to a creature, not a
+# player, and is still combat damage dealt by Ruric Thar: it loses its hexproof, so Bot2's Unsummon now targets it.
 
 [Bot1 Deck]
 Forest
@@ -13,7 +14,8 @@ Forest x14
 [Bot2 Deck]
 Island
 Ornithopter
-Island x18
+Unsummon
+Island x17
 
 [Actions]
 Bot1.Hand.Forest.Play
@@ -39,8 +41,9 @@ Bot1.Pass
 Bot2.Attack(Ornithopter > Bot1)
 Bot1.Block(Ruric Thar, Magecrusher > Ornithopter)
 [T4 Bot2.Main2]
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Ruric Thar, Magecrusher)
 
 [Expect]
-Bot1.Battlefield.Ruric Thar, Magecrusher.Damage = 0
-Bot1.Battlefield.Ruric Thar, Magecrusher.Tapped = false
-Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Count = 4
+Bot2.Graveyard = Unsummon; Ornithopter

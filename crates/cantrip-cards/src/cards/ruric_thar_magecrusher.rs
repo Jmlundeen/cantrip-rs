@@ -8,10 +8,15 @@ use cantrip_oracle as oracle;
 /// object after a zone change has not dealt any, CR 400.7). Damage that was prevented was not dealt (CR 615.6), so it is
 /// no combat damage here; noncombat damage does not count.
 fn itself_until_it_deals_combat_damage(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    // Newest first, up to the zone change that made this object: it can have dealt damage only since then.
     source == affected
-        && !view.history().all().iter().any(|record| {
-            matches!(record.event, Event::Damage { source: from, combat: true, amount, .. } if from == source && amount > 0)
-        })
+        && !view
+            .history()
+            .all()
+            .iter()
+            .rev()
+            .take_while(|record| !matches!(record.event, Event::ZoneChange { new, .. } if new == source))
+            .any(|record| matches!(record.event, Event::Damage { source: from, combat: true, amount, .. } if from == source && amount > 0))
 }
 
 pub static CARD: CardDef = CardDef {

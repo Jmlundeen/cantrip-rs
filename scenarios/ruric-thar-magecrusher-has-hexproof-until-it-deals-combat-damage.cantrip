@@ -2,7 +2,9 @@
 # 604.1, 611.3a). Before any combat damage, Bot2's Unsummon cannot target it, while the same Unsummon targeting Bot2's
 # own Ornithopter works (the positive control). Bot1's own Giant Growth does target it, hexproof stopping only opponents.
 # On turn three it attacks with vigilance (untapped) and trample: the Ornithopter blocks for two and the other eight go to
-# Bot2, so it has dealt combat damage. On turn six the second Unsummon now targets it.
+# Bot2, so it has dealt combat damage. On turn six the second Unsummon now targets it
+# and returns it to Bot1's hand. Bot1 recasts it on turn seven: a new object (CR 400.7) has dealt no combat damage, so it
+# has hexproof again and Bot2's third Unsummon on turn eight is refused.
 
 [Bot1 Deck]
 Forest
@@ -12,7 +14,8 @@ Mox Emerald
 Mox Sapphire
 Ruric Thar, Magecrusher
 Giant Growth
-Forest x13
+Black Lotus
+Forest x12
 
 [Bot2 Deck]
 Island
@@ -21,7 +24,8 @@ Ornithopter
 Ornithopter
 Unsummon
 Unsummon
-Island x14
+Unsummon
+Island x13
 
 [Actions]
 Bot1.Hand.Forest.Play
@@ -63,10 +67,22 @@ Bot2.Hand.Island.Play
 Bot2.Battlefield.Island#2.Activate
 Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Ruric Thar, Magecrusher)
 [T6 Bot2.Main2]
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ruric Thar, Magecrusher.Cast
+Bot1.Pass
+Bot2.Pass
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#3.Activate
+! Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Ruric Thar, Magecrusher)
 
 [Expect]
-Bot1.Hand.Count = 3
-Bot1.Battlefield.Count = 4
-Bot1.Battlefield.Ruric Thar, Magecrusher = (absent)
+Bot1.Battlefield.Ruric Thar, Magecrusher.Toughness = 7
 Bot2.Graveyard = Unsummon; Ornithopter; Unsummon
 Bot2.Life = 12
