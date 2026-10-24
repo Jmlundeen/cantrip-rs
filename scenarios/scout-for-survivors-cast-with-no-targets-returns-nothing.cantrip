@@ -1,0 +1,45 @@
+# Scout for Survivors: "up to three target creature cards": it can be cast with no targets at all (CR 601.2c). Wheel of Fortune
+# puts Llanowar Elves in the graveyard; Scout is cast choosing none, resolves, and the Elves stay in the graveyard with nothing
+# on the battlefield but the Moxen and no counters.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Wheel of Fortune
+Llanowar Elves
+Ornithopter
+Ornithopter
+Ornithopter
+Scout for Survivors
+Mox Pearl
+Mox Jet
+Plains x20
+
+[Bot2 Deck]
+Plains x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Scout for Survivors.Cast
+Bot1.Target()
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Graveyard.Count = 7
+Bot1.Graveyard.Llanowar Elves.Power = 1

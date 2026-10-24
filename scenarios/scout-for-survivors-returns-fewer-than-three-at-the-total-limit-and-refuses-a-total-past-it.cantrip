@@ -1,0 +1,50 @@
+# Scout for Survivors: "up to three target creature cards with total mana value 3 or less". Wheel of Fortune puts Llanowar
+# Elves (1), Guerrilla Gorilla (2), Hired Blade (3) and Yargle, Glutton of Urborg (5) in the graveyard. Gorilla + Elves is exactly 3 and is
+# accepted with two targets, fewer than three; Hired Blade with Elves (4) and Yargle, Glutton of Urborg alone (5) are past the limit and are
+# refused (CR 601.2c, 202.3). The Elves and the Gorilla enter with a +1/+1 counter each; Hired Blade and Yargle, Glutton of Urborg stay.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Wheel of Fortune
+Llanowar Elves
+Guerrilla Gorilla
+Hired Blade
+Yargle, Glutton of Urborg
+Scout for Survivors
+Mox Pearl
+Mox Jet
+Plains x20
+
+[Bot2 Deck]
+Plains x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Scout for Survivors.Cast
+! Bot1.Target(Hired Blade; Llanowar Elves)
+! Bot1.Target(Yargle, Glutton of Urborg)
+! Bot1.Target(Black Lotus)
+Bot1.Target(Guerrilla Gorilla; Llanowar Elves)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Guerrilla Gorilla; Llanowar Elves; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Guerrilla Gorilla.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Scout for Survivors; Wheel of Fortune; Yargle, Glutton of Urborg; Hired Blade; Black Lotus

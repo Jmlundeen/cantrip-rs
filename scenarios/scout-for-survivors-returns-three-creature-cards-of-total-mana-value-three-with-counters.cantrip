@@ -1,0 +1,56 @@
+# Scout for Survivors: "Return up to three target creature cards with total mana value 3 or less from your graveyard to the
+# battlefield. Put a +1/+1 counter on each of them." Bot1's Wheel of Fortune (cast on turn 1 off Black Lotus) puts Llanowar
+# Elves, Elvish Mystic, Avacyn's Pilgrim (mana value 1 each) and Ornithopter (0) in its graveyard, and Bot2's Ornithopter in
+# Bot2's. The four of Bot1's total only 3 but are four targets, one past "up to three", and are refused, as is a creature card
+# from the other graveyard; the three 1s are exactly 3 and are accepted. They enter together (CR 110.2a) and each gets a +1/+1
+# counter (CR 122.1); Bot1's Ornithopter and Bot2's stay where they are.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Wheel of Fortune
+Llanowar Elves
+Elvish Mystic
+Avacyn's Pilgrim
+Ornithopter
+Scout for Survivors
+Mox Pearl
+Mox Jet
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Plains x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Scout for Survivors.Cast
+! Bot1.Target(Bot2.Graveyard.Ornithopter)
+! Bot1.Target(Bot1.Graveyard.Ornithopter; Llanowar Elves; Elvish Mystic; Avacyn's Pilgrim)
+Bot1.Target(Llanowar Elves; Elvish Mystic; Avacyn's Pilgrim)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Avacyn's Pilgrim; Elvish Mystic; Llanowar Elves; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Avacyn's Pilgrim.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Graveyard = Scout for Survivors; Wheel of Fortune; Ornithopter; Black Lotus
+Bot2.Graveyard.Count = 7
+Bot2.Battlefield.Count = 0

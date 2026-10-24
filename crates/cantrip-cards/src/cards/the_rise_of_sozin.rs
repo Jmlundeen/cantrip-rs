@@ -43,8 +43,9 @@ fn creature_card_in_that_players_graveyard(q: &dyn Query, _: &Asker, t: Target) 
 }
 
 /// "... put any number of target creature cards with total mana value X or less from that player's graveyard onto the
-/// battlefield under your control." The total was judged as the targets were chosen (CR 601.2c, 603.3d); as it resolves each
-/// target is checked on its own (CR 608.2b), and those still legal enter together under the ability's controller's control.
+/// battlefield under your control." The total was judged as the targets were chosen (CR 601.2c, 603.3d) and is judged again
+/// on resolution: if it has grown past X every target is illegal (CR 608.2b); otherwise the targets still legal enter under
+/// the ability's controller's control (CR 110.2a).
 fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let cards: Vec<(ObjectId, PlayerId)> = targets::legal_objects(g, item).into_iter().map(|c| (c, you)).collect();
