@@ -24,4 +24,4 @@ fn enter_tapped_as_copy(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Su
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { enters: Some(enter_tapped_as_copy), ..oracle::VESUVA };
+pub static CARD: CardDef = CardDef { enters_as_copy: Some(enter_tapped_as_copy), ..oracle::VESUVA };

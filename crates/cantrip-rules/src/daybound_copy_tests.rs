@@ -39,7 +39,7 @@ static INVADER: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(3),
     toughness: Some(3),
-    enters: Some(as_the_admirer),
+    enters_as_copy: Some(as_the_admirer),
     back: Some(&SORCERY_BACK),
     ..CardDef::BLANK
 };
@@ -74,8 +74,75 @@ static VILLAGER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A creature with no daybound, and its id in the test table.
+static PLAIN: CardDef = CardDef {
+    name: "Daybound Copy Test Plain",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(3),
+    toughness: Some(3),
+    ..CardDef::BLANK
+};
+static PLAIN_ID: std::sync::OnceLock<CardId> = std::sync::OnceLock::new();
+
+/// "You may have this creature enter as a copy of the Plain" (a Clone's replacement, CR 707.9).
+fn as_the_plain(_: &mut dyn cantrip_api::Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.copy = Some(Copiable::of(*PLAIN_ID.get().expect("the table is built")));
+    Ok(())
+}
+
+/// "Enters with a +1/+1 counter on it."
+fn with_a_counter(_: &mut dyn cantrip_api::Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.counters[CounterKind::PlusOne as usize] += 1;
+    Ok(())
+}
+
+/// Daybound double-faced cards whose front face enters as a copy (of the Plain, of the Admirer), and whose back faces enter
+/// with a +1/+1 counter.
+static SHAPER_BACK: CardDef = CardDef {
+    name: "Daybound Copy Test Shaper Beast",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(5),
+    toughness: Some(5),
+    keywords: Keywords::of(&[Keyword::Nightbound]),
+    enters: Some(with_a_counter),
+    ..CardDef::BLANK
+};
+static SHAPER: CardDef = CardDef {
+    name: "Daybound Copy Test Shaper",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Daybound]),
+    enters_as_copy: Some(as_the_plain),
+    back: Some(&SHAPER_BACK),
+    ..CardDef::BLANK
+};
+static MIMIC_BACK: CardDef = CardDef {
+    name: "Daybound Copy Test Mimic Beast",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(5),
+    toughness: Some(5),
+    keywords: Keywords::of(&[Keyword::Nightbound]),
+    enters: Some(with_a_counter),
+    ..CardDef::BLANK
+};
+static MIMIC: CardDef = CardDef {
+    name: "Daybound Copy Test Mimic",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Daybound]),
+    enters_as_copy: Some(as_the_admirer),
+    back: Some(&MIMIC_BACK),
+    ..CardDef::BLANK
+};
+
 fn game(time: DayNight) -> (Game, &'static CardTable) {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&ADMIRER, &INVADER, &WOLF, &VILLAGER])));
+    let table: &'static CardTable =
+        Box::leak(Box::new(CardTable::new([&ADMIRER, &INVADER, &WOLF, &VILLAGER, &PLAIN, &SHAPER, &MIMIC])));
+    PLAIN_ID.get_or_init(|| table.id_of(&PLAIN));
     ADMIRER_ID.get_or_init(|| table.id_of(&ADMIRER));
     let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
     game.state.update_turn(|t| {
@@ -181,4 +248,25 @@ fn a_front_face_up_copy_of_a_nightbound_face_is_not_turned_over_by_day() {
     assert!(cx.chars(villager).has(Keyword::Nightbound));
     assert!(!day_night::apply(&mut cx, &[Bound { id: villager, daybound: false }]).expect("nothing is asked"));
     assert!(!cx.s().obj(villager).transformed);
+}
+
+/// A daybound double-faced card whose front face enters as a copy, put onto the battlefield at night: its copy replacement
+/// applies first (CR 616.1c), and whether it enters back face up is then judged on the copy (CR 616.1d, 702.145b). As a
+/// copy of the Plain it has no daybound: it enters front face up, the Plain, with none of its back face's replacements.
+/// As a copy of the daybound Admirer it enters transformed, still the Admirer (CR 707.2), with none of them either.
+#[test]
+fn a_daybound_card_entering_as_a_copy_at_night_is_judged_on_the_copy() {
+    let (mut game, table) = game(DayNight::Night);
+    let shaper = put(&mut game, table, &SHAPER, Zone::graveyard(YOU));
+    let mimic = put(&mut game, table, &MIMIC, Zone::graveyard(YOU));
+    let mut cx = cx(&mut game);
+    ops::put_onto_battlefield(&mut cx, &[(shaper, YOU, false), (mimic, YOU, false)], ZoneReason::Other).expect("nothing is asked");
+    let shaper = cx.s().obj(shaper).became.expect("it entered");
+    assert!(!cx.s().obj(shaper).transformed);
+    assert!(!cx.s().obj(shaper).has_counters());
+    assert_eq!(cx.chars(shaper).name, PLAIN.name);
+    let mimic = cx.s().obj(mimic).became.expect("it entered");
+    assert!(cx.s().obj(mimic).transformed);
+    assert!(!cx.s().obj(mimic).has_counters());
+    assert_eq!(cx.chars(mimic).name, ADMIRER.name);
 }

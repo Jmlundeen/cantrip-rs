@@ -73,7 +73,7 @@ fn exile_that_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(mind_swap),
+    enters_as_copy: Some(mind_swap),
     delayed: &[delayed_trigger(exile_that_card, "When you do, exile that card.")],
     ..oracle::SUPERIOR_SPIDER_MAN
 };

@@ -1,0 +1,73 @@
+# Ardyn, the Usurper makes a token copy of Clone from Bot2's graveyard ("except it's a 5/5 black Demon"). The token has
+# Clone's ability, so it may enter as a copy of a creature (CR 707.9): it copies Outland Liberator, a copy effect over it
+# that overwrites the Demon exception (CR 707.2) - a 2/2 green Human Werewolf with daybound. A token created with its own
+# characteristics that enters as a copy of a double-faced permanent by a replacement effect is no double-faced token
+# (CR 707.8a, its last sentence), so when night comes (CR 731.2) the Liberator card transforms and the token stays an
+# Outland Liberator, front face up (CR 701.27c).
+#
+# Turn 1: Black Lotus and every Mox cast Ardyn ({5}{B}{B}{B}). Bot2 draws Clone on turn 2 and discards it to hand size.
+# Turn 3: Outland Liberator from Mox Emerald and Mox Jet (it becomes day, CR 702.145d); at the beginning of combat
+# Starscourge exiles the Clone and makes the token, which copies the Liberator. Bot2 casts nothing on turn 4, so turn 5 is
+# night.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Ardyn, the Usurper
+Outland Liberator
+Swamp x12
+
+[Bot2 Deck]
+Swamp x7
+Clone
+Swamp x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ardyn, the Usurper.Cast
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Clone
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Graveyard.Clone)
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Outland Liberator)
+[T3 Bot1.Main2]
+? DayNight = Day
+? Bot1.Battlefield.Outland Liberator#2.Token = true
+? Bot1.Battlefield.Outland Liberator#2.Power = 2
+? Bot1.Battlefield.Outland Liberator#2.Colors = Green
+? Bot1.Battlefield.Outland Liberator#2.Subtypes = Human; Werewolf
+[T5 Bot1.Main1]
+
+[Expect]
+DayNight = Night
+Bot1.Battlefield = Ardyn, the Usurper; Frenzied Trapbreaker; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Outland Liberator
+Bot1.Battlefield.Frenzied Trapbreaker.Transformed = true
+Bot1.Battlefield.Outland Liberator.Token = true
+Bot1.Battlefield.Outland Liberator.Keywords = Daybound
+Bot1.Battlefield.Outland Liberator.Transformed = (absent)

@@ -10,4 +10,4 @@ fn enter_as_copy(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Suspend> 
     cantrip_mechanics::copy::enter_as_copy(g, entry, |c| c.is(CardType::Creature), |_, copy| copy.with_keyword(Keyword::Changeling))
 }
 
-pub static CARD: CardDef = CardDef { enters: Some(enter_as_copy), ..oracle::OMNI_CHANGELING };
+pub static CARD: CardDef = CardDef { enters_as_copy: Some(enter_as_copy), ..oracle::OMNI_CHANGELING };

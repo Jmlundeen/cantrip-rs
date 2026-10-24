@@ -15,4 +15,4 @@ fn enter_as_copy(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Suspend> 
     )
 }
 
-pub static CARD: CardDef = CardDef { enters: Some(enter_as_copy), ..oracle::PHYREXIAN_METAMORPH };
+pub static CARD: CardDef = CardDef { enters_as_copy: Some(enter_as_copy), ..oracle::PHYREXIAN_METAMORPH };

@@ -405,6 +405,14 @@ only the candidates the host's verdict on those picked says may be added.
   subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
   such a land other than abilities stay: CR 305.7 lists copiable effects among the sources of the abilities it loses,
   against the abilities other effects granted, which it keeps.
+- **The order of a permanent's entering replacements (CR 616.1c-e)**: a replacement that has it enter as a copy applies
+  first, then one that has it enter back face up (daybound at night, judged on the copy, `ops::enters_by_daybound`), then
+  the rest. A card's own copy replacement is its typed `CardDef::enters_as_copy` (built with
+  `cantrip_mechanics::copy::enter_as_copy*`), which `ops::prepare_entry` runs first; a plain `CardDef::enters` that makes it a
+  copy stops a verifying run (`ops::verify_no_copy_in_enters`), so the engine, not a card, decides what is a copy
+  replacement. Copy replacements from other sources - Essence of the Wild's "creatures you control enter as a copy",
+  Mystic Reflection's - are not built yet; when one is, it must take the same place, before the back-face-up one.
+  Daybound only ever turns an entry over: a face an instruction or CR 707.8a gave it stays.
 - **An effect that says what a card is as it enters is that from the start (614.12)**: `Game::put_onto_battlefield_as`
   takes an `EntersAs` ("It's an enchantment", the Enduring cycle; "It's an Aura enchantment with enchant Forest you control
   and '...'", Old-Growth Troll), carried on `Entering::becomes`. `as_it_would_exist` judges it with those effects, and

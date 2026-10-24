@@ -1,0 +1,63 @@
+# Mirrorweave makes each other creature a copy of its target until end of turn (CR 707.2): a token included, which stays a
+# token. Its target is Frenzied Trapbreaker, Outland Liberator transformed at night: its copiable values are that face's
+# (CR 707.8), those of a double-faced permanent - which only a token made as a copy of them would take both faces from
+# (CR 707.8a). Fable of the Mirror-Breaker's Goblin Shaman token becomes a 3/3 Frenzied Trapbreaker with nightbound, a copy
+# effect over it like any creature's, and is a 2/2 Goblin Shaman again as the turn ends (CR 514.2).
+#
+# Turn 1: Plains, Mox Ruby, Black Lotus for Fable (a Goblin Shaman token); Mox Emerald, then Outland Liberator from the
+# Emerald and the Ruby (it becomes day, CR 702.145d). Bot2 casts nothing on turn 2, so turn 3 is night (CR 731.2) and the
+# Liberator becomes Frenzied Trapbreaker. Turn 3: Fable's chapter II (nothing discarded), a Plains, and Mirrorweave on the
+# Trapbreaker from both Plains, the Emerald and the Ruby.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Fable of the Mirror-Breaker
+Outland Liberator
+Plains
+Mox Emerald
+Plains
+Mirrorweave
+Plains x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? DayNight = Night
+Bot1.Choose()
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mirrorweave.Cast(Frenzied Trapbreaker)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Fable of the Mirror-Breaker; Frenzied Trapbreaker; Frenzied Trapbreaker; Mox Emerald; Mox Ruby; Plains; Plains
+? Bot1.Battlefield.Frenzied Trapbreaker#1.Token = true
+? Bot1.Battlefield.Frenzied Trapbreaker#1.Power = 3
+? Bot1.Battlefield.Frenzied Trapbreaker#1.Keywords = Nightbound
+? Bot1.Battlefield.Frenzied Trapbreaker#1.Subtypes = Werewolf
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Fable of the Mirror-Breaker; Frenzied Trapbreaker; Goblin Shaman Token; Mox Emerald; Mox Ruby; Plains; Plains
+Bot1.Battlefield.Goblin Shaman Token.Token = true
+Bot1.Battlefield.Goblin Shaman Token.Power = 2

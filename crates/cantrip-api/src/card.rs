@@ -2382,8 +2382,13 @@ pub struct CardDef {
     pub additional_cost: Option<Cost>,
     /// An additional cost of which one of these is paid, chosen as it is cast (CR 601.2b): Bitter Triumph.
     pub additional_choice: &'static [ExtraCost],
-    /// Its own entering replacements, applied as it enters from anywhere (CR 614.12).
+    /// Its own entering replacements, applied as it enters from anywhere (CR 614.12), other than one that has it enter as
+    /// a copy (`enters_as_copy`): none of them may make it a copy, which the engine checks.
     pub enters: Option<Enters>,
+    /// Its replacement that has it enter as a copy (CR 707.9): "you may have this creature enter as a copy of ..." (Clone,
+    /// Glasspool Mimic; built with `cantrip_mechanics::copy::enter_as_copy*`). Applied before every other replacement of how
+    /// it enters, a back face up included, which is then judged on the copy (CR 616.1c, 616.1d, 702.145b).
+    pub enters_as_copy: Option<Enters>,
     /// Its "as this transforms into [this face]" ability (CR 712.20), on the face it is printed on: applied as the permanent
     /// turns over to this face. See `AsTransforms`.
     pub as_transforms: Option<AsTransforms>,
@@ -2712,6 +2717,7 @@ impl CardDef {
         additional_cost: None,
         additional_choice: &[],
         enters: None,
+        enters_as_copy: None,
         as_transforms: None,
         delayed: &[],
         prepare: None,
@@ -2839,7 +2845,7 @@ impl CardDef {
             (!self.statics.is_empty(), "static abilities"),
             (!self.replacements.is_empty(), "replacement effects"),
             (!self.preventions.is_empty(), "prevention effects"),
-            (self.enters.is_some(), "an enters rule"),
+            (self.enters.is_some() || self.enters_as_copy.is_some(), "an enters rule"),
             (self.keywords != Keywords::NONE, "keywords"),
             (self.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.functions != crate::ability::ON_THE_BATTLEFIELD)), "a triggered ability that functions outside the battlefield"),
             (self.abilities.iter().any(|a| matches!(a, AbilityDef::Static(_))), "a static ability in its abilities"),

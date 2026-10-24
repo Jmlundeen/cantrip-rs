@@ -9,7 +9,7 @@ const COPY_AS_ENTERS: Question =
 /// "You may have this [permanent] enter as a copy of any [permanent that passes `eligible`] on the battlefield, except
 /// [`exception`]" (CR 614.1c, 707.2, 707.9): a choice, not a target (CR 608.2d), so hexproof and protection narrow nothing
 /// and an opponent's permanent is as available as your own. With nothing to copy nothing is asked, and with one candidate which to copy is not. The exception becomes part of the copy's own copiable values (CR 707.9b),
-/// so a later copy of it has it too. Use it as `CardDef::enters`. Phantasmal Image (a creature; an Illusion with a
+/// so a later copy of it has it too. Use it as `CardDef::enters_as_copy` (CR 616.1c). Phantasmal Image (a creature; an Illusion with a
 /// sacrifice ability) and Phyrexian Metamorph (an artifact or a creature; an artifact too) print it.
 pub fn enter_as_copy(
     g: &mut dyn Game,

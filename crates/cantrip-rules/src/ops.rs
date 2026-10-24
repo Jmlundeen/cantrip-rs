@@ -868,32 +868,53 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     // A token made as a copy, its copy values over its card (a copy of a Clone, of Glasspool Mimic copying a creature):
     // what it enters as is that copy's, not its card's. (A bestowed Aura spell's copy values are its own card's Aura face.)
     let copied = cx.s().obj(entering.object).token && copy_over(cx, entering);
-    // CR 702.145b: at night a daybound permanent represented by a double-faced card enters transformed. The face is decided
-    // before any face's replacements apply, and daybound only ever turns it over: a face an instruction or CR 707.8a gave
+    // CR 616.1c: a replacement that has it enter as a copy applies first - its face's own (Clone's, `CardDef::enters_as_copy`),
+    // the face that would be up as nothing has turned it over yet - unless a copy effect is over it already.
+    let face = cx.cards().face(cx.s().obj(entering.object).card, entering.transformed);
+    let mut copied_by = None;
+    if !copy_over(cx, entering)
+        && let Some(enters_as_copy) = cx.cards().get(face).enters_as_copy
+        && !lost(cx, entering)
+    {
+        enters_as_copy(cx, entering)?;
+        copied_by = Some(face);
+    }
+    // CR 616.1d, 702.145b: then, at night, daybound has a permanent represented by a double-faced card enter transformed -
+    // judged on the copy it now enters as, if any. Daybound only ever turns it over: a face an instruction or CR 707.8a gave
     // it stays.
     if !entering.transformed && enters_by_daybound(cx, entering, may_lose) {
         entering.transformed = true;
     }
     choose_protector(cx, entering)?;
-    // Its face's own replacements - none where a copy effect is over it already, as its copy's apply instead.
+    // Its face's other replacements (CR 616.1e) - none where its copy replacement made it a copy, or it was made as one, as
+    // its copy's apply instead.
     let card = cx.cards().face(cx.s().obj(entering.object).card, entering.transformed);
     if !copied
+        && !(copied_by.is_some() && copy_over(cx, entering))
         && let Some(enters) = cx.cards().get(card).enters
         && !lost(cx, entering)
     {
+        let was_copy = entering.copy.is_some();
         enters(cx, entering)?;
+        verify_no_copy_in_enters(cx, card, was_copy, entering);
     }
     // CR 707.9a: what it entered as a copy of has its own "enters with" and "enters tapped" to apply, as the copy
-    // enters; a copy of a kicked permanent was never kicked itself (CR 702.33d). They are judged on it as that copy
-    // (CR 614.12: "taking into account replacement effects that have already modified how it enters"). A double-faced
-    // token's own copy values are its faces, whose own replacements are the face's, above (CR 707.8a).
+    // enters - its copy replacement too, which has nothing more to do unless it is another card's (a Clone copying a Clone
+    // that entered as itself) - and a copy of a kicked permanent was never kicked itself (CR 702.33d). They are judged on
+    // it as that copy (CR 614.12: "taking into account replacement effects that have already modified how it enters"). A
+    // double-faced token's own copy values are its faces, whose own replacements are the face's, above (CR 707.8a).
     if copy_over(cx, entering)
         && let Some(copy) = entering.copy
-        && (copied || copy.card != card)
-        && let Some(enters) = cx.cards().get(copy.card).enters
+        && (copied || Some(copy.card) != copied_by)
         && !lost(cx, entering)
     {
-        enters(cx, entering)?;
+        let def = cx.cards().get(copy.card);
+        if let Some(enters_as_copy) = def.enters_as_copy {
+            enters_as_copy(cx, entering)?;
+        }
+        if let Some(enters) = cx.cards().get(entering.copy.map_or(copy.card, |c| c.card)).enters {
+            enters(cx, entering)?;
+        }
     }
     // CR 702.145b: the daybound of a permanent that its own replacement made a copy (a Clone-like double-faced card) is the
     // copy's - the example under CR 712.13a: a double-faced card entering at night as a copy of a daybound creature enters
@@ -902,6 +923,19 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
         entering.transformed = true;
     }
     Ok(())
+}
+
+/// A card's `enters` that made it a copy is a copy replacement out of its place (`CardDef::enters_as_copy`): applied after
+/// the replacement that has it enter back face up instead of before it (CR 616.1c, 616.1d). The engine, not the card,
+/// decides which replacements are copy replacements, so a verifying run stops on one.
+fn verify_no_copy_in_enters(cx: &Cx, card: CardId, was_copy: bool, entering: &Entering) {
+    if layers::verifying() && !was_copy && entering.copy.is_some() {
+        panic!(
+            "{}'s `CardDef::enters` made it enter as a copy: a copy replacement is `CardDef::enters_as_copy`, applied before \
+             the others (CR 616.1c)",
+            cx.cards().get(card).name
+        );
+    }
 }
 
 /// Whether a copy effect is over the object `entering` would be (`Entering::copy`), other than a double-faced token's own
@@ -1535,18 +1569,20 @@ fn create_tokens_as(
 /// that was: copying one of its own faces, its copy values are kept only for their exceptions, which apply to either face
 /// (`Obj::own_faces`); copying what a copy effect over it made it (Glasspool Mimic as a copy of a creature), they are that
 /// copy effect, over both faces, as on the card. A copy of one face of a card that has two - a copy of a Clone that copied
-/// one - keeps those values as one face alone (`Copiable::single_face`), so it is no double-faced token. Any other copy is
-/// kept only for its exceptions.
-fn token_faces(cards: &CardTable, card: CardId, copy: Option<Copiable>) -> (CardId, Option<Copiable>, bool) {
-    let Some(c) = copy else { return (card, None, false) };
+/// one - is single-faced (`Obj::one_face`). Any other copy is kept only for its exceptions. The token's card, its copy
+/// values, whether it enters back face up, and whether it is single-faced.
+fn token_faces(cards: &CardTable, card: CardId, copy: Option<Copiable>) -> (CardId, Option<Copiable>, bool, bool) {
+    let Some(c) = copy else { return (card, None, false, false) };
     match c.faces() {
         Some(front) if c.card == front || cards.backs[front.0 as usize] == Some(c.card) => {
-            let own = Copiable { card: front, ..c }.from_faces(Some(front), false);
-            (front, own.has_exceptions().then_some(own), c.card != front)
+            let own = Copiable { card: front, ..c }.own_faces_of(front);
+            (front, own.has_exceptions().then_some(own), c.card != front, false)
         }
-        Some(front) => (front, Some(c.from_faces(None, false)), c.back_up()),
-        None if cards.backs[c.card.0 as usize].is_some() => (c.card, Some(c.single_face()), false),
-        None => (c.card, c.has_exceptions().then_some(c), false),
+        Some(front) => (front, Some(c.from_faces(None, false)), c.back_up(), false),
+        None => {
+            let c = c.from_faces(None, false);
+            (c.card, c.has_exceptions().then_some(c), false, cards.backs[c.card.0 as usize].is_some())
+        }
     }
 }
 
@@ -1558,7 +1594,11 @@ fn token_copy(cards: &CardTable, card: CardId, copy: Option<Copiable>, words: Wo
     }
     // A double-faced token's own definition (an Incubator, CR 111.10i) keeps both faces, each under the changed words.
     let faces = cards.backs[card.0 as usize].map(|_| card);
-    Some(Copiable { words, name: cards.get(card).token_name_under(words), ..Copiable::of(card) }.from_faces(faces, false))
+    let values = Copiable { words, name: cards.get(card).token_name_under(words), ..Copiable::of(card) };
+    Some(match faces {
+        Some(front) => values.own_faces_of(front),
+        None => values,
+    })
 }
 
 /// Creates tokens of several definitions as one instruction (CR 111.1, 101.4): all enter at once, and what watches
@@ -1634,12 +1674,13 @@ fn create_tokens_onto(
     // out before any of them is on the battlefield, so none sees another (Giada counts the Angels already there).
     let mut arriving: Vec<(ObjectId, PlayerId, Entering)> = Vec::with_capacity(tokens.len());
     for &(card, copy, controller) in tokens {
-        let (card, copy, back_up) = token_faces(cx.cards(), card, copy);
+        let (card, copy, back_up, one_face) = token_faces(cx.cards(), card, copy);
         let turn = cx.s().turn.number;
         let timestamp = cx.st().timestamp();
         let mut token = Obj::new(card, controller, Zone::GONE);
         token.copy = copy;
         token.transformed = back_up;
+        token.one_face = one_face;
         token.token = true;
         token.controlled_since = turn;
         token.timestamp = timestamp;

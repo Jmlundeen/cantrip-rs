@@ -70,6 +70,9 @@ pub struct Obj {
     /// A copy of a card (CR 707.12, 722.3): not a card; it ceases to exist anywhere but where it may be, and leaves
     /// the stack for nowhere.
     pub card_copy: bool,
+    /// A token made as a copy of one face of a card that has two - a copy of a Clone that copied a double-faced permanent
+    /// (CR 707.8a) - is single-faced, whatever copy effect later applies to it.
+    pub one_face: bool,
     /// For a prepare spell's copy in exile: the prepared permanent it belongs to, for as long as its exemption lasts
     /// (CR 722.3c). The link is severed for good when that permanent becomes unprepared or phases out (CR 702.26f), even
     /// if it prepares again or phases in before the next state-based check ends the copy (CR 704.5e).
@@ -237,6 +240,7 @@ impl Obj {
             class_level: _,
             prepared: _,
             card_copy: _,
+            one_face: _,
             prepared_from,
             chosen_color: _,
             chosen_subtype: _,
@@ -308,6 +312,7 @@ impl Obj {
             class_level: 0,
             prepared: false,
             card_copy: false,
+            one_face: false,
             prepared_from: None,
             chosen_color: None,
             chosen_subtype: None,
@@ -368,18 +373,18 @@ impl Obj {
     }
 
     /// Whether `copy`, its copy values, are a double-faced token's own faces (CR 707.8a): a token whose card is the front
-    /// face of the double-faced card or token it copies, and whose values are kept for their exceptions, which apply to
-    /// whichever face is up. A token whose copy values are a copy effect over both its faces (a copy of Glasspool Mimic
-    /// copying a creature) has them as a card with a copy effect on it does.
+    /// face of the double-faced card or token it copies, and whose values its creation kept for their exceptions, which
+    /// apply to whichever face is up (`Copiable::own_faces`). Values a copy effect gives it later - Mirrorweave, Saheeli's
+    /// "becomes a copy", a Clone's copy it entered as - are a copy effect over it, as on a card (CR 707.2).
     pub fn own_faces(&self, copy: &Copiable) -> bool {
-        self.token && copy.faces().is_some()
+        self.token && copy.is_own_faces()
     }
 
     /// Whether it is represented by a double-faced card or a double-faced token (CR 701.27a, 707.8a, 712.9), given whether
     /// its card has a back face: a card with a copy effect on it is still its card (Glasspool Mimic); a token made as a copy
     /// of one face alone (a copy of a Clone that copied a double-faced permanent, CR 707.8a's example) is single-faced.
     pub fn represented_double_faced(&self, card_has_back: bool) -> bool {
-        card_has_back && !(self.token && self.copy.as_ref().is_some_and(|c| c.one_face()))
+        card_has_back && !(self.token && self.one_face)
     }
 
     /// Whether it has any counter on it.
@@ -505,15 +510,15 @@ impl Copiable {
     /// No exception: with `faces`, the double-faced object these are the values of had its back face up (CR 707.8a: a
     /// token copy of it enters back face up).
     pub const STATED_BACK_UP: u16 = 1 << 5;
-    /// No exception: a token's copy values that are one face of a card that has two, as a copy of a Clone that copied a
-    /// double-faced permanent has (CR 707.8a): it is single-faced.
-    pub const STATED_ONE_FACE: u16 = 1 << 6;
+    /// No exception: a double-faced token's own copy values, kept by its creation for their exceptions over its faces
+    /// (CR 707.8a, `Obj::own_faces`). Never on values a copy effect gives an object.
+    pub const STATED_OWN_FACES: u16 = 1 << 6;
     /// No exception: `front` names the double-faced object these are the values of (`faces`).
     pub const STATED_FACES_OF: u16 = 1 << 7;
     /// "Except it's [power]/[toughness]" (`sized`): `stated_pt` is its power and toughness.
     pub const STATED_PT: u16 = 1 << 8;
     /// The bits that are no exception.
-    const STATED_FACES: u16 = Copiable::STATED_BACK_UP | Copiable::STATED_ONE_FACE | Copiable::STATED_FACES_OF;
+    const STATED_FACES: u16 = Copiable::STATED_BACK_UP | Copiable::STATED_OWN_FACES | Copiable::STATED_FACES_OF;
 
     /// The front face of the double-faced card or token these are the copiable values of (CR 707.8a), if they are one's.
     pub fn faces(&self) -> Option<CardId> {
@@ -539,16 +544,17 @@ impl Copiable {
         self.stated & Copiable::STATED_BACK_UP != 0
     }
 
-    /// These values as a token's copy values of one face alone (`STATED_ONE_FACE`).
-    pub fn single_face(self) -> Copiable {
-        let mut c = self.from_faces(None, false);
-        c.stated |= Copiable::STATED_ONE_FACE;
+    /// These values as a double-faced token's own, over its faces from `front` (`STATED_OWN_FACES`): only a token's
+    /// creation makes them.
+    pub fn own_faces_of(self, front: CardId) -> Copiable {
+        let mut c = self.from_faces(Some(front), false);
+        c.stated |= Copiable::STATED_OWN_FACES;
         c
     }
 
-    /// Whether these are a token's copy values of one face alone (`STATED_ONE_FACE`).
-    pub fn one_face(&self) -> bool {
-        self.stated & Copiable::STATED_ONE_FACE != 0
+    /// Whether these are a double-faced token's own copy values (`STATED_OWN_FACES`).
+    pub fn is_own_faces(&self) -> bool {
+        self.stated & Copiable::STATED_OWN_FACES != 0
     }
 
     /// "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the exception states what it is, so its card types and
@@ -2084,7 +2090,6 @@ mod copiable_tests {
     /// take three bytes, and an object pays nothing for them. Each reads back as it was set, a later one over an earlier.
     #[test]
     fn the_rare_exceptions_cost_an_object_nothing_and_read_back() {
-        eprintln!("OBJSIZE {} COPIABLE {}", std::mem::size_of::<Obj>(), std::mem::size_of::<Option<Copiable>>());
         assert!(std::mem::size_of::<Option<Copiable>>() <= 160, "Option<Copiable> is {} bytes", std::mem::size_of::<Option<Copiable>>());
         let plain = Copiable::of(CardId(1));
         assert!(!plain.has_exceptions() && plain.legendary_stated().is_none() && plain.stated_loyalty().is_none());
@@ -2097,9 +2102,10 @@ mod copiable_tests {
         // A stated power and toughness, and the faces of a double-faced object (no exception, CR 707.8a), read back.
         assert_eq!((plain.pt(), plain.sized(4, -1).pt()), (None, Some((4, -1))));
         let faces = plain.from_faces(Some(CardId(7)), true);
-        assert!(!faces.has_exceptions() && faces.back_up() && !faces.one_face());
+        assert!(!faces.has_exceptions() && faces.back_up() && !faces.is_own_faces());
         assert_eq!((faces.faces(), faces.from_faces(None, true).faces()), (Some(CardId(7)), None));
-        assert!(plain.single_face().one_face() && !plain.single_face().has_exceptions());
+        assert!(plain.own_faces_of(CardId(7)).is_own_faces() && !plain.own_faces_of(CardId(7)).has_exceptions());
+        assert!(!plain.own_faces_of(CardId(7)).from_faces(Some(CardId(7)), false).is_own_faces());
     }
 
     /// A seventh distinct ability added by exceptions to a copy that holds six: not taken, the six and their counts left as
