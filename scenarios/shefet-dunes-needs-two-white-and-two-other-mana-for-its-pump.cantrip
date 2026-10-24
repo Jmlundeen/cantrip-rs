@@ -1,0 +1,43 @@
+# {2}{W}{W}: on turn 5 the Sol Ring (CC), the other Shefet Dunes (C) and the Mox Pearl (W) - nothing else untapped make {C}{C}{C}{W} - four mana
+# but one white too few - and the activation is refused. On turn 7 the Sol Ring (CC) and the Mox Pearl and a Plains (WW) pay it
+# exactly (pool empty right after) and Bot1's Ornithopter (0/2) becomes 1/3.
+
+[Bot1 Deck]
+Shefet Dunes
+Shefet Dunes
+Mox Pearl
+Sol Ring
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shefet Dunes.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Shefet Dunes.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Shefet Dunes#2.Activate(Ability: {T}: Add {C})
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{C}{C}{C}
+! Bot1.Battlefield.Shefet Dunes#1.Activate(Ability: Sacrifice a Desert)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Shefet Dunes#1.Activate(Ability: Sacrifice a Desert)
+Bot1.Choose(Shefet Dunes#1)
+Bot1.Pass
+? Bot1.Mana = 
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3

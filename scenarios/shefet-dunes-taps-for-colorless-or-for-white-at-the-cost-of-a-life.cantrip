@@ -1,0 +1,22 @@
+# Both mana abilities of Shefet Dunes: on turn 1 {T}: Add {C} costs no life (Bot1 stays at 20); on turn 3 the same land
+# taps with {T}, Pay 1 life for {W} (Bot1 at 19). The pool is checked right after each tap.
+
+[Bot1 Deck]
+Shefet Dunes
+Plains x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shefet Dunes.Play
+Bot1.Battlefield.Shefet Dunes.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+Bot1.Battlefield.Shefet Dunes.Activate(Ability: Pay 1 life)
+? Bot1.Mana = {W}
+? Bot1.Life = 19
+
+[Expect]
+Bot1.Life = 19
