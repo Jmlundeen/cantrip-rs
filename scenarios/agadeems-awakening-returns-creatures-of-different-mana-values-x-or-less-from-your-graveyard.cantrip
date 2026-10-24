@@ -1,0 +1,64 @@
+# Agadeem's Awakening: "Return from your graveyard to the battlefield any number of target creature cards that each have a
+# different mana value X or less." Wheel of Fortune puts Ornithopter (0), Glistener Elf (1), Benalish Hero (1), Mesa Pegasus (2) and Hired
+# Blade (3) in Bot1's graveyard and Healer's Hawk (1) in Bot2's. With X = 1 the Ornithopter and one of the mana value 1 cards are
+# accepted (the limit is inclusive); a second mana value 1 card (CR 202.3), the Pegasus just past the limit, and the opponent's
+# Hawk (not "from your graveyard", CR 115.1) and the Black Lotus (mana value 0, but not a creature card) are each refused;
+# the unchosen cards stay where they are.
+# The cost {1}{B}{B}{B} is paid by exactly four sources.
+
+[Bot1 Deck]
+Black Lotus
+Wheel of Fortune
+Ornithopter
+Glistener Elf
+Benalish Hero
+Mesa Pegasus
+Hired Blade
+Agadeem's Awakening
+Mox Jet
+Gleemox
+Mox Pearl
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Healer's Hawk
+Plains x6
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Agadeem's Awakening.Cast(X: 1)
+! Bot1.Target(Glistener Elf; Benalish Hero)
+! Bot1.Target(Mesa Pegasus)
+! Bot1.Target(Hired Blade)
+! Bot1.Target(Black Lotus)
+! Bot1.Target(Bot2.Graveyard.Healer's Hawk)
+Bot1.Target(Ornithopter; Benalish Hero)
+? Bot1.Mana = 
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Benalish Hero; Gleemox; Mox Jet; Mox Pearl; Ornithopter; Swamp
+Bot1.Graveyard = Agadeem's Awakening; Wheel of Fortune; Hired Blade; Mesa Pegasus; Glistener Elf; Black Lotus
+Bot2.Graveyard.Count = 7

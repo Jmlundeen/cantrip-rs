@@ -1,0 +1,27 @@
+# Agadeem's Awakening played as its back face, Agadeem, the Undercrypt: "As this land enters, you may pay 3 life. If you don't, it
+# enters tapped. {T}: Add {B}." (CR 614.12a, 712.12). Turn 1 the life is paid: 17 life, untapped, and tapping it adds exactly {B}.
+# Turn 3 (the first has untapped) the second copy is declined: still 17 life and it enters tapped.
+
+[Bot1 Deck]
+Agadeem's Awakening
+Agadeem's Awakening
+Swamp x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Agadeem's Awakening.Play(Ability: back face)
+Bot1.Accept
+Bot1.Battlefield.Agadeem, the Undercrypt.Activate
+? Bot1.Mana = {B}
+[T3 Bot1.Main1]
+Bot1.Hand.Agadeem's Awakening.Play(Ability: back face)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Agadeem, the Undercrypt#1.Tapped = false
+Bot1.Battlefield.Agadeem, the Undercrypt#2.Tapped = true

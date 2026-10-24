@@ -1,0 +1,12 @@
+{
+  "name": "Agadeem's Awakening",
+  "manaCost": "{X}{B}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Return from your graveyard to the battlefield any number of target creature cards that each have a different mana value X or less.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Agadeem, the Undercrypt",
+    "type": "Land",
+    "oracleText": "As this land enters, you may pay 3 life. If you don't, it enters tapped.\n{T}: Add {B}."
+  }
+}
