@@ -439,12 +439,18 @@ pub fn attacking_you_costs<const N: u8>(_: &dyn Query, asker: &Asker, _: ObjectI
 /// they control costs {N} to declare; one attacking a battle costs nothing. Baird, Steward of Argive and Archon of
 /// Absolution print it with {1}.
 pub fn attacking_you_or_your_planeswalkers_costs<const N: u8>(q: &dyn Query, asker: &Asker, _: ObjectId, target: Target) -> Option<ManaCost> {
-    let yours = match target {
+    attacks_you_or_your_planeswalker(q, asker, target).then_some(ManaCost { generic: N, ..ManaCost::ZERO })
+}
+
+/// Whether an attack on `target` is one on "you or planeswalkers you control" of an attack cost (CR 508.1d): the source's
+/// controller, or a planeswalker they control; never a battle. Baird, Steward of Argive and Archon of Absolution ask it
+/// with {1} (`attacking_you_or_your_planeswalkers_costs`), Norn's Annex with {W/P}.
+pub fn attacks_you_or_your_planeswalker(q: &dyn Query, asker: &Asker, target: Target) -> bool {
+    match target {
         Target::Player(p) => p == asker.controller,
         Target::Object(id) => q.chars(id).is(CardType::Planeswalker) && q.controller(id) == asker.controller,
         _ => false,
-    };
-    yours.then_some(ManaCost { generic: N, ..ManaCost::ZERO })
+    }
 }
 
 /// "Artifacts and creatures entering don't cause abilities to trigger" (CR 603.2, 603.6a) as a `CardDef::trigger_rules` entry:
