@@ -1,9 +1,9 @@
-# Warped Landscape taps for {C}; its {2} search may find any basic land tapped, while a nonbasic land is not a legal find (CR 205.4a, 305.6, 701.23).
+# Warped Landscape taps for {C}; its {2} search, paid with Mox Jet and Mox Ruby (neither white nor blue, so a {W}{U} or {1}{W} cost would be refused), may find any basic land tapped, while a nonbasic land is not a legal find (CR 205.4a, 305.6, 701.23).
 
 [Bot1 Deck]
 Warped Landscape
-Mox Pearl
-Mox Sapphire
+Mox Jet
+Mox Ruby
 Island x4
 Forest x6
 Tundra
@@ -14,8 +14,8 @@ Island x20
 
 [Actions]
 Bot1.Hand.Warped Landscape.Play
-Bot1.Hand.Mox Pearl.Cast
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
 Bot2.Pass
 [T3 Bot1.Main1]
@@ -23,8 +23,8 @@ Bot1.Battlefield.Warped Landscape.Activate(Ability: {T}: Add {C})
 ? Bot1.Mana = {C}
 [T5 Bot1.Main1]
 Bot1.Battlefield.Warped Landscape.Activate(Ability: {2}, {T}, Sacrifice this land)
-Bot1.Battlefield.Mox Pearl.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
 ? Bot1.Mana =
 ! Bot1.Search(Tundra)
 Bot1.Search(Forest)
