@@ -21,7 +21,7 @@ static SHIELDED: CardDef =
 static IMMUNE: CardDef =
     CardDef { name: "Excess Immune", preventions: &[PreventionDef { hint: "prevent all", applies: to_self, amount: None }], ..BEAR };
 fn to_another(_: &dyn Query, a: &Asker, p: &Proposal) -> bool {
-    matches!(p, Proposal::Damage(d) if d.target != Target::Object(a.source))
+    matches!(p, Proposal::Damage(d) if matches!(d.target, Target::Object(id) if id != a.source))
 }
 fn redirect(_: &dyn Query, a: &Asker, p: &mut Proposal) {
     if let Proposal::Damage(d) = p {
@@ -61,9 +61,48 @@ static DOUBLER: CardDef = CardDef {
     replacements: &[replacement(ReplacementKind::Damage, damage, double, "double")],
     ..CardDef::BLANK
 };
+fn ascendant_itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected
+}
+fn ascendant_toughness(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    if q.state().player(q.state().obj(source).controller).life >= 30 {
+        chars.power = Some(chars.power.unwrap_or(0) + 5);
+        chars.toughness = Some(chars.toughness.unwrap_or(0) + 5);
+    }
+}
+static ASCENDANT: CardDef = CardDef {
+    name: "Excess Serra Ascendant",
+    power: Some(1),
+    toughness: Some(1),
+    statics: &[static_ability(
+        Layer::PtModify,
+        ascendant_itself,
+        ascendant_toughness,
+        "As long as you have 30 or more life, this creature gets +5/+5.",
+    )],
+    ..BEAR
+};
+static REDIRECTING_ASCENDANT: CardDef = CardDef {
+    name: "Excess Redirecting Ascendant",
+    replacements: &[replacement(ReplacementKind::Damage, to_another, redirect, "redirect to this")],
+    ..ASCENDANT
+};
 fn game(defs: &[&'static CardDef]) -> (Game, Vec<ObjectId>) {
-    let table: &'static CardTable =
-        Box::leak(Box::new(CardTable::new([&BEAR, &TOUCH, &INFECT, &WALKER, &BATTLE, &MULTI, &SHIELDED, &IMMUNE, &REDIRECTOR, &DOUBLER, &HEALER])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([
+        &BEAR,
+        &TOUCH,
+        &INFECT,
+        &WALKER,
+        &BATTLE,
+        &MULTI,
+        &SHIELDED,
+        &IMMUNE,
+        &REDIRECTOR,
+        &DOUBLER,
+        &ASCENDANT,
+        &REDIRECTING_ASCENDANT,
+        &HEALER,
+    ])));
     let mut g = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
     g.state.update_turn(|t| t.number = 1);
     let mut ids = Vec::new();
@@ -182,6 +221,43 @@ fn excess_damage_zero_or_a_missing_recipient_deals_nothing() {
     assert_eq!(hit(&mut g, ids[0], ids[1], 6), None);
 }
 
+/// CR 702.2c's one-damage lethal exception is for combat damage assigned.
+#[test]
+fn excess_damage_combat_deathtouch_counts_one_as_lethal() {
+    let (mut g, ids) = game(&[&TOUCH, &BEAR]);
+    assert_eq!(ops::damage_result(&mut cx(&mut g), ids[0], Target::Object(ids[1]), 6, true).unwrap().excess, 5);
+}
+
+/// Damage to an earlier recipient must not lower the pre-event toughness used by a later one (CR 120.10).
+#[test]
+fn excess_damage_snapshots_all_recipients_before_any_simultaneous_damage() {
+    let (mut g, ids) = game(&[&BEAR, &ASCENDANT]);
+    g.state.update_player(YOU, |p| p.life = 30);
+    ops::damage_together(&mut cx(&mut g), &[(ids[0], Target::Player(YOU), 3), (ids[0], Target::Object(ids[1]), 3)]);
+    assert_eq!(recorded(&g), [(Target::Player(YOU), 3, 0), (Target::Object(ids[1]), 3, 0)]);
+}
+
+#[test]
+fn excess_damage_snapshots_redirected_recipients_before_the_simultaneous_event() {
+    let (mut g, ids) = game(&[&BEAR, &BEAR, &REDIRECTING_ASCENDANT]);
+    g.state.update_player(YOU, |p| p.life = 30);
+    ops::damage_together(&mut cx(&mut g), &[(ids[0], Target::Player(YOU), 3), (ids[0], Target::Object(ids[1]), 3)]);
+    assert_eq!(recorded(&g), [(Target::Player(YOU), 3, 0), (Target::Object(ids[2]), 3, 0)]);
+}
+#[test]
+fn excess_damage_combat_snapshots_recipients_before_any_assignment() {
+    let (mut g, ids) = game(&[&BEAR, &ASCENDANT]);
+    g.state.update_player(YOU, |p| p.life = 30);
+    let hits = [(ids[0], Target::Player(YOU), 3), (ids[0], Target::Object(ids[1]), 3)];
+    let mut cx = cx(&mut g);
+    let mut batch = ops::DamageBatch::new(&cx, &hits);
+    let mut events: Vec<Event> =
+        hits.into_iter().filter_map(|(s, t, n)| ops::deal_damage_with(&mut cx, s, t, n, true, &mut batch)).collect();
+    batch.finish(&mut cx, &mut events);
+    cx.emit_batch(&events, None);
+    assert_eq!(recorded(&g), [(Target::Player(YOU), 3, 0), (Target::Object(ids[1]), 3, 0)]);
+}
+
 /// Damage healed as this damage is dealt (Wolverine, Fierce Fighter) is no longer marked: lethal is the whole toughness.
 #[test]
 fn excess_damage_heals_the_marks_its_replacement_heals() {
@@ -189,11 +265,4 @@ fn excess_damage_heals_the_marks_its_replacement_heals() {
     g.state.update_obj(ids[1], |o| o.damage = 2);
     assert_eq!(hit(&mut g, ids[0], ids[1], 6).unwrap().excess, 2);
     assert_eq!(g.state.obj(ids[1]).damage, 6);
-}
-
-/// CR 702.2c's one-damage lethal exception is for combat damage assigned.
-#[test]
-fn excess_damage_combat_deathtouch_counts_one_as_lethal() {
-    let (mut g, ids) = game(&[&TOUCH, &BEAR]);
-    assert_eq!(ops::damage_result(&mut cx(&mut g), ids[0], Target::Object(ids[1]), 6, true).unwrap().excess, 5);
 }
