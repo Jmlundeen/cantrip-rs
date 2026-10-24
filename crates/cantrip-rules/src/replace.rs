@@ -67,15 +67,32 @@ const ENTERS_HINT: &str = "its own replacement as it enters";
 
 /// What a permanent's own entering replacement (`CardDef::enters`) says it does, for the player who orders it with others
 /// (CR 616.1): the line of its card's rules text that says how it enters ("This land enters tapped.", "As this creature
-/// enters, choose a color."), not a triggered ability's ("When this creature enters, ...").
+/// enters, choose a color.") - not reminder text ("(As this Saga enters ...)"), nor a triggered ability's line ("When this
+/// creature enters, ...", "Landfall — Whenever a land you control enters, ...").
 fn enters_hint(def: &CardDef) -> &'static str {
     let text: &'static str = def.text;
-    text.lines()
-        .find(|line| {
-            let line = line.trim_start();
-            line.contains("enter") && !line.starts_with("When") && !line.starts_with("At ")
-        })
-        .unwrap_or(ENTERS_HINT)
+    text.lines().map(str::trim).find(|line| says_how_it_enters(line)).unwrap_or(ENTERS_HINT)
+}
+
+/// Whether a line of rules text is a static ability's that speaks of entering: "enter" outside its reminder text, and no
+/// trigger word starting the ability, after an ability word if it has one (CR 207.2c).
+pub(crate) fn says_how_it_enters(line: &str) -> bool {
+    let mut words = String::with_capacity(line.len());
+    let mut depth = 0u32;
+    for c in line.chars() {
+        match c {
+            '(' => depth += 1,
+            ')' => depth = depth.saturating_sub(1),
+            _ if depth == 0 => words.push(c),
+            _ => {}
+        }
+    }
+    let words = words.trim();
+    let ability = match words.split_once(" — ") {
+        Some((word, rest)) if !word.contains(['.', ',', ':']) => rest,
+        _ => words,
+    };
+    words.contains("enter") && !["When ", "Whenever ", "At "].iter().any(|t| ability.starts_with(t))
 }
 
 /// Whether some replacement effect could apply to `change`, other than an entering permanent's own (`Entering::own`): the
@@ -582,7 +599,6 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
             }
             // CR 614.1d: it enters tapped.
             Origin::PlayedTapped => {
-
                 if let Proposal::ZoneChange(z) = proposal {
                     z.tapped = true;
                 }

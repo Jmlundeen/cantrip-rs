@@ -1,0 +1,31 @@
+# Mox Diamond's own replacement (CR 614.12a), declined, puts it into its owner's graveyard instead of onto the battlefield:
+# no entry any more, but a move to the graveyard, which Rest in Peace's "if a card or token would be put into a graveyard
+# from anywhere, exile it instead" then replaces (CR 616.1f). Mox Diamond is exiled; the land stays in hand.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mox Diamond
+Island
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Hand.Mox Diamond.Cast
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mox Pearl; Plains; Rest in Peace
+Bot1.Graveyard.Count = 0
+Exile = Mox Diamond
+Bot1.Hand = Island; Island; Island

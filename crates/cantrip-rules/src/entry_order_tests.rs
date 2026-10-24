@@ -137,3 +137,80 @@ fn nothing_is_asked_where_only_one_effect_applies() {
     let land = put(&mut g, &FILLER, YOU, Zone::hand(YOU));
     assert_eq!(play(&mut g, land, land), (false, Vec::new()));
 }
+
+/// "As this creature enters, an opponent of your choice gains control of it" written as `CardDef::enters`: a replacement that
+/// changes under whose control it enters, which is chosen before the others (CR 616.1b), not ordered as one any of which may
+/// be chosen.
+fn given_away(_: &mut dyn cantrip_api::Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.controller = THEM;
+    Ok(())
+}
+
+/// "... enters transformed" written as `CardDef::enters` (CR 616.1d).
+fn turned_over(_: &mut dyn cantrip_api::Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.transformed = true;
+    Ok(())
+}
+
+static GIVEN_AWAY: CardDef = CardDef { name: "Entry Order Given Away", enters: Some(given_away), ..TAPLAND };
+static TURNED_OVER: CardDef = CardDef { name: "Entry Order Turned Over", enters: Some(turned_over), ..TAPLAND };
+
+/// An own `enters` that changes control (CR 616.1b), the face up (616.1d) or makes it a copy (616.1c) is out of its tier:
+/// `enters_tier_fault` says so, and a verifying run (CANTRIP_VERIFY) stops on it as it applies; one that taps it does not.
+#[test]
+fn an_own_enters_out_of_its_tier_stops_a_verifying_run() {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &TAPLAND, &GIVEN_AWAY, &TURNED_OVER])));
+    let mut g = Game::new(table, &Setup { decks: vec![vec![table.id_of(&FILLER); 5]; 2], ..Default::default() });
+    for (def, out_of_tier) in [(&TAPLAND, false), (&GIVEN_AWAY, true), (&TURNED_OVER, true)] {
+        let id = put(&mut g, def, YOU, Zone::hand(YOU));
+        let before = Entering {
+            object: id,
+            controller: YOU,
+            tapped: false,
+            counters: [0; CounterKind::COUNT],
+            copy: None,
+            prepared: false,
+            chosen_color: None,
+            chosen_subtype: None,
+            chosen_player: None,
+            chosen_card: None,
+            chosen_option: None,
+            attach: None,
+            attach_player: None,
+            x: 0,
+            transformed: false,
+            protector: None,
+            instead: None,
+            becomes: None,
+            own: [Some(table.id_of(def)), None],
+        };
+        let mut after = before;
+        let mut c = crate::Cx { g: &mut g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+        let stopped = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| crate::ops::apply_own_entering(&mut c, &mut after, 0, YOU, false))).is_err();
+        assert_eq!(stopped, out_of_tier && crate::layers::verifying(), "{}", def.name);
+        let mut copied = before;
+        copied.copy = Some(Copiable::of(table.id_of(&FILLER)));
+        assert!(crate::ops::enters_tier_fault(&before, &copied).is_some(), "a copy is out of its tier");
+        let mut swapped = copied;
+        swapped.copy = Some(Copiable::of(table.id_of(&TAPLAND)));
+        assert!(crate::ops::enters_tier_fault(&copied, &swapped).is_some(), "one copy swapped for another is out of its tier");
+        assert!(crate::ops::enters_tier_fault(&copied, &copied).is_none(), "a copy kept is no fault");
+        if !stopped {
+            assert_eq!(crate::ops::enters_tier_fault(&before, &after).is_some(), out_of_tier, "{}", def.name);
+        }
+    }
+}
+
+/// The line offered for a permanent's own entering replacement: its static ability's, not reminder text's nor a triggered
+/// ability's after an ability word.
+#[test]
+fn its_own_replacement_is_offered_in_the_line_that_says_how_it_enters() {
+    let says = crate::replace::says_how_it_enters;
+    assert!(says("This land enters tapped."));
+    assert!(says("As this creature enters, choose a color."));
+    assert!(says("If this artifact would enter, you may discard a land card instead."));
+    assert!(!says("(As this Saga enters and after your draw step, add a lore counter.)"));
+    assert!(!says("Landfall — Whenever a land you control enters, you gain 1 life."));
+    assert!(!says("When this creature enters, draw a card."));
+    assert!(!says("Flying (This creature can't be blocked except by creatures with flying or reach.)"));
+}

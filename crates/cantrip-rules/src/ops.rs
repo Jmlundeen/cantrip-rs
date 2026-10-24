@@ -901,12 +901,11 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
         entering.transformed = true;
     }
     choose_protector(cx, entering)?;
-    // Its face's other replacements (CR 616.1e) - none where its copy replacement made it a copy, or it was made as one, as
-    // its copy's apply instead. Applied with the other replacements that modify how it enters, in the order its controller
-    // chooses (CR 616.1, `entry_replacements`).
+    // Its face's other replacements (CR 616.1e) - none where a copy effect is over it (its copy replacement made it a copy, it
+    // was made as one, or it is a bestowed Aura, CR 702.103b), as its copy's apply instead, below. Applied with the other
+    // replacements that modify how it enters, in the order its controller chooses (CR 616.1, `entry_replacements`).
     let card = cx.cards().face(cx.s().obj(entering.object).card, entering.transformed);
-    if !copied
-        && !(copied_by.is_some() && copy_over(cx, entering))
+    if !copy_over(cx, entering)
         && cx.cards().get(card).enters.is_some()
         && !lost(cx, entering)
     {
@@ -957,9 +956,13 @@ pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, slot: usi
     let Some(enters) = cx.cards().get(card).enters else { return };
     entering.controller = controller;
     entering.tapped = tapped;
-    let was_copy = entering.copy.is_some();
+    let before = *entering;
     let _ = enters(cx, entering);
-    verify_no_copy_in_enters(cx, card, was_copy, entering);
+    if layers::verifying()
+        && let Some(fault) = enters_tier_fault(&before, entering)
+    {
+        panic!("{}'s `CardDef::enters` {fault}", cx.cards().get(card).name);
+    }
 }
 
 /// The replacement effects that modify how a permanent enters (CR 614.12) applied to its entry `proposed`: its own
@@ -973,7 +976,9 @@ pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, slot: usi
 /// Where nothing could apply but its own, there is nothing to order: they are applied as they are, and nothing is judged.
 fn entry_replacements(cx: &mut Cx, entering: &mut Entering, proposed: ZoneChange) -> ZoneChange {
     let own = entering.own.iter().any(Option::is_some);
-    if !own || !crate::replace::zone_change_possible(cx, &proposed) {
+    // A copy's own replacements that function from every zone are its, not its card's (`judged_entering`).
+    let copy_replaces = copy_over(cx, entering) && cx.cards().replaces[entering_card(cx, entering).0 as usize];
+    if !own || !(copy_replaces || crate::replace::zone_change_possible(cx, &proposed)) {
         let mut proposed = proposed;
         for slot in 0..entering.own.len() {
             apply_own_entering(cx, entering, slot, proposed.controller, proposed.tapped);
@@ -994,16 +999,21 @@ fn entry_replacements(cx: &mut Cx, entering: &mut Entering, proposed: ZoneChange
     change
 }
 
-/// A card's `enters` that made it a copy is a copy replacement out of its place (`CardDef::enters_as_copy`): applied after
-/// the replacement that has it enter back face up instead of before it (CR 616.1c, 616.1d). The engine, not the card,
-/// decides which replacements are copy replacements, so a verifying run stops on one.
-fn verify_no_copy_in_enters(cx: &Cx, card: CardId, was_copy: bool, entering: &Entering) {
-    if layers::verifying() && !was_copy && entering.copy.is_some() {
-        panic!(
-            "{}'s `CardDef::enters` made it enter as a copy: a copy replacement is `CardDef::enters_as_copy`, applied before \
-             the others (CR 616.1c)",
-            cx.cards().get(card).name
-        );
+/// A card's `enters` is ordered as one of the replacements any of which may be chosen (CR 616.1e). One that has it enter
+/// under another player's control (CR 616.1b), as a copy (616.1c) or with its back face up (616.1d) is a replacement of an
+/// earlier tier out of its place: its controller could choose another effect before it, which the rules don't allow. The
+/// engine, not the card, decides which tier a replacement is in, so a verifying run stops on one (`apply_own_entering`): a
+/// copy replacement is `CardDef::enters_as_copy`, and the others need a hook of their own tier, as it is. What `enters`
+/// did out of its tier, from the entry before it to the entry after, if anything.
+pub(crate) fn enters_tier_fault(before: &Entering, after: &Entering) -> Option<&'static str> {
+    if after.copy != before.copy {
+        Some("made it enter as a copy, or as another: a copy replacement is `CardDef::enters_as_copy`, applied before the others (CR 616.1c)")
+    } else if after.controller != before.controller {
+        Some("changed under whose control it enters: such a replacement is chosen before the others (CR 616.1b), and needs a hook of that tier")
+    } else if after.transformed != before.transformed {
+        Some("changed the face it enters with: such a replacement is chosen before the others (CR 616.1d), and needs a hook of that tier")
+    } else {
+        None
     }
 }
 
@@ -1808,8 +1818,8 @@ fn create_tokens_onto(
         };
         let change = entry_replacements(cx, &mut entering, proposed);
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist
-
-        // (CR 111.7), so it is never created. No implemented effect does this to a token yet.
+        // (CR 111.7), so it is never created: an entry its own replacement sends elsewhere instead (`Entering::instead`)
+        // as much as one another effect does.
         if !change.to.is(ZoneKind::Battlefield) {
             continue;
         }

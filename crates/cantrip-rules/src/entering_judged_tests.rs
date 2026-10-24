@@ -72,6 +72,16 @@ static HUMBLE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 static GROWN: CardDef = CardDef { name: "Judged Grown", statics: &[], ..HUMBLE };
+/// The Aura face of a creature with bestow, which has its "enters with two +1/+1 counters" as well (CR 702.103b).
+static BESTOWED: CardDef = CardDef {
+    name: "Judged Bestowed",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura]),
+    power: None,
+    toughness: None,
+    ..GROWN
+};
+static BESTOWER: CardDef = CardDef { name: "Judged Bestower", bestow: Some(&BESTOWED), ..GROWN };
 
 /// "This creature enters tapped", a replacement of its own that functions from every zone (CR 113.6b, 614.1d).
 fn this_enters(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
@@ -108,6 +118,8 @@ fn game() -> (Game, &'static CardTable) {
         &GROWN,
         &SLEEPER,
         &PLAIN,
+        &BESTOWED,
+        &BESTOWER,
     ])));
     (Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() }), table)
 }
@@ -362,4 +374,21 @@ fn it_is_judged_with_its_cast_door_and_its_protector() {
     protected.protector = Some(P0);
     assert!(ops::as_it_would_exist(&mut cx, &protected).chars.is(CardType::Creature));
     assert!(!ops::as_it_would_exist(&mut cx, &entering(relic, P0, false)).chars.is(CardType::Creature));
+}
+
+/// A bestowed Aura enters as its card's Aura face (CR 702.103b), whose copy values are over its card: its "enters with two
+/// +1/+1 counters" is the Aura face's, applied once - never its creature face's as well.
+#[test]
+fn a_bestowed_aura_applies_its_enters_with_once() {
+    let (mut game, table) = game();
+    let bestower = put(&mut game, table, &BESTOWER, Zone::hand(P0), P0);
+    let mut cx = cx(&mut game);
+    let mut e = entering(bestower, P0, false);
+    e.copy = Some(Copiable::of(table.id_of(&BESTOWED)));
+    ops::prepare_entry(&mut cx, &mut e).expect("nothing is asked");
+    assert_eq!(e.own, [Some(table.id_of(&BESTOWED)), None], "the Aura face's alone");
+    for slot in 0..e.own.len() {
+        ops::apply_own_entering(&mut cx, &mut e, slot, P0, false);
+    }
+    assert_eq!(e.counters[CounterKind::PlusOne as usize], 2);
 }

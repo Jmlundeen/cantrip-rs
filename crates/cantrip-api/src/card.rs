@@ -102,7 +102,8 @@ pub struct Entering {
     /// Its own "enters tapped / enters with / as it enters" replacements still to apply (`CardDef::enters` of these cards:
     /// its face's, and those of what it enters as a copy of, CR 707.9a), set by the engine as it prepares the entry and
     /// applied by it among the other replacement effects that modify how it enters, in the order its controller chooses
-    /// (CR 614.12, 616.1). Empty in every `Entering` a card sees or builds.
+    /// (CR 614.12, 616.1). Each is emptied as it applies, so an `enters` may see the other still set; a card never reads or
+    /// sets it.
     pub own: [Option<CardId>; 2],
 }
 
@@ -2527,8 +2528,11 @@ pub struct CardDef {
     pub additional_cost: Option<Cost>,
     /// An additional cost of which one of these is paid, chosen as it is cast (CR 601.2b): Bitter Triumph.
     pub additional_choice: &'static [ExtraCost],
-    /// Its own entering replacements, applied as it enters from anywhere (CR 614.12), other than one that has it enter as
-    /// a copy (`enters_as_copy`): none of them may make it a copy, which the engine checks.
+    /// Its own entering replacements, applied as it enters from anywhere (CR 614.12), ordered by its controller with the other
+    /// replacements of its entry as ones any of which may be chosen (CR 616.1e). So none of them may make it a copy (that is
+    /// `enters_as_copy`, CR 616.1c), change under whose control it enters (CR 616.1b) or the face it enters with (CR 616.1d):
+    /// each of those is chosen before the others, and a card that prints one needs a hook of that tier, as `enters_as_copy`
+    /// is for copies. A verifying run stops on any of the three.
     pub enters: Option<Enters>,
     /// Its replacement that has it enter as a copy (CR 707.9): "you may have this creature enter as a copy of ..." (Clone,
     /// Glasspool Mimic; built with `cantrip_mechanics::copy::enter_as_copy*`). Applied before every other replacement of how

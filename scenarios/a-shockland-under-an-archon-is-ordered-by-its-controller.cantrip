@@ -1,6 +1,6 @@
 # CR 616.1. Two replacement effects apply to Hallowed Fountain entering: its own "you may pay 2 life" and Archon of
-# Emeria's "nonbasic lands your opponents control enter tapped". Either way the land enters tapped, so which applies
-# first changes nothing and its controller need not be asked: the card's ruling, "If an effect puts this land onto the
+# Emeria's "nonbasic lands your opponents control enter tapped". Bot1, the land's controller, is asked which applies first,
+# and chooses the Archon's. Either way the land enters tapped: the card's ruling, "If an effect puts this land onto the
 # battlefield tapped, you may pay 2 life, but it still enters tapped." Bot1 does not pay, and the land enters tapped.
 
 [Bot1 Deck]
@@ -24,6 +24,7 @@ Bot2.Battlefield.Plains#3.Activate
 Bot2.Hand.Archon of Emeria.Cast
 [T7 Bot1.Main1]
 Bot1.Hand.Hallowed Fountain.Play
+Bot1.Replace(Archon of Emeria)
 
 [Expect]
 Turn = 7
