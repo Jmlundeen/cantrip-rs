@@ -1,0 +1,60 @@
+# Weathered Runestone: "Players can't cast spells from graveyards or libraries" (CR 101.2, 601.3) and "Nonland
+# permanent cards ... can't enter" (CR 110.4a): a land card still can, since playing a land is not casting (CR 305.1).
+# Bot1 casts the Runestone, Crucible of Worlds and Faithless Looting (discarding Plains and Mox Sapphire), and plays
+# Plains from the graveyard. Bot2 casts its own Looting on turn 2 with Mox Ruby and two more Moxen open, and is refused
+# the flashback ({2}{R}); on turn 3 Bot1, with Mox Ruby, Jet and Pearl untapped, is refused its own.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Weathered Runestone
+Crucible of Worlds
+Faithless Looting
+Plains
+Mox Sapphire
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Faithless Looting
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Weathered Runestone.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Crucible of Worlds.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Plains; Mox Sapphire)
+Bot1.Graveyard.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Island; Island)
+! Bot2.Graveyard.Faithless Looting.Cast
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Faithless Looting.Cast
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Crucible of Worlds; Mox Jet; Mox Pearl; Mox Ruby; Plains; Weathered Runestone
+Bot1.Graveyard = Faithless Looting; Mox Sapphire; Black Lotus
+Bot2.Graveyard = Faithless Looting; Island; Island

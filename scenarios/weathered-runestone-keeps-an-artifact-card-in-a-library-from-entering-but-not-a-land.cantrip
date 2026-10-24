@@ -1,0 +1,50 @@
+# Weathered Runestone: "Nonland permanent cards in graveyards and libraries can't enter the battlefield" (CR 101.2,
+# 110.4a). Bot1 casts the Runestone and Repurposing Bay on turn 1. On turn 3 Fabled Passage finds a Forest, a land card in the
+# library, which enters: the control. Then the Bay sacrifices Mox Jet (mana value 0) to search for an artifact card with
+# mana value 1: Sol Ring, a nonland permanent card in the library, can't be put onto the
+# battlefield, so it stays there.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Weathered Runestone
+Repurposing Bay
+Fabled Passage
+Swamp
+Sol Ring
+Forest
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Weathered Runestone.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Repurposing Bay.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Forest)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Repurposing Bay.Activate
+Bot1.Choose(Mox Jet)
+Bot1.Search(Sol Ring)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Forest; Mox Emerald; Mox Sapphire; Repurposing Bay; Weathered Runestone
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Library.Sol Ring.Colors.Count = 0
+Bot1.Graveyard = Mox Jet; Fabled Passage; Black Lotus

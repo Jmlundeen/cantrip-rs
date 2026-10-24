@@ -1,0 +1,52 @@
+# Weathered Runestone: "Nonland permanent cards in graveyards and libraries can't enter the battlefield" (CR 101.2,
+# 110.4a). Bot1 casts the Runestone and Goblin Welder, then Faithless Looting, discarding Phyrexian Metamorph (an
+# artifact creature card) and Mox Pearl (a noncreature artifact card, which Grafdigger's Cage would let in). Goblin Welder
+# sacrifices Mox Jet for the Metamorph and then Mox Ruby for Mox Pearl: each Mox is sacrificed, but neither card in the
+# graveyard returns, and the Metamorph is never asked what to copy.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Weathered Runestone
+Goblin Welder
+Faithless Looting
+Phyrexian Metamorph
+Mox Pearl
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Weathered Runestone.Cast
+Bot1.Hand.Goblin Welder.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Metamorph; Mox Pearl)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Goblin Welder.Activate
+Bot1.Target(Mox Jet)
+Bot1.Target(Phyrexian Metamorph)
+Bot1.Pass
+! Bot1.Accept
+? Bot1.Graveyard = Mox Jet; Faithless Looting; Mox Pearl; Phyrexian Metamorph; Black Lotus
+[T5 Bot1.Main1]
+Bot1.Battlefield.Goblin Welder.Activate
+Bot1.Target(Mox Ruby)
+Bot1.Target(Mox Pearl)
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Goblin Welder; Mountain; Weathered Runestone
+Bot1.Graveyard = Mox Ruby; Mox Jet; Faithless Looting; Mox Pearl; Phyrexian Metamorph; Black Lotus
