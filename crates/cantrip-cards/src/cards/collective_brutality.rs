@@ -24,6 +24,6 @@ const MODES: &[ModeDef] = &[
         .targets(&[targets::OPPONENT]),
 ];
 
-static MODAL: ModalDef = escalate::modal(MODES, Cost { discard: Some((1, targets::filters::any)), ..Cost::NONE });
+static MODAL: ModalDef = escalate::modal(MODES, discard_cards(1));
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::COLLECTIVE_BRUTALITY };

@@ -1640,7 +1640,7 @@ impl<'s> Run<'s> {
                 for spec in action.positional() {
                     let index = match spec.trim().parse::<usize>() {
                         Ok(n) if n >= 1 => n - 1,
-                        _ => match modes.iter().position(|m| label_text(m).to_lowercase().contains(&spec.trim().to_lowercase())) {
+                        _ => match modes.iter().position(|m| label_text_in(self.game.cards, m).to_lowercase().contains(&spec.trim().to_lowercase())) {
                             Some(i) => i,
                             None if could.iter().any(|m| m.to_lowercase().contains(&spec.trim().to_lowercase())) => {
                                 absent = true;
@@ -1948,7 +1948,7 @@ impl<'s> Run<'s> {
         for spec in step.positional() {
             let index = match spec.trim().parse::<usize>() {
                 Ok(n) if n >= 1 => n - 1,
-                _ => match modes.iter().position(|m| label_text(m).to_lowercase().contains(&spec.trim().to_lowercase())) {
+                _ => match modes.iter().position(|m| label_text_in(self.game.cards, m).to_lowercase().contains(&spec.trim().to_lowercase())) {
                     Some(i) => i,
                     None => return fail(format!("line {}: no mode reads \"{spec}\"", step.line)),
                 },

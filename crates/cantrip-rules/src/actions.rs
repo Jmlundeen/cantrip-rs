@@ -178,7 +178,7 @@ fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost
     }
     if let Some((n, filter)) = cost.discard {
         let asker = Asker { source, controller };
-        let hand = cx.s().zone(Zone::hand(controller)).iter().filter(|&&c| c != source && filter(cx, &asker, c)).count();
+        let hand = cx.s().zone(Zone::hand(controller)).iter().filter(|&&c| c != source && filter.is_none_or(|f| f(cx, &asker, c))).count();
         if hand < n as usize {
             return false;
         }
@@ -591,7 +591,7 @@ fn choose_discards(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost)
     let Some((n, filter)) = cost.discard else { return Ok(Vec::new()) };
     let asker = Asker { source, controller: player };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
+    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter.is_none_or(|f| f(cx, &asker, c))).collect();
     let ask = RequestKind::choose_cards(source, Purpose::Discard, hand, eligible, u32::from(n), false, "");
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
@@ -745,12 +745,14 @@ fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cos
     }
 }
 
-/// Pays the discard part of a cost: the chosen cards, together (CR 701.9).
-fn pay_discards(cx: &mut Cx, chosen: &[ObjectId]) {
+/// Pays the discard part of `cost`: the chosen cards, together (CR 701.9). A discard of cards the cost names by a
+/// characteristic ("Discard a creature card") can't put them into a hidden zone unrevealed (CR 701.9c, `ops::discard_paying`).
+fn pay_discards(cx: &mut Cx, cost: &Cost, chosen: &[ObjectId]) {
     if chosen.is_empty() {
         return;
     }
-    ops::discard_together(cx, chosen);
+    let specifies = cost.discard.is_some_and(|(_, filter)| filter.is_some());
+    ops::discard_paying(cx, chosen, if specifies { chosen } else { &[] });
 }
 
 /// Whether `player` can still pay this much energy (CR 107.14) and life (CR 119.4) once the mana of the cost is paid: the
@@ -5647,7 +5649,7 @@ fn is_land(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
 }
 
 /// The additional cost of retrace (CR 702.81a): discard a land card.
-const RETRACE: Cost = Cost { discard: Some((1, is_land)), ..Cost::NONE };
+const RETRACE: Cost = Cost { discard: Some((1, Some(is_land))), ..Cost::NONE };
 
 /// Whether a permanent has a mana ability that could be activated now: one more way to spend its tap, which a creature
 /// or artifact tapped to pay for convoke or improvise cannot also be used for.
@@ -6610,7 +6612,7 @@ fn cast(
     pay_counters_among(cx, &removed);
     pay_counters_among(cx, &extra_removed);
     pay_permanents(cx, &cost, &chosen, None);
-    pay_discards(cx, &discards);
+    pay_discards(cx, &cost, &discards);
     pay_exiles(cx, &exiles);
     pay_exiles(cx, &hand_exiles);
     ops::sacrifice(cx, &way_sacrifices);
@@ -6625,7 +6627,7 @@ fn cast(
         add_revealed_to_item(cx, at, &revealed);
     }
     ops::sacrifice(cx, &extra_sacrifices);
-    pay_discards(cx, &extra_discards);
+    pay_discards(cx, &extra, &extra_discards);
     pay_life_and_counters(cx, player, spell, &extra);
     pay_exert_and_tappers(cx, spell, &extra, &extra_tappers);
     // CR 119.4: the life paid for Phyrexian symbols and for X, with the rest of the cost.
@@ -7842,7 +7844,7 @@ fn activate(
     let revealed = pay_behold(cx, player, &beheld);
     let at = cx.s().stack.len() - 1;
     add_revealed_to_item(cx, at, &revealed);
-    pay_discards(cx, &discards);
+    pay_discards(cx, &def.cost, &discards);
     pay_exiles(cx, &exiles);
     pay_life_and_counters(cx, player, source, &def.cost);
     if let Some(kind) = counter {
@@ -8045,7 +8047,7 @@ pub fn activate_mana(
     pay_exert_and_tappers(cx, source, &def.cost, &[]);
     if def.cost.discard_hand {
         let hand = choose_discards(cx, player, source, &def.cost)?;
-        pay_discards(cx, &hand);
+        pay_discards(cx, &def.cost, &hand);
     }
     pay_permanents(cx, &def.cost, &chosen, Some(source));
     pay_life_and_counters(cx, player, source, &def.cost);
@@ -9483,7 +9485,7 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     // Revealed for the effect paying it, as part of that effect (CR 701.20a): no reveal of the effect's own lasts past the
     // instruction it is for (`ops::seen_by_all`).
     pay_behold(cx, payer, &beheld);
-    pay_discards(cx, &discards);
+    pay_discards(cx, cost, &discards);
     pay_exiles(cx, &exiles);
     pay_exiles(cx, &hand_exiles);
     ops::sacrifice(cx, &sacrifices);

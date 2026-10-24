@@ -40,6 +40,11 @@ pub struct ZoneChange {
     /// Its own madness (CR 702.35a) has exiled it in place of the graveyard it was discarded to: the core's replacement,
     /// ordered with the others (CR 616.1), whose linked "when this card is exiled this way" trigger follows the move.
     pub madness: bool,
+    /// The card is discarded to pay a cost that specifies a characteristic of it ("unless you discard a creature card", "you
+    /// may discard a land card instead", "Discard a creature card:"; CR 118.12): set by the discard, never by a replacement.
+    /// A card put into a hidden zone unrevealed has its characteristics undefined and can't pay such a cost (CR 701.9c), so
+    /// no replacement that would put it there is offered, and it goes where the others leave it.
+    pub pays_characteristic: bool,
 }
 
 /// Counters that would be put on a permanent (CR 122.6, 614.1a): by an effect, or as it enters with them.

@@ -326,6 +326,17 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
     {
         found.insert(0, Candidate { source: by, index: 0, origin: Origin::Protection });
     }
+    // A card discarded to pay a cost that specifies a characteristic of it can't pay it from a hidden zone it was put into
+    // unrevealed (CR 701.9c): an effect that would put it there is not offered, and it goes where the others leave it.
+    if let Proposal::ZoneChange(z) = proposal
+        && z.pays_characteristic
+    {
+        found.retain(|c| {
+            let mut after = *proposal;
+            reshape(cx, c, &mut after);
+            !matches!(after, Proposal::ZoneChange(a) if matches!(a.to.kind(), ZoneKind::Hand | ZoneKind::Library) && !a.reveal)
+        });
+    }
     found
 }
 

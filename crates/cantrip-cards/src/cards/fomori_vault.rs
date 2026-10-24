@@ -1,7 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{look_at_top, Rest};
 use cantrip_mechanics::artifacts_you_control;
-use cantrip_mechanics::targets::filters;
 use cantrip_oracle as oracle;
 
 /// Look at the top X cards of your library, where X is the number of artifacts you control as this resolves. Put one of
@@ -17,7 +16,7 @@ fn look(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
-        ability(cost("{3}, {T}").and(discard(1, filters::any)), look, "{3}, {T}, Discard a card: Look at the top X cards of your library, where X is the number of artifacts you control. Put one of those cards into your hand and the rest on the bottom of your library in a random order."),
+        ability(cost("{3}, {T}").and(discard_cards(1)), look, "{3}, {T}, Discard a card: Look at the top X cards of your library, where X is the number of artifacts you control. Put one of those cards into your hand and the rest on the bottom of your library in a random order."),
     ],
     ..oracle::FOMORI_VAULT
 };

@@ -121,7 +121,7 @@ pub fn create_tapped_powerstone(g: &mut dyn Game, controller: PlayerId) -> Resul
 /// A colorless Blood artifact token with "{1}, {T}, Discard a card, Sacrifice this token: Draw a card." (CR 111.10g).
 pub static BLOOD: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Artifact]),
-    abilities: &[ability(cost("{1}, {T}").and(SACRIFICE_THIS).and(discard(1, crate::targets::filters::any)), draw_a_card, "{1}, {T}, Discard a card, Sacrifice this token: Draw a card.")],
+    abilities: &[ability(cost("{1}, {T}").and(SACRIFICE_THIS).and(discard_cards(1)), draw_a_card, "{1}, {T}, Discard a card, Sacrifice this token: Draw a card.")],
     text: "{1}, {T}, Discard a card, Sacrifice this token: Draw a card.",
     ..token!(Blood)
 };

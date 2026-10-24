@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::{self, THIS_ENTERS};
-use cantrip_mechanics::{choose_discard_two_unless_discarding, class};
+use cantrip_mechanics::{class, discard_two_unless_discarding};
 use cantrip_oracle as oracle;
 
 /// "When this Class enters, each opponent discards two cards unless they discard a nonland card." Each opponent, in
@@ -8,14 +8,7 @@ use cantrip_oracle as oracle;
 /// the hands together (CR 701.9a).
 fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
-    let mut discarded = Vec::new();
-    for opponent in opponents {
-        if !cantrip_mechanics::players::reached(g, opponent) {
-            continue;
-        }
-        discarded.extend(choose_discard_two_unless_discarding(g, opponent, item.object, |chars| !chars.is(CardType::Land))?);
-    }
-    g.discard_together(&discarded);
+    discard_two_unless_discarding(g, &opponents, item.object, |chars| !chars.is(CardType::Land))?;
     Ok(())
 }
 

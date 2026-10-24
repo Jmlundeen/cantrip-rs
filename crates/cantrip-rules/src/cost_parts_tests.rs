@@ -99,7 +99,7 @@ fn return_tapped(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), 
 
 /// "You may discard a card and pay 1 energy. If you do, you gain 5 life."
 fn discard_and_energy(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
-    may_pay_with(g, item, discard(1, |_, _, _| true).and(Cost { energy: 1, ..Cost::NONE }))
+    may_pay_with(g, item, discard_cards(1).and(Cost { energy: 1, ..Cost::NONE }))
 }
 
 /// "You may pay {B/P}. If you do, you gain 5 life." - a Phyrexian symbol in a cost paid as a spell resolves, as Ice Cave's

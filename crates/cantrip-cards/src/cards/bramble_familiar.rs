@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets::filters;
 use cantrip_mechanics::library::mill_then_put_onto_battlefield;
 use cantrip_oracle as oracle;
 
@@ -22,7 +21,7 @@ pub static FETCH_QUEST: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::G), "{T}: Add {G}."),
-        ability(cost("{1}{G}, {T}").and(discard(1, filters::any)), cantrip_mechanics::effects::return_this_to_hand, "{1}{G}, {T}, Discard a card: Return this creature to its owner's hand."),
+        ability(cost("{1}{G}, {T}").and(discard_cards(1)), cantrip_mechanics::effects::return_this_to_hand, "{1}{G}, {T}, Discard a card: Return this creature to its owner's hand."),
     ],
     adventure: Some(&FETCH_QUEST),
     ..oracle::BRAMBLE_FAMILIAR

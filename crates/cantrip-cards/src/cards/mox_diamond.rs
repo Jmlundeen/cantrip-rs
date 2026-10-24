@@ -8,7 +8,8 @@ const ASK: Question = Question::new("Discard", "discard a land card?", "If you d
 /// "If this artifact would enter, you may discard a land card instead. If you do, put this artifact onto the battlefield. If
 /// you don't, put it into its owner's graveyard." A replacement with a choice inside it (CR 614.12a), settled before the card
 /// moves, wherever it is. A player with no land card in hand is never asked: the payment is impossible, and it goes to the
-/// graveyard.
+/// graveyard. The land card pays a cost that names its type (CR 118.12), so it can't be put into a hidden zone unrevealed
+/// instead of the graveyard (CR 701.9c, `Game::discard_paying`).
 fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let player = entering.controller;
     let lands: Vec<ObjectId> = g.state().zone(Zone::hand(player)).iter().copied().filter(|&c| g.chars(c).is(CardType::Land)).collect();
@@ -18,7 +19,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
         return Ok(());
     }
     if let Some(land) = choose::card(g, player, entering.object, Purpose::Discard, lands)? {
-        g.discard(land);
+        g.discard_paying(&[land], &[land]);
     }
     Ok(())
 }

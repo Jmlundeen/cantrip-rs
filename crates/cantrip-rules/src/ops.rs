@@ -70,11 +70,13 @@ pub struct Moving {
     /// card all players can see as it moves (`seen_by_all`). Set by the reveal-and-move verbs, never by a move that is not
     /// about the revealed card (a later draw).
     pub revealed: bool,
+    /// It is discarded to pay a cost that specifies a characteristic of it (`ZoneChange::pays_characteristic`, CR 701.9c).
+    pub pays_characteristic: bool,
 }
 
 impl Moving {
     pub fn to(id: ObjectId, to: Zone) -> Moving {
-        Moving { id, to, entering: None, reason: None, revealed: false }
+        Moving { id, to, entering: None, reason: None, revealed: false, pays_characteristic: false }
     }
 }
 
@@ -295,6 +297,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             shuffle: false,
             is_card: !old.token && !old.card_copy,
             madness: false,
+            pays_characteristic: m.pays_characteristic,
         };
         // A permanent entering is judged as it would exist on the battlefield (CR 614.12).
         let change = match entry {
@@ -1731,6 +1734,7 @@ fn create_tokens_onto(
             shuffle: false,
             is_card: false,
             madness: false,
+            pays_characteristic: false,
         };
         let change = judged_entering(cx, &entering, false, |cx| replace::zone_change(cx, proposed));
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist
@@ -2391,12 +2395,19 @@ pub fn discard(cx: &mut Cx, card: ObjectId) {
 
 /// Discards cards together (CR 701.9).
 pub fn discard_together(cx: &mut Cx, cards: &[ObjectId]) -> Vec<ObjectId> {
+    discard_paying(cx, cards, &[])
+}
+
+/// `discard_together`, the cards among them in `paying` discarded to pay a cost that specifies a characteristic of them (CR
+/// 118.12): no replacement that would put one into a hidden zone unrevealed is offered for it (CR 701.9c,
+/// `ZoneChange::pays_characteristic`).
+pub fn discard_paying(cx: &mut Cx, cards: &[ObjectId], paying: &[ObjectId]) -> Vec<ObjectId> {
     // CR 101.2: a card an opponent's spell or ability can't make its owner discard stays where it is.
     let causer = cx.effect_controller();
     let moves: Vec<Moving> = cards
         .iter()
         .filter(|&&c| causer.is_none_or(|by| cantrip_api::may_cause(&*cx, by, cx.s().obj(c).owner, cantrip_api::CauseKind::Discard)))
-        .map(|&c| Moving::to(c, Zone::graveyard(cx.s().obj(c).owner)))
+        .map(|&c| Moving { pays_characteristic: paying.contains(&c), ..Moving::to(c, Zone::graveyard(cx.s().obj(c).owner)) })
         .collect();
     let (new, seen) = move_together_seen(cx, &moves, ZoneReason::Discard);
     // A card a replacement put into a hidden zone instead of its owner's graveyard (Library of Leng), and not revealed as it

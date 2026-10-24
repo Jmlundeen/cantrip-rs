@@ -107,6 +107,13 @@ pub fn deal_on(
 
 /// A label's text, as a client shows it and a scenario names it.
 pub fn label_text(label: &Label) -> &'static str {
+    label_text_in(cards(), label)
+}
+
+/// `label_text` read from `table`: a game dealt on a table of its own (`run_on`, test-only cards among it) names its cards'
+/// labels by that table's ids.
+pub fn label_text_in(table: &'static CardTable, label: &Label) -> &'static str {
+    let cards = || table;
     match *label {
         Label::Card(card, i) | Label::Option(card, i) => cards().get(card).labels.get(i as usize).copied().unwrap_or(""),
         Label::Name(card) | Label::Face(card) => cards().get(card).name,

@@ -12,7 +12,7 @@ pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::CREATURE], effect),
     // "As an additional cost to cast this spell, discard a card or pay {5}" (CR 601.2b).
     additional_choice: &[
-        ExtraCost { text: "Discard a card", cost: Cost { discard: Some((1, targets::filters::any)), ..Cost::NONE } },
+        ExtraCost { text: "Discard a card", cost: discard_cards(1) },
         ExtraCost { text: "Pay {5}", cost: Cost::mana(mana("{5}")) },
     ],
     ..oracle::LIGHTNING_AXE

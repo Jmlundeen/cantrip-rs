@@ -406,6 +406,11 @@ pub trait Game: Query {
     /// A card its owner can't be made to discard by this spell or ability stays (CR 101.2), and madness applies
     /// (CR 702.35a). The new objects, in order, of the cards that were discarded.
     fn discard_together(&mut self, cards: &[ObjectId]) -> Vec<ObjectId>;
+    /// `discard_together`, where the cards among them in `paying` are discarded to pay a cost that specifies a
+    /// characteristic of them (CR 118.12): "discard two cards unless you discard a creature card", "you may discard a land
+    /// card instead". Those can't be put into a hidden zone unrevealed (CR 701.9c): no replacement that would is offered
+    /// for them (`ZoneChange::pays_characteristic`).
+    fn discard_paying(&mut self, cards: &[ObjectId], paying: &[ObjectId]) -> Vec<ObjectId>;
     /// `player` discards their hand (CR 701.9): every card in it, at once, through `discard_together`. The new objects.
     fn discard_hand(&mut self, player: PlayerId) -> Vec<ObjectId> {
         let hand = self.state().zone(Zone::hand(player)).to_vec();

@@ -589,8 +589,10 @@ pub struct Cost {
     pub remove_counters_among: Option<(u8, ObjectFilter)>,
     /// Exile this card (from the zone the ability functions in: eternalize, CR 702.129a).
     pub exile_self: bool,
-    /// Discard this many cards from your hand that pass the filter (CR 701.9), chosen as the cost is chosen.
-    pub discard: Option<(u8, ObjectFilter)>,
+    /// Discard this many cards from your hand (CR 701.9), chosen as the cost is chosen: any cards ("discard a card") with no
+    /// filter, else only cards that pass it ("discard a creature card"), a cost that specifies a characteristic of the cards
+    /// discarded (CR 701.9c, `ZoneChange::pays_characteristic`).
+    pub discard: Option<(u8, Option<ObjectFilter>)>,
     /// Pay X life, X announced with the spell (CR 118.8, 601.2b): Toxic Deluge, Vicious Rivalry.
     pub pay_x_life: bool,
     /// Exile this many cards from your graveyard, other than the source (CR 702.138a escape, and "exile three cards

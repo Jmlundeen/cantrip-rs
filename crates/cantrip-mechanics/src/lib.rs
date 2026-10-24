@@ -161,25 +161,40 @@ pub fn each_discards_a_card(g: &mut dyn Game, players: &[PlayerId], source: Obje
     Ok(g.discard_together(&chosen))
 }
 
-/// "Discard two cards unless you discard [a quality of card]" (CR 608.2d, 701.9): the cards `player` chooses, not yet
-/// discarded. With a card of the quality in hand they choose between discarding one such card and discarding two cards
-/// of any kind (the card's `labels` 0 and 1 name the two answers, in that order); a card of the quality may be one of the
-/// two. With none in hand nothing is offered but the two cards. Steamcore Scholar, Winternight Stories and Bandit's Talent print it.
-pub fn choose_discard_two_unless_discarding(
+/// "[Each of `players`] discards two cards unless they discard [a quality of card]" (CR 608.2d, 701.9, 101.4): in the order
+/// given (turn order from the active player, `apnap()`), each player still in the game chooses; then every chosen card is
+/// discarded together, and the cards discarded are returned. With a card of the quality in hand a player chooses between
+/// discarding one such card and discarding two cards of any kind (the card's `labels` 0 and 1 name the two answers, in that
+/// order); a card of the quality may be one of the two. With none in hand nothing is offered but the two cards.
+///
+/// The one card pays the "unless", a cost that specifies a characteristic of it (CR 118.12a): no replacement that would put
+/// it into a hidden zone unrevealed is offered (CR 701.9c, `Game::discard_paying`). The two cards specify none. Steamcore
+/// Scholar, Winternight Stories and Bandit's Talent print it.
+pub fn discard_two_unless_discarding(
     g: &mut dyn Game,
-    player: PlayerId,
+    players: &[PlayerId],
     source: ObjectId,
     qualifies: fn(&Chars) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let hand = g.state().zone(Zone::hand(player)).to_vec();
-    let qualifying: Vec<ObjectId> = hand.iter().copied().filter(|&c| qualifies(&g.chars(c))).collect();
-    if !qualifying.is_empty() {
-        let card = g.obj(source).card;
-        if choose::one_of(g, player, source, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0 {
-            return choose::cards_from(g, player, source, Purpose::Discard, hand, qualifying, 1, false);
+    let (mut chosen, mut paying) = (Vec::new(), Vec::new());
+    for &player in players {
+        if !players::reached(g, player) {
+            continue;
         }
+        let hand = g.state().zone(Zone::hand(player)).to_vec();
+        let qualifying: Vec<ObjectId> = hand.iter().copied().filter(|&c| qualifies(&g.chars(c))).collect();
+        if !qualifying.is_empty() {
+            let card = g.obj(source).card;
+            if choose::one_of(g, player, source, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0 {
+                let one = choose::cards_from(g, player, source, Purpose::Discard, hand, qualifying, 1, false)?;
+                paying.extend_from_slice(&one);
+                chosen.extend(one);
+                continue;
+            }
+        }
+        chosen.extend(choose_from_hand(g, player, source, 2)?);
     }
-    choose_from_hand(g, player, source, 2)
+    Ok(g.discard_paying(&chosen, &paying))
 }
 
 /// "[Player] discards `count` cards at random" (CR 701.9b; Hymn to Tourach, Mind Twist): the hand put in a random order

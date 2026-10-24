@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose_discard_two_unless_discarding, triggers::THIS_ENTERS};
+use cantrip_mechanics::{discard_two_unless_discarding, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "When this creature enters, draw two cards. Then discard two cards unless you discard an instant or sorcery card
@@ -9,10 +9,9 @@ use cantrip_oracle as oracle;
 fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, 2);
-    let chosen = choose_discard_two_unless_discarding(g, you, item.object, |chars| {
+    discard_two_unless_discarding(g, &[you], item.object, |chars| {
         chars.is(CardType::Instant) || chars.is(CardType::Sorcery) || (chars.is(CardType::Creature) && chars.has(Keyword::Flying))
     })?;
-    g.discard_together(&chosen);
     Ok(())
 }
 

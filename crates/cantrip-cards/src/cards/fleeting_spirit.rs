@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets::filters;
 use cantrip_mechanics::effects::this_gains_first_strike;
 use cantrip_mechanics::delayed;
 use cantrip_oracle as oracle;
@@ -17,7 +16,7 @@ fn blink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{W}").and(exile_from_graveyard(3)), this_gains_first_strike, "{W}, Exile three cards from your graveyard: This creature gains first strike until end of turn."),
-        ability(discard(1, filters::any), blink, "Discard a card: Exile this creature. Return it to the battlefield under its owner's control at the beginning of the next end step."),
+        ability(discard_cards(1), blink, "Discard a card: Exile this creature. Return it to the battlefield under its owner's control at the beginning of the next end step."),
     ],
     delayed: &[delayed_trigger(delayed::return_exiled_to_battlefield, "Return it to the battlefield under its owner's control.")],
     ..oracle::FLEETING_SPIRIT

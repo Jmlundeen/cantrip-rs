@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose_discard_two_unless_discarding, harmonize};
+use cantrip_mechanics::{discard_two_unless_discarding, harmonize};
 use cantrip_oracle as oracle;
 
 /// "Draw three cards. Then discard two cards unless you discard a creature card." The player decides as the discard is made
@@ -8,8 +8,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, 3);
-    let chosen = choose_discard_two_unless_discarding(g, you, item.object, |chars| chars.is(CardType::Creature))?;
-    g.discard_together(&chosen);
+    discard_two_unless_discarding(g, &[you], item.object, |chars| chars.is(CardType::Creature))?;
     Ok(())
 }
 

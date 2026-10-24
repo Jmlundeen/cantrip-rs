@@ -1,11 +1,10 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::gain_indestructible_until_end_of_turn;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::targets::filters;
 use cantrip_oracle as oracle;
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[ability(discard(1, filters::any), tap_then_gain_indestructible, "Discard a card: Tap this creature. It gains indestructible until end of turn.")],
+    abilities: &[ability(discard_cards(1), tap_then_gain_indestructible, "Discard a card: Tap this creature. It gains indestructible until end of turn.")],
     ..oracle::SEASONED_HALLOWBLADE
 };
 

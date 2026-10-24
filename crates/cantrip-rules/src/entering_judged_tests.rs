@@ -220,6 +220,7 @@ fn it_is_judged_again_after_a_replacement_changes_how_it_enters() {
         shuffle: false,
         is_card: true,
         madness: false,
+        pays_characteristic: false,
     };
     ops::rejudge_entering(&mut cx, &change(P1, Zone::BATTLEFIELD));
     assert!(cx.entering.is_some_and(|w| w.chars.is(CardType::Creature) && w.entering.controller == P1));

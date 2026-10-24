@@ -3,8 +3,9 @@
 //! bottom of their library, and "when you discard this card" (Titanbones, Towering Heart) and "when you cycle this card"
 //! (the cycling decrees) trigger from there. Library of Leng puts a card discarded by an effect on top of its owner's
 //! library unrevealed: its characteristics are undefined (CR 701.9c), its abilities among them (CR 109.3), and it triggers
-//! on nothing. No printed card in the engine has such a trigger or puts a discarded card into a library yet, so test-only
-//! ones do (`cantrip_script::run_on`).
+//! on nothing. A card discarded to pay a cost that specifies a characteristic of it can't pay it from there (CR 701.9c,
+//! 118.12), so no such replacement is offered for it. No printed card in the engine has such a trigger or puts a discarded
+//! card into a library yet, so test-only ones do (`cantrip_script::run_on`).
 
 use std::sync::OnceLock;
 
@@ -80,9 +81,24 @@ static SHUFFLING_BONES: CardDef = CardDef {
     ..BONES
 };
 
+/// Library of Leng's own replacement, with its choice: "If an effect causes you to discard a card, discard it, but you may put
+/// it on top of your library instead of into your graveyard." Unrevealed.
+fn you_discard_to_a_graveyard(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    discarded_to_a_graveyard(q, asker, proposal) && matches!(proposal, Proposal::ZoneChange(z) if q.obj(z.object).owner == asker.controller)
+}
+
+const ON_TOP: Question = Question::new("Library", "put the discarded card on top of your library?", "", "On top", "Graveyard");
+
+static OPTIONAL_LENG: CardDef = CardDef {
+    name: "Probe Optional Leng",
+    replacements: &[replacement(ReplacementKind::ZoneChange, you_discard_to_a_graveyard, library_instead, "may put a discarded card on top of its owner's library")
+        .optional(&ON_TOP)],
+    ..LENG
+};
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BONES, &LENG, &REVEALING_LENG, &SHUFFLING_BONES])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BONES, &LENG, &REVEALING_LENG, &OPTIONAL_LENG, &SHUFFLING_BONES])))
 }
 
 fn play(name: &str, text: &str) {
@@ -742,4 +758,401 @@ Bot2.Library.Count = 14
             hand = if revealed { 0 } else { 1 }
         )
     });
+}
+
+// A card discarded to pay a cost that specifies a characteristic of it - "unless you discard a nonland card", "you may discard
+// a land card instead", "Discard a creature card:" (CR 118.12) - can't pay it from a hidden zone it was put into unrevealed (CR
+// 701.9c): the Leng's library is not offered for it, and it goes to the graveyard. A discard that specifies nothing ("discard
+// two cards", "Discard a card:") still goes to the library.
+
+/// Bandit's Talent under `leng`: Bot2 pays the "unless" with a Lightning Bolt, which the Leng can't put on top of the library
+/// unrevealed; or discards two cards, the Bolt among them, which specify no characteristic, and both go there.
+fn bandits_talent(leng: &str, answer: &str, graveyard: &str, library: u32) -> String {
+    format!(
+        "
+[Bot1 Deck]
+{leng}
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x16
+
+[Bot2 Deck]
+Lightning Bolt
+Island x19
+
+[Actions]
+Bot1.Hand.{leng}.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+{answer}
+[Bot1.Main2]
+
+[Expect]
+{graveyard}
+Bot2.Library.Count = {library}
+"
+    )
+}
+
+#[test]
+fn bandits_talent_nonland_card_paying_the_unless_is_not_put_into_a_library() {
+    play("bandits-talent-paid-nonland", &bandits_talent("Probe Leng", "Bot2.Modes(Discard a nonland card)\nBot2.Choose(Lightning Bolt)", "Bot2.Graveyard = Lightning Bolt", 13));
+}
+
+#[test]
+fn bandits_talent_two_cards_discarded_may_be_put_into_a_library() {
+    play("bandits-talent-two-cards", &bandits_talent("Probe Leng", "Bot2.Modes(Discard two cards)\nBot2.Choose(Lightning Bolt; Island)", "Bot2.Graveyard.Count = 0", 15));
+}
+
+/// A Leng that reveals the card as it puts it on top of the library leaves its characteristics known (CR 701.9c), so the Bolt
+/// paying the "unless" may go there.
+#[test]
+fn bandits_talent_nonland_card_paying_the_unless_may_be_revealed_into_a_library() {
+    play(
+        "bandits-talent-paid-nonland-revealed",
+        &bandits_talent("Probe Revealing Leng", "Bot2.Modes(Discard a nonland card)\nBot2.Choose(Lightning Bolt)", "Bot2.Graveyard.Count = 0", 14),
+    );
+}
+
+/// In one simultaneous discard (CR 101.4, 701.9a), Bot2's Lightning Bolt pays the "unless" and goes to the graveyard while
+/// Bot3's two Forests, paying nothing that names a characteristic, go on top of the library.
+#[test]
+fn bandits_talent_judges_each_card_of_one_discard_by_the_cost_it_pays() {
+    play(
+        "bandits-talent-mixed",
+        "
+[Bot1 Deck]
+Probe Leng
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x16
+
+[Bot2 Deck]
+Lightning Bolt
+Island x19
+
+[Bot3 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+Bot2.Modes(Discard a nonland card)
+Bot2.Choose(Lightning Bolt)
+Bot3.Choose(Forest; Forest)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot2.Library.Count = 13
+Bot3.Graveyard.Count = 0
+Bot3.Library.Count = 15
+",
+    );
+}
+
+/// Library of Leng's choice, under Bot2's own Leng: the two cards discarded for Bandit's Talent may each be put on top of the
+/// library - the question is asked, once for each, and taken.
+#[test]
+fn bandits_talent_two_cards_discarded_are_offered_to_an_optional_leng() {
+    play(
+        "bandits-talent-optional-leng",
+        "
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x17
+
+[Bot2 Deck]
+Probe Optional Leng
+Lightning Bolt
+Island x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Probe Optional Leng.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+Bot2.Modes(Discard two cards)
+Bot2.Choose(Island; Island)
+Bot2.Accept
+Bot2.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot2.Library.Count = 14
+",
+    );
+}
+
+/// Steamcore Scholar's "unless you discard an instant or sorcery card": the Lightning Bolt goes to the graveyard, not the library.
+#[test]
+fn steamcore_scholar_instant_paying_the_unless_is_not_put_into_a_library() {
+    play(
+        "steamcore-scholar-paid-instant",
+        "
+[Bot1 Deck]
+Probe Leng
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Steamcore Scholar
+Lightning Bolt
+Island
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Steamcore Scholar.Cast
+Bot1.Modes(Discard an instant)
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 11
+",
+    );
+}
+
+/// Winternight Stories' "unless you discard a creature card": the Ornithopter goes to the graveyard, not the library.
+#[test]
+fn winternight_stories_creature_paying_the_unless_is_not_put_into_a_library() {
+    play(
+        "winternight-stories-paid-creature",
+        "
+[Bot1 Deck]
+Probe Leng
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Winternight Stories
+Ornithopter
+Plains
+Plains
+Llanowar Elves
+Island
+Plains x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Winternight Stories.Cast
+Bot1.Modes(Discard a creature card)
+Bot1.Choose(Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Winternight Stories; Ornithopter
+Bot1.Library.Count = 10
+",
+    );
+}
+
+/// Mox Diamond's "you may discard a land card instead": the Forest goes to the graveyard, not the library, and the Mox enters.
+#[test]
+fn mox_diamond_land_is_not_put_into_a_library() {
+    play(
+        "mox-diamond-paid-land",
+        "
+[Bot1 Deck]
+Probe Leng
+Mox Diamond
+Island
+Forest
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Diamond.Cast
+Bot1.Accept
+Bot1.Choose(Forest)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Probe Leng; Island; Mox Diamond
+Bot1.Graveyard = Forest
+Bot1.Library.Count = 13
+",
+    );
+}
+
+/// Loamcrafter Faun's "you may discard one or more land cards": the Island goes to the graveyard, not the library, and the
+/// reflexive ability returns the Black Lotus.
+#[test]
+fn loamcrafter_faun_land_is_not_put_into_a_library() {
+    play(
+        "loamcrafter-faun-paid-land",
+        "
+[Bot1 Deck]
+Probe Leng
+Forest
+Lotus Petal
+Black Lotus
+Lightning Bolt
+Loamcrafter Faun
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Loamcrafter Faun.Cast
+Bot1.Choose(Island)
+Bot1.Target(Black Lotus)
+
+[Expect]
+Bot1.Hand = Black Lotus
+Bot1.Graveyard = Island; Lightning Bolt; Lotus Petal
+Bot1.Library.Count = 13
+",
+    );
+}
+
+/// Survival of the Fittest's "Discard a creature card" cost (CR 118.3, 602.2b): the Birds of Paradise goes to the graveyard, not
+/// the library.
+#[test]
+fn a_cost_naming_a_creature_card_does_not_put_it_into_a_library() {
+    play(
+        "survival-paid-creature",
+        "
+[Bot1 Deck]
+Probe Leng
+Forest
+Black Lotus
+Survival of the Fittest
+Birds of Paradise
+Lightning Bolt
+Forest
+Elvish Mystic
+Noble Hierarch
+Forest x11
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Survival of the Fittest.Cast
+Bot1.Battlefield.Survival of the Fittest.Activate
+Bot1.Choose(Birds of Paradise)
+Bot1.Search(Noble Hierarch)
+[Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Birds of Paradise; Black Lotus
+Bot1.Hand = Noble Hierarch; Lightning Bolt; Forest
+",
+    );
+}
+
+/// Psychic Frog's "Discard a card" cost names no characteristic: the Lightning Bolt goes on top of the library.
+#[test]
+fn a_cost_of_any_card_may_put_it_into_a_library() {
+    play(
+        "frog-paid-any-card",
+        "
+[Bot1 Deck]
+Probe Leng
+Black Lotus
+Psychic Frog
+Lightning Bolt
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Psychic Frog.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Psychic Frog.Activate
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 14
+Bot1.Battlefield.Psychic Frog.Counters.PlusOnePlusOne = 1
+",
+    );
 }

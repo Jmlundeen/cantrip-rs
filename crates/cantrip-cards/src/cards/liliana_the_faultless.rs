@@ -21,7 +21,7 @@ fn hexproof(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, triggers::another_creature_or_planeswalker_you_control_enters), |g, item| { g.gain_life(item.controller, 1); Ok(()) }, "Whenever another creature or planeswalker you control enters, you gain 1 life."),
-        ability(cost("{1}, {T}").and(discard(1, targets::filters::any)), hexproof, "{1}, {T}, Discard a card: Another target creature or planeswalker you control gains hexproof until end of turn.")
+        ability(cost("{1}, {T}").and(discard_cards(1)), hexproof, "{1}, {T}, Discard a card: Another target creature or planeswalker you control gains hexproof until end of turn.")
             .targets(&[target(another_creature_or_planeswalker_you_control)]),
     ],
     ..oracle::LILIANA_THE_FAULTLESS

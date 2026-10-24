@@ -1,6 +1,5 @@
 use cantrip_api::*;
 use cantrip_mechanics::{effects, targets};
-use cantrip_mechanics::targets::filters;
 use cantrip_oracle as oracle;
 
 /// "This creature gains lifelink until end of turn." Nothing if it has left the battlefield by the time the ability
@@ -32,7 +31,7 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        ability(discard(1, filters::any), lifelink, "Discard a card: This creature gains lifelink until end of turn."),
+        ability(discard_cards(1), lifelink, "Discard a card: This creature gains lifelink until end of turn."),
         triggered(
             when_asked(EventMask::ZONE_CHANGE, cards_leave_your_graveyard),
             counter,
