@@ -1,0 +1,45 @@
+# Enduring Vitality gives "creatures you control" "{T}: Add one mana of any color." (CR 613.1f), itself included: on turn 3
+# Bot1's vigilant Vitality attacks without tapping (CR 702.20b), then taps for {G}, and its Ornithopter taps for {U}, so the pool
+# is exactly {U}{G}. Bot2's own Ornithopter, not summoning sick on turn 4, is not a creature Bot1 controls: it has no such ability.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Ornithopter
+Enduring Vitality
+Forest x15
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Enduring Vitality.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Enduring Vitality > Bot2)
+? Bot1.Battlefield.Enduring Vitality.Tapped = false
+Bot1.Battlefield.Enduring Vitality.Activate(Color: Green)
+Bot1.Battlefield.Ornithopter.Activate(Color: Blue)
+? Bot1.Mana = {U}{G}
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Ornithopter.Activate
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Enduring Vitality.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Ornithopter.Tapped = false

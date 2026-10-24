@@ -1,0 +1,45 @@
+# Enduring Vitality is killed by Bot2's Lightning Bolt on turn 4 and returns to the battlefield as an enchantment, not a
+# creature (CR 614.12; the ruling): it keeps giving Bot1's Ornithopter "{T}: Add one mana of any color." (a static ability of an
+# enchantment still works, CR 604.2) while it is no longer a creature itself, so it has no mana ability to refuse or use.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Ornithopter
+Enduring Vitality
+Forest x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Enduring Vitality.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Vitality)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Enduring Vitality.Types = Enchantment
+! Bot1.Battlefield.Enduring Vitality.Activate
+Bot1.Battlefield.Ornithopter.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Enduring Vitality.Types = Enchantment
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Ornithopter.Tapped = true
