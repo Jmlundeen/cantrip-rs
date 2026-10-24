@@ -132,6 +132,9 @@ TEST_POINTS = [
     (r"\btarget\b", "'target': one of your own (or you) accepted as a target"),
     (r"\btarget\b", "'target': one of an opponent's (or the opponent) accepted as a target"),
     (r"\btarget\b", "'target': one just outside the filter refused"),
+    (r"\btarget (?:spell|permanent|card)\b",
+     "'{m}': targets of different kinds the word covers (a creature spell and a noncreature one for 'spell'), so a filter"
+     " narrower than the text fails"),
     (r"\bwhenever\b[^,]*\b(?:dies|die|sacrifices?|leaves?|put into a graveyard|is exiled)\b",
      "'{m}': several at once trigger it as many times, and this permanent leaving in the same event still sees them"),
     (r"\b(?:return|exile|sacrifice|put) (?:it|them|that \w+|those \w+)\b[^.]*\bat the beginning of\b",
