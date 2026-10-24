@@ -1,0 +1,51 @@
+# The Wondrous Wasp's enters ability taps Bot1's own Llanowar Elves, which lose all abilities for as long as the Wasp
+# remains on the battlefield (CR 611.2b): on Bot1's next turn the untapped Elves cannot be tapped for mana. Paying for
+# Woodland Changeling ({1}{G}), Bot1 sacrifices the Wasp to Ashnod's Altar - a mana ability, activated in the middle
+# of the payment (CR 601.2g, 605.3a) - and the effect ends the moment the Wasp leaves, with no state-based check in
+# between: the Elves have "{T}: Add {G}" back and pay the {G} in the same payment. Mox Emerald, Bot1's other green
+# source, stays untapped, so only the Elves can have paid it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Llanowar Elves
+Ashnod's Altar
+The Wondrous Wasp
+Woodland Changeling
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ashnod's Altar.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Wondrous Wasp.Cast
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: The Wondrous Wasp)
+Bot1.Battlefield.Llanowar Elves.Activate
+
+[Expect]
+Bot1.Graveyard = The Wondrous Wasp
+Bot1.Battlefield.Woodland Changeling.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Mana = {C}

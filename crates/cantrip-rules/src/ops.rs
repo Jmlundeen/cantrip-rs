@@ -3147,7 +3147,7 @@ pub fn lasting_holds(cx: &Cx, e: &cantrip_state::ContinuousEffect) -> bool {
 /// whatever creates a continuous effect (`Game::add_effect`, `become_copy`).
 pub fn duration_begins(cx: &Cx, e: &cantrip_state::ContinuousEffect) -> bool {
     let s = cx.s();
-    if e.duration == Duration::WhileSourceOnBattlefield && !(live(s, e.source) && s.obj(e.source).zone.is(ZoneKind::Battlefield)) {
+    if source_departed(s, e) {
         return false;
     }
     e.duration.holds_for(s.obj(e.affected)) && lasting_holds(cx, e)
@@ -3179,8 +3179,10 @@ pub fn settle_at_once(cx: &mut Cx) {
 /// Ends the "for as long as" effects whose condition is false (CR 611.2b) and settles control (CR 613.1b), again and again
 /// while either changes anything: a change of control can end an effect "for as long as you control [it]", whose end
 /// changes control again. It ends, as each round but the last ends an effect or changes nothing. Whether anything changed.
+/// The effects "for as long as [their source] remains on the battlefield" whose source has gone end first: no change of
+/// control moves a permanent, so they end once.
 pub fn settle_lasting_and_control(cx: &mut Cx) -> bool {
-    let mut changed = false;
+    let mut changed = end_departed_sources(cx);
     // Each round that goes on ended an effect; there are no more rounds than effects, and one to see nothing more changes.
     for _ in 0..=cx.s().effects.len() {
         let lasting = cx.s().effects.iter().any(|e| matches!(e.duration, Duration::AsLongAs(..)));
@@ -3211,6 +3213,29 @@ pub fn as_one_instruction<T>(cx: &mut Cx, f: impl FnOnce(&mut Cx) -> T) -> T {
         settle_at_once(cx);
     }
     done
+}
+
+/// Whether an effect's "for as long as [its source] remains on the battlefield" duration (`Duration::WhileSourceOnBattlefield`,
+/// CR 611.2b) is over: its source is no longer the permanent it was (CR 400.7), or is phased out, which the duration can no
+/// longer see (CR 702.26f). Any other duration is not, as far as this goes.
+pub fn source_departed(s: &cantrip_state::GameState, e: &cantrip_state::ContinuousEffect) -> bool {
+    e.duration == Duration::WhileSourceOnBattlefield && !(live(s, e.source) && s.obj(e.source).zone.is(ZoneKind::Battlefield))
+}
+
+/// Ends each effect "for as long as [its source] remains on the battlefield" whose source has left it or phased out (CR
+/// 611.2b, 702.26f), the moment it has, as each event happens (`settle_at_once`): not only as the state-based actions are
+/// next checked, which no cost being paid (CR 601.2h) or resolution (CR 608.2) waits for. A control-changing effect that
+/// ends gives its permanent back with the next `settle_control`. Whether any ended.
+pub fn end_departed_sources(cx: &mut Cx) -> bool {
+    let s = cx.s();
+    if !s.effects.iter().any(|e| source_departed(s, e)) {
+        return false;
+    }
+    let keep: Vec<bool> = s.effects.iter().map(|e| !source_departed(s, e)).collect();
+    cx.st().effects_keep(&keep);
+    // An effect that ends changes the game with no event (CR 603.8).
+    cx.state_changed();
+    true
 }
 
 /// Ends each effect whose "for as long as [condition]" duration (`Duration::AsLongAs`) is no longer true (CR 611.2b), as

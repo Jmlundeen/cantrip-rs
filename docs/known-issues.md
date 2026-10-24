@@ -67,27 +67,8 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-123](#ki-123-the-ai-crates-knowledge-misjudges-what-a-seat-saw-across-the-control-of-a-player) | The AI crate's knowledge misjudges what a seat saw across the control of a player | Pri-2 | Open |
 | [KI-124](#ki-124-what-a-land-could-produce-is-judged-for-at-most-256-answers-to-its-mana-abilitys-questions) | What a land could produce is judged for at most 256 answers to its mana ability's questions | Pri-3 | Won't fix: beyond practical scale |
 | [KI-125](#ki-125-a-mana-abilitys-row-can-show-what-its-ability-lists-or-the-best-of-several-outcomes-under-replacement-effects-on-its-mana) | A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana | Pri-2 | Open |
-| [KI-126](#ki-126-an-effect-for-as-long-as-its-source-remains-on-the-battlefield-ends-only-at-the-state-based-check) | An effect "for as long as its source remains on the battlefield" ends only at the state-based check | Pri-1 | Open |
 
 ## Issues
-
-### KI-126: An effect "for as long as its source remains on the battlefield" ends only at the state-based check
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Open | engine | 2026-10-23, Yasharn, Implacable Earth's review tests |
-
-**Notes.** CR 611.2b: a "for as long as" effect ends when its condition does. `Duration::WhileSourceOnBattlefield` is
-dropped only by `settle.rs` (the state-based check, as `phasing.rs` says), and `layers::lost_all_abilities` and the layers
-read the effect until then. So while a spell is cast or an ability activated - when no state-based check is made - a
-source sacrificed for mana (Ashnod's Altar) leaves its effect applying: The Wondrous Wasp's "loses all abilities" goes on
-stopping Yasharn's cost ban for the rest of the payment, and the activation that should be taken back (CR 601.2h, 733.1)
-is paid. A fix ends the effect as its source leaves the battlefield (as `ops::end_counter_durations` does for counter
-durations), with what an ended control effect needs (`ops::settle_control`).
-
-**Scenarios.**
-- [`scenarios/yasharn-regaining-its-abilities-while-a-hammer-is-paid-for-takes-the-activation-back.cantrip`](../scenarios/yasharn-regaining-its-abilities-while-a-hammer-is-paid-for-takes-the-activation-back.cantrip)
-  (marked `# Known bug`).
 
 ### KI-114: The web client cannot name colorless mana for a sacrificed land that could also produce a color
 

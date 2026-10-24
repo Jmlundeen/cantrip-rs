@@ -64,8 +64,8 @@ pub fn phase_out(cx: &mut Cx, permanents: &[ObjectId], until_leaves: Option<Obje
         cx.st().set_blocks(blocks);
     }
     // CR 702.26f: a "for as long as" duration that tracks one of them ends, as it can no longer see it (Teferi's Protection's
-    // ruling on Mathas, Fiend Seeker): one about its counters or its being tapped. (One about an effect's source on the
-    // battlefield ends with the state-based check, `WhileSourceOnBattlefield`.)
+    // ruling on Mathas, Fiend Seeker): one about its counters or its being tapped. One about an effect's source remaining on
+    // the battlefield ends once they have phased out, below.
     let tracks = |e: &ContinuousEffect| leaving(e.affected) && matches!(e.duration, Duration::WhileCounter(_) | Duration::WhileTapped);
     if cx.s().effects.iter().any(tracks) {
         let effects_before = cx.s().effects.len();
@@ -95,6 +95,9 @@ pub fn phase_out(cx: &mut Cx, permanents: &[ObjectId], until_leaves: Option<Obje
         });
         cx.record(Event::PhasedOut { permanent: id, controller, indirect });
     }
+    // CR 702.26f: so does an effect "for as long as [its source] remains on the battlefield" whose source phased out, and
+    // what it gave or took is settled at once (CR 611.2b, 613.1b): a permanent it gave control of goes back now.
+    crate::ops::settle_at_once(cx);
     // CR 702.26f: so does a "for as long as you control" permission about one of them, for good though it phase in.
     if cx.s().permissions.iter().any(|p| p.grant.expiry.controlled().is_some_and(leaving)) {
         cx.st().end_lapsed_permissions();

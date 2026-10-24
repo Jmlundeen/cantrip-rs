@@ -1037,8 +1037,9 @@ pub enum Duration {
     EndOfCombat,
     /// As long as the affected object stays where it is.
     Indefinite,
-    /// "For as long as [the source] remains on the battlefield" (CR 611.2b): it ends when the effect's source is no
-    /// longer the permanent it was, on the battlefield.
+    /// "For as long as [the source] remains on the battlefield" (CR 611.2b): it ends the moment the effect's source is no
+    /// longer the permanent it was, on the battlefield, or phases out (CR 702.26f) - as that event happens, in the middle of
+    /// a cost being paid or a resolution as much as anywhere, not when the state-based actions are next checked.
     WhileSourceOnBattlefield,
     /// Until the next turn of this player begins (CR 611.2b): "until your next turn".
     UntilNextTurnOf(PlayerId),

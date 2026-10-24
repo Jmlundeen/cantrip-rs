@@ -312,3 +312,70 @@ fn a_phased_out_permanent_is_untouched_by_a_control_changing_ability() {
     let order = crate::layers::control_order(cx.cards(), cx.s(), &cx.g.log);
     assert!(order.contains(&(bear, YOU, false)), "{order:?}");
 }
+
+// --- "For as long as [its source] remains on the battlefield" (CR 611.2b): over the moment the source is gone.
+
+static FLYER: CardDef = CardDef {
+    name: "Control Test Flyer",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Flying]),
+    ..CardDef::BLANK
+};
+
+fn source_game() -> (Game, &'static CardTable) {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&PLAIN, &BEAR, &FLYER])));
+    (Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() }), table)
+}
+
+/// You control their Bear for as long as your Plain remains on the battlefield. Sacrificing the Plain gives the Bear back
+/// as it is sacrificed - in the middle of a cost being paid as much as anywhere - not when the state-based actions are next
+/// checked.
+#[test]
+fn control_for_as_long_as_its_source_remains_ends_as_the_source_leaves() {
+    let (mut game, table) = source_game();
+    let plain = put(&mut game, table, &PLAIN, YOU);
+    let bear = put(&mut game, table, &BEAR, THEM);
+    let mut cx = cx(&mut game);
+    cantrip_api::Game::add_effect(&mut cx, plain, bear, EffectKind::Control(YOU), Duration::WhileSourceOnBattlefield);
+    assert_eq!(cx.s().obj(bear).controller, YOU);
+    crate::ops::sacrifice(&mut cx, &[plain]);
+    assert_eq!(cx.s().obj(bear).controller, THEM);
+    assert!(cx.s().effects.is_empty());
+}
+
+/// Your Flyer gets +2/+0 and loses all abilities for as long as your Plain remains on the battlefield; the moment the
+/// Plain is put into the graveyard it is a 1/1 flyer again (layers 6 and 7c).
+#[test]
+fn characteristics_for_as_long_as_their_source_remains_end_as_the_source_leaves() {
+    let (mut game, table) = source_game();
+    let plain = put(&mut game, table, &PLAIN, YOU);
+    let flyer = put(&mut game, table, &FLYER, YOU);
+    let mut cx = cx(&mut game);
+    cantrip_api::Game::add_effect(&mut cx, plain, flyer, EffectKind::Pump(2, 0), Duration::WhileSourceOnBattlefield);
+    cantrip_api::Game::add_effect(&mut cx, plain, flyer, EffectKind::LoseAllAbilities, Duration::WhileSourceOnBattlefield);
+    assert_eq!(cx.chars(flyer).power, Some(3));
+    assert!(!cx.chars(flyer).has(Keyword::Flying));
+    crate::ops::move_to(&mut cx, plain, Zone::graveyard(YOU));
+    assert_eq!(cx.chars(flyer).power, Some(1));
+    assert!(cx.chars(flyer).has(Keyword::Flying));
+}
+
+/// CR 702.26f: the duration tracks the Plain, which phasing out it can no longer see: the Bear is theirs again as the
+/// Plain phases out, and stays theirs when it phases back in.
+#[test]
+fn control_for_as_long_as_its_source_remains_ends_as_the_source_phases_out() {
+    let (mut game, table) = source_game();
+    let plain = put(&mut game, table, &PLAIN, YOU);
+    let bear = put(&mut game, table, &BEAR, THEM);
+    let mut cx = cx(&mut game);
+    cantrip_api::Game::add_effect(&mut cx, plain, bear, EffectKind::Control(YOU), Duration::WhileSourceOnBattlefield);
+    assert_eq!(cx.s().obj(bear).controller, YOU);
+    crate::phasing::phase_out(&mut cx, &[plain], None, false);
+    assert_eq!(cx.s().obj(bear).controller, THEM);
+    crate::phasing::untap_step(&mut cx, YOU);
+    assert_eq!(cx.s().obj(plain).zone, Zone::BATTLEFIELD);
+    crate::ops::settle_control(&mut cx);
+    assert_eq!(cx.s().obj(bear).controller, THEM);
+}

@@ -1,11 +1,10 @@
-# Known bug: an effect "for as long as [its source] remains on the battlefield" outlasts its source until the state-based check, not ending as the source leaves (CR 611.2b; KI-126).
 # Yasharn, Implacable Earth's ban is judged as the cost is paid (CR 601.2h by way of 602.2b), not only as the ability is
 # begun. Bot2's Yasharn has lost all its abilities to Bot1's The Wondrous Wasp ("for as long as The Wondrous Wasp remains
 # on the battlefield"), so Bot1's Ornithopter, equipped with Deconstruction Hammer, may begin "{3}, {T}, Sacrifice
 # Deconstruction Hammer" at Bot2's Sol Ring. Bot1 pays the {3} with Ashnod's Altar, sacrificing the Wasp, and a Mox Pearl:
 # with the Wasp gone Yasharn has its ability again, the Hammer can't be sacrificed, and the activation is taken back
 # (CR 601.2h: unpayable costs can't be paid; CR 733.1). The Hammer stays, the Ornithopter untapped, and the Sol Ring
-# survives. Today the Wasp's effect lasts until the state-based check, so Yasharn has no ability while the cost is paid.
+# survives: the Wasp's effect ends as the Wasp leaves (CR 611.2b), not at the next state-based check.
 
 [Bot1 Deck]
 Island
