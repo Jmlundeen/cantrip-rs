@@ -1,5 +1,5 @@
 # Tranquil Frillback paid twice: Bot1 can't raise the payment past three times, pays {G} two times ({G} stays in the pool), and
-# the reflexive ability may choose two modes but not three (CR 603.12a). Both are aimed at Bot1's own side: its own Mox Jet is
+# the reflexive ability may choose two modes but not three (CR 700.2b). Both are aimed at Bot1's own side: its own Mox Jet is
 # a legal artifact to destroy (a Forest is no artifact or enchantment and is refused), and Bot1 is a legal player whose
 # graveyard is exiled - the Mox destroyed first, then the graveyard with it and the Black Lotus (CR 608.2c: in printed order).
 # No life is gained: the third mode was not chosen.

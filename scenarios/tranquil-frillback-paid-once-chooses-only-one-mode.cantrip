@@ -1,5 +1,5 @@
 # Tranquil Frillback paid once: Bot1 floats {G}{G}{G} from Black Lotus and pays {G} one time, so {G}{G} stays in the pool. The
-# reflexive ability may then choose one mode at most (CR 603.12a: "up to that many"): two modes are refused, and Bot1 gains 4
+# reflexive ability may then choose one mode at most ("up to that many", CR 700.2b): two modes are refused, and Bot1 gains 4
 # life with the third alone. Bot2's Sol Ring, which a second mode would have destroyed, stays.
 
 [Bot1 Deck]

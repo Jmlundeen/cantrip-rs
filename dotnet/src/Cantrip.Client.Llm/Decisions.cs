@@ -593,7 +593,10 @@ public sealed class Decisions
                 // is to make, or not at all. Total is the cost at the number shown, X times its one payment.
                 int pool = client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Mana.Sum() ?? 0;
                 int mana = pool + prompt.Options.Where(option => option.Kind == ActionKindView.ActivateAbility).Select(option => option.Source).Distinct().Count();
-                int most = Math.Max(1, prompt.MostTimes > 0 ? Math.Min(prompt.MostTimes, mana) : mana);
+                // Each payment takes the mana of the cost once: Total, as first asked, is it paid X times over.
+                int once = Math.Max(1, SymbolsIn(prompt.Total) / Math.Max(1, prompt.X));
+                int affordable = mana / once;
+                int most = Math.Max(1, prompt.MostTimes > 0 ? Math.Min(prompt.MostTimes, affordable) : affordable);
                 int picked = One(new Question
                 {
                     Heading = $"{source}: {question}{(detail.Length > 0 ? $" ({detail}.)" : string.Empty)}{no} "
@@ -621,6 +624,11 @@ public sealed class Decisions
         _unlessContinuing = answer.Kind is ActionKindView.ActivateAbility or ActionKindView.IncreaseX or ActionKindView.DecreaseX;
         return answer;
     }
+
+    /// <summary>How much mana a cost in symbols takes ("{2}{G}" is 3): a number is that much, any other symbol one.</summary>
+    private static int SymbolsIn(string cost) =>
+        System.Text.RegularExpressions.Regex.Matches(cost ?? string.Empty, @"\{([^}]*)\}")
+            .Sum(m => int.TryParse(m.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int n) ? n : 1);
 
     // --- Combat ------------------------------------------------------------------------------------------------------
 

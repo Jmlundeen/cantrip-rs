@@ -9257,10 +9257,13 @@ fn pay_during_resolution(
     } else {
         cost
     };
+    // The cost paid the number of times chosen so far, changed only to a number the cost's shape holds that many times over
+    // (`ManaCost::times`); once, it is the cost itself.
+    let mut times_total = cost.mana;
     loop {
         // The cost as X now stands: each {X} is X generic mana (CR 107.3f).
         let total = match x {
-            Some(n) if times.is_some() => cost.mana.times(n).unwrap_or(cost.mana),
+            Some(_) if times.is_some() => times_total,
             Some(n) => {
                 let generic = u32::from(cost.mana.generic) + u32::from(n) * u32::from(cost.mana.x);
                 ManaCost { generic: generic.min(255) as u8, x: 0, ..cost.mana }
@@ -9319,6 +9322,15 @@ fn pay_during_resolution(
                         cx.g.log.truncate(log_mark);
                     }
                     Err(stop) => return Err(stop),
+                }
+            }
+            // A number of times moves only to one the cost's shape holds (the options offer no other).
+            ActionKind::IncreaseX | ActionKind::DecreaseX if times.is_some() => {
+                let n = x.unwrap_or(1);
+                let to = if action.kind == ActionKind::IncreaseX { n.saturating_add(1) } else { n.saturating_sub(1) };
+                if let Some(t) = cost.mana.times(to).filter(|_| to >= 1) {
+                    x = Some(to);
+                    times_total = t;
                 }
             }
             ActionKind::IncreaseX => x = x.map(|n| n + 1),
