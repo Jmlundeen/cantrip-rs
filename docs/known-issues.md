@@ -74,6 +74,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-132](#ki-132-an-absent-expectation-on-a-key-the-dump-never-writes-always-holds) | An `(absent)` expectation on a key the dump never writes always holds | Pri-3 | Open |
 | [KI-133](#ki-133-a-refusal-written-while-its-question-cannot-yet-be-asked-holds-vacuously) | A refusal written while its question cannot yet be asked holds vacuously | Pri-3 | Open |
 | [KI-134](#ki-134-the-browser-scenario-for-lands-planned-for-x-fails-on-main) | The browser scenario for lands planned for X fails on main | Pri-2 | Open |
+| [KI-136](#ki-136-a-choice-listing-an-opponents-face-down-permanent-records-it-as-shown-to-the-chooser) | A choice listing an opponent's face-down permanent records it as shown to the chooser | Pri-2 | Open |
 
 ## Issues
 
@@ -468,6 +469,21 @@ write (a parent such as `.Counters`, or a misspelling), as a key with a value al
 - [`scenarios/darksteel-angel-keeps-minus-counters-off-its-controllers-creature.cantrip`](../scenarios/darksteel-angel-keeps-minus-counters-off-its-controllers-creature.cantrip)
 - [`scenarios/dispelling-exhale-beholding-a-dragon-and-an-opponent-who-pays-the-four-keeps-the-bolt.cantrip`](../scenarios/dispelling-exhale-beholding-a-dragon-and-an-opponent-who-pays-the-four-keeps-the-bolt.cantrip)
 - [`scenarios/dispelling-exhale-beholding-a-dragon-permanent-asks-four-and-the-bolt-is-countered.cantrip`](../scenarios/dispelling-exhale-beholding-a-dragon-permanent-asks-four-and-the-bolt-is-countered.cantrip)
+
+### KI-136: A choice listing an opponent's face-down permanent records it as shown to the chooser
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | engine (AI knowledge) | 2026-10-24, review of PR #565 |
+
+**Notes.** When a `ChooseCards` or `ChooseTarget` request lists an opponent's face-down permanent, the engine records
+`Event::Shown` for the chooser (`crates/cantrip-rules/src/lib.rs` ~1068-1072 and ~2327-2335), though `hidden_from` already
+treats that permanent as hidden from them (CR 708.5): Liliana of the Veil's controller separating piles that include an
+opponent's morphs "learns" them in the history. Only `cantrip-ai` (`knowledge.rs`, `worlds.rs`) reads `Shown`, and
+nothing that plays a real game uses its search; the host and the client never read it. A fix leaves out of `shown`
+whatever `hidden_from` hides from the chooser.
+
+**Scenarios.** None: the history record only; a `cantrip-ai` redaction test can pin it.
 
 ### KI-134: The browser scenario for lands planned for X fails on main
 
