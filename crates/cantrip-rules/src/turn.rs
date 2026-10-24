@@ -1276,7 +1276,7 @@ fn lethal_in_turn(power: u16, lethal: &[u16], rest_to_defender: bool) -> (Vec<u1
 fn spared(cx: &Cx, power: u16, creatures: &[ObjectId], lethal: &[u16]) -> Vec<u16> {
     let worth = |c: ObjectId| {
         let chars = cx.chars(c);
-        chars.power.unwrap_or(0) + chars.toughness.unwrap_or(0)
+        i32::from(chars.power.unwrap_or(0)) + i32::from(chars.toughness.unwrap_or(0))
     };
     let survivor = (0..creatures.len()).filter(|&i| lethal[i] > power).max_by_key(|&i| lethal[i]);
     let pick = survivor.unwrap_or_else(|| (0..creatures.len()).min_by_key(|&i| worth(creatures[i])).unwrap_or(0));

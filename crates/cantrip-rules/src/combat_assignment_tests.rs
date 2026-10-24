@@ -34,7 +34,7 @@ static TOUGHNESS: CardDef = CardDef {
 };
 
 fn cx(game: &mut Game) -> Cx<'_> {
-    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
+    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
 }
 
 fn table(cards: &[(&'static CardDef, PlayerId)]) -> (Game, Vec<ObjectId>) {

@@ -1897,6 +1897,7 @@ and assignment choices. `CardDef::damage_by_absolute_power` selects creatures th
 were positive (CR 609.4, Loot, the Anomaly); only this combat calculation uses the unsigned magnitude, with actual
 power unchanged everywhere else (CR 107.1b). A rule assigning by toughness uses toughness instead, without applying
 an exception about power to it.
+
 CR 510.4: the regular combat damage step after a first-strike step is for the attackers and blockers that had neither first
 strike nor double strike as the first-strike step began, and those that have double strike now. `Attacker::first_strike` and
 `Block::first_strike` record which had one of them as that step began; a creature that loses first strike after dealing

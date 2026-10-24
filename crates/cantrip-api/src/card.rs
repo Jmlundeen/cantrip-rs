@@ -2873,6 +2873,7 @@ impl CardDef {
             (!self.player_counter_bans.is_empty(), "player counter bans"),
             (!self.cost_bans.is_empty(), "cost bans"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),
+            (!self.damage_by_absolute_power.is_empty(), "damage by absolute power"),
             (!self.damage_stays.is_empty(), "a damage-stays rule"),
             (!self.mana_told_apart.is_empty(), "a mana source rule"),
             (!self.zero_loyalty_stays.is_empty(), "a zero-loyalty rule"),
