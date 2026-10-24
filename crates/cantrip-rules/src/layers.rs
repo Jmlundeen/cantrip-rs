@@ -797,7 +797,7 @@ fn own_statics(cx: &Ctx, o: &ObjCtx, layer: Layer, chars: &mut Chars) {
     // CR 707.9d: a copy that states its colors or its power and toughness does not copy a characteristic-defining
     // ability that would define them.
     let colors = o.copy.and_then(|c| c.colors).is_some();
-    let pt = o.copy.and_then(|c| c.pt).is_some();
+    let pt = o.copy.and_then(|c| c.pt()).is_some();
     if (layer == Layer::Color && colors) || (layer == Layer::PtDefine && pt) {
         return;
     }
@@ -1007,7 +1007,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
 fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     let def = cards.get(card);
     let (extra_types, extra_subtypes, extra_keywords, colors, pt, no_cost, copy_name, words) = match copy {
-        Some(c) => (c.extra_types, c.extra_subtypes, c.extra_keywords, c.colors, c.pt, c.has_no_cost(), c.name, c.words),
+        Some(c) => (c.extra_types, c.extra_subtypes, c.extra_keywords, c.colors, c.pt(), c.has_no_cost(), c.name, c.words),
         None => (TypeSet::NONE, SubtypeSet::NONE, Keywords::NONE, None, None, false, None, Words::NONE),
     };
     // "Except it's legendary" or "except it isn't legendary" (CR 707.9b).

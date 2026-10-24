@@ -865,38 +865,72 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
         || entering.copy.is_some_and(|c| cx.card(c.card).statics.iter().any(|s| s.loses_all || s.sets_land_subtypes))
         || entering.becomes.is_some_and(|b| b.what.loses_other_abilities);
     let lost = |cx: &mut Cx, entering: &Entering| may_lose && as_it_would_exist(cx, entering).lost;
-    // CR 702.145b: at night a daybound card enters transformed - daybound's static ability, of the permanent as it would
-    // exist on the battlefield front face up (CR 614.12), which a "loses all abilities" effect takes.
-    if crate::day_night::enters_transformed(cx, entering.object)
-        && (!may_lose || as_it_would_exist(cx, entering).chars.has(Keyword::Daybound))
-    {
+    // A token made as a copy, its copy values over its card (a copy of a Clone, of Glasspool Mimic copying a creature):
+    // what it enters as is that copy's, not its card's. (A bestowed Aura spell's copy values are its own card's Aura face.)
+    let copied = cx.s().obj(entering.object).token && copy_over(cx, entering);
+    // CR 702.145b: at night a daybound permanent represented by a double-faced card enters transformed. The face is decided
+    // before any face's replacements apply, and daybound only ever turns it over: a face an instruction or CR 707.8a gave
+    // it stays.
+    if !entering.transformed && enters_by_daybound(cx, entering, may_lose) {
         entering.transformed = true;
     }
     choose_protector(cx, entering)?;
+    // Its face's own replacements - none where a copy effect is over it already, as its copy's apply instead.
     let card = cx.cards().face(cx.s().obj(entering.object).card, entering.transformed);
-    if let Some(enters) = cx.cards().get(card).enters
+    if !copied
+        && let Some(enters) = cx.cards().get(card).enters
         && !lost(cx, entering)
     {
         enters(cx, entering)?;
     }
     // CR 707.9a: what it entered as a copy of has its own "enters with" and "enters tapped" to apply, as the copy
     // enters; a copy of a kicked permanent was never kicked itself (CR 702.33d). They are judged on it as that copy
-    // (CR 614.12: "taking into account replacement effects that have already modified how it enters").
-    if let Some(copy) = entering.copy
-        && copy.card != card
+    // (CR 614.12: "taking into account replacement effects that have already modified how it enters"). A double-faced
+    // token's own copy values are its faces, whose own replacements are the face's, above (CR 707.8a).
+    if copy_over(cx, entering)
+        && let Some(copy) = entering.copy
+        && (copied || copy.card != card)
         && let Some(enters) = cx.cards().get(copy.card).enters
         && !lost(cx, entering)
     {
         enters(cx, entering)?;
     }
-    // CR 702.145b: the daybound of a permanent entering as a copy is the copy's, judged as it would exist (CR 614.12) - the
-    // example under CR 712.13a: a double-faced card entering at night as a copy of a daybound creature enters transformed,
-    // and one entering as a copy of something without daybound does not. Its back face up, it is still that copy (CR 707.2).
-    if entering.copy.is_some() && crate::day_night::night_and_double_faced(cx, entering.object) {
-        let face_up = Entering { transformed: false, ..*entering };
-        entering.transformed = as_it_would_exist(cx, &face_up).chars.has(Keyword::Daybound);
+    // CR 702.145b: the daybound of a permanent that its own replacement made a copy (a Clone-like double-faced card) is the
+    // copy's - the example under CR 712.13a: a double-faced card entering at night as a copy of a daybound creature enters
+    // transformed. Only ever turned over, never back.
+    if !copied && !entering.transformed && copy_over(cx, entering) && enters_by_daybound(cx, entering, may_lose) {
+        entering.transformed = true;
     }
     Ok(())
+}
+
+/// Whether a copy effect is over the object `entering` would be (`Entering::copy`), other than a double-faced token's own
+/// faces (CR 707.8a, `Obj::own_faces`).
+fn copy_over(cx: &Cx, entering: &Entering) -> bool {
+    entering.copy.is_some_and(|c| !cx.s().obj(entering.object).own_faces(&c))
+}
+
+/// The definition `entering` would have as it enters: the card a copy effect over it copies, else the face it enters
+/// with (a double-faced token's own copy values are its faces', CR 707.8a).
+fn entering_card(cx: &Cx, entering: &Entering) -> CardId {
+    match entering.copy {
+        Some(c) if !cx.s().obj(entering.object).own_faces(&c) => c.card,
+        _ => cx.cards().face(cx.s().obj(entering.object).card, entering.transformed),
+    }
+}
+
+/// CR 702.145b: whether, it being night, the permanent `entering` would be has daybound and is represented by a double-faced
+/// card or token, so that it enters transformed: judged on it front face up as it would exist (CR 614.12) - its card's
+/// daybound, or a copy effect's over it (the example under CR 712.13a), which a "loses all abilities" effect takes.
+fn enters_by_daybound(cx: &mut Cx, entering: &Entering, may_lose: bool) -> bool {
+    if !crate::day_night::night_and_double_faced(cx, entering.object) {
+        return false;
+    }
+    if entering.copy.is_none() && !may_lose {
+        return crate::day_night::enters_transformed(cx, entering.object);
+    }
+    let face_up = Entering { transformed: false, ..*entering };
+    as_it_would_exist(cx, &face_up).chars.has(Keyword::Daybound)
 }
 
 /// A permanent about to enter the battlefield as it would exist there (CR 614.12): what the replacement effects that
@@ -985,7 +1019,7 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
 ///
 /// Judged again after each replacement that changes how it enters (`rejudge_entering`).
 fn judged_entering<T>(cx: &mut Cx, entering: &Entering, counters: bool, f: impl FnOnce(&mut Cx) -> T) -> T {
-    let copy_replaces = entering.copy.is_some_and(|c| cx.cards().replaces[c.card.0 as usize]);
+    let copy_replaces = copy_over(cx, entering) && cx.cards().replaces[entering_card(cx, entering).0 as usize];
     if !(copy_replaces || crate::replace::possible(cx, Some(entering.object)) || (counters && crate::static_rules::counter_bans_possible(cx.s(), cx.cards())))
     {
         return f(cx);
@@ -1043,8 +1077,7 @@ pub fn protector_candidates(cx: &Cx, siege: bool, controller: PlayerId) -> Vec<P
 /// allows, asked only when there is more than one. A choice, not a target. A battle nobody can protect enters with
 /// none, and CR 704.5x puts it into its owner's graveyard.
 fn choose_protector(cx: &mut Cx, entering: &mut Entering) -> R<()> {
-    let card = entering.copy.map_or_else(|| cx.cards().face(cx.s().obj(entering.object).card, entering.transformed), |c| c.card);
-    let def = cx.cards().get(card);
+    let def = cx.cards().get(entering_card(cx, entering));
     if !def.is(CardType::Battle) {
         return Ok(());
     }
@@ -1498,26 +1531,34 @@ fn create_tokens_as(
 }
 
 /// The card, copy values and face up of a token made with `card` and `copy` (CR 707.8a). A copy of a double-faced
-/// permanent or card (`Copiable::double_faced`) is a double-faced token: its card is the front face, its own copy values
-/// (kept only for their exceptions, which apply to either face) name that face, and it enters with the copied face up. A copy
-/// of one face of a card that has two - a copy of a Clone that copied one - keeps those values as a copy, so it is no
-/// double-faced token. Any other copy is kept only for its exceptions.
+/// permanent or card (`Copiable::faces`) is a double-faced token whose card is that front face, entering with the face up
+/// that was: copying one of its own faces, its copy values are kept only for their exceptions, which apply to either face
+/// (`Obj::own_faces`); copying what a copy effect over it made it (Glasspool Mimic as a copy of a creature), they are that
+/// copy effect, over both faces, as on the card. A copy of one face of a card that has two - a copy of a Clone that copied
+/// one - keeps those values as one face alone (`Copiable::single_face`), so it is no double-faced token. Any other copy is
+/// kept only for its exceptions.
 fn token_faces(cards: &CardTable, card: CardId, copy: Option<Copiable>) -> (CardId, Option<Copiable>, bool) {
-    match copy {
-        Some(c) if c.double_faced() => {
-            let front = cards.fronts[c.card.0 as usize].unwrap_or(c.card);
-            (front, c.has_exceptions().then_some(Copiable { card: front, ..c }), front != c.card)
+    let Some(c) = copy else { return (card, None, false) };
+    match c.faces() {
+        Some(front) if c.card == front || cards.backs[front.0 as usize] == Some(c.card) => {
+            let own = Copiable { card: front, ..c }.from_faces(Some(front), false);
+            (front, own.has_exceptions().then_some(own), c.card != front)
         }
-        Some(c) if cards.backs[c.card.0 as usize].is_some() => (c.card, Some(c), false),
-        Some(c) => (c.card, c.has_exceptions().then_some(c), false),
-        None => (card, None, false),
+        Some(front) => (front, Some(c.from_faces(None, false)), c.back_up()),
+        None if cards.backs[c.card.0 as usize].is_some() => (c.card, Some(c.single_face()), false),
+        None => (c.card, c.has_exceptions().then_some(c), false),
     }
 }
 
 /// Token copy values, including text changes in the creating instruction (CR 612.4, 707.2): the colors and subtypes the
 /// changed text names, and the name of a token named for its subtypes (CR 111.4, 612.2a).
 fn token_copy(cards: &CardTable, card: CardId, copy: Option<Copiable>, words: Words) -> Option<Copiable> {
-    if words.is_printed() { copy } else { Some(Copiable { words, name: cards.get(card).token_name_under(words), ..Copiable::of(card) }) }
+    if words.is_printed() {
+        return copy;
+    }
+    // A double-faced token's own definition (an Incubator, CR 111.10i) keeps both faces, each under the changed words.
+    let faces = cards.backs[card.0 as usize].map(|_| card);
+    Some(Copiable { words, name: cards.get(card).token_name_under(words), ..Copiable::of(card) }.from_faces(faces, false))
 }
 
 /// Creates tokens of several definitions as one instruction (CR 111.1, 101.4): all enter at once, and what watches
@@ -1610,10 +1651,7 @@ fn create_tokens_onto(
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
-        let face = match entering.copy {
-            Some(c) if !c.double_faced() => c.card,
-            _ => cx.cards().face(card, entering.transformed),
-        };
+        let face = entering_card(cx, &entering);
         if instant_or_sorcery(cx.card(face)) {
             continue;
         }

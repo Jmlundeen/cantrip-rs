@@ -55,7 +55,7 @@ fn absolute_power_assignment_preserves_actual_power_across_the_signed_range() {
     for power in [i16::MIN, -6, -2, 0, 3, i16::MAX] {
         let (mut game, ids) = table(&[(&ABSOLUTE, ME), (&NEGATIVE, ME)]);
         let card = game.cards.id_of(&ABSOLUTE);
-        game.state.update_obj(ids[0], |o| o.copy = Some(Copiable { pt: Some((power, 4)), ..Copiable::of(card) }));
+        game.state.update_obj(ids[0], |o| o.copy = Some(Copiable::of(card).sized(power, 4)));
         let cx = cx(&mut game);
         assert_eq!(cx.chars(ids[0]).power, Some(power));
         assert_eq!(static_rules::combat_damage_of(&cx, ids[0]), power.unsigned_abs());
@@ -89,7 +89,7 @@ fn assignment_by_toughness_ignores_the_exception_about_power() {
     let (mut game, ids) = table(&[(&ABSOLUTE, ME), (&TOUGHNESS, ME)]);
     let card = game.cards.id_of(&ABSOLUTE);
     assert_eq!(static_rules::combat_damage_of(&cx(&mut game), ids[0]), 4);
-    game.state.update_obj(ids[0], |o| o.copy = Some(Copiable { pt: Some((-2, -3)), ..Copiable::of(card) }));
+    game.state.update_obj(ids[0], |o| o.copy = Some(Copiable::of(card).sized(-2, -3)));
     assert_eq!(static_rules::combat_damage_of(&cx(&mut game), ids[0]), 0);
     cantrip_api::Game::add_effect(&mut cx(&mut game), ids[1], ids[1], EffectKind::LoseAllAbilities, Duration::EndOfTurn);
     assert_eq!(static_rules::combat_damage_of(&cx(&mut game), ids[0]), 2);
@@ -125,7 +125,7 @@ fn minimum_signed_power_deals_32768_combat_damage_and_destroys_its_blocker() {
     let (mut game, ids) = table(&[(&ABSOLUTE, ME), (&NEGATIVE, THEM)]);
     let [attacker, blocker] = ids[..] else { unreachable!() };
     let card = game.cards.id_of(&ABSOLUTE);
-    game.state.update_obj(attacker, |o| o.copy = Some(Copiable { pt: Some((i16::MIN, 4)), ..Copiable::of(card) }));
+    game.state.update_obj(attacker, |o| o.copy = Some(Copiable::of(card).sized(i16::MIN, 4)));
     game.state.set_attackers(vec![Attacker { blocked: true, ..Attacker::new(attacker, Target::Player(THEM)) }]);
     game.state.set_blocks(vec![Block { blocker, attacker, first_strike: false }]);
     game.state.update_turn(|t| t.set_step(Step::CombatDamage));

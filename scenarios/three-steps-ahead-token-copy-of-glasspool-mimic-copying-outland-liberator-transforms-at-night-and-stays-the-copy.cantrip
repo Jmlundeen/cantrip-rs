@@ -1,0 +1,71 @@
+# CR 707.8a: a token created as a copy of a double-faced permanent is a double-faced token, each face's characteristics
+# the copiable values of that face as modified by the other copy effects. Glasspool Mimic, a modal double-faced card, is
+# a copy of Outland Liberator (except a Shapeshifter Rogue): a token copy of it is double-faced too, both faces that copy
+# (the Cytoshape example's kind). When night comes (CR 702.145c) the token is front face up with daybound, so it
+# transforms - and stays the copy of Outland Liberator, as the Mimic does (CR 707.2).
+#
+# Turn 1: Forest and Mox Emerald cast Outland Liberator (it becomes day, CR 702.145d); Black Lotus casts Glasspool Mimic,
+# copying it; Mox Sapphire. Bot2 casts Mox Jet on turn 2, so turn 3 is still day (CR 731.2). Turn 3: Island; Three Steps
+# Ahead ({U} plus {3} for its token mode) on the Mimic - one spell, so turn 4 stays day. Bot2 casts nothing on turn 4, so
+# turn 5 is night: the Liberator becomes Frenzied Trapbreaker, and the Mimic and its token transform.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Outland Liberator
+Glasspool Mimic
+Mox Sapphire
+Island
+Three Steps Ahead
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Glasspool Mimic.Cast
+Bot1.Accept
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+? DayNight = Day
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Create a token)
+Bot1.Target(Bot1.Battlefield.Outland Liberator#2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Outland Liberator#3.Token = true
+? Bot1.Battlefield.Outland Liberator#3.Subtypes = Human; Rogue; Shapeshifter; Werewolf
+? Bot1.Battlefield.Outland Liberator#3.Transformed = (absent)
+[T5 Bot1.Main1]
+
+[Expect]
+DayNight = Night
+Bot1.Battlefield = Forest; Frenzied Trapbreaker; Island; Mox Emerald; Mox Sapphire; Outland Liberator; Outland Liberator
+Bot1.Battlefield.Outland Liberator#1.Token = (absent)
+Bot1.Battlefield.Outland Liberator#1.Transformed = true
+Bot1.Battlefield.Outland Liberator#2.Token = true
+Bot1.Battlefield.Outland Liberator#2.Transformed = true
+Bot1.Battlefield.Outland Liberator#2.Subtypes = Human; Rogue; Shapeshifter; Werewolf
+Bot1.Battlefield.Outland Liberator#2.Keywords = Daybound
+Bot1.Battlefield.Outland Liberator#2.Power = 2
