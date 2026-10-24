@@ -1,0 +1,65 @@
+# Brotherhood's End, first mode: "3 damage to each creature and each planeswalker." Both players' permanents are hit alike:
+# Bot1's Ornithopter and Bot2's Ornithopter (0/2) die, its Spellskite (0/4) survives with 3 damage, its Wrenn and Six (loyalty 3) dies; Bot1's Oko
+# (loyalty 4) survives at loyalty 1, so the damage is exactly 3. The Moxen (artifacts, not creatures) and both players are
+# untouched. CR 120.3, 306.8, 704.5i.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Ornithopter
+Oko, Thief of Crowns
+Brotherhood's End
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Wrenn and Six
+Ornithopter
+Spellskite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Spellskite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Brotherhood's End.Cast
+Bot1.Modes(1)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 1
+Bot1.Graveyard.Count = 2
+Bot2.Battlefield.Spellskite.Damage = 3
+Bot2.Battlefield.Count = 5
+Bot2.Graveyard.Count = 2
+Bot1.Life = 20
+Bot2.Life = 20

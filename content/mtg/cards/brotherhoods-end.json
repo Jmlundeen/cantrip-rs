@@ -1,0 +1,6 @@
+{
+  "name": "Brotherhood's End",
+  "manaCost": "{1}{R}{R}",
+  "type": "Sorcery",
+  "oracleText": "Choose one —\n• Brotherhood's End deals 3 damage to each creature and each planeswalker.\n• Destroy all artifacts with mana value 3 or less."
+}
