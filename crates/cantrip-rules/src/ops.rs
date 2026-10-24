@@ -989,6 +989,10 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
 /// Notes `card`'s `CardDef::enters` as one of the entering permanent's own replacements still to apply (`Entering::own`).
 /// There are two places: its face's, and those of what it enters as a copy of (CR 707.9a).
 fn own_to_apply(entering: &mut Entering, card: CardId) {
+    // One text's own replacements modify how it enters, the text it enters with (`keep_chosen` keeps its choices with it).
+    if layers::verifying() && entering.own.iter().any(Option::is_some) {
+        panic!("a permanent enters with the own replacements of one text");
+    }
     if let Some(slot) = entering.own.iter_mut().find(|c| c.is_none()) {
         *slot = Some(card);
     }
@@ -1010,28 +1014,29 @@ pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, slot: usi
     {
         panic!("{}'s `CardDef::enters` {fault}", cx.cards().get(card).name);
     }
-    // What it chose is linked to this text's abilities (CR 607.2d, 607.2f): kept with the text, whatever the card wrote.
-    let after = *entering;
-    entering.chosen_by.note(&before, &after, cx.cards().linked_card(card));
 }
 
-/// What `entering` chose as it entered (CR 614.12a), put on the permanent it is, each choice kept with the text that made
-/// it (`Chosen`, CR 607.2d, 607.2f): that of the `enters` that made it (`Entering::chosen_by`), else the text it enters with.
-/// A choice made as it entered is its own text's, printed or of the copiable values it enters with (CR 607.5, 707.9a).
+/// What `entering` chose as it entered (CR 614.12a), put on the permanent it is, kept with the text that made the choices
+/// (`Marks::chosen_by`, CR 607.2d, 607.2f): the text it enters with (`entering_card`), whose own "as this enters" is the
+/// only one of its own that modifies how it enters (`prepare_entry`: its face's, or what it enters as a copy of, CR 707.9a),
+/// printed or of the copiable values it enters with, acquired as its own (CR 607.5).
 fn keep_chosen(cx: &Cx, entering: &Entering) -> impl Fn(&mut Obj) + use<> {
-    let enters_as = cx.cards().linked_card(entering_card(cx, entering));
     let e = *entering;
-    fn kept<T>(value: Option<T>, text: Option<CardId>, enters_as: CardId) -> Option<Chosen<T>> {
-        value.map(|value| Chosen { value, text: text.unwrap_or(enters_as), acquired: Acquired::OWN })
-    }
+    let chose = e.chosen_color.is_some()
+        || e.chosen_subtype.is_some()
+        || e.chosen_player.is_some()
+        || e.chosen_card.is_some()
+        || e.chosen_option.is_some()
+        || e.chosen_object.is_some();
+    let by = chose.then(|| cx.cards().linked_card(entering_card(cx, entering)));
     move |o: &mut Obj| {
-        let by = e.chosen_by;
-        o.chosen_color = kept(e.chosen_color, by.color, enters_as);
-        o.chosen_subtype = kept(e.chosen_subtype, by.subtype, enters_as);
-        o.marks.chosen_player = kept(e.chosen_player, by.player, enters_as);
-        o.marks.chosen_card = kept(e.chosen_card, by.card, enters_as);
-        o.marks.chosen_option = kept(e.chosen_option, by.option, enters_as);
-        o.marks.chosen_object = kept(e.chosen_object, by.object, enters_as);
+        o.chosen_color = e.chosen_color;
+        o.chosen_subtype = e.chosen_subtype;
+        o.marks.chosen_player = e.chosen_player;
+        o.marks.chosen_card = e.chosen_card.zip(by).map(|(value, text)| Chosen { value, text, acquired: Acquired::OWN });
+        o.marks.chosen_option = e.chosen_option;
+        o.marks.chosen_object = e.chosen_object;
+        o.marks.chosen_by = by;
     }
 }
 
@@ -1354,7 +1359,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, chosen_by: ChosenBy::default(), attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None, own: [None; 2] };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None, own: [None; 2] };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1414,7 +1419,6 @@ pub fn put_onto_battlefield_as(
         chosen_card: None,
         chosen_option: None,
         chosen_object: None,
-        chosen_by: ChosenBy::default(),
         attach: None, attach_player: None,
         x: 0,
         transformed,
@@ -1500,7 +1504,6 @@ pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: Play
         chosen_card: None,
         chosen_option: None,
         chosen_object: None,
-        chosen_by: ChosenBy::default(),
         attach: None,
         attach_player: None,
         x: 0,
@@ -1841,7 +1844,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, chosen_by: ChosenBy::default(), attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None, own: [None; 2] };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None, own: [None; 2] };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -3991,7 +3994,6 @@ mod tests {
             chosen_card: None,
             chosen_option: None,
             chosen_object: None,
-            chosen_by: ChosenBy::default(),
             attach: None,
             attach_player: None,
             x: 0,

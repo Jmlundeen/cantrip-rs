@@ -86,9 +86,6 @@ pub struct Entering {
     /// The object chosen as it enters (CR 614.12a, 607.2d): Dauntless Bodyguard's "another creature you control"
     /// (`cantrip_mechanics::choose::object_as_enters`).
     pub chosen_object: Option<ObjectId>,
-    /// The card whose text made each choice above (CR 607.2d, 607.5): set by the engine as it applies the `enters` that made
-    /// it (`Entering::own`), and kept with the choice on the permanent (`Chosen`). A card never reads or sets it.
-    pub chosen_by: ChosenBy,
     /// It enters attached to this permanent (CR 303.4f): an Aura entering from the stack, or choosing its host as it
     /// is put onto the battlefield (CR 303.4g).
     pub attach: Option<ObjectId>,
@@ -111,35 +108,6 @@ pub struct Entering {
     /// (CR 614.12, 616.1). Each is emptied as it applies, so an `enters` may see the other still set; a card never reads or
     /// sets it.
     pub own: [Option<CardId>; 2],
-}
-
-/// The card whose text made each choice of an `Entering` (`Entering::chosen_by`), none for a choice not made.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
-pub struct ChosenBy {
-    pub color: Option<CardId>,
-    pub subtype: Option<CardId>,
-    pub player: Option<CardId>,
-    pub card: Option<CardId>,
-    pub option: Option<CardId>,
-    pub object: Option<CardId>,
-}
-
-impl ChosenBy {
-    /// Notes `text` as the maker of each choice `after` has that `before` did not have the same (an `enters` of that text
-    /// applied between them).
-    pub fn note(&mut self, before: &Entering, after: &Entering, text: CardId) {
-        let made = |b: bool, slot: &mut Option<CardId>| {
-            if b {
-                *slot = Some(text);
-            }
-        };
-        made(after.chosen_color != before.chosen_color, &mut self.color);
-        made(after.chosen_subtype != before.chosen_subtype, &mut self.subtype);
-        made(after.chosen_player != before.chosen_player, &mut self.player);
-        made(after.chosen_card != before.chosen_card, &mut self.card);
-        made(after.chosen_option != before.chosen_option, &mut self.option);
-        made(after.chosen_object != before.chosen_object, &mut self.object);
-    }
 }
 
 /// What an effect that puts a card onto the battlefield says it is (CR 614.12: it enters as that, never as what it was;

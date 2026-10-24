@@ -482,7 +482,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
                 o.entered_with.map(|id| canon.id(id)),
                 o.prepared_from.map(|id| canon.id(id)),
                 o.exiled.map(|e| (canon.id(e.by), e.text, e.from, e.until_leaves, e.encoded)),
-                o.marks.chosen_object.map(|c| (canon.id(c.value), c.text, c.acquired)),
+                o.marks.chosen_object.map(|c| canon.id(c)),
                 stamp,
             )
                 .hash(h);

@@ -163,7 +163,10 @@ fn a_static_ability_given_by_an_effect_reads_no_choice_the_permanents_own_text_m
     let source = game.state.push_obj(Obj::new(t.id_of(&CHOOSER), me, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, source);
     let text = t.linked_card(t.id_of(&CHOOSER));
-    game.state.update_obj(source, |o| o.chosen_color = Some(Chosen { value: Color::Blue, text, acquired: Acquired::OWN }));
+    game.state.update_obj(source, |o| {
+        o.chosen_color = Some(Color::Blue);
+        o.marks.chosen_by = Some(text);
+    });
     assert_eq!(crate::layers::chars(t, &game.state, &game.log, source).power, Some(2), "its own ability reads its own choice");
     let lender = game.state.push_obj(Obj::new(t.id_of(&EXILED), me, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, lender);
