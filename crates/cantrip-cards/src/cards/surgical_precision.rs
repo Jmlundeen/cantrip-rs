@@ -2,14 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{destroy_target, effects, targets};
 use cantrip_oracle as oracle;
 
-/// "Target creature with toughness 4 or greater" (CR 115.1): its toughness as the target is chosen.
-fn creature_with_toughness_four_or_greater(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id)
-        if targets::permanent(q, id)
-            && q.chars(id).is(CardType::Creature)
-            && q.chars(id).toughness.is_some_and(|t| t >= 4))
-}
-
 /// "Destroy target creature with toughness 4 or greater. You gain 1 life." (CR 701.8, 608.2b): with its one target illegal
 /// the core does not resolve the spell at all, so no life; with a legal target the life is gained whether or not the destroy
 /// did anything (an indestructible target, a regeneration shield), the instructions being independent (CR 608.2c).
@@ -26,7 +18,7 @@ fn draw_and_gain_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 
 static MODAL: ModalDef = modes(&[
     mode(destroy_and_gain_one, "Destroy target creature with toughness 4 or greater. You gain 1 life.")
-        .targets(&[target(creature_with_toughness_four_or_greater)]),
+        .targets(&[targets::CREATURE_WITH_TOUGHNESS_4_OR_GREATER]),
     mode(draw_and_gain_two, "You draw a card and gain 2 life."),
 ]);
 

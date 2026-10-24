@@ -76,6 +76,13 @@ fn spell_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// Any target (CR 115.4): a creature, a player, a planeswalker or a battle.
 pub const ANY: TargetSpec = target(any_target_filter);
 pub const CREATURE: TargetSpec = target(creature_filter);
+
+fn creature_with_toughness_four_or_greater_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).toughness.is_some_and(|v| v >= 4))
+}
+/// "Target creature with toughness 4 or greater" (CR 115.1) as the layers give the toughness now, so a counter or an
+/// effect moves a creature in and out of range. Valorous Stance, Surgical Precision and Destroy Evil print it.
+pub const CREATURE_WITH_TOUGHNESS_4_OR_GREATER: TargetSpec = target(creature_with_toughness_four_or_greater_filter);
 /// "A creature with flying" (CR 702.9) as the layers give it now: a creature on the battlefield that has flying. Pick Your Poison
 /// sacrifices one; `CREATURE_WITH_FLYING` is the target slot. Bow of Nylea and Konstrari Charm print the target.
 pub fn has_flying_creature(q: &dyn Query, id: ObjectId) -> bool {
