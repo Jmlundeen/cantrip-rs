@@ -587,6 +587,15 @@ pub static OCTOPUS: CardDef = CardDef {
     ..token!(Octopus)
 };
 
+/// A 3/3 green Beast creature token. Garruk Wildspeaker and Thragtusk make it.
+pub static BEAST_3_3: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(3),
+    toughness: Some(3),
+    ..token!(Beast)
+};
+
 /// A 4/4 green Beast creature token with trample. Garruk, Curse Breaker and Garruk, Veiled Butcher make it.
 pub static BEAST_4_4_TRAMPLE: CardDef = CardDef {
     colors: Some(ColorSet::of(Color::Green)),
