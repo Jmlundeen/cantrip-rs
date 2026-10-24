@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::{find_to_battlefield, object_names};
+use cantrip_mechanics::library::{find_to_battlefield, object_has_name};
 use cantrip_mechanics::select::{self, part, up_to};
 use cantrip_mechanics::{choose, effects};
 use cantrip_oracle as oracle;
@@ -44,14 +44,13 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, 2);
     g.end_sentence();
+    let approach = g.card_id(&CARD);
     let named: Vec<ObjectId> = g
         .state()
         .zone(Zone::graveyard(you))
         .iter()
         .copied()
-        // The literal name the card's text prints, not whatever name this particular object shows: a copy keeps
-        // Sphinx's Approach's text (CR 707.2) whatever its own name is.
-        .filter(|&card| object_names(g, card).contains(&oracle::SPHINXS_APPROACH.name))
+        .filter(|&card| object_has_name(g, card, approach))
         .collect();
     if named.len() < 4 {
         return Ok(());

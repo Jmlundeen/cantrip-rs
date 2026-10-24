@@ -46,7 +46,6 @@ Bot1.Pass
 Bot1.Pass
 Bot1.Accept
 Bot1.Search(Sphinx of the Guildpact)
-? Bot1.Battlefield.Sphinx of the Guildpact.Power = 5
 Bot1.Pass
 [T3 Bot1.Main2]
 

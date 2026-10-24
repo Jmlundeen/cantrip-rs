@@ -1,0 +1,56 @@
+# Artificial Evolution changes the text of Sphinx's Approach on the stack, Sphinx to Elf (CR 612.1): the search then finds an
+# Elf creature card, not a Sphinx, even though the spell has been exiled by then (its words are last-known, CR 400.7).
+# Emry mills the four copies on turn one; on turn three the Approach is cast with Island, Mox Sapphire and Mox Jet, then
+# Artificial Evolution with the Black Lotus. Sphinx of the Guildpact is refused, Llanowar Elves is found.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Black Lotus
+Emry, Lurker of the Loch
+Artificial Evolution
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Island x7
+Sphinx of the Guildpact
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Opt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sphinx's Approach.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Artificial Evolution.Cast(Sphinx's Approach)
+Bot1.Pass
+Bot1.Modes(Sphinx)
+Bot1.Modes(Elf)
+Bot1.Pass
+Bot1.Accept
+! Bot1.Search(Sphinx of the Guildpact)
+Bot1.Search(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
+Bot1.Battlefield.Sphinx of the Guildpact = (absent)
+Exile.Count = 5
