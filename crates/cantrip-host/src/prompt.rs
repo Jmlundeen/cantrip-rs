@@ -550,6 +550,16 @@ fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
     if faces {
         return ("Only the face you choose is cast, with its own cost and mana value".into(), false);
     }
+    // The Phyrexian symbols paid with life (CR 107.4f): what is not chosen is paid with mana.
+    if let Some(&Label::PayLife(color)) = modes.first()
+        && modes.iter().all(|l| matches!(l, Label::PayLife(_)))
+    {
+        return if modes.iter().all(|l| *l == Label::PayLife(color)) {
+            (format!("Each one not chosen is paid with {{{}}}", color.symbol()), false)
+        } else {
+            ("Each one not chosen is paid with mana of its color".into(), false)
+        };
+    }
     match modal_of(game, modes) {
         Some(modal) => {
             if let Some(escalate) = modal.escalate {
@@ -993,6 +1003,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 } else if matches!(modes.first(), Some(Label::TargetSlot(..))) {
                     // Two instances of "target" hold the same object (CR 115.3): which one changes to the source (CR 115.7b).
                     format!("Choose which target to change to {}", game.cards.get(game.chars(*source).card).name)
+                } else if let Some(heading) = phyrexian_heading(game, *source, modes) {
+                    heading
                 } else if let Some(heading) = options_heading(game, modes) {
                     heading
                 } else {
@@ -1678,9 +1690,19 @@ mod tests {
     }
 }
 
-/// What a choice of a subtype says it is for: "Choose a creature type" for one an effect names from now on (the heading the
-/// bots read it by), and for a word of a text change (CR 612.1), after the spell's name, which word it is - the one replaced, or the one replacing it -
-/// and its kind, a creature type or a basic land type.
+/// The announcement of how Phyrexian symbols are paid (CR 107.4f, 601.2b, 118.13): which of them are paid with 2 life, the
+/// rest with mana. Worded for the symbols alone, since the cost may be a spell's, an ability's, one paid as either resolves or
+/// a cost to attack (Norn's Annex), where "an additional cost" of the source would not be true.
+fn phyrexian_heading(game: &Game, source: ObjectId, modes: &[Label]) -> Option<String> {
+    let Some(&Label::PayLife(color)) = modes.first() else { return None };
+    if !modes.iter().all(|l| matches!(l, Label::PayLife(_))) {
+        return None;
+    }
+    let name = game.cards.get(game.chars(source).card).name;
+    let symbols = if modes.iter().all(|l| *l == Label::PayLife(color)) { format!("{{{}/P}}", color.symbol()) } else { "Phyrexian symbols".into() };
+    Some(format!("{name}: choose which {symbols} to pay with 2 life"))
+}
+
 /// The caption of a choice between the words a card's text offers (CR 607.2f), in its words with the card's name: "Frostcliff
 /// Siege: choose Jeskai or Temur", "Mirrodin Besieged: choose Mirran or Phyrexian". The name is the card whose text it is,
 /// which a permanent entering as a copy of it is not yet (CR 707.5). None when the options are anything else.
@@ -1698,6 +1720,9 @@ fn options_heading(game: &Game, modes: &[Label]) -> Option<String> {
     Some(format!("{}: choose {listed}", game.cards.get(card).name))
 }
 
+/// What a choice of a subtype says it is for: "Choose a creature type" for one an effect names from now on (the heading the
+/// bots read it by), and for a word of a text change (CR 612.1), after the spell's name, which word it is - the one replaced, or the one replacing it -
+/// and its kind, a creature type or a basic land type.
 fn subtype_heading(source: &str, choices: &[Subtype], purpose: WordUse) -> String {
     let kind = if choices.first().is_some_and(|s| s.is_creature_type()) { "creature type" } else { "basic land type" };
     match purpose {

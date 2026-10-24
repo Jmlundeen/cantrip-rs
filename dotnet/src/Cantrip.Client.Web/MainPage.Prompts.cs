@@ -388,8 +388,10 @@ public sealed partial class MainPage
                 string attackers = prompt.Attackers.Count == 1
                     ? client.Object(prompt.Attackers[0])?.Name ?? "1 creature"
                     : $"{prompt.Attackers.Count} creatures";
+                // The life chosen for its Phyrexian symbols (CR 107.4f: Norn's Annex's {W/P}), paid with the mana.
+                string life = prompt.Life > 0 ? $" and {prompt.Life} life" : string.Empty;
                 Prompt(
-                    $"Pay {prompt.Total} to attack with {attackers}",
+                    $"Pay {prompt.Total}{life} to attack with {attackers}",
                     covered
                         ? $"{name} asks it  ·  your pool covers it  ·  {how}"
                         : $"{name} asks it  ·  {prompt.Remaining} still to pay  ·  {how}  ·  Cancel declares attackers again");

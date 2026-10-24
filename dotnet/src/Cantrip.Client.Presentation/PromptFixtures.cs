@@ -1827,6 +1827,9 @@ public static class PromptFixtures
                     Count = 0,
                     AtMost = 2,
                     AdditionalCost = true,
+                    // The host's words for the choice (`phyrexian_heading`), true of a cost to attack too (Norn's Annex).
+                    Heading = "Dismember: choose which {B/P} to pay with 2 life",
+                    Detail = "Each one not chosen is paid with {B}",
                 };
 
             case "venture-room":
