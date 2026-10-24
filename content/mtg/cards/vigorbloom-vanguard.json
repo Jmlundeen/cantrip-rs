@@ -1,0 +1,14 @@
+{
+  "name": "Vigorbloom Vanguard",
+  "manaCost": "{1}{G/W}",
+  "type": "Creature \u2014 Troll Druid",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "This creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)\nEach creature you control with a +1/+1 counter on it has vigilance.",
+  "prepare": {
+    "name": "Seed Suture",
+    "manaCost": "{G/W}",
+    "type": "Sorcery",
+    "oracleText": "Put a +1/+1 counter on target creature. You gain 1 life."
+  }
+}

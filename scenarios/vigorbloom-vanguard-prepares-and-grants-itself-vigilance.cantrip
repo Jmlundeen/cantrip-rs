@@ -1,0 +1,40 @@
+# Seed Suture puts one counter on the Vanguard and gains one life. Its counter grants vigilance,
+# while a creature without a counter does not gain it (CR 722.3c, 611.3a, 702.20).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Vigorbloom Vanguard
+Ornithopter
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Vigorbloom Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Vigorbloom Vanguard.Prepared = true
+? Exile = Seed Suture
+? Bot1.Battlefield.Vigorbloom Vanguard.Keywords = (absent)
+Bot1.Battlefield.Plains.Activate
+Bot1.Exile.Seed Suture.Cast(Bot1.Battlefield.Vigorbloom Vanguard)
+
+[Expect]
+Bot1.Battlefield.Vigorbloom Vanguard.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Vigorbloom Vanguard.Power = 3
+Bot1.Battlefield.Vigorbloom Vanguard.Toughness = 3
+Bot1.Battlefield.Vigorbloom Vanguard.Keywords = Vigilance
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Life = 21
+Bot1.Battlefield.Vigorbloom Vanguard.Prepared = (absent)
+Exile.Count = 0
