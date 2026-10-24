@@ -1,16 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::combat::{choose_among, create_attacking, player_or_their_planeswalkers};
-use cantrip_mechanics::{lands, triggers};
+use cantrip_mechanics::{lands, tokens, triggers};
 use cantrip_oracle as oracle;
-
-/// The 1/1 white Human creature token it makes.
-pub static HUMAN: CardDef = CardDef {
-    colors: Some(ColorSet::of(Color::White)),
-    types: TypeSet::of(&[CardType::Creature]),
-    power: Some(1),
-    toughness: Some(1),
-    ..token!(Human)
-};
 
 /// "Adeline's power is equal to the number of creatures you control" (CR 604.3, layer 7a): a characteristic-defining
 /// ability, itself included.
@@ -21,7 +12,7 @@ fn power_is_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &
 /// "For each opponent, create a 1/1 white Human creature token that's tapped and attacking that player or a planeswalker
 /// they control" (CR 508.4): its controller chooses which, asked only when the opponent controls a planeswalker.
 fn human_for_each_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let human = g.card_id(&HUMAN);
+    let human = g.card_id(&tokens::HUMAN);
     let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
     let mut chosen: Vec<Target> = Vec::new();
     for opponent in opponents {
@@ -38,4 +29,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::ADELINE_RESPLENDENT_CATHAR
 };
 
-pub static EXTRA: &[&CardDef] = &[&HUMAN];
+pub static EXTRA: &[&CardDef] = &[&tokens::HUMAN];

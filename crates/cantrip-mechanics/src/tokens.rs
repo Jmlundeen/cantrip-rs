@@ -525,6 +525,15 @@ pub static HUMAN_CITIZEN: CardDef = CardDef {
     ..token!(Human Citizen)
 };
 
+/// The 1/1 white Human creature token. Adeline, Resplendent Cathar and Castle Ardenvale make it.
+pub static HUMAN: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Human)
+};
+
 /// The 1/1 white Human Soldier creature token. Cosmogrand Zenith makes it, and recruit (CR 701.70a: The Queen of Dale) does.
 pub static HUMAN_SOLDIER: CardDef = CardDef {
     colors: Some(ColorSet::of(Color::White)),
