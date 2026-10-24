@@ -1,0 +1,11 @@
+{
+  "name": "Prowling Serpopard",
+  "manaCost": "{1}{G}{G}",
+  "type": "Creature — Cat Snake",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "This spell can't be countered.\nCreature spells you control can't be countered.",
+  "keywords": [
+    "CantBeCountered"
+  ]
+}
