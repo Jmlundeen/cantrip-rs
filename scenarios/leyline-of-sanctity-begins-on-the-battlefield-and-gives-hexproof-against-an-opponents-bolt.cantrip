@@ -1,0 +1,35 @@
+# Leyline of Sanctity: "If this card is in your opening hand, you may begin the game with it on the battlefield" (CR 103.6a):
+# Bot1 accepts. "You have hexproof" (CR 702.11c): on turn 2 Bot2 has the red mana for Lightning Bolt but can't target Bot1
+# (the refusal); it can still Bolt Bot1's Ornithopter (hexproof covers only the player).
+# The control where the Bolt does reach Bot1: leyline-of-sanctity-declined-in-the-opening-hand-gives-no-hexproof.
+
+[Bot1 Deck]
+Leyline of Sanctity
+Ornithopter
+Island x5
+Island x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Leyline of Sanctity.Tapped = false
+Bot1.Graveyard = Ornithopter
+Bot2.Graveyard = Lightning Bolt
