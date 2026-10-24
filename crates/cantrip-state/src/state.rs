@@ -237,9 +237,10 @@ impl GameState {
 /// Two states are the same position whatever their journals and request counters hold.
 impl PartialEq for GameState {
     fn eq(&self, other: &GameState) -> bool {
-        // Last-known rows are named by the objects that left (`Obj::last_known`), which the position hashes, and by the
-        // stack items of the spells cast (`StackItem::cast_known`); the rows themselves are compared, not hashed, since
-        // every move and every cast adds one.
+        // Last-known rows are named by the objects that left (`Obj::last_known`), which the position hashes, by the
+        // stack items of the spells cast (`StackItem::cast_known`), and by the history's declarations of attackers
+        // (`Event::Attacks::known`); the rows themselves are compared, not hashed, since every move, every cast and every
+        // attacker declared adds one.
         self.position() == other.position() && self.last_known == other.last_known
     }
 }
@@ -1376,7 +1377,6 @@ impl GameState {
         let old = self.objects[chain[0].index()].card;
         for &id in chain {
             debug_assert_eq!(self.objects[id.index()].card, old, "a chain of rows of one card");
-            debug_assert!(self.last_known.iter().all(|l| l.id != id), "a hidden object has no last-known snapshot");
             self.objects[id.index()].card = new;
         }
         let rebound = |id: ObjectId| chain.contains(&id);
@@ -1413,7 +1413,6 @@ impl GameState {
                 }
                 Undo::TriggerRemoved(_, trigger) if rebound(trigger.source) => patch(&mut trigger.ability),
                 Undo::DelayedRemoved(_, delayed) if rebound(delayed.source) => patch(&mut delayed.ability),
-                Undo::LastKnownPopped(last) => debug_assert!(!rebound(last.id), "a hidden object has no last-known snapshot"),
                 Undo::StaticsSeen(seen) if statics => *seen = true,
                 _ => {}
             }
@@ -1422,6 +1421,50 @@ impl GameState {
             self.statics_seen = true;
         }
         self.epoch += 1;
+        self.chars_epoch += 1;
+    }
+
+    /// The last-known rows, kept and in the journal, of the objects of `chain` (hidden ones `rebind_hidden` deals anew) for
+    /// which `shows` holds: those that show the card they were dealt from.
+    fn hidden_rows_mut<'a>(&'a mut self, chain: &'a [ObjectId]) -> impl Iterator<Item = &'a mut LastKnown> + 'a {
+        let popped = self.journal.entries.iter_mut().filter_map(|e| match e {
+            Undo::LastKnownPopped(last) => Some(&mut **last),
+            _ => None,
+        });
+        self.last_known.iter_mut().chain(popped).filter(move |l| chain.contains(&l.id))
+    }
+
+    /// The objects of `chain` with a last-known row, kept or in the journal, that `shows` says shows the card they are
+    /// dealt anew from: what `rebind_hidden_rows` needs a row of the new card for.
+    pub fn hidden_rows_showing(&self, chain: &[ObjectId], shows: impl Fn(&LastKnown) -> bool) -> Vec<ObjectId> {
+        let popped = self.journal.entries.iter().filter_map(|e| match e {
+            Undo::LastKnownPopped(last) => Some(&**last),
+            _ => None,
+        });
+        let mut ids: Vec<ObjectId> = Vec::new();
+        for l in self.last_known.iter().chain(popped) {
+            if chain.contains(&l.id) && shows(l) && !ids.contains(&l.id) {
+                ids.push(l.id);
+            }
+        }
+        ids
+    }
+
+    /// The last-known rows of the hidden objects of `chain` once `rebind_hidden` has given them another card, for a
+    /// search's world: never on a real game, and not journalled, the journal's stored copies rewritten too. A row that
+    /// showed the old card (`shows`: one an object left as it moved while hidden, a library card drawn or a hand card
+    /// cast, CR 400.7) becomes its object's row in `rows`, as the new card. One that showed nothing of it - a face-down
+    /// object's (a face-down spell as it was cast, a face-down creature as it attacked, `Event::Attacks::known`, a card
+    /// cloaked from the library as it left) - holds the world's values as much as the game's, and stays.
+    pub fn rebind_hidden_rows(&mut self, chain: &[ObjectId], rows: &[(ObjectId, LastKnown)], shows: impl Fn(&LastKnown) -> bool) {
+        for row in self.hidden_rows_mut(chain) {
+            if shows(row) {
+                match rows.iter().find(|(id, _)| *id == row.id) {
+                    Some((_, l)) => *row = *l,
+                    None => debug_assert!(false, "a row that shows a hidden card has a row of the card it is dealt"),
+                }
+            }
+        }
         self.chars_epoch += 1;
     }
 

@@ -776,6 +776,39 @@ impl Game {
         }
         let statics = [card, new_back].iter().any(|c| self.cards.statics[c.0 as usize]);
         self.state.rebind_hidden(chain, card, &abilities, statics);
+        // The rows an object left as it moved while hidden that showed its face (CR 400.7) show the new card's, printed, as
+        // a hidden card is. A face-down object's show its face-down values, the world's too.
+        let old_faces: Vec<CardId> = abilities.iter().map(|&(from, _)| from).collect();
+        let old_names: Vec<&'static str> = old_faces.iter().map(|&c| self.cards.get(c).name).collect();
+        let shows = |l: &LastKnown| old_names.contains(&l.name) || l.abilities.iter().flatten().any(|a| old_faces.contains(&a.card));
+        let rows: Vec<(ObjectId, LastKnown)> = self
+            .state
+            .hidden_rows_showing(chain, shows)
+            .into_iter()
+            .map(|id| {
+                let face = self.cards.face(card, self.state.obj(id).transformed);
+                let c = layers::chars_as_face(&self.cards, &self.state, &self.log, id, face);
+                let mana_value = cantrip_api::mana_value_of(&|c| self.cards.get(c), &self.state, id, &c);
+                let row = LastKnown {
+                    id,
+                    name: c.name,
+                    name_set: false,
+                    supertypes: c.supertypes,
+                    no_cost: false,
+                    types: c.types,
+                    subtypes: c.subtypes,
+                    colors: c.colors,
+                    power: c.power,
+                    toughness: c.toughness,
+                    keywords: c.keywords,
+                    mana_value,
+                    abilities: c.abilities,
+                    words: Words::NONE,
+                };
+                (id, row)
+            })
+            .collect();
+        self.state.rebind_hidden_rows(chain, &rows, shows);
         let patch = |source: ObjectId, ability: &mut AbilityRef| {
             if chain.contains(&source)
                 && let Some(&(_, to)) = abilities.iter().find(|(from, _)| *from == ability.card)

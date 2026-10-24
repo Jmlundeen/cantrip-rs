@@ -754,6 +754,13 @@ fn a_world_dealt_mid_resolution_keeps_its_cards_through_the_rerun_and_back() {
         .collect();
     let card = |g: &Game, id: ObjectId| g.state.obj(id).card;
     assert!(drawn.iter().any(|&id| card(&world, id) != card(&game, id)), "the world deals the cards drawn in the resolution anew");
+    // Each left a row as it moved from the library (CR 400.7), which showed its card: in the world, the card dealt.
+    for &id in &drawn {
+        let from = (0..world.state.objects.len()).map(|i| ObjectId(i as u32)).find(|&o| world.state.obj(o).became == Some(id)).expect("drawn");
+        let row = |g: &Game| g.state.last_known(from).expect("a row").name;
+        assert_eq!(row(&game), game.cards.get(card(&game, id)).name);
+        assert_eq!(row(&world), world.cards.get(card(&world, id)).name, "the row a drawn card left shows the card dealt");
+    }
     assert_ne!(hand, names(&game, Zone::hand(bot1)), "the world deals Bot1's hand anew");
     let dealt = (world.state.clone(), world.log.clone());
     let root = world.checkpoint();
@@ -975,4 +982,67 @@ fn a_companion_not_yet_revealed_is_not_in_another_seats_world() {
     }
     assert_eq!(canon_of(&wa, false), canon_of(&wb, false), "a world revealed what Bot2 chose");
     assert_eq!(wa.state.player(PlayerId(1)).companion, None);
+}
+
+/// Cryptic Coat cloaks Bot1's top card, a Snapcaster Mage Bot2 never sees (CR 701.58a), and the face-down creature attacks
+/// on turn 3: its declaration keeps it as it attacked, a nameless 2/2 equipped to 3/2, in a last-known row
+/// (`Event::Attacks::known`). Bot1 then has priority in its second main phase.
+const CLOAKED_ATTACKER: &str = "
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Island x5
+Snapcaster Mage
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(#1 > Bot2)
+[T3 Bot1.Main2]
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 3
+Step = Main2
+Bot2.Life = 17
+";
+
+/// A world for Bot2 deals the cloaked attacker anew (`GameState::rebind_hidden`): the row its attack kept was of a
+/// face-down creature, which shows nothing of the card it is dealt from, so it may be (the rebind's checks hold), and
+/// the attacker as declared is the same in the world as in the real game.
+#[test]
+fn a_world_deals_anew_a_face_down_creature_whose_attack_kept_it_as_declared() {
+    let game = handed_over(CLOAKED_ATTACKER);
+    let bot1 = PlayerId(0);
+    let declared = |g: &Game| -> Vec<(Option<i16>, Option<i16>, &'static str)> {
+        g.history()
+            .attacked_with(bot1)
+            .map(|a| {
+                let c = a.chars(g);
+                (c.power, c.toughness, c.name)
+            })
+            .collect()
+    };
+    let real = declared(&game);
+    assert_eq!(real.len(), 1, "the cloaked creature attacked");
+    assert_eq!((real[0].0, real[0].1), (Some(3), Some(2)), "a face-down 2/2 equipped with Cryptic Coat as it attacked");
+    let world = world_for_bot2(&game);
+    let attacker = game.history().attacked_with(bot1).next().expect("the attack").attacker;
+    assert_ne!(world.state.obj(attacker).card, game.state.obj(attacker).card, "the world deals the cloaked card anew");
+    // The library card it was cloaked from left a row as it moved (CR 400.7), already face down (CR 701.58a): nameless in
+    // the game and in the world alike.
+    let from = (0..world.state.objects.len()).map(|i| ObjectId(i as u32)).find(|&id| world.state.obj(id).became == Some(attacker)).expect("cloaked from the library");
+    assert_eq!(game.state.last_known(from).expect("a row").name, "");
+    assert_eq!(world.state.last_known(from).expect("a row").name, "");
+    assert_eq!(declared(&world), real, "the world's attacker as declared is the real one's: nothing of its face");
 }
