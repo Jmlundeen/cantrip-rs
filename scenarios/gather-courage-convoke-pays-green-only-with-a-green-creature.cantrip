@@ -1,0 +1,25 @@
+# Gather Courage costs {G}. Bot1's only creature is a white Mother of Runes and its only mana is a Plains and a Mox Pearl:
+# it can pay {1} by convoke but never the {G}, so the cast is refused though plenty of mana is untapped (CR 702.51a).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mother of Runes
+Gather Courage
+Plains x13
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+! Bot1.Hand.Gather Courage.Cast(Mother of Runes)
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Tapped = false
+Stack.Count = 0
