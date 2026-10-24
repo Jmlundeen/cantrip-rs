@@ -1,0 +1,8 @@
+{
+  "name": "Dauntless Bodyguard",
+  "manaCost": "{W}",
+  "type": "Creature — Human Knight",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "As this creature enters, choose another creature you control.\nSacrifice this creature: The chosen creature gains indestructible until end of turn."
+}

@@ -1,0 +1,46 @@
+# Dauntless Bodyguard enters on turn 3 with no other creature its controller controls: Bot2's Llanowar Elves are not
+# Bot1's, and the Bodyguard is not "another" creature, so nothing is chosen and no choice is asked (CR 614.12a). A creature
+# that enters later is not chosen either (the card's ruling: no new creature is chosen), so sacrificing the Bodyguard gives
+# Ornithopter nothing.
+
+[Bot1 Deck]
+Plains
+Dauntless Bodyguard
+Ornithopter
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Dauntless Bodyguard.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+? Bot1.Battlefield.Dauntless Bodyguard.ChosenObject = (absent)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dauntless Bodyguard.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Ornithopter
+Bot1.Graveyard = Dauntless Bodyguard
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Llanowar Elves.Keywords = (absent)

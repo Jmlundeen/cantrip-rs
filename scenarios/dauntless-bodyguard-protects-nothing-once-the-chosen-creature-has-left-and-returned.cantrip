@@ -1,0 +1,40 @@
+# Dauntless Bodyguard chooses Ornithopter as it enters. Ephemerate then exiles Ornithopter and returns it: the Ornithopter
+# that returns is a new object (CR 400.7), never chosen, and no new creature is chosen (the card's ruling). Sacrificing the
+# Bodyguard gives nothing indestructible.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Dauntless Bodyguard
+Ephemerate
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Dauntless Bodyguard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dauntless Bodyguard.ChosenObject = (absent)
+Bot1.Battlefield.Dauntless Bodyguard.Activate
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Ornithopter
+Bot1.Graveyard = Dauntless Bodyguard
+Bot1.Battlefield.Ornithopter.Keywords = Flying

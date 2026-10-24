@@ -1,0 +1,37 @@
+# Collected Company puts Dauntless Bodyguard and Birds of Paradise onto the battlefield at the same time. The Bodyguard's
+# creature is chosen before it enters (CR 614.12a), when the Birds are not on the battlefield yet, so they can't be chosen
+# (the card's ruling); Ornithopter, already there, is.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Ornithopter
+Collected Company
+Island
+Island
+Island
+Dauntless Bodyguard
+Birds of Paradise
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Collected Company.Cast
+Bot1.Pass
+Bot1.Choose(Dauntless Bodyguard; Birds of Paradise)
+! Bot1.Choose(Birds of Paradise)
+Bot1.Choose(Ornithopter)
+Bot1.Arrange(Island; Island; Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Ornithopter; Dauntless Bodyguard; Birds of Paradise
+Bot1.Battlefield.Dauntless Bodyguard.ChosenObject = Ornithopter

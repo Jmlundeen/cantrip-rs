@@ -1,0 +1,47 @@
+# The choice made as a permanent enters is no copiable value (CR 707.2): Clone entering as a copy of Dauntless Bodyguard
+# makes its own choice as it enters (CR 707.5, 614.12a), and its abilities, the Bodyguard's text, refer to it (CR 607.2d).
+# The original chose Ornithopter; the copy chooses the original Bodyguard, and sacrificing the copy makes the original
+# indestructible, not Ornithopter.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Sapphire
+Ornithopter
+Dauntless Bodyguard
+Clone
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Dauntless Bodyguard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Dauntless Bodyguard)
+Bot1.Choose(Dauntless Bodyguard)
+? Bot1.Battlefield.Dauntless Bodyguard#1.ChosenObject = Ornithopter
+? Bot1.Battlefield.Dauntless Bodyguard#2.ChosenObject = Dauntless Bodyguard
+Bot1.Battlefield.Dauntless Bodyguard#2.Activate
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Sapphire; Ornithopter; Dauntless Bodyguard
+Bot1.Battlefield.Dauntless Bodyguard.Keywords = Indestructible
+Bot1.Battlefield.Ornithopter.Keywords = Flying

@@ -1,0 +1,36 @@
+# Browser
+# What a player sees of Dauntless Bodyguard's "As this creature enters, choose another creature you control" (CR 614.12a):
+# as it enters, Bot1's page asks for a creature, captioned as the choice it is - not a target, and nothing happens to it
+# now - and Bot1 clicks Ornithopter, Birds of Paradise also offered. The Bodyguard then wears the creature it chose over its
+# art, as a permanent shows any one quality chosen as it entered (CR 607.2d).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Ornithopter
+Birds of Paradise
+Dauntless Bodyguard
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Dauntless Bodyguard.Cast
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Dauntless Bodyguard: choose a creature as it enters
+Bot1.Choose(Ornithopter)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dauntless Bodyguard.ChosenObject = Ornithopter
+Client.Bot1.Battlefield.Dauntless Bodyguard.Annotation = Ornithopter
