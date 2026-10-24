@@ -1,0 +1,64 @@
+# Valgavoth, Terror Eater: "Ward--Sacrifice three nonland permanents" (CR 702.21a, 118.12), flying and lifelink.
+# On turn 2 Bot2 controls three permanents, but one is Dryad Arbor, a land: with two nonland permanents it can't pay (CR
+# 118.3), so it is not asked and its first Lightning Bolt is countered. With a second Mox Ruby it controls three nonland
+# permanents, agrees to pay and sacrifices the three Moxen together (all it has, so no choice); Dryad Arbor stays and the
+# second Bolt deals 3 to Valgavoth. The countered Bolt, the resolved one and the Moxen go to Bot2's graveyard from the stack
+# and the battlefield, so Valgavoth exiles each. On turn 3 Valgavoth attacks: Dryad Arbor can't block a flier (CR 702.9b),
+# and lifelink gives Bot1 9 life for the 9 damage it deals (CR 702.15b).
+
+[Bot1 Deck]
+Black Lotus x3
+Valgavoth, Terror Eater
+Swamp x10
+
+[Bot2 Deck]
+Dryad Arbor
+Mox Ruby
+Mox Jet
+Lightning Bolt
+Mox Ruby
+Lightning Bolt
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Valgavoth, Terror Eater.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Dryad Arbor.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Valgavoth, Terror Eater)
+Bot2.Pass
+! Bot2.Accept
+? Exile = Lightning Bolt
+? Bot2.Battlefield = Dryad Arbor; Mox Jet; Mox Ruby
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Valgavoth, Terror Eater)
+Bot2.Pass
+Bot2.Accept
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Valgavoth, Terror Eater.Damage = 3
+? Bot2.Battlefield = Dryad Arbor
+[T3 Bot1.Main1]
+Bot1.Attack(Valgavoth, Terror Eater > Bot2)
+! Bot2.Block(Dryad Arbor > Valgavoth, Terror Eater)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 29
+Bot2.Life = 11
+Bot2.Battlefield = Dryad Arbor
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt; Lightning Bolt; Mox Jet; Mox Ruby; Mox Ruby

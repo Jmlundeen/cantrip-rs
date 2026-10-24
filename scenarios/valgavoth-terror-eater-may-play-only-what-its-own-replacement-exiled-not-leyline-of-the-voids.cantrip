@@ -1,0 +1,55 @@
+# Valgavoth, Terror Eater's last ability refers only to the cards its own replacement effect exiled (CR 607.2b, 406.6).
+# Bot1 has Leyline of the Void too, so each of Bot2's cards headed for Bot2's graveyard meets two replacement effects, and
+# Bot2, whose card it is, chooses which applies (CR 616.1); once one has exiled it the other no longer applies. Bot2's
+# Lightning Bolt goes by Leyline: exiled, but not with Valgavoth, so Bot1 can't cast it. Bot2's Shock goes by Valgavoth, and
+# on turn 3 Bot1 casts it at Bot2 for 1 life, its mana value. Bot1 controlled that Shock, so Valgavoth lets it go to Bot2's graveyard, but
+# Leyline (which asks nothing about control) exiles it.
+
+[Bot1 Deck]
+Leyline of the Void
+Black Lotus x3
+Valgavoth, Terror Eater
+Swamp x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mox Ruby
+Shock
+Forest x13
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Valgavoth, Terror Eater.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot2.Replace(Leyline of the Void)
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+Bot2.Replace(Valgavoth, Terror Eater)
+[T3 Bot1.Main1]
+? Exile = Lightning Bolt; Shock
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Exile.Shock.Cast(Bot2; Ability: 1 life)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 14
+Bot2.Life = 18
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt; Shock

@@ -1,0 +1,12 @@
+{
+  "name": "Valgavoth, Terror Eater",
+  "manaCost": "{6}{B}{B}{B}",
+  "type": "Legendary Creature — Elder Demon",
+  "power": 9,
+  "toughness": 9,
+  "oracleText": "Flying, lifelink\nWard—Sacrifice three nonland permanents.\nIf a card you didn't control would be put into an opponent's graveyard from anywhere, exile it instead.\nDuring your turn, you may play cards exiled with Valgavoth. If you cast a spell this way, pay life equal to its mana value rather than pay its mana cost.",
+  "keywords": [
+    "Flying",
+    "Lifelink"
+  ]
+}

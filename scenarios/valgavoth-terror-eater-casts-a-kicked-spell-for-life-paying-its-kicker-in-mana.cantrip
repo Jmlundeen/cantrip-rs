@@ -1,0 +1,51 @@
+# Valgavoth, Terror Eater: a spell cast by its permission is paid for with life equal to its mana value rather than its mana
+# cost, and additional costs are still paid as usual (CR 118.9, 118.8; the ruling: "You may still pay for additional costs,
+# such as kicker costs, and you may pay mana for those as normal"). Bot2's Burst Lightning resolves on turn 2 and is exiled
+# with Valgavoth. On turn 3 Bot1 casts it kicked at Bot2: 1 life, its mana value, plus {4} in mana for the kicker - a Black
+# Lotus's three and a Swamp, all four spent - and it deals 4.
+
+[Bot1 Deck]
+Black Lotus x3
+Valgavoth, Terror Eater
+Black Lotus
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Burst Lightning
+Forest x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Valgavoth, Terror Eater.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Burst Lightning.Cast(Bot1)
+Bot2.Pass
+[T3 Bot1.Main1]
+? Exile = Burst Lightning
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Mana = {B}{B}{B}{B}
+Bot1.Exile.Burst Lightning.Cast(Bot2; Kicked: 1)
+Bot1.Pass
+? Bot1.Mana = 
+? Bot1.Life = 17
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 17
+Bot2.Life = 16
+Bot2.Graveyard = Burst Lightning

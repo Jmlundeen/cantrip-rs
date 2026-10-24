@@ -1,0 +1,71 @@
+# Valgavoth, Terror Eater: "If a card you didn't control would be put into an opponent's graveyard from anywhere, exile it
+# instead" (CR 614.1a), and "During your turn, you may play cards exiled with Valgavoth. If you cast a spell this way, pay
+# life equal to its mana value rather than pay its mana cost" (CR 607.2b, 305.1, 118.9, 119.4).
+# Bot1 casts Valgavoth off three Black Lotuses, which go to Bot1's own graveyard (not an opponent's). On turn 2 Bot2 loses
+# cards from every zone: its Black Lotus sacrificed from the battlefield, Faithless Looting and Lightning Bolt resolving off
+# the stack, a Mountain and an Island discarded from its hand; each is exiled with Valgavoth. Bot1 can't cast the Bolt on
+# Bot2's turn. On turn 3, Bot1's, Bot1 plays the Mountain from exile as its land play, casts the Black Lotus for 0 life with
+# Bot2 unable to cast its own Bolt from exile meanwhile, then the Bolt at Bot2 for 1 life and Looting for 1 life, an untapped
+# Mountain notwithstanding. Bot1 controlled those spells and that Lotus, so when they go to Bot2's graveyard they stay there.
+
+[Bot1 Deck]
+Black Lotus x3
+Valgavoth, Terror Eater
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Black Lotus
+Faithless Looting
+Lightning Bolt
+Plains x3
+Swamp
+Mountain
+Island
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Valgavoth, Terror Eater.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot2.Choose(Mountain; Island)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T2 Bot2.Main2]
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main1]
+? Exile = Black Lotus; Faithless Looting; Island; Lightning Bolt; Mountain
+? Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus
+Bot1.Exile.Mountain.Play
+Bot1.Exile.Black Lotus.Cast
+! Bot2.Exile.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot1.Exile.Lightning Bolt.Cast(Bot2; Ability: 1 life)
+? Bot1.Life = 16
+Bot1.Pass
+Bot1.Exile.Faithless Looting.Cast(Ability: 1 life)
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 15
+Bot2.Life = 17
+Exile = Island
+Bot2.Graveyard = Black Lotus; Faithless Looting; Lightning Bolt
+Bot1.Battlefield = Mountain; Valgavoth, Terror Eater
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.LandsPlayed = 1
