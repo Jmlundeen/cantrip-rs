@@ -578,6 +578,15 @@ pub static WOLF: CardDef = CardDef {
     ..token!(Wolf)
 };
 
+/// The 1/1 green Squirrel creature token (CR 111.4). Comet, Stellar Pup and The Unbeatable Squirrel Girl make it.
+pub static SQUIRREL: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Squirrel)
+};
+
 /// A 1/1 blue Fish creature token (CR 702.174f). Into the Flood Maw's gift makes it, tapped.
 pub static FISH: CardDef = CardDef {
     colors: Some(ColorSet::of(Color::Blue)),

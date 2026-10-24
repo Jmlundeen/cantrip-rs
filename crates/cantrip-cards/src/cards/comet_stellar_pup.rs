@@ -1,15 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, haste_until_end_of_turn};
+use cantrip_mechanics::{choose, haste_until_end_of_turn, tokens};
 use cantrip_oracle as oracle;
-
-/// A 1/1 green Squirrel creature token.
-pub static SQUIRREL: CardDef = CardDef {
-    colors: Some(ColorSet::of(Color::Green)),
-    types: TypeSet::of(&[CardType::Creature]),
-    power: Some(1),
-    toughness: Some(1),
-    ..token!(Squirrel)
-};
 
 fn loyalty(g: &mut dyn Game, comet: ObjectId, delta: i16) {
     if delta >= 0 {
@@ -28,7 +19,7 @@ fn roll(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         // "[+2], then create two 1/1 green Squirrel creature tokens. They gain haste until end of turn."
         1 | 2 => {
             loyalty(g, comet, 2);
-            let squirrel = g.card_id(&SQUIRREL);
+            let squirrel = g.card_id(&tokens::SQUIRREL);
             let made = g.create_tokens_together(&[(squirrel, you), (squirrel, you)])?;
             g.end_sentence();
             instruction(g, |g| {
@@ -81,4 +72,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::COMET_STELLAR_PUP
 };
 
-pub static EXTRA: &[&CardDef] = &[&SQUIRREL];
+pub static EXTRA: &[&CardDef] = &[&tokens::SQUIRREL];
