@@ -1,0 +1,59 @@
+# "This artifact can't be sacrificed" (CR 101.2, 701.21a): Bot1's Pick Your Poisons have each opponent sacrifice an
+# artifact. Bot2 controls Hithlain Rope, Mox Jet and Mox Emerald. The first asks Bot2 to choose between the Moxen alone -
+# the Rope can't be chosen (the rulings: you can't try to sacrifice it and fail) - and Bot2 gives up the Jet; the second
+# finds the Emerald the only artifact Bot2 can sacrifice, and takes it unasked; the third finds only the Rope, and nothing is
+# sacrificed.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Pick Your Poison
+Pick Your Poison
+Pick Your Poison
+Plains x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Hithlain Rope
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Hithlain Rope.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Pick Your Poison.Cast
+Bot1.Modes(1)
+Bot2.Pass
+! Bot2.Choose(Hithlain Rope)
+Bot2.Choose(Mox Jet)
+[T3 Bot1.Main2]
+? Bot2.Graveyard = Mox Jet
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Pick Your Poison.Cast
+Bot1.Modes(1)
+Bot2.Pass
+! Bot2.Choose
+[T3 Bot1.End]
+? Bot2.Graveyard = Mox Emerald; Mox Jet
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Pick Your Poison.Cast
+Bot1.Modes(1)
+Bot2.Pass
+! Bot2.Choose
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mox Emerald; Mox Jet
+Bot2.Battlefield = Hithlain Rope
+Bot1.Graveyard = Pick Your Poison; Pick Your Poison; Pick Your Poison

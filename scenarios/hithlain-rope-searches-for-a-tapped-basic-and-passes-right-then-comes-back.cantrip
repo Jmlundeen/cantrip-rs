@@ -1,0 +1,53 @@
+# Hithlain Rope's first ability on turn 5: Bot1 pays {1} with a Mountain and taps the Rope, finds the Forest, which enters
+# tapped, and the library is shuffled; then "the player to your right gains control of this artifact" - in a duel the other
+# player (the ruling) - so Bot2 controls it, with no end. On turn 6 Bot2 uses the second ability with its own Islands, draws
+# a card, and the Rope goes to the player on Bot2's right: Bot1.
+
+[Bot1 Deck]
+Hithlain Rope
+Mountain
+Mountain
+Mountain
+Island
+Island
+Island
+Island x4
+Forest
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Hithlain Rope.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Hithlain Rope.Activate(Ability: Search)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Search(Forest)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Forest.Tapped = true
+? Bot2.Battlefield = Island; Island; Hithlain Rope
+? Bot2.Battlefield.Hithlain Rope.Tapped = true
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Hithlain Rope.Activate(Ability: Draw)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mountain; Forest; Hithlain Rope
+Bot1.Battlefield.Hithlain Rope.Tapped = true
+Bot2.Battlefield = Island; Island; Island
+# Seven, three Islands played, a draw on each of turns 2, 4 and 6, and the Rope's card.
+Bot2.Hand.Count = 8

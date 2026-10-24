@@ -1,0 +1,38 @@
+# "The player to your right": turns pass to each player's left (CR 103.1, clockwise), so the player to Bot1's right is the
+# one who plays just before Bot1, Bot3 - not Bot2, who plays after. Bot1 draws with the Rope's second ability on turn 4 and
+# Bot3 gains control of it.
+
+[Bot1 Deck]
+Hithlain Rope
+Mountain
+Mountain
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T4 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Hithlain Rope.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Hithlain Rope.Activate(Ability: Draw)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Island
+Bot2.Battlefield.Count = 0
+Bot3.Battlefield = Hithlain Rope
+# Seven; a draw on each of turns 1, 4 and 7 (a game of three draws on its first turn, CR 103.8a) and the Rope's card, less
+# three lands and the Rope.
+Bot1.Hand.Count = 7

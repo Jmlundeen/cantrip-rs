@@ -1,0 +1,45 @@
+# "Sacrifice an artifact. If you do, return target artifact card ...": on turn 9 the -2 targets the Mox Emerald in Bot1's
+# graveyard, and the only artifact Bot1 controls is Hithlain Rope, which can't be sacrificed (CR 101.2, 701.21a). Nothing
+# was sacrificed, so nothing returns (CR 608.2c): the Rope stays and the Mox stays in the graveyard.
+
+[Bot1 Deck]
+Daretti, Scrap Savant
+Mox Emerald
+Mountain
+Mountain
+Mountain
+Mountain
+Island
+Hithlain Rope
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Hand.Daretti, Scrap Savant.Cast
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Mox Emerald)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Hithlain Rope.Cast
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Sacrifice an artifact; Bot1.Graveyard.Mox Emerald)
+! Bot1.Choose
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Emerald
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mountain; Daretti, Scrap Savant; Hithlain Rope
+Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 3

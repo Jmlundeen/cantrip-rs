@@ -1,0 +1,38 @@
+# A permanent that can't be sacrificed pays no cost that sacrifices it (CR 118.3, 701.21a; the rulings: "You also can't
+# sacrifice it to pay a cost"). On turn 3 Krark-Clan Ironworks' "Sacrifice an artifact: Add {C}{C}" can't be paid with
+# Hithlain Rope, the refusal; it is paid with Mox Ruby, the positive control.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Krark-Clan Ironworks
+Hithlain Rope
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Krark-Clan Ironworks.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hithlain Rope.Cast
+! Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Hithlain Rope)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Mox Ruby)
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Bot1.Graveyard = Mox Ruby
+Bot1.Battlefield = Mox Jet; Mox Emerald; Mox Sapphire; Krark-Clan Ironworks; Hithlain Rope

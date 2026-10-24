@@ -1,0 +1,6 @@
+{
+  "name": "Hithlain Rope",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "This artifact can't be sacrificed.\n{1}, {T}: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle. The player to your right gains control of this artifact.\n{2}, {T}: Draw a card. The player to your right gains control of this artifact."
+}

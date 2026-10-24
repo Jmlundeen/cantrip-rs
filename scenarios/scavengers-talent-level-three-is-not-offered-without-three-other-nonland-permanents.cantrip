@@ -35,8 +35,11 @@ Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 3)
 Bot1.Pass
 Bot2.Pass
 [T5 Bot1.End]
-! Bot1.Accept
+? Stack = Scavenger's Talent
 Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+? Stack.Count = 0
 
 [Expect]
 Bot1.Battlefield = Swamp; Swamp; Swamp; Scavenger's Talent

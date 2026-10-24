@@ -1,0 +1,53 @@
+# Level 3 needs three other nonland permanents to sacrifice: Bot1 has Mox Jet, Mox Emerald and Hithlain Rope, but the Rope
+# can't be sacrificed (CR 101.2: it is no option), so at the beginning of its end step in turn 5 the "you may" is never asked
+# (`! Bot1.Accept`) and nothing is sacrificed. The sibling scenario with three Moxen is asked.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Scavenger's Talent
+Mox Jet
+Mox Emerald
+Hithlain Rope
+Island x10
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hithlain Rope.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.End]
+? Stack = Scavenger's Talent
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Mox Jet; Mox Emerald; Hithlain Rope; Scavenger's Talent
+Bot1.Graveyard.Count = 0

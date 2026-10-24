@@ -1,0 +1,44 @@
+# "Each opponent loses 4 life unless that player sacrifices a nonland permanent of their choice or discards a card": a
+# permanent that can't be sacrificed is nothing to sacrifice (CR 101.2, 118.3). Bot2 mulligans to Hithlain Rope alone and
+# puts it onto the battlefield with Bot1's Show and Tell, which puts Rottenmouth Viper onto Bot1's. For the Viper's blight
+# counter Bot2 has a nonland permanent but can't sacrifice it, and no card in hand: it is asked nothing and loses 4 life.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Rottenmouth Viper
+Island x10
+
+[Bot2 Deck]
+Hithlain Rope
+Island x30
+
+[Actions]
+Bot1.PlayFirst
+Bot1.Keep
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Keep
+Bot2.Choose(Island; Island; Island; Island; Island; Island)
+? Bot2.Hand = Hithlain Rope
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Rottenmouth Viper)
+Bot2.Choose(Hithlain Rope)
+! Bot2.Modes
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Hithlain Rope
+Bot2.Life = 16
+Bot1.Battlefield.Rottenmouth Viper.Counters.Blight = 1

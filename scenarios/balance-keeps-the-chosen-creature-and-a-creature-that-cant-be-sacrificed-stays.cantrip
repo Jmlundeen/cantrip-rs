@@ -1,0 +1,57 @@
+# Balance has each player choose the creatures they keep, "then sacrifices the rest": March of the Machines makes Bot1's
+# Hithlain Rope a 2/2 artifact creature that can't be sacrificed (CR 101.2, 701.21a). Bot1 has it and an Ornithopter against
+# Bot2's Llanowar Elves, so Bot1 keeps one creature: it keeps the Ornithopter, and the Rope, which is the rest, can't be
+# sacrificed - Bot1 ends with both. (Choosing what to sacrifice instead would have forced the Ornithopter out.) Lands are
+# even; Bot2's whole hand goes, Bot1's being empty.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Hithlain Rope
+Ornithopter
+Black Lotus
+March of the Machines
+Island
+Balance
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hithlain Rope.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.March of the Machines.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Hithlain Rope.Power = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Balance.Cast
+Bot1.Choose(Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Island; Hithlain Rope; Ornithopter; March of the Machines
+Bot2.Battlefield = Forest; Forest; Llanowar Elves
+Bot2.Hand.Count = 0

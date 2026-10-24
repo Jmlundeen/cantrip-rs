@@ -1,0 +1,56 @@
+# Hithlain Rope's second ability resolves without its source (CR 113.7a): Bot2 destroys the Rope with Abrade in response, so
+# Bot1 still draws its card, but "the player to your right gains control of this artifact" finds no artifact to give
+# (CR 400.7) - the Rope stays in Bot1's graveyard and Bot2 controls nothing new.
+
+[Bot1 Deck]
+Hithlain Rope
+Mountain
+Mountain
+Mountain
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Abrade
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Hithlain Rope.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Hithlain Rope.Activate(Ability: Draw)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Abrade.Cast
+Bot2.Modes(Destroy target artifact)
+Bot2.Target(Hithlain Rope)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Hithlain Rope
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Hithlain Rope
+Bot1.Battlefield = Mountain; Mountain; Mountain
+Bot2.Battlefield = Mountain; Mountain
+# Seven, two draws (turns 3 and 5) and the Rope's card, less three Mountains and the Rope.
+Bot1.Hand.Count = 6

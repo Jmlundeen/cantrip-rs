@@ -1,0 +1,46 @@
+# Birthing Ritual's "you may sacrifice a creature" with no creature that can be sacrificed: March of the Machines makes Hithlain
+# Rope a 2/2 artifact creature, Bot1's only creature, so the Ritual triggers at the end step ("if you control a creature"),
+# looks at the top seven, but offers no sacrifice (CR 101.2: a creature that can't be sacrificed is none to sacrifice):
+# nothing is asked, the Rope stays, and nothing enters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Hithlain Rope
+Black Lotus
+March of the Machines
+Birthing Ritual
+Island
+Llanowar Elves x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hithlain Rope.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birthing Ritual.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.March of the Machines.Cast
+[T3 Bot1.End]
+? Stack = Birthing Ritual
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+? Stack.Count = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Forest; Island; Hithlain Rope; Birthing Ritual; March of the Machines
+Bot1.Battlefield.Hithlain Rope.Power = 2
