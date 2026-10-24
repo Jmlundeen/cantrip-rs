@@ -1,0 +1,41 @@
+# The ability backup gives lasts until end of turn (CR 702.165a): on turn 5 the Ornithopter (2/4 with the counters) can no longer
+# be activated, while the Thrillseeker, which prints it, still can ({1} from a Plains), dealing its power, 1, to the Ornithopter, an own creature (a legal any target).
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Mox Pearl
+Mox Ruby
+Mox Jet
+Voldaren Thrillseeker
+Plains
+Plains x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Voldaren Thrillseeker.Cast
+Bot1.Target(Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+? Bot1.Battlefield.Ornithopter.Power = 2
+! Bot1.Battlefield.Ornithopter.Activate(Bot2)
+Bot1.Battlefield.Voldaren Thrillseeker.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Damage = 1
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Voldaren Thrillseeker

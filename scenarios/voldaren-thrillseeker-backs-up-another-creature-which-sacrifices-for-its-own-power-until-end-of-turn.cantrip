@@ -1,0 +1,43 @@
+# Backup 2 on another creature (CR 702.165a): the Ornithopter gets two counters (2/4) and, until end of turn, the sacrifice
+# ability, fixed as backup triggers (CR 702.165d); the Thrillseeker stays a 1/1. The Ornithopter sacrifices itself for {1},
+# dealing its own power, 2 as it last existed (CR 113.7a), not the Thrillseeker's 1, to Bot2 (20 - 2). It is gone as the cost was paid.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Mox Pearl
+Mox Ruby
+Mox Jet
+Voldaren Thrillseeker
+Plains
+Plains x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Voldaren Thrillseeker.Cast
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Voldaren Thrillseeker.Power = 1
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Ornithopter.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Jet; Voldaren Thrillseeker; Plains; Plains

@@ -1,0 +1,43 @@
+# Voldaren Thrillseeker targets itself with backup 2 (CR 702.165a): it is a 3/3 and gains nothing more, its own ability
+# being already printed. The ability costs exactly {1}: one Plains is tapped for it, sacrificing
+# the Thrillseeker as a cost (CR 601.2h), and the pool is empty afterwards. It deals damage equal to its power as it last
+# existed (CR 113.7a, 608.2h): 3 to Bot2, an opponent's player target (20 - 3). A land is not an "any target" (CR 115.1).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Mox Jet
+Voldaren Thrillseeker
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Voldaren Thrillseeker.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Voldaren Thrillseeker.Power = 3
+? Bot1.Battlefield.Voldaren Thrillseeker.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Plains.Activate
+! Bot1.Battlefield.Voldaren Thrillseeker.Activate(Bot1.Battlefield.Plains)
+Bot1.Battlefield.Voldaren Thrillseeker.Activate(Bot2)
+? Bot1.Mana =
+? Bot1.Battlefield.Plains#2.Tapped = false
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Voldaren Thrillseeker
