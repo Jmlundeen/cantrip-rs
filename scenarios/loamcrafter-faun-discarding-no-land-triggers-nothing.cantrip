@@ -1,4 +1,4 @@
-# Loamcrafter Faun: Bot1 chooses to discard no land card. Then it did not discard "one or more land cards", and the
+# Loamcrafter Faun: Bot1 declines to discard land cards. Then it did not discard "one or more land cards", and the
 # reflexive ability does not trigger (CR 603.12): no target is asked for, and Black Lotus stays in the graveyard. The
 # scenarios that discard lands are the positive control.
 
@@ -24,7 +24,7 @@ Bot1.Hand.Lightning Bolt.Cast(Bot2)
 Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
 Bot1.Battlefield.Forest.Activate
 Bot1.Hand.Loamcrafter Faun.Cast
-Bot1.Choose()
+Bot1.Decline
 ! Bot1.Target
 
 [Expect]

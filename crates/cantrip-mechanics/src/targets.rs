@@ -751,7 +751,8 @@ pub mod filters {
     pub fn creature(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         q.chars(id).is(CardType::Creature)
     }
-    /// Any card or permanent. Bitter Triumph and Collective Brutality discard one.
+    /// Any permanent: Fear of Isolation returns one. Never a discard cost's filter: a filter there names a characteristic of the
+    /// cards (CR 701.9c), and "discard a card" is `discard_cards`.
     pub fn any(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
         true
     }

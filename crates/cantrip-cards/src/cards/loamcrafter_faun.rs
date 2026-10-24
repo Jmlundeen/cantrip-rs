@@ -1,20 +1,19 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{targets, targets::filters, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
-/// You may discard one or more land cards, together (CR 701.9): chosen from among the hand, only land cards eligible.
-/// When you do (CR 603.12), the reflexive ability triggers counting them: "that many" is the number of land cards
-/// discarded, and none discarded is not doing it. The land cards pay a cost that names their type (CR 118.12), so none can
-/// be put into a hidden zone unrevealed instead of the graveyard (CR 701.9c, `Game::discard_paying`).
+const ASK: Question = Question::new("Discard", "discard one or more land cards?", "When you do, return up to that many nonland permanent cards from your graveyard to your hand", "Discard lands", "Don't");
+
+/// You may discard one or more land cards, together (CR 701.9): a cost paid as the ability resolves (CR 118.12), its number
+/// the payer's to choose as they pay it, and one that names land cards, so none can be put into a hidden zone unrevealed
+/// (CR 701.9c). When you do (CR 603.12), the reflexive ability triggers counting them: "that many" is the number of land
+/// cards discarded. A player with no land card in hand is not asked.
 fn discard_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let hand = g.state().zone(Zone::hand(you)).to_vec();
-    let lands: Vec<ObjectId> = hand.iter().copied().filter(|&card| g.chars(card).is(CardType::Land)).collect();
-    let chosen = choose::any_number_of(g, you, item.object, Purpose::Discard, "land", hand, lands)?;
-    let discarded = g.discard_paying(&chosen, &chosen);
-    if !discarded.is_empty() {
+    let lands = Cost { variable: Some(VariableCost::DiscardOneOrMore(filters::land)), ..Cost::NONE };
+    if let Some(discarded) = g.may_pay_counted(you, item.object, item.object, lands, &ASK)? {
         let this = g.card_id(&CARD);
-        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, u16::try_from(discarded.len()).unwrap_or(u16::MAX));
+        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, discarded);
     }
     Ok(())
 }

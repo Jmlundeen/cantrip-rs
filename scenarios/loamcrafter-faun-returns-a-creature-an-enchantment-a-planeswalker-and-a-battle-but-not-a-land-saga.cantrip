@@ -39,6 +39,7 @@ Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Forest#1.Activate
 Bot1.Battlefield.Forest#2.Activate
 Bot1.Hand.Loamcrafter Faun.Cast
+Bot1.Accept
 Bot1.Choose(Island; Island; Island; Island)
 ! Bot1.Target(Urza's Saga)
 Bot1.Target(Llanowar Elves; Authority of the Consuls; Chandra, Torch of Defiance; Invasion of Gobakhan)

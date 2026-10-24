@@ -1058,6 +1058,7 @@ Bot1.Hand.Lightning Bolt.Cast(Bot2)
 Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
 Bot1.Battlefield.Forest.Activate
 Bot1.Hand.Loamcrafter Faun.Cast
+Bot1.Accept
 Bot1.Choose(Island)
 Bot1.Target(Black Lotus)
 
@@ -1153,6 +1154,67 @@ Bot2.Pass
 Bot1.Graveyard = Black Lotus
 Bot1.Library.Count = 14
 Bot1.Battlefield.Psychic Frog.Counters.PlusOnePlusOne = 1
+",
+    );
+}
+
+/// Collective Brutality retraced (Wrenn and Six's emblem) and escalated once: retrace's "discard a land card" (CR 702.81a)
+/// names a characteristic and escalate's "discard a card" (CR 702.120a) does not, so of the two cards discarded together the
+/// Forest goes to the graveyard and the Chain Lightning on top of the library.
+#[test]
+fn retrace_land_is_not_put_into_a_library_but_escalates_card_is() {
+    play(
+        "retrace-and-escalate-under-leng",
+        "
+[Bot1 Deck]
+Probe Leng
+Mountain
+Forest
+Wrenn and Six
+Collective Brutality
+Swamp
+Forest
+Chain Lightning
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return)
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return)
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return)
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return)
+Bot1.Discard(Collective Brutality)
+[T11 Bot1.Main1]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: emblem)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Collective Brutality.Cast
+Bot1.Modes(1; 3)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Choose(Forest)
+Bot1.Choose(Chain Lightning)
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard.Count = 3
+Bot1.Library.Count = 17
+Bot1.Hand = Island; Island; Island; Island
 ",
     );
 }

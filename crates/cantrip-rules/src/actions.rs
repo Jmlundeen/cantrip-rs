@@ -176,10 +176,10 @@ fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost
     if cost.remove_any_counter && !obj.counter_array().iter().any(|&n| n > 0) {
         return false;
     }
-    if let Some((n, filter)) = cost.discard {
+    if !cost.discard.is_none() {
         let asker = Asker { source, controller };
-        let hand = cx.s().zone(Zone::hand(controller)).iter().filter(|&&c| c != source && filter.is_none_or(|f| f(cx, &asker, c))).count();
-        if hand < n as usize {
+        let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(controller)).iter().copied().filter(|&c| c != source).collect();
+        if !discards_payable(cx, &asker, &hand, &cost.discard) {
             return false;
         }
     }
@@ -582,21 +582,73 @@ fn note_activation(cx: &mut Cx, id: ObjectId, index: usize, def: &ActivatedDef) 
     });
 }
 
-/// Chooses the cards a cost discards (CR 601.2h), always asked, even when the choice is forced.
-fn choose_discards(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
+/// Whether `hand` holds the cards `discards` asks, each card paying one instruction (CR 601.2h): a matching of the
+/// instructions' cards to cards that pass their filters (Kuhn's augmenting paths), so a Dryad Arbor pays either a "land
+/// card" or a "creature card" but not both.
+fn discards_payable(cx: &Cx, asker: &Asker, hand: &[ObjectId], discards: &Discards) -> bool {
+    let total = discards.count() as usize;
+    if total > hand.len() {
+        return false;
+    }
+    // One slot for each card an instruction takes, and the cards of the hand each may take.
+    let slots: Vec<Vec<usize>> = discards
+        .parts()
+        .flat_map(|(n, filter)| {
+            let fits: Vec<usize> = (0..hand.len()).filter(|&i| filter.is_none_or(|f| f(cx, asker, hand[i]))).collect();
+            std::iter::repeat_n(fits, usize::from(n))
+        })
+        .collect();
+    fn augment(slot: usize, slots: &[Vec<usize>], taken_by: &mut [Option<usize>], seen: &mut [bool]) -> bool {
+        for &card in &slots[slot] {
+            if seen[card] {
+                continue;
+            }
+            seen[card] = true;
+            if taken_by[card].is_none_or(|other| augment(other, slots, taken_by, seen)) {
+                taken_by[card] = Some(slot);
+                return true;
+            }
+        }
+        false
+    }
+    let mut taken_by = vec![None; hand.len()];
+    (0..slots.len()).all(|slot| augment(slot, &slots, &mut taken_by, &mut vec![false; hand.len()]))
+}
+
+/// The cards a cost discards: all of them, and those among them that pay an instruction naming a characteristic of the card
+/// ("discard a land card", CR 701.9c).
+#[derive(Default)]
+struct Discarding {
+    cards: Vec<ObjectId>,
+    paying: Vec<ObjectId>,
+}
+
+/// Chooses the cards a cost discards (CR 601.2h), always asked, even when the choice is forced: one question for each of
+/// its instructions (`Discards::parts`), those that name a characteristic first, each from the cards the ones before left
+/// (retrace's land card, then escalate's card). A choice that leaves a later instruction too few cards can't pay the cost,
+/// and is taken back (CR 601.2h, 733.1).
+fn choose_discards(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Discarding> {
     // "Discard your hand" (CR 701.9) chooses nothing: every card in it, the source (on the stack by now) not among them.
     if cost.discard_hand {
-        return Ok(cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| c != source).collect());
+        return Ok(Discarding { cards: cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| c != source).collect(), paying: Vec::new() });
     }
-    let Some((n, filter)) = cost.discard else { return Ok(Vec::new()) };
     let asker = Asker { source, controller: player };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter.is_none_or(|f| f(cx, &asker, c))).collect();
-    let ask = RequestKind::choose_cards(source, Purpose::Discard, hand, eligible, u32::from(n), false, "");
-    match cx.ask_core(player, ask, true)? {
-        Answer::Cards(cards) => Ok(cards),
-        _ => Err(Stop::Cancel),
+    let mut out = Discarding::default();
+    for (n, filter) in cost.discard.parts() {
+        let eligible: Vec<ObjectId> =
+            hand.iter().copied().filter(|&c| c != source && !out.cards.contains(&c) && filter.is_none_or(|f| f(cx, &asker, c))).collect();
+        if eligible.len() < usize::from(n) {
+            return Err(Stop::Cancel);
+        }
+        let ask = RequestKind::choose_cards(source, Purpose::Discard, hand.clone(), eligible, u32::from(n), false, "");
+        let Answer::Cards(cards) = cx.ask_core(player, ask, true)? else { return Err(Stop::Cancel) };
+        if filter.is_some() {
+            out.paying.extend_from_slice(&cards);
+        }
+        out.cards.extend(cards);
     }
+    Ok(out)
 }
 
 /// Chooses the cards a cost exiles from the hand (CR 601.2h, 118.9), always asked, even when the choice is forced: the
@@ -745,14 +797,13 @@ fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cos
     }
 }
 
-/// Pays the discard part of `cost`: the chosen cards, together (CR 701.9). A discard of cards the cost names by a
-/// characteristic ("Discard a creature card") can't put them into a hidden zone unrevealed (CR 701.9c, `ops::discard_paying`).
-fn pay_discards(cx: &mut Cx, cost: &Cost, chosen: &[ObjectId]) {
-    if chosen.is_empty() {
+/// Pays the discard part of a cost: the chosen cards, together (CR 701.9). Those an instruction names by a characteristic
+/// ("Discard a creature card") can't be put into a hidden zone unrevealed (CR 701.9c, `ops::discard_paying`).
+fn pay_discards(cx: &mut Cx, chosen: &Discarding) {
+    if chosen.cards.is_empty() {
         return;
     }
-    let specifies = cost.discard.is_some_and(|(_, filter)| filter.is_some());
-    ops::discard_paying(cx, chosen, if specifies { chosen } else { &[] });
+    ops::discard_paying(cx, &chosen.cards, &chosen.paying);
 }
 
 /// Whether `player` can still pay this much energy (CR 107.14) and life (CR 119.4) once the mana of the cost is paid: the
@@ -866,6 +917,10 @@ fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: Va
         VariableCost::ExileFromGraveyardWithTypes(_) => {
             cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect()
         }
+        VariableCost::DiscardOneOrMore(filter) => {
+            let asker = Asker { source, controller: player };
+            cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect()
+        }
     }
 }
 
@@ -890,7 +945,7 @@ fn types_among(cx: &Cx, cards: &[ObjectId]) -> usize {
 fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost, paid: Option<CostFor>) -> bool {
     match variable {
         VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => true,
-        VariableCost::SacrificeOneOrMore(_) => !variable_candidates(cx, source, player, variable, paid).is_empty(),
+        VariableCost::SacrificeOneOrMore(_) | VariableCost::DiscardOneOrMore(_) => !variable_candidates(cx, source, player, variable, paid).is_empty(),
         // Its power is read as the cost is paid (CR 601.2h), after the mana abilities of CR 601.2g, which may change it: any
         // permanent that passes the filter may yet pay.
         VariableCost::SacrificeWithPowerX(_) => !variable_candidates(cx, source, player, variable, paid).is_empty(),
@@ -908,12 +963,35 @@ fn ask_cards(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Purpose, 
     }
 }
 
-/// What a variable cost takes, chosen as the cost is chosen (CR 601.2h): the permanents to sacrifice, or the cards to
-/// exile. `x` is the X announced for `SacrificeX`; `paid` is what the cost is paid for (`variable_candidates`).
-fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u32, paid: Option<CostFor>) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
-    let Some(variable) = cost.variable else { return Ok((Vec::new(), Vec::new())) };
+/// What a variable cost takes, chosen as the cost is chosen (CR 601.2h): the permanents to sacrifice, the cards to exile,
+/// or the cards to discard. `x` is the X announced for `SacrificeX`; `paid` is what the cost is paid for
+/// (`variable_candidates`).
+fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u32, paid: Option<CostFor>) -> R<(Vec<ObjectId>, Vec<ObjectId>, Discarding)> {
+    let Some(variable) = cost.variable else { return Ok((Vec::new(), Vec::new(), Discarding::default())) };
     let candidates = variable_candidates(cx, source, player, variable, paid);
+    if let VariableCost::DiscardOneOrMore(_) = variable {
+        // The hand shown, the cards that pass the filter eligible, as many as the payer likes but one at least: none chosen
+        // gives the payment up. Each card pays an instruction that names a characteristic of it (CR 701.9c).
+        if candidates.is_empty() {
+            return Err(Stop::Cancel);
+        }
+        let hand = cx.s().zone(Zone::hand(player)).to_vec();
+        let n = count_u32(candidates.len());
+        let ask = RequestKind::choose_cards(source, Purpose::Discard, hand, candidates, n, true, "");
+        let Answer::Cards(cards) = cx.ask_core(player, ask, true)? else { return Err(Stop::Cancel) };
+        if cards.is_empty() {
+            return Err(Stop::Cancel);
+        }
+        return Ok((Vec::new(), Vec::new(), Discarding { paying: cards.clone(), cards }));
+    }
+    let (sacrifices, exiles) = choose_variable_permanents(cx, player, source, variable, candidates, x)?;
+    Ok((sacrifices, exiles, Discarding::default()))
+}
+
+/// `choose_variable`'s sacrifices and exiles.
+fn choose_variable_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, variable: VariableCost, candidates: Vec<ObjectId>, x: u32) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
     match variable {
+        VariableCost::DiscardOneOrMore(_) => Ok((Vec::new(), Vec::new())),
         VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => {
             if x == 0 {
                 return Ok((Vec::new(), Vec::new()));
@@ -5649,7 +5727,7 @@ fn is_land(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
 }
 
 /// The additional cost of retrace (CR 702.81a): discard a land card.
-const RETRACE: Cost = Cost { discard: Some((1, Some(is_land))), ..Cost::NONE };
+const RETRACE: Cost = Cost { discard: Discards::one(1, Some(is_land)), ..Cost::NONE };
 
 /// Whether a permanent has a mana ability that could be activated now: one more way to spend its tap, which a creature
 /// or artifact tapped to pay for convoke or improvise cannot also be used for.
@@ -6509,7 +6587,7 @@ fn cast(
     let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, spell, &cost, Some(CostFor::Spell))? };
     let discards = choose_discards(cx, player, spell, &cost)?;
     let mut exiles = choose_exiles(cx, player, spell, &cost)?;
-    let (way_sacrifices, way_exiles) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item), Some(CostFor::Spell))?;
+    let (way_sacrifices, way_exiles, way_discards) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item), Some(CostFor::Spell))?;
     exiles.extend(way_exiles);
     let hand_exiles = choose_hand_exiles(cx, player, spell, &cost)?;
     // CR 702.119a: emerge's mana comes down by the mana value of what was just chosen to be sacrificed. Nothing has
@@ -6562,7 +6640,7 @@ fn cast(
     let extra_blighted = choose_blight(cx, player, spell, &extra)?;
     let removed = choose_counters_among(cx, player, spell, &cost)?;
     let extra_removed = choose_counters_among(cx, player, spell, &extra)?;
-    let (extra_sacrifices, extra_exiles) = choose_variable(cx, player, spell, &extra, variable_n(&extra, &item), Some(CostFor::Spell))?;
+    let (extra_sacrifices, extra_exiles, extra_variable_discards) = choose_variable(cx, player, spell, &extra, variable_n(&extra, &item), Some(CostFor::Spell))?;
     // An optional cost that sacrifices one or more: how many were is how many times it was paid (Plumb the Forbidden's
     // linked trigger reads it).
     if matches!(extra.variable, Some(VariableCost::SacrificeOneOrMore(_))) {
@@ -6612,7 +6690,8 @@ fn cast(
     pay_counters_among(cx, &removed);
     pay_counters_among(cx, &extra_removed);
     pay_permanents(cx, &cost, &chosen, None);
-    pay_discards(cx, &cost, &discards);
+    pay_discards(cx, &discards);
+    pay_discards(cx, &way_discards);
     pay_exiles(cx, &exiles);
     pay_exiles(cx, &hand_exiles);
     ops::sacrifice(cx, &way_sacrifices);
@@ -6627,7 +6706,8 @@ fn cast(
         add_revealed_to_item(cx, at, &revealed);
     }
     ops::sacrifice(cx, &extra_sacrifices);
-    pay_discards(cx, &extra, &extra_discards);
+    pay_discards(cx, &extra_discards);
+    pay_discards(cx, &extra_variable_discards);
     pay_life_and_counters(cx, player, spell, &extra);
     pay_exert_and_tappers(cx, spell, &extra, &extra_tappers);
     // CR 119.4: the life paid for Phyrexian symbols and for X, with the rest of the cost.
@@ -7844,7 +7924,7 @@ fn activate(
     let revealed = pay_behold(cx, player, &beheld);
     let at = cx.s().stack.len() - 1;
     add_revealed_to_item(cx, at, &revealed);
-    pay_discards(cx, &def.cost, &discards);
+    pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
     pay_life_and_counters(cx, player, source, &def.cost);
     if let Some(kind) = counter {
@@ -8047,7 +8127,7 @@ pub fn activate_mana(
     pay_exert_and_tappers(cx, source, &def.cost, &[]);
     if def.cost.discard_hand {
         let hand = choose_discards(cx, player, source, &def.cost)?;
-        pay_discards(cx, &def.cost, &hand);
+        pay_discards(cx, &hand);
     }
     pay_permanents(cx, &def.cost, &chosen, Some(source));
     pay_life_and_counters(cx, player, source, &def.cost);
@@ -9242,6 +9322,12 @@ pub fn may_pay(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId
     Ok(pay_during_resolution(cx, payer, source, subject, cost, question, x, None)?.is_some())
 }
 
+/// `may_pay` for a cost whose variable part's size the payer sets as they pay it (`VariableCost::DiscardOneOrMore`): how many
+/// it took, or `None` declined.
+pub fn may_pay_counted(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<Option<u16>> {
+    pay_during_resolution(cx, payer, source, subject, cost, question, None, None)
+}
+
 /// The most X a payer may raise "you may pay {X}" to while choosing it: past what any game could produce, a bound for a
 /// player who raises without paying.
 const MOST_X_PAID: u16 = 1000;
@@ -9393,7 +9479,8 @@ fn pay_during_resolution(
             ActionKind::PayCost => {
                 let (mark, log_mark) = (cx.s().mark(), cx.g.log.len());
                 match pay_announced(cx, payer, source, cost, total, life, x.unwrap_or(0)) {
-                    Ok(()) => return Ok(Some(x.unwrap_or(0))),
+                    // Without an X, what was paid is how many the variable part took (`may_pay_counted`), if it has one.
+                    Ok(taken) => return Ok(Some(x.unwrap_or(taken))),
                     // A choice given up: nothing was paid, and the payer is asked again.
                     Err(Stop::Cancel) => {
                         cx.st().revert(mark);
@@ -9442,7 +9529,7 @@ pub(crate) fn pool_pays(pool: &ManaPool, owed: &ManaCost, life_room: i32) -> boo
 /// Pays a resolution's cost with `total` its mana and `life` its life: its Phyrexian symbols are announced first, each
 /// paid with its color or 2 life, immediately before the cost is paid (CR 118.13b, 107.4f), and the life they take is paid
 /// with the rest. A choice of more life than the payer can pay gives the payment up, to be asked again.
-fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mut total: ManaCost, life: u16, x: u16) -> R<()> {
+fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mut total: ManaCost, life: u16, x: u16) -> R<u16> {
     let mut life = u32::from(life);
     if total.phyrexian != [0; 5] {
         life += announce_life(cx, payer, source, &mut total, false, None)?;
@@ -9455,15 +9542,16 @@ fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mu
 
 /// Chooses what the parts of a resolution's cost other than mana and life take, then pays the whole (CR 118.3, 601.2h):
 /// the mana from the pool, the life, and each other part as an activated ability's cost pays it (`activate`). `x` is the
-/// X paid, for a "sacrifice X" part.
-fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, total: ManaCost, life: u32, x: u16) -> R<()> {
+/// X paid, for a "sacrifice X" part. How many the variable part took ("discard one or more"), 0 for none.
+fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, total: ManaCost, life: u32, x: u16) -> R<u16> {
     // A cost paid as a spell or ability resolves is paid for no cast or activation (CR 118.12): nothing that forbids paying
     // for those touches it (Yasharn, Implacable Earth's ruling).
     let chosen = choose_permanents(cx, payer, source, cost, None)?;
     let discards = choose_discards(cx, payer, source, cost)?;
     let exiles = choose_exiles(cx, payer, source, cost)?;
     let hand_exiles = choose_hand_exiles(cx, payer, source, cost)?;
-    let (sacrifices, variable_exiles) = choose_variable(cx, payer, source, cost, u32::from(x), None)?;
+    let (sacrifices, variable_exiles, variable_discards) = choose_variable(cx, payer, source, cost, u32::from(x), None)?;
+    let taken = u16::try_from(sacrifices.len() + variable_exiles.len() + variable_discards.cards.len()).unwrap_or(u16::MAX);
     let tappers = choose_tappers(cx, payer, source, cost)?;
     let counter = choose_counter_kind(cx, payer, source, cost)?;
     let beheld = choose_behold(cx, payer, source, cost)?;
@@ -9485,7 +9573,8 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     // Revealed for the effect paying it, as part of that effect (CR 701.20a): no reveal of the effect's own lasts past the
     // instruction it is for (`ops::seen_by_all`).
     pay_behold(cx, payer, &beheld);
-    pay_discards(cx, cost, &discards);
+    pay_discards(cx, &discards);
+    pay_discards(cx, &variable_discards);
     pay_exiles(cx, &exiles);
     pay_exiles(cx, &hand_exiles);
     ops::sacrifice(cx, &sacrifices);
@@ -9508,7 +9597,7 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     if cost.return_self {
         ops::move_to_for(cx, source, Zone::hand(cx.s().obj(source).owner), ZoneReason::Other);
     }
-    Ok(())
+    Ok(taken)
 }
 
 /// Whether a cost has only parts a payment during a resolution can have (CR 118.12). A loyalty cost is a loyalty

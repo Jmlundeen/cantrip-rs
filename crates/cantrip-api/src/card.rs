@@ -447,6 +447,107 @@ pub type Condition = fn(&dyn Query, &Asker) -> bool;
 /// Whether a permanent may be sacrificed to pay a cost.
 pub type ObjectFilter = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// One discard instruction of a cost (CR 701.9): this many cards from the hand, only cards that pass the filter - a cost
+/// that specifies a characteristic of them ("discard a land card", CR 701.9c) - or any cards without one ("discard a card").
+pub type DiscardPart = (u8, Option<ObjectFilter>);
+
+/// The discards a cost asks (CR 701.9), each instruction with its own filter: retrace's "discard a land card" (CR 702.81a)
+/// and escalate's "discard a card" (CR 702.120a) paid together are a land card and any other card, not two land cards. The
+/// instructions that take any card add up into one; each that names a characteristic is kept apart. A cast merges at most six
+/// sources of cost (its own additional cost, a permission's, an additional cost chosen, an optional cost, escalate's and
+/// the one its targets define), and no printed cost has two discard instructions, so six parts hold every cost play can
+/// make; one more is beyond practical scale (docs/known-issues.md), and leaves the cost unpayable rather than wrong.
+#[derive(Clone, Copy, Debug)]
+pub struct Discards {
+    parts: [Option<DiscardPart>; Discards::PARTS],
+}
+
+/// A card no discard can take: what a cost with more discard instructions than `Discards` holds asks for.
+fn no_card(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
+    false
+}
+
+impl Discards {
+    pub const PARTS: usize = 6;
+    pub const NONE: Discards = Discards { parts: [None; Discards::PARTS] };
+
+    /// One instruction: "discard `n` cards" (no filter) or "discard `n` [kind] cards".
+    pub const fn one(n: u8, filter: Option<ObjectFilter>) -> Discards {
+        let mut d = Discards::NONE;
+        d.parts[0] = Some((n, filter));
+        d
+    }
+
+    pub const fn is_none(&self) -> bool {
+        let mut i = 0;
+        while i < Discards::PARTS {
+            if self.parts[i].is_some() {
+                return false;
+            }
+            i += 1;
+        }
+        true
+    }
+
+    /// Every instruction, those that name a characteristic first and the one of any cards last: what a payer chooses in
+    /// turn, each from the cards the ones before left.
+    pub fn parts(&self) -> impl Iterator<Item = DiscardPart> + '_ {
+        let named = self.parts.iter().flatten().filter(|p| p.1.is_some());
+        named.chain(self.parts.iter().flatten().filter(|p| p.1.is_none())).copied()
+    }
+
+    /// How many cards in all.
+    pub fn count(&self) -> u32 {
+        self.parts.iter().flatten().map(|p| u32::from(p.0)).sum()
+    }
+
+    /// Both together (`Cost::and`): the instructions of any cards add up, the others are kept apart.
+    pub const fn and(self, other: Discards) -> Discards {
+        let mut d = self;
+        let mut i = 0;
+        while i < Discards::PARTS {
+            if let Some(part) = other.parts[i] {
+                d = d.with(part);
+            }
+            i += 1;
+        }
+        d
+    }
+
+    const fn with(mut self, part: DiscardPart) -> Discards {
+        let mut i = 0;
+        while i < Discards::PARTS {
+            match self.parts[i] {
+                Some((n, None)) if part.1.is_none() => {
+                    self.parts[i] = Some((n + part.0, None));
+                    return self;
+                }
+                None => {
+                    self.parts[i] = Some(part);
+                    return self;
+                }
+                _ => {}
+            }
+            i += 1;
+        }
+        // More instructions than a cost holds (beyond practical scale, above): a discard no hand can pay.
+        self.parts[Discards::PARTS - 1] = Some((u8::MAX, Some(no_card)));
+        self
+    }
+
+    /// Each instruction `n` times over (`Cost::times`); none for 0.
+    pub fn times(self, n: u8) -> Discards {
+        if n == 0 {
+            return Discards::NONE;
+        }
+        let mut d = self;
+        for part in d.parts.iter_mut().flatten() {
+            part.0 = part.0.saturating_mul(n);
+        }
+        d
+    }
+}
+
 /// Who is doing something with what: the source and the player controlling it.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Asker {
@@ -589,10 +690,10 @@ pub struct Cost {
     pub remove_counters_among: Option<(u8, ObjectFilter)>,
     /// Exile this card (from the zone the ability functions in: eternalize, CR 702.129a).
     pub exile_self: bool,
-    /// Discard this many cards from your hand (CR 701.9), chosen as the cost is chosen: any cards ("discard a card") with no
-    /// filter, else only cards that pass it ("discard a creature card"), a cost that specifies a characteristic of the cards
+    /// Discard cards from your hand (CR 701.9), chosen as the cost is chosen: each instruction any cards ("discard a card"),
+    /// or only cards that pass its filter ("discard a creature card"), a cost that specifies a characteristic of the cards
     /// discarded (CR 701.9c, `ZoneChange::pays_characteristic`).
-    pub discard: Option<(u8, Option<ObjectFilter>)>,
+    pub discard: Discards,
     /// Pay X life, X announced with the spell (CR 118.8, 601.2b): Toxic Deluge, Vicious Rivalry.
     pub pay_x_life: bool,
     /// Exile this many cards from your graveyard, other than the source (CR 702.138a escape, and "exile three cards
@@ -720,6 +821,10 @@ pub enum VariableCost {
     /// announced up to the most a power can be (`i16::MAX`), and the cost is offered while any such permanent is there,
     /// whatever its power now. With none of power X or greater at payment, the cast is taken back.
     SacrificeWithPowerX(ObjectFilter),
+    /// Discard one or more cards from your hand that pass the filter, as many as the payer chooses as they pay (CR 701.9):
+    /// Loamcrafter Faun's "you may discard one or more land cards" (`Game::may_pay_counted`, which says how many). The
+    /// filter names a characteristic of the cards (CR 701.9c), so none of them is put into a hidden zone unrevealed.
+    DiscardOneOrMore(ObjectFilter),
 }
 
 impl VariableCost {
@@ -864,7 +969,7 @@ impl Cost {
         c.blight = self.blight.saturating_mul(n);
         c.remove_counters_among = self.remove_counters_among.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
         c.exile_from_hand = self.exile_from_hand.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
-        c.discard = self.discard.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
+        c.discard = self.discard.times(n);
         c.permanents = self.permanents.map(|p| PermanentCost { count: p.count.saturating_mul(n), ..p }).filter(|_| n > 0);
         c
     }
@@ -932,11 +1037,7 @@ impl Cost {
         if c.exile_from_hand_for_less.is_none() {
             c.exile_from_hand_for_less = other.exile_from_hand_for_less;
         }
-        c.discard = match (self.discard, other.discard) {
-            (Some((a, f)), Some((b, _))) => Some((a + b, f)),
-            (None, b) => b,
-            (a, None) => a,
-        };
+        c.discard = self.discard.and(other.discard);
         c.permanents = match (self.permanents, other.permanents) {
             (Some(a), Some(b)) => {
                 // A tapped permanent chosen after the mana and one chosen before are not one choice.
@@ -991,7 +1092,7 @@ impl Cost {
             remove_any_counter: false,
             remove_counters_among: None,
             exile_self: false,
-            discard: None,
+            discard: Discards::NONE,
             pay_x_life: false,
             exile_from_graveyard: 0,
             exile_from_graveyard_of: None,

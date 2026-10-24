@@ -68,6 +68,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-124](#ki-124-what-a-land-could-produce-is-judged-for-at-most-256-answers-to-its-mana-abilitys-questions) | What a land could produce is judged for at most 256 answers to its mana ability's questions | Pri-3 | Won't fix: beyond practical scale |
 | [KI-125](#ki-125-a-mana-abilitys-row-can-show-what-its-ability-lists-or-the-best-of-several-outcomes-under-replacement-effects-on-its-mana) | A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana | Pri-2 | Open |
 | [KI-128](#ki-128-the-non-tactical-bots-drop-an-attack-whose-phyrexian-cost-only-life-could-pay) | The non-tactical bots drop an attack whose Phyrexian cost only life could pay | Pri-2 | Open |
+| [KI-129](#ki-129-a-cost-holds-at-most-six-discard-instructions) | A cost holds at most six discard instructions | Pri-3 | Won't fix: beyond practical scale |
 
 ## Issues
 
@@ -376,6 +377,21 @@ it is not judged: its listed mana stands for it, and with `CANTRIP_VERIFY` it pa
 asked only of lands (Squandered Resources' sacrifice, `colors_from_sacrifice`), and no printed land comes near: the most
 is Cascading Cataracts, five mana in any combination of colors, 126 runs; a filter land is 3 runs, a single color 5. Seven
 mana in any combination of five colors (330) on one land's ability, or two such questions on one, is what would reach it.
+
+**Scenarios.** None: no printed card reaches it.
+
+### KI-129: A cost holds at most six discard instructions
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Won't fix: beyond practical scale | engine | 2026-10-24, review of the CR 701.9c discard costs |
+
+**Notes.** A cost keeps each discard instruction that names a characteristic apart from the others (`cantrip_api::Discards`:
+retrace's "discard a land card" and escalate's "discard a card" are a land card and any card, CR 702.81a, 702.120a), the
+instructions of any cards adding up into one, in six parts. Past six, the cost asks for a discard no hand can pay, so the
+spell or ability can't be cast or activated: never a wrong discard. A cast merges at most six sources of cost (its own
+additional cost, a permission's such as retrace, a chosen additional cost, an optional cost, escalate and a cost its targets
+define), and no printed cost has two discard instructions, so play cannot reach it.
 
 **Scenarios.** None: no printed card reaches it.
 

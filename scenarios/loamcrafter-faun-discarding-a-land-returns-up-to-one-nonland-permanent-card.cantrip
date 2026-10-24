@@ -24,6 +24,7 @@ Bot1.Hand.Lightning Bolt.Cast(Bot2)
 Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
 Bot1.Battlefield.Forest.Activate
 Bot1.Hand.Loamcrafter Faun.Cast
+Bot1.Accept
 ! Bot1.Choose(Brainstorm)
 Bot1.Choose(Island)
 ! Bot1.Target(Black Lotus; Lotus Petal)

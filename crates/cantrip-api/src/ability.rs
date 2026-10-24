@@ -77,13 +77,13 @@ pub const fn tap_untapped(n: u8, filter: ObjectFilter) -> Cost {
 
 /// "Discard N cards" (CR 701.9): any cards of the hand.
 pub const fn discard_cards(n: u8) -> Cost {
-    Cost { discard: Some((n, None)), ..Cost::NONE }
+    Cost { discard: Discards::one(n, None), ..Cost::NONE }
 }
 
 /// "Discard N [kind of] cards" (CR 701.9): only cards that pass the filter, a cost that specifies a characteristic of them
-/// (CR 701.9c).
+/// (CR 701.9c) - a filter that passes every card would still be read as naming one, so "discard N cards" is `discard_cards`.
 pub const fn discard(n: u8, filter: ObjectFilter) -> Cost {
-    Cost { discard: Some((n, Some(filter))), ..Cost::NONE }
+    Cost { discard: Discards::one(n, Some(filter)), ..Cost::NONE }
 }
 
 /// "Exile N cards that pass the filter from your hand", other than this one (CR 118.9).
