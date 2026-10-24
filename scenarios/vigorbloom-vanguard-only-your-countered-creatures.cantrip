@@ -1,0 +1,52 @@
+# The same +1/+1 counter grants vigilance to your Walking Ballista, not the opponent's Walking Ballista.
+# Seed Suture can target an opponent's creature and still gains its caster life (CR 611.3a, 722.3c).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Vigorbloom Vanguard
+Walking Ballista
+Ornithopter
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Walking Ballista
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Vigorbloom Vanguard.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Keywords = Vigilance
+? Bot2.Battlefield.Walking Ballista.Keywords = (absent)
+Bot1.Battlefield.Plains.Activate
+Bot1.Exile.Seed Suture.Cast(Bot2.Battlefield.Walking Ballista)
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Walking Ballista.Keywords = Vigilance
+Bot1.Battlefield.Vigorbloom Vanguard.Keywords = (absent)
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Walking Ballista.Keywords = (absent)
+Bot1.Life = 21
+Bot2.Life = 20
