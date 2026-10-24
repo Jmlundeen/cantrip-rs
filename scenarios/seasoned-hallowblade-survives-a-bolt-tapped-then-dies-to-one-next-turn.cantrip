@@ -1,0 +1,42 @@
+# Seasoned Hallowblade: Bot2 Bolts the 3/1 on turn 2; Bot1 discards an Island (the cost) in response, so it is tapped and
+# indestructible and survives with 3 damage. On turn 4 the effect has ended with the turn, and a second Bolt destroys it.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Seasoned Hallowblade
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Seasoned Hallowblade.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Seasoned Hallowblade)
+Bot1.Battlefield.Seasoned Hallowblade.Activate
+Bot1.Choose(Island)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Seasoned Hallowblade.Damage = 3
+? Bot1.Battlefield.Seasoned Hallowblade.Tapped = true
+? Bot1.Battlefield.Seasoned Hallowblade.Keywords = Indestructible
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Seasoned Hallowblade)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Seasoned Hallowblade; Island
