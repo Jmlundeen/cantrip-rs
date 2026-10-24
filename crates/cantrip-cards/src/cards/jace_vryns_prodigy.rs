@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{discard_chosen, exile_and_return_transformed, grant_flashback, targets};
+use cantrip_mechanics::{discard_chosen, exile_and_return_transformed, targets};
 use cantrip_oracle as oracle;
 
 /// "{T}: Draw a card, then discard a card. If there are five or more cards in your graveyard, exile Jace, then return him
@@ -44,6 +44,17 @@ pub static EMBLEM: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "−3: You may cast target instant or sorcery card from your graveyard this turn. If that spell would be put into your
+/// graveyard, exile it instead." A permission to cast it (CR 601.3), for its costs - its mana cost or an alternative cost,
+/// which this is not (the rulings: it does not give the card flashback) - with the replacement of its move to the graveyard
+/// alone: returned to a hand or put into a library, it goes there (CR 614.1a, `ExileInstead`).
+fn may_cast_from_graveyard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(card) = targets::object(g, item, 0) {
+        g.allow_play(card, item.controller, PlayGrant { expiry: Expiry::EndOfTurn, exile_instead: ExileInstead::Spell, ..PlayGrant::CAST });
+    }
+    Ok(())
+}
+
 fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::tokens::create_emblem(g, item.controller, &EMBLEM);
     Ok(())
@@ -53,7 +64,7 @@ pub static BACK: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Up to one target creature gets -2/-0 until your next turn.")
             .targets(&[targets::CREATURE.optional()]),
-        ability(loyalty(-3), grant_flashback, "\u{2212}3: You may cast target instant or sorcery card from your graveyard this turn. If that spell would be put into your graveyard, exile it instead.")
+        ability(loyalty(-3), may_cast_from_graveyard, "\u{2212}3: You may cast target instant or sorcery card from your graveyard this turn. If that spell would be put into your graveyard, exile it instead.")
             .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
         ability(loyalty(-9), emblem, "\u{2212}9: You get an emblem with \"Whenever you cast a spell, target opponent mills five cards.\""),
     ],

@@ -360,8 +360,9 @@ impl Query for Reader<'_> {
     }
 }
 
-/// Where a spell goes as it leaves the stack other than to the battlefield: its owner's graveyard, or exile when it
-/// was cast with flashback (CR 702.34a), or on an Adventure (CR 715.4), or its owner's library for an Omen (CR 720.3d).
+/// Where a spell goes as it leaves the stack other than to the battlefield: its owner's graveyard, unless a replacement
+/// effect - its own flashback's (CR 702.34a), among others (`its_own_exile`) - sends it elsewhere; or exile on an Adventure
+/// (CR 715.4), or its owner's library for an Omen (CR 720.3d).
 fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
     if item.kind != StackKind::Spell {
         return;
@@ -418,15 +419,21 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
         ops::move_to_for(cx, item.object, Zone::exile(obj.owner), reason);
         return;
     }
-    let exiled = (item.way > 0 && def.ways.get(item.way as usize - 1).is_some_and(|w| w.exile_after))
-        || item.flashback
-        || (item.exile_after && {
-        // The spell it was cast as (CR 709.3b, 715.3b): a half or an Adventure is judged by its own types.
-        let spell = cx.card(face(cx.s(), item.object));
-        spell.is(CardType::Instant) || spell.is(CardType::Sorcery)
-    });
-    let to = if exiled { Zone::exile(obj.owner) } else { Zone::graveyard(obj.owner) };
-    ops::move_to_for(cx, item.object, to, reason);
+    // To its owner's graveyard (CR 608.2n, 701.6a, 608.2b), unless a replacement effect sends it elsewhere: among them its
+    // own "exile it instead" (`its_own_exile`), ordered with the others by its controller (CR 616.1).
+    ops::move_together(cx, &[its_own_exile(cx, item, ops::Moving::to(item.object, Zone::graveyard(obj.owner)))], reason);
+}
+
+/// `moving`, the spell `item`'s move off the stack, with the spell's own replacement effects of that move (CR 614.1a), which
+/// the core orders with the others that would change it by the spell's controller (CR 616.1, `replace`): flashback's
+/// "exile this card instead of putting it anywhere else any time it would leave the stack" (CR 702.34a) - printed, given by a
+/// permission or a permanent - harmonize's (CR 702.180a) and aftermath's (CR 702.127a), of a move anywhere but exile; and
+/// "if that spell would be put into your graveyard, exile it instead", which the effect that had it cast made
+/// (`StackItem::exile_instead`), of a move to the graveyard alone.
+fn its_own_exile(cx: &Cx, item: &StackItem, moving: ops::Moving) -> ops::Moving {
+    let card = cx.s().obj(item.object).card;
+    let flashback = item.flashback || (item.way > 0 && cx.card(card).ways.get(item.way as usize - 1).is_some_and(|w| w.exile_after));
+    ops::Moving { flashback, exile_instead: item.exile_instead, ..moving }
 }
 
 pub fn resolve(cx: &mut Cx) -> R<Flow> {
@@ -628,18 +635,16 @@ fn send_spell(cx: &mut Cx, at: usize, to: CounterTo, reason: ZoneReason) {
         ops::cease_to_exist(cx, Zone::STACK, item.object);
         return;
     }
-    // Flashback (CR 702.34a): exiled instead of going anywhere else as it leaves the stack, so a flashed-back spell sent to
-    // a hand or a library by the effect that removes it is exiled instead (CR 614.1: the replacement applies to the
-    // move whichever zone it was headed for).
-    let flashback = item.flashback || (item.way > 0 && cx.card(obj.card).ways.get(item.way as usize - 1).is_some_and(|w| w.exile_after));
     let zone = match to {
-        _ if flashback => Zone::exile(obj.owner),
         CounterTo::Hand => Zone::hand(obj.owner),
         CounterTo::LibraryTop | CounterTo::LibraryBottom => Zone::library(obj.owner),
         CounterTo::Exile => Zone::exile(obj.owner),
     };
-    let new = ops::move_to_for(cx, item.object, zone, reason);
-    if to == CounterTo::LibraryBottom && !flashback && cx.s().obj(new).zone.is(ZoneKind::Library) {
+    // Flashback's "instead of putting it anywhere else" (CR 702.34a) replaces a move to a hand or a library too, as the
+    // replacement effects of the spell's own do (`its_own_exile`); a cast's "if that spell would be put into your
+    // graveyard" does not.
+    let new = ops::move_together(cx, &[its_own_exile(cx, &item, ops::Moving::to(item.object, zone))], reason)[0];
+    if to == CounterTo::LibraryBottom && cx.s().obj(new).zone.is(ZoneKind::Library) {
         cx.st().zone_remove(zone, new);
         cx.st().zone_push(zone, new);
     }

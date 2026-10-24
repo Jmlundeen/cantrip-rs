@@ -25,6 +25,12 @@ pub(crate) enum Origin {
     Granted(u32),
     /// Madness's static ability (CR 702.35a), the core's own keyword replacement, of the discarded card itself.
     Madness,
+    /// A spell's own "exile this card instead of putting it anywhere else any time it would leave the stack": flashback's,
+    /// harmonize's or aftermath's (CR 702.34a, 702.180a, 702.127a; `ZoneChange::flashback`), of the spell leaving.
+    Flashback,
+    /// "If that spell would be put into your graveyard, exile it instead" (CR 614.1a; `ZoneChange::exile_instead`): the
+    /// replacement the effect that had the spell cast made, of the spell leaving the stack for its graveyard.
+    ExileInstead,
     /// Protection's prevention of damage (CR 702.16e, 702.16j), a prevention effect ordered with the replacement effects that
     /// would change the same damage (CR 616.1): of the protected permanent, or the source of a player's protection.
     Protection,
@@ -55,6 +61,12 @@ pub(crate) type Applied = (ObjectId, u8, Origin);
 
 /// What madness's replacement says it does, for the player who orders it with others (CR 616.1).
 const MADNESS_HINT: &str = "madness discards it into exile, then it may be cast for its madness cost";
+
+/// What a spell's flashback (or harmonize, or aftermath) says it does, for the player who orders it with others (CR 616.1).
+const FLASHBACK_HINT: &str = "exile it instead of putting it anywhere else, as it was cast with flashback";
+
+/// What the "exile it instead" of the effect a spell was cast by says it does, for the player who orders it (CR 616.1).
+const EXILE_INSTEAD_HINT: &str = "exile it instead of putting it into the graveyard, as the effect it was cast by says";
 
 /// What protection's prevention says it does, for the player who orders it with others (CR 616.1).
 const PROTECTION_HINT: &str = "protection prevents the damage";
@@ -98,7 +110,7 @@ pub(crate) fn says_how_it_enters(line: &str) -> bool {
 /// Whether some replacement effect could apply to `change`, other than an entering permanent's own (`Entering::own`): the
 /// guard that keeps an entry with nothing to order free of the ordering.
 pub(crate) fn zone_change_possible(cx: &Cx, change: &ZoneChange) -> bool {
-    possible(cx, Some(change.object)) || madness_applies(cx, change) || played_tapped_applies(cx, change)
+    possible(cx, Some(change.object)) || madness_applies(cx, change) || played_tapped_applies(cx, change) || flashback_applies(change) || exile_instead_applies(cx, change)
 }
 
 /// `change` sent to `instead` by the entering permanent's own replacement (`Entering::instead`, CR 614.12): no entry any more,
@@ -142,6 +154,30 @@ fn madness_applies(cx: &Cx, z: &ZoneChange) -> bool {
         && z.to.is(ZoneKind::Graveyard)
         && cx.cards().get(card_of(cx, z.object)).madness.is_some()
         && !cx.lost_all_abilities(z.object)
+}
+
+/// Flashback's, harmonize's or aftermath's replacement (CR 702.34a, 702.180a, 702.127a): "exile this card instead of putting it
+/// anywhere else any time it would leave the stack" - so of a card (a copy of a spell, or of a card, is no card, CR 707.10)
+/// that would leave the stack for any zone but exile. Once another effect has exiled it, it no longer applies (CR 616.1f).
+fn flashback_applies(z: &ZoneChange) -> bool {
+    z.flashback && z.is_card && z.from.is(ZoneKind::Stack) && !z.to.is(ZoneKind::Exile)
+}
+
+/// "If that spell would be put into your graveyard, exile it instead" (CR 614.1a, `ExileInstead`): of the spell leaving the
+/// stack for its owner's graveyard and nowhere else, and for `ExileInstead::InstantOrSorcery` only while it is an instant
+/// or a sorcery spell, as it now is (CR 709.3b, 715.3b: a half, an Adventure or a face cast is judged by its own types).
+fn exile_instead_applies(cx: &Cx, z: &ZoneChange) -> bool {
+    if !z.is_card || !z.from.is(ZoneKind::Stack) || !z.to.is(ZoneKind::Graveyard) {
+        return false;
+    }
+    match z.exile_instead {
+        ExileInstead::Never => false,
+        ExileInstead::Spell => true,
+        ExileInstead::InstantOrSorcery => {
+            let chars = cx.chars(z.object);
+            chars.is(CardType::Instant) || chars.is(CardType::Sorcery)
+        }
+    }
 }
 
 /// The card whose replacement effects `id` has: `card_of`, but for a permanent about to enter, judged as it would exist on
@@ -383,6 +419,16 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
     {
         found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::Madness });
     }
+    // A spell's own replacements of its leaving the stack (CR 702.34a, 614.1a), ordered with the rest (CR 616.1): of the spell
+    // itself, which is what the player ordering them is shown. Offered first, as the order its controller almost always wants.
+    if let Proposal::ZoneChange(z) = proposal {
+        if !applied.contains(&(z.object, 0, Origin::ExileInstead)) && exile_instead_applies(cx, z) {
+            found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::ExileInstead });
+        }
+        if !applied.contains(&(z.object, 0, Origin::Flashback)) && flashback_applies(z) {
+            found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::Flashback });
+        }
+    }
     // A permission's "each land played this way enters tapped" (CR 614.1d), ordered with the rest (CR 616.1): it is of the
     // land itself, which is what the player ordering them is shown.
     if let Proposal::ZoneChange(z) = proposal
@@ -423,6 +469,8 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
         Origin::Printed => card.replacements[c.index as usize].hint,
         Origin::Granted(_) => card.granted_replacements[c.index as usize].hint,
         Origin::Madness => MADNESS_HINT,
+        Origin::Flashback => FLASHBACK_HINT,
+        Origin::ExileInstead => EXILE_INSTEAD_HINT,
         Origin::Protection => PROTECTION_HINT,
         Origin::Prevention => card.preventions[c.index as usize].hint,
         Origin::GrantedPrevention(timestamp) => match cx.s().effects.iter().find(|e| e.timestamp == timestamp).map(|e| e.kind) {
@@ -595,6 +643,12 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
                     } else {
                         cx.entering = Some(crate::ops::as_it_would_exist(cx, e));
                     }
+                }
+            }
+            // CR 702.34a, 614.1a: exiled instead, in its owner's exile (CR 400.3).
+            Origin::Flashback | Origin::ExileInstead => {
+                if let Proposal::ZoneChange(z) = proposal {
+                    z.to = Zone::exile(cx.s().obj(z.object).owner);
                 }
             }
             // CR 614.1d: it enters tapped.
@@ -807,7 +861,7 @@ fn prevent(cx: &mut Cx, d: &mut DamageEvent, amount: u16, by: ObjectId) {
 
 /// An object about to change zones (CR 614.1a, 614.1c): what remains of the move once every effect has applied.
 pub fn zone_change(cx: &mut Cx, change: ZoneChange) -> ZoneChange {
-    if !possible(cx, Some(change.object)) && !madness_applies(cx, &change) && !played_tapped_applies(cx, &change) {
+    if !zone_change_possible(cx, &change) {
         return change;
     }
     let mut proposal = Proposal::ZoneChange(change);
@@ -1136,6 +1190,8 @@ mod tests {
             madness: false,
             pays_characteristic: false,
             exiled_with: Some(linked),
+            flashback: false,
+            exile_instead: ExileInstead::Never,
         };
         let link = |p: Proposal| match p {
             Proposal::ZoneChange(z) => z.exiled_with,

@@ -757,7 +757,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         gift: cx.s().obj(trigger.source).gift,
         shares: StackItem::NO_SHARES,
         spill: 0,
-        exile_after: false,
+        exile_instead: ExileInstead::Never,
         flashback: false,
         // Put on the stack now, or, a delayed triggered ability, created when its `Delayed` was (CR 701.27f).
         since: trigger.since.unwrap_or(cx.g.log.len() as u32),

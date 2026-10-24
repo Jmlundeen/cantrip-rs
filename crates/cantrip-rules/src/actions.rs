@@ -5215,7 +5215,7 @@ impl Route {
     /// (CR 118.9a). Flashback a permission gives is one too, though its cost is the mana cost (CR 702.34a; Snapcaster
     /// Mage's ruling).
     fn imposes(&self) -> bool {
-        self.terms.instead.is_some() || self.terms.life_for_mana_value || self.terms.exile_after
+        self.terms.instead.is_some() || self.terms.life_for_mana_value || self.terms.flashback
     }
 
     /// The mana it has the face cast for, before what the cast adds: what it names instead, or the face's mana cost.
@@ -6030,10 +6030,10 @@ fn describe_cast(cards: &CardTable, state: &GameState, log: &[Record], option: &
                     _ => format!("{}: cast by paying {life} life instead", face.name).into(),
                 };
             }
-            if option.index == 0 && (route.terms.instead.is_some() || route.terms.exile_after) {
+            if option.index == 0 && (route.terms.instead.is_some() || route.terms.flashback) {
                 // A flashback granted costs the card's own mana cost unless the grant names another.
                 let cost = route.terms.instead.unwrap_or(whole.cost);
-                return if route.terms.exile_after {
+                return if route.terms.flashback {
                     format!("Flashback {cost}").into()
                 } else if cost == ManaCost::ZERO {
                     "Cast without paying its mana cost".into()
@@ -6159,7 +6159,9 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 any_type: route.terms.any_type,
                 more: route.terms.more,
                 // A flashback a permission gives (Snapcaster Mage, CR 702.34a).
-                flashback: route.terms.exile_after,
+                flashback: route.terms.flashback,
+                // "If that spell would be put into your graveyard, exile it instead" (Jace, Telepath Unbound's).
+                exile_instead: route.terms.exile_instead,
                 ..CastTerms::default()
             };
             let by = CastBy { by: action.granted_by, way, additional: route.additional, life_for_mana_value: route.life(), alternative };
@@ -6213,7 +6215,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         gift: None,
         shares: StackItem::NO_SHARES,
         spill: 0,
-        exile_after: false,
+        exile_instead: ExileInstead::Never,
         flashback: false,
         since: 0,
         copied: false,
@@ -6282,7 +6284,7 @@ fn cast(
     by: CastBy,
     resolving: bool,
 ) -> R<()> {
-    let CastTerms { instead, any_type, exile_after, flashback, life, more, less, copy: _, way: _ } = terms;
+    let CastTerms { instead, any_type, exile_instead, flashback, life, more, less, copy: _, way: _ } = terms;
     // CR 406.3a: a card exiled face down is turned face up just before it is announced.
     ops::turn_up_to_play(cx, card);
     let printed = cx.s().obj(card).card;
@@ -6372,7 +6374,7 @@ fn cast(
     }
     let mut item = stack_item(StackKind::Spell, spell, AbilityRef { card: face, index: u8::MAX }, player, targets);
     item.way = way;
-    item.exile_after = exile_after;
+    item.exile_instead = exile_instead;
     item.flashback = flashback;
     // Overload (CR 702.96a): "each" for "target", so nothing is targeted.
     let specs: &[TargetSpec] = if way == WAY_OVERLOAD { &[] } else { cx.cards().spell_targets_of(def) };
@@ -10144,7 +10146,7 @@ mod tests {
     fn an_alternative_cost_is_not_combined_with_another() {
         for grant in [
             PlayGrant { instead: Some(ManaCost::ZERO), ..PlayGrant::CAST },
-            PlayGrant { exile_after: true, ..PlayGrant::CAST },
+            PlayGrant { flashback: true, ..PlayGrant::CAST },
             PlayGrant { life_for_mana_value: true, ..PlayGrant::CAST },
         ] {
             let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::graveyard(ME), ME)]);

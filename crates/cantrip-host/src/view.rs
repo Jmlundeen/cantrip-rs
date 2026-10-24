@@ -1092,8 +1092,11 @@ impl<'a> Projector<'a> {
         if grant.later_turns {
             text.push_str(", on a later turn");
         }
-        if grant.exile_after {
+        if grant.flashback {
             text.push_str(", then exiled");
+        }
+        if grant.exile_instead != ExileInstead::Never {
+            text.push_str(", exiled instead of put into the graveyard");
         }
         // What the permission adds to playing it, for what the card can be played as: a spell's extra cost (CR 601.2f), a land's
         // entering tapped (CR 614.1c). A modal double-faced card may be either (CR 712.3, 712.12).

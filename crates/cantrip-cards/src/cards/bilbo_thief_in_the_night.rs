@@ -32,7 +32,7 @@ fn recast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(&chosen) = choose::cards_from(g, you, item.object, Purpose::Cast, graveyard, eligible, 1, true)?.first() {
         let ways = ways_of(g, chosen);
         if let Some(way) = choose::cast_way(g, you, chosen, ways)? {
-            g.cast_during_resolution_as(chosen, CastTerms { exile_after: true, way: Some(way.way), ..CastTerms::default() })?;
+            g.cast_during_resolution_as(chosen, CastTerms { exile_instead: ExileInstead::InstantOrSorcery, way: Some(way.way), ..CastTerms::default() })?;
         }
     }
     Ok(())

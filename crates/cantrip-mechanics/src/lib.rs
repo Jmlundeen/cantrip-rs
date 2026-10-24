@@ -410,7 +410,7 @@ pub fn grant_flashback(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     if g.target_legal(item, 0)
         && let Target::Object(card) = item.target(0)
     {
-        g.allow_play(card, item.controller, PlayGrant { expiry: Expiry::EndOfTurn, exile_after: true, ..PlayGrant::CAST });
+        g.allow_play(card, item.controller, PlayGrant { expiry: Expiry::EndOfTurn, flashback: true, ..PlayGrant::CAST });
     }
     Ok(())
 }

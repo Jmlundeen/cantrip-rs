@@ -869,9 +869,10 @@ pub struct StackItem {
     /// For an item with more than `INLINE_TARGETS` targets, where all `target_count` of them and their slots start in the
     /// game's target arena (`GameState::targets`); 0 otherwise.
     pub spill: usize,
-    /// For an instant or sorcery spell: if it would be put into a graveyard as it leaves the stack, it is exiled
-    /// instead (Bilbo's "cast this way").
-    pub exile_after: bool,
+    /// The "if that spell would be put into your graveyard, exile it instead" of the effect that had it cast (CR 614.1a):
+    /// a replacement of its move to its owner's graveyard only, ordered with the others that would change that move (CR
+    /// 616.1; `ExileInstead`).
+    pub exile_instead: ExileInstead,
     /// For a spell cast with flashback that is not printed in its ways (CR 702.34a): one a permission gave (Snapcaster Mage)
     /// or a permanent's static ability (Iroh, Grand Lotus), or an aftermath half cast from a graveyard (CR 702.127a). It is
     /// exiled instead of put anywhere else any time it would leave the stack.
@@ -1293,9 +1294,14 @@ pub struct PlayGrant {
     /// It may be played only on a turn after the one it was granted on: warp's "cast this card from exile on a later
     /// turn" (CR 702.185a).
     pub later_turns: bool,
-    /// An instant or sorcery cast this way is exiled instead of put anywhere else as it leaves the stack (CR 702.34a):
-    /// a flashback granted by Snapcaster Mage or Flashback.
-    pub exile_after: bool,
+    /// It is flashback (CR 702.34a): an alternative cost, the card's mana cost unless `instead` names another, and a spell
+    /// cast this way is exiled instead of put anywhere else any time it would leave the stack. A flashback granted by
+    /// Snapcaster Mage or Flashback.
+    pub flashback: bool,
+    /// "If that spell would be put into your graveyard, exile it instead" (CR 614.1a): no alternative cost, and only a move
+    /// to the graveyard is replaced (`ExileInstead`). Jace, Telepath Unbound's "you may cast target instant or sorcery card
+    /// from your graveyard this turn".
+    pub exile_instead: ExileInstead,
     /// It may be played only while this holds (CR 611.2, 601.3): "during any turn you attacked with a Rogue".
     pub when: Option<PlayCondition>,
     /// It is cast only at sorcery speed, whatever it is (CR 702.170d): plot's "cast it as a sorcery".
@@ -1313,6 +1319,26 @@ pub struct PlayGrant {
     pub life_for_mana_value: bool,
 }
 
+/// "If [that spell] would be put into your graveyard, exile it instead" (CR 614.1a): the replacement effect an effect that
+/// lets a spell be cast, or casts it, makes of that spell. It replaces only the spell's move from the stack to its owner's
+/// graveyard - resolving, countered, or with its targets gone - and not a move to a hand or a library, which flashback's
+/// "instead of putting it anywhere else" replaces too (CR 702.34a, `StackItem::flashback`). It is ordered with the other
+/// replacement effects that would change the same move by the spell's controller (CR 616.1). "Your graveyard" is the
+/// owner's: each card that says it has the spell cast from its controller's own graveyard.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum ExileInstead {
+    /// No such effect.
+    #[default]
+    Never,
+    /// "If that spell would be put into your graveyard, exile it instead", whatever the spell is: Dreadhorde Arcanist, Jace,
+    /// Telepath Unbound.
+    Spell,
+    /// "If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead": only while the
+    /// spell is an instant or a sorcery, judged as it would be put there (Bilbo, Thief in the Night, whose cast may be an
+    /// artifact spell).
+    InstantOrSorcery,
+}
+
 /// A condition on a standing permission to play a card, worked out whenever the permission is asked.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum PlayCondition {
@@ -1326,7 +1352,7 @@ pub enum PlayCondition {
 
 impl PlayGrant {
     /// "You may cast it": for as long as it stays where it is, for its mana cost.
-    pub const CAST: PlayGrant = PlayGrant { instead: None, lands: false, expiry: Expiry::Never, any_type: false, more: 0, later_turns: false, exile_after: false, when: None, sorcery_speed: false, enters_tapped: false, adventure_only: false, life_for_mana_value: false };
+    pub const CAST: PlayGrant = PlayGrant { instead: None, lands: false, expiry: Expiry::Never, any_type: false, more: 0, later_turns: false, flashback: false, exile_instead: ExileInstead::Never, when: None, sorcery_speed: false, enters_tapped: false, adventure_only: false, life_for_mana_value: false };
 }
 
 /// A standing permission to play or cast one card from a zone it could not be played from (CR 601.3, 305.1): "until

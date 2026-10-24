@@ -50,6 +50,14 @@ pub struct ZoneChange {
     /// and the card in exile is linked to that object's text as it arrives (`Query::exiled_with`). Only the direct result of
     /// that replacement is linked: a later effect that sends the card elsewhere leaves it unlinked, which the core sees to.
     pub exiled_with: Option<Linked>,
+    /// A spell leaving the stack that was cast with flashback, harmonize or aftermath (CR 702.34a, 702.180a, 702.127a): its
+    /// own "exile this card instead of putting it anywhere else any time it would leave the stack", which the core orders
+    /// with the other replacement effects that would change the move (CR 616.1). Set by the move, never by a replacement.
+    pub flashback: bool,
+    /// A spell leaving the stack whose cast carried "if that spell would be put into your graveyard, exile it instead" (CR
+    /// 614.1a, `StackItem::exile_instead`): the core's replacement of its move to the graveyard, ordered with the others (CR
+    /// 616.1). Set by the move, never by a replacement.
+    pub exile_instead: ExileInstead,
 }
 
 /// Counters that would be put on a permanent (CR 122.6, 614.1a): by an effect, or as it enters with them.

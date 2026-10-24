@@ -1,0 +1,61 @@
+# Jace, Telepath Unbound's -3: "You may cast target instant or sorcery card from your graveyard this turn. If that spell
+# would be put into your graveyard, exile it instead." Not flashback (the rulings): the replacement is of the move to the
+# graveyard alone (CR 614.1a), so a spell cast this way that leaves the stack for anywhere else goes there. Turn 1 Bot1
+# sacrifices Black Lotus for three Lightning Bolts; Jace loots on turn 5, flips with five cards in the graveyard, and his -3
+# lets a Bolt be cast from there at Bot2. Bot2's Remand returns it to Bot1's hand - not to exile, as Snapcaster Mage's
+# flashback would - and Bot2 draws a card. Bot2 took the first three Bolts only: 20 - 9.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Jace, Vryn's Prodigy
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Remand
+Island
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Jace, Vryn's Prodigy.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Jace, Vryn's Prodigy.Activate
+Bot1.Choose(Island)
+Bot1.Battlefield.Jace, Telepath Unbound.Activate(Bot1.Graveyard.Lightning Bolt; Ability: #2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Remand.Cast(Lightning Bolt)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 11
+Bot1.Hand = Island; Lightning Bolt
+Exile.Count = 0
+Bot1.Graveyard = Island; Lightning Bolt; Lightning Bolt; Black Lotus
+Bot2.Graveyard = Remand
+Bot1.Battlefield.Jace, Telepath Unbound.Counters.Loyalty = 2

@@ -597,7 +597,7 @@ fn two_play_permissions_are_two_casts_and_the_chosen_one_is_made() {
     for free_first in [true, false] {
         let (mut game, spell) = game_with("Route Probe", Zone::graveyard, 0);
         let (life_source, free_source) = (put(&mut game, "Route Permission Source", ME), put(&mut game, "Route Permission Source", ME));
-        let life = permission(spell, life_source, PlayGrant { life_for_mana_value: true, exile_after: true, ..PlayGrant::CAST });
+        let life = permission(spell, life_source, PlayGrant { life_for_mana_value: true, flashback: true, ..PlayGrant::CAST });
         let free = permission(spell, free_source, PlayGrant { instead: Some(ManaCost::ZERO), ..PlayGrant::CAST });
         for p in if free_first { [free, life] } else { [life, free] } {
             game.state.permission_push(p);
@@ -620,7 +620,7 @@ fn two_play_permissions_are_two_casts_and_the_chosen_one_is_made() {
 /// themselves: recorded so, and back to the graveyard rather than into the exile the other's flashback would send it to.
 #[test]
 fn a_rule_or_the_cards_own_permission_stays_beside_a_permission_that_names_a_cost() {
-    let forced = PlayGrant { instead: Some(ManaCost::ZERO), exile_after: true, ..PlayGrant::CAST };
+    let forced = PlayGrant { instead: Some(ManaCost::ZERO), flashback: true, ..PlayGrant::CAST };
     for case in 0..3 {
         let (name, zone): (&str, fn(PlayerId) -> Zone) = match case {
             0 => ("Route Intrinsic Graveyard Probe", Zone::graveyard),

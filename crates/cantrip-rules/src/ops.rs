@@ -72,11 +72,15 @@ pub struct Moving {
     pub revealed: bool,
     /// It is discarded to pay a cost that specifies a characteristic of it (`ZoneChange::pays_characteristic`, CR 701.9c).
     pub pays_characteristic: bool,
+    /// A spell leaving the stack, its own replacements of that move (`ZoneChange::flashback`, `ZoneChange::exile_instead`):
+    /// set by the spell's leaving (`resolve::leave_stack`, `resolve::send_spell`).
+    pub flashback: bool,
+    pub exile_instead: ExileInstead,
 }
 
 impl Moving {
     pub fn to(id: ObjectId, to: Zone) -> Moving {
-        Moving { id, to, entering: None, reason: None, revealed: false, pays_characteristic: false }
+        Moving { id, to, entering: None, reason: None, revealed: false, pays_characteristic: false, flashback: false, exile_instead: ExileInstead::Never }
     }
 }
 
@@ -293,6 +297,8 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             madness: false,
             pays_characteristic: m.pays_characteristic,
             exiled_with: None,
+            flashback: m.flashback,
+            exile_instead: m.exile_instead,
         };
         // A permanent entering is judged as it would exist on the battlefield (CR 614.12), and its own replacements are
         // ordered with the others (CR 616.1). One its own replacement sent elsewhere instead does not enter at all.
@@ -1815,6 +1821,8 @@ fn create_tokens_onto(
             madness: false,
             pays_characteristic: false,
             exiled_with: None,
+            flashback: false,
+            exile_instead: ExileInstead::Never,
         };
         let change = entry_replacements(cx, &mut entering, proposed);
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist

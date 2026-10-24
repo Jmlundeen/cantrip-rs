@@ -1829,7 +1829,7 @@ mod tests {
             gift: None,
             shares: StackItem::NO_SHARES,
             spill: 0,
-            exile_after: false,
+            exile_instead: ExileInstead::Never,
             flashback: false,
             since: 0,
             copied: false,
