@@ -1,7 +1,7 @@
 # Balance on turn 3: Bot1 (two lands, Mother of Runes and Ornithopter, three cards in hand) against Bot2 (one land,
 # Llanowar Elves and two Ornithopters, four cards in hand). Each kind is evened out to the player with the fewest
-# (Balance's text): Bot1 has more lands and chooses which to sacrifice, keeping the
-# Tundra; Bot2 has the most cards in hand and creatures and chooses what goes, keeping the Elves; Bot1, who has the
+# (Balance's text): Bot1 has more lands and chooses which to keep, the
+# Tundra; Bot2 has the most cards in hand and creatures and chooses what goes, keeping the Elves and one Ornithopter; Bot1, who has the
 # fewest creatures and cards in hand, is asked nothing about them.
 
 [Bot1 Deck]
@@ -42,9 +42,9 @@ Bot1.Hand.Tundra.Play
 Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Tundra.Activate(Ability: {W})
 Bot1.Hand.Balance.Cast
-Bot1.Choose(Plains)
+Bot1.Choose(Tundra)
 Bot2.Choose(Island)
-Bot2.Choose(Ornithopter)
+Bot2.Choose(Llanowar Elves; Ornithopter)
 
 [Expect]
 Turn = 3

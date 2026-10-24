@@ -1,7 +1,7 @@
 # Balance counts only the players still in the game (CR 800.4a): one who has left has no lands and no cards in hand, and
 # counted, would make the fewest zero. Bot2's library holds just its opening seven, so it loses by drawing from an empty
 # library on turn 2 (CR 704.5b), and turns go Bot3, Bot1. On turn 6 Bot1 (three Plains, six cards in hand once Balance
-# is cast) casts Balance against Bot3 (two Forests, seven cards): Bot1 sacrifices one Plains and Bot3 discards one card,
+# is cast) casts Balance against Bot3 (two Forests, seven cards): Bot1 keeps two Plains and sacrifices the third, and Bot3 discards one card,
 # down to two lands and six cards each. Nobody has a creature.
 
 [Bot1 Deck]
@@ -30,7 +30,7 @@ Bot1.Hand.Plains.Play
 Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Plains#2.Activate
 Bot1.Hand.Balance.Cast
-Bot1.Choose(Plains)
+Bot1.Choose(Plains; Plains)
 Bot3.Choose(Forest)
 
 [Expect]

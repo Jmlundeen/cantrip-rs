@@ -29,10 +29,10 @@ fn is_artifact(c: &Chars) -> bool {
 /// (CR 608.2c), and only to a target still legal (CR 608.2b).
 fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    if !g.permanents_of(you).into_iter().any(|id| is_artifact(&g.chars(id))) {
+    // "If you do" (CR 608.2c): nothing returns when no artifact was sacrificed - none controlled, or none that can be.
+    if sacrifice_chosen(g, you, item.object, 1, is_artifact)?.is_empty() {
         return Ok(());
     }
-    sacrifice_chosen(g, you, item.object, 1, is_artifact)?;
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
     g.put_onto_battlefield(card, you, false)?;
     Ok(())

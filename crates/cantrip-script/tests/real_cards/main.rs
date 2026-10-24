@@ -6,6 +6,7 @@ mod concession;
 mod counter_duration_ends;
 mod demonic_pact;
 mod eluge;
+mod fantasticar_cant_be_sacrificed;
 mod floodpits_drowner_self;
 mod hybrid_reduction;
 mod look_counts;

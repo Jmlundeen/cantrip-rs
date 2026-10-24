@@ -39,12 +39,13 @@ const ASK: Question = Question::new(
 
 /// Level 3: "you may sacrifice three other nonland permanents. If you do, return a creature card from your graveyard to the
 /// battlefield with a finality counter on it" (CR 701.21a, 122.6, 614.1c). Not offered without three other nonland permanents
-/// to sacrifice. The three are sacrificed together, and the creature card is chosen afterwards, from the graveyard as it now is:
+/// that can be sacrificed (CR 101.2: one that can't is no option). The three are sacrificed together, and the creature card is chosen afterwards, from the graveyard as it now is:
 /// one of the sacrificed creatures may be the card (the ruling). It enters with the finality counter, so it is exiled instead of
 /// dying (CR 122.1h).
 fn sacrifice_three_to_reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let me = item.controller;
-    let eligible: Vec<ObjectId> = g.permanents_of(me).into_iter().filter(|&p| p != item.object && !g.chars(p).is(CardType::Land)).collect();
+    let eligible: Vec<ObjectId> =
+        g.permanents_of(me).into_iter().filter(|&p| p != item.object && !g.chars(p).is(CardType::Land) && g.can_sacrifice(p)).collect();
     if eligible.len() < 3 || !effects::ask_may(g, me, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }

@@ -17,13 +17,12 @@ fn ritual(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let looked = top_of_library(g, you, 7);
     g.look_at(you, &looked);
     let mut maximum = None;
-    let creatures = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect::<Vec<_>>();
+    // Only a creature that can be sacrificed is one to sacrifice (CR 101.2): with none, nothing is asked.
+    let creatures = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature) && g.can_sacrifice(id)).collect::<Vec<_>>();
     if !creatures.is_empty()
-        && cantrip_api::may_cause(g, you, you, cantrip_api::CauseKind::Sacrifice)
         && effects::ask_may(g, you, item.object, Purpose::Ask(&SACRIFICE))?
+        && let Some(creature) = choose::card(g, you, item.object, Purpose::Sacrifice, creatures)?
     {
-        let creature = choose::card(g, you, item.object, Purpose::Sacrifice, creatures)?
-            .expect("a permitted mandatory sacrifice has a creature to choose");
         let mana_value = g.mana_value(creature);
         let sacrificed = g.sacrifice(&[creature]);
         if !sacrificed.is_empty() {

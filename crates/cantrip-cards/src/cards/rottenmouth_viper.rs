@@ -31,7 +31,7 @@ fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
                 break;
             }
             let permanents: Vec<ObjectId> =
-                g.permanents_of(opponent).into_iter().filter(|&id| nonland(g, &asker, id) && !sacrificed.contains(&id)).collect();
+                g.permanents_of(opponent).into_iter().filter(|&id| nonland(g, &asker, id) && !sacrificed.contains(&id) && g.can_sacrifice(id)).collect();
             let hand = g.state().zone(Zone::hand(opponent)).to_vec();
             let cards: Vec<ObjectId> = hand.iter().copied().filter(|c| !discarded.contains(c)).collect();
             let mut options = Vec::new();
