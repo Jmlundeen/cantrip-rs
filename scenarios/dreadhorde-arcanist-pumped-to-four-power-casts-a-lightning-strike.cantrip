@@ -1,0 +1,47 @@
+# Dreadhorde Arcanist's "mana value less than or equal to this creature's power" reads its power as it is (CR 208.3, 613.4c),
+# not its printed 1. Faithless Looting on turn 1 discards a Lightning Bolt (mana value 1) and a Lightning Strike (2). On turn
+# 5 Giant Growth makes the Arcanist 4/6 before combat; it attacks, and its trigger targets the Strike, which a power of 1
+# could not. The Strike is cast for no mana at Bot2 and exiled as it resolves; the Bolt stays in the graveyard. Bot2 takes 3
+# from the Strike and 4 from the Arcanist.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Dreadhorde Arcanist
+Forest
+Lightning Bolt
+Lightning Strike
+Giant Growth
+Mountain x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Lightning Strike)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Dreadhorde Arcanist.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Giant Growth.Cast(Dreadhorde Arcanist)
+Bot1.Pass
+Bot1.Attack(Dreadhorde Arcanist)
+Bot1.Target(Lightning Strike)
+? Bot1.Battlefield.Dreadhorde Arcanist.Power = 4
+Bot1.Accept
+Bot1.Target(Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Strike
+Bot1.Graveyard = Giant Growth; Faithless Looting; Lightning Bolt
+Bot2.Life = 13

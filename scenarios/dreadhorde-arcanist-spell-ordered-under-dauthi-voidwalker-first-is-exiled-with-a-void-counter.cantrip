@@ -1,0 +1,71 @@
+# Dreadhorde Arcanist's "If that spell would be put into your graveyard, exile it instead" is a replacement effect (CR
+# 614.1a), ordered by the spell's controller with the others that would change the same move (CR 616.1). Faithless Looting
+# on turn 1 discards a Lightning Bolt and a Lightning Strike; Bot2 has Dauthi Voidwalker ("If a card would be put into an
+# opponent's graveyard from anywhere, instead exile it with a void counter on it") by turn 5, when the Arcanist attacks and
+# casts the Bolt for free at Bot2. As it resolves Bot1 is asked which applies first and takes the Voidwalker's: the Bolt is
+# exiled with a void counter, and the Arcanist's own no longer applies (CR 616.1f). On turn 6 Bot2 sacrifices the
+# Voidwalker, which lets it play the one exiled card Bot1 owns with a void counter - proving the counter is there - and casts
+# the Bolt at Bot1.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Dreadhorde Arcanist
+Mountain
+Lightning Bolt
+Lightning Strike
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Swamp
+Swamp
+Dauthi Voidwalker
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Lightning Strike)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Dreadhorde Arcanist.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Dreadhorde Arcanist)
+Bot1.Target(Lightning Bolt)
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Replace(Dauthi Voidwalker)
+[T5 Bot1.Main2]
+? Exile = Lightning Bolt
+? Bot1.Graveyard = Faithless Looting; Lightning Strike
+[T6 Bot2.Main1]
+Bot2.Battlefield.Dauthi Voidwalker.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Exile.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Bot2.Life = 16
+Bot1.Life = 17
+Bot1.Graveyard = Lightning Bolt; Faithless Looting; Lightning Strike
+Bot2.Graveyard = Dauthi Voidwalker
+Exile.Count = 0

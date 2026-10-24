@@ -1,0 +1,11 @@
+{
+  "name": "Dreadhorde Arcanist",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Zombie Wizard",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Trample\nWhenever this creature attacks, you may cast target instant or sorcery card with mana value less than or equal to this creature's power from your graveyard without paying its mana cost. If that spell would be put into your graveyard, exile it instead.",
+  "keywords": [
+    "Trample"
+  ]
+}

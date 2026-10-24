@@ -1,0 +1,39 @@
+# Dreadhorde Arcanist: the only card in the graveyard within its power is a Spell Pierce (mana value 1), a legitimate target
+# for the trigger, but with nothing on the stack it has no target to be cast on (CR 601.2c), so it cannot be cast: the
+# "you may" is not asked (a default Decline would hide it) and the card stays.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Dreadhorde Arcanist
+Mountain
+Spell Pierce
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Spell Pierce; Mountain)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Dreadhorde Arcanist.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Dreadhorde Arcanist)
+Bot1.Target(Spell Pierce)
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Mountain; Spell Pierce
+Exile.Count = 0

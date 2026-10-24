@@ -1,0 +1,58 @@
+# Dreadhorde Arcanist's trigger reads "this creature's power" as it last was on the battlefield once it has left (CR 113.7a,
+# 608.2h; the rulings). Faithless Looting on turn 1 discards a Lightning Bolt and a Lightning Strike (mana value 2). On turn 5
+# Giant Growth makes the Arcanist 4/6; it attacks and its trigger targets the Strike. Bot2 answers with Swords to Plowshares:
+# the Arcanist is exiled and Bot1 gains 4 life. As the trigger resolves the Arcanist's last known power is 4, so the Strike is
+# still a legal target (its printed 1 would not allow it): it is cast for no mana at Bot2 and exiled as it resolves.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Dreadhorde Arcanist
+Forest
+Lightning Bolt
+Lightning Strike
+Giant Growth
+Mountain x20
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Lightning Strike)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Dreadhorde Arcanist.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Giant Growth.Cast(Dreadhorde Arcanist)
+Bot1.Pass
+Bot1.Attack(Dreadhorde Arcanist)
+Bot1.Target(Lightning Strike)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Dreadhorde Arcanist)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 24
+Bot1.Accept
+Bot1.Target(Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Exile = Dreadhorde Arcanist; Lightning Strike
+Bot1.Graveyard = Giant Growth; Faithless Looting; Lightning Bolt
+Bot1.Life = 24
+Bot2.Life = 17

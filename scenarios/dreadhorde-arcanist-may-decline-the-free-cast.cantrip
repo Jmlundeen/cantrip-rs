@@ -1,0 +1,40 @@
+# Dreadhorde Arcanist: "you may cast" -- the cast is optional. The Lightning Bolt Looting discarded is targeted on turn 3
+# but Bot1 declines: it stays in the graveyard, not exiled, and Bot2 takes only combat damage. (The sibling
+# dreadhorde-arcanist-casts-a-power-limited-spell-free-and-exiles-it is the positive control.)
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Dreadhorde Arcanist
+Mountain
+Lightning Bolt
+Llanowar Elves
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Dreadhorde Arcanist.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Dreadhorde Arcanist)
+! Bot1.Target(Llanowar Elves)
+Bot1.Target(Lightning Bolt)
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Llanowar Elves; Lightning Bolt
+Exile.Count = 0
+Bot2.Life = 19

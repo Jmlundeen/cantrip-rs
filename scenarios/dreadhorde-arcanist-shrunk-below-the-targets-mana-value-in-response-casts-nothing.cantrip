@@ -1,0 +1,53 @@
+# Dreadhorde Arcanist's target is checked again as the trigger resolves (CR 608.2b), against its power then. Faithless Looting
+# on turn 1 discards a Lightning Bolt (mana value 1) and a Mountain. On turn 5 the 1-power Arcanist attacks and its trigger
+# targets the Bolt; Bot2 answers with Ray of Enfeeblement, and the Arcanist is -3/2 as the trigger resolves. No mana value
+# is at most -3, so the Bolt is no longer a legal target, the trigger does nothing, and its "you may cast" is never asked:
+# the Bolt stays in the graveyard. The Arcanist deals no combat damage.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Dreadhorde Arcanist
+Mountain
+Lightning Bolt
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Swamp
+Ray of Enfeeblement
+Swamp x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Mountain)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Dreadhorde Arcanist.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Dreadhorde Arcanist)
+Bot1.Target(Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Ray of Enfeeblement.Cast(Dreadhorde Arcanist)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Dreadhorde Arcanist.Power = -3
+Bot1.Pass
+! Bot1.Accept
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Mountain; Lightning Bolt
+Exile.Count = 0
+Bot2.Life = 20
+Bot2.Graveyard = Ray of Enfeeblement; Swamp

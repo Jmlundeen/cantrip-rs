@@ -1,0 +1,58 @@
+# Dreadhorde Arcanist (power 1): "Whenever this creature attacks, you may cast target instant or sorcery card with mana
+# value less than or equal to this creature's power from your graveyard without paying its mana cost. If that spell would
+# be put into your graveyard, exile it instead." Faithless Looting on turn 1 discards a Lightning Bolt (mana value 1, exactly
+# at the limit) and a Lightning Strike (2, just past it). Bot2's Shock (1) is in Bot2's graveyard. On turn 5 the attack
+# trigger refuses the Strike and Bot2's Shock and takes the Bolt; it is cast for no mana (all three Mountains stay
+# untapped) and, resolving, is exiled rather than put into the graveyard. Trample is checked on the attacker.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Dreadhorde Arcanist
+Mountain
+Lightning Bolt
+Lightning Strike
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Shock
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Lightning Strike)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Dreadhorde Arcanist.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Dreadhorde Arcanist)
+! Bot1.Target(Lightning Strike)
+! Bot1.Target(Shock)
+Bot1.Target(Lightning Bolt)
+Bot1.Accept
+Bot1.Target(Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dreadhorde Arcanist.Keywords = Trample
+Bot1.Graveyard = Faithless Looting; Lightning Strike
+Bot2.Graveyard = Shock
+Exile = Lightning Bolt
+Bot2.Life = 16
+Bot1.Life = 18
+Bot1.Battlefield.Mountain#1.Tapped = false
+Bot1.Battlefield.Mountain#2.Tapped = false
