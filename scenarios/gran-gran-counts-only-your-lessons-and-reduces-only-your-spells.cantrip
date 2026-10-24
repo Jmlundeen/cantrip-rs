@@ -1,0 +1,76 @@
+# Gran-Gran counts "Lesson cards in your graveyard" and reduces "spells you cast". Bot1 has two Lessons (turn 1); Bot2 puts two
+# of its own in its graveyard on turn 2 (four Lessons in all, so counting the opponent's would reduce Bot1's Sol Ring on turn 3):
+# Bot1's Sol Ring still costs {1} (pool empty after the cast). Turn 4: Bot2, with three Lessons of its own in its graveyard
+# but not Gran-Gran's controller, casts Sol Ring for its full {1}.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Gran-Gran
+Octopus Form
+Octopus Form
+Octopus Form
+Sol Ring
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Octopus Form
+Octopus Form
+Octopus Form
+Sol Ring
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Gran-Gran.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Octopus Form.Cast(Gran-Gran)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Octopus Form.Cast(Gran-Gran)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Octopus Form.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Octopus Form.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana = 
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Octopus Form.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+? Bot2.Mana = 
+Bot2.Pass
+Bot1.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard.Count = 3
+Bot1.Battlefield = Island; Mox Sapphire; Mox Sapphire; Gran-Gran; Sol Ring
+Bot2.Battlefield = Island; Mox Sapphire; Ornithopter; Sol Ring

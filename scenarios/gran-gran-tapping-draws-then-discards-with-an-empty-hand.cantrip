@@ -1,0 +1,39 @@
+# Gran-Gran's "draw a card, then discard a card" in that order: Bot1 has an empty hand when Gran-Gran attacks (turn 3), so the
+# trigger draws the Forest and then must discard it (hand 0, Forest in the graveyard). Discarding first would find no card to
+# discard and leave the Forest in hand.
+
+[Bot1 Deck]
+Gran-Gran
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Island
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Gran-Gran.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Hand.Count = 0
+Bot1.Attack(Gran-Gran > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Forest
+Bot1.Battlefield.Gran-Gran.Tapped = true
+Bot2.Life = 19
