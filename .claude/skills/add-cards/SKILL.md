@@ -133,8 +133,9 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    `content/<dataset>/cards/<card-name>.json` by hand (characteristics only: `name`, `manaCost`, `type`,
    `power`/`toughness`, `loyalty`/`defense`, `oracleText`, core `keywords` from `crates/cantrip-oracle/build.rs`,
    `colorIndicator`, `convoke`/`delve`/`improvise`, faces `backFace`/`adventure`/`omen`/`halves`/`aftermath`). It
-   then prints whether the Oracle text is still Scryfall's (fix a "DIFFERS" in the JSON first), the official rulings,
-   the CR rule of each keyword and keyword action (the number and where the engine does it, or the whole rule when
+   then prints the owner's design for the card if one is left in `docs/card-notes/<card_name>.md` (it is followed,
+   and the file deleted in the card's commit), whether the Oracle text is still Scryfall's (fix a "DIFFERS" in the
+   JSON first), the official rulings, the CR rule of each keyword and keyword action (the number and where the engine does it, or the whole rule when
    nothing does yet), the scenarios that hold the card, and its prior art; and writes
    `crates/cantrip-cards/src/cards/<card_name>.rs` over the generated constant. A card whose text is only core
    keywords needs no Rust file.

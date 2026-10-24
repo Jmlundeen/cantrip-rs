@@ -138,6 +138,10 @@ TEST_POINTS = [
      "'{m}': the delayed part touches only the same object(s), and only while still where the text left them (CR 603.7c, 400.7)"),
     (r"\b(?:each|all)\b(?! (?:opponent|player))", "'{m}': both players' objects it could apply to, so one side left out fails"),
     (r"\byou control\b|\ban opponent controls\b|\byour opponents? control\b", "'{m}': the other side's object must not count"),
+    (r"\b(?:from )?your (?:graveyard|hand|library)\b|\b(?:from )?an opponent's (?:graveyard|hand|library)\b",
+     "'{m}': a matching card in the other player's zone at that moment, which must stay where it is"),
+    (r"\b(?:another|other)\b", "'{m}': the object itself must not count (it is there, and would match)"),
+    (r"\bthen\b", "'{m}': the order shown - a case where the steps in the other order end differently"),
     (r"\b(?:this turn|until end of turn|until (?:the end of )?your next turn|next turn|last turn)\b",
      "'{m}': the same thing on another turn, and the effect checked after it should have ended"),
     (r"\binstead\b", "'instead': the replaced event must not also happen"),
@@ -338,6 +342,12 @@ def main():
         print("    CantBeBlocked, CantBeCountered ... in crates/cantrip-oracle/build.rs - are yours to add where the text says so)")
     print(text.strip())
 
+    notes = os.path.join(ROOT, "docs", "card-notes", file_stem(name) + ".md")
+    if os.path.exists(notes):
+        print(f"\n=== {os.path.relpath(notes, ROOT)}: the owner's design for this card - follow it, and delete the file")
+        print("    in the card's commit")
+        print(open(notes, encoding="utf-8").read().strip())
+
     print("\n=== Scenarios naming it")
     pattern = re.compile(r"^\s*(?:\d+\s+)?" + re.escape(name) + r"(?:\s+x\d+)?\s*$", re.M | re.I)
     for file in sorted(os.listdir(SCRIPTS)):
@@ -360,7 +370,9 @@ def main():
     print(index.report(index.Index(exclude=[name]), abilities) or "  (no rules text)")
 
     print("\n=== Test points: each needs an expectation that fails if the card gets it wrong (list the line that catches")
-    print("    each in your report; the reviewer checks the list)")
+    print("    each in your report; the reviewer checks the list). A refusal (`! ...`) pins nothing unless the action could")
+    print("    otherwise be taken right there: pass priority first if a trigger may be on the stack, and empty the pool of")
+    print("    any mana that could pay instead (docs/known-issues.md KI-133)")
     print(test_points(abilities) or "  none beyond showing each ability")
 
     target = os.path.join(CARDS, file_stem(name) + ".rs")
