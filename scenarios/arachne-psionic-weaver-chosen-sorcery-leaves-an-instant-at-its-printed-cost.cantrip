@@ -1,0 +1,37 @@
+# Arachne chooses Sorcery (the last type offered), so Bot2's Lightning Bolt is not taxed: with one Mountain tapped ({R}),
+# the pool is empty right after the cast, and Bot1 takes 3.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Arachne, Psionic Weaver
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Arachne, Psionic Weaver.Cast
+Bot1.Name(Sorcery)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+? Bot2.Mana = {R}
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+? Bot2.Mana = 
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 17
+Bot1.Battlefield.Arachne, Psionic Weaver.ChosenOption = Sorcery

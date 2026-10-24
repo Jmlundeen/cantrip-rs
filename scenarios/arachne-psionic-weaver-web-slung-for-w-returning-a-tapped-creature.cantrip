@@ -1,0 +1,40 @@
+# Arachne's Web-slinging {W} (CR 702.188a): after Bot1's Ornithopter attacks and is tapped, Arachne is cast in the second
+# main phase for {W} from one Plains, returning the Ornithopter; the pool is empty right after paying (not {2}{W}).
+# Bot1 chooses Artifact and looks at Bot2's hand. Her own tax then applies to her controller's artifact: recasting the
+# Ornithopter costs {1}, so one Plains pays it exactly.
+
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Arachne, Psionic Weaver
+Plains x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Plains.Activate
+? Bot1.Mana = {W}
+Bot1.Hand.Arachne, Psionic Weaver.Cast(Ability: Web-slinging)
+Bot1.Choose(Bot1.Battlefield.Ornithopter)
+Bot1.Name(Artifact)
+? Bot1.Mana = 
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Arachne, Psionic Weaver; Ornithopter; Plains; Plains
+Bot1.Hand.Count = 4
+Bot1.Looked = Island; Island; Island; Island; Island; Island; Island
+Bot1.Battlefield.Arachne, Psionic Weaver.ChosenOption = Artifact
