@@ -1,0 +1,42 @@
+# Nature's Rhythm cast for {1}{G}{G} (X = 1) searches for a creature card with mana value X or less (CR 701.23): the Llanowar
+# Elves (mana value 1, exactly at the limit) can be found, the Sylvan Caryatid (mana value 2, just past it) cannot, nor can the
+# Snakeskin Veil (mana value 1 but not a creature). The card is put onto the battlefield, and the spell goes to the graveyard.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Forest
+Nature's Rhythm
+Forest
+Forest
+Forest
+Forest
+Forest
+Llanowar Elves
+Sylvan Caryatid
+Snakeskin Veil
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Nature's Rhythm.Cast(X: 1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Sylvan Caryatid)
+! Bot1.Search(Snakeskin Veil)
+Bot1.Search(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Llanowar Elves; Mox Ruby
+Bot1.Graveyard = Nature's Rhythm
+Bot1.Mana =

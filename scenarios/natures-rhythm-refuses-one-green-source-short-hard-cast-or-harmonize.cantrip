@@ -1,0 +1,48 @@
+# Each {G} is paid with green mana. Turn 1: Forest, Mox Ruby and Mox Jet make three mana but one green, so {G}{G} (X = 0) is
+# refused. Turn 3 it is hard-cast for {G}{G} (X = 0) with two Forests and finds Ornithopter (power 0, no mana). Turn 5: three
+# Forests, Ruby and Jet make five mana but three green; Harmonize {1}{G}{G}{G}{G} (X = 1) needs four green: refused.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Jet
+Nature's Rhythm
+Forest
+Forest
+Forest
+Forest
+Forest
+Ornithopter
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Nature's Rhythm.Cast(X: 0)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Nature's Rhythm.Cast(X: 0)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Graveyard.Nature's Rhythm.Cast(X: 1; Ability: Harmonize)
+
+[Expect]
+Bot1.Graveyard = Nature's Rhythm
+Exile.Count = 0

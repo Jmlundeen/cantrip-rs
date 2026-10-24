@@ -1,0 +1,57 @@
+# Browser
+# Nature's Rhythm's harmonize cost {X}{G}{G}{G}{G} has no generic mana until X is announced, and the creature to tap is chosen
+# before X is (CR 702.180b, 601.2b): the dock must not say tapping Llanowar Elves takes 0 off, or exactly its power, but up to
+# its power - "Tap it (up to -1)". With X = 1 the Elves really take the {1} off (CR 702.180a): three Forests and Mox Emerald
+# pay {G}{G}{G}{G}, and the Birds of Paradise (mana value 1) is found.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Nature's Rhythm
+Forest
+Forest
+Forest
+Forest
+Forest
+Llanowar Elves
+Birds of Paradise
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Nature's Rhythm.Cast(X: 1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Graveyard.Nature's Rhythm.Cast(X: 1; Ability: Harmonize)
+? Client.Bot1.Prompt.Title = Nature's Rhythm: tap up to one untapped creature you control to reduce the cost by generic mana equal to its power
+Bot1.Choose(Llanowar Elves)
+? Client.Bot1.Confirm = Tap it (up to -1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Birds of Paradise)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Nature's Rhythm
+Bot1.Graveyard.Count = 0
+Bot1.Mana =
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Birds of Paradise.Tapped = false

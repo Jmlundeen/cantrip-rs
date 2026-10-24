@@ -1,0 +1,56 @@
+# Nature's Rhythm hard-cast (X = 1) finds Llanowar Elves, then from the graveyard with Harmonize {X}{G}{G}{G}{G} (CR 702.180a)
+# and X = 1 the cost is {1}{G}{G}{G}{G}; tapping the Elves (power 1) takes the {1} off (CR 702.180a), so four mana paid by
+# three Forests and Mox Emerald is exact (the pool is empty after). The X of the harmonize cast limits the search too: the
+# Sylvan Caryatid (mana value 2) is refused, the Birds of Paradise (mana value 1) is found. The spell is exiled, not put in the graveyard.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Nature's Rhythm
+Forest
+Forest
+Forest
+Forest
+Forest
+Llanowar Elves
+Sylvan Caryatid
+Birds of Paradise
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Nature's Rhythm.Cast(X: 1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Nature's Rhythm.Cast(X: 1; Ability: Harmonize)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Sylvan Caryatid)
+Bot1.Search(Birds of Paradise)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Nature's Rhythm
+Bot1.Graveyard.Count = 0
+Bot1.Mana =
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Birds of Paradise.Tapped = false
