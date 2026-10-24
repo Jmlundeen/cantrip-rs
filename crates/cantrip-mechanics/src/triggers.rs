@@ -406,6 +406,24 @@ pub const ANNIHILATOR: Trigger = when(EventMask::ATTACKS, this_attacks_defender)
 /// on the bottom of your library in a random order." Bloodbraid Challenger and Bloodbraid Elf print it.
 pub const CASCADE: AbilityDef = triggered(CAST_THIS_SPELL, cascade_resolves, "Cascade");
 
+/// "When you cycle this card" (CR 702.29c): "When you discard this card to pay an activation cost of a cycling ability",
+/// typecycling's included (CR 702.29f), from whatever zone the card winds up in (`WHERE_A_DISCARD_ENDS`). `Event::Cycled`
+/// names the card where the discard put it, which is the ability's source. The ability is about the card cycled; `data[0]`
+/// is the X announced for the cycling ability that discarded it (CR 107.3a), read off that ability where it stands on the
+/// stack as the trigger is collected (CR 602.2b, 603.2) - its object is the card as it was in the hand (CR 400.7): the X
+/// of a cycling cost such as Shark Typhoon's {X}{1}{U}, 0 for any other. Shark Typhoon, Krosan Tusker, Renewed Faith and
+/// Decree of Pain print it.
+pub fn you_cycle_this_card(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    let Event::Cycled { card, player } = *event else { return None };
+    if player != me.controller || card != me.source {
+        return None;
+    }
+    let x = q.state().stack.iter().rev().find(|i| i.kind == StackKind::Activated && q.obj(i.object).became == Some(card)).map_or(0, |i| i.x);
+    Some(Fired { subject: Target::Object(card), data: [x as u32, 0] })
+}
+
+pub const YOU_CYCLE_THIS_CARD: Trigger = when_asked(EventMask::CYCLED, you_cycle_this_card).functions_in(WHERE_A_DISCARD_ENDS);
+
 fn cycle_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
     Ok(())
