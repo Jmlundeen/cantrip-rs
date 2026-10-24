@@ -38,6 +38,8 @@ mod control_at_once_tests;
 #[cfg(test)]
 mod return_at_once_tests;
 #[cfg(test)]
+mod linked_text_tests;
+#[cfg(test)]
 mod loser_check_tests;
 #[cfg(test)]
 mod history_cut_tests;
