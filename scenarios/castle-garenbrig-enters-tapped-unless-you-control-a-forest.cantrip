@@ -1,0 +1,37 @@
+# Castle Garenbrig: "This land enters tapped unless you control a Forest." and "{T}: Add {G}."
+# Turn 3 Bot1 controls only an Island while Bot2 controls a Forest (played turn 2): the first Castle enters tapped - an
+# opponent's Forest is not one "you control". Turn 5 Bot1 plays a Forest; turn 7 the second Castle enters untapped and
+# taps for {G}.
+
+[Bot1 Deck]
+Island
+Castle Garenbrig
+Forest
+Castle Garenbrig
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Forest x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Garenbrig.Play
+? Bot1.Battlefield.Castle Garenbrig.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Castle Garenbrig.Play
+? Bot1.Battlefield.Castle Garenbrig#2.Tapped = false
+Bot1.Battlefield.Castle Garenbrig#2.Activate(Ability: Add {G}.)
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Castle Garenbrig#1.Tapped = false
+Bot1.Battlefield.Castle Garenbrig#2.Tapped = true

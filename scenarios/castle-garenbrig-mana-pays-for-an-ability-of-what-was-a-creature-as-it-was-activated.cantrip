@@ -1,0 +1,88 @@
+# Castle Garenbrig's six {G} pay for an ability of a creature as its source was when the ability was activated (CR 602.2a,
+# 113.7a), though the source stops being a creature while the cost is paid (CR 601.2g-h): it is the same object, changed
+# in place.
+# Mycosynth Lattice makes every permanent an artifact, so March of the Machines makes Aether Spellbomb - and March itself -
+# artifact creatures (the lands and the last Mox, 0/0, die). Turn 7 the Castle's six {G} are made first; the Ironworks
+# sacrifices two Moxen to cast March and the tapped Forest for {C}{C} more. Bot1 activates the Spellbomb's "{1}, Sacrifice
+# this artifact: Draw a card", an ability of a creature: with {C} and restricted {G} in the pool it is asked what pays
+# (CR 601.2g-h). It sacrifices March to Krark-Clan Ironworks first (a mana ability, CR 605.3a), so the Spellbomb, the same
+# object, is no longer a creature, then pays the {1} with one of the Castle's {G}, not a {C}: the card is drawn, and four
+# {C} and five {G} are left. (Read as the Spellbomb is when the {G} is spent, the {G} would not be offered.)
+
+[Bot1 Deck]
+Castle Garenbrig
+Mox Emerald
+Mox Jet
+Mox Ruby
+Black Lotus
+Mycosynth Lattice
+Forest
+Krark-Clan Ironworks
+Aether Spellbomb
+March of the Machines
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Castle Garenbrig.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Castle Garenbrig.Activate(Ability: Add {G}.)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Krark-Clan Ironworks.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Castle Garenbrig.Activate(Ability: six)
+? Bot1.Mana = {G}{G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Mox Emerald)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Mox Jet)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Forest)
+Bot1.Hand.March of the Machines.Cast(Spend: C, C, C, C)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Aether Spellbomb; Krark-Clan Ironworks; March of the Machines; Mycosynth Lattice
+? Bot1.Battlefield.Aether Spellbomb.Power = 1
+? Bot1.Mana = {C}{C} {G}{G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: March of the Machines; Spend: G CreatureSpellsOrAbilitiesOfCreatures)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot1.Hand = Island
+Bot1.Mana = {C}{C}{C}{C} {G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+Bot1.Battlefield = Krark-Clan Ironworks; Mycosynth Lattice

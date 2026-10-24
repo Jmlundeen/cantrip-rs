@@ -1,0 +1,66 @@
+# Castle Garenbrig: "{2}{G}{G}, {T}: Add six {G}. Spend this mana only to cast creature spells or activate abilities of
+# creatures." (CR 106.6, 601.2g, 602.2b, 109.2.)
+# Turn 3, the Castle untapped beside the Forest: with the Forest and three non-green Moxen (four mana, one green) the ability
+# is not offered - each {G} of its cost is pinned. Mox Sapphire's {U} casts Aether Spellbomb; Mox Emerald makes the second
+# green source. The Forest, Mox Emerald, Mox Jet and Mox Ruby pay {2}{G}{G} exactly: six restricted {G} and nothing else in
+# the pool, the Castle tapped. The Spellbomb's "{1}, Sacrifice: Draw a card", an artifact's ability, is not offered; Basking
+# Rootwalla, a creature spell, is cast with one {G}, and its "{1}{G}: +2/+2", a creature's ability, is paid with two more.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Castle Garenbrig
+Mox Emerald
+Aether Spellbomb
+Basking Rootwalla
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Garenbrig.Play
+? Bot1.Battlefield.Castle Garenbrig.Tapped = false
+! Bot1.Battlefield.Castle Garenbrig.Activate(Ability: six)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {B}{R}{G}{G}
+Bot1.Battlefield.Castle Garenbrig.Activate(Ability: six)
+? Bot1.Mana = {G}{G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+? Bot1.Battlefield.Castle Garenbrig.Tapped = true
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+Bot1.Battlefield.Basking Rootwalla.Activate
+? Bot1.Mana = {G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Basking Rootwalla.Power = 3
+Bot1.Battlefield.Aether Spellbomb.Tapped = false

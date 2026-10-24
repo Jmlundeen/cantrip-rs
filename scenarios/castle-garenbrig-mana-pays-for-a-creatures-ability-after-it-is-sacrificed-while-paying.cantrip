@@ -1,0 +1,61 @@
+# Castle Garenbrig's six {G} pay for an ability of a creature as the ability was activated (CR 602.2a, 113.7a): a source
+# that leaves the battlefield while the cost is paid is still the creature whose ability it is. (A regression check: a
+# sacrificed object's last-known characteristics say the same, so this holds whichever way the source is read; the
+# scenario of March of the Machines leaving tells the two apart.)
+# Turn 3 Bot1 activates Basking Rootwalla's "{1}{G}: +2/+2" with nothing in the pool. While paying (CR 601.2g) it sacrifices
+# the Rootwalla to Phyrexian Altar for {G}, then activates the Castle, paying {2}{G}{G} with that {G}, the Forest, Mox
+# Emerald and Mox Jet. Two of the six {G} pay the Rootwalla's {1}{G}, though the Rootwalla is in the graveyard by then: four
+# are left, and the ability resolves and does nothing.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Phyrexian Altar
+Basking Rootwalla
+Castle Garenbrig
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Altar.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Garenbrig.Play
+Bot1.Battlefield.Basking Rootwalla.Activate
+Bot1.Battlefield.Phyrexian Altar.Activate(Sacrifice: Basking Rootwalla; Color: Green)
+Bot1.Battlefield.Castle Garenbrig.Activate(Ability: six)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Stack.Count = 1
+? Bot1.Mana = {G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Basking Rootwalla
+Bot1.Battlefield.Castle Garenbrig.Tapped = true

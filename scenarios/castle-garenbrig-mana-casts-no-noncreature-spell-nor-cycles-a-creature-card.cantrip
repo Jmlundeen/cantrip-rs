@@ -1,0 +1,50 @@
+# Castle Garenbrig's six {G}, "Spend this mana only to cast creature spells or activate abilities of creatures" (CR 106.6):
+# "creatures" are creature permanents (CR 109.2), so - its ruling - not a creature card's ability in the hand.
+# Turn 3 the Forest and Black Lotus pay {2}{G}{G}; the six {G} cast Llanowar Elves (a creature spell) but neither Giant
+# Growth (a noncreature spell, with the Elves to target) nor Generous Ent's forestcycling {1}. Turn 5, with the Forest's
+# and the Elves' unrestricted {G}, both are offered (the controls): the Ent is cycled and Giant Growth cast on the Elves.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Castle Garenbrig
+Llanowar Elves
+Giant Growth
+Generous Ent
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Garenbrig.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Castle Garenbrig.Activate(Ability: six)
+? Bot1.Mana = {G}{G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
+! Bot1.Hand.Giant Growth.Cast
+! Bot1.Hand.Generous Ent.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Generous Ent.Activate(Ability: Forestcycling)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Llanowar Elves.Power = 4
+Bot1.Graveyard = Giant Growth; Generous Ent; Black Lotus
