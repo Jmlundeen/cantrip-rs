@@ -524,6 +524,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     protector: None,
                     instead: None,
                     becomes: None,
+                    own: [None; 2],
                 };
                 ops::prepare_entry(cx, &mut entering)?;
                 if let Some(at) = on_stack(cx) {

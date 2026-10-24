@@ -393,7 +393,7 @@ only the candidates the host's verdict on those picked says may be added.
   with the permanents leaving the battlefield in the same move gone (`GameState::leaving_together`, Goblin Welder) - reads
   its characteristics and
   `lost_all_abilities` through every layer, other objects' static abilities and its own alike, and reverts. One answer serves
-  every entering check: `prepare_entry` applies its own `enters` replacements, and daybound's "enters transformed", only if it
+  every entering check: `prepare_entry` leaves its own `enters` replacements to apply, and daybound's "enters transformed", only if it
   would keep its abilities (asked only while a "loses all abilities" or land-subtype-setting static ability is on the
   battlefield or its own, `layers::abilities_may_be_lost`), and asks again as the copy once a copy replacement chose one; and
   `ops::judged_entering` sets the answer on `Cx::entering` while the replacement effects of its zone change and the counters
@@ -412,7 +412,14 @@ only the candidates the host's verdict on those picked says may be added.
   copy stops a verifying run (`ops::verify_no_copy_in_enters`), so the engine, not a card, decides what is a copy
   replacement. Copy replacements from other sources - Essence of the Wild's "creatures you control enter as a copy",
   Mystic Reflection's - are not built yet; when one is, it must take the same place, before the back-face-up one.
-  Daybound only ever turns an entry over: a face an instruction or CR 707.8a gave it stays.
+  Daybound only ever turns an entry over: a face an instruction or CR 707.8a gave it stays. The rest (CR 616.1e) - its own
+  `CardDef::enters` and those of what it enters as a copy of (CR 707.9a), which `prepare_entry` only notes as still to apply
+  (`Entering::own`), and every other replacement of its zone change - are applied by `ops::entry_replacements` in the order
+  its controller chooses (`replace::entry`, `Origin::Enters`, offered in the card's own words), each judged again as it would
+  exist once the ones before it applied (CR 616.1f): a land's own "enters tapped" and Spelunking's "lands you control enter
+  untapped" in either order, so it enters tapped or untapped (Spelunking's ruling). Where no other replacement could apply
+  (`replace::zone_change_possible`) its own simply apply, and nothing is judged or asked.
+
 - **An effect that says what a card is as it enters is that from the start (614.12)**: `Game::put_onto_battlefield_as`
   takes an `EntersAs` ("It's an enchantment", the Enduring cycle; "It's an Aura enchantment with enchant Forest you control
   and '...'", Old-Growth Troll), carried on `Entering::becomes`. `as_it_would_exist` judges it with those effects, and
@@ -744,7 +751,7 @@ are never asked about, and neither is the end of an "until" exile (CR 610.3, a o
 something has matched.
 
 Objects that move together (`ops::move_together`, and the tokens of one `create_tokens_worded`) are planned before any of
-them moves (CR 614.12, 101.4): each one's "as enters" choices (`prepare_entry`, done by the callers first), its zone-change
+them moves (CR 614.12, 101.4): each one's copy and face (`prepare_entry`, done by the callers first), its own "as enters" choices and its zone-change
 and entering-counter replacements and the last-known information of a permanent leaving are all worked out against the
 game as it was before the event, then every object moves. So permanents entering together never see one another (a
 creature returned with Gev or Containment Priest is untouched by them; Giada counts only the Angels already there), and

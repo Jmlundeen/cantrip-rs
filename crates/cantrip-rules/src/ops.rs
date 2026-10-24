@@ -261,13 +261,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         let from = old.zone;
         // A permanent that would leave the battlefield for anywhere else is exiled instead (CR 702.84a).
         let mut to = m.to;
-        // An entry its own replacement turned into a move elsewhere (CR 614.12): it does not enter at all.
         let mut m = *m;
-        if let Some(instead) = m.entering.and_then(|e| e.instead) {
-            to = instead;
-            m.entering = None;
-        }
-        let m = &m;
         if from.is(ZoneKind::Battlefield) && old.exile_on_leave && !to.is(ZoneKind::Exile) {
             to = Zone::exile(old.owner);
         }
@@ -300,11 +294,17 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             pays_characteristic: m.pays_characteristic,
             exiled_with: None,
         };
-        // A permanent entering is judged as it would exist on the battlefield (CR 614.12).
+        // A permanent entering is judged as it would exist on the battlefield (CR 614.12), and its own replacements are
+        // ordered with the others (CR 616.1). One its own replacement sent elsewhere instead does not enter at all.
         let change = match entry {
-            Some(e) => judged_entering(cx, &e, false, |cx| replace::zone_change(cx, proposed)),
+            Some(mut e) => {
+                let change = entry_replacements(cx, &mut e, proposed);
+                m.entering = Some(e).filter(|_| change.to.is(ZoneKind::Battlefield) && e.instead.is_none());
+                change
+            }
             None => replace::zone_change(cx, proposed),
         };
+        let m = &m;
         let to = change.to;
         // Madness (CR 702.35a) exiled a discarded card in place of its graveyard, one of the replacements above: it was
         // still discarded, and the linked ability is queued below, once the exiled card exists - if no later effect sent
@@ -902,16 +902,15 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     }
     choose_protector(cx, entering)?;
     // Its face's other replacements (CR 616.1e) - none where its copy replacement made it a copy, or it was made as one, as
-    // its copy's apply instead.
+    // its copy's apply instead. Applied with the other replacements that modify how it enters, in the order its controller
+    // chooses (CR 616.1, `entry_replacements`).
     let card = cx.cards().face(cx.s().obj(entering.object).card, entering.transformed);
     if !copied
         && !(copied_by.is_some() && copy_over(cx, entering))
-        && let Some(enters) = cx.cards().get(card).enters
+        && cx.cards().get(card).enters.is_some()
         && !lost(cx, entering)
     {
-        let was_copy = entering.copy.is_some();
-        enters(cx, entering)?;
-        verify_no_copy_in_enters(cx, card, was_copy, entering);
+        own_to_apply(entering, card);
     }
     // CR 707.9a: what it entered as a copy of has its own "enters with" and "enters tapped" to apply, as the copy
     // enters - its copy replacement too, which has nothing more to do unless it is another card's (a Clone copying a Clone
@@ -927,8 +926,9 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
         if let Some(enters_as_copy) = def.enters_as_copy {
             enters_as_copy(cx, entering)?;
         }
-        if let Some(enters) = cx.cards().get(entering.copy.map_or(copy.card, |c| c.card)).enters {
-            enters(cx, entering)?;
+        let card = entering.copy.map_or(copy.card, |c| c.card);
+        if cx.cards().get(card).enters.is_some() {
+            own_to_apply(entering, card);
         }
     }
     // CR 702.145b: the daybound of a permanent that its own replacement made a copy (a Clone-like double-faced card) is the
@@ -938,6 +938,60 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
         entering.transformed = true;
     }
     Ok(())
+}
+
+/// Notes `card`'s `CardDef::enters` as one of the entering permanent's own replacements still to apply (`Entering::own`).
+/// There are two places: its face's, and those of what it enters as a copy of (CR 707.9a).
+fn own_to_apply(entering: &mut Entering, card: CardId) {
+    if let Some(slot) = entering.own.iter_mut().find(|c| c.is_none()) {
+        *slot = Some(card);
+    }
+}
+
+/// Applies the entering permanent's own replacement in `Entering::own[slot]` (CR 614.1c-d): its card's `CardDef::enters`, to
+/// the entry as the replacements applied so far have left it - under `controller`, tapped or not. Applied once: the slot
+/// is emptied. One that asks a question with no answer yet leaves the entry as far as it got; the run goes on and is
+/// replayed with the answer (`Cx::ask_core`), as for every question a zone change asks.
+pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, slot: usize, controller: PlayerId, tapped: bool) {
+    let Some(card) = entering.own[slot].take() else { return };
+    let Some(enters) = cx.cards().get(card).enters else { return };
+    entering.controller = controller;
+    entering.tapped = tapped;
+    let was_copy = entering.copy.is_some();
+    let _ = enters(cx, entering);
+    verify_no_copy_in_enters(cx, card, was_copy, entering);
+}
+
+/// The replacement effects that modify how a permanent enters (CR 614.12) applied to its entry `proposed`: its own
+/// (`Entering::own`) and every other that applies, each once, in the order its controller chooses where more than one
+/// applies (CR 616.1: "the affected object's controller ... chooses one to apply"), each judged on it as it would exist
+/// with those applied before it (CR 614.12, 616.1f). Spelunking's "lands you control enter untapped" and a land's own
+/// "this land enters tapped": applied in the order its controller chooses, it enters tapped or untapped (Spelunking's
+/// ruling). `entering` is left as they made it, but for where it goes and whether it enters tapped and under whom, which are
+/// the returned zone change's; an entry its own replacement sent elsewhere (`Entering::instead`) goes there.
+///
+/// Where nothing could apply but its own, there is nothing to order: they are applied as they are, and nothing is judged.
+fn entry_replacements(cx: &mut Cx, entering: &mut Entering, proposed: ZoneChange) -> ZoneChange {
+    let own = entering.own.iter().any(Option::is_some);
+    if !own || !crate::replace::zone_change_possible(cx, &proposed) {
+        let mut proposed = proposed;
+        for slot in 0..entering.own.len() {
+            apply_own_entering(cx, entering, slot, proposed.controller, proposed.tapped);
+            proposed.controller = entering.controller;
+            proposed.tapped = entering.tapped;
+        }
+        // An entry its own replacement turned into a move elsewhere (CR 614.12): it does not enter at all.
+        if let Some(instead) = entering.instead {
+            return crate::replace::zone_change(cx, crate::replace::sent_instead(cx, proposed, instead));
+        }
+        return judged_entering(cx, entering, false, |cx| crate::replace::zone_change(cx, proposed));
+    }
+    // Judged as it would exist from the start, whatever its own replacements make of it (CR 614.12).
+    let would = as_it_would_exist(cx, entering);
+    let outer = cx.entering.replace(would);
+    let change = crate::replace::entry(cx, proposed, entering);
+    cx.entering = outer;
+    change
 }
 
 /// A card's `enters` that made it a copy is a copy replacement out of its place (`CardDef::enters_as_copy`): applied after
@@ -1223,7 +1277,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None, own: [None; 2] };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1288,6 +1342,7 @@ pub fn put_onto_battlefield_as(
         protector: None,
         instead: None,
         becomes: None,
+        own: [None; 2],
     };
     prepare_entry(cx, &mut entering)?;
     // Turned over by its own daybound as it would enter (CR 702.145b), it is judged as that face (CR 304.4, 307.4).
@@ -1372,6 +1427,7 @@ pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: Play
         protector: None,
         instead: None,
         becomes: Some(becomes),
+        own: [None; 2],
     };
     prepare_entry(cx, &mut entering)?;
     if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1704,7 +1760,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None, own: [None; 2] };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -1750,8 +1806,9 @@ fn create_tokens_onto(
             pays_characteristic: false,
             exiled_with: None,
         };
-        let change = judged_entering(cx, &entering, false, |cx| replace::zone_change(cx, proposed));
+        let change = entry_replacements(cx, &mut entering, proposed);
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist
+
         // (CR 111.7), so it is never created. No implemented effect does this to a token yet.
         if !change.to.is(ZoneKind::Battlefield) {
             continue;
@@ -3831,6 +3888,7 @@ mod tests {
             protector: None,
             instead: None,
             becomes: None,
+            own: [None; 2],
         }
     }
 
@@ -3866,6 +3924,10 @@ mod tests {
         for &id in &held {
             let mut entering = entering(id);
             assert!(prepare_entry(&mut cx, &mut entering).is_ok());
+            // Its own replacements left to apply (`Entering::own`), applied as they would be with nothing else to order.
+            for slot in 0..entering.own.len() {
+                apply_own_entering(&mut cx, &mut entering, slot, PlayerId(0), false);
+            }
             assert!(cx.s().obj(id).zone == hand && cx.s().zone(hand).contains(&id) && !cx.s().battlefield().contains(&id));
             out.push((cx.cards().get(cx.s().obj(id).card).name, entering.counters[CounterKind::PlusOne as usize]));
         }

@@ -5,7 +5,8 @@
 # a 0/0 without its +1/+1 counter, dies. "Mill three cards, then return a permanent card with mana value 3 or less from your
 # graveyard to the battlefield": not targeted, so a card just milled may be chosen (the ruling). Argothian Elder (mana value
 # 4) and Lightning Bolt (not a permanent) can't be; Elvish Spirit Guide (exactly 3) is, and enters under Tayam with a
-# vigilance counter of its own.
+# vigilance counter of its own. The Ballista's own "enters with X +1/+1 counters" and Tayam's are both replacements of its
+# entry, which Bot1, its controller, orders (CR 616.1): its own first here.
 
 [Bot1 Deck]
 Mox Pearl
@@ -48,6 +49,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Walking Ballista.Cast(X: 1)
 Bot1.Pass
 Bot2.Pass
+Bot1.Replace(Walking Ballista)
 ? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
 ? Bot1.Battlefield.Walking Ballista.Counters.Vigilance = 1
 ? Bot1.Battlefield.Ornithopter.Counters.Vigilance = 1

@@ -92,6 +92,8 @@ mod mana_trigger_tests;
 #[cfg(test)]
 mod mana_replacement_tests;
 #[cfg(test)]
+mod entry_order_tests;
+#[cfg(test)]
 mod must_block_tests;
 #[cfg(test)]
 mod room_door_tests;

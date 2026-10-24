@@ -99,6 +99,11 @@ pub struct Entering {
     pub instead: Option<Zone>,
     /// What the effect putting it onto the battlefield says it is as it enters (CR 614.12, 613.1): `Game::put_onto_battlefield_as`.
     pub becomes: Option<Becomes>,
+    /// Its own "enters tapped / enters with / as it enters" replacements still to apply (`CardDef::enters` of these cards:
+    /// its face's, and those of what it enters as a copy of, CR 707.9a), set by the engine as it prepares the entry and
+    /// applied by it among the other replacement effects that modify how it enters, in the order its controller chooses
+    /// (CR 614.12, 616.1). Empty in every `Entering` a card sees or builds.
+    pub own: [Option<CardId>; 2],
 }
 
 /// What an effect that puts a card onto the battlefield says it is (CR 614.12: it enters as that, never as what it was;

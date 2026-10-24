@@ -145,6 +145,7 @@ fn entering(id: ObjectId, controller: PlayerId, tapped: bool) -> Entering {
         protector: None,
         instead: None,
         becomes: None,
+        own: [None; 2],
     }
 }
 
@@ -176,13 +177,14 @@ fn its_own_static_ability_can_take_its_enters_with_abilities() {
     let humble = put(&mut game, table, &HUMBLE, Zone::hand(P0), P0);
     let grown = put(&mut game, table, &GROWN, Zone::hand(P0), P0);
     let mut cx = cx(&mut game);
+    // Whether its own "enters with" is left to apply as it enters (`Entering::own`).
     let mut judged = |id| {
         let mut e = entering(id, P0, false);
         ops::prepare_entry(&mut cx, &mut e).expect("nothing is asked");
-        e.counters[CounterKind::PlusOne as usize]
+        e.own[0].is_some()
     };
-    assert_eq!(judged(grown), 2);
-    assert_eq!(judged(humble), 0);
+    assert!(judged(grown));
+    assert!(!judged(humble));
 }
 
 /// It is judged tapped if it enters tapped: "tapped artifacts are creatures" makes it a creature there.

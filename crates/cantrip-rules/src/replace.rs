@@ -36,6 +36,10 @@ pub(crate) enum Origin {
     /// "Each land played this way enters tapped" (CR 305.1, 614.1d, `PlayGrant::enters_tapped`): the replacement the effect
     /// that gave a permission to play the land made, of the land played by it.
     PlayedTapped,
+    /// The entering permanent's own "enters tapped", "enters with" or "as it enters" (CR 614.1c-d, 614.12): this card's
+    /// `CardDef::enters`, the one in `Entering::own` at the candidate's index. Ordered with the others that modify how it
+    /// enters (CR 616.1): a land's own "enters tapped" and Spelunking's "lands you control enter untapped" in either order.
+    Enters(CardId),
 }
 
 /// One effect that applies to the event: its source, and which of the source's replacements it is.
@@ -57,6 +61,50 @@ const PROTECTION_HINT: &str = "protection prevents the damage";
 
 /// What a permission's "enters tapped" says it does, for the player who orders it with others (CR 616.1).
 const PLAYED_TAPPED_HINT: &str = "a land played this way enters tapped";
+
+/// What a permanent's own entering replacement says it does where its text has no line for it (CR 616.1).
+const ENTERS_HINT: &str = "its own replacement as it enters";
+
+/// What a permanent's own entering replacement (`CardDef::enters`) says it does, for the player who orders it with others
+/// (CR 616.1): the line of its card's rules text that says how it enters ("This land enters tapped.", "As this creature
+/// enters, choose a color."), not a triggered ability's ("When this creature enters, ...").
+fn enters_hint(def: &CardDef) -> &'static str {
+    let text: &'static str = def.text;
+    text.lines()
+        .find(|line| {
+            let line = line.trim_start();
+            line.contains("enter") && !line.starts_with("When") && !line.starts_with("At ")
+        })
+        .unwrap_or(ENTERS_HINT)
+}
+
+/// Whether some replacement effect could apply to `change`, other than an entering permanent's own (`Entering::own`): the
+/// guard that keeps an entry with nothing to order free of the ordering.
+pub(crate) fn zone_change_possible(cx: &Cx, change: &ZoneChange) -> bool {
+    possible(cx, Some(change.object)) || madness_applies(cx, change) || played_tapped_applies(cx, change)
+}
+
+/// `change` sent to `instead` by the entering permanent's own replacement (`Entering::instead`, CR 614.12): no entry any more,
+/// but a move there of the object as it is, under its controller (Mox Diamond's "put it into its owner's graveyard").
+pub(crate) fn sent_instead(cx: &Cx, mut change: ZoneChange, instead: Zone) -> ZoneChange {
+    change.to = instead;
+    change.tapped = false;
+    change.controller = cx.s().obj(change.object).controller;
+    change.counters_by = change.controller;
+    change
+}
+
+/// The replacement effects that modify how a permanent enters (CR 614.12) applied to its entry: its own still to apply
+/// (`Entering::own`), which change `entering`, among the others, in the order its controller chooses (CR 616.1). Called by
+/// `ops::entry_replacements` with the permanent judged as it would exist (`Cx::entering`).
+pub(crate) fn entry(cx: &mut Cx, change: ZoneChange, entering: &mut Entering) -> ZoneChange {
+    let mut proposal = Proposal::ZoneChange(change);
+    apply_to(cx, &mut proposal, Some(entering));
+    match proposal {
+        Proposal::ZoneChange(change) => change,
+        _ => unreachable!("an effect cannot change the kind of the event"),
+    }
+}
 
 /// "Each land played this way enters tapped" (CR 305.1, 614.1d): a land played by a permission that says so, entering
 /// untapped as the proposal stands. Judged before the land moves, while it is still where it was played from and the
@@ -173,7 +221,7 @@ fn affected(cx: &Cx, proposal: &Proposal) -> PlayerId {
 
 /// Every effect that applies to the event and has not been applied to it yet (CR 614.5), in a deterministic order:
 /// by source, then by the order the card lists them.
-fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidate> {
+fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&Entering>) -> Vec<Candidate> {
     // Damage that has been prevented in full is no event any more: nothing is left to replace (CR 615.1); nor is a draw that
     // an effect has replaced, which never happens (CR 614.6).
     if let Proposal::Damage(d) = proposal
@@ -298,6 +346,17 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
         }
     }
     found.sort_by_key(|c| (c.source, c.index, c.origin));
+    // The entering permanent's own replacements still to apply (CR 614.12), ordered with the rest (CR 616.1), while it still
+    // enters - judged as it would exist with those applied so far, which may have taken its abilities (CR 613.1f). Offered
+    // first, as they were printed on it.
+    if let (Some(e), Proposal::ZoneChange(z)) = (entry, proposal)
+        && z.object == e.object
+        && z.to.is(ZoneKind::Battlefield)
+        && !cx.entering.is_some_and(|w| w.object == e.object && w.lost)
+    {
+        let own = e.own.iter().enumerate().filter_map(|(slot, card)| Some(Candidate { source: e.object, index: slot as u8, origin: Origin::Enters((*card)?) }));
+        found.splice(0..0, own);
+    }
     // The discarded card's own madness (CR 702.35a), ordered with the rest (CR 616.1). It is offered first, as the
     // order its owner almost always wants: declining the cast still puts the card into the graveyard, where the other
     // effects meet it again. A player or bot who takes the first offer keeps the madness.
@@ -354,6 +413,7 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
             _ => "",
         },
         Origin::PlayedTapped => PLAYED_TAPPED_HINT,
+        Origin::Enters(card) => enters_hint(cx.cards().get(card)),
     }
 }
 
@@ -435,13 +495,18 @@ fn note_counters_by(before: &Proposal, after: &mut Proposal, controller: PlayerI
 /// event (CR 616.1f), and none applies twice (CR 614.5), nor to an event that is part of what one of them made of an event
 /// it applied to already (`Cx::lineage`).
 fn apply(cx: &mut Cx, proposal: &mut Proposal) {
+    apply_to(cx, proposal, None);
+}
+
+/// `apply`, to a permanent's entry with its own replacements still to apply (`Entering::own`) where `entry` is given.
+fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Entering>) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
         // An entering permanent is judged as it would exist with the changes of the replacements applied so far (CR 614.12).
         if let Proposal::ZoneChange(z) = *proposal {
             crate::ops::rejudge_entering(cx, &z);
         }
-        let found = candidates(cx, proposal, &applied);
+        let found = candidates(cx, proposal, &applied, entry.as_deref());
         if found.is_empty() {
             return;
         }
@@ -499,8 +564,25 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                     z.madness = true;
                 }
             }
+            // Its own (CR 614.1c-d), to the entry as it now is: whether it enters tapped, and under whom, are the event's;
+            // the rest it changes is the entry's. It is judged again as it would exist with it applied (CR 614.12), or, sent
+            // elsewhere instead, is no entry at all.
+            Origin::Enters(_) => {
+                if let (Some(e), Proposal::ZoneChange(z)) = (entry.as_deref_mut(), &mut *proposal) {
+                    crate::ops::apply_own_entering(cx, e, index as usize, z.controller, z.tapped);
+                    z.controller = e.controller;
+                    z.tapped = e.tapped;
+                    if let Some(instead) = e.instead {
+                        *z = sent_instead(cx, *z, instead);
+                        cx.entering = None;
+                    } else {
+                        cx.entering = Some(crate::ops::as_it_would_exist(cx, e));
+                    }
+                }
+            }
             // CR 614.1d: it enters tapped.
             Origin::PlayedTapped => {
+
                 if let Proposal::ZoneChange(z) = proposal {
                     z.tapped = true;
                 }
@@ -628,7 +710,7 @@ pub(crate) fn mana_outcomes(cx: &Cx, production: ManaProduction) -> Vec<ManaProd
             return;
         }
         seen.push((key, proposal));
-        let found = candidates(cx, &proposal, applied);
+        let found = candidates(cx, &proposal, applied, None);
         if found.is_empty() {
             if let Proposal::ManaProduction(m) = proposal
                 && !out.contains(&m)
