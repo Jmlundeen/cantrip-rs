@@ -779,6 +779,51 @@ fn choose_counter_kind(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &C
     }
 }
 
+/// The other cards of `player`'s hand that could pay "exile any number of [white] cards from your hand" (`ExileFromHandForLess`).
+fn hand_exiles_for_less(cx: &Cx, source: ObjectId, player: PlayerId, cost: ExileFromHandForLess) -> Vec<ObjectId> {
+    let asker = Asker { source, controller: player };
+    cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| c != source && (cost.filter)(cx, &asker, c)).collect()
+}
+
+/// "You may exile any number of [white] cards from your hand" (`ExileFromHandForLess`), as the intention to pay it is
+/// announced (CR 601.2b): which of the cards that could pay will, any number of them or none, so the total cost is
+/// determined knowing how many (CR 601.2f). Nothing moves yet. Not asked when no card could pay.
+fn announce_hand_exiles(cx: &mut Cx, player: PlayerId, spell: ObjectId, could: &[ObjectId]) -> R<Vec<ObjectId>> {
+    if could.is_empty() {
+        return Ok(Vec::new());
+    }
+    let hand = cx.s().zone(Zone::hand(player)).to_vec();
+    let ask = RequestKind::choose_cards(spell, Purpose::ExileToPay, hand, could.to_vec(), count_u32(could.len()), true, "");
+    match cx.ask_core(player, ask, true)? {
+        Answer::Cards(cards) => Ok(cards),
+        _ => Err(Stop::Cancel),
+    }
+}
+
+/// The cards `announce_hand_exiles` chose, as the cost is paid (CR 601.2h): the same cards while the cards that could pay are
+/// the ones that could as they were chosen (`could`). A mana ability activated while paying (CR 601.2g) may have taken one
+/// from the hand, put another there or changed one's color; then as many as were announced, which the total cost was locked
+/// in with (CR 601.2f), are chosen again from the cards that could pay now, since which ones pay is chosen as it is paid.
+/// With too few, the cost can't be paid, and the cast is taken back (CR 601.2h, 733.1).
+fn confirm_hand_exiles(cx: &mut Cx, player: PlayerId, spell: ObjectId, cost: ExileFromHandForLess, chosen: &[ObjectId], could: &[ObjectId]) -> R<Vec<ObjectId>> {
+    if chosen.is_empty() {
+        return Ok(Vec::new());
+    }
+    let now = hand_exiles_for_less(cx, spell, player, cost);
+    if now.as_slice() == could {
+        return Ok(chosen.to_vec());
+    }
+    if now.len() < chosen.len() {
+        return Err(Stop::Cancel);
+    }
+    let hand = cx.s().zone(Zone::hand(player)).to_vec();
+    let ask = RequestKind::choose_cards(spell, Purpose::ExileToPay, hand, now, count_u32(chosen.len()), false, "");
+    match cx.ask_core(player, ask, true)? {
+        Answer::Cards(cards) => Ok(cards),
+        _ => Err(Stop::Cancel),
+    }
+}
+
 /// The permanents a variable sacrifice may take, or the other cards in the graveyard an exile may take (CR 601.2h).
 fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost) -> Vec<ObjectId> {
     match variable {
@@ -2691,6 +2736,11 @@ fn least_cost_parts(
     let off = match def.additional_cost.and_then(|c| c.variable) {
         Some(v @ VariableCost::SacrificeAnyNumber { less_each, .. }) => (variable_candidates(cx, card, player, v).len() as u32 * less_each as u32).min(255) as u8,
         _ => 0,
+    };
+    // "Costs {2} less for each card exiled this way": as little as exiling every card that could be.
+    let off = match def.additional_cost.and_then(|c| c.exile_from_hand_for_less) {
+        Some(e) => off.saturating_add((hand_exiles_for_less(cx, card, player, e).len() as u32 * u32::from(e.less_each)).min(255) as u8),
+        None => off,
     };
     finish(cx, available, player, card, def, cost, targets, earlier.spell.as_ref(), &mut |mut cost, least| {
         cost.generic = cost.generic.saturating_sub(off);
@@ -6166,6 +6216,19 @@ fn cast(
     // How many permanents "sacrifice any number of" announces (Rottenmouth Viper): no X (its mana cost has none, CR
     // 107.3), up to every permanent that could be sacrificed (CR 601.2b), kept here for the reduction and the sacrifice.
     let mut sacrificed_any_number: u32 = 0;
+    // "You may exile any number of [white] cards from your hand. This spell costs {2} less to cast for each card exiled this
+    // way" (the Marches): the cards are chosen as the intention to pay is announced (CR 601.2b), before X, which is announced
+    // from the value their reduction pays for; the reduction comes off the total cost once it is determined (CR 601.2f), and
+    // the cards are exiled as it is paid (CR 601.2h). `hand_could` is which cards could have paid as they were chosen.
+    let (hand_could, hand_chosen, hand_reduction) = match extra.exile_from_hand_for_less {
+        Some(for_less) => {
+            let could = hand_exiles_for_less(cx, spell, player, for_less);
+            let chosen = announce_hand_exiles(cx, player, spell, &could)?;
+            let reduction = count_u32(chosen.len()).saturating_mul(u32::from(for_less.less_each));
+            (could, chosen, reduction)
+        }
+        None => (Vec::new(), Vec::new(), 0),
+    };
     // "X can't be 0" (CR 107.3a): cast where X can only be 0 (CR 107.3b: without paying its mana cost, or for an
     // alternative cost with no {X}), there is no X it may be cast with, and it can't be cast (Mind Grind's ruling).
     if x_only_zero(def.x_cant_be_zero, def.cost.x, x_symbols) {
@@ -6191,7 +6254,7 @@ fn cast(
         // An X that can't be 0 starts at 1 (CR 107.3a). A kicker with {X} announces 0 as not kicking it, so a kicked one
         // has X 1 or more as it is.
         let least = if def.kicker.is_none() && less_each == 0 { u32::from(least_x(def.x_cant_be_zero)) } else { 0 };
-        let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, least, cap, false, less_each, extra.variable.map_or("", |v| v.governs()))?;
+        let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, least, cap, false, less_each, hand_reduction, extra.variable.map_or("", |v| v.governs()))?;
         // Every announcement but "any number"'s is within an X's u16 (`cap`).
         let n = announced.min(u32::from(u16::MAX)) as u16;
         if let Some(k) = def.kicker {
@@ -6387,6 +6450,8 @@ fn cast(
     if less_each > 0 {
         cost.mana.generic = cost.mana.generic.saturating_sub(sacrificed_any_number.saturating_mul(u32::from(less_each)).min(255) as u8);
     }
+    // "This spell costs {2} less to cast for each card exiled this way" (CR 601.2f, 118.7a): by the cards chosen, the same way.
+    cost.mana.generic = cost.mana.generic.saturating_sub(hand_reduction.min(255) as u8);
     // How many a variable sacrifice takes: X announced for "sacrifice X" (Immoral Bargain), or the number announced for
     // "sacrifice any number" (Rottenmouth Viper), kept apart from X.
     let variable_n = |c: &Cost, item: &StackItem| match c.variable {
@@ -6468,6 +6533,10 @@ fn cast(
     let extra_discards = choose_discards(cx, player, spell, &extra)?;
     let extra_tappers = choose_tappers(cx, player, spell, &extra)?;
     let extra_evidence = choose_exiles(cx, player, spell, &extra)?;
+    let hand_exiled = match extra.exile_from_hand_for_less {
+        Some(for_less) => confirm_hand_exiles(cx, player, spell, for_less, &hand_chosen, &hand_could)?,
+        None => Vec::new(),
+    };
     // Sneak (CR 702.190b): the permanent the spell becomes attacks what the creature its cost returns to hand is attacking
     // as the cost is paid, kept on the spell for its resolution. An instant or sorcery becomes no permanent, and keeps none.
     if granted.is_none()
@@ -6506,6 +6575,7 @@ fn cast(
     ops::sacrifice(cx, &way_sacrifices);
     pay_exiles(cx, &extra_exiles);
     pay_exiles(cx, &extra_evidence);
+    pay_exiles(cx, &hand_exiled);
     pay_life_and_counters(cx, player, spell, &cost);
     pay_permanents(cx, &extra, &extra_chosen, None);
     let mut revealed = pay_behold(cx, player, &beheld);
@@ -7444,7 +7514,7 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 /// question that raises and lowers the value until confirmed.
 fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, x_symbols: u8, least: u16, cap: u16) -> R<u16> {
     // X itself is a u16 (`StackItem::x`), and `cap` keeps the number within it.
-    announce_x(cx, player, spell, base, None, x_symbols, u32::from(least), u32::from(cap), false, 0, "").map(|n| n as u16)
+    announce_x(cx, player, spell, base, None, x_symbols, u32::from(least), u32::from(cap), false, 0, 0, "").map(|n| n as u16)
 }
 
 /// The least value X may be announced as (CR 107.3a, 601.2b): 1 for an X that can't be 0 ("X can't be 0"), else 0.
@@ -7468,12 +7538,14 @@ fn at_least_x(mut cost: ManaCost, x_cant_be_zero: bool) -> ManaCost {
     cost
 }
 
-/// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`), and how much generic mana
-/// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`). The value starts at,
-/// and never goes below, `least` (1 for an X that can't be 0, CR 107.3a); with no value from `least` to `cap` there is
-/// nothing that may be announced, and the spell or ability is taken back (CR 601.2b, 733.1).
+/// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`), how much generic mana
+/// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`), and how much a
+/// reduction already announced takes off it (`reduced`: the cards chosen for `ExileFromHandForLess`, CR 601.2b, 601.2f,
+/// 118.7a). The value starts at `least` (1 for an X that can't be 0, CR 107.3a), or at the X the reduction pays for where
+/// that is more, and never goes below `least`; with no value from `least` to `cap` there is nothing that may be announced,
+/// and the spell or ability is taken back (CR 601.2b, 733.1).
 #[allow(clippy::too_many_arguments)]
-fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, least: u32, cap: u32, loyalty: bool, less_each: u8, governs: &'static str) -> R<u32> {
+fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, least: u32, cap: u32, loyalty: bool, less_each: u8, reduced: u32, governs: &'static str) -> R<u32> {
     let most: u32 = match kicker {
         Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
         _ => cap,
@@ -7481,12 +7553,18 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
     if least > most {
         return Err(Stop::Cancel);
     }
-    let mut n: u32 = least;
+    // The X the reduction pays for: the most X whose generic mana it takes off whole.
+    let paid_for = if kicker.is_none() && x_symbols > 0 { reduced / u32::from(x_symbols) } else { 0 };
+    let mut n: u32 = paid_for.clamp(least, most);
     loop {
         let mut total = base;
         match kicker {
             Some(k) => total = kicker_total(total, k, n as u16),
-            None if x_symbols > 0 => total.generic = total.generic.saturating_add((n.saturating_mul(u32::from(x_symbols))).min(255) as u8),
+            // A reduction past the generic mana there is takes it all, never colored mana (CR 118.7a).
+            None if x_symbols > 0 => {
+                let generic = (u32::from(total.generic) + n.saturating_mul(u32::from(x_symbols))).saturating_sub(reduced);
+                total.generic = generic.min(255) as u8;
+            }
             // A reduction past the generic mana there is takes it all, so the most it is matters, never the rest (CR 118.7a).
             None => total.generic = total.generic.saturating_sub(n.saturating_mul(u32::from(less_each)).min(255) as u8),
         }
@@ -7581,7 +7659,7 @@ fn activate(
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
     if def.cost.loyalty == Some(LOYALTY_MINUS_X) {
         let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
-        item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(cap), true, 0, "")? as u16;
+        item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(cap), true, 0, 0, "")? as u16;
     }
     announce_twobrids(cx, player, source, &mut mana, false)?;
     let life = announce_life(cx, player, source, &mut mana, false)?;
@@ -9239,6 +9317,7 @@ fn resolution_parts(cost: &Cost) -> bool {
         tap_creatures: _,
         emerge,
         exile_from_hand: _,
+        exile_from_hand_for_less: _,
         tap_permanents: _,
         unattach_self: _,
         return_self: _,

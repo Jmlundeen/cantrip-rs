@@ -940,11 +940,12 @@ impl<'s> Run<'s> {
 
     /// Paying from the pool without being told (`AutoPay`): `Spend:` first, then any pool mana that pays what is owed.
     fn auto_pay(&mut self, request: &Request) -> R<Option<Answer>> {
-        let RequestKind::PayCosts { remaining, options, announcing, most, least, .. } = &request.kind else { return Ok(None) };
+        let RequestKind::PayCosts { remaining, options, announcing, x, most, least, .. } = &request.kind else { return Ok(None) };
         if *announcing {
             // X, or how many times it is kicked, announced as the line said, as a page announces it; a line that says none
-            // announces the least it may be (an X that can't be 0 is 1).
-            let want = self.casting.as_ref().and_then(|c| c.x).map_or(*least, u32::from);
+            // announces the value the question starts at, as a page does: the least it may be (an X that can't be 0 is 1), or
+            // the X a reduction already announced pays for (`ExileFromHandForLess`).
+            let want = self.casting.as_ref().and_then(|c| c.x).map_or(*x, u32::from);
             return Ok((*least..=*most).contains(&want).then_some(Answer::Announce(want)));
         }
         // Convoke taps the creatures it names, one per question, and Delve exiles that many cards from the graveyard, the

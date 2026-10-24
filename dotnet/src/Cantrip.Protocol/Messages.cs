@@ -2573,8 +2573,9 @@ public sealed class PayCostsPromptMessage : PromptPayload
     public int MostAnnounced { get; set; }
 
     /// <summary>
-    /// For the announcement: the smallest value an <see cref="AnnounceAnswer"/> may announce, and the one it starts at: 1 for
-    /// an X that can't be 0 (CR 107.3a, 601.2b), else 0. Zero while paying.
+    /// For the announcement: the smallest value an <see cref="AnnounceAnswer"/> may announce: 1 for an X that can't be 0
+    /// (CR 107.3a, 601.2b), else 0. The announcement starts at <see cref="X"/>: this, or the X a reduction already announced
+    /// pays for (the cards a March exiles from the hand, CR 601.2f). Zero while paying.
     /// </summary>
     [Key(26)]
     public int LeastAnnounced { get; set; }

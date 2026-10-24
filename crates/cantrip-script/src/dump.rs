@@ -167,7 +167,21 @@ impl StateDump {
         }
 
         let stack: Vec<String> = s.stack.iter().rev().map(|item| game.known_name(item.object).to_string()).collect();
-        d.list("Stack", stack, true);
+        d.list("Stack", stack.clone(), true);
+        // Each spell's mana value on the stack (CR 202.3e: X counted as announced) and the X it was cast with, absent where
+        // there was none: `Stack.<Name>`, numbered top first as the names are.
+        for (at, item) in s.stack.iter().rev().enumerate() {
+            if item.kind != StackKind::Spell {
+                continue;
+            }
+            let name = &stack[at];
+            let same = stack.iter().filter(|n| *n == name).count();
+            let label = if same == 1 { name.clone() } else { format!("{name}#{}", stack[..=at].iter().filter(|n| *n == name).count()) };
+            d.set(format!("Stack.{label}.ManaValue"), game.mana_value(item.object));
+            if s.obj(item.object).x > 0 {
+                d.set(format!("Stack.{label}.X"), s.obj(item.object).x);
+            }
+        }
 
         // The delayed triggered abilities waiting for their moment (CR 603.7), each named for the object it came from.
         let delayed: Vec<String> = s.delayed.iter().map(|d| game.known_name(d.source).to_string()).collect();

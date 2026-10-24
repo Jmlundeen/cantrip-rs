@@ -1136,8 +1136,9 @@ pub struct PayCostsPrompt {
     /// legal targets an "X target" spell has, once for a kicker paid at most once; how much could be paid for is
     /// `most_affordable`. Zero while paying.
     pub most_announced: i32,
-    /// While announcing: the smallest value an `AnnounceAnswer` may announce, and the one the announcement starts at: 1 for
-    /// an X that can't be 0 (CR 107.3a, 601.2b), else 0. Zero while paying.
+    /// While announcing: the smallest value an `AnnounceAnswer` may announce: 1 for an X that can't be 0 (CR 107.3a, 601.2b),
+    /// else 0. The announcement starts at `x`: this, or the X a reduction already announced pays for (the cards a March
+    /// exiles from the hand, CR 601.2f). Zero while paying.
     pub least_announced: i32,
     /// While announcing an X that is not paid in mana: what X governs, in words ("the least power of the creature you
     /// sacrifice", casualty X, CR 702.153a), for a caption where "mana for X" would be false. Empty for any other.

@@ -610,6 +610,9 @@ pub struct Cost {
     /// Exile this many cards from your hand that pass the filter, other than the source (CR 118.9: "exile a red card from
     /// your hand"), chosen as the cost is chosen.
     pub exile_from_hand: Option<(u8, ObjectFilter)>,
+    /// "As an additional cost to cast this spell, you may exile any number of [white] cards from your hand. This spell costs
+    /// {2} less to cast for each card exiled this way" (`ExileFromHandForLess`): a spell's additional cost only.
+    pub exile_from_hand_for_less: Option<ExileFromHandForLess>,
     /// The `permanents` are tapped instead of sacrificed or returned (CR 118.3, 701.26): "Tap an untapped creature you
     /// control", chosen as the cost is chosen and tapped as it is paid. It is not the {T} symbol (CR 107.5), so a
     /// summoning-sick creature, or the source itself, may be tapped for it.
@@ -672,6 +675,21 @@ pub struct Materials {
 pub struct MaterialPart {
     pub filter: ObjectFilter,
     pub quality: &'static str,
+}
+
+/// "As an additional cost to cast this spell, you may exile any number of [white] cards from your hand. This spell costs {2}
+/// less to cast for each card exiled this way": the Marches of Kamigawa: Neon Dynasty (March of Otherworldly Light, March of
+/// Swirling Mist, March of Wretched Sorrow, March of Reckless Joy, March of Burgeoning Life). The cards, other cards of the
+/// caster's hand that pass the filter, are chosen as the intention to pay is announced (CR 601.2b), before X, so the total
+/// cost is determined knowing how many (CR 601.2f): `less_each` generic mana off for each, a reduction applied after any
+/// increase, never below {0} and never off colored mana (CR 118.7a). X is announced from the value that reduction pays for.
+/// The cards are exiled as the cost is paid (CR 601.2h), chosen again there only if the mana abilities activated while
+/// paying (CR 601.2g) changed which cards could pay. How many is no X: the spell's X is its {X}'s alone, and its mana value
+/// on the stack X plus the rest of its mana cost (CR 202.3e), whatever was paid.
+#[derive(Clone, Copy)]
+pub struct ExileFromHandForLess {
+    pub filter: ObjectFilter,
+    pub less_each: u8,
 }
 
 /// A cost part whose size is the payer's to set, chosen as the cost is chosen.
@@ -778,6 +796,7 @@ impl Cost {
             tap_creatures,
             emerge,
             exile_from_hand,
+            exile_from_hand_for_less,
             tap_permanents,
             unattach_self,
             return_self,
@@ -810,6 +829,7 @@ impl Cost {
             && tap_creatures.is_none()
             && !emerge
             && exile_from_hand.is_none()
+            && exile_from_hand_for_less.is_none()
             && !tap_permanents
             && !unattach_self
             && !return_self
@@ -907,6 +927,9 @@ impl Cost {
             (None, b) => b,
             (a, None) => a,
         };
+        if c.exile_from_hand_for_less.is_none() {
+            c.exile_from_hand_for_less = other.exile_from_hand_for_less;
+        }
         c.discard = match (self.discard, other.discard) {
             (Some((a, f)), Some((b, _))) => Some((a + b, f)),
             (None, b) => b,
@@ -974,6 +997,7 @@ impl Cost {
             tap_creatures: None,
             emerge: false,
             exile_from_hand: None,
+            exile_from_hand_for_less: None,
             tap_permanents: false,
 
             unattach_self: false,

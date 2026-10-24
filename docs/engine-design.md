@@ -1212,6 +1212,16 @@ the mana is paid (CR 601.2g-h). The advice counts every permanent that could be 
 what the number is (`PayCostsPromptMessage::SacrificeReduces`). A spell's mana value in its `Cast` record counts X once
 for each {X} in its mana cost (CR 202.3e), and not at all for an X a cost defines without one.
 
+"As an additional cost to cast this spell, you may exile any number of white cards from your hand. This spell costs {2} less
+to cast for each card exiled this way" (the five Marches) is `Cost::exile_from_hand_for_less`. The cards themselves are
+chosen first, with the generic choice of cards from the hand (CR 601.2b: the intention to pay, which fixes how many), nothing
+moved; X is then announced with the existing announcement, which starts at the X their reduction pays for; the targets
+follow, judged by that X; the reduction comes off the total once it is determined, after any increase (CR 601.2f, 118.7a);
+and the cards are exiled as the cost is paid (CR 601.2h). Which cards pay is the payer's choice as it is paid: if a mana
+ability activated while paying (CR 601.2g) changed which cards could pay, as many as were chosen are asked for again, and
+with too few the cast is taken back. The advice counts every card that could be exiled. X stays the spell's X, so its mana
+value on the stack is X plus 1 whatever was paid (the ruling).
+
 An additional cost the targets define ("collect evidence X, where X is the total mana value of the permanents this spell
 targets", Urgent Necropsy) is `CardDef::cost_of_targets`, asked once the targets are chosen and added to the total then
 (CR 601.2c, 601.2f); one its caster can't pay takes the cast back (CR 601.2h). A batch of zone changes moves an object once

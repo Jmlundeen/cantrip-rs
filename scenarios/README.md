@@ -436,6 +436,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `Stack`, `Exile`, `Combat.Attackers`, `Combat.Blocks`, each with `.Count`: an attacker as `Grizzly Bears > Bot2`, one in an
   attacking band (CR 702.22c) as `Benalish Hero > Bot2 (band 1)`, bands numbered in the order announced; a block as
   `Blocker > Attacker`, one for each member of a band a creature blocks (CR 702.22h)
+- `Stack.<Name>.ManaValue` for each spell on the stack (CR 202.3e: its X counted as announced) and `Stack.<Name>.X`, the X it
+  was cast with, absent where there was none; named and numbered as `Stack` lists them, top first
 - `Delayed` (with `.Count`): the delayed triggered abilities still waiting (CR 603.7), each named for the object it came from:
   one used up or ended with its turn is gone from it
 - `Combat.AttackCost` (`{2}`), `.Remaining` and `.Attackers` (with `.Count`), while a declaration's cost to attack is being
