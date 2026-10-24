@@ -1,0 +1,46 @@
+# Flameblade Adept has menace (CR 702.111b): one Llanowar Elves alone may not block it, two together may. Both blockers are
+# offered, so the refusal is the menace rule. Blocked by both, the 1/2 dies and deals its 1 damage to one of them.
+
+[Bot1 Deck]
+Mox Ruby
+Flameblade Adept
+Mountain x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flameblade Adept.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Flameblade Adept > Bot2)
+! Bot2.Block(Llanowar Elves#1 > Flameblade Adept)
+Bot2.Block(Llanowar Elves#1 > Flameblade Adept; Llanowar Elves#2 > Flameblade Adept)
+
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Flameblade Adept

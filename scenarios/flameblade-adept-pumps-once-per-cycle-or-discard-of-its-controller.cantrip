@@ -1,0 +1,71 @@
+# Flameblade Adept: "Whenever you cycle or discard a card, this creature gets +1/+0 until end of turn." Bot1 cycles
+# Intimidation Tactics: a cycled card is discarded too, yet the trigger fires once (CR 702.29d), so power is 2, not 3.
+# Bot2 cycles its own card on its turn: nothing happens, and the earlier boost is gone then (until end of turn, CR 514.2).
+# On Bot1's next turn Faithless Looting discards two cards, one trigger each: power 3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Flameblade Adept
+Intimidation Tactics
+Faithless Looting
+Mountain x3
+Swamp x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Intimidation Tactics
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flameblade Adept.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Flameblade Adept.Power = 1
+Bot1.Hand.Intimidation Tactics.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Flameblade Adept.Power = 2
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Flameblade Adept.Power = 1
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Intimidation Tactics.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Flameblade Adept.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Flameblade Adept.Power = 3
+
+[Expect]
+Bot1.Battlefield.Flameblade Adept.Power = 3
+Bot2.Graveyard = Intimidation Tactics

@@ -1,0 +1,11 @@
+{
+  "name": "Flameblade Adept",
+  "manaCost": "{R}",
+  "type": "Creature — Jackal Warrior",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Menace\nWhenever you cycle or discard a card, this creature gets +1/+0 until end of turn.",
+  "keywords": [
+    "Menace"
+  ]
+}
