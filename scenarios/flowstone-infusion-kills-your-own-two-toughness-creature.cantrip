@@ -1,0 +1,38 @@
+# Flowstone Infusion: "Target creature gets +2/-2 until end of turn." Bot1 targets its own Samut (2/2): she becomes 4/0
+# and is put into the graveyard by state-based actions (CR 704.5f). Own creatures are legal targets, and a Mox is not.
+# The cost is {R}: the pool is checked right after the cast.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Samut, Hazoret's Champion
+Flowstone Infusion
+Mountain
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Samut, Hazoret's Champion.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Flowstone Infusion.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Flowstone Infusion.Cast(Samut, Hazoret's Champion)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Samut, Hazoret's Champion = (absent)
+Bot1.Graveyard = Samut, Hazoret's Champion; Flowstone Infusion

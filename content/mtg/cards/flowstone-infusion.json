@@ -1,0 +1,6 @@
+{
+  "name": "Flowstone Infusion",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Target creature gets +2/-2 until end of turn."
+}

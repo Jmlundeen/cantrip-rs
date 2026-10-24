@@ -1,0 +1,45 @@
+# Flowstone Infusion on an opponent's Giant Cindermaw (4/3): +2/-2 makes it 6/1 (it survives, so the -2 is exactly 2),
+# and at the cleanup step the effect ends (CR 514.2): on turn 4 it is 4/3 again.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Flowstone Infusion
+Mountain x17
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Giant Cindermaw
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Giant Cindermaw.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flowstone Infusion.Cast(Giant Cindermaw)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Giant Cindermaw.Power = 6
+? Bot2.Battlefield.Giant Cindermaw.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Giant Cindermaw.Power = 4
+Bot2.Battlefield.Giant Cindermaw.Toughness = 3
+Bot1.Graveyard = Flowstone Infusion
