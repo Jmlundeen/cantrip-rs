@@ -1,0 +1,6 @@
+{
+  "name": "Destroy Evil",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Destroy target creature with toughness 4 or greater.\n• Destroy target enchantment."
+}

@@ -1,0 +1,41 @@
+# Destroy Evil, first mode: "Destroy target creature with toughness 4 or greater." Bot1's own Crystal Barricade (0/4,
+# exactly the limit) is a legal target and dies; Bot2's Arboreal Grazer (0/3, one under) is refused -- CR 115.1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Crystal Barricade
+Plains
+Destroy Evil
+Plains x16
+
+[Bot2 Deck]
+Forest
+Arboreal Grazer
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Arboreal Grazer.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Destroy Evil.Cast
+Bot1.Modes(Destroy target creature)
+! Bot1.Target(Bot2.Battlefield.Arboreal Grazer)
+Bot1.Target(Bot1.Battlefield.Crystal Barricade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Destroy Evil; Crystal Barricade
+Bot2.Battlefield = Arboreal Grazer; Forest; Forest
