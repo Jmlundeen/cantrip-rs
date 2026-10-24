@@ -3,6 +3,12 @@
 
 use cantrip_api::*;
 
+/// "Each opponent sacrifices a creature of their choice" (CR 701.21a, 101.4).
+/// Tithing Blade and Winter, Tormented Loner print it.
+pub fn each_opponent_sacrifices_a_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::each_opponent_sacrifices(g, item.controller, item.object, 1, |q, card| q.chars(card).is(CardType::Creature))
+}
+
 /// "This creature enters with X +1/+1 counters on it" (CR 614.1c), for the X it was cast with; put onto the battlefield
 /// without being cast, X is 0. Walking Ballista, Guiding Hydra and the ravenous creatures print it.
 pub fn enters_with_x_counters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
