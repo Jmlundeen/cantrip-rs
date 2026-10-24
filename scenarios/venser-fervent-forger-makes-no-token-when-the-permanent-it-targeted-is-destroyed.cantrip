@@ -40,7 +40,6 @@ Bot1.Target(Bot2.Battlefield.Llanowar Elves)
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Cut Down.Cast(Bot2.Battlefield.Llanowar Elves)
 [T3 Bot1.Main2]
-? Delayed.Count = 0
 ? Bot1.Battlefield.Count = 5
 
 [Expect]

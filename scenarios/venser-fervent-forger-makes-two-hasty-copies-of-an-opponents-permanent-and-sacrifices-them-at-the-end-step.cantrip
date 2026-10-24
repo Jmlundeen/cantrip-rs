@@ -2,7 +2,7 @@
 # the beginning of the next end step, sacrifice them." Bot2 has a Forest and a Llanowar Elves, so the choice of target is
 # asked: Venser's own controller's Mox Pearl is not one of the answers (it is not an opponent's permanent), the Elves is.
 # The two 1/1 Elf Druid tokens arrive under Bot1 with haste, and the delayed ability of Venser's own card sacrifices both
-# at the end step of this turn: they cease to exist, so they are in no graveyard.
+# at the end step of this turn: they cease to exist, so they are in no graveyard (Bot1's Graveyard is only the Black Lotus).
 
 [Bot1 Deck]
 Black Lotus

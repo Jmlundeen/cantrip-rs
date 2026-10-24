@@ -1,0 +1,55 @@
+# Venser, Fervent Forger: "Copy target instant or sorcery spell an opponent controls" - a permanent spell is not one. Bot2
+# has Shock on the stack and, above it, Brazen Borrower (a flash creature spell) when Bot1 flashes in Venser and chooses
+# the copy mode: the Borrower is refused as the target (CR 115.1) and the Shock is copied twice, both copies aimed at Bot2
+# (2 and 2) before the Borrower resolves and the Shock hits Bot1 (2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Venser, Fervent Forger
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Shock
+Brazen Borrower
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Hand.Brazen Borrower.Cast
+? Stack.Count = 2
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Venser, Fervent Forger.Cast
+Bot1.Modes(Copy target instant or sorcery spell an opponent controls twice. You may choose new targets for the copies.)
+! Bot1.Target(Stack.Brazen Borrower)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 18
+Bot2.Life = 16
+Bot2.Battlefield.Brazen Borrower.Power = 3
+Bot2.Graveyard = Shock; Black Lotus
