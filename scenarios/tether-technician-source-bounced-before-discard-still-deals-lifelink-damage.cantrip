@@ -1,5 +1,5 @@
 # The ETB ability is independent of its source (CR 113.7a). Scales grants lifelink, then Unsummon returns Tether before discard.
-# The reflexive ability still comes from that original creature, with last-known lifelink (CR 603.7d, 608.2h, 120.3f).
+# The reflexive ability still comes from that original creature, with last-known lifelink (CR 603.7e, 608.2h, 120.3f).
 
 [Bot1 Deck]
 Black Lotus
