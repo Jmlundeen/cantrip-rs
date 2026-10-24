@@ -10,6 +10,7 @@ mod fantasticar_cant_be_sacrificed;
 mod floodpits_drowner_self;
 mod hybrid_reduction;
 mod look_counts;
+mod land_cant_be_sacrificed;
 mod lost_abilities;
 mod mana_ability_guards;
 mod repeatable_mana;
