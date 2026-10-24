@@ -1,0 +1,8 @@
+{
+  "name": "Coppercoat Vanguard",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Each other Human you control gets +1/+0 and has ward {1}. (Whenever it becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)"
+}

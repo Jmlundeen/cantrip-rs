@@ -1,0 +1,59 @@
+# Coppercoat Vanguard gives each other Human you control ward {1}. Turn 2: Bot2's only mana is one Mountain, so its Lightning Bolt
+# at Bot1's Dragon Sniper is countered by the ward trigger (it cannot pay {1}) and the Sniper takes no damage. Turn 4: with two Mountains
+# it bolts the Vanguard itself, which has no ward (it is not "other"): the Bolt resolves with a Mountain untapped, killing the 2/2.
+# CR 702.21a.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Ornithopter
+Dragon Sniper
+Coppercoat Vanguard
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Dragon Sniper.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Coppercoat Vanguard.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dragon Sniper)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Sniper.Damage = 0
+? Bot2.Graveyard.Count = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Coppercoat Vanguard)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Mox Emerald; Ornithopter; Dragon Sniper; Plains
+Bot1.Graveyard = Coppercoat Vanguard
+Bot1.Battlefield.Dragon Sniper.Damage = 0
+Bot2.Graveyard.Count = 2

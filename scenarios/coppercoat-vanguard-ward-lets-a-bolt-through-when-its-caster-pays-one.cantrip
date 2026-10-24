@@ -1,0 +1,47 @@
+# Coppercoat Vanguard gives Bot1's Dragon Sniper ward {1}; Bot2 has exactly two mana (Mountain and its own Mox Ruby), pays the {1} the
+# ward trigger asks and the Lightning Bolt resolves, killing the Sniper (the control for the scenario in which Bot2 cannot pay). CR 702.21a.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Ornithopter
+Dragon Sniper
+Coppercoat Vanguard
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Dragon Sniper.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Coppercoat Vanguard.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dragon Sniper)
+Bot2.PayCost
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Mox Emerald; Ornithopter; Coppercoat Vanguard; Plains
+Bot1.Graveyard = Dragon Sniper
+Bot2.Graveyard = Lightning Bolt

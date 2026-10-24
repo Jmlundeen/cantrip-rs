@@ -1,0 +1,47 @@
+# Coppercoat Vanguard: "Each other Human you control gets +1/+0 and has ward {1}." Bot1's Dragon Sniper (a Human) is 2/1 with the
+# Vanguard out; the Vanguard itself stays 2/2 (it is not "other"), Bot1's Ornithopter (not a Human) stays 0/2, and Bot2's own
+# Dragon Sniper (a Human, but not one Bot1 controls) stays 1/1. CR 613.4c, 613.1f.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Ornithopter
+Dragon Sniper
+Coppercoat Vanguard
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mox Emerald
+Dragon Sniper
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Dragon Sniper.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Coppercoat Vanguard.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Dragon Sniper.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Dragon Sniper.Power = 2
+Bot1.Battlefield.Dragon Sniper.Toughness = 1
+Bot1.Battlefield.Coppercoat Vanguard.Power = 2
+Bot1.Battlefield.Coppercoat Vanguard.Toughness = 2
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Dragon Sniper.Power = 1
+Bot2.Battlefield.Dragon Sniper.Toughness = 1
