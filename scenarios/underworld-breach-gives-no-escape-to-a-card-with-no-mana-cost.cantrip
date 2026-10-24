@@ -1,0 +1,41 @@
+# Underworld Breach's escape cost is the card's mana cost plus exiling three other cards; a card with no mana cost has an
+# unpayable escape cost, so it can't be cast that way (the rulings). Black Lotus's {R}{R}{R} casts Breach, and Lion's Eye
+# Diamond discards Lotus Bloom (no mana cost), Lightning Bolt and two Mountains for {R}{R}{R}. With six cards in the
+# graveyard and four red mana floating, Lotus Bloom can't escape, while Lightning Bolt escapes for {R}, exiling three others,
+# and Bot2 takes 3 (17).
+
+[Bot1 Deck]
+Black Lotus
+Underworld Breach
+Lion's Eye Diamond
+Lotus Bloom
+Lightning Bolt
+Mountain
+Mountain
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Pass
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+? Bot1.Graveyard.Count = 6
+? Bot1.Mana = {R}{R}{R}{R}
+! Bot1.Graveyard.Lotus Bloom.Cast
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Escape)
+Bot1.Choose(Mountain; Mountain; Lion's Eye Diamond)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 17
+Exile.Count = 3
+Bot1.Graveyard = Lightning Bolt; Lotus Bloom; Black Lotus

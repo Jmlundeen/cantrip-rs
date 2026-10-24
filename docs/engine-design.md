@@ -1414,7 +1414,9 @@ mana cost (Lurrus of the Dream-Den)"; an ordinary cast reads as it always has.
 
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra
 Paragon, Underworld Breach's escape, mayhem) or the hand. Each is judged on the face being cast and offered as that face's
-cast with the way's `Grant`. One that is a permission (`GrantedWay::permission`: Lurrus, Serra Paragon) is a route: the card
+cast with the way's `Grant`, which the spell's `Cast` record keeps (`Cast::by`): what the spell was cast with is read from
+it and the way it names (`GrantedWay::kind`, as `WayDef::kind` for the card's own ways), so a card escaped by Underworld
+Breach's escape escaped as one cast by its own (`escape::escaped`, CR 702.138b). One that is a permission (`GrantedWay::permission`: Lurrus, Serra Paragon) is a route: the card
 is cast by it for its mana cost or any alternative cost, as by any permission. Any other is the one alternative cost of that
 cast (CR 118.9a); additional costs and cost increases still apply to it (CR 118.9d). Whether X is announced follows from the
 cost the way names (CR 107.3a-b): a cost that is or includes the mana cost has its {X}; `Cost::NONE`, "without paying its

@@ -26,7 +26,7 @@ fn sacrifice_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    granted_ways: &[GrantedWay { text: "Escape", cost: escape_cost, ..GrantedWay::CAST }],
+    granted_ways: &[escape::granted(escape_cost)],
     abilities: &[triggered(cantrip_mechanics::triggers::EACH_END_STEP, sacrifice_this, "At the beginning of the end step, sacrifice this enchantment.")],
     ..oracle::UNDERWORLD_BREACH
 };

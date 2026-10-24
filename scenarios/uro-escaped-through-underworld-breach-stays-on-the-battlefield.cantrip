@@ -1,0 +1,58 @@
+# Uro escaped with the escape Underworld Breach gives it stays (CR 702.138b: a spell "escaped" if it was cast from a
+# graveyard with an escape ability, its own or one a permanent gives it; the rulings sacrifice it only "if it was cast
+# using any permission other than an escape ability"). Cast from hand on turn 1 (Mox Emerald, Mox Sapphire, a Lotus Petal)
+# Uro gains 3, draws Black Lotus and is sacrificed. On turn 3 Black Lotus's {R}{R}{R} casts Breach, and with Black Lotus and
+# two Petals beside it - three other cards, too few for its own escape - Uro escapes by Breach's for its mana cost
+# {1}{G}{U}, exiling those three. It stays, and gains 3 more (26).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Uro, Titan of Nature's Wrath
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Underworld Breach
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Hand.Uro, Titan of Nature's Wrath.Cast
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+[T3 Bot1.Main1]
+? Bot1.Life = 23
+? Bot1.Graveyard = Uro, Titan of Nature's Wrath; Lotus Petal
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Graveyard.Count = 4
+? Bot1.Mana = {U}{R}{G}
+Bot1.Graveyard.Uro, Titan of Nature's Wrath.Cast(Ability: Escape)
+Bot1.Choose(Black Lotus; Lotus Petal; Lotus Petal)
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 26
+Exile.Count = 3
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Uro, Titan of Nature's Wrath.Damage = 0

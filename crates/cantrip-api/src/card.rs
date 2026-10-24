@@ -1569,6 +1569,8 @@ pub enum WayKind {
     Warp,
     /// Web-slinging (CR 702.188a).
     WebSlinging,
+    /// Escape (CR 702.138a), the card's own or one a permanent gives it (`GrantedWay::kind`): "escaped" asks it (CR 702.138b).
+    Escape,
 }
 
 /// An alternative way to cast a card (CR 118.9): flashback (CR 702.34) from the graveyard, Fireblast's sacrifice.
@@ -1790,12 +1792,24 @@ pub struct GrantedWay {
     /// by it as it would be by any permission - for its mana cost or an alternative cost another object gives or the card
     /// has (CR 118.9: Primal Prayers' energy, evoke), every additional cost owed - rather than only for `cost`.
     pub permission: bool,
+    /// Which keyword's way this is, as `WayDef::kind` is for a card's own: set by the keyword's constructor
+    /// (`cantrip_mechanics::escape::granted` for Underworld Breach's escape), so a spell cast by it is known to have been cast
+    /// with that keyword whatever gave it (CR 702.138b: "cast from a graveyard with an escape ability").
+    pub kind: WayKind,
 }
 
 impl GrantedWay {
     /// A way that casts only and grants nothing, for a card's file to start from.
-    pub const CAST: GrantedWay =
-        GrantedWay { text: "", cost: |_, _, _, _| None, from: ZoneKind::Graveyard, lands: false, gains: None, flashback: false, permission: false };
+    pub const CAST: GrantedWay = GrantedWay {
+        text: "",
+        cost: |_, _, _, _| None,
+        from: ZoneKind::Graveyard,
+        lands: false,
+        gains: None,
+        flashback: false,
+        permission: false,
+        kind: WayKind::Other,
+    };
 }
 
 /// What a static ability lets a spell be cast for rather than its mana cost (CR 118.9, `SpellAlternative::cost`).
