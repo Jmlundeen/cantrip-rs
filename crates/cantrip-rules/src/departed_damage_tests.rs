@@ -57,8 +57,48 @@ static SHIELD: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn to_other(_: &dyn Query, _: &Asker, _: ObjectId, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::Damage(d) if d.target == Target::Player(OTHER))
+}
+
+fn to_affected(_: &dyn Query, _: &Asker, affected: ObjectId, proposal: &mut Proposal) {
+    if let Proposal::Damage(d) = proposal {
+        d.target = Target::Object(affected);
+    }
+}
+
+/// "The next time damage would be dealt to that player this turn, it's dealt to [the affected permanent] instead": a
+/// redirection used up by the one event it replaces (CR 614.1a).
+static ONCE_REDIRECT: CardDef = CardDef {
+    name: "Once-only redirect probe",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    granted_replacements: &[GrantedReplacementDef {
+        hint: "redirect the next damage",
+        kind: ReplacementKind::Damage,
+        applies: to_other,
+        apply: to_affected,
+        then: None,
+        once: true,
+    }],
+    ..CardDef::BLANK
+};
+
+static BYSTANDER: CardDef = CardDef {
+    name: "Redirect destination probe",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(5),
+    ..CardDef::BLANK
+};
+
+static NONCREATURE: CardDef = CardDef {
+    name: "Noncreature redirect destination probe",
+    types: TypeSet::of(&[CardType::Artifact]),
+    ..CardDef::BLANK
+};
+
 fn game() -> (RulesGame, ObjectId) {
-    let cards = Box::leak(Box::new(CardTable::new([&SOURCE, &REPLACER, &SHIELD, &REDIRECT])));
+    let cards = Box::leak(Box::new(CardTable::new([&SOURCE, &REPLACER, &SHIELD, &REDIRECT, &ONCE_REDIRECT, &BYSTANDER, &NONCREATURE])));
     let mut game = RulesGame::new(cards, &crate::Setup { decks: vec![Vec::new(); 3], ..Default::default() });
     let id = game.state.push_obj(Obj::new(cards.id_of(&SOURCE), YOU, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, id);
@@ -147,4 +187,32 @@ fn invalid_redirection_keeps_original_live_damage_and_does_not_use_destination_s
     assert_eq!(cx.g.log.iter().filter(|r| matches!(r.event, Event::Damage { target: Target::Player(OTHER), amount: 2, .. })).count(), 1);
     assert!(!cx.g.log.iter().any(|r| matches!(r.event, Event::DamagePrevented { .. })));
     assert!(matches!(cx.s().effects[0].kind, EffectKind::Prevention { shield: Shield::Next(3), .. }));
+}
+
+/// A once-only redirection to `destination` in `zone`, the source's 2 damage aimed at OTHER: returns OTHER's life, the
+/// damage marked on the destination and whether the redirection is still waiting.
+fn redirect_once_to(destination: &'static CardDef, zone: Zone) -> (i32, u16, bool) {
+    let (mut game, source) = game();
+    let redirector = game.state.push_obj(Obj::new(game.cards.id_of(&ONCE_REDIRECT), YOU, Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, redirector);
+    let to = game.state.push_obj(Obj::new(game.cards.id_of(destination), OTHER, zone));
+    game.state.zone_push(zone, to);
+    game.state.effect_push(ContinuousEffect {
+        source: redirector, affected: to, controller: YOU, kind: EffectKind::Replacement(0),
+        duration: Duration::EndOfTurn, timestamp: 1,
+    });
+    let mut cx = cx(&mut game);
+    assert_eq!(damage(&mut cx, source, Target::Player(OTHER), 2, false), 2);
+    let waiting = cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement(0)));
+    (cx.s().player(OTHER).life, cx.s().obj(to).damage, waiting)
+}
+
+/// CR 614.9: a redirection to a permanent that can't be dealt damage - one that is no creature, planeswalker or battle, or
+/// a card that is not on the battlefield - does nothing: the damage stays with the player, and "the next time" is not
+/// used up. The control: a creature on the battlefield takes the damage, and the effect is used up.
+#[test]
+fn a_redirection_to_a_permanent_that_cannot_be_dealt_damage_does_nothing_and_is_not_used_up() {
+    assert_eq!(redirect_once_to(&BYSTANDER, Zone::BATTLEFIELD), (20, 2, false), "a creature takes the redirected damage");
+    assert_eq!(redirect_once_to(&NONCREATURE, Zone::BATTLEFIELD), (18, 0, true), "a noncreature permanent is no destination");
+    assert_eq!(redirect_once_to(&BYSTANDER, Zone::hand(OTHER)), (18, 0, true), "a creature card in hand is no destination");
 }
