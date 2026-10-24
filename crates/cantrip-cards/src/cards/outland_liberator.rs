@@ -4,11 +4,12 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-/// "Target artifact or enchantment defending player controls" (CR 506.2): the player the source attacks, or the
-/// controller of the planeswalker it attacks.
+/// "Target artifact or enchantment defending player controls" (CR 508.5): the player the source attacks, or the
+/// controller of the planeswalker or the protector of the battle it attacks - still so once that planeswalker or battle
+/// has been removed from combat (`Attacker::defending`).
 fn defending_players_artifact_or_enchantment(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Some(attack) = q.state().attackers.iter().find(|a| a.id == asker.source) else { return false };
-    let Some(defending) = q.defending_player(attack.target) else { return false };
+    let defending = attack.defending;
     (targets::ARTIFACT_OR_ENCHANTMENT.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == defending)
 }
 

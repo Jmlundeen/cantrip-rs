@@ -727,7 +727,10 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     let (attacks, bands, options) = attacks;
     let mut attackers = Vec::new();
     for ((id, target), band) in attacks.into_iter().zip(bands) {
-        attackers.push(Attacker { band, ..Attacker::new(id, target) });
+        // Each names a player or a planeswalker or battle of a defending player (CR 508.1b), which the declaration was checked
+        // against: its defending player is the one that names (CR 508.5).
+        let Some(defending) = defending_player(cx, target) else { continue };
+        attackers.push(Attacker { band, ..Attacker::new(id, target, defending) });
     }
     let attacked = !attackers.is_empty();
     cx.st().update_turn(|t| t.attacked = attacked);
@@ -1022,7 +1025,9 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
     if attackers.is_empty() {
         return Ok(());
     }
-    let Some(defender) = defending_player(cx, cx.s().attackers[0].target) else { return Ok(()) };
+    // The defending player of the first attacker (CR 508.5): one attacking a planeswalker or battle removed from combat
+    // still has one, and may still be blocked (CR 506.4c).
+    let defender = cx.s().attackers[0].defending;
     let eligible: Vec<ObjectId> = cx
         .s()
         .battlefield()
@@ -1305,14 +1310,16 @@ fn blocked_by(cx: &Cx, blocker: ObjectId) -> Vec<ObjectId> {
     cx.s().blocks.iter().filter(|b| b.blocker == blocker && live(cx.s(), b.attacker)).map(|b| b.attacker).collect()
 }
 
-/// CR 800.4e, 506.4c, 510.1b: damage is not assigned to a departed player or an absent attacked permanent.
-/// A battle still being attacked keeps its departed protector until combat ends (CR 704.5x).
+/// Whether combat damage can be assigned to what an attacker attacks (CR 510.1b, 702.19b): a player still in the game
+/// (CR 800.4e), or a planeswalker or battle - which the combat state names only while it is being attacked (removed from
+/// combat, it is cleared, `ops::remove_from_combat`, `ops::settle_attacked`); a battle still being attacked keeps a
+/// protector who has left the game until combat ends (CR 704.5x). Nothing, for an attacker attacking nothing (CR 506.4c).
 fn combat_defender_present(cx: &Cx, target: Target) -> bool {
     match target {
         Target::Player(p) => cx.s().in_game(p),
-        Target::Object(id) if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) => {
-            let chars = cx.chars(id);
-            chars.is(CardType::Planeswalker) || chars.is(CardType::Battle)
+        Target::Object(id) => {
+            debug_assert!(live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield), "a permanent removed from combat is no longer attacked");
+            true
         }
         _ => false,
     }
@@ -1415,6 +1422,10 @@ fn blocker_division(cx: &Cx, blocker: ObjectId) -> Option<DamageDivision> {
 #[cfg(test)]
 #[path = "departed_combat_tests.rs"]
 mod departed_combat_tests;
+
+#[cfg(test)]
+#[path = "removed_from_combat_tests.rs"]
+mod removed_from_combat_tests;
 
 /// Cleanup (CR 514): discard to hand size, then damage wears off and "until end of turn" effects end.
 pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {

@@ -55,14 +55,8 @@ pub fn phase_out(cx: &mut Cx, permanents: &[ObjectId], until_leaves: Option<Obje
     direct.retain(|id| !indirect.contains(id));
     let all: Vec<(ObjectId, bool)> = direct.iter().map(|&id| (id, false)).chain(indirect.iter().map(|&id| (id, true))).collect();
     let leaving = |id: ObjectId| all.iter().any(|&(a, _)| a == id);
-    if cx.s().attackers.iter().any(|a| leaving(a.id)) {
-        let attackers = cx.s().attackers.iter().copied().filter(|a| !leaving(a.id)).collect();
-        cx.st().set_attackers(attackers);
-    }
-    if cx.s().blocks.iter().any(|b| leaving(b.blocker) || leaving(b.attacker)) {
-        let blocks = cx.s().blocks.iter().copied().filter(|b| !leaving(b.blocker) && !leaving(b.attacker)).collect();
-        cx.st().set_blocks(blocks);
-    }
+    let phasing: Vec<ObjectId> = all.iter().map(|&(id, _)| id).collect();
+    crate::ops::remove_from_combat(cx, &phasing);
     // CR 702.26f: a "for as long as" duration that tracks one of them ends, as it can no longer see it (Teferi's Protection's
     // ruling on Mathas, Fiend Seeker): one about its counters or its being tapped. One about an effect's source remaining on
     // the battlefield ends once they have phased out, below.

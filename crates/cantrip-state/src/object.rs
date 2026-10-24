@@ -2309,7 +2309,15 @@ impl Turn {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Attacker {
     pub id: ObjectId,
+    /// The player, planeswalker or battle it attacks; `Target::None` once that planeswalker or battle has been removed from
+    /// combat (CR 506.4, 506.4c): it is still an attacking creature, attacking nothing, and may be blocked, but unblocked it
+    /// assigns no combat damage (CR 510.1b). Cleared as the removal happens (`ops::remove_from_combat`,
+    /// `ops::settle_attacked`), so a permanent named here is one still being attacked.
     pub target: Target,
+    /// Its defending player (CR 508.5): the player it attacks, or the controller of the planeswalker or the protector of the
+    /// battle it attacks - fixed while it attacks it, as a change of either removes that permanent from combat (CR 506.4) -
+    /// and still that player once the planeswalker or battle has been removed (`target` `Target::None`).
+    pub defending: PlayerId,
     pub blocked: bool,
     /// It had first strike or double strike as this combat's first-strike damage step began (CR 510.4): in the regular
     /// combat damage step it assigns combat damage only if it has double strike then.
@@ -2320,9 +2328,10 @@ pub struct Attacker {
 }
 
 impl Attacker {
-    /// An attacking creature, unblocked, in no band, not yet in any combat damage step.
-    pub const fn new(id: ObjectId, target: Target) -> Attacker {
-        Attacker { id, target, blocked: false, first_strike: false, band: 0 }
+    /// An attacking creature attacking `target`, whose defending player is `defending`: unblocked, in no band, not yet in any
+    /// combat damage step.
+    pub const fn new(id: ObjectId, target: Target, defending: PlayerId) -> Attacker {
+        Attacker { id, target, defending, blocked: false, first_strike: false, band: 0 }
     }
 }
 

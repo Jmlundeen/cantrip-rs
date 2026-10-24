@@ -35,7 +35,7 @@ fn game(def: &'static CardDef, blocked: bool) -> (RulesGame, ObjectId) {
     game.state.update_turn(|t| { t.number = 1; t.active = YOU; t.set_step(Step::CombatDamage); t.attacked = true; });
     let attacker = game.state.push_obj(Obj::new(cards.id_of(def), YOU, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, attacker);
-    game.state.set_attackers(vec![Attacker { blocked, ..Attacker::new(attacker, Target::Player(LEFT)) }]);
+    game.state.set_attackers(vec![Attacker { blocked, ..Attacker::new(attacker, Target::Player(LEFT), LEFT) }]);
     (game, attacker)
 }
 
@@ -123,12 +123,15 @@ fn absent_planeswalkers_have_no_assignment_but_live_battles_keep_departed_protec
         let id = game.state.push_obj(Obj::new(game.cards.id_of(def), OTHER, Zone::BATTLEFIELD));
         game.state.zone_push(Zone::BATTLEFIELD, id);
         game.state.update_obj(id, |o| { o.marks.protector = (def.types.has(CardType::Battle)).then_some(LEFT); });
-        game.state.set_attackers(vec![Attacker::new(attacker, Target::Object(id))]);
+        let defending = if def.types.has(CardType::Battle) { LEFT } else { OTHER };
+        game.state.set_attackers(vec![Attacker::new(attacker, Target::Object(id), defending)]);
         game.state.update_player(LEFT, |p| p.lost = true);
         let mut cx = cx(&mut game);
         if def.types.has(CardType::Planeswalker) {
+            // Leaving the battlefield removes it from combat (CR 506.4): its attacker attacks nothing (CR 506.4c).
             ops::exile_all(&mut cx, &[id]);
-            assert!(!combat_defender_present(&cx, Target::Object(id)));
+            assert_eq!(cx.s().attackers[0].target, Target::None);
+            assert_eq!(cx.s().attackers[0].defending, OTHER);
             combat_damage(&mut cx).unwrap();
             assert_eq!(damage_events(&cx), 0);
             assert_eq!(cx.s().player(YOU).life, 20);

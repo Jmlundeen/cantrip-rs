@@ -2061,8 +2061,22 @@ an exception about power to it.
 Combat assignments themselves leave out a departed player (CR 800.4e), not merely the later damage operation.
 `turn::combat_defender_present` and `combat_assignments` exclude that defender from an unblocked or blocker-free
 trample assignment and from a trample division's options; remaining creatures still receive assignments normally.
-An absent attacked planeswalker/battle receives none (CR 506.4c, 510.1b); a battle still present keeps its departed
-protector through combat (CR 704.5x). Both damage steps use the same procedure.
+Both damage steps use the same procedure.
+
+The combat state is the one truth of what is attacked. An `Attacker` names what it attacks (`target`) and its defending
+player (`defending`, CR 508.5), fixed as it begins attacking. A planeswalker or battle being attacked is removed from
+combat the moment the rules say (CR 506.4), and the creatures attacking it go on attacking nothing - `target` becomes
+`Target::None`, `defending` stays - so they may still be blocked (by that player, `declare_blockers`) and, unblocked,
+assign no combat damage (CR 506.4c, 510.1b): the damage step asks nothing of the permanent again, and one that is a
+planeswalker again, or its first controller's again, by then is still not attacked. `ops::remove_from_combat` is the
+one place combat forgets a permanent - leaving the battlefield, phasing out, regenerating while attacking or blocking,
+a change of controller (`ops::write_controller`, CR 613.1b) or of a battle's protector (the state-based action of CR
+704.5x-y); `ops::settle_attacked` removes one that has stopped being a planeswalker or battle by its card types as the
+layers have them (CR 506.4e: one that is both stays while it is either, a planeswalker that was a battle only while its
+protector controls it), asked wherever control is settled - every event, every effect begun, the end of an instruction,
+the state-based actions (`settle_lasting_and_control`) - and at every change with no event (`Cx::state_changed`), free
+while nothing attacks a permanent. Type loss takes no creature out of a block (CR 506.4d). A battle still being attacked
+keeps its departed protector through combat (CR 704.5x).
 The departed-recipient and assignment checks measured 13.86 us per decision before and 14.05 after on 128 games, in
 back-to-back runs of the two builds (2026-10-24; shared-machine load, no speed claim).
 

@@ -505,15 +505,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
 
         // A permanent that leaves the battlefield leaves combat (CR 506.4).
         if from.is(ZoneKind::Battlefield) {
-            let id = m.id;
-            if cx.s().attackers.iter().any(|a| a.id == id) {
-                let attackers = cx.s().attackers.iter().copied().filter(|a| a.id != id).collect();
-                cx.st().set_attackers(attackers);
-            }
-            if cx.s().blocks.iter().any(|b| b.blocker == id || b.attacker == id) {
-                let blocks = cx.s().blocks.iter().copied().filter(|b| b.blocker != id && b.attacker != id).collect();
-                cx.st().set_blocks(blocks);
-            }
+            remove_from_combat(cx, &[m.id]);
         }
         events.push(Event::ZoneChange { old: m.id, new: new_id, from, to, reason });
         // CR 303.4f, 301.5e: it entered attached to something, so it became attached to it.
@@ -3073,13 +3065,10 @@ pub fn regenerate_instead(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
             o.deathtouched = false;
         });
         tap(cx, id);
-        if cx.s().attackers.iter().any(|a| a.id == id) {
-            let attackers = cx.s().attackers.iter().copied().filter(|a| a.id != id).collect();
-            cx.st().set_attackers(attackers);
-        }
-        if cx.s().blocks.iter().any(|b| b.blocker == id || b.attacker == id) {
-            let blocks = cx.s().blocks.iter().copied().filter(|b| b.blocker != id && b.attacker != id).collect();
-            cx.st().set_blocks(blocks);
+        // An attacking or blocking creature that regenerates is removed from combat (CR 506.4) - a planeswalker being attacked
+        // that is one too with it; one that is neither is not.
+        if cx.s().attackers.iter().any(|a| a.id == id) || cx.s().blocks.iter().any(|b| b.blocker == id) {
+            remove_from_combat(cx, &[id]);
         }
         saved.push(id);
     }
@@ -3531,9 +3520,10 @@ pub fn enter_attacking(cx: &mut Cx, entered: &[ObjectId], defender: Target) {
         return;
     }
     let attacking = cx.s().turn.active;
-    if !attackable(cx, attacking, defender) {
+    // Its defending player (CR 508.5): the player attacked, or the controller or protector of the permanent.
+    let Some(defending) = defending_player_of(cx.s(), defender).filter(|_| attackable(cx, attacking, defender)) else {
         return;
-    }
+    };
     let mut attackers = cx.s().attackers.clone();
     for &id in entered {
         if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).controller != attacking {
@@ -3541,7 +3531,7 @@ pub fn enter_attacking(cx: &mut Cx, entered: &[ObjectId], defender: Target) {
         }
         let chars = cx.chars(id);
         if chars.is(CardType::Creature) && !chars.is(CardType::Battle) {
-            attackers.push(Attacker::new(id, defender));
+            attackers.push(Attacker::new(id, defender, defending));
         }
     }
     if attackers.len() != cx.s().attackers.len() {
@@ -3593,14 +3583,9 @@ fn write_controller(cx: &mut Cx, id: ObjectId, controller: PlayerId, by_effect: 
         }
     });
     if controller != obj.controller {
-        if cx.s().attackers.iter().any(|a| a.id == id) {
-            let attackers = cx.s().attackers.iter().copied().filter(|a| a.id != id).collect();
-            cx.st().set_attackers(attackers);
-        }
-        if cx.s().blocks.iter().any(|b| b.blocker == id || b.attacker == id) {
-            let blocks = cx.s().blocks.iter().copied().filter(|b| b.blocker != id && b.attacker != id).collect();
-            cx.st().set_blocks(blocks);
-        }
+        // A permanent whose controller changes is removed from combat (CR 506.4): an attacking or blocking creature, and a
+        // planeswalker or battle being attacked, whose attackers then attack nothing (CR 506.4c).
+        remove_from_combat(cx, &[id]);
         // "For as long as you control [it]" is over for good, though control come back (CR 611.2b).
         if cx.s().permissions.iter().any(|p| p.grant.expiry.controlled() == Some(id)) {
             cx.st().end_lapsed_permissions();
@@ -3642,6 +3627,84 @@ pub(crate) fn control_may_change(cx: &Cx) -> bool {
         })
 }
 
+/// Removes `permanents` from combat (CR 506.4): an attacking creature among them stops attacking, a blocking one stops
+/// blocking, and a planeswalker or battle among them being attacked stops being attacked - the creatures attacking it go on
+/// attacking, attacking nothing (`Attacker::target` `Target::None`), and may still be blocked; unblocked, they assign no
+/// combat damage (CR 506.4c, 510.1b). Their defending player stays who it was (CR 508.5, `Attacker::defending`). The one
+/// place combat forgets a permanent: leaving the battlefield, phasing out, a change of controller or protector,
+/// regeneration.
+pub(crate) fn remove_from_combat(cx: &mut Cx, permanents: &[ObjectId]) {
+    if permanents.is_empty() {
+        return;
+    }
+    let removed = |id: ObjectId| permanents.contains(&id);
+    let s = cx.s();
+    let attacking = s.attackers.iter().any(|a| removed(a.id) || a.target.object().is_some_and(removed));
+    if attacking {
+        let attackers = s
+            .attackers
+            .iter()
+            .filter(|a| !removed(a.id))
+            .map(|&a| if a.target.object().is_some_and(removed) { Attacker { target: Target::None, ..a } } else { a })
+            .collect();
+        cx.st().set_attackers(attackers);
+    }
+    if cx.s().blocks.iter().any(|b| removed(b.blocker) || removed(b.attacker)) {
+        let blocks = cx.s().blocks.iter().copied().filter(|b| !removed(b.blocker) && !removed(b.attacker)).collect();
+        cx.st().set_blocks(blocks);
+    }
+}
+
+/// Whether a planeswalker or battle being attacked by a creature whose defending player is `defending` is still one the
+/// rules keep in combat by its card types (CR 506.4, 506.4e), as the layers have it now. Its controller and protector have
+/// not changed since it was attacked (that removes it, `remove_from_combat`), so `defending` says how it was attacked: as a
+/// planeswalker its controller is the defending player, as a battle (or as both) its protector is (CR 508.5). It stays
+/// while it is both; a planeswalker and no longer a battle stays while it is controlled by the defending player - always,
+/// if it was attacked as a planeswalker, and if it was attacked as a battle, only while its protector controls it; a
+/// battle and no longer a planeswalker stays while the defending player protects it - one attacked as a battle, or as
+/// both - and not if it was attacked as a planeswalker alone; neither, it does not.
+fn still_attacked(cx: &Cx, id: ObjectId, defending: PlayerId) -> bool {
+    let chars = cx.chars(id);
+    let obj = cx.s().obj(id);
+    match (chars.is(CardType::Planeswalker), chars.is(CardType::Battle)) {
+        (true, true) => true,
+        (true, false) => obj.controller == defending,
+        (false, true) => obj.marks.protector == Some(defending),
+        (false, false) => false,
+    }
+}
+
+/// A planeswalker or battle being attacked that has stopped being one is removed from combat (CR 506.4, 506.4e) the moment
+/// it does, for good: the creatures attacking it attack nothing from then on (CR 506.4c), though it become one again before
+/// combat damage. Asked wherever characteristics may have changed - at every event and every effect begun
+/// (`settle_lasting_and_control`), and at every change with no event (`Cx::state_changed`). It takes the permanent out
+/// of no block: a blocking creature that is also a planeswalker being attacked and stops being a planeswalker is still
+/// blocking (CR 506.4d). Free while no creature attacks a permanent.
+pub(crate) fn settle_attacked(cx: &mut Cx) {
+    let s = cx.s();
+    if !s.attackers.iter().any(|a| matches!(a.target, Target::Object(_))) {
+        return;
+    }
+    let mut lapsed: Vec<ObjectId> = Vec::new();
+    for a in &s.attackers {
+        if let Target::Object(id) = a.target
+            && !lapsed.contains(&id)
+            && !still_attacked(cx, id, a.defending)
+        {
+            lapsed.push(id);
+        }
+    }
+    if lapsed.is_empty() {
+        return;
+    }
+    let attackers = s
+        .attackers
+        .iter()
+        .map(|&a| if a.target.object().is_some_and(|id| lapsed.contains(&id)) { Attacker { target: Target::None, ..a } } else { a })
+        .collect();
+    cx.st().set_attackers(attackers);
+}
+
 /// Settles at once what continuous effects say of control (CR 613.1b) and of "for as long as" durations (CR 611.2b), as
 /// each event happens rather than only as the state-based actions are next checked: an Aura that gave control leaving or
 /// moving, a condition turning false partway through a resolution. Before an event's triggers are looked for (`Cx::emit`),
@@ -3670,6 +3733,7 @@ pub fn settle_lasting_and_control(cx: &mut Cx) -> bool {
             break;
         }
     }
+    settle_attacked(cx);
     changed
 }
 
@@ -3942,15 +4006,10 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
             cx.st().delayed_remove(at);
         }
     }
-    let gone = |cx: &Cx, id: ObjectId| cx.s().obj(id).zone.is(ZoneKind::Gone);
-    if cx.s().attackers.iter().any(|a| gone(cx, a.id)) {
-        let attackers = cx.s().attackers.iter().copied().filter(|a| !gone(cx, a.id)).collect();
-        cx.st().set_attackers(attackers);
-    }
-    if cx.s().blocks.iter().any(|b| gone(cx, b.blocker) || gone(cx, b.attacker)) {
-        let blocks = cx.s().blocks.iter().copied().filter(|b| !gone(cx, b.blocker) && !gone(cx, b.attacker)).collect();
-        cx.st().set_blocks(blocks);
-    }
+    let gone = |id: ObjectId| cx.s().obj(id).zone.is(ZoneKind::Gone);
+    let in_combat = cx.s().attackers.iter().flat_map(|a| [a.id].into_iter().chain(a.target.object()));
+    let departed: Vec<ObjectId> = in_combat.chain(cx.s().blocks.iter().map(|b| b.blocker)).filter(|&id| gone(id)).collect();
+    remove_from_combat(cx, &departed);
     // What they still control is exiled (CR 800.4a), a phased-out permanent included (CR 702.26n) once the effects that
     // gave them control of it have ended; one that goes back to another player phases in later (`phasing::untap_step`).
     let phased: Vec<ObjectId> = cx.s().zone(Zone::PHASED_OUT).iter().copied().filter(|&id| cx.s().obj(id).controller == player).collect();

@@ -365,6 +365,9 @@ fn check_once(cx: &mut Cx) -> R<bool> {
             candidates[0]
         };
         cx.st().update_obj(id, |o| o.marks.protector = Some(protector));
+        // A battle whose protector changes is removed from combat (CR 506.4): the creatures attacking it attack nothing
+        // (CR 506.4c).
+        ops::remove_from_combat(cx, &[id]);
         acted = true;
     }
 
