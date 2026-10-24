@@ -16,14 +16,6 @@ fn exiled_creature_cards(view: &dyn LayerQuery, by: ObjectId) -> Vec<ObjectId> {
     view.exiled_with(view.linked_to(by)).into_iter().filter(|&id| view.cards().get(view.state().obj(id).card).is(CardType::Creature)).collect()
 }
 
-/// "Creatures you control with +1/+1 counters on them" (CR 613.1f).
-fn creature_with_counters(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    let s = view.state();
-    so_far.is(CardType::Creature)
-        && s.obj(affected).controller == s.obj(source).controller
-        && s.obj(affected).counters(CounterKind::PlusOne) > 0
-}
-
 /// "... have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron": each is the creature's own
 /// ability as written, so the creature is its source and "this creature" means it (CR 113.7, 613.1f).
 /// The same ability twice is two abilities (CR 602.5c): a Rootwalla that exiled itself has its pump twice.
@@ -58,7 +50,7 @@ pub static CARD: CardDef = CardDef {
         .targets(&[targets::CARD_IN_A_GRAVEYARD])],
     delayed: &[delayed_trigger(put_counter, "When a creature card is exiled this way, put a +1/+1 counter on target creature you control.")
         .targets(&[targets::CREATURE_YOU_CONTROL])],
-    statics: &[static_ability(Layer::Ability, creature_with_counters, grant_abilities, "Creatures you control with +1/+1 counters on them have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron.")],
+    statics: &[static_ability(Layer::Ability, cantrip_mechanics::statics::your_creatures_with_plus_one_counters, grant_abilities, "Creatures you control with +1/+1 counters on them have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron.")],
     spend_any_color: &[creature_you_control],
     ..oracle::AGATHAS_SOUL_CAULDRON
 };
