@@ -4,10 +4,7 @@ use cantrip_oracle as oracle;
 const GRANTED: Keywords = Keywords::of(&[Keyword::Flying, Keyword::Trample, Keyword::Indestructible, Keyword::Haste]);
 
 fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    affected != source
-        && so_far.is(CardType::Artifact)
-        && so_far.is(CardType::Creature)
-        && q.state().obj(affected).controller == q.state().obj(source).controller
+    affected != source && cantrip_mechanics::statics::your_artifact_creatures(q, source, affected, so_far)
 }
 
 fn apply(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

@@ -11,6 +11,12 @@ pub fn your_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, 
     so_far.is(CardType::Creature) && s.obj(affected).controller == s.obj(source).controller
 }
 
+/// "Artifact creatures you control" (CR 613.1): Tempered Steel and Vraska, Soul of Stone use it;
+/// Krang, Utrom Warlord excludes itself from the same group.
+pub fn your_artifact_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    so_far.is(CardType::Artifact) && your_creatures(q, source, affected, so_far)
+}
+
 /// "Other creatures you control" (CR 613.1f, layer 6): `your_creatures` without the source itself, judged on what the earlier
 /// layers made the object. Hexing Squelcher, Ulvenwald Oddity and Suki, Courageous Rescuer use it as `StaticDef::affects`.
 pub fn other_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
