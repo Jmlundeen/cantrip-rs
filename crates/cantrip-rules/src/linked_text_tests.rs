@@ -132,3 +132,51 @@ fn a_front_face_ability_given_to_the_back_face_is_acquired_by_the_effect() {
     let printed = crate::layers::acquired(t, &game.state, &game.log, source, &chars, slot(&TRANSFORMED));
     assert_eq!(printed, Acquired::OWN, "the back face's printed ability is its own");
 }
+
+/// "+1/+0 while a color was chosen for it", read by the ability that asks (CR 607.2d): a static ability of `CHOOSER`'s text,
+/// which the card prints and also lists to give (`delayed`).
+fn plus_one_for_a_chosen_color(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    if q.state().chosen_color(q.linked_to(source)).is_some() {
+        chars.power = chars.power.map(|p| p + 1);
+    }
+}
+
+static CHOOSER: CardDef = CardDef {
+    name: "Linked Test Chooser",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    statics: &[characteristic_defining(Layer::PtModify, plus_one_for_a_chosen_color, "This creature gets +1/+0 while a color was chosen.")],
+    delayed: &[granted_static(Layer::PtModify, plus_one_for_a_chosen_color, "This creature gets +1/+0 while a color was chosen.")],
+    ..CardDef::BLANK
+};
+
+/// A static ability an effect gives a permanent is acquired by that effect (CR 607.5), even where the permanent prints the
+/// same one: linked only to the abilities that effect gave it, it reads no choice the permanent's own text made (CR 607.2d).
+/// The Chooser chose a color as it entered: its printed "+1/+0" reads the choice; the same ability another object's effect
+/// gave it reads none, so it is a 2/1, not a 3/1.
+#[test]
+fn a_static_ability_given_by_an_effect_reads_no_choice_the_permanents_own_text_made() {
+    let t = Box::leak(Box::new(CardTable::new([&CHOOSER, &EXILED])));
+    let mut game = Game::new(t, &Setup { decks: vec![Vec::new(); 2], ..Default::default() });
+    let me = PlayerId(0);
+    let source = game.state.push_obj(Obj::new(t.id_of(&CHOOSER), me, Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, source);
+    let text = t.linked_card(t.id_of(&CHOOSER));
+    game.state.update_obj(source, |o| o.chosen_color = Some(Chosen { value: Color::Blue, text, acquired: Acquired::OWN }));
+    assert_eq!(crate::layers::chars(t, &game.state, &game.log, source).power, Some(2), "its own ability reads its own choice");
+    let lender = game.state.push_obj(Obj::new(t.id_of(&EXILED), me, Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, lender);
+    let timestamp = game.state.timestamp();
+    game.state.effect_push(ContinuousEffect {
+        source: lender,
+        controller: me,
+        timestamp,
+        affected: source,
+        kind: EffectKind::AddAbility(AbilityRef::delayed(t.id_of(&CHOOSER), 0)),
+        duration: Duration::EndOfTurn,
+    });
+    let chars = crate::layers::chars(t, &game.state, &game.log, source);
+    assert!(chars.abilities.contains(&Some(AbilityRef::delayed(t.id_of(&CHOOSER), 0))), "it has the given ability");
+    assert_eq!(chars.power, Some(2), "the given ability reads no choice: it made none");
+}

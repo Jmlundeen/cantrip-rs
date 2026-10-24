@@ -39,6 +39,20 @@ pub struct Giver {
 
 impl Giver {
     pub const NONE: Giver = Giver { object: ObjectId::NONE, acquired: Acquired::OWN };
+
+    /// The giver of a resolved effect that gave an object an ability (`EffectKind::AddAbility`): its source, as the effect's
+    /// entry gives it (`GEntry::giver`).
+    fn of_effect(e: &ContinuousEffect) -> Giver {
+        Giver { object: e.source, acquired: Acquired { by: AcquiredBy::Grant, stamp: e.timestamp, part: 0 } }
+    }
+}
+
+/// `ability`, an ability `giver` gave `holder`, as linked abilities know it (CR 607.1, 607.5): of its card's text, acquired
+/// by that effect - or, given by an effect of `holder`'s own (or by none), of the text `holder` has, as `ability_givers`
+/// counts it (`acquired`).
+fn given_ability(cards: &CardTable, state: &GameState, holder: ObjectId, ability: AbilityRef, giver: Giver) -> Linked {
+    let acquired = if giver.object == ObjectId::NONE || giver.object == holder { state.copy_acquired(holder) } else { giver.acquired };
+    Linked { object: holder, text: cards.linked_card(ability.card), acquired }
 }
 
 /// For each of `id`'s abilities (`Chars::abilities`, slot for slot), the other object whose effect gave it the ability (CR
@@ -233,6 +247,7 @@ impl Drop for JudgedFaceUp<'_> {
 /// layer is being applied (`stage`), as that layer's entries applied so far leave them (CR 613.8: the order of a layer's
 /// effects is judged on the whole game as it stands at each step). A static ability applied at step `k` of a layer reads
 /// every other object at step `k`, so the reads go to strictly earlier steps and end.
+#[derive(Clone, Copy)]
 struct View<'a> {
     cards: &'a CardTable,
     state: &'a GameState,
@@ -247,11 +262,15 @@ struct View<'a> {
     pass: Option<&'a Pass>,
     /// In layer 2, who controls each object as the control-changing effects applied so far leave it (`control_order`).
     controllers: Option<&'a std::collections::HashMap<ObjectId, PlayerId, Quick>>,
+    /// The static ability whose functions are being asked, where an effect gave it its object (`GKind::Given`,
+    /// `GKind::Granted`): as linked abilities know it (CR 607.5), what `linked_to` of that object answers. Its own and a copy
+    /// effect's are the text the object has (`CardTable::linked_to`).
+    asking: Option<Linked>,
 }
 
 impl<'a> View<'a> {
     fn new(cards: &'a CardTable, state: &'a GameState, log: &'a [Record], stop: Layer) -> View<'a> {
-        View { cards, state, log, stop, stage: None, reads: None, pass: None, controllers: None }
+        View { cards, state, log, stop, stage: None, reads: None, pass: None, controllers: None, asking: None }
     }
 
     /// An object with the layers before `stop` done, in the pass at hand or the position's.
@@ -279,6 +298,15 @@ impl<'a> View<'a> {
 impl LayerQuery for View<'_> {
     fn state(&self) -> &GameState {
         self.state
+    }
+
+    /// The static ability being asked, where an effect gave it `source` (CR 607.5: linked only to the abilities that effect
+    /// gave it); else an ability of the text `source` has.
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        match self.asking {
+            Some(by) if by.object == source => by,
+            _ => self.cards.linked_to(self.state, source),
+        }
     }
 
     fn cards(&self) -> &CardTable {
@@ -942,13 +970,13 @@ fn turn_face_up_action(cards: &CardTable, obj: &Obj, chars: &mut Chars) {
 /// abilities away has taken them from `chars` already: only what the object still has is kept. A grant of the same ability
 /// twice is two effects, each with its own timestamp. Guarded on the object's own effects, so an object nothing granted
 /// anything to costs nothing here.
-fn granted_statics(cards: &CardTable, object_timestamp: u32, fx: &[ContinuousEffect], chars: &Chars) -> Vec<(u32, &'static StaticDef)> {
-    let mut granted: Vec<(u32, AbilityRef)> = Vec::new();
+fn granted_statics(cards: &CardTable, object_timestamp: u32, fx: &[ContinuousEffect], chars: &Chars) -> Vec<(u32, &'static StaticDef, AbilityRef, Giver)> {
+    let mut granted: Vec<(u32, AbilityRef, Giver)> = Vec::new();
     for e in fx {
         match e.kind {
             // Its own: one that affects other objects applies from it as a source (`granted_to_others`).
             EffectKind::AddAbility(ability) if matches!(cards.ability(ability), AbilityDef::Static(s) if s.own) => {
-                granted.push((e.timestamp.max(object_timestamp), ability));
+                granted.push((e.timestamp.max(object_timestamp), ability, Giver::of_effect(e)));
             }
             EffectKind::LoseAllAbilities => granted.clear(),
             _ => {}
@@ -956,9 +984,9 @@ fn granted_statics(cards: &CardTable, object_timestamp: u32, fx: &[ContinuousEff
     }
     granted
         .into_iter()
-        .filter(|(_, ability)| chars.abilities.contains(&Some(*ability)))
-        .filter_map(|(timestamp, ability)| match cards.ability(ability) {
-            AbilityDef::Static(s) => Some((timestamp, s)),
+        .filter(|(_, ability, _)| chars.abilities.contains(&Some(*ability)))
+        .filter_map(|(timestamp, ability, giver)| match cards.ability(ability) {
+            AbilityDef::Static(s) => Some((timestamp, s, ability, giver)),
             _ => None,
         })
         .collect()
@@ -1275,12 +1303,12 @@ enum GKind {
     Static { source: ObjectId, st: &'static StaticDef, first: *const StaticDef, continues: bool },
     /// A static ability `holder` was given that affects other objects (CR 613.1f, 613.7a). `ability` is the ability, where
     /// it was given in this very layer (layer 6): it applies only once `holder` has it.
-    Given { holder: ObjectId, st: &'static StaticDef, ability: Option<AbilityRef> },
+    Given { holder: ObjectId, st: &'static StaticDef, ability: Option<AbilityRef>, by: Linked },
     /// A resolved spell's or ability's (CR 611.2), which names the object; a keyword counter's (CR 122.1b, 613.7c).
     Effect(ContinuousEffect),
     /// A static ability `holder` was granted that applies to it alone (CR 613.7a), with it as its source; `ability` as for
     /// `Given`.
-    Granted { holder: ObjectId, st: &'static StaticDef, ability: Option<AbilityRef> },
+    Granted { holder: ObjectId, st: &'static StaticDef, ability: Option<AbilityRef>, by: Linked },
 }
 
 impl GEntry {
@@ -1418,8 +1446,8 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
         }
         // The static abilities effects gave permanents that affect other objects, in their timestamp order (CR 613.7a).
         for holder in granted_holders {
-            for (timestamp, holder, st) in granted_to_others(cx, holder, layer) {
-                entries.push(GEntry { kind: GKind::Given { holder, st, ability: None }, timestamp, seq: 1 });
+            for (timestamp, holder, st, by) in granted_to_others(cx, holder, layer) {
+                entries.push(GEntry { kind: GKind::Given { holder, st, ability: None, by }, timestamp, seq: 1 });
             }
         }
     }
@@ -1463,9 +1491,10 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
             }
             let fx: Vec<ContinuousEffect> = state.effects.iter().filter(|e| e.affected == holder).copied().collect();
             let chars = chars_in(cx, holder, Layer::PtDefine);
-            for (timestamp, st) in granted_statics(cards, obj.timestamp, &fx, &chars) {
+            for (timestamp, st, ability, giver) in granted_statics(cards, obj.timestamp, &fx, &chars) {
                 if st.layer == layer {
-                    entries.push(GEntry { kind: GKind::Granted { holder, st, ability: None }, timestamp, seq: 3 });
+                    let by = given_ability(cards, state, holder, ability, giver);
+                    entries.push(GEntry { kind: GKind::Granted { holder, st, ability: None, by }, timestamp, seq: 3 });
                 }
             }
         }
@@ -1499,7 +1528,8 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
                         continue;
                     }
                     let timestamp = state.obj(holder).timestamp.max(state.obj(givers[slot].object).timestamp);
-                    let kind = if st.own { GKind::Granted { holder, st, ability: None } } else { GKind::Given { holder, st, ability: None } };
+                    let by = given_ability(cards, state, holder, ability, givers[slot]);
+                    let kind = if st.own { GKind::Granted { holder, st, ability: None, by } } else { GKind::Given { holder, st, ability: None, by } };
                     entries.push(GEntry { kind, timestamp, seq: if st.own { 3 } else { 1 } });
                 }
             }
@@ -1521,10 +1551,10 @@ fn applies(view: &View, o: &ObjCtx, entry: &GEntry, snap: &Snap) -> bool {
                     exists(view, source, id, snap) && (st.affects)(view, source, id, &snap.chars)
                 }
         }
-        GKind::Given { holder, st, ability } => {
+        GKind::Given { holder, st, ability, by } => {
             o.on_battlefield
                 && ability.is_none_or(|a| view.chars(holder).abilities.contains(&Some(a)))
-                && (st.affects)(view, holder, id, &snap.chars)
+                && (st.affects)(&View { asking: Some(by), ..*view }, holder, id, &snap.chars)
         }
         GKind::Effect(e) => {
             e.affected == id
@@ -1586,9 +1616,9 @@ fn strippers_present(cards: &CardTable, state: &GameState) -> bool {
 fn apply_raw(view: &View, layer: Layer, id: ObjectId, entry: &GEntry, chars: &mut Chars) {
     match entry.kind {
         GKind::Static { source, st, .. } => apply_static(st, view, source, id, chars),
-        GKind::Given { holder, st, .. } => apply_static(st, view, holder, id, chars),
+        GKind::Given { holder, st, by, .. } => apply_static(st, &View { asking: Some(by), ..*view }, holder, id, chars),
         GKind::Effect(e) => apply_effect(&e, layer, chars),
-        GKind::Granted { st, .. } => (st.apply)(view, id, chars),
+        GKind::Granted { st, by, .. } => (st.apply)(&View { asking: Some(by), ..*view }, id, chars),
     }
 }
 
@@ -1772,10 +1802,11 @@ fn appear(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>, order: &[u32], e: u32,
                     continue;
                 }
                 let timestamp = cx.state.obj(holder).timestamp.max(entries[e as usize].timestamp);
+                let by = given_ability(cx.cards, cx.state, holder, ability, entries[e as usize].giver(cx.cards, cx.state));
                 let (kind, seq) = if st.own {
-                    (GKind::Granted { holder, st, ability: Some(ability) }, 3)
+                    (GKind::Granted { holder, st, ability: Some(ability), by }, 3)
                 } else {
-                    (GKind::Given { holder, st, ability: Some(ability) }, 1)
+                    (GKind::Given { holder, st, ability: Some(ability), by }, 1)
                 };
                 found.push(GEntry { kind, timestamp, seq });
             }
@@ -2589,7 +2620,7 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
 /// The static abilities of `layer` effects have given `holder` that affect other objects (CR 613.1f), each with its
 /// timestamp (CR 613.7a: the later of the holder's and the granting effect's), that it still has once its abilities are
 /// settled: a later "loses all abilities" takes them, as a static ability that removes abilities does.
-fn granted_to_others(cx: &Ctx, holder: ObjectId, layer: Layer) -> Vec<(u32, ObjectId, &'static StaticDef)> {
+fn granted_to_others(cx: &Ctx, holder: ObjectId, layer: Layer) -> Vec<(u32, ObjectId, &'static StaticDef, Linked)> {
     let (cards, state) = (cx.cards, cx.state);
     // Whether it has the ability is settled by layer 6, so only abilities of the layers after it can be told apart without
     // asking the layers of the very object being worked out (`granted_static_ability`).
@@ -2597,26 +2628,26 @@ fn granted_to_others(cx: &Ctx, holder: ObjectId, layer: Layer) -> Vec<(u32, Obje
         return Vec::new();
     }
     let object_timestamp = state.obj(holder).timestamp;
-    let mut found: Vec<(u32, AbilityRef, &'static StaticDef)> = Vec::new();
+    let mut found: Vec<(u32, AbilityRef, &'static StaticDef, Linked)> = Vec::new();
     for e in state.effects.iter().filter(|e| e.affected == holder) {
         match e.kind {
             EffectKind::AddAbility(ability) => {
                 if let AbilityDef::Static(s) = cards.ability(ability)
                     && !s.own
                 {
-                    found.push((e.timestamp.max(object_timestamp), ability, s));
+                    found.push((e.timestamp.max(object_timestamp), ability, s, given_ability(cards, state, holder, ability, Giver::of_effect(e))));
                 }
             }
             EffectKind::LoseAllAbilities => found.clear(),
             _ => {}
         }
     }
-    found.retain(|(_, _, s)| s.layer == layer);
+    found.retain(|(_, _, s, _)| s.layer == layer);
     if found.is_empty() {
         return Vec::new();
     }
     let has = chars_in(cx, holder, Layer::PtDefine);
-    found.into_iter().filter(|(_, ability, _)| has.abilities.contains(&Some(*ability))).map(|(t, _, s)| (t, holder, s)).collect()
+    found.into_iter().filter(|(_, ability, _, _)| has.abilities.contains(&Some(*ability))).map(|(t, _, s, by)| (t, holder, s, by)).collect()
 }
 
 /// A continuous effect a resolved spell or ability created (CR 611.2), applied if it is in `layer`.
@@ -3049,8 +3080,8 @@ mod tests {
         }
     }
 
-    fn stamps(granted: Vec<(u32, &'static StaticDef)>) -> Vec<u32> {
-        granted.into_iter().map(|(t, _)| t).collect()
+    fn stamps(granted: Vec<(u32, &'static StaticDef, AbilityRef, Giver)>) -> Vec<u32> {
+        granted.into_iter().map(|(t, ..)| t).collect()
     }
 
     /// CR 613.1f, 613.7: "loses all abilities" takes the abilities the object has when it applies, so a grant with a LATER
