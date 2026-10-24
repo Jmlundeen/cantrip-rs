@@ -384,6 +384,16 @@ public sealed class ScenarioPlayer
                 return;
             }
 
+            // A choice of player: a button for each, named for the player.
+            case PlayerChosenAnswer chosenPlayer:
+            {
+                string name = state.Players?.FirstOrDefault(p => p.Seat == chosenPlayer.Player)?.Name is { Length: > 0 } shown
+                    ? shown
+                    : throw new NotDrivenException($"seat {chosenPlayer.Player}, whose name the page does not publish", state);
+                await ClickButtonNamedAsync(name);
+                return;
+            }
+
             case ModesChosenAnswer modes:
             {
                 // A choice of modes: a button for each, named by the mode's text; one mode answers on its click, several

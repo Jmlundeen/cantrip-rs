@@ -1179,6 +1179,7 @@ public sealed partial class MainPage
             "LookAtHand" => "shows you their hand, then you choose a card name",
             "ChooseRevealedCard" => "chooses which revealed card goes into your hand; the other is exiled with a silver counter",
             "GainControl" => "gains control of this artifact",
+            "SeparatePiles" => $"separates the {(prompt.Amount == 1 ? "revealed card" : $"{prompt.Amount} revealed cards")} into two piles",
             _ => prompt.Verb,
         };
 

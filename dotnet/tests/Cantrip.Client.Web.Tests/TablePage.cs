@@ -361,7 +361,8 @@ public sealed record PlayerState(
     bool GraveyardLit = false,
     string GraveyardNote = "",
     float GraveyardX = 0,
-    float GraveyardY = 0);
+    float GraveyardY = 0,
+    string Name = "");
 
 /// <summary>A button over a player's piles (Exile, Companion): what it says and its tooltip, whether it is lit, and where it is.</summary>
 public sealed record ZoneButtonState(string Text, string Tooltip, bool Lit, bool Open, float X, float Y, float W, float H);

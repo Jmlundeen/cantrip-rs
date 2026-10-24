@@ -17,7 +17,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     g.reveal(you, &revealed);
     let opponents: Vec<PlayerId> = g.state().opponents(you).collect();
-    let separator = choose::player(g, you, item.object, opponents, "separate the revealed cards into two piles", 5)?;
+    let separator = choose::player(g, you, item.object, opponents, "SeparatePiles", revealed.len() as u16)?; // at most five
     let (first, second) = choose::separate(g, separator, item.object, revealed)?;
     let (keep, rest) = choose::pile(g, you, item.object, first, second)?;
     // One instruction about the revealed cards: both piles move at once, still revealed as they move (CR 701.20a, 603.10a).

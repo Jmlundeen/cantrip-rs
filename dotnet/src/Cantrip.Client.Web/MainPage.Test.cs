@@ -393,6 +393,8 @@ public sealed partial class MainPage
 
                     json.WriteStartObject();
                     json.WriteNumber("seat", rail.Seat);
+                    // The name a button for the player reads (a choice of player).
+                    json.WriteString("name", client is null ? string.Empty : NameOf(client, rail.Seat));
                     WriteBox(json, rail.Avatar.TransformToVisual(Root).TransformBounds(new Rect(0, 0, rail.Avatar.ActualWidth, rail.Avatar.ActualHeight)));
 
                     // The facts beside the life total, and the buttons into exile and a sideboard, with whether they are lit.
