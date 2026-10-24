@@ -274,3 +274,24 @@ pub fn cast_during_your_main_phase(q: &dyn Query, me: &Asker) -> u32 {
     let turn = q.state().turn;
     (turn.active == me.controller && turn.step().is_main()) as u32
 }
+
+/// "Attacked with N creatures this turn" (CR 508.1): how many different creatures were declared as attackers this turn by
+/// `player`, who declares them only on their own turn (CR 506.2, 508.1a), so any other player has attacked with none - an
+/// ability's controller need not be the active player when a copy of it is controlled by another (CR 707.10). A creature
+/// that attacked in two combats counts once, one put onto the battlefield attacking was never declared, and the creature
+/// need not still be on the battlefield or under anyone's control. Windbrisk Heights, Wedding Announcement and Chart a
+/// Course (whether it is any) ask it.
+pub fn creatures_attacked_with(q: &dyn Query, player: PlayerId) -> usize {
+    if q.state().turn.active != player {
+        return 0;
+    }
+    let mut seen: Vec<ObjectId> = Vec::new();
+    for r in q.history().this_turn() {
+        if let Event::Attacks { attacker, .. } = r.event
+            && !seen.contains(&attacker)
+        {
+            seen.push(attacker);
+        }
+    }
+    seen.len()
+}

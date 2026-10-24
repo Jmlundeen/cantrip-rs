@@ -1,0 +1,50 @@
+# Windbrisk Heights asks whether Bot1 attacked with three creatures this turn, a question about the declaration (CR 508.1),
+# not about who controls the creatures now. Bot1 attacks with three Ornithopters on turn 5; Bot2's Old Man of the Sea, free to
+# tap since turn 4, takes one before the ability is activated. Bot1 still attacked with three, so the hidden Plains is played.
+[Bot1 Deck]
+Windbrisk Heights
+Mox Pearl
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Plains
+Island x3
+Island x20
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island x20
+[Actions]
+Bot1.Hand.Windbrisk Heights.Play
+Bot1.Arrange(Plains | Island; Island; Island)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2; Ornithopter#3 > Bot2)
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Ornithopter#1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Windbrisk Heights.Activate(Ability: You may play)
+Bot1.Accept
+[Bot1.Main2]
+? Bot2.Battlefield = Island; Mox Jet; Mox Sapphire; Old Man of the Sea; Ornithopter
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Pearl; Ornithopter; Ornithopter; Plains; Windbrisk Heights
+Bot1.LandsPlayed = 1
