@@ -1,0 +1,66 @@
+# Own creatures are legal enters-trigger targets. Four counters reduce equip to zero, then to one under
+# Anointed Peacekeeper's two-mana tax; three counters reduce the taxed cost to two (CR 601.2f, 602.2b).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Pearl
+Mox Ruby
+Sol Ring
+Warrior's Blades
+Walking Ballista
+Island x20
+[Bot2 Deck]
+Black Lotus
+Anointed Peacekeeper
+Island x25
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 4)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Warrior's Blades.Cast
+Bot1.Target(Bot1.Battlefield.Walking Ballista)
+[Bot1.Main2]
+? Bot1.Life = 23
+? Bot1.Battlefield.Walking Ballista.Damage = 3
+Bot1.Battlefield.Warrior's Blades.Activate(Walking Ballista)
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Anointed Peacekeeper.Cast
+Bot2.Name(Warrior's Blades)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Walking Ballista.Power = 6
+? Bot1.Battlefield.Walking Ballista.Toughness = 5
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Warrior's Blades.Activate(Walking Ballista)
+? Bot1.Mana = {C}
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Walking Ballista.Activate(Bot2; Ability: Remove)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Warrior's Blades.Activate(Walking Ballista)
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 19
+Bot1.Battlefield.Warrior's Blades.AttachedTo = Walking Ballista
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Walking Ballista.Power = 5
+Bot1.Battlefield.Walking Ballista.Toughness = 4
