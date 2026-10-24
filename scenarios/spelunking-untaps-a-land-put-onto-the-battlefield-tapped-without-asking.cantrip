@@ -1,0 +1,52 @@
+# Spelunking's second ruling: "If a land you control is simply put onto the battlefield tapped without a replacement effect
+# being applied, it always enters untapped if you control Spelunking." Arboreal Grazer puts a Forest from Bot1's hand onto
+# the battlefield tapped; Spelunking's (CR 614.1d) is the one replacement of its entry, so nothing is asked, and the Forest
+# enters untapped. Only lands: Wizard's Rockets, an artifact with its own "This artifact enters tapped", enters tapped, and
+# Bot1 is asked nothing about it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Spelunking
+Wizard's Rockets
+Forest
+Arboreal Grazer
+Forest
+Island x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spelunking.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wizard's Rockets.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wizard's Rockets.Tapped = true
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Arboreal Grazer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Forest)
+? Bot1.Battlefield.Forest#2.Tapped = false
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Mox Pearl; Spelunking; Wizard's Rockets; Forest; Arboreal Grazer; Forest
+Bot1.Battlefield.Forest#1.Tapped = true
+Bot1.Battlefield.Forest#2.Tapped = false

@@ -1,0 +1,37 @@
+# Spelunking, the other order (CR 616.1): Bot1 puts Opulent Palace from its hand, is asked which of the two replacements
+# of its entry applies first, and takes Spelunking's, "lands you control enter untapped": it leaves the land untapped, then
+# the Palace's own "This land enters tapped" applies, and it enters tapped (the ruling: "you can choose to have the land
+# enter tapped or untapped").
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Spelunking
+Opulent Palace
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spelunking.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Opulent Palace)
+Bot1.Replace(lands you control enter untapped)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Opulent Palace.Tapped = true

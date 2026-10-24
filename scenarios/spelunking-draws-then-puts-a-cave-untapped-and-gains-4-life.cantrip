@@ -1,0 +1,42 @@
+# Spelunking: "draw a card, then you may put a land card from your hand onto the battlefield. If you put a Cave onto the
+# battlefield this way, you gain 4 life." The Moxen pay {2}{G} exactly. The draw (an Island) comes first; the hand holds a
+# Forest, Promising Vein (a Cave, CR 205.3i) and a Lightning Bolt: Bot1 puts the Vein, gaining exactly 4 life (20 -> 24);
+# the Forest and the drawn Island stay in hand, and the Bolt (not a land) is refused. The put is not a land play (CR 305.2).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Spelunking
+Promising Vein
+Forest
+Lightning Bolt
+Island
+Forest x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spelunking.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Promising Vein)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Spelunking; Promising Vein
+Bot1.Battlefield.Promising Vein.Tapped = false
+Bot1.Hand = Forest; Island; Lightning Bolt
+Bot1.LandsPlayed = 0

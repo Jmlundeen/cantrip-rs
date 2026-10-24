@@ -1,0 +1,37 @@
+# Spelunking, "you may": the hand holds Promising Vein (a Cave) and a Forest, and the drawn card is an Island. Bot1 answers
+# the choice with no card: nothing is put onto the battlefield, so there is no Cave and no life is gained (20 stays 20).
+# The sibling scenario shows the same hand with the Vein put.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Spelunking
+Promising Vein
+Forest
+Lightning Bolt
+Island
+Forest x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spelunking.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Spelunking
+Bot1.Hand = Forest; Island; Lightning Bolt; Promising Vein

@@ -1,0 +1,35 @@
+# Spelunking: "draw a card, then you may put a land card from your hand onto the battlefield" (CR 608.2c: in the order
+# written). Bot1's hand holds no land; the trigger draws Promising Vein (a Cave), which is then in the hand to be put: Bot1
+# puts it and gains 4 life (20 -> 24). Were the land chosen before the draw, there would be none to choose.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Spelunking
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Promising Vein
+Forest x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spelunking.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Promising Vein)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Spelunking; Promising Vein
+Bot1.Hand = Lightning Bolt; Lightning Bolt; Lightning Bolt
