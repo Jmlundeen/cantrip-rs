@@ -187,12 +187,30 @@ pub fn search_to_exile(
 /// "Search [`owner`]'s graveyard, hand, and library for any number of cards with the same name as" an object whose `names` the
 /// caller read before it moved (`object_names`: CR 608.2h, the object as it last existed, since a move makes a new object,
 /// CR 400.7, and a card's copy, face-down or transformed state is gone with it) "and exile them.
-/// That player shuffles, then draws a card for each card exiled from their hand this way" (CR 701.23, 701.23a, 406.2):
-/// `searcher` (the spell's controller) does the searching, in the order the text names the zones; each zone is a search for
-/// any number (CR 701.23b), so cards of the name may be left. A card matches by sharing one of `names` (CR 201.2); the cards found go to exile together, and `owner` draws one card for each that
-/// reached exile from their hand. Deadly Cover-Up (the owner of a card it exiled) and The End (the controller of the
-/// permanent it exiled) print it.
+/// That player shuffles, then draws a card for each card exiled from their hand this way" (CR 701.23, 701.23a, 406.2): the
+/// search of `exile_any_number_named_from_graveyard_hand_and_library`, then `owner` draws by its count. Deadly Cover-Up (the
+/// owner of a card it exiled), The End (the controller of the permanent it exiled) and Test of Talents (the controller of the
+/// spell it countered) print it.
 pub fn exile_same_name_from_graveyard_hand_and_library(g: &mut dyn Game, searcher: PlayerId, owner: PlayerId, source: ObjectId, names: &[&'static str]) -> Result<(), Suspend> {
+    let from_hand = exile_any_number_named_from_graveyard_hand_and_library(g, searcher, owner, source, names)?;
+    g.draw(owner, from_hand);
+    Ok(())
+}
+
+/// "Search [`owner`]'s graveyard, hand, and library for any number of cards with [one of `names`] and exile them. That player
+/// shuffles": how many of the cards found reached exile from the hand, for what "for each card exiled from their hand this
+/// way" gives after the shuffle. `searcher` (the spell's controller) does the searching, in the order the text names the
+/// zones; each zone is a search for any number (CR 701.23b), so cards of the name may be left. A card matches by sharing one
+/// of `names` (CR 201.2); the cards found go to exile together and `owner` shuffles (CR 701.23, 406.2), and a card a
+/// replacement sent elsewhere is not counted. Necromentia (a token for each), Deadly Cover-Up, The End and Test of Talents (a
+/// card drawn for each: `exile_same_name_from_graveyard_hand_and_library`) print it.
+pub fn exile_any_number_named_from_graveyard_hand_and_library(
+    g: &mut dyn Game,
+    searcher: PlayerId,
+    owner: PlayerId,
+    source: ObjectId,
+    names: &[&'static str],
+) -> Result<u32, Suspend> {
     let has_name = |q: &dyn Query, c: ObjectId| object_names(q, c).iter().any(|n| names.contains(n));
     let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner)).iter().copied().filter(|&c| has_name(g, c)).collect();
     let mut found = crate::choose::any_number_of(g, searcher, source, Purpose::Exile, "", graveyard.clone(), graveyard)?;
@@ -202,10 +220,8 @@ pub fn exile_same_name_from_graveyard_hand_and_library(g: &mut dyn Game, searche
     let cards_found = found.len();
     // The library is searched and everything found goes to exile together; the owner shuffles (CR 701.23, 406.2).
     let moved = search_to_exile(g, searcher, owner, source, Find::ONE.up_to(crate::ANY_NUMBER), &found, |q, c| has_name(q, c))?;
-    // A card for each one that actually reached exile from the hand: a replacement may have sent one elsewhere.
-    let from_hand = moved[in_graveyard..cards_found].iter().filter(|&&c| g.obj(c).zone.is(ZoneKind::Exile)).count();
-    g.draw(owner, from_hand as u32);
-    Ok(())
+    // Only one that actually reached exile from the hand counts: a replacement may have sent one elsewhere.
+    Ok(moved[in_graveyard..cards_found].iter().filter(|&&c| g.obj(c).zone.is(ZoneKind::Exile)).count() as u32)
 }
 
 /// "Choose a card name. Search target opponent's graveyard, hand, and library for up to four cards with that name and exile
