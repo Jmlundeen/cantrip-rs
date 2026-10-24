@@ -3,20 +3,11 @@ use cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES;
 use cantrip_mechanics::{each_opponent_keeps_one_of_each_type, each_player_sacrifices, effects, tokens};
 use cantrip_oracle as oracle;
 
-/// A 2/2 black Zombie creature token (CR 111.1, 111.4).
-static ZOMBIE: CardDef = CardDef {
-    colors: Some(ColorSet::of(Color::Black)),
-    types: TypeSet::of(&[CardType::Creature]),
-    power: Some(2),
-    toughness: Some(2),
-    ..token!(Zombie)
-};
-
-pub static EXTRA: &[&CardDef] = &[&ZOMBIE];
+pub static EXTRA: &[&CardDef] = &[&tokens::ZOMBIE];
 
 /// +1: "Create a 2/2 black Zombie creature token."
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &ZOMBIE, 1)?;
+    tokens::create(g, item.controller, &tokens::ZOMBIE, 1)?;
     Ok(())
 }
 

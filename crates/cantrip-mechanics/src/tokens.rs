@@ -476,6 +476,15 @@ pub static GOBLIN: CardDef = CardDef {
     ..token!(Goblin)
 };
 
+/// The 2/2 black Zombie creature token (CR 111.1, 111.4). Liliana, Dreadhorde General and Cryptcaller Chariot make it.
+pub static ZOMBIE: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Black)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    ..token!(Zombie)
+};
+
 /// The 1/1 white Soldier creature token. Hero of Bladehold, Elspeth, Storm Slayer and Torsten, Founder of Benalia make
 /// it. (Third Path Iconoclast's is an artifact Soldier of the same name.)
 pub static SOLDIER: CardDef = CardDef {
