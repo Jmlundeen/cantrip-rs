@@ -1,9 +1,8 @@
-# Blasted Landscape: cycle the second copy for its exact printed cost, using one matching land source for each colored symbol; then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
+# Blasted Landscape: cycle the second copy for its exact printed cost, {2}, paid with two Mountains: neither is white or blue, so only a generic cost leaves the pool empty (a {W}{U} or {1}{W} cost would be refused). Then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
 
 [Bot1 Deck]
 Blasted Landscape x2
-Plains
-Island
+Mountain x2
 Plains x6
 Island x6
 Forest x6
@@ -16,12 +15,12 @@ Island x20
 [Actions]
 Bot1.Hand.Blasted Landscape.Play
 [T3 Bot1.Main1]
-Bot1.Hand.Plains.Play
+Bot1.Hand.Mountain.Play
 [T5 Bot1.Main1]
-Bot1.Hand.Island.Play
+Bot1.Hand.Mountain.Play
 Bot1.Hand.Blasted Landscape.Activate(Ability: Cycling)
-Bot1.Battlefield.Plains.Activate
-Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
 ? Bot1.Mana =
 Bot1.Pass
 Bot2.Pass
@@ -32,4 +31,5 @@ Bot1.Battlefield.Blasted Landscape.Activate(Ability: {T}: Add {C})
 [Expect]
 Turn = 7
 Bot1.Graveyard = Blasted Landscape
+Bot1.Hand = Island; Plains; Plains; Plains; Plains; Plains; Plains
 Bot1.Battlefield.Blasted Landscape.Tapped = true
