@@ -282,7 +282,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
                 break;
             }
             let Some(action) = cx.card(cx.s().obj(card).card).opening_hand else { continue };
-            if !(action.condition)(cx, &Asker { source: card, controller: p, by: None }) {
+            if !(action.condition)(cx, &Asker { source: card, controller: p, by: None, spell: false }) {
                 continue;
             }
             if !matches!(cx.ask_rule(p, RequestKind::May { source: card, purpose: Purpose::Ask(&BEGIN_ON_BATTLEFIELD) })?, Some(Answer::Yes)) {
@@ -474,7 +474,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
             continue;
         }
         let card = obj.copied_card().unwrap_or(obj.card);
-        let asker = Asker { source: id, controller: player, by: None };
+        let asker = Asker { source: id, controller: player, by: None, spell: false };
         // A scan once a turn of what is on the battlefield, for a card that has such a rule.
         if !cx.card(card).turn_begin.is_empty() && cx.lost_all_abilities(id) {
             continue;
@@ -489,7 +489,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
         for (id, rule) in optional {
             if cx.ask_rule(player, RequestKind::May { source: id, purpose: Purpose::Ask(rule.question) })? == Some(Answer::Yes) {
                 // A replacement effect's own doing, its controller's (CR 609.1, 614.10).
-                cx.acting_as(player, |cx| (rule.on_skip)(cx, &Asker { source: id, controller: player, by: None }))?;
+                cx.acting_as(player, |cx| (rule.on_skip)(cx, &Asker { source: id, controller: player, by: None, spell: false }))?;
                 return Ok(true);
             }
         }
@@ -508,7 +508,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
             && let Some(&(id, rule)) = optional.get(i as usize - 1)
         {
             // A replacement effect's own doing, its controller's (CR 609.1, 614.10).
-            cx.acting_as(player, |cx| (rule.on_skip)(cx, &Asker { source: id, controller: player, by: None }))?;
+            cx.acting_as(player, |cx| (rule.on_skip)(cx, &Asker { source: id, controller: player, by: None, spell: false }))?;
             return Ok(true);
         }
     }
@@ -562,7 +562,7 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
                 continue;
             }
             if others.iter().any(|&(source, controller, def)| {
-                let asker = Asker { source, controller, by: None };
+                let asker = Asker { source, controller, by: None, spell: false };
                 def.untap_in_others_untap_steps.iter().any(|rule| rule(&*cx, &asker, id))
             }) {
                 untapping.push(id);

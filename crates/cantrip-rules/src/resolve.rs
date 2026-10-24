@@ -204,7 +204,7 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     };
     // Asked as the spell or ability it is (CR 607.5): one an effect gave its source reads only its own links.
     let by = Linked { object: item.object, text: cards.linked_card(item.ability.card), acquired: item.acquired };
-    let asker = Asker { source: item.object, controller: item.controller, by: Some(by).filter(|&by| by != cards.linked_to(state, item.object)) };
+    let asker = Asker { source: item.object, controller: item.controller, by: Some(by).filter(|&by| by != cards.linked_to(state, item.object)), spell: item.kind == StackKind::Spell };
     if let Target::Object(id) = target
         && !live(state, id)
     {

@@ -546,7 +546,7 @@ fn choose_trigger_targets(
     first_spec: u8,
 ) -> R<bool> {
     // Asked as the ability it is (CR 607.5): one an effect gave its source reads only its own links.
-    let asker = Asker { source: trigger.source, controller: trigger.controller, by: layers::given_link(cx.cards(), cx.s(), trigger.source, trigger.ability, trigger.acquired) };
+    let asker = Asker { source: trigger.source, controller: trigger.controller, by: layers::given_link(cx.cards(), cx.s(), trigger.source, trigger.ability, trigger.acquired), spell: false };
     let start = targets.len();
     let slots = crate::resolve::expand_specs(cx.s(), trigger.controller, specs);
     // "If [it] was kicked, instead choose ..." (CR 702.33a, 601.2c), of the source.
@@ -656,7 +656,7 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
     }
     let def = triggered(cx, trigger.ability);
     // Asked as the ability it is (CR 607.5): one an effect gave its source reads only its own links.
-    let asker = Asker { source: trigger.source, controller: trigger.controller, by: layers::given_link(cx.cards(), cx.s(), trigger.source, trigger.ability, trigger.acquired) };
+    let asker = Asker { source: trigger.source, controller: trigger.controller, by: layers::given_link(cx.cards(), cx.s(), trigger.source, trigger.ability, trigger.acquired), spell: false };
     let mut targets = Vec::new();
     let mut of: Vec<u8> = Vec::new();
     let mut shares: Vec<u32> = Vec::new();
@@ -725,7 +725,7 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         if left_the_game(cx, trigger.controller) {
             return Ok(());
         }
-        match crate::actions::ask_divided(cx, trigger.controller, trigger.source, spec, total, None, false, by)? {
+        match crate::actions::ask_divided(cx, trigger.controller, trigger.source, false, spec, total, None, false, by)? {
             crate::actions::Divided::Chosen(chosen, given) => {
                 targets = chosen;
                 shares = given;
@@ -835,7 +835,7 @@ fn consider(
             && let Some(state) = t.state
         {
             if (later.is_some() || !look_back)
-                && state(cx, &Asker { source, controller, by: by() })
+                && state(cx, &Asker { source, controller, by: by(), spell: false })
                 && !state_trigger_waiting(cx, source, ability, found, later.as_deref())
             {
                 found.push((state_trigger(source, ability, controller, acquired_at(nth)), t, Again::new()));
@@ -852,13 +852,13 @@ fn consider(
             } else if t.attack_option.is_some() {
                 paid_to_attack(source, ability, chars.instance(nth), event)
             } else if t.listens.intersects(mask) {
-                t.fires(cx, &Asker { source, controller, by: by() }, event)
+                t.fires(cx, &Asker { source, controller, by: by(), spell: false }, event)
             } else {
                 None
             }
         {
             if let Some(condition) = t.condition
-                && !condition(cx, &Asker { source, controller, by: by() })
+                && !condition(cx, &Asker { source, controller, by: by(), spell: false })
             {
                 continue;
             }
@@ -968,7 +968,7 @@ fn state_triggers(cx: &mut Cx) {
         for (nth, ability) in chars.abilities().enumerate() {
             if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                 && let Some(state) = t.state
-                && state(cx, &Asker { source, controller, by: cx.link_nth(source, &chars, nth) })
+                && state(cx, &Asker { source, controller, by: cx.link_nth(source, &chars, nth), spell: false })
                 && !state_trigger_waiting(cx, source, ability, &found, None)
             {
                 found.push((state_trigger(source, ability, controller, acquired_at(nth)), t, Again::new()));
@@ -1005,7 +1005,7 @@ pub(crate) fn state_triggers_now(cx: &mut Cx) {
         for (nth, ability) in chars.abilities().enumerate() {
             if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                 && let Some(state) = t.state
-                && state(cx, &Asker { source, controller, by: cx.link_nth(source, &chars, nth) })
+                && state(cx, &Asker { source, controller, by: cx.link_nth(source, &chars, nth), spell: false })
                 && !state_trigger_waiting(cx, source, ability, &found, None)
             {
                 found.push((state_trigger(source, ability, controller, acquired_at(nth)), t, Again::new()));
@@ -1071,7 +1071,7 @@ impl<'a> TriggerStatics<'a> {
     pub(crate) fn stop(&mut self, cx: &Cx, event: &Event, triggering: &Triggering) -> bool {
         self.sources(cx, triggering).iter().any(|&id| {
             let obj = cx.s().obj(id);
-            let asker = Asker { source: id, controller: obj.controller, by: None };
+            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
             cx.card(cx.cards().current(obj)).trigger_rules.iter().any(|rule| rule(cx, &asker, event, triggering))
         })
     }
@@ -1081,7 +1081,7 @@ impl<'a> TriggerStatics<'a> {
     pub(crate) fn additional(&mut self, cx: &Cx, event: &Event, triggering: &Triggering, again: &mut Again) {
         for &id in self.sources(cx, triggering) {
             let obj = cx.s().obj(id);
-            let asker = Asker { source: id, controller: obj.controller, by: None };
+            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
             for (n, rule) in cx.card(cx.cards().current(obj)).additional_triggers.iter().enumerate() {
                 if rule(cx, &asker, event, triggering) && !again.contains(&(id, n as u8)) {
                     again.push((id, n as u8));
@@ -1305,7 +1305,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                     // "You" in its trigger event is its own controller, the player who controlled the spell or ability that
                     // created it (CR 603.7d-e), whoever controls its source now and wherever the source has gone. So is "you"
                     // in an intervening "if" (CR 603.4).
-                    let asker = Asker { source: d.source, controller: d.controller, by: delayed_link(cx, &d) };
+                    let asker = Asker { source: d.source, controller: d.controller, by: delayed_link(cx, &d), spell: false };
                     if d.when.is_event()
                         && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
                         // A delayed triggered mana ability never goes on the stack: it resolves as the mana ability that
@@ -1388,7 +1388,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                     if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                         && t.functions.contains(zone)
                         && t.listens.intersects(mask)
-                        && let Some(fired) = t.fires(cx, &Asker { source: id, controller: cx.s().obj(id).controller, by: by() }, event)
+                        && let Some(fired) = t.fires(cx, &Asker { source: id, controller: cx.s().obj(id).controller, by: by(), spell: false }, event)
                     {
                         // A spell is controlled by whoever cast it; a card in another zone answers to its owner.
                         let controller = if cx.s().obj(id).zone.is(ZoneKind::Stack) {
@@ -1397,7 +1397,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                             cx.s().obj(id).owner
                         };
                         if let Some(condition) = t.condition
-                            && !condition(cx, &Asker { source: id, controller, by: by() })
+                            && !condition(cx, &Asker { source: id, controller, by: by(), spell: false })
                         {
                             continue;
                         }
@@ -1577,7 +1577,7 @@ fn suspended_cards(cx: &mut Cx, active: PlayerId) {
 pub fn still_holds(cx: &Cx, item: &StackItem) -> bool {
     match cx.cards().ability(item.ability) {
         AbilityDef::Triggered(TriggeredDef { condition: Some(condition), .. }) => {
-            condition(cx, &Asker { source: item.object, controller: item.controller, by: cx.link_of(item) })
+            condition(cx, &Asker { source: item.object, controller: item.controller, by: cx.link_of(item), spell: false })
         }
         _ => true,
     }

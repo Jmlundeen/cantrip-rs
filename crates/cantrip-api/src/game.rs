@@ -94,7 +94,7 @@ pub fn may_cause(q: &dyn Query, causer: PlayerId, player: PlayerId, kind: CauseK
         if def.cause_rules.is_empty() || q.lost_all_abilities(id) {
             continue;
         }
-        let asker = Asker { source: id, controller: o.controller, by: None };
+        let asker = Asker { source: id, controller: o.controller, by: None, spell: false };
         if def.cause_rules.iter().any(|rule| !rule(q, &asker, causer, player, kind)) {
             return false;
         }
@@ -355,7 +355,7 @@ pub trait Query {
     /// it makes as it resolves is asked with.
     fn item_asker(&self, item: &StackItem, controller: PlayerId) -> Asker {
         let by = self.linked(item);
-        Asker { source: item.object, controller, by: (by != self.text_linked(item.object)).then_some(by) }
+        Asker { source: item.object, controller, by: (by != self.text_linked(item.object)).then_some(by), spell: item.kind == StackKind::Spell }
     }
 
     /// The object `left` became when it moved to a public zone, if that object is still where the move put it (CR 400.7e):

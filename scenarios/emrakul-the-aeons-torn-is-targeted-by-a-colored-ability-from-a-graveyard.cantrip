@@ -1,0 +1,78 @@
+# "Protection from spells that are one or more colors" (CR 702.16a) is no protection from abilities, including one that
+# functions from a graveyard: an ability of a card is not a spell (CR 113.1, 115.1a) and is not judged as one. After
+# Collector's Cage plays Emrakul on turn 5 (the extra turn is turn 6), Bot2 on turn 7 activates the blue Cryotheory Adept's
+# ability from its graveyard at Emrakul, which becomes tapped with a stun counter.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Plains
+Llanowar Elves
+Collector's Cage
+Forest
+Forest
+Forest
+Forest
+Emrakul, the Aeons Torn
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x8
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Cryotheory Adept
+Lightning Bolt
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cryotheory Adept.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Cryotheory Adept)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Collector's Cage.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Llanowar Elves#1.Activate
+Bot1.Arrange(Emrakul, the Aeons Torn | Forest; Forest; Forest; Forest)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Collector's Cage.Activate(Bot1.Battlefield.Llanowar Elves#2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Accept
+[T7 Bot2.Main1]
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Graveyard.Cryotheory Adept.Activate(Bot1.Battlefield.Emrakul, the Aeons Torn)
+Bot2.Pass
+[T7 Bot2.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Emrakul, the Aeons Torn.Tapped = true
+Bot1.Battlefield.Emrakul, the Aeons Torn.Counters.Stun = 1
+Exile = Cryotheory Adept

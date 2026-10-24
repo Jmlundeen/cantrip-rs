@@ -1036,6 +1036,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         made.setters.clear();
         made.controllers.clear();
         made.honed.clear();
+        made.targeting.clear();
         // A permanent that has lost all its abilities to an effect keeps the effects its static abilities had applied in
         // layers 1 to 5 by the time layer 6 took them (CR 613.6, Humility with Magus of the Moon); from layer 6 on it has
         // none (CR 613.1f, 613.8a).
@@ -1051,6 +1052,9 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
             // CR 122.1j: hone counters act on what their permanent is attached to, abilities or none.
             if state.obj(source).counters(CounterKind::Hone) > 0 && live(state, source) {
                 made.honed.push(source);
+            }
+            if cards.targeting_rules[cards.current(state.obj(source)).0 as usize] && live(state, source) {
+                made.targeting.push(source);
             }
         }
         // An emblem's static abilities function in the command zone (CR 114.4).
@@ -2897,7 +2901,7 @@ pub fn live(state: &GameState, id: ObjectId) -> bool {
 }
 
 /// The rules' half of target legality (CR 115.4, 702.11, 702.16): the target still exists where it was, and nothing
-/// about it forbids `asker`'s source from targeting it.
+/// about it forbids `asker` - the spell, or the ability of its source (`Asker::spell`) - from targeting it.
 pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &Asker, target: Target) -> bool {
     match target {
         Target::None => false,
@@ -2919,24 +2923,33 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
                 return false;
             }
             let obj = state.obj(id);
-            if obj.zone.is(ZoneKind::Battlefield) {
-                let target_chars = chars(cards, state, log, id);
+            let on_battlefield = obj.zone.is(ZoneKind::Battlefield);
+            // The permanents whose static abilities say what can't target what (CR 601.2c, 604.1): most boards have none.
+            let forbidders: Vec<ObjectId> = static_sources(cards, state).targeting.clone();
+            if !on_battlefield && forbidders.is_empty() {
+                return true;
+            }
+            let opponent = obj.controller != asker.controller;
+            let target_chars = on_battlefield.then(|| chars(cards, state, log, id));
+            if let Some(target_chars) = &target_chars {
                 // Shroud: no player may target it (CR 702.18a); hexproof: no opponent (CR 702.11b).
                 if target_chars.has(Keyword::Shroud) {
                     return false;
                 }
-                let opponent = obj.controller != asker.controller;
                 if target_chars.has(Keyword::Hexproof) && opponent && !targeting_rule(cards, state, log, TargetingRuleKind::IgnoreHexproof, id) {
                     return false;
                 }
-                let mut source_chars = chars(cards, state, log, asker.source);
-                // A card that is not on the battlefield or the stack and asks for a target is about to be cast: it
-                // moves to the stack before its targets are chosen (CR 601.2a), so it is judged as the spell it
-                // will be, which protection from spells (CR 702.16a) turns away.
-                let source = state.obj(asker.source);
-                if !source.zone.is(ZoneKind::Battlefield) && !source.zone.is(ZoneKind::Stack) {
-                    source_chars.spell = true;
-                }
+            }
+            let mut source_chars = chars(cards, state, log, asker.source);
+            // A card that is not on the battlefield or the stack and is asked about as a spell is about to be cast: it moves
+            // to the stack before its targets are chosen (CR 601.2a), so it is judged as the spell it will be, which
+            // protection from spells (CR 702.16a) turns away. An ability that functions from there (channel, scavenge, a
+            // cycled card's trigger, CR 115.1a) is an ability of a card, not a spell.
+            let source = state.obj(asker.source);
+            if asker.spell && !source.zone.is(ZoneKind::Battlefield) && !source.zone.is(ZoneKind::Stack) {
+                source_chars.spell = true;
+            }
+            if let Some(target_chars) = &target_chars {
                 // Hexproof from [quality] (CR 702.11d): no [quality] spell an opponent controls, nor an ability an opponent
                 // controls from a [quality] source, the source as it is now (a spell, or an ability's source on the
                 // battlefield or as it last was). A hexproof ability, so what ignores hexproof ignores it (CR 702.11e).
@@ -2950,9 +2963,29 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
                     return false;
                 }
             }
-            true
+            !targeting_forbidden(cards, state, log, &forbidders, id, asker, &source_chars)
         }
     }
+}
+
+/// Whether a static ability of one of `forbidders` (`StaticSources::targeting`) with its abilities says `subject` can't be
+/// the target of `asker` (`TargetingRuleKind::Forbid`, CR 601.2c, 602.2b, 603.3d, 608.2b): "Thrun can't be the target of
+/// nongreen spells your opponents control or abilities from nongreen sources your opponents control". No hexproof
+/// ability, so nothing that ignores hexproof lifts it (CR 702.11e); `source` is the spell, or the ability's source as it
+/// is now or as it last was (CR 608.2b).
+fn targeting_forbidden(cards: &CardTable, state: &GameState, log: &[Record], forbidders: &[ObjectId], subject: ObjectId, asker: &Asker, source: &Chars) -> bool {
+    if forbidders.is_empty() {
+        return false;
+    }
+    let view = View::new(cards, state, log, Layer::Ability);
+    forbidders.iter().any(|&from| {
+        cards.get(cards.current(state.obj(from))).targeting_rules.iter().any(|r| match r.kind {
+            TargetingRuleKind::Forbid(forbids) => (r.applies)(&view, from, subject) && forbids(&view, from, asker, source),
+            _ => false,
+        })
+        // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
+        && !lost_all_abilities(cards, state, log, from)
+    })
 }
 
 /// Whether `id` has lost all its abilities (CR 613.1f): to a resolved effect, or to a static ability (`StaticDef::loses_all`)
@@ -2996,14 +3029,13 @@ pub fn abilities_may_be_lost(cards: &CardTable, state: &GameState) -> bool {
 /// Whether a targeting rule of `kind` (CR 609.4, 702.11, 702.21) applies to `subject`: some permanent on the battlefield has a static
 /// ability that names it. Found from the board, so asked only when it would change the answer (a hexproof target, a ward trigger).
 pub fn targeting_rule(cards: &CardTable, state: &GameState, log: &[Record], kind: TargetingRuleKind, subject: ObjectId) -> bool {
+    let sources: Vec<ObjectId> = static_sources(cards, state).targeting.clone();
     let view = View::new(cards, state, log, Layer::Ability);
-    state.battlefield().iter().any(|&source| {
-        let obj = state.obj(source);
-        let card = cards.current(obj);
+    sources.into_iter().any(|source| {
+        let card = cards.current(state.obj(source));
         // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
-        cards.targeting_rules[card.0 as usize]
+        cards.get(card).targeting_rules.iter().any(|r| std::mem::discriminant(&r.kind) == std::mem::discriminant(&kind) && (r.applies)(&view, source, subject))
             && !lost_all_abilities(cards, state, log, source)
-            && cards.get(card).targeting_rules.iter().any(|r| r.kind == kind && (r.applies)(&view, source, subject))
     })
 }
 
@@ -3730,8 +3762,8 @@ mod player_keyword_tests {
         let mut state = GameState::new(2, 0);
         let veil = put(&cards, &mut state, "Player Shroud Test Veil", 0, Zone::BATTLEFIELD);
         let ward = put(&cards, &mut state, "Player Hexproof Test Ward", 1, Zone::BATTLEFIELD);
-        let mine = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 0, Zone::hand(PlayerId(0))), controller: PlayerId(0), by: None };
-        let theirs = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 1, Zone::hand(PlayerId(1))), controller: PlayerId(1), by: None };
+        let mine = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 0, Zone::hand(PlayerId(0))), controller: PlayerId(0), by: None, spell: false };
+        let theirs = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 1, Zone::hand(PlayerId(1))), controller: PlayerId(1), by: None, spell: false };
         state.see_statics();
         assert!(player_has(&cards, &state, &[], PlayerId(0), Keyword::Shroud));
         assert!(!player_has(&cards, &state, &[], PlayerId(1), Keyword::Shroud));

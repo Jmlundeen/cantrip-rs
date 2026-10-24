@@ -1453,6 +1453,23 @@ needs it: a resolved effect that gives it ("gains hexproof from that color until
 "hexproof from activated and triggered abilities" (Volatile Stormdrake), "hexproof from each of its colors" (Tam), and a
 player's hexproof from a quality (Veil of Summer).
 
+### "Can't be the target of" restrictions
+
+A static ability that says what can't target an object - "Thrun can't be the target of nongreen spells your opponents
+control or abilities from nongreen sources your opponents control", Fiendslayer Paladin's "black or red spells your
+opponents control", Shanna's "abilities your opponents control", Spellbane Centaur's "Creatures you control can't be
+the targets of blue spells or abilities from blue sources", Ground Seal's cards in graveyards - is a
+`TargetingRuleKind::Forbid` in its card's `targeting_rules`: `applies` names the objects, and the `TargetingForbid`
+function reads the spell or ability that would target (`Asker`: its controller, and `Asker::spell`, whether it is a spell
+or an ability, CR 115.1a) and the characteristics of its source - the spell itself, or the ability's source as it is or
+last was (CR 608.2b). `layers::can_target` asks it of every object target, in any zone, after shroud, hexproof, hexproof
+from a quality and protection, so it holds as targets are chosen (CR 601.2c, 602.2b, 603.3d) and as the spell or ability
+resolves (CR 608.2b). It is no hexproof ability: what ignores hexproof (CR 702.11e, Nowhere to Run) leaves it. The
+permanents with targeting rules are found once per state (`StaticSources::targeting`), so a board without one pays
+nothing; one that lost all its abilities applies none (CR 613.1f). Not built, as no card in content needs it: a resolved
+effect that says it (Vines of Vastwood, Autumn's Veil, Veilstone Amulet) and Wall of Shadows' "spells that can target
+only Walls", which reads the targeting spell's requirement rather than its characteristics.
+
 ### Craft
 
 Craft with [materials] [cost] (CR 702.167a) is an activated ability whose cost exiles its source and its materials

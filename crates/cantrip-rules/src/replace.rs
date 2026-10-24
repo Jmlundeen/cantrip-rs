@@ -382,7 +382,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
         }
         // "You" for an ability of a card in a graveyard is its owner (CR 108.4a: it has no controller).
         let controller = if at == At::Graveyard { cx.s().obj(id).owner } else { controller_of(cx, id, proposal) };
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         for (index, def) in cards.get(card).replacements.iter().enumerate() {
             let index = index as u8;
             let functions = match at {
@@ -444,7 +444,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
                     && !applied.contains(&(e.source, index, Origin::GrantedPrevention(e.timestamp)))
                 {
                     let def = &cards.get(card).granted_preventions[index as usize];
-                    let asker = Asker { source: e.source, controller: e.controller, by: None };
+                    let asker = Asker { source: e.source, controller: e.controller, by: None, spell: false };
                     if (def.applies)(cx, &asker, e.affected, d) {
                         found.push(Candidate { source: e.source, index, origin: Origin::GrantedPrevention(e.timestamp) });
                     }
@@ -460,7 +460,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
         if def.kind != kind || applied.contains(&(e.source, index, Origin::Granted(e.timestamp))) {
             continue;
         }
-        let asker = Asker { source: e.source, controller: e.controller, by: None };
+        let asker = Asker { source: e.source, controller: e.controller, by: None, spell: false };
         if (def.applies)(cx, &asker, e.affected, proposal) {
             found.push(Candidate { source: e.source, index, origin: Origin::Granted(e.timestamp) });
         }
@@ -678,7 +678,7 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
                 {
                     continue;
                 }
-                let asker = Asker { source, controller, by: None };
+                let asker = Asker { source, controller, by: None, spell: false };
                 let before = *proposal;
                 apply(&*cx, &asker, proposal);
                 note_counters_by(&before, proposal, controller);
@@ -691,7 +691,7 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
                 let e = *cx.s().effects.iter().find(|e| e.timestamp == timestamp).expect("the effect that applies");
                 let def = &cx.cards().get(card_of(cx, source)).granted_replacements[index as usize];
                 let (apply, then, once) = (def.apply, def.then, def.once);
-                let asker = Asker { source, controller: e.controller, by: None };
+                let asker = Asker { source, controller: e.controller, by: None, spell: false };
                 // "The next time": used up by this event (CR 614.1a).
                 if once {
                     let effects_before = cx.s().effects.len();
@@ -781,7 +781,7 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
             // CR 615.1: a static ability's prevention, of all the damage or of as much as it says, of the damage as it now is
             // (CR 616.1f).
             Origin::Prevention => {
-                let asker = Asker { source, controller: controller_of(cx, source, proposal), by: None };
+                let asker = Asker { source, controller: controller_of(cx, source, proposal), by: None, spell: false };
                 if let Proposal::Damage(d) = proposal {
                     let def = &cx.cards().get(card_of(cx, source)).preventions[index as usize];
                     let amount = def.amount.map_or(d.amount, |how_much| how_much(&*cx, &asker, d).min(d.amount));
@@ -837,13 +837,13 @@ fn reshape(cx: &Cx, c: &Candidate, proposal: &mut Proposal) {
     match c.origin {
         Origin::Printed => {
             let def = &cx.cards().get(source_card(cx, c.source)).replacements[c.index as usize];
-            let asker = Asker { source: c.source, controller: controller_of(cx, c.source, proposal), by: None };
+            let asker = Asker { source: c.source, controller: controller_of(cx, c.source, proposal), by: None, spell: false };
             (def.apply)(cx, &asker, proposal);
         }
         Origin::Granted(timestamp) => {
             let Some(e) = cx.s().effects.iter().find(|e| e.timestamp == timestamp) else { return };
             let def = &cx.cards().get(card_of(cx, c.source)).granted_replacements[c.index as usize];
-            (def.apply)(cx, &Asker { source: c.source, controller: e.controller, by: None }, e.affected, proposal);
+            (def.apply)(cx, &Asker { source: c.source, controller: e.controller, by: None, spell: false }, e.affected, proposal);
         }
         // No other kind of effect applies to the mana a permanent produces.
         _ => {}
@@ -958,7 +958,7 @@ pub(crate) fn shields(cx: &Cx, d: &DamageEvent) -> Option<(ObjectId, u16)> {
             continue;
         }
         let def = &cx.cards().get(card).granted_preventions[index as usize];
-        if (def.applies)(cx, &Asker { source: e.source, controller: e.controller, by: None }, e.affected, d) {
+        if (def.applies)(cx, &Asker { source: e.source, controller: e.controller, by: None, spell: false }, e.affected, d) {
             found = Some(found.map_or((e.source, left), |(s, n)| (s, n.saturating_add(left))));
         }
     }

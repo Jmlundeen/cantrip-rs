@@ -459,6 +459,10 @@ shapes have an example:
   `HexproofFrom::card_type`; a color in it is a word of the text, CR 612.2); given by a static ability it is
   `cantrip_mechanics::hexproof_from::gives::<Q>` (a resolved effect that gives it, Mondo Gecko's, is not built). The core judges it
   as a target is chosen, loses it with hexproof (CR 702.11e) and the host shows a granted one on the card.
+  **"Can't be the target of [quality] spells or abilities ..."** on a permanent (Thrun, Breaker of Silence) is a
+  `TargetingRule { kind: TargetingRuleKind::Forbid(f), applies }` in `CardDef::targeting_rules`: `applies` names the
+  objects, `f` reads the `Asker` (`spell` or ability, its controller) and its source's characteristics, a color word
+  through the words of the card's text (engine-design.md, "Can't be the target of" restrictions).
 - **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`; its `kind`, `NameKind::Any`,
   `Nonland` or `Land`, is what the name must be the name of, CR 201.4a, and the core refuses any other) and `ChoosePlayer`;
   a name chosen as a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`, and one chosen for a

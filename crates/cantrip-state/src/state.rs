@@ -199,6 +199,9 @@ pub struct StaticSources {
     /// "Equipped creature gets +3/+3"), whatever abilities they have lost before it: the layers ask each whether it still
     /// has the ability.
     pub granted: Vec<ObjectId>,
+    /// The permanents on the battlefield whose card has targeting rules (`CardDef::targeting_rules`, CR 115.4, 609.4), in
+    /// battlefield order, whatever abilities they have lost: what `can_target` asks, and nothing when there are none.
+    pub targeting: Vec<ObjectId>,
     /// Whether a source of `list` has a static ability that continues an effect begun in an earlier layer
     /// (`StaticDef::continues`, CR 613.6): only then do the layers note which effects began to apply to an object.
     pub continuing: bool,
@@ -456,7 +459,7 @@ impl GameState {
             journal: Journal::default(),
             epoch: 0,
             chars_epoch: 0,
-            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), controllers: Vec::new(), honed: Vec::new(), granted: Vec::new(), continuing: false }),
+            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), controllers: Vec::new(), honed: Vec::new(), granted: Vec::new(), targeting: Vec::new(), continuing: false }),
             judged_face_up: std::cell::Cell::new(None),
             leaving_together: std::cell::RefCell::new(Vec::new()),
             settle_held: std::cell::Cell::new(0),

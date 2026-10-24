@@ -45,7 +45,7 @@ pub fn mana_told_apart(q: &dyn Query, cards: &'static CardTable, player: PlayerI
         return Vec::new();
     }
     from.retain(|&source| {
-        rules.iter().any(|&(id, controller, def)| def.mana_told_apart.iter().any(|rule| rule(q, &Asker { source: id, controller, by: None }, source)))
+        rules.iter().any(|&(id, controller, def)| def.mana_told_apart.iter().any(|rule| rule(q, &Asker { source: id, controller, by: None, spell: false }, source)))
     });
     from
 }
@@ -64,7 +64,7 @@ pub fn cast_barred(cx: &Cx, player: PlayerId) -> ZoneKinds {
         }
     }
     for (id, controller, def) in sources(cx, |d| !d.cast_rules.is_empty()) {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         for from in ZoneKinds::CAST_FROM {
             if !barred.contains(from) && def.cast_rules.iter().any(|rule| !rule(cx, &asker, player, from)) {
                 barred = barred.with(from);
@@ -83,7 +83,7 @@ pub fn spell_forbidders(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> 
 /// Whether one of `forbidders` (`spell_forbidders`) forbids `player` to cast `spell`, read through `q`: the card seen as the
 /// face it would be cast as (CR 601.3e), or the spell on the stack once its proposal is complete (CR 601.6).
 pub fn spell_forbidden(q: &dyn Query, forbidders: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, spell: ObjectId) -> bool {
-    forbidders.iter().any(|&(id, controller, def)| def.spell_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller, by: None }, player, spell)))
+    forbidders.iter().any(|&(id, controller, def)| def.spell_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller, by: None, spell: false }, player, spell)))
 }
 
 /// The permanents on the battlefield with a static ability that keeps cards in some zones from entering the battlefield
@@ -97,7 +97,7 @@ pub fn enter_bans(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> {
 /// names, so it is not asked.
 pub fn enter_banned(q: &dyn Query, bans: &[(ObjectId, PlayerId, &'static CardDef)], card: ObjectId) -> bool {
     !q.obj(card).zone.is(ZoneKind::Stack)
-        && bans.iter().any(|&(id, controller, def)| def.enter_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller, by: None }, card)))
+        && bans.iter().any(|&(id, controller, def)| def.enter_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller, by: None, spell: false }, card)))
 }
 
 /// Whether a static ability of a permanent on the battlefield keeps `card` from being put onto the battlefield from where it
@@ -111,7 +111,7 @@ pub fn cant_enter(cx: &Cx, card: ObjectId) -> bool {
 /// protection would prevent it, which is rare, so the battlefield is searched then.
 pub fn damage_cant_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool {
     for (id, controller, def) in sources(cx, |d| !d.unpreventable_damage.is_empty()) {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         if def.unpreventable_damage.iter().any(|rule| rule(cx, &asker, source, combat)) {
             return true;
         }
@@ -132,7 +132,7 @@ pub fn damage_stays(cx: &Cx, damaged: &[ObjectId]) -> Vec<ObjectId> {
         .copied()
         .filter(|&object| {
             rules.iter().any(|&(id, controller, def)| {
-                let asker = Asker { source: id, controller, by: None };
+                let asker = Asker { source: id, controller, by: None, spell: false };
                 def.damage_stays.iter().any(|rule| rule(cx, &asker, object))
             })
         })
@@ -145,7 +145,7 @@ pub fn damage_stays(cx: &Cx, damaged: &[ObjectId]) -> Vec<ObjectId> {
 /// searched then.
 pub fn zero_loyalty_stays(cx: &Cx, planeswalker: ObjectId) -> bool {
     sources(cx, |d| !d.zero_loyalty_stays.is_empty()).any(|(id, controller, def)| {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         def.zero_loyalty_stays.iter().any(|rule| rule(cx, &asker, planeswalker))
     })
 }
@@ -156,7 +156,7 @@ pub fn zero_loyalty_stays(cx: &Cx, planeswalker: ObjectId) -> bool {
 /// permanent, so the battlefield is searched then.
 pub fn legend_rule_exempt(cx: &Cx, legend: ObjectId) -> bool {
     sources(cx, |d| !d.legend_rule_exempt.is_empty()).any(|(id, controller, def)| {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         def.legend_rule_exempt.iter().any(|rule| rule(cx, &asker, legend))
     })
 }
@@ -174,7 +174,7 @@ pub fn cant_gain_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId
         let obj = s.obj(id);
         let def = cards.get(cards.current(obj));
         !def.cant_gain_life.is_empty() && !q.lost_all_abilities(id) && {
-            let asker = Asker { source: id, controller: obj.controller, by: None };
+            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
             def.cant_gain_life.iter().any(|rule| rule(q, &asker, player))
         }
     })
@@ -203,7 +203,7 @@ pub fn may_attack_despite_defender(q: &dyn Query, cards: &'static CardTable, cre
         let obj = s.obj(id);
         let def = cards.get(cards.current(obj));
         !def.attacks_despite_defender.is_empty() && !q.lost_all_abilities(id) && {
-            let asker = Asker { source: id, controller: obj.controller, by: None };
+            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
             def.attacks_despite_defender.iter().any(|rule| rule(q, &asker, creature))
         }
     })
@@ -225,7 +225,7 @@ pub fn attack_costs(cx: &Cx, eligible: &[ObjectId], targets: &[Target]) -> Vec<A
             let mut total = ManaCost::ZERO;
             let mut first = None;
             for &(id, controller, def) in &taxes {
-                let asker = Asker { source: id, controller, by: None };
+                let asker = Asker { source: id, controller, by: None, spell: false };
                 for rule in def.attack_costs {
                     if let Some(cost) = rule(cx, &asker, attacker, target)
                         && !cost.is_zero()
@@ -268,14 +268,14 @@ pub fn any_color_spenders(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)
 pub fn lets_spend_any_color(q: &dyn Query, spenders: &[(ObjectId, PlayerId, &'static CardDef)], spending: &Spending) -> bool {
     spenders
         .iter()
-        .any(|&(id, controller, def)| def.spend_any_color.iter().any(|rule| rule(q, &Asker { source: id, controller, by: None }, spending)))
+        .any(|&(id, controller, def)| def.spend_any_color.iter().any(|rule| rule(q, &Asker { source: id, controller, by: None, spell: false }, spending)))
 }
 
 /// Whether `player` may activate the abilities of `creature` as though it had haste (CR 302.6): a static ability of a
 /// permanent `player` controls says so.
 pub fn activates_as_though_haste(cx: &Cx, player: PlayerId, creature: ObjectId) -> bool {
     sources(cx, |d| !d.activate_as_though_haste.is_empty()).any(|(id, controller, def)| {
-        controller == player && def.activate_as_though_haste.iter().any(|rule| rule(cx, &Asker { source: id, controller, by: None }, creature))
+        controller == player && def.activate_as_though_haste.iter().any(|rule| rule(cx, &Asker { source: id, controller, by: None, spell: false }, creature))
     })
 }
 
@@ -285,7 +285,7 @@ pub fn activates_as_though_haste(cx: &Cx, player: PlayerId, creature: ObjectId) 
 pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
     let c = cx.chars(creature);
     let by_toughness = sources(cx, |d| !d.damage_by_toughness.is_empty()).any(|(id, controller, def)| {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         def.damage_by_toughness.iter().any(|rule| rule(cx, &asker, creature))
     });
     if by_toughness {
@@ -293,7 +293,7 @@ pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
     }
     let power = c.power.unwrap_or(0);
     if power < 0 && sources(cx, |d| !d.damage_by_absolute_power.is_empty()).any(|(id, controller, def)| {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         def.damage_by_absolute_power.iter().any(|rule| rule(cx, &asker, creature))
     }) {
         return power.unsigned_abs();
@@ -325,7 +325,7 @@ pub fn flash_granters(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> {
 /// where that is not the card itself.
 pub fn grants_flash(q: &dyn Query, granters: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, spell: ObjectId) -> bool {
     granters.iter().any(|&(id, controller, def)| {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         def.flash_rules.iter().any(|rule| rule(q, &asker, spell, player))
     })
 }
@@ -349,7 +349,7 @@ pub fn activation_alternatives(
 ) -> Vec<(Grant, ManaCost)> {
     let mut all = Vec::new();
     for &(id, controller, card) in alternative_sources {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         let card_id = cx.cards().current(cx.s().obj(id));
         for (k, rule) in card.ability_alternatives.iter().enumerate() {
             if let Some(cost) = rule(cx, &asker, player, permanent, def) {
@@ -369,13 +369,13 @@ pub fn named_activation_alternative(q: &dyn Query, grant: Grant, player: PlayerI
     if !obj.zone.is(ZoneKind::Battlefield) || q.lost_all_abilities(grant.object) {
         return None;
     }
-    rule(q, &Asker { source: grant.object, controller: obj.controller, by: None }, player, permanent, def)
+    rule(q, &Asker { source: grant.object, controller: obj.controller, by: None, spell: false }, player, permanent, def)
 }
 
 /// Whether a static ability lets `player` activate this sorcery-speed ability whenever they could cast an instant.
 pub fn instant_activation(cx: &Cx, player: PlayerId, source: ObjectId, index: u8) -> bool {
     for (id, controller, def) in sources(cx, |d| !d.instant_activation.is_empty()) {
-        let asker = Asker { source: id, controller, by: None };
+        let asker = Asker { source: id, controller, by: None, spell: false };
         if def.instant_activation.iter().any(|rule| rule(cx, &asker, source, index, player)) {
             return true;
         }
@@ -419,7 +419,7 @@ pub fn activation_barred(cx: &Cx, forbidders: &[ObjectId], source: ObjectId, def
     }
     forbidders.iter().any(|&id| {
         let obj = cx.s().obj(id);
-        let asker = Asker { source: id, controller: obj.controller, by: None };
+        let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
         cx.card(cx.cards().current(obj)).activation_rules.iter().any(|rule| !rule(cx, &asker, source, def))
     })
 }
@@ -460,7 +460,7 @@ fn any_static<R: Copy + 'static>(q: &dyn Query, cards: &'static CardTable, rules
         let obj = s.obj(id);
         let list = rules(cards.get(cards.current(obj)));
         !list.is_empty() && !q.lost_all_abilities(id) && {
-            let asker = Asker { source: id, controller: obj.controller, by: None };
+            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
             list.iter().any(|&rule| test(rule, &asker))
         }
     })

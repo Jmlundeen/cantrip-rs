@@ -1588,7 +1588,7 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
         && !cx.lost_all_abilities(id)
     {
         let controller = cx.s().obj(id).controller;
-        as_transforms(cx, &Asker { source: id, controller, by: None })?;
+        as_transforms(cx, &Asker { source: id, controller, by: None, spell: false })?;
     }
     cx.emit(Event::Transformed { object: id });
     Ok(true)
@@ -2149,7 +2149,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
     // and does not choose again (CR 707.10c, 700.2); an instant's or sorcery's, or a permanent spell's (an Aura's enchant
     // ability, CR 303.4a); the face's it is on the stack as, not its card's (CR 715.3b, 720.3b, 709.3b).
     let specs = crate::resolve::spell_specs(cx.cards(), cx.s(), &item);
-    let asker = Asker { source: object, controller: chooser, by: None };
+    let asker = Asker { source: object, controller: chooser, by: None, spell: item.kind == StackKind::Spell };
     let mut targets = cx.s().targets(&item).to_vec();
     let mut changed = false;
     for (at, spec) in specs.iter().enumerate() {

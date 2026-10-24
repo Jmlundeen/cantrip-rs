@@ -26,7 +26,7 @@ pub fn host_allows(q: &dyn Query, attachment: ObjectId, host: ObjectId, attachin
         return (!ac.is(CardType::Creature) || creature_ok) && q.is_on_battlefield(host) && hc.is(CardType::Creature);
     }
     if ac.has_subtype(Subtype::Aura) {
-        let asker = Asker { source: attachment, controller: q.controller(attachment), by: None };
+        let asker = Asker { source: attachment, controller: q.controller(attachment), by: None, spell: false };
         return !ac.is(CardType::Creature) && enchants_allow(q, &ac, &asker, Target::Object(host));
     }
     false
@@ -61,7 +61,7 @@ pub fn player_allows(cx: &Cx, aura: ObjectId, player: PlayerId) -> bool {
         return false;
     }
     let ac = q.chars(aura);
-    let asker = Asker { source: aura, controller: q.controller(aura), by: None };
+    let asker = Asker { source: aura, controller: q.controller(aura), by: None, spell: false };
     !ac.is(CardType::Creature) && enchants_allow(q, &ac, &asker, Target::Player(player))
 }
 
@@ -74,7 +74,7 @@ pub(crate) fn aura_hosts(cx: &Cx, aura: ObjectId, aura_chars: &Chars, controller
     if aura_chars.is(CardType::Creature) {
         return Vec::new();
     }
-    let asker = Asker { source: aura, controller, by: None };
+    let asker = Asker { source: aura, controller, by: None, spell: false };
     let state = cx.s();
     let mut zones = vec![Zone::BATTLEFIELD];
     zones.extend(state.seats().map(Zone::graveyard));

@@ -582,18 +582,28 @@ pub struct Asker {
     /// card's own hook (a cost change, a replacement effect, a play rule) - which `Query::text_linked` answers. Set by the
     /// engine as it asks a triggered or activated ability's functions, from how the object acquired the ability.
     pub by: Option<Linked>,
+    /// The one doing it is a spell (CR 112.1) - `source` itself, being cast or on the stack - and not an ability of `source`
+    /// (CR 113.1): what "can't be the target of [quality] spells" reads (CR 115.4, `TargetingRuleKind::Forbid`), and what
+    /// tells a card cast from a hand or graveyard, judged as the spell it becomes (CR 601.2a), from an ability that
+    /// functions there (channel, scavenge), and a spell from its own "when you cast" ability.
+    pub spell: bool,
 }
 
 impl Asker {
     /// `source` and `controller` asking with the text `source` has (`by` none).
     pub const fn new(source: ObjectId, controller: PlayerId) -> Asker {
-        Asker { source, controller, by: None }
+        Asker { source, controller, by: None, spell: false }
+    }
+
+    /// The spell `source`, controlled by `controller`, asking (`spell`): being cast, or on the stack.
+    pub const fn spell(source: ObjectId, controller: PlayerId) -> Asker {
+        Asker { source, controller, by: None, spell: true }
     }
 
     /// The ability `by` of `by.object`, controlled by `controller`, asking: as linked abilities know it, where that differs
     /// from the text the object has (`by`).
     pub const fn ability(controller: PlayerId, by: Linked) -> Asker {
-        Asker { source: by.object, controller, by: Some(by) }
+        Asker { source: by.object, controller, by: Some(by), spell: false }
     }
 }
 
@@ -1989,7 +1999,7 @@ pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
         if def.granted_miracles.is_empty() || q.lost_all_abilities(id) {
             continue;
         }
-        let asker = Asker { source: id, controller: o.controller, by: None };
+        let asker = Asker { source: id, controller: o.controller, by: None, spell: false };
         for (i, grant) in def.granted_miracles.iter().enumerate() {
             if (grant.has)(q, &asker, card) {
                 all.push(Miracle { granter: Some((granter, i as u8)), cost: (grant.cost)(q, q.obj(card).card).map(|c| reduced_by(c, grant.less).0) });
@@ -2020,7 +2030,7 @@ pub fn cant_draw(q: &dyn Query, player: PlayerId, n: u32) -> bool {
         };
         // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
         !def.cant_draw.is_empty() && !q.lost_all_abilities(id) && {
-            let asker = Asker { source: id, controller: o.controller, by: None };
+            let asker = Asker { source: id, controller: o.controller, by: None, spell: false };
             def.cant_draw.iter().any(|rule| rule(q, &asker, player, n))
         }
     })
@@ -2077,7 +2087,7 @@ pub type AttackRule = fn(&dyn Query, ObjectId, ObjectId) -> bool;
 pub type AttackCostRule = fn(&dyn Query, &Asker, ObjectId, Target) -> Option<ManaCost>;
 
 /// What a [`TargetingRule`] changes about targeting.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug)]
 pub enum TargetingRuleKind {
     /// The creatures it names "can be the targets of spells and abilities as though they didn't have hexproof" (CR 702.11b,
     /// 609.4): hexproof, granted before or after, does not stop targeting them. Shroud and protection still do.
@@ -2085,7 +2095,22 @@ pub enum TargetingRuleKind {
     /// "Ward abilities of those creatures don't trigger" (CR 702.21a): a ward ability of the object it names does not trigger
     /// when it becomes a target.
     SuppressWard,
+    /// "[It] can't be the target of [spells or abilities ...]" (CR 601.2c, 602.2b, 603.3d, 608.2b): the objects it names
+    /// can't be chosen as a target of a spell or ability the function says - and a target that has become one of them
+    /// is illegal as the spell or ability resolves. "Thrun can't be the target of nongreen spells your opponents control or
+    /// abilities from nongreen sources your opponents control" (Thrun, Breaker of Silence), "This creature can't be the
+    /// target of black or red spells your opponents control" (Fiendslayer Paladin), "Creatures you control can't be the
+    /// targets of blue spells or abilities from blue sources" (Spellbane Centaur). No hexproof ability (CR 702.11d is the
+    /// keyword): what lets a player target as though there were no hexproof (CR 702.11e) does not lift it.
+    Forbid(TargetingForbid),
 }
+
+/// The rule of a `TargetingRuleKind::Forbid`: asked of the static ability's source, the spell or ability that would
+/// target (`Asker::spell` tells which; `Asker::controller` controls it), and the characteristics of its source - the spell
+/// itself, or the ability's source as it is now or as it last existed (CR 608.2b, 113.7a) - read as the targets are chosen
+/// and again as it resolves. True when it can't target. A color word it reads is read through the words of the static
+/// ability's source (CR 612.1, `LayerQuery::words`).
+pub type TargetingForbid = fn(&dyn LayerQuery, ObjectId, &Asker, &Chars) -> bool;
 
 /// A static ability that changes targeting rules for the objects it names (CR 604, 609.4), while its source is on the
 /// battlefield: `applies` is asked of the source and of an object that is or would be a target, and sees the layers as they
