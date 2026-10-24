@@ -141,10 +141,18 @@ fn excess_damage_names_the_redirected_recipient_and_players_have_none() {
         Some(DamageResult { target: Target::Player(PlayerId(1)), amount: 6, excess: 0 })
     );
 }
+/// CR 120.4a: damage beyond 1 from a source with deathtouch is excess, noncombat damage as much as combat.
 #[test]
-fn excess_damage_counts_deathtouch_as_lethal() {
+fn excess_damage_noncombat_deathtouch_counts_one_as_lethal() {
     let (mut g, ids) = game(&[&TOUCH, &BEAR]);
     assert_eq!(hit(&mut g, ids[0], ids[1], 6).unwrap().excess, 5);
+}
+/// A creature already marked with lethal damage takes no further damage as lethal, deathtouch or not (CR 120.4a, 120.6).
+#[test]
+fn excess_damage_deathtouch_to_a_creature_already_marked_lethal_is_all_excess() {
+    let (mut g, ids) = game(&[&TOUCH, &BEAR]);
+    g.state.update_obj(ids[1], |o| o.damage = 4);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 6).unwrap().excess, 6);
 }
 #[test]
 fn excess_damage_sums_a_simultaneous_event_and_preserves_predamage_loyalty() {
@@ -181,4 +189,11 @@ fn excess_damage_heals_the_marks_its_replacement_heals() {
     g.state.update_obj(ids[1], |o| o.damage = 2);
     assert_eq!(hit(&mut g, ids[0], ids[1], 6).unwrap().excess, 2);
     assert_eq!(g.state.obj(ids[1]).damage, 6);
+}
+
+/// CR 702.2c's one-damage lethal exception is for combat damage assigned.
+#[test]
+fn excess_damage_combat_deathtouch_counts_one_as_lethal() {
+    let (mut g, ids) = game(&[&TOUCH, &BEAR]);
+    assert_eq!(ops::damage_result(&mut cx(&mut g), ids[0], Target::Object(ids[1]), 6, true).unwrap().excess, 5);
 }

@@ -3042,6 +3042,7 @@ pub fn deal_damage_with(
                 batch.dealt[at].prior_marked = 0;
             }
             batch.dealt[at].amount += amount as u32;
+            // CR 120.4a: any damage beyond 1 dealt to a creature by a source with deathtouch is excess, combat or not.
             batch.dealt[at].deathtouch |= deathtouch;
             if target_chars.is(CardType::Creature) {
                 if source_chars.has(Keyword::Infect) {

@@ -965,8 +965,8 @@ so (Bonecrusher Giant's Stomp) or a `CardDef::unpreventable_damage` static (Ques
 `Game::damage_result` returns damage's actual recipient, amount and excess after replacement and prevention
 (CR 120.10). `damage` retains its amount-only result. `ops::DamageBatch` keeps each recipient's pre-damage
 creature toughness and marked damage, loyalty and defense alongside its existing marked-damage accounting.
-Excess uses the greatest amount among its creature, planeswalker and battle types; deathtouch makes one damage
-lethal to a creature. The batch finishes this calculation over all its sources before damage triggers are collected,
+Excess uses the greatest amount among its creature, planeswalker and battle types; damage beyond 1 dealt to a creature by a
+source with deathtouch, combat or noncombat, is excess (CR 120.4a). The batch finishes this calculation over all its sources before damage triggers are collected,
 including combat damage. Each `Event::Damage::recipient_excess` repeats the recipient's total for that simultaneous
 event; it is never summed across source records or attributed to one source. Violent Echoes uses the direct result;
 Toralf and Aegar can ask the event history without reconstructing pre-damage characteristics from later state.
