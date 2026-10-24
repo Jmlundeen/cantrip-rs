@@ -712,6 +712,21 @@ impl<'s> Run<'s> {
                         }
                         offered = kept;
                     }
+                    // A refused activation with `Sacrifice:` (`! Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice:
+                    // Hithlain Rope)`) refuses only a mana ability whose sacrifice could be paid with that permanent.
+                    if let Some(name) = action.named("Sacrifice") {
+                        let all: Vec<ObjectId> = (0..self.game.state.objects.len()).map(|i| ObjectId(i as u32)).collect();
+                        if self.objects(action, name, &all)?.is_empty() {
+                            return fail(format!("line {line}: {text} proves nothing: nothing is named {name}"));
+                        }
+                        let mut kept = Vec::new();
+                        for o in offered {
+                            if self.target(action, name, &o.target_candidates)?.is_some() {
+                                kept.push(o);
+                            }
+                        }
+                        offered = kept;
+                    }
                     if !offered.is_empty() {
                         return fail(format!("line {line} says {text} must not be offered, but it is"));
                     }

@@ -305,7 +305,9 @@ with `Ability:` the option whose text contains it. A refused `Cast` without `Abi
 the card, not only for its mana cost. Whether an option the player cannot pay for is offered at all depends on the action (many unpayable casts are not offered), so a refusal for want of mana proves nothing; refuse for the rule in question and give the player the mana. A refused activation
 with `Color:` (`! Bot1.Battlefield.Chrome Mox.Activate(Color: Green)`) is offered only where that color is among the colors the
 ability may add: the colors it lets the player choose from, or the fixed mana it adds (`! Bot1.Battlefield.Llanowar Elves.Activate(Color: Blue)`);
-`Color: Colorless` (or `C`) likewise asks whether it may add colorless mana.
+`Color: Colorless` (or `C`) likewise asks whether it may add colorless mana. One with `Sacrifice:`
+(`! Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Hithlain Rope)`) refuses only a mana ability whose sacrifice
+that permanent could pay.
 
 A refused question to a player who has lost the game (`! Bot2.Accept`) holds once the stack is empty and they were asked
 nothing: a player who has left the game is given no priority and no choice (CR 800.4a).
