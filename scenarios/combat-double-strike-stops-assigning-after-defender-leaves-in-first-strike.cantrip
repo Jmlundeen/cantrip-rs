@@ -1,5 +1,5 @@
 # Pursuer with Shadowspear deals three in the first damage step, killing Bot2. CR 800.4e forbids the second assignment.
-# Actual first-strike damage still grants lifelink: Bot1 gains three, not six. No block/ping or spell/prowess changes the total.
+# Actual first-strike damage still grants lifelink: Bot1 gains three, not six.
 
 [Life]
 Bot2: 3
