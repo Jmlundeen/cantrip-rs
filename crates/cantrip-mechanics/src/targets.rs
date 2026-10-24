@@ -572,6 +572,28 @@ pub fn card_in_an_opponents_graveyard(q: &dyn Query, asker: &Asker, t: Target) -
 /// "Target card from an opponent's graveyard": see `card_in_an_opponents_graveyard`.
 pub const CARD_IN_AN_OPPONENTS_GRAVEYARD: TargetSpec = target(card_in_an_opponents_graveyard);
 
+fn instant_or_sorcery_spell_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    spell_filter(q, asker, t) && matches!(t, Target::Object(id) if { let c = q.chars(id); c.is(CardType::Instant) || c.is(CardType::Sorcery) })
+}
+
+fn instant_or_sorcery_spell_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    instant_or_sorcery_spell_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
+}
+
+fn instant_or_sorcery_spell_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    instant_or_sorcery_spell_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
+}
+
+/// "Target instant or sorcery spell" (CR 115.1, 304.1, 307.1): a spell on the stack, not a permanent spell, with the card
+/// type instant or sorcery. Test of Talents prints it.
+pub const INSTANT_OR_SORCERY_SPELL: TargetSpec = target(instant_or_sorcery_spell_filter);
+
+/// "Target instant or sorcery spell an opponent controls" (CR 115.1, 109.5). Venser, Fervent Forger prints it.
+pub const INSTANT_OR_SORCERY_SPELL_AN_OPPONENT_CONTROLS: TargetSpec = target(instant_or_sorcery_spell_an_opponent_controls_filter);
+
+/// "Target instant or sorcery spell you control" (CR 115.1, 109.5). Lutri, the Spellchaser prints it.
+pub const INSTANT_OR_SORCERY_SPELL_YOU_CONTROL: TargetSpec = target(instant_or_sorcery_spell_you_control_filter);
+
 /// "Target noncreature spell". Spell Pierce, Stubborn Denial, Negate and Dovin's Veto print it.
 pub const NONCREATURE_SPELL: TargetSpec = target(noncreature_spell_filter);
 
