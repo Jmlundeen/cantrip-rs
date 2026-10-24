@@ -657,10 +657,12 @@ pub fn put_all_onto_battlefield_face_down(cx: &mut Cx, ids: &[ObjectId], control
         cx.st().update_obj(id, |o| o.copy = Some(values));
     }
     let objects: Vec<(ObjectId, PlayerId, bool)> = moving.iter().map(|&(id, _)| (id, controller, tapped)).collect();
-    let arrived = put_onto_battlefield(cx, &objects, ZoneReason::Other)?;
+    // Judged face down: a card a static ability keeps from entering as the face-down card it now is does not move
+    // (CR 701.40f, 701.58f), so each is found by what it became, not by its place among those that moved.
+    put_onto_battlefield(cx, &objects, ZoneReason::Other)?;
     let mut entered: Vec<Option<ObjectId>> = vec![None; ids.len()];
-    for (k, &(id, was)) in moving.iter().enumerate() {
-        let new = arrived.get(k).copied().filter(|&new| cx.s().obj(new).zone.is(ZoneKind::Battlefield) && cx.s().obj(new).face_down);
+    for &(id, was) in &moving {
+        let new = cx.s().obj(id).became.filter(|&new| cx.s().obj(new).zone.is(ZoneKind::Battlefield) && cx.s().obj(new).face_down);
         if new.is_none() && live(cx.s(), id) {
             cx.st().update_obj(id, |o| o.copy = was);
         }
@@ -1046,10 +1048,16 @@ pub fn put_onto_battlefield_along(
 
 /// Each of `objects` prepared to enter (`prepare_entry`) and added to `moves`.
 fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, PlayerId, bool)], with: &[(CounterKind, i16)]) -> R<()> {
+    let bans = crate::static_rules::enter_bans(cx);
     for &(id, controller, tapped) in objects {
         // A card that has changed zones since it was chosen is a new object, not the one to put onto the battlefield
         // (CR 400.7), as for the other moves of a chosen object.
         if !live(cx.s(), id) {
+            continue;
+        }
+        // A card a static ability keeps from entering stays where it is (CR 101.2, 101.3): nothing of its entering is asked
+        // or applied, as no entering happens.
+        if !bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id) {
             continue;
         }
         let mut entering =
@@ -1089,6 +1097,10 @@ pub fn put_onto_battlefield_as(
 ) -> R<ObjectId> {
     // Only a double-faced card has a back face to enter with: any other stays where it is (CR 712.14a).
     if transformed && cx.cards().backs[cx.s().obj(id).card.0 as usize].is_none() {
+        return Ok(id);
+    }
+    // Nor does one a static ability keeps from entering (CR 101.2, 101.3).
+    if crate::static_rules::cant_enter(cx, id) {
         return Ok(id);
     }
     let mut entering = Entering {
@@ -1164,7 +1176,9 @@ fn enter_as(cx: &mut Cx, id: ObjectId, b: Becomes) {
 /// replacements judged on it as that (`as_it_would_exist`), as an Aura choosing what it enchants as it enters and staying
 /// where it is with nothing to enchant (CR 303.4f-g), and arriving as that. The permanent, or None if it did not enter.
 pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: PlayerId, becomes: Becomes) -> R<Option<ObjectId>> {
-    if !live(cx.s(), id) {
+    // A card a static ability keeps from entering stays where it is (CR 101.2, 101.3), judged as the card it is there, not
+    // as what the effect would make it (Grafdigger's Cage's ruling).
+    if !live(cx.s(), id) || crate::static_rules::cant_enter(cx, id) {
         return Ok(None);
     }
     let mut entering = Entering {

@@ -86,6 +86,27 @@ pub fn spell_forbidden(q: &dyn Query, forbidders: &[(ObjectId, PlayerId, &'stati
     forbidders.iter().any(|&(id, controller, def)| def.spell_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller }, player, spell)))
 }
 
+/// The permanents on the battlefield with a static ability that keeps cards in some zones from entering the battlefield
+/// (`CardDef::enter_rules`, CR 101.2), with their controllers: empty, so unallocated, in nearly every game.
+pub fn enter_bans(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> {
+    sources(cx, |d| !d.enter_rules.is_empty()).collect()
+}
+
+/// Whether one of `bans` (`enter_bans`) keeps `card` from being put onto the battlefield from where it is (CR 101.2): the card
+/// judged as it exists there (`EnterRule`). A permanent spell resolving is put there from the stack, which no such ability
+/// names, so it is not asked.
+pub fn enter_banned(q: &dyn Query, bans: &[(ObjectId, PlayerId, &'static CardDef)], card: ObjectId) -> bool {
+    !q.obj(card).zone.is(ZoneKind::Stack)
+        && bans.iter().any(|&(id, controller, def)| def.enter_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller }, card)))
+}
+
+/// Whether a static ability of a permanent on the battlefield keeps `card` from being put onto the battlefield from where it
+/// is now (`enter_banned`, CR 101.2).
+pub fn cant_enter(cx: &Cx, card: ObjectId) -> bool {
+    let bans = enter_bans(cx);
+    !bans.is_empty() && enter_banned(cx, &bans, card)
+}
+
 /// Whether a static ability makes the damage `source` is about to deal unpreventable (CR 615.12). Asked only when
 /// protection would prevent it, which is rare, so the battlefield is searched then.
 pub fn damage_cant_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool {

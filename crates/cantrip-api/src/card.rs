@@ -2083,6 +2083,17 @@ pub type InfectDamageRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
 /// enters under - and `kind`. Melira, Sylvok Outcast; Solemnity.
 pub type CounterBan = fn(&dyn Query, &Asker, ObjectId, PlayerId, CounterKind) -> bool;
 
+/// A static ability that says cards in some zones can't enter the battlefield (CR 101.2): whether `card` may be put onto
+/// the battlefield from where it is now, false forbidding it. The card is judged as it exists in that zone, not as it would
+/// exist on the battlefield (Grafdigger's Cage's ruling: a Phyrexian Metamorph in a graveyard is a creature card whatever it
+/// would copy), and a card turned face down to be manifested or cloaked as the face-down card it then is (CR 701.40f,
+/// 701.58f). Asked of every card put onto the battlefield from a zone other than the stack, by any effect or rule (a land
+/// played too, CR 305.1); one that can't stays where it is, nothing of its entering asked or applied (CR 101.3).
+/// "Creature cards in graveyards and libraries can't enter the battlefield" (Grafdigger's Cage), "creature cards in
+/// graveyards ..." (Kunoros, Hound of Athreos), "permanent cards in graveyards ..." (Soulless Jailer), "nonland permanent
+/// cards in graveyards and libraries ..." (Weathered Runestone).
+pub type EnterRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// The counters a player may get (CR 122.1), for `PlayerCounterBan`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum PlayerCounter {
@@ -2531,6 +2542,10 @@ pub struct CardDef {
     /// "artifacts, creatures, enchantments, and lands can't have counters put on them". It entering with counters is
     /// counters being put on it too (CR 122.6).
     pub counter_bans: &'static [CounterBan],
+    /// Its static abilities that keep cards in some zones from entering the battlefield (CR 101.2), while it is on the
+    /// battlefield with its abilities: Grafdigger's Cage's "creature cards in graveyards and libraries can't enter the
+    /// battlefield".
+    pub enter_rules: &'static [EnterRule],
     /// Its static abilities that keep players from getting counters (CR 122.1, 101.2), while it is on the battlefield with
     /// its abilities: Melira's "you can't get poison counters", Solemnity's "players can't get counters".
     pub player_counter_bans: &'static [PlayerCounterBan],
@@ -2713,6 +2728,7 @@ impl CardDef {
         win_rules: &[],
         infect_damage_to: &[],
         counter_bans: &[],
+        enter_rules: &[],
         player_counter_bans: &[],
         damage_by_toughness: &[],
         damage_stays: &[],
@@ -2797,6 +2813,7 @@ impl CardDef {
             (!self.win_rules.is_empty(), "win rules"),
             (!self.infect_damage_to.is_empty(), "an infect damage rule"),
             (!self.counter_bans.is_empty(), "counter bans"),
+            (!self.enter_rules.is_empty(), "enter rules"),
             (!self.player_counter_bans.is_empty(), "player counter bans"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),
             (!self.damage_stays.is_empty(), "a damage-stays rule"),

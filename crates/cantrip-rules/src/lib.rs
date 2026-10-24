@@ -52,6 +52,8 @@ mod suspend_haste_tests;
 #[cfg(test)]
 mod entering_judged_tests;
 #[cfg(test)]
+mod enter_rules_tests;
+#[cfg(test)]
 mod enters_as_tests;
 #[cfg(test)]
 mod land_text_tests;

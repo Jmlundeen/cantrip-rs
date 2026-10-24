@@ -4529,9 +4529,15 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     if !unlimited && cx.s().player(player).lands_played >= 1 + extra {
         return;
     }
+    // Playing a land puts it onto the battlefield (CR 305.1): one a static ability keeps from entering from where it is
+    // can't be played (CR 101.2), judged as the card it is there - a modal double-faced card by its front face.
+    let bans = crate::static_rules::enter_bans(cx);
     // A land card is played as itself; a modal double-faced card whose back face is a land may be played as that
     // (CR 712.12), from wherever a land could be played.
     let offer = |id: ObjectId, by: Option<Grant>, options: &mut Vec<ActionOption>| {
+        if !bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id) {
+            return;
+        }
         // A card exiled face down is judged as the land it would be (CR 406.3a).
         let _face_up = layers::judged_face_up(cx.s(), id);
         if cx.chars(id).is(CardType::Land) {
@@ -4568,7 +4574,7 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     // their turns, say. Looked for only when the graveyard holds a land card.
     let mut granted: Option<Vec<Given<GrantedWay>>> = None;
     for &id in cx.s().zone(Zone::graveyard(player)) {
-        if !cx.chars(id).is(CardType::Land) {
+        if !cx.chars(id).is(CardType::Land) || (!bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id)) {
             continue;
         }
         for way in granted.get_or_insert_with(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)).iter() {
@@ -6739,7 +6745,8 @@ pub fn could_play_land_during_resolution(cx: &Cx, card: ObjectId) -> bool {
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) || cx.s().turn.active != player {
         return false;
     }
-    if !cx.card(obj.card).is(CardType::Land) || cx.s().player(player).lost {
+    // One a static ability keeps from entering can't be played (CR 305.1, 101.2).
+    if !cx.card(obj.card).is(CardType::Land) || cx.s().player(player).lost || crate::static_rules::cant_enter(cx, card) {
         return false;
     }
     let LandRules { extra, unlimited, .. } = land_rules(cx, player);
