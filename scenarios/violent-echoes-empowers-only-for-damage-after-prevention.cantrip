@@ -1,0 +1,33 @@
+# Healing Salve prevents three of six damage to the opponent's 0/2 Ornithopter.
+# Only three is dealt, leaving one excess for empower (CR 120.10, 615.6).
+[Bot1 Deck]
+Violent Echoes
+Black Lotus
+Mox Ruby
+Island x22
+
+[Bot2 Deck]
+Ornithopter
+Mox Pearl
+Healing Salve
+Island x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Violent Echoes.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Prevent the next 3 damage)
+Bot2.Target(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 1
+Bot2.Graveyard = Ornithopter; Healing Salve

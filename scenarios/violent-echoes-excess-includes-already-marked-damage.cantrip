@@ -1,0 +1,33 @@
+# One damage is already marked on our 0/2 Ornithopter, leaving one lethal damage;
+# six further damage has five excess (CR 120.6, 120.10).
+[Bot1 Deck]
+Violent Echoes
+Black Lotus
+Mox Ruby
+Fanatical Firebrand
+Ornithopter
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Damage = 1
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Violent Echoes.Cast(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 5
+Bot1.Graveyard = Ornithopter; Violent Echoes; Black Lotus; Fanatical Firebrand

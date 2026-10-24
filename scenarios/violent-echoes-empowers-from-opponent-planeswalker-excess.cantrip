@@ -1,0 +1,33 @@
+# The opponent's planeswalker starts with three loyalty: six damage has three excess,
+# creating our own Jace token with three counters (CR 120.10, 701.71a).
+[Bot1 Deck]
+Violent Echoes
+Black Lotus
+Mox Ruby
+Island x22
+
+[Bot2 Deck]
+The Theorist, Jace Beleren
+Black Lotus
+Island x23
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.The Theorist, Jace Beleren.Cast
+[T2 Bot2.Main2]
+? Bot2.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Violent Echoes.Cast(Bot2.Battlefield.The Theorist, Jace Beleren)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 3
+Bot2.Graveyard = The Theorist, Jace Beleren; Black Lotus

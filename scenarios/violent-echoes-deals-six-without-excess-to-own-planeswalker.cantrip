@@ -1,0 +1,30 @@
+# Six damage removes six of Jace's eight loyalty without excess, so no counters are added (CR 120.10, 701.71a).
+# A land is outside the target filter; our own planeswalker is inside it.
+[Bot1 Deck]
+Violent Echoes
+Jace's Machinations
+Black Lotus x2
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace's Machinations.Cast
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 8
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Violent Echoes.Cast(Bot1.Battlefield.Island)
+Bot1.Hand.Violent Echoes.Cast(Bot1.Battlefield.Jace Token)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 2
+Bot1.Graveyard = Violent Echoes; Black Lotus; Jace's Machinations; Black Lotus
