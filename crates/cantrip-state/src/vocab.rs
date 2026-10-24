@@ -329,7 +329,8 @@ impl ManaCost {
                 if generic.get(at).copied().unwrap_or(false) {
                     out.generic = out.generic.saturating_add(2);
                 } else {
-                    out.symbols[Color::ALL[i].mana() as usize] += 1;
+                    let colored = &mut out.symbols[Color::ALL[i].mana() as usize];
+                    *colored = colored.saturating_add(1);
                 }
                 at += 1;
             }
