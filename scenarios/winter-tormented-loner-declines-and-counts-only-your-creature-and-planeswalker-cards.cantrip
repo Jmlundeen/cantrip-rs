@@ -1,0 +1,60 @@
+# Declining sacrifices nothing. Winter's power counts your creature and planeswalker cards, with Grist counted once
+# despite having both types in the graveyard; opponent cards and other types do not count (CR 613.4c).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Winter, Tormented Loner
+Thought Scour
+Island
+Ornithopter
+Island
+Island
+Grist, the Hunger Tide
+Ornithopter
+Liliana of the Veil
+Island x20
+[Bot2 Deck]
+Mox Jet
+Entomb
+Ornithopter
+Soul-Guide Lantern
+Island x4
+Liliana of the Veil
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Winter, Tormented Loner.Cast
+Bot1.Choose()
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Liliana of the Veil)
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+Bot2.Target(Bot1.Graveyard.Black Lotus)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Winter, Tormented Loner.Power = 0
+? Bot1.Battlefield.Winter, Tormented Loner.Toughness = 3
+? Bot2.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+[Bot1.Main2]
+? Bot1.Battlefield.Winter, Tormented Loner.Power = 2
+? Bot1.Battlefield.Winter, Tormented Loner.Toughness = 3
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Winter, Tormented Loner.Power = 0
+Bot1.Battlefield.Winter, Tormented Loner.Toughness = 3
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Graveyard = Soul-Guide Lantern; Entomb; Liliana of the Veil

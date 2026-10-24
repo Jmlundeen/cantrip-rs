@@ -1,0 +1,63 @@
+# Sacrificing a planeswalker creates a separate reflexive trigger. Winter can leave in response; each opponent
+# still chooses a creature, while their artifacts cannot be chosen (CR 603.12, 701.21a, 101.4).
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Sol Ring
+Karn, Scion of Urza
+Winter, Tormented Loner
+Unsummon
+Island x20
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Mox Pearl
+Island x20
+[Bot3 Deck]
+Ornithopter
+Ornithopter
+Mox Pearl
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Karn, Scion of Urza.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Ornithopter.Cast
+Bot3.Hand.Ornithopter.Cast
+Bot3.Hand.Mox Pearl.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Winter, Tormented Loner.Cast
+! Bot1.Choose(Mox Pearl)
+! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Karn, Scion of Urza)
+? Stack.Count = 1
+? Bot1.Battlefield.Winter, Tormented Loner.Power = 1
+? Bot2.Battlefield.Ornithopter#1.Power = 0
+? Bot3.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Winter, Tormented Loner)
+! Bot2.Choose(Mox Pearl)
+Bot2.Choose(Ornithopter#1)
+! Bot3.Choose(Mox Pearl)
+Bot3.Choose(Ornithopter#1)
+[Expect]
+Bot1.Hand.Winter, Tormented Loner.Power = 0
+Bot1.Graveyard = Unsummon; Karn, Scion of Urza
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Mox Pearl; Ornithopter
+Bot3.Graveyard = Ornithopter
+Bot3.Battlefield = Mox Pearl; Ornithopter
