@@ -1,0 +1,44 @@
+# Hellcat, Undying Vigilante under Containment Priest: "When Hellcat dies, return her to the battlefield ... She loses all
+# abilities and gains haste." The return is replaced: she wasn't cast, so she is exiled instead (CR 614.1c), and "she" -
+# the permanent returned - never exists to lose abilities or gain haste; the card in exile is a new object (CR 400.7).
+# (Nothing the dump shows could carry an effect wrongly given to the card she was; this runs the card's guard for that
+# case.) Bot2 kills the 2/2 Hellcat with Lightning Bolt.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Pearl
+Plains
+Containment Priest
+Hellcat, Undying Vigilante
+Forest x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Containment Priest.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hellcat, Undying Vigilante.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Hellcat, Undying Vigilante)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Exile = Hellcat, Undying Vigilante
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Containment Priest; Mox Emerald; Mox Emerald; Mox Pearl; Plains
+Bot2.Graveyard = Lightning Bolt

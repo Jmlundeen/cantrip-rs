@@ -11,6 +11,11 @@ fn return_changed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
     let owner = g.obj(card).owner;
     let hellcat = g.put_onto_battlefield_with_counters(card, owner, false, &[(CounterKind::PlusOne, 1)])?;
+    // "She" is the permanent returned: a card kept from entering (Grafdigger's Cage, CR 101.2) or sent elsewhere (Containment
+    // Priest, CR 614.1c) gets neither change where it is.
+    if !g.is_on_battlefield(hellcat) {
+        return Ok(());
+    }
     g.end_sentence();
     instruction(g, |g| {
         g.add_effect(item.object, hellcat, EffectKind::LoseAllAbilities, Duration::Indefinite);
