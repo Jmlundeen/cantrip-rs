@@ -90,14 +90,22 @@ fn activated(cx: &Cx, ability: AbilityRef) -> Option<&'static ActivatedDef> {
 /// Whether the non-mana parts of a spell's cost could be paid (CR 601.2b, 118.3): a cast that cannot be is not offered.
 /// The card is judged where it is, before it moves to the stack, so it is not among what its own cost could choose.
 fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> bool {
-    can_pay_other_as(cx, source, controller, cost, Judged::Cast)
+    can_pay_other_as(cx, source, controller, cost, Judged::Cast, Some(CostFor::Spell))
 }
 
 /// Whether the non-mana parts of an activated ability's cost could be paid (CR 602.2b, 118.3): an activation that cannot
 /// be is not offered at all. Its source stays where it is as the cost is paid, so it may be what the cost chooses (a
-/// permanent that beholds itself, CR 701.4a).
-fn can_pay_activation(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> bool {
-    can_pay_other_as(cx, source, controller, cost, Judged::Activation)
+/// permanent that beholds itself, CR 701.4a). `paid` is what the cost is paid for (`activating`): `None` for a cost paid as
+/// a spell or ability resolves, judged as an activation's is.
+fn can_pay_activation(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, paid: Option<CostFor>) -> bool {
+    can_pay_other_as(cx, source, controller, cost, Judged::Activation, paid)
+}
+
+/// What the cost of an ability that isn't a mana ability is paid for, as the static abilities that forbid some payments
+/// read it (`CostFor`, `CardDef::cost_bans`): activating it (CR 602.2b). A special action is no activation (CR 116.2), and
+/// its cost is paid for nothing they forbid. A mana ability's is `CostFor::ManaAbility`, which its own paths name.
+fn activating(def: &ActivatedDef) -> Option<CostFor> {
+    (!def.special_action).then_some(CostFor::Ability)
 }
 
 /// What a cost is judged for by `can_pay_other_as`.
@@ -114,7 +122,8 @@ enum Judged {
     Nested,
 }
 
-fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, judged: Judged) -> bool {
+/// `paid` is what the cost is paid for, which a static ability may forbid some payments for (`CardDef::cost_bans`).
+fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, judged: Judged, paid: Option<CostFor>) -> bool {
     let obj = cx.s().obj(source);
     // A creature's {T} ability needs it under its controller's control since their turn began, unless it has haste or the
     // ability may be activated as though it had (CR 302.6).
@@ -141,14 +150,18 @@ fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost
         return false;
     }
     // Energy is paid from the payer's counters (CR 107.14, 118.3): payable only with at least that many.
-    if cx.s().player(controller).energy() < cost.energy || !can_pay_life(cx, controller, cost.life) {
+    if cx.s().player(controller).energy() < cost.energy || !can_pay_life_for(cx, controller, cost.life, paid) {
+        return false;
+    }
+    // CR 101.2, 701.21a: a permanent a static ability says can't be sacrificed for this cost can't pay "sacrifice this".
+    if cost.sacrifice_self && obj.zone.is(ZoneKind::Battlefield) && !may_sacrifice_for(cx, controller, source, paid) {
         return false;
     }
     if cost.return_self && !obj.zone.is(ZoneKind::Battlefield) {
         return false;
     }
     if let Some(variable) = cost.variable
-        && !variable_payable(cx, source, controller, variable)
+        && !variable_payable(cx, source, controller, variable, paid)
     {
         return false;
     }
@@ -189,21 +202,21 @@ fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost
     }
     if let Some(p) = cost.permanents {
         let asker = Asker { source, controller };
-        let mut candidates = cx.permanents_of(controller).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).count();
+        let mut candidates = cx.permanents_of(controller).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id, paid)).count();
         // Tapped permanents are judged once the mana abilities have been activated (CR 601.2g-h): an untapped one that
         // passes the filter and one of its controller's mana abilities could tap will do.
         if p.tapped && candidates < p.count as usize && judged == Judged::Nested {
             candidates = cx
                 .permanents_of(controller)
                 .into_iter()
-                .filter(|&id| pays_permanents(cx, cost, &PermanentCost { tapped: false, ..p }, &asker, id))
+                .filter(|&id| pays_permanents(cx, cost, &PermanentCost { tapped: false, ..p }, &asker, id, paid))
                 .count();
         } else if p.tapped && candidates < p.count as usize {
             let tappable = tappable_for_mana(cx, controller);
             candidates += cx
                 .permanents_of(controller)
                 .into_iter()
-                .filter(|&id| !cx.s().obj(id).tapped && (p.filter)(cx, &asker, id) && tappable.contains(&id))
+                .filter(|&id| !cx.s().obj(id).tapped && (p.filter)(cx, &asker, id) && permanent_allowed(cx, cost, &p, controller, id, paid) && tappable.contains(&id))
                 .count();
         }
         if candidates < p.count as usize {
@@ -654,9 +667,20 @@ fn pay_exiles(cx: &mut Cx, chosen: &[ObjectId]) {
 /// cost, and one permanent can't be tapped to pay both (CR 118.3, 602.2b). When it asks for tapped permanents and has {T},
 /// the source is one: the parts of a cost are paid in any order (CR 601.2h by way of 602.2b), so {T} may tap it first
 /// ("{T}, Return a tapped creature you control" may return itself), as `activate` and `activate_mana` pay it.
-fn pays_permanents(cx: &Cx, cost: &Cost, p: &PermanentCost, asker: &Asker, id: ObjectId) -> bool {
+/// `paid` is what the cost is paid for (`permanent_allowed`).
+fn pays_permanents(cx: &Cx, cost: &Cost, p: &PermanentCost, asker: &Asker, id: ObjectId, paid: Option<CostFor>) -> bool {
     let tapped = cx.s().obj(id).tapped || cost.tap && id == asker.source;
-    !(cost.tap && cost.tap_permanents && id == asker.source) && (!p.tapped || tapped) && (p.filter)(cx, asker, id)
+    !(cost.tap && cost.tap_permanents && id == asker.source)
+        && (!p.tapped || tapped)
+        && (p.filter)(cx, asker, id)
+        && permanent_allowed(cx, cost, p, asker.controller, id, paid)
+}
+
+/// Whether `player` may pay a permanents cost paid for `paid` with `id` as far as the static abilities that forbid some
+/// payments go (CR 101.2, `CardDef::cost_bans`): a sacrifice one forbids can't be made (CR 701.21a), and tapping, returning
+/// or exiling a permanent is no sacrifice.
+fn permanent_allowed(cx: &Cx, cost: &Cost, p: &PermanentCost, player: PlayerId, id: ObjectId, paid: Option<CostFor>) -> bool {
+    cost.tap_permanents || p.action != PermanentAction::Sacrifice || may_sacrifice_for(cx, player, id, paid)
 }
 
 /// The untapped permanents `player`'s mana abilities could tap as they are activated now (CR 601.2g, 605.3a): each one
@@ -689,11 +713,12 @@ fn permanents_after_mana(cost: &Cost) -> bool {
 }
 
 /// Chooses the permanents a cost names (CR 601.2h), always asked, even when the choice is forced. Too few to choose
-/// among (tapped ones, judged once the mana is paid) is a cost that can't be paid: the announcement is taken back.
-fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
+/// among (tapped ones, judged once the mana is paid) is a cost that can't be paid: the announcement is taken back. `paid` is
+/// what the cost is paid for (`permanent_allowed`).
+fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, paid: Option<CostFor>) -> R<Vec<ObjectId>> {
     let Some(p) = cost.permanents else { return Ok(Vec::new()) };
     let asker = Asker { source, controller: player };
-    let eligible: Vec<ObjectId> = cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).collect();
+    let eligible: Vec<ObjectId> = cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id, paid)).collect();
     if eligible.len() < p.count as usize {
         return Err(Stop::Cancel);
     }
@@ -729,9 +754,10 @@ fn pay_discards(cx: &mut Cx, chosen: &[ObjectId]) {
 }
 
 /// Whether `player` can still pay this much energy (CR 107.14) and life (CR 119.4) once the mana of the cost is paid: the
-/// mana abilities activated while paying it (CR 601.2g) may have spent energy or life the rest of the cost needs.
-fn rest_payable(cx: &Cx, player: PlayerId, energy: u32, life: u32) -> bool {
-    u32::from(cx.s().player(player).energy()) >= energy && (life == 0 || payable_life(cx, player) >= life.min(i32::MAX as u32) as i32)
+/// mana abilities activated while paying it (CR 601.2g) may have spent energy or life the rest of the cost needs. `paid` is
+/// what the cost is paid for (`payable_life_for`).
+fn rest_payable(cx: &Cx, player: PlayerId, energy: u32, life: u32, paid: Option<CostFor>) -> bool {
+    u32::from(cx.s().player(player).energy()) >= energy && (life == 0 || payable_life_for(cx, player, paid) >= life.min(i32::MAX as u32) as i32)
 }
 
 /// Pays the life and counters parts of a cost.
@@ -824,15 +850,16 @@ fn confirm_hand_exiles(cx: &mut Cx, player: PlayerId, spell: ObjectId, cost: Exi
     }
 }
 
-/// The permanents a variable sacrifice may take, or the other cards in the graveyard an exile may take (CR 601.2h).
-fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost) -> Vec<ObjectId> {
+/// The permanents a variable sacrifice may take, or the other cards in the graveyard an exile may take (CR 601.2h). `paid`
+/// is what the cost is paid for: a sacrifice a static ability forbids for it is no candidate (CR 101.2, `may_sacrifice_for`).
+fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost, paid: Option<CostFor>) -> Vec<ObjectId> {
     match variable {
         VariableCost::SacrificeX(filter)
         | VariableCost::SacrificeOneOrMore(filter)
         | VariableCost::SacrificeAnyNumber { filter, .. }
         | VariableCost::SacrificeWithPowerX(filter) => {
             let asker = Asker { source, controller: player };
-            cx.permanents_of(player).into_iter().filter(|&id| filter(cx, &asker, id)).collect()
+            cx.permanents_of(player).into_iter().filter(|&id| filter(cx, &asker, id) && may_sacrifice_for(cx, player, id, paid)).collect()
         }
         VariableCost::ExileFromGraveyardWithTypes(_) => {
             cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect()
@@ -858,15 +885,15 @@ fn types_among(cx: &Cx, cards: &[ObjectId]) -> usize {
 }
 
 /// Whether a variable cost could be paid at all: X may be zero, "one or more" needs one, and the exile needs enough types.
-fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost) -> bool {
+fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost, paid: Option<CostFor>) -> bool {
     match variable {
         VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => true,
-        VariableCost::SacrificeOneOrMore(_) => !variable_candidates(cx, source, player, variable).is_empty(),
+        VariableCost::SacrificeOneOrMore(_) => !variable_candidates(cx, source, player, variable, paid).is_empty(),
         // Its power is read as the cost is paid (CR 601.2h), after the mana abilities of CR 601.2g, which may change it: any
         // permanent that passes the filter may yet pay.
-        VariableCost::SacrificeWithPowerX(_) => !variable_candidates(cx, source, player, variable).is_empty(),
+        VariableCost::SacrificeWithPowerX(_) => !variable_candidates(cx, source, player, variable, paid).is_empty(),
         VariableCost::ExileFromGraveyardWithTypes(n) => {
-            types_among(cx, &variable_candidates(cx, source, player, variable)) >= n.max(1) as usize
+            types_among(cx, &variable_candidates(cx, source, player, variable, paid)) >= n.max(1) as usize
         }
     }
 }
@@ -880,10 +907,10 @@ fn ask_cards(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Purpose, 
 }
 
 /// What a variable cost takes, chosen as the cost is chosen (CR 601.2h): the permanents to sacrifice, or the cards to
-/// exile. `x` is the X announced for `SacrificeX`.
-fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u32) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
+/// exile. `x` is the X announced for `SacrificeX`; `paid` is what the cost is paid for (`variable_candidates`).
+fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u32, paid: Option<CostFor>) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
     let Some(variable) = cost.variable else { return Ok((Vec::new(), Vec::new())) };
-    let candidates = variable_candidates(cx, source, player, variable);
+    let candidates = variable_candidates(cx, source, player, variable, paid);
     match variable {
         VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => {
             if x == 0 {
@@ -993,7 +1020,7 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOp
             if !def.is_mana_ability()
                 || def.from != ZoneKind::Battlefield
                 || limit_reached(cx, id, &chars, index, def)
-                || !can_pay_other_as(cx, id, player, &def.cost, judged)
+                || !can_pay_other_as(cx, id, player, &def.cost, judged, Some(CostFor::ManaAbility))
                 || static_rules::activation_barred(cx, &forbidders, id, def)
             {
                 continue;
@@ -1027,7 +1054,7 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOp
                 option.target_candidates = cx
                     .permanents_of(player)
                     .into_iter()
-                    .filter(|&o| pays_permanents(cx, &def.cost, &p, &asker, o))
+                    .filter(|&o| pays_permanents(cx, &def.cost, &p, &asker, o, Some(CostFor::ManaAbility)))
                     .map(Target::Object)
                     .collect();
                 option.targets_required = u32::from(p.count);
@@ -1040,7 +1067,11 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOp
                     Some(p) => {
                         let asker = Asker { source: id, controller: player };
                         let untapped = PermanentCost { tapped: false, ..p };
-                        cx.permanents_of(player).into_iter().filter(|&o| pays_permanents(cx, &def.cost, &untapped, &asker, o)).map(Target::Object).collect()
+                        cx.permanents_of(player)
+                            .into_iter()
+                            .filter(|&o| pays_permanents(cx, &def.cost, &untapped, &asker, o, Some(CostFor::ManaAbility)))
+                            .map(Target::Object)
+                            .collect()
                     }
                     None => Vec::new(),
                 };
@@ -1072,7 +1103,7 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOp
     for (n, effect) in cx.s().effects.iter().filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player).enumerate() {
         let EffectKind::PlayerManaAbility(ability) = effect.kind else { continue };
         if let Some(def) = activated(cx, ability)
-            && can_pay_other_as(cx, effect.source, player, &def.cost, judged)
+            && can_pay_other_as(cx, effect.source, player, &def.cost, judged, Some(CostFor::ManaAbility))
         {
             options.push(ActionOption::on(ActionKind::ActivateAbility, effect.source, PLAYER_MANA_ABILITY + n as u8));
         }
@@ -1084,7 +1115,7 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOp
             let AbilityDef::Activated(a) = ability else { continue };
             if !a.is_mana_ability()
                 || a.from != ZoneKind::Hand
-                || !can_pay_other_as(cx, id, player, &a.cost, judged)
+                || !can_pay_other_as(cx, id, player, &a.cost, judged, Some(CostFor::ManaAbility))
                 || static_rules::activation_barred(cx, &forbidders, id, a)
             {
                 continue;
@@ -1779,9 +1810,9 @@ fn some_cast(
     let x_life = def.additional_cost.is_some_and(|c| c.pay_x_life);
     let x_sacrifices = matches!(variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeWithPowerX(_)));
     let cap = if x_life {
-        payable_life(cx, player).clamp(0, 1000) as u32
+        payable_life_for(cx, player, Some(CostFor::Spell)).clamp(0, 1000) as u32
     } else if let Some(v @ VariableCost::SacrificeX(_)) = variable {
-        cantrip_state::count_u32(variable_candidates(cx, card, player, v).len())
+        cantrip_state::count_u32(variable_candidates(cx, card, player, v, Some(CostFor::Spell)).len())
     } else {
         u32::from(u16::MAX)
     };
@@ -1959,7 +1990,7 @@ fn added_life_payable(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, 
         return true;
     }
     let (_, _, added, _, _) = deltas_as(cx, &a.changers, player, Costed::Spell(card), face_of(cx, card, def), targets, earlier.spell.as_ref());
-    added == 0 || payable_life(cx, player) >= added as i32 + def.additional_cost.map_or(0, |c| c.life as i32)
+    added == 0 || payable_life_for(cx, player, Some(CostFor::Spell)) >= added as i32 + def.additional_cost.map_or(0, |c| c.life as i32)
 }
 
 /// The face `def` is of the card `card`, where it is one of its faces rather than the card itself (an Adventure, an Omen, a
@@ -2192,7 +2223,7 @@ pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: Pla
     let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) else { return None };
     let mut copy = advice_game(game);
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
-    Some((less_each, variable_candidates(&cx, spell, player, variable).len()))
+    Some((less_each, variable_candidates(&cx, spell, player, variable, Some(CostFor::Spell)).len()))
 }
 
 /// What casting a card from a hand by the cast option `option` costs `player` before any target is announced, with the cost
@@ -2734,7 +2765,9 @@ fn least_cost_parts(
     }
     // "Costs {1} less for each permanent sacrificed this way": as little as sacrificing every permanent that could be.
     let off = match def.additional_cost.and_then(|c| c.variable) {
-        Some(v @ VariableCost::SacrificeAnyNumber { less_each, .. }) => (variable_candidates(cx, card, player, v).len() as u32 * less_each as u32).min(255) as u8,
+        Some(v @ VariableCost::SacrificeAnyNumber { less_each, .. }) => {
+            (variable_candidates(cx, card, player, v, Some(CostFor::Spell)).len() as u32 * less_each as u32).min(255) as u8
+        }
         _ => 0,
     };
     // "Costs {2} less for each card exiled this way": as little as exiling every card that could be.
@@ -2762,7 +2795,7 @@ fn finish(
     announced: Option<&Obj>,
     covered: &mut dyn FnMut(ManaCost, u8) -> bool,
 ) -> bool {
-    cost = phyrexian_with_life(cx, player, cost, 0);
+    cost = phyrexian_with_life(cx, player, cost, 0, Some(CostFor::Spell));
     // A face cast from the hand (an Adventure, an Omen, a half, a back face) is judged as that face (CR 715.4, 720.3a,
     // 709.3, 712.8a).
     change_any(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets, announced, covered)
@@ -2770,12 +2803,13 @@ fn finish(
 
 /// `cost` with as many of its Phyrexian symbols paid with 2 life each as `player`'s life total allows beside `other_life`
 /// the rest of the cost pays (CR 107.4f, 119.4: a payment of life the life total covers, down to 0), and the others paid
-/// with their color: the least mana it could be announced to cost (advice; `announce_life` asks the real choice).
-fn phyrexian_with_life(cx: &Cx, player: PlayerId, mut cost: ManaCost, other_life: u32) -> ManaCost {
+/// with their color: the least mana it could be announced to cost (advice; `announce_life` asks the real choice). `paid` is
+/// what the cost is paid for (`payable_life_for`).
+fn phyrexian_with_life(cx: &Cx, player: PlayerId, mut cost: ManaCost, other_life: u32, paid: Option<CostFor>) -> ManaCost {
     if cost.phyrexian == [0; 5] {
         return cost;
     }
-    let mut life = i64::from(payable_life(cx, player)) - i64::from(other_life);
+    let mut life = i64::from(payable_life_for(cx, player, paid)) - i64::from(other_life);
     for (i, n) in cost.phyrexian.into_iter().enumerate() {
         for _ in 0..n {
             if life >= 2 {
@@ -2921,13 +2955,13 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
     }
     let mut flex = [0u32; 64];
     // Mana abilities of the player's own (CR 605.1a): paid with life, as often as the life total allows (CR 119.4), and never
-    // while the player can't lose life (CR 119.8).
+    // while the player can't lose life (CR 119.8) or can't pay life to activate mana abilities (`payable_life_for`).
     for effect in cx.s().effects.iter().filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player) {
         let EffectKind::PlayerManaAbility(ability) = effect.kind else { continue };
         if let Some(def) = activated(cx, ability)
             && def.cost.life > 0
         {
-            let times = payable_life(cx, player).max(0) as u32 / def.cost.life as u32;
+            let times = payable_life_for(cx, player, Some(CostFor::ManaAbility)).max(0) as u32 / def.cost.life as u32;
             for m in 0..6 {
                 fixed[m] = fixed[m].saturating_add(def.adds.0[m].saturating_mul(times));
             }
@@ -2962,7 +2996,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
             if !def.is_mana_ability()
                 || def.from != ZoneKind::Battlefield
                 || limit_reached(cx, id, &chars, index, def)
-                || !can_pay_activation(cx, id, player, &def.cost)
+                || !can_pay_activation(cx, id, player, &def.cost, Some(CostFor::ManaAbility))
                 || static_rules::activation_barred(cx, &forbidders, id, def)
             {
                 continue;
@@ -3081,7 +3115,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
             return Vec::new();
         }
         taps.iter()
-            .filter(|(_, source, cost, p)| pays_permanents(cx, cost, p, &Asker { source: *source, controller: player }, target))
+            .filter(|(_, source, cost, p)| pays_permanents(cx, cost, p, &Asker { source: *source, controller: player }, target, Some(CostFor::ManaAbility)))
             .map(|&(a, ..)| a)
             .collect()
     };
@@ -3124,7 +3158,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
             let outlets: Vec<Alternative> = repeatable
                 .iter()
                 .filter_map(|&(a, source, repeat)| match repeat {
-                    Repeat::Sacrifice(cost, p, from_it) if pays_permanents(cx, &cost, &p, &Asker { source, controller: player }, target) => {
+                    Repeat::Sacrifice(cost, p, from_it) if pays_permanents(cx, &cost, &p, &Asker { source, controller: player }, target, Some(CostFor::ManaAbility)) => {
                         if !from_it {
                             return Some(a);
                         }
@@ -4188,7 +4222,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             {
                 continue;
             }
-            if !can_pay_activation(cx, id, player, &def.cost) {
+            if !can_pay_activation(cx, id, player, &def.cost, activating(def)) {
                 continue;
             }
             // An X that can't be 0 counting targets there are none of ("X target ...", CR 107.3a, 601.2c): nothing may be
@@ -4220,7 +4254,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 // Its Phyrexian symbols paid with life where the life total allows, beside the life the cost pays
                 // (CR 107.4f, 601.2b by way of 602.2b, 116.2b), as the activation announces them (`announce_life`).
                 let judge = |cost: ManaCost| {
-                    let cost = phyrexian_with_life(cx, player, cost, u32::from(def.cost.life));
+                    let cost = phyrexian_with_life(cx, player, cost, u32::from(def.cost.life), activating(def));
                     a.covers_for(&if any_color { cost.paid_with_any_color() } else { cost }, &payment)
                 };
                 if def.special_action {
@@ -4269,8 +4303,11 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 continue;
             }
             let mut option = ActionOption { granted_by: granted_by(cx, id, Some(&chars), index, ability, &givers), ..ActionOption::on(ActionKind::ActivateAbility, id, index as u8) };
-            // "Sacrifice [the card that gives this ability]" (CR 201.5a, 701.21a): only with that permanent the player's.
-            if def.cost.sacrifice_granter && !option.granted_by.is_some_and(|g| cx.s().obj(g.object).controller == player) {
+            // "Sacrifice [the card that gives this ability]" (CR 201.5a, 701.21a): only with that permanent the player's, and
+            // one a static ability lets them sacrifice for it (CR 101.2, `may_sacrifice_for`).
+            if def.cost.sacrifice_granter
+                && !option.granted_by.is_some_and(|g| cx.s().obj(g.object).controller == player && may_sacrifice_for(cx, player, g.object, activating(def)))
+            {
                 continue;
             }
             let possible = match def.modal {
@@ -5535,7 +5572,7 @@ fn emerge_reduction(cx: &Cx, player: PlayerId, card: ObjectId, cost: &Cost) -> u
     let Some(p) = cost.permanents.filter(|_| cost.emerge) else { return 0 };
     let asker = Asker { source: card, controller: player };
     let mut values: Vec<u32> =
-        cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).map(|id| cx.mana_value(id)).collect();
+        cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id, Some(CostFor::Spell))).map(|id| cx.mana_value(id)).collect();
     values.sort_unstable_by(|a, b| b.cmp(a));
     values.iter().take(p.count as usize).sum::<u32>().min(255) as u8
 }
@@ -5621,7 +5658,7 @@ fn has_mana_source(cx: &Cx, id: ObjectId, player: PlayerId) -> bool {
         activated(cx, ability).is_some_and(|def| {
             def.is_mana_ability()
                 && !limit_reached(cx, id, &chars, index, def)
-                && can_pay_activation(cx, id, player, &def.cost)
+                && can_pay_activation(cx, id, player, &def.cost, Some(CostFor::ManaAbility))
                 && !static_rules::activation_barred(cx, &forbidders, id, def)
         })
     })
@@ -6243,13 +6280,13 @@ fn cast(
         // X paid in life is announced up to the life there is (CR 119.4), and X creatures sacrificed up to the creatures
         // there are (CR 601.2b).
         let cap: u32 = if extra.pay_x_life {
-            payable_life(cx, player).clamp(0, 1000) as u32
+            payable_life_for(cx, player, Some(CostFor::Spell)).clamp(0, 1000) as u32
         } else if matches!(extra.variable, Some(VariableCost::SacrificeWithPowerX(_))) {
             // A power read as the cost is paid (CR 601.2h), after the mana abilities that may change it (CR 601.2g): X up
             // to the most a power can be, the payment refusing one nothing has.
             i16::MAX as u32
         } else if let Some(variable) = extra.variable.filter(|_| sacrifices_x) {
-            let there = u32::try_from(variable_candidates(cx, spell, player, variable).len()).unwrap_or(u32::MAX);
+            let there = u32::try_from(variable_candidates(cx, spell, player, variable, Some(CostFor::Spell)).len()).unwrap_or(u32::MAX);
             // An X ("sacrifice X creatures") is a u16 (`StackItem::x`); the number "any number" announces is not.
             if less_each > 0 { there } else { there.min(u32::from(u16::MAX)) }
         } else {
@@ -6330,7 +6367,7 @@ fn cast(
 
     // CR 601.2b, 107.4f: which Phyrexian symbols are paid with life is announced before any target.
     announce_twobrids(cx, player, spell, &mut cost.mana, any_type)?;
-    let life = announce_life(cx, player, spell, &mut cost.mana, any_type)?;
+    let life = announce_life(cx, player, spell, &mut cost.mana, any_type, Some(CostFor::Spell))?;
     // CR 601.2b, 702.174a: gift is an optional additional cost, announced, with the opponent it is promised to, before
     // the targets (CR 702.174m): what may be targeted can depend on it. The opponent is the only one without asking.
     if let Some(gift) = def.gift
@@ -6440,7 +6477,7 @@ fn cast(
     if added_life > 0 {
         cost.life = (u32::from(cost.life) + added_life).min(u32::from(u16::MAX)) as u16;
         let owed = cost.life as i32 + extra.life as i32 + life as i32 + x_life as i32;
-        if payable_life(cx, player) < owed {
+        if payable_life_for(cx, player, Some(CostFor::Spell)) < owed {
             return Err(Stop::Cancel);
         }
     }
@@ -6467,10 +6504,10 @@ fn cast(
     // cost's choices come once the mana is paid (CR 601.2h), as the C# engine asks them, and so do tapped permanents
     // (web-slinging's), which a mana ability activated while paying may have tapped (CR 601.2g).
     let late = permanents_after_mana(&cost);
-    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, spell, &cost)? };
+    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, spell, &cost, Some(CostFor::Spell))? };
     let discards = choose_discards(cx, player, spell, &cost)?;
     let mut exiles = choose_exiles(cx, player, spell, &cost)?;
-    let (way_sacrifices, way_exiles) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item))?;
+    let (way_sacrifices, way_exiles) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item), Some(CostFor::Spell))?;
     exiles.extend(way_exiles);
     let hand_exiles = choose_hand_exiles(cx, player, spell, &cost)?;
     // CR 702.119a: emerge's mana comes down by the mana value of what was just chosen to be sacrificed. Nothing has
@@ -6514,16 +6551,16 @@ fn cast(
     }
     apply_next_spell_effects(cx, player, spell);
     if late {
-        chosen = choose_permanents(cx, player, spell, &cost)?;
+        chosen = choose_permanents(cx, player, spell, &cost, Some(CostFor::Spell))?;
     }
-    let extra_chosen = choose_permanents(cx, player, spell, &extra)?;
+    let extra_chosen = choose_permanents(cx, player, spell, &extra, Some(CostFor::Spell))?;
     let beheld = choose_behold(cx, player, spell, &cost)?;
     let extra_beheld = choose_behold(cx, player, spell, &extra)?;
     let blighted = choose_blight(cx, player, spell, &cost)?;
     let extra_blighted = choose_blight(cx, player, spell, &extra)?;
     let removed = choose_counters_among(cx, player, spell, &cost)?;
     let extra_removed = choose_counters_among(cx, player, spell, &extra)?;
-    let (extra_sacrifices, extra_exiles) = choose_variable(cx, player, spell, &extra, variable_n(&extra, &item))?;
+    let (extra_sacrifices, extra_exiles) = choose_variable(cx, player, spell, &extra, variable_n(&extra, &item), Some(CostFor::Spell))?;
     // An optional cost that sacrifices one or more: how many were is how many times it was paid (Plumb the Forbidden's
     // linked trigger reads it).
     if matches!(extra.variable, Some(VariableCost::SacrificeOneOrMore(_))) {
@@ -6563,7 +6600,7 @@ fn cast(
     });
     // The energy and life are judged again now the mana is paid: a mana ability activated while paying (CR 601.2g) may have
     // spent what they needed, and a cost that can't be paid takes the cast back (CR 601.2h, 119.4, 107.14).
-    if !rest_payable(cx, player, cost.energy as u32 + extra.energy as u32, life_owed) {
+    if !rest_payable(cx, player, cost.energy as u32 + extra.energy as u32, life_owed, Some(CostFor::Spell)) {
         return Err(Stop::Cancel);
     }
     // Counters put on and taken off permanents are paid first (CR 601.2h: in any order), so a permanent the cost also
@@ -7388,8 +7425,8 @@ fn announce_hybrids(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Cos
 /// Announces which Phyrexian symbols are paid with 2 life (CR 107.4f, 601.2b), as the C# engine's prompt: a choice of
 /// up to as many as the life total covers, cheapest first. The symbols not paid with life become colored mana in
 /// `cost`. Returns the life to pay with the rest of the cost. `any_type`: mana of any type may pay it (CR 609.4b), which
-/// the advice of how few to pay with life reads.
-fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut ManaCost, any_type: bool) -> R<u8> {
+/// the advice of how few to pay with life reads. `paid` is what the cost is paid for (`payable_life_for`).
+fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut ManaCost, any_type: bool, paid: Option<CostFor>) -> R<u8> {
     let mut symbols: Vec<Color> = Vec::new();
     for (i, &n) in cost.phyrexian.iter().enumerate() {
         for _ in 0..n {
@@ -7398,7 +7435,7 @@ fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut Man
     }
     let mut life = 0u8;
     if !symbols.is_empty() {
-        let have = payable_life(cx, player).max(0) as usize;
+        let have = payable_life_for(cx, player, paid).max(0) as usize;
         let most = symbols.len().min(have / 2) as u8;
         if most > 0 {
             // Advice: the fewest symbols that, paid with life, leave a cost the player could pay.
@@ -7625,6 +7662,7 @@ fn activate(
     paid_by: Option<Grant>,
 ) -> R<()> {
     let def = activated(cx, ability).expect("activated");
+    let paid = activating(def);
     // What gave the source this ability (CR 113.2c, 613.1f): the option names it; read now, before any cost moves it (a cost
     // may sacrifice the very permanent that gave it).
     let granted = granted.or_else(|| granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
@@ -7671,7 +7709,7 @@ fn activate(
         item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(cap), true, 0, 0, "")? as u16;
     }
     announce_twobrids(cx, player, source, &mut mana, false)?;
-    let life = announce_life(cx, player, source, &mut mana, false)?;
+    let life = announce_life(cx, player, source, &mut mana, false, paid)?;
     // CR 602.2a, 701.27f: put on the stack now, before its costs are paid; a slot counted by X reads the X announced.
     item.counted = item.x;
     item.since = cx.g.log.len() as u32;
@@ -7701,7 +7739,7 @@ fn activate(
         (at_least(cost, least), life)
     };
     let life = life as u32 + added_life;
-    if added_life > 0 && payable_life(cx, player) < life as i32 + def.cost.life as i32 {
+    if added_life > 0 && payable_life_for(cx, player, paid) < life as i32 + def.cost.life as i32 {
         return Err(Stop::Cancel);
     }
 
@@ -7709,7 +7747,7 @@ fn activate(
     // except tapped ones ("return a tapped creature you control"), chosen once the mana is paid, as a spell's are
     // (`cast`): a mana ability activated while paying may have tapped them.
     let late = permanents_after_mana(&def.cost);
-    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, source, &def.cost)? };
+    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, source, &def.cost, paid)? };
     let discards = choose_discards(cx, player, source, &def.cost)?;
     let exiles = choose_exiles(cx, player, source, &def.cost)?;
     let tappers = choose_tappers(cx, player, source, &def.cost)?;
@@ -7722,7 +7760,7 @@ fn activate(
         &Helpers { waterbend: if def.waterbend { u8::MAX } else { 0 }, creatures: def.tap_creatures_for_mana, purpose: Paying::Activating, ..Helpers::NONE },
     )?;
     if late {
-        chosen = choose_permanents(cx, player, source, &def.cost)?;
+        chosen = choose_permanents(cx, player, source, &def.cost, paid)?;
     }
     // What an attacking creature the cost returns or sacrifices was attacking, for the effect to read (ninjutsu,
     // CR 702.49a: the ninja attacks the same player, planeswalker or battle).
@@ -7763,8 +7801,12 @@ fn activate(
         return Err(Stop::Cancel);
     }
     let beheld = choose_behold(cx, player, source, &def.cost)?;
-    // The energy and life, judged again after the mana abilities (CR 601.2g-h by way of 602.2b).
-    if !rest_payable(cx, player, def.cost.energy as u32, life as u32 + def.cost.life as u32) {
+    // The energy and life, judged again after the mana abilities (CR 601.2g-h by way of 602.2b), and the permanents the cost
+    // sacrifices by naming them, which a static ability may forbid it to (CR 101.2, `may_sacrifice_for`).
+    if !rest_payable(cx, player, def.cost.energy as u32, life as u32 + def.cost.life as u32, paid)
+        || def.cost.sacrifice_self && !may_sacrifice_for(cx, player, source, paid)
+        || granter.is_some_and(|g| !may_sacrifice_for(cx, player, g, paid))
+    {
         return Err(Stop::Cancel);
     }
     if life > 0 {
@@ -7898,7 +7940,8 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     // How each {2/C} and each Phyrexian symbol is paid is announced first, as for a cast or an activation (CR 601.2b, 107.4f,
     // 116.2b: a face-down Phyrexian Metamorph turned face up for {3}{U/P} may pay the {U/P} with 2 life).
     announce_twobrids(cx, player, source, &mut printed, false)?;
-    let life = announce_life(cx, player, source, &mut printed, false)?;
+    // A special action is no activation (CR 116.2): what forbids paying life to activate abilities leaves it alone.
+    let life = announce_life(cx, player, source, &mut printed, false, None)?;
     announce_hybrids(cx, player, source, costed, &mut printed, &[], false)?;
     let split = announce_reduction(cx, player, source, costed, &printed, &[])?;
     let (mana, _, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, printed, None, &[], &split);
@@ -7907,7 +7950,7 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
         pay_mana(cx, player, source, mana)?;
     }
     // The life, judged again once the mana is paid (CR 601.2g-h, 119.4): a mana ability may have spent it.
-    if !rest_payable(cx, player, 0, u32::from(life)) {
+    if !rest_payable(cx, player, 0, u32::from(life), None) {
         return Err(Stop::Cancel);
     }
     if life > 0 {
@@ -7974,7 +8017,7 @@ pub fn activate_mana(
         pay_mana_with(cx, player, source, mana, &Helpers { purpose: Paying::Activating, ..Helpers::NONE })?;
     }
     if late {
-        chosen = choose_permanents(cx, player, source, &def.cost)?;
+        chosen = choose_permanents(cx, player, source, &def.cost, Some(CostFor::ManaAbility))?;
         if def.colors_from_sacrifice {
             adds_nothing = sacrificed_names(cx, &chosen, color, colorless)?;
         }
@@ -9091,6 +9134,34 @@ pub fn can_pay_life(cx: &Cx, player: PlayerId, life: u16) -> bool {
     life == 0 || payable_life(cx, player) >= i32::from(life)
 }
 
+/// Whether `player` could pay `life` life now for a cost paid for `paid` (CR 119.4): as `can_pay_life` says, and any amount
+/// but 0 not at all where a static ability says life can't be paid for it (`payable_life_for`).
+pub fn can_pay_life_for(cx: &Cx, player: PlayerId, life: u16, paid: Option<CostFor>) -> bool {
+    // CR 119.4b: 0 life can always be paid, "even if an effect says players can't pay life".
+    life == 0 || payable_life_for(cx, player, paid) >= i32::from(life)
+}
+
+/// The most life `player` may pay for a cost paid for `paid` (CR 119.4): `payable_life`, or none at all to cast a spell or
+/// activate an ability while a static ability says life can't be paid for it (CR 101.2, `CardDef::cost_bans`: Yasharn,
+/// Implacable Earth; Karn's Sylex, for abilities that aren't mana abilities). `None` is a payment for anything else - a cost
+/// paid as a spell or ability resolves (Yasharn's ruling: "Other things may still cause players to pay life"), a special
+/// action's - which they leave alone.
+pub fn payable_life_for(cx: &Cx, player: PlayerId, paid: Option<CostFor>) -> i32 {
+    if paid.is_some_and(|f| static_rules::cost_banned(cx, cx.cards(), player, f, CostPayment::Life)) {
+        0
+    } else {
+        payable_life(cx, player)
+    }
+}
+
+/// Whether `player` may sacrifice `id` to pay a cost paid for `paid` (CR 701.21a): always, but to cast a spell or activate an
+/// ability while a static ability says it can't be sacrificed for that (CR 101.2, `CardDef::cost_bans`: Yasharn,
+/// Implacable Earth's nonland permanents, Angel of Jubilation's creatures). `None` is a cost paid for anything else (a
+/// resolving spell or ability's "sacrifice ... If you do"), which they leave alone.
+fn may_sacrifice_for(cx: &Cx, player: PlayerId, id: ObjectId, paid: Option<CostFor>) -> bool {
+    paid.is_none_or(|f| !static_rules::cost_banned(cx, cx.cards(), player, f, CostPayment::Sacrifice(id)))
+}
+
 /// The most life `player` may pay (CR 119.4): their life total, or none at all while they can't lose life (CR 119.8: "a cost
 /// that involves having that player pay life can't be paid") or their life total can't change (Teferi's Protection's ruling:
 /// "You can't pay a cost that includes the payment of any amount of life other than 0 life").
@@ -9245,11 +9316,13 @@ fn pay_during_resolution(
 /// the mana from the pool, the life, and each other part as an activated ability's cost pays it (`activate`). `x` is the
 /// X paid, for a "sacrifice X" part.
 fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, total: ManaCost, life: u16, x: u16) -> R<()> {
-    let chosen = choose_permanents(cx, payer, source, cost)?;
+    // A cost paid as a spell or ability resolves is paid for no cast or activation (CR 118.12): nothing that forbids paying
+    // for those touches it (Yasharn, Implacable Earth's ruling).
+    let chosen = choose_permanents(cx, payer, source, cost, None)?;
     let discards = choose_discards(cx, payer, source, cost)?;
     let exiles = choose_exiles(cx, payer, source, cost)?;
     let hand_exiles = choose_hand_exiles(cx, payer, source, cost)?;
-    let (sacrifices, variable_exiles) = choose_variable(cx, payer, source, cost, u32::from(x))?;
+    let (sacrifices, variable_exiles) = choose_variable(cx, payer, source, cost, u32::from(x), None)?;
     let tappers = choose_tappers(cx, payer, source, cost)?;
     let counter = choose_counter_kind(cx, payer, source, cost)?;
     let beheld = choose_behold(cx, payer, source, cost)?;
@@ -9360,11 +9433,11 @@ fn resolution_rest_payable(cx: &Cx, payer: PlayerId, source: ObjectId, cost: &Co
     }
     // "Sacrifice X" takes X of them (CR 107.3f).
     if let Some(variable @ (VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. })) = cost.variable
-        && variable_candidates(cx, source, payer, variable).len() < usize::from(x)
+        && variable_candidates(cx, source, payer, variable, None).len() < usize::from(x)
     {
         return false;
     }
-    can_pay_activation(cx, source, payer, &Cost { tap: false, life: 0, mana: ManaCost::ZERO, ..*cost })
+    can_pay_activation(cx, source, payer, &Cost { tap: false, life: 0, mana: ManaCost::ZERO, ..*cost }, None)
 }
 
 /// Whether an object is somewhere it can be found by its id: still the same object.

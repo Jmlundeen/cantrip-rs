@@ -1417,6 +1417,15 @@ Saga as their precombat main phase begins (CR 714.3c, a turn-based action). So D
 loyalty and not its +1, and Innkeeper's Talent doubles both. A cost that would put counters a static ability forbids (CR 101.2,
 `CardDef::counter_bans`: Solemnity, Melira) can't be paid (CR 118.3, Solemnity's ruling): such a loyalty ability, counter cost or
 blight is not offered. Whether damage's -1/-1 counters (infect, CR 120.3d) are an effect's has no ruling; they are put as one.
+A static ability may forbid some payments of the costs to cast spells and activate abilities (CR 101.2, 118.3, 601.2h, 602.2b:
+`CardDef::cost_bans`, a `CostBan` asked of the payer, what the cost is for - `CostFor::Spell`, `Ability` or `ManaAbility` - and the
+payment, `CostPayment::Life` or `Sacrifice(permanent)`, through `static_rules::cost_banned`). Yasharn, Implacable Earth forbids life
+and nonland sacrifices, Angel of Jubilation life and creatures, Karn's Sylex life outside mana abilities. Every cost path of a cast or
+an activation reads it: the life a cost may pay (`payable_life_for`, which also limits Phyrexian symbols and "pay X life"), the
+permanents a sacrifice may take (`pays_permanents`, `variable_candidates`), "sacrifice this" and "sacrifice [the granter]". A cost that
+can be paid only that way can't be paid, so the spell or ability isn't offered; one with another way (a land for "sacrifice a
+permanent", a Phyrexian symbol's color) is paid that way. 0 life can always be paid (CR 119.4b). What a resolving spell or ability
+has a player pay (CR 118.12: `may_pay`), and a special action's cost (CR 116.2), are paid for none of these, and pass `None`.
 The permanent's controller orders the replacements (CR 616.1), told the counters as the effects so far have left them
 (`RequestKind::ChooseReplacement::counters`, which the host words "1 +1/+1 counter would be put on Walking Ballista"); the
 tactical bot has one that adds a counter apply before one that doubles them.

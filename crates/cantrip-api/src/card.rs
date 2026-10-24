@@ -2106,6 +2106,36 @@ pub enum PlayerCounter {
 /// Melira, Sylvok Outcast's "you can't get poison counters"; Solemnity's "players can't get counters".
 pub type PlayerCounterBan = fn(&dyn Query, &Asker, PlayerId, PlayerCounter) -> bool;
 
+/// What a cost is paid for, as a `CostBan` reads it: casting a spell (CR 601.2h), or activating an activated ability that
+/// is a mana ability (CR 605.1a, 605.3a) or one that isn't (CR 602.2b). A cost paid as a spell or ability resolves (CR
+/// 118.12) and a special action's (CR 116.2) are none of these, and no `CostBan` reaches them.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CostFor {
+    Spell,
+    Ability,
+    ManaAbility,
+}
+
+/// A payment a `CostBan` may forbid.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CostPayment {
+    /// Paying more than 0 life (CR 119.4): 0 life can always be paid, even when an effect says life can't be (CR 119.4b,
+    /// 118.3b), so a payment of 0 is never asked about.
+    Life,
+    /// Sacrificing this permanent (CR 701.21a), judged as it is now.
+    Sacrifice(ObjectId),
+}
+
+/// A static ability that forbids some payments of the costs to cast spells and activate abilities (CR 101.2, 118.3, 601.2h,
+/// 602.2b): true when `player` can't make `payment` for a cost paid for `paid_for`. It stops the action, not words on a card
+/// (Angel of Jubilation's ruling: "Sacrifice an artifact" may still be paid with a noncreature artifact), so a cost that
+/// can only be paid that way can't be paid, and its spell can't be cast or its ability activated - while a cost with
+/// another way to pay it (Phyrexian mana's color, a land for "sacrifice a permanent") is paid that way. What a resolving
+/// spell or ability has a player pay is untouched. Yasharn, Implacable Earth ("Players can't pay life or sacrifice nonland
+/// permanents to cast spells or activate abilities"), Angel of Jubilation ("... or sacrifice creatures ..."), Karn's Sylex
+/// ("Players can't pay life to cast spells or to activate abilities that aren't mana abilities").
+pub type CostBan = fn(&dyn Query, &Asker, PlayerId, CostFor, CostPayment) -> bool;
+
 /// Whether a static ability makes this creature assign combat damage equal to its toughness rather than its power
 /// (CR 510.1a): given the rule's own asker.
 pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
@@ -2549,6 +2579,10 @@ pub struct CardDef {
     /// Its static abilities that keep players from getting counters (CR 122.1, 101.2), while it is on the battlefield with
     /// its abilities: Melira's "you can't get poison counters", Solemnity's "players can't get counters".
     pub player_counter_bans: &'static [PlayerCounterBan],
+    /// Its static abilities that forbid some payments of the costs to cast spells and activate abilities (CR 101.2, 118.3,
+    /// 601.2h, 602.2b), while it is on the battlefield with its abilities: Yasharn, Implacable Earth's "players can't pay life
+    /// or sacrifice nonland permanents to cast spells or activate abilities". See `CostBan`.
+    pub cost_bans: &'static [CostBan],
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
     /// Assault Formation, Doran, the Siege Tower.
     pub damage_by_toughness: &'static [DamageByToughnessRule],
@@ -2730,6 +2764,7 @@ impl CardDef {
         counter_bans: &[],
         enter_rules: &[],
         player_counter_bans: &[],
+        cost_bans: &[],
         damage_by_toughness: &[],
         damage_stays: &[],
         mana_told_apart: &[],
@@ -2815,6 +2850,7 @@ impl CardDef {
             (!self.counter_bans.is_empty(), "counter bans"),
             (!self.enter_rules.is_empty(), "enter rules"),
             (!self.player_counter_bans.is_empty(), "player counter bans"),
+            (!self.cost_bans.is_empty(), "cost bans"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),
             (!self.damage_stays.is_empty(), "a damage-stays rule"),
             (!self.mana_told_apart.is_empty(), "a mana source rule"),
