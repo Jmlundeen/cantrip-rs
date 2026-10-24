@@ -1,0 +1,46 @@
+# Gideon, Battle-Forged's +2 targets Bot2's Dwarven Mauler on turn 3. On turn 4 Bot2 Bolts Gideon twice before combat, and
+# he is put into the graveyard with no loyalty: the Mauler can't attack him, so nothing is required of it - it may attack
+# Bot1 or not attack at all (the ruling; CR 508.1d counts only requirements that can be obeyed). Bot2 declares no attack.
+
+[Bot1 Deck]
+Plains
+Kytheon, Hero of Akros
+Ornithopter
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Dwarven Mauler
+Lightning Bolt
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Kytheon, Hero of Akros.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dwarven Mauler.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Kytheon, Hero of Akros > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Gideon, Battle-Forged.Activate(Bot2.Battlefield.Dwarven Mauler; Ability: +2)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gideon, Battle-Forged)
+Bot2.Pass
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gideon, Battle-Forged)
+Bot2.Attack()
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Kytheon, Hero of Akros
+Bot2.Battlefield.Dwarven Mauler.Tapped = false

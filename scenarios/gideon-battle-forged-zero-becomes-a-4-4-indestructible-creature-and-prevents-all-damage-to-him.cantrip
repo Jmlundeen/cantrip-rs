@@ -1,0 +1,68 @@
+# Gideon, Battle-Forged: "0: Until end of turn, Gideon becomes a 4/4 Human Soldier creature with indestructible that's
+# still a planeswalker. Prevent all damage that would be dealt to him this turn" (CR 613.1d, 615.1, 306.8). On turn 5 the 0
+# keeps his 3 loyalty; Bot1's own Lightning Bolt and Bot2's in response are both prevented, and so is the combat damage of
+# Bot2's Dwarven Mauler blocking him, which his 4 power kills. On turn 6 he is a planeswalker alone again, and a Bolt is
+# no longer prevented: his 3 loyalty are gone and he is put into the graveyard (CR 704.5i).
+
+[Bot1 Deck]
+Plains
+Kytheon, Hero of Akros
+Ornithopter
+Ornithopter
+Mountain
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Dwarven Mauler
+Lightning Bolt
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Kytheon, Hero of Akros.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dwarven Mauler.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Kytheon, Hero of Akros > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gideon, Battle-Forged.Activate(Ability: 0)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gideon, Battle-Forged.Types = Planeswalker; Creature
+? Bot1.Battlefield.Gideon, Battle-Forged.Subtypes = Gideon; Human; Soldier
+? Bot1.Battlefield.Gideon, Battle-Forged.Power = 4
+? Bot1.Battlefield.Gideon, Battle-Forged.Toughness = 4
+? Bot1.Battlefield.Gideon, Battle-Forged.Keywords = Indestructible
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gideon, Battle-Forged)
+Bot1.Pass
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gideon, Battle-Forged)
+Bot2.Pass
+Bot1.Attack(Gideon, Battle-Forged > Bot2)
+Bot2.Block(Dwarven Mauler > Gideon, Battle-Forged)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Gideon, Battle-Forged.Counters.Loyalty = 3
+? Bot1.Battlefield.Gideon, Battle-Forged.Damage = 0
+? Bot2.Graveyard = Dwarven Mauler; Lightning Bolt
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Gideon, Battle-Forged.Types = Planeswalker
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gideon, Battle-Forged)
+Bot2.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Ornithopter; Ornithopter; Plains
+Bot2.Life = 18

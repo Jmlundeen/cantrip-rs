@@ -1,0 +1,40 @@
+# Kytheon, Hero of Akros: "At end of combat, if Kytheon and at least two other creatures attacked this combat, exile Kytheon,
+# then return him to the battlefield transformed under his owner's control" (CR 511.2, 603.4, 712.14a). Kytheon and two
+# Ornithopters attack on turn 3; Bot2 Bolts one of the Ornithopters while it attacks, and it still counts - it attacked (the
+# ruling). Kytheon returns as Gideon, Battle-Forged, a new object with his 3 loyalty (CR 306.5b), and Gideon's +2 with no
+# target (up to one) raises it to 5. Bot2 took Kytheon's 2.
+
+[Bot1 Deck]
+Plains
+Kytheon, Hero of Akros
+Ornithopter
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Kytheon, Hero of Akros.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Kytheon, Hero of Akros > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Gideon, Battle-Forged.Counters.Loyalty = 3
+Bot1.Battlefield.Gideon, Battle-Forged.Activate(Ability: +2)
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Battlefield = Gideon, Battle-Forged; Ornithopter; Plains
+Bot1.Battlefield.Gideon, Battle-Forged.Counters.Loyalty = 5
+Bot1.Graveyard = Ornithopter
+Bot2.Life = 18

@@ -1,0 +1,54 @@
+# Gideon, Battle-Forged: "+1: Until your next turn, target creature gains indestructible. Untap that creature" (CR 611.2a,
+# 701.26b). After the attack that transforms Kytheon on turn 3, the +1 - which can't target a Plains - untaps an
+# attacking Ornithopter with indestructible: Bot2's Lightning Bolt on turn 4 marks 3 damage on it and it survives. On turn
+# 5, Bot1's next turn, the indestructible is gone, and the +1 targets Bot2's Dwarven Mauler: an opponent's creature is a
+# target too. Gideon has 3 + 1 + 1 loyalty.
+
+[Bot1 Deck]
+Plains
+Kytheon, Hero of Akros
+Ornithopter
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Dwarven Mauler
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Kytheon, Hero of Akros.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dwarven Mauler.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Kytheon, Hero of Akros > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Gideon, Battle-Forged.Activate(Bot1.Battlefield.Plains; Ability: +1)
+Bot1.Battlefield.Gideon, Battle-Forged.Activate(Bot1.Battlefield.Ornithopter#1; Ability: +1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Tapped = false
+? Bot1.Battlefield.Ornithopter#1.Keywords = Flying; Indestructible
+? Bot1.Battlefield.Ornithopter#2.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#1)
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Ornithopter#1.Damage = 3
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+Bot1.Battlefield.Gideon, Battle-Forged.Activate(Bot2.Battlefield.Dwarven Mauler; Ability: +1)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Gideon, Battle-Forged.Counters.Loyalty = 5
+Bot2.Battlefield.Dwarven Mauler.Keywords = Indestructible

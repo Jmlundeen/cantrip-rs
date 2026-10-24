@@ -1,0 +1,43 @@
+# Kytheon, Hero of Akros: "{2}{W}: Kytheon gains indestructible until end of turn" (CR 702.12b, 611.2a). On turn 3 Bot1
+# floats {W}{R}{R}{R} and activates: {R} is left, so the cost is {2}{W} exactly, its {W} paid with the white mana. Bot2's
+# Lightning Bolt marks 3 damage on him and he survives; on turn 4 the indestructible is gone and a second Bolt kills him.
+
+[Bot1 Deck]
+Plains
+Kytheon, Hero of Akros
+Black Lotus
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Kytheon, Hero of Akros.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Kytheon, Hero of Akros.Activate
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Kytheon, Hero of Akros)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Kytheon, Hero of Akros.Damage = 3
+? Bot1.Battlefield.Kytheon, Hero of Akros.Keywords = Indestructible
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Kytheon, Hero of Akros)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Kytheon, Hero of Akros; Black Lotus

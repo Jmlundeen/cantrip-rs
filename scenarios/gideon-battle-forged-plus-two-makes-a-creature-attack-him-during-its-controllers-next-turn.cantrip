@@ -1,0 +1,57 @@
+# Gideon, Battle-Forged: "+2: Up to one target creature an opponent controls attacks Gideon during its controller's next
+# turn if able" (CR 508.1d, 611.2a). Kytheon transforms on turn 3 and the +2 targets Bot2's Dwarven Mauler - not Bot1's own
+# Ornithopter, which is not a creature an opponent controls. Bot1 then takes an extra turn with Time Walk (turn 4): Bot1's
+# next turn comes and goes, and Bot2's does not. On turn 5, Bot2's next turn, the Mauler must attack Gideon: attacking Bot1
+# instead, or not attacking, is refused, and its 2 damage takes Gideon from 5 loyalty to 3. On turn 7 the requirement is
+# over (it ended once both players had begun a turn since) and the Mauler attacks Bot1.
+
+[Bot1 Deck]
+Plains
+Kytheon, Hero of Akros
+Ornithopter
+Ornithopter
+Black Lotus
+Time Walk
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Dwarven Mauler
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Kytheon, Hero of Akros.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dwarven Mauler.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Kytheon, Hero of Akros > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Gideon, Battle-Forged.Activate(Bot1.Battlefield.Ornithopter; Ability: +2)
+Bot1.Battlefield.Gideon, Battle-Forged.Activate(Bot2.Battlefield.Dwarven Mauler; Ability: +2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Dwarven Mauler.MustAttack = Gideon, Battle-Forged
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Time Walk.Cast
+[T4 Bot1.Main2]
+? ActivePlayer = Bot1
+[T5 Bot2.Main1]
+! Bot2.Attack(Dwarven Mauler > Bot1)
+! Bot2.Attack()
+[T5 Bot2.Main2]
+? Bot1.Battlefield.Gideon, Battle-Forged.Counters.Loyalty = 3
+[T7 Bot2.Main1]
+? Bot2.Battlefield.Dwarven Mauler.MustAttack = (absent)
+Bot2.Attack(Dwarven Mauler > Bot1)
+[T7 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Gideon, Battle-Forged.Counters.Loyalty = 3
