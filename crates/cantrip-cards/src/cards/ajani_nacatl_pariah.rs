@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, each_opponent_keeps_one_of_each_type, exile_and_return_transformed, targets, triggers, effects, tokens};
+use cantrip_mechanics::{damage_target, each_opponent_keeps_one_of_each_type, effects, exile_and_return_transformed, lands, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("ExileAndReturn", "exile Ajani, then return him to the battlefield transformed?", "He returns as Ajani, Nacatl Avenger", "Exile and transform", "Don't");
@@ -51,15 +51,6 @@ fn exile_and_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 // --- Ajani, Nacatl Avenger ---------------------------------------------------------------------------------------
 
-fn plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for id in g.permanents_of(item.controller) {
-        if g.chars(id).has_subtype(g.words(item.object).subtype(Subtype::Cat)) {
-            g.add_counters(id, CounterKind::PlusOne, 1);
-        }
-    }
-    Ok(())
-}
-
 /// "If you control a red permanent other than Ajani."
 fn controls_other_red(q: &dyn Query, asker: &Asker) -> bool {
     q.permanents_of(asker.controller).into_iter().any(|id| id != asker.source && q.chars(id).colors.has(q.words(asker.source).color(Color::Red)))
@@ -98,7 +89,7 @@ fn minus_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
-        ability(loyalty(2), plus_two, "+2: Put a +1/+1 counter on each Cat you control."),
+        ability(loyalty(2), effects::plus_one_counter_on_each_of_subtype_you_control::<{ lands::sub(Subtype::Cat) }>, "+2: Put a +1/+1 counter on each Cat you control."),
         ability(loyalty(0), zero, "0: Create a 2/1 white Cat Warrior creature token. When you do, if you control a red permanent other than Ajani, he deals damage equal to the number of creatures you control to any target."),
         ability(loyalty(-4), minus_four, "\u{2212}4: Each opponent chooses an artifact, a creature, an enchantment, and a planeswalker from among the nonland permanents they control, then sacrifices the rest."),
     ],

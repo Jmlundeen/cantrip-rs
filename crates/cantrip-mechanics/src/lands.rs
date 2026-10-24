@@ -24,8 +24,12 @@ pub const fn sub(subtype: Subtype) -> u16 {
 
 /// The subtype a template's number names, as `source`'s text has that word now (CR 612.2).
 pub fn word(q: &dyn Query, source: ObjectId, n: u16) -> Subtype {
-    let printed = Subtype::ALL.into_iter().find(|&s| s as u16 == n).expect("a subtype's number");
-    q.words(source).subtype(printed)
+    q.words(source).subtype(printed(n))
+}
+
+/// The printed subtype a template's number names (`sub`), before any text change reads it (CR 612.2).
+pub fn printed(n: u16) -> Subtype {
+    Subtype::ALL.into_iter().find(|&s| s as u16 == n).expect("a subtype's number")
 }
 
 /// Whether `controller` controls a permanent with the land type `land_type`, through the layers (CR 305.6, 613). Arena of

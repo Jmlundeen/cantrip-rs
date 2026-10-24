@@ -124,6 +124,47 @@ fn counters_on_each(g: &mut dyn Game, objects: &[ObjectId], kind: CounterKind, n
     g.add_counters_together(&puts);
 }
 
+/// "Put `n` `kind` counters on each [subtype] you control": every permanent the ability's controller controls as it resolves
+/// that has the subtype (CR 608.2c, 205.3), the source among them, the subtype read through the words of the source's text
+/// (CR 612.2); all of them at once (CR 608.2, 101.4: one event, CR 603.2c). The permanents. Lyra, Archangel of Dawn
+/// (Angels) and Ajani, Nacatl Avenger (Cats) print it, with one +1/+1 counter: `plus_one_counter_on_each_of_subtype_you_control`.
+pub fn counters_on_each_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i16) -> Vec<ObjectId> {
+    of_subtype_you_control(g, item, subtype, false, kind, n)
+}
+
+/// "Put `n` `kind` counters on each other [subtype] you control": `counters_on_each_of_subtype_you_control` without the
+/// source. Thalia's Lieutenant (Humans), Rescue Retriever (Soldiers), Camellia, the Seedmiser (Squirrels), Agent Phil
+/// Coulson and Doctor Spectrum (Heroes) and Vampire Socialite (Vampires) print it, with one +1/+1 counter:
+/// `plus_one_counter_on_each_other_of_subtype_you_control`.
+pub fn counters_on_each_other_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i16) -> Vec<ObjectId> {
+    of_subtype_you_control(g, item, subtype, true, kind, n)
+}
+
+fn of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, other: bool, kind: CounterKind, n: i16) -> Vec<ObjectId> {
+    let word = g.words(item.object).subtype(subtype);
+    let objects: Vec<ObjectId> = g
+        .permanents_of(item.controller)
+        .into_iter()
+        .filter(|&id| !(other && id == item.object) && g.chars(id).has_subtype(word))
+        .collect();
+    counters_on_each(g, &objects, kind, n);
+    objects
+}
+
+/// "Put a +1/+1 counter on each [subtype] you control" as an ability's whole effect, `SUBTYPE` a `Subtype` as `u16`
+/// (`lands::sub`): `counters_on_each_of_subtype_you_control`. Lyra, Archangel of Dawn and Ajani, Nacatl Avenger's +2.
+pub fn plus_one_counter_on_each_of_subtype_you_control<const SUBTYPE: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    counters_on_each_of_subtype_you_control(g, item, crate::lands::printed(SUBTYPE), CounterKind::PlusOne, 1);
+    Ok(())
+}
+
+/// "Put a +1/+1 counter on each other [subtype] you control" as an ability's whole effect: `counters_on_each_other_of_subtype_you_control`.
+/// Thalia's Lieutenant, Rescue Retriever, Camellia, the Seedmiser, Agent Phil Coulson, Doctor Spectrum and Vampire Socialite.
+pub fn plus_one_counter_on_each_other_of_subtype_you_control<const SUBTYPE: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    counters_on_each_other_of_subtype_you_control(g, item, crate::lands::printed(SUBTYPE), CounterKind::PlusOne, 1);
+    Ok(())
+}
+
 /// "Put a +1/+1 counter on [this permanent]" (CR 122.1), the ability's source: none once it has left the battlefield, as a
 /// new object it is another (CR 400.7). The whole effect of a trigger or ability of Essence Channeler, Ajani Resolute's
 /// Ajani's Pridemate token, Leonardo, Cutting Edge, Blood Hustler, Cryptic Trilobite, Gau, Feral Youth, Hired Claw, Ivora,
