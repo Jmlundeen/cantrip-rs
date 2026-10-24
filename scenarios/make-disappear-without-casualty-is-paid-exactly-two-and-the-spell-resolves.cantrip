@@ -1,0 +1,48 @@
+# Make Disappear cast without casualty (CR 702.153a) makes no copy, though Bot1 controls a creature it could sacrifice
+# (Dryad Arbor stays). Bot2's Lightning Bolt asks {2} (CR 118.12): Bot2 pays exactly two (a Mountain and Mox Jet) and the Bolt
+# resolves, Bot1 at 17. Make Disappear can target its caster's own spell too: here the Bolt is Bot2's; the paired scenario
+# has Bot1 counter its own creature spell.
+
+[Bot1 Deck]
+Dryad Arbor
+Mox Sapphire
+Mox Sapphire
+Make Disappear
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mox Jet
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Make Disappear.Cast(Stack.Lightning Bolt)
+Bot1.Modes(Cast without)
+Bot1.Pass
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.PayCost
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Make Disappear
+Bot1.Battlefield.Dryad Arbor.Power = 1
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

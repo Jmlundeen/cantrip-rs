@@ -1,0 +1,30 @@
+# Make Disappear may target a spell its own caster controls (CR 115.1): Bot1 casts Ornithopter, holds priority and counters
+# it with Make Disappear (cast without casualty, no creature to sacrifice that has power). Bot1 is tapped out, so cannot pay {2}.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Ornithopter
+Make Disappear
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Make Disappear.Cast(Stack.Ornithopter)
+Bot1.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Graveyard = Make Disappear; Ornithopter
+Bot1.Battlefield.Ornithopter = (absent)
+Stack.Count = 0

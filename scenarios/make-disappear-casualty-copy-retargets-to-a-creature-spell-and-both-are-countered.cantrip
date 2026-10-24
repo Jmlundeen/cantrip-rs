@@ -1,0 +1,49 @@
+# Make Disappear with casualty 1 (CR 702.153a): Bot1 sacrifices Dryad Arbor (a 1/1, power exactly 1) as it is cast. The casualty
+# trigger copies the spell and Bot1 gives the copy a new target (CR 707.10c): the original counters Bot2's Lightning Bolt
+# (a noncreature spell), the copy Bot2's Ornithopter (a creature spell). Bot2 holds one untapped Mountain, so it cannot pay
+# {2} for either (! Bot2.PayCost, one mana made): both are countered, the Bolt does no damage. The copy is not a card: only the original goes to the graveyard.
+
+[Bot1 Deck]
+Dryad Arbor
+Mox Sapphire
+Mox Sapphire
+Make Disappear
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Make Disappear.Cast(Stack.Lightning Bolt)
+Bot1.Modes(Casualty 1)
+Bot1.Target(Stack.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mountain#2.Activate
+! Bot2.PayCost
+Bot2.Decline
+Bot2.Decline
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Make Disappear; Dryad Arbor
+Bot2.Graveyard = Lightning Bolt; Ornithopter
+Bot2.Battlefield = Mountain; Mountain
+Stack.Count = 0
