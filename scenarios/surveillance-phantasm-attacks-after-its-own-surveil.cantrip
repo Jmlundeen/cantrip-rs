@@ -25,8 +25,11 @@ Bot2.Hand.Basking Rootwalla.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
-Bot1.Battlefield.Island.Activate
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
 Bot1.Battlefield.Surveillance Phantasm.Activate
+? Bot1.Mana = {U}
 Bot1.Arrange(| Island)
 ? Stack.Count = 0
 Bot1.Attack(Surveillance Phantasm > Bot2)
