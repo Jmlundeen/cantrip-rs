@@ -1,0 +1,73 @@
+# Anoint with Affliction: "Exile that creature instead if its controller has three or more poison counters." Bot1's
+# Glistener Elf gives Bot2 three poison counters (turns 3, 5, 7). On turn 7 Bot1 steals Bot2's Argothian Elder (mana
+# value 4) with Act of Treason: Bot2 owns it and has three poison counters, but Bot1 controls it and has none. The
+# controller counts, so Anoint does nothing (CR 608.2h, 110.2: the owner would exile it).
+
+[Bot1 Deck]
+Mox Emerald
+Glistener Elf
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Ruby
+Act of Treason
+Anoint with Affliction
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Argothian Elder
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glistener Elf.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Argothian Elder.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Glistener Elf > Bot2)
+[T5 Bot1.Main1]
+Bot1.Attack(Glistener Elf > Bot2)
+[T7 Bot1.Main1]
+Bot1.Attack(Glistener Elf > Bot2)
+[T7 Bot1.Main2]
+? Bot2.Poison = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Act of Treason.Cast(Argothian Elder)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Argothian Elder; Glistener Elf; Mox Emerald; Mox Jet; Mox Jet; Mox Jet; Mox Jet; Mox Ruby
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Hand.Anoint with Affliction.Cast(Argothian Elder)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Poison = 3
+Bot1.Poison = 0
+Bot1.Battlefield.Argothian Elder.Power = 2
+Exile.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard.Count = 2

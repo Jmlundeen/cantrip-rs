@@ -1,0 +1,67 @@
+# Anoint with Affliction: "Exile target creature if it has mana value 3 or less." Nobody has a poison counter, so the
+# Corrupted clause is off. Bot2 has a Monastery Mentor (mana value 3, exactly at the limit) and an Argothian Elder
+# (mana value 4, just past it). Bot1 casts one Anoint on each: the Mentor is exiled (not destroyed - it is in exile, not
+# the graveyard) and the Elder is untouched (CR 608.2h).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Anoint with Affliction
+Anoint with Affliction
+Island
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Argothian Elder
+Monastery Mentor
+Island
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Argothian Elder.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Monastery Mentor.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Anoint with Affliction.Cast(Monastery Mentor)
+Bot1.Pass
+Bot2.Pass
+? Exile = Monastery Mentor
+? Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Hand.Anoint with Affliction.Cast(Argothian Elder)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Monastery Mentor
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Argothian Elder; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Graveyard.Count = 2
