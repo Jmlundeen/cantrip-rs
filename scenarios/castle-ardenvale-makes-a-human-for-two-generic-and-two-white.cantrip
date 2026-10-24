@@ -1,0 +1,55 @@
+# Castle Ardenvale: "{2}{W}{W}, {T}: Create a 1/1 white Human creature token." (CR 111.1, 602.2b.)
+# Turn 3, the Castle untapped beside the Plains: with the Plains, Mox Jet and Mox Ruby tapped and Mox Sapphire untapped
+# (four mana, one {W}) the ability is not offered - each {W} of its cost is pinned. Mox Pearl is the second {W}: the Plains,
+# Pearl, Jet and Ruby pay {2}{W}{W} exactly, the pool empty and the Castle tapped, and a 1/1 white Human token appears.
+# Only one token is made.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Castle Ardenvale
+Mox Pearl
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Ardenvale.Play
+? Bot1.Battlefield.Castle Ardenvale.Tapped = false
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Castle Ardenvale.Activate(Ability: Create)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{W}{B}{R}
+Bot1.Battlefield.Castle Ardenvale.Activate(Ability: Create)
+? Bot1.Mana =
+? Bot1.Battlefield.Castle Ardenvale.Tapped = true
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Human Token.Power = 1
+Bot1.Battlefield.Human Token.Toughness = 1
+Bot1.Battlefield.Human Token.Colors = White
+Bot1.Battlefield.Human Token.Subtypes = Human
+Bot1.Battlefield.Mox Sapphire.Tapped = false
