@@ -1,0 +1,58 @@
+# Thalia's Lieutenant: "When this creature enters, put a +1/+1 counter on each other Human you control. Whenever another Human
+# you control enters, put a +1/+1 counter on this creature." Bot1 casts a Lieutenant, then a Dragon Sniper (a Human: the
+# Lieutenant grows) and an Ornithopter (not a Human: nothing). Bot2 casts its own Dragon Sniper (not Bot1's: nothing). Bot1 then
+# casts a second Lieutenant: the first grows for the Human entering and for its enters ability (3 counters in all), the Sniper
+# gets one counter, Bot2's Sniper and the Ornithopter none, and the second Lieutenant none (it is not "other" to itself, nor
+# "another" to itself). CR 603.6a, 603.2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Thalia's Lieutenant
+Dragon Sniper
+Ornithopter
+Thalia's Lieutenant
+Plains x14
+
+[Bot2 Deck]
+Mox Emerald
+Dragon Sniper
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thalia's Lieutenant.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dragon Sniper.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Dragon Sniper.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Thalia's Lieutenant.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Thalia's Lieutenant#1.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Thalia's Lieutenant#1.Power = 4
+Bot1.Battlefield.Thalia's Lieutenant#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Thalia's Lieutenant#2.Power = 1
+Bot1.Battlefield.Dragon Sniper.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Dragon Sniper.Power = 2
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Dragon Sniper.Counters.PlusOnePlusOne = (absent)

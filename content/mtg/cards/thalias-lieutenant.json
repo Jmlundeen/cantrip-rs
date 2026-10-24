@@ -1,0 +1,8 @@
+{
+  "name": "Thalia's Lieutenant",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "When this creature enters, put a +1/+1 counter on each other Human you control.\nWhenever another Human you control enters, put a +1/+1 counter on this creature."
+}
