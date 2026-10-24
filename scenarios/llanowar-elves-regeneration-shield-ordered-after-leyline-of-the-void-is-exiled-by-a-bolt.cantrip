@@ -1,0 +1,43 @@
+# Regeneration (CR 701.19a, 614.8) is a destruction-replacement effect, ordered by the permanent's controller with the others
+# that would change the event (CR 616.1). Bot1 begins with Leyline of the Void. On turn 5 Bot1 Bolts Bot2's Llanowar Elves and
+# Bot2 regenerates them with Yavimaya Hollow in response; the lethal damage destroys them (CR 704.5g), and Bot2 takes the
+# Leyline's exile first: the Elves are exiled rather than put into a graveyard, so the event is no destruction any more (CR
+# 614.6) and the shield does not apply. The positive control is
+# assassins-trophy-regenerated-creature-lives-and-its-controller-still-fetches, the shield alone.
+
+[Bot1 Deck]
+Leyline of the Void
+Mox Ruby
+Lightning Bolt
+Island x17
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x17
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Replace(Leyline of the Void)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Llanowar Elves
+Bot2.Battlefield = Forest; Yavimaya Hollow
+Bot2.Graveyard.Count = 0

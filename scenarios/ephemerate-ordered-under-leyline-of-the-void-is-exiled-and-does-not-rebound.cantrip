@@ -1,0 +1,40 @@
+# Rebound's "instead of putting it into your graveyard as it resolves, exile it" (CR 702.88a) is a replacement effect (CR
+# 614.1a), ordered by the spell's controller with the others that would change the move (CR 616.1). Bot2 begins with Leyline
+# of the Void. On turn 3 Bot1 casts Ephemerate from its hand on Thraben Inspector (a second Clue), and as it resolves takes the
+# Leyline's exile first: Ephemerate is exiled, rebound no longer applies (CR 616.1f), and nothing is cast at Bot1's next
+# upkeep - two Clues, not three, and Ephemerate stays in exile.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Thraben Inspector
+Ephemerate
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Leyline of the Void
+Island x19
+
+[Actions]
+Bot2.Accept
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Thraben Inspector)
+Bot1.Replace(Leyline of the Void)
+[T3 Bot1.Main2]
+? Exile = Ephemerate
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile = Ephemerate
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Plains; Plains; Thraben Inspector; Clue Token; Clue Token

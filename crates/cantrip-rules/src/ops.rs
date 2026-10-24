@@ -76,11 +76,19 @@ pub struct Moving {
     /// set by the spell's leaving (`resolve::leave_stack`, `resolve::send_spell`).
     pub flashback: bool,
     pub exile_instead: ExileInstead,
+    /// A spell resolving, the rules' own "instead of putting it into its owner's graveyard as it resolves" that it is subject
+    /// to (`ZoneChange::adventure`, `omen`, `rebound`): set by `resolve::leave_stack`.
+    pub adventure: bool,
+    pub omen: bool,
+    pub rebound: bool,
+    /// The move is a destruction a regeneration shield may replace (`ZoneChange::destroy`): lethal damage's (CR 704.5g-h).
+    /// A move made for `ZoneReason::Destroy` is one whatever this says.
+    pub destroy: bool,
 }
 
 impl Moving {
     pub fn to(id: ObjectId, to: Zone) -> Moving {
-        Moving { id, to, entering: None, reason: None, revealed: false, pays_characteristic: false, flashback: false, exile_instead: ExileInstead::Never }
+        Moving { id, to, entering: None, reason: None, revealed: false, pays_characteristic: false, flashback: false, exile_instead: ExileInstead::Never, adventure: false, omen: false, rebound: false, destroy: false }
     }
 }
 
@@ -211,14 +219,6 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     } else {
         moves
     };
-    // Destruction a regeneration shield replaces never happens (CR 701.19a, 614.8).
-    let unregenerated;
-    let moves = if reason == ZoneReason::Destroy {
-        unregenerated = without_regenerated(cx, moves);
-        &unregenerated[..]
-    } else {
-        moves
-    };
     let before: Vec<ObjectId> = cx.s().battlefield().to_vec();
     // A permanent leaving, phased in or out (CR 702.26d: a phased-out permanent is still on the battlefield, and leaves it when
     // its owner leaves the game, CR 702.26n): what it held "until" it left comes back (`return_until_left`).
@@ -254,6 +254,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     // entering with Gev gets none of his counters) and those leaving together still see one another - and only then do
     // they all move. The last-known information of each permanent leaving is taken before any of them leaves (CR 603.10a).
     let mut plans: Vec<Plan> = Vec::with_capacity(moves.len());
+    let mut regenerating: Vec<ObjectId> = Vec::new();
     let together = moves.iter().any(|m| m.entering.is_some()) && moves.iter().any(|m| cx.s().obj(m.id).zone.is(ZoneKind::Battlefield));
     let leaving: Vec<ObjectId> =
         if together { moves.iter().map(|m| m.id).filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Battlefield)).collect() } else { Vec::new() };
@@ -263,16 +264,14 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         let reason = m.reason.unwrap_or(reason);
         let old = *cx.s().obj(m.id);
         let from = old.zone;
-        // A permanent that would leave the battlefield for anywhere else is exiled instead (CR 702.84a).
-        let mut to = m.to;
+        let to = m.to;
         let mut m = *m;
-        if from.is(ZoneKind::Battlefield) && old.exile_on_leave && !to.is(ZoneKind::Exile) {
-            to = Zone::exile(old.owner);
-        }
-        // CR 122.1h: a permanent with a finality counter that would be put into a graveyard from the battlefield is exiled
-        // instead.
-        if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) && old.counters(CounterKind::Finality) > 0 {
-            to = Zone::exile(old.owner);
+        // A spell moved off the stack by any instruction carries its own replacements of that move (`resolve::its_own_exile`):
+        // flashback's "instead of putting it anywhere else" (CR 702.34a) and a cast's "exile it instead" (CR 614.1a).
+        if from.is(ZoneKind::Stack)
+            && let Some(item) = cx.s().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == m.id).copied()
+        {
+            m = crate::resolve::its_own_exile(cx, &item, m);
         }
         // A card goes to its owner's own hand, library or graveyard, whoever puts it there (CR 400.3).
         let to = match to.kind() {
@@ -299,6 +298,13 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             exiled_with: None,
             flashback: m.flashback,
             exile_instead: m.exile_instead,
+            adventure: m.adventure,
+            omen: m.omen,
+            rebound: m.rebound,
+            on_adventure: false,
+            rebounding: false,
+            destroy: m.destroy || reason == ZoneReason::Destroy,
+            regenerated: false,
         };
         // A permanent entering is judged as it would exist on the battlefield (CR 614.12), and its own replacements are
         // ordered with the others (CR 616.1). One its own replacement sent elsewhere instead does not enter at all.
@@ -310,6 +316,12 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             }
             None => replace::zone_change(cx, proposed),
         };
+        // A regeneration shield replaced the destruction (CR 701.19a, 614.8): it never happens (CR 614.6), and the permanent
+        // is regenerated instead, once every move is worked out.
+        if change.regenerated {
+            regenerating.push(m.id);
+            continue;
+        }
         let m = &m;
         let to = change.to;
         // Madness (CR 702.35a) exiled a discarded card in place of its graveyard, one of the replacements above: it was
@@ -323,6 +335,11 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         let entering = to.is(ZoneKind::Battlefield);
         let from_stack = entering && from.is(ZoneKind::Stack);
         let mut new = Obj::new(old.card, old.owner, to);
+        // An Adventure its controller exiled as it resolved (CR 715.3d), if no later effect sent it elsewhere: that player may
+        // play the card for as long as it stays exiled.
+        if change.on_adventure && to.is(ZoneKind::Exile) {
+            new.on_adventure = Some(old.controller);
+        }
         new.controller = if entering || to.is(ZoneKind::Stack) { old.controller } else { old.owner };
         new.token = old.token;
         new.controlled_since = turn;
@@ -416,6 +433,13 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, counts, counts_by, last_known, seen_by_all });
     }
     *cx.s().leaving_together.borrow_mut() = outer_leaving;
+    // The permanents regenerated instead of destroyed stay (CR 701.19a): no attachment of theirs ends for their sake.
+    if !regenerating.is_empty() {
+        let moving = |id: &ObjectId| plans.iter().any(|p| p.m.id == *id);
+        events.retain(|e| !matches!(e, Event::Unattached { attachment, from } if !moving(attachment) && !moving(from)));
+        regenerate_instead(cx, &regenerating);
+    }
+    let mut rebounds: Vec<(ObjectId, PlayerId, CardId)> = Vec::new();
     // A card from a hand, a library or outside the game that all players can see as it is put into a hand or a library is
     // looked back on too (CR 603.10a), which the moves' planned destinations and reveals say.
     let then = if !then.taken() && plans.iter().any(|p| p.seen_by_all) {
@@ -462,6 +486,11 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         if change.shuffle && to.is(ZoneKind::Library) {
             crate::turn::shuffle(cx.st(), to);
             shuffled.push(to.player);
+        }
+        // Rebound exiled it as it resolved (CR 702.88a), if no later effect sent it elsewhere: its delayed triggered ability is
+        // created once the move is recorded.
+        if change.rebounding && to.is(ZoneKind::Exile) {
+            rebounds.push((new_id, old.controller, old.card));
         }
         if madness {
             // "When you do" (CR 702.35a, 603.12): a reflexive trigger of the exiled card, its owner's.
@@ -513,6 +542,20 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then, seen_by_all: &seen }));
     for player in shuffled {
         cx.record(Event::Shuffled { player });
+    }
+    // "At the beginning of your next upkeep, you may cast this card from exile without paying its mana cost" (CR 702.88a).
+    for (card, controller, printed) in rebounds {
+        let since = cx.g.log.len() as u32;
+        cx.st().delayed_push(cantrip_state::Delayed {
+            when: DelayedWhen::Step { step: Step::Upkeep, on_turn_of: Some(controller) },
+            source: card,
+            controller,
+            ability: AbilityRef::rebound(printed),
+            subject: Target::None,
+            members: cantrip_state::Span::default(),
+            since,
+            acquired: Acquired::OWN,
+        });
     }
     // A permanent left the battlefield: what was exiled or phased out until it left comes back now (CR 610.3, 610.4).
     if left_battlefield {
@@ -1823,6 +1866,13 @@ fn create_tokens_onto(
             exiled_with: None,
             flashback: false,
             exile_instead: ExileInstead::Never,
+            adventure: false,
+            omen: false,
+            rebound: false,
+            on_adventure: false,
+            rebounding: false,
+            destroy: false,
+            regenerated: false,
         };
         let change = entry_replacements(cx, &mut entering, proposed);
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist
@@ -2936,17 +2986,6 @@ fn blocked(cx: &Cx, player: PlayerId, delta: i32) -> bool {
     } else {
         crate::static_rules::cant_lose_life(cx, cx.cards(), player)
     }
-}
-
-/// The moves left of a destruction once the permanents a regeneration shield saves have regenerated instead
-/// (CR 701.19a, 614.8): one shield is used up for each.
-fn without_regenerated(cx: &mut Cx, moves: &[Moving]) -> Vec<Moving> {
-    if !cx.s().effects.iter().any(|e| e.kind == EffectKind::RegenerationShield) {
-        return moves.to_vec();
-    }
-    let ids: Vec<ObjectId> = moves.iter().map(|m| m.id).collect();
-    let saved = regenerate_instead(cx, &ids);
-    moves.iter().copied().filter(|m| !saved.contains(&m.id)).collect()
 }
 
 /// Regeneration (CR 701.19a): each permanent with a shield uses one up; it is tapped, all damage is removed from it and

@@ -238,6 +238,13 @@ fn it_is_judged_again_after_a_replacement_changes_how_it_enters() {
         exiled_with: None,
         flashback: false,
         exile_instead: ExileInstead::Never,
+        adventure: false,
+        omen: false,
+        rebound: false,
+        on_adventure: false,
+        rebounding: false,
+        destroy: false,
+        regenerated: false,
     };
     ops::rejudge_entering(&mut cx, &change(P1, Zone::BATTLEFIELD));
     assert!(cx.entering.is_some_and(|w| w.chars.is(CardType::Creature) && w.entering.controller == P1));

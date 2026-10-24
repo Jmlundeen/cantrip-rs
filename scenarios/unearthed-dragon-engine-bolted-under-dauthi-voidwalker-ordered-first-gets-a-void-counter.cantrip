@@ -1,0 +1,66 @@
+# Unearth's "If it would leave the battlefield, exile it instead of putting it anywhere else" (CR 702.84a) is a replacement
+# effect (CR 614.1a), ordered by the permanent's controller with the others that would change the move (CR 616.1). Bot1 loots
+# Phyrexian Dragon Engine into its graveyard on turn 1; Bot2 has Dauthi Voidwalker by turn 2. On turn 3 Bot1 unearths the
+# Engine (declining its rummage) and Bolts it: as it would be put into the graveyard, Bot1 takes the Voidwalker's exile first,
+# and the Engine is exiled with a void counter (unearth's no longer applies, CR 616.1f). On turn 4 Bot2 sacrifices the
+# Voidwalker, chooses the Engine among Bot1's void-countered cards (the sacrificed Black Lotus and the Bolt are the others) and casts it.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Phyrexian Dragon Engine
+Faithless Looting
+Lightning Bolt
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Dragon Engine; Mountain)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Graveyard.Phyrexian Dragon Engine.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Phyrexian Dragon Engine)
+Bot1.Replace(Dauthi Voidwalker)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Faithless Looting; Mountain
+[T4 Bot2.Main1]
+Bot2.Battlefield.Dauthi Voidwalker.Activate
+Bot2.Choose(Phyrexian Dragon Engine)
+Bot2.Pass
+Bot1.Pass
+Bot2.Exile.Phyrexian Dragon Engine.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot2.Battlefield = Swamp; Mox Jet; Phyrexian Dragon Engine
+Exile = Black Lotus; Lightning Bolt

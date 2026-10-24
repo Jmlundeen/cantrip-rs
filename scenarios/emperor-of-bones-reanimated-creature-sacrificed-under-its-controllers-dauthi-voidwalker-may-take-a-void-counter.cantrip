@@ -1,0 +1,78 @@
+# A finality counter's "If this permanent would be put into a graveyard from the battlefield, exile it instead" (CR 122.1h)
+# is a replacement effect, ordered by the permanent's controller with the others that would change the move (CR 616.1). Bot1's
+# Bolt kills Bot2's Llanowar Elves on turn 3, before Bot1's Dauthi Voidwalker arrives; Emperor of Bones exiles the Elves from
+# Bot2's graveyard at the beginning of combat. On turn 5 its Adapt puts the Elves onto the battlefield under Bot1 with a
+# finality counter, and at the end step they are sacrificed: going to Bot2's graveyard, Bot1 takes the Voidwalker's exile
+# first, so the Elves are exiled with a void counter (the finality counter's exile no longer applies, CR 616.1f). On turn 7
+# Bot1 sacrifices the Voidwalker, chooses the Elves among Bot2's void-countered cards (an Island Bot2 discarded to its hand size
+# is the other) and casts them for free.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Emperor of Bones
+Lightning Bolt
+Dauthi Voidwalker
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Emperor of Bones.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Graveyard.Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Emperor of Bones.Activate(Ability: Adapt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Counters.Finality = 1
+Bot1.Replace(Dauthi Voidwalker)
+[T6 Bot2.Main1]
+? Exile = Llanowar Elves
+[T7 Bot1.Main1]
+Bot1.Battlefield.Dauthi Voidwalker.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Llanowar Elves)
+Bot1.Exile.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Exile = Island
+Bot1.Graveyard = Dauthi Voidwalker; Lightning Bolt

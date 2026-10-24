@@ -103,6 +103,42 @@ static RECYCLER: CardDef = CardDef {
 
 static FILLER: CardDef = CardDef { name: "Leave Filler", has_cost: false, ..CardDef::BLANK };
 
+/// The first card of its controller's graveyard cast by its flashback, then returned to its owner's hand by an instruction
+/// that is no counterspell's (a move of the spell like any other's).
+fn return_by_way(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(&card) = g.state().zone(Zone::graveyard(item.controller)).first() else { return Ok(()) };
+    g.cast_during_resolution_as(card, CastTerms::default())?;
+    if let Some(spell) = g.state().stack.last().map(|i| i.object).filter(|&s| s != item.object) {
+        g.return_to_hand(&[spell]);
+    }
+    Ok(())
+}
+
+static RETURN_BY_WAY: CardDef = stager!("Leave Return By Way", return_by_way);
+
+/// A modal double-faced card (CR 712.2) whose front is an instant and whose back a creature with a cost of its own.
+static CREATURE_BACK: CardDef = CardDef {
+    name: "Leave Creature Back",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    spell: None,
+    ..INSTANT
+};
+static MODAL: CardDef = CardDef { name: "Leave Modal Instant", back: Some(&CREATURE_BACK), ..INSTANT };
+
+fn nothing(_: &dyn Query, _: &Asker, _: ObjectId, _: PlayerId) -> Option<Cost> {
+    Some(Cost::NONE)
+}
+
+/// "Each card in your graveyard has flashback" for nothing (Iroh's kind, CR 702.34a), the way a permanent gives.
+static FLASHBACK_GIVER: CardDef = CardDef {
+    name: "Leave Flashback Giver",
+    types: TypeSet::of(&[CardType::Artifact]),
+    granted_ways: &[GrantedWay { text: "free flashback", cost: nothing, flashback: true, ..GrantedWay::CAST }],
+    ..CardDef::BLANK
+};
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
     TABLE.get_or_init(|| {
@@ -117,6 +153,10 @@ fn table() -> &'static CardTable {
             &COUNTER_BY_WAY,
             &RECYCLER,
             &FILLER,
+            &RETURN_BY_WAY,
+            &CREATURE_BACK,
+            &MODAL,
+            &FLASHBACK_GIVER,
         ])
     })
 }
@@ -258,4 +298,59 @@ fn flashback_is_ordered_with_the_other_replacements_and_applies_after_them() {
         assert_eq!(asked.len(), 1, "asked once: {asked:?}");
         assert_eq!(where_is(&game, "Leave Flashback Instant"), ZoneKind::Exile, "own first: {own_first}");
     }
+}
+
+/// CR 702.34a: flashback's replacement is the spell's own, of any move off the stack - one an instruction makes with no word
+/// of countering (a return to its owner's hand) as much as resolving or being countered: the move carries it, read off the
+/// spell, whatever made it.
+#[test]
+fn a_flashback_spell_returned_to_hand_by_any_instruction_is_exiled() {
+    let (mut game, stager, _) = setup("Leave Return By Way", "Leave Flashback Instant", false);
+    play(&mut game, stager, |_| 0);
+    assert_eq!(where_is(&game, "Leave Flashback Instant"), ZoneKind::Exile);
+}
+
+/// The casts a priority request offers of `card` (the way of each, and what offered it).
+fn casts(game: &mut RulesGame, card: ObjectId) -> Vec<(u8, Option<ObjectId>)> {
+    game.run();
+    match &game.pending().expect("priority").kind {
+        RequestKind::Priority { options } => options
+            .iter()
+            .filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card))
+            .map(|o| (o.index, o.granted_by.map(|g| g.object)))
+            .collect(),
+        other => panic!("expected priority, got {other:?}"),
+    }
+}
+
+/// CR 702.34a: "You may cast this card from your graveyard if the resulting spell is an instant or sorcery spell": flashback a
+/// permission gives (Snapcaster Mage's) or a permanent gives (Iroh's) casts the instant front of a modal double-faced card, never
+/// its creature back - which a permission that is no flashback does cast (CR 712.8a).
+#[test]
+fn granted_flashback_casts_only_an_instant_or_sorcery_face() {
+    let (mut game, _, _) = setup("Leave Filler", "Leave Modal Instant", false);
+    let card = game.state.zone(Zone::graveyard(ME))[0];
+    let source = game.state.push_obj(Obj::new(table().find("Leave Filler").unwrap(), ME, Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, source);
+    let permission = |grant| PlayPermission { card, player: ME, grant, by: Grant { object: source, ability: AbilityRef::spell(CardId(0)) }, turn: 1 };
+    game.state.update_player(ME, |p| p.pool.0[Mana::C as usize] = 2);
+
+    let mut plain = game.clone();
+    plain.state.permission_push(permission(PlayGrant::CAST));
+    let offered = casts(&mut plain, card);
+    assert!(offered.contains(&(0, Some(source))) && offered.contains(&(WAY_BACK_FACE, Some(source))), "{offered:?}");
+
+    let mut flashback = game.clone();
+    flashback.state.permission_push(permission(PlayGrant { flashback: true, ..PlayGrant::CAST }));
+    let offered = casts(&mut flashback, card);
+    assert!(offered.contains(&(0, Some(source))), "{offered:?}");
+    assert!(!offered.iter().any(|&(way, _)| way == WAY_BACK_FACE), "{offered:?}");
+
+    let mut given = game.clone();
+    let giver = given.state.push_obj(Obj::new(table().find("Leave Flashback Giver").unwrap(), ME, Zone::BATTLEFIELD));
+    given.state.zone_push(Zone::BATTLEFIELD, giver);
+    given.state.see_statics();
+    let offered = casts(&mut given, card);
+    assert!(offered.contains(&(0, Some(giver))), "{offered:?}");
+    assert!(!offered.iter().any(|&(way, _)| way == WAY_BACK_FACE), "{offered:?}");
 }

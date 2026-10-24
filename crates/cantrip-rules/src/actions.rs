@@ -4943,6 +4943,11 @@ pub fn exile_cast_texts(game: &crate::Game, card: ObjectId) -> Vec<(PlayerId, &'
         .collect()
 }
 
+/// Whether the face cast is an instant or a sorcery spell: what flashback asks of "the resulting spell" (CR 702.34a).
+fn instant_or_sorcery(face: &CardDef) -> bool {
+    face.is(CardType::Instant) || face.is(CardType::Sorcery)
+}
+
 /// Whether the additional costs a card has (CR 118.8) could be paid, whatever way it is cast.
 fn extra_payable(cx: &Cx, id: ObjectId, player: PlayerId, def: &CardDef) -> bool {
     def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
@@ -5382,6 +5387,11 @@ impl<'a> Offer<'a> {
             if route.terms.adventure_only && way != WAY_ADVENTURE {
                 continue;
             }
+            // Flashback a permission gives casts the card only "if the resulting spell is an instant or sorcery spell" (CR
+            // 702.34a): judged on the face cast (CR 709.3a, 712.8a, 715.3a).
+            if route.terms.flashback && !instant_or_sorcery(face) {
+                continue;
+            }
             // Judged as the face cast (CR 601.3e); the card itself is read as it is.
             let allowed = if way == 0 || matches!(route.allows, Allows::Any) {
                 route.allows.face(cx, card, player)
@@ -5589,6 +5599,10 @@ impl<'a> Offer<'a> {
             };
             for way in ways {
                 if way.what.permission || way.what.from != zone.kind() {
+                    continue;
+                }
+                // Flashback a permanent gives: only if the resulting spell is an instant or sorcery spell (CR 702.34a).
+                if way.what.flashback && !instant_or_sorcery(face) {
                     continue;
                 }
                 let Some(cost) = (way.what.cost)(q, &way.asker(), card, player) else { continue };

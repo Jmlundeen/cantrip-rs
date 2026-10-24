@@ -1,0 +1,59 @@
+# An Adventure's "instead of putting [it] into its owner's graveyard as it resolves, its controller exiles it" (CR 715.3d) is a
+# replacement effect (CR 614.1a), ordered by the spell's controller with the others that would change the move (CR 616.1).
+# Bot2's Dauthi Voidwalker ("If a card would be put into an opponent's graveyard from anywhere, instead exile it with a void
+# counter on it") is out by turn 3, when Bot1 casts Bonecrusher Giant as Stomp at Bot2. As Stomp resolves Bot1 takes the
+# Voidwalker's first: the card is exiled with a void counter, the Adventure's exile no longer applies (CR 616.1f), and the
+# card is not on an Adventure - Bot1 is never offered the Giant from exile. On turn 6 Bot2 sacrifices the Voidwalker and casts
+# the Giant, the one void-countered card, for free.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Bonecrusher Giant
+Mountain
+Mountain
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Stomp)
+Bot1.Replace(Dauthi Voidwalker)
+[T3 Bot1.Main2]
+? Exile = Bonecrusher Giant
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Exile.Bonecrusher Giant.Cast
+[T6 Bot2.Main1]
+Bot2.Battlefield.Dauthi Voidwalker.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Exile.Bonecrusher Giant.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Exile.Count = 0
+Bot2.Battlefield = Swamp; Mox Jet; Bonecrusher Giant
+Bot2.Graveyard = Dauthi Voidwalker

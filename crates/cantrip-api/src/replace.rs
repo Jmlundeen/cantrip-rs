@@ -58,6 +58,27 @@ pub struct ZoneChange {
     /// 614.1a, `StackItem::exile_instead`): the core's replacement of its move to the graveyard, ordered with the others (CR
     /// 616.1). Set by the move, never by a replacement.
     pub exile_instead: ExileInstead,
+    /// A spell cast as an Adventure, resolving (CR 715.3d): "instead of putting [it] into its owner's graveyard as it resolves,
+    /// its controller exiles it", and may play the card from there. The core's replacement, ordered with the others (CR
+    /// 616.1); `on_adventure` says it applied. Set by the move, never by a replacement.
+    pub adventure: bool,
+    /// An Omen spell resolving (CR 720.3d): its controller shuffles it into its owner's library instead of putting it into the
+    /// graveyard. The core's replacement, ordered with the others (CR 616.1). Set by the move.
+    pub omen: bool,
+    /// A spell with rebound cast from its controller's hand, resolving (CR 702.88a): exiled instead of put into the graveyard,
+    /// to be cast at its controller's next upkeep. The core's replacement, ordered with the others (CR 616.1); `rebounding`
+    /// says it applied. Set by the move.
+    pub rebound: bool,
+    /// The Adventure's exile applied (`adventure`): the card exiled is on an Adventure for the spell's controller.
+    pub on_adventure: bool,
+    /// Rebound's exile applied (`rebound`): its delayed triggered ability is created with the move.
+    pub rebounding: bool,
+    /// The move is a destruction (CR 701.8a) that a regeneration shield may replace (CR 701.19a, 614.8): by an effect that
+    /// destroys, or by lethal damage (CR 704.5g-h), and not one that says it can't be regenerated (CR 701.19c). Set by the
+    /// move.
+    pub destroy: bool,
+    /// A regeneration shield replaced the destruction (CR 701.19a): the permanent does not move, and is regenerated instead.
+    pub regenerated: bool,
 }
 
 /// Counters that would be put on a permanent (CR 122.6, 614.1a): by an effect, or as it enters with them.

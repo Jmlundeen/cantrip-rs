@@ -298,14 +298,6 @@ fn check_once(cx: &mut Cx) -> R<bool> {
         acted = true;
     }
     destroyed.retain(|&id| !cx.chars(id).has(Keyword::Indestructible));
-    // CR 701.19a, 614.8: a creature a regeneration shield saves from lethal damage regenerates instead.
-    if !destroyed.is_empty() && cx.s().effects.iter().any(|e| e.kind == EffectKind::RegenerationShield) {
-        let saved = ops::regenerate_instead(cx, &destroyed);
-        if !saved.is_empty() {
-            destroyed.retain(|id| !saved.contains(id));
-            acted = true;
-        }
-    }
     for id in unattach {
         ops::unattach(cx, id);
         acted = true;
@@ -430,8 +422,10 @@ fn check_once(cx: &mut Cx) -> R<bool> {
     if !to_graveyard.is_empty() || !destroyed.is_empty() {
         // All at once (CR 704.3): a creature that dies to its toughness and one destroyed by damage leave together.
         let mut moves: Vec<ops::Moving> = Vec::new();
-        for id in to_graveyard.into_iter().chain(destroyed) {
-            let mut moving = ops::Moving::to(id, Zone::graveyard(cx.s().obj(id).owner));
+        for id in to_graveyard.into_iter().chain(destroyed.iter().copied()) {
+            // Lethal damage destroys (CR 704.5g-h): a regeneration shield may replace that (CR 701.19a, 614.8), ordered with the
+            // other replacement effects (CR 616.1).
+            let mut moving = ops::Moving { destroy: destroyed.contains(&id), ..ops::Moving::to(id, Zone::graveyard(cx.s().obj(id).owner)) };
             if sagas_sacrificed.contains(&id) {
                 moving.reason = Some(ZoneReason::Sacrifice);
             }

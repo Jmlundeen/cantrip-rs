@@ -360,68 +360,43 @@ impl Query for Reader<'_> {
     }
 }
 
-/// Where a spell goes as it leaves the stack other than to the battlefield: its owner's graveyard, unless a replacement
-/// effect - its own flashback's (CR 702.34a), among others (`its_own_exile`) - sends it elsewhere; or exile on an Adventure
-/// (CR 715.4), or its owner's library for an Omen (CR 720.3d).
+/// Where a spell goes as it leaves the stack other than to the battlefield: its owner's graveyard (CR 608.2n, 701.6a,
+/// 608.2b), unless a replacement effect sends it elsewhere. Among them are the spell's own (`its_own_exile`) and, as it
+/// resolves, the rules' "instead of putting it into its owner's graveyard as it resolves" for how it was cast: an Adventure's
+/// exile (CR 715.3d), an Omen's shuffle into its owner's library (CR 720.3d) and rebound's exile (CR 702.88a). Each is a
+/// replacement effect (CR 614.1a), ordered by the spell's controller with the others that would change the move (CR 616.1,
+/// `replace`); what follows one - the card on an Adventure, rebound's delayed trigger - follows only if it applied.
 fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
     if item.kind != StackKind::Spell {
         return;
     }
     let obj = *cx.s().obj(item.object);
-    // An Omen spell that resolves is shuffled into its owner's library by its controller instead of going to the graveyard
-    // (CR 720.3d); countered, or its targets gone, it is put into the graveyard like any spell. A copy of one is an Omen too
-    // (CR 720.3c): its owner's library is still shuffled, and the copy, in no zone it can be in, ceases to exist (CR
-    // 707.10a, 704.5e).
-    if item.way == WAY_OMEN && reason == ZoneReason::Resolve {
-        if obj.card_copy {
-            ops::cease_to_exist(cx, Zone::STACK, item.object);
-        } else {
-            ops::move_to_for(cx, item.object, Zone::library(obj.owner), reason);
-        }
-        crate::turn::shuffle_library(cx, obj.owner);
-        return;
-    }
-    // A copy of a card leaves the stack for nowhere: it ceases to exist (CR 707.10a, 722.3c).
+    let resolving = reason == ZoneReason::Resolve;
+    // A copy of a card leaves the stack for nowhere: it ceases to exist (CR 707.10a, 722.3c). A copy of an Omen is an Omen too
+    // (CR 720.3c): resolving, its owner's library is still shuffled, though the copy, in no zone it can be in, is not put there
+    // (CR 707.10a, 704.5e).
     if obj.card_copy {
         ops::cease_to_exist(cx, Zone::STACK, item.object);
-        return;
-    }
-    // A spell cast as its Adventure that resolves is exiled by its controller, who may play the card from there later
-    // (CR 715.3d) - in its owner's exile zone, whoever cast it; countered, or its targets gone, it is put into the graveyard
-    // like any spell.
-    if item.way == WAY_ADVENTURE && reason == ZoneReason::Resolve {
-        let new = ops::move_to_for(cx, item.object, Zone::exile(obj.owner), reason);
-        let controller = item.controller;
-        cx.st().update_obj(new, |o| o.on_adventure = Some(controller));
+        if item.way == WAY_OMEN && resolving {
+            crate::turn::shuffle_library(cx, obj.owner);
+        }
         return;
     }
     let def = cx.card(obj.card);
-    // Rebound (CR 702.88a): a spell cast from its caster's hand is exiled as it resolves instead of going to the
-    // graveyard (one that is countered, or has no legal target, is not), and its controller may cast it from exile at
-    // the beginning of their next upkeep.
-    if def.rebound && reason == ZoneReason::Resolve && obj.cast_from == Some(ZoneKind::Hand) {
-        let new = ops::move_to_for(cx, item.object, Zone::exile(obj.owner), reason);
-        let since = cx.g.log.len() as u32;
-        cx.st().delayed_push(cantrip_state::Delayed {
-            when: DelayedWhen::Step { step: Step::Upkeep, on_turn_of: Some(item.controller) },
-            source: new,
-            controller: item.controller,
-            ability: AbilityRef::rebound(obj.card),
-            subject: Target::None,
-            members: cantrip_state::Span::default(),
-            since,
-            acquired: Acquired::OWN,
-        });
-        return;
-    }
-    // Paradigm (CR 702.192a): "exile this spell" as it resolves; a spell that is countered or fizzles is not exiled.
-    if def.paradigm.is_some() && reason == ZoneReason::Resolve {
+    // Paradigm (CR 702.192a): "exile this spell" as it resolves, an instruction of the spell; a spell that is countered or
+    // fizzles is not exiled.
+    if def.paradigm.is_some() && resolving {
         ops::move_to_for(cx, item.object, Zone::exile(obj.owner), reason);
         return;
     }
-    // To its owner's graveyard (CR 608.2n, 701.6a, 608.2b), unless a replacement effect sends it elsewhere: among them its
-    // own "exile it instead" (`its_own_exile`), ordered with the others by its controller (CR 616.1).
-    ops::move_together(cx, &[its_own_exile(cx, item, ops::Moving::to(item.object, Zone::graveyard(obj.owner)))], reason);
+    let moving = ops::Moving {
+        adventure: resolving && item.way == WAY_ADVENTURE,
+        omen: resolving && item.way == WAY_OMEN,
+        // "If this spell was cast from your hand" (CR 702.88a).
+        rebound: resolving && def.rebound && obj.cast_from == Some(ZoneKind::Hand),
+        ..ops::Moving::to(item.object, Zone::graveyard(obj.owner))
+    };
+    ops::move_together(cx, &[its_own_exile(cx, item, moving)], reason);
 }
 
 /// `moving`, the spell `item`'s move off the stack, with the spell's own replacement effects of that move (CR 614.1a), which
@@ -430,7 +405,7 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
 /// permission or a permanent - harmonize's (CR 702.180a) and aftermath's (CR 702.127a), of a move anywhere but exile; and
 /// "if that spell would be put into your graveyard, exile it instead", which the effect that had it cast made
 /// (`StackItem::exile_instead`), of a move to the graveyard alone.
-fn its_own_exile(cx: &Cx, item: &StackItem, moving: ops::Moving) -> ops::Moving {
+pub(crate) fn its_own_exile(cx: &Cx, item: &StackItem, moving: ops::Moving) -> ops::Moving {
     let card = cx.s().obj(item.object).card;
     let flashback = item.flashback || (item.way > 0 && cx.card(card).ways.get(item.way as usize - 1).is_some_and(|w| w.exile_after));
     ops::Moving { flashback, exile_instead: item.exile_instead, ..moving }

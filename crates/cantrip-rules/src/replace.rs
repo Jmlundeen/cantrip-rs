@@ -31,6 +31,19 @@ pub(crate) enum Origin {
     /// "If that spell would be put into your graveyard, exile it instead" (CR 614.1a; `ZoneChange::exile_instead`): the
     /// replacement the effect that had the spell cast made, of the spell leaving the stack for its graveyard.
     ExileInstead,
+    /// An Adventure spell's exile as it resolves (CR 715.3d; `ZoneChange::adventure`).
+    Adventure,
+    /// An Omen spell's shuffle into its owner's library as it resolves (CR 720.3d; `ZoneChange::omen`).
+    Omen,
+    /// Rebound's exile as the spell resolves (CR 702.88a; `ZoneChange::rebound`).
+    Rebound,
+    /// "If it would leave the battlefield, exile it instead of putting it anywhere else": unearth's (CR 702.84a) and the
+    /// effects worded as it is (From the Catacombs), of a permanent marked so (`Obj::exile_on_leave`).
+    Unearth,
+    /// Finality counters' "if this permanent would be put into a graveyard from the battlefield, exile it instead" (CR 122.1h).
+    Finality,
+    /// A regeneration shield (CR 701.19a, 614.8): of a permanent that would be destroyed (`ZoneChange::destroy`).
+    Regeneration,
     /// Protection's prevention of damage (CR 702.16e, 702.16j), a prevention effect ordered with the replacement effects that
     /// would change the same damage (CR 616.1): of the protected permanent, or the source of a player's protection.
     Protection,
@@ -67,6 +80,15 @@ const FLASHBACK_HINT: &str = "exile it instead of putting it anywhere else, as i
 
 /// What the "exile it instead" of the effect a spell was cast by says it does, for the player who orders it (CR 616.1).
 const EXILE_INSTEAD_HINT: &str = "exile it instead of putting it into the graveyard, as the effect it was cast by says";
+
+/// What the rules' replacements of a spell resolving, a permanent leaving and a destruction say they do, for the player who
+/// orders them with others (CR 616.1).
+const ADVENTURE_HINT: &str = "exile it on an Adventure, to be cast later as itself";
+const OMEN_HINT: &str = "shuffle it into its owner's library, as an Omen";
+const REBOUND_HINT: &str = "exile it with rebound, to be cast again at the next upkeep";
+const UNEARTH_HINT: &str = "exile it instead of putting it anywhere else";
+const FINALITY_HINT: &str = "exile it, as it has a finality counter";
+const REGENERATION_HINT: &str = "regenerate it instead of destroying it";
 
 /// What protection's prevention says it does, for the player who orders it with others (CR 616.1).
 const PROTECTION_HINT: &str = "protection prevents the damage";
@@ -111,6 +133,8 @@ pub(crate) fn says_how_it_enters(line: &str) -> bool {
 /// guard that keeps an entry with nothing to order free of the ordering.
 pub(crate) fn zone_change_possible(cx: &Cx, change: &ZoneChange) -> bool {
     possible(cx, Some(change.object)) || madness_applies(cx, change) || played_tapped_applies(cx, change) || flashback_applies(change) || exile_instead_applies(cx, change)
+        || resolving_applies(change)
+        || leaving_applies(cx, change)
 }
 
 /// `change` sent to `instead` by the entering permanent's own replacement (`Entering::instead`, CR 614.12): no entry any more,
@@ -178,6 +202,43 @@ fn exile_instead_applies(cx: &Cx, z: &ZoneChange) -> bool {
             chars.is(CardType::Instant) || chars.is(CardType::Sorcery)
         }
     }
+}
+
+/// The rules' "instead of putting it into its owner's graveyard as it resolves" for the way a spell was cast: an Adventure's
+/// exile (CR 715.3d), an Omen's shuffle (CR 720.3d), rebound's exile (CR 702.88a) - of a card, as it would be put into its
+/// graveyard from the stack. Once another effect has sent it elsewhere, none of them applies any more (CR 616.1f).
+fn resolving_to_graveyard(z: &ZoneChange) -> bool {
+    z.is_card && z.from.is(ZoneKind::Stack) && z.to.is(ZoneKind::Graveyard)
+}
+
+fn resolving_applies(z: &ZoneChange) -> bool {
+    (z.adventure || z.omen || z.rebound) && resolving_to_graveyard(z)
+}
+
+/// "Exile it instead of putting it anywhere else" (CR 702.84a): a permanent marked so leaving the battlefield for any zone
+/// but exile.
+fn unearth_applies(cx: &Cx, z: &ZoneChange) -> bool {
+    z.from.is(ZoneKind::Battlefield) && !z.to.is(ZoneKind::Exile) && cx.s().obj(z.object).exile_on_leave
+}
+
+/// CR 122.1h: a permanent with a finality counter that would be put into a graveyard from the battlefield.
+fn finality_applies(cx: &Cx, z: &ZoneChange) -> bool {
+    z.from.is(ZoneKind::Battlefield) && z.to.is(ZoneKind::Graveyard) && cx.s().obj(z.object).counters(CounterKind::Finality) > 0
+}
+
+/// CR 701.19a, 614.8: "the next time [it] would be destroyed", a permanent with a regeneration shield that would be destroyed
+/// (CR 701.8a: moved from the battlefield to its owner's graveyard). Once another effect has sent it elsewhere, the event is
+/// no destruction any more (CR 614.6), and the shield does not apply.
+fn regeneration_applies(cx: &Cx, z: &ZoneChange) -> bool {
+    z.destroy
+        && !z.regenerated
+        && z.from.is(ZoneKind::Battlefield)
+        && z.to.is(ZoneKind::Graveyard)
+        && cx.s().effects.iter().any(|e| e.kind == EffectKind::RegenerationShield && e.affected == z.object)
+}
+
+fn leaving_applies(cx: &Cx, z: &ZoneChange) -> bool {
+    z.from.is(ZoneKind::Battlefield) && (unearth_applies(cx, z) || finality_applies(cx, z) || regeneration_applies(cx, z))
 }
 
 /// The card whose replacement effects `id` has: `card_of`, but for a permanent about to enter, judged as it would exist on
@@ -284,6 +345,12 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
     }
     if let Proposal::Draw(d) = proposal
         && d.replaced
+    {
+        return Vec::new();
+    }
+    // Nor is a destruction a regeneration shield has replaced (CR 614.6).
+    if let Proposal::ZoneChange(z) = proposal
+        && z.regenerated
     {
         return Vec::new();
     }
@@ -428,6 +495,21 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
         if !applied.contains(&(z.object, 0, Origin::Flashback)) && flashback_applies(z) {
             found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::Flashback });
         }
+        // The rules' own for how it was cast, as it resolves (CR 715.3d, 720.3d, 702.88a), and for a permanent leaving the
+        // battlefield (CR 702.84a, 122.1h, 701.19a): of the object itself, offered first.
+        let own = [
+            (resolving_to_graveyard(z) && z.adventure, Origin::Adventure),
+            (resolving_to_graveyard(z) && z.omen, Origin::Omen),
+            (resolving_to_graveyard(z) && z.rebound, Origin::Rebound),
+            (unearth_applies(cx, z), Origin::Unearth),
+            (finality_applies(cx, z), Origin::Finality),
+            (regeneration_applies(cx, z), Origin::Regeneration),
+        ];
+        for (applies, origin) in own {
+            if applies && !applied.contains(&(z.object, 0, origin)) {
+                found.insert(0, Candidate { source: z.object, index: 0, origin });
+            }
+        }
     }
     // A permission's "each land played this way enters tapped" (CR 614.1d), ordered with the rest (CR 616.1): it is of the
     // land itself, which is what the player ordering them is shown.
@@ -471,6 +553,12 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
         Origin::Madness => MADNESS_HINT,
         Origin::Flashback => FLASHBACK_HINT,
         Origin::ExileInstead => EXILE_INSTEAD_HINT,
+        Origin::Adventure => ADVENTURE_HINT,
+        Origin::Omen => OMEN_HINT,
+        Origin::Rebound => REBOUND_HINT,
+        Origin::Unearth => UNEARTH_HINT,
+        Origin::Finality => FINALITY_HINT,
+        Origin::Regeneration => REGENERATION_HINT,
         Origin::Protection => PROTECTION_HINT,
         Origin::Prevention => card.preventions[c.index as usize].hint,
         Origin::GrantedPrevention(timestamp) => match cx.s().effects.iter().find(|e| e.timestamp == timestamp).map(|e| e.kind) {
@@ -646,9 +734,36 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
                 }
             }
             // CR 702.34a, 614.1a: exiled instead, in its owner's exile (CR 400.3).
-            Origin::Flashback | Origin::ExileInstead => {
+            Origin::Flashback | Origin::ExileInstead | Origin::Unearth | Origin::Finality => {
                 if let Proposal::ZoneChange(z) = proposal {
                     z.to = Zone::exile(cx.s().obj(z.object).owner);
+                }
+            }
+            // CR 715.3d: its controller exiles it, in its owner's exile, and may play the card from there.
+            Origin::Adventure => {
+                if let Proposal::ZoneChange(z) = proposal {
+                    z.to = Zone::exile(cx.s().obj(z.object).owner);
+                    z.on_adventure = true;
+                }
+            }
+            // CR 720.3d: shuffled into its owner's library.
+            Origin::Omen => {
+                if let Proposal::ZoneChange(z) = proposal {
+                    z.to = Zone::library(cx.s().obj(z.object).owner);
+                    z.shuffle = true;
+                }
+            }
+            // CR 702.88a: exiled, and cast again at its controller's next upkeep.
+            Origin::Rebound => {
+                if let Proposal::ZoneChange(z) = proposal {
+                    z.to = Zone::exile(cx.s().obj(z.object).owner);
+                    z.rebounding = true;
+                }
+            }
+            // CR 701.19a: the destruction never happens; the permanent is regenerated instead (`ops::move_together`).
+            Origin::Regeneration => {
+                if let Proposal::ZoneChange(z) = proposal {
+                    z.regenerated = true;
                 }
             }
             // CR 614.1d: it enters tapped.
@@ -1192,6 +1307,13 @@ mod tests {
             exiled_with: Some(linked),
             flashback: false,
             exile_instead: ExileInstead::Never,
+            adventure: false,
+            omen: false,
+            rebound: false,
+            on_adventure: false,
+            rebounding: false,
+            destroy: false,
+            regenerated: false,
         };
         let link = |p: Proposal| match p {
             Proposal::ZoneChange(z) => z.exiled_with,
