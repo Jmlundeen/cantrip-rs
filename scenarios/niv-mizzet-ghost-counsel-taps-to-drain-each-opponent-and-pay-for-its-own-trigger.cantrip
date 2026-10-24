@@ -39,5 +39,6 @@ Turn = 4
 Bot1.Life = 20
 Bot1.Hand.Count = 4
 Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Sapphire; Niv-Mizzet, Ghost Counsel; Swamp
+Bot1.Battlefield.Niv-Mizzet, Ghost Counsel.Tapped = true
 Bot2.Life = 19
 Bot3.Life = 19
