@@ -345,6 +345,17 @@ pub enum ManaSpendFilterView {
     /// Creature spells with one of the subtypes named beside it, or abilities of creature sources with one: "a creature
     /// spell of the chosen type or an ability of a creature source of the chosen type".
     SubtypeCreatureSpellsOrAbilities,
+    /// Abilities of artifacts: artifact permanents only (CR 109.2), never an artifact card in a hand or graveyard.
+    AbilitiesOfArtifacts,
+    /// Creature spells, or abilities of creatures: creature permanents only (CR 109.2).
+    CreatureSpellsOrAbilitiesOfCreatures,
+    /// Creature spells, or abilities of creature sources in any zone (CR 109.2c).
+    CreatureSpellsOrAbilities,
+    /// Artifact spells, or abilities of artifacts: artifact permanents only (CR 109.2).
+    ArtifactSpellsOrAbilitiesOfArtifacts,
+    /// Spells with one of the subtypes named beside it, or abilities of permanents with one (CR 109.2): "Elemental spells
+    /// or abilities of Elementals".
+    SubtypeSpellsOrAbilitiesOfPermanents,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

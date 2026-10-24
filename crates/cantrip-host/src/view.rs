@@ -113,10 +113,12 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         ManaRestriction::Subtypes(s) => {
             subtypes = s.subtypes.iter().flatten().map(|t| t.name().to_string()).collect();
             match (s.creature, s.abilities) {
-                (true, true) => ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities,
-                (false, true) => ManaSpendFilterView::SubtypeSpellsOrAbilities,
-                (true, false) => ManaSpendFilterView::SubtypeCreatureSpells,
-                (false, false) => ManaSpendFilterView::SubtypeSpells,
+                (true, Some(AbilitiesOf::Sources)) => ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities,
+                (false, Some(AbilitiesOf::Sources)) => ManaSpendFilterView::SubtypeSpellsOrAbilities,
+                (false, Some(AbilitiesOf::Permanents)) => ManaSpendFilterView::SubtypeSpellsOrAbilitiesOfPermanents,
+                (true, None) => ManaSpendFilterView::SubtypeCreatureSpells,
+                (false, None) => ManaSpendFilterView::SubtypeSpells,
+                (true, Some(AbilitiesOf::Permanents)) => panic!("a mana restriction the wire has no word for: {}", restriction.name()),
             }
         }
         ManaRestriction::NotNonartifactSpells => ManaSpendFilterView::NotNonartifactSpells,
@@ -132,6 +134,10 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         r if r == ManaRestriction::CREATURE_ABILITIES => ManaSpendFilterView::CreatureAbilities,
         r if r == ManaRestriction::SPELLS_FROM_EXILE => ManaSpendFilterView::SpellsFromExile,
         r if r == ManaRestriction::NOT_SPELLS_FROM_HAND => ManaSpendFilterView::NotSpellsFromHand,
+        r if r == ManaRestriction::ABILITIES_OF_ARTIFACTS => ManaSpendFilterView::AbilitiesOfArtifacts,
+        r if r == ManaRestriction::CREATURE_SPELLS_OR_ABILITIES_OF_CREATURES => ManaSpendFilterView::CreatureSpellsOrAbilitiesOfCreatures,
+        r if r == ManaRestriction::CREATURE_SPELLS_OR_ABILITIES => ManaSpendFilterView::CreatureSpellsOrAbilities,
+        r if r == ManaRestriction::ARTIFACT_SPELLS_OR_ABILITIES_OF_ARTIFACTS => ManaSpendFilterView::ArtifactSpellsOrAbilitiesOfArtifacts,
         r => panic!("a mana restriction the wire has no word for: {}", r.name()),
     };
     let effect = match restriction.effects() {
@@ -151,7 +157,14 @@ pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, 
         let at_least = u8::try_from(mana_value).ok()?;
         return Some(ManaRestriction::ManaValue(ManaValueSpells { at_least, or_x: filter == ManaSpendFilterView::ManaValueOrXSpells }));
     }
-    if matches!(filter, ManaSpendFilterView::SubtypeSpells | ManaSpendFilterView::SubtypeCreatureSpells | ManaSpendFilterView::SubtypeSpellsOrAbilities | ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities) {
+    if matches!(
+        filter,
+        ManaSpendFilterView::SubtypeSpells
+            | ManaSpendFilterView::SubtypeCreatureSpells
+            | ManaSpendFilterView::SubtypeSpellsOrAbilities
+            | ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities
+            | ManaSpendFilterView::SubtypeSpellsOrAbilitiesOfPermanents
+    ) {
         if subtypes.len() > 2 {
             return None;
         }
@@ -164,7 +177,11 @@ pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, 
             chosen: false,
             creature: matches!(filter, ManaSpendFilterView::SubtypeCreatureSpells | ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities),
             uncounterable: effect == ManaSpendEffectView::CantBeCountered,
-            abilities: matches!(filter, ManaSpendFilterView::SubtypeSpellsOrAbilities | ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities),
+            abilities: match filter {
+                ManaSpendFilterView::SubtypeSpellsOrAbilities | ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities => Some(AbilitiesOf::Sources),
+                ManaSpendFilterView::SubtypeSpellsOrAbilitiesOfPermanents => Some(AbilitiesOf::Permanents),
+                _ => None,
+            },
         }));
     }
     ManaRestriction::NAMED.into_iter().map(|(r, _)| r).find(|&r| restriction_view(r) == (filter, effect, Vec::new(), 0))

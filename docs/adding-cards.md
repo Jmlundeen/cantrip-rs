@@ -424,13 +424,19 @@ shapes have an example:
 - **Mana**: `PlayGrant.any_type` / `CastTerms.any_type` (mana of any type pays, CR 609.4b). Mana with a restriction on
   what it may be spent on (CR 106.6) is added by a mana ability with `.only_for(restriction)` (or `g.add_restricted_mana(..)`
   from an effect): `ManaRestriction::Spells(types)` is "spend this mana only to cast [type] spells" (`ARTIFACT_SPELLS`,
-  `INSTANT_OR_SORCERY_SPELLS`, `PLANESWALKER_SPELLS`, `CREATURE_SPELLS`), `ManaRestriction::Abilities(types)` "spend this mana only to
-  activate abilities [of [type] sources]" (`ABILITIES` for any source, `LAND_ABILITIES`, `ARTIFACT_ABILITIES`, `CREATURE_ABILITIES`),
+  `INSTANT_OR_SORCERY_SPELLS`, `PLANESWALKER_SPELLS`, `CREATURE_SPELLS`), `ManaRestriction::Abilities(types, of)` "spend this mana only to
+  activate abilities [of [type] sources]" (`ABILITIES` for any source, `LAND_ABILITIES`, `ARTIFACT_ABILITIES`, `CREATURE_ABILITIES`)
+  - with `AbilitiesOf::Permanents` for "of [type]s", which are permanents only (CR 109.2: `ABILITIES_OF_ARTIFACTS`, Soldevi
+  Machinist) and `AbilitiesOf::Sources` for "of [type] sources" in any zone (CR 109.2c) -, `ManaRestriction::SpellsOrAbilities(types,
+  of)` "spend this mana only to cast [type] spells or activate abilities of [type]s | [type] sources"
+  (`CREATURE_SPELLS_OR_ABILITIES_OF_CREATURES` for Castle Garenbrig, `CREATURE_SPELLS_OR_ABILITIES` for Gwenna's "creature
+  sources", `ARTIFACT_SPELLS_OR_ABILITIES_OF_ARTIFACTS`),
   `SPELLS_FROM_EXILE` "spend this mana only to cast spells from exile", `NOT_SPELLS_FROM_HAND` "this mana can't be
   spent to cast spells from your hand",
   `ManaRestriction::Subtypes(..)` "spend this mana only to cast [subtype] [creature] spells" (`SubtypeSpells::of(Dragon)`,
   `::either(Dragon, Omen)`, `SubtypeSpells::CHOSEN_TYPE_CREATURE` for "a creature spell of the chosen type",
   `.uncounterable()` for Cavern of Souls, `.or_abilities()` for "or activate abilities of [subtype] sources",
+  `.or_abilities_of_permanents()` for "or activate abilities of [subtype]s" (Smokebraider),
   `SubtypeSpells::CHOSEN_TYPE_SPELLS_OR_ABILITIES` for Eclipsed Realms, `CHOSEN_TYPE_CREATURE_SPELLS_OR_ABILITIES` for Secluded
   Courtyard), `ManaRestriction::NONCREATURE_SPELLS` "spend this mana only to cast a noncreature
   spell", `ManaRestriction::mana_value_at_least(4)` "spells with mana value 4 or greater" (and `mana_value_at_least_or_x(5)`

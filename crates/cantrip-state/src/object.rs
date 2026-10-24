@@ -1555,15 +1555,24 @@ pub enum ManaRestriction {
     /// Tablet of Discovery (and the same limit on Abstract Paintmage and Cormela, Glamour Thief). Planeswalker spells:
     /// Gideon's Memorial. Creature spells: Rockface Village ("a creature spell"), Guildmages' Forum's kind.
     Spells(TypeSet),
-    /// "Spend this mana only to activate abilities [of [type] sources]" (CR 106.6, 602.2b): only on the cost of activating
-    /// an activated ability - a mana ability's included (CR 605.3a), wherever the ability functions from (a land card's
-    /// channel or cycling in the hand) - whose source has one of these card types as the ability is activated; with no
-    /// types, of any source. Never on a spell, a special action (CR 116.2: turning a face-down permanent face up,
+    /// "Spend this mana only to activate abilities [of [type] sources | of [type]s]" (CR 106.6, 602.2b): only on the cost
+    /// of activating an activated ability - a mana ability's included (CR 605.3a) - whose source has one of these card
+    /// types as the ability is activated; with no types, of any source. `AbilitiesOf` says where that source may be: in
+    /// any zone for "sources" (a land card's channel or cycling in the hand, CR 109.2c), only on the battlefield for
+    /// "[type]s" (CR 109.2). Never on a spell, a special action (CR 116.2: turning a face-down permanent face up,
     /// unlocking a door), a triggered ability's cost or "unless ... pays" (CR 118.12).
     /// Any source: Omen Hawker, Pit Automaton, The Enigma Jewel. Land sources: Sunken Citadel, Eumidian Lifeseed.
-    /// Artifact sources: Soldevi Machinist ("of artifacts"), Steelswarm Operator. Creature sources: Shang-Chi, Master of
-    /// Kung Fu.
-    Abilities(TypeSet),
+    /// Artifact sources: Steelswarm Operator; artifacts: Soldevi Machinist. Creature sources: Shang-Chi, Master of Kung Fu.
+    Abilities(TypeSet, AbilitiesOf),
+    /// "Spend this mana only to cast [type] spells or activate abilities of [type]s | of [type] sources" (CR 106.6, 601.2g,
+    /// 602.2b): casting a spell with one of these card types as it is on the stack, or activating an ability (a mana
+    /// ability's included, CR 605.3a) of a source with one of them as it is activated - on the battlefield for "[type]s"
+    /// (CR 109.2: not a creature card's cycling in the hand, Castle Garenbrig's ruling), in any zone for "[type] sources"
+    /// (CR 109.2c). Never a special action, a triggered ability's cost or "unless ... pays" (CR 118.12).
+    /// Creature spells or abilities of creatures: Castle Garenbrig, Lukka, Bound to Ruin; of creature sources: Gwenna, Eyes
+    /// of Gaea. Artifact spells or abilities of artifacts: Dalakos, Crafter of Wonders, Grand Architect, Hargilde, Kindly
+    /// Runechanter, Power Depot, Renowned Weaponsmith, Slobad, Iron Goblin, Vedalken Engineer.
+    SpellsOrAbilities(TypeSet, AbilitiesOf),
     /// "Spend this mana only to cast [a] [subtype] [or [subtype]] [creature] spell[s][, and that spell can't be
     /// countered]" (CR 106.6, 205.3): only on casting a spell that has one of these subtypes as it is on the stack (its
     /// characteristics there, CR 601.2g: a changeling creature spell is every creature type, CR 702.73a; a type an effect
@@ -1593,6 +1602,26 @@ pub enum ManaRestriction {
     NotSpellsFrom(ZoneKind),
 }
 
+/// Where the source of an ability that restricted mana may pay for must be (CR 106.6, 109.2).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum AbilitiesOf {
+    /// "Abilities of [type] sources", or "abilities" alone: a source in any zone (CR 109.2c) - a permanent, or a card in a
+    /// hand, a graveyard or exile whose ability functions there.
+    Sources,
+    /// "Abilities of [type]s": a permanent of that type on the battlefield (CR 109.2) - never a card in another zone.
+    Permanents,
+}
+
+impl AbilitiesOf {
+    /// Whether an ability whose source is or is not on the battlefield is one this reads.
+    pub const fn admits(self, on_battlefield: bool) -> bool {
+        match self {
+            AbilitiesOf::Sources => true,
+            AbilitiesOf::Permanents => on_battlefield,
+        }
+    }
+}
+
 /// "Spend this mana only to cast spells with mana value N or greater [or spells with {X} in their mana costs]"
 /// (CR 106.6, 202.3, 107.3). Mana value 4 or greater: Ashling, Rimebound. Mana value 5 or greater or {X}: Troyan, Gutsy
 /// Explorer. (Helga, Skittish Seer's is for creature spells only, which this does not say.)
@@ -1616,7 +1645,8 @@ impl ManaValueSpells {
 /// Dragon. A creature spell of the chosen type: Unclaimed Territory, Pillar of Origins, and Cavern of Souls, whose spell
 /// can't be countered. Elemental spells or abilities of Elemental sources: Flamebraider. A spell or an ability of a source of
 /// the chosen type: Eclipsed Realms; a creature spell or an ability of a creature source of the chosen type: Secluded
-/// Courtyard.
+/// Courtyard. Elemental spells or abilities of Elementals (permanents): Smokebraider; of Myr: Myr Reservoir; of Dragons:
+/// Orb of Dragonkind, Crucible of the Spirit Dragon.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct SubtypeSpells {
     /// The subtypes, any one of which the spell must have. Read through the words of the text that names them (CR 612)
@@ -1630,35 +1660,37 @@ pub struct SubtypeSpells {
     pub creature: bool,
     /// "... and that spell can't be countered" (CR 106.6, 701.6): the effect the mana has on the spell it pays for.
     pub uncounterable: bool,
-    /// "... or activate abilities of [subtype] sources" (CR 106.6, 602.2b): it pays too for activating an ability whose
-    /// source has one of the subtypes as the ability is activated - a permanent, or a card in a hand or graveyard (the
-    /// rulings of Flamebraider and Eclipsed Realms) - never a special action or a triggered ability's cost.
-    pub abilities: bool,
+    /// "... or activate abilities of [subtype] sources | of [subtype]s" (CR 106.6, 602.2b): it pays too for activating an
+    /// ability whose source has one of the subtypes as the ability is activated - of a source in any zone, a permanent or a
+    /// card in a hand or graveyard (`AbilitiesOf::Sources`: the rulings of Flamebraider and Eclipsed Realms), or only of a
+    /// permanent (`AbilitiesOf::Permanents`, CR 109.2: the rulings of Smokebraider and Myr Reservoir) - never a special
+    /// action or a triggered ability's cost. None: spells only.
+    pub abilities: Option<AbilitiesOf>,
 }
 
 impl SubtypeSpells {
     /// "Spend this mana only to cast a creature spell of the chosen type."
     pub const CHOSEN_TYPE_CREATURE: SubtypeSpells =
-        SubtypeSpells { subtypes: [None, None], chosen: true, creature: true, uncounterable: false, abilities: false };
+        SubtypeSpells { subtypes: [None, None], chosen: true, creature: true, uncounterable: false, abilities: None };
 
     /// "Spend this mana only to cast a spell of the chosen type or activate an ability of a source of the chosen type"
     /// (Eclipsed Realms).
     pub const CHOSEN_TYPE_SPELLS_OR_ABILITIES: SubtypeSpells =
-        SubtypeSpells { subtypes: [None, None], chosen: true, creature: false, uncounterable: false, abilities: true };
+        SubtypeSpells { subtypes: [None, None], chosen: true, creature: false, uncounterable: false, abilities: Some(AbilitiesOf::Sources) };
 
     /// "Spend this mana only to cast a creature spell of the chosen type or activate an ability of a creature source of the
     /// chosen type" (Secluded Courtyard): `creature` limits the ability's source as it does the spell.
     pub const CHOSEN_TYPE_CREATURE_SPELLS_OR_ABILITIES: SubtypeSpells =
-        SubtypeSpells { subtypes: [None, None], chosen: true, creature: true, uncounterable: false, abilities: true };
+        SubtypeSpells { subtypes: [None, None], chosen: true, creature: true, uncounterable: false, abilities: Some(AbilitiesOf::Sources) };
 
     /// "Spend this mana only to cast [subtype] spells."
     pub const fn of(subtype: Subtype) -> SubtypeSpells {
-        SubtypeSpells { subtypes: [Some(subtype), None], chosen: false, creature: false, uncounterable: false, abilities: false }
+        SubtypeSpells { subtypes: [Some(subtype), None], chosen: false, creature: false, uncounterable: false, abilities: None }
     }
 
     /// "Spend this mana only to cast a [subtype] spell or a [subtype] spell."
     pub const fn either(a: Subtype, b: Subtype) -> SubtypeSpells {
-        SubtypeSpells { subtypes: [Some(a), Some(b)], chosen: false, creature: false, uncounterable: false, abilities: false }
+        SubtypeSpells { subtypes: [Some(a), Some(b)], chosen: false, creature: false, uncounterable: false, abilities: None }
     }
 
     /// "... and that spell can't be countered."
@@ -1668,7 +1700,12 @@ impl SubtypeSpells {
 
     /// "... or activate abilities of [subtype] sources": Flamebraider's Elementals.
     pub const fn or_abilities(self) -> SubtypeSpells {
-        SubtypeSpells { abilities: true, ..self }
+        SubtypeSpells { abilities: Some(AbilitiesOf::Sources), ..self }
+    }
+
+    /// "... or activate abilities of [subtype]s", permanents only (CR 109.2): Smokebraider's Elementals, Myr Reservoir's Myr.
+    pub const fn or_abilities_of_permanents(self) -> SubtypeSpells {
+        SubtypeSpells { abilities: Some(AbilitiesOf::Permanents), ..self }
     }
 
     /// Whether a spell with these characteristics may be paid for with the mana.
@@ -1688,8 +1725,9 @@ pub enum ManaPayment {
     /// the stack (`Obj::cast_from`).
     Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool, mana_value: u32, x: bool, from: ZoneKind },
     /// Activating an ability whose source has these card types and these subtypes as it is activated (CR 602.2b, 605.3a):
-    /// both always filled, from the source's characteristics.
-    Ability { source: TypeSet, subtypes: SubtypeSet },
+    /// both always filled, from the source's characteristics. `on_battlefield`: whether the source is a permanent (CR
+    /// 109.2), not a card in a hand, a graveyard or exile.
+    Ability { source: TypeSet, subtypes: SubtypeSet, on_battlefield: bool },
     /// Anything else: a special action, "unless ... pays", a cost a resolving effect asks for.
     Other,
 }
@@ -1704,12 +1742,26 @@ impl ManaRestriction {
     pub const INSTANT_OR_SORCERY_SPELLS: ManaRestriction =
         ManaRestriction::Spells(TypeSet::of(&[CardType::Instant, CardType::Sorcery]));
     pub const PLANESWALKER_SPELLS: ManaRestriction = ManaRestriction::Spells(TypeSet::of(&[CardType::Planeswalker]));
-    pub const ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::NONE);
-    pub const LAND_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Land]));
-    pub const ARTIFACT_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Artifact]));
+    pub const ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::NONE, AbilitiesOf::Sources);
+    pub const LAND_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Land]), AbilitiesOf::Sources);
+    pub const ARTIFACT_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Artifact]), AbilitiesOf::Sources);
+    /// "Spend this mana only to activate abilities of artifacts" (Soldevi Machinist): artifact permanents only (CR 109.2).
+    pub const ABILITIES_OF_ARTIFACTS: ManaRestriction =
+        ManaRestriction::Abilities(TypeSet::of(&[CardType::Artifact]), AbilitiesOf::Permanents);
     pub const NONCREATURE_SPELLS: ManaRestriction = ManaRestriction::NonSpells(TypeSet::of(&[CardType::Creature]));
     pub const CREATURE_SPELLS: ManaRestriction = ManaRestriction::Spells(TypeSet::of(&[CardType::Creature]));
-    pub const CREATURE_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Creature]));
+    pub const CREATURE_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Creature]), AbilitiesOf::Sources);
+    /// "Spend this mana only to cast creature spells or activate abilities of creatures" (Castle Garenbrig, Lukka, Bound to
+    /// Ruin): creature permanents' abilities only (CR 109.2).
+    pub const CREATURE_SPELLS_OR_ABILITIES_OF_CREATURES: ManaRestriction =
+        ManaRestriction::SpellsOrAbilities(TypeSet::of(&[CardType::Creature]), AbilitiesOf::Permanents);
+    /// "Spend this mana only to cast creature spells or activate abilities of creature sources" (Gwenna, Eyes of Gaea).
+    pub const CREATURE_SPELLS_OR_ABILITIES: ManaRestriction =
+        ManaRestriction::SpellsOrAbilities(TypeSet::of(&[CardType::Creature]), AbilitiesOf::Sources);
+    /// "Spend this mana only to cast artifact spells or activate abilities of artifacts" (Dalakos, Crafter of Wonders, Grand
+    /// Architect, Power Depot, Vedalken Engineer, ...): artifact permanents' abilities only (CR 109.2).
+    pub const ARTIFACT_SPELLS_OR_ABILITIES_OF_ARTIFACTS: ManaRestriction =
+        ManaRestriction::SpellsOrAbilities(TypeSet::of(&[CardType::Artifact]), AbilitiesOf::Permanents);
     pub const SPELLS_FROM_EXILE: ManaRestriction = ManaRestriction::SpellsFrom(ZoneKind::Exile);
     pub const NOT_SPELLS_FROM_HAND: ManaRestriction = ManaRestriction::NotSpellsFrom(ZoneKind::Hand);
 
@@ -1727,7 +1779,7 @@ impl ManaRestriction {
     /// of `Subtypes` are named for their subtypes and those of `ManaValue` for their number (`name`). A card naming a
     /// restriction of card types not here fails the build (`Adds::only_for` is checked at compile time), since the host
     /// has no word for it on the wire.
-    pub const NAMED: [(ManaRestriction, &'static str); 14] = [
+    pub const NAMED: [(ManaRestriction, &'static str); 18] = [
         (ManaRestriction::NotNonartifactSpells, "NotNonartifactSpells"),
         (ManaRestriction::GainsHaste, "GainsHaste"),
         (ManaRestriction::LegendaryUncounterable, "LegendarySpells, CantBeCountered"),
@@ -1742,6 +1794,10 @@ impl ManaRestriction {
         (ManaRestriction::CREATURE_ABILITIES, "CreatureAbilities"),
         (ManaRestriction::SPELLS_FROM_EXILE, "SpellsFromExile"),
         (ManaRestriction::NOT_SPELLS_FROM_HAND, "NotSpellsFromHand"),
+        (ManaRestriction::ABILITIES_OF_ARTIFACTS, "AbilitiesOfArtifacts"),
+        (ManaRestriction::CREATURE_SPELLS_OR_ABILITIES_OF_CREATURES, "CreatureSpellsOrAbilitiesOfCreatures"),
+        (ManaRestriction::CREATURE_SPELLS_OR_ABILITIES, "CreatureSpellsOrAbilities"),
+        (ManaRestriction::ARTIFACT_SPELLS_OR_ABILITIES_OF_ARTIFACTS, "ArtifactSpellsOrAbilitiesOfArtifacts"),
     ];
 
     const fn same(self, other: ManaRestriction) -> bool {
@@ -1749,17 +1805,23 @@ impl ManaRestriction {
             (ManaRestriction::NotNonartifactSpells, ManaRestriction::NotNonartifactSpells)
             | (ManaRestriction::GainsHaste, ManaRestriction::GainsHaste)
             | (ManaRestriction::LegendaryUncounterable, ManaRestriction::LegendaryUncounterable) => true,
-            (ManaRestriction::Spells(a), ManaRestriction::Spells(b))
-            | (ManaRestriction::Abilities(a), ManaRestriction::Abilities(b))
-            | (ManaRestriction::NonSpells(a), ManaRestriction::NonSpells(b)) => a.0 == b.0,
+            (ManaRestriction::Spells(a), ManaRestriction::Spells(b)) | (ManaRestriction::NonSpells(a), ManaRestriction::NonSpells(b)) => {
+                a.0 == b.0
+            }
+            (ManaRestriction::Abilities(a, x), ManaRestriction::Abilities(b, y))
+            | (ManaRestriction::SpellsOrAbilities(a, x), ManaRestriction::SpellsOrAbilities(b, y)) => a.0 == b.0 && x as u8 == y as u8,
             (ManaRestriction::SpellsFrom(a), ManaRestriction::SpellsFrom(b))
             | (ManaRestriction::NotSpellsFrom(a), ManaRestriction::NotSpellsFrom(b)) => a as u8 == b as u8,
             _ => false,
         }
     }
 
-    /// Whether the wire has a word for it: one of `NAMED`, or any of `Subtypes` or `ManaValue`.
+    /// Whether the wire has a word for it: one of `NAMED`, or any of `ManaValue` or `Subtypes` - but one of creature
+    /// spells or abilities of creature permanents of a subtype, which no card prints.
     pub const fn is_known(self) -> bool {
+        if let ManaRestriction::Subtypes(SubtypeSpells { creature: true, abilities: Some(AbilitiesOf::Permanents), .. }) = self {
+            return false;
+        }
         if let ManaRestriction::Subtypes(_) | ManaRestriction::ManaValue(_) = self {
             return true;
         }
@@ -1801,11 +1863,20 @@ impl ManaRestriction {
             (ManaRestriction::NotSpellsFrom(_), _) => true,
             (ManaRestriction::GainsHaste, _) => true,
             (ManaRestriction::LegendaryUncounterable, ManaPayment::Spell { legendary, .. }) => legendary,
-            (ManaRestriction::Spells(allowed), ManaPayment::Spell { types, .. }) => allowed.0 & types.0 != 0,
-            (ManaRestriction::Abilities(allowed), ManaPayment::Ability { source, .. }) => allowed.0 == 0 || allowed.0 & source.0 != 0,
+            (ManaRestriction::Spells(allowed) | ManaRestriction::SpellsOrAbilities(allowed, _), ManaPayment::Spell { types, .. }) => {
+                allowed.0 & types.0 != 0
+            }
+            (ManaRestriction::Abilities(allowed, of), ManaPayment::Ability { source, on_battlefield, .. }) => {
+                of.admits(on_battlefield) && (allowed.0 == 0 || allowed.0 & source.0 != 0)
+            }
+            (ManaRestriction::SpellsOrAbilities(allowed, of), ManaPayment::Ability { source, on_battlefield, .. }) => {
+                of.admits(on_battlefield) && allowed.0 & source.0 != 0
+            }
             (ManaRestriction::Subtypes(s), ManaPayment::Spell { types, ref subtypes, .. }) => s.admits(types, subtypes),
-            (ManaRestriction::Subtypes(s), ManaPayment::Ability { source, ref subtypes }) => {
-                s.abilities && (!s.creature || source.has(CardType::Creature)) && s.subtypes.iter().flatten().any(|&t| subtypes.has(t))
+            (ManaRestriction::Subtypes(s), ManaPayment::Ability { source, ref subtypes, on_battlefield }) => {
+                s.abilities.is_some_and(|of| of.admits(on_battlefield))
+                    && (!s.creature || source.has(CardType::Creature))
+                    && s.subtypes.iter().flatten().any(|&t| subtypes.has(t))
             }
             _ => false,
         }
@@ -1836,8 +1907,10 @@ impl ManaRestriction {
                 name = "ChosenType".to_string();
             }
             name.push_str(if s.creature { "CreatureSpells" } else { "Spells" });
-            if s.abilities {
-                name.push_str("OrAbilities");
+            match s.abilities {
+                Some(AbilitiesOf::Sources) => name.push_str("OrAbilities"),
+                Some(AbilitiesOf::Permanents) => name.push_str("OrAbilitiesOfPermanents"),
+                None => {}
             }
             if s.uncounterable {
                 name.push_str(", CantBeCountered");
@@ -1873,9 +1946,10 @@ impl ManaRestriction {
             return None;
         }
         let limit = text.iter().find(|w| *w != "cantbecountered")?;
-        let (limit, abilities) = match limit.strip_suffix("orabilities") {
-            Some(rest) => (rest, true),
-            None => (limit.as_str(), false),
+        let (limit, abilities) = match (limit.strip_suffix("orabilities"), limit.strip_suffix("orabilitiesofpermanents")) {
+            (Some(rest), _) => (rest, Some(AbilitiesOf::Sources)),
+            (None, Some(rest)) => (rest, Some(AbilitiesOf::Permanents)),
+            (None, None) => (limit.as_str(), None),
         };
         let (body, creature) = match limit.strip_suffix("creaturespells") {
             Some(body) => (body, true),
@@ -2136,11 +2210,13 @@ mod tests {
         all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Orc, Subtype::Warrior)));
         all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Horror, Subtype::Orc)));
         all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Dragon, Subtype::Omen)));
-        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: true, abilities: false }));
-        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: true, uncounterable: false, abilities: false }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: true, abilities: None }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: true, uncounterable: false, abilities: None }));
         all.push(ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Elemental).or_abilities()));
-        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: false, abilities: true }));
-        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: false, uncounterable: false, abilities: true }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: false, abilities: Some(AbilitiesOf::Sources) }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: false, uncounterable: false, abilities: Some(AbilitiesOf::Sources) }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Elemental).or_abilities_of_permanents()));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Myr).or_abilities_of_permanents()));
         all.push(ManaRestriction::mana_value_at_least(4));
         all.push(ManaRestriction::mana_value_at_least_or_x(5));
         all.push(ManaRestriction::mana_value_at_least(12));
@@ -2149,6 +2225,42 @@ mod tests {
             let name = r.name();
             assert_eq!(ManaRestriction::parse(name.split_whitespace()), Some(r), "{name}");
         }
+    }
+
+    /// "Abilities of [type]s" are a permanent's only (CR 109.2), "abilities of [type] sources" a source's in any zone (CR
+    /// 109.2c): a creature card's cycling in the hand is paid by Gwenna's mana, not by Castle Garenbrig's (its ruling), nor
+    /// Soldevi Machinist's by an artifact card's unearth, nor Smokebraider's by an Elemental card's.
+    #[test]
+    fn abilities_of_a_type_are_a_permanents_and_of_a_type_source_any_sources() {
+        let creature = TypeSet::of(&[CardType::Creature]);
+        let artifact = TypeSet::of(&[CardType::Artifact]);
+        let elemental = || SubtypeSet::of(&[Subtype::Elemental]);
+        let ability = |source, subtypes, on_battlefield| ManaPayment::Ability { source, subtypes, on_battlefield };
+        let spell = |types| ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary: false, mana_value: 2, x: false, from: ZoneKind::Hand };
+        let castle = ManaRestriction::CREATURE_SPELLS_OR_ABILITIES_OF_CREATURES;
+        assert!(castle.may_pay(&spell(creature)));
+        assert!(!castle.may_pay(&spell(artifact)));
+        assert!(castle.may_pay(&ability(creature, SubtypeSet::NONE, true)));
+        assert!(!castle.may_pay(&ability(creature, SubtypeSet::NONE, false)));
+        assert!(!castle.may_pay(&ability(artifact, SubtypeSet::NONE, true)));
+        assert!(!castle.may_pay(&ManaPayment::Other));
+        let gwenna = ManaRestriction::CREATURE_SPELLS_OR_ABILITIES;
+        assert!(gwenna.may_pay(&ability(creature, SubtypeSet::NONE, false)));
+        assert!(!gwenna.may_pay(&ability(artifact, SubtypeSet::NONE, false)));
+        assert!(gwenna.may_pay(&spell(creature)));
+        let artifacts = ManaRestriction::ARTIFACT_SPELLS_OR_ABILITIES_OF_ARTIFACTS;
+        assert!(artifacts.may_pay(&spell(artifact)) && artifacts.may_pay(&ability(artifact, SubtypeSet::NONE, true)));
+        assert!(!artifacts.may_pay(&ability(artifact, SubtypeSet::NONE, false)) && !artifacts.may_pay(&spell(creature)));
+        let soldevi = ManaRestriction::ABILITIES_OF_ARTIFACTS;
+        assert!(soldevi.may_pay(&ability(artifact, SubtypeSet::NONE, true)));
+        assert!(!soldevi.may_pay(&ability(artifact, SubtypeSet::NONE, false)) && !soldevi.may_pay(&spell(artifact)));
+        assert!(ManaRestriction::ARTIFACT_ABILITIES.may_pay(&ability(artifact, SubtypeSet::NONE, false)));
+        assert!(ManaRestriction::ABILITIES.may_pay(&ability(TypeSet::NONE, SubtypeSet::NONE, false)));
+        let smokebraider = ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Elemental).or_abilities_of_permanents());
+        assert!(smokebraider.may_pay(&ability(creature, elemental(), true)));
+        assert!(!smokebraider.may_pay(&ability(creature, elemental(), false)));
+        let flamebraider = ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Elemental).or_abilities());
+        assert!(flamebraider.may_pay(&ability(creature, elemental(), false)));
     }
 }
 

@@ -1120,7 +1120,7 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOp
                 if static_rules::spend_any_color_for(cx, player, id, SpendingFor::Activating) {
                     cost = cost.paid_with_any_color();
                 }
-                if !a.covers_for(&cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes }) {
+                if !a.covers_for(&cost, &ability_payment(cx, id, chars.types, chars.subtypes)) {
                     continue;
                 }
             }
@@ -2945,7 +2945,7 @@ pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) 
             && static_rules::lets_spend_any_color(cx, &a.spenders, &Spending { player, source: Some(source), purpose: SpendingFor::Casting });
         a.covers_for(&if any_color { cost.paid_with_any_color() } else { *cost }, &spell_payment(cx, source, a.names_subtypes()))
     } else {
-        a.covers_for(cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes })
+        a.covers_for(cost, &ability_payment(cx, source, chars.types, chars.subtypes))
     }
 }
 
@@ -3146,7 +3146,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
                 types: if def.adds_any > 0 { any_types(cx, id, player, def) } else { 0 },
                 restriction: def.restricted.filter(|&r| r != ManaRestriction::GainsHaste).map(|r| restriction_from(cx, id, r)),
                 cost: ManaCost { x: 0, ..def.cost.mana },
-                source: ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes },
+                source: ability_payment(cx, id, chars.types, chars.subtypes),
                 extra: [0; 6],
                 produced: 0,
                 tapped: false,
@@ -4383,7 +4383,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             .then(|| available_without(cx, player, Some(id)));
             let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
-            let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes } };
+            let payment = if def.special_action { ManaPayment::Other } else { ability_payment(cx, id, chars.types, chars.subtypes) };
             let covered = |a: &Available, owed: ManaCost, targets: &[Target]| {
                 let owed = at_least_x(owed, def.x_cant_be_zero);
                 // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
@@ -7920,6 +7920,11 @@ fn activate(
     }
     announce_twobrids(cx, player, source, &mut mana, false)?;
     let life = announce_life(cx, player, source, &mut mana, false, paid)?;
+    // What the mana paying its cost pays for (CR 106.6): the source as the ability is activated, as it begins to be put on
+    // the stack (CR 602.2a, 113.7a), before any cost is paid - a cost that sacrifices or exiles it, or a mana ability
+    // activated while paying that does (CR 601.2g-h), leaves it the source it was.
+    let chars = cx.chars(source);
+    let paying = ability_payment(cx, source, chars.types, chars.subtypes);
     // CR 602.2a, 701.27f: put on the stack now, before its costs are paid; a slot counted by X reads the X announced.
     item.counted = item.x;
     item.since = cx.g.log.len() as u32;
@@ -7967,7 +7972,12 @@ fn activate(
         player,
         source,
         mana,
-        &Helpers { waterbend: if def.waterbend { u8::MAX } else { 0 }, creatures: def.tap_creatures_for_mana, purpose: Paying::Activating, ..Helpers::NONE },
+        &Helpers {
+            waterbend: if def.waterbend { u8::MAX } else { 0 },
+            creatures: def.tap_creatures_for_mana,
+            purpose: Paying::Activating(paying),
+            ..Helpers::NONE
+        },
     )?;
     if late {
         chosen = choose_permanents(cx, player, source, &def.cost, paid)?;
@@ -8195,6 +8205,10 @@ pub fn activate_mana(
     let acquired = acquired_nth(cx, source, index as usize);
     // What restricts its mana, read from the source as it is activated, before a cost may take it away (CR 106.6).
     let restricted = def.restricted.map(|r| restriction_from(cx, source, r));
+    // And what mana paying its own mana cost pays for: the source as it is activated, before {T} or "exile this" is paid
+    // (CR 602.2a, 113.7a, 601.2h: those costs may be paid in any order).
+    let chars = cx.chars(source);
+    let paying = ability_payment(cx, source, chars.types, chars.subtypes);
     // "Sacrifice a creature: Add ..." (Phyrexian Altar): the permanents come with the activation, as its option's
     // candidates (a mana ability never targets, CR 605.1a, so the slots are free for them). Tapped ones ("return a tapped
     // creature you control") are chosen once the ability's own mana is paid, as a spell's are (CR 605.3a, 601.2g-h): a mana
@@ -8230,7 +8244,7 @@ pub fn activate_mana(
     }
     // A mana ability's own mana cost (Chromatic Star's {1}) is paid like any other (CR 605.3a, 601.2g).
     if mana != ManaCost::ZERO {
-        pay_mana_with(cx, player, source, mana, &Helpers { purpose: Paying::Activating, ..Helpers::NONE })?;
+        pay_mana_with(cx, player, source, mana, &Helpers { purpose: Paying::Activating(paying), ..Helpers::NONE })?;
     }
     if late {
         chosen = choose_permanents(cx, player, source, &def.cost, Some(CostFor::ManaAbility))?;
@@ -8888,21 +8902,26 @@ fn record_spent(cx: &mut Cx, player: PlayerId, on: ObjectId, cast: bool, taken: 
     }
 }
 
+/// Activating an ability of `source`, which has these card types and subtypes as it is activated (CR 602.2b, 605.3a), as
+/// far as restricted mana is concerned: and whether it is a permanent, for "abilities of [type]s" (CR 109.2), or a card in
+/// another zone, which only "abilities of [type] sources" reads (CR 109.2c).
+fn ability_payment(cx: &Cx, source: ObjectId, types: TypeSet, subtypes: SubtypeSet) -> ManaPayment {
+    ManaPayment::Ability { source: types, subtypes, on_battlefield: cx.s().obj(source).zone.is(ZoneKind::Battlefield) }
+}
+
 /// What paying for `source` is, as far as restricted mana is concerned (CR 106.6): casting it, when it is a spell on the
 /// stack being cast; activating one of its abilities; or anything else. Only casting a spell is limited to spells (CR
 /// 601.2g): paying "unless its controller pays" (CR 118.12) or a copy's cost for the spell on the stack is not casting it;
-/// and only an ability's activation is activating one (CR 602.2b, 605.3a), never a special action (CR 116.2). The source
-/// is judged as it is now, as the cost is paid (an ability of a land card in the hand is an ability of a land source).
+/// and only an ability's activation is activating one (CR 602.2b, 605.3a), never a special action (CR 116.2). An
+/// ability's source is judged as it was activated (`Paying::Activating`), however its costs have moved it since (an ability
+/// of a land card in the hand is an ability of a land source).
 fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> ManaPayment {
     match purpose {
         Paying::Casting if cx.s().obj(source).zone.is(ZoneKind::Stack) => {
             // The subtypes, only where some of the player's mana is limited by them.
             spell_payment(cx, source, cx.s().restricted_of(player).any(|(r, _)| r.names_subtypes()))
         }
-        Paying::Activating => {
-            let chars = cx.chars(source);
-            ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes }
-        }
+        Paying::Activating(payment) => payment,
         _ => ManaPayment::Other,
     }
 }
@@ -8912,7 +8931,7 @@ fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> 
 fn spending_for(cx: &Cx, source: ObjectId, purpose: Paying) -> SpendingFor {
     match purpose {
         Paying::Casting if cx.s().obj(source).zone.is(ZoneKind::Stack) => SpendingFor::Casting,
-        Paying::Activating => SpendingFor::Activating,
+        Paying::Activating(_) => SpendingFor::Activating,
         _ => SpendingFor::Other,
     }
 }
@@ -9037,7 +9056,8 @@ impl Helpers<'static> {
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Paying {
     Casting,
-    Activating,
+    /// Activating an ability, its source as it was when the activation began (CR 602.2a, 113.7a).
+    Activating(ManaPayment),
     Other,
 }
 
