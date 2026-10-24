@@ -658,6 +658,19 @@ pub static RAT_CANT_BLOCK: CardDef = CardDef {
     ..token!(Rat)
 };
 
+/// The 1/1 colorless Phyrexian Mite artifact creature token with toxic 1 and "This token can't block." (CR 111.1, 702.164a,
+/// 509.1b). Mirrex, Mite Overseer, Skrelv's Hive, Infested Fleshcutter, Crawling Chorus, Stinging Hivemaster and
+/// Indoctrination Attendant make it; the card file lists it in its `EXTRA`.
+pub static PHYREXIAN_MITE: CardDef = CardDef {
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::CantBlock]),
+    toxic: 1,
+    text: "Toxic 1 (Players dealt combat damage by this creature also get a poison counter.)\nThis token can't block.",
+    ..token!(Phyrexian Mite)
+};
+
 /// "This token can't block or be blocked by non-Spirit creatures" (CR 509.1b): of any possible block it is in, the other
 /// creature must be a Spirit, read through the token's words (CR 612).
 fn spirit_blocking(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
