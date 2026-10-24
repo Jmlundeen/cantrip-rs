@@ -318,7 +318,9 @@ def draft_content(name, index):
             card["backFacePlayableAsLand"] = True  # CR 712.12: a modal double-faced card may be played as its back face
         card["backFace"] = _face(faces[1], names, index, core)
     elif layout == "adventure" and len(faces) == 2:
-        card = _face(faces[0], names, index, core) | {"adventure": _face(faces[1], names, index, core)}
+        # Scryfall lays an Omen card (CR 720) out as an adventure: its second face's subtype says which it is.
+        kind = "omen" if "Omen" in faces[1]["type_line"].split(" — ")[-1].split() else "adventure"
+        card = _face(faces[0], names, index, core) | {kind: _face(faces[1], names, index, core)}
     else:
         print(f"{found['name']} is a {layout} card: write content/mtg/cards/<name>.json by hand (the add-cards skill, step 2),")
         print("then run new-card.py again. What Scryfall has:\n")
