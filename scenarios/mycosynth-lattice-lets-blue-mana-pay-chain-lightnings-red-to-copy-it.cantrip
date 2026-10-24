@@ -1,0 +1,62 @@
+# Mycosynth Lattice: "Players may spend mana as though it were mana of any color" (CR 609.4b) - for every payment, so for
+# Chain Lightning's "that player ... may pay {R}{R}" too, a cost paid as the spell resolves (CR 118.12). Bot1 casts Chain
+# Lightning at Bot2 on turn 3; Bot2 makes {U}{U} (Island, Mox Sapphire), is offered paying and pays both {R} with it, then
+# declines the copy: it takes 3 and its mana is spent.
+
+[Bot1 Deck]
+Mountain
+Mycosynth Lattice
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Chain Lightning
+Mountain x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+? Bot2.Mana = {U}{U}
+Bot2.PayCost
+? Bot2.Mana =
+Bot2.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot2.Mana =
+Stack.Count = 0

@@ -8701,7 +8701,7 @@ pub(crate) fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
         *mana = more;
     }
     if owed.twobrid != [0; 5] {
-        return if pool_pays(pool, &owed, 0) { Ways::Many } else { Ways::None };
+        return if pool_pays(pool, &owed, 0, false) { Ways::Many } else { Ways::None };
     }
     let owed = &owed;
     let mut left = pool.0;
@@ -9478,14 +9478,17 @@ fn pay_during_resolution(
         // left to do but decline - or, where X sets the life, lower X.
         let mut options = Vec::new();
         let pool = spendable(cx, payer, source, Paying::Other);
-        let remaining = uncovered(&pool, &total);
+        // Mana spent as though it were mana of any color where a rule lets the payer for this payment (CR 609.4b), as the
+        // payment itself asks (`pay_mana_used`, `spending_for`): no spell is cast and no ability activated by it.
+        let any_color = static_rules::spend_any_color_for(cx, payer, source, SpendingFor::Other);
+        let remaining = uncovered(&pool, &if any_color { total.paid_with_any_color() } else { total });
         let life_payable = can_pay_life(cx, payer, life);
         let payable = life_payable && resolution_rest_payable(cx, payer, source, cost, x.unwrap_or(0));
         if payable {
             if total != ManaCost::ZERO || x.is_some() {
                 options = mana_options_while_paying(cx, payer, source, Paying::Other);
             }
-            if total == ManaCost::ZERO || pool_pays(&pool, &total, payable_life(cx, payer) - i32::from(life)) {
+            if total == ManaCost::ZERO || pool_pays(&pool, &total, payable_life(cx, payer) - i32::from(life), any_color) {
                 options.push(ActionOption::simple(ActionKind::PayCost));
             }
         }
@@ -9559,11 +9562,13 @@ fn pay_during_resolution(
 /// Whether `pool` pays `owed` now, however its symbols that can be paid in more than one way are paid (CR 118.13): each
 /// Phyrexian symbol with its color or 2 life, at most `life_room` life between them (CR 107.4f), and each monocolored hybrid
 /// symbol with its color or {2} (CR 107.4e). Symbols of one kind and color are alike, so each choice is how many of them
-/// are paid each way.
-pub(crate) fn pool_pays(pool: &ManaPool, owed: &ManaCost, life_room: i32) -> bool {
-    fn go(pool: &ManaPool, rest: ManaCost, life_room: i32, at: usize) -> bool {
+/// are paid each way. `any_color`: the payer may spend mana as though it were mana of any color for it (CR 609.4b), so once
+/// those symbols are announced each colored one is paid with any mana (`ManaCost::paid_with_any_color`), as `pay_mana_used`
+/// pays it.
+pub(crate) fn pool_pays(pool: &ManaPool, owed: &ManaCost, life_room: i32, any_color: bool) -> bool {
+    fn go(pool: &ManaPool, rest: ManaCost, life_room: i32, any_color: bool, at: usize) -> bool {
         if at == 10 {
-            return !matches!(ways(pool, &rest), Ways::None);
+            return !matches!(ways(pool, &if any_color { rest.paid_with_any_color() } else { rest }), Ways::None);
         }
         let (color, phyrexian) = (at % 5, at < 5);
         let n = if phyrexian { rest.phyrexian[color] } else { rest.twobrid[color] };
@@ -9582,10 +9587,10 @@ pub(crate) fn pool_pays(pool: &ManaPool, owed: &ManaCost, life_room: i32) -> boo
                 next.generic = generic;
                 life_room
             };
-            room >= 0 && go(pool, next, room, at + 1)
+            room >= 0 && go(pool, next, room, any_color, at + 1)
         })
     }
-    go(pool, *owed, life_room, 0)
+    go(pool, *owed, life_room, any_color, 0)
 }
 
 /// Pays a resolution's cost with `total` its mana and `life` its life: its Phyrexian symbols are announced first, each
