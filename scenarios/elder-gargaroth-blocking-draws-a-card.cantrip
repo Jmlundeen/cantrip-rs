@@ -1,0 +1,31 @@
+# Elder Gargaroth blocking: the trigger fires on a block too, third mode draws exactly one card (CR 700.2).
+# Bot2's Ornithopter attacks on turn 4 into the untapped Gargaroth.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Elder Gargaroth
+Forest x30
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.Elder Gargaroth.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Block(Elder Gargaroth > Ornithopter)
+Bot1.Modes(3)
+[Bot2.Damage]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Life = 20
+Bot1.Battlefield.Count = 1

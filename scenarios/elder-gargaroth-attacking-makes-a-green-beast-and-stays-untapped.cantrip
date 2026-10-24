@@ -1,0 +1,32 @@
+# Elder Gargaroth attacking: vigilance keeps it untapped, the trigger's first mode makes a 3/3 green Beast
+# (the token is not attacking), and the other modes do not happen (CR 700.2). Two Black Lotuses pay {3}{G}{G}.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Elder Gargaroth
+Forest x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.Elder Gargaroth.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Elder Gargaroth > Bot2)
+Bot1.Modes(1)
+[Bot1.Damage]
+
+[Expect]
+Bot1.Battlefield.Elder Gargaroth.Tapped = false
+Bot1.Battlefield.Beast Token.Power = 3
+Bot1.Battlefield.Beast Token.Toughness = 3
+Bot1.Battlefield.Beast Token.Colors = Green
+Bot1.Life = 20
+Bot2.Life = 14
+Bot1.Battlefield.Count = 2
+Combat.Attackers.Count = 1

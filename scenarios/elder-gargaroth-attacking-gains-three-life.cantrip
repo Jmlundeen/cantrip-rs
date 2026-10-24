@@ -1,0 +1,28 @@
+# Elder Gargaroth attacking, second mode: exactly 3 life and no Beast (CR 700.2, 119.3). Reach and trample are
+# on the card; vigilance is shown by the attack scenario.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Elder Gargaroth
+Forest x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.Elder Gargaroth.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Elder Gargaroth > Bot2)
+Bot1.Modes(2)
+[Bot1.Damage]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 14
+Bot1.Battlefield.Count = 1
+Bot1.Battlefield.Elder Gargaroth.Keywords = Reach; Trample; Vigilance
