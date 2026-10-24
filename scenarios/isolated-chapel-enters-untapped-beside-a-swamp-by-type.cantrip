@@ -1,8 +1,8 @@
-# "...unless you control a Plains or a Swamp": the Swamp branch, read by land type and not by name (CR 305.6, 305.7).
-# Bayou is a Swamp (and a Forest, which does not count) and no Plains is anywhere, so the Chapel enters untapped.
+# "...unless you control a Plains or a Swamp": the Swamp branch, read by land type and not by name (CR 305.6, 205.3i).
+# A plain Swamp (the Forest in the first scenario does not count) and no Plains is anywhere, so the Chapel enters untapped.
 
 [Bot1 Deck]
-Bayou
+Swamp
 Isolated Chapel
 Forest x10
 
@@ -10,7 +10,7 @@ Forest x10
 Island x16
 
 [Actions]
-Bot1.Hand.Bayou.Play
+Bot1.Hand.Swamp.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Isolated Chapel.Play
 

@@ -1,20 +1,22 @@
-# Isolated Chapel: "This land enters tapped unless you control a Plains or a Swamp." (CR 614.1c, 614.12a: read on the
-# battlefield as it enters, the land itself never counted). Beside an Island only the first copy enters tapped (turn 3);
+# Isolated Chapel: "This land enters tapped unless you control a Plains or a Swamp." (CR 614.1d, 614.12: read on the
+# battlefield as it enters, the land itself never counted). Beside a Forest only the first copy enters tapped (turn 3);
 # once a Plains is out the second enters untapped (turn 7), the positive control for the first. It also taps for {W} or
-# {B}: green is refused beside the white it does add, and the {W} activation is that positive control.
+# {B}: green is refused beside the white it does add, and the {W} and {B} activations are the positive controls.
+# Bot2 controls Plains and Swamps, which do not count for "you control".
 
 [Bot1 Deck]
-Island
+Forest
 Isolated Chapel
 Plains
 Isolated Chapel
 Plains x10
 
 [Bot2 Deck]
-Forest x16
+Plains x8
+Swamp x8
 
 [Actions]
-Bot1.Hand.Island.Play
+Bot1.Hand.Forest.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Isolated Chapel.Play
 ? Bot1.Battlefield.Isolated Chapel.Tapped = true
@@ -26,6 +28,8 @@ Bot1.Hand.Plains.Play
 [T7 Bot1.Main1]
 Bot1.Hand.Isolated Chapel.Play
 ? Bot1.Battlefield.Isolated Chapel#2.Tapped = false
+Bot1.Battlefield.Isolated Chapel.Activate(Ability: {W} or {B}; Color: Black)
+? Bot1.Mana = {B}
 
 [Expect]
 Turn = 7
