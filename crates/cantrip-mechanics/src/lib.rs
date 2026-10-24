@@ -406,13 +406,14 @@ pub fn connive(g: &mut dyn Game, creature: ObjectId, source: ObjectId) -> Result
 }
 
 /// Connive N (CR 701.50): draw N cards, then discard N (as many as the hand holds), together, and a +1/+1 counter
-/// goes on the creature for each nonland card discarded. Raffine, Scheming Seer connives X; Ledger Shredder, 1.
+/// goes on the creature for each nonland card discarded, read where it went by its discard (`hand::discarded_nonland_card`:
+/// one put into a hidden zone unrevealed is undefined, no nonland card, CR 701.9c). Raffine, Scheming Seer connives X; Ledger Shredder, 1.
 pub fn connive_n(g: &mut dyn Game, creature: ObjectId, source: ObjectId, count: u32) -> Result<(), Suspend> {
     let player = g.obj(creature).controller;
     g.draw(player, count);
     let chosen = choose_from_hand(g, player, source, count)?;
-    let nonland = chosen.iter().filter(|&&c| !g.chars(c).is(CardType::Land)).count() as i16;
-    g.discard_together(&chosen);
+    let discarded = g.discard_together(&chosen);
+    let nonland = discarded.iter().filter(|&&c| hand::discarded_nonland_card(&*g, c)).count() as i16;
     if nonland > 0 && g.is_on_battlefield(creature) && g.obj(creature).became.is_none() {
         g.add_counters(creature, CounterKind::PlusOne, nonland);
     }

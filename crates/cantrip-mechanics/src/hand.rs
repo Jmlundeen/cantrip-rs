@@ -168,3 +168,33 @@ pub fn look_at_an_opponents_hand_then_choose_a_name(g: &mut dyn Game, entering: 
     }
     Ok(())
 }
+
+/// The card a discard event names and what it is - "an opponent discards a land card" (Aclazotz, Deepest Betrayal), "for
+/// each nonland card discarded this way" (Seasoned Pyromancer) - read where it went (CR 701.9a): none when the event is no
+/// discard, and no characteristics when a replacement put it into a hidden zone unrevealed, where every value of them is
+/// undefined (CR 701.9c), so it is no card of any type, nonland included. `event` is the trigger's own, or a discard's
+/// record from the history.
+pub fn discarded_card(q: &dyn Query, event: &Event) -> Option<(ObjectId, Option<Chars>)> {
+    match *event {
+        Event::Discarded { card, undefined, .. } => Some((card, (!undefined).then(|| q.chars(card)))),
+        _ => None,
+    }
+}
+
+/// The discard record of `card`, the object a discard put where it went (`Game::discard_together`'s result), for
+/// `discarded_card`.
+pub fn discard_of<'a>(q: &'a dyn Query, card: ObjectId) -> Option<&'a Event> {
+    q.history().select(EventQuery::kind(EventMask::DISCARDED).object(card)).next_back().map(|r| &r.event)
+}
+
+/// What a card a discard put where it went is (`Game::discard_together`'s result), by its discard's record
+/// (`discarded_card`): none when it is undefined (CR 701.9c), or no discard put it there.
+pub fn discarded_chars(q: &dyn Query, card: ObjectId) -> Option<Chars> {
+    discard_of(q, card).and_then(|e| discarded_card(q, e)).and_then(|(_, chars)| chars)
+}
+
+/// "A nonland card discarded this way" (`discarded_chars`): an undefined card is no nonland card (CR 701.9c). Connive (CR
+/// 701.50a), Seasoned Pyromancer, Seasoned Cryomancer, Glacial Dragonhunt and Garruk, Veiled Butcher ask it.
+pub fn discarded_nonland_card(q: &dyn Query, card: ObjectId) -> bool {
+    discarded_chars(q, card).is_some_and(|chars| !chars.is(CardType::Land))
+}

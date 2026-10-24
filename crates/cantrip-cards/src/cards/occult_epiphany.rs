@@ -1,11 +1,11 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens::WHITE_FLYING_SPIRIT;
-use cantrip_mechanics::choose_from_hand;
+use cantrip_mechanics::{choose_from_hand, hand};
 use cantrip_oracle as oracle;
 
 /// Draw X cards, then discard X cards (mandatory, one batch). A Spirit for each card type among the cards discarded
-/// this way, created together (CR 101.4). Types are read before the discard, since a card is a new object after it
-/// moves (CR 400.7).
+/// this way, created together (CR 101.4). Each card's types are read by its discard where it went
+/// (`hand::discarded_chars`): one put into a hidden zone unrevealed is undefined and adds no type (CR 701.9c).
 fn epiphany(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let x = item.x;
     if x < 1 {
@@ -14,13 +14,9 @@ fn epiphany(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, x as u32);
     let chosen = choose_from_hand(g, you, item.object, u32::from(x))?;
-    let mut types = 0;
-    for kind in CardType::ALL {
-        if chosen.iter().any(|&c| g.chars(c).is(kind)) {
-            types += 1;
-        }
-    }
-    g.discard_together(&chosen);
+    let discarded = g.discard_together(&chosen);
+    let known: Vec<Chars> = discarded.iter().filter_map(|&c| hand::discarded_chars(&*g, c)).collect();
+    let types = CardType::ALL.iter().filter(|&&kind| known.iter().any(|c| c.is(kind))).count();
     if types == 0 {
         return Ok(());
     }

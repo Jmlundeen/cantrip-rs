@@ -190,6 +190,12 @@ pub(crate) fn verify_reveal_carried(cx: &Cx, id: ObjectId) {
 /// the board as it was before any of them moved (CR 603.10a); everything else on the board after. A library is
 /// entered on top. Returns the new objects, in order.
 pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<ObjectId> {
+    move_together_seen(cx, moves, reason).0
+}
+
+/// `move_together`, which also returns the objects, by their old ids, put into a hand or a library that every player could
+/// see as they moved (`seen_by_all`, decided as the moves were made): the rest put there were not revealed.
+fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec<ObjectId>, Vec<ObjectId>) {
     // An object moves once however many times the batch names it: a permanent a spell targets twice ("destroy target
     // artifact and target creature" at an artifact creature, CR 115.3) is destroyed once (CR 400.7). The first move kept.
     let distinct;
@@ -494,7 +500,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
     if left_battlefield {
         return_until_left(cx);
     }
-    created
+    (created, seen)
 }
 
 /// Attaches an Aura or Equipment to a permanent (CR 701.3a). Nothing happens when it could not be attached there
@@ -2266,9 +2272,19 @@ pub fn discard_together(cx: &mut Cx, cards: &[ObjectId]) -> Vec<ObjectId> {
         .filter(|&&c| causer.is_none_or(|by| cantrip_api::may_cause(&*cx, by, cx.s().obj(c).owner, cantrip_api::CauseKind::Discard)))
         .map(|&c| Moving::to(c, Zone::graveyard(cx.s().obj(c).owner)))
         .collect();
-    let new = move_together(cx, &moves, ZoneReason::Discard);
+    let (new, seen) = move_together_seen(cx, &moves, ZoneReason::Discard);
+    // A card a replacement put into a hidden zone instead of its owner's graveyard (Library of Leng), and not revealed as it
+    // went (Wheel of Sun and Moon reveals it), has every characteristic undefined (CR 701.9c): the event says so, for the
+    // history and every ability that reads it.
+    let undefined: Vec<ObjectId> = moves
+        .iter()
+        .filter(|m| !seen.contains(&m.id))
+        .filter_map(|m| cx.s().obj(m.id).became)
+        .filter(|&n| matches!(cx.s().obj(n).zone.kind(), ZoneKind::Hand | ZoneKind::Library))
+        .collect();
     // One event for the whole discard, so that "whenever you discard one or more cards" sees it once (CR 603.2c).
-    let events: Vec<Event> = new.iter().map(|&card| Event::Discarded { player: cx.s().obj(card).owner, card }).collect();
+    let events: Vec<Event> =
+        new.iter().map(|&card| Event::Discarded { player: cx.s().obj(card).owner, card, undefined: undefined.contains(&card) }).collect();
     cx.emit_batch(&events, None);
     new
 }

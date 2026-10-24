@@ -688,7 +688,14 @@ Triggers are indexed by the kinds of event they listen for (`EventMask`), so an 
 could match it. Where a triggered ability functions (CR 113.6) is `TriggeredDef::functions`, and the engine asks it in
 those zones only, so no matcher checks its own zone: the battlefield, unless its trigger condition can't trigger from
 there (CR 113.6k) - "when you cast this spell" is made by `when_this_spell_is_cast` and functions from the stack, "when
-this card is put into a graveyard from anywhere" is a shared trigger that functions from the graveyard - or its own text
+this card is put into a graveyard from anywhere" is a shared trigger that functions from the graveyard, "when you discard
+this card" functions wherever a discarded card can end up (`WHERE_A_DISCARD_ENDS`, a library included: CR 113.6k,
+702.29c), a discard being the event rather than a move to a graveyard (Sand Golem's "return this card from your
+graveyard" included). A card a discard put into a hand or a library unrevealed has undefined characteristics (CR
+701.9c): `Event::Discarded::undefined` says so in the history, its own abilities trigger on nothing, and what asks what
+was discarded reads it through `cantrip_mechanics::hand::discarded_card`, never `chars` (Aclazotz's land card, Seasoned
+Pyromancer's nonland cards). The first "when you cycle this card" is the shared cycling mechanic matching that
+`Discarded` record (`Event::Cycled` names the card in hand) - or its own text
 names the zone (CR 113.6b, 113.6m: "return this card from your graveyard"), which the card declares with `functions_in`.
 `CardTable::functions_elsewhere` says per card which other zones to look in, and
 `cantrip-cards/tests/functioning_zones_match_text.rs` holds every ability's zones, declared or derived, to its words and

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{each_discards_a_card, targets, triggers};
+use cantrip_mechanics::{each_discards_a_card, hand, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "This spell costs {1} less to cast for each creature card in your graveyard" (CR 601.2f, 118.7a): counted as the cost is
@@ -18,8 +18,11 @@ fn discard_then_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     let legal = targets::legal_players(g, item);
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|p| legal.contains(p)).collect();
     let discarded = each_discards_a_card(g, &opponents, item.object)?;
-    // The cards are in graveyards now, so their mana values are those of the cards (CR 202.3).
-    let big = |g: &dyn Game, p: PlayerId| discarded.iter().any(|&c| g.state().obj(c).owner == p && g.mana_value(c) >= 4);
+    // The cards are in graveyards now, so their mana values are those of the cards (CR 202.3); one a replacement put into a
+    // hidden zone unrevealed is undefined and has none (CR 701.9c, `hand::discarded_chars`).
+    let big = |g: &dyn Game, p: PlayerId| {
+        discarded.iter().any(|&c| g.state().obj(c).owner == p && hand::discarded_chars(g, c).is_some() && g.mana_value(c) >= 4)
+    };
     let draws = opponents.iter().filter(|&&p| !big(g, p)).count();
     g.draw(item.controller, draws as u32);
     Ok(())

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::{choose_from_hand, triggers::THIS_ENTERS};
+use cantrip_mechanics::{choose_from_hand, hand, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// The 1/1 red Elemental creature token it makes.
@@ -13,12 +13,16 @@ pub static ELEMENTAL: CardDef = CardDef {
 };
 
 /// Discard two cards (all of a shorter hand) as one action, draw two, then an Elemental for each nonland card
-/// discarded this way, created together (CR 701.9b, 101.4). A card's type is read before it moves (CR 400.7).
+/// discarded this way, created together (CR 701.9b, 101.4). Each card is read by its discard where it went; one put into a
+/// hidden zone unrevealed is undefined, no nonland card (CR 701.9c, `hand::discarded_card`).
 fn enter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let chosen = choose_from_hand(g, you, item.object, 2)?;
-    let nonlands = chosen.iter().filter(|&&c| !g.chars(c).is(CardType::Land)).count();
-    g.discard_together(&chosen);
+    let discarded = g.discard_together(&chosen);
+    let nonlands = discarded
+        .iter()
+        .filter(|&&c| hand::discarded_nonland_card(&*g, c))
+        .count();
     g.draw(you, 2);
     if nonlands > 0 {
         let elemental = g.card_id(&ELEMENTAL);

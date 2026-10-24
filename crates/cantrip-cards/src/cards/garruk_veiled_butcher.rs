@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::replacements::OPPONENTS_CREATURES_EXILED_INSTEAD_OF_DYING;
-use cantrip_mechanics::{choose_from_hand, each_player_sacrifices, targets, tokens};
+use cantrip_mechanics::{choose_from_hand, each_player_sacrifices, hand, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// +2: Up to one target creature gets -4/-1 until your next turn (CR 611.2b).
@@ -30,7 +30,8 @@ fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// −3: Each opponent discards two cards. For each opponent who didn't discard two nonland cards this way, you draw a
 /// card. Each opponent chooses in turn order and the cards are discarded together (CR 101.4, 701.9); an opponent with
-/// fewer cards, or whom this ability can't make discard (CR 101.2), is one who didn't discard two nonland cards.
+/// fewer cards, or whom this ability can't make discard (CR 101.2), is one who didn't discard two nonland cards, and so is one
+/// whose card a replacement put into a hidden zone unrevealed: it is undefined, no nonland card (CR 701.9c).
 fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != you).collect();
@@ -45,7 +46,7 @@ fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let short = opponents
         .iter()
         .filter(|&&who| {
-            discarded.iter().filter(|&&card| g.obj(card).owner == who && !g.chars(card).is(CardType::Land)).count() < 2
+            discarded.iter().filter(|&&card| g.obj(card).owner == who && hand::discarded_nonland_card(&*g, card)).count() < 2
         })
         .count();
     for _ in 0..short {

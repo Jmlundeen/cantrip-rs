@@ -37,7 +37,12 @@ pub enum Event {
     DamagePrevented { source: ObjectId, target: Target, amount: u16, combat: bool, by: ObjectId },
     LifeChange { player: PlayerId, delta: i32 },
     Drew { player: PlayerId, card: ObjectId },
-    Discarded { player: PlayerId, card: ObjectId },
+    /// A card was discarded (CR 701.9a): `card` is the object it became where it went. `undefined` when a replacement put it
+    /// into a hidden zone instead of its owner's graveyard without its being revealed (Library of Leng): every value of its
+    /// characteristics is undefined (CR 701.9c), its abilities among them (CR 109.3), for its own triggers and for anything
+    /// that asks what was discarded (`cantrip_mechanics::hand::discarded_card`) - though the card itself, in that zone, is
+    /// what it is to a later search or draw.
+    Discarded { player: PlayerId, card: ObjectId, undefined: bool },
     /// Cards were revealed to every player (CR 701.20a).
     Revealed { player: PlayerId, card: ObjectId },
     Countered { spell: ObjectId },

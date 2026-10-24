@@ -1188,6 +1188,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
     // The look-back abilities are judged on the game just before the events (CR 603.10a), the history then included.
     let then = before.map(|b| b.then);
     let seen_by_all = before.map_or(&[][..], |b| b.seen_by_all);
+    // The cards a discard put into a hidden zone unrevealed: their characteristics, their abilities among them, are undefined
+    // (CR 701.9c, 109.3), so none of their own abilities is asked of these events.
+    let undefined: Vec<ObjectId> =
+        events.iter().filter_map(|e| if let Event::Discarded { card, undefined: true, .. } = e { Some(*card) } else { None }).collect();
     let before = before.map(|b| b.battlefield);
     let outer = cx.g.history_end;
     cx.g.history_end = Some(start);
@@ -1294,7 +1298,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             }
             // Abilities that function in other zones (`TriggeredDef::functions`, CR 113.6): each asked only in the zones it
             // functions in, and only of cards that have one there. A spell on the stack is among them: "when you cast this
-            // spell" (storm, replicate; CR 702.40a, 702.56a) functions from the stack (CR 113.6k).
+            // spell" (storm, replicate; CR 702.40a, 702.56a) functions from the stack (CR 113.6k), and so is a library: a card
+            // discarded or cycled into one triggers from there (CR 113.6k, 702.29c) when it was revealed as it went (Wheel of
+            // Sun and Moon). One put into a hidden zone unrevealed (Library of Leng) has its characteristics, its abilities
+            // among them, undefined (CR 701.9c, 109.3), so nothing of its own triggers (`Event::Discarded::undefined`).
             // A spell may also be given such an ability by a static ability (Thrumming Stone's ripple, CR 613.1f), which only
             // a game that has had static abilities in play can have done.
             let cards = cx.cards();
@@ -1302,12 +1309,13 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             let elsewhere: Vec<ObjectId> = cx
                 .s()
                 .seats()
-                .flat_map(|p| [Zone::hand(p), Zone::graveyard(p), Zone::exile(p)])
+                .flat_map(|p| [Zone::hand(p), Zone::graveyard(p), Zone::exile(p), Zone::library(p)])
                 .chain(std::iter::once(Zone::STACK))
                 .flat_map(|z| cx.s().zone(z).iter().copied())
                 .filter(|&id| {
                     let obj = cx.s().obj(id);
-                    cards.functions_elsewhere[obj.card.0 as usize].contains(obj.zone.kind()) || (granted && obj.zone.is(ZoneKind::Stack))
+                    (!undefined.contains(&id) && cards.functions_elsewhere[obj.card.0 as usize].contains(obj.zone.kind()))
+                        || (granted && obj.zone.is(ZoneKind::Stack))
                 })
                 .collect();
             for id in elsewhere {

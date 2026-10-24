@@ -1,17 +1,18 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose_from_hand, effects, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{choose_from_hand, effects, hand, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Draw two cards, then discard two cards (all of a shorter hand) as one action (CR 701.9). When one or more of the
 /// cards discarded this way are nonland cards, the reflexive ability triggers (CR 603.12), counting them: its "that
 /// many" is the number of nonland cards among the discarded ones, read where they went (a card's types are the same
-/// in the graveyard, or in exile by madness, as in the hand).
+/// in the graveyard, or in exile by madness, as in the hand; one put into a hidden zone unrevealed is undefined, no nonland
+/// card: CR 701.9c, `hand::discarded_nonland_card`).
 fn enter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, 2);
     let chosen = choose_from_hand(g, you, item.object, 2)?;
     let discarded = g.discard_together(&chosen);
-    let nonlands = discarded.iter().filter(|&&card| !g.chars(card).is(CardType::Land)).count();
+    let nonlands = discarded.iter().filter(|&&card| hand::discarded_nonland_card(&*g, card)).count();
     if nonlands > 0 {
         let this = g.card_id(&CARD);
         g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, u16::try_from(nonlands).unwrap_or(u16::MAX));

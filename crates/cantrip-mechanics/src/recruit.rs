@@ -4,9 +4,10 @@
 //! The player draws (an empty library draws nothing, CR 121.4, and loses at the next state check, CR 704.5b), then
 //! discards a card they choose (CR 701.9); with an empty hand there is nothing to discard and so no token. The token is made
 //! only for a card that was actually discarded: one its owner can't be made to discard stays (CR 101.2), and a card
-//! discarded is judged by what it is, a land card or not.
+//! discarded is judged by what it is where it went, a land card or not - and one a replacement put into a hidden zone
+//! unrevealed is undefined, no nonland card (CR 701.9c, `hand::discarded_nonland_card`).
 
-use crate::{choose_from_hand, tokens};
+use crate::{choose_from_hand, hand, tokens};
 use cantrip_api::*;
 
 /// `player` recruits, on behalf of `source` (the object whose ability does it).
@@ -14,7 +15,7 @@ pub fn recruit(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(
     g.draw(player, 1);
     let chosen = choose_from_hand(g, player, source, 1)?;
     let discarded = g.discard_together(&chosen);
-    if discarded.iter().any(|&card| !g.chars(card).is(CardType::Land)) {
+    if discarded.iter().any(|&card| hand::discarded_nonland_card(&*g, card)) {
         tokens::create_by_rule(g, player, &tokens::HUMAN_SOLDIER, 1, false)?;
     }
     Ok(())

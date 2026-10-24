@@ -3249,10 +3249,11 @@ impl CardTable {
                 assert!(!s.everywhere && !s.own && s.layer == Layer::Type, "{}: a static ability that sets land subtypes affects permanents in layer 4", card.name);
             }
         }
-        // Where a triggered ability can function outside the battlefield: the zones the engine looks in for one (`settle`). An
-        // ability said to function anywhere else, or a triggered mana ability that functions off the battlefield (CR 605.1b:
-        // tapping a permanent), would never be asked, so neither is made.
-        let elsewhere = ZoneKinds::of(&[ZoneKind::Stack, ZoneKind::Hand, ZoneKind::Graveyard, ZoneKind::Exile]);
+        // Where a triggered ability can function outside the battlefield: the zones the engine looks in for one (`settle`),
+        // a library among them - a card discarded into one (Library of Leng) or cycled into one (Wheel of Sun and Moon)
+        // triggers from there (CR 113.6k, 702.29c). An ability said to function anywhere else, or a triggered mana ability
+        // that functions off the battlefield (CR 605.1b: tapping a permanent), would never be asked, so neither is made.
+        let elsewhere = ZoneKinds::of(&[ZoneKind::Stack, ZoneKind::Hand, ZoneKind::Graveyard, ZoneKind::Exile, ZoneKind::Library]);
         let functions_elsewhere = cards
             .iter()
             .map(|c| {

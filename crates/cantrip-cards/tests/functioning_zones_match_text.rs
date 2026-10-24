@@ -18,7 +18,8 @@ const CAST_KEYWORDS: [&str; 5] = ["storm", "replicate", "ripple", "cascade", "ca
 ///
 /// - on the stack, if it is the spell's own cast: "when you cast this spell", a reflexive "when you do" of an additional
 ///   cost paid to cast it ("... copy this spell"), or a keyword whose trigger is its cast (CR 113.6k);
-/// - in every zone a discarded card can wind up in, if it is the card's own cycling or discarding (CR 702.29c);
+/// - in every zone a discarded card can wind up in, a library included, if it is the card's own cycling or discarding (CR
+///   113.6k, 702.29c), even if what it does then returns it "from your graveyard" (Sand Golem);
 /// - in a graveyard, if it is the card's own move into a graveyard other than from the battlefield ("when this card is put
 ///   into a graveyard from anywhere", "... into your graveyard from your library": CR 113.6k);
 /// - in the zone the ability names for its own card, "this card from your graveyard", "if this card is in your graveyard"
@@ -41,7 +42,8 @@ fn said_zones(text: &str, name: &str) -> ZoneKinds {
     conditions.iter().fold(ZoneKinds::NONE, |zones, c| zones.union(condition_zones(c, &text, &name)))
 }
 
-/// Every zone a card discarded to pay a cost can wind up in, a replacement effect's included (CR 702.29c, 614.1).
+/// Every zone a discarded card can wind up in, a replacement effect's included (CR 113.6k, 702.29c, 614.1): read here
+/// apart from the engine's `cantrip_api::WHERE_A_DISCARD_ENDS`, which the abilities are held to.
 const WHERE_A_DISCARD_ENDS: ZoneKinds =
     ZoneKinds::of(&[ZoneKind::Graveyard, ZoneKind::Exile, ZoneKind::Library, ZoneKind::Hand, ZoneKind::Battlefield]);
 
@@ -57,7 +59,14 @@ fn condition_zones(condition: &str, text: &str, name: &str) -> ZoneKinds {
     if condition.contains("cast this spell") || (condition == "when you do" && text.contains("this spell")) {
         return ON_THE_STACK;
     }
-    if ["cycle this card", "discard this card", "cycle or discard this card"].iter().any(|w| condition.contains(&format!("you {w}"))) {
+    if ["you cycle this card", "you discard this card", "you cycle or discard this card", "causes you to discard this card"]
+        .iter()
+        .any(|w| condition.contains(w))
+    {
+        // Even when what it does then moves the card out of its graveyard (Sand Golem, Pure Intentions, Mangara's Blessing:
+        // "return this card from your graveyard ... at the beginning of the next end step"): the discard is the event, not a
+        // move to the graveyard, so it triggers wherever the discard ends (a ruling of the owner's: Megrim triggers when
+        // Leyline of the Void exiles the discarded card), and its return finds nothing there.
         return WHERE_A_DISCARD_ENDS;
     }
     // The zones the condition itself puts its own object into (CR 113.6m's exception).
@@ -112,6 +121,11 @@ fn the_reader_reads_the_printed_forms() {
         // CR 702.29c: from whatever zone the card winds up in.
         ("When you cycle this card, draw a card.", "Test", WHERE_A_DISCARD_ENDS),
         ("When you cycle or discard this card, you gain 1 life.", "Test", WHERE_A_DISCARD_ENDS),
+        ("When you discard this card, you gain 3 life.", "Titanbones, Towering Heart", WHERE_A_DISCARD_ENDS),
+        ("When a spell or ability an opponent controls causes you to discard this card, that player loses 5 life.", "Psychic Purge", WHERE_A_DISCARD_ENDS),
+        ("When a spell or ability an opponent controls causes you to discard this card, return it to your hand.", "Quagnoth", WHERE_A_DISCARD_ENDS),
+        // Not CR 113.6m's graveyard alone: the discard is the event, wherever the card went.
+        ("When a spell or ability an opponent controls causes you to discard this card, return this card from your graveyard to the battlefield with a +1/+1 counter on it at the beginning of the next end step.", "Sand Golem", WHERE_A_DISCARD_ENDS),
         ("Whenever you cycle or discard another card, scry 1.", "Test", ON_THE_BATTLEFIELD),
         ("Offspring {2} (You may pay an additional {2} as you cast this spell.)", "Pawpatch Recruit", ON_THE_BATTLEFIELD),
         ("Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", "Ugin, Eye of the Storms", ON_THE_BATTLEFIELD),

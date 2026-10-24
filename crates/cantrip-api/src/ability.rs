@@ -289,6 +289,15 @@ pub const ON_THE_STACK: ZoneKinds = ZoneKinds::of(&[ZoneKind::Stack]);
 /// Where an ability that returns "this card from your graveyard" functions (CR 113.6m), and one that triggers on its own
 /// card being put into a graveyard (CR 113.6k).
 pub const IN_A_GRAVEYARD: ZoneKinds = ZoneKinds::of(&[ZoneKind::Graveyard]);
+/// Where a trigger on its own card being discarded functions - "when you discard this card", "when you cycle this card",
+/// "when a spell or ability an opponent controls causes you to discard this card": every zone a discarded card can wind up
+/// in, a replacement effect's included (CR 113.6k, 702.29c, 614.1) - its graveyard, exile (madness, Leyline of the Void),
+/// the battlefield (Obstinate Baloth), its hand, and its library (Library of Leng, Wheel of Sun and Moon). The discard is the
+/// event, not a move to a graveyard, so this holds for one whose effect then returns "this card from your graveyard" (Sand
+/// Golem, Mangara's Blessing) too. One put into a hidden zone unrevealed triggers on nothing (CR 701.9c,
+/// `Event::Discarded::undefined`).
+pub const WHERE_A_DISCARD_ENDS: ZoneKinds =
+    ZoneKinds::of(&[ZoneKind::Graveyard, ZoneKind::Exile, ZoneKind::Library, ZoneKind::Hand, ZoneKind::Battlefield]);
 
 impl Trigger {
     /// A trigger condition that can't trigger from the battlefield, which functions in the zones it can trigger from (CR

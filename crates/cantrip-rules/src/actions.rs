@@ -7856,6 +7856,10 @@ fn activate(
     }
     if def.cost.discard_self {
         ops::discard(cx, source);
+        // `Cycled` names the card in hand, and is its own event after the discard's. No card has "when you cycle this
+        // card" yet (CR 702.29c: "when you discard this card to pay a cycling cost", from whatever zone it went to): the first
+        // is the shared cycling mechanic, matching this discard's `Event::Discarded` record - the card where it went, and its
+        // `undefined` (CR 701.9c) - or `Cycled` is emitted in the discard's batch naming the new object with that flag.
         if def.from == ZoneKind::Hand {
             cx.emit(Event::Cycled { card: source, player });
         }

@@ -1063,7 +1063,7 @@ pub const YOU_COMMIT_A_CRIME: Trigger = when_asked(EventMask::CRIME, you_commit_
 /// discard one or more cards" (CR 603.2c). Ivora, Currency Converter, Marauding Mako, Inti and Cool but Rude print it.
 pub fn you_discard(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Discarded { player, card } if *player == me.controller => Fired::about(Target::Object(*card)),
+        Event::Discarded { player, card, .. } if *player == me.controller => Fired::about(Target::Object(*card)),
         _ => None,
     }
 }

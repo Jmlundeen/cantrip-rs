@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, effects};
+use cantrip_mechanics::{choose, effects, hand};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new(
@@ -18,7 +18,8 @@ const ASK: Question = Question::new(
 /// cards to discard: with fewer in hand it is impossible and not offered, and the reflexive trigger needs that event. Both cards go
 /// together (CR 701.9), so what watches discards sees one event. The reflexive ability (CR 603.12) triggers when cards were
 /// discarded, carrying X: the greatest mana value among the cards as they are in the graveyard now (CR 202.3: an {X} in a mana cost
-/// is 0 there, a land's is 0). The damage is dealt by the spell, as it last existed (CR 608.2h), to every creature at once.
+/// is 0 there, a land's is 0); one a replacement put into a hidden zone unrevealed is undefined and has none (CR 701.9c,
+/// `hand::discarded_chars`), so it adds nothing to X but the discard was still made. The damage is dealt by the spell, as it last existed (CR 608.2h), to every creature at once.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, 2);
@@ -28,7 +29,11 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let chosen = choose::cards(g, you, item.object, Purpose::Discard, hand.clone(), 2, false)?;
     // Nothing discarded (nothing a discard can't be made of, CR 101.2) is not doing it: the reflexive ability does not trigger.
-    let Some(x) = g.discard_together(&chosen).iter().map(|&card| g.mana_value(card)).max() else { return Ok(()) };
+    let discarded = g.discard_together(&chosen);
+    if discarded.is_empty() {
+        return Ok(());
+    }
+    let x = discarded.iter().filter(|&&card| hand::discarded_chars(&*g, card).is_some()).map(|&card| g.mana_value(card)).max().unwrap_or(0);
     let this = g.card_id(&CARD);
     g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, u16::try_from(x).unwrap_or(u16::MAX));
     Ok(())
