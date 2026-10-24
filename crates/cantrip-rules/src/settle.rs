@@ -90,7 +90,7 @@ pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
 }
 
 /// Checks every state-based action at once and performs those that apply, simultaneously (CR 704.3). Whether any did.
-fn state_based_actions(cx: &mut Cx) -> R<bool> {
+pub(crate) fn state_based_actions(cx: &mut Cx) -> R<bool> {
     verify_control(cx);
     let mut acted = false;
     let mut leavers = Vec::new();
@@ -125,11 +125,11 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         crate::designations::monarch_left(cx);
         crate::designations::initiative_left(cx);
     }
-    // They all lost at once; the game goes on without them, or ends with the one left (CR 800.4a, 104.2a).
-    for (p, reason) in leavers {
-        cx.record(Event::GameLost { player: p, reason });
-        ops::leave_game(cx, p);
-    }
+    // CR 704.3: the rest of this check is judged on the board as it is now, the losers' objects still on it - an anthem of
+    // theirs still counts towards whether another player's creature has lethal damage - and those objects leave with their
+    // owners as part of this check (CR 800.4a), below, not by any of the other actions.
+    let leaving: Vec<PlayerId> = leavers.iter().map(|&(p, _)| p).collect();
+    let stays = |cx: &Cx, id: ObjectId| !leaving.contains(&cx.s().obj(id).owner);
 
     // A prepare spell's copy ceases to exist out of exile, or once what prepared it is gone or no longer prepared
     // (CR 722.3c); on the stack it is a spell like any other.
@@ -194,6 +194,9 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     let mut annihilate: Vec<(ObjectId, i16)> = Vec::new();
     let mut roles: Vec<(ObjectId, ObjectId, PlayerId, u32)> = Vec::new();
     for &id in cx.s().battlefield() {
+        if !stays(cx, id) {
+            continue;
+        }
         // CR 704.5q: a permanent with both +1/+1 and -1/-1 counters loses N of each, N the smaller number. Power and
         // toughness are the same either way, so the other actions of this check are judged alike; removed below.
         let both = cx.s().obj(id).counters(CounterKind::PlusOne).min(cx.s().obj(id).counters(CounterKind::MinusOne));
@@ -426,6 +429,15 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
             counters::remove(cx, id, CounterKind::MinusOne, n);
             acted = true;
         }
+    }
+
+    // The losers of this check leave the game, all of them, as part of it (CR 704.3, 800.4a): after the other actions of
+    // the check were judged with their objects on the battlefield, and performed - so what dies in this check is seen as it
+    // last existed with those objects there (CR 603.10a). The game goes on without them, or ends with the one left (CR
+    // 104.2a).
+    for (p, reason) in leavers {
+        cx.record(Event::GameLost { player: p, reason });
+        ops::leave_game(cx, p);
     }
 
     // CR 704.5t: a player on the bottommost room of a dungeon with none of its abilities on the stack completes it.
