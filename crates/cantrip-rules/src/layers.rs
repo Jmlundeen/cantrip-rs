@@ -2575,6 +2575,7 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
         | EffectKind::LoseKeywords(_)
         | EffectKind::AddAbility(_)
         | EffectKind::Enchant(_)
+        | EffectKind::LoseEnchant(_)
         | EffectKind::MustAttack => Layer::Ability,
         EffectKind::SetPt(..) => Layer::PtSet,
         EffectKind::Pump(..) => Layer::PtModify,
@@ -2717,6 +2718,16 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
                 if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
                     chars.abilities[slot] = Some(AbilityRef::enchant_given(card));
                 }
+            }
+            // An enchant ability lost (CR 613.1f), every instance of it (CR 113.10b); the abilities after it close up, in
+            // order, as those "loses all abilities except mana abilities" keeps do.
+            (Layer::Ability, EffectKind::LoseEnchant(card)) => {
+                let lost = AbilityRef::enchant(card);
+                let mut kept = [None; cantrip_state::MAX_ABILITIES];
+                for (slot, ability) in chars.abilities.iter().flatten().filter(|a| **a != lost).enumerate() {
+                    kept[slot] = Some(*ability);
+                }
+                chars.abilities = kept;
             }
             // A gained "this creature attacks each combat if able" (Carnage, Crimson Chaos). Goad and "attacks that player this
             // combat if able" are effects, not abilities: they are read from the effects as attackers are declared.

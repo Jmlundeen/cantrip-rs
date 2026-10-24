@@ -985,6 +985,12 @@ pub enum EffectKind {
     SetColors(ColorSet),
     /// "Loses all abilities" (CR 613.1f), layer 6: at its timestamp, so what is granted later is kept.
     LoseAllAbilities,
+    /// It loses the enchant ability `card` prints (CR 113.10, 613.1f, 702.5a), layer 6, at its timestamp: every instance of
+    /// it (CR 113.10b), whether its own card's or a copy effect's (`AbilityRef::enchant`); one given after it is kept. Animate
+    /// Dead's and Dance of the Dead's "it loses 'enchant creature card in a graveyard'", as their enters ability resolves.
+    /// An enchant ability is read only off the object's abilities (`attach::enchants`), so taking it from them is all
+    /// the loss is.
+    LoseEnchant(CardId),
     /// Goaded by the effect's controller (CR 701.15a): attacks each combat if able, and attacks a player other than
     /// the goader if able (CR 701.15b). An effect, not an ability: a goaded creature that loses its abilities is still goaded.
     Goaded,

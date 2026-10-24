@@ -2647,7 +2647,8 @@ pub struct CardDef {
     pub enchant: Option<TargetSpec>,
     /// The enchant ability (CR 702.5a) this card's own effects give an object they make an Aura (CR 303.4, 613.1d, 613.1f),
     /// granted with `EffectKind::Enchant` of this card: Necromancy's "enchant creature put onto the battlefield with
-    /// Necromancy", Old-Growth Troll's "enchant Forest you control" (`EntersAs::aura`). Not an Aura spell's, so it targets nothing.
+    /// Necromancy", Animate Dead's "enchant creature put onto the battlefield with Animate Dead" (gained as it loses its
+    /// printed one, `EffectKind::LoseEnchant`), Old-Growth Troll's "enchant Forest you control" (`EntersAs::aura`). Not an Aura spell's, so it targets nothing.
     pub becomes_aura_enchant: Option<TargetSpec>,
     /// \"You may cast this spell as though it had flash\" (CR 307.5, 702.8): it may be cast whenever its caster could cast an instant.
     pub cast_as_though_flash: bool,

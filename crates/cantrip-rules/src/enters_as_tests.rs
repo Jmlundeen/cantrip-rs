@@ -310,6 +310,53 @@ fn a_given_enchant_is_never_the_cards_printed_one() {
     assert_eq!(abilities, vec![given]);
 }
 
+/// "It loses '[its printed enchant]' and gains '[another]'" (CR 113.10, 613.1f; Animate Dead): the printed enchant ability is
+/// gone, every other ability stays in its order, and the gained one alone judges the host (CR 303.4c, 704.5m). A creature it
+/// enchants is no longer legal (it was only by the lost ability), so it is put into its owner's graveyard.
+#[test]
+fn an_aura_that_loses_its_printed_enchant_is_judged_by_the_one_it_gains() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
+    let aura = put(&mut g, &TWO_ENCHANTS, YOU, Zone::BATTLEFIELD);
+    g.state.update_obj(aura, |o| o.attached_to = Some(bear));
+    assert!(!crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(true), "enchant creature: it stays");
+
+    let card = g.cards.id_of(&TWO_ENCHANTS);
+    let mut c = cx(&mut g);
+    cantrip_api::Game::add_effect(&mut c, aura, aura, EffectKind::LoseEnchant(card), Duration::Indefinite);
+    cantrip_api::Game::add_effect(&mut c, aura, aura, EffectKind::Enchant(card), Duration::Indefinite);
+    let abilities: Vec<AbilityRef> = c.chars(aura).abilities().collect();
+    assert_eq!(abilities, vec![AbilityRef { card, index: 0 }, AbilityRef::enchant_given(card)]);
+    assert!(crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(false));
+    assert!(!g.state.battlefield().contains(&aura));
+}
+
+/// Only the enchant ability it names is lost (CR 113.10b), and at its timestamp (CR 613.7b): losing another card's changes
+/// nothing, and an enchant ability given after the loss is kept. With its printed one lost and nothing given, nothing
+/// restricts what it enchants (CR 702.5a), so it stays.
+#[test]
+fn only_the_named_enchant_is_lost_and_one_given_later_is_kept() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let aura = put(&mut g, &TWO_ENCHANTS, YOU, Zone::BATTLEFIELD);
+    g.state.update_obj(aura, |o| o.attached_to = Some(bear));
+    let (card, curse) = (g.cards.id_of(&TWO_ENCHANTS), g.cards.id_of(&CURSE));
+    let mut c = cx(&mut g);
+    cantrip_api::Game::add_effect(&mut c, aura, aura, EffectKind::LoseEnchant(curse), Duration::Indefinite);
+    assert!(c.chars(aura).abilities().any(|a| a == AbilityRef::enchant(card)), "another card's enchant: nothing to lose");
+    cantrip_api::Game::add_effect(&mut c, aura, aura, EffectKind::LoseEnchant(card), Duration::Indefinite);
+    assert!(!c.chars(aura).abilities().any(|a| a.is_enchant()), "its printed enchant is lost");
+    assert!(!crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(true), "restricted by nothing, it stays");
+
+    let mut c = cx(&mut g);
+    cantrip_api::Game::add_effect(&mut c, aura, aura, EffectKind::Enchant(card), Duration::Indefinite);
+    let enchants: Vec<AbilityRef> = c.chars(aura).abilities().filter(|a| a.is_enchant()).collect();
+    assert_eq!(enchants, vec![AbilityRef::enchant_given(card)], "given after the loss, it is kept");
+    assert!(crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(false), "a Bear is no Forest");
+    assert!(!g.state.battlefield().contains(&aura));
+}
+
 /// An Aura with "enchant player" put onto the battlefield without being cast is attached to a player its enchant ability
 /// allows (CR 303.4f: "a legal object or player"): the Curse enchants the opponent.
 #[test]

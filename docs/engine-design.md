@@ -423,7 +423,10 @@ only the candidates the host's verdict on those picked says may be added.
 - **Enchant abilities are abilities (702.5a)**: a printed one and a given one are each an `AbilityRef::enchant(card)` among
   the object's abilities (layer 6), so "loses all abilities" takes them (613.1f). `attach::host_allows`, `player_allows` and
   `choose_aura_hosts` read them off the characteristics: each must allow the host (702.5c), one that has none is restricted
-  by none, and an Aura that is a creature enchants nothing (303.4d).
+  by none, and an Aura that is a creature enchants nothing (303.4d). "It loses '[enchant ...]'" is
+  `EffectKind::LoseEnchant(card)` (113.10b, 613.1f), every instance of that card's printed one: Animate Dead loses it and
+  gains its `becomes_aura_enchant` as its enters ability resolves, so a card that then can't return leaves it attached to
+  what it can no longer enchant (704.5m).
 - **A face-down permanent is what the rule that put it there lists (708.2)**: `Game::put_onto_battlefield_face_down` takes
   `FaceDown::Manifested` (701.40a, a 2/2) or `FaceDown::Cloaked` (701.58a, a 2/2 with ward {2}), and gives the card those
   copiable values (`intrinsic::FACE_DOWN`, `intrinsic::CLOAKED`) before it enters (708.3). On the battlefield they are its
