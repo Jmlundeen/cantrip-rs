@@ -1,0 +1,122 @@
+# Hostile Hostel // Creeping Inn, both faces in one game, because the back face is reached only by three activations.
+# "{1}, {T}, Sacrifice a creature: Put a soul counter on this land. Then if there are three or more soul counters on it,
+# remove those counters, transform it, then untap it. Activate only as a sorcery": refused in Bot2's upkeep on turn 2 with
+# Mox Sapphire and the Hostel untapped (CR 602.5d); on turn 5 paid from two lands with one mana left, and a Mountain can't
+# be sacrificed for it; at two counters (turn 7) it stays a land, at three (turn 9) the counters come off, it transforms
+# (CR 701.27a) and untaps. "{T}: Add {C}" on turn 3. The Inn has been under Bot1's control since turn 1, so it attacks at
+# once (CR 302.6). "Whenever this creature attacks, you may exile a creature card from your graveyard. If you do, each
+# opponent loses X life and you gain X life, where X is the number of creature cards exiled with this creature": a
+# Lightning Bolt in Bot1's graveyard and Bot2's discarded Yargles can't be chosen; X is 1 on turn 9, nothing on turn 11
+# (declined), 2 on turn 13, when two Ornithopters can't both be chosen. "{4}: This creature phases out" on turn 13 leaves one of five mana; it phases in on Bot1's
+# untap step (CR 502.1) still remembering its two cards (the 2021-09-24 ruling), so X is 3 on turn 15.
+
+[Life]
+Bot2: 30
+
+[Bot1 Deck]
+Hostile Hostel
+Mox Sapphire
+Ornithopter x3
+Mountain
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Yargle, Glutton of Urborg x30
+
+[Actions]
+Bot1.Hand.Hostile Hostel.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+! Bot1.Battlefield.Hostile Hostel.Activate(Ability: Sacrifice)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Hostile Hostel.Activate(Ability: Add)
+? Bot1.Mana = {C}
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Hostile Hostel.Activate(Ability: Sacrifice)
+! Bot1.Choose(Mountain)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+? Bot1.Mana = {R}
+Bot2.Pass
+? Bot1.Battlefield.Hostile Hostel.Counters.Soul = 1
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Hostile Hostel.Activate(Ability: Sacrifice)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hostile Hostel.Counters.Soul = 2
+? Bot1.Battlefield.Hostile Hostel.Tapped = true
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Hostile Hostel.Activate(Ability: Sacrifice)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Creeping Inn.Transformed = true
+? Bot1.Battlefield.Creeping Inn.Tapped = false
+? Bot1.Battlefield.Creeping Inn.Counters.Soul = (absent)
+Bot1.Attack(Creeping Inn > Bot2)
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Yargle, Glutton of Urborg)
+Bot1.Choose(Ornithopter)
+[T9 Bot1.Main2]
+? Bot2.Life = 23
+? Bot1.Life = 21
+[T11 Bot1.Main1]
+Bot1.Attack(Creeping Inn > Bot2)
+Bot1.Choose()
+[T11 Bot1.Main2]
+? Bot2.Life = 20
+? Bot1.Life = 21
+[T13 Bot1.Main1]
+Bot1.Attack(Creeping Inn > Bot2)
+! Bot1.Choose(Ornithopter; Ornithopter)
+Bot1.Choose(Ornithopter)
+[T13 Bot1.Main2]
+? Bot2.Life = 15
+? Bot1.Life = 23
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Island#4.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Creeping Inn.Activate
+Bot1.Pass
+? Bot1.Mana = {R}
+Bot2.Pass
+? Bot1.PhasedOut.Creeping Inn.Transformed = true
+[T15 Bot1.Main1]
+Bot1.Attack(Creeping Inn > Bot2)
+Bot1.Choose(Ornithopter)
+[T15 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 9
+Bot1.Life = 26
+Exile = Ornithopter; Ornithopter; Ornithopter
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Creeping Inn.Transformed = true

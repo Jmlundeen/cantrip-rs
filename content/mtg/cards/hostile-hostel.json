@@ -1,0 +1,15 @@
+{
+  "name": "Hostile Hostel",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{1}, {T}, Sacrifice a creature: Put a soul counter on this land. Then if there are three or more soul counters on it, remove those counters, transform it, then untap it. Activate only as a sorcery.",
+  "backFace": {
+    "name": "Creeping Inn",
+    "colorIndicator": [
+      "Black"
+    ],
+    "type": "Artifact Creature — Horror Construct",
+    "power": 3,
+    "toughness": 7,
+    "oracleText": "Whenever this creature attacks, you may exile a creature card from your graveyard. If you do, each opponent loses X life and you gain X life, where X is the number of creature cards exiled with this creature.\n{4}: This creature phases out."
+  }
+}
