@@ -1,0 +1,62 @@
+# CR 707.8a: a token created as a copy of a double-faced permanent is a double-faced token with both faces, and one copying a
+# permanent with its back face up enters back face up. Three Steps Ahead copies Frenzied Trapbreaker, Outland Liberator
+# transformed at night: the token is a double-faced Outland Liberator // Frenzied Trapbreaker, back face up, with
+# nightbound, and the mana value of its front face (CR 202.3b, 712.8e). When day comes (CR 731.2), both are back face up
+# with nightbound and transform (CR 702.145f): the token becomes Outland Liberator, front face up, as the card does.
+#
+# Turn 1: Forest and Mox Emerald cast Outland Liberator (it becomes day, CR 702.145d), and Mox Sapphire. Bot2 casts nothing
+# on turn 2, so turn 3 is night. Turn 3: Island; Mox Ruby and Three Steps Ahead ({U} plus {3} for its token mode, from the
+# Island, Forest, Emerald and Sapphire) on the Trapbreaker - two spells, so turn 4 is day.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Outland Liberator
+Mox Sapphire
+Island
+Mox Ruby
+Island
+Three Steps Ahead
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? DayNight = Night
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Create a token)
+Bot1.Target(Frenzied Trapbreaker)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Forest; Frenzied Trapbreaker; Frenzied Trapbreaker; Island; Mox Emerald; Mox Ruby; Mox Sapphire
+? Bot1.Battlefield.Frenzied Trapbreaker#2.Token = true
+? Bot1.Battlefield.Frenzied Trapbreaker#2.Transformed = true
+? Bot1.Battlefield.Frenzied Trapbreaker#2.ManaValue = 2
+[T4 Bot2.Main1]
+
+[Expect]
+DayNight = Day
+Bot1.Battlefield = Forest; Island; Mox Emerald; Mox Ruby; Mox Sapphire; Outland Liberator; Outland Liberator
+Bot1.Battlefield.Outland Liberator#2.Token = true
+Bot1.Battlefield.Outland Liberator#2.Keywords = Daybound
+Bot1.Battlefield.Outland Liberator#2.Power = 2
+Bot1.Battlefield.Outland Liberator#2.Transformed = (absent)

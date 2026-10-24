@@ -1,6 +1,6 @@
 # A token copy of Summon: Esper Maduin (Three Steps Ahead's "+ {3} - Create a token that's a copy of target artifact or
-# creature you control"). The original is the back face of Esper Origins, so the copy has the back face's values and enters
-# with that face up (CR 707.8; the Esper Origins ruling): a 4/4 green Saga Elemental. It enters with the lore counter
+# creature you control"). The original is the back face of Esper Origins, so the copy is a double-faced token that enters
+# with that face up (CR 707.8a; the Esper Origins ruling): a 4/4 green Saga Elemental. It enters with the lore counter
 # every Saga enters with (CR 714.3a), which triggers its own chapter I - the top card, Ornithopter, is revealed and put into
 # the hand - but not with a finality counter: counters are not copied (CR 707.2), and only the original was put onto the
 # battlefield "with a finality counter on it". The original by then has two lore counters (its chapter II on turn 3).
@@ -55,6 +55,7 @@ Bot1.Pass
 Bot1.Battlefield.Summon: Esper Maduin#1.Counters.Finality = 1
 Bot1.Battlefield.Summon: Esper Maduin#1.Counters.Lore = 2
 Bot1.Battlefield.Summon: Esper Maduin#2.Token = true
+Bot1.Battlefield.Summon: Esper Maduin#2.Transformed = true
 Bot1.Battlefield.Summon: Esper Maduin#2.Counters.Lore = 1
 Bot1.Battlefield.Summon: Esper Maduin#2.Counters.Finality = (absent)
 Bot1.Battlefield.Summon: Esper Maduin#2.Power = 4

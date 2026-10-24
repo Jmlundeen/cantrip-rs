@@ -1,0 +1,63 @@
+# CR 707.8a: a token created as a copy of a double-faced permanent is double-faced - but a Clone that copied one is no
+# double-faced permanent (CR 707.8a's Clone example, 712.9), so a token copy of the Clone has one face, Outland Liberator's.
+# Made at night, it has daybound yet is not represented by a double-faced card or token, so it neither enters transformed
+# (CR 702.145b) nor transforms (CR 701.27c): it stays a front-face-up Outland Liberator, as the Clone does.
+#
+# Turn 1: Forest and Mox Emerald cast Outland Liberator (it becomes day, CR 702.145d); Black Lotus and Mox Sapphire cast
+# Clone, copying it. Bot2 casts nothing on turn 2, so turn 3 is night (CR 731.2) and the Liberator becomes Frenzied
+# Trapbreaker. Turn 3: Island, then Three Steps Ahead ({U} plus {3} for its token mode) on the Clone.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Mox Sapphire
+Outland Liberator
+Clone
+Island
+Three Steps Ahead
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[T3 Bot1.Main1]
+? DayNight = Night
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Create a token)
+Bot1.Target(Bot1.Battlefield.Outland Liberator)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+DayNight = Night
+Bot1.Battlefield = Forest; Frenzied Trapbreaker; Island; Mox Emerald; Mox Sapphire; Outland Liberator; Outland Liberator
+Bot1.Battlefield.Frenzied Trapbreaker.Transformed = true
+Bot1.Battlefield.Outland Liberator#1.Token = (absent)
+Bot1.Battlefield.Outland Liberator#1.Keywords = Daybound
+Bot1.Battlefield.Outland Liberator#2.Token = true
+Bot1.Battlefield.Outland Liberator#2.Keywords = Daybound
+Bot1.Battlefield.Outland Liberator#2.Power = 2
+Bot1.Battlefield.Outland Liberator#2.Transformed = (absent)

@@ -416,10 +416,11 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
     // The face-down values are a card's own printed values (no exceptions), so a face-down permanent starts from that card
     // as an object with no copy effect does.
     let copy: Option<&Copiable> = if obj.marks.face_down_as.is_some() { None } else { obj.copy.as_ref() };
+    // A double-faced token's own copy values (CR 707.8a) are its card's faces, the one up, under its exceptions.
     let card = match (obj.marks.face_down_as, copy) {
         (Some(values), _) => values,
-        (None, Some(c)) => c.card,
-        (None, None) => cards.face(obj.card, obj.transformed),
+        (None, Some(c)) if !obj.own_faces(c) => c.card,
+        (None, _) => cards.face(obj.card, obj.transformed),
     };
     let def = cards.get(card);
     // A Room on the battlefield (CR 709.5): the name, mana cost and abilities of its unlocked doors alone, which no

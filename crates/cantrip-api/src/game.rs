@@ -242,10 +242,17 @@ pub trait Query {
     }
 
     /// An object's copiable values (CR 707.2): what a copy of it copies, the exceptions of its own copy effect
-    /// included, and the face that is up for a double-faced permanent (CR 707.8).
+    /// included, and the face that is up for a double-faced permanent (CR 707.8). Those of a permanent or card represented
+    /// by a double-faced card or token are marked so (`Copiable::double_faced`): a token copy of it is double-faced too
+    /// (CR 707.8a). A copy effect on an object makes it no double-faced object to copy, nor does a token made of one face.
     fn copiable_values(&self, id: ObjectId) -> Copiable {
         let obj = self.obj(id);
-        obj.copiable().unwrap_or_else(|| Copiable::of(self.chars(id).card))
+        let double_faced = obj.marks.face_down_as.is_none() && obj.represented_double_faced(self.card(obj.card).back.is_some());
+        match obj.copiable() {
+            Some(c) if obj.marks.face_down_as.is_none() && obj.own_faces(&c) => Copiable { card: self.chars(id).card, ..c },
+            Some(c) => c.with_faces(false),
+            None => Copiable::of(self.chars(id).card).with_faces(double_faced),
+        }
     }
 
     /// The cards `player` owns outside the game (CR 400.11, 108.3b) - in a match, their sideboard (CR 100.4, 400.11a) - in

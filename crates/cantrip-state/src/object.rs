@@ -357,11 +357,27 @@ impl Obj {
 
     /// The card whose values it has from its copy effects and face-down status (layers 1a and 1b), if not its own card:
     /// `copiable().map(|c| c.card)` without copying the values.
+    ///
+    /// A double-faced token's own copiable values (CR 707.8a) are no copy effect over another card: its faces are those of
+    /// its card, as a double-faced card's are, and its exceptions apply to whichever is up (`layers`), so it has none here.
     pub fn copied_card(&self) -> Option<CardId> {
         match self.marks.face_down_as {
             Some(card) => Some(card),
-            None => self.copy.as_ref().map(|c| c.card),
+            None => self.copy.as_ref().filter(|c| !self.own_faces(c)).map(|c| c.card),
         }
+    }
+
+    /// Whether `copy`, its copy values, are a double-faced token's own (CR 707.8a): a token made as a copy of a double-faced
+    /// permanent or card, `card` its front face.
+    pub fn own_faces(&self, copy: &Copiable) -> bool {
+        self.token && copy.double_faced()
+    }
+
+    /// Whether it is represented by a double-faced card or a double-faced token (CR 701.27a, 707.8a, 712.9), given whether
+    /// its card has a back face: a card with a copy effect on it is still its card (Glasspool Mimic); a token made as a copy
+    /// of one face alone (a copy of a Clone that copied a double-faced permanent, CR 707.8a's example) is single-faced.
+    pub fn represented_double_faced(&self, card_has_back: bool) -> bool {
+        card_has_back && !(self.token && self.copy.as_ref().is_some_and(|c| !c.double_faced()))
     }
 
     /// Whether it has any counter on it.
@@ -477,6 +493,27 @@ impl Copiable {
     pub const LEGENDARY: u8 = 1 << 3;
     /// "Except it has starting loyalty X" (`with_loyalty`).
     pub const STATED_LOYALTY: u8 = 1 << 4;
+    /// No exception: the values are those of a double-faced permanent or card (`double_faced`), `card` the face that is
+    /// up, so a token made as a copy of them is a double-faced token (CR 707.8a).
+    pub const STATED_DOUBLE_FACED: u8 = 1 << 5;
+
+    /// Whether these are the copiable values of a double-faced permanent, or of a double-faced card not on the battlefield
+    /// (CR 707.8a): `card` is the face that is up, and a token created as a copy of them has both faces, each with these
+    /// exceptions, and enters with that face up. A copy effect on a card copies the face that is up alone (CR 707.8, Glasspool
+    /// Mimic as a copy of a transformed permanent), whatever this says.
+    pub fn double_faced(&self) -> bool {
+        self.stated & Copiable::STATED_DOUBLE_FACED != 0
+    }
+
+    /// These values, marked as a double-faced object's or not (`double_faced`).
+    pub fn with_faces(mut self, double_faced: bool) -> Copiable {
+        if double_faced {
+            self.stated |= Copiable::STATED_DOUBLE_FACED;
+        } else {
+            self.stated &= !Copiable::STATED_DOUBLE_FACED;
+        }
+        self
+    }
 
     /// "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the exception states what it is, so its card types and
     /// subtypes are `extra_types` and `extra_subtypes` instead of the copied card's, and a characteristic-defining
@@ -514,7 +551,7 @@ impl Copiable {
     pub fn has_exceptions(&self) -> bool {
         self.extra_types.0 != 0
             || !self.extra_subtypes.is_empty()
-            || self.stated != 0
+            || self.stated & !Copiable::STATED_DOUBLE_FACED != 0
             || self.extra_abilities[0].instances > 0
             || self.extra_keywords.0 != 0
             || self.colors.is_some()

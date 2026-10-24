@@ -1351,8 +1351,9 @@ fn transformed_since(cx: &Cx, item: &StackItem, id: ObjectId) -> bool {
 ///
 /// Only a permanent represented by a double-faced card or token transforms (CR 701.27a, 701.27c, 712.9): a card with a
 /// copy effect on it is still that card (Glasspool Mimic as a copy of a daybound creature), and stays that copy with its
-/// other face up (CR 707.2); a face-down permanent, and a token whose copiable values a copy effect set, do not. Nor does
-/// one whose other face is an instant or sorcery face (CR 701.27d, 712.10). Whether it turned over.
+/// other face up (CR 707.2); a token made as a copy of a double-faced permanent is double-faced, each face under its
+/// exceptions (CR 707.8a); a token made of one face alone is not, nor is a face-down permanent. Nor does one transform
+/// whose other face is an instant or sorcery face (CR 701.27d, 712.10). Whether it turned over.
 pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
     if !live(cx.s(), id) {
         return Ok(false);
@@ -1360,8 +1361,7 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
     let obj = cx.s().obj(id);
     if !obj.zone.is(ZoneKind::Battlefield)
         || obj.marks.face_down_as.is_some()
-        || (obj.token && obj.copy.is_some())
-        || cx.cards().backs[obj.card.0 as usize].is_none()
+        || !obj.represented_double_faced(cx.cards().backs[obj.card.0 as usize].is_some())
         || instant_or_sorcery(cx.card(cx.cards().face(obj.card, !obj.transformed)))
     {
         return Ok(false);
@@ -1403,7 +1403,7 @@ pub fn create_emblem(cx: &mut Cx, def: CardId, player: PlayerId) -> ObjectId {
 /// Creates tokens that are copies of a permanent (CR 707.2, 111.1): the permanent's copiable values, its own copy
 /// effect's exceptions included.
 pub fn create_token_copies(cx: &mut Cx, values: Copiable, controller: PlayerId, count: u32) -> R<Vec<ObjectId>> {
-    create_tokens_as(cx, values.card, controller, count, false, if values.has_exceptions() { Some(values) } else { None }, &[])
+    create_tokens_as(cx, values.card, controller, count, false, Some(values), &[])
 }
 
 /// An object that ceases to exist where it is, in no zone it can be in (CR 111.7, 111.8, 707.10a, 704.5d, 800.4a), as it
@@ -1497,6 +1497,23 @@ fn create_tokens_as(
     create_tokens_batch(cx, &tokens, tapped, copy, with)
 }
 
+/// The card, copy values and face up of a token made with `card` and `copy` (CR 707.8a). A copy of a double-faced
+/// permanent or card (`Copiable::double_faced`) is a double-faced token: its card is the front face, its own copy values
+/// (kept only for their exceptions, which apply to either face) name that face, and it enters with the copied face up. A copy
+/// of one face of a card that has two - a copy of a Clone that copied one - keeps those values as a copy, so it is no
+/// double-faced token. Any other copy is kept only for its exceptions.
+fn token_faces(cards: &CardTable, card: CardId, copy: Option<Copiable>) -> (CardId, Option<Copiable>, bool) {
+    match copy {
+        Some(c) if c.double_faced() => {
+            let front = cards.fronts[c.card.0 as usize].unwrap_or(c.card);
+            (front, c.has_exceptions().then_some(Copiable { card: front, ..c }), front != c.card)
+        }
+        Some(c) if cards.backs[c.card.0 as usize].is_some() => (c.card, Some(c), false),
+        Some(c) => (c.card, c.has_exceptions().then_some(c), false),
+        None => (card, None, false),
+    }
+}
+
 /// Token copy values, including text changes in the creating instruction (CR 612.4, 707.2): the colors and subtypes the
 /// changed text names, and the name of a token named for its subtypes (CR 111.4, 612.2a).
 fn token_copy(cards: &CardTable, card: CardId, copy: Option<Copiable>, words: Words) -> Option<Copiable> {
@@ -1576,9 +1593,12 @@ fn create_tokens_onto(
     // out before any of them is on the battlefield, so none sees another (Giada counts the Angels already there).
     let mut arriving: Vec<(ObjectId, PlayerId, Entering)> = Vec::with_capacity(tokens.len());
     for &(card, copy, controller) in tokens {
+        let (card, copy, back_up) = token_faces(cx.cards(), card, copy);
         let turn = cx.s().turn.number;
         let timestamp = cx.st().timestamp();
         let mut token = Obj::new(card, controller, Zone::GONE);
+        token.copy = copy;
+        token.transformed = back_up;
         token.token = true;
         token.controlled_since = turn;
         token.timestamp = timestamp;
@@ -1586,17 +1606,23 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: false, protector: None, instead: None, becomes: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
-        let face = entering.copy.map_or_else(|| cx.cards().face(card, entering.transformed), |c| c.card);
+        let face = match entering.copy {
+            Some(c) if !c.double_faced() => c.card,
+            _ => cx.cards().face(card, entering.transformed),
+        };
         if instant_or_sorcery(cx.card(face)) {
             continue;
         }
         // The token is judged as it would exist on the battlefield (CR 614.12): a token copy as what it copies.
-        let copy = entering.copy;
-        cx.st().update_obj(id, |o| o.copy = copy);
+        let (copy, transformed) = (entering.copy, entering.transformed);
+        cx.st().update_obj(id, |o| {
+            o.copy = copy;
+            o.transformed = transformed;
+        });
         // "Create a token attached to [a permanent]" (CR 303.4h-i, 301.5e): an Aura that could not enchant it is not
         // created; an Equipment that could not equip it is created unattached; anything else enters unattached.
         if let Some(host) = host {
@@ -1654,6 +1680,9 @@ fn create_tokens_onto(
             o.controller = entering.controller;
             o.tapped = entering.tapped;
             o.copy = entering.copy;
+            // With the face up it entered with: a double-faced token copy of a transformed permanent (CR 707.8a), or one
+            // turned over by daybound at night (CR 702.145b).
+            o.transformed = entering.transformed;
             // What the token chose as it entered (CR 614.12): a copy of Painter's Servant picks its own color.
             o.chosen_color = entering.chosen_color;
             o.chosen_subtype = entering.chosen_subtype;

@@ -86,7 +86,13 @@ pub fn enters_transformed(cx: &Cx, card: ObjectId) -> bool {
 /// Whether it is night and `card` is represented by a double-faced card (CR 702.145b), so that daybound it would have
 /// makes it enter transformed.
 pub fn night_and_double_faced(cx: &Cx, card: ObjectId) -> bool {
-    cx.s().turn.day_night == DayNight::Night && cx.cards().backs[cx.s().obj(card).card.0 as usize].is_some()
+    cx.s().turn.day_night == DayNight::Night && double_faced(cx, card)
+}
+
+/// Whether `id` is represented by a double-faced card or token (CR 701.27a, 707.8a), which alone can be turned over.
+fn double_faced(cx: &Cx, id: ObjectId) -> bool {
+    let obj = cx.s().obj(id);
+    obj.represented_double_faced(cx.cards().backs[obj.card.0 as usize].is_some())
 }
 
 /// Every permanent with daybound or nightbound on the battlefield.
@@ -114,7 +120,7 @@ fn turn_disagreeing(cx: &mut Cx, bound: &[Bound]) -> R<bool> {
             let obj = cx.s().obj(b.id);
             live(cx.s(), b.id)
                 && obj.zone.is(ZoneKind::Battlefield)
-                && cx.cards().backs[obj.card.0 as usize].is_some()
+                && double_faced(cx, b.id)
                 && !stuck.contains(&b.id)
                 && ((b.daybound && !obj.transformed && designation == DayNight::Night)
                     || (!b.daybound && obj.transformed && designation == DayNight::Day))

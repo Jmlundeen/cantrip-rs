@@ -1,0 +1,64 @@
+# CR 707.8a: a token created as a copy of a double-faced card not on the battlefield is a double-faced token, each face's
+# characteristics those of the same face of the card as modified by the other copy effects - here Ardyn, the Usurper's
+# "except it's a 5/5 black Demon". Ardyn copies Outland Liberator from Bot2's graveyard on turn 3; the token has daybound,
+# so it becomes day (CR 702.145d). Bot2 casts nothing on turn 4, so turn 5 is night (CR 731.2) and the token transforms
+# (CR 702.145c): Frenzied Trapbreaker, with nightbound, still a 5/5 black Demon - the exception applies to that face too.
+# (Ardyn gives Demons menace, lifelink and haste.)
+#
+# Turn 1: Black Lotus and every Mox cast Ardyn ({5}{B}{B}{B}). Bot2 draws Outland Liberator on turn 2 and discards it to
+# hand size; at Bot1's turn-3 beginning of combat Starscourge exiles it and makes the token.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Ardyn, the Usurper
+Swamp x12
+
+[Bot2 Deck]
+Swamp x7
+Outland Liberator
+Swamp x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ardyn, the Usurper.Cast
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Outland Liberator
+Bot1.Target(Bot2.Graveyard.Outland Liberator)
+[T3 Bot1.Main2]
+? DayNight = Day
+? Bot1.Battlefield.Outland Liberator.Token = true
+? Bot1.Battlefield.Outland Liberator.Types = Creature
+? Bot1.Battlefield.Outland Liberator.Subtypes = Demon
+[T5 Bot1.Main1]
+
+[Expect]
+DayNight = Night
+Bot1.Battlefield.Frenzied Trapbreaker.Token = true
+Bot1.Battlefield.Frenzied Trapbreaker.Transformed = true
+Bot1.Battlefield.Frenzied Trapbreaker.Power = 5
+Bot1.Battlefield.Frenzied Trapbreaker.Toughness = 5
+Bot1.Battlefield.Frenzied Trapbreaker.Colors = Black
+Bot1.Battlefield.Frenzied Trapbreaker.Subtypes = Demon
+Bot1.Battlefield.Frenzied Trapbreaker.Keywords = Haste; Lifelink; Menace; Nightbound
