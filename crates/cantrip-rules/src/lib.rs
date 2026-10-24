@@ -104,6 +104,8 @@ mod mana_replacement_tests;
 #[cfg(test)]
 mod entry_order_tests;
 #[cfg(test)]
+mod excess_damage_tests;
+#[cfg(test)]
 mod must_block_tests;
 #[cfg(test)]
 mod room_door_tests;
@@ -1675,6 +1677,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn damage(&mut self, source: ObjectId, target: Target, amount: u16) -> u16 {
         ops::damage(self, source, target, amount, false)
+    }
+
+    fn damage_result(&mut self, source: ObjectId, target: Target, amount: u16) -> Option<DamageResult> {
+        ops::damage_result(self, source, target, amount, false)
     }
 
     fn damage_together(&mut self, damage: &[(ObjectId, Target, u16)]) -> Vec<u16> {

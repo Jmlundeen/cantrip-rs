@@ -8,6 +8,7 @@ use crate::card::{CounterTo, EntersAs, FaceDown, LibraryPlace};
 use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef, CauseKind};
 use crate::chars::Chars;
 use crate::history::{History, Record};
+use crate::DamageResult;
 
 /// A die roll (CR 706.2): the face the die showed, and the result once the roll was modified (CR 706.4).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -514,6 +515,10 @@ pub trait Game: Query {
     /// lost as life by a player, each after prevention and replacement. How much was dealt, which is none when the damage
     /// was prevented or the target is gone.
     fn damage(&mut self, source: ObjectId, target: Target, amount: u16) -> u16;
+    /// Deals damage as `damage` does, returning its actual recipient, amount and excess (CR 120.10), or none if no
+    /// damage was dealt. Violent Echoes reads the excess after dealing damage; damage triggers such as Toralf's and
+    /// Aegar's can read the same rules information from `Event::Damage::recipient_excess`.
+    fn damage_result(&mut self, source: ObjectId, target: Target, amount: u16) -> Option<DamageResult>;
     /// Deals damage to several recipients at once (CR 120.2, 603.2c): "N damage to each creature and each opponent" is one
     /// event, so "whenever this deals damage" triggers once. Each entry is a source, a recipient and an amount; an effect
     /// that heals the damage already marked does not heal what the event itself dealt. How much each was dealt, in order.
