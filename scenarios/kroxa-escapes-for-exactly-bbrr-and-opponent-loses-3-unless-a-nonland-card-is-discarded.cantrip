@@ -1,0 +1,78 @@
+# Kroxa: "When Kroxa enters, sacrifice it unless it escaped" and "Whenever Kroxa enters or attacks, each opponent discards a
+# card, then each opponent who didn't discard a nonland card this way loses 3 life." Cast from hand on turn 1 (Petal's {R},
+# Mox Jet's {B}): Bot2 discards an Island, loses 3 (20 to 17), and Kroxa is sacrificed. On turn 3 the graveyard holds Kroxa and
+# the Petal plus three more Petals sacrificed now for {B}{B}{R}, and Mox Ruby adds {R}: four other cards, so escape is refused
+# with the whole {B}{B}{R}{R} in the pool; a fourth Petal ({B}) makes five other cards, and escape leaves only that {B}.
+# Escaped, Kroxa stays; Bot2 discards its Ornithopter, a nonland card, and loses nothing. On turn 5 Kroxa attacks, Bot2
+# discards an Island and loses 3 (14), then 6 combat damage: 8.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Kroxa, Titan of Death's Hunger
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Mountain x12
+
+[Bot2 Deck]
+Island
+Island
+Ornithopter
+Island
+Island
+Island
+Island
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Kroxa, Titan of Death's Hunger.Cast
+Bot1.Triggers(sacrifice it unless; each opponent discards)
+Bot2.Choose(Island)
+? Bot2.Life = 17
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 2
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Graveyard.Count = 5
+? Bot1.Mana = {B}{B}{R}{R}
+! Bot1.Graveyard.Kroxa, Titan of Death's Hunger.Cast(Ability: Escape)
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Graveyard.Kroxa, Titan of Death's Hunger.Cast(Ability: Escape)
+Bot1.Triggers(sacrifice it unless; each opponent discards)
+? Bot1.Mana = {B}
+Bot2.Choose(Ornithopter)
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+? Stack.Count = 0
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Kroxa, Titan of Death's Hunger > Bot2)
+Bot2.Choose(Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 8
+Exile.Count = 5
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Kroxa, Titan of Death's Hunger.Tapped = true
+Bot2.Graveyard = Island; Ornithopter; Island

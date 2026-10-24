@@ -1,0 +1,63 @@
+# Kroxa escaped with the escape Underworld Breach gives it stays (CR 702.138b: a spell "escaped" if it was cast from a
+# graveyard with an escape ability, its own or a granted one; the rulings sacrifice it only "if it was cast using any
+# permission other than an escape ability"). Cast from hand on turn 1 (Mox Jet's {B}, Mox Ruby's {R}): Bot2 discards an
+# Island, loses 3 (17), and Kroxa is sacrificed. On turn 3 Breach resolves (Mountain and Mox Ruby), three Lotus Petals go
+# to the graveyard for {B}{R}{R}, and Kroxa, with only three other cards beside it, can't use its own escape but escapes
+# by Breach's for its mana cost {B}{R}, exiling the three Petals. It stays; Bot2 discards an Island and loses 3 (14).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Kroxa, Titan of Death's Hunger
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Underworld Breach
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kroxa, Titan of Death's Hunger.Cast
+Bot1.Triggers(sacrifice it unless; each opponent discards)
+Bot2.Choose(Island)
+? Bot2.Life = 17
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Kroxa, Titan of Death's Hunger
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+? Bot1.Graveyard.Count = 4
+Bot1.Graveyard.Kroxa, Titan of Death's Hunger.Cast(Ability: Escape)
+Bot1.Choose(Lotus Petal; Lotus Petal; Lotus Petal)
+Bot1.Triggers(sacrifice it unless; each opponent discards)
+? Bot1.Mana = {R}
+Bot2.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 14
+Exile.Count = 3
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Kroxa, Titan of Death's Hunger.Damage = 0
+Bot1.Battlefield.Count = 5
+Bot2.Graveyard = Island; Island

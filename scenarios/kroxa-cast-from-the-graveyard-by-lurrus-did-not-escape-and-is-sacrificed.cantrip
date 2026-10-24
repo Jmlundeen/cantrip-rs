@@ -1,0 +1,53 @@
+# Kroxa cast from the graveyard by a permission other than an escape ability did not escape (CR 702.138b; the rulings: it is
+# sacrificed "if it was cast using any permission other than an escape ability"). Cast from hand on turn 1 (Mox Jet's {B},
+# Mox Ruby's {R}), Bot2 discards an Island and loses 3 (17) and Kroxa is sacrificed. On turn 3 Lurrus resolves (Mountain and
+# two Lotus Petals' {B}{B}), and Kroxa, mana value 2, is cast from the graveyard by Lurrus's permission for {B}{R}: Bot2
+# discards another Island (14), and Kroxa is sacrificed again.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Kroxa, Titan of Death's Hunger
+Lotus Petal
+Lotus Petal
+Lurrus of the Dream-Den
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kroxa, Titan of Death's Hunger.Cast
+Bot1.Triggers(sacrifice it unless; each opponent discards)
+Bot2.Choose(Island)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Kroxa, Titan of Death's Hunger
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Kroxa, Titan of Death's Hunger.Cast(Ability: Once during each of your turns)
+Bot1.Triggers(sacrifice it unless; each opponent discards)
+Bot2.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 14
+Bot1.Graveyard = Kroxa, Titan of Death's Hunger; Lotus Petal; Lotus Petal
+Bot1.Battlefield.Count = 4
+Bot2.Graveyard = Island; Island

@@ -1,0 +1,86 @@
+# Kroxa's escape cost is {B}{B}{R}{R} (CR 702.138a), two of each color, not four mana of which some are black and some red.
+# Cast from hand on turn 1 (Mox Jet's {B}, Mox Ruby's {R}), Bot2 discards an Island and loses 3 (17) and Kroxa is
+# sacrificed. On turn 3 the mana of a Lotus Petal and both Moxen is spent on nothing in the first main phase, and in the
+# second four more Petals go to the graveyard for {B}{R}{R}{R}, with nothing untapped: five other cards, but escape is
+# refused. On turn 7 Mox Jet, Mox Ruby and two
+# Badlands make {B}{B}{B}{R}: refused again. On turn 9 the same four make {B}{B}{R}{R}, and Kroxa escapes, exiling the five
+# Petals and emptying the pool; it stays, and Bot2 discards an Island and loses 3 (14).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Kroxa, Titan of Death's Hunger
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Badlands
+Badlands
+Mountain x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kroxa, Titan of Death's Hunger.Cast
+Bot1.Triggers(sacrifice it unless; each opponent discards)
+Bot2.Choose(Island)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Kroxa, Titan of Death's Hunger
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+? Bot1.Graveyard.Count = 6
+? Bot1.Mana = {B}{R}{R}{R}
+! Bot1.Graveyard.Kroxa, Titan of Death's Hunger.Cast(Ability: Escape)
+[T5 Bot1.Main1]
+Bot1.Hand.Badlands.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Badlands.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Badlands.Activate(Ability: {T}: Add {B}.)
+Bot1.Battlefield.Badlands.Activate(Ability: {T}: Add {B}.)
+? Bot1.Graveyard.Count = 6
+? Bot1.Mana = {B}{B}{B}{R}
+! Bot1.Graveyard.Kroxa, Titan of Death's Hunger.Cast(Ability: Escape)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Badlands.Activate(Ability: {T}: Add {B}.)
+Bot1.Battlefield.Badlands.Activate(Ability: {T}: Add {R}.)
+? Bot1.Mana = {B}{B}{R}{R}
+Bot1.Graveyard.Kroxa, Titan of Death's Hunger.Cast(Ability: Escape)
+Bot1.Triggers(sacrifice it unless; each opponent discards)
+? Bot1.Mana =
+Bot2.Choose(Island)
+[T9 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 14
+Exile.Count = 5
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Kroxa, Titan of Death's Hunger.Damage = 0
