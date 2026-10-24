@@ -1,0 +1,66 @@
+# The Unbeatable Squirrel Girl: entering makes a Squirrel (her own creature type counts, so Bot1 controls two), and
+# "{1}{G}{G}{G}: Create X 1/1 green Squirrel creature tokens, where X is the number of Squirrels you control" then makes
+# exactly two more - Bot2's own Squirrel Girl and token are not "you control" (X would be 4). The cost needs three green
+# sources: Forest, Forest, Jet and Pearl give only two, so it is refused until Mox Emerald is out, then paid with exactly
+# four mana. Attacking makes one more Squirrel. Bot1 ends with Squirrel Girl and 4 tokens; Bot2 with her and 1 token.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Emerald
+Forest
+Forest
+The Unbeatable Squirrel Girl
+Forest x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+The Unbeatable Squirrel Girl
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Unbeatable Squirrel Girl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The Unbeatable Squirrel Girl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+! Bot1.Battlefield.The Unbeatable Squirrel Girl.Activate(Ability: Create X; Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.The Unbeatable Squirrel Girl.Activate(Ability: Create X)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Attack(The Unbeatable Squirrel Girl > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 10
+Bot1.Battlefield.Squirrel Token#1.Colors = Green
+Bot1.Battlefield.Squirrel Token#1.Subtypes = Squirrel
+Bot1.Battlefield.Squirrel Token#1.Types = Creature
+Bot1.Battlefield.Squirrel Token#1.Power = 1
+Bot1.Battlefield.Squirrel Token#1.Toughness = 1
+Bot2.Battlefield.Count = 3
+Bot2.Life = 16
