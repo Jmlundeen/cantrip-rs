@@ -1,0 +1,52 @@
+# Each half of Wear // Tear cast alone: Wear ({1}{R}) destroys an artifact (Bot2's Ornithopter) and Tear ({W}) an
+# enchantment (Bot2's Weaponize the Monsters), each paid exactly from the Moxen. The other type is refused as a target
+# of each half (an enchantment for Wear, an artifact for Tear), checked with mana in the pool and both targets on the
+# battlefield, so the refusal is the target filter's.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Wear // Tear
+Wear // Tear
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Weaponize the Monsters
+Ornithopter
+Island x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Weaponize the Monsters.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Wear // Tear.Cast(Bot2.Battlefield.Weaponize the Monsters; Ability: Wear)
+! Bot1.Hand.Wear // Tear.Cast(Bot2.Battlefield.Ornithopter; Ability: Tear)
+Bot1.Hand.Wear // Tear.Cast(Bot2.Battlefield.Ornithopter; Ability: Wear)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wear // Tear.Cast(Bot2.Battlefield.Weaponize the Monsters; Ability: Tear)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Weaponize the Monsters = (absent)
+Bot2.Battlefield.Ornithopter = (absent)
+Bot2.Battlefield.Mox Ruby.Tapped = true
+Bot1.Graveyard = Wear // Tear; Wear // Tear
