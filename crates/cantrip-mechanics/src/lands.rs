@@ -3,7 +3,8 @@
 //! types as `Subtype`'s discriminant (`sub(Subtype::Plains)`), because a function pointer cannot capture them.
 //!
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
-//! `enters_tapped_unless_you_control` or `enters_tapped_unless_you_control_either` below; the card sets it in `enters`.
+//! `enters_tapped_unless_you_control`, `enters_tapped_unless_you_control_either` or
+//! `enters_tapped_unless_opponents_control` below; the card sets it in `enters`.
 
 use crate::library::{ask_may_search, find_to_battlefield, find_to_hand, find_to_top, search_to_battlefield, Find};
 use crate::select;
