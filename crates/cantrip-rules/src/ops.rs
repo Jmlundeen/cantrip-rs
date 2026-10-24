@@ -3725,7 +3725,7 @@ mod tests {
     fn tap_only_changes_a_live_untapped_permanent_on_the_battlefield() {
         let (mut game, held) = game_with(&[&ANIMATOR]);
         let permanent = game.state.battlefield()[0];
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
         cantrip_api::Game::tap(&mut cx, permanent);
         assert!(cx.s().obj(permanent).tapped);
         assert_eq!(cx.g.log.iter().filter(|r| matches!(r.event, Event::Tapped { permanent: id } if id == permanent)).count(), 1);
