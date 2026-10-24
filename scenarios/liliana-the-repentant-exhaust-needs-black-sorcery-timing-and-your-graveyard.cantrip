@@ -1,0 +1,94 @@
+# Liliana's {5}{B} exhaust ability, each limit refused while the rest is in place. Her controller's only black source is one Swamp.
+#   T6 (Bot2's turn): all six mana incl. the Swamp's {B} and a legal target, yet "activate only as a sorcery" refuses it (CR 602.5d).
+#   T7: the Swamp casts Fatal Push on Bot2's Ornithopter and is tapped; Islands, Sol Ring and both Moxen are six mana, none black,
+#       so {5}{B} cannot be paid (CR 202.2) and the ability is not offered.
+#   T9: with black back, a creature card in the opponent's graveyard is refused as the target (CR 115.1, "your graveyard"),
+#       while Bot1's own Ornithopter is returned and Liliana gets her counter.
+
+[Bot1 Deck]
+Swamp
+Island
+Liliana the Repentant
+Fatal Push
+Ornithopter
+Sol Ring
+Mox Pearl
+Mox Ruby
+Island
+Ornithopter
+Swamp
+Island
+Island
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Liliana the Repentant.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Fatal Push.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot2.Graveyard.Ornithopter)
+Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot1.Graveyard.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Liliana the Repentant.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard.Ornithopter.Colors.Count = 0

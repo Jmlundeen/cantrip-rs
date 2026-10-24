@@ -1,0 +1,67 @@
+# Liliana's exhaust ability is on the stack when Bot2's Lightning Bolt kills her: the ability still returns the card, but with Liliana gone no +1/+1 counter is put anywhere (CR 608.2h: her last-known information; CR 400.7: the returned card is a new object and she is not).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Liliana the Repentant
+Ornithopter
+Sol Ring
+Mox Pearl
+Mox Ruby
+Island
+Island
+Ornithopter
+Island
+Island
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Liliana the Repentant.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Liliana the Repentant.Activate(Ability: Exhaust; Bot1.Graveyard.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Liliana the Repentant)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Liliana the Repentant.Colors = Black
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
