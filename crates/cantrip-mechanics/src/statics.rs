@@ -90,6 +90,13 @@ pub fn itself_during_your_turn(q: &dyn LayerQuery, source: ObjectId, affected: O
     source == affected && q.state().turn.active == q.state().obj(source).controller
 }
 
+/// Threshold's "as long as there are seven or more cards in your graveyard" (CR 207.2c,
+/// 604.1), affecting only itself. Decaying Soil and Void Extrapolator print it.
+pub fn itself_with_threshold(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    let state = q.state();
+    source == affected && state.zone(Zone::graveyard(state.obj(source).controller)).len() >= 7
+}
+
 /// "... has haste" (CR 702.10, layer 6) as a static ability's `StaticDef::apply`. Anger, Samut, Lavaspur Boots, Skateboard
 /// and dash's haste print it.
 pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
