@@ -55,4 +55,4 @@ Bot2.Life = 20
 Monarch = Bot2
 Bot2.Battlefield = Court of Garenbrig; Forest; Llanowar Elves; Mox Emerald; Mox Sapphire
 Bot2.Battlefield.Llanowar Elves.Tapped = true
-Bot2.Battlefield.Llanowar Elves.Counters = (absent)
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = (absent)

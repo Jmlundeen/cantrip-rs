@@ -1,0 +1,47 @@
+# Tamiyo, Upriser Crowned: "tap those creatures" taps a creature the attack did not: Dragon Sniper has vigilance, so
+# it is untapped after hitting the monarch until the trigger taps it (CR 701.26a) and puts its one stun counter on it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Tamiyo, Upriser Crowned
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Dragon Sniper
+Island
+Island
+Island
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tamiyo, Upriser Crowned.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Dragon Sniper.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Dragon Sniper > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 19
+Monarch = Bot2
+Bot2.Battlefield.Dragon Sniper.Tapped = true
+Bot2.Battlefield.Dragon Sniper.Counters.Stun = 1

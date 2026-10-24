@@ -1,0 +1,43 @@
+# Tamiyo, Upriser Crowned: the trigger is for combat damage dealt "to you". Bot1 is the monarch and attacks Bot2 with
+# Tamiyo (haste, flying, double strike: 3 + 3 damage), so Tamiyo is no creature that dealt damage to Bot1 and gets no
+# stun counter and is not tapped by the trigger (she is tapped only by attacking, and double strike leaves her so).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Tamiyo, Upriser Crowned
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tamiyo, Upriser Crowned.Cast
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Tamiyo, Upriser Crowned > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot2.Life = 14
+Monarch = Bot1
+Bot1.Battlefield.Tamiyo, Upriser Crowned.Counters.Stun = (absent)

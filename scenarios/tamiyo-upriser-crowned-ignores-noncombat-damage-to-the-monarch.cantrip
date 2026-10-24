@@ -1,0 +1,48 @@
+# Tamiyo, Upriser Crowned: only combat damage triggers her. Bot2's Viashino Pyromancer, entering, deals 2 damage to
+# Bot1, the monarch: a creature's damage, but not combat damage, so it is not tapped and has no stun counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Tamiyo, Upriser Crowned
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Island
+Viashino Pyromancer
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tamiyo, Upriser Crowned.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Viashino Pyromancer.Cast
+Bot2.Target(Bot1)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 18
+Monarch = Bot1
+Bot2.Battlefield.Viashino Pyromancer.Tapped = false
+Bot2.Battlefield.Viashino Pyromancer.Counters.Stun = (absent)
