@@ -1,0 +1,54 @@
+# Tranquil Frillback paid twice: Bot1 can't raise the payment past three times, pays {G} two times ({G} stays in the pool), and
+# the reflexive ability may choose two modes but not three (CR 603.12a). Both are aimed at Bot1's own side: its own Mox Jet is
+# a legal artifact to destroy (a Forest is no artifact or enchantment and is refused), and Bot1 is a legal player whose
+# graveyard is exiled - the Mox destroyed first, then the graveyard with it and the Black Lotus (CR 608.2c: in printed order).
+# No life is gained: the third mode was not chosen.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Black Lotus
+Tranquil Frillback
+Forest
+Forest x14
+
+[Bot2 Deck]
+Mountain
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tranquil Frillback.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+! Bot1.PayCost(Times: 4)
+Bot1.PayCost(Times: 2)
+? Bot1.Mana = {G}
+! Bot1.Modes(1; 2; 3)
+Bot1.Modes(1; 2)
+! Bot1.Target(Bot1.Battlefield.Forest)
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Target(Bot1)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard =
+Exile = Mox Jet; Black Lotus
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Tranquil Frillback

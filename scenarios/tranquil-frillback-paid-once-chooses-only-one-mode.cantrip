@@ -1,0 +1,55 @@
+# Tranquil Frillback paid once: Bot1 floats {G}{G}{G} from Black Lotus and pays {G} one time, so {G}{G} stays in the pool. The
+# reflexive ability may then choose one mode at most (CR 603.12a: "up to that many"): two modes are refused, and Bot1 gains 4
+# life with the third alone. Bot2's Sol Ring, which a second mode would have destroyed, stays.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Black Lotus
+Tranquil Frillback
+Forest x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Sol Ring
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tranquil Frillback.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.PayCost(Times: 1)
+? Bot1.Mana = {G}{G}
+! Bot1.Modes(1; 3)
+Bot1.Modes(3)
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 24
+Bot2.Battlefield = Mountain; Sol Ring
+Bot2.Graveyard = Black Lotus

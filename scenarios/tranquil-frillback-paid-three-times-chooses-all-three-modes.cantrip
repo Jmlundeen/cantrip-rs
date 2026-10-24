@@ -1,0 +1,62 @@
+# Tranquil Frillback: "you may pay {G} up to three times. When you pay this cost one or more times, choose up to that many".
+# Bot1 floats {G}{G}{G} from Black Lotus with the enters trigger on the stack and pays {G} three times in the one payment
+# (CR 118.12, 603.12a): the pool is empty right after. The reflexive ability triggers once for the three payments (CR 603.12a) -
+# no second choice of modes, one item on the stack - and may choose all three modes (CR 700.2b), done in printed order (CR 608.2c): Bot2's Sol Ring is destroyed
+# first, so the graveyard exiled next holds it beside Bot2's Black Lotus, and Bot1 gains exactly 4 life.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Black Lotus
+Tranquil Frillback
+Forest x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Sol Ring
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tranquil Frillback.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.PayCost(Times: 3)
+? Bot1.Mana =
+Bot1.Modes(1; 2; 3)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+Bot1.Target(Bot2)
+! Bot1.Modes
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 24
+Bot2.Graveyard =
+Exile = Black Lotus; Sol Ring
+Bot1.Graveyard = Black Lotus
+Bot2.Battlefield = Mountain
+Bot1.Battlefield.Tranquil Frillback.Power = 3

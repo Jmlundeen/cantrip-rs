@@ -1,0 +1,53 @@
+# Tranquil Frillback paid three times may still choose fewer modes: "choose up to that many" (CR 603.12a, 700.2). Bot1 pays {G}
+# three times and chooses only the first mode, destroying Bot2's Sol Ring; Bot2's graveyard (its Black Lotus, and now the Sol
+# Ring) is not exiled and Bot1 gains no life.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Black Lotus
+Tranquil Frillback
+Forest x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Sol Ring
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tranquil Frillback.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.PayCost(Times: 3)
+Bot1.Modes(Destroy target artifact or enchantment)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Graveyard = Sol Ring; Black Lotus
+Bot2.Battlefield = Mountain

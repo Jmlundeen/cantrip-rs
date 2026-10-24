@@ -1,0 +1,54 @@
+# Tranquil Frillback declined: Bot1 holds {G}{G}{G} but pays {G} no times, so "when you pay this cost one or more times" never
+# triggers (CR 603.12, 603.12a): nothing goes on the stack, no mode is chosen, the pool keeps its three mana, and Bot2's Sol
+# Ring and Bot1's life total are untouched.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Black Lotus
+Tranquil Frillback
+Forest x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Sol Ring
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tranquil Frillback.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Decline
+! Bot1.Modes
+? Stack.Count = 0
+? Bot1.Mana = {G}{G}{G}
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Battlefield = Mountain; Sol Ring
+Bot2.Graveyard = Black Lotus
+Bot1.Battlefield.Tranquil Frillback.Power = 3

@@ -1,0 +1,8 @@
+{
+  "name": "Tranquil Frillback",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Dinosaur",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, you may pay {G} up to three times. When you pay this cost one or more times, choose up to that many —\n• Destroy target artifact or enchantment.\n• Exile target player's graveyard.\n• You gain 4 life."
+}

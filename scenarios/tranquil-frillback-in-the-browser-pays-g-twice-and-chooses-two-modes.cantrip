@@ -1,0 +1,60 @@
+# Browser
+# Tranquil Frillback at a table, Bot1 a browser page: "you may pay {G} up to three times" is one payment whose number of times
+# the dock's stepper sets (CR 603.12a) - it says it goes up to three, and its pay button names the cost at the number shown.
+# The page is read as the line that pays is played, its + already clicked to twice: {G}{G} is paid. The reflexive ability's
+# dock then asks to "choose up to two" (CR 700.2b), and Bot1 destroys Bot2's Sol Ring and gains 4 life.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Black Lotus
+Tranquil Frillback
+Forest x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Sol Ring
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tranquil Frillback.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Tranquil Frillback: pay {G} up to three times?
+? Client.Bot1.Prompt.Detail = When you do, choose up to that many: destroy target artifact or enchantment, exile target player's graveyard, you gain 4 life  ·  2 times, so {G}{G}  ·  − and + change how many times (up to three)  ·  {G}{G} is covered
+? Client.Bot1.Button.Pay {G}{G}.Enabled = true
+Bot1.PayCost(Times: 2)
+? Client.Bot1.Prompt.Title = Tranquil Frillback: choose up to two
+Bot1.Modes(1; 3)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 24
+Bot1.Mana = {G}
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Sol Ring; Black Lotus
