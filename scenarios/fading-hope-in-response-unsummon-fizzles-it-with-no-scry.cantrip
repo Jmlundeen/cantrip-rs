@@ -1,0 +1,42 @@
+# Fading Hope targets Bot1's Magus of the Moon; in response Bot1 returns the Magus with Unsummon, so Hope's only target is
+# illegal and it does nothing (CR 608.2b): no scry (`! Bot1.Arrange`: no placement question is asked; Counterspell stays on top of the library) even though the
+# Magus's mana value is 3. Both spells end in the graveyard and the Magus is in hand once.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Magus of the Moon
+Fading Hope
+Unsummon
+Lightning Bolt
+Counterspell
+Mountain
+Swamp
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Fading Hope.Cast(Bot1.Battlefield.Magus of the Moon)
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Magus of the Moon)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Arrange
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Magus of the Moon
+Bot1.Graveyard = Fading Hope; Unsummon; Black Lotus
+Bot1.Library = Counterspell; Mountain; Swamp

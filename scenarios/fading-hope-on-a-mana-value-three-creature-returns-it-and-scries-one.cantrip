@@ -1,0 +1,45 @@
+# Fading Hope on Bot1's own Magus of the Moon, mana value exactly 3: it returns to its owner's hand and then Bot1 scries 1
+# (CR 701.22a), here bottoming the top card (Lightning Bolt), so Black Lotus is the new top. The mana value is read from
+# the creature as it last existed on the battlefield (CR 608.2h). Magus cost {2}{R} is paid with three Moxen, Hope with Sapphire.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Island
+Magus of the Moon
+Fading Hope
+Lightning Bolt
+Black Lotus
+Counterspell
+Mountain
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Fading Hope.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Hand.Fading Hope.Cast(Bot1.Battlefield.Magus of the Moon)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Lightning Bolt)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Magus of the Moon
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Mox Pearl; Island
+Bot1.Graveyard = Fading Hope
+Bot1.Library = Black Lotus; Counterspell; Mountain; Lightning Bolt

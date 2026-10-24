@@ -1,0 +1,52 @@
+# Fading Hope on Bot2's Magus of the Moon (mana value 3): it goes to its OWNER's hand (Bot2, CR 400.3) and the scry is
+# Hope's controller's, Bot1's (CR 701.22a): Bot1 bottoms Lightning Bolt. Bot2 pays the
+# Magus with three Moxen on turn 2; Bot1 casts Hope on turn 3 with Mox Sapphire.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Island
+Fading Hope
+Island
+Island
+Island
+Island
+Lightning Bolt
+Black Lotus
+Counterspell
+Mountain
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Island
+Magus of the Moon
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Magus of the Moon.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fading Hope.Cast(Bot2.Battlefield.Magus of the Moon)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Lightning Bolt)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Hand = Island; Island; Island; Island; Magus of the Moon
+Bot2.Battlefield = Mox Ruby; Mox Jet; Mox Pearl
+Bot1.Graveyard = Fading Hope
+Bot1.Library = Black Lotus; Counterspell; Mountain; Lightning Bolt

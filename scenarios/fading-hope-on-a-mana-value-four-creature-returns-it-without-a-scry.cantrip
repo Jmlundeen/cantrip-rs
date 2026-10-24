@@ -1,0 +1,46 @@
+# Fading Hope on Bot2's Argothian Elder, mana value 4 (one past the limit): it returns to its owner's hand but there is no
+# scry. That is shown by Bot1's Chance-Met Elves ("whenever you scry", cast turn 1 with Black Lotus), which stays 3/2
+# instead of growing (CR 701.22a: a scry that finds nothing still happens when there is a library; here none happens at
+# all). The mana value is read as the creature last existed on the battlefield (CR 608.2h). Bot2 pays the Elder on turn 2
+# with Black Lotus (three green) and Mox Emerald; Bot1 pays Hope on turn 3 with Mox Sapphire.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Chance-Met Elves
+Fading Hope
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Argothian Elder
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Chance-Met Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Argothian Elder.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fading Hope.Cast(Bot2.Battlefield.Argothian Elder)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Hand = Argothian Elder; Island; Island; Island; Island; Island
+Bot2.Battlefield = Mox Emerald
+Bot1.Battlefield.Chance-Met Elves.Power = 3
+Bot1.Graveyard = Fading Hope; Black Lotus
