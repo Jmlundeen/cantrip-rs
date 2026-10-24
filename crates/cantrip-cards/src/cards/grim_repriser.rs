@@ -5,10 +5,7 @@ use cantrip_oracle as oracle;
 /// "Activate only if an opponent has been dealt noncombat damage this turn" (CR 602.5b): this turn's noncombat damage to
 /// an opponent of the activating player.
 fn opponent_was_dealt_noncombat_damage_this_turn(q: &dyn Query, asker: &Asker) -> bool {
-    q.history().this_turn().iter().any(|r| {
-        matches!(r.event, Event::Damage { target: Target::Player(p), amount, kind, .. }
-            if !kind.is_combat() && amount > 0 && q.state().opponents(asker.controller).any(|o| o == p))
-    })
+    cantrip_mechanics::history::opponent_dealt_noncombat_damage_this_turn(q.history(), q.state(), asker.controller)
 }
 
 /// "{B}{R}: Return this card from your graveyard to the battlefield with a finality counter on it" (CR 113.6k, 400.7): the

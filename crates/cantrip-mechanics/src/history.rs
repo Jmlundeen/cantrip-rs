@@ -4,6 +4,15 @@
 
 use cantrip_api::*;
 
+/// An opponent was dealt noncombat damage this turn (CR 120.2). Grim Repriser and Whiplash Wordsmith ask this
+/// same question, from an activated ability's condition and a static ability's layers respectively.
+pub fn opponent_dealt_noncombat_damage_this_turn(history: History<'_>, state: &GameState, player: PlayerId) -> bool {
+    history.this_turn().iter().any(|r| {
+        matches!(r.event, Event::Damage { target: Target::Player(p), amount, kind, .. }
+            if !kind.is_combat() && amount > 0 && state.opponents(player).any(|opponent| opponent == p))
+    })
+}
+
 /// Whether a draw `player` is about to make (or is making, from a trigger on it) is the first card they draw in their
 /// own draw step this turn: the draw that "except the first one they draw in each of their draw steps" exempts. Orcish
 /// Bowmasters (a trigger) and Hullbreacher (a replacement) print it.
