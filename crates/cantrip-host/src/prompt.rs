@@ -9,6 +9,7 @@
 //! | `PayCosts`             | `PayCostsPromptMessage` (announcing X/kicks sets `AnnouncesXOrKicks`)              |
 //! | `UnlessPays`           | `UnlessPaysPromptMessage`                                                          |
 //! | `ChooseCards`          | `ChooseCardsPromptMessage`                                                         |
+//! | `ChooseCards`          | `ChooseTargetPromptMessage` for an unrestricted `SeparatePiles` choice (`pile_selection`): untargeted, any number |
 //! | `TapForPower`          | `ChooseCardsPromptMessage` (purpose `TapToPay`, `Powers`, `MinimumPower`; harmonize's: `TapToReduce`, up to one, `PowersUpTo`) |
 //! | `Craft`                | `ChooseCardsPromptMessage` (purpose `Craft`, the quality as `Kind`, `Minimum` for "one or more")               |
 //! | `ChooseTarget`         | `ChooseTargetPromptMessage`                                                        |
