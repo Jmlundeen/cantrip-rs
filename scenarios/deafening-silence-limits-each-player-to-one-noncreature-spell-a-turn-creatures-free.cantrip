@@ -1,0 +1,69 @@
+# Deafening Silence: each player can't cast more than one noncreature spell each turn; creature spells are not counted.
+# Bot1 turn 1: Mox Pearl (noncreature, cast before Silence is out), then Deafening Silence itself (allowed: nothing
+# limited it when it was cast) - but now a second Deafening Silence is refused with white mana ready (ruling: it looks at
+# the whole turn, so you can't cast Silence and then another noncreature spell), while Thraben Inspector is cast after
+# it. Bot2's turn 2: Mox Pearl, then Deafening Silence refused with white ready (each player). Turn 3, Bot1's: its second
+# Silence is its first noncreature spell that turn, and Bot2, who has cast none this turn, answers with Swords to
+# Plowshares (each player's count is its own). Turn 4, Bot2's: a creature first, then Deafening Silence (creature spells
+# are not counted), and a second one is refused. CR 101.2, 601.3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Deafening Silence
+Deafening Silence
+Thraben Inspector
+Plains x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Thraben Inspector
+Swords to Plowshares
+Deafening Silence
+Deafening Silence
+Plains x14
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deafening Silence.Cast
+! Bot1.Hand.Deafening Silence.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+! Bot2.Hand.Deafening Silence.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Deafening Silence.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Thraben Inspector)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Deafening Silence.Cast
+Bot2.Battlefield.Plains.Activate
+! Bot2.Hand.Deafening Silence.Cast
+[Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 21
+Bot1.Battlefield = Clue Token; Deafening Silence; Deafening Silence; Mox Pearl; Plains; Plains
+Bot1.Hand = Plains; Plains
+Bot2.Battlefield = Clue Token; Deafening Silence; Mox Pearl; Plains; Plains; Thraben Inspector
+Bot2.Hand = Deafening Silence; Plains; Plains

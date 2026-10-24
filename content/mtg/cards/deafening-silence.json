@@ -1,0 +1,6 @@
+{
+  "name": "Deafening Silence",
+  "manaCost": "{W}",
+  "type": "Enchantment",
+  "oracleText": "Each player can't cast more than one noncreature spell each turn."
+}
