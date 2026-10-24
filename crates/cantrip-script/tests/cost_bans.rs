@@ -81,6 +81,23 @@ static RITE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "{T}: Add {U}."
+static BLUE: CardDef = CardDef {
+    name: "Probe Blue",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[mana_ability(TAP, add(Mana::U), "{T}: Add {U}.")],
+    ..CardDef::BLANK
+};
+
+/// "As an additional cost to cast this spell, sacrifice one or more creatures": a variable sacrifice (`VariableCost`).
+static OFFERING: CardDef = CardDef {
+    name: "Probe Offering",
+    types: TypeSet::of(&[CardType::Sorcery]),
+    additional_cost: Some(Cost { variable: Some(VariableCost::SacrificeOneOrMore(creature)), ..Cost::NONE }),
+    spell: spell(&[], nothing),
+    ..CardDef::BLANK
+};
+
 static WELL: CardDef = CardDef {
     name: "Probe Well",
     types: TypeSet::of(&[CardType::Artifact]),
@@ -100,7 +117,7 @@ static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeS
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&BAN, &SYLEX, &COSTS, &RITE, &WELL, &BEAR, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&BAN, &SYLEX, &COSTS, &RITE, &BLUE, &OFFERING, &WELL, &BEAR, &FILLER]))
 }
 
 /// The board every test starts from: Bot1 plays a land and casts a Bear, Probe Costs and Probe Well, and `ban` first if
@@ -118,8 +135,21 @@ fn setup(ban: Option<&str>) -> Vec<(ActionKind, &'static str, u8)> {
 /// A cost's choice of permanents takes the first, a payment asked as an ability resolves is paid, and Phyrexian symbols are
 /// paid with life where they may be. The game.
 fn play(steps: &[(ActionKind, &str, u8)]) -> Game {
+    play_holding(steps, None)
+}
+
+/// `play`, with `held` in the opening hand as well, never cast.
+fn play_holding(steps: &[(ActionKind, &str, u8)], held: Option<&str>) -> Game {
     let filler = table().find("Filler").unwrap();
-    let mut deck: Vec<CardId> = ["Filler", "Probe Ban", "Probe Sylex", "Probe Bear", "Probe Costs", "Probe Well", "Probe Rite"].iter().map(|n| table().find(n).unwrap()).collect();
+    // The opening hand: each card a step plays or casts, in order, and the card held.
+    let mut deck: Vec<CardId> = held.map(|n| table().find(n).unwrap()).into_iter().collect();
+    for &(kind, name, _) in steps {
+        let card = table().find(name).unwrap();
+        if matches!(kind, ActionKind::PlayLand | ActionKind::CastSpell) && !deck.contains(&card) {
+            deck.push(card);
+        }
+    }
+    assert!(deck.len() <= 7, "the opening hand holds every card cast");
     deck.extend(std::iter::repeat(filler).take(30 - deck.len()));
     let others = vec![filler; 30];
     let mut game = Game::new(table(), &Setup { decks: vec![deck, others], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
@@ -153,6 +183,11 @@ fn play(steps: &[(ActionKind, &str, u8)]) -> Game {
             }
             // Every Phyrexian symbol it may is paid with life.
             RequestKind::ChooseModes { eligible, at_most, .. } => Answer::Modes(eligible.iter().copied().take(usize::from(*at_most)).collect()),
+            // Mana is paid from the pool, or by tapping for it.
+            RequestKind::PayCosts { options, .. } => match options.iter().find(|o| o.kind == ActionKind::AssignMana).or_else(|| options.iter().find(|o| o.kind == ActionKind::ActivateAbility)) {
+                Some(pay) => Answer::Act(Action::of(pay)),
+                None => panic!("nothing pays the cost: {options:?}"),
+            },
             RequestKind::UnlessPays { options, .. } => match options.iter().find(|o| o.kind == ActionKind::PayCost) {
                 Some(pay) => Answer::Act(Action::of(pay)),
                 None => panic!("the payment as the ability resolves is not offered"),
@@ -236,3 +271,36 @@ fn a_special_action_pays_life_under_the_ban() {
     assert_eq!(game.state.player(PlayerId(0)).life, 18);
 }
 
+
+/// Whether Bot1 is offered to cast `name` at its next priority.
+fn cast_offered(game: &mut Game, name: &str) -> bool {
+    game.run();
+    let request = game.pending().cloned().expect("Bot1's priority");
+    let RequestKind::Priority { options } = &request.kind else { panic!("a priority") };
+    options.iter().any(|o| o.kind == ActionKind::CastSpell && o.source.is_some_and(|s| game.name(s) == name))
+}
+
+/// A variable sacrifice ("sacrifice one or more creatures", `VariableCost`) is a sacrifice like any other: under the ban
+/// the Bear can't pay it and the spell is not offered; without it, it is (the positive control).
+#[test]
+fn a_ban_refuses_a_variable_sacrifice() {
+    let mut steps = vec![(ActionKind::PlayLand, "Filler", 0), (ActionKind::CastSpell, "Probe Bear", 0)];
+    let mut game = play_holding(&steps, Some("Probe Offering"));
+    assert!(cast_offered(&mut game, "Probe Offering"));
+    steps.insert(1, (ActionKind::CastSpell, "Probe Ban", 0));
+    let mut game = play_holding(&steps, Some("Probe Offering"));
+    assert!(!cast_offered(&mut game, "Probe Offering"));
+}
+
+/// CR 107.4f, 601.2b by way of 602.2b: under the ban, an ability's {U/P} with blue mana there to pay it is paid with the
+/// blue, never 2 life - the announcement of life offers none.
+#[test]
+fn a_phyrexian_symbol_of_an_ability_is_paid_with_mana_under_the_ban() {
+    let mut steps = setup(Some("Probe Ban"));
+    steps.push((ActionKind::CastSpell, "Probe Blue", 0));
+    steps.push((ActionKind::ActivateAbility, "Probe Costs", 5));
+    let game = play(&steps);
+    assert_eq!(game.state.player(PlayerId(0)).life, 20);
+    let blue = game.state.battlefield().iter().copied().find(|&id| game.name(id) == "Probe Blue").expect("Probe Blue");
+    assert!(game.state.obj(blue).tapped, "the {{U}} was paid with Probe Blue's mana");
+}
