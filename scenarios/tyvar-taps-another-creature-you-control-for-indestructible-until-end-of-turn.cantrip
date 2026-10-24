@@ -1,0 +1,73 @@
+# Tyvar's first ability taps ANOTHER untapped creature YOU control (a cost, so a summoning-sick Woodland Changeling may pay it),
+# then taps Tyvar itself. Alone on turn 1 Tyvar cannot pay with itself, and on turn 3 Bot2's untapped Keral Keep Disciples is
+# no creature of Bot1's. Once the Changeling is cast, Bot2 bolts the untapped Tyvar and Bot1 pays with the Changeling: Tyvar
+# survives 3 damage indestructible and ends tapped. On turn 4 the protection has ended with the turn, and a second Bolt
+# destroys Tyvar. (CR 118.3, 107.5, 702.12b, 611.2a)
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Tyvar, the Pummeler
+Forest
+Woodland Changeling
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Keral Keep Disciples
+Lightning Bolt
+Lightning Bolt
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Tyvar, the Pummeler.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Tyvar, the Pummeler.Activate(Ability: Tap another)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Keral Keep Disciples.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Tyvar, the Pummeler.Activate(Ability: Tap another)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Tyvar, the Pummeler)
+Bot1.Battlefield.Tyvar, the Pummeler.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Tyvar, the Pummeler.Damage = 3
+? Bot1.Battlefield.Tyvar, the Pummeler.Tapped = true
+? Bot1.Battlefield.Woodland Changeling.SummoningSick = true
+? Bot1.Battlefield.Woodland Changeling.Tapped = true
+? Bot1.Battlefield.Tyvar, the Pummeler.Keywords = Indestructible
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Tyvar, the Pummeler)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Tyvar, the Pummeler; Black Lotus

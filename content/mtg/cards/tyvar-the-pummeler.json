@@ -1,0 +1,8 @@
+{
+  "name": "Tyvar, the Pummeler",
+  "manaCost": "{1}{G}{G}",
+  "type": "Legendary Creature — Elf Warrior",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Tap another untapped creature you control: Tyvar gains indestructible until end of turn. Tap it.\n{3}{G}{G}: Creatures you control get +X/+X until end of turn, where X is the greatest power among creatures you control."
+}

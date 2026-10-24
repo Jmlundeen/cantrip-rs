@@ -1,0 +1,84 @@
+# {3}{G}{G}: X is the greatest power among creatures YOU control (Tyvar 3; Bot2's Keral Keep Disciples is 4 and does not
+# count), so Tyvar becomes 6/6 and Woodland Changeling 5/5, and the Disciples stays 4/3. The cost is {3}{G}{G}: on turn 3
+# Bot1 has five mana sources but only one makes green, so it is refused; on turn 5 a second green source (Mox Emerald) makes
+# it payable, paid with exactly five and leaving the sixth Mox untapped and the pool empty. The pump ends with the turn: Tyvar
+# is 3/3 again on turn 7. (CR 602.2b, 608.2h, 611.2a)
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Tyvar, the Pummeler
+Woodland Changeling
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Keral Keep Disciples
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Tyvar, the Pummeler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Keral Keep Disciples.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Tyvar, the Pummeler.Activate(Ability: greatest power; Mana: short)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tyvar, the Pummeler.Activate(Ability: greatest power)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Tyvar, the Pummeler.Power = 6
+? Bot1.Battlefield.Tyvar, the Pummeler.Toughness = 6
+? Bot1.Battlefield.Woodland Changeling.Power = 5
+? Bot1.Battlefield.Woodland Changeling.Toughness = 5
+? Bot2.Battlefield.Keral Keep Disciples.Power = 4
+? Bot2.Battlefield.Keral Keep Disciples.Toughness = 3
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Tyvar, the Pummeler.Power = 3
+
+[Expect]
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Woodland Changeling.Power = 2
