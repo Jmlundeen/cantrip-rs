@@ -5,15 +5,19 @@ its official rulings, by name.
     python tools/maintenance/scryfall.py --text "regex"  # every printed card whose Oracle text matches (any face,
                                                          # case-insensitive), with the matching line: whether a
                                                          # wording is printed on a second card, implemented or not
+    python tools/maintenance/scryfall.py --refresh       # the coordinator only, from the main checkout: download
+                                                         # today's bulk files and rebuild the index
 
     import scryfall
     scryfall.card("Card Name")   # {"name", "layout", "faces": [{"name", "mana_cost", "type_line", "power", "toughness",
                                  #  "loyalty", "defense", "color_indicator", "oracle_text"}], "rulings": [...]} or None
     scryfall.oracle_cards()      # every Oracle Cards object, for whole-pool reports (ability-index.py rank)
 
-The bulk files go to target/scryfall in the main checkout (a worktree's git common directory), so the pool's slots
-download them once between them. A day-old download is replaced; if Scryfall can't be reached, the last one serves, and
-with none at all `card` returns None and says why on stderr.
+The bulk files go to target/scryfall in the main checkout (a worktree's git common directory), shared by the pool's
+slots. Only `--refresh` writes there: it downloads today's files (keeping the last ones if Scryfall can't be reached)
+and rebuilds by-name.json. It is the coordinator's, run from the main checkout before agents start, and refused inside a
+pool slot, so agents started together never race to write the shared files. Every other use only reads the newest files
+there; an index older than them is rebuilt in memory, and with none at all `card` returns None and says why on stderr.
 """
 
 import datetime
@@ -46,31 +50,48 @@ def _main_checkout():
 CACHE = os.path.join(_main_checkout(), "target", "scryfall")
 
 
-def bulk(kind):
-    """The path of today's bulk file of a kind ("oracle-cards", "rulings"), downloading it if need be; else the newest
-    one there is; else None."""
+def _newest(kind):
+    """The newest bulk file of a kind there is, or None."""
+    if not os.path.isdir(CACHE):
+        return None
+    files = sorted(f for f in os.listdir(CACHE) if f.startswith(kind + "-") and f.endswith(".jsonl.gz"))
+    return os.path.join(CACHE, files[-1]) if files else None
+
+
+def _download(kind):
+    """Today's bulk file of a kind, downloaded if it isn't there yet; the files it replaces are removed. If Scryfall
+    can't be reached, the newest one there is serves. For `--refresh` alone."""
     os.makedirs(CACHE, exist_ok=True)
     today = os.path.join(CACHE, f"{kind}-{datetime.date.today():%Y%m%d}.jsonl.gz")
-    if os.path.exists(today):
-        return today
-    try:
-        meta = json.load(urllib.request.urlopen(urllib.request.Request(
-            f"https://api.scryfall.com/bulk-data/{kind}", headers=HEADERS), timeout=30))
-        print(f"downloading {meta['jsonl_download_uri']}", file=sys.stderr)
-        with urllib.request.urlopen(urllib.request.Request(meta["jsonl_download_uri"], headers=HEADERS), timeout=300) as r:
-            data = r.read()
-        partial = today + ".part"
-        with open(partial, "wb") as f:
-            f.write(data)
-        os.replace(partial, today)
-        for old in os.listdir(CACHE):
-            if old.startswith(kind + "-") and os.path.join(CACHE, old) != today:
-                os.remove(os.path.join(CACHE, old))
-        return today
-    except (OSError, ValueError, KeyError) as e:
-        older = sorted(f for f in os.listdir(CACHE) if f.startswith(kind + "-") and f.endswith(".jsonl.gz"))
-        print(f"scryfall: could not download {kind} ({e}){'; using ' + older[-1] if older else ''}", file=sys.stderr)
-        return os.path.join(CACHE, older[-1]) if older else None
+    if not os.path.exists(today):
+        try:
+            meta = json.load(urllib.request.urlopen(urllib.request.Request(
+                f"https://api.scryfall.com/bulk-data/{kind}", headers=HEADERS), timeout=30))
+            print(f"downloading {meta['jsonl_download_uri']}", file=sys.stderr)
+            with urllib.request.urlopen(urllib.request.Request(meta["jsonl_download_uri"], headers=HEADERS), timeout=300) as r:
+                data = r.read()
+            partial = f"{today}.{os.getpid()}.part"
+            with open(partial, "wb") as f:
+                f.write(data)
+            os.replace(partial, today)
+        except (OSError, ValueError, KeyError) as e:
+            print(f"scryfall: could not download {kind} ({e}); keeping the files there are", file=sys.stderr)
+            return _newest(kind)
+    for old in os.listdir(CACHE):
+        stale = old.startswith(kind + "-") and os.path.join(CACHE, old) != today
+        if stale or (old.startswith(kind + "-") and old.endswith(".part")):
+            os.remove(os.path.join(CACHE, old))
+    return today
+
+
+def bulk(kind):
+    """The path of the newest bulk file of a kind ("oracle-cards", "rulings") there is, or None. Never downloads:
+    `--refresh` does, for the coordinator."""
+    found = _newest(kind)
+    if found is None:
+        print(f"scryfall: no {kind} file in {CACHE}; the coordinator runs scryfall.py --refresh from the main checkout",
+              file=sys.stderr)
+    return found
 
 
 def _lines(path):
@@ -93,8 +114,9 @@ def oracle_cards():
 _index = None
 
 
-def _load():
-    """{lowercase name: card} for every card and face name, rulings attached, cached beside the bulk files."""
+def _load(write=False):
+    """{lowercase name: card} for every card and face name, rulings attached, cached beside the bulk files. An index
+    older than the bulk files is rebuilt; it is written back only by `--refresh` (`write`)."""
     global _index
     if _index is not None:
         return _index
@@ -136,12 +158,32 @@ def _load():
             key = name.lower()
             if key not in cards or order < rank[key]:
                 cards[key], rank[key] = card, order
-    partial = built + ".part"
-    with open(partial, "w", encoding="utf-8") as f:
-        json.dump({"stamp": stamp, "cards": cards}, f)
-    os.replace(partial, built)
+    if write:
+        partial = f"{built}.{os.getpid()}.part"
+        with open(partial, "w", encoding="utf-8") as f:
+            json.dump({"stamp": stamp, "cards": cards}, f)
+        os.replace(partial, built)
+    else:
+        print("scryfall: by-name.json is older than the bulk files; rebuilt in memory (scryfall.py --refresh writes it)",
+              file=sys.stderr)
     _index = cards
     return _index
+
+
+def refresh():
+    """Downloads today's bulk files and rebuilds by-name.json. The coordinator's, from the main checkout: refused inside a
+    pool slot (.claude/worktrees), so agents started together never write the shared cache at once."""
+    here = os.path.normcase(os.path.abspath(os.getcwd()))
+    if os.path.normcase(os.path.join(".claude", "worktrees")) in here:
+        sys.exit("scryfall.py --refresh is the coordinator's, run from the main checkout, not from a pool slot")
+    global _index
+    _download("oracle-cards")
+    _download("rulings")
+    for old in os.listdir(CACHE):
+        if old.startswith("by-name.json") and old.endswith(".part"):
+            os.remove(os.path.join(CACHE, old))
+    _index = None
+    print(f"{len(_load(write=True))} names indexed in {CACHE}")
 
 
 def card(name):
@@ -169,6 +211,9 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     if len(sys.argv) < 2:
         sys.exit(__doc__)
+    if sys.argv[1] == "--refresh":
+        refresh()
+        return
     if sys.argv[1] == "--text":
         if len(sys.argv) < 3:
             sys.exit("--text needs a regex")

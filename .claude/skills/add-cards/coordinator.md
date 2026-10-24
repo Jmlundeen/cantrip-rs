@@ -35,7 +35,9 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    cargo's freshness records name absolute source paths, so a shared or copied `target/` compiles another tree's files
    into a test run that claims to test this one.
 1. **One card per agent, one lease per card.** Before starting an agent, `card-issues.py next <format>`: an agent
-   started on an empty format spends minutes finding that out. For each card, `acquire` a lease and start a card agent
+   started on an empty format spends minutes finding that out. Once a day, before the first agents start, run
+   `python tools/maintenance/scryfall.py --refresh` from the main checkout: only the coordinator refreshes the shared
+   Scryfall cache, and agents only read it (it is refused in a pool slot). For each card, `acquire` a lease and start a card agent
    with a token for it: the agent claims the card (`claim --format <format>`, or the card named), implements it,
    commits, reports and leaves. Its review and fixes follow in the same lease, each agent with its own token (4). When
    the card has landed, `release`; the next card takes a new lease and a fresh agent: the finished card's history is no
