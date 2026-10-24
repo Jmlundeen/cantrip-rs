@@ -3042,7 +3042,8 @@ pub fn deal_damage_with(
                 batch.dealt[at].prior_marked = 0;
             }
             batch.dealt[at].amount += amount as u32;
-            batch.dealt[at].deathtouch |= deathtouch;
+            // CR 702.2c: the one-damage lethal exception applies to combat damage assigned, not noncombat damage dealt.
+            batch.dealt[at].deathtouch |= deathtouch && combat;
             if target_chars.is(CardType::Creature) {
                 if source_chars.has(Keyword::Infect) {
                     // Damage from a source with infect is dealt to a creature as that many -1/-1 counters (CR 702.90c,

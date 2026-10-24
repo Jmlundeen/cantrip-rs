@@ -128,9 +128,9 @@ fn excess_damage_names_the_redirected_recipient_and_players_have_none() {
     );
 }
 #[test]
-fn excess_damage_counts_deathtouch_as_lethal() {
+fn excess_damage_noncombat_deathtouch_does_not_change_lethal_toughness() {
     let (mut g, ids) = game(&[&TOUCH, &BEAR]);
-    assert_eq!(hit(&mut g, ids[0], ids[1], 6).unwrap().excess, 5);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 6).unwrap().excess, 2);
 }
 #[test]
 fn excess_damage_sums_a_simultaneous_event_and_preserves_predamage_loyalty() {
@@ -158,4 +158,11 @@ fn excess_damage_zero_or_a_missing_recipient_deals_nothing() {
     g.state.update_obj(ids[1], |o| o.zone = Zone::graveyard(YOU));
     g.state.zone_push(Zone::graveyard(YOU), ids[1]);
     assert_eq!(hit(&mut g, ids[0], ids[1], 6), None);
+}
+
+/// CR 702.2c's one-damage lethal exception is for combat damage assigned.
+#[test]
+fn excess_damage_combat_deathtouch_counts_one_as_lethal() {
+    let (mut g, ids) = game(&[&TOUCH, &BEAR]);
+    assert_eq!(ops::damage_result(&mut cx(&mut g), ids[0], Target::Object(ids[1]), 6, true).unwrap().excess, 5);
 }
