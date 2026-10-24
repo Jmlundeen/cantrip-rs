@@ -2,13 +2,9 @@ use cantrip_api::*;
 use cantrip_mechanics::{attach::attached_object, bestow};
 use cantrip_oracle as oracle;
 
-fn flying_and_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Haste);
-}
-
 const STATICS: &[StaticDef] = &[
     static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<2, 2>, "Enchanted creature gets +2/+2."),
-    static_ability(Layer::Ability, attached_object, flying_and_haste, "Enchanted creature has flying and haste."),
+    static_ability(Layer::Ability, attached_object, cantrip_mechanics::statics::have_flying_and_haste, "Enchanted creature has flying and haste."),
 ];
 
 /// Bestow—{R}, Collect evidence 6 (CR 702.103, 701.59): while it is bestowed it is an Aura enchantment with "enchant
