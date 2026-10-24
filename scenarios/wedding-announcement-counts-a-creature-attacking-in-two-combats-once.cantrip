@@ -1,0 +1,47 @@
+# Wedding Announcement asks how many different creatures were declared as attackers this turn (CR 508.1). Aurelia, the
+# Warleader attacks twice on turn 3, in the first combat and in the additional one (CR 500.8), but is one creature, so Bot1 has
+# not attacked with two or more: the end step makes a second Human and draws nothing. Bot1 plays out its whole hand and draws
+# one card for the turn (Mox Ruby), so a card drawn by the trigger would stay in hand.
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Emerald
+Wedding Announcement
+Black Lotus
+Aurelia, the Warleader
+Mox Ruby
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wedding Announcement.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aurelia, the Warleader.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Aurelia, the Warleader)
+Bot1.Attack(Aurelia, the Warleader)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Wedding Announcement.Counters.Invitation = 2
+Bot1.Battlefield.Count = 9

@@ -1,0 +1,14 @@
+{
+  "name": "Wedding Announcement",
+  "manaCost": "{2}{W}",
+  "type": "Enchantment",
+  "oracleText": "At the beginning of your end step, put an invitation counter on this enchantment. If you attacked with two or more creatures this turn, draw a card. Otherwise, create a 1/1 white Human creature token. Then if this enchantment has three or more invitation counters on it, transform it.",
+  "backFace": {
+    "name": "Wedding Festivity",
+    "colorIndicator": [
+      "White"
+    ],
+    "type": "Enchantment",
+    "oracleText": "Creatures you control get +1/+1."
+  }
+}

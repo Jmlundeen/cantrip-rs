@@ -1,0 +1,51 @@
+# Wedding Announcement: each of Bot1's end steps it gets an invitation counter, then draws if Bot1 attacked with two or more
+# creatures that turn (CR 508.1) and otherwise makes a 1/1 Human; at three counters it transforms (keeping them, CR 712.18)
+# into Wedding Festivity, +1/+1 to Bot1's creatures only. T1: no attack, Human (1 counter). T3: two Ornithopters attack
+# (exactly two), a card is drawn and no Human (2). T5: one attacks (its T3 attack does not count), Human, 3 counters, transform.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Wedding Announcement
+Ornithopter
+Ornithopter
+Plains
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wedding Announcement.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Wedding Announcement.Counters.Invitation = 1
+? Bot1.Battlefield.Count = 7
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Wedding Announcement.Counters.Invitation = 2
+? Bot1.Battlefield.Count = 7
+? Bot1.Hand.Count = 3
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2)
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Wedding Festivity.Counters.Invitation = 3
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Human Token#1.Power = 2
+Bot2.Battlefield.Ornithopter.Power = 0

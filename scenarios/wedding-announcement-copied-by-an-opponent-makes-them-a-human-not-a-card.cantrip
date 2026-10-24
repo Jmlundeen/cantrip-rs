@@ -1,0 +1,53 @@
+# "You" in Wedding Announcement's trigger is whoever controls it, and a copy is controlled by the player who copies it
+# (CR 707.10). Bot1 attacks with two Ornithopters on turn 3, so its own trigger draws. In that end step Bot2 copies the
+# trigger with Return the Favor: Bot2 declared no attackers (only the active player does, CR 506.2, 508.1a), so the copy
+# gives Bot2 a Human and no card, and puts a second counter on the enchantment, the same source (CR 707.10b).
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Mox Pearl
+Mox Jet
+Mox Ruby
+Wedding Announcement
+Plains
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Return the Favor
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wedding Announcement.Cast
+Bot1.Pass
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T3 Bot1.End]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Return the Favor.Cast
+Bot2.Modes(Copy target)
+Bot2.Target(Stack.Wedding Announcement)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Wedding Announcement.Counters.Invitation = 2
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 6
+Bot2.Battlefield.Count = 1
