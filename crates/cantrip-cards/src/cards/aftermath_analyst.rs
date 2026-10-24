@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::lands;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -8,21 +9,9 @@ fn mill_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Return all land cards from your graveyard to the battlefield tapped": every land card in the graveyard as the ability
-/// resolves, entering together, tapped, under the control of the ability's controller (CR 110.2a). Only
-/// the controller's graveyard is looked at.
+/// "Return all land cards from your graveyard to the battlefield tapped."
 fn return_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    let lands: Vec<(ObjectId, PlayerId, bool)> = g
-        .state()
-        .zone(Zone::graveyard(you))
-        .iter()
-        .copied()
-        .filter(|&card| g.chars(card).is(CardType::Land))
-        .map(|card| (card, you, true))
-        .collect();
-    g.put_all_onto_battlefield_as(&lands)?;
-    Ok(())
+    lands::return_all_land_cards_from_graveyard_tapped(g, item.controller)
 }
 
 pub static CARD: CardDef = CardDef {

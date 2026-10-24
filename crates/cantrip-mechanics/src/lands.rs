@@ -412,3 +412,19 @@ pub fn count_you_control(q: &dyn LayerQuery, source: ObjectId, counts: &dyn Fn(&
     let obj = state.obj(source);
     state.battlefield().iter().filter(|&&id| state.obj(id).controller == obj.controller && counts(&q.chars(id))).count() as i16
 }
+
+/// "Return all land cards from your graveyard to the battlefield tapped" (Aftermath Analyst, Lumra, Bellow of the Woods,
+/// Splendid Reclamation): every land card in `player`'s graveyard as this is done, put onto the battlefield together
+/// (CR 603.6a), tapped (CR 110.5b), under that player's control (CR 110.2a). Only that player's own graveyard is looked at.
+pub fn return_all_land_cards_from_graveyard_tapped(g: &mut dyn Game, player: PlayerId) -> Result<(), Suspend> {
+    let lands: Vec<(ObjectId, PlayerId, bool)> = g
+        .state()
+        .zone(Zone::graveyard(player))
+        .iter()
+        .copied()
+        .filter(|&card| g.chars(card).is(CardType::Land))
+        .map(|card| (card, player, true))
+        .collect();
+    g.put_all_onto_battlefield_as(&lands)?;
+    Ok(())
+}
