@@ -299,7 +299,8 @@ only fails after four turns, without saying why:
 ! Bot2.Block(Grizzly Bears > True-Name Nemesis)        protection from Bot2
 ```
 
-A play, cast or activation is checked the next time that player has priority, without answering it, and fails
+A play, cast or activation is checked the next time that player has priority (a refused mana ability sooner, at a
+payment that asks for mana, below), without answering it, and fails
 listing what was offered, written as script lines. It is matched as the line would be: the card in that zone, and
 with `Ability:` the option whose text contains it. A refused `Cast` without `Ability:` refuses every way of casting
 the card, not only for its mana cost. A cast or activation the player cannot pay for is not offered at all (CR 601.2g,
@@ -341,9 +342,12 @@ engine's own check refuses the declaration as a whole - it obeys fewer of the re
 declaration with requirements is the engine's own, which obeys them.
 
 `! Bot1.Attack()` says declaring no attackers at all is refused at the next declaration (a creature must attack, CR 508.1d).
-A refused activation (`! Bot1.Battlefield.Llanowar Elves.Activate`) is checked at the player's next priority or payment -
-a cost being paid, a cost to attack after an `Attack` line among them, or an "unless pays" question - and fails if that
-ability is offered then.
+A refused activation (`! Bot1.Battlefield.Llanowar Elves.Activate`) is checked at the player's next priority, and fails if
+that ability is offered then. One that names only mana abilities is checked sooner at a payment that asks for mana, where
+mana abilities may be activated (CR 605.3a): a spell's or ability's cost, a cost to attack after an `Attack` line, or an
+"unless pays" cost with mana in it. A payment of life alone (a shock land's 2 life) does not count, and a refusal of a
+non-mana ability is always checked at priority. Wherever it is checked, it is judged with mana to spare as above, and
+needs `Mana: short` where it holds only for want of mana.
 An attack, `! Bot1.Attack(Sylvan Caryatid > Bot2)`, is checked at the next declaration of attackers and fails if that attacker may attack the
 target. The attacker must be one the question offers, or else one that only a restriction (Defender, "can't attack", summoning sickness) can have left
 out: the asked player's own, untapped, with another creature of theirs offered in the same question. A pair the question

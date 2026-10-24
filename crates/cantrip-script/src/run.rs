@@ -716,8 +716,7 @@ impl<'s> Run<'s> {
 
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
                 && request.player == player_of(action.bot)
-                && (answers(action.verb, &request.kind)
-                    || action.verb == ScriptVerb::Activate && matches!(request.kind, RequestKind::PayCosts { .. } | RequestKind::UnlessPays { .. }))
+                && (answers(action.verb, &request.kind) || self.refused_at_payment(action, &request.kind))
             {
                 if let RequestKind::Priority { options } | RequestKind::PayCosts { options, .. } | RequestKind::UnlessPays { options, .. } = &request.kind {
                     if !self.refused_offered(action, *line, text, options)?.is_empty() {
@@ -1367,6 +1366,49 @@ impl<'s> Run<'s> {
 
     /// A mana ability the player has of their own (CR 605.1a, 611.2a), named by the card that gave it and no zone,
     /// `Bot1.Channel.Activate`: it has no source, so it is offered wherever that card has gone.
+    /// Whether a refused `Activate` is checked at this payment rather than left for the player's next priority: the payment
+    /// asks for mana, so mana abilities may be activated during it (CR 605.3a) - a spell's or ability's cost, a cost to
+    /// attack, an "unless pays" cost with mana in it - and the line names only mana abilities. A payment of life alone (a
+    /// shock land's 2 life) is no chance to activate one, and a non-mana ability is activated only with priority (CR
+    /// 602.2), so either refusal waits for priority.
+    fn refused_at_payment(&self, step: &ActionStep, kind: &RequestKind) -> bool {
+        let asks_mana = match kind {
+            RequestKind::PayCosts { total, announcing: false, .. } | RequestKind::UnlessPays { total, .. } => !total.is_zero(),
+            _ => false,
+        };
+        asks_mana && step.verb == ScriptVerb::Activate && self.names_only_mana_abilities(step)
+    }
+
+    /// Whether the activated abilities a refused `Activate` line names - every one of the named object's, or those its
+    /// `Ability:` picks - are all mana abilities (CR 605.1a), and there is at least one.
+    fn names_only_mana_abilities(&self, step: &ActionStep) -> bool {
+        let g = &self.game;
+        let needle = step.named("Ability").map(|a| a.to_lowercase());
+        let mut any = false;
+        for id in (0..g.state.objects.len()).map(|i| ObjectId(i as u32)) {
+            if !self.is_source(step, Some(id)) {
+                continue;
+            }
+            for (i, a) in g.chars(id).abilities().enumerate() {
+                let AbilityDef::Activated(d) = g.cards.ability(a) else { continue };
+                let named = match needle.as_deref() {
+                    None => true,
+                    Some(n) => match n.strip_prefix('#').and_then(|n| n.parse::<usize>().ok()) {
+                        Some(n) => i + 1 == n,
+                        None => d.text.to_lowercase().contains(n),
+                    },
+                };
+                if named {
+                    if !d.is_mana_ability() {
+                        return false;
+                    }
+                    any = true;
+                }
+            }
+        }
+        any
+    }
+
     fn is_players_ability(&self, step: &ActionStep, option: &ActionOption) -> bool {
         let (Some(source), Some(card)) = (option.source, &step.card) else { return false };
         option.index >= PLAYER_MANA_ABILITY
