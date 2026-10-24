@@ -1053,6 +1053,7 @@ counter_kinds! {
     Net = 47, "net", "Net";
     Blight = 48, "blight", "Blight";
     Ice = 49, "ice", "Ice";
+    Soul = 50, "soul", "Soul";
 }
 
 impl CounterKind {
