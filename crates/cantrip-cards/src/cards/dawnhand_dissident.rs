@@ -41,6 +41,8 @@ pub static CARD: CardDef = CardDef {
         allows,
         additional: remove_counters_among(3, targets::filters::creature),
         any_type: false,
+        lands: false,
+        life_for_mana_value: false,
     }],
     ..oracle::DAWNHAND_DISSIDENT
 };

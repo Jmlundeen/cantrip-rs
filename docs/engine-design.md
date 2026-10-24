@@ -1100,7 +1100,10 @@ are then made together, 610.3d). The link is the exiled card's `ExileLink` (`unt
 whose text the exiling ability is printed in (`Linked`: `Query::linked` for a resolving ability, `Query::linked_to` for one of
 the text the object has now; either face of a transforming card and either door of a Room are one text, 607.1b,
 `CardTable::linked_card`), and `Query::exiled_with` answers only an ability of that same text. So a creature that copies
-another (Mirrorweave) does not see, through the copied text's linked ability, the cards its own text exiled.
+another (Mirrorweave) does not see, through the copied text's linked ability, the cards its own text exiled. A replacement
+effect that exiles links what it exiles the same way when its card has an ability that refers to them (607.2b:
+`ZoneChange::exiled_with`, set by `replacements::exile_instead_linked_apply`); only its direct result is linked, so an effect
+that applies afterwards and sends the card elsewhere leaves it unlinked (`replace::unlink_if_sent_elsewhere`).
 
 `ops::return_until_left` carries both out (`ops::returns_due`: `return_exiled`, `phasing::phase_in_returning`), and is
 called by whatever can make a permanent leave: `move_together`, after the move's events and their triggers (so "leaves"

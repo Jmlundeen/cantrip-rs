@@ -503,12 +503,15 @@ shapes have an example:
   card from your hand: Target land gains "{T}: Add ..." until this card is cast from exile. You may cast this card for as
   long as it remains exiled" (Emrakul, the Exigent Doom; Glamorous Outlaw and its cycle).
 - **Casting cards in exile by a permanent's static ability** (CR 601.3, 604.1): `CardDef.exile_casts`, an `ExileCast { text,
-  allows, additional, any_type }` - `allows(q, asker, card, player)` asked of the permanent with the card as the face that would be cast
+  allows, additional, any_type, lands, life_for_mana_value }` - `allows(q, asker, card, player)` asked of the permanent with the card as the face that would be cast
   ("you may cast creature spells from among cards you own exiled with this creature": `q.exiled_with(q.linked_to(asker.source))`, its
   controller, its owner, the turn), and `additional` the cost owed on top of whatever it is cast for (Dawnhand Dissident's
   `remove_counters_among(3, targets::filters::creature)`; `Cost::NONE` for Rona, Disciple of Gix). The card's own alternative
   costs stay open to it. `any_type: true` is "and mana of any type can be spent to cast that spell" (CR 609.4b, Null
-  Summoner); an "as long as" condition on the game state (threshold) goes in `allows`.
+  Summoner); an "as long as" condition on the game state (threshold) goes in `allows`. `lands: true` is "you may play"
+  rather than "cast": a land it allows is played from exile as a land play (CR 305.1); `life_for_mana_value: true` is "if
+  you cast a spell this way, pay life equal to its mana value rather than pay its mana cost" (CR 118.9, 119.4), the one
+  alternative cost, additional costs paid as usual (Valgavoth, Terror Eater).
 - **Ward with a cost other than mana** (CR 702.21a, 118.12): `triggers::ward_life::<N>`, `ward_discard`, and
   `ward_sacrifice::<N>` ("Sacrifice N permanents": refused with fewer, and under Tamiyo, Collector of Tales).
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `DelayedWhen::EachStep` for "at the beginning of each [step] ... for the

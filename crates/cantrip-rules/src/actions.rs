@@ -4747,6 +4747,21 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
             }
         }
     }
+    // A land card in exile a permanent lets this player play (CR 305.1, 604.1): "you may play cards exiled with this", each
+    // permission its own. Looked for only when exile holds a card.
+    let mut exile_casts: Option<Vec<Given<ExileCast>>> = None;
+    for zone in cx.s().seats().map(Zone::exile) {
+        for &id in cx.s().zone(zone) {
+            if cx.s().obj(id).card_copy {
+                continue;
+            }
+            for c in exile_casts.get_or_insert_with(|| exile_casts_of(cx.cards(), cx.s(), &cx.g.log)).iter() {
+                if c.what.lands && (c.what.allows)(cx, &c.asker(), id, player) {
+                    offer(id, Some(c.grant), options);
+                }
+            }
+        }
+    }
     // The land cards in the graveyard that a way a permanent gives lets the player play (CR 305.1, 604): once during each of
     // their turns, say. Looked for only when the graveyard holds a land card.
     let mut granted: Option<Vec<Given<GrantedWay>>> = None;
@@ -5165,6 +5180,19 @@ impl Route {
         Route { by, terms, ..Route::RULES }
     }
 
+    /// A permanent's permission to cast cards in exile (CR 601.3, 604.1), judged on each face: what it adds is owed with every
+    /// cast by it (CR 118.8), it may let mana of any type pay (CR 609.4b), and it may name life equal to the mana value as the
+    /// cost paid rather than the mana cost (CR 118.9, 119.4).
+    fn exile_cast(c: &Given<ExileCast>) -> Route {
+        Route {
+            by: Some(c.grant),
+            terms: PlayGrant { any_type: c.what.any_type, life_for_mana_value: c.what.life_for_mana_value, ..PlayGrant::CAST },
+            additional: c.what.additional,
+            allows: Allows::Exile(c.asker(), c.what),
+            ..Route::RULES
+        }
+    }
+
     /// Retrace (CR 702.81a): a cast from the graveyard for its ordinary costs and a land card discarded.
     fn retrace(card: ObjectId, printed: CardId) -> Route {
         Route { by: Some(Grant { object: card, ability: AbilityRef::retrace(printed) }), additional: RETRACE, ..Route::RULES }
@@ -5464,15 +5492,7 @@ impl<'a> Offer<'a> {
                 // A permanent's permission to cast cards in exile (CR 601.3, 604.1), judged on each face; what it adds is owed
                 // with every cast by it (CR 118.8), and it may let mana of any type pay (CR 609.4b).
                 if !obj.card_copy {
-                    for c in self.exile_casts() {
-                        routes.push(Route {
-                            by: Some(c.grant),
-                            terms: PlayGrant { any_type: c.what.any_type, ..PlayGrant::CAST },
-                            additional: c.what.additional,
-                            allows: Allows::Exile(c.asker(), c.what),
-                            ..Route::RULES
-                        });
-                    }
+                    routes.extend(self.exile_casts().iter().map(Route::exile_cast));
                 }
             }
             _ => {}
@@ -5673,13 +5693,7 @@ fn through(q: &dyn Query, cards: &CardTable, player: PlayerId, card: ObjectId, b
         });
     }
     if let Some(c) = named_exile_cast(s, cards, g) {
-        return Some(Through::Route(Route {
-            by,
-            terms: PlayGrant { any_type: c.what.any_type, ..PlayGrant::CAST },
-            additional: c.what.additional,
-            allows: Allows::Exile(c.asker(), c.what),
-            ..Route::RULES
-        }));
+        return Some(Through::Route(Route::exile_cast(&c)));
     }
     if let Some(rule) = play_rule_at(cards, g.ability) {
         let asker = Asker { source: g.object, controller: player };
@@ -9814,7 +9828,7 @@ mod tests {
     static EXILER: CardDef = CardDef {
         name: "Alternative Test Exiler",
         types: TypeSet::of(&[CardType::Enchantment]),
-        exile_casts: &[ExileCast { text: "Cast from exile", allows: any_card, additional: Cost::NONE, any_type: false }],
+        exile_casts: &[ExileCast { text: "Cast from exile", allows: any_card, additional: Cost::NONE, any_type: false, lands: false, life_for_mana_value: false }],
         ..CardDef::BLANK
     };
     /// "You may cast spells from the top of your library" (CR 601.3).

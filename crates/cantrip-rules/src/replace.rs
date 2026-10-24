@@ -448,6 +448,7 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
         let pick = if found.len() > 1 && !found.iter().all(|c| prevents_all(cx, c)) { choose(cx, proposal, &found) } else { 0 };
         let Candidate { source, index, origin } = found[pick];
         applied.push((source, index, origin));
+        let start = *proposal;
         match origin {
             Origin::Printed => {
                 let def = &cx.cards().get(source_card(cx, source)).replacements[index as usize];
@@ -548,6 +549,18 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 }
             }
         }
+        unlink_if_sent_elsewhere(&start, proposal);
+    }
+}
+
+/// A card is exiled with a replacement effect's source only as the direct result of that effect (CR 607.2b): an effect that
+/// applies afterwards and changes where it goes, without linking it to a source of its own, leaves it linked to none.
+fn unlink_if_sent_elsewhere(before: &Proposal, after: &mut Proposal) {
+    if let (Proposal::ZoneChange(b), Proposal::ZoneChange(a)) = (before, after)
+        && a.to != b.to
+        && a.exiled_with == b.exiled_with
+    {
+        a.exiled_with = None;
     }
 }
 
@@ -1002,5 +1015,44 @@ mod tests {
         crate::ops::draw_cards(&mut cx, them, 1);
         assert!(cx.s().agenda[frame].pending.is_none(), "the controller's answer was the one asked for");
         assert!(cx.s().zone(Zone::hand(them)).is_empty(), "the draw was replaced");
+    }
+
+    /// A card is exiled with a replacement effect's source only as that effect's direct result (CR 607.2b): an effect that
+    /// applies afterwards and sends it elsewhere leaves it unlinked; one that changes something else, or that is the one
+    /// linking it, keeps the link.
+    #[test]
+    fn a_later_effect_that_sends_the_card_elsewhere_unlinks_it() {
+        let linked = Linked { object: ObjectId(5), text: CardId(3) };
+        let exiling = ZoneChange {
+            object: ObjectId(1),
+            from: Zone::hand(ME),
+            to: Zone::exile(ME),
+            reason: ZoneReason::Other,
+            controller: ME,
+            tapped: false,
+            counters: [0; CounterKind::COUNT],
+            counters_by: ME,
+            reveal: false,
+            shuffle: false,
+            is_card: true,
+            madness: false,
+            pays_characteristic: false,
+            exiled_with: Some(linked),
+        };
+        let link = |p: Proposal| match p {
+            Proposal::ZoneChange(z) => z.exiled_with,
+            _ => unreachable!(),
+        };
+        let before = Proposal::ZoneChange(exiling);
+        let mut elsewhere = Proposal::ZoneChange(ZoneChange { to: Zone::library(ME), ..exiling });
+        unlink_if_sent_elsewhere(&before, &mut elsewhere);
+        assert_eq!(link(elsewhere), None, "sent on to a library, it is exiled with nothing");
+        let mut revealed = Proposal::ZoneChange(ZoneChange { reveal: true, ..exiling });
+        unlink_if_sent_elsewhere(&before, &mut revealed);
+        assert_eq!(link(revealed), Some(linked), "still exiled, it stays linked");
+        let to_graveyard = Proposal::ZoneChange(ZoneChange { to: Zone::graveyard(ME), exiled_with: None, ..exiling });
+        let mut exiled = before;
+        unlink_if_sent_elsewhere(&to_graveyard, &mut exiled);
+        assert_eq!(link(exiled), Some(linked), "the effect exiling it links it");
     }
 }

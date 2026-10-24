@@ -45,6 +45,11 @@ pub struct ZoneChange {
     /// A card put into a hidden zone unrevealed has its characteristics undefined and can't pay such a cost (CR 701.9c), so
     /// no replacement that would put it there is offered, and it goes where the others leave it.
     pub pays_characteristic: bool,
+    /// The card is exiled by this ability (CR 607.2b, 406.6): a replacement effect of an object with an ability that refers
+    /// to cards "exiled with" it has made the event exile the card (`cantrip_mechanics::replacements::exile_instead_linked_apply`),
+    /// and the card in exile is linked to that object's text as it arrives (`Query::exiled_with`). Only the direct result of
+    /// that replacement is linked: a later effect that sends the card elsewhere leaves it unlinked, which the core sees to.
+    pub exiled_with: Option<Linked>,
 }
 
 /// Counters that would be put on a permanent (CR 122.6, 614.1a): by an effect, or as it enters with them.

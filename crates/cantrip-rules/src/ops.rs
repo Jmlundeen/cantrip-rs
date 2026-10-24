@@ -298,6 +298,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             is_card: !old.token && !old.card_copy,
             madness: false,
             pays_characteristic: m.pays_characteristic,
+            exiled_with: None,
         };
         // A permanent entering is judged as it would exist on the battlefield (CR 614.12).
         let change = match entry {
@@ -342,6 +343,13 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         // What the replacements left of its arrival: tapped, and the counters they give it, a void counter on a card
         // exiled in place of a graveyard as much as those of a permanent (CR 122.6).
         new.tapped = entering && change.tapped;
+        // A card a replacement effect exiled is exiled with that effect's source as it arrives, where the effect's object has
+        // an ability that refers to the cards exiled with it (CR 607.2b, 406.6): never "until" anything.
+        if to.is(ZoneKind::Exile)
+            && let Some(by) = change.exiled_with
+        {
+            new.exiled = Some(ExileLink { by: by.object, text: by.text, from, until_leaves: false, encoded: false });
+        }
         if entering {
             new.controller = change.controller;
         }
@@ -1738,6 +1746,7 @@ fn create_tokens_onto(
             is_card: false,
             madness: false,
             pays_characteristic: false,
+            exiled_with: None,
         };
         let change = judged_entering(cx, &entering, false, |cx| replace::zone_change(cx, proposed));
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist
