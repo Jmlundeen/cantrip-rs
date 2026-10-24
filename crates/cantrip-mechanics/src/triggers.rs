@@ -926,6 +926,23 @@ pub fn dragon_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Op
     }
 }
 
+/// "Whenever another [subtype] you control enters" (CR 603.6a), `SUBTYPE` a `Subtype` as `u16` (`lands::sub`): a permanent
+/// other than this one, under your control as it entered, that is that creature type (a token too), the type read through
+/// the words of the source's text (CR 612). Thalia's Lieutenant (Humans) and Youthful Valkyrie (Angels) print it.
+pub fn another_of_subtype_you_control_enters<const SUBTYPE: u16>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if *new != me.source
+                && to.is(ZoneKind::Battlefield)
+                && q.controller(*new) == me.controller
+                && q.chars(*new).has_subtype(crate::lands::word(q, me.source, SUBTYPE)) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever a creature you control attacks" (CR 508.3a, 603.2c): declaring attackers names each attacker in its own event, so
 /// the ability triggers once for each creature of its controller's that attacks, and is about that attacker. A creature put onto
 /// the battlefield attacking was never declared (CR 508.4) and triggers nothing. Shared Animosity, Connecting the Dots and
