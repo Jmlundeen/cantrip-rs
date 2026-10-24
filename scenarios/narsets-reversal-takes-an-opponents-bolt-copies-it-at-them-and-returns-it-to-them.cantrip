@@ -1,0 +1,39 @@
+# Narset's Reversal on an opponent's spell: Bot2's Lightning Bolt at Bot1 is copied by Bot1, who controls the copy
+# (CR 707.10) and aims it at Bot2; the original goes back to its owner's hand, Bot2's (CR 400.3), so Bot1 takes
+# nothing. Bot1 holds Mox Sapphire and an Island, so the {U}{U} is paid on Bot2's turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Narset's Reversal
+Island x14
+
+[Bot2 Deck]
+Mountain
+Forest
+Lightning Bolt
+Llanowar Elves
+Mountain x5
+Forest x5
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Narset's Reversal.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot2.Hand.Lightning Bolt.Colors = Red
+Bot2.Graveyard =
+Stack.Count = 0

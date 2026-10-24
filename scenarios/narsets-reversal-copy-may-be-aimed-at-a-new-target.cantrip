@@ -1,0 +1,32 @@
+# Narset's Reversal: "You may choose new targets for the copy." Bot1's Lightning Bolt is aimed at Bot2; the copy is
+# given a new target, Bot1 itself (CR 707.10c): Bot1 takes 3 and Bot2 none. The original returns to Bot1's hand and
+# was never cast again, so it deals nothing. The other answer (keeping Bot2) is
+# narsets-reversal-copies-your-bolt-keeps-its-target-and-returns-the-original.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Narset's Reversal
+Island x14
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Narset's Reversal.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Hand.Lightning Bolt.Colors = Red
+Stack.Count = 0

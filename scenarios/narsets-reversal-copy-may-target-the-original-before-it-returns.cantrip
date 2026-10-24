@@ -1,0 +1,44 @@
+# Narset's Reversal: "Copy target instant or sorcery spell, then return it to its owner's hand." The copy is made, and
+# its new targets chosen, while the original is still on the stack (CR 707.10c): Bot2's Counterspell at Bot1's Lightning
+# Bolt is copied, and Bot1 aims the copy at the original Counterspell (`Stack.Counterspell`: the copy cannot target
+# itself, CR 115.5). Only then is the original returned to Bot2's hand; the copy's one target is gone and it does nothing
+# (CR 608.2b), and the Bolt resolves. In the other order the original would be off the stack when the copy's targets are
+# chosen, and the copy would keep the Bolt as its target and counter it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Narset's Reversal
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Island
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Narset's Reversal.Cast(Stack.Counterspell)
+Bot1.Pass
+Bot1.Target(Stack.Counterspell)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Hand.Counterspell.Colors = Blue
+Bot2.Graveyard =
+Stack.Count = 0

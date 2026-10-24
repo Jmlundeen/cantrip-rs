@@ -1,0 +1,29 @@
+# Narset's Reversal targets an instant or sorcery spell only. Bot2's Llanowar Elves is a creature spell on the stack:
+# Bot1, holding {U}{U}, cannot cast the Reversal at it (nor at all - there is no other spell to aim at).
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Narset's Reversal
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Narset's Reversal.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Types = Creature
+Bot1.Hand.Narset's Reversal.Colors = Blue

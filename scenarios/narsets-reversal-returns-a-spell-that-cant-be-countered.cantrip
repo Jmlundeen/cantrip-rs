@@ -1,0 +1,38 @@
+# Narset's Reversal returns the spell to its owner's hand; that is not countering it (CR 701.6), so Bot2's Abrupt Decay,
+# which can't be countered, goes too. Bot2 aims the Decay at Bot1's Mox Sapphire; Bot1 copies it at Bot2's Mox Jet. The
+# copy destroys the Jet, and the original is in Bot2's hand, so the Sapphire stays.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Narset's Reversal
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Forest
+Abrupt Decay
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Narset's Reversal.Cast(Stack.Abrupt Decay)
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Mox Sapphire.Types = Artifact
+Bot2.Graveyard = Mox Jet
+Bot2.Hand.Abrupt Decay.Colors = Black; Green
+Stack.Count = 0
