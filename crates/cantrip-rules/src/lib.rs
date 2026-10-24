@@ -28,6 +28,8 @@ mod loops;
 mod ops;
 mod phasing;
 #[cfg(test)]
+mod any_color_spell_tests;
+#[cfg(test)]
 mod back_face_targets_tests;
 #[cfg(test)]
 mod cloak_tests;

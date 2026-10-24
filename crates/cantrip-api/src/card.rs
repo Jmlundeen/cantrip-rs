@@ -2293,15 +2293,28 @@ pub type LegendRuleExemption = fn(&dyn Query, &Asker, ObjectId) -> bool;
 pub type AttackDespiteDefenderRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
 /// A payment a "spend mana as though it were mana of any color" rule is asked about (CR 609.4b): the player paying, what the
-/// cost is for - the permanent whose ability is activated, the spell, the source of an "unless pays" - and whether it is
-/// an activation cost. `source` is `None` when the question is whether the player may do so for every payment whatever it
+/// cost is for - the permanent whose ability is activated, the spell, the source of an "unless pays" - and what kind of
+/// payment it is. `source` is `None` when the question is whether the player may do so for every payment whatever it
 /// is for (Mycosynth Lattice's "players may spend mana as though it were mana of any color"), which the payments' advice
 /// asks once.
 #[derive(Clone, Copy, Debug)]
 pub struct Spending {
     pub player: PlayerId,
     pub source: Option<ObjectId>,
-    pub activating: bool,
+    pub purpose: SpendingFor,
+}
+
+/// What kind of payment a `Spending` is (CR 609.4b: "to cast ... spells", "to activate abilities of ...").
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SpendingFor {
+    /// The total cost of casting `source`, a spell (CR 601.2h). Before it is cast, whether the card could be cast is
+    /// judged with `source` the card read as the spell it would be, the face it would be cast as (CR 712.11c, 709.3a,
+    /// 715.4).
+    Casting,
+    /// An activation cost of an ability of `source` (CR 602.2b).
+    Activating,
+    /// Anything else: a special action's cost (CR 116.2), an "unless pays" (CR 118.12), a cost to attack (CR 508.1h).
+    Other,
 }
 
 /// Whether a static ability lets a player spend mana as though it were mana of any color for a payment (CR 609.4b), given
@@ -2727,7 +2740,8 @@ pub struct CardDef {
     /// battlefield with its abilities.
     pub legend_rule_exempt: &'static [LegendRuleExemption],
     /// "You may spend mana as though it were mana of any color to activate abilities of creatures you control" (CR 609.4b):
-    /// Agatha's Soul Cauldron; "Players may spend mana as though it were mana of any color": Mycosynth Lattice.
+    /// Agatha's Soul Cauldron; "... to cast planeswalker spells": Oath of Nissa; "Players may spend mana as though it were
+    /// mana of any color": Mycosynth Lattice.
     pub spend_any_color: &'static [SpendAnyColorRule],
     /// "You may activate each of those abilities only once each turn" (CR 602.5b): how many of a permanent's instances of
     /// an activated ability are ones its static ability gave it with that limit (Locus of Enlightenment's of the exiled

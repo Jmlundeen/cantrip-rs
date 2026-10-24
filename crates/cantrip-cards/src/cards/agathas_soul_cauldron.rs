@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "You may spend mana as though it were mana of any color to activate abilities of creatures you control" (CR 609.4b).
 fn creature_you_control(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool {
     spending.player == asker.controller
-        && spending.activating
+        && spending.purpose == SpendingFor::Activating
         && spending.source.is_some_and(|source| {
             q.controller(source) == asker.controller && q.is_on_battlefield(source) && q.chars(source).is(CardType::Creature)
         })

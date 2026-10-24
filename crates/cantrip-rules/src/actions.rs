@@ -1117,7 +1117,7 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOp
             if def.cost.mana.x == 0 && def.cost.mana.mana_value() > 0 && judged != Judged::Nested {
                 let a = available_without(cx, player, def.cost.tap.then_some(id));
                 let mut cost = def.cost.mana;
-                if static_rules::spend_any_color_for(cx, player, id, true) {
+                if static_rules::spend_any_color_for(cx, player, id, SpendingFor::Activating) {
                     cost = cost.paid_with_any_color();
                 }
                 if !a.covers_for(&cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes }) {
@@ -2834,7 +2834,7 @@ fn least_cost_parts(
         // a second blue.
         if modal.min <= 1
             && let Some(i) = costs.iter().position(|&c| {
-                finish(cx, available, player, card, def, add_cost(cost, c), targets, earlier.spell.as_ref(), &mut |total, least| available.covers_for(&at_least(total, least), &spell_kind(cx, available, card, def)))
+                finish(cx, available, player, card, def, add_cost(cost, c), targets, earlier.spell.as_ref(), &mut |total, least| spell_covers(cx, available, player, card, def, &at_least(total, least)))
             })
         {
             costs.swap(0, i);
@@ -2907,7 +2907,8 @@ fn phyrexian_with_life(cx: &Cx, player: PlayerId, mut cost: ManaCost, other_life
 /// CR 601.2g): a mana ability whose yield is not stated is taken to be able to pay anything.
 ///
 /// `source` is what the cost is for: a spell on the stack may be paid with the restricted mana its kind allows, anything
-/// else with the restricted mana an ability may spend (CR 106.6).
+/// else with the restricted mana an ability may spend (CR 106.6); and the spell with mana spent as though it were mana of
+/// any color where a static ability lets `player` do so to cast it (CR 609.4b).
 pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) -> bool {
     if cost.mana_value() == 0 {
         return true;
@@ -2915,7 +2916,10 @@ pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) 
     let a = available(cx, player);
     let chars = cx.chars(source);
     if cx.s().obj(source).zone.is(ZoneKind::Stack) {
-        a.covers_for(cost, &spell_payment(cx, source, a.names_subtypes()))
+        let any_color = !a.any_color
+            && !a.spenders.is_empty()
+            && static_rules::lets_spend_any_color(cx, &a.spenders, &Spending { player, source: Some(source), purpose: SpendingFor::Casting });
+        a.covers_for(&if any_color { cost.paid_with_any_color() } else { *cost }, &spell_payment(cx, source, a.names_subtypes()))
     } else {
         a.covers_for(cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes })
     }
@@ -2939,6 +2943,10 @@ pub struct Available {
     restricted: Vec<(ManaRestriction, [u32; 6], u32)>,
     /// The player may spend mana as though it were mana of any color for every payment (CR 609.4b: Mycosynth Lattice).
     any_color: bool,
+    /// The permanents whose static abilities may let the player spend mana as though it were mana of any color for some
+    /// payments (CR 609.4b: Oath of Nissa's planeswalker spells), asked of each spell judged (`spell_covers`). Empty in nearly
+    /// every game.
+    spenders: Vec<(ObjectId, PlayerId, &'static CardDef)>,
     /// Mana that comes in groups of one type chosen once, by the mana types it may be and how many: a tap whose type the
     /// player chooses (Shivan Reef's {U} or {R}) and the "one mana of any type that land produced" it triggers (Mana Flare)
     /// are one choice, {U}{U} or {R}{R} and never {U}{R} (CR 106.12a, 605.1b). Empty unless such a trigger waits.
@@ -3102,6 +3110,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
                     grantors: pay_with_grantors(cx),
                     restricted,
                     any_color: false,
+                    spenders: Vec::new(),
                     linked,
                     complex: Vec::new(),
                     spent: Vec::new(),
@@ -3271,6 +3280,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
             account(&outlets, n, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
         }
     }
+    let spenders = static_rules::any_color_spenders(cx);
     Available {
         fixed,
         flex,
@@ -3278,7 +3288,8 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) 
         changers: cost_change_sources(cx),
         grantors: pay_with_grantors(cx),
         restricted,
-        any_color: static_rules::spend_any_color_always(cx, player),
+        any_color: static_rules::spend_any_color_always(cx, &spenders, player),
+        spenders,
         linked,
         complex,
         spent,
@@ -3532,6 +3543,29 @@ fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPaym
     ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from }
 }
 
+/// Whether a static ability lets `player` spend mana as though it were mana of any color to cast `card` as `def` (CR
+/// 609.4b: Oath of Nissa's "to cast planeswalker spells"), asked before it is cast: the rule reads the card as the spell it
+/// would be, the face it would be cast as (CR 712.11c, 709.3a, 715.4, `AsFace`). Mana spent so for every payment
+/// (`Available::any_color`) is not asked again.
+fn casts_with_any_color(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef) -> bool {
+    if a.spenders.is_empty() || a.any_color {
+        return false;
+    }
+    let spending = Spending { player, source: Some(card), purpose: SpendingFor::Casting };
+    match face_of(cx, card, def) {
+        Some(face) => static_rules::lets_spend_any_color(&AsFace { cx, spell: card, face }, &a.spenders, &spending),
+        None => static_rules::lets_spend_any_color(cx, &a.spenders, &spending),
+    }
+}
+
+/// Whether `cost` could be paid to cast `card` as `def` (advice, CR 601.2g-h): by the mana at hand that may pay for that
+/// spell (`spell_kind`), spent as though it were mana of any color where a static ability lets `player` do so for it
+/// (`casts_with_any_color`, CR 609.4b).
+fn spell_covers(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: &ManaCost) -> bool {
+    let payment = spell_kind(cx, a, card, def);
+    if casts_with_any_color(cx, a, player, card, def) { a.covers_for(&cost.paid_with_any_color(), &payment) } else { a.covers_for(cost, &payment) }
+}
+
 impl Available {
     /// Whether `cost` could be paid for `payment` (casting a spell of a kind, activating an ability of a source): the
     /// restricted mana that may be spent on it counts (CR 106.6, 601.2g, 602.2b).
@@ -3595,6 +3629,7 @@ impl Available {
             grantors: Vec::new(),
             restricted: Vec::new(),
             any_color: false,
+            spenders: Vec::new(),
             linked: self.linked.clone(),
             complex: Vec::new(),
             spent: Vec::new(),
@@ -3730,6 +3765,7 @@ impl Available {
             grantors: Vec::new(),
             restricted: self.restricted.clone(),
             any_color: self.any_color,
+            spenders: Vec::new(),
             linked: self.linked.clone(),
             complex: Vec::new(),
             spent: Vec::new(),
@@ -4330,7 +4366,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 // touch it; what changes its own cost is already in `owed` (`special_action_cost`), which `special_action`
                 // pays. A cost of nothing is judged too: an increase still applies to it (CR 118.9d, 601.2f).
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
-                let any_color = static_rules::spend_any_color_for(cx, player, id, !def.special_action);
+                let any_color = static_rules::spend_any_color_for(cx, player, id, if def.special_action { SpendingFor::Other } else { SpendingFor::Activating });
                 // Its Phyrexian symbols paid with life where the life total allows, beside the life the cost pays
                 // (CR 107.4f, 601.2b by way of 602.2b, 116.2b), as the activation announces them (`announce_life`).
                 let judge = |cost: ManaCost| {
@@ -5452,7 +5488,7 @@ impl<'a> Offer<'a> {
         let mut option = ActionOption::on(ActionKind::CastSpell, card, WAY_BESTOW);
         // The Aura's target is announced with it, and the total cost follows from it (CR 601.2c, 601.2f): judged for each.
         let covered = |targets: &[Target], earlier: &Earlier| {
-            least_cost(cx, a, player, card, bestow, def.bestow_cost, targets, earlier, &mut |cost| a.covers_for(&cost, &spell_kind(cx, a, card, bestow)))
+            least_cost(cx, a, player, card, bestow, def.bestow_cost, targets, earlier, &mut |cost| spell_covers(cx, a, player, card, bestow, &cost))
         };
         if offer_costed(cx, a, &self.asker(card), bestow, def.bestow_cost.x, &mut option, covered) {
             options.push(option);
@@ -5799,7 +5835,8 @@ fn pay_with(cx: &Cx, grantors: &[ObjectId], player: PlayerId, spell: ObjectId, d
 fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, exiled: u8, any_type: bool) -> bool {
     let no_mana = def.keywords.has(Keyword::CantSpendManaToCast);
     let with = pay_with(cx, &a.grantors, player, card, def, face_of(cx, card, def));
-    let as_paid = |cost: ManaCost| if any_type { cost.paid_with_any_type() } else { cost };
+    let any_color = !any_type && casts_with_any_color(cx, a, player, card, def);
+    let as_paid = |cost: ManaCost| if any_type { cost.paid_with_any_type() } else if any_color { cost.paid_with_any_color() } else { cost };
     if !with.any() && !no_mana {
         return a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def));
     }
@@ -8808,6 +8845,16 @@ fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> 
     }
 }
 
+/// What paying for `source` is, as a "spend mana as though it were mana of any color" rule asks (CR 609.4b), as `payment_for`
+/// judges it: casting a spell only while it is a spell on the stack being cast.
+fn spending_for(cx: &Cx, source: ObjectId, purpose: Paying) -> SpendingFor {
+    match purpose {
+        Paying::Casting if cx.s().obj(source).zone.is(ZoneKind::Stack) => SpendingFor::Casting,
+        Paying::Activating => SpendingFor::Activating,
+        _ => SpendingFor::Other,
+    }
+}
+
 /// Casting `spell`, a spell on the stack, as it is there (CR 601.2g): its card types, supertypes, mana value with X as
 /// announced (CR 202.3e: 0 for a copy with no mana cost or of a back face, CR 707.9b, 202.3b, and for a face-down spell,
 /// CR 708.4; the cast half's alone, CR 709.3b), whether its mana cost has {X} and the zone it was cast from (CR 601.2a); its
@@ -9102,7 +9149,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
     // payment's view of what is left.
     let any = if helpers.any_type {
         AnyMana::Type
-    } else if static_rules::spend_any_color_for(cx, player, source, helpers.purpose == Paying::Activating) {
+    } else if static_rules::spend_any_color_for(cx, player, source, spending_for(cx, source, helpers.purpose)) {
         AnyMana::Color
     } else {
         AnyMana::No
@@ -10182,6 +10229,7 @@ mod tests {
             grantors: Vec::new(),
             restricted: Vec::new(),
             any_color: false,
+            spenders: Vec::new(),
             linked: Vec::new(),
             complex,
             spent: Vec::new(),

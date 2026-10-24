@@ -1701,13 +1701,15 @@ it, never both (where it falls short, KI-108).
 ### Mana spent as though it were of any color
 
 "Spend mana as though it were mana of any color" (CR 609.4b) is a `CardDef::spend_any_color` rule, asked of a payment
-(`Spending`: the player, what it is for, whether it is an activation): Agatha's Soul Cauldron's for its controller's
-creatures' abilities, Mycosynth Lattice's for every player and payment. Where one says yes, the cost is paid as
-`ManaCost::paid_with_any_color` has it - each colored and hybrid symbol by any mana, colorless included, a {C} symbol by
+(`Spending`: the player, what it is for, and whether it is casting that spell, activating an ability of it or another
+payment, `SpendingFor`): Agatha's Soul Cauldron's for its controller's creatures' abilities, Oath of Nissa's for its
+controller's planeswalker spells, Mycosynth Lattice's for every player and payment. Where one says yes, the cost is paid
+as `ManaCost::paid_with_any_color` has it - each colored and hybrid symbol by any mana, colorless included, a {C} symbol by
 colorless only - by the payment itself (`pay_mana_used`) and by the advice (`Available::covers_for`, which asks once per
-player whether the rule holds for every payment, and the activation offers, which ask for their source); the cost, its
-mana value and the mana spent are unchanged, and no restriction on the mana is lifted. "Mana of any type can be spent to
-cast that spell" (`PlayGrant::any_type`, `ExileCast::any_type`) is the same with {C} too (`ManaCost::paid_with_any_type`,
+player whether the rule holds for every payment; whether a card can be cast, which asks for that spell, read as the face
+it would be cast as, CR 712.11c, 709.3a, 715.4 - `spell_covers`, `covers_total`; and the activation offers, which
+ask for their source); the cost, its mana value and the mana spent are unchanged, and no restriction on the mana is lifted. "Mana of
+any type can be spent to cast that spell" (`PlayGrant::any_type`, `ExileCast::any_type`) is the same with {C} too (`ManaCost::paid_with_any_type`,
 `Helpers::any_type`). The payment keeps the cost's symbols and asks for the mana by that view of what is left, so what
 pays instead of mana still pays only its own share: delve and improvise the generic mana, convoke a symbol of its
 creature's color.
