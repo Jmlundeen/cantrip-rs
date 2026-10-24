@@ -1,0 +1,30 @@
+# Fiery Temper's control is Cast(Bot2): a player is a legal target, a land is not (refused beside it). The three
+# Mountains pay {1}{R}{R} exactly, so the pool is empty right after the cast, and Bot2 goes from 20 to 17.
+
+[Bot1 Deck]
+Mountain x3
+Fiery Temper
+Mountain x17
+
+[Bot2 Deck]
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+! Bot1.Hand.Fiery Temper.Cast(Bot1.Battlefield.Mountain#1)
+Bot1.Hand.Fiery Temper.Cast(Bot2)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Fiery Temper

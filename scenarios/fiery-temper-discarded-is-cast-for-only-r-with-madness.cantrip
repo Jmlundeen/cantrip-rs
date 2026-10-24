@@ -1,0 +1,31 @@
+# Fiery Temper has madness {R} (CR 702.35): discarded to Faithless Looting it goes to exile, and when the linked
+# trigger resolves Bot1 casts it for {R}, not for {1}{R}{R}, at Bot2 (20 to 17). Two Mountains are tapped before
+# Looting: Looting takes one R, madness the other, so the pool is empty right after the madness cast.
+
+[Bot1 Deck]
+Mountain
+Fiery Temper
+Faithless Looting
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Fiery Temper; Mountain)
+Bot1.Accept
+Bot1.Target(Bot2)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Exile.Count = 0
+Bot1.Graveyard = Fiery Temper; Faithless Looting; Mountain

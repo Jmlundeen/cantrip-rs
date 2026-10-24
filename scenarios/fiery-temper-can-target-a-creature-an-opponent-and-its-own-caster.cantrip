@@ -1,0 +1,50 @@
+# Fiery Temper's "any target": Bot1 kills Bot2's 3/3 Bog Wraith with the first (3 damage, exactly its toughness) and
+# aims the second at itself (20 to 17), so a creature, a player who is an opponent and the caster itself are accepted.
+
+[Bot1 Deck]
+Mox Ruby x6
+Fiery Temper
+Fiery Temper
+Mountain x15
+
+[Bot2 Deck]
+Mox Jet x4
+Bog Wraith
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Jet#3.Activate
+Bot2.Battlefield.Mox Jet#4.Activate
+Bot2.Hand.Bog Wraith.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Fiery Temper.Cast(Bot2.Battlefield.Bog Wraith)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Battlefield.Mox Ruby#6.Activate
+Bot1.Hand.Fiery Temper.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Bog Wraith = (absent)
+Bot2.Graveyard = Bog Wraith
+Bot1.Life = 17
+Bot2.Life = 20

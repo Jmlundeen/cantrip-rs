@@ -1,0 +1,33 @@
+# Fiery Temper's madness cost is {R} (CR 702.35a): after Faithless Looting takes the Mountain's R, only the Island's {U}
+# is left. Bot1 accepts the cast and picks a target, but {U} cannot pay a colored {R}, so the cast is cancelled and the
+# card goes to the graveyard, Bot2 untouched. A cost of {1} would be payable here, so this pins the color.
+
+[Bot1 Deck]
+Mountain
+Island
+Fiery Temper
+Faithless Looting
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Fiery Temper; Mountain)
+? Bot1.Mana = {U}
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Cancel
+
+[Expect]
+Bot2.Life = 20
+Exile.Count = 0
+Bot1.Graveyard = Fiery Temper; Faithless Looting; Mountain
