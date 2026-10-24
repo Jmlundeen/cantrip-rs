@@ -893,8 +893,19 @@ impl<'s> Run<'s> {
             if matches!(request.kind, RequestKind::Priority { .. }) {
                 self.casting = None;
             }
-        } else if let Some(auto) = self.auto_pay(request)? {
-            return Ok(Decision { intent: Intent::Answer(auto), line: None });
+        } else {
+            // A mana ability the line under the cursor activates is activated while paying (CR 601.2g), before the pool
+            // pays: what it does - a source it sacrifices, a type it takes away - may change what the pool's mana pays for.
+            if let Some(ScriptStep::Action(step)) = self.current()
+                && matches!(step.verb, ScriptVerb::Activate)
+                && request.player == player_of(step.bot)
+                && let Some(answer) = self.matches(step, request)?
+            {
+                return Ok(Decision { intent: Intent::Answer(answer), line: Some(step) });
+            }
+            if let Some(auto) = self.auto_pay(request)? {
+                return Ok(Decision { intent: Intent::Answer(auto), line: None });
+            }
         }
 
         if let Some(ScriptStep::Action(step)) = self.current()
