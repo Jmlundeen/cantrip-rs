@@ -1,0 +1,74 @@
+# Farewell, mode 3 alone (a single mode satisfies 'one or more'): both players' enchantments are exiled; artifacts, creatures and graveyards stay.
+# Each player has an artifact, an enchantment, a non-artifact creature (Black Lotus, sacrificed for mana, is in each graveyard);
+# Farewell is cast on turn 5 from 3 Plains, Sol Ring and Mox Pearl (CR 700.2, 406.2, 608.2c).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Sigarda's Aid
+Benalish Hero
+Black Lotus
+Plains
+Plains
+Farewell
+Plains x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Healer's Hawk
+Authority of the Consuls
+Black Lotus
+Plains
+Plains
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sigarda's Aid.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Authority of the Consuls.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Graveyard = Black Lotus
+? Bot2.Graveyard = Black Lotus
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Farewell.Cast
+Bot1.Modes(3)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Benalish Hero; Mox Pearl; Plains; Plains; Plains; Sol Ring
+Bot2.Battlefield = Healer's Hawk; Mox Pearl; Plains; Plains
+Bot1.Graveyard = Farewell; Black Lotus
+Bot2.Graveyard = Black Lotus
+Exile = Authority of the Consuls; Sigarda's Aid

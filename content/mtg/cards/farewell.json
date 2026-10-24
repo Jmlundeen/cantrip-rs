@@ -1,0 +1,6 @@
+{
+  "name": "Farewell",
+  "manaCost": "{4}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Choose one or more —\n• Exile all artifacts.\n• Exile all creatures.\n• Exile all enchantments.\n• Exile all graveyards."
+}
