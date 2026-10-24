@@ -1,0 +1,32 @@
+# Shark Typhoon: Cycling with X = 0 costs {1}{U}; the trigger still makes a 0/0 Shark, which state-based actions put into
+# the graveyard at once (CR 704.5f). The trigger is on the stack above the cycling ability, and once it
+# resolves the Shark is seen leaving the battlefield; the Typhoon is in the graveyard, the battlefield holds only the Moxen.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Shark Typhoon
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Shark Typhoon.Activate(Ability: Cycling; X: 0)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana =
+? Stack.Count = 2
+? LeftBattlefield.Count = 0
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? LeftBattlefield = Shark Token
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Shark Typhoon
+Bot1.Battlefield.Count = 2

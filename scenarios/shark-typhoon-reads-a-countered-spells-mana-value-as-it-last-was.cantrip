@@ -1,0 +1,65 @@
+# Shark Typhoon: "where X is that spell's mana value" is read as the trigger resolves, from the spell as it last was on the
+# stack once it has left (CR 608.2h; the ruling: the ability "resolves even if that spell is countered"). Bot1 casts Mind
+# Twist with X = 1, mana value 2 there (CR 202.3e); Bot2 counters it in response to the trigger, and the Shark is still
+# 2/2: the X the spell had on the stack counts, not its card's printed 1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Jet
+Shark Typhoon
+Mind Twist
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shark Typhoon.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 1)
+Bot1.Pass
+? Stack = Shark Typhoon; Mind Twist
+? Stack.Mind Twist.ManaValue = 2
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Mind Twist)
+Bot2.Pass
+Bot1.Pass
+? Stack = Shark Typhoon
+? Bot1.Graveyard = Mind Twist; Black Lotus
+? Bot1.Battlefield.Count = 6
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Shark Token.Power = 2
+Bot1.Battlefield.Shark Token.Toughness = 2
+Bot2.Graveyard = Counterspell

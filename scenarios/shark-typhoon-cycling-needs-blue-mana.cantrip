@@ -1,0 +1,29 @@
+# Shark Typhoon: Cycling {X}{1}{U} needs a blue mana. Four Moxen of the other colors make four mana, enough for X = 0
+# or 1 by amount, but no {U}: the cycling ability can't be activated, and the Typhoon stays in the hand.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Shark Typhoon
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+! Bot1.Hand.Shark Typhoon.Activate(Ability: Cycling)
+
+[Expect]
+Bot1.Hand = Shark Typhoon; Island; Island
+Bot1.Graveyard.Count = 0

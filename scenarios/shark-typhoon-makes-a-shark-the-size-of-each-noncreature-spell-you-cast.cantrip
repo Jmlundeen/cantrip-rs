@@ -1,0 +1,77 @@
+# Shark Typhoon: "Whenever you cast a noncreature spell, create an X/X blue Shark creature token with flying, where X is
+# that spell's mana value." Mind Twist with X = 1 has mana value 2 (CR 107.3a, 202.3e), not its printed 1, so the Shark is
+# 2/2. A mana value 0 spell (Mox Ruby) makes a 0/0 that dies (CR 704.5f); a creature spell (Faerie Miscreant) and
+# Bot2's noncreature spell (Brainstorm) make nothing. The Typhoon itself and the Moxen before it trigger nothing.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Jet
+Shark Typhoon
+Mind Twist
+Mox Ruby
+Faerie Miscreant
+Island x10
+
+[Bot2 Deck]
+Island
+Island
+Island
+Brainstorm
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shark Typhoon.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Shark Token.Power = 2
+? Bot1.Battlefield.Shark Token.Toughness = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Count = 8
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Miscreant.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Shark Token.Power = 2
+Bot1.Battlefield.Shark Token.Toughness = 2
+Bot1.Battlefield.Shark Token.Keywords = Flying
+Bot1.Battlefield.Shark Token.Colors = Blue
+Bot1.Battlefield.Count = 9
