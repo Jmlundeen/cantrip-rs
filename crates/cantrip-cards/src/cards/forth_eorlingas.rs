@@ -25,8 +25,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// for the whole batch.
 fn creature_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Player(_), amount, combat: true, .. }
-            if *amount > 0 && q.controller(*from) == me.controller && q.chars(*from).is(CardType::Creature) =>
+        Event::Damage { source: from, target: Target::Player(_), amount, kind, .. }
+            if kind.is_combat() && *amount > 0 && q.controller(*from) == me.controller && q.chars(*from).is(CardType::Creature) =>
         {
             Fired::PLAIN
         }

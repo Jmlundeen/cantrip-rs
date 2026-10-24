@@ -12,8 +12,8 @@ fn creatures_you_control_deal_unpreventable_combat_damage(q: &dyn Query, asker: 
 /// and "that player controls" read. Zero damage is no damage dealt (CR 120.8).
 fn deals_combat_damage_to_an_opponent(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Player(p), amount, combat: true, .. }
-            if *from == source && *amount > 0 && *p != q.controller(source) =>
+        Event::Damage { source: from, target: Target::Player(p), amount, kind, .. }
+            if kind.is_combat() && *from == source && *amount > 0 && *p != q.controller(source) =>
         {
             Some(Fired { subject: Target::Player(*p), data: [*amount as u32, 0] })
         }

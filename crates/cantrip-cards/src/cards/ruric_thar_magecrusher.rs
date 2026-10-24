@@ -16,7 +16,7 @@ fn itself_until_it_deals_combat_damage(view: &dyn LayerQuery, source: ObjectId, 
             .iter()
             .rev()
             .take_while(|record| !matches!(record.event, Event::ZoneChange { new, .. } if new == source))
-            .any(|record| matches!(record.event, Event::Damage { source: from, combat: true, amount, .. } if from == source && amount > 0))
+            .any(|record| matches!(record.event, Event::Damage { source: from, kind, amount, .. } if kind.is_combat() && from == source && amount > 0))
 }
 
 pub static CARD: CardDef = CardDef {

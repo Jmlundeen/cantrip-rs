@@ -6,8 +6,8 @@ use cantrip_oracle as oracle;
 /// an opponent of the activating player.
 fn opponent_was_dealt_noncombat_damage_this_turn(q: &dyn Query, asker: &Asker) -> bool {
     q.history().this_turn().iter().any(|r| {
-        matches!(r.event, Event::Damage { target: Target::Player(p), amount, combat: false, .. }
-            if amount > 0 && q.state().opponents(asker.controller).any(|o| o == p))
+        matches!(r.event, Event::Damage { target: Target::Player(p), amount, kind, .. }
+            if !kind.is_combat() && amount > 0 && q.state().opponents(asker.controller).any(|o| o == p))
     })
 }
 

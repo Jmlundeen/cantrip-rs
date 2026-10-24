@@ -7,8 +7,8 @@ use cantrip_oracle as oracle;
 /// set this one up (CR 603.7d), so it reads `me.controller`; the dealer is judged as it was when it dealt the damage.
 fn creature_you_control_deals_combat_damage_to_player_or_planeswalker(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source, target, amount, combat: true, .. }
-            if *amount > 0 && q.controller(*source) == me.controller && q.chars(*source).is(CardType::Creature) =>
+        Event::Damage { source, target, amount, kind, .. }
+            if kind.is_combat() && *amount > 0 && q.controller(*source) == me.controller && q.chars(*source).is(CardType::Creature) =>
         {
             match target {
                 Target::Player(_) => Fired::PLAIN,

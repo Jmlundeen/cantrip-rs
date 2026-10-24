@@ -37,7 +37,7 @@ fn red_sources_dealt_four_noncombat_damage(q: &dyn Query, asker: &Asker) -> bool
         .this_turn()
         .iter()
         .filter_map(|r| match r.event {
-            Event::Damage { amount, combat: false, controller, colors, .. } if controller == asker.controller && colors.has(red) => {
+            Event::Damage { amount, kind, controller, .. } if !kind.is_combat() && controller == asker.controller && kind.colors().has(red) => {
                 Some(u32::from(amount))
             }
             _ => None,

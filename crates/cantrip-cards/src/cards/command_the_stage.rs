@@ -24,7 +24,7 @@ fn opponent_was_dealt_noncombat_damage_last_turn(q: &dyn Query, asker: &Asker) -
     let last_turn = q.state().turn.number.saturating_sub(1);
     q.history().all().iter().any(|record| {
         record.turn == last_turn
-            && matches!(record.event, Event::Damage { target: Target::Player(p), combat: false, .. } if p != asker.controller)
+            && matches!(record.event, Event::Damage { target: Target::Player(p), kind, .. } if !kind.is_combat() && p != asker.controller)
     })
 }
 
