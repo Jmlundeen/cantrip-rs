@@ -58,16 +58,9 @@ fn pay_to_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Threshold \u{2014} As long as there are seven or more cards in your graveyard, this enchantment has ...": the
-/// enchantment's own delayed ability 0.
-fn has_threshold(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    let state = view.state();
-    source == affected && state.zone(Zone::graveyard(state.obj(source).controller)).len() >= 7
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::YOUR_UPKEEP, exile_from_graveyard, "At the beginning of your upkeep, exile a card from your graveyard.")],
     delayed: &[triggered(when(EventMask::ZONE_CHANGE, nontoken_creature_to_your_graveyard), pay_to_return, "Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.")],
-    statics: &[static_ability(Layer::Ability, has_threshold, cantrip_mechanics::statics::grant_delayed_ability, "Threshold \u{2014} As long as there are seven or more cards in your graveyard, this enchantment has \"Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.\"")],
+    statics: &[static_ability(Layer::Ability, cantrip_mechanics::statics::itself_with_threshold, cantrip_mechanics::statics::grant_delayed_ability, "Threshold \u{2014} As long as there are seven or more cards in your graveyard, this enchantment has \"Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.\"")],
     ..oracle::DECAYING_SOIL
 };
