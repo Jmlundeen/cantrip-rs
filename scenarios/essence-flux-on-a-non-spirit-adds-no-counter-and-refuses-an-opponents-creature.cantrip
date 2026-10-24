@@ -1,0 +1,31 @@
+# Essence Flux blinks Bot1's Ornithopter, which is not a Spirit, so it returns with no counter. Bot2's Ornithopter is not a legal target ("you control"),
+# while Bot1's own is (the positive control).
+
+[Bot1 Deck]
+Island
+Ornithopter
+Essence Flux
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Hand.Essence Flux.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Essence Flux.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Island.Activate
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield = Ornithopter
+Bot1.Graveyard = Essence Flux

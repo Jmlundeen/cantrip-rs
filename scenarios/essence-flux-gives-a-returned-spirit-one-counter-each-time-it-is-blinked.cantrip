@@ -1,0 +1,38 @@
+# Essence Flux exiles Spirit of the Labyrinth and returns it as a new object (CR 400.7), then, because it is a Spirit, puts a +1/+1 counter on it.
+# Cast twice: the second blink loses the first counter with the exiled object, so the Spirit has exactly one counter (4/2), never two. Black Lotus
+# gives UUU, Mox Pearl the W for the Spirit.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Pearl
+Spirit of the Labyrinth
+Essence Flux
+Essence Flux
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+Bot1.Hand.Essence Flux.Cast(Spirit of the Labyrinth)
+Bot2.Pass
+Bot1.Pass
+Bot1.Hand.Essence Flux.Cast(Spirit of the Labyrinth)
+Bot1.Battlefield.Island.Activate
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Spirit of the Labyrinth.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spirit of the Labyrinth.Power = 4
+Bot1.Battlefield.Spirit of the Labyrinth.Toughness = 2
+Bot1.Graveyard = Essence Flux; Essence Flux; Black Lotus
+Stack.Count = 0

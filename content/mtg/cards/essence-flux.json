@@ -1,0 +1,6 @@
+{
+  "name": "Essence Flux",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Exile target creature you control, then return that card to the battlefield under its owner's control. If it's a Spirit, put a +1/+1 counter on it."
+}
