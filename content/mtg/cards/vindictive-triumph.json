@@ -1,0 +1,6 @@
+{
+  "name": "Vindictive Triumph",
+  "manaCost": "{W}{B}{B}",
+  "type": "Instant",
+  "oracleText": "Exile target creature or planeswalker. If that permanent's mana value was 3 or less, return it to the battlefield tapped under your control. Exile it at the beginning of the next end step."
+}
