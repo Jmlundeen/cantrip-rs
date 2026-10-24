@@ -80,13 +80,26 @@ impl Cast {
     }
 }
 
-/// An attacker's characteristics as it was declared (CR 508.1): those its `Event::Attacks` kept (`known`), whatever it has
-/// become, wherever it has gone and whoever controls it since.
-pub fn attacker_as_declared(q: &dyn crate::Query, attacker: ObjectId, known: u32) -> crate::Chars {
-    let c = q.chars(attacker);
-    match q.state().last_known.get(known as usize) {
-        Some(row) => c.as_known(row),
-        None => c,
+/// A creature declared as an attacker (CR 508.1; not one put onto the battlefield attacking, CR 508.4): its
+/// `Event::Attacks`, as `History::attacked_with` gives it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Attacked {
+    pub attacker: ObjectId,
+    /// The last-known row that keeps it as it was declared (`Event::Attacks::known`).
+    pub known: u32,
+}
+
+impl Attacked {
+    /// Its characteristics as it was declared (CR 508.1): "you attacked with a Rogue" asks what it was then, whatever it
+    /// has become, wherever it has gone and whoever controls it since. The rest - its card - is this object's.
+    pub fn chars(&self, q: &dyn crate::Query) -> crate::Chars {
+        let c = q.chars(self.attacker);
+        let row = q.state().last_known.get(self.known as usize);
+        debug_assert!(row.is_some_and(|r| r.id == self.attacker), "an attack names its own last-known row");
+        match row {
+            Some(row) => c.as_known(row),
+            None => c,
+        }
     }
 }
 
@@ -394,12 +407,13 @@ impl<'a> History<'a> {
         })
     }
 
-    /// The creatures `player` declared as attackers this turn (CR 508.1; not one put onto the battlefield attacking, CR
-    /// 508.4), each as it was declared (`attacker_as_declared`): only the active player declares attackers (CR 506.2,
-    /// 508.1), so none for another, whoever controls those creatures now.
-    pub fn attacked_with(&self, q: &'a dyn crate::Query, player: PlayerId) -> impl Iterator<Item = crate::Chars> + 'a {
+    /// The declarations of attackers `player` made this turn (CR 508.1; not a creature put onto the battlefield attacking,
+    /// CR 508.4), in order, a creature that attacked in two combats twice: only the active player declares attackers (CR
+    /// 506.2, 508.1), so none for another, whoever controls those creatures now. `Attacked::chars` is one as it was
+    /// declared.
+    pub fn attacked_with(&self, player: PlayerId) -> impl Iterator<Item = Attacked> + 'a {
         self.this_turn().iter().filter_map(move |r| match r.event {
-            Event::Attacks { attacker, known, .. } if r.active == player => Some(attacker_as_declared(q, attacker, known)),
+            Event::Attacks { attacker, known, .. } if r.active == player => Some(Attacked { attacker, known }),
             _ => None,
         })
     }

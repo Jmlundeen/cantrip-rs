@@ -4560,7 +4560,7 @@ fn permission_stands(cx: &Cx, p: &PlayPermission, player: PlayerId) -> bool {
 /// the declaring player's, the active player (CR 506.2, 508.1).
 fn play_condition_holds(cx: &Cx, player: PlayerId, when: PlayCondition) -> bool {
     match when {
-        PlayCondition::AttackedWithThisTurn(kind) => cx.history().attacked_with(cx, player).any(|c| c.has_subtype(kind)),
+        PlayCondition::AttackedWithThisTurn(kind) => cx.history().attacked_with(player).any(|a| a.chars(cx).has_subtype(kind)),
         PlayCondition::ControlsSubtype(kind) => {
             cx.s().battlefield().iter().any(|&id| cx.s().obj(id).controller == player && cx.chars(id).has_subtype(kind))
         }

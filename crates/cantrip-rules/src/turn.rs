@@ -733,7 +733,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     cx.st().set_attackers(attackers.clone());
     // One batch (CR 603.2c): "whenever one or more creatures attack" triggers once; "whenever you attack" after the
     // creatures' own abilities (CR 508.1m).
-    // Each keeps the attacker as it was declared (`history::attacker_as_declared`): "during any turn you attacked with a
+    // Each keeps the attacker as it was declared (`history::Attacked::chars`): "during any turn you attacked with a
     // Rogue" asks what it was then, not what it has become or who has taken it since.
     let mut events: Vec<Event> = Vec::with_capacity(attackers.len() + options.len() + 1);
     for a in &attackers {

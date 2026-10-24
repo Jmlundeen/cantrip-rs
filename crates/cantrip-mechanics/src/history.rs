@@ -282,15 +282,10 @@ pub fn cast_during_your_main_phase(q: &dyn Query, me: &Asker) -> u32 {
 /// need not still be on the battlefield or under anyone's control. Windbrisk Heights, Wedding Announcement and Chart a
 /// Course (whether it is any) ask it.
 pub fn creatures_attacked_with(q: &dyn Query, player: PlayerId) -> usize {
-    if q.state().turn.active != player {
-        return 0;
-    }
     let mut seen: Vec<ObjectId> = Vec::new();
-    for r in q.history().this_turn() {
-        if let Event::Attacks { attacker, .. } = r.event
-            && !seen.contains(&attacker)
-        {
-            seen.push(attacker);
+    for a in q.history().attacked_with(player) {
+        if !seen.contains(&a.attacker) {
+            seen.push(a.attacker);
         }
     }
     seen.len()
