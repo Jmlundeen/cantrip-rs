@@ -276,6 +276,41 @@ pub fn chosen_option(q: &dyn Query, asker: &Asker, def: &'static CardDef) -> Opt
     q.state().chosen_option(q.linked_to(asker)).filter(|c| std::ptr::eq(q.card(c.card), def)).map(|c| c.index)
 }
 
+/// "As [this] enters, choose [a permanent]" (CR 614.12a, 607.2d): before it enters, its controller chooses one of the
+/// permanents `rule` allows among `permanents` (the noun and count are the rule's: `select::up_to(1)` for "you may
+/// choose"), and the permanent keeps the choice for as long as it is on the battlefield. Only what is on the battlefield as
+/// the choice is made may be chosen: a permanent entering at the same time is not there yet (CR 614.12a; Dauntless
+/// Bodyguard's and Metamorphic Alteration's rulings), nor is the one entering. Nobody is asked when `rule` allows none of
+/// them, and nothing is chosen. It is not targeting (CR 115.10), so hexproof and shroud don't stop it. Only the abilities
+/// of the text that asks refer to the choice (CR 607.2d, `chosen_object`): the engine keeps it with that text. The
+/// choice is no copiable value (CR 707.2), so a copy entering makes its own (CR 707.5). Dauntless Bodyguard and Tyrannical
+/// Pitlord ("another creature you control"), Scheming Fence ("you may choose a nonland permanent") and Metamorphic
+/// Alteration ("a creature") print it.
+pub fn object_as_enters(g: &mut dyn Game, entering: &mut Entering, permanents: Vec<ObjectId>, rule: Selection) -> Result<(), Suspend> {
+    let (chooser, source) = (entering.controller, entering.object);
+    let permanents: Vec<ObjectId> = permanents.into_iter().filter(|&id| id != source && g.obj(id).zone.is(ZoneKind::Battlefield)).collect();
+    let none: &[ObjectId] = &[];
+    if !cantrip_api::select::judge(&*g, &rule, &cantrip_api::select::Choice { chooser, source, candidates: &permanents, selected: none }).addable.any() {
+        return Ok(());
+    }
+    let chosen = select(g, chooser, source, Purpose::ChooseAsEnters, permanents, rule)?;
+    entering.chosen_object = chosen.first().copied();
+    Ok(())
+}
+
+/// "The chosen [permanent]" of `by`'s text (CR 607.2d): the permanent chosen as `by`'s source entered (`object_as_enters`),
+/// read by an ability linked to the one that chose it - `Query::linked` of a resolving ability, `Query::linked_to` of a
+/// static one - from its source as it is or as it last existed, if it has left (CR 608.2h). None if nothing was chosen, if
+/// `by` is not linked to that choice (CR 607.5: an ability of another text, or one a copy or grant effect gave it later), or
+/// if the chosen permanent is no longer on the battlefield: one that left is gone, and if it has come back it is a new
+/// object (CR 400.7) that was never chosen; one phased out is treated as though it doesn't exist until it phases in
+/// (CR 702.26b).
+pub fn chosen_object(q: &dyn Query, by: Linked) -> Option<ObjectId> {
+    let chosen = q.state().chosen_object(by)?;
+    let obj = q.obj(chosen);
+    (obj.became.is_none() && obj.zone.is(ZoneKind::Battlefield)).then_some(chosen)
+}
+
 /// The labels "choose odd or even" offers, odd first: a card that asks it lists them as its `labels`.
 pub const ODD_OR_EVEN: &[&str] = &["Odd", "Even"];
 
