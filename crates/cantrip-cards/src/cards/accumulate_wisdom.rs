@@ -1,5 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{look_at_top, Rest};
+use cantrip_mechanics::learn;
 use cantrip_oracle as oracle;
 
 /// "Look at the top three cards of your library. Put one of those cards into your hand and the rest on the bottom of your
@@ -9,7 +10,7 @@ use cantrip_oracle as oracle;
 /// when the count is met.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let lessons = g.state().zone(Zone::graveyard(player)).iter().filter(|&&c| g.chars(c).has_subtype(Subtype::Lesson)).count();
+    let lessons = learn::lesson_cards_in_graveyard(g, player);
     let taken = if lessons >= 3 { 3 } else { 1 };
     look_at_top(g, player, item.object, 3, (taken, taken), false, |_| true, Rest::BottomChosen)?;
     Ok(())

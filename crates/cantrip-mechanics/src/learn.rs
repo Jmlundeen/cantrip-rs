@@ -15,6 +15,12 @@ fn lesson(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
 /// "A Lesson card" (the Lesson subtype, CR 205.3k): the quality learn reveals.
 pub const LESSON: Part = part(&(lesson as SelectFn), 0, "");
 
+/// "The number of Lesson cards in your graveyard" (CR 205.3k): the Lesson cards in `player`'s graveyard, as the caller asks.
+/// Accumulate Wisdom, Combustion Technique and Gran-Gran print it.
+pub fn lesson_cards_in_graveyard(q: &dyn Query, player: PlayerId) -> usize {
+    q.state().zone(Zone::graveyard(player)).iter().filter(|&&card| q.chars(card).has_subtype(Subtype::Lesson)).count()
+}
+
 /// One Lesson card or none.
 pub const LESSON_CARD: Selection = Selection::of(up_to(1), &[LESSON]).called("Lesson");
 
