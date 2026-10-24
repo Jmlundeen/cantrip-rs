@@ -1,4 +1,4 @@
-# Twisted Landscape: each of the three listed basic land types is legal. Reject Island, reject Tundra because it is nonbasic, then find Swamp, Mountain and Forest; each search puts its land onto the battlefield tapped (CR 205.4a, 305.6, 701.23).
+# Twisted Landscape: each of the three listed basic land types is legal. Reject Island, reject Badlands because it is nonbasic although it has the Swamp and Mountain types, then find Swamp, Mountain and Forest; each search puts its land onto the battlefield tapped (CR 205.4a, 305.6, 701.23).
 
 [Bot1 Deck]
 Twisted Landscape x3
@@ -7,7 +7,7 @@ Forest x8
 Island x8
 Mountain x8
 Swamp x8
-Tundra x2
+Badlands x2
 
 [Bot2 Deck]
 Island x20
@@ -22,7 +22,7 @@ Bot1.Battlefield.Twisted Landscape.Activate(Ability: {T}, Sacrifice this land)
 ! Bot1.Search(Island)
 Bot1.Search(Swamp)
 Bot1.Battlefield.Twisted Landscape.Activate(Ability: {T}, Sacrifice this land)
-! Bot1.Search(Tundra)
+! Bot1.Search(Badlands)
 Bot1.Search(Mountain)
 Bot1.Battlefield.Twisted Landscape.Activate(Ability: {T}, Sacrifice this land)
 Bot1.Search(Forest)

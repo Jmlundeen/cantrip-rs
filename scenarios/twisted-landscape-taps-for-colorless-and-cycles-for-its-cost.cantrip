@@ -1,10 +1,11 @@
-# Twisted Landscape: cycle the second copy for its exact printed cost, using one matching land source for each colored symbol; then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
+# Twisted Landscape: cycle the second copy for its exact printed cost, paid with a Swamp, a Mountain and a Forest while a Plains is tapped as well, so that the {W} left over shows each colored symbol took its own color (a {3} or {1}{R}{G} cost would leave something else); then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
 
 [Bot1 Deck]
 Twisted Landscape x2
 Swamp
 Mountain
 Forest
+Plains
 Plains x6
 Island x6
 Forest x6
@@ -22,18 +23,22 @@ Bot1.Hand.Swamp.Play
 Bot1.Hand.Mountain.Play
 [T7 Bot1.Main1]
 Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
 Bot1.Hand.Twisted Landscape.Activate(Ability: Cycling)
+Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Forest.Activate
-? Bot1.Mana =
+? Bot1.Mana = {W}
 Bot1.Pass
 Bot2.Pass
-[T9 Bot1.Main1]
+[T11 Bot1.Main1]
 Bot1.Battlefield.Twisted Landscape.Activate(Ability: {T}: Add {C})
 ? Bot1.Mana = {C}
 
 [Expect]
-Turn = 9
+Turn = 11
 Bot1.Graveyard = Twisted Landscape
+Bot1.Hand = Island; Plains; Plains; Plains; Plains; Plains; Plains
 Bot1.Battlefield.Twisted Landscape.Tapped = true
