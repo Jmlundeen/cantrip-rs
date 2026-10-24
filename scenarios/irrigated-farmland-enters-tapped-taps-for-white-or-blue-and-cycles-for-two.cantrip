@@ -1,0 +1,37 @@
+# Irrigated Farmland: it enters tapped (T1); it taps for {W} and, on another turn, for {U} (its Plains and Island types, CR 305.6); the second copy cycles for exactly {2} paid with two Mountains, which are neither white nor blue, so only a generic cost leaves the pool empty (CR 702.29).
+
+[Bot1 Deck]
+Irrigated Farmland x2
+Mountain x2
+Plains x6
+Island x6
+Forest x6
+Mountain x6
+Swamp x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Irrigated Farmland.Play
+? Bot1.Battlefield.Irrigated Farmland.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Irrigated Farmland.Activate(Ability: {W})
+? Bot1.Mana = {W}
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Irrigated Farmland.Activate(Ability: {U})
+? Bot1.Mana = {U}
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Irrigated Farmland.Activate(Ability: Cycling)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Irrigated Farmland
+Bot1.Hand = Island; Plains; Plains; Plains; Plains; Plains; Plains
