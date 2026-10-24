@@ -5,24 +5,44 @@ core-feature agents and review agents run on Opus. Agents read only what their w
 (and the `write-game-script` skill), a reviewer `review.md` and the parts of `SKILL.md` it names, a core-feature agent
 `SKILL.md`'s "Where code goes" and the rule it builds.
 
-0. **The worktree pool.** Work happens in a fixed pool of worktrees, `.claude/worktrees/pool-1` .. `pool-N`, each on
-   its own branch with its own warm `target/`; N (about 4) is also the cap on build-heavy agents at once, because each
-   cargo build takes every core. A slot is made once (`git worktree add .claude/worktrees/pool-<n> -b pool-<n>
-   origin/main`) and never removed. Agents are started without the Agent tool's own worktree isolation and work in
-   their slot by absolute path: every shell command starts with `cd <slot>` (so cargo uses the slot's workspace and
-   `target/`) and every file path is under the slot. (`EnterWorktree` refuses a subagent that was not launched inside a
-   worktree.) Every build stays in the slot's own `target/`: never `CARGO_TARGET_DIR` or `--target-dir` pointed at
-   another tree's, and never a copied `target/` - cargo's freshness records name absolute source paths, so a shared or
-   copied `target/` compiles another tree's files into a test run that claims to test this one.
-1. **One card per agent, many agents per slot.** Before starting an agent, `card-issues.py next <format>`: an agent
-   started on an empty format spends minutes finding that out. A card agent takes one card in its slot: it starts the
-   slot afresh (`git fetch`, then `git checkout -B pool-<n> origin/main`, once the slot's last work has landed), claims
-   the card (`claim --format <format>`, or the card named), implements it, commits, reports, and stays alive for its
-   review and fixes. When the card has landed, the coordinator ends that agent and starts a fresh one in the same slot
-   for the next card: the finished card's history is no help to the next one and only costs tokens. Cards go in list
-   order, never pre-sorted by difficulty. The coordinator's job is the format and how many slots are busy, not the
-   claims, and it releases nothing an agent has not claimed.
-2. **A card agent's prompt** names its slot and the format, points it at `SKILL.md` (read with the Read tool - it is
+0. **The worktree pool is the tool's: `tools\worktree.cmd`** (`tools/maintenance/worktrees.py`, its docstring the
+   whole model). Work happens in a pool of worktrees, `.claude/worktrees/pool-<n>`, each with its own warm `target/`;
+   their number (about 4) is also the cap on build-heavy agents at once, because each cargo build takes every core.
+   Nothing reaches a slot but through the tool, and nobody picks a slot or passes its path. The pool is opt-in per
+   machine (its hooks in the local settings): when `acquire` says they are not installed, stop and offer the user the
+   `worktree-pool-setup` skill.
+   - **New work is a new lease**: `worktree.cmd acquire --for "card: <Name>"` (or `"gap: <rule>"`, `"PR #N"`) gives a
+     clean slot on today's `origin/main`, its path and a lease ID that stay with you - never in a prompt or a message.
+     `NO WORKTREE AVAILABLE` means wait for a release; growing the pool (`create`) is the user's call. A lease is
+     never reused for the next card.
+   - **Every agent in the slot is let in by a token**: `worktree.cmd token <lease>` (`--read-only` for a reviewer) -
+     single-use, dead in two minutes - pasted into its prompt as the token's output says; the agent's first command is
+     `join`. That includes an agent resumed with SendMessage to work in the slot again: the message carries a fresh
+     token, since an agent that stopped has left.
+   - **One member at a time**: the next token is made only once the member has left (`leave`, or its agent stopping -
+     the SubagentStop hook makes it leave). A long-running agent keeps its slot until then; nothing is ever started
+     beside it. `evict` only a member whose agent you know has ended.
+   - **Release when it has landed**: `worktree.cmd release <lease>` - refused while a member is in, while the slot is
+     dirty or while its commits' patches are not on `origin/main`; `--discard --reason` only for work truly abandoned.
+   - **`worktree.cmd status`** lists every lease, its purpose and member - read it rather than your memory of the pool
+     (after a compaction, before every `acquire`). `reconcile` finds what is stale. A slot set aside as needing
+     attention is the user's: `status pool-<n>` shows what it holds, and `clean pool-<n> --reason` empties it on
+     their say.
+
+   The hooks deny an edit or shell command into a slot by anyone but its member, and the main thread while a member
+   is in it. Agents are started without the Agent tool's own worktree isolation. Every build stays in the slot's own
+   `target/`: never `CARGO_TARGET_DIR` or `--target-dir` pointed at another tree's, and never a copied `target/` -
+   cargo's freshness records name absolute source paths, so a shared or copied `target/` compiles another tree's files
+   into a test run that claims to test this one.
+1. **One card per agent, one lease per card.** Before starting an agent, `card-issues.py next <format>`: an agent
+   started on an empty format spends minutes finding that out. For each card, `acquire` a lease and start a card agent
+   with a token for it: the agent claims the card (`claim --format <format>`, or the card named), implements it,
+   commits, reports and leaves. Its review and fixes follow in the same lease, each agent with its own token (4). When
+   the card has landed, `release`; the next card takes a new lease and a fresh agent: the finished card's history is no
+   help to the next one and only costs tokens. Cards go in list order, never pre-sorted by difficulty. The
+   coordinator's job is the format and how many leases are out, not the claims, and it releases nothing an agent has
+   not claimed.
+2. **A card agent's prompt** carries its token (never a path) and the format, points it at `SKILL.md` (read with the Read tool - it is
    longer than a shell result shows) and the `write-game-script` skill, and adds no requirement the skill does not
    make. It says: claim before any work; `new-card.py` first; the core is closed to it (a missing keyword module may go
    in `cantrip-mechanics`); run only its card's scenarios and coverage and those of a card whose file or shared
@@ -33,24 +53,27 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    output it used, what was noise, what it searched for by hand and what cost it failed runs (the coordinator's
    material for step 7). A card blocked by the core is never faked and never released: the agent keeps the claim,
    commits nothing the gap would change, sends a gap report - the card, its issue, the exact rule (CR), what
-   `cantrip-api` lacks and what it learned - and ends; the slot takes the next card meanwhile. The agent logs its
+   `cantrip-api` lacks and what it learned - and ends; its lease is released (nothing landed is lost: the gap's
+   commits, if any, are pushed to a branch first) and the next card takes a new one meanwhile. The agent logs its
    points on the card's issue (`claims.md`, "The progress log": `committed`, `fixes-committed`, `blocked`); a fresh
    agent finishing a card that waited logs `unblocked`.
-3. **Gaps.** For a reported gap the coordinator starts a core-feature agent (Opus) in a free slot: the core open to it,
+3. **Gaps.** For a reported gap the coordinator `acquire`s a lease and starts a core-feature agent (Opus) with its token: the core open to it,
    the feature built to its rule for every card the rule describes, the benchmark run, its own commits
    (`Engine: ...`), no card work. Gaps several waiting cards share go to one feature agent; feature agents work on
    separate rules areas. As soon as the feature passes its review, a fresh card agent, given the gap report, finishes
-   the waiting card, cherry-picking the reviewed core commits into its slot rather than waiting for them to land. Other
+   the waiting card in a new lease, cherry-picking the reviewed core commits rather than waiting for them to land. Other
    running agents are told what landed so they rebase. Only a gap the coordinator decides not to build is released,
    with the gap recorded on the issue.
-4. **Review agents** (Opus) review inside the implementing agent's slot - by absolute path as in (0), on the commit as
-   it stands, using its warm build - never in a worktree of their own, and change no files, check out nothing and clean
-   nothing there; they log `review-started` and their verdict on the card's issue. Their prompt points them at
+4. **Review agents** (Opus) review inside the card's lease - let in by a `--read-only` token once the card agent has
+   left, on the commit as it stands, using its warm build - never in a worktree of their own, and change no files,
+   check out nothing and clean nothing there; they log `review-started` and their verdict on the card's issue, and
+   leave. Their prompt points them at
    `review.md`, the card's issue number, the commit, the card's Oracle text and the CR rules it
    touches, and at correctness, safety and rules adherence; it hands them no list of corner cases to demand tests for.
-   The implementing agent waits while it is reviewed; each card is reviewed as soon as it is committed. The
-   coordinator sends back the blocking findings, and a non-blocking note that is a real test gap (a limit not met
-   exactly, one player's side untested) when the fix is a line of a scenario.
+   Each card is reviewed as soon as it is committed. The coordinator sends back the blocking findings, and a
+   non-blocking note that is a real test gap (a limit not met exactly, one player's side untested) when the fix is a
+   line of a scenario - to the card agent with SendMessage, a fresh write token in the message, once the reviewer has
+   left; the reviewer confirms the fixes the same way, with a fresh read-only token.
 5. **Land** each reviewed card or core change on `main` (cherry-pick its commits; a conflict stops for a look), then
    one test run for everything ready to land together: `tools\test.cmd /engine` (the Rust workspace, about a minute and
    a half: the corpus with 0 fail - known bugs reported beside it - and the verify tests) when the batch touches only
@@ -59,8 +82,8 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    much lower cadence (the last landing of a session, or every ten or so). `git fetch` and `git rebase origin/main`
    right before every push. If more commits arrive while the run goes, rebase, build, and run only the scenarios of
    the cards and mechanics this landing touches before pushing. Push, then `card-issues.py log <N> landed --commit
-   <sha>` for each card (and `review-passed` first where the coordinator verified review fixes itself); end the slot's
-   agent; the slot takes its next card (1).
+   <sha>` for each card (and `review-passed` first where the coordinator verified review fixes itself); end the card's
+   agents, then `worktree.cmd release <lease>`; the next card takes a new lease (1).
 6. **Report** what landed, what waited on which core gap and how it was built, the corpus line, and
    `card-issues.py times` for the cards of the run.
 7. **Improve the process, always.** After each card, read the agent's report and the review for friction - a search by

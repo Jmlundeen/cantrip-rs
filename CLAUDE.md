@@ -137,6 +137,9 @@ is pushed from there. Card art never goes in: `content/*/images/` is gitignored 
   `cantrip-rules`, `cantrip-mechanics`, `cantrip-oracle` (generated), `cantrip-cards` (the cards), `cantrip-engine`,
   `cantrip-script` (scenarios), `cantrip-bench`, `cantrip-host` (the `cantrip-native-host` sidecar the server drives
   over JSON lines; protocol in `docs/host-protocol.md`). Build output is `target/`.
+- `.claude/worktrees/pool-<n>` — the agents' worktree pool, reached only through `tools\worktree.cmd`: a lease for
+  new work, a single-use token for each agent let into it, one member at a time (`coordinator.md` step 0). Opt-in per
+  machine: the `worktree-pool-setup` skill installs its hooks in the gitignored `.claude/settings.local.json`.
 - `scenarios/` — the scenario corpus, one `.cantrip` file per case.
 - `dotnet/` — everything C#: `Cantrip.sln` (and `Cantrip.NoWeb.slnf`, the solution without the web client, what
   `test.cmd /noweb` builds), `src/`, `tests/` and `tools/` projects.

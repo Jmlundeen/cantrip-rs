@@ -46,7 +46,8 @@ checked for sufficiency, not exhaustiveness:
 
 A reviewer runs only the card's scenarios and coverage (`corpus -- --card "Name"`, `python tools/maintenance/card-coverage.py "Name"`), and those of a
 card whose shared code the change touched - nothing wider - and, in another's worktree, changes no files, checks out
-nothing and cleans nothing.
+nothing and cleans nothing. It reaches that worktree only by the read-only token in its prompt (`tools\worktree.cmd
+join`, its first command, and `leave` its last), never by a path it was given.
 
 The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
 land. Self-reported "exact" is not proof. A finding **blocks** the card when it is a rules deviation, a code defect

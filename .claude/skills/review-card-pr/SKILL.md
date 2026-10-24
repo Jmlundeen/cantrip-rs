@@ -14,15 +14,13 @@ Take pull requests **one at a time**, oldest first unless the user names one; re
 
 ## 1. The PR's commits in a fresh pool slot
 
-Take a free slot of the worktree pool (`coordinator.md` step 0: `.claude/worktrees/pool-<n>`, made once with
-`git worktree add .claude/worktrees/pool-<n> -b pool-<n> origin/main` if the pool has no free one) and start it afresh
-with the PR on today's `main`:
+Take a lease on the worktree pool (`coordinator.md` step 0): `tools\worktree.cmd acquire --for "PR #<N>"` gives a
+clean slot on today's `main`, its path and the lease ID, which stay with you. No slot free: wait, or ask the user to
+grow the pool. With no member in the slot yet, put the PR on it:
 
 ```
-cd .claude/worktrees/pool-<n>
-git fetch origin
+cd <the path acquire printed>
 git fetch origin pull/<N>/head:pr-<N>
-git checkout -B pool-<n> origin/main
 git cherry-pick origin/main..pr-<N>        # the PR's own commits, in order, authorship kept
 ```
 
@@ -34,7 +32,8 @@ the commits, or `gh issue list --search "<Card Name> in:title" --state all`; a c
 ## 2. Straight to the review: an Opus agent
 
 Start a fresh agent (`model: "opus"`, no worktree isolation) exactly as `coordinator.md` step 4 says for a review
-agent: in the slot by absolute path, on the commits as they stand, pointed at `review.md`, the card's issue number,
+agent: let into the lease by a `--read-only` token (`worktree.cmd token <lease> --read-only`, the token in its prompt,
+never the path), on the commits as they stand, pointed at `review.md`, the card's issue number,
 the commits, the card's Oracle text and the CR rules it touches - and nothing else, no opinion of the card and no list
 of corner cases. Add only what a PR makes different:
 
@@ -52,13 +51,15 @@ Read its report before acting on it; a finding that is wrong is dropped, and the
 ## 3. Fixes: a fresh Sonnet agent
 
 With blocking findings (or a non-blocking note that `coordinator.md` step 4 says to send back), start a fresh agent
-(`model: "sonnet"`, no worktree isolation) in the same slot, as the card agent that would have written the card: its
+(`model: "sonnet"`, no worktree isolation) in the same lease, with a write token once the reviewer has left, as the
+card agent that would have written the card: its
 prompt is a card agent's (`coordinator.md` step 2 - `SKILL.md` read with the Read tool, the `write-game-script` skill,
 the core closed to it, only the touched cards' scenarios and coverage, no push), plus the findings verbatim and that
 it fixes them on top of the PR's commits, logs `fixes-committed` on the issue and reports how each was fixed. A fix
 that needs the core is a gap report, handled as `coordinator.md` step 3 says.
 
-Send the fix commits back to the review agent (SendMessage, its context kept) to confirm each finding is resolved and
+Send the fix commits back to the review agent (SendMessage, its context kept, a fresh read-only token in the message
+once the fix agent has left) to confirm each finding is resolved and
 nothing new is broken; loop until it passes, or stop and tell the user when a finding needs a decision only they can
 make. No blocking findings: nothing to fix.
 
@@ -66,7 +67,9 @@ make. No blocking findings: nothing to fix.
 
 Land as `coordinator.md` step 5 says (the test run it names, `git fetch` and rebase before the push, push, `log <N>
 landed`). Then on the PR: `gh pr comment <N>` saying it landed, with the commit hashes on `main` and a short list of
-what the review found and what was changed, and `gh pr close <N>`. Delete `pr-<N>`. The slot stays for the next PR.
+what the review found and what was changed, and `gh pr close <N>`. Delete `pr-<N>`, then `tools\worktree.cmd release
+<lease>`; the next PR takes a new lease. A PR that does not land: `release --discard --reason "PR #<N> not landed:
+..."`, since its commits stay on the PR.
 
 ## 5. Report
 
