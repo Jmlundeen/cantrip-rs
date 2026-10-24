@@ -1,0 +1,161 @@
+//! Excess actually dealt (CR 120.10): Violent Echoes, Toralf and Aegar share this rules information.
+use crate::{Cx, Game, Setup, ops};
+use cantrip_api::*;
+const YOU: PlayerId = PlayerId(0);
+static BEAR: CardDef =
+    CardDef { name: "Excess Bear", types: TypeSet::of(&[CardType::Creature]), power: Some(2), toughness: Some(4), ..CardDef::BLANK };
+static TOUCH: CardDef = CardDef { name: "Excess Touch", keywords: Keywords::of(&[Keyword::Deathtouch]), ..BEAR };
+static INFECT: CardDef = CardDef { name: "Excess Infect", keywords: Keywords::of(&[Keyword::Infect]), ..BEAR };
+static WALKER: CardDef = CardDef { name: "Excess Walker", types: TypeSet::of(&[CardType::Planeswalker]), ..CardDef::BLANK };
+static BATTLE: CardDef = CardDef { name: "Excess Battle", types: TypeSet::of(&[CardType::Battle]), ..CardDef::BLANK };
+static MULTI: CardDef =
+    CardDef { name: "Excess Multitype", types: TypeSet::of(&[CardType::Creature, CardType::Planeswalker, CardType::Battle]), ..BEAR };
+fn to_self(_: &dyn Query, a: &Asker, d: &DamageEvent) -> bool {
+    d.target == Target::Object(a.source)
+}
+fn two(_: &dyn Query, _: &Asker, _: &DamageEvent) -> u16 {
+    2
+}
+static SHIELDED: CardDef =
+    CardDef { name: "Excess Shielded", preventions: &[PreventionDef { hint: "prevent two", applies: to_self, amount: Some(two) }], ..BEAR };
+static IMMUNE: CardDef =
+    CardDef { name: "Excess Immune", preventions: &[PreventionDef { hint: "prevent all", applies: to_self, amount: None }], ..BEAR };
+fn to_another(_: &dyn Query, a: &Asker, p: &Proposal) -> bool {
+    matches!(p, Proposal::Damage(d) if d.target != Target::Object(a.source))
+}
+fn redirect(_: &dyn Query, a: &Asker, p: &mut Proposal) {
+    if let Proposal::Damage(d) = p {
+        d.target = Target::Object(a.source);
+    }
+}
+static REDIRECTOR: CardDef = CardDef {
+    name: "Excess Redirector",
+    replacements: &[replacement(ReplacementKind::Damage, to_another, redirect, "redirect to this")],
+    ..BEAR
+};
+fn damage(_: &dyn Query, _: &Asker, p: &Proposal) -> bool {
+    matches!(p, Proposal::Damage(_))
+}
+fn double(_: &dyn Query, _: &Asker, p: &mut Proposal) {
+    if let Proposal::Damage(d) = p {
+        d.amount *= 2;
+    }
+}
+static DOUBLER: CardDef = CardDef {
+    name: "Excess Doubler",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    replacements: &[replacement(ReplacementKind::Damage, damage, double, "double")],
+    ..CardDef::BLANK
+};
+fn game(defs: &[&'static CardDef]) -> (Game, Vec<ObjectId>) {
+    let table: &'static CardTable =
+        Box::leak(Box::new(CardTable::new([&BEAR, &TOUCH, &INFECT, &WALKER, &BATTLE, &MULTI, &SHIELDED, &IMMUNE, &REDIRECTOR, &DOUBLER])));
+    let mut g = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    g.state.update_turn(|t| t.number = 1);
+    let mut ids = Vec::new();
+    for &def in defs {
+        let id = g.state.push_obj(Obj::new(table.id_of(def), YOU, Zone::BATTLEFIELD));
+        let timestamp = g.state.timestamp();
+        g.state.update_obj(id, |o| o.timestamp = timestamp);
+        g.state.zone_push(Zone::BATTLEFIELD, id);
+        g.state.see_statics();
+        ids.push(id);
+    }
+    (g, ids)
+}
+fn cx(g: &mut Game) -> Cx<'_> {
+    Cx {
+        g,
+        frame: usize::MAX,
+        cursor: 0,
+        mana_source: None,
+        entering: None,
+        lineage: Vec::new(),
+        asked_at: None,
+        doer: None,
+        producing: None,
+    }
+}
+fn hit(g: &mut Game, source: ObjectId, target: ObjectId, amount: u16) -> Option<DamageResult> {
+    cantrip_api::Game::damage_result(&mut cx(g), source, Target::Object(target), amount)
+}
+fn recorded(g: &Game) -> Vec<(Target, u16, u32)> {
+    g.log
+        .iter()
+        .filter_map(|r| match r.event {
+            Event::Damage { target, amount, recipient_excess, .. } => Some((target, amount, recipient_excess)),
+            _ => None,
+        })
+        .collect()
+}
+#[test]
+fn excess_damage_uses_toughness_and_preexisting_marks_and_exact_lethal() {
+    for (marks, amount, excess) in [(0, 4, 0), (0, 6, 2), (2, 6, 4), (4, 1, 1)] {
+        let (mut g, ids) = game(&[&BEAR, &BEAR]);
+        g.state.update_obj(ids[1], |o| o.damage = marks);
+        assert_eq!(hit(&mut g, ids[0], ids[1], amount), Some(DamageResult { target: Target::Object(ids[1]), amount, excess }));
+        assert_eq!(recorded(&g), [(Target::Object(ids[1]), amount, excess)]);
+    }
+}
+#[test]
+fn excess_damage_uses_loyalty_defense_and_greatest_of_multiple_types() {
+    for (def, loyalty, defense, excess) in [(&WALKER, 3, 0, 3), (&BATTLE, 0, 5, 1), (&MULTI, 2, 1, 5)] {
+        let (mut g, ids) = game(&[&BEAR, def]);
+        crate::counters::put(&mut cx(&mut g), ids[1], CounterKind::Loyalty, loyalty, YOU, crate::counters::How::Effect);
+        crate::counters::put(&mut cx(&mut g), ids[1], CounterKind::Defense, defense, YOU, crate::counters::How::Effect);
+        assert_eq!(hit(&mut g, ids[0], ids[1], 6).unwrap().excess, excess);
+    }
+}
+#[test]
+fn excess_damage_is_based_on_actual_prevented_and_replaced_amounts() {
+    let (mut g, ids) = game(&[&BEAR, &SHIELDED]);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 7), Some(DamageResult { target: Target::Object(ids[1]), amount: 5, excess: 1 }));
+    let (mut g, ids) = game(&[&BEAR, &IMMUNE]);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 7), None);
+    assert!(recorded(&g).is_empty());
+    let (mut g, ids) = game(&[&BEAR, &BEAR, &DOUBLER]);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 3), Some(DamageResult { target: Target::Object(ids[1]), amount: 6, excess: 2 }));
+}
+#[test]
+fn excess_damage_names_the_redirected_recipient_and_players_have_none() {
+    let (mut g, ids) = game(&[&BEAR, &BEAR, &REDIRECTOR]);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 6), Some(DamageResult { target: Target::Object(ids[2]), amount: 6, excess: 2 }));
+    assert_eq!(g.state.obj(ids[1]).damage, 0);
+    let (mut g, ids) = game(&[&BEAR]);
+    assert_eq!(
+        cantrip_api::Game::damage_result(&mut cx(&mut g), ids[0], Target::Player(PlayerId(1)), 6),
+        Some(DamageResult { target: Target::Player(PlayerId(1)), amount: 6, excess: 0 })
+    );
+}
+#[test]
+fn excess_damage_counts_deathtouch_as_lethal() {
+    let (mut g, ids) = game(&[&TOUCH, &BEAR]);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 6).unwrap().excess, 5);
+}
+#[test]
+fn excess_damage_sums_a_simultaneous_event_and_preserves_predamage_loyalty() {
+    for (def, excess) in [(&BEAR, 3), (&WALKER, 4)] {
+        let (mut g, ids) = game(&[&BEAR, &BEAR, def]);
+        crate::counters::put(&mut cx(&mut g), ids[2], CounterKind::Loyalty, 3, YOU, crate::counters::How::Effect);
+        assert_eq!(
+            ops::damage_together(&mut cx(&mut g), &[(ids[0], Target::Object(ids[2]), 3), (ids[1], Target::Object(ids[2]), 4)]),
+            [3, 4]
+        );
+        assert_eq!(recorded(&g), [(Target::Object(ids[2]), 3, excess), (Target::Object(ids[2]), 4, excess)]);
+    }
+}
+#[test]
+fn excess_damage_uses_toughness_before_simultaneous_infect_counters() {
+    let (mut g, ids) = game(&[&INFECT, &BEAR, &BEAR]);
+    ops::damage_together(&mut cx(&mut g), &[(ids[0], Target::Object(ids[2]), 2), (ids[1], Target::Object(ids[2]), 4)]);
+    assert_eq!(recorded(&g), [(Target::Object(ids[2]), 2, 2), (Target::Object(ids[2]), 4, 2)]);
+}
+#[test]
+fn excess_damage_zero_or_a_missing_recipient_deals_nothing() {
+    let (mut g, ids) = game(&[&BEAR, &BEAR]);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 0), None);
+    g.state.zone_remove(Zone::BATTLEFIELD, ids[1]);
+    g.state.update_obj(ids[1], |o| o.zone = Zone::graveyard(YOU));
+    g.state.zone_push(Zone::graveyard(YOU), ids[1]);
+    assert_eq!(hit(&mut g, ids[0], ids[1], 6), None);
+}

@@ -15,6 +15,16 @@ pub enum CoinFlip {
     Tails,
 }
 
+/// A single source's damage after replacement and prevention (CR 120.3, 120.10).
+/// `target` is the actual recipient, including redirection; `excess` is damage actually dealt above lethal damage,
+/// or the recipient's loyalty or defense before the damage. Players have no excess damage.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct DamageResult {
+    pub target: Target,
+    pub amount: u16,
+    pub excess: u32,
+}
+
 /// One thing that happened. Each names what it is about by id; a zone change names both the old object and the new
 /// one it became (CR 400.7).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -28,7 +38,13 @@ pub enum Event {
     /// Damage was dealt. `controller` and `colors` are the source's as it dealt it (CR 120.3, 609.7): "damage red sources
     /// you controlled dealt this turn" counts a source that has since changed controller or color, or left (Temple of
     /// Power's ruling), and a spell's or an ability's source by what it was on the stack or the battlefield then.
-    Damage { source: ObjectId, target: Target, amount: u16, combat: bool, controller: PlayerId, colors: ColorSet },
+    Damage {
+        source: ObjectId, target: Target, amount: u16, combat: bool, controller: PlayerId, colors: ColorSet,
+        /// Total excess damage this recipient was dealt by ALL sources in this simultaneous damage event (CR 120.10).
+        /// Repeated on each source's record for that recipient: never sum it across those records or attribute it to
+        /// that source alone. A trigger about the recipient uses the batch's other records for its source restrictions.
+        recipient_excess: u32,
+    },
     /// Damage that would have been dealt was prevented (CR 615.6, 615.13): `amount` of what `source` would have dealt to
     /// `target`, by the prevention effect of `by` - the permanent whose static ability it is, the source of a resolved
     /// prevention effect, the protected permanent or the source of a player's protection (CR 702.16e). One event each time

@@ -2751,17 +2751,23 @@ pub fn mill_together(cx: &mut Cx, mills: &[(PlayerId, u32)]) -> Vec<ObjectId> {
 /// Deals damage (CR 120): marked on a creature, removed as loyalty from a planeswalker, lost as life by a player.
 /// Protection prevents damage from sources of its colors (CR 702.16e).
 pub fn damage(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat: bool) -> u16 {
+    damage_result(cx, source, target, amount, combat).map_or(0, |result| result.amount)
+}
+
+/// Damage's final recipient and actual excess (CR 120.10), not the amount proposed before prevention or redirection.
+pub fn damage_result(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat: bool) -> Option<DamageResult> {
     let mut batch = DamageBatch::default();
     let event = deal_damage_with(cx, source, target, amount, combat, &mut batch);
     let mut events: Vec<Event> = event.into_iter().collect();
     batch.finish(cx, &mut events);
+    let result = events.iter().find_map(|event| match *event {
+        Event::Damage { target, amount, recipient_excess, .. } => Some(DamageResult { target, amount, excess: recipient_excess }),
+        _ => None,
+    });
     if !events.is_empty() {
         cx.emit_batch(&events, None);
     }
-    match event {
-        Some(Event::Damage { amount, .. }) => amount,
-        _ => 0,
-    }
+    result
 }
 
 /// Deals damage to several recipients at once (CR 120.2, 603.2c): announced as one batch, as combat damage is. How much
@@ -2877,7 +2883,7 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
 pub struct DamageBatch {
     /// What it has dealt to each permanent, for an effect that heals the damage marked before the event (it must not
     /// heal the event's own).
-    dealt: Vec<(ObjectId, u16)>,
+    dealt: Vec<DamageRecipient>,
     /// What each source with lifelink has dealt, and who controls it: one life gain event per source, however many
     /// recipients it dealt damage to (CR 120.3f; Angel of Vitality's and Leyline of Hope's rulings).
     lifelink: Vec<(ObjectId, PlayerId, u32)>,
@@ -2888,6 +2894,29 @@ pub struct DamageBatch {
     /// The -1/-1 counters its damage is dealt to creatures as (CR 702.90c, 120.3d): put on together once all of it is dealt,
     /// and announced with it (CR 510.2, 603.2c).
     counters: Vec<counters::Placement>,
+}
+
+/// A recipient's state before this damage event, and the damage actually dealt in it. Shared with the marked-damage
+/// accounting used by prevention, rather than an independent record of past damage (CR 120.10).
+struct DamageRecipient {
+    object: ObjectId,
+    marked: u16,
+    amount: u32,
+    creature_toughness: Option<u32>,
+    prior_marked: u16,
+    other_lethal: Option<u32>,
+    deathtouch: bool,
+}
+
+impl DamageRecipient {
+    fn excess(&self) -> u32 {
+        let creature = self.creature_toughness.map(|toughness| {
+            let lethal = toughness.saturating_sub(self.prior_marked as u32);
+            if self.deathtouch { lethal.min(1) } else { lethal }
+        });
+        let lethal = creature.into_iter().chain(self.other_lethal).min();
+        lethal.map_or(0, |lethal| self.amount.saturating_sub(lethal))
+    }
 }
 
 impl DamageBatch {
@@ -2908,6 +2937,12 @@ impl DamageBatch {
     pub fn finish(&mut self, cx: &mut Cx, events: &mut Vec<Event>) {
         let placements = std::mem::take(&mut self.counters);
         events.extend(counters::place_together(cx, &placements, counters::How::Effect));
+        // Complete the simultaneous event's excess amounts before any damage triggers see it (CR 120.10).
+        for event in events.iter_mut() {
+            if let Event::Damage { target: Target::Object(id), recipient_excess, .. } = event {
+                *recipient_excess = self.dealt.iter().find(|r| r.object == *id).map_or(0, DamageRecipient::excess);
+            }
+        }
         self.gain_lifelink(cx);
     }
 
@@ -2976,7 +3011,7 @@ pub fn deal_damage_with(
                 counters::put_on_player(cx, p, counters::PlayerCounts { poison, ..Default::default() }, by);
             }
             lifelink(cx, source, &source_chars, amount, batch);
-            Some(Event::Damage { source, target, amount, combat, controller: cx.controller(source), colors: source_chars.colors })
+            Some(Event::Damage { source, target, amount, combat, controller: cx.controller(source), colors: source_chars.colors, recipient_excess: 0 })
         }
         Target::Object(id) => {
             if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
@@ -2988,6 +3023,26 @@ pub fn deal_damage_with(
                 return prevented(cx, id);
             }
             let deathtouch = source_chars.has(Keyword::Deathtouch);
+            // The recipient's characteristics and counters are read before this event deals it damage. Later hits in
+            // the same event must not see loyalty already removed or toughness reduced by that event's infect damage.
+            let at = match batch.dealt.iter().position(|r| r.object == id) {
+                Some(at) => at,
+                None => {
+                    let obj = cx.s().obj(id);
+                    let creature_toughness = target_chars.is(CardType::Creature).then(|| target_chars.toughness.unwrap_or(0).max(0) as u32);
+                    let other_lethal = [
+                        target_chars.is(CardType::Planeswalker).then(|| obj.counters(CounterKind::Loyalty).max(0) as u32),
+                        target_chars.is(CardType::Battle).then(|| obj.counters(CounterKind::Defense).max(0) as u32),
+                    ].into_iter().flatten().min();
+                    batch.dealt.push(DamageRecipient { object: id, marked: 0, amount: 0, creature_toughness, prior_marked: obj.damage, other_lethal, deathtouch: false });
+                    batch.dealt.len() - 1
+                }
+            };
+            if heal_marked {
+                batch.dealt[at].prior_marked = 0;
+            }
+            batch.dealt[at].amount += amount as u32;
+            batch.dealt[at].deathtouch |= deathtouch;
             if target_chars.is(CardType::Creature) {
                 if source_chars.has(Keyword::Infect) {
                     // Damage from a source with infect is dealt to a creature as that many -1/-1 counters (CR 702.90c,
@@ -3002,10 +3057,10 @@ pub fn deal_damage_with(
                 } else {
                     if heal_marked {
                         // CR 614.1a: the damage marked before this event is healed; this event's own stays.
-                        let kept = batch.dealt.iter().filter(|(b, _)| *b == id).map(|(_, a)| *a).sum();
+                        let kept = batch.dealt[at].marked;
                         cx.st().update_obj(id, |o| o.damage = kept);
                     }
-                    batch.dealt.push((id, amount));
+                    batch.dealt[at].marked += amount;
                     cx.st().update_obj(id, |o| {
                         o.damage += amount;
                         o.deathtouched |= deathtouch;
@@ -3022,7 +3077,7 @@ pub fn deal_damage_with(
                 counters::remove(cx, id, CounterKind::Loyalty, amount.min(i16::MAX as u16) as i16);
             }
             lifelink(cx, source, &source_chars, amount, batch);
-            Some(Event::Damage { source, target, amount, combat, controller: cx.controller(source), colors: source_chars.colors })
+            Some(Event::Damage { source, target, amount, combat, controller: cx.controller(source), colors: source_chars.colors, recipient_excess: 0 })
         }
     }
 }
