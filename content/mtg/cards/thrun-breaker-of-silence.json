@@ -1,0 +1,12 @@
+{
+  "name": "Thrun, Breaker of Silence",
+  "manaCost": "{3}{G}{G}",
+  "type": "Legendary Creature — Troll Shaman",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "This spell can't be countered.\nTrample\nThrun can't be the target of nongreen spells your opponents control or abilities from nongreen sources your opponents control.\nDuring your turn, Thrun has indestructible.",
+  "keywords": [
+    "Trample",
+    "CantBeCountered"
+  ]
+}

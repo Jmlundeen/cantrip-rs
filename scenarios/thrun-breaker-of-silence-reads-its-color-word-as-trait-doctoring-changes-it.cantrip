@@ -1,0 +1,70 @@
+# "Nongreen" is a word of Thrun's text (CR 612.2). On turn 3, Bot2's Giant Growth (green) targets Thrun (8/8). Bot1 then
+# casts Trait Doctoring on its own Thrun, replacing green with blue until end of turn: Thrun now can't be the target of
+# nonblue spells Bot2 controls, so Bot2's second Giant Growth can't target it - though it is on offer at Bot2's
+# Ornithopter - and Bot2's blue Unsummon can, returning Thrun to Bot1's hand.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Forest
+Black Lotus
+Trait Doctoring
+Thrun, Breaker of Silence
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Giant Growth
+Giant Growth
+Unsummon
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Thrun, Breaker of Silence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Thrun, Breaker of Silence.Power = 8
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Thrun, Breaker of Silence)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald#2.Activate
+! Bot2.Hand.Giant Growth.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Hand = Forest; Forest; Thrun, Breaker of Silence
+Bot2.Graveyard = Unsummon; Giant Growth
+Bot2.Hand = Giant Growth; Island

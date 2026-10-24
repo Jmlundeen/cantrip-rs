@@ -1,0 +1,72 @@
+# Thrun, Breaker of Silence "can't be the target of nongreen spells your opponents control or abilities from nongreen
+# sources your opponents control" (CR 601.2c, 602.2b): only while it is on the battlefield (CR 113.6), so on turn 3 Bot2's
+# Counterspell targets Thrun the spell - which "can't be countered" and resolves anyway (CR 101.2). On turn 4 Bot2 can't aim
+# Lightning Bolt (red) or Walking Ballista's ability (a colorless source: nongreen, CR 105.2c) at Thrun, though both are on
+# offer elsewhere: the Bolt goes at Bot1 (17 life) and the Ballista's 1 damage at Bot2's own Ornithopter, which the
+# restriction, naming Thrun alone, does not shield. On turn 5 Thrun attacks; Ornithopter (0/2, its damage gone in the
+# cleanup step) blocks, and trample (CR 702.19b) carries 3 of Thrun's 5 damage over to Bot2.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Black Lotus
+Mox Emerald
+Thrun, Breaker of Silence
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Ornithopter
+Counterspell
+Lightning Bolt
+Walking Ballista
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Thrun, Breaker of Silence.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Counterspell.Cast(Thrun, Breaker of Silence)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Pass
+! Bot2.Battlefield.Walking Ballista.Activate(Bot1.Battlefield.Thrun, Breaker of Silence; Ability: Remove)
+Bot2.Battlefield.Walking Ballista.Activate(Bot2.Battlefield.Ornithopter; Ability: Remove)
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+Bot1.Attack(Thrun, Breaker of Silence > Bot2)
+Bot2.Block(Ornithopter > Thrun, Breaker of Silence)
+Bot1.AssignDamage(Thrun, Breaker of Silence > Ornithopter: 2; Thrun, Breaker of Silence > Bot2: 3)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Thrun, Breaker of Silence.Damage = 0
+Bot1.Life = 17
+Bot2.Life = 17
+Bot2.Graveyard = Ornithopter; Lightning Bolt; Walking Ballista; Counterspell

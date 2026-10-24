@@ -1,0 +1,80 @@
+# Thrun's targeting restriction stops only nongreen spells and abilities its controller's opponents control (CR 601.2c),
+# and "During your turn, Thrun has indestructible" (CR 702.12b) holds only on its controller's turn. On turn 3 Bot1 aims its
+# own Lightning Bolt (red) at Thrun: its controller is no opponent, so the target is legal and Thrun takes 3. Still on
+# Bot1's turn, Bot2's Assassin's Trophy - black and green, so not nongreen - targets Thrun, which is indestructible and
+# survives (Bot1 declines the basic land). On turn 4, Bot2's turn, Thrun has no indestructible: Giant Growth (green)
+# targets it (8/8), and a second Assassin's Trophy destroys it.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Forest
+Black Lotus
+Forest
+Thrun, Breaker of Silence
+Lightning Bolt
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Jet
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Assassin's Trophy
+Assassin's Trophy
+Giant Growth
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Thrun, Breaker of Silence.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Thrun, Breaker of Silence.Keywords = CantBeCountered; Indestructible; Trample
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Thrun, Breaker of Silence.Damage = 3
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Assassin's Trophy.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot2.Pass
+Bot1.Pass
+Bot1.Decline
+? Bot1.Battlefield.Thrun, Breaker of Silence.Damage = 3
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Thrun, Breaker of Silence.Keywords = CantBeCountered; Trample
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Giant Growth.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Thrun, Breaker of Silence.Power = 8
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Emerald#3.Activate
+Bot2.Hand.Assassin's Trophy.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot2.Pass
+Bot1.Pass
+Bot1.Decline
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Forest; Forest; Mox Ruby
+Bot1.Graveyard = Thrun, Breaker of Silence; Lightning Bolt; Black Lotus
+Bot2.Graveyard = Assassin's Trophy; Giant Growth; Assassin's Trophy

@@ -1,0 +1,50 @@
+# A target is checked again as the spell resolves (CR 608.2b). On turn 4 Bot2's Giant Growth, green, targets Bot1's Thrun;
+# in response Bot1 casts Sleight of Mind on its own Thrun, replacing green with blue (CR 612.2): Thrun now can't be the
+# target of nonblue spells Bot2 controls, so Giant Growth's only target is illegal and it does not resolve - Thrun stays
+# 5/5.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Forest
+Black Lotus
+Sleight of Mind
+Thrun, Breaker of Silence
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mox Emerald
+Giant Growth
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Thrun, Breaker of Silence.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Thrun, Breaker of Silence)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Thrun, Breaker of Silence.Power = 5
+Bot2.Graveyard = Giant Growth
