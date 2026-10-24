@@ -1,0 +1,5 @@
+{
+  "name": "Field of Ruin",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{2}, {T}, Sacrifice this land: Destroy target nonbasic land an opponent controls. Each player searches their library for a basic land card, puts it onto the battlefield, then shuffles."
+}

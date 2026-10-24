@@ -1,0 +1,16 @@
+# Field of Ruin: "{T}: Add {C}."
+
+[Bot1 Deck]
+Field of Ruin
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Field of Ruin.Play
+Bot1.Battlefield.Field of Ruin.Activate(Ability: {T}: Add {C})
+
+[Expect]
+Bot1.Battlefield.Field of Ruin.Tapped = true
+Bot1.Mana = {C}

@@ -1,0 +1,57 @@
+# Field of Ruin: ruling 2021-03-19: if the target is legal but not destroyed (indestructible), each player does search. In
+# response Bot2 animates Creeping Tar Pit and casts Revitalizing Repast on it (indestructible until end of turn); Bot1 then
+# searches for Plains and Bot2 for Forest.
+
+[Bot1 Deck]
+Island
+Island
+Field of Ruin
+Island x16
+Plains
+
+[Bot2 Deck]
+Creeping Tar Pit
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Revitalizing Repast
+Island x14
+Island
+Forest
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Creeping Tar Pit.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Field of Ruin.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Field of Ruin.Activate(Ability: Destroy; Bot2.Battlefield.Creeping Tar Pit)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Creeping Tar Pit.Activate(Ability: Until end of turn)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Creeping Tar Pit.Activate(Ability: {T}: Add {U} or {B}; Color: Black)
+Bot2.Hand.Revitalizing Repast.Cast(Creeping Tar Pit)
+Bot2.Pass
+Bot1.Pass
+Bot1.Search(Plains)
+Bot2.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Field of Ruin
+Bot1.Battlefield = Island; Island; Plains
+Bot2.Graveyard = Revitalizing Repast
+Bot2.Battlefield.Creeping Tar Pit.Tapped = true
+Bot2.Battlefield.Forest.Tapped = false
