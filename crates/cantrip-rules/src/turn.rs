@@ -1270,7 +1270,7 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
     let assignments = combat_assignments(cx, &attackers, &blockers, &chosen);
     // CR 510.2: all of it is dealt at once, and announced at once (CR 603.2c). A prevention shield two or more sources would
     // deal damage to prevents whose damage its player or controller chooses (CR 615.7).
-    let mut batch = ops::DamageBatch::default();
+    let mut batch = ops::DamageBatch::new(cx, &assignments);
     let mut events: Vec<Event> = ops::order_for_shields(cx, &assignments, true)
         .into_iter()
         .filter_map(|i| {

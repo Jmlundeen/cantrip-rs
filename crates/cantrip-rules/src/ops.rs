@@ -2773,7 +2773,7 @@ pub fn damage_result(cx: &mut Cx, source: ObjectId, target: Target, amount: u16,
 /// Deals damage to several recipients at once (CR 120.2, 603.2c): announced as one batch, as combat damage is. How much
 /// each was dealt, in order.
 pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16> {
-    let mut batch = DamageBatch::default();
+    let mut batch = DamageBatch::new(cx, hits);
     let mut events = Vec::with_capacity(hits.len());
     let mut dealt = vec![0; hits.len()];
     for i in order_for_shields(cx, hits, false) {
@@ -2920,6 +2920,46 @@ impl DamageRecipient {
 }
 
 impl DamageBatch {
+    /// Read every possible recipient before any assignment changes the state (CR 120.10). For example, damage to a
+    /// player can change Serra Ascendant's toughness before the next assignment reaches that creature. Redirection
+    /// can choose a recipient absent from `hits`, so active replacement effects require the whole battlefield.
+    pub fn new(cx: &Cx, hits: &[(ObjectId, Target, u16)]) -> Self {
+        let mut batch = Self::default();
+        if hits.len() < 2 {
+            return batch;
+        }
+        let objects: Vec<ObjectId> = if replace::possible(cx, None) {
+            cx.s().battlefield().to_vec()
+        } else {
+            let mut objects = Vec::new();
+            for &(_, target, amount) in hits {
+                if let Target::Object(id) = target
+                    && amount > 0 && live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield)
+                    && !objects.contains(&id)
+                {
+                    objects.push(id);
+                }
+            }
+            objects
+        };
+        for id in objects {
+            let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
+            batch.snapshot(cx.s(), id, &chars);
+        }
+        batch
+    }
+
+    fn snapshot(&mut self, state: &GameState, id: ObjectId, chars: &Chars) -> usize {
+        let obj = state.obj(id);
+        let creature_toughness = chars.is(CardType::Creature).then(|| chars.toughness.unwrap_or(0).max(0) as u32);
+        let other_lethal = [
+            chars.is(CardType::Planeswalker).then(|| obj.counters(CounterKind::Loyalty).max(0) as u32),
+            chars.is(CardType::Battle).then(|| obj.counters(CounterKind::Defense).max(0) as u32),
+        ].into_iter().flatten().min();
+        self.dealt.push(DamageRecipient { object: id, marked: 0, amount: 0, creature_toughness, prior_marked: obj.damage, other_lethal, deathtouch: false });
+        self.dealt.len() - 1
+    }
+
     /// Whether this event's damage to `player` is dealt as though its source had infect (CR 702.90b): asked of the static
     /// abilities the first time the event deals `player` damage, before it changes their life.
     fn as_though_infect(&mut self, cx: &Cx, player: PlayerId) -> bool {
@@ -3027,16 +3067,7 @@ pub fn deal_damage_with(
             // the same event must not see loyalty already removed or toughness reduced by that event's infect damage.
             let at = match batch.dealt.iter().position(|r| r.object == id) {
                 Some(at) => at,
-                None => {
-                    let obj = cx.s().obj(id);
-                    let creature_toughness = target_chars.is(CardType::Creature).then(|| target_chars.toughness.unwrap_or(0).max(0) as u32);
-                    let other_lethal = [
-                        target_chars.is(CardType::Planeswalker).then(|| obj.counters(CounterKind::Loyalty).max(0) as u32),
-                        target_chars.is(CardType::Battle).then(|| obj.counters(CounterKind::Defense).max(0) as u32),
-                    ].into_iter().flatten().min();
-                    batch.dealt.push(DamageRecipient { object: id, marked: 0, amount: 0, creature_toughness, prior_marked: obj.damage, other_lethal, deathtouch: false });
-                    batch.dealt.len() - 1
-                }
+                None => batch.snapshot(cx.s(), id, &target_chars),
             };
             if heal_marked {
                 batch.dealt[at].prior_marked = 0;
