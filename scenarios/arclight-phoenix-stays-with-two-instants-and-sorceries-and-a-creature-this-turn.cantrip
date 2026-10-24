@@ -1,0 +1,43 @@
+# Arclight Phoenix is discarded on turn 3 (Faithless Looting and a Shock: two spells, no return). On turn 5 Bot1 casts a
+# Shock, Goblin Welder (a creature, not counted) and another Shock: two instants this turn, three spells, and four
+# instants and sorceries over both turns - none of which is "three or more instant and sorcery spells this turn", so it
+# stays in the graveyard at the beginning of combat (CR 603.4).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Faithless Looting
+Arclight Phoenix
+Shock
+Shock
+Shock
+Goblin Welder
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Arclight Phoenix; Mountain)
+Bot1.Hand.Shock.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Hand.Goblin Welder.Cast
+Bot1.Hand.Shock.Cast(Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Graveyard.Arclight Phoenix.Power = 3
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Goblin Welder.Power = 1

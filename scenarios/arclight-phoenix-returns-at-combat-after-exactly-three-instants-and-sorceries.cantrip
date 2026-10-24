@@ -1,0 +1,39 @@
+# Arclight Phoenix, discarded to Faithless Looting (spell 1), returns at the beginning of Bot1's combat once two Shocks
+# make the third instant or sorcery spell cast this turn (CR 603.4, 113.6m). It is in the graveyard through main phase 1
+# and on the battlefield (with haste, flying) from the beginning of combat.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Faithless Looting
+Arclight Phoenix
+Shock
+Shock
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Arclight Phoenix; Mountain)
+Bot1.Hand.Shock.Cast(Bot2)
+? Bot1.Graveyard.Count = 3
+Bot1.Hand.Shock.Cast(Bot2)
+? Bot1.Graveyard.Arclight Phoenix.Power = 3
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Arclight Phoenix.Power = 3
+Bot1.Battlefield.Arclight Phoenix.Keywords = Flying; Haste
+Bot1.Graveyard.Count = 4
