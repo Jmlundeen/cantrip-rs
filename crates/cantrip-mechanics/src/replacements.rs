@@ -359,3 +359,23 @@ fn reveal_and_shuffle_into_library(q: &dyn Query, _: &Asker, proposal: &mut Prop
 pub const REVEAL_AND_SHUFFLE_INTO_LIBRARY_INSTEAD_OF_GRAVEYARD: ReplacementDef =
     replacement(ReplacementKind::ZoneChange, this_would_be_put_into_a_graveyard, reveal_and_shuffle_into_library, "shuffles it into its owner's library")
         .own_everywhere();
+
+/// "Lands you control enter untapped." (CR 614.1d), as Spelunking and The Wandering Minstrel print it: every land entering the
+/// battlefield under the asker's control, judged as it would exist there (CR 614.12), whether it would enter tapped as the event
+/// stands or not. So a land whose own "enters tapped" also applies has its controller order the two (CR 616.1): its own first,
+/// then this, and it enters untapped; this first, then its own, and it enters tapped (the rulings).
+fn lands_you_control_enter_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    let Proposal::ZoneChange(z) = proposal else { return false };
+    z.to.is(ZoneKind::Battlefield) && z.controller == asker.controller && q.chars(z.object).is(CardType::Land)
+}
+
+/// The apply half of [`LANDS_YOU_CONTROL_ENTER_UNTAPPED`]: the land enters untapped.
+fn lands_enter_untapped(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::ZoneChange(z) = proposal {
+        z.tapped = false;
+    }
+}
+
+/// "Lands you control enter untapped." (CR 614.1d): the whole replacement, as Spelunking and The Wandering Minstrel print it.
+pub const LANDS_YOU_CONTROL_ENTER_UNTAPPED: ReplacementDef =
+    replacement(ReplacementKind::ZoneChange, lands_you_control_enter_applies, lands_enter_untapped, "lands you control enter untapped");
