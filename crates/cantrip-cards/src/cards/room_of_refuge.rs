@@ -4,12 +4,11 @@ use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
 /// "{5}, {T}, Sacrifice this land: Put two +1/+1 counters on target creature. Activate only as a sorcery." The land is
-/// sacrificed as a cost (CR 118.3, 701.21a), and the counters are put on the target as the ability resolves (CR 608.2c);
+/// sacrificed as a cost (CR 602.2b, 601.2h, 701.21a), and the counters are put on the target as the ability resolves (CR 608.2c);
 /// a target that has left the battlefield is no target at all (CR 608.2b), and the ability does nothing.
 fn two_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.add_counters(creature, CounterKind::PlusOne, 2);
-    }
+    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
+    g.add_counters(creature, CounterKind::PlusOne, 2);
     Ok(())
 }
 

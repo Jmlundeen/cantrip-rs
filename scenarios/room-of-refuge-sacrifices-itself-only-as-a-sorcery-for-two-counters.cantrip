@@ -1,6 +1,7 @@
 # Room of Refuge's "{5}, {T}, Sacrifice this land: Put two +1/+1 counters on target creature. Activate only as a sorcery."
-# (CR 118.3, 701.21a, 608.2c): the activation is not offered in the beginning of combat, the land is sacrificed as a cost
+# (CR 602.2b, 601.2h, 701.21a, 608.2c): the activation is not offered in the beginning of combat, the land is sacrificed as a cost
 # and is in the graveyard before the ability resolves, and exactly two +1/+1 counters go on the chosen creature.
+# Only a creature can be chosen (a Sol Ring is refused), an opponent's as well as one's own, and the {5} is paid in full.
 
 [Bot1 Deck]
 Room of Refuge
@@ -13,7 +14,8 @@ Ornithopter
 Island x13
 
 [Bot2 Deck]
-Island x20
+Ornithopter
+Island x19
 
 [Actions]
 Bot1.Hand.Room of Refuge.Play
@@ -26,6 +28,7 @@ Bot1.Hand.Mox Emerald.Cast
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Hand.Ornithopter.Cast
 [T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.BeginCombat]
 ! Bot1.Battlefield.Room of Refuge.Activate(Ability: Sacrifice this land)
 [T3 Bot1.Main2]
@@ -33,11 +36,14 @@ Bot1.Battlefield.Sol Ring.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
-Bot1.Battlefield.Room of Refuge.Activate(Ability: Sacrifice this land; Bot1.Battlefield.Ornithopter)
+! Bot1.Battlefield.Room of Refuge.Activate(Ability: Sacrifice this land; Sol Ring)
+Bot1.Battlefield.Room of Refuge.Activate(Ability: Sacrifice this land; Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
 [T3 Bot1.Main2]
 
 [Expect]
 Bot1.Graveyard = Room of Refuge; Black Lotus
-Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
-Bot1.Battlefield.Ornithopter.Power = 2
-Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Ornithopter.Power = 2
+Bot2.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

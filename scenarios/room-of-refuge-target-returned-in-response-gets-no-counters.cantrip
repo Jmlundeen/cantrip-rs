@@ -1,5 +1,5 @@
 # Room of Refuge's target leaves the battlefield before the ability resolves: Unsummon returns the Ornithopter to Bot1's
-# hand, and the ability, still resolving, has no legal target and does nothing (CR 608.2b). The land was already
+# hand, and the ability, whose only target is now illegal, does not resolve at all (CR 608.2b). The land was already
 # sacrificed as a cost, so it stays in the graveyard and no counters are put anywhere.
 
 [Bot1 Deck]
