@@ -9,11 +9,6 @@
 
 use cantrip_api::*;
 
-/// "Tap another untapped creature you control" (CR 702.184a): not the station permanent itself, even once it is a creature.
-fn another_untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    id != asker.source && q.controller(id) == asker.controller && !q.obj(id).tapped && q.chars(id).is(CardType::Creature)
-}
-
 /// "Put a number of charge counters on this permanent equal to the tapped creature's power": its power as the ability
 /// resolves, or as it last existed on the battlefield if it has left (CR 608.2h; the station rulings). A power of 0 or less
 /// puts none and removes none (ruling 2025-07-25). A station permanent that has left the battlefield gets none
@@ -30,7 +25,7 @@ fn put_charge_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 /// The station ability (CR 702.184a). Its cost taps a creature, not the {T} symbol (CR 107.5, 302.6), so a creature that
 /// came under its controller's control this turn may station. `text` is the ability's full text, as printed.
 pub const fn ability(text: &'static str) -> AbilityDef {
-    cantrip_api::ability(Cost::tap_untapped(1, another_untapped_creature_you_control), put_charge_counters, text).sorcery_speed()
+    cantrip_api::ability(crate::TAP_ANOTHER_UNTAPPED_CREATURE, put_charge_counters, text).sorcery_speed()
 }
 
 /// The number of charge counters on `source`, as the layers see it.

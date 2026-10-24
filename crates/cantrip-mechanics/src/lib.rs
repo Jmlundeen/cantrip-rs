@@ -403,6 +403,14 @@ pub fn threshold(q: &dyn Query, player: PlayerId) -> bool {
 /// print it.
 pub const TAP_AN_UNTAPPED_CREATURE: Cost = Cost::tap_untapped(1, untapped_creature_you_control);
 
+/// "Tap another untapped creature you control" as a cost (CR 118.3): as `TAP_AN_UNTAPPED_CREATURE`, but never the ability's
+/// own source, even when it is a creature ("another"). Station (CR 702.184a) and Tyvar, the Pummeler print it.
+pub const TAP_ANOTHER_UNTAPPED_CREATURE: Cost = Cost::tap_untapped(1, another_untapped_creature_you_control);
+
+fn another_untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    id != asker.source && untapped_creature_you_control(q, asker, id)
+}
+
 /// "Target instant or sorcery card in your graveyard gains flashback until end of turn. The flashback cost is equal to its
 /// mana cost" (CR 702.34a): its controller may cast it from the graveyard this turn for its mana cost, and it is exiled
 /// instead of going anywhere else as it leaves the stack. Snapcaster Mage and Flashback print it.
