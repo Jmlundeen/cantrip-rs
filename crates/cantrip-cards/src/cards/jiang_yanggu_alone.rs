@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// rather than a planeswalker or battle, and controlled by this ability's controller. The ability is about that attacker.
 fn attacks_a_player_alone(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker, defender: Target::Player(_) }
+        Event::Attacks { attacker, defender: Target::Player(_), .. }
             if q.state().attackers.len() == 1 && q.controller(*attacker) == q.controller(source) =>
         {
             Fired::about(Target::Object(*attacker))

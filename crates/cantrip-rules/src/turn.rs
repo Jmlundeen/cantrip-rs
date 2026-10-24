@@ -733,7 +733,14 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     cx.st().set_attackers(attackers.clone());
     // One batch (CR 603.2c): "whenever one or more creatures attack" triggers once; "whenever you attack" after the
     // creatures' own abilities (CR 508.1m).
-    let mut events: Vec<Event> = attackers.iter().map(|a| Event::Attacks { attacker: a.id, defender: a.target }).collect();
+    // Each keeps the attacker as it was declared (`history::attacker_as_declared`): "during any turn you attacked with a
+    // Rogue" asks what it was then, not what it has become or who has taken it since.
+    let mut events: Vec<Event> = Vec::with_capacity(attackers.len() + options.len() + 1);
+    for a in &attackers {
+        let known = ops::last_known_from(cx, a.id, &cx.chars(a.id));
+        let known = cx.st().last_known_push(known);
+        events.push(Event::Attacks { attacker: a.id, defender: a.target, known });
+    }
     // The optional costs paid (CR 508.1g, 508.1j): what their linked "when you do" abilities trigger on (CR 607.2h), in the
     // same batch, so they go on the stack with the attack triggers, before blockers are declared.
     events.extend(options.iter().map(|o| Event::PaidToAttack { attacker: o.attacker, option: o.option, ability: o.ability, instance: o.instance, tapped: o.tapped }));

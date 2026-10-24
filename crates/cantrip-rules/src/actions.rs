@@ -4556,13 +4556,11 @@ fn permission_stands(cx: &Cx, p: &PlayPermission, player: PlayerId) -> bool {
 }
 
 /// Whether the condition on a permission to play holds now (CR 611.2): asked of the history of this turn, which no later
-/// event can change, so it is a creature as it was declared that counts, dead or changed since.
+/// event can change, so it is a creature as it was declared that counts, dead, changed or taken since; "you attacked" is
+/// the declaring player's, the active player (CR 506.2, 508.1).
 fn play_condition_holds(cx: &Cx, player: PlayerId, when: PlayCondition) -> bool {
     match when {
-        PlayCondition::AttackedWithThisTurn(kind) => cx.history().this_turn().iter().any(|r| {
-            matches!(r.event, Event::Attacks { attacker, .. }
-                if cx.s().obj(attacker).controller == player && cx.chars(attacker).has_subtype(kind))
-        }),
+        PlayCondition::AttackedWithThisTurn(kind) => cx.history().attacked_with(cx, player).any(|c| c.has_subtype(kind)),
         PlayCondition::ControlsSubtype(kind) => {
             cx.s().battlefield().iter().any(|&id| cx.s().obj(id).controller == player && cx.chars(id).has_subtype(kind))
         }

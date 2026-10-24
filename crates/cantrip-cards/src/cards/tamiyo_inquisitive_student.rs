@@ -27,7 +27,7 @@ fn transform_her(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// delayed ability's controller, who activated the +2 (CR 603.7d), whoever controls Tamiyo now or wherever she is.
 fn creature_attacks_you_or_your_planeswalker(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker, defender } => {
+        Event::Attacks { attacker, defender, .. } => {
             let you = me.controller;
             let at_you = match defender {
                 Target::Player(p) => *p == you,

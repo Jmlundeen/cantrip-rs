@@ -13,7 +13,7 @@ fn has_most_life(q: &dyn Query, player: PlayerId) -> bool {
 /// planeswalker or battle (the ruling), and that player has the most life.
 fn attacks_player_with_most_life(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker, defender: Target::Player(p) } if *attacker == me.source && has_most_life(q, *p) => Fired::PLAIN,
+        Event::Attacks { attacker, defender: Target::Player(p), .. } if *attacker == me.source && has_most_life(q, *p) => Fired::PLAIN,
         _ => None,
     }
 }

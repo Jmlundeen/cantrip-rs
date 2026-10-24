@@ -362,7 +362,7 @@ impl View<'_> {
                     Event::LifeChange { delta, .. } => obs.amount = delta,
                     Event::Drew { card, .. } | Event::Discarded { card, .. } | Event::Revealed { card, .. } | Event::Cycled { card, .. } => obs.objects = vec![o(card)],
                     Event::SpellCast { spell, .. } | Event::Countered { spell } => obs.objects = vec![o(spell)],
-                    Event::Attacks { attacker, defender } => obs.objects = vec![o(attacker), target_ref(defender, refs)],
+                    Event::Attacks { attacker, defender, .. } => obs.objects = vec![o(attacker), target_ref(defender, refs)],
                     Event::Blocks { blocker, attacker, .. } => obs.objects = vec![o(blocker), o(attacker)],
                     Event::Tapped { permanent } | Event::TurnedFaceUp { permanent, .. } | Event::Transformed { object: permanent } => obs.objects = vec![o(permanent)],
                     Event::CountersPut { object, kind, amount, .. } => {

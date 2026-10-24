@@ -11,7 +11,7 @@ use cantrip_oracle as oracle;
 fn creature_defending_player_controls(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Target::Object(attacker) = q.event_subject() else { return false };
     let defender = q.history().all().iter().rev().find_map(|r| match r.event {
-        Event::Attacks { attacker: a, defender } if a == attacker => Some(defender),
+        Event::Attacks { attacker: a, defender, .. } if a == attacker => Some(defender),
         _ => None,
     });
     let Some(defending) = defender.and_then(|d| q.defending_player(d)) else { return false };

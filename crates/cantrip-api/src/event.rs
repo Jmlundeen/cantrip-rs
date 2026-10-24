@@ -50,8 +50,10 @@ pub enum Event {
     /// gave the source that ability (CR 113.2c, 613.1f: Chromatic Lantern's mana ability on a land, an Equipment's ability on
     /// the creature), with the ability, or is `Grant::NONE` for one of the source's own (`Grant::some` reads it).
     AbilityActivated { source: ObjectId, ability: AbilityRef, player: PlayerId, by: Grant },
-    /// A creature was declared as an attacker (CR 508.1).
-    Attacks { attacker: ObjectId, defender: Target },
+    /// A creature was declared as an attacker (CR 508.1). `known` is the last-known row (`GameState::last_known`) that keeps
+    /// its characteristics as it was declared, which "you attacked with a Rogue" asks of it once it has changed, left or
+    /// changed controllers (`history::attacker_as_declared`).
+    Attacks { attacker: ObjectId, defender: Target, known: u32 },
     /// An optional cost to attack (CR 508.1g) was paid as `attacker` was declared an attacker (CR 508.1j): the cost of the
     /// `instance`th of the attacker's abilities that are `ability` (counted from 0 in the order it has them; two of one card's
     /// enlist are two instances, CR 702.154d), which is `option`. `tapped` is the creature the cost tapped - for enlist the

@@ -309,7 +309,7 @@ pub fn this_enters_or_attacks(q: &dyn Query, source: ObjectId, event: &Event) ->
 /// Glory print it.
 pub fn this_attacks_defender(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker, defender } if *attacker == source => Fired::about(*defender),
+        Event::Attacks { attacker, defender, .. } if *attacker == source => Fired::about(*defender),
         _ => None,
     }
 }
@@ -370,7 +370,7 @@ pub const THIS_BECOMES_ATTACHED_TO_A_CREATURE: Trigger = when(EventMask::ATTACHE
 /// directly. The attacking creature is the trigger's subject. Curse of Opulence and Curse of Predation print it.
 pub fn enchanted_player_attacked(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker, defender: Target::Player(p) } if q.obj(source).attached_player == Some(*p) => {
+        Event::Attacks { attacker, defender: Target::Player(p), .. } if q.obj(source).attached_player == Some(*p) => {
             Fired::about(Target::Object(*attacker))
         }
         _ => None,

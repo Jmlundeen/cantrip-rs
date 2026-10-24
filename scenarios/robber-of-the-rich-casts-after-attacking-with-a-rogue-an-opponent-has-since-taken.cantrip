@@ -1,0 +1,56 @@
+# "During any turn you attacked with a Rogue" asks about the declaration (CR 508.1), not about who controls the Rogue now.
+# Bot2's Old Man of the Sea, free to tap since turn 4, takes Robber of the Rich in response to its attack trigger on turn 5.
+# Bot1 still attacked with a Rogue this turn, so Bot1 casts the exiled Lightning Bolt with Mox Pearl's white mana.
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Robber of the Rich
+Island x20
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robber of the Rich.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Robber of the Rich > Bot2)
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Robber of the Rich)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot2.Battlefield = Island; Mox Jet; Mox Sapphire; Old Man of the Sea; Robber of the Rich
+? Exile.Count = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Bot2.Life = 17

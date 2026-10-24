@@ -17,7 +17,7 @@ fn vigil(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// monarch controls is not the monarch.
 fn attacks_the_monarch(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker, defender: Target::Player(p) } if *attacker == source && q.state().player(*p).monarch => {
+        Event::Attacks { attacker, defender: Target::Player(p), .. } if *attacker == source && q.state().player(*p).monarch => {
             Fired::PLAIN
         }
         _ => None,

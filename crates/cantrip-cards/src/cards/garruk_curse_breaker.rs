@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// that set this one up (CR 603.7d).
 fn creature_attacks_one_of_your_opponents(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker, defender: Target::Player(p) } if q.state().opponents(me.controller).any(|o| o == *p) => {
+        Event::Attacks { attacker, defender: Target::Player(p), .. } if q.state().opponents(me.controller).any(|o| o == *p) => {
             Some(Fired { subject: Target::Object(*attacker), data: [0, p.0 as u32] })
         }
         _ => None,

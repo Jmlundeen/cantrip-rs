@@ -80,6 +80,16 @@ impl Cast {
     }
 }
 
+/// An attacker's characteristics as it was declared (CR 508.1): those its `Event::Attacks` kept (`known`), whatever it has
+/// become, wherever it has gone and whoever controls it since.
+pub fn attacker_as_declared(q: &dyn crate::Query, attacker: ObjectId, known: u32) -> crate::Chars {
+    let c = q.chars(attacker);
+    match q.state().last_known.get(known as usize) {
+        Some(row) => c.as_known(row),
+        None => c,
+    }
+}
+
 /// What made an event happen.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Cause {
@@ -381,6 +391,16 @@ impl<'a> History<'a> {
     pub fn discarded_this_turn(&self, object: ObjectId) -> bool {
         self.this_turn().iter().any(|r| {
             matches!(r.event, Event::ZoneChange { new, to, reason: ZoneReason::Discard, .. } if new == object && to.is(ZoneKind::Graveyard))
+        })
+    }
+
+    /// The creatures `player` declared as attackers this turn (CR 508.1; not one put onto the battlefield attacking, CR
+    /// 508.4), each as it was declared (`attacker_as_declared`): only the active player declares attackers (CR 506.2,
+    /// 508.1), so none for another, whoever controls those creatures now.
+    pub fn attacked_with(&self, q: &'a dyn crate::Query, player: PlayerId) -> impl Iterator<Item = crate::Chars> + 'a {
+        self.this_turn().iter().filter_map(move |r| match r.event {
+            Event::Attacks { attacker, known, .. } if r.active == player => Some(attacker_as_declared(q, attacker, known)),
+            _ => None,
         })
     }
 

@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// as it triggers, and the defending player is carried to the resolution.
 fn attacks_a_richer_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Attacks { attacker, defender } if *attacker == source => {
+        Event::Attacks { attacker, defender, .. } if *attacker == source => {
             let defending = q.defending_player(*defender)?;
             if hand_size(q, defending) > hand_size(q, q.controller(source)) {
                 Some(Fired { subject: Target::Player(defending), data: [0; 2] })
