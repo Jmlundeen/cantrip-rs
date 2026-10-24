@@ -74,6 +74,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-134](#ki-134-the-browser-scenario-for-lands-planned-for-x-fails-on-main) | The browser scenario for lands planned for X fails on main | Pri-2 | Open |
 | [KI-136](#ki-136-a-choice-listing-an-opponents-face-down-permanent-records-it-as-shown-to-the-chooser) | A choice listing an opponent's face-down permanent records it as shown to the chooser | Pri-2 | Open |
 | [KI-135](#ki-135-a-permanent-keeps-the-names-of-at-most-two-abilities-that-chose-one) | A permanent keeps the names of at most two abilities that chose one | Pri-3 | Won't fix: beyond practical scale |
+| [KI-137](#ki-137-the-host-shows-an-attacker-attacking-nothing-as-attacking-a-player-at-seat-0) | The host shows an attacker attacking nothing as attacking a player at seat 0 | Pri-2 | Open |
 
 ## Issues
 
@@ -451,6 +452,20 @@ reduction or a `VariableCost::SacrificeAnyNumber { less_each }`. No printed harm
 false, only less precise.
 
 **Scenarios.** None: display. `HarmonizeTests` covers the X case.
+
+### KI-137: The host shows an attacker attacking nothing as attacking a player at seat 0
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host / client | 2026-10-24, review of the CR 506.4c removal from combat |
+
+**Notes.** A creature attacking a planeswalker or battle that is removed from combat goes on attacking nothing (CR
+506.4c; `Attacker::target` is `Target::None`). `crates/cantrip-host/src/view.rs` (`combat`, ~857) sends it to the client
+through its catch-all arm as `AttackTargetKindView::Player` with seat 0, so the client is told it attacks a player, at a
+seat no player has. The game state is right; only the display is wrong. A fix adds a "nothing" kind to
+`AttackTargetKindView` (and its C# mirror) and has the client draw the attacker as attacking nothing.
+
+**Scenarios.** None: the engine's own tests (`removed_from_combat_tests.rs`) show the state; a host view test can pin it.
 
 ### KI-136: A choice listing an opponent's face-down permanent records it as shown to the chooser
 

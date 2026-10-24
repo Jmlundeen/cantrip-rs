@@ -2318,6 +2318,10 @@ pub struct Attacker {
     /// battle it attacks - fixed while it attacks it, as a change of either removes that permanent from combat (CR 506.4) -
     /// and still that player once the planeswalker or battle has been removed (`target` `Target::None`).
     pub defending: PlayerId,
+    /// What the planeswalker or battle it attacks is being attacked as (CR 506.4, 506.4e): of its card types, planeswalker,
+    /// battle or both - what it was as it was attacked, kept up to date while it stays attacked (`ops::settle_attacked`), so
+    /// a change from both to one is told from a change from one to the other. None for a player, or once it attacks nothing.
+    pub attacked_as: TypeSet,
     pub blocked: bool,
     /// It had first strike or double strike as this combat's first-strike damage step began (CR 510.4): in the regular
     /// combat damage step it assigns combat damage only if it has double strike then.
@@ -2328,10 +2332,10 @@ pub struct Attacker {
 }
 
 impl Attacker {
-    /// An attacking creature attacking `target`, whose defending player is `defending`: unblocked, in no band, not yet in any
-    /// combat damage step.
-    pub const fn new(id: ObjectId, target: Target, defending: PlayerId) -> Attacker {
-        Attacker { id, target, defending, blocked: false, first_strike: false, band: 0 }
+    /// An attacking creature attacking `target` as `attacked_as`, whose defending player is `defending`: unblocked, in no
+    /// band, not yet in any combat damage step.
+    pub const fn new(id: ObjectId, target: Target, defending: PlayerId, attacked_as: TypeSet) -> Attacker {
+        Attacker { id, target, defending, attacked_as, blocked: false, first_strike: false, band: 0 }
     }
 }
 

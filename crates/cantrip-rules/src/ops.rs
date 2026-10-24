@@ -3524,6 +3524,8 @@ pub fn enter_attacking(cx: &mut Cx, entered: &[ObjectId], defender: Target) {
     let Some(defending) = defending_player_of(cx.s(), defender).filter(|_| attackable(cx, attacking, defender)) else {
         return;
     };
+    // What it is attacked as (CR 506.4e): what the permanent is now; nothing, for a player.
+    let attacked_as = defender.object().map_or(TypeSet::NONE, |d| attackable_types(&cx.chars(d)));
     let mut attackers = cx.s().attackers.clone();
     for &id in entered {
         if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).controller != attacking {
@@ -3531,7 +3533,7 @@ pub fn enter_attacking(cx: &mut Cx, entered: &[ObjectId], defender: Target) {
         }
         let chars = cx.chars(id);
         if chars.is(CardType::Creature) && !chars.is(CardType::Battle) {
-            attackers.push(Attacker::new(id, defender, defending));
+            attackers.push(Attacker::new(id, defender, defending, attacked_as));
         }
     }
     if attackers.len() != cx.s().attackers.len() {
@@ -3645,7 +3647,7 @@ pub(crate) fn remove_from_combat(cx: &mut Cx, permanents: &[ObjectId]) {
             .attackers
             .iter()
             .filter(|a| !removed(a.id))
-            .map(|&a| if a.target.object().is_some_and(removed) { Attacker { target: Target::None, ..a } } else { a })
+            .map(|&a| if a.target.object().is_some_and(removed) { Attacker { target: Target::None, attacked_as: TypeSet::NONE, ..a } } else { a })
             .collect();
         cx.st().set_attackers(attackers);
     }
@@ -3655,54 +3657,67 @@ pub(crate) fn remove_from_combat(cx: &mut Cx, permanents: &[ObjectId]) {
     }
 }
 
-/// Whether a planeswalker or battle being attacked by a creature whose defending player is `defending` is still one the
-/// rules keep in combat by its card types (CR 506.4, 506.4e), as the layers have it now. Its controller and protector have
-/// not changed since it was attacked (that removes it, `remove_from_combat`), so `defending` says how it was attacked: as a
-/// planeswalker its controller is the defending player, as a battle (or as both) its protector is (CR 508.5). It stays
-/// while it is both; a planeswalker and no longer a battle stays while it is controlled by the defending player - always,
-/// if it was attacked as a planeswalker, and if it was attacked as a battle, only while its protector controls it; a
-/// battle and no longer a planeswalker stays while the defending player protects it - one attacked as a battle, or as
-/// both - and not if it was attacked as a planeswalker alone; neither, it does not.
-fn still_attacked(cx: &Cx, id: ObjectId, defending: PlayerId) -> bool {
-    let chars = cx.chars(id);
-    let obj = cx.s().obj(id);
-    match (chars.is(CardType::Planeswalker), chars.is(CardType::Battle)) {
-        (true, true) => true,
-        (true, false) => obj.controller == defending,
-        (false, true) => obj.marks.protector == Some(defending),
-        (false, false) => false,
-    }
+/// The card types a permanent can be attacked as that it has (CR 506.3): planeswalker, battle, both or neither.
+pub(crate) fn attackable_types(chars: &Chars) -> TypeSet {
+    TypeSet(chars.types.0 & TypeSet::of(&[CardType::Planeswalker, CardType::Battle]).0)
 }
 
-/// A planeswalker or battle being attacked that has stopped being one is removed from combat (CR 506.4, 506.4e) the moment
-/// it does, for good: the creatures attacking it attack nothing from then on (CR 506.4c), though it become one again before
-/// combat damage. Asked wherever characteristics may have changed - at every event and every effect begun
-/// (`settle_lasting_and_control`), and at every change with no event (`Cx::state_changed`). It takes the permanent out
-/// of no block: a blocking creature that is also a planeswalker being attacked and stops being a planeswalker is still
-/// blocking (CR 506.4d). Free while no creature attacks a permanent.
+/// What a permanent being attacked as `was` (`Attacker::attacked_as`) is being attacked as now, its card types as the layers
+/// have them now (`attackable_types`); none once the rules remove it from combat by its types (CR 506.4, 506.4e). Its
+/// controller and protector are the ones it had (a change removes it, `remove_from_combat`).
+/// - It stays as long as it keeps what it was attacked as, and a planeswalker or battle that becomes both is being attacked
+///   as both (nothing removes it).
+/// - One that was both: it is removed once it is neither; a planeswalker and no longer a battle stays only while it is
+///   controlled by its protector - a protector it no longer has controls nothing (CR 310.9g keeps it one) - and a battle and
+///   no longer a planeswalker stays (CR 506.4e).
+/// - One that was only a planeswalker and is now only a battle, or only a battle and is now only a planeswalker, has
+///   stopped being what it was attacked as, and is removed (CR 506.4); it was never both, so CR 506.4e is not about it.
+fn attacked_as_now(cx: &Cx, id: ObjectId, was: TypeSet) -> Option<TypeSet> {
+    let now = attackable_types(&cx.chars(id));
+    let both = TypeSet::of(&[CardType::Planeswalker, CardType::Battle]);
+    let stays = if now == TypeSet::NONE {
+        false
+    } else if now == was || now == both {
+        true
+    } else if was == both {
+        // CR 506.4e.
+        let obj = cx.s().obj(id);
+        !now.has(CardType::Planeswalker) || obj.marks.protector == Some(obj.controller)
+    } else {
+        false
+    };
+    stays.then_some(now)
+}
+
+/// A planeswalker or battle being attacked that has stopped being what it is attacked as is removed from combat (CR 506.4,
+/// 506.4e) the moment it does, for good: the creatures attacking it attack nothing from then on (CR 506.4c), though it
+/// become one again before combat damage. One that stays has what it is now attacked as recorded (`attacked_as_now`).
+/// Asked wherever characteristics may have changed - at every event and every effect begun (`settle_lasting_and_control`),
+/// and at every change with no event (`Cx::state_changed`). It takes the permanent out of no block: a blocking creature
+/// that is also a planeswalker being attacked and stops being a planeswalker is still blocking (CR 506.4d). Free while no
+/// creature attacks a permanent.
 pub(crate) fn settle_attacked(cx: &mut Cx) {
     let s = cx.s();
     if !s.attackers.iter().any(|a| matches!(a.target, Target::Object(_))) {
         return;
     }
-    let mut lapsed: Vec<ObjectId> = Vec::new();
-    for a in &s.attackers {
-        if let Target::Object(id) = a.target
-            && !lapsed.contains(&id)
-            && !still_attacked(cx, id, a.defending)
-        {
-            lapsed.push(id);
-        }
-    }
-    if lapsed.is_empty() {
-        return;
-    }
-    let attackers = s
+    let mut changed = false;
+    let attackers: Vec<Attacker> = s
         .attackers
         .iter()
-        .map(|&a| if a.target.object().is_some_and(|id| lapsed.contains(&id)) { Attacker { target: Target::None, ..a } } else { a })
+        .map(|&a| {
+            let Target::Object(id) = a.target else { return a };
+            let next = match attacked_as_now(cx, id, a.attacked_as) {
+                Some(now) => Attacker { attacked_as: now, ..a },
+                None => Attacker { target: Target::None, attacked_as: TypeSet::NONE, ..a },
+            };
+            changed |= next != a;
+            next
+        })
         .collect();
-    cx.st().set_attackers(attackers);
+    if changed {
+        cx.st().set_attackers(attackers);
+    }
 }
 
 /// Settles at once what continuous effects say of control (CR 613.1b) and of "for as long as" durations (CR 611.2b), as

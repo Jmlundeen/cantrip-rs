@@ -545,7 +545,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
     }
     s.attackers.len().hash(h);
     for a in &s.attackers {
-        (canon.id(a.id), canon.target(a.target), a.blocked).hash(h);
+        (canon.id(a.id), canon.target(a.target), a.defending, a.attacked_as, a.blocked, a.first_strike, a.band).hash(h);
     }
     s.blocks.len().hash(h);
     for b in &s.blocks {

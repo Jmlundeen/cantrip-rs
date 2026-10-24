@@ -730,7 +730,8 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
         // Each names a player or a planeswalker or battle of a defending player (CR 508.1b), which the declaration was checked
         // against: its defending player is the one that names (CR 508.5).
         let Some(defending) = defending_player(cx, target) else { continue };
-        attackers.push(Attacker { band, ..Attacker::new(id, target, defending) });
+        let attacked_as = target.object().map_or(TypeSet::NONE, |d| ops::attackable_types(&cx.chars(d)));
+        attackers.push(Attacker { band, ..Attacker::new(id, target, defending, attacked_as) });
     }
     let attacked = !attackers.is_empty();
     cx.st().update_turn(|t| t.attacked = attacked);
@@ -1314,13 +1315,12 @@ fn blocked_by(cx: &Cx, blocker: ObjectId) -> Vec<ObjectId> {
 /// (CR 800.4e), or a planeswalker or battle - which the combat state names only while it is being attacked (removed from
 /// combat, it is cleared, `ops::remove_from_combat`, `ops::settle_attacked`); a battle still being attacked keeps a
 /// protector who has left the game until combat ends (CR 704.5x). Nothing, for an attacker attacking nothing (CR 506.4c).
+/// A permanent named is still checked to be on the battlefield as a planeswalker or battle, so that a removal some path
+/// failed to record deals no damage to a permanent that is not being attacked.
 fn combat_defender_present(cx: &Cx, target: Target) -> bool {
     match target {
         Target::Player(p) => cx.s().in_game(p),
-        Target::Object(id) => {
-            debug_assert!(live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield), "a permanent removed from combat is no longer attacked");
-            true
-        }
+        Target::Object(id) => live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) && ops::attackable_types(&cx.chars(id)) != TypeSet::NONE,
         _ => false,
     }
 }

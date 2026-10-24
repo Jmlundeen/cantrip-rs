@@ -105,7 +105,7 @@ fn absolute_power_is_used_for_unblocked_attackers_blocked_attackers_and_blockers
         let [absolute, normal] = ids[..] else { unreachable!() };
         let attacker = if blocking { normal } else { absolute };
         let blocker = if blocking { absolute } else { normal };
-        game.state.set_attackers(vec![Attacker { blocked: arrangement > 0, ..Attacker::new(attacker, Target::Player(THEM), THEM) }]);
+        game.state.set_attackers(vec![Attacker { blocked: arrangement > 0, ..Attacker::new(attacker, Target::Player(THEM), THEM, TypeSet::NONE) }]);
         if arrangement > 0 {
             game.state.set_blocks(vec![Block { blocker, attacker, first_strike: false }]);
         }
@@ -126,7 +126,7 @@ fn minimum_signed_power_deals_32768_combat_damage_and_destroys_its_blocker() {
     let [attacker, blocker] = ids[..] else { unreachable!() };
     let card = game.cards.id_of(&ABSOLUTE);
     game.state.update_obj(attacker, |o| o.copy = Some(Copiable::of(card).sized(i16::MIN, 4)));
-    game.state.set_attackers(vec![Attacker { blocked: true, ..Attacker::new(attacker, Target::Player(THEM), THEM) }]);
+    game.state.set_attackers(vec![Attacker { blocked: true, ..Attacker::new(attacker, Target::Player(THEM), THEM, TypeSet::NONE) }]);
     game.state.set_blocks(vec![Block { blocker, attacker, first_strike: false }]);
     game.state.update_turn(|t| t.set_step(Step::CombatDamage));
     crate::turn::begin_step(&mut cx(&mut game)).expect("no assignment choice");
@@ -154,7 +154,7 @@ fn trample_accounts_for_large_marked_damage_and_deathtouch_without_signed_narrow
         }
         cantrip_api::Game::add_effect(&mut cx(&mut game), blocker, blocker, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
         game.state.update_obj(blocker, |o| o.damage = marked);
-        game.state.set_attackers(vec![Attacker { blocked: true, ..Attacker::new(attacker, Target::Player(THEM), THEM) }]);
+        game.state.set_attackers(vec![Attacker { blocked: true, ..Attacker::new(attacker, Target::Player(THEM), THEM, TypeSet::NONE) }]);
         game.state.set_blocks(vec![Block { blocker, attacker, first_strike: false }]);
         game.state.update_turn(|t| t.set_step(Step::CombatDamage));
         let frame = game.state.agenda.len();

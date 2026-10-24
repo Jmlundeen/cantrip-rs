@@ -31,9 +31,9 @@ static BOTH: CardDef = CardDef {
 /// The same, a Siege: protected by an opponent of its controller (CR 310.9a).
 static BOTH_SIEGE: CardDef = CardDef { name: "Removed combat walker siege probe", subtypes: SubtypeSet::of(&[Subtype::Siege]), ..BOTH };
 
-/// The attacker as the combat state has it, attacking `target` with `defending` its defending player.
-fn attacking(id: ObjectId, target: Target, defending: PlayerId) -> Attacker {
-    Attacker::new(id, target, defending)
+/// The attacker as the combat state has it, attacking `target` as `attacked_as` with `defending` its defending player.
+fn attacking(id: ObjectId, target: Target, defending: PlayerId, attacked_as: TypeSet) -> Attacker {
+    Attacker::new(id, target, defending, attacked_as)
 }
 
 /// A game of `players` in YOU's declare blockers step: YOU's creature attacks `def`, a permanent `controller` controls and
@@ -54,7 +54,7 @@ fn game(players: usize, def: &'static CardDef, controller: PlayerId, protector: 
     let attacker = put(&mut game, &ATTACKER, YOU);
     let attacked = put(&mut game, def, controller);
     game.state.update_obj(attacked, |o| o.marks.protector = protector);
-    game.state.set_attackers(vec![attacking(attacker, Target::Object(attacked), defending)]);
+    game.state.set_attackers(vec![attacking(attacker, Target::Object(attacked), defending, def.types)]);
     (game, attacker, attacked)
 }
 
@@ -196,4 +196,61 @@ fn an_attacked_planeswalker_left_alone_is_dealt_the_combat_damage() {
     crate::ops::settle_lasting_and_control(&mut cx);
     assert_eq!(cx.s().attackers[0].target, Target::Object(walker));
     assert_eq!(damage_to(&mut cx, walker), 3);
+}
+
+/// A battle protected by its controller (no Siege), being attacked, becomes a planeswalker and stops being a battle in one
+/// change. It was never both, so CR 506.4e is not about it: it stopped being the battle it was attacked as, and CR 506.4
+/// removes it from combat.
+#[test]
+fn an_attacked_battle_that_becomes_only_a_planeswalker_is_dealt_no_combat_damage() {
+    let (mut game, attacker, battle) = game(2, &BATTLE, THEM, Some(THEM), THEM);
+    let mut cx = cx(&mut game);
+    effect(&mut cx, battle, EffectKind::SetTypes(TypeSet::of(&[CardType::Planeswalker])));
+    cantrip_api::Game::add_counters(&mut cx, battle, CounterKind::Loyalty, 10);
+    attacks_nothing(&cx, attacker, THEM);
+    assert_eq!(damage_to(&mut cx, battle), 0);
+}
+
+/// The same for a planeswalker that becomes only a battle (it has a protector, its controller, as from an earlier time as
+/// one, CR 310.9g): never both, so removed (CR 506.4).
+#[test]
+fn an_attacked_planeswalker_that_becomes_only_a_battle_is_dealt_no_combat_damage() {
+    let (mut game, attacker, walker) = game(2, &WALKER, THEM, Some(THEM), THEM);
+    let mut cx = cx(&mut game);
+    effect(&mut cx, walker, EffectKind::SetTypes(TypeSet::of(&[CardType::Battle])));
+    cantrip_api::Game::add_counters(&mut cx, walker, CounterKind::Defense, 10);
+    attacks_nothing(&cx, attacker, THEM);
+    assert_eq!(damage_to(&mut cx, walker), 0);
+}
+
+/// A planeswalker being attacked becomes a battle too - now a permanent being attacked that is both - and then stops being
+/// a planeswalker: CR 506.4e keeps it a battle being attacked, and it is dealt the combat damage.
+#[test]
+fn an_attacked_planeswalker_that_becomes_both_and_then_only_a_battle_stays_attacked() {
+    let (mut game, _, walker) = game(2, &WALKER, THEM, None, THEM);
+    let mut cx = cx(&mut game);
+    effect(&mut cx, walker, EffectKind::AddTypes(TypeSet::of(&[CardType::Battle])));
+    assert_eq!(cx.s().attackers[0].target, Target::Object(walker), "both: still attacked");
+    effect(&mut cx, walker, EffectKind::SetTypes(TypeSet::of(&[CardType::Battle])));
+    assert_eq!(cx.s().attackers[0].target, Target::Object(walker), "CR 506.4e: still a battle being attacked");
+    assert_eq!(damage_to(&mut cx, walker), 3);
+}
+
+/// Should some path ever fail to record a removal, the combat damage step still deals no damage to a permanent that is not
+/// a planeswalker or battle on the battlefield: the combat state names one (written here as a missed removal would leave
+/// it) that has become a creature alone with no settling since.
+#[test]
+fn a_permanent_named_by_the_combat_state_that_is_no_longer_attackable_is_dealt_no_combat_damage() {
+    let (mut game, _, walker) = game(2, &WALKER, THEM, None, THEM);
+    let timestamp = game.state.timestamp();
+    game.state.effect_push(ContinuousEffect {
+        source: walker,
+        controller: THEM,
+        timestamp,
+        affected: walker,
+        kind: EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])),
+        duration: Duration::EndOfTurn,
+    });
+    let mut cx = cx(&mut game);
+    assert_eq!(damage_to(&mut cx, walker), 0);
 }
