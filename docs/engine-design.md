@@ -712,8 +712,10 @@ this card" functions wherever a discarded card can end up (`WHERE_A_DISCARD_ENDS
 graveyard" included). A card a discard put into a hand or a library unrevealed has undefined characteristics (CR
 701.9c): `Event::Discarded::undefined` says so in the history, its own abilities trigger on nothing, and what asks what
 was discarded reads it through `cantrip_mechanics::hand::discarded_card`, never `chars` (Aclazotz's land card, Seasoned
-Pyromancer's nonland cards). The first "when you cycle this card" is the shared cycling mechanic matching that
-`Discarded` record (`Event::Cycled` names the card in hand) - or its own text
+Pyromancer's nonland cards). A cycle (CR 702.29c) is the discard paying a cycling or typecycling ability's cost
+(`ActivatedDef::cycling`, set only by the keyword's shared mechanics and held to the Oracle text by
+`cantrip-cards/tests/cycling_matches_oracle.rs`), never another "Discard this card" cost (channel): `Event::Cycled`
+follows that `Discarded` in the discard's batch, naming the same object, the card where it ended - or its own text
 names the zone (CR 113.6b, 113.6m: "return this card from your graveyard"), which the card declares with `functions_in`.
 `CardTable::functions_elsewhere` says per card which other zones to look in, and
 `cantrip-cards/tests/functioning_zones_match_text.rs` holds every ability's zones, declared or derived, to its words and

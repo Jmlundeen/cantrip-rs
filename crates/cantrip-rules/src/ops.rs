@@ -2503,8 +2503,27 @@ pub fn discard_revealed(cx: &mut Cx, cards: &[ObjectId]) -> Vec<ObjectId> {
     discard_moving(cx, cards, &[], true)
 }
 
+/// `player` cycles `card` (CR 702.29c): discards it to pay the cost of a cycling ability (`ActivatedDef::cycling`). The
+/// discard's batch announces both, each naming the card where it went (CR 400.7) - in its graveyard, or wherever a
+/// replacement put it - so "when you cycle this card" triggers from that zone (CR 702.29c), "whenever you cycle or discard
+/// a card" sees one batch (CR 702.29d), and a card put into a hidden zone unrevealed has nothing of its own trigger (CR
+/// 701.9c, `Event::Discarded::undefined`).
+pub fn cycle(cx: &mut Cx, player: PlayerId, card: ObjectId) {
+    let (new, mut events) = discard_events(cx, &[card], &[], false);
+    events.extend(new.iter().map(|&card| Event::Cycled { card, player }));
+    cx.emit_batch(&events, None);
+}
+
 /// The discard of `discard_paying` and `discard_revealed`: each move marked as paying a characteristic or as revealed.
 fn discard_moving(cx: &mut Cx, cards: &[ObjectId], paying: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
+    let (new, events) = discard_events(cx, cards, paying, revealed);
+    cx.emit_batch(&events, None);
+    new
+}
+
+/// Moves the cards of `discard_moving`, and returns what they became with the discard's events, to be announced as one
+/// batch.
+fn discard_events(cx: &mut Cx, cards: &[ObjectId], paying: &[ObjectId], revealed: bool) -> (Vec<ObjectId>, Vec<Event>) {
     // CR 101.2: a card an opponent's spell or ability can't make its owner discard stays where it is.
     let causer = cx.effect_controller();
     let moves: Vec<Moving> = cards
@@ -2525,8 +2544,7 @@ fn discard_moving(cx: &mut Cx, cards: &[ObjectId], paying: &[ObjectId], revealed
     // One event for the whole discard, so that "whenever you discard one or more cards" sees it once (CR 603.2c).
     let events: Vec<Event> =
         new.iter().map(|&card| Event::Discarded { player: cx.s().obj(card).owner, card, undefined: undefined.contains(&card) }).collect();
-    cx.emit_batch(&events, None);
-    new
+    (new, events)
 }
 
 /// Mills (CR 701.17): the top cards together, top first, so the second card milled ends up above the first.

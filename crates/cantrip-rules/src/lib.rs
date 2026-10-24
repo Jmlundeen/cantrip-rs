@@ -102,6 +102,8 @@ mod play_permission_tests;
 #[cfg(test)]
 mod preparation_tests;
 #[cfg(test)]
+mod cycled_tests;
+#[cfg(test)]
 mod counters_together_tests;
 #[cfg(test)]
 mod remove_up_to_tests;

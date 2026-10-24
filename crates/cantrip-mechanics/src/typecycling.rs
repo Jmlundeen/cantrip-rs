@@ -43,6 +43,7 @@ pub const fn ability(subtype: Subtype, mana: ManaCost, text: &'static str) -> Ab
     };
     cantrip_api::ability(Cost::mana(mana).and(DISCARD_THIS), effect, text)
         .from(ZoneKind::Hand)
+        .cycling()
 }
 
 /// Basic landcycling (CR 702.29e): "Search your library for a basic land card, reveal it, put it into your hand, then
@@ -57,5 +58,5 @@ fn search_basic_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 /// The basic landcycling ability, from the hand (CR 702.29e). Apex Witchstalker, Awaken the Inferno, Hexhaven Battalion,
 /// Undulating Witness and Vinelasher Adept print it.
 pub const fn basic_landcycling(mana: ManaCost, text: &'static str) -> AbilityDef {
-    cantrip_api::ability(Cost::mana(mana).and(DISCARD_THIS), search_basic_land, text).from(ZoneKind::Hand)
+    cantrip_api::ability(Cost::mana(mana).and(DISCARD_THIS), search_basic_land, text).from(ZoneKind::Hand).cycling()
 }

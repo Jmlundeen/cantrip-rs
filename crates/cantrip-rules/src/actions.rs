@@ -8058,14 +8058,13 @@ fn activate(
     if def.cost.exile_self && def.cost.materials.is_none() {
         ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
     }
+    // Discarding this card to pay a cycling ability's cost is cycling it (CR 702.29c), typecycling's included (CR 702.29f);
+    // any other "Discard this card" (channel, Harvester of Misery's) is a discard and nothing more.
     if def.cost.discard_self {
-        ops::discard(cx, source);
-        // `Cycled` names the card in hand, and is its own event after the discard's. No card has "when you cycle this
-        // card" yet (CR 702.29c: "when you discard this card to pay a cycling cost", from whatever zone it went to): the first
-        // is the shared cycling mechanic, matching this discard's `Event::Discarded` record - the card where it went, and its
-        // `undefined` (CR 701.9c) - or `Cycled` is emitted in the discard's batch naming the new object with that flag.
-        if def.from == ZoneKind::Hand {
-            cx.emit(Event::Cycled { card: source, player });
+        if def.cycling {
+            ops::cycle(cx, player, source);
+        } else {
+            ops::discard(cx, source);
         }
     }
     if let Some(loyalty) = def.cost.loyalty {

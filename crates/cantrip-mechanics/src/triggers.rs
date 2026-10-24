@@ -416,6 +416,7 @@ fn cycle_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub const fn cycling(mana: ManaCost, text: &'static str) -> AbilityDef {
     ability(Cost::mana(mana).and(DISCARD_THIS), cycle_draw, text)
         .from(ZoneKind::Hand)
+        .cycling()
 }
 
 fn lone_attacker(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {

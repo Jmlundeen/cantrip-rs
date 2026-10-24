@@ -1264,6 +1264,11 @@ pub struct ActivatedDef {
     /// Plot's special action (CR 702.170a, 116.2k): "plotting cards" is named as a class by a card that changes its cost
     /// (Doc Aurlock, Grizzled Genius).
     pub plot: bool,
+    /// A cycling ability (CR 702.29a), typecycling's included (CR 702.29e-f): discarding its card to pay its cost is
+    /// cycling it, which the core announces as `Event::Cycled` ("when you cycle this card", CR 702.29c). Set by the
+    /// keyword's shared mechanics (`triggers::cycling`, `typecycling`), never by a card, and held to the words by
+    /// `cantrip-cards/tests/cycling_matches_oracle.rs`.
+    pub cycling: bool,
     /// "X can't be 0" (CR 107.3a, 601.2b by way of 602.2b): the X of its activation cost is announced as 1 or more, and it is
     /// offered only where it could be paid with X as 1 (Lair of the Hydra, Helm of Obedience, Aladdin's Lamp).
     pub x_cant_be_zero: bool,
@@ -1323,6 +1328,7 @@ impl ActivatedDef {
         equip: false,
         late_targets: false,
         plot: false,
+        cycling: false,
         x_cant_be_zero: false,
         special_action: false,
         modal: None,

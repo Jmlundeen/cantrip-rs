@@ -63,7 +63,9 @@ pub enum Event {
     PaidToAttack { attacker: ObjectId, option: AttackOption, ability: AbilityRef, instance: u8, tapped: ObjectId },
     /// A Class became a level (CR 716.2a).
     ClassLevel { object: ObjectId, level: u8 },
-    /// A card was cycled (CR 702.29c).
+    /// `player` cycled `card` (CR 702.29c): discarded it to pay the cost of a cycling or typecycling ability (CR 702.29f,
+    /// `ActivatedDef::cycling`), and no other "Discard this card" cost (channel). In the discard's batch, after its
+    /// `Discarded`, and naming the same object: the card where the discard put it (CR 400.7).
     Cycled { card: ObjectId, player: PlayerId },
     /// A player looked at a card (a look at one card of a hand, at a card exiled face down): kept for the history, and
     /// seen by that player alone.
