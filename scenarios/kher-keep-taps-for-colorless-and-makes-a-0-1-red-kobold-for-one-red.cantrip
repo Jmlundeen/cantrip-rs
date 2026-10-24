@@ -19,16 +19,19 @@ Bot1.Hand.Mountain.Play
 Bot1.Hand.Kher Keep.Play
 Bot1.Battlefield.Kher Keep.Activate(Ability: {T}: Add {C})
 ? Bot1.Mana = {C}
+? Bot1.Battlefield.Kher Keep.Tapped = true
 [T7 Bot1.Main1]
 Bot1.Battlefield.Mountain#1.Activate
 Bot1.Battlefield.Mountain#2.Activate
 Bot1.Battlefield.Kher Keep.Activate(Ability: {1}{R}, {T})
+? Bot1.Mana =
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Kobolds of Kher Keep.Token = true
 
 [Expect]
 Turn = 7
+Bot1.Battlefield = Kher Keep; Mountain; Mountain; Kobolds of Kher Keep
 Bot1.Battlefield.Kobolds of Kher Keep.Token = true
 Bot1.Battlefield.Kobolds of Kher Keep.Types = Creature
 Bot1.Battlefield.Kobolds of Kher Keep.Subtypes = Kobold
