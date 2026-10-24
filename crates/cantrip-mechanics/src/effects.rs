@@ -42,6 +42,19 @@ pub fn destroy_nonland_permanents_with_mana_value_at_most(g: &mut dyn Game, limi
     g.destroy_all(&doomed)
 }
 
+/// "Destroy all artifacts with mana value `limit` or less" (CR 701.8a): every such artifact on the battlefield, destroyed at
+/// once. The artifacts it destroyed. Brotherhood's End (3), Hammer Mage (X) and Meltdown (X) print it.
+pub fn destroy_artifacts_with_mana_value_at_most(g: &mut dyn Game, limit: u32) -> Vec<ObjectId> {
+    let doomed: Vec<ObjectId> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| g.chars(id).is(CardType::Artifact) && g.mana_value(id) <= limit)
+        .collect();
+    g.destroy_all(&doomed)
+}
+
 /// "Creatures you control get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): the creatures `item`'s controller
 /// controls as it resolves, and no creature that enters later. The creatures, for what the rest of the sentence does to them
 /// ("and gain haste", "untap those creatures"). Assault Formation, Eagles of the North, Fatehold Charm, Haze of Rage, Jeskai
@@ -706,9 +719,28 @@ pub fn change_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
 }
 
 /// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event
-/// for every creature on the battlefield as the effect is carried out (CR 608.2c), dealt simultaneously (CR 120.2b, 603.2c).
+/// for every creature on the battlefield as the effect is carried out (CR 608.2c), all dealt together.
 pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
     damage_each_creature_dealt(g, item, n);
+}
+
+/// "[This spell] deals `n` damage to each creature and each planeswalker" (Brotherhood's End, Storm's Wrath, Burn Down the
+/// House, Temporal Firestorm, Dragonback Assault, Invasion of Karsus, Star of Extinction, Underworld Fires, Calamitous
+/// Cave-In): one damage event for every creature and planeswalker on the battlefield as the effect is carried out (CR 608.2c),
+/// each permanent once even when it is both, all dealt together. Damage to a planeswalker removes loyalty counters (CR 306.8).
+pub fn damage_each_creature_and_planeswalker(g: &mut dyn Game, item: &StackItem, n: u16) {
+    let hits: Vec<(ObjectId, Target, u16)> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| {
+            let chars = g.chars(id);
+            chars.is(CardType::Creature) || chars.is(CardType::Planeswalker)
+        })
+        .map(|id| (item.object, Target::Object(id), n))
+        .collect();
+    g.damage_together(&hits);
 }
 
 /// `damage_each_creature`, answering which creatures were actually dealt damage by it (CR 120.3), for "a creature dealt
