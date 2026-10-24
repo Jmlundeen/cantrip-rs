@@ -35,7 +35,7 @@ Bot1.Battlefield.Sol Ring.Activate
 Bot1.Hand.Captain Marvel, Earth's Protector.Cast
 Bot1.Pass
 [T3 Bot1.Main1]
-! Bot1.Battlefield.Captain Marvel, Earth's Protector.Activate
+! Bot1.Battlefield.Captain Marvel, Earth's Protector.Activate(Mana: short)
 Bot1.Hand.Plains.Play
 Bot1.Battlefield.Plains#1.Activate
 Bot1.Battlefield.Plains#2.Activate

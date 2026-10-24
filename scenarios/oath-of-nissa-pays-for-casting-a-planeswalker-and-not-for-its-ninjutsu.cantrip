@@ -39,7 +39,7 @@ Bot1.Pass
 [T3 Bot1.Main1]
 Bot1.Attack(Guerrilla Gorilla)
 [T3 Bot1.Blockers]
-! Bot1.Hand.Kaito, Bane of Nightmares.Activate(Ability: Ninjutsu)
+! Bot1.Hand.Kaito, Bane of Nightmares.Activate(Ability: Ninjutsu; Mana: short)
 [T3 Bot1.Main2]
 Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Mox Emerald.Activate

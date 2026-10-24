@@ -302,7 +302,14 @@ only fails after four turns, without saying why:
 A play, cast or activation is checked the next time that player has priority, without answering it, and fails
 listing what was offered, written as script lines. It is matched as the line would be: the card in that zone, and
 with `Ability:` the option whose text contains it. A refused `Cast` without `Ability:` refuses every way of casting
-the card, not only for its mana cost. Whether an option the player cannot pay for is offered at all depends on the action (many unpayable casts are not offered), so a refusal for want of mana proves nothing; refuse for the rule in question and give the player the mana. A refused activation
+the card, not only for its mana cost. A cast or activation the player cannot pay for is not offered at all (CR 601.2g,
+602.2b), so a refusal that holds only for want of mana proves nothing of any other rule: each refused cast or activation
+(special actions too) is judged again with a thousand mana of every type in the player's pool, and one that would then be
+offered fails as proving nothing - give the player the mana, and refuse for the rule in question. Where the cost is what
+the refusal is about (a cost increase, a reduction that does not apply, a color no source can make, mana restricted to
+other things, a filter land with nothing to pay its hybrid), say so with `Mana: short`:
+`! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)` holds only if the action is not offered now and would be with mana to
+spare, and fails if it is refused even then. A refused activation
 with `Color:` (`! Bot1.Battlefield.Chrome Mox.Activate(Color: Green)`) is offered only where that color is among the colors the
 ability may add: the colors it lets the player choose from, or the fixed mana it adds (`! Bot1.Battlefield.Llanowar Elves.Activate(Color: Blue)`);
 `Color: Colorless` (or `C`) likewise asks whether it may add colorless mana. One with `Sacrifice:`
@@ -392,14 +399,33 @@ answers it on the next line.
 A color choice, `! Bot1.Colors(Blue)`, is checked at that player's next color question and fails if the named color is on offer
 (a replacement color that may not be the one being replaced); pair it with the `Bot1.Colors(...)` that answers it on the next line.
 
-A "you may" choice, `! Bot1.Accept`, fails if that player is asked one before their next priority: the way to show a
-choice is *not* offered (a choice made impossible, CR 608.2d), which a default Decline would otherwise hide. Put `Bot1.Pass`
-lines before it for the priorities that come first, so it lands on the resolution that would ask.
+A "you may" choice, `! Bot1.Accept`, fails if that player is asked one before their next priority (or before the question
+the line after it answers, if that comes first: `! Bot1.Accept` then `Bot1.Choose(Mox Pearl)` for the sacrifice the same
+resolution asks): the way to show a choice is *not* offered (a choice made impossible, CR 608.2d), which a default Decline
+would otherwise hide. Put `Bot1.Pass` lines before it for the priorities that come first, so it lands on the resolution
+that would ask.
 
 The same holds for the other questions, written bare: `! Bot1.Choose`, `! Bot1.Decline`, `! Bot1.Discard`, `! Bot1.Colors`, `! Bot1.Name`,
 `! Bot1.Arrange`, `! Bot1.ChoosePlayer`, `! Bot1.Modes` and `! Bot1.Target` (without arguments) fail if that player is asked that kind
 of question before their next priority: a discard, a search result, a placement or a target that should not be asked for (an
 empty hand, a lone candidate, nothing to reveal). Pair each with a scenario that does ask it.
+
+Such a refusal must cover a point where its question could have been asked, or it fails as proving nothing. Its window
+opens where the game stood before the answer to the line above it (or, under a step header, as the step began; a refusal
+straight after another, checks between, shares that one's window) and closes where it is judged. For `Modes` and `Target`,
+asked as a triggered ability is put on the stack, anything at all happening in it is such a point, the beginning of the
+step under the header too ("at the beginning of"). For every other kind it is one of: a spell or ability leaving the stack
+(resolved, countered, or with no legal target) or resolving; a step ending, every player having passed with the stack
+empty (a trigger that should not have been there would have resolved first); a spell cast, a non-mana ability activated (a
+mana ability only for `Colors`), a land played, a spell copied, a permanent turned face up, a door unlocked; a declaration of
+attackers with banding among them, for the attacking player's `Choose` (bands); and the beginning of the step under the
+header where its turn-based action asks that question (`Block` in the declare blockers step, `Discard` at cleanup, a draw replacement's `Accept`/`Decline` in the draw step). So
+`! Bot1.Accept` written right after a step header, with the trigger that would ask still on the stack, fails: pass priority
+first (`Bot1.Pass`, and the other player's `Pass` when the refusal is theirs, since their own priority would judge it). So
+does a refusal of a combat damage trigger's question written after the `Attack` or `Block` line: it is judged in the
+declare attackers or blockers step; put it under `[T3 Bot1.CombatDamage]` after a `Bot1.Pass`. The rule sees that
+something happened, not that it was the thing meant: a refusal of a death trigger's question after the pass that resolves
+the removal spell still has the trigger above it, so pass once more.
 
 `! Bot1.Arrange(A; B | )` with arguments is a distribution the question must refuse (two cards to a hand that takes one, a
 card left unplaced), judged by the rules' own check of the answer at the next placement question; place it before the
@@ -546,7 +572,10 @@ shuffles). Use it only where no positive value can be known; never for a `Client
 A key described above as absent is asserted absent with `(absent)`: `Bot2.Battlefield.Deep-Cavern Bat.Keywords =
 (absent)` holds when it has no keywords at all, and fails if the key is there. It also fails when the dump has no
 other key on the same object (`Bot2.Battlefield.Deep-Cavern Bat.`, or for a `.Counters.` key the permanent itself),
-so a misspelt or departed object cannot pass vacuously. Anywhere else a missing key fails.
+so a misspelt or departed object cannot pass vacuously, and on a key the dump never writes - a parent such as
+`.Counters` (the dump writes `.Counters.MinusOneMinusOne`, one key per kind) or a misspelt property - which would be absent
+whatever the game did ("not a key the dump has"). An object itself, `Bot1.Battlefield.Ornithopter = (absent)`, holds when no
+object of that name is there (no `Ornithopter.` key, nor `Ornithopter#1.`). Anywhere else a missing key fails.
 
 ## Handing a position over
 

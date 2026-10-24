@@ -27,7 +27,7 @@ Bot1.Hand.Aether Spellbomb.Cast
 Bot2.Pass
 Bot1.Battlefield.The Enigma Jewel.Activate
 ? Bot1.Mana = {C}{C} (Abilities)
-! Bot1.Hand.Sol Ring.Cast
+! Bot1.Hand.Sol Ring.Cast(Mana: short)
 Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
 Bot1.Pass
 Bot2.Pass

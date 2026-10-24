@@ -34,7 +34,7 @@ Bot2.Hand.Ornithopter.Cast
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Mother of Runes.Cast
 Bot1.Pass
-! Bot1.Battlefield.Greatsword of Tyr.Activate(Dwarven Mauler)
+! Bot1.Battlefield.Greatsword of Tyr.Activate(Dwarven Mauler; Mana: short)
 [T5 Bot1.Main1]
 Bot1.Battlefield.Mox Pearl.Activate
 ? Bot1.Mana = {W}

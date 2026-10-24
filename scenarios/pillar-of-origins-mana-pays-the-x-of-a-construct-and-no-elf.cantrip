@@ -27,7 +27,7 @@ Bot2.Pass
 Bot1.Modes(Construct)
 Bot1.Battlefield.Pillar of Origins.Activate(Color: Green)
 ? Bot1.Mana = {G} (ConstructCreatureSpells)
-! Bot1.Hand.Llanowar Elves.Cast
+! Bot1.Hand.Llanowar Elves.Cast(Mana: short)
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Walking Ballista.Cast(X: 1)
 Bot1.Pass

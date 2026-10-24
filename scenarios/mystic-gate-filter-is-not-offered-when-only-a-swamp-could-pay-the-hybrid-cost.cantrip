@@ -17,7 +17,7 @@ Forest x16
 Bot1.Hand.Swamp.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Mystic Gate.Play
-! Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U})
+! Bot1.Battlefield.Mystic Gate.Activate(Ability: {W/U}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Plains.Play

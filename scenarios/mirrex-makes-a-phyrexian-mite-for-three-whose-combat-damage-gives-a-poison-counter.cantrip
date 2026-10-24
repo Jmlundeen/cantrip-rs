@@ -19,7 +19,7 @@ Bot1.Hand.Mox Pearl.Cast
 Bot1.Pass
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
-! Bot1.Battlefield.Mirrex.Activate(Ability: Create)
+! Bot1.Battlefield.Mirrex.Activate(Ability: Create; Mana: short)
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
 Bot1.Battlefield.Mox Pearl.Activate

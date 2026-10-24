@@ -23,7 +23,7 @@ Bot1.Hand.Sol Ring.Cast
 ! Bot1.Battlefield.Sol Ring.Activate(Color: Blue)
 Bot1.Battlefield.Sol Ring.Activate
 ? Bot1.Mana = {C}{C}
-! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
 Bot1.Hand.Mind Stone.Cast
 
 [Expect]

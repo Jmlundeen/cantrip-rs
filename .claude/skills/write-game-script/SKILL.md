@@ -57,8 +57,9 @@ sweeping seeds (CLAUDE.md).
      something it could apply to, so a filter that reads only one side (or the wrong one) fails.
    - **When it reads** ("this turn", "since your last turn", "the first time each turn"): have the thing happen on an
      earlier turn as well, and show it does not count.
-   - **A cost or a cost change**: a refusal can't prove it (an unaffordable cast still counts as offered). Make the
-     mana available before the cast and check the pool with `? Bot1.Mana = ...` **right after the cast or activation
+   - **A cost or a cost change**: an unaffordable cast or activation is not offered, so a refusal proves it only as
+     `! ...Cast(...; Mana: short)` - not offered now, offered with mana to spare - beside the same action paid with
+     exactly enough. Better still, make the mana available before the cast and check the pool with `? Bot1.Mana = ...` **right after the cast or activation
      has finished, in the same step** (a `?` on the very next line can run while the cost is still being paid: put it
      after `BotN.Pass` if it reads too early) - the pool empties between steps, so an `[Expect]` of an empty pool proves nothing. Too high a cost fails
      the cast; too low leaves more than the check says.
@@ -139,7 +140,9 @@ sweeping seeds (CLAUDE.md).
   After a cast the spell is still on the stack. After a choice made during resolution, the spell has usually
   finished. To check a permanent that a cast puts onto the battlefield, put the check after a later line or a wait.
 - **Proving something is not allowed.** `! Bot1.Graveyard.Card.Cast` fails if that player's next priority offers the
-  action (a refused `Cast` without `Ability:` covers every way to cast it; unaffordable still counts as offered).
+  action (a refused `Cast` without `Ability:` covers every way to cast it). An action the player can't pay for is not
+  offered, so the runner judges every refused cast or activation again with mana to spare, and fails one that is then
+  offered as "proves nothing": give the player the mana, or write `Mana: short` when the cost is the point.
   `! Bot2.Block(Blocker > Attacker)` and `! Bot1.Attack(Attacker > Defender)` fail if that player's next declaration
   allows the pair. `! Bot1.Search(Plains)` fails if their next library search may find a Plains. A refusal lands on
   the *next* question, so place it where the action would otherwise be legal (main phase, empty stack) - a refusal of
@@ -149,13 +152,21 @@ sweeping seeds (CLAUDE.md).
   test does not apply — or it can pass for the wrong reason.
 - **Refusals that name targets or questions.** `! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Figure of Fable)` refuses only the
   option announceable with that target (how a hexproof or protection limit is proved). A bare `! Bot1.Choose` (also `Decline`,
-  `Colors`, `Name`, `Arrange`, `ChoosePlayer`, `Modes`, `Target`) fails if that question is asked before the player's next priority.
+  `Colors`, `Name`, `Arrange`, `ChoosePlayer`, `Modes`, `Target`) fails if that question is asked before the player's next priority
+  (or the question the next line answers). It also fails as "proves nothing" unless something since the line above it could
+  have asked it (scenarios/README.md, "Refusals"): for `Accept`, `Choose` and the like, something left the stack or resolved,
+  a step ended, or a spell or ability was cast or activated - not a priority reached with the trigger that would ask still on
+  the stack. Right after a step header or an `Attack`/`Block` line, write `Bot1.Pass` (and the opponent's `Bot2.Pass` when the
+  refusal is theirs) before it; a combat damage trigger's question waits under `[T3 Bot1.CombatDamage]` and a `Bot1.Pass`.
+  The runner checks only that some such point passed: when two things sit on the stack, pass until the one meant resolves.
 - **Zone lists in `[Expect]` have an order.** `Graveyard` and `Library` are top first: the card put into a graveyard
   last comes first, so a spell that resolved and went to the graveyard is listed before what it destroyed, and two
   cards destroyed together keep the order they arrived in, newest first. `Hand`, `Battlefield` and the other lists are
   sorted by name. When the order is not what the test is about, assert `.Count` and the per-card keys instead.
 - **Asserting a key is missing.** `Bot2.Battlefield.Bat.Keywords = (absent)`; it fails unless the dump has some
-  other key on that object, so a typo cannot pass. A counter kind at zero is absent from the dump.
+  other key on that object, so a typo cannot pass, and on a key the dump never writes (`Bat.Counters`, a misspelt
+  property). A counter kind at zero is absent from the dump: say which, `Bat.Counters.MinusOneMinusOne = (absent)`.
+  `Bot1.Battlefield.Bat = (absent)` says no object of that name is there.
 
 ## When the engine is wrong
 

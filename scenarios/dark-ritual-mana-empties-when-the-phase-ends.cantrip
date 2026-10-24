@@ -27,4 +27,4 @@ Bot2.Pass
 ? Bot1.Mana = {B}{B}
 [T1 Bot1.Main2]
 ? Bot1.Mana =
-! Bot1.Hand.Duress.Cast(Bot2)
+! Bot1.Hand.Duress.Cast(Bot2; Mana: short)

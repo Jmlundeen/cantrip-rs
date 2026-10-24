@@ -38,6 +38,8 @@ Bot1.Attack(Kona, Rescue Beastie > Bot2)
 ! Bot1.Choose(Lightning Bolt)
 Bot1.Choose(Forest)
 [T4 Bot2.Main2]
+Bot2.Pass
+Bot1.Pass
 ! Bot1.Choose
 [Bot2.End]
 

@@ -27,7 +27,7 @@ Bot2.Attack(Ornithopter#1 > Bot1)
 Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 ? Bot1.Mana = {W}{W}
-! Bot1.Hand.Ajani's Response.Cast(Bot2.Battlefield.Ornithopter#2)
+! Bot1.Hand.Ajani's Response.Cast(Bot2.Battlefield.Ornithopter#2; Mana: short)
 Bot1.Hand.Ajani's Response.Cast(Bot2.Battlefield.Ornithopter#1)
 ? Bot1.Mana =
 Bot1.Pass

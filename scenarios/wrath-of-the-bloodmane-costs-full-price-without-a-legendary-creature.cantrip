@@ -24,7 +24,7 @@ Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Jet.Activate
-! Bot1.Hand.Wrath of the Bloodmane.Cast(Bot2.Battlefield.Ornithopter)
+! Bot1.Hand.Wrath of the Bloodmane.Cast(Bot2.Battlefield.Ornithopter; Mana: short)
 
 [Expect]
 Stack.Count = 0

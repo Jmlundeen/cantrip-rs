@@ -55,7 +55,7 @@ Bot2.Pass
 [T4 Bot2.Main1]
 Bot2.Battlefield.Powerstone Token.Activate
 Bot2.Battlefield.Mox Jet.Activate
-! Bot2.Hand.Demonic Tutor.Cast
+! Bot2.Hand.Demonic Tutor.Cast(Mana: short)
 
 [Expect]
 Turn = 4

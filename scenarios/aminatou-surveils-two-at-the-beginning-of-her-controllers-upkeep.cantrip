@@ -28,6 +28,8 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Aminatou, Veil Piercer.Cast
 
 [T2 Bot2.Upkeep]
+Bot2.Pass
+Bot1.Pass
 ! Bot1.Arrange
 [T3 Bot1.Upkeep]
 Bot1.Arrange(Swamp | Llanowar Elves)

@@ -41,7 +41,7 @@ Bot1.Pass
 [T5 Bot1.Main2]
 ? Bot1.Battlefield.Mox Pearl.Tapped = false
 ? Bot1.Battlefield.Wistfulness.Tapped = false
-! Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter)
+! Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Mana: short)
 
 [Expect]
 Bot1.Graveyard = Wild Ride

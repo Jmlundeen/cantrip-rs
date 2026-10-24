@@ -28,7 +28,7 @@ Bot2.Pass
 Bot1.Modes(Goblin)
 Bot1.Battlefield.Pillar of Origins.Activate(Color: Green)
 ? Bot1.Mana = {G} (GoblinCreatureSpells)
-! Bot1.Hand.Llanowar Elves.Cast
+! Bot1.Hand.Llanowar Elves.Cast(Mana: short)
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Woodland Changeling.Cast
 Bot1.Pass

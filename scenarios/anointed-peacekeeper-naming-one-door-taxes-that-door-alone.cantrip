@@ -28,7 +28,7 @@ Bot1.Name(Unholy Annex)
 Bot2.Hand.Swamp.Play
 Bot2.Hand.Black Lotus.Cast
 Bot2.Pass
-! Bot2.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+! Bot2.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex; Mana: short)
 
 [Expect]
 Bot2.Battlefield.Count = 2

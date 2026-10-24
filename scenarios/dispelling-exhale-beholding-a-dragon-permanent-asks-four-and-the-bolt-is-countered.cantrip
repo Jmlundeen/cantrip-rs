@@ -47,7 +47,8 @@ Bot2.Decline
 [Expect]
 Bot1.Life = 20
 Bot1.Battlefield.Phyrexian Dragon Engine.Tapped = false
-Bot1.Battlefield.Phyrexian Dragon Engine.Counters = (absent)
+Bot1.Battlefield.Phyrexian Dragon Engine.Power = 2
+Bot1.Battlefield.Phyrexian Dragon Engine.Toughness = 2
 Bot1.Graveyard = Dispelling Exhale
 Bot1.Hand = Kokusho, the Evening Star; Island; Island
 Bot1.Revealed = (absent)

@@ -26,7 +26,7 @@ Mountain x18
 Bot1.Hand.Rockface Village.Play
 Bot1.Battlefield.Rockface Village.Activate(Ability: creature spell)
 ? Bot1.Mana = {R} (CreatureSpells)
-! Bot1.Hand.Lightning Bolt.Cast
+! Bot1.Hand.Lightning Bolt.Cast(Mana: short)
 Bot1.Hand.Blazing Rootwalla.Cast
 Bot1.Hand.Ornithopter.Cast
 Bot1.Pass

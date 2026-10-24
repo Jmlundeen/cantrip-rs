@@ -39,7 +39,7 @@ Bot2.Pass
 Bot1.Battlefield.Cryptic Trilobite.Activate(Ability: Remove)
 ? Bot1.Mana = {C}{C} (Abilities)
 ? Bot1.Battlefield.Cryptic Trilobite.Counters.PlusOnePlusOne = 1
-! Bot1.Hand.Karn, Scion of Urza.Cast
+! Bot1.Hand.Karn, Scion of Urza.Cast(Mana: short)
 Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
 Bot1.Pass
 Bot2.Pass

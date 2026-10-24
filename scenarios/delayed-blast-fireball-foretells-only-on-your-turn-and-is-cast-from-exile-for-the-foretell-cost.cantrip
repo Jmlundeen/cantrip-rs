@@ -28,7 +28,7 @@ Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Sol Ring.Activate
 Bot1.Hand.Delayed Blast Fireball.Foretell
 [T4 Bot2.Main1]
-! Bot1.Exile.Delayed Blast Fireball.Cast
+! Bot1.Exile.Delayed Blast Fireball.Cast(Mana: short)
 [T5 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Mountain.Activate

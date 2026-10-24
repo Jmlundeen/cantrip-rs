@@ -27,7 +27,7 @@ Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Battlefield.Heartwood Crafter.Activate
 ? Bot1.Mana = {C} (NotSpellsFromHand)
-! Bot1.Hand.Mind Stone.Cast
+! Bot1.Hand.Mind Stone.Cast(Mana: short)
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Mountain.Activate

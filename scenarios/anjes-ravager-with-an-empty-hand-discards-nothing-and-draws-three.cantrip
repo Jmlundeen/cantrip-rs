@@ -29,9 +29,9 @@ Bot1.Hand.Mox Sapphire.Cast
 Bot1.Hand.Mountain.Play
 ? Bot1.Hand.Count = 0
 [T3 Bot1.DeclareAttackers]
-! Bot1.Choose
 Bot1.Pass
 Bot2.Pass
+! Bot1.Choose
 ? Combat.Attackers = Anje's Ravager > Bot2
 ? Bot1.Graveyard.Count = 1
 [T3 Bot1.Main2]

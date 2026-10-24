@@ -34,7 +34,7 @@ Bot1.Hand.Blazing Rootwalla.Cast
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Mana = {R}{R} (InstantOrSorcerySpells)
-! Bot1.Battlefield.Blazing Rootwalla.Activate
+! Bot1.Battlefield.Blazing Rootwalla.Activate(Mana: short)
 
 [Expect]
 Turn = 1

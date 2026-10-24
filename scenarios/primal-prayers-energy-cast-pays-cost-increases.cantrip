@@ -28,7 +28,7 @@ Bot1.Hand.Ornithopter.Cast(Ability: Pay {E})
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Energy = 1
-! Bot1.Hand.Ornithopter.Cast(Ability: Pay {E})
+! Bot1.Hand.Ornithopter.Cast(Ability: Pay {E}; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Battlefield.Island.Activate
 Bot1.Hand.Ornithopter.Cast(Ability: Pay {E})

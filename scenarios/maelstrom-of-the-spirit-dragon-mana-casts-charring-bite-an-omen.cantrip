@@ -27,7 +27,7 @@ Bot2.Hand.Llanowar Elves.Cast
 [T3 Bot1.Main1]
 Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: any color; Color: Red)
 ? Bot1.Mana = {R} (DragonOrOmenSpells)
-! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves; Mana: short)
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Twinmaw Stormbrood.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Omen)
 ? Stack = Charring Bite

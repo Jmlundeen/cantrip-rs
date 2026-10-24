@@ -36,9 +36,9 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Battlefield.Sunken Citadel.Activate(Ability: two mana; Color: Blue)
 ? Bot1.Mana = {U}{U} (LandAbilities)
-! Bot1.Hand.Ponder.Cast
-! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return)
-! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+! Bot1.Hand.Ponder.Cast(Mana: short)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return; Mana: short)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw; Mana: short)
 [T3 Bot1.Main2]
 ? Bot1.Mana =
 [T5 Bot1.Main1]

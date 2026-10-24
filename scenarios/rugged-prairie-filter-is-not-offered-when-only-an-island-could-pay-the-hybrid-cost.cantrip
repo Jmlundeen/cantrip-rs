@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Island.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Rugged Prairie.Play
-! Bot1.Battlefield.Rugged Prairie.Activate(Ability: {R/W})
+! Bot1.Battlefield.Rugged Prairie.Activate(Ability: {R/W}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Mountain.Play

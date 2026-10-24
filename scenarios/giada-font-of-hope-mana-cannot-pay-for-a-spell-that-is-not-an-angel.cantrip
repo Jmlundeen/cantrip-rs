@@ -24,7 +24,7 @@ Bot1.Pass
 [T3 Bot1.Main1]
 Bot1.Battlefield.Giada, Font of Hope.Activate
 ? Bot1.Mana = {W} (AngelSpells)
-! Bot1.Hand.Hinterland Sanctifier.Cast
+! Bot1.Hand.Hinterland Sanctifier.Cast(Mana: short)
 Bot1.Hand.Mox Pearl.Cast
 Bot1.Hand.Mox Jet.Cast
 Bot1.Hand.Inspiring Overseer.Cast

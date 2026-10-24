@@ -16,7 +16,7 @@ Island x20
 Bot1.Hand.Sunbillow Verge.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Plains.Play
-! Bot1.Hand.Consider.Cast
+! Bot1.Hand.Consider.Cast(Mana: short)
 Bot1.Battlefield.Sunbillow Verge.Activate(Ability: {R})
 Bot1.Battlefield.Plains.Activate
 Bot1.Hand.Lightning Helix.Cast(Bot2)

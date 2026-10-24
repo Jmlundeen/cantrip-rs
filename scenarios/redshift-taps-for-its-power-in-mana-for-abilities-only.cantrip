@@ -31,7 +31,7 @@ Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Add X mana; Color: Green)
 ? Bot1.Mana = {G}{G} (Abilities)
-! Bot1.Hand.Karn, Scion of Urza.Cast
+! Bot1.Hand.Karn, Scion of Urza.Cast(Mana: short)
 Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
 Bot1.Pass
 Bot2.Pass

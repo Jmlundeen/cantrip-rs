@@ -33,7 +33,7 @@ Bot2.Battlefield.Plains#1.Activate
 Bot2.Battlefield.Plains#2.Activate
 Bot2.Hand.Thalia, Guardian of Thraben.Cast
 [T5 Bot1.Upkeep]
-! Bot1.Hand.March of Otherworldly Light.Cast
+! Bot1.Hand.March of Otherworldly Light.Cast(Mana: short)
 [T5 Bot1.Main1]
 Bot1.Battlefield.Plains.Activate
 Bot1.Hand.March of Otherworldly Light.Cast(X: 1)

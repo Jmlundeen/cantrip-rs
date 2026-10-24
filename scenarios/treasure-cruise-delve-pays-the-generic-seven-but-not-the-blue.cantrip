@@ -30,7 +30,7 @@ Bot2.Pass
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Graveyard.Count = 10
-! Bot1.Hand.Treasure Cruise.Cast
+! Bot1.Hand.Treasure Cruise.Cast(Mana: short)
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate
 Bot1.Hand.Treasure Cruise.Cast(Delve: 7)

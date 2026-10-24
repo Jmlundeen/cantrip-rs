@@ -27,7 +27,7 @@ Bot2.Hand.Ornithopter.Cast
 Bot2.Hand.Ornithopter.Cast
 Bot2.Hand.Mox Jet.Cast
 Bot2.Battlefield.Mox Jet.Activate
-! Bot2.Hand.Basalt Monolith.Cast(Convoke: Ornithopter, Ornithopter)
+! Bot2.Hand.Basalt Monolith.Cast(Convoke: Ornithopter, Ornithopter; Mana: short)
 
 [Expect]
 Turn = 2

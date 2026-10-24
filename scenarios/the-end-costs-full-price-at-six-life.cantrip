@@ -21,7 +21,7 @@ Bot1.Hand.Black Lotus.Cast
 Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Battlefield.Black Lotus.Activate(Color: Black)
-! Bot1.Hand.The End.Cast(Bot2.Battlefield.Ornithopter)
+! Bot1.Hand.The End.Cast(Bot2.Battlefield.Ornithopter; Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.The End.Cast(Bot2.Battlefield.Ornithopter)

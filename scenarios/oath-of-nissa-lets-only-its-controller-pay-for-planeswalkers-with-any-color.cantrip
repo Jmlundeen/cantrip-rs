@@ -48,7 +48,7 @@ Bot2.Battlefield.Mox Emerald.Activate
 Bot2.Battlefield.Mox Pearl.Activate
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Forest.Activate
-! Bot2.Hand.Jace, the Mind Sculptor.Cast
+! Bot2.Hand.Jace, the Mind Sculptor.Cast(Mana: short)
 Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Hand.Forest.Play
@@ -57,7 +57,7 @@ Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 ? Bot1.Mana = {W}{G}{G}{G}
-! Bot1.Hand.Brainstorm.Cast
+! Bot1.Hand.Brainstorm.Cast(Mana: short)
 Bot1.Hand.Jace, the Mind Sculptor.Cast
 Bot1.Pass
 Bot1.Pass

@@ -28,7 +28,7 @@ Island x27
 ? Bot1.Companion = Lurrus of the Dream-Den
 ? Bot1.Revealed = Lurrus of the Dream-Den
 Bot1.Hand.Swamp.Play
-! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion
+! Bot1.Sideboard.Lurrus of the Dream-Den.TakeCompanion(Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
 Bot1.Hand.Mox Pearl.Cast

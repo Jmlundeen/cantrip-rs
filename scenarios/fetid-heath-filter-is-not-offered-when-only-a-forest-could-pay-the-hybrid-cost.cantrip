@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Forest.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Fetid Heath.Play
-! Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B})
+! Bot1.Battlefield.Fetid Heath.Activate(Ability: {W/B}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Plains.Play

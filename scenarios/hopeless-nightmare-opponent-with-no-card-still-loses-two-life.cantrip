@@ -43,6 +43,9 @@ Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Swamp.Activate
 Bot1.Hand.Hopeless Nightmare.Cast
 Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
 ! Bot2.Choose
 [T3 Bot1.Main2]
 

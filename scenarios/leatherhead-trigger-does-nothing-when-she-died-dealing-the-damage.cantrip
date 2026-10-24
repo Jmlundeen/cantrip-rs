@@ -39,6 +39,8 @@ Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
 Bot2.Block(Ulvenwald Oddity > Leatherhead, Swamp Stalker)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
 ! Bot1.Accept
 [T3 Bot1.Main2]
 

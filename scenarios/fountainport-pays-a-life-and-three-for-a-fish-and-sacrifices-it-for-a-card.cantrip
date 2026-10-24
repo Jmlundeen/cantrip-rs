@@ -27,9 +27,9 @@ Bot1.Hand.Sol Ring.Cast
 Bot1.Battlefield.Island.Activate
 [T3 Bot1.Main1]
 Bot1.Hand.Fountainport.Play
-! Bot1.Battlefield.Fountainport.Activate(Ability: Fish)
+! Bot1.Battlefield.Fountainport.Activate(Ability: Fish; Mana: short)
 ! Bot1.Battlefield.Fountainport.Activate(Ability: Sacrifice a token)
-! Bot1.Battlefield.Fountainport.Activate(Ability: Treasure)
+! Bot1.Battlefield.Fountainport.Activate(Ability: Treasure; Mana: short)
 [T5 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate
@@ -48,7 +48,7 @@ Bot1.Battlefield.Fountainport.Activate(Ability: Fish)
 Bot1.Battlefield.Sol Ring.Activate
 Bot1.Battlefield.Island#2.Activate
 [T7 Bot1.Main1]
-! Bot1.Battlefield.Fountainport.Activate(Ability: Sacrifice a token)
+! Bot1.Battlefield.Fountainport.Activate(Ability: Sacrifice a token; Mana: short)
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island#3.Activate
 Bot1.Battlefield.Island.Activate

@@ -41,7 +41,7 @@ Bot2.Battlefield.Black Lotus.Activate(Color: Black)
 Bot2.Hand.Tainted Remedy.Cast
 Bot2.Pass
 [T3 Bot1.Main1]
-! Bot1.Hand.Gitaxian Probe.Cast
+! Bot1.Hand.Gitaxian Probe.Cast(Mana: short)
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Healing Salve.Cast
 Bot1.Modes(Target player gains 3 life)

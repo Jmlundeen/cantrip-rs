@@ -24,8 +24,8 @@ Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
 Bot1.Pass
 [T3 Bot1.DeclareAttackers]
 Bot1.Attack(Dyadrine, Synthesis Amalgam > Bot2)
-! Bot1.Accept
 Bot1.Pass
+! Bot1.Accept
 [T3 Bot1.Main2]
 
 [Expect]

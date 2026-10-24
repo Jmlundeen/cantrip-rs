@@ -48,7 +48,7 @@ Bot1.Colors(Red; Red; Red; Red)
 ? Bot1.Mana = {R}{R}{R}{R} (DragonSpells)
 ? Bot2.Graveyard = Llanowar Elves
 ? Bot1.Battlefield.Phyrexian Dragon Engine.Damage = 0
-! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
 Bot1.Hand.Magmatic Hellkite.Cast
 ? Bot1.Mana =
 Bot1.Pass

@@ -41,6 +41,7 @@ Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Pass
 Bot1.Pass
 [T5 Bot1.Main1]
+Bot1.Pass
 ! Bot1.Accept
 [T5 Bot1.Main2]
 

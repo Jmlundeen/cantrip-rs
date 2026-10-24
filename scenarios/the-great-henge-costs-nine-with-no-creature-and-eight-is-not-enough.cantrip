@@ -23,7 +23,7 @@ Bot1.Hand.Mox Sapphire.Cast
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Hand.Black Lotus.Cast
 Bot1.Pass
-! Bot1.Hand.The Great Henge.Cast
+! Bot1.Hand.The Great Henge.Cast(Mana: short)
 
 [Expect]
 Bot1.Battlefield.Count = 6

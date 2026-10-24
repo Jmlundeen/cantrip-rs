@@ -37,6 +37,7 @@ Bot2.Battlefield.Giver of Runes.Activate(Ornithopter)
 Bot2.Decline
 Bot2.Colors(White)
 Bot1.Pass
+Bot2.Pass
 ! Bot2.Accept
 [T5 Bot1.Main2]
 

@@ -18,7 +18,8 @@ Bot1.Hand.Plains.Play
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: White)
 Bot1.Hand.Enlightened Confidant.Cast
-[T3 Bot1.Main1]
+[T3 Bot1.End]
+Bot1.Pass
 ! Bot1.Arrange
 [T5 Bot1.Upkeep]
 

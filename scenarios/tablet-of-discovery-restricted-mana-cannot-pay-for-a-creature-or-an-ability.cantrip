@@ -36,8 +36,8 @@ Bot1.Hand.Blazing Rootwalla.Cast
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Mana = {R}{R} (InstantOrSorcerySpells)
-! Bot1.Hand.Blazing Rootwalla.Cast
-! Bot1.Battlefield.Blazing Rootwalla.Activate
+! Bot1.Hand.Blazing Rootwalla.Cast(Mana: short)
+! Bot1.Battlefield.Blazing Rootwalla.Activate(Mana: short)
 [T3 Bot1.Main1]
 Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Add {R}.)
 Bot1.Battlefield.Blazing Rootwalla.Activate

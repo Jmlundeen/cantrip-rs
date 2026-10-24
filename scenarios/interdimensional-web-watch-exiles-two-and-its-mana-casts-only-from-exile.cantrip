@@ -40,12 +40,12 @@ Bot2.Pass
 Bot1.Battlefield.Interdimensional Web Watch.Activate
 Bot1.Colors(Red; Red)
 ? Bot1.Mana = {R}{R} (SpellsFromExile)
-! Bot1.Hand.Lightning Bolt.Cast
+! Bot1.Hand.Lightning Bolt.Cast(Mana: short)
 Bot1.Exile.Lightning Bolt.Cast(Bot2)
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Mana = {R} (SpellsFromExile)
-! Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look)
+! Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Exile.Mountain.Play
 Bot1.Battlefield.Interdimensional Web Watch.Activate

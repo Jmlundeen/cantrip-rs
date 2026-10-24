@@ -24,7 +24,7 @@ Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Mox Ruby.Cast
-! Bot1.Hand.Lightning Axe.Cast
+! Bot1.Hand.Lightning Axe.Cast(Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Hand.Lightning Axe.Cast(Bot1.Battlefield.Ornithopter)

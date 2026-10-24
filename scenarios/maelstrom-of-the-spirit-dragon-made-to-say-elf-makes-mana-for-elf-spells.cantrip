@@ -30,7 +30,7 @@ Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: any color; Col
 ? Bot1.Mana = {G} (ElfOrOmenSpells)
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Pearl.Activate
-! Bot1.Hand.Phyrexian Dragon Engine.Cast
+! Bot1.Hand.Phyrexian Dragon Engine.Cast(Mana: short)
 Bot1.Hand.Llanowar Elves.Cast
 ? Bot1.Mana = {W}{B}
 Bot1.Pass

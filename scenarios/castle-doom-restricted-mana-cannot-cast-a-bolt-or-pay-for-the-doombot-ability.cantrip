@@ -26,8 +26,8 @@ Bot1.Hand.Ornithopter.Cast
 Bot1.Hand.Castle Doom.Play
 Bot1.Battlefield.Castle Doom.Activate(Ability: any color; Color: Red)
 ? Bot1.Mana = {R} (ArtifactSpells)
-! Bot1.Hand.Lightning Bolt.Cast(Bot2)
-! Bot1.Battlefield.Castle Doom#2.Activate(Ability: Doombot)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
+! Bot1.Battlefield.Castle Doom#2.Activate(Ability: Doombot; Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
 Bot2.Pass

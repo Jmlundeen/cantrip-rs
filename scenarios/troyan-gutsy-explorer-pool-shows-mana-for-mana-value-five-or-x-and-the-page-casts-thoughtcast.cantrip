@@ -32,7 +32,7 @@ Bot2.Pass
 Bot1.Battlefield.Troyan, Gutsy Explorer.Activate(Ability: Add)
 ? Client.Bot1.Menu = {T}: Add {U}{G} (only for spells with mana value 5 or greater or with {X} in their mana costs); {U}, {T}: Draw a card, then discard a card.
 ? Client.Bot1.Mana = 1 Blue (mana value 5+ or X); 1 Green (mana value 5+ or X)
-! Bot1.Hand.Mine Collapse.Cast(Bot1.Battlefield.Troyan, Gutsy Explorer)
+! Bot1.Hand.Mine Collapse.Cast(Bot1.Battlefield.Troyan, Gutsy Explorer; Mana: short)
 Bot1.Battlefield.Island.Activate
 Bot1.Hand.Thoughtcast.Cast
 Bot1.Pass

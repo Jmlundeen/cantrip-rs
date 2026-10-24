@@ -29,7 +29,7 @@ Bot1.Hand.Bloodforged Battle-Axe.Cast
 Bot1.Battlefield.Plains.Activate
 [T5 Bot1.Main2]
 ? Bot1.Hand.Count = 6
-! Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Ability: Equip)
+! Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Ability: Equip; Mana: short)
 [T7 Bot1.Main1]
 Bot1.Hand.Plains.Play
 Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Kíli the Resourceful; Ability: Equip)

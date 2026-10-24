@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Mountain.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Wooded Bastion.Play
-! Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W})
+! Bot1.Battlefield.Wooded Bastion.Activate(Ability: {G/W}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Forest.Play

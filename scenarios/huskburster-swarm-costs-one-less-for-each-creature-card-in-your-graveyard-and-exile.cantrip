@@ -40,7 +40,7 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Dark Ritual.Cast
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Pearl.Activate
-! Bot1.Hand.Huskburster Swarm.Cast
+! Bot1.Hand.Huskburster Swarm.Cast(Mana: short)
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Hand.Huskburster Swarm.Cast

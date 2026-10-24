@@ -27,7 +27,7 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Concealing Curtains.Cast
 Bot1.Pass
 Bot2.Pass
-! Bot1.Battlefield.Concealing Curtains.Activate
+! Bot1.Battlefield.Concealing Curtains.Activate(Mana: short)
 [T5 Bot1.Main1]
 Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Swamp.Activate

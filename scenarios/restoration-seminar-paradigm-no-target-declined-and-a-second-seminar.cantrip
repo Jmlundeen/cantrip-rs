@@ -37,6 +37,7 @@ Bot1.Hand.Restoration Seminar.Cast(Bot1.Graveyard.Black Lotus)
 ? Bot1.Battlefield.Black Lotus.Tapped = false
 ? Exile = Restoration Seminar
 [T5 Bot1.Main1]
+Bot1.Pass
 ! Bot1.Accept
 Bot1.Battlefield.Black Lotus.Activate(Color: White)
 Bot1.Battlefield.Mox Pearl.Activate
@@ -55,6 +56,8 @@ Bot1.Decline
 ? Bot1.Graveyard = Black Lotus
 [T9 Bot1.Main1]
 Bot1.Accept
+Bot1.Pass
+Bot1.Pass
 ! Bot1.Accept
 [T9 Bot1.Main2]
 ? Bot1.Graveyard.Count = 0

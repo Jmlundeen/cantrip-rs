@@ -67,6 +67,7 @@ Bot2.Pass
 ? Bot1.Life = 18
 [T14 Bot2.Main1]
 Bot2.Attack(Llanowar Elves > Bot1)
+[T14 Bot2.DeclareBlockers]
 ! Bot1.Block
 [T14 Bot2.Main2]
 [T15 Bot1.Main1]

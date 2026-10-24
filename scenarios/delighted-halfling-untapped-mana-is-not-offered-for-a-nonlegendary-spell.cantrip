@@ -18,7 +18,7 @@ Bot1.Hand.Forest.Play
 Bot1.Battlefield.Forest.Activate
 Bot1.Hand.Delighted Halfling.Cast
 [T3 Bot1.Main1]
-! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
 Bot1.Hand.Ragavan, Nimble Pilferer.Cast
 Bot1.Battlefield.Delighted Halfling.Activate(Ability: any color; Color: Red)
 

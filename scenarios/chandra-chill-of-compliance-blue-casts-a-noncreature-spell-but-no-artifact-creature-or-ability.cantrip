@@ -38,8 +38,8 @@ Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Add {U})
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Mana = {U} (NoncreatureSpells)
-! Bot1.Hand.Aerial Doombot.Cast
-! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+! Bot1.Hand.Aerial Doombot.Cast(Mana: short)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Add {U})
 Bot1.Pass

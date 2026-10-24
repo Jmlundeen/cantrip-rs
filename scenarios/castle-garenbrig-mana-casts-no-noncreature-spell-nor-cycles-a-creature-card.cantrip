@@ -32,8 +32,8 @@ Bot1.Hand.Llanowar Elves.Cast
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Mana = {G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
-! Bot1.Hand.Giant Growth.Cast
-! Bot1.Hand.Generous Ent.Activate
+! Bot1.Hand.Giant Growth.Cast(Mana: short)
+! Bot1.Hand.Generous Ent.Activate(Mana: short)
 [T5 Bot1.Main1]
 Bot1.Battlefield.Forest.Activate
 Bot1.Hand.Generous Ent.Activate(Ability: Forestcycling)

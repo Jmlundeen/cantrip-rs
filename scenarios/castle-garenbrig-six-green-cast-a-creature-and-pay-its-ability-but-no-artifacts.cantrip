@@ -34,7 +34,7 @@ Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Hand.Castle Garenbrig.Play
 ? Bot1.Battlefield.Castle Garenbrig.Tapped = false
-! Bot1.Battlefield.Castle Garenbrig.Activate(Ability: six)
+! Bot1.Battlefield.Castle Garenbrig.Activate(Ability: six; Mana: short)
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Hand.Aether Spellbomb.Cast
 Bot1.Pass
@@ -50,7 +50,7 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Castle Garenbrig.Activate(Ability: six)
 ? Bot1.Mana = {G}{G}{G}{G}{G}{G} (CreatureSpellsOrAbilitiesOfCreatures)
 ? Bot1.Battlefield.Castle Garenbrig.Tapped = true
-! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw; Mana: short)
 Bot1.Hand.Basking Rootwalla.Cast
 Bot1.Pass
 Bot2.Pass

@@ -25,7 +25,7 @@ Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Hand.Ironheart, Clever Champion.Cast(Convoke: Ornithopter, Ornithopter)
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mox Jet.Activate
-! Bot1.Hand.Dark Confidant.Cast(Convoke: Ornithopter)
+! Bot1.Hand.Dark Confidant.Cast(Convoke: Ornithopter; Mana: short)
 Bot1.Hand.Basalt Monolith.Cast(Convoke: Ornithopter, Ornithopter)
 
 [Expect]

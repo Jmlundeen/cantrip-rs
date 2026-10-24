@@ -45,6 +45,8 @@ Bot1.Hand.Sol Ring.Cast
 ? Bot1.Battlefield.Gnome Soldier Token.Power = 5
 [T4 Bot2.Main1]
 ? Stack.Count = 0
+Bot2.Pass
+Bot1.Pass
 ! Bot1.Accept
 [T5 Bot1.Main1]
 Bot1.Decline

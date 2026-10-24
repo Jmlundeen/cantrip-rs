@@ -54,6 +54,8 @@ Bot2.Hand.Black Lotus.Cast
 Bot2.Pass
 [T3 Bot1.DeclareAttackers]
 Bot1.Attack(Aclazotz, Deepest Betrayal > Bot2)
+Bot1.Pass
+Bot2.Pass
 ! Bot2.Choose
 [T3 Bot1.Main2]
 

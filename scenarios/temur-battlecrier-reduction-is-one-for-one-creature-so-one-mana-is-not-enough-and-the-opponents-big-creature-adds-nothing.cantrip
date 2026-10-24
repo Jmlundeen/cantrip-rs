@@ -42,7 +42,7 @@ Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Hand.Temur Battlecrier.Cast
 Bot1.Pass
 Bot2.Pass
-! Bot1.Hand.Frantic Search.Cast
+! Bot1.Hand.Frantic Search.Cast(Mana: short)
 
 [Expect]
 Bot1.Hand.Count = 3

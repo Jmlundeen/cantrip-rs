@@ -19,7 +19,7 @@ Bot1.Battlefield.Plains.Activate
 Bot1.Hand.Chromatic Star.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Plains.Play
-! Bot1.Hand.Monastery Mentor.Cast
+! Bot1.Hand.Monastery Mentor.Cast(Mana: short)
 
 [Expect]
 Turn = 3

@@ -29,7 +29,7 @@ Mountain x13
 Bot1.Hand.Mudflat Village.Play
 Bot1.Battlefield.Mudflat Village.Activate(Ability: creature spell)
 ? Bot1.Mana = {B} (CreatureSpells)
-! Bot1.Hand.Dark Ritual.Cast
+! Bot1.Hand.Dark Ritual.Cast(Mana: short)
 Bot1.Hand.Callous Inspector.Cast
 Bot1.Pass
 Bot2.Pass

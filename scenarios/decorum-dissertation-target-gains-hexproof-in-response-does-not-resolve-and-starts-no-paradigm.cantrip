@@ -37,6 +37,7 @@ Bot2.Battlefield.Mox Ruby.Activate
 [T3 Bot1.Main2]
 ? Exile.Count = 0
 [T5 Bot1.Main1]
+Bot1.Pass
 ! Bot1.Accept
 
 [Expect]

@@ -14,7 +14,7 @@ Island x20
 Bot1.Hand.Lupinflower Village.Play
 Bot1.Battlefield.Lupinflower Village.Activate(Ability: creature spell)
 ? Bot1.Mana = {W} (CreatureSpells)
-! Bot1.Hand.Enlightened Tutor.Cast
+! Bot1.Hand.Enlightened Tutor.Cast(Mana: short)
 Bot1.Hand.Thraben Inspector.Cast
 Bot1.Pass
 Bot2.Pass

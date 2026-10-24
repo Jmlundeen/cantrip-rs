@@ -30,7 +30,7 @@ Bot1.Hand.Mana Flare.Cast
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Mana =
-! Bot1.Hand.Expressive Iteration.Cast
+! Bot1.Hand.Expressive Iteration.Cast(Mana: short)
 Bot1.Hand.Lord of Atlantis.Cast
 Bot1.Battlefield.Shivan Reef.Activate(Ability: {U} or {R}; Color: Blue)
 Bot1.Pass

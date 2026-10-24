@@ -32,7 +32,7 @@ Bot1.Battlefield.Island.Activate
 Bot1.Hand.Mind Stone.Cast
 Bot1.Pass
 Bot2.Pass
-! Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+! Bot1.Battlefield.Mind Stone.Activate(Ability: Draw; Mana: short)
 [T5 Bot1.Main1]
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)

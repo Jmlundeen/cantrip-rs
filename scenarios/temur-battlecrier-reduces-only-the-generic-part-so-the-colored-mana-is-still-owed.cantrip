@@ -34,7 +34,7 @@ Bot1.Battlefield.Island.Activate
 Bot1.Hand.Temur Battlecrier.Cast
 Bot1.Pass
 Bot2.Pass
-! Bot1.Hand.Frantic Search.Cast
+! Bot1.Hand.Frantic Search.Cast(Mana: short)
 
 [Expect]
 Bot1.Battlefield.Giant Cindermaw.Power = 4

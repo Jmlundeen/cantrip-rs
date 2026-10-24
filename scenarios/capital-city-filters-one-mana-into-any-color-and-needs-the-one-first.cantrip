@@ -12,7 +12,7 @@ Island x20
 
 [Actions]
 Bot1.Hand.Capital City.Play
-! Bot1.Battlefield.Capital City.Activate(Ability: any color; Color: Red)
+! Bot1.Battlefield.Capital City.Activate(Ability: any color; Color: Red; Mana: short)
 Bot1.Battlefield.Capital City.Activate(Ability: {T}: Add {C})
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play

@@ -62,7 +62,7 @@ Bot2.Pass
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Island#2.Activate
 Bot1.Battlefield.Mox Pearl.Activate
-! Bot1.Exile.Bonecrusher Giant.Cast
+! Bot1.Exile.Bonecrusher Giant.Cast(Mana: short)
 [T5 Bot1.Main1]
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass

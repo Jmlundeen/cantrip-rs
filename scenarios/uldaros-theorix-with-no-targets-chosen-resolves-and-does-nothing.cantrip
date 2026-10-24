@@ -30,6 +30,7 @@ Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Swamp.Activate
 Bot1.Hand.Uldaros Theorix.Cast
 Bot1.Target()
+Bot1.Pass
 ! Bot1.Choose
 [Bot1.Main2]
 

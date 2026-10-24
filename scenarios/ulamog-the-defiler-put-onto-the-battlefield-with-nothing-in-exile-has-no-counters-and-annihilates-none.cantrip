@@ -26,6 +26,8 @@ Bot2.Choose()
 Bot2.Hand.Plains.Play
 [T3 Bot1.Main1]
 Bot1.Attack(Ulamog, the Defiler > Bot2)
+Bot1.Pass
+Bot2.Pass
 ! Bot2.Choose
 [T3 Bot1.Main2]
 

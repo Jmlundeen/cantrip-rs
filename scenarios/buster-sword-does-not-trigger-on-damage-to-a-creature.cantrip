@@ -35,6 +35,8 @@ Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Attack(Ornithopter > Bot2)
 Bot2.Block(Ornithopter > Ornithopter)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
 ! Bot1.Choose
 [Bot1.Main2]
 

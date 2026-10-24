@@ -45,7 +45,7 @@ Bot2.Hand.Mox Jet.Cast
 Bot2.Pass
 Bot1.Pass
 Bot2.Hand.Inventors' Fair.Play
-! Bot2.Battlefield.Inventors' Fair.Activate(Ability: Search)
+! Bot2.Battlefield.Inventors' Fair.Activate(Ability: Search; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Inventors' Fair.Play
 Bot1.Battlefield.Mox Ruby.Activate

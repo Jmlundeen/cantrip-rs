@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Plains.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Graven Cairns.Play
-! Bot1.Battlefield.Graven Cairns.Activate(Ability: {B/R})
+! Bot1.Battlefield.Graven Cairns.Activate(Ability: {B/R}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Swamp.Play

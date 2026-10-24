@@ -31,7 +31,7 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 2)
 Bot2.Pass
-! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
 Bot1.Hand.Sol Ring.Cast
 Bot1.Choose()
 Bot2.Pass

@@ -40,7 +40,7 @@ Bot2.Pass
 ? Bot1.Battlefield.Hero Token.Subtypes = Hero; Samurai
 ? Bot1.Battlefield.Hero Token.Keywords = Haste; Trample
 ? Bot1.Battlefield.Samurai's Katana.AttachedTo = Hero Token
-! Bot1.Battlefield.Samurai's Katana.Activate(Ornithopter)
+! Bot1.Battlefield.Samurai's Katana.Activate(Ornithopter; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass

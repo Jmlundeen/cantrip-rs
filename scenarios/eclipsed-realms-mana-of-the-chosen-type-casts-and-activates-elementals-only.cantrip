@@ -24,7 +24,7 @@ Bot1.Modes(Elemental)
 ? Bot1.Battlefield.Eclipsed Realms.ChosenSubtype = Elemental
 Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Red)
 ? Bot1.Mana = {R} (ElementalSpellsOrAbilities)
-! Bot1.Hand.Lightning Bolt.Cast
+! Bot1.Hand.Lightning Bolt.Cast(Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Forest.Play
 Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Green)
@@ -41,7 +41,7 @@ Bot2.Pass
 Bot1.Battlefield.Bramble Familiar.Activate(Ability: Add {G})
 Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Green)
 ? Bot1.Mana = {G} {G} (ElementalSpellsOrAbilities)
-! Bot1.Battlefield.Basking Rootwalla.Activate
+! Bot1.Battlefield.Basking Rootwalla.Activate(Mana: short)
 [T7 Bot1.Main1]
 Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Green)
 Bot1.Battlefield.Forest.Activate

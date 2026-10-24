@@ -71,8 +71,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-129](#ki-129-a-cost-holds-at-most-six-discard-instructions) | A cost holds at most six discard instructions | Pri-3 | Won't fix: beyond practical scale |
 | [KI-130](#ki-130-an-unless-pays-prompts-remaining-hint-lists-a-phyrexian-symbol-under-its-color-when-any-color-may-pay-it) | An "unless pays" prompt's remaining hint lists a Phyrexian symbol under its color when any color may pay it | Pri-2 | Open |
 | [KI-131](#ki-131-harmonizes-tap-a-creature-caption-says-up-to-or-an-exact-amount-a-little-off-in-rare-costs) | Harmonize's tap-a-creature caption says "up to", or an exact amount, a little off in rare costs | Pri-2 | Open |
-| [KI-132](#ki-132-an-absent-expectation-on-a-key-the-dump-never-writes-always-holds) | An `(absent)` expectation on a key the dump never writes always holds | Pri-3 | Open |
-| [KI-133](#ki-133-a-refusal-written-while-its-question-cannot-yet-be-asked-holds-vacuously) | A refusal written while its question cannot yet be asked holds vacuously | Pri-3 | Open |
 | [KI-134](#ki-134-the-browser-scenario-for-lands-planned-for-x-fails-on-main) | The browser scenario for lands planned for X fails on main | Pri-2 | Open |
 | [KI-136](#ki-136-a-choice-listing-an-opponents-face-down-permanent-records-it-as-shown-to-the-chooser) | A choice listing an opponent's face-down permanent records it as shown to the chooser | Pri-2 | Open |
 | [KI-135](#ki-135-a-permanent-keeps-the-names-of-at-most-two-abilities-that-chose-one) | A permanent keeps the names of at most two abilities that chose one | Pri-3 | Won't fix: beyond practical scale |
@@ -454,23 +452,6 @@ false, only less precise.
 
 **Scenarios.** None: display. `HarmonizeTests` covers the X case.
 
-### KI-132: An `(absent)` expectation on a key the dump never writes always holds
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-3 | Open | harness | 2026-10-24, PR reviews (#566 onward) |
-
-**Notes.** `Dump::mismatches` (`crates/cantrip-script/src/dump.rs`) passes `Key = (absent)` whenever the key is missing
-and its owner (`Bot1.Battlefield.X`) is in the dump. A key the dump never writes at all is therefore always "absent":
-`Bot1.Battlefield.X.Counters = (absent)` holds whatever counters X has, because the dump writes only
-`X.Counters.<Kind>`. Such an expectation can never fail. A fix refuses `(absent)` on a key that is not one the dump can
-write (a parent such as `.Counters`, or a misspelling), as a key with a value already is ("not a key the dump has").
-
-**Scenarios.** These use the vacuous form and need their expectation rewritten once the harness refuses it:
-- [`scenarios/darksteel-angel-keeps-minus-counters-off-its-controllers-creature.cantrip`](../scenarios/darksteel-angel-keeps-minus-counters-off-its-controllers-creature.cantrip)
-- [`scenarios/dispelling-exhale-beholding-a-dragon-and-an-opponent-who-pays-the-four-keeps-the-bolt.cantrip`](../scenarios/dispelling-exhale-beholding-a-dragon-and-an-opponent-who-pays-the-four-keeps-the-bolt.cantrip)
-- [`scenarios/dispelling-exhale-beholding-a-dragon-permanent-asks-four-and-the-bolt-is-countered.cantrip`](../scenarios/dispelling-exhale-beholding-a-dragon-permanent-asks-four-and-the-bolt-is-countered.cantrip)
-
 ### KI-136: A choice listing an opponent's face-down permanent records it as shown to the chooser
 
 | Priority | Status | Area | Found |
@@ -514,26 +495,6 @@ origin/main (a3276106b), with the host rebuilt: the page does not tap the Mounta
 planned for X as the spell is paid for has regressed. Needs bisecting.
 
 **Scenarios.** The browser scenario named above.
-
-### KI-133: A refusal written while its question cannot yet be asked holds vacuously
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-3 | Open | harness | 2026-10-24, the "can't be sacrificed" work (Scavenger's Talent) |
-
-**Notes.** A refusal such as `! Bot1.Accept` written right after a step header, while a trigger is still on the stack,
-is checked at a moment the action could not be taken anyway, so it holds whatever the card does. A Scavenger's Talent
-refusal passed on the old card this way; it was fixed to pass priority first. The harness should refuse to judge a
-refusal until the question or action it names could be asked (an empty stack, the right player's priority), as it
-already fails a refusal of a card that is nowhere in the game as "proving nothing".
-
-**Scenarios.** These refuse right after a header the same way and may prove nothing (unchecked):
-- `decorum-dissertation-target-gains-hexproof-in-response…`
-- `germination-practicum-countered…`
-- `guiding-hydra-does-not-trigger-on-an-opponents-combat`
-- `restoration-seminar-paradigm-no-target…`
-- `restoration-seminar-with-its-target-exiled…`
-- `trait-doctoring-encoded-on-nothing…`
 
 ### KI-128: The non-tactical bots drop an attack whose Phyrexian cost only life could pay
 

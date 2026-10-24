@@ -37,7 +37,7 @@ Bot1.Hand.Sphinx of the Guildpact.Cast
 Bot1.Pass
 Bot1.Battlefield.Mox Jet.Activate
 ? Bot1.Mana = {B}
-! Bot1.Battlefield.Dragonfire Blade.Activate(Ornithopter)
+! Bot1.Battlefield.Dragonfire Blade.Activate(Ornithopter; Mana: short)
 Bot1.Battlefield.Dragonfire Blade.Activate(Sphinx of the Guildpact)
 ? Bot1.Mana = {B}
 Bot1.Pass

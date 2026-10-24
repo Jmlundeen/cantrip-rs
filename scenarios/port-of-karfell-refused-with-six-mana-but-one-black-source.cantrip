@@ -24,7 +24,7 @@ Bot1.Hand.Port of Karfell.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play
 ? Bot1.Battlefield.Port of Karfell.Tapped = false
-! Bot1.Battlefield.Port of Karfell.Activate(Ability: Mill)
+! Bot1.Battlefield.Port of Karfell.Activate(Ability: Mill; Mana: short)
 
 [Expect]
 Bot1.Battlefield.Port of Karfell.Tapped = false

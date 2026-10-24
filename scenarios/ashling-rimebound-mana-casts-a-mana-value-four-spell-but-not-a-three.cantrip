@@ -38,11 +38,11 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Colors(Black)
 ? Bot1.Mana = {B}{B} (ManaValue4OrGreaterSpells)
-! Bot1.Hand.Wheel of Fortune.Cast
+! Bot1.Hand.Wheel of Fortune.Cast(Mana: short)
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 ? Bot1.Mana = {R}{R} {B}{B} (ManaValue4OrGreaterSpells)
-! Bot1.Hand.Wheel of Fortune.Cast
+! Bot1.Hand.Wheel of Fortune.Cast(Mana: short)
 Bot1.Hand.Damnation.Cast
 ? Bot1.Mana =
 Bot1.Pass

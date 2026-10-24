@@ -14,7 +14,7 @@ Island x20
 [Actions]
 Bot1.Hand.Cavern of Souls.Play
 Bot1.Modes(Merfolk)
-! Bot1.Hand.Floodpits Drowner.Cast
+! Bot1.Hand.Floodpits Drowner.Cast(Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Hand.Floodpits Drowner.Cast

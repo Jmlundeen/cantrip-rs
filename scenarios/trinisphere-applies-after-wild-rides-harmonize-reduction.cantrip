@@ -37,7 +37,7 @@ Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Battlefield.Mox Jet.Activate
 Bot2.Hand.Trinisphere.Cast
 [T3 Bot1.Main1]
-! Bot1.Graveyard.Wild Ride.Cast(Patchwork Beastie; Ability: Harmonize)
+! Bot1.Graveyard.Wild Ride.Cast(Patchwork Beastie; Ability: Harmonize; Mana: short)
 [T5 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Graveyard.Wild Ride.Cast(Patchwork Beastie; Ability: Harmonize)

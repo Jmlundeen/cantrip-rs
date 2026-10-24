@@ -39,7 +39,7 @@ Bot2.Pass
 ? Bot1.Mana =
 Bot1.Battlefield.Shang-Chi, Master of Kung Fu.Activate(Color: Green)
 ? Bot1.Mana = {G}{G} (CreatureAbilities)
-! Bot1.Hand.Bramble Familiar.Cast
+! Bot1.Hand.Bramble Familiar.Cast(Mana: short)
 Bot1.Battlefield.Basking Rootwalla.Activate
 Bot1.Pass
 Bot2.Pass

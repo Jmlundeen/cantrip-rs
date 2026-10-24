@@ -33,6 +33,7 @@ Bot2.Battlefield.Forest.Activate
 Bot2.Hand.Llanowar Elves.Cast
 [T3 Bot1.DeclareAttackers]
 Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
 ! Bot1.Accept
 [T4 Bot2.DeclareAttackers]
 Bot2.Attack(Llanowar Elves > Bot1)

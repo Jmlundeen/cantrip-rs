@@ -37,7 +37,7 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Battlefield.Omen Hawker.Activate
 ? Bot1.Mana = {U} (Abilities) {C} (Abilities)
-! Bot1.Hand.Sol Ring.Cast
+! Bot1.Hand.Sol Ring.Cast(Mana: short)
 Bot1.Battlefield.Aether Spellbomb#1.Activate(Ability: Draw; Spend: C Abilities)
 Bot1.Pass
 Bot2.Pass

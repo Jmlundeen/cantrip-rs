@@ -38,7 +38,7 @@ Bot2.Pass
 [T5 Bot1.Main1]
 Bot1.Battlefield.James, Wandering Dad.Activate
 ? Bot1.Mana = {C}{C} (Abilities)
-! Bot1.Hand.Karn, Scion of Urza.Cast
+! Bot1.Hand.Karn, Scion of Urza.Cast(Mana: short)
 Bot1.Battlefield.Clue Token#1.Activate
 Bot1.Pass
 Bot2.Pass

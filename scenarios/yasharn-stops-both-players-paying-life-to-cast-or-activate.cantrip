@@ -34,11 +34,11 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Yasharn, Implacable Earth.Cast
 Bot1.Pass
 Bot1.Search()
-! Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+! Bot1.Hand.Gitaxian Probe.Cast(Bot2; Mana: short)
 [T2 Bot2.Main1]
 Bot2.Hand.Mana Confluence.Play
 ! Bot2.Battlefield.Mana Confluence.Activate
-! Bot2.Hand.Gitaxian Probe.Cast(Bot1)
+! Bot2.Hand.Gitaxian Probe.Cast(Bot1; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate

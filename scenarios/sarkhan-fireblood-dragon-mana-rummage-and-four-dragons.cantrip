@@ -34,7 +34,7 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Colors(Red; Red)
 ? Bot1.Mana = {R}{R} (DragonSpells)
-! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Swashbuckler Extraordinaire.Cast
 Bot1.Pass

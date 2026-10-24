@@ -49,8 +49,9 @@ Bot2.Battlefield.Mox Pearl.Activate
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Hand.Disenchant.Cast(Nowhere to Run)
 Bot2.Pass
-! Bot1.Decline
 Bot1.Pass
+Bot1.Pass
+! Bot1.Decline
 [T3 Bot1.Main2]
 
 [Expect]

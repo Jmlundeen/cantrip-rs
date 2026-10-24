@@ -28,6 +28,7 @@ Bot1.Choose()
 ? Bot1.Graveyard = Trait Doctoring
 Bot1.Attack(Llanowar Elves)
 [T3 Bot1.CombatDamage]
+Bot1.Pass
 ! Bot1.Accept
 [T3 Bot1.Main2]
 

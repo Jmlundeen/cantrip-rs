@@ -11,7 +11,7 @@ Island x20
 
 [Actions]
 Bot1.Hand.Sunscorched Divide.Play
-! Bot1.Battlefield.Sunscorched Divide.Activate(Ability: {1}, {T})
+! Bot1.Battlefield.Sunscorched Divide.Activate(Ability: {1}, {T}; Mana: short)
 Bot1.Pass
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play

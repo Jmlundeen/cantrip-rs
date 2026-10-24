@@ -25,7 +25,7 @@ Bot1.Battlefield.Restless Reef.Activate(Ability: Add; Color: Blue)
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Emerald.Activate
-! Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+! Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn; Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
@@ -37,7 +37,7 @@ Bot1.Battlefield.Restless Reef.Activate(Ability: Add; Color: Black)
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Emerald.Activate
-! Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+! Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn; Mana: short)
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)

@@ -47,6 +47,8 @@ Bot1.Choose()
 ? Bot2.Battlefield = Ornithopter
 [T4 Bot2.DeclareAttackers]
 Bot2.Attack(Bot2.Battlefield.Ornithopter > Bot1)
+Bot2.Pass
+Bot1.Pass
 ! Bot1.Choose
 [T5 Bot1.DeclareAttackers]
 Bot1.Attack(Bot1.Battlefield.Ornithopter > Bot2)

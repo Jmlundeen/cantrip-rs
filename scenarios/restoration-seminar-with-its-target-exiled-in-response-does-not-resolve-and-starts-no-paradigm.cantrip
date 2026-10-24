@@ -62,6 +62,7 @@ Bot2.Pass
 ? Exile = Ornithopter
 ? Bot1.Graveyard = Restoration Seminar; Black Lotus
 [T5 Bot1.Main1]
+Bot1.Pass
 ! Bot1.Accept
 
 [Expect]

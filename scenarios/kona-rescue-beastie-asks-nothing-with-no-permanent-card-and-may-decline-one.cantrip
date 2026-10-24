@@ -32,6 +32,7 @@ Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Attack(Kona, Rescue Beastie > Bot2)
 [T3 Bot1.Main2]
+Bot1.Pass
 ! Bot1.Choose
 ? Bot1.Hand = Lightning Bolt; Lightning Bolt; Lightning Bolt
 [T5 Bot1.Main1]

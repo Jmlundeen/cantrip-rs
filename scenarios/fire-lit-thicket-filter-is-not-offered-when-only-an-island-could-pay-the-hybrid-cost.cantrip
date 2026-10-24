@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Island.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Fire-Lit Thicket.Play
-! Bot1.Battlefield.Fire-Lit Thicket.Activate(Ability: {R/G})
+! Bot1.Battlefield.Fire-Lit Thicket.Activate(Ability: {R/G}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Mountain.Play

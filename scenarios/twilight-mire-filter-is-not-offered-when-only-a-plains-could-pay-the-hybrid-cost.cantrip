@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Plains.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Twilight Mire.Play
-! Bot1.Battlefield.Twilight Mire.Activate(Ability: {B/G})
+! Bot1.Battlefield.Twilight Mire.Activate(Ability: {B/G}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Swamp.Play

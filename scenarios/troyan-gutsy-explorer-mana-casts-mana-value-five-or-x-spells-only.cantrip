@@ -38,7 +38,7 @@ Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Battlefield.Troyan, Gutsy Explorer.Activate(Ability: Add)
 ? Bot1.Mana = {U} (ManaValue5OrGreaterOrXSpells) {G} (ManaValue5OrGreaterOrXSpells)
-! Bot1.Hand.Mine Collapse.Cast(Bot1.Battlefield.Troyan, Gutsy Explorer)
+! Bot1.Hand.Mine Collapse.Cast(Bot1.Battlefield.Troyan, Gutsy Explorer; Mana: short)
 Bot1.Battlefield.Island.Activate
 Bot1.Hand.Thoughtcast.Cast
 Bot1.Pass

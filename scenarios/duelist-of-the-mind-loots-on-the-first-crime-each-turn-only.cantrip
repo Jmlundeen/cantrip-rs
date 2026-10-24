@@ -26,11 +26,11 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Red)
-! Bot1.Accept
 Bot1.Hand.Lightning Bolt.Cast(Bot1)
 ? Stack.Count = 1
 Bot1.Pass
 Bot2.Pass
+! Bot1.Accept
 Bot1.Hand.Lightning Bolt.Cast(Bot2)
 ? Stack.Count = 2
 Bot1.Pass

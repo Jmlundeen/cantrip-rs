@@ -14,9 +14,9 @@ Island x20
 
 [Actions]
 Bot1.Hand.Sunbillow Verge.Play
-! Bot1.Hand.Stadium Headliner.Cast
+! Bot1.Hand.Stadium Headliner.Cast(Mana: short)
 [T3 Bot1.Main1]
-! Bot1.Hand.Stadium Headliner.Cast
+! Bot1.Hand.Stadium Headliner.Cast(Mana: short)
 Bot1.Hand.Plains.Play
 Bot1.Battlefield.Sunbillow Verge.Activate(Ability: {R})
 Bot1.Hand.Stadium Headliner.Cast

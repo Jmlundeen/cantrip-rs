@@ -20,7 +20,7 @@ Bot1.Hand.Mox Ruby.Cast
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Ruby.Activate
-! Bot1.Battlefield.Sun-Blessed Peak.Activate(Ability: Draw)
+! Bot1.Battlefield.Sun-Blessed Peak.Activate(Ability: Draw; Mana: short)
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Sun-Blessed Peak.Activate(Ability: Draw)
 

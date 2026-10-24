@@ -32,7 +32,7 @@ Bot2.Battlefield.Mox Jet.Activate
 Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Ironheart, Clever Champion)
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mox Jet.Activate
-! Bot1.Hand.Basalt Monolith.Cast(Convoke: Ornithopter, Ornithopter)
+! Bot1.Hand.Basalt Monolith.Cast(Convoke: Ornithopter, Ornithopter; Mana: short)
 
 [Expect]
 Turn = 3

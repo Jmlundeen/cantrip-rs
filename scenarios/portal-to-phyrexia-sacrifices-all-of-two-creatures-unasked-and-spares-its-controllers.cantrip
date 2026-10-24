@@ -62,6 +62,7 @@ Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
 Bot1.Hand.Portal to Phyrexia.Cast
 Bot1.Pass
 Bot1.Pass
+Bot2.Pass
 ! Bot2.Choose
 [T5 Bot1.Main2]
 ? Bot2.Graveyard.Count = 2

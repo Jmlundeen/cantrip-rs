@@ -13,7 +13,7 @@ Island x20
 [Actions]
 Bot1.Hand.Lair of the Hydra.Play
 [T1 Bot1.Main1]
-! Bot1.Battlefield.Lair of the Hydra.Activate(Ability: Until end of turn)
+! Bot1.Battlefield.Lair of the Hydra.Activate(Ability: Until end of turn; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass

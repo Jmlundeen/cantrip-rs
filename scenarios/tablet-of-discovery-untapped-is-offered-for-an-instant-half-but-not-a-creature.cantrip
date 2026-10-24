@@ -28,7 +28,7 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Pass
 Bot2.Pass
-! Bot1.Hand.Painter's Servant.Cast
+! Bot1.Hand.Painter's Servant.Cast(Mana: short)
 Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Adventure)
 Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
 Bot1.Pass

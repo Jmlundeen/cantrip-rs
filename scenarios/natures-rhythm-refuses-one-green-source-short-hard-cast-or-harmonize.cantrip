@@ -25,7 +25,7 @@ Bot1.Hand.Mox Jet.Cast
 Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Jet.Activate
-! Bot1.Hand.Nature's Rhythm.Cast(X: 0)
+! Bot1.Hand.Nature's Rhythm.Cast(X: 0; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Forest.Play
 Bot1.Hand.Nature's Rhythm.Cast(X: 0)
@@ -41,7 +41,7 @@ Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Jet.Activate
-! Bot1.Graveyard.Nature's Rhythm.Cast(X: 1; Ability: Harmonize)
+! Bot1.Graveyard.Nature's Rhythm.Cast(X: 1; Ability: Harmonize; Mana: short)
 
 [Expect]
 Bot1.Graveyard = Nature's Rhythm

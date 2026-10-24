@@ -19,6 +19,8 @@ Bot1.Hand.Guiding Hydra.Cast(X: 1)
 [T1 Bot1.BeginCombat]
 Bot1.Decline
 [T2 Bot2.BeginCombat]
+Bot2.Pass
+Bot1.Pass
 ! Bot1.Accept
 
 [Expect]

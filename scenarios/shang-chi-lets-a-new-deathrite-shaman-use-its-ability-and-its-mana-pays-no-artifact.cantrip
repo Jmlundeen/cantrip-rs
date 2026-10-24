@@ -40,7 +40,7 @@ Bot2.Pass
 ? Bot2.Life = 17
 Bot1.Battlefield.Shang-Chi, Master of Kung Fu.Activate(Color: Black)
 ? Bot1.Mana = {B}{B} (CreatureAbilities)
-! Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look)
+! Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look; Mana: short)
 Bot1.Battlefield.Deathrite Shaman.Activate(Ability: instant or sorcery; Bot1.Graveyard.Lightning Bolt)
 Bot1.Pass
 Bot2.Pass

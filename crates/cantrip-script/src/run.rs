@@ -95,6 +95,22 @@ struct Run<'s> {
     undo: Undo<()>,
     /// A driven player's question, and what the script means them to answer, until they do.
     asked: Option<(Request, Decision<'s>)>,
+    /// Where the game stood before the latest answer, or where the step a wait line reached began: where the window of a
+    /// refusal that becomes the line under the cursor opens.
+    before: Window,
+    /// The refusal of a kind of question under the cursor (its index) and its window: what has happened since it was
+    /// written, which must hold some point where that question could have been asked.
+    refusal: Option<(usize, Window)>,
+}
+
+/// A point of the game a refusal's window opens at: the history's length then, and the stack's items by their serials.
+/// `header` is set where the window opens at the beginning of the step a wait line reached, its `StepBegan` the first
+/// record: that beginning is a point some questions are asked at and others are not.
+#[derive(Clone, Default)]
+struct Window {
+    log: usize,
+    stack: Vec<u32>,
+    header: bool,
 }
 
 pub fn run(script: &GameScript) -> Result<ScriptResult, ScriptFailure> {
@@ -234,6 +250,8 @@ impl<'s> Run<'s> {
             colors: None,
             undo: Undo::default(),
             asked: None,
+            before: Window::default(),
+            refusal: None,
         })
     }
 
@@ -448,6 +466,7 @@ impl<'s> Run<'s> {
             }
         }
         let noted = Undo::<()>::before(&self.game, request.player, &answer);
+        self.before = self.window();
         match self.game.answer(request.id, request.player, answer.clone()) {
             Ok(()) => {
                 if self.undo.may_take_back(&self.game, &noted) {
@@ -476,6 +495,20 @@ impl<'s> Run<'s> {
         loop {
             if let Some(check) = self.run_checks(!driven.is_empty())? {
                 return Ok(Stop::Check(check));
+            }
+            // A refusal's window opens where the game stood before the answer that brought the cursor to it - or, written
+            // straight after another refusal (checks between), where that one's opened: they are judged together.
+            if matches!(self.current(), Some(ScriptStep::Refused { .. })) && self.refusal.as_ref().is_none_or(|(at, _)| *at != self.cursor) {
+                let window = match &self.refusal {
+                    Some((at, window))
+                        if *at < self.cursor
+                            && self.script.steps[*at + 1..self.cursor].iter().all(|s| matches!(s, ScriptStep::Refused { .. } | ScriptStep::Check { .. })) =>
+                    {
+                        window.clone()
+                    }
+                    _ => self.before.clone(),
+                };
+                self.refusal = Some((self.cursor, window));
             }
             if self.game.is_over() {
                 if let Some(step) = self.current() {
@@ -534,9 +567,21 @@ impl<'s> Run<'s> {
                         && action.named("Count").is_none()))
                 && request.player == player_of(action.bot)
             {
+                // Judged at the player's next priority, or at the question to them the line after it answers (a sacrifice
+                // chosen in the resolution whose "may" the refusal says is not asked), whichever comes first.
+                let answered_next = matches!(
+                    self.script.steps.get(self.cursor + 1),
+                    Some(ScriptStep::Action(next)) if player_of(next.bot) == request.player && answers(next.verb, &request.kind)
+                );
                 match request.kind {
                     ref k if answers(action.verb, k) => return fail(format!("line {line} says {text}, but the player was asked that question")),
-                    RequestKind::Priority { .. } => {
+                    ref k if matches!(k, RequestKind::Priority { .. }) || answered_next => {
+                        if !self.could_have_asked(action.verb, request.player) {
+                            return fail(format!(
+                                "line {line}: {text} proves nothing: nothing since the line above it could have asked {} that (nothing resolved or left the stack, no step ended, nothing was cast, activated or played); pass priority first, or wait for the step it means",
+                                bot(request.player)
+                            ));
+                        }
                         self.next();
                         continue;
                     }
@@ -689,46 +734,28 @@ impl<'s> Run<'s> {
                 && answers(action.verb, &request.kind)
             {
                 if let RequestKind::Priority { options } = &request.kind {
-                    let mut offered = self.offered(action, options, true)?;
-                    // A refusal that names targets (`! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Emrakul)`) refuses only
-                    // the option that could be announced with them, and proves nothing when no such object exists.
-                    let specs: Vec<&str> = action.positional().collect();
-                    if !specs.is_empty() {
-                        let all: Vec<ObjectId> = (0..self.game.state.objects.len()).map(|i| ObjectId(i as u32)).collect();
-                        for spec in &specs {
-                            if bot_id(spec).is_none() && !spec.to_ascii_lowercase().starts_with("stack.") && self.objects(action, spec, &all)?.is_empty() {
-                                return fail(format!("line {line}: {text} proves nothing: nothing is named {spec}"));
-                            }
-                        }
-                        let mut kept = Vec::new();
-                        for o in offered {
-                            let mut every = true;
-                            for spec in &specs {
-                                every &= self.target(action, spec, &o.target_candidates)?.is_some();
-                            }
-                            if every {
-                                kept.push(o);
-                            }
-                        }
-                        offered = kept;
-                    }
-                    // A refused activation with `Sacrifice:` (`! Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice:
-                    // Hithlain Rope)`) refuses only a mana ability whose sacrifice could be paid with that permanent.
-                    if let Some(name) = action.named("Sacrifice") {
-                        let all: Vec<ObjectId> = (0..self.game.state.objects.len()).map(|i| ObjectId(i as u32)).collect();
-                        if self.objects(action, name, &all)?.is_empty() {
-                            return fail(format!("line {line}: {text} proves nothing: nothing is named {name}"));
-                        }
-                        let mut kept = Vec::new();
-                        for o in offered {
-                            if self.target(action, name, &o.target_candidates)?.is_some() {
-                                kept.push(o);
-                            }
-                        }
-                        offered = kept;
-                    }
-                    if !offered.is_empty() {
+                    if !self.refused_offered(action, *line, text, options)?.is_empty() {
                         return fail(format!("line {line} says {text} must not be offered, but it is"));
+                    }
+                    // Nothing is offered that the player could not pay for (CR 601.2g, 602.2b), so a refusal that holds only for
+                    // want of mana proves nothing of any other rule: one that does must say so (`Mana: short`), and is then
+                    // judged by it - not offered now, offered with mana to spare. Any other must still hold with mana to spare.
+                    if !matches!(action.verb, ScriptVerb::Play) {
+                        let short = match action.named("Mana") {
+                            None => false,
+                            Some(v) if v.trim().eq_ignore_ascii_case("short") => true,
+                            Some(v) => return fail(format!("line {line}: {text}: `Mana: {v}` - the only value is `Mana: short`")),
+                        };
+                        let spare = !self.refused_offered(action, *line, text, &options_with_mana_to_spare(&self.game, request.player))?.is_empty();
+                        if spare && !short {
+                            return fail(format!(
+                                "line {line}: {text} proves nothing: it is not offered only because {} cannot pay for it; give them the mana, or say `Mana: short` if the cost is what it tests",
+                                bot(request.player)
+                            ));
+                        }
+                        if short && !spare {
+                            return fail(format!("line {line}: {text} says `Mana: short`, but it is not offered even with mana to spare"));
+                        }
                     }
                 }
                 self.check_refused_declaration(action, *line, text, &request)?;
@@ -741,6 +768,13 @@ impl<'s> Run<'s> {
             if let Some(ScriptStep::Wait(w)) = self.current()
                 && self.reached(w)
             {
+                // A line written under a step header waits from the step's beginning (or the latest answer, if later): what
+                // happened before it is no part of the window of a refusal written there.
+                if let Some(began) = self.game.log.iter().rposition(|r| matches!(r.event, Event::StepBegan { .. }))
+                    && began >= self.before.log
+                {
+                    self.before = Window { log: began, header: true, ..self.window() };
+                }
                 self.next();
                 continue;
             }
@@ -2159,6 +2193,114 @@ impl<'s> Run<'s> {
             return fail(format!("line {}: Triggers takes every one of the {} triggers", step.line, sources.len()));
         }
         Ok(Answer::Order(order))
+    }
+
+    /// The game as it stands, as a refusal's window opens at it.
+    fn window(&self) -> Window {
+        Window { log: self.game.log.len(), stack: self.game.state.stack.iter().map(|i| i.serial).collect(), header: false }
+    }
+
+    /// Whether the window of the refusal under the cursor (`! Bot1.Accept`, `! Bot1.Modes`, a bare `! Bot2.Block`) holds a
+    /// point where a question of that kind could have been asked. For targets and modes, asked as a triggered ability is put
+    /// on the stack (CR 603.3c-d), that is anything at all that happened, since anything may trigger - the beginning of the
+    /// step under its header too ("at the beginning of"). For any other kind: every player passing in succession, so that
+    /// a spell or ability left the stack (resolved, countered, or with no legal target) or the step ended - a trigger that
+    /// should not have been there would have resolved first (CR 117.4, 500.2) - or anything a resolution did; a spell cast,
+    /// an ability activated (a mana ability only for the colors it makes), a land played, a spell copied, a permanent turned
+    /// face up (their costs, and the replacements as a permanent enters); a declaration of attackers with banding among
+    /// them, for a choice of the attacking player's (a band, CR 702.22c); and the beginning of the step under its header
+    /// where its turn-based action asks that question (a declaration of blockers, the discard at cleanup, CR 703.4).
+    /// Anything else - a priority reached with the trigger that would ask still on the stack, a declaration of attackers,
+    /// combat damage dealt - asks nothing of these before that priority, so a refusal judged there holds whatever the card
+    /// does. (A question a turn-based action puts as it is taken comes before the priority, where the refusal sees it.)
+    fn could_have_asked(&self, verb: ScriptVerb, player: PlayerId) -> bool {
+        let Some((_, window)) = &self.refusal else { return true };
+        let stack = &self.game.state.stack;
+        if window.stack.iter().any(|&serial| !stack.iter().any(|i| i.serial == serial)) {
+            return true;
+        }
+        // A spell or ability that was on the stack is resolving, and asking (CR 608.2).
+        if self.game.state.agenda.iter().any(|f| matches!(f.kind, FrameKind::Resolve { serial } if window.stack.contains(&serial))) {
+            return true;
+        }
+        let triggers = matches!(verb, ScriptVerb::Modes | ScriptVerb::Target);
+        let records = self.game.log.get(window.log..).unwrap_or(&[]);
+        // A declaration of attackers with banding among them, where the attacking player announces bands (CR 702.22c).
+        let bands = verb == ScriptVerb::Choose
+            && records.iter().any(|r| matches!(r.event, Event::Attacks { attacker, .. } if self.game.chars(attacker).keywords.has(Keyword::Banding)));
+        records.iter().enumerate().any(|(at, r)| {
+            if triggers {
+                return true;
+            }
+            matches!(r.cause, Cause::Spell(_) | Cause::Ability { .. })
+                || match r.event {
+                    // A mana ability asks only what mana it makes (CR 605.3b).
+                    Event::AbilityActivated { ability, .. } => {
+                        verb == ScriptVerb::Colors || !matches!(self.game.cards.ability(ability), AbilityDef::Activated(d) if d.is_mana_ability())
+                    }
+                    Event::Resolved { .. }
+                    | Event::SpellCast { .. }
+                    | Event::LandPlayed { .. }
+                    | Event::Copied { .. }
+                    | Event::TurnedFaceUp { .. }
+                    | Event::DoorUnlocked { .. }
+                    | Event::TurnBegan { .. } => true,
+                    Event::ZoneChange { from, .. } => from.is(ZoneKind::Stack),
+                    Event::AttackersDeclared { player: attacker, .. } => bands && attacker == player,
+                    // The step under the header began: a point only where its turn-based action asks this (the declaration
+                    // of blockers, the discard to hand size). Any later step began because every player passed with the
+                    // stack empty (CR 500.2).
+                    Event::StepBegan { step } => {
+                        !(window.header && at == 0)
+                            || matches!((verb, step), (ScriptVerb::Block, Step::DeclareBlockers) | (ScriptVerb::Discard, Step::Cleanup) | (ScriptVerb::Accept | ScriptVerb::Decline, Step::Draw))
+                    }
+                    _ => false,
+                }
+        })
+    }
+
+    /// The options among `options` a refused play, cast or activation (`! Bot1.Hand.Lightning Bolt.Cast(..)`) names: the
+    /// action, and with targets or `Sacrifice:` named only the options that could be announced or paid with them.
+    fn refused_offered(&self, action: &ActionStep, line: usize, text: &str, options: &[ActionOption]) -> R<Vec<ActionOption>> {
+        let mut offered = self.offered(action, options, true)?;
+        // A refusal that names targets (`! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Emrakul)`) refuses only
+        // the option that could be announced with them, and proves nothing when no such object exists.
+        let specs: Vec<&str> = action.positional().collect();
+        if !specs.is_empty() {
+            let all: Vec<ObjectId> = (0..self.game.state.objects.len()).map(|i| ObjectId(i as u32)).collect();
+            for spec in &specs {
+                if bot_id(spec).is_none() && !spec.to_ascii_lowercase().starts_with("stack.") && self.objects(action, spec, &all)?.is_empty() {
+                    return fail(format!("line {line}: {text} proves nothing: nothing is named {spec}"));
+                }
+            }
+            let mut kept = Vec::new();
+            for o in offered {
+                let mut every = true;
+                for spec in &specs {
+                    every &= self.target(action, spec, &o.target_candidates)?.is_some();
+                }
+                if every {
+                    kept.push(o);
+                }
+            }
+            offered = kept;
+        }
+        // A refused activation with `Sacrifice:` (`! Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice:
+        // Hithlain Rope)`) refuses only a mana ability whose sacrifice could be paid with that permanent.
+        if let Some(name) = action.named("Sacrifice") {
+            let all: Vec<ObjectId> = (0..self.game.state.objects.len()).map(|i| ObjectId(i as u32)).collect();
+            if self.objects(action, name, &all)?.is_empty() {
+                return fail(format!("line {line}: {text} proves nothing: nothing is named {name}"));
+            }
+            let mut kept = Vec::new();
+            for o in offered {
+                if self.target(action, name, &o.target_candidates)?.is_some() {
+                    kept.push(o);
+                }
+            }
+            offered = kept;
+        }
+        Ok(offered)
     }
 
     fn offered(&self, step: &ActionStep, options: &[ActionOption], every_cost: bool) -> R<Vec<ActionOption>> {

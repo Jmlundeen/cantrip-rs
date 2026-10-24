@@ -44,6 +44,8 @@ Bot1.Accept
 Bot1.Target(Sol Ring)
 [T5 Bot1.Main1]
 Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
+[T5 Bot1.CombatDamage]
+Bot1.Pass
 ! Bot1.Accept
 [T5 Bot1.Main2]
 

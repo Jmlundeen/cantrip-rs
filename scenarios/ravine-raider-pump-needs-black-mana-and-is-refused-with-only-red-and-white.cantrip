@@ -27,7 +27,7 @@ Bot2.Hand.Forest.Play
 Bot2.Battlefield.Forest.Activate
 Bot2.Hand.Llanowar Elves.Cast
 [T3 Bot1.Main1]
-! Bot1.Battlefield.Ravine Raider.Activate
+! Bot1.Battlefield.Ravine Raider.Activate(Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
 Bot2.Pass

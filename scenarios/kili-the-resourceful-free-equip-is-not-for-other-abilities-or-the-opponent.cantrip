@@ -51,7 +51,7 @@ Bot2.Pass
 Bot2.Hand.Ragavan, Nimble Pilferer.Cast
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Pass
-! Bot2.Battlefield.Bloodforged Battle-Axe.Activate(Ability: Equip)
+! Bot2.Battlefield.Bloodforged Battle-Axe.Activate(Ability: Equip; Mana: short)
 [T4 Bot2.Main2]
 
 [Expect]

@@ -37,7 +37,7 @@ Bot2.Pass
 [T3 Bot1.Main1]
 ? Bot1.Graveyard = Mosswood Dreadknight
 Bot1.Hand.Forest.Play
-! Bot1.Graveyard.Mosswood Dreadknight.Cast
+! Bot1.Graveyard.Mosswood Dreadknight.Cast(Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
 Bot1.Battlefield.Mox Jet.Activate

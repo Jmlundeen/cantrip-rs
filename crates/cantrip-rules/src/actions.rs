@@ -2352,6 +2352,21 @@ fn advice_game(game: &crate::Game) -> crate::Game {
     crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE }
 }
 
+/// What `player` would be offered at this priority with a thousand mana of every type in their pool: what a script's refusal
+/// of a cast or an activation is held against, so that one that holds only because the cost could not be paid (CR 601.2g,
+/// 602.2b: such an action is not offered at all) is told from one the rules under test refuse. Nothing is paid; the pool
+/// of a copy is all that changes.
+pub fn options_with_mana_to_spare(game: &crate::Game, player: PlayerId) -> Vec<ActionOption> {
+    let mut copy = advice_game(game);
+    copy.state.update_player(player, |p| {
+        for mana in Mana::ALL {
+            p.pool.0[mana as usize] += 1000;
+        }
+    });
+    let mut cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    priority_options(&mut cx, player)
+}
+
 /// The face a cast option casts, as the card id the cost changes judge it by where it is not the card itself (CR 715.4,
 /// 720.3a, 709.3, 712.8a).
 fn option_face(game: &crate::Game, card: ObjectId, index: u8) -> (&'static CardDef, Option<CardId>) {

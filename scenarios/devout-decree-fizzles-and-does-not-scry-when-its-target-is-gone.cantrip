@@ -37,6 +37,8 @@ Bot1.Pass
 Bot2.Battlefield.Mox Ruby#2.Activate
 Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Dark Confidant)
 Bot2.Pass
+Bot1.Pass
+Bot1.Pass
 ! Bot1.Arrange
 
 [Expect]

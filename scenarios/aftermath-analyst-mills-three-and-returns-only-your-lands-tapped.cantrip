@@ -41,7 +41,7 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mountain.Activate
-! Bot1.Battlefield.Aftermath Analyst.Activate
+! Bot1.Battlefield.Aftermath Analyst.Activate(Mana: short)
 [T2 Bot2.Main1]
 Bot2.Hand.Fabled Passage.Play
 Bot2.Battlefield.Fabled Passage.Activate

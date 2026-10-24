@@ -26,7 +26,7 @@ Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: any color; Col
 ? Client.Bot1.Mana = 1 Red (dragon or omen spells)
 Bot1.Battlefield.Mox Jet.Activate
 ? Client.Bot1.Mana = 1 Black; 1 Red (dragon or omen spells)
-! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Phyrexian Dragon Engine.Cast(Spend: R DragonOrOmenSpells, B, W)
 Bot1.Pass

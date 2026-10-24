@@ -32,6 +32,8 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
 [T3 Bot1.Main1]
 Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
 ! Bot1.Choose
 [Bot1.Main2]
 

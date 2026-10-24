@@ -43,7 +43,7 @@ Bot2.Pass
 Bot1.Battlefield.Steelswarm Operator#1.Activate(Ability: {U}{U})
 Bot1.Battlefield.Steelswarm Operator#2.Activate(Ability: {U}{U})
 ? Bot1.Mana = {U}{U}{U}{U} (ArtifactAbilities)
-! Bot1.Hand.Sol Ring.Cast
+! Bot1.Hand.Sol Ring.Cast(Mana: short)
 Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return; Bot2.Battlefield.Llanowar Elves)
 Bot1.Pass
 Bot2.Pass
@@ -56,8 +56,8 @@ Bot2.Pass
 Bot1.Battlefield.Steelswarm Operator#1.Activate(Ability: Add {U}.)
 Bot1.Battlefield.Steelswarm Operator#2.Activate(Ability: Add {U}.)
 ? Bot1.Mana = {U}{U} (ArtifactSpells)
-! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return)
-! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return; Mana: short)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw; Mana: short)
 Bot1.Hand.Sol Ring.Cast
 Bot1.Pass
 Bot2.Pass

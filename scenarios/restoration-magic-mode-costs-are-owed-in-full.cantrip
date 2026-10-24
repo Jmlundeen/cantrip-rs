@@ -18,7 +18,7 @@ Mountain x20
 Bot1.Hand.Plains.Play
 Bot1.Battlefield.Plains.Activate
 Bot1.Hand.Mother of Runes.Cast
-! Bot1.Hand.Restoration Magic.Cast
+! Bot1.Hand.Restoration Magic.Cast(Mana: short)
 [T3 Bot1.Main1]
 Bot1.Battlefield.Plains.Activate
 Bot1.Hand.Restoration Magic.Cast

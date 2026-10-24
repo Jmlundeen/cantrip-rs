@@ -32,7 +32,7 @@ Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Without paying)
 Bot1.Pass
 Bot2.Pass
 ? Bot2.Life = 17
-! Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Without paying)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Without paying; Mana: short)
 Bot1.Hand.Ornithopter.Cast(Ability: Without paying)
 
 [Expect]

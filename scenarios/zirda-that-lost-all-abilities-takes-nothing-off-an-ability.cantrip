@@ -45,7 +45,7 @@ Bot2.Pass
 Bot1.Pass
 [T3 Bot1.Main1]
 Bot1.Hand.Inventors' Fair.Play
-! Bot1.Battlefield.Inventors' Fair.Activate(Ability: Search)
+! Bot1.Battlefield.Inventors' Fair.Activate(Ability: Search; Mana: short)
 
 [Expect]
 Bot1.Hand.Count = 3

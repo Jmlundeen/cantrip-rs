@@ -46,6 +46,7 @@ Bot2.Target(Bot1.Battlefield.Llanowar Elves)
 Bot1.Attack(Llanowar Elves)
 [T5 Bot1.CombatDamage]
 ? Stack.Count = 0
+Bot1.Pass
 ! Bot1.Accept
 [T5 Bot1.Main2]
 ? Bot2.Life = 19

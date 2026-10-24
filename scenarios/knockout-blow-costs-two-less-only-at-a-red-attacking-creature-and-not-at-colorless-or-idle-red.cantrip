@@ -34,7 +34,7 @@ Bot2.Attack(Samut, Hazoret's Champion > Bot1; Ornithopter > Bot1)
 Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 ? Bot1.Mana = {W}{W}
-! Bot1.Hand.Knockout Blow.Cast(Bot2.Battlefield.Ornithopter)
+! Bot1.Hand.Knockout Blow.Cast(Bot2.Battlefield.Ornithopter; Mana: short)
 ! Bot1.Hand.Knockout Blow.Cast(Bot2.Battlefield.Vengeful Tracker)
 Bot1.Hand.Knockout Blow.Cast(Bot2.Battlefield.Samut, Hazoret's Champion)
 ? Bot1.Mana = {W}

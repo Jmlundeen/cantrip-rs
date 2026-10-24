@@ -704,6 +704,19 @@ impl StateDump {
             if e.value == "(absent)" {
                 if let Some(actual) = self.values.get(&e.key) {
                     out.push(format!("line {}: {} expected to be absent, was \"{actual}\"", e.line, e.key));
+                } else if let Some(object) = object_key(&e.key)
+                    && !(object_key_shape(parent(object)) && self.values.keys().any(|k| k.starts_with(&format!("{}.", parent(object)))))
+                {
+                    // `Bot1.Battlefield.Ornithopter = (absent)`: no object of that name is there - none of its keys, nor
+                    // those of `Ornithopter#1`, `#2`.
+                    if let Some(k) = self.values.keys().find(|k| k.starts_with(&format!("{object}.")) || k.starts_with(&format!("{object}#"))) {
+                        out.push(format!("line {}: {} expected to be absent, but the dump has {k}", e.line, e.key));
+                    }
+                } else if !writable(&e.key) {
+                    // A key the dump never writes is always missing: `X.Counters` (the dump writes `X.Counters.<Kind>`) or a
+                    // misspelt property would hold whatever the game did.
+                    let near: Vec<&String> = self.values.keys().filter(|k| close(k, &e.key)).take(6).collect();
+                    out.push(format!("line {}: {} is not a key the dump has, so it is always absent (keys like it: {near:?})", e.line, e.key));
                 } else if let Some(owner) = owner(&e.key)
                     && !self.values.keys().any(|k| k.starts_with(&owner))
                 {
@@ -734,6 +747,83 @@ impl StateDump {
     }
 }
 
+/// The keys the dump writes outside any player (each list with `.Count` beside it).
+const GAME_KEYS: &[&str] = &[
+    "Turn", "Step", "ActivePlayer", "PriorityPlayer", "Result", "DrawReason", "Monarch", "Initiative", "DayNight", "Stack", "Exile",
+    "Exile.FaceDown", "Combat.Attackers", "Combat.Blocks", "Combat.AttackCost", "Combat.AttackCost.Remaining",
+    "Combat.AttackCost.Attackers", "Delayed", "LeftBattlefield", "Prevented", "Attached",
+];
+
+/// The keys the dump writes of a player, after `BotN.`.
+const PLAYER_KEYS: &[&str] = &[
+    "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
+    "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked",
+    "Hand", "Revealed", "Crimes", "Library", "Companion", "Sideboard", "Graveyard", "Emblems", "Battlefield", "PhasedOut",
+];
+
+/// The keys the dump writes of a permanent, after `BotN.Battlefield.<name>.` (or `.PhasedOut.`), beside `Counters.<Kind>`.
+const PERMANENT_KEYS: &[&str] = &[
+    "Tapped", "Toxic", "FaceDown", "FaceDownName", "Token", "Transformed", "ManaValue", "X", "Doors", "Prepared", "AttachedTo", "Monstrous",
+    "Solved", "Suspected", "Saddled", "Exerted", "GoadedBy", "MustAttack", "ChosenPlayer", "ChosenOption", "ChosenObject",
+    "ChosenModes", "ChosenName", "ClassLevel", "Types", "Supertypes", "Subtypes", "Colors", "Keywords", "HexproofFrom",
+    "ProtectionFrom", "Power", "Toughness", "Damage", "SummoningSick", "ChosenColor", "ChosenSubtype",
+];
+
+/// The keys the dump writes of a card in a hand, a graveyard, a library or a sideboard, after `BotN.<zone>.<name>.`.
+const CARD_KEYS: &[&str] = &["Colors", "Power", "Toughness", "Subtypes"];
+
+/// The zones whose objects the dump writes keys of, `BotN.<zone>.<name>.<property>`.
+const OBJECT_ZONES: [&str; 6] = ["Battlefield", "PhasedOut", "Hand", "Graveyard", "Library", "Sideboard"];
+
+/// `key` without its last segment.
+fn parent(key: &str) -> &str {
+    key.rsplit_once('.').map_or("", |(p, _)| p)
+}
+
+/// The key of an object itself, `BotN.<zone>.<name>`, which the dump writes no value for: `(absent)` on it says no object of
+/// that name is there. A key whose last segment follows a name the dump has an object of is a property of it instead (a
+/// misspelt one is not writable, `mismatches`), as is `.Counters`.
+fn object_key(key: &str) -> Option<&str> {
+    (object_key_shape(key) && !key.ends_with(".Counters") && !writable(key)).then_some(key)
+}
+
+/// Whether `key` is `BotN.<zone>.<name>` for a zone the dump writes objects of.
+fn object_key_shape(key: &str) -> bool {
+    let Some((bot, rest)) = key.split_once('.') else { return false };
+    bot.strip_prefix("Bot").is_some_and(|n| n.parse::<u8>().is_ok())
+        && rest.split_once('.').is_some_and(|(zone, name)| OBJECT_ZONES.contains(&zone) && !name.is_empty())
+}
+
+/// Whether the dump ever writes `key` (in some position): what an `(absent)` expectation may name. A parent such as
+/// `Bot1.Battlefield.X.Counters` or a misspelt property is never written, so it is always absent and proves nothing.
+fn writable(key: &str) -> bool {
+    let key = key.strip_suffix(".Count").unwrap_or(key);
+    if GAME_KEYS.contains(&key) {
+        return true;
+    }
+    if let Some(rest) = key.strip_prefix("Stack.") {
+        return rest.ends_with(".ManaValue") || rest.ends_with(".X");
+    }
+    let Some(rest) = key.strip_prefix("Bot").and_then(|r| r.split_once('.')).filter(|(n, _)| n.parse::<u8>().is_ok()).map(|(_, r)| r) else {
+        return false;
+    };
+    if PLAYER_KEYS.contains(&rest) {
+        return true;
+    }
+    let property = |zone: &str| rest.strip_prefix(zone).and_then(|r| r.strip_prefix('.')).and_then(|r| r.rsplit_once('.')).map(|(_, p)| p);
+    for zone in ["Battlefield", "PhasedOut"] {
+        if let Some(object) = rest.strip_prefix(zone).and_then(|r| r.strip_prefix('.'))
+            && let Some((_, kind)) = object.rsplit_once(".Counters.")
+        {
+            return CounterKind::ALL.iter().any(|k| k.token() == kind);
+        }
+        if let Some(p) = property(zone) {
+            return PERMANENT_KEYS.contains(&p);
+        }
+    }
+    ["Hand", "Graveyard", "Library", "Sideboard"].iter().any(|zone| property(zone).is_some_and(|p| CARD_KEYS.contains(&p)))
+}
+
 fn owner(key: &str) -> Option<String> {
     let dot = key.rfind('.')?;
     let mut parent = &key[..dot];
@@ -760,4 +850,67 @@ fn same(unordered: bool, expected: &str, actual: &str) -> bool {
         a.sort();
     }
     e == a
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Every key `StateDump::of` writes is one `writable` knows, so that an `(absent)` expectation on it is judged: the
+    /// properties named in the writes of this file are all in the lists.
+    #[test]
+    fn the_writable_lists_name_every_key_the_dump_writes() {
+        let source = include_str!("dump.rs");
+        let body = &source[source.find("pub fn of(game: &Game)").unwrap()..source.find("pub fn mismatches").unwrap()];
+        let (mut missing, mut checked) = (Vec::new(), 0);
+        for (open, close) in [("\"", "\""), ("&format!(\"", "\""), ("format!(\"", "\"")] {
+            // A write split over lines has its key on the next line: whitespace after the parenthesis is skipped.
+            for piece in body.split("d.set(").skip(1).chain(body.split("d.list(").skip(1)) {
+                let Some(piece) = piece.trim_start().strip_prefix(open) else { continue };
+                let key = &piece[..piece.find(close).unwrap()];
+                checked += 1;
+                let sample = key.replace("{b}", "Bot1").replace("{key}", "Bot1.Battlefield.Card").replace("{row}", "Battlefield").replace("{label}", "Card");
+                let sample = sample.replace("{}", CounterKind::ALL[0].token());
+                if !writable(&sample) && !writable(&key.replace("{b}", "Bot1").replace("{key}", "Bot1.Graveyard.Card")) {
+                    missing.push(key.to_string());
+                }
+            }
+        }
+        assert!(checked > 80, "only {checked} writes found: the test no longer reads the dump");
+        assert!(missing.is_empty(), "keys the dump writes that `writable` refuses: {missing:?}");
+    }
+
+    #[test]
+    fn a_parent_or_a_misspelt_key_is_not_writable() {
+        assert!(writable("Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne"));
+        assert!(writable("Bot1.Battlefield.Grizzly Bears#2.Tapped"));
+        assert!(writable("Bot2.Graveyard.Sandman, Shifting Scoundrel.Power"));
+        assert!(writable("Bot1.Battlefield.Grizzly Bears.Keywords.Count"));
+        assert!(writable("Monarch"));
+        assert!(!writable("Bot1.Battlefield.Grizzly Bears.Counters"));
+        assert!(!writable("Bot1.Battlefield.Grizzly Bears.Counters.MinusOne"));
+        assert!(!writable("Bot1.Battlefield.Grizzly Bears.Taped"));
+        assert!(!writable("Bot1.Hand.Lightning Bolt.Tapped"));
+        assert!(!writable("Bot1.Lfie"));
+        assert!(!writable("Monarchy"));
+    }
+
+    fn dump(keys: &[&str]) -> StateDump {
+        StateDump { values: keys.iter().map(|k| (k.to_string(), "x".to_string())).collect(), unordered: BTreeSet::new() }
+    }
+
+    fn absent(d: &StateDump, key: &str) -> Vec<String> {
+        d.mismatches(&[Expectation { line: 1, key: key.to_string(), value: "(absent)".to_string(), negated: false }])
+    }
+
+    #[test]
+    fn absent_is_refused_on_a_key_the_dump_never_writes_and_judged_on_an_object() {
+        let d = dump(&["Bot1.Battlefield", "Bot1.Battlefield.Ornithopter#1.Tapped", "Bot1.Battlefield.Ornithopter#2.Tapped", "Bot1.Battlefield.Ornithopter#1.Counters.Stun"]);
+        assert!(absent(&d, "Bot1.Battlefield.Ornithopter#2.Counters.Stun").is_empty());
+        assert!(!absent(&d, "Bot1.Battlefield.Ornithopter#1.Counters.Stun").is_empty());
+        assert!(!absent(&d, "Bot1.Battlefield.Ornithopter#2.Counters").is_empty(), "a parent is never written");
+        assert!(!absent(&d, "Bot1.Battlefield.Ornithopter#2.Taped").is_empty(), "a misspelt property is never written");
+        assert!(!absent(&d, "Bot1.Battlefield.Ornithopter").is_empty(), "two Ornithopters are there");
+        assert!(absent(&d, "Bot1.Battlefield.Llanowar Elves").is_empty());
+    }
 }

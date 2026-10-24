@@ -23,6 +23,8 @@ Bot1.Hand.Sigarda's Aid.Cast
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Mox Jet.Cast
 Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
 ! Bot1.Accept
 Bot1.Hand.Sol Ring.Cast
 Bot1.Battlefield.Mox Jet.Activate
@@ -34,8 +36,9 @@ Bot2.Hand.Lightning Greaves.Cast
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Mox Emerald.Activate
 Bot2.Pass
-! Bot1.Accept
 Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
 [T3 Bot1.Main1]
 Bot1.Hand.Lightning Greaves.Cast
 Bot1.Battlefield.Sol Ring.Activate

@@ -23,13 +23,13 @@ Bot1.Hand.Mox Pearl.Cast
 [T3 Bot1.Main1]
 Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Green)
 ? Bot1.Mana = {G} (DragonCreatureSpells, CantBeCountered)
-! Bot1.Hand.Llanowar Elves.Cast
+! Bot1.Hand.Llanowar Elves.Cast(Mana: short)
 [T5 Bot1.Main1]
 Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Red)
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 ? Bot1.Mana = {W}{B} {R} (DragonCreatureSpells, CantBeCountered)
-! Bot1.Hand.Firdoch Core.Cast
+! Bot1.Hand.Firdoch Core.Cast(Mana: short)
 Bot1.Hand.Phyrexian Dragon Engine.Cast
 Bot1.Pass
 Bot2.Pass

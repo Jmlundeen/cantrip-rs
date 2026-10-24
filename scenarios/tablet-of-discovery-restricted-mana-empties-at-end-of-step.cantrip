@@ -30,7 +30,7 @@ Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
 Bot1.Pass
 [Bot1.Main2]
 ? Bot1.Mana =
-! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
 
 [Expect]
 Bot1.Hand = Lightning Bolt; Island; Island

@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Mountain.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Sunken Ruins.Play
-! Bot1.Battlefield.Sunken Ruins.Activate(Ability: {U/B})
+! Bot1.Battlefield.Sunken Ruins.Activate(Ability: {U/B}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Island.Play

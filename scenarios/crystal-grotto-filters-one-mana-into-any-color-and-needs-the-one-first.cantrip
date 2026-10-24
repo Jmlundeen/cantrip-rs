@@ -14,7 +14,7 @@ Island x20
 [Actions]
 Bot1.Hand.Crystal Grotto.Play
 Bot1.Arrange(Lightning Bolt | )
-! Bot1.Battlefield.Crystal Grotto.Activate(Ability: any color; Color: Red)
+! Bot1.Battlefield.Crystal Grotto.Activate(Ability: any color; Color: Red; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate

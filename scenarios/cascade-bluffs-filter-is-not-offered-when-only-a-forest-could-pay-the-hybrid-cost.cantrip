@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Forest.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Cascade Bluffs.Play
-! Bot1.Battlefield.Cascade Bluffs.Activate(Ability: {U/R})
+! Bot1.Battlefield.Cascade Bluffs.Activate(Ability: {U/R}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Island.Play

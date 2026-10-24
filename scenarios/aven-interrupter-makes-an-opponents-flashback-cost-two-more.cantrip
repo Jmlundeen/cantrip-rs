@@ -39,7 +39,7 @@ Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Mox Ruby.Activate
-! Bot2.Graveyard.Faithless Looting.Cast
+! Bot2.Graveyard.Faithless Looting.Cast(Mana: short)
 Bot2.Hand.Mox Sapphire.Cast
 Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Graveyard.Faithless Looting.Cast(Ability: Flashback)

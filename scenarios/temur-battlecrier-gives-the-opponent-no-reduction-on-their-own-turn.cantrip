@@ -42,7 +42,7 @@ Bot2.Battlefield.Mox Pearl.Activate
 Bot2.Hand.Giant Cindermaw.Cast
 Bot2.Pass
 Bot1.Pass
-! Bot2.Hand.Frantic Search.Cast
+! Bot2.Hand.Frantic Search.Cast(Mana: short)
 
 [Expect]
 Bot2.Battlefield.Giant Cindermaw.Power = 4

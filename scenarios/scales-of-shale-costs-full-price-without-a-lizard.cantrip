@@ -20,7 +20,7 @@ Bot2.Hand.Ornithopter.Cast
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Mox Jet.Activate
 ? Bot1.Mana = {B}{B}
-! Bot1.Hand.Scales of Shale.Cast(Bot2.Battlefield.Ornithopter)
+! Bot1.Hand.Scales of Shale.Cast(Bot2.Battlefield.Ornithopter; Mana: short)
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate
 Bot1.Hand.Scales of Shale.Cast(Bot2.Battlefield.Ornithopter)

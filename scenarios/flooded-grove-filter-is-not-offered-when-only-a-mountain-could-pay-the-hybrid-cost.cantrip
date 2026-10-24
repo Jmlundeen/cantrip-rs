@@ -17,7 +17,7 @@ Island x16
 Bot1.Hand.Mountain.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Flooded Grove.Play
-! Bot1.Battlefield.Flooded Grove.Activate(Ability: {G/U})
+! Bot1.Battlefield.Flooded Grove.Activate(Ability: {G/U}; Mana: short)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Hand.Forest.Play

@@ -22,7 +22,7 @@ Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass
 Bot2.Pass
 ? Stack.Count = 0
-! Bot1.Hand.Shark Typhoon.Activate(Ability: Cycling)
+! Bot1.Hand.Shark Typhoon.Activate(Ability: Cycling; Mana: short)
 
 [Expect]
 Bot1.Hand = Shark Typhoon; Island; Island

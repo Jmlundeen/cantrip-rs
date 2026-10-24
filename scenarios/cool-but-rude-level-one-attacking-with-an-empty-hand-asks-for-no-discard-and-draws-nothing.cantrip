@@ -30,6 +30,7 @@ Bot1.Hand.Cool but Rude.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
 ! Bot1.Choose
 [T3 Bot1.Main2]
 ? Bot1.Hand.Count = 0

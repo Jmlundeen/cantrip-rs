@@ -40,7 +40,7 @@ Bot1.Pass
 ? Bot1.Battlefield.Unholy Annex.Doors = Unholy Annex
 ? Bot1.Battlefield.Unholy Annex.ManaValue = 3
 # Four sources, {3}{B}{B} owed: refused for cost, in a main phase with an empty stack.
-! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door; Mana: short)
 [T3 Bot1.Main1]
 Bot1.Hand.Swamp.Play
 [T3 Bot1.BeginCombat]

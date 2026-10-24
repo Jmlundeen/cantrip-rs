@@ -22,7 +22,7 @@ Bot2.Battlefield.Forest.Activate
 Bot2.Hand.Llanowar Elves.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Swamp.Play
-! Bot1.Hand.Stir Up Trouble.Cast
+! Bot1.Hand.Stir Up Trouble.Cast(Mana: short)
 [T3 Bot1.Main2]
 
 [Expect]

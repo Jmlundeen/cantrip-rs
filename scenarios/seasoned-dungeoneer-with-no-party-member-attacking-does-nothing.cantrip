@@ -32,6 +32,7 @@ Bot1.Target(Seasoned Dungeoneer)
 [T3 Bot1.DeclareAttackers]
 Bot1.Attack(Llanowar Elves)
 ! Bot1.Target
+Bot1.Pass
 ! Bot1.Arrange
 ! Bot1.Choose
 [T3 Bot1.Main2]
