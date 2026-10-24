@@ -1,4 +1,4 @@
-# "Whenever Ruric Thar becomes the target of a spell or ability an opponent controls, draw a card" (CR 603.2, 115.10):
+# "Whenever Ruric Thar becomes the target of a spell or ability an opponent controls, draw a card" (CR 603.2, 102.2, 102.3, 115.1):
 # Bot2's Lightning Bolt targets it on turn two, so the trigger resolves and Bot1 draws; the three damage stays marked.
 
 [Bot1 Deck]
