@@ -1,0 +1,65 @@
+# Own noncreature spells make exactly one 1/1 colorless Sculpture Treasure before the spell resolves (CR 603.2).
+# Only your artifact creatures have vigilance; the new token cannot tap until its next turn (CR 302.6, 702.20).
+[Bot1 Deck]
+Vraska, Soul of Stone
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Ornithopter
+Sol Ring
+Plains
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Mox Jet
+Sol Ring
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Vraska, Soul of Stone.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sculpture Treasure Token.Power = 1
+? Bot1.Battlefield.Sculpture Treasure Token.Toughness = 1
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Sculpture Treasure Token.Activate(Color: Red)
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Count = 8
+? Bot1.Battlefield.Sculpture Treasure Token.Types = Artifact; Creature
+? Bot1.Battlefield.Sculpture Treasure Token.Subtypes = Sculpture; Treasure
+? Bot1.Battlefield.Sculpture Treasure Token.Colors = (absent)
+? Bot1.Battlefield.Sculpture Treasure Token.Keywords = Vigilance
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Vigilance
+? Bot1.Battlefield.Vraska, Soul of Stone.Keywords = (absent)
+? Bot1.Battlefield.Mox Sapphire.Keywords = (absent)
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Attack(Ornithopter > Bot2; Sculpture Treasure Token > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Tapped = false
+? Bot1.Battlefield.Sculpture Treasure Token.Tapped = false
+Bot1.Battlefield.Sculpture Treasure Token.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot2.Life = 19
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Graveyard =
