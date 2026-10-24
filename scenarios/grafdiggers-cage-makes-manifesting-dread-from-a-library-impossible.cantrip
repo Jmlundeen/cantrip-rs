@@ -1,0 +1,43 @@
+# Grafdigger's Cage and manifest dread (CR 701.62a, 701.40a, 701.40f): a card about to be manifested is turned face down
+# first, a 2/2 face-down creature card in the library, so the Cage keeps even a Lightning Bolt from entering (the Cage's
+# ruling: manifesting from a library is impossible). Dissection Tools enters and Bot1 picks the Bolt to manifest over
+# Llanowar Elves: nothing is manifested, the Bolt stays a face-up Lightning Bolt, and as neither card was manifested both
+# go to the graveyard; the Tools has no creature to attach to.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Dissection Tools
+Grafdigger's Cage
+Plains
+Llanowar Elves
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grafdigger's Cage.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dissection Tools.Cast
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt | Llanowar Elves)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Dissection Tools; Grafdigger's Cage; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Battlefield.Dissection Tools.AttachedTo = (absent)
+Bot1.Graveyard = Lightning Bolt; Llanowar Elves; Black Lotus
+Bot1.Library.Count = 10

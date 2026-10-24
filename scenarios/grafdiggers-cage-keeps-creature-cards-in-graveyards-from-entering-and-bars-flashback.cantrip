@@ -1,0 +1,81 @@
+# Grafdigger's Cage: "Creature cards in graveyards ... can't enter the battlefield. Players can't cast spells from
+# graveyards ..." (CR 101.2, 101.3). Bot1 casts the Cage and a Goblin Welder on turn 1 and Faithless Looting from its
+# hand, discarding Phyrexian Metamorph and Guerrilla Gorilla; it is refused the Looting's flashback with Black Lotus open.
+# - Turn 2: Bot2, the Cage's opponent, loots away two Gorillas and is refused its flashback too, three Moxen open.
+# - Turn 3: Exhume has each player put a creature card from their graveyard onto the battlefield: neither can, so both
+#   stay. Goblin Welder then sacrifices Mox Jet to return Phyrexian Metamorph: Mox Jet is sacrificed, but the Metamorph,
+#   a creature card in the graveyard whatever it would copy (the Cage's ruling), stays there, and is never asked what to
+#   copy, though the Cage is an artifact it could have copied.
+# - Turn 5: the Welder sacrifices Mox Ruby to return Mox Jet, a noncreature card, which enters: the control.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Grafdigger's Cage
+Goblin Welder
+Faithless Looting
+Phyrexian Metamorph
+Guerrilla Gorilla
+Exhume
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Faithless Looting
+Island
+Island
+Guerrilla Gorilla
+Guerrilla Gorilla
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grafdigger's Cage.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Welder.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Metamorph; Guerrilla Gorilla)
+[T1 Bot1.Main2]
+! Bot1.Graveyard.Faithless Looting.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Guerrilla Gorilla; Guerrilla Gorilla)
+! Bot2.Graveyard.Faithless Looting.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Exhume.Cast
+Bot1.Pass
+? Bot1.Battlefield.Count = 5
+? Bot2.Battlefield.Count = 4
+Bot1.Battlefield.Goblin Welder.Activate
+Bot1.Target(Mox Jet)
+Bot1.Target(Phyrexian Metamorph)
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Battlefield.Goblin Welder.Activate
+Bot1.Target(Mox Ruby)
+Bot1.Target(Mox Jet)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Goblin Welder; Grafdigger's Cage; Mountain; Mox Jet
+Bot1.Graveyard = Mox Ruby; Exhume; Black Lotus; Faithless Looting; Guerrilla Gorilla; Phyrexian Metamorph
+Bot2.Battlefield = Mountain; Mox Emerald; Mox Pearl; Mox Sapphire
+Bot2.Graveyard = Faithless Looting; Guerrilla Gorilla; Guerrilla Gorilla

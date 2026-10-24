@@ -1,0 +1,44 @@
+# Grafdigger's Cage and Serra Paragon's "you may play a land from your graveyard": playing a land is putting it onto the
+# battlefield (CR 305.1), and Dryad Arbor in the graveyard is a creature card, which the Cage keeps from entering
+# (CR 101.2) - so the Paragon can't play it. Bot1 casts the Cage and the Paragon on turn 1, then Faithless Looting,
+# discarding Dryad Arbor and Plains; it is refused the Arbor and plays the Plains from its graveyard by the Paragon.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+Grafdigger's Cage
+Serra Paragon
+Faithless Looting
+Dryad Arbor
+Plains
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grafdigger's Cage.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Dryad Arbor; Plains)
+? Bot1.Graveyard = Faithless Looting; Plains; Dryad Arbor; Black Lotus
+! Bot1.Graveyard.Dryad Arbor.Play
+Bot1.Graveyard.Plains.Play
+
+[Expect]
+Turn = 1
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Grafdigger's Cage; Mox Jet; Mox Pearl; Mox Ruby; Plains; Serra Paragon
+Bot1.Graveyard = Faithless Looting; Dryad Arbor; Black Lotus

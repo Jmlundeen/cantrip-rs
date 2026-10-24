@@ -1,0 +1,41 @@
+# Hellcat, Undying Vigilante under Grafdigger's Cage: "When Hellcat dies, return her to the battlefield ... She loses all
+# abilities and gains haste." Hellcat in the graveyard is a creature card, which the Cage keeps from entering (CR 101.2,
+# 101.3), so she stays there, with no +1/+1 counter, and "she" - the permanent returned - does not exist to lose
+# abilities or gain haste. (The card in the graveyard has no ability that functions there, so the dump can't show an
+# effect wrongly given to it; this runs the card's guard for that case.) Bot2 kills the 2/2 Hellcat with Lightning Bolt.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Pearl
+Grafdigger's Cage
+Hellcat, Undying Vigilante
+Forest x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grafdigger's Cage.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hellcat, Undying Vigilante.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Hellcat, Undying Vigilante)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Graveyard = Hellcat, Undying Vigilante
+Bot1.Graveyard.Hellcat, Undying Vigilante.Power = 2
+Bot1.Battlefield = Grafdigger's Cage; Mox Emerald; Mox Emerald; Mox Pearl
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,43 @@
+# Grafdigger's Cage and Crucible of Worlds: playing a land is putting it onto the battlefield (CR 305.1), so a land card
+# a static ability keeps from entering can't be played (CR 101.2). Bot1 casts the Cage and the Crucible on turn 1, then
+# Faithless Looting, discarding Dryad Arbor and Plains. Dryad Arbor is a creature card in the graveyard, so it can't be
+# played from there; Plains, no creature card, is played from the graveyard: the land play the Cage leaves alone (the
+# Cage's ruling).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Grafdigger's Cage
+Crucible of Worlds
+Faithless Looting
+Swamp
+Dryad Arbor
+Plains
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grafdigger's Cage.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crucible of Worlds.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Dryad Arbor; Plains)
+? Bot1.Graveyard = Faithless Looting; Plains; Dryad Arbor; Black Lotus
+! Bot1.Graveyard.Dryad Arbor.Play
+Bot1.Graveyard.Plains.Play
+
+[Expect]
+Turn = 1
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Crucible of Worlds; Grafdigger's Cage; Mox Jet; Mox Ruby; Plains
+Bot1.Graveyard = Faithless Looting; Dryad Arbor; Black Lotus

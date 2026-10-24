@@ -1,0 +1,45 @@
+# Grafdigger's Cage: "Players can't cast spells from ... libraries" (CR 101.2, 601.3). Bot1 casts the Cage and Bolas's
+# Citadel on turn 1: Lightning Bolt on top of its library can't be cast for life, though the Citadel allows it. Playing a
+# land is not casting a spell (CR 305.1, the Cage's ruling), and a land card is no creature card: on turn 3, with the Bolt
+# drawn, Bot1 plays Tundra from the top of its library.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Grafdigger's Cage
+Bolas's Citadel
+Lightning Bolt
+Tundra
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grafdigger's Cage.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Pass
+! Bot1.Library.Lightning Bolt.Cast
+[T3 Bot1.Main1]
+Bot1.Library.Tundra.Play
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Hand = Lightning Bolt
+Bot1.Battlefield = Bolas's Citadel; Grafdigger's Cage; Mox Jet; Mox Pearl; Mox Ruby; Sol Ring; Tundra

@@ -1,0 +1,54 @@
+# Grafdigger's Cage: "Creature cards in ... libraries can't enter the battlefield" (CR 101.2, 101.3). On turn 1 Bot1
+# casts the Cage, then Collected Company, choosing Llanowar Elves from the top six: it can't be put onto the battlefield,
+# so it stays in the library and goes to the bottom with the rest (the "rest" are the cards not put onto the battlefield).
+# On turn 3 Fabled Passage finds a Forest, a noncreature card in the library, which enters tapped: the control.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Mox Jet
+Grafdigger's Cage
+Collected Company
+Fabled Passage
+Llanowar Elves
+Island
+Island
+Island
+Island
+Island
+Plains
+Forest
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grafdigger's Cage.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Collected Company.Cast
+Bot1.Pass
+Bot1.Choose(Llanowar Elves)
+Bot1.Arrange(Island; Island; Island; Island; Island; Llanowar Elves)
+Bot1.Pass
+? Bot1.Battlefield = Forest; Grafdigger's Cage; Mox Jet; Mox Pearl
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Forest; Forest; Grafdigger's Cage; Mox Jet; Mox Pearl
+Bot1.Battlefield.Forest#2.Tapped = true
+Bot1.Library.Llanowar Elves.Power = 1
+Bot1.Graveyard = Fabled Passage; Collected Company; Black Lotus
