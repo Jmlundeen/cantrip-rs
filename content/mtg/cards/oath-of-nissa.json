@@ -1,0 +1,6 @@
+{
+  "name": "Oath of Nissa",
+  "manaCost": "{G}",
+  "type": "Legendary Enchantment",
+  "oracleText": "When Oath of Nissa enters, look at the top three cards of your library. You may reveal a creature, land, or planeswalker card from among them and put it into your hand. Put the rest on the bottom of your library in any order.\nYou may spend mana as though it were mana of any color to cast planeswalker spells."
+}

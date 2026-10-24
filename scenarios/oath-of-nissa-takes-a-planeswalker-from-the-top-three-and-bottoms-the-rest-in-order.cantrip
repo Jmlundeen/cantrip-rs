@@ -1,0 +1,33 @@
+# Oath of Nissa entering: the top three are Lightning Bolt, Jace, the Mind Sculptor and Guerrilla Gorilla; Llanowar Elves, a
+# creature card that would qualify, is the fourth and is not looked at. Bot1 reveals and takes the planeswalker card, one
+# card at most ("a ... card"), and bottoms Lightning Bolt then Guerrilla Gorilla, the Gorilla lowest: "in any order" (CR
+# 401.4). Lightning Bolt, a card that is no creature, land or planeswalker, cannot be taken.
+
+[Bot1 Deck]
+Forest
+Oath of Nissa
+Plains x5
+Lightning Bolt
+Jace, the Mind Sculptor
+Guerrilla Gorilla
+Llanowar Elves
+Plains x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Oath of Nissa.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Arrange(Lightning Bolt | Jace, the Mind Sculptor; Guerrilla Gorilla)
+! Bot1.Arrange(Jace, the Mind Sculptor; Guerrilla Gorilla | Lightning Bolt)
+Bot1.Arrange(Jace, the Mind Sculptor | Lightning Bolt; Guerrilla Gorilla)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Jace, the Mind Sculptor; Plains; Plains; Plains; Plains; Plains
+Bot1.Library = Llanowar Elves; Plains; Plains; Plains; Plains; Lightning Bolt; Guerrilla Gorilla
+Bot1.Revealed = Jace, the Mind Sculptor

@@ -1,0 +1,57 @@
+# Oath of Nissa: "You may spend mana as though it were mana of any color to cast planeswalker spells" (CR 609.4b) - to cast
+# them, nothing else. Its trigger takes a Forest, a land card, from the top three. Turn 3, Guerrilla Gorilla attacks
+# unblocked and Bot1 has four mana untapped, green, white and red (Forest, Mox Emerald, Mox Pearl, Mox Ruby): Kaito, Bane
+# of Nightmares's ninjutsu {1}{U}{B} is an activated ability of a planeswalker card, not the casting of a spell (CR
+# 702.49a, 602.1), so that mana cannot pay it and it is not offered. In the second main phase the same four mana cast
+# Kaito ({2}{U}{B}), his {U} and {B} paid with green, white or red.
+
+[Bot1 Deck]
+Forest
+Oath of Nissa
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Guerrilla Gorilla
+Kaito, Bane of Nightmares
+Forest x3
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Oath of Nissa.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Arrange(Forest | Forest; Forest)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Guerrilla Gorilla)
+[T3 Bot1.Blockers]
+! Bot1.Hand.Kaito, Bane of Nightmares.Activate(Ability: Ninjutsu)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Mana =
+Bot1.Hand = Forest; Plains
+Bot1.Battlefield.Kaito, Bane of Nightmares.Counters.Loyalty = 4

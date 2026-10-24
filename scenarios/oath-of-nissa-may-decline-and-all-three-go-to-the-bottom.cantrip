@@ -1,0 +1,28 @@
+# Oath of Nissa: "You may reveal": Bot1 declines the Island, a land card among the top three, so its hand gains nothing
+# and all three go to the bottom in the order chosen (CR 401.4), Brainstorm lowest; the Mountains that were below
+# them are now on top.
+
+[Bot1 Deck]
+Forest
+Oath of Nissa
+Plains x5
+Island
+Lightning Bolt
+Brainstorm
+Mountain x3
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Oath of Nissa.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Arrange( | Lightning Bolt; Island; Brainstorm)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains
+Bot1.Library = Mountain; Mountain; Mountain; Lightning Bolt; Island; Brainstorm

@@ -1,0 +1,70 @@
+# Oath of Nissa: "You may spend mana as though it were mana of any color to cast planeswalker spells" (CR 609.4b). Its
+# trigger takes Guerrilla Gorilla, a creature card, from the top three. Turn 3, Bot1's only mana is green (Forests, Mox
+# Emerald) and white (Mox Pearl): it cannot cast Brainstorm ({U}), no planeswalker, though it has mana enough, but Jace, the
+# Mind Sculptor ({2}{U}{U}) is offered and paid with that same mana, all four of it. Bot2, with four mana of other colors
+# (Forest and three Moxen), cannot cast its own Jace, the Mind Sculptor: the permission is its controller's alone.
+
+[Bot1 Deck]
+Forest
+Forest
+Oath of Nissa
+Mox Emerald
+Mox Pearl
+Jace, the Mind Sculptor
+Brainstorm
+Guerrilla Gorilla
+Forest x2
+Plains x10
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Jace, the Mind Sculptor
+Forest
+Island x2
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Oath of Nissa.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Arrange(Guerrilla Gorilla | Forest; Forest)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Forest.Activate
+! Bot2.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{G}{G}{G}
+! Bot1.Hand.Brainstorm.Cast
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Mana =
+Bot2.Hand = Jace, the Mind Sculptor; Island; Island; Island
+Bot1.Hand = Brainstorm; Guerrilla Gorilla; Plains
