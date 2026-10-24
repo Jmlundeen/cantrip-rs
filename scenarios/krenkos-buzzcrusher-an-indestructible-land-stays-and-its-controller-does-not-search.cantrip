@@ -1,0 +1,44 @@
+# Krenko's Buzzcrusher: "For each land destroyed this way". Bot1 chooses its Tundra and Bot2's indestructible Darksteel
+# Citadel. The Citadel is not destroyed, so Bot2 is never offered a search (the refusal comes right after Bot1's own
+# search question, where Bot2's offer would be); Bot1, whose Tundra was destroyed, is offered one and declines it.
+
+[Bot1 Deck]
+Tundra
+Mox Ruby x4
+Krenko's Buzzcrusher
+Island
+Island x4
+Mountain
+Island x10
+
+[Bot2 Deck]
+Darksteel Citadel
+Island x9
+Forest
+Island x10
+
+[Actions]
+Bot1.Hand.Tundra.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Darksteel Citadel.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Krenko's Buzzcrusher.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Choose(Tundra)
+Bot1.Choose(Darksteel Citadel)
+Bot1.Decline
+! Bot2.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Tundra
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Darksteel Citadel
+Bot2.Library.Forest.Colors.Count = 0

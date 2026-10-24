@@ -1,0 +1,43 @@
+# Krenko's Buzzcrusher: "up to one" may be none, and "may search" may be declined. Bot1 has a nonbasic Tundra and chooses
+# to destroy none of its own (it stays, and Bot1 is never offered a search); it destroys Bot2's Bazaar of Baghdad, and Bot2
+# declines the search: no basic land enters and the Forest stays in its library.
+
+[Bot1 Deck]
+Tundra
+Mox Ruby x4
+Krenko's Buzzcrusher
+Island
+Island x10
+
+[Bot2 Deck]
+Bazaar of Baghdad
+Island x6
+Island x3
+Forest
+Island x10
+
+[Actions]
+Bot1.Hand.Tundra.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Bazaar of Baghdad.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Krenko's Buzzcrusher.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Choose()
+Bot1.Choose(Bazaar of Baghdad)
+Bot2.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Krenko's Buzzcrusher; Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby; Tundra
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Bazaar of Baghdad
+Bot2.Battlefield.Count = 0
+Bot2.Library.Forest.Colors.Count = 0

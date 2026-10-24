@@ -1,0 +1,50 @@
+# Krenko's Buzzcrusher has flying and trample. It enters with no nonbasic land in play (nothing is asked). On Bot1's next
+# turn Bot2's Woodland Changeling cannot block it (flying), and Bot2's 1/1 flying Healer's Hawk can: the Buzzcrusher assigns 1
+# damage to the Hawk and tramples the other 3 over to Bot2 (20 - 3 = 17, +1 for the Hawk's lifelink damage = 18).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby x4
+Krenko's Buzzcrusher
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Woodland Changeling
+Healer's Hawk
+Island x2
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Krenko's Buzzcrusher.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Krenko's Buzzcrusher > Bot2)
+! Bot2.Block(Woodland Changeling > Krenko's Buzzcrusher)
+Bot2.Block(Healer's Hawk > Krenko's Buzzcrusher)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Healer's Hawk
+Bot1.Battlefield.Krenko's Buzzcrusher.Damage = 1

@@ -1,0 +1,58 @@
+# Krenko's Buzzcrusher: "for each player, destroy up to one nonbasic land that player controls. For each land destroyed this
+# way, its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle."
+# Bot1 (who chooses for both) controls two nonbasic lands and a basic one and destroys only one of them ("up to one"), the
+# Tundra; Bot2's Island is refused (basic) and its Bazaar of Baghdad destroyed. Each controller searches for a basic land
+# (Bot1's Mountain, Bot2's Forest - the Tundra in Bot1's library is not a basic land card) and each enters tapped.
+
+[Bot1 Deck]
+Tundra
+Bazaar of Baghdad
+Mox Ruby x4
+Krenko's Buzzcrusher
+Island x4
+Tundra
+Mountain
+Island x10
+
+[Bot2 Deck]
+Bazaar of Baghdad
+Island
+Island x16
+Forest
+Island x2
+
+[Actions]
+Bot1.Hand.Tundra.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bazaar of Baghdad.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Bazaar of Baghdad.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Krenko's Buzzcrusher.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+! Bot1.Choose(Bot1.Battlefield.Tundra; Bot1.Battlefield.Bazaar of Baghdad)
+Bot1.Choose(Bot1.Battlefield.Tundra)
+! Bot1.Choose(Bot2.Battlefield.Island)
+Bot1.Choose(Bot2.Battlefield.Bazaar of Baghdad)
+Bot1.Accept
+! Bot1.Search(Tundra)
+Bot1.Search(Mountain)
+Bot2.Accept
+Bot2.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Tundra
+Bot1.Battlefield = Bazaar of Baghdad; Krenko's Buzzcrusher; Mountain; Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby
+Bot1.Battlefield.Mountain.Tapped = true
+Bot2.Graveyard = Bazaar of Baghdad
+Bot2.Battlefield = Forest; Island
+Bot2.Battlefield.Forest.Tapped = true
