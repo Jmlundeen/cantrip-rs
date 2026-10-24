@@ -1,0 +1,34 @@
+# Adarkar Wastes prints two mana abilities (CR 605.1a): "{T}: Add {C}." costs nothing, while "{T}: Add {W} or {U}.
+# This land deals 1 damage to you." deals the damage as it resolves (a mana ability has no stack, CR 605.3b) and names its
+# color as it resolves. Bot1 taps it for {C} on turn 3 and stays at 20, for {W} on turn 5 and for {U} on
+# turn 7, one damage each. The colored ability refuses red (the {W} activation is the positive control), and the
+# colorless ability takes no color at all.
+
+[Bot1 Deck]
+Adarkar Wastes
+Plains x15
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Adarkar Wastes.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Adarkar Wastes.Activate(Ability: {W} or {U}; Color: Red)
+! Bot1.Battlefield.Adarkar Wastes.Activate(Ability: {C}; Color: White)
+Bot1.Battlefield.Adarkar Wastes.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Adarkar Wastes.Activate(Ability: {W} or {U}; Color: White)
+? Bot1.Mana = {W}
+? Bot1.Life = 19
+[T7 Bot1.Main1]
+Bot1.Battlefield.Adarkar Wastes.Activate(Ability: {W} or {U}; Color: Blue)
+? Bot1.Mana = {U}
+? Bot1.Life = 18
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Adarkar Wastes.Tapped = true
+Bot1.Life = 18
