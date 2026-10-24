@@ -1,0 +1,48 @@
+# Surge of Salvation on Bot1's own turn 3: Bot1 and its Ornithopter are hexproof, so Bot2's Lightning Bolt cannot target either
+# (refusals). On Bot2's turn 4 both effects are over (CR 514.2): Embereth Shieldbreaker (red) attacks into the Ornithopter and kills
+# it, and Bolt now targets Bot1 (20 - 3).
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Surge of Salvation
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mountain
+Embereth Shieldbreaker
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Surge of Salvation.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Embereth Shieldbreaker > Bot1)
+Bot1.Block(Ornithopter > Embereth Shieldbreaker)
+[T4 Bot2.Main2]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+[T4 Bot2.End]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Ornithopter; Surge of Salvation

@@ -1,0 +1,6 @@
+{
+  "name": "Surge of Salvation",
+  "manaCost": "{W}",
+  "type": "Instant",
+  "oracleText": "You and permanents you control gain hexproof until end of turn. Prevent all damage that black and/or red sources would deal to creatures you control this turn."
+}

@@ -1,0 +1,55 @@
+# Surge of Salvation prevents damage to creatures you control only (CR 615.1): after Bot1 casts it, Bot2's unblocked red Samut deals
+# its 2 to Bot1, and a red Embereth Shieldbreaker, hasty under Samut, deals its 2 to Bot1's Liliana of the Veil (a planeswalker, not
+# a creature). Bot1 has no creature to protect. Liliana is 4 (3, +1) before the damage and 2 after.
+
+[Bot1 Deck]
+Plains
+Plains
+Surge of Salvation
+Black Lotus
+Liliana of the Veil
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mountain
+Samut, Hazoret's Champion
+Embereth Shieldbreaker
+Mountain
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player discards)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Samut, Hazoret's Champion.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Samut, Hazoret's Champion > Bot1; Embereth Shieldbreaker > Liliana of the Veil)
+[T4 Bot2.DeclareBlockers]
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Surge of Salvation.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 2

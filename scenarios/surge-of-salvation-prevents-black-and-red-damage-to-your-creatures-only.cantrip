@@ -1,0 +1,66 @@
+# Surge of Salvation: black and red sources' damage to Bot1's creatures is prevented (CR 615.1); a green source's is not, and
+# damage Bot2's own red Lightning Bolt deals to Bot2's own creature is not either ("creatures you control"). Bot2 attacks with
+# Embereth Shieldbreaker (red), Vampire Hexmage (black) and Elvish Spirit Guide (green), each blocked by a 0/2 Ornithopter, and
+# Bot1 casts Surge. The Ornithopters that blocked the red and black attackers live (2 damage prevented each); the one that
+# blocked the green Spirit Guide dies. Then Bolt kills the Spirit Guide.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Ornithopter
+Ornithopter
+Surge of Salvation
+Plains
+Plains
+Plains x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mountain
+Embereth Shieldbreaker
+Vampire Hexmage
+Elvish Spirit Guide
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Vampire Hexmage.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Elvish Spirit Guide.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Embereth Shieldbreaker > Bot1; Vampire Hexmage > Bot1; Elvish Spirit Guide > Bot1)
+Bot1.Block(Ornithopter > Embereth Shieldbreaker; Ornithopter#2 > Vampire Hexmage; Ornithopter#3 > Elvish Spirit Guide)
+[T4 Bot2.DeclareBlockers]
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Surge of Salvation.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Spirit Guide)
+Bot1.Pass
+[T4 Bot2.End]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Plains; Ornithopter; Ornithopter
+Bot2.Graveyard = Elvish Spirit Guide; Lightning Bolt; Black Lotus

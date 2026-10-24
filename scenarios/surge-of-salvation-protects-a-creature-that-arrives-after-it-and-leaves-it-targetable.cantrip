@@ -1,0 +1,35 @@
+# Surge of Salvation, ruling 2023-04-14: hexproof goes only to the permanents there as it resolves, but the damage prevention
+# covers every creature Bot1 controls this turn (CR 615.1). Bot1 resolves Surge on turn 3, then casts Ornithopter. Bot2 can still
+# target that Ornithopter (no hexproof: the Bolt is cast), and the Bolt's red damage is prevented, so it lives undamaged.
+
+[Bot1 Deck]
+Plains
+Surge of Salvation
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Surge of Salvation.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot2.Graveyard = Lightning Bolt

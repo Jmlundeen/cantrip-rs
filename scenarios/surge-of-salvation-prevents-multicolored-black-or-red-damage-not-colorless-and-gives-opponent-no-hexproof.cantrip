@@ -1,0 +1,61 @@
+# Surge of Salvation: "black and/or red sources" is any source that is black or red, whatever else it is (CR 105.2), and no
+# colorless source. Bot2 attacks with Witherbloom Apprentice (black-green) and Afterthought Sentry (colorless), each blocked by a
+# 0/2 Ornithopter; Bot1 casts Surge. The Ornithopter blocking the black-green source lives; the one blocking the colorless
+# Sentry dies. "Permanents you control" are Bot1's only: afterwards Bot1's Lightning Bolt targets Bot2's Sentry and kills it.
+# Bot1's Mox Ruby, Lightning Bolt and Plains pay for them.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Ornithopter
+Mox Ruby
+Surge of Salvation
+Lightning Bolt
+Plains
+Plains x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mountain
+Witherbloom Apprentice
+Afterthought Sentry
+Mountain
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Witherbloom Apprentice.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Afterthought Sentry.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Witherbloom Apprentice > Bot1; Afterthought Sentry > Bot1)
+Bot1.Block(Ornithopter > Witherbloom Apprentice; Ornithopter#2 > Afterthought Sentry)
+[T4 Bot2.DeclareBlockers]
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Surge of Salvation.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.CombatDamage]
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Afterthought Sentry)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Ruby; Ornithopter
+Bot2.Battlefield = Mox Jet; Mox Emerald; Mox Ruby; Mountain; Witherbloom Apprentice
