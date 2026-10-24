@@ -1,0 +1,42 @@
+# CR 304.4: an instant can't enter the battlefield; if one would, it stays in its previous zone. Cryptic Coat cloaks the
+# top card of Bot1's library, Lightning Bolt: a face-down 2/2 creature may be an instant card (CR 701.58a). Ephemerate
+# exiles that creature and returns the card to the battlefield - face up, as the instant it is - so it can't enter and
+# stays in exile. The Coat, attached to nothing, stays on the battlefield; Ephemerate is exiled by its rebound.
+#
+# Black Lotus pays the Coat; the Plains pays Ephemerate. Bot1 skips its turn-1 draw, so Lightning Bolt, the eighth
+# card, is the top of the library when the Coat enters.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Plains
+Ephemerate
+Plains
+Plains
+Plains
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield..FaceDownName = Lightning Bolt
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.#1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Ephemerate; Lightning Bolt
+Bot1.Battlefield = Cryptic Coat; Plains
+Bot1.Graveyard = Black Lotus

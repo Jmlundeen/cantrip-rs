@@ -1,0 +1,58 @@
+# CR 307.4, 712.14: a sorcery can't enter the battlefield; if one would, it stays in its previous zone. Esper Origins,
+# flashed back on turn 3, exiles itself and enters transformed as Summon: Esper Maduin, its creature back face (CR 712.14a:
+# put there transformed, it is judged as that face, so it enters). Ephemerate then exiles the Maduin and returns the card:
+# a double-faced card put onto the battlefield enters front face up (CR 712.14), and that face, Esper Origins, is a
+# sorcery, so it stays in exile, with Ephemerate (exiled by its rebound).
+#
+# Turn 1: Forest, Mox Emerald, Mox Jet, Mox Pearl; Esper Origins from the hand (surveil: Forest kept, Lightning Bolt
+# binned). Turn 3: the flashback ({3}{G}: two Forests, Emerald and Jet; surveil keeps Llanowar Elves and Island on top),
+# chapter I puts the Elves into the hand, then Ephemerate on the Maduin with Mox Pearl.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Esper Origins
+Mox Pearl
+Ephemerate
+Forest
+Forest
+Lightning Bolt
+Llanowar Elves
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Arrange(Llanowar Elves; Island |)
+Bot1.Pass
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Summon: Esper Maduin)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Ephemerate; Esper Origins
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet; Mox Pearl
+Bot1.Hand = Forest; Llanowar Elves

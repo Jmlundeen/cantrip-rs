@@ -58,6 +58,8 @@ mod entering_judged_tests;
 #[cfg(test)]
 mod enter_rules_tests;
 #[cfg(test)]
+mod instant_sorcery_entering_tests;
+#[cfg(test)]
 mod enters_as_tests;
 #[cfg(test)]
 mod land_text_tests;

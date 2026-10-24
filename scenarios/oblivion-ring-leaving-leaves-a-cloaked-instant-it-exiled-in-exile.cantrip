@@ -1,0 +1,60 @@
+# CR 304.4: an instant can't enter the battlefield; if one would, it stays in its previous zone. Cryptic Coat cloaks the
+# top card of Bot1's library, Lightning Bolt, as a face-down 2/2 creature (CR 701.58a). Oblivion Ring exiles it; when the
+# Ring leaves, the exiled card would return to the battlefield (CR 610.3) - face up, as the instant it is - so it stays in
+# exile, while the Coat, attached to nothing, stays on the battlefield.
+#
+# Turn 1: Plains, Sol Ring, Black Lotus for the Coat. Turn 3: Forest, Oblivion Ring (Plains and Sol Ring) on the face-down
+# Bolt, not the Coat. Turn 5: Krosan Grip (Forest and Sol Ring) destroys the Ring.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Plains
+Sol Ring
+Oblivion Ring
+Plains
+Plains
+Lightning Bolt
+Forest
+Krosan Grip
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield..FaceDownName = Lightning Bolt
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Oblivion Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.#1)
+[T3 Bot1.Main2]
+? Exile = Lightning Bolt
+? Bot1.Battlefield = Cryptic Coat; Forest; Oblivion Ring; Plains; Sol Ring
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Krosan Grip.Cast(Oblivion Ring)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Lightning Bolt
+Bot1.Battlefield = Cryptic Coat; Forest; Plains; Sol Ring
+Bot1.Graveyard.Count = 3
+Bot1.Graveyard.Oblivion Ring.Colors = White

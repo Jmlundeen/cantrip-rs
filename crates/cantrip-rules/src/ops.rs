@@ -1046,6 +1046,27 @@ pub fn put_onto_battlefield_along(
     Ok(move_together(cx, &moves, reason))
 }
 
+/// Whether `id` would enter the battlefield as an instant or sorcery card, which can't (CR 304.4, 307.4, 110.4, 400.4a): if
+/// one would, it stays in the zone it is in instead. Judged by the face it would enter with - its back face if it enters
+/// transformed (CR 712.14a: Esper Origins puts itself there as its Saga back face), its front face otherwise, so a modal
+/// double-faced card put onto the battlefield whose front face is an instant or sorcery stays where it is (CR 712.14b) while
+/// one played as its land back face enters (CR 712.12) - and a card turned face down to be manifested or cloaked as the
+/// face-down creature it then is (CR 701.40a, 701.58a: an instant card may be manifested; turned face up it stays face
+/// down, CR 701.40g). The card's own face, not what a copy or type-setting effect would make it as it enters: the example
+/// of CR 712.13a, a sorcery face entering as a copy of a creature, still can't.
+pub(crate) fn instant_or_sorcery_entering(cx: &Cx, id: ObjectId, transformed: bool) -> bool {
+    let obj = cx.s().obj(id);
+    if obj.copy.is_some_and(|c| cx.card(c.card).face_down) {
+        return false;
+    }
+    instant_or_sorcery(cx.card(cx.cards().face(obj.card, transformed)))
+}
+
+/// An instant or sorcery card face (CR 304, 307), which no permanent can be (CR 110.4).
+fn instant_or_sorcery(def: &CardDef) -> bool {
+    def.types.has(CardType::Instant) || def.types.has(CardType::Sorcery)
+}
+
 /// Each of `objects` prepared to enter (`prepare_entry`) and added to `moves`.
 fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, PlayerId, bool)], with: &[(CounterKind, i16)]) -> R<()> {
     let bans = crate::static_rules::enter_bans(cx);
@@ -1057,12 +1078,17 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
         }
         // A card a static ability keeps from entering stays where it is (CR 101.2, 101.3): nothing of its entering is asked
         // or applied, as no entering happens.
-        if !bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id) {
+        // Nor does an instant or sorcery card (CR 304.4, 307.4).
+        if (!bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id)) || instant_or_sorcery_entering(cx, id, false) {
             continue;
         }
         let mut entering =
             Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None };
         prepare_entry(cx, &mut entering)?;
+        // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
+        if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
+            continue;
+        }
         moves.push(Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) });
     }
     Ok(())
@@ -1099,8 +1125,8 @@ pub fn put_onto_battlefield_as(
     if transformed && cx.cards().backs[cx.s().obj(id).card.0 as usize].is_none() {
         return Ok(id);
     }
-    // Nor does one a static ability keeps from entering (CR 101.2, 101.3).
-    if crate::static_rules::cant_enter(cx, id) {
+    // Nor does one a static ability keeps from entering (CR 101.2, 101.3), nor an instant or sorcery face (CR 304.4, 307.4).
+    if crate::static_rules::cant_enter(cx, id) || instant_or_sorcery_entering(cx, id, transformed) {
         return Ok(id);
     }
     let mut entering = Entering {
@@ -1123,6 +1149,10 @@ pub fn put_onto_battlefield_as(
         becomes: None,
     };
     prepare_entry(cx, &mut entering)?;
+    // Turned over by its own daybound as it would enter (CR 702.145b), it is judged as that face (CR 304.4, 307.4).
+    if entering.transformed && !transformed && instant_or_sorcery_entering(cx, id, true) {
+        return Ok(id);
+    }
     Ok(move_together(cx, &[Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }], reason)[0])
 }
 
@@ -1178,7 +1208,8 @@ fn enter_as(cx: &mut Cx, id: ObjectId, b: Becomes) {
 pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: PlayerId, becomes: Becomes) -> R<Option<ObjectId>> {
     // A card a static ability keeps from entering stays where it is (CR 101.2, 101.3), judged as the card it is there, not
     // as what the effect would make it (Grafdigger's Cage's ruling).
-    if !live(cx.s(), id) || crate::static_rules::cant_enter(cx, id) {
+    // Nor does an instant or sorcery card, whatever the effect says it is (CR 304.4, 307.4).
+    if !live(cx.s(), id) || crate::static_rules::cant_enter(cx, id) || instant_or_sorcery_entering(cx, id, false) {
         return Ok(None);
     }
     let mut entering = Entering {
@@ -1202,6 +1233,9 @@ pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: Play
         becomes: Some(becomes),
     };
     prepare_entry(cx, &mut entering)?;
+    if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
+        return Ok(None);
+    }
     let mut moves = vec![Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }];
     crate::attach::choose_aura_hosts(cx, &mut moves)?;
     if moves.is_empty() {
@@ -1485,6 +1519,12 @@ fn create_tokens_onto(
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
         let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: false, protector: None, instead: None, becomes: None };
         prepare_entry(cx, &mut entering)?;
+        // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
+        // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
+        let face = entering.copy.map_or_else(|| cx.cards().face(card, entering.transformed), |c| c.card);
+        if instant_or_sorcery(cx.card(face)) {
+            continue;
+        }
         // The token is judged as it would exist on the battlefield (CR 614.12): a token copy as what it copies.
         let copy = entering.copy;
         cx.st().update_obj(id, |o| o.copy = copy);

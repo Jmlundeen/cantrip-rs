@@ -502,7 +502,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     attach: if def.enchant.is_some() { item.target(0).object() } else { None },
                     attach_player: if def.enchant.is_some() { item.target(0).player() } else { None },
                     x: item.x,
-                    // Cast as its back face, it enters back face up (CR 712.8b).
+                    // Cast as its back face, or transformed, it enters with that face up (CR 712.8c, 712.8f, 712.13).
                     transformed: item.way == WAY_BACK_FACE || item.way == WAY_TRANSFORMED,
                     protector: None,
                     instead: None,
@@ -511,6 +511,15 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                 ops::prepare_entry(cx, &mut entering)?;
                 if let Some(at) = on_stack(cx) {
                     cx.st().stack_remove(at);
+                }
+                // CR 712.13a: one that would enter with an instant or sorcery face up - turned over as it enters, by its
+                // daybound at night (CR 702.145b) - doesn't enter, and is put into its owner's graveyard instead (CR 304.4,
+                // 307.4).
+                if ops::instant_or_sorcery_entering(cx, item.object, entering.transformed) {
+                    leave_stack(cx, &item, ZoneReason::Resolve);
+                    let card = cx.s().obj(item.object).card;
+                    cx.record(Event::Resolved { source: item.object, ability: AbilityRef::spell(card) });
+                    return Ok(Flow::Done);
                 }
                 ops::move_together(
                     cx,
