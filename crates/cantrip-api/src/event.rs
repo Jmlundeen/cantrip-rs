@@ -167,7 +167,7 @@ pub enum Event {
     /// A player rolled a die with `sides` sides (CR 706.2): the `natural` result, and the `result` once whatever modifies
     /// the roll has been applied (CR 706.4). Both are what the rolled number is, each for the questions that ask for it.
     DieRolled { player: PlayerId, sides: u8, natural: u8, result: i16 },
-    /// One of `count` things was chosen at random (CR 701.9c): the one at `index`. A scenario fixes it like a die of `count`
+    /// One of `count` things was chosen at random: the one at `index`. A scenario fixes it like a die of `count`
     /// sides (face `index + 1`).
     ChosenAtRandom { count: u32, index: u32 },
     /// An activated or triggered ability of this object finished resolving (CR 608.2m), or, with `AbilityRef::spell`, this

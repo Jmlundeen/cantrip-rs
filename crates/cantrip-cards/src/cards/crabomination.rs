@@ -4,7 +4,7 @@ use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::library::random_of;
 use cantrip_oracle as oracle;
 
-/// "A card at random from a zone": the card at a random place in it (CR 701.9c), nothing from an empty zone.
+/// "A card at random from a zone": the card at a random place in it, nothing from an empty zone.
 fn at_random(g: &mut dyn Game, zone: Zone) -> Option<ObjectId> {
     let cards: Vec<ObjectId> = g.state().zone(zone).to_vec();
     random_of(g, &cards)

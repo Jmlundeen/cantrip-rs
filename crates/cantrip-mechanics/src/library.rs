@@ -691,7 +691,7 @@ pub fn exile_top_play_while_you_control(g: &mut dyn Game, player: PlayerId, sour
     exile_top_may_play(g, player, 1, player, grant)
 }
 
-/// "[One] of `items` chosen at random" (CR 701.9c, 705): one is drawn from the game's own generator, so the same game picks
+/// "[One] of `items` chosen at random": one is drawn from the game's own generator, so the same game picks
 /// the same one; no draw is made when there is no choice. None from an empty list. Crabomination picks a card at random
 /// from a graveyard and a hand, Chaos Defiler one of the creatures chosen, Ursine Monstrosity an opponent and Tersa
 /// Lightshatter a card of her graveyard.

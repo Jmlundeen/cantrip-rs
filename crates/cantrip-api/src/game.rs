@@ -574,7 +574,7 @@ pub trait Game: Query {
     /// Marks a permanent to be exiled instead if it would leave the battlefield (CR 702.84a).
     fn exile_on_leave(&mut self, permanent: ObjectId);
     fn shuffle(&mut self, player: PlayerId);
-    /// A number below `bound`, from the game's own random source (CR 701.9c "at random"): journalled, so the same
+    /// A number below `bound`, from the game's own random source ("at random"): journalled, so the same
     /// game and answers give the same result.
     fn random(&mut self, bound: u32) -> u32;
     /// `player` rolls a die with this many sides (CR 706.2) and the roll is recorded as `Event::DieRolled`, which
@@ -584,7 +584,7 @@ pub trait Game: Query {
     }
     /// A roll whose result is modified (CR 706.4): `modifier` added to the natural result.
     fn roll_die_modified(&mut self, player: PlayerId, sides: u32, modifier: i32) -> Roll;
-    /// One of `count` things is chosen at random (CR 701.9c): its index, below `count`; recorded as
+    /// One of `count` things is chosen at random: its index, below `count`; recorded as
     /// `Event::ChosenAtRandom`. Nothing is drawn when there is no choice (`count` of 0 or 1 gives 0).
     fn choose_at_random(&mut self, count: usize) -> usize;
     /// `player` flips a coin (CR 705.1): true if they win the flip (CR 705.2). A flip is a two-sided die whose first face

@@ -14,7 +14,7 @@ fn red_instant_or_sorcery_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bo
 static FOUR_OR_MORE: Materials = craft::materials(4, true, red_instant_or_sorcery_card, "red instant and/or sorcery card");
 
 /// "Choose an exiled card used to craft this artifact at random. You may cast that card without paying its mana cost."
-/// (CR 701.9c, 702.167c, 608.2g) The card is chosen among those still in exile, its timing waived; the controller is asked
+/// (CR 702.167c, 608.2g) The card is chosen among those still in exile, its timing waived; the controller is asked
 /// whether to cast it, and nothing is asked when it could not be cast at all.
 fn cast_one_at_random(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let crafted = craft::exiled_cards_used_to_craft(g, item.object);
