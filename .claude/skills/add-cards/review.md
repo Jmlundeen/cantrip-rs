@@ -61,6 +61,9 @@ clamp, a floor, a fixed-size list that cuts down or drops, an approximation that
 left untested "until a card needs it". Each blocks. "Record it as a known issue" is never an answer to a rules finding.
 A suspected rules bug elsewhere is reported as a finding to be fixed, not filed away; a path no scenario can reach gets
 a Rust test with test-only cards. Only a human may allow a deviation, in `docs/rules-exceptions.md`.
+A rules finding needs a way to reach it: real cards legal in a constructed format, or cards the engine implements
+(`CLAUDE.md`, "Bug priority"). Name the cards that reach it; a case only an unprinted, illegal or unimplemented card
+could reach is not raised.
 
 Report briefly: PASS, or the blocking findings - each with file:line, what is wrong and the rule - then any
 non-blocking notes apart.

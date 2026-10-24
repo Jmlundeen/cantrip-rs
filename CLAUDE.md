@@ -42,7 +42,10 @@ abilities as it can hold is granted no more, a list that is full takes no more e
 different, wrong value.
 
 **Bug priority.** Pri-0 is a crash, a hang, a desync or a game that cannot go on. Pri-1 is any rules violation, however
-rare the interaction and whether or not a printed card reaches it today. Both are blockers: one found is fixed at once,
+rare the interaction, that can be reached in a game: with real cards legal in a constructed format, or with cards the
+engine already implements. A case only an unprinted, illegal or unimplemented card could reach is not a rules bug: it
+is not fixed, filed or raised in review, and becomes one the day a card that reaches it is added (that card's work
+fixes it). Both are blockers: one found is fixed at once,
 never filed away, and they are never allowed to accumulate. Other work does not stop for the fix: cards and pull
 requests that don't depend on it keep being built, reviewed and landed beside it, and the fix rebases over them before
 it lands; only work that needs the fix waits for it. Everything else - the client's display,

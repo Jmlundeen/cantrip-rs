@@ -18,7 +18,7 @@ beyond practical scale" with the limit, what happens past it, and why play canno
 | Priority | Meaning |
 | --- | --- |
 | Pri-0 | A crash, a hang, a desync between engine and client, or a game that cannot go on. A blocker. |
-| Pri-1 | Any rules violation, however rare and whether or not a printed card reaches it today. A blocker. |
+| Pri-1 | Any rules violation, however rare, that real cards legal in a constructed format, or cards the engine implements, can reach. A blocker. |
 | Pri-2 | A choice the client cannot offer or show, or a wrong display of a right game state. |
 | Pri-3 | Cosmetic, a harness or tooling gap, or a path no scenario runs yet. |
 
