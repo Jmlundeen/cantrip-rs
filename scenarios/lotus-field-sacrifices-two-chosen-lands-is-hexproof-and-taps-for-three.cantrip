@@ -1,0 +1,44 @@
+# Lotus Field enters tapped, and its trigger makes Bot1 sacrifice exactly two lands of their choice (CR 701.21a): with
+# Forest, Mountain and Island out, Bot1 gives up Forest and Island and keeps the Mountain and the Field. The Field has
+# hexproof (CR 702.11): Bot2's Wasteland is refused it, and allowed the other nonbasic land, Bot2's
+# own second Wasteland, as the control. Turn 9 the untapped Field taps for three mana of one color (CR 106.1): {R}{R}{R}
+# after the tap and nothing else, in the same step.
+
+[Bot1 Deck]
+Forest
+Mountain
+Island
+Lotus Field
+Island x14
+
+[Bot2 Deck]
+Wasteland
+Wasteland
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Lotus Field.Play
+Bot1.Choose(Forest; Island)
+? Bot1.Battlefield.Lotus Field.Tapped = true
+? Bot1.Battlefield.Count = 2
+[T8 Bot2.Main1]
+! Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot1.Battlefield.Lotus Field)
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot2.Battlefield.Wasteland#2)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Lotus Field.Activate(Color: R)
+? Bot1.Mana = {R}{R}{R}
+
+[Expect]
+Bot1.Battlefield = Lotus Field; Mountain
+Bot1.Graveyard = Island; Forest
+Bot2.Battlefield.Count = 0

@@ -1,0 +1,24 @@
+# Lotus Field's trigger with fewer than two other lands (the 2019-07-12 ruling): Bot1 controls Forest and the Field, so
+# both are sacrificed, the Field itself included (CR 701.21a: it is a land Bot1 controls), and Bot2's Island is not
+# touched. Nothing is asked: with no more lands than the count, all are taken.
+
+[Bot1 Deck]
+Forest
+Lotus Field
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Field.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Lotus Field; Forest
+Bot2.Battlefield.Count = 1
