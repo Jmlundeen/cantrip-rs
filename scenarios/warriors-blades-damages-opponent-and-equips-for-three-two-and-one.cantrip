@@ -1,0 +1,59 @@
+# The enters trigger deals three to the opponent and gains three life. Equip costs three, two, and one
+# for zero, one, and two +1/+1 counters on its target, paid with exact pools (CR 603.6a, 601.2f, 702.6a).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Sol Ring
+Warrior's Blades
+Ornithopter
+Walking Ballista
+Island x20
+[Bot2 Deck]
+Island x25
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Warrior's Blades.Cast
+Bot1.Target(Bot2)
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Main1]
+? Bot1.Life = 23
+? Bot2.Life = 17
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Warrior's Blades.Activate(Ornithopter)
+? Bot1.Mana =
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Warrior's Blades.Activate(Walking Ballista)
+? Bot1.Mana =
+[Bot1.Main2]
+? Bot1.Battlefield.Walking Ballista.Power = 3
+? Bot1.Battlefield.Walking Ballista.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Walking Ballista.Activate(Ability: Put)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Warrior's Blades.Activate(Walking Ballista)
+? Bot1.Mana = {C}
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Warrior's Blades.AttachedTo = Walking Ballista
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Walking Ballista.Power = 4
+Bot1.Battlefield.Walking Ballista.Toughness = 3
