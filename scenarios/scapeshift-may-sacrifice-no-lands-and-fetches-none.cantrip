@@ -1,0 +1,35 @@
+# Scapeshift: "any number" includes none (CR 608.2d), and then "up to that many" is up to zero land cards: nothing is found
+# even though the library holds a Plains (the search is for zero cards, CR 701.23b), and nothing is sacrificed. Bot1 pays with
+# a Black Lotus and a Forest, keeps the Forest on the battlefield and chooses no land. The Plains stays in the library.
+
+[Bot1 Deck]
+Forest
+Forest
+Black Lotus
+Scapeshift
+Island x3
+Island
+Plains
+Island x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Scapeshift.Cast
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest
+Bot1.Graveyard = Scapeshift; Black Lotus
+Bot1.Library.Count = 11

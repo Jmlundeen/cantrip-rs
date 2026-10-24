@@ -1,0 +1,36 @@
+# Scapeshift: "that many" is the number sacrificed (CR 608.2c). Bot1 controls two Forests and sacrifices only one: the search
+# is for up to one land card, so finding two is refused, and Bot1 takes Tundra. The other Forest stays on the battlefield.
+
+[Bot1 Deck]
+Forest
+Forest
+Black Lotus
+Scapeshift
+Island x3
+Island
+Tundra
+Plains
+Island x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Scapeshift.Cast
+Bot1.Choose(Forest#1)
+! Bot1.Search(Tundra; Plains)
+Bot1.Search(Tundra)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Forest; Tundra
+Bot1.Battlefield.Tundra.Tapped = true
+Bot1.Graveyard = Scapeshift; Forest; Black Lotus

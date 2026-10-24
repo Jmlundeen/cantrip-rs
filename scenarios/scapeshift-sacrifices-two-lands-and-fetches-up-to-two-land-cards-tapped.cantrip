@@ -1,0 +1,57 @@
+# Scapeshift: lands are sacrificed as it resolves (not a cost), only lands you control, and the search is for up to that many
+# land cards, any land cards, entering tapped (CR 701.21a, 608.2c, 701.23b). Bot1 pays with three Moxen and a Forest, so on
+# resolution it controls two Forests and three (tapped) Moxen; Bot2 has a Mountain. A Mox may not be chosen
+# (only lands may be sacrificed), nor may Bot2's Mountain. Bot1 sacrifices both Forests and may find two of the three
+# land cards in its library, not three; it takes Tundra (a nonbasic) and Plains, tapped. Mox Pearl, in the library, is not a
+# land and is not offered. The Moxen stay.
+
+[Bot1 Deck]
+Forest
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Scapeshift
+Island
+Island
+Tundra
+Plains
+Mountain
+Mox Pearl
+Island x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Scapeshift.Cast
+! Bot1.Choose(Mox Emerald)
+! Bot1.Choose(Bot2.Battlefield.Mountain)
+Bot1.Choose(Forest#1; Forest#2)
+! Bot1.Search(Tundra; Plains; Mountain)
+! Bot1.Search(Mox Pearl)
+Bot1.Search(Tundra; Plains)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Plains; Tundra
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Battlefield.Tundra.Tapped = true
+Bot1.Graveyard = Scapeshift; Forest; Forest
+Bot2.Battlefield = Mountain
