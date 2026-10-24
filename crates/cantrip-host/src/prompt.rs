@@ -448,6 +448,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::Attach => V::Attach,
         Purpose::Encode => V::Encode,
         Purpose::Behold => V::Behold,
+        Purpose::ChooseAsEnters => V::ChooseAsEnters,
         Purpose::Blight => V::Blight,
         Purpose::TapToReduce => V::TapToReduce,
         Purpose::Reveal => V::Reveal,

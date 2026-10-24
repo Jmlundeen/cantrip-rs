@@ -347,6 +347,12 @@ public enum CardChoicePurposeView
     /// choosing one, the source gets +X/+0 until end of turn, X that creature's power.
     /// </summary>
     Enlist = 35,
+
+    /// <summary>
+    /// A permanent chosen as the source enters, which the source's text then refers to as "the chosen [<c>Kind</c>]" (CR 614.12a,
+    /// 607.2d): Dauntless Bodyguard's "another creature you control". Chosen, not targeted; nothing happens to it now.
+    /// </summary>
+    ChooseAsEnters = 36,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

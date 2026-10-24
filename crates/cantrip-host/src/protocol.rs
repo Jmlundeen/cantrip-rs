@@ -277,6 +277,9 @@ pub enum CardChoicePurposeView {
     /// controller controls that isn't attacking. Choosing none pays nothing; choosing one, `Source` gets +X/+0 until end of turn,
     /// X that creature's power.
     Enlist,
+    /// A permanent chosen as `Source` enters, which its text then refers to as "the chosen [`Kind`]" (CR 614.12a, 607.2d):
+    /// Dauntless Bodyguard's "another creature you control". Chosen, not targeted; nothing happens to it now.
+    ChooseAsEnters,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -595,6 +598,8 @@ pub struct SpellTargetView {
 pub struct ChoiceView {
     pub key: String,
     pub value: String,
+    /// The permanent chosen, for a choice of one (`creature`, `permanent`): what the client points at. None otherwise.
+    pub object: ViewHandle,
 }
 
 /// A kind of counter and how many of it. The name is the card's, lower case: `+1/+1`, `stun`, `lore`.

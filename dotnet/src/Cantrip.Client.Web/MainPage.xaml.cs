@@ -291,6 +291,9 @@ public sealed partial class MainPage : Page
 
         _opponentHalf.Board.DamageStepped += OnShareStepped;
         _myHalf.Board.DamageStepped += OnShareStepped;
+        // A permanent under the pointer that chose another as it entered points at it (PaintTargetArrows).
+        _opponentHalf.Board.HoverChanged += () => PaintTargetArrows(_gameClient);
+        _myHalf.Board.HoverChanged += () => PaintTargetArrows(_gameClient);
         _handBoard.HoverChanged += () =>
         {
             if (_gameClient is { } client)
@@ -1962,6 +1965,8 @@ public sealed partial class MainPage : Page
     /// Arrows from one spell on the stack to what it is aimed at: the one under the pointer
     /// in the stack window, or else the top of the stack, since what resolves next is what a player wants to know about
     /// before they think to ask. Targets no longer legal are left out; the spell will do nothing to them (CR 608.2b).
+    /// A permanent under the pointer on the battlefield that chose another as it entered (CR 614.12a, 607.2d) points at the
+    /// one it chose instead, the arrow labelled with what its text calls it: "Chosen creature".
     /// </summary>
     private void PaintTargetArrows(GameClient? client)
     {
@@ -1973,6 +1978,11 @@ public sealed partial class MainPage : Page
         spell ??= stack.Count > 0 && stack[^1].Targets.Count > 0 ? stack[^1] : null;
 
         _arrowLabels.Children.Clear();
+        if (PaintChosenArrows())
+        {
+            return;
+        }
+
         if (client is null || spell is null || _stackCollapsed || BoundsOn(_stackBoard, spell.Handle) is not { } source)
         {
             _arrows.Show([]);
@@ -2000,6 +2010,39 @@ public sealed partial class MainPage : Page
     }
 
     private readonly Canvas _arrowLabels = new() { IsHitTestVisible = false };
+
+    /// <summary>
+    /// Arrows from the battlefield permanent under the pointer to each permanent it chose as it entered (a choice with an
+    /// object, <see cref="ChoiceView.Object"/>), if it has any: whether any were drawn.
+    /// </summary>
+    private bool PaintChosenArrows()
+    {
+        foreach (CardBoardElement board in (CardBoardElement[])[_opponentHalf.Board, _myHalf.Board])
+        {
+            if (board.Hovered is not { } hovered || board.CardOf(hovered) is not { } card
+                || !card.Choices.Exists(choice => choice.Object != ViewHandle.None) || BoundsOn(board, hovered) is not { } source)
+            {
+                continue;
+            }
+
+            var from = new SkiaSharp.SKPoint(source.MidX, source.MidY);
+            List<(SkiaSharp.SKPoint From, SkiaSharp.SKPoint To)> arrows = [];
+            foreach (ChoiceView choice in card.Choices)
+            {
+                if (choice.Object != ViewHandle.None && CardBounds(choice.Object) is { } box)
+                {
+                    SkiaSharp.SKPoint to = TargetArrowsElement.Edge(box, from);
+                    arrows.Add((from, to));
+                    LabelArrow(Cantrip.Core.ObjectChoice.Label(choice.Key), TargetArrowsElement.LabelAt(from, to));
+                }
+            }
+
+            _arrows.Show(arrows);
+            return true;
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// The clause of the spell that applies to one target, on its own backing so it reads over a card, centred just

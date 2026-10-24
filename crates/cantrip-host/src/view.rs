@@ -1139,20 +1139,31 @@ impl<'a> Projector<'a> {
         let mut choices = Vec::new();
         let text = game.cards.linked_to(s, id);
         if let Some(color) = s.chosen_color(text) {
-            choices.push(ChoiceView { key: "color".into(), value: color.name().to_string() });
+            choices.push(ChoiceView { key: "color".into(), value: color.name().to_string(), ..Default::default() });
         }
         if let Some(sub) = s.chosen_subtype(text) {
-            choices.push(ChoiceView { key: "creature type".into(), value: sub.name().to_string() });
+            choices.push(ChoiceView { key: "creature type".into(), value: sub.name().to_string(), ..Default::default() });
         }
         if let Some(p) = s.chosen_player(text) {
-            choices.push(ChoiceView { key: "player".into(), value: seat(p).to_string() });
+            choices.push(ChoiceView { key: "player".into(), value: seat(p).to_string(), ..Default::default() });
         }
         if let Some(card) = s.chosen_card(text) {
-            choices.push(ChoiceView { key: "name".into(), value: game.cards.get(card).name.to_string() });
+            choices.push(ChoiceView { key: "name".into(), value: game.cards.get(card).name.to_string(), ..Default::default() });
         }
         // One of the words its text offered to choose between as it entered (CR 607.2f), by the word: "Jeskai", "Odd".
         if let Some(chosen) = s.chosen_option(text) {
-            choices.push(ChoiceView { key: "option".into(), value: label_text(&Label::Option(chosen.card, chosen.index)).to_string() });
+            choices.push(ChoiceView { key: "option".into(), value: label_text(&Label::Option(chosen.card, chosen.index)).to_string(), ..Default::default() });
+        }
+        // The permanent chosen as it entered (CR 614.12a, 607.2d), while it is still that permanent on the battlefield: one that
+        // left, or came back as a new object (CR 400.7), is chosen no longer. Named as it shows there, and pointed at.
+        if let Some(chosen) = s.chosen_object(text)
+            && s.obj(chosen).became.is_none()
+            && s.obj(chosen).zone.is(ZoneKind::Battlefield)
+        {
+            let shown = game.chars(chosen);
+            let key = if shown.is(CardType::Creature) { "creature" } else { "permanent" };
+            let value = game.cards.get(shown.card).name.to_string();
+            choices.push(ChoiceView { key: key.into(), value, object: handles.handle(chosen) });
         }
         choices.sort_by(|a, b| a.key.cmp(&b.key));
 

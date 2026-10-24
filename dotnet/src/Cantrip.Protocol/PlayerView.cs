@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 213;
+    public const int ProtocolVersion = 214;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -723,6 +723,10 @@ public sealed class ChoiceView
     /// <summary>What was chosen, as it is shown.</summary>
     [Key(1)]
     public string Value { get; set; } = string.Empty;
+
+    /// <summary>The permanent chosen, for a choice of one (<c>creature</c>, <c>permanent</c>, CR 607.2d): what is pointed at. None otherwise.</summary>
+    [Key(2)]
+    public ViewHandle Object { get; set; }
 }
 
 /// <summary>
