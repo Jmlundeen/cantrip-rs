@@ -457,14 +457,19 @@ pub fn exile_and_return_transformed(g: &mut dyn Game, permanent: ObjectId, under
 /// 101.4), then all returned at once, as new objects (CR 400.7). A token exiled this way ceases to exist and does not return
 /// (CR 111.7). Ephemerate, Displacer Kitten, Skycoach Conductor, The Mind Stone and Gone Fishing print it.
 pub fn exile_and_return(g: &mut dyn Game, permanents: &[ObjectId]) -> Result<(), Suspend> {
+    exile_and_return_objects(g, permanents).map(|_| ())
+}
+
+/// `exile_and_return`, the new objects that came back, for a card that then does something to them: Essence Flux's "If it's
+/// a Spirit, put a +1/+1 counter on it."
+pub fn exile_and_return_objects(g: &mut dyn Game, permanents: &[ObjectId]) -> Result<Vec<ObjectId>, Suspend> {
     let returning: Vec<(ObjectId, PlayerId)> = g
         .exile_all(permanents)
         .into_iter()
         .filter(|&card| !g.obj(card).token && g.obj(card).zone.is(ZoneKind::Exile))
         .map(|card| (card, g.obj(card).owner))
         .collect();
-    g.put_all_onto_battlefield(&returning)?;
-    Ok(())
+    g.put_all_onto_battlefield(&returning)
 }
 
 /// Exiles the targeted card, if it is still a legal target.
