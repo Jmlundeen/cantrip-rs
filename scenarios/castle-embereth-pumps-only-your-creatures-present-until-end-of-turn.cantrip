@@ -1,0 +1,68 @@
+# Castle Embereth: "{1}{R}{R}, {T}: Creatures you control get +1/+0 until end of turn." (CR 611.2c.)
+# Turn 5, Castle untapped beside the Mountain: with Island, Mountain and Mox Jet tapped ({U}{R}{B}: three mana, but one
+# {R}) the ability is not offered - the second {R} is pinned. On turn 7 Mountain, Mox Ruby and Mox Jet pay {1}{R}{R}
+# exactly: the pool is empty and the Castle tapped. Bot1's 0/2 Ornithopter becomes 1/2 (+1/+0, toughness unchanged),
+# Bot2's stays 0/2 ("you control"), an Ornithopter cast afterwards stays 0/2 (only creatures there as it resolved), and
+# on turn 9 the first one is 0/2 again (until end of turn).
+
+[Bot1 Deck]
+Island
+Mox Jet
+Ornithopter
+Mountain
+Castle Embereth
+Mox Ruby
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Castle Embereth.Play
+? Bot1.Battlefield.Castle Embereth.Tapped = false
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Castle Embereth.Activate(Ability: Creatures)
+[T7 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}{R}{R}
+Bot1.Battlefield.Castle Embereth.Activate(Ability: Creatures)
+? Bot1.Mana =
+? Bot1.Battlefield.Castle Embereth.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot2.Battlefield.Ornithopter.Power = 0
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#2.Power = 0
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot2.Battlefield.Ornithopter.Power = 0

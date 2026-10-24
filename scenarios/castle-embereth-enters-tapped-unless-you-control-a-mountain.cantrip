@@ -1,0 +1,37 @@
+# Castle Embereth: "This land enters tapped unless you control a Mountain." and "{T}: Add {R}."
+# Turn 3 Bot1 controls only an Island while Bot2 controls a Mountain (played turn 2): the first Castle enters tapped - an
+# opponent's Mountain is not one "you control". Turn 5 Bot1 plays a Mountain; turn 7 the second Castle enters untapped and
+# taps for {R}.
+
+[Bot1 Deck]
+Island
+Castle Embereth
+Mountain
+Castle Embereth
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Embereth.Play
+? Bot1.Battlefield.Castle Embereth.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Castle Embereth.Play
+? Bot1.Battlefield.Castle Embereth#2.Tapped = false
+Bot1.Battlefield.Castle Embereth#2.Activate(Ability: Add {R}.)
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Castle Embereth#1.Tapped = false
+Bot1.Battlefield.Castle Embereth#2.Tapped = true
