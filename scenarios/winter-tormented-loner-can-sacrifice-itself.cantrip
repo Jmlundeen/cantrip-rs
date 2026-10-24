@@ -1,0 +1,25 @@
+# "A creature" includes Winter itself. Its reflexive trigger survives its sacrifice and the opponent chooses
+# which creature to sacrifice (CR 603.12, 113.7a, 701.21a).
+[Bot1 Deck]
+Black Lotus
+Winter, Tormented Loner
+Island x20
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Winter, Tormented Loner.Cast
+Bot1.Choose(Winter, Tormented Loner)
+Bot2.Choose(Ornithopter#1)
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Winter, Tormented Loner; Black Lotus
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Ornithopter

@@ -1,0 +1,8 @@
+{
+  "name": "Winter, Tormented Loner",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Human Warlock",
+  "power": 0,
+  "toughness": 3,
+  "oracleText": "When Winter enters, you may sacrifice a creature or planeswalker. When you do, each opponent sacrifices a creature of their choice.\nWinter gets +1/+0 for each creature and planeswalker card in your graveyard."
+}
