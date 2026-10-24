@@ -1,0 +1,38 @@
+# Jwari Disruption: "Counter target spell unless its controller pays {1}". Bot1 holds Island and Mox Sapphire up and pays its
+# {1}{U} (a third source, Mox Jet, stays untapped, so the cost is exactly two). Bot2 taps its only Swamp for Duress and has
+# nothing to pay with, so Duress is countered (CR 118.12) and Bot1's hand keeps its Lightning Bolt.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Jwari Disruption
+Lightning Bolt
+Island x2
+Island x10
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Jwari Disruption.Cast(Duress)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = 
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Duress
+Bot1.Graveyard = Jwari Disruption
+Bot1.Hand = Island; Island; Lightning Bolt
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Island.Tapped = true

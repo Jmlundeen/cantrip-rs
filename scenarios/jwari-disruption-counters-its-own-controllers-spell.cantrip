@@ -1,0 +1,29 @@
+# Jwari Disruption may target a creature spell its own controller cast: Bot1 casts Ravine Raider (Mox Jet) and answers it with Jwari
+# Disruption (Island + Mox Sapphire). Bot1 has nothing left to pay {1} with, so its own Ravine Raider is countered.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Jwari Disruption
+Ravine Raider
+Island x3
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ravine Raider.Cast
+Bot1.Hand.Jwari Disruption.Cast(Ravine Raider)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Jwari Disruption; Ravine Raider
+Bot1.Battlefield.Count = 3

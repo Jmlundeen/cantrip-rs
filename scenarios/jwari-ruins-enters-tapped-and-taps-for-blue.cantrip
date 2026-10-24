@@ -1,0 +1,21 @@
+# Jwari Disruption's back face (CR 712.12), Jwari Ruins: "This land enters tapped. {T}: Add {U}." It is played on turn 1
+# and is tapped; on turn 3 one tap adds exactly {U}.
+
+[Bot1 Deck]
+Jwari Disruption
+Island x6
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Jwari Disruption.Play
+? Bot1.Battlefield.Jwari Ruins.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jwari Ruins.Activate
+? Bot1.Mana = {U}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jwari Ruins.Tapped = true

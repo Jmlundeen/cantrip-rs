@@ -1,0 +1,12 @@
+{
+  "name": "Jwari Disruption",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target spell unless its controller pays {1}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Jwari Ruins",
+    "type": "Land",
+    "oracleText": "This land enters tapped.\n{T}: Add {U}."
+  }
+}

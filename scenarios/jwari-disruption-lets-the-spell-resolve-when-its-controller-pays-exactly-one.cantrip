@@ -1,0 +1,38 @@
+# Jwari Disruption against a spell whose controller can pay exactly {1}: Bot2 taps Swamp for Duress, keeps a Mox Jet, and
+# pays the {1} with it, so Duress is not countered and resolves, taking Bot1's Lightning Bolt (CR 118.12).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Jwari Disruption
+Lightning Bolt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Duress
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Jwari Disruption.Cast(Duress)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.PayCost
+Bot2.Choose(Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Duress
+Bot1.Graveyard = Lightning Bolt; Jwari Disruption
+Bot2.Battlefield.Mox Jet.Tapped = true
