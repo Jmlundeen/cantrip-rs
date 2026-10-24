@@ -1,0 +1,47 @@
+# "Whenever this creature deals combat damage to a player, you may sacrifice it. If you do, proliferate." Bot1's Scamp connects on
+# turn 3, Bot1 accepts and proliferates, choosing Bot2's Liliana of the Veil (an opponent's permanent is allowed, CR 701.34a): loyalty
+# 3 -> 4. The Scamp was sacrificed, so it died and "deals damage equal to its power to any target" (its power 1, as it last existed): a
+# land is not a legal target (refused), Bot2 is, 20 - 1 combat damage - 1 = 18.
+
+[Bot1 Deck]
+Cacophony Scamp
+Mountain x7
+Mountain x16
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cacophony Scamp.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Cacophony Scamp > Bot2)
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+! Bot1.Target(Bot2.Battlefield.Swamp)
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 4
+Bot2.Life = 18
+Bot1.Battlefield.Cacophony Scamp = (absent)
+Bot1.Graveyard.Count = 1

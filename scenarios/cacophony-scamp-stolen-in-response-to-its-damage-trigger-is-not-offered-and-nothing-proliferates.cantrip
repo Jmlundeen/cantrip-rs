@@ -1,0 +1,64 @@
+# "Whenever this creature deals combat damage to a player, you may sacrifice it. If you do, proliferate." With the trigger
+# on the stack, Bot2 takes the Scamp with Old Man of the Sea (power 1 is no more than Old Man's 2; Bot2 has controlled
+# Old Man since their turn began, CR 302.6). As the trigger resolves, its controller, Bot1, can't sacrifice a permanent
+# they don't control (CR 701.21a), so the sacrifice is an impossible option and isn't offered (CR 608.2d): Bot1 isn't
+# asked, nothing is sacrificed (Bot1's graveyard stays empty, the Scamp stays Bot2's, no dies trigger hits anyone) and
+# nothing proliferates (Bot2's Liliana of the Veil keeps 3 loyalty).
+
+[Bot1 Deck]
+Cacophony Scamp
+Mountain x7
+Mountain x16
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Swamp
+Liliana of the Veil
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cacophony Scamp.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Cacophony Scamp > Bot2)
+[T5 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Cacophony Scamp)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+? Bot2.Battlefield.Cacophony Scamp.Tapped = true
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Cacophony Scamp.Tapped = true
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+Bot1.Graveyard.Count = 0
+Bot1.Life = 20
+Bot2.Life = 19

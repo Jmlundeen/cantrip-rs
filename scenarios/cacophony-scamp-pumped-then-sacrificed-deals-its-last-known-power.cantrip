@@ -1,0 +1,37 @@
+# "When this creature dies, it deals damage equal to its power to any target." Giant Growth makes the attacking Scamp 4/4;
+# it deals 4 combat damage to Bot2 (16), Bot1 sacrifices it to its damage trigger, and the dies trigger deals damage equal
+# to its power as it last existed on the battlefield (CR 608.2h, 113.7a): 4, not its printed 1. Bot2: 16 - 4 = 12.
+
+[Bot1 Deck]
+Cacophony Scamp
+Mountain
+Forest
+Giant Growth
+Mountain x3
+Mountain x16
+
+[Bot2 Deck]
+Swamp x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cacophony Scamp.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Cacophony Scamp > Bot2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Cacophony Scamp)
+Bot1.Pass
+[T3 Bot1.CombatDamage]
+? Bot2.Life = 16
+Bot1.Pass
+Bot1.Accept
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Bot1.Battlefield.Cacophony Scamp = (absent)
+Bot1.Graveyard.Count = 2

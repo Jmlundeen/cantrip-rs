@@ -1,0 +1,60 @@
+# The "you may" and its trigger. Turn 3: the Scamp attacks Bot2's Liliana of the Veil (3 -> 2) and is not asked anything: damage to a
+# planeswalker is not damage to a player. Turn 5: it connects with Bot2, Bot1 declines, so it stays and nothing proliferates (Liliana
+# stays at 2). Turn 6: Bot2's Lightning Bolt kills it and its dies trigger may target its own controller (any target): Bot1 20 -> 19.
+
+[Bot1 Deck]
+Cacophony Scamp
+Mountain x7
+Mountain x16
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Lightning Bolt
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cacophony Scamp.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Cacophony Scamp > Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Cacophony Scamp > Bot2)
+Bot1.Decline
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2
+? Bot1.Battlefield.Cacophony Scamp.Tapped = true
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cacophony Scamp)
+Bot1.Target(Bot1)
+[T7 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Bot1.Battlefield.Cacophony Scamp = (absent)
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2

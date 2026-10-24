@@ -1,0 +1,56 @@
+# "Whenever this creature deals combat damage to a player, you may sacrifice it. If you do, proliferate." Bot2 Lightning
+# Bolts the Scamp with its combat damage trigger on the stack; it dies (its dies trigger hits Bot2 for its power, 1). As
+# the damage trigger resolves there is no Scamp to sacrifice (CR 400.7, 701.21a), so the sacrifice is an impossible
+# option and isn't offered (CR 608.2d): Bot1 isn't asked, and nothing proliferates (Bot2's Liliana of the Veil keeps 3
+# loyalty). Bot2: 20 - 1 combat damage - 1 from the dies trigger = 18.
+
+[Bot1 Deck]
+Cacophony Scamp
+Mountain x7
+Mountain x16
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Ruby
+Liliana of the Veil
+Lightning Bolt
+Swamp x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cacophony Scamp.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Cacophony Scamp > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cacophony Scamp)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Cacophony Scamp = (absent)
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
