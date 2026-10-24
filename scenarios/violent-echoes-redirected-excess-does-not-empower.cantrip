@@ -1,0 +1,50 @@
+# Ancient Adamantoise keeps the seventeen damage from our Fire Covenant through cleanup (CR 514.2).
+# Echoes targets our Ornithopter, but its six damage is redirected to the Turtle instead (CR 614.9):
+# that recipient takes three excess damage and dies. The targeted Ornithopter took none, so no Jace is made.
+[Bot1 Deck]
+Show and Tell
+Ancient Adamantoise
+Ornithopter
+Black Lotus
+Mox Jet
+Mox Ruby
+Mountain
+Fire Covenant
+Violent Echoes
+Black Lotus
+Island x15
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T3 Bot1.Main1]
+Bot1.Hand.Fire Covenant.Cast(X: 17)
+Bot1.Divide(Ancient Adamantoise: 17)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 17
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Violent Echoes.Cast(Bot1.Battlefield.Ornithopter)
+[T7 Bot1.Main2]
+
+[Expect]
+Exile = Ancient Adamantoise
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield.Count = 14
+Bot1.Battlefield.Treasure Token#10.Tapped = true
+Bot1.Graveyard = Violent Echoes; Black Lotus; Fire Covenant; Show and Tell; Black Lotus
