@@ -1,0 +1,12 @@
+{
+  "name": "Lumra, Bellow of the Woods",
+  "manaCost": "{4}{G}{G}",
+  "type": "Legendary Creature — Elemental Bear",
+  "power": "*",
+  "toughness": "*",
+  "oracleText": "Reach, vigilance\nLumra's power and toughness are each equal to the number of lands you control.\nWhen Lumra enters, mill four cards. Then return all land cards from your graveyard to the battlefield tapped.",
+  "keywords": [
+    "Reach",
+    "Vigilance"
+  ]
+}

@@ -1,0 +1,93 @@
+# Lumra's enters trigger mills exactly four (Forest, Island, Llanowar Elves, Forest) and then returns every land card in ITS
+# CONTROLLER's graveyard at once, tapped: the two Forests Bot1 discarded to Faithless Looting earlier AND the three milled
+# lands (the Elves stays). Bot2's two discarded Plains stay in Bot2's graveyard. Lumra counts the lands Bot1 controls:
+# 2 on the battlefield + 5 returned = 7/7 (Bot2's Plains is not counted: 8 would be wrong); an eighth land makes it 8/8.
+# Vigilance: it attacks and stays untapped. Reach: it blocks Bot2's Healer's Hawk (flying) and kills it.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Lumra, Bellow of the Woods
+Black Lotus
+Black Lotus
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island
+Llanowar Elves
+Forest
+Forest x3
+Plains x10
+
+[Bot2 Deck]
+Mox Ruby
+Faithless Looting
+Plains
+Healer's Hawk
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Forest#1; Forest#2)
+[T2 Bot2.Main1]
+? Bot1.Graveyard.Count = 3
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Plains#1; Plains#2)
+Bot2.Pass
+? Bot2.Graveyard.Count = 3
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Lumra, Bellow of the Woods.Cast
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Lumra, Bellow of the Woods.Power = 7
+? Bot1.Graveyard = Llanowar Elves; Black Lotus; Black Lotus; Faithless Looting
+? Bot1.Battlefield.Count = 9
+? Bot1.Battlefield.Island.Tapped = true
+? Bot1.Battlefield.Forest#1.Tapped = false
+? Bot1.Battlefield.Forest#2.Tapped = false
+? Bot1.Battlefield.Forest#3.Tapped = true
+? Bot1.Battlefield.Forest#4.Tapped = true
+? Bot1.Battlefield.Forest#5.Tapped = true
+? Bot1.Battlefield.Forest#6.Tapped = true
+? Bot2.Graveyard.Count = 3
+[T4 Bot2.Main1]
+Bot2.Attack(Healer's Hawk > Bot1)
+Bot1.Block(Lumra, Bellow of the Woods > Healer's Hawk)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.Battlefield.Lumra, Bellow of the Woods.Power = 8
+? Bot1.Battlefield.Lumra, Bellow of the Woods.Toughness = 8
+Bot1.Attack(Lumra, Bellow of the Woods > Bot2)
+[Bot1.Main2]
+? Bot1.Battlefield.Lumra, Bellow of the Woods.Tapped = false
+
+[Expect]
+# 20 + 1 (the Hawk's lifelink damage to Lumra) - 8
+Bot2.Life = 13
+Bot2.Graveyard = Healer's Hawk; Faithless Looting; Plains; Plains
