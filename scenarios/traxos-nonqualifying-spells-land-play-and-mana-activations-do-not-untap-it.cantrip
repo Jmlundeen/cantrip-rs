@@ -1,5 +1,5 @@
 # An instant, an enchantment, a land play and mana abilities are not artifact-or-creature spell casts (CR 601.2i).
-# Each leaves Traxos tapped. The same source then untaps to a zero-mana artifact cast, the positive control.
+# Each leaves Traxos tapped. An artifact cast then untaps it.
 
 [Bot1 Deck]
 Forest

@@ -131,9 +131,9 @@ pub fn plus_one_counter_on_this(g: &mut dyn Game, item: &StackItem) -> Result<()
 }
 
 /// "Put two +1/+1 counters on [this permanent]" (CR 122.1, 201.5): the ability's source, not a new object once it has
-/// left the battlefield (CR 400.7). The whole effect of a trigger or ability of Brave Brawler, Demon Wall, Extremis Elite,
-/// Knight of Autumn, Loki Laufeyson, Serpent Specialist, Thanos, the Mad Titan, Titanbones, Towering Heart, Ultron Drone,
-/// Unliving Legionnaire, Viv Vision, Teen Synthezoid, Volcanic Villain and Ygra, Eater of All.
+/// left the battlefield (CR 400.7). The whole effect of a trigger or ability of Brave Brawler, Demon Wall, Knight of Autumn,
+/// Loki Laufeyson, Serpent Specialist, Titanbones, Towering Heart, Viv Vision, Teen Synthezoid, Volcanic Villain and Ygra,
+/// Eater of All; one step of the effect of Extremis Elite, Thanos, the Mad Titan, Ultron Drone and Unliving Legionnaire.
 pub fn two_plus_one_counters_on_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 2);
     Ok(())

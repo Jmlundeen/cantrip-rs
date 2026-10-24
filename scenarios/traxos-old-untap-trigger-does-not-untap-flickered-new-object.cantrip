@@ -1,5 +1,5 @@
 # Flickering Traxos makes a new object (CR 400.7). Tap the returned creature with Drum before the old untap trigger
-# resolves: that trigger must leave the new one tapped. A new artifact cast does untap it, the positive control.
+# resolves: that trigger must leave the new one tapped. A new artifact cast does untap it.
 
 [Bot1 Deck]
 Island

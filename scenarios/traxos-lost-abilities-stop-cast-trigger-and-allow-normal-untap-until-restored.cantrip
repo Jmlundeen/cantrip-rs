@@ -1,6 +1,6 @@
 # Kasmina's Transmutation removes both the cast trigger and the untap restriction (CR 613.1f). Ornithopter no longer
 # untaps Traxos, but the next untap step does. Disenchant restores the abilities; its next attack stays tapped through
-# another untap step, then a new artifact cast untaps it (CR 502.3/603.2). Both sides of ability loss are exercised.
+# another untap step, then a new artifact cast untaps it (CR 502.3/603.2).
 
 [Bot1 Deck]
 Island

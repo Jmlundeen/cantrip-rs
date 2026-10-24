@@ -1,6 +1,6 @@
 # Traxos triggers even while untapped: it has no intervening "if" (CR 603.2/603.4). Sage's cast makes one untap trigger
 # and one copy trigger. After the untap resolves, tap Traxos with Drum; Sage's spell copy and both entries must leave
-# it tapped because a copy is not cast (CR 707.10). The earlier Mox Jet cast is the qualifying-cast positive control.
+# it tapped because a copy is not cast (CR 707.10).
 
 [Bot1 Deck]
 Island
