@@ -25,7 +25,7 @@ fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     let (mut sacrificed, mut discarded, mut losses) = (Vec::new(), Vec::new(), Vec::new());
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| g.state().opponents(item.controller).any(|o| o == p)).collect();
     for opponent in opponents {
-        let asker = Asker { source: item.object, controller: opponent };
+        let asker = g.item_asker(item, opponent);
         for _ in 0..counters {
             if !cantrip_mechanics::players::reached(g, opponent) {
                 break;

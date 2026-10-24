@@ -44,7 +44,7 @@ fn chapter_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn first_named_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     let Event::SpellCast { spell, player, .. } = *event else { return None };
     let you = me.controller;
-    let name = q.state().chosen_card(q.linked_to(me.source))?;
+    let name = q.state().chosen_card(q.linked_to(me))?;
     let earlier = q.history().casts_by(you).any(|c| c.spell != spell && object_has_name(q, c.spell, name));
     if player == you && object_has_name(q, spell, name) && !earlier { Fired::PLAIN } else { None }
 }

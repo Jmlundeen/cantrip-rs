@@ -337,8 +337,9 @@ impl StaticDef {
 pub enum Costed {
     /// The card that is being cast.
     Spell(ObjectId),
-    /// The permanent (or card) whose ability is being activated, and which of its abilities.
-    Ability(ObjectId, AbilityRef),
+    /// The permanent (or card) whose ability is being activated, which of its abilities, and that ability as linked abilities
+    /// know it where an effect gave it the object (`Asker::by`, CR 607.5).
+    Ability(ObjectId, AbilityRef, Option<Linked>),
     /// The object a special action with a cost is taken for (CR 116.2), and the ability-shaped entry that is the action:
     /// plotting a card (CR 116.2k, 702.170a: "plotting cards from your hand costs {2} less"), suspending, foretelling,
     /// turning a face-down permanent face up, unlocking a door. A special action is not an activated ability (CR 116.1), so
@@ -423,6 +424,10 @@ impl CostDelta {
 /// is worth offering), they are the candidate target the action would be announced with, or empty when its targets are
 /// chosen later; a change that depends on them then does not apply.
 pub type CostChange = fn(&dyn Query, ObjectId, PlayerId, Costed, &[Target]) -> CostDelta;
+
+/// An activated ability's own cost change (`ActivatedDef::cost_change`), asked as that ability: `asker` is its object and the
+/// player activating it, as the ability it is (`Asker::by`, CR 607.5); otherwise as `CostChange`.
+pub type AbilityCostChange = fn(&dyn Query, &Asker, Costed, &[Target]) -> CostDelta;
 
 /// A cost change a resolving spell or ability makes for a duration (CR 611.2a/c, 601.2f): "artifact spells you cast this
 /// turn cost {1} less to cast" (Armor Wars), "artifact, instant, and sorcery spells you cast this turn cost {2} less"
@@ -572,6 +577,25 @@ impl Discards {
 pub struct Asker {
     pub source: ObjectId,
     pub controller: PlayerId,
+    /// The ability whose function is asked, as linked abilities know it (CR 607.1, 607.5), where an effect gave `source`
+    /// that ability: what `Query::linked_to` of this asker answers, so the function reads only that ability's links (the
+    /// choices it made, the cards it exiled). None for one of the text `source` has - its own or a copy effect's, every
+    /// card's own hook (a cost change, a replacement effect, a play rule) - which `Query::text_linked` answers. Set by the
+    /// engine as it asks a triggered or activated ability's functions, from how the object acquired the ability.
+    pub by: Option<Linked>,
+}
+
+impl Asker {
+    /// `source` and `controller` asking with the text `source` has (`by` none).
+    pub const fn new(source: ObjectId, controller: PlayerId) -> Asker {
+        Asker { source, controller, by: None }
+    }
+
+    /// The ability `by` of `by.object`, controlled by `controller`, asking: as linked abilities know it, where that differs
+    /// from the text the object has (`by`).
+    pub const fn ability(controller: PlayerId, by: Linked) -> Asker {
+        Asker { source: by.object, controller, by: Some(by) }
+    }
 }
 
 /// One target slot (CR 115.1).
@@ -1242,8 +1266,8 @@ pub struct ActivatedDef {
     pub once: bool,
     /// Its own cost change (CR 601.2f by way of 602.2b): "this ability costs {1} less to activate for each ...", power-up's
     /// "this ability's cost is reduced by this permanent's mana cost" (CR 702.193a). Its `source` is the object whose
-    /// ability it is, and it is asked only for this ability.
-    pub cost_change: Option<CostChange>,
+    /// ability it is, and it is asked only for this ability, as this ability (`AbilityCostChange`).
+    pub cost_change: Option<AbilityCostChange>,
     /// Its modes, chosen on activation before its costs (CR 602.2b, 700.2); `effect` and `targets` are then unused.
     pub modal: Option<&'static ModalDef>,
     /// For a mana ability: its mana can only be spent as this restriction allows (CR 106.6), and goes to the pool
@@ -1966,7 +1990,7 @@ pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
         if def.granted_miracles.is_empty() || q.lost_all_abilities(id) {
             continue;
         }
-        let asker = Asker { source: id, controller: o.controller };
+        let asker = Asker { source: id, controller: o.controller, by: None };
         for (i, grant) in def.granted_miracles.iter().enumerate() {
             if (grant.has)(q, &asker, card) {
                 all.push(Miracle { granter: Some((granter, i as u8)), cost: (grant.cost)(q, q.obj(card).card).map(|c| reduced_by(c, grant.less).0) });
@@ -1997,7 +2021,7 @@ pub fn cant_draw(q: &dyn Query, player: PlayerId, n: u32) -> bool {
         };
         // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
         !def.cant_draw.is_empty() && !q.lost_all_abilities(id) && {
-            let asker = Asker { source: id, controller: o.controller };
+            let asker = Asker { source: id, controller: o.controller, by: None };
             def.cant_draw.iter().any(|rule| rule(q, &asker, player, n))
         }
     })

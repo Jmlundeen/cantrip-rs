@@ -1597,7 +1597,7 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
         && !cx.lost_all_abilities(id)
     {
         let controller = cx.s().obj(id).controller;
-        as_transforms(cx, &Asker { source: id, controller })?;
+        as_transforms(cx, &Asker { source: id, controller, by: None })?;
     }
     cx.emit(Event::Transformed { object: id });
     Ok(true)
@@ -2158,7 +2158,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
     // and does not choose again (CR 707.10c, 700.2); an instant's or sorcery's, or a permanent spell's (an Aura's enchant
     // ability, CR 303.4a); the face's it is on the stack as, not its card's (CR 715.3b, 720.3b, 709.3b).
     let specs = crate::resolve::spell_specs(cx.cards(), cx.s(), &item);
-    let asker = Asker { source: object, controller: chooser };
+    let asker = Asker { source: object, controller: chooser, by: None };
     let mut targets = cx.s().targets(&item).to_vec();
     let mut changed = false;
     for (at, spec) in specs.iter().enumerate() {
@@ -2261,7 +2261,8 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
     let Some(at) = at else { return Ok(()) };
     let mut item = cx.s().stack[at];
     let count = item.target_count as usize;
-    let asker = Asker { source: item.object, controller: item.controller };
+    // Its targets are judged as the spell or ability it is (CR 607.5).
+    let asker = cx.item_asker(&item, item.controller);
     let all = cx.s().targets(&item).to_vec();
     // Nobody is asked anything when some target has nowhere else to go, since then nothing changes at all.
     let mut options: Vec<Vec<Target>> = Vec::with_capacity(count);
@@ -2338,7 +2339,8 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
     }
     let mut item = cx.s().stack[at];
     let count = item.target_count as usize;
-    let asker = Asker { source: item.object, controller: item.controller };
+    // Its targets are judged as the spell or ability it is (CR 607.5).
+    let asker = cx.item_asker(&item, item.controller);
     let new = Target::Object(to);
     let all = cx.s().targets(&item).to_vec();
     let spec_of = cx.s().spec_of(&item).to_vec();

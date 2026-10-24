@@ -17,7 +17,7 @@ fn card_you_didnt_control(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> 
 /// the replacement exiled with this object (CR 607.2b), a land as a land play and a spell at the time its type allows (the
 /// rulings).
 fn allows(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> bool {
-    player == asker.controller && your_turn(q, asker) && q.exiled_with(q.linked_to(asker.source)).contains(&card)
+    player == asker.controller && your_turn(q, asker) && q.exiled_with(q.linked_to(asker)).contains(&card)
 }
 
 pub static CARD: CardDef = CardDef {

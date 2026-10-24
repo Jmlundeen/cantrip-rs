@@ -21,7 +21,7 @@ fn exile_a_nonland_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 /// rules meaning of its own (CR 207.2c). It is a permission, so the card is cast at the time its type allows, for its mana
 /// cost or an alternative cost it has. It functions only while this permanent is on the battlefield with its abilities.
 fn may_cast_the_exiled_card(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> bool {
-    player == asker.controller && threshold(q, player) && q.exiled_with(q.linked_to(asker.source)).contains(&card)
+    player == asker.controller && threshold(q, player) && q.exiled_with(q.linked_to(asker)).contains(&card)
 }
 
 pub static CARD: CardDef = CardDef {

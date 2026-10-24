@@ -104,7 +104,7 @@ pub fn exile_instead_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 pub fn exile_instead_linked_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
     exile_instead_apply(q, asker, proposal);
     if let Proposal::ZoneChange(z) = proposal {
-        z.exiled_with = Some(q.linked_to(asker.source));
+        z.exiled_with = Some(q.linked_to(asker));
     }
 }
 

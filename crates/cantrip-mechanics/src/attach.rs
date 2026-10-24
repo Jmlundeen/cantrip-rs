@@ -39,7 +39,7 @@ pub const fn equip_quality(mana: ManaCost, creature: &'static [TargetSpec], text
 /// {0}. Any equip ability, a variant with a restriction ("equip legendary creature") too; reconfigure is not one.
 /// Dwarven Mauler and Helitrooper ({2}), Fervent Champion ({3}).
 pub fn equip_targeting_this_costs_less<const N: u8>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta {
-    let Costed::Ability(_, ability) = costed else { return CostDelta::NONE };
+    let Costed::Ability(_, ability, _) = costed else { return CostDelta::NONE };
     let equip = q.activated_ability(ability).is_some_and(|d| d.equip);
     if equip && player == q.controller(source) && targets.contains(&Target::Object(source)) {
         CostDelta::less(N)

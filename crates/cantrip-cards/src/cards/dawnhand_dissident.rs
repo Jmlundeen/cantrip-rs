@@ -25,7 +25,7 @@ fn allows(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> boo
     player == asker.controller
         && your_turn(q, asker)
         && q.obj(card).owner == player
-        && q.exiled_with(q.linked_to(asker.source)).contains(&card)
+        && q.exiled_with(q.linked_to(asker)).contains(&card)
         && q.chars(card).is(CardType::Creature)
 }
 

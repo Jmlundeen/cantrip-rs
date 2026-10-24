@@ -17,7 +17,8 @@ use crate::history::entered_this_turn;
 /// "If this permanent entered this turn, this ability's cost is reduced by this permanent's mana cost" (CR 702.193a-b):
 /// the mana cost it has now, a copy's being the one it copies (CR 707.2). An object that left and came back entered
 /// anew (CR 400.7).
-pub fn reduction(q: &dyn Query, permanent: ObjectId, _: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+pub fn reduction(q: &dyn Query, asker: &Asker, _: Costed, _: &[Target]) -> CostDelta {
+    let permanent = asker.source;
     if !entered_this_turn(q.history(), permanent) {
         return CostDelta::NONE;
     }

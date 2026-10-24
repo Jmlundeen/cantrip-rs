@@ -15,7 +15,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 /// "• Jeskai — Whenever one or more creatures you control deal combat damage to a player" (CR 603.2c): one trigger for each
 /// player the batch damaged, and none unless Jeskai was chosen.
 fn jeskai_damage(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    if choose::chosen_option(q, me.source, &CARD) != Some(JESKAI) {
+    if choose::chosen_option(q, me, &CARD) != Some(JESKAI) {
         return None;
     }
     creature_you_control_deals_combat_damage_to_player(q, me, event)

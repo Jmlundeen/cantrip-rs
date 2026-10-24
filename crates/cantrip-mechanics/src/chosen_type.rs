@@ -64,12 +64,13 @@ pub fn your_creatures_spells_and_cards(q: &dyn LayerQuery, source: ObjectId, aff
     }
 }
 
-/// "Whenever you cast a spell of the chosen type" (CR 603.2): the spell's own subtypes on the stack (CR 205.3). Chronicle
-/// of Victory and Door of Destinies print it.
-pub fn you_cast_chosen_type(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+/// "Whenever you cast a spell of the chosen type" (CR 603.2): the spell's own subtypes on the stack (CR 205.3), the type
+/// chosen for the ability that asks (`Query::linked_to`). Chronicle of Victory and Door of Destinies print it, asked with its
+/// controller (`when_asked`).
+pub fn you_cast_chosen_type(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, player, .. } if *player == q.controller(source) => {
-            let chosen = q.state().chosen_subtype(q.linked_to(source))?;
+        Event::SpellCast { spell, player, .. } if *player == asker.controller => {
+            let chosen = q.state().chosen_subtype(q.linked_to(asker))?;
             q.chars(*spell).has_subtype(chosen).then_some(Fired::default())
         }
         _ => None,

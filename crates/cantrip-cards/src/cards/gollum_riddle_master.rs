@@ -9,10 +9,10 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 }
 
 /// "Whenever an opponent casts a spell with mana value of the chosen quality": a spell, not an ability, and one of an opponent's.
-fn opponent_casts_a_matching_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+fn opponent_casts_a_matching_spell(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
     let Event::SpellCast { spell, player, .. } = event else { return None };
-    let odd = choose::chosen_option(q, source, &CARD)? == 0;
-    if *player == q.controller(source) || !choose::mana_value_of_quality(q, *spell, odd) {
+    let odd = choose::chosen_option(q, asker, &CARD)? == 0;
+    if *player == asker.controller || !choose::mana_value_of_quality(q, *spell, odd) {
         return None;
     }
     Fired::PLAIN
@@ -49,6 +49,6 @@ static RIDDLE: ModalDef = modes(&[
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     labels: choose::ODD_OR_EVEN,
-    abilities: &[modal_triggered(when(EventMask::SPELL_CAST, opponent_casts_a_matching_spell), &RIDDLE, "Whenever an opponent casts a spell with mana value of the chosen quality, choose one that hasn't been chosen \u{2014} put a +1/+1 counter on Gollum; or each opponent loses 2 life and you gain 2 life; or draw a card.")],
+    abilities: &[modal_triggered(when_asked(EventMask::SPELL_CAST, opponent_casts_a_matching_spell), &RIDDLE, "Whenever an opponent casts a spell with mana value of the chosen quality, choose one that hasn't been chosen \u{2014} put a +1/+1 counter on Gollum; or each opponent loses 2 life and you gain 2 life; or draw a card.")],
     ..oracle::GOLLUM_RIDDLE_MASTER
 };

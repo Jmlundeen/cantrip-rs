@@ -20,7 +20,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// cost to less than one mana" (CR 601.2f, 118.7).
 /// Asked of activated abilities alone (`Costed::Ability`): never of a spell, nor of a special action (CR 116.1).
 fn artifact_abilities(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    let Costed::Ability(permanent, _) = costed else { return CostDelta::NONE };
+    let Costed::Ability(permanent, ..) = costed else { return CostDelta::NONE };
     let you = q.controller(source);
     if player == you && q.controller(permanent) == you && q.is_on_battlefield(permanent) && q.chars(permanent).is(CardType::Artifact) {
         CostDelta::less_to_one(1)

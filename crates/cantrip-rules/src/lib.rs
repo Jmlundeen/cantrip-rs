@@ -1108,8 +1108,10 @@ impl<'a> Cx<'a> {
     fn reflexive(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: Option<u16>) {
         // A reflexive triggered ability is an ordinary one (CR 603.12): its intervening "if" must hold for it to trigger at all
         // (CR 603.4), not only as it resolves.
+        // Asked as the ability it is, acquired as the resolving one that makes it trigger was (CR 607.5).
+        let by = layers::given_link(self.g.cards, &self.g.state, source, ability, self.resolving_acquired(source));
         if let AbilityDef::Triggered(TriggeredDef { condition: Some(condition), .. }) = self.g.cards.ability(ability)
-            && !condition(&*self, &Asker { source, controller })
+            && !condition(&*self, &Asker { source, controller, by })
         {
             return;
         }
@@ -1356,7 +1358,7 @@ impl Query for Game {
         self.cards.linked_card(card)
     }
 
-    fn linked_to(&self, source: ObjectId) -> Linked {
+    fn text_linked(&self, source: ObjectId) -> Linked {
         self.cards.linked_to(&self.state, source)
     }
 
@@ -1398,7 +1400,7 @@ impl Query for Cx<'_> {
         self.g.cards.linked_card(card)
     }
 
-    fn linked_to(&self, source: ObjectId) -> Linked {
+    fn text_linked(&self, source: ObjectId) -> Linked {
         self.g.cards.linked_to(&self.g.state, source)
     }
 
@@ -1438,6 +1440,34 @@ impl Query for Cx<'_> {
 }
 
 impl Cx<'_> {
+    /// The ability in the `nth` place of `source`'s abilities (`Chars::abilities()`), as linked abilities know it where an
+    /// effect gave it (`layers::given_link`): what an `Asker` for it asks as (`Asker::by`). None, worked out at no cost, where nothing could
+    /// have given anything an ability.
+    pub(crate) fn link_nth(&self, source: ObjectId, chars: &Chars, nth: usize) -> Option<Linked> {
+        if !layers::acquisition_possible(self.cards(), self.s()) {
+            return None;
+        }
+        let slot = chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(nth).map(|(slot, _)| slot)?;
+        let ability = chars.abilities[slot]?;
+        let acquired = layers::acquired(self.cards(), self.s(), &self.g.log, source, chars, slot);
+        layers::given_link(self.cards(), self.s(), source, ability, acquired)
+    }
+
+    /// `link_nth` of `source` as it is now, its characteristics worked out only where an effect could have given it an
+    /// ability.
+    pub(crate) fn link_of_nth(&self, source: ObjectId, nth: usize) -> Option<Linked> {
+        if !layers::acquisition_possible(self.cards(), self.s()) {
+            return None;
+        }
+        self.link_nth(source, &self.chars(source), nth)
+    }
+
+    /// A spell or ability on the stack, as linked abilities know it (`Query::linked`), where that differs from an ability of
+    /// its source's text: what an `Asker` for it asks as (`Asker::by`).
+    pub(crate) fn link_of(&self, item: &StackItem) -> Option<Linked> {
+        let by = self.linked(item);
+        (by != self.g.cards.linked_to(&self.g.state, item.object)).then_some(by)
+    }
     /// A question card code asks, as the rules let it be asked (CR 101.2): a discard the resolving spell or ability can't
     /// cause `player` to make is answered with nothing, unasked; and a choice of what to sacrifice takes only the permanents
     /// that can be sacrificed now (`ops::sacrificeable`: not one that can't be sacrificed, nor one its controller can't be made

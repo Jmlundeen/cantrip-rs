@@ -626,7 +626,7 @@ fn ward_sacrifice_among(
 ) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    let asker = Asker { source: item.object, controller: payer };
+    let asker = g.item_asker(item, payer);
     // Only what the payer can sacrifice pays (CR 118.3, `Game::can_sacrifice`): a permanent that can't be sacrificed, or any
     // at all when the ward's controller can't cause them to sacrifice (CR 101.2), is no resource for it.
     let eligible: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| kind(&*g, &asker, id) && g.can_sacrifice(id)).collect();

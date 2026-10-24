@@ -10,10 +10,10 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 /// chosen name cost {2} more to activate unless they're mana abilities (CR 601.2f, 602.2b): the rules ask this only of
 /// the abilities that use the stack.
 fn tax(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    let Some(chosen) = q.state().chosen_card(q.linked_to(source)) else { return CostDelta::NONE };
+    let Some(chosen) = q.state().chosen_card(q.text_linked(source)) else { return CostDelta::NONE };
     let (object, spell) = match costed {
         Costed::Spell(id) => (id, true),
-        Costed::Ability(id, _) => (id, false),
+        Costed::Ability(id, ..) => (id, false),
         // Plotting and the other special actions are no activated abilities (CR 116.1).
         Costed::SpecialAction(..) => return CostDelta::NONE,
     };

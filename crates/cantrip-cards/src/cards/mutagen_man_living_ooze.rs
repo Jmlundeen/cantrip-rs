@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// "Activated abilities of artifact tokens you control cost {1} less to activate" (CR 601.2f, 118.7): the source of the
 /// ability is an artifact token under the controller of this permanent, and the reduction may reach {0}.
 fn artifact_token_abilities_cost_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    let Costed::Ability(from, _) = costed else { return CostDelta::NONE };
+    let Costed::Ability(from, ..) = costed else { return CostDelta::NONE };
     if player != q.controller(source) || q.controller(from) != player || !q.obj(from).token {
         return CostDelta::NONE;
     }

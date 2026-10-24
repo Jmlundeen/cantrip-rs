@@ -94,7 +94,7 @@ pub fn may_cause(q: &dyn Query, causer: PlayerId, player: PlayerId, kind: CauseK
         if def.cause_rules.is_empty() || q.lost_all_abilities(id) {
             continue;
         }
-        let asker = Asker { source: id, controller: o.controller };
+        let asker = Asker { source: id, controller: o.controller, by: None };
         if def.cause_rules.iter().any(|rule| !rule(q, &asker, causer, player, kind)) {
             return false;
         }
@@ -336,9 +336,25 @@ pub trait Query {
     }
 
     /// An ability `source` has from the text it has now (CR 607.1, 607.5): its card's, the face that is up, or a copy effect's
-    /// (CR 707.2), acquired with that text - what a static ability, a replacement effect or a mana ability of that text
-    /// links and asks for (`CardTable::linked_to`).
-    fn linked_to(&self, source: ObjectId) -> Linked;
+    /// (CR 707.2), acquired with that text (`CardTable::linked_to`) - what a card's own hook of that text links and asks for,
+    /// one asked with the object alone: a cost change. A function asked with an `Asker` asks `linked_to` of it.
+    fn text_linked(&self, source: ObjectId) -> Linked;
+
+    /// The ability `asker` asks as, as linked abilities know it (CR 607.1, 607.5): the one an effect gave its source, which
+    /// the engine names (`Asker::by`), or else one of the text the source has (`text_linked`). What a triggered or activated
+    /// ability's functions - its trigger event and condition, its costs, targets and colors of mana - and a card's own
+    /// hooks asked with an `Asker` link and ask for.
+    fn linked_to(&self, asker: &Asker) -> Linked {
+        asker.by.unwrap_or_else(|| self.text_linked(asker.source))
+    }
+
+    /// `item`, a spell or ability resolving, asking with `controller` as its "you" - its own controller, or the player an
+    /// instruction names ("that opponent ...") - as linked abilities know it (`linked`, `Asker::by`): what a filter or a choice
+    /// it makes as it resolves is asked with.
+    fn item_asker(&self, item: &StackItem, controller: PlayerId) -> Asker {
+        let by = self.linked(item);
+        Asker { source: item.object, controller, by: (by != self.text_linked(item.object)).then_some(by) }
+    }
 
     /// The object `left` became when it moved to a public zone, if that object is still where the move put it (CR 400.7e):
     /// "return it to the battlefield" from a "when this dies" ability finds the card in the graveyard it went to, and

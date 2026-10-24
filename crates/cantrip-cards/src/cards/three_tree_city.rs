@@ -13,7 +13,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 /// "Add an amount of mana of that color equal to the number of creatures you control of the chosen type" (CR 106.5):
 /// the color is named as the ability is activated, the creatures are counted as it resolves, after its {2} is paid.
 fn add_for_chosen_type(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Result<(), Suspend> {
-    let Some(chosen) = g.state().chosen_subtype(g.linked_to(asker.source)) else { return Ok(()) };
+    let Some(chosen) = g.state().chosen_subtype(g.linked_to(asker)) else { return Ok(()) };
     let count = g
         .permanents_of(asker.controller)
         .into_iter()

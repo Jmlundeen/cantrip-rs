@@ -268,12 +268,12 @@ pub fn option_as_enters(g: &mut dyn Game, entering: &mut Entering, def: &'static
     Ok(())
 }
 
-/// The word chosen as `id` entered (`option_as_enters`), by index into `def`'s `labels`, for "the chosen [word]" or "• Jeskai
-/// — ..." of `def`'s text, which `id` has now (`Query::linked_to`): none if no choice was made, or if it was made by an
-/// ability its abilities are not linked to (CR 607.2f, 607.5) - another card's, or its own before a copy effect gave it this
-/// text: a permanent that entered as one card and has since become a copy of another.
-pub fn chosen_option(q: &dyn Query, id: ObjectId, def: &'static CardDef) -> Option<u8> {
-    q.state().chosen_option(q.linked_to(id)).filter(|c| std::ptr::eq(q.card(c.card), def)).map(|c| c.index)
+/// The word chosen as `asker`'s source entered (`option_as_enters`), by index into `def`'s `labels`, for "the chosen [word]" or
+/// "• Jeskai — ..." of `def`'s text, read by the ability that asks (`Query::linked_to`): none if no choice was made, or if it
+/// was made by an ability that one is not linked to (CR 607.2f, 607.5) - another card's, its own before a copy effect gave
+/// it this text, or the permanent's own where an effect gave it the ability asking.
+pub fn chosen_option(q: &dyn Query, asker: &Asker, def: &'static CardDef) -> Option<u8> {
+    q.state().chosen_option(q.linked_to(asker)).filter(|c| std::ptr::eq(q.card(c.card), def)).map(|c| c.index)
 }
 
 /// The labels "choose odd or even" offers, odd first: a card that asks it lists them as its `labels`.

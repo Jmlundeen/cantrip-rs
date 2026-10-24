@@ -33,7 +33,7 @@ fn activated(game: &Game, source: ObjectId) -> Event {
 #[test]
 fn harsh_mentors_trigger_is_not_for_a_mana_ability() {
     let (game, mox, vacuum, shaman) = board();
-    let me = Asker { source: shaman, controller: YOU };
+    let me = Asker { source: shaman, controller: YOU, by: None };
     let matches = cantrip_mechanics::triggers::opponent_activates_ability_of_artifact_creature_or_land;
     assert!(matches(&game, &me, &activated(&game, mox)).is_none(), "a mana ability triggers it");
     assert!(matches(&game, &me, &activated(&game, vacuum)).is_some(), "an artifact's other ability does not");

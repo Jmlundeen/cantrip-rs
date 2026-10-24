@@ -202,7 +202,9 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     let Some((spec, slot_player)) = slot_spec(cards, state, item, slot) else {
         return false;
     };
-    let asker = Asker { source: item.object, controller: item.controller };
+    // Asked as the spell or ability it is (CR 607.5): one an effect gave its source reads only its own links.
+    let by = Linked { object: item.object, text: cards.linked_card(item.ability.card), acquired: item.acquired };
+    let asker = Asker { source: item.object, controller: item.controller, by: Some(by).filter(|&by| by != cards.linked_to(state, item.object)) };
     if let Target::Object(id) = target
         && !live(state, id)
     {
@@ -249,8 +251,8 @@ impl Query for Given<'_> {
         self.q.linked_card(card)
     }
 
-    fn linked_to(&self, source: ObjectId) -> Linked {
-        self.q.linked_to(source)
+    fn text_linked(&self, source: ObjectId) -> Linked {
+        self.q.text_linked(source)
     }
 
     fn state(&self) -> &GameState {
@@ -323,7 +325,7 @@ impl Query for Reader<'_> {
         self.cards.linked_card(card)
     }
 
-    fn linked_to(&self, source: ObjectId) -> Linked {
+    fn text_linked(&self, source: ObjectId) -> Linked {
         self.cards.linked_to(self.state, source)
     }
 

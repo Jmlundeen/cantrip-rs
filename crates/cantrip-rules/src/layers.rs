@@ -47,12 +47,20 @@ impl Giver {
     }
 }
 
+/// Whether `ability` is of the text an object whose characteristics are `chars` has (CR 607.1, 607.1a-b): the card's it is
+/// now, its face's or a copy effect's, read as a whole card (`CardTable::linked_card`).
+fn own_text(cards: &CardTable, chars: &Chars, ability: AbilityRef) -> bool {
+    cards.linked_card(ability.card) == cards.linked_card(chars.card)
+}
+
 /// `ability`, an ability `giver` gave `holder`, as linked abilities know it (CR 607.1, 607.5): of its card's text, acquired
-/// by that effect - or, given by an effect of `holder`'s own (or by none), of the text `holder` has, as `ability_givers`
-/// counts it (`acquired`).
+/// by that effect - or, given by none, or by an effect of `holder`'s own and printed within its text (CR 607.1a), of the
+/// text `holder` has, as `ability_givers` counts it (`acquired`).
 fn given_ability(cards: &CardTable, state: &GameState, holder: ObjectId, ability: AbilityRef, giver: Giver) -> Linked {
-    let acquired = if giver.object == ObjectId::NONE || giver.object == holder { state.copy_acquired(holder) } else { giver.acquired };
-    Linked { object: holder, text: cards.linked_card(ability.card), acquired }
+    let text = cards.linked_card(ability.card);
+    let own = giver.object == ObjectId::NONE || (giver.object == holder && text == cards.linked_to(state, holder).text);
+    let acquired = if own { state.copy_acquired(holder) } else { giver.acquired };
+    Linked { object: holder, text, acquired }
 }
 
 /// For each of `id`'s abilities (`Chars::abilities`, slot for slot), the other object whose effect gave it the ability (CR
@@ -93,6 +101,10 @@ pub fn acquisition_possible(cards: &CardTable, state: &GameState) -> bool {
 /// to an animated Hauken's Insight), and is worked out.
 fn surely_its_text(cards: &CardTable, chars: &Chars, slot: usize) -> bool {
     let Some(ability) = chars.abilities.get(slot).copied().flatten() else { return true };
+    // One its card only lists to give (`CardDef::delayed`) it has only because an effect gave it: whose, is worked out.
+    if ability.is_delayed() {
+        return false;
+    }
     let of_face_up = ability.card == chars.card
         || cards.halves.get(chars.card.0 as usize).copied().flatten().is_some_and(|(left, right)| ability.card == left || ability.card == right);
     ability.card == cards.intrinsic
@@ -112,6 +124,13 @@ pub fn acquired(cards: &CardTable, state: &GameState, log: &[Record], id: Object
     }
     let giver = ability_givers(cards, state, log, id)[slot];
     if giver.object == ObjectId::NONE { text } else { giver.acquired }
+}
+
+/// `ability`, an ability `id` has, acquired `acquired` (`acquired`), as linked abilities know it (CR 607.1, 607.5), where that
+/// differs from an ability of the text it has (`CardTable::linked_to`): one an effect gave it. None for one of its text.
+pub fn given_link(cards: &CardTable, state: &GameState, id: ObjectId, ability: AbilityRef, acquired: Acquired) -> Option<Linked> {
+    let by = Linked { object: id, text: cards.linked_card(ability.card), acquired };
+    (by != cards.linked_to(state, id)).then_some(by)
 }
 
 /// `acquired` for each of `chars`'s slots, of an object as it is now: none worked out (`None`) where every one is surely
@@ -152,8 +171,10 @@ fn watched_givers(id: ObjectId) -> Option<[Giver; cantrip_state::MAX_ABILITIES]>
 
 /// Applies `f`, an entry of the layers, to `id`'s characteristics, and while its abilities' givers are being worked out
 /// (`ability_givers`), notes `giver` beside each ability the entry put there (an ability the entry only moved keeps its
-/// giver).
-fn watching_givers(id: ObjectId, giver: Giver, chars: &mut Chars, f: impl FnOnce(&mut Chars)) {
+/// giver). One `id`'s own effect gave it is of its own text only if it is printed within that text (CR 607.1a: "{1}: This
+/// creature gains '...'"); one of another card's text its own effect gave it is acquired by that effect (CR 607.5:
+/// Quicksilver Elemental gaining Sisters of Stone Death's abilities).
+fn watching_givers(cards: &CardTable, id: ObjectId, giver: Giver, chars: &mut Chars, f: impl FnOnce(&mut Chars)) {
     let Some(givers) = watched_givers(id) else { return f(chars) };
     let before = chars.abilities;
     f(chars);
@@ -171,7 +192,7 @@ fn watching_givers(id: ObjectId, giver: Giver, chars: &mut Chars, f: impl FnOnce
                 moved[from] = true;
                 givers[from]
             }
-            None if giver.object == id => Giver::NONE,
+            None if giver.object == id && ability.is_some_and(|a| own_text(cards, chars, a)) => Giver::NONE,
             None => giver,
         };
     }
@@ -1632,7 +1653,7 @@ fn apply_entry(cx: &Ctx, o: &ObjCtx, entry: &GEntry, stage: &Stage, snap: &mut S
     let layer = LAYERS[stage.li];
     let text_lost = snap.chars.text_lost;
     if watch {
-        watching_givers(o.id, entry.giver(cx.cards, cx.state), &mut snap.chars, |chars| apply_raw(&view, layer, o.id, entry, chars));
+        watching_givers(cx.cards, o.id, entry.giver(cx.cards, cx.state), &mut snap.chars, |chars| apply_raw(&view, layer, o.id, entry, chars));
     } else {
         apply_raw(&view, layer, o.id, entry, &mut snap.chars);
     }
@@ -3711,8 +3732,8 @@ mod player_keyword_tests {
         let mut state = GameState::new(2, 0);
         let veil = put(&cards, &mut state, "Player Shroud Test Veil", 0, Zone::BATTLEFIELD);
         let ward = put(&cards, &mut state, "Player Hexproof Test Ward", 1, Zone::BATTLEFIELD);
-        let mine = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 0, Zone::hand(PlayerId(0))), controller: PlayerId(0) };
-        let theirs = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 1, Zone::hand(PlayerId(1))), controller: PlayerId(1) };
+        let mine = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 0, Zone::hand(PlayerId(0))), controller: PlayerId(0), by: None };
+        let theirs = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 1, Zone::hand(PlayerId(1))), controller: PlayerId(1), by: None };
         state.see_statics();
         assert!(player_has(&cards, &state, &[], PlayerId(0), Keyword::Shroud));
         assert!(!player_has(&cards, &state, &[], PlayerId(1), Keyword::Shroud));

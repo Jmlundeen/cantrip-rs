@@ -12,7 +12,7 @@ fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// "This ability costs {1} less to activate for each color of the creature it targets" (CR 601.2f, 602.2b): the colors
 /// the target has as the total cost is determined, once it is announced (CR 601.2c); generic mana only (CR 118.7a), so
 /// a creature of five colors takes the {4} to {0} and no lower. A colorless creature takes nothing off.
-fn less_per_color_of_target(q: &dyn Query, _: ObjectId, _: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
+fn less_per_color_of_target(q: &dyn Query, _: &Asker, _: Costed, targets: &[Target]) -> CostDelta {
     // Its one target, the creature (equip's only slot).
     let colors: u32 = targets.iter().filter_map(|t| t.object()).map(|creature| q.chars(creature).colors.0.count_ones()).sum();
     CostDelta::less(colors as u8)

@@ -28,7 +28,8 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 
 /// "Spells of the chosen type cost {1} more to cast" (CR 601.2f), whoever casts them.
 fn tax(q: &dyn Query, source: ObjectId, _player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    let Some(index) = choose::chosen_option(q, source, &CARD) else { return CostDelta::NONE };
+    // A cost change of its own text (CR 601.2f): asked as that text.
+    let Some(index) = choose::chosen_option(q, &Asker::new(source, q.controller(source)), &CARD) else { return CostDelta::NONE };
     match costed {
         Costed::Spell(id) if q.chars(id).is(TYPES[usize::from(index)]) => CostDelta::more(1),
         _ => CostDelta::NONE,

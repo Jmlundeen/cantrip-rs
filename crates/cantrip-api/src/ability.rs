@@ -551,7 +551,7 @@ impl AbilityDef {
     }
 
     /// Its own cost change (CR 601.2f, 602.2b): "this ability costs ... less to activate".
-    pub const fn cost_change(self, change: CostChange) -> AbilityDef {
+    pub const fn cost_change(self, change: AbilityCostChange) -> AbilityDef {
         AbilityDef::Activated(ActivatedDef { cost_change: Some(change), ..activated(self, "only an activated ability has a cost") })
     }
 

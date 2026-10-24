@@ -52,7 +52,7 @@ pub fn enters_tapped_choosing_a_color(g: &mut dyn Game, entering: &mut Entering)
 /// 607.5), none if none was (a land that became a copy of it without entering), and then the ability adds no mana. "The chosen color" is no color word, so a text-changing effect leaves it
 /// as it is (CR 612.2). The colors for a mana ability's `colors_from`: Sunken Citadel, Valgavoth's Lair, Heraldic Banner and Room of Refuge.
 pub fn chosen_color(q: &dyn Query, asker: &Asker) -> ColorSet {
-    q.state().chosen_color(q.linked_to(asker.source)).map_or(ColorSet::NONE, ColorSet::of)
+    q.state().chosen_color(q.linked_to(asker)).map_or(ColorSet::NONE, ColorSet::of)
 }
 
 /// "This land enters tapped unless you control a [land type]" (CR 614.12, 614.1d): read on the battlefield as it is while the land
