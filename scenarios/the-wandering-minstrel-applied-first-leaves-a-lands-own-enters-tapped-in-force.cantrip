@@ -1,0 +1,31 @@
+# The Wandering Minstrel, the other order (CR 616.1): Bot1 puts Ishgard, the Holy See and is asked which replacement applies
+# first; it takes the Minstrel's "lands you control enter untapped" first, then the land's own "This land enters tapped"
+# applies, and it enters tapped (the ruling: the land's controller may choose it enters tapped or untapped).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+The Wandering Minstrel
+Ishgard, the Holy See
+Forest x3
+Forest x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Wandering Minstrel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ishgard, the Holy See.Play
+Bot1.Replace(lands you control enter untapped)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ishgard, the Holy See.Tapped = true
