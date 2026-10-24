@@ -1,0 +1,53 @@
+# Silverback Elder, first mode: "Whenever you cast a creature spell, choose one - Destroy target artifact or enchantment."
+# Bot1 casts the Elder on turn 1 (Black Lotus and two Moxen), then Benalish Hero on turn 3. Bot2's Earthcraft (an
+# enchantment) is destroyed; its Forest (a land) is refused as a target beside it, and Bot2's Mox Ruby, an artifact, is a
+# legal target too but is not chosen (CR 701.8). The trigger resolves before the Hero does (CR 603.3).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Mox Pearl
+Silverback Elder
+Benalish Hero
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Earthcraft
+Island x4
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Silverback Elder.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Earthcraft.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Modes(Destroy target artifact)
+! Bot1.Target(Bot2.Battlefield.Forest)
+Bot1.Target(Bot2.Battlefield.Earthcraft)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Earthcraft
+Bot2.Battlefield = Forest; Mox Ruby
+Bot1.Battlefield = Forest; Mox Jet; Mox Pearl; Silverback Elder; Benalish Hero

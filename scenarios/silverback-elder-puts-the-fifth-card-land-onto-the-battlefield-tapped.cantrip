@@ -1,0 +1,48 @@
+# Silverback Elder, second mode: Bot1 looks at its top five cards, the fifth a Swamp and the sixth a Plains. The Plains is not
+# among the cards looked at, so it is refused; the Swamp enters tapped, the other four go to the bottom. Bot2's library
+# also has a land on top, and it stays where it is.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Mox Pearl
+Silverback Elder
+Llanowar Elves
+Llanowar Elves
+Llanowar Elves x4
+Swamp
+Plains
+Llanowar Elves x7
+
+[Bot2 Deck]
+Island x7
+Swamp
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Silverback Elder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Modes(Look at the top five)
+! Bot1.Choose(Plains)
+Bot1.Choose(Swamp)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Swamp.Tapped = true
+Bot1.Library.Count = 12
+Bot1.Library.Plains.Colors.Count = 0
+Bot2.Library.Count = 13
+Bot2.Library.Swamp.Colors.Count = 0

@@ -1,0 +1,47 @@
+# Silverback Elder: "Whenever you cast a creature spell". Bot1's noncreature spell (Mox Sapphire) casts with nothing
+# triggering (the stack holds the Mox alone, Bot1 is asked no mode), and Bot2's creature spell on its turn triggers nothing
+# either: Bot1 stays at 20 life and loses nothing to a default mode.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Mox Pearl
+Silverback Elder
+Mox Sapphire
+Island
+
+Island x13
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Silverback Elder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Forest; Mox Jet; Mox Pearl; Mox Sapphire; Silverback Elder
+Bot2.Battlefield = Forest; Llanowar Elves

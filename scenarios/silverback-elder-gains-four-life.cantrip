@@ -1,0 +1,36 @@
+# Silverback Elder, third mode: "You gain 4 life." The Elder's controller casts a creature spell and gains exactly 4: 24.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Mox Pearl
+Silverback Elder
+Llanowar Elves
+Llanowar Elves
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Silverback Elder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Modes(You gain 4 life)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 20
