@@ -1072,21 +1072,25 @@ neither a triggered ability nor a state-based action, so it waits for no player 
 happens in the middle of whatever made the permanent leave - a cost being paid (Yasharn back on the battlefield as the White
 Auracite holding it is sacrificed to Krark-Clan Ironworks, so a sacrifice later in the same payment can't be made, 601.2h),
 a resolution (the card back before the spell's next instruction), the state-based actions (back before the next check,
-704.3). The link is the exiled card's `ExileLink` (`until_leaves`) or the phased-out permanent's `Phased::until_leaves`;
+704.3: a check is one event, so its returns wait until all of it - the losers' leaving the game included - is done, and
+are then made together, 610.3d). The link is the exiled card's `ExileLink` (`until_leaves`) or the phased-out permanent's `Phased::until_leaves`;
 `phasing::still_on_battlefield` says the permanent has not left (phasing out is no leaving, 702.26d).
 
-`ops::return_until_left` carries both out (`return_exiled`, `phasing::phase_in_returning`), and is called by whatever can
-make a permanent leave: `move_together`, after the move's events and their triggers (so "leaves" abilities and the return's
-"enters" ones are collected in that order, and the history has the return after the leaving), and `leave_game`, whose
-leaving player's permanents cease to exist (800.4a). The returns of one event are one move (610.3d, 610.4d), and it goes round
-until nothing is due, since a return can make another such permanent leave; the moves it makes don't call it again
-(`GameState::returning`). A return can ask a question - what a returning Aura enchants (303.4f), an "as enters" choice - and
+`ops::return_until_left` carries both out (`ops::returns_due`: `return_exiled`, `phasing::phase_in_returning`), and is
+called by whatever can make a permanent leave: `move_together`, after the move's events and their triggers (so "leaves"
+abilities and the return's "enters" ones are collected in that order, and the history has the return after the leaving),
+`leave_game`, whose leaving player's permanents cease to exist (800.4a), and `settle::state_based_actions` once its check
+is done, which holds the others' calls for the length of the check (`GameState::returning`). The returns of one event are
+one move (610.3d, 610.4d), and it goes round until nothing is due, since a return can make another such permanent leave;
+the moves it makes don't call it again. A return can ask a question - what a returning Aura enchants (303.4f), an "as enters" choice - and
 the move it follows returns no suspension. The question waits on the frame and the run goes on, as for a replacement
 effect's question asked mid-move (`Cx::ask_core`); the run is then wound back to the position the question was asked in
 (`Cx::asked_at`) whether it ends or stops at a later question, so the question is judged and answered there, and redone
-from the frame's start with the answer. Outside a run (a rules test's bare `Cx`, a concession between runs) nothing could be
-asked, so it does nothing; settling (`settle::settle`, `state_based_actions_alone`) still calls `return_exiled` and
-`phase_in_returning` after the state-based actions as a backstop, and they find nothing due when the moves have done it.
+from the frame's start with the answer. Outside a run (a rules test's bare `Cx`, a concession between runs - a player
+conceding while their own announcement waits) nothing could be asked, so it does nothing; settling (`settle::settle`,
+`state_based_actions_alone`) carries out any return still due first, before the state triggers and the state-based actions
+look at the board, and finds nothing due when the moves have done it. Nothing runs between: a change sets
+`GameState::unsettled`, and priority settles before it is given.
 
 ### Winning, losing and drawing
 

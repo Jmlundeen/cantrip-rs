@@ -37,6 +37,12 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
     let mut progress = Progress::default();
     loop {
         progress.check(cx);
+        // CR 610.3, 610.4: what was exiled or phased out until a permanent left has come back as it left
+        // (`ops::return_until_left`); one whose permanent left where no question could be asked (a concession between runs,
+        // a player leaving while their own announcement waited) comes back first here, before anything looks at the board.
+        if !cx.s().is_over() && ops::returns_due(cx)? {
+            continue;
+        }
         // CR 603.8: a state trigger triggers as soon as its state is true, so the board a resolution leaves is asked before
         // the state-based actions change it (CR 704.3): Thespian's Stage that became a Dark Depths with no ice counters has
         // triggered even if the legend rule then puts it into the graveyard.
@@ -46,12 +52,6 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
         }
         if cx.s().is_over() {
             break;
-        }
-        // CR 610.3, 610.4: what was exiled or phased out until a permanent left has come back as it left
-        // (`ops::return_until_left`); one whose permanent left where no question could be asked (a concession between runs)
-        // comes back here, before anyone receives priority.
-        if ops::return_exiled(cx)? || crate::phasing::phase_in_returning(cx) {
-            continue;
         }
         if !cx.s().triggers.is_empty() {
             put_triggers_on_stack(cx)?;
@@ -65,21 +65,18 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
 
 /// State-based actions checked and performed until none applies (CR 704.3), and no triggered ability put on the stack: the
 /// check of the cleanup step (CR 514.3a) and of a turn being ended (CR 724.1c). A permanent they make leave gives back what
-/// was exiled or phased out until it left as it leaves, before the next check (CR 610.3, 610.4; `ops::return_until_left`),
-/// and any such return still due is carried out here, as in `settle`. Whether anything was done.
+/// was exiled or phased out until it left once the check is done, before the next (CR 610.3, 610.4; `state_based_actions`),
+/// and any such return still due is carried out first here, as in `settle`. Whether anything was done.
 pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
     let mut acted = false;
     let mut progress = Progress::default();
     loop {
         progress.check(cx);
-        if state_based_actions(cx)? {
+        if !cx.s().is_over() && ops::returns_due(cx)? {
             acted = true;
             continue;
         }
-        if cx.s().is_over() {
-            break;
-        }
-        if ops::return_exiled(cx)? || crate::phasing::phase_in_returning(cx) {
+        if state_based_actions(cx)? {
             acted = true;
             continue;
         }
@@ -89,8 +86,28 @@ pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
     Ok(acted)
 }
 
-/// Checks every state-based action at once and performs those that apply, simultaneously (CR 704.3). Whether any did.
+/// Checks every state-based action at once and performs those that apply, simultaneously (CR 704.3), as one event: what was
+/// exiled or phased out until a permanent that leaves in it left comes back once all of it is done, all together, and
+/// before the next check (CR 610.3, 610.3d, 610.4, 610.4d) - not between its parts, with a loser still to leave or a
+/// creature still to die. Whether any did.
 pub(crate) fn state_based_actions(cx: &mut Cx) -> R<bool> {
+    // The returns its moves would make at once (`ops::return_until_left`) wait for the end of the check, however it ends (a
+    // question stops it; a host that catches a panic goes on with the game).
+    let held = cx.s().returning.replace(true);
+    let done = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| check_once(&mut *cx)));
+    cx.s().returning.set(held);
+    let acted = match done {
+        Ok(acted) => acted?,
+        Err(panic) => std::panic::resume_unwind(panic),
+    };
+    if acted {
+        ops::return_until_left(cx);
+    }
+    Ok(acted)
+}
+
+/// `state_based_actions`' check, its returns held.
+fn check_once(cx: &mut Cx) -> R<bool> {
     verify_control(cx);
     let mut acted = false;
     let mut leavers = Vec::new();

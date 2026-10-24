@@ -795,36 +795,40 @@ pub fn return_exiled(cx: &mut Cx) -> R<bool> {
 /// permanent] leaves the battlefield" returns (`return_exiled`), and what phased out until then phases in
 /// (`phasing::phase_in_returning`), the moment that permanent has left - a move off the battlefield (`move_together`) or
 /// its owner leaving the game (`leave_game`) - whatever is under way: a cost being paid (CR 601.2g-h), a spell or ability
-/// resolving (CR 608.2), the state-based actions being performed (CR 704.3). Neither is a triggered ability or a
-/// state-based action, so neither waits for a player to receive priority or for the next check. The returns go on until
-/// none is due: one that makes another such permanent leave (an "as enters" sacrifice) is followed by the returns that
-/// leaving makes due.
+/// resolving (CR 608.2). Neither is a triggered ability or a state-based action, so neither waits for a player to receive
+/// priority or for the next check. A state-based check is one event (CR 704.3): its returns are held until all of it is
+/// performed, the losers gone with it, and then made together, before the next check (CR 610.3d, 610.4d;
+/// `settle::state_based_actions`). The returns go on until none is due: one that makes another such permanent leave (an
+/// "as enters" sacrifice) is followed by the returns that leaving makes due.
 ///
 /// A return can ask a question - the permanent an Aura returns attached to (CR 303.4f), an "as [this] enters" choice - and
 /// the operation it follows has no suspension to give back. The question waits on the frame, and the run goes on and is
 /// wound back to it and redone with the answer (`Game::run`), as one a replacement effect asks mid-move is; nothing more
 /// is returned while it waits. Outside a run (a rules test's bare `Cx`, a concession between runs) no one could be asked,
-/// so the returns are left to the next settling, which carries out any that are due (`settle::settle`) as a backstop.
+/// so the returns are left to the next settling, which carries them out first, before the state triggers and the
+/// state-based actions look at the board (`settle::settle`).
 pub fn return_until_left(cx: &mut Cx) {
     if cx.s().returning.get() || cx.s().agenda.get(cx.frame).is_none_or(|f| f.pending.is_some()) {
         return;
     }
-    // The moves the returns make look for no returns of their own: this goes round until none is due. Lowered however it
-    // ends, a host that catches a panic going on with the game.
-    cx.s().returning.set(true);
+    // A question asked stops it: the run is redone with its answer, and the rest is returned then.
+    while let Ok(true) = returns_due(cx) {}
+}
+
+/// The returns due now (CR 610.3, 610.4) carried out once, the exiled cards' (`return_exiled`) and the phased-out
+/// permanents' (`phasing::phase_in_returning`): whether any was. The moves they make look for no returns of their own
+/// (`GameState::returning`, held for the length of this and lowered however it ends, a host that catches a panic going
+/// on with the game). `return_until_left` goes round it; settling asks it as a backstop (`settle::settle`).
+pub fn returns_due(cx: &mut Cx) -> R<bool> {
+    let held = cx.s().returning.replace(true);
     let done = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        loop {
-            // A question asked: the run is redone with its answer, and the rest is returned then.
-            let Ok(returned) = return_exiled(&mut *cx) else { break };
-            let phased_in = crate::phasing::phase_in_returning(&mut *cx);
-            if !returned && !phased_in {
-                break;
-            }
-        }
+        let returned = return_exiled(&mut *cx)?;
+        Ok(crate::phasing::phase_in_returning(&mut *cx) || returned)
     }));
-    cx.s().returning.set(false);
-    if let Err(panic) = done {
-        std::panic::resume_unwind(panic);
+    cx.s().returning.set(held);
+    match done {
+        Ok(done) => done,
+        Err(panic) => std::panic::resume_unwind(panic),
     }
 }
 
