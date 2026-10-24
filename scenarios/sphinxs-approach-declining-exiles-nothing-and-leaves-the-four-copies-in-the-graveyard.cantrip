@@ -1,5 +1,5 @@
 # Sphinx's Approach declined: the draw still happens, but nothing is exiled and no search is made, so the four milled
-# copies stay in the graveyard, the resolving spell joins them there (CR 608.2c), and no Sphinx arrives. The only other
+# copies stay in the graveyard, the resolving spell joins them there (CR 608.2n), and no Sphinx arrives. The only other
 # card in the graveyard is the Black Lotus sacrificed for the spell's mana.
 
 [Bot1 Deck]
@@ -43,3 +43,4 @@ Bot1.Decline
 Bot1.Battlefield.Count = 5
 Bot1.Graveyard.Count = 6
 Exile.Count = 0
+Bot1.Hand.Count = 2

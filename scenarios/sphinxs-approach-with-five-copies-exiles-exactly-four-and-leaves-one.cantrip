@@ -1,6 +1,6 @@
 # Sphinx's Approach with five copies in the graveyard when it resolves: Emry mills four copies on turn one, and the
 # first Approach is cast and resolves (putting the fifth in the graveyard); the second, cast on turn three, may exile
-# itself and four of the five, leaving one copy in the graveyard. The two draws are Islands, so Sphinx of the Guildpact
+# itself and exactly four of the five of its controller's choosing (three or all five are refused, and the four need not be the first four), leaving one copy in the graveyard. The two draws are Islands, so Sphinx of the Guildpact
 # is still in the library to be searched for. The sacrificed Black Lotus and the exiled spell are the only other cards
 # that leave.
 
@@ -49,12 +49,14 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Sphinx's Approach.Cast
 Bot1.Pass
 Bot1.Accept
-Bot1.Choose(Sphinx's Approach#1; Sphinx's Approach#2; Sphinx's Approach#3; Sphinx's Approach#4)
+! Bot1.Choose(Sphinx's Approach#1; Sphinx's Approach#2; Sphinx's Approach#3)
+! Bot1.Choose(Sphinx's Approach#1; Sphinx's Approach#2; Sphinx's Approach#3; Sphinx's Approach#4; Sphinx's Approach#5)
+Bot1.Choose(Sphinx's Approach#1; Sphinx's Approach#2; Sphinx's Approach#3; Sphinx's Approach#5)
 Bot1.Search(Sphinx of the Guildpact)
 [T3 Bot1.Main2]
 
 [Expect]
 Bot1.Battlefield.Sphinx of the Guildpact.Power = 5
 Bot1.Battlefield.Count = 5
-Bot1.Graveyard.Count = 2
+Bot1.Graveyard = Sphinx's Approach; Black Lotus
 Exile.Count = 5

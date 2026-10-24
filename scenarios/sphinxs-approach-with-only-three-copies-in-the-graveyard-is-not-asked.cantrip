@@ -1,7 +1,7 @@
 # Sphinx's Approach with only three copies in the graveyard: Emry mills three Sphinx's Approach and an Island, so the
 # graveyard does not hold the four cards the action needs. The action is impossible, so no question is asked (the bare
 # refusal, CR 608.2d), nothing is exiled and no search happens; the resolving spell itself reaches the graveyard only after
-# the check, so it cannot be one of the four (CR 608.2c).
+# the check, so it cannot be one of the four (CR 608.2n).
 
 [Bot1 Deck]
 Island

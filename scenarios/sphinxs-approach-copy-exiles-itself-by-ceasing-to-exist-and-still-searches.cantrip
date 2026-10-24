@@ -1,0 +1,57 @@
+# Sphinx's Approach copied by Return the Favor: the copy resolves first (CR 707.10) and its controller may exile "this
+# spell" (the copy, which moves to exile and then ceases to exist, CR 704.5e) and the four milled copies in the
+# graveyard (the original is still on the stack, so it is not one of them). All five were exiled, so "if you do" holds
+# (CR 608.2c) and Sphinx of the Guildpact is found. The original then resolves, draws two more and finds no four copies.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Black Lotus
+Emry, Lurker of the Loch
+Return the Favor
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Sphinx's Approach
+Island x7
+Sphinx of the Guildpact
+Island x10
+
+[Bot2 Deck]
+Opt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sphinx's Approach.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target)
+Bot1.Target(Stack.Sphinx's Approach)
+Bot1.Pass
+Bot1.Pass
+Bot1.Accept
+Bot1.Search(Sphinx of the Guildpact)
+? Bot1.Battlefield.Sphinx of the Guildpact.Power = 5
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sphinx of the Guildpact.Power = 5
+Exile.Count = 4
+Bot1.Hand.Count = 5
+Bot1.Graveyard.Count = 3

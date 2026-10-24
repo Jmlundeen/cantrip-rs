@@ -2,7 +2,7 @@
 # graveyard. If you do, search your library for a Sphinx creature card, put it onto the battlefield, then shuffle."
 # Emry mills the four copies at the top of the library on turn one (CR 701.17a), then the Approach is cast for {1}{U}{U}
 # with a Mox Sapphire and a Black Lotus. Accepting exiles the spell and exactly those four cards together (CR 701.13) and
-# finds Sphinx of the Guildpact; the two cards drawn are Islands, so the Sphinx is still in the library for the search.
+# finds Sphinx of the Guildpact; the two cards drawn are Islands, so the Sphinx is still in the library for the search; a Llanowar Elves (a creature, not a Sphinx) and the Islands (not creatures) cannot be found.
 
 [Bot1 Deck]
 Island
@@ -19,7 +19,8 @@ Sphinx's Approach
 Island
 Island
 Sphinx of the Guildpact
-Island x10
+Llanowar Elves
+Island x9
 
 [Bot2 Deck]
 Opt x20
@@ -39,6 +40,8 @@ Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Hand.Sphinx's Approach.Cast
 Bot1.Pass
 Bot1.Accept
+! Bot1.Search(Island)
+! Bot1.Search(Llanowar Elves)
 Bot1.Search(Sphinx of the Guildpact)
 [T1 Bot1.Main2]
 
@@ -48,3 +51,4 @@ Bot1.Battlefield.Sphinx of the Guildpact.Toughness = 5
 Bot1.Battlefield.Count = 6
 Bot1.Graveyard = Black Lotus
 Exile.Count = 5
+Bot1.Hand.Count = 2
