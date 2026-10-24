@@ -1,13 +1,14 @@
-# Myriad Landscape enters tapped; two mana pays its search ability. A Forest and second Forest are allowed, while a Plains cannot join that choice because it shares no land type with the Forest (CR 205.3i, 305.6, 701.23b).
+# Myriad Landscape enters tapped; {2} pays its search ability, paid here with Mox Jet and Mox Ruby: neither is white or blue, so a {W}{U} or {1}{W} cost would be refused. The search takes up to two basic lands: three Forests are too many, a Savannah is no basic land although it shares the Forest type, and a Plains cannot join a Forest because they share no land type. Two Forests are allowed (CR 205.3i, 205.4a, 305.6, 701.23b).
 
 [Bot1 Deck]
 Myriad Landscape
-Mox Pearl
-Mox Sapphire
+Mox Jet
+Mox Ruby
 Island x4
 Forest x6
 Plains x4
-Island x10
+Island x9
+Savannah
 
 [Bot2 Deck]
 Island x20
@@ -15,8 +16,8 @@ Island x20
 [Actions]
 Bot1.Hand.Myriad Landscape.Play
 ? Bot1.Battlefield.Myriad Landscape.Tapped = true
-Bot1.Hand.Mox Pearl.Cast
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
 Bot2.Pass
 [T3 Bot1.Main1]
@@ -24,9 +25,11 @@ Bot1.Battlefield.Myriad Landscape.Activate(Ability: {T}: Add {C})
 ? Bot1.Mana = {C}
 [T5 Bot1.Main1]
 Bot1.Battlefield.Myriad Landscape.Activate(Ability: {2}, {T}, Sacrifice this land)
-Bot1.Battlefield.Mox Pearl.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
 ? Bot1.Mana =
+! Bot1.Search(Forest; Forest; Forest)
+! Bot1.Search(Savannah)
 ! Bot1.Search(Forest; Plains)
 Bot1.Search(Forest; Forest)
 

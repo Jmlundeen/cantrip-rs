@@ -1,0 +1,30 @@
+# Myriad Landscape's {T} in "{2}, {T}, Sacrifice this land" (CR 602.2b, 118.3): with the land tapped for {C} and {2} to spare
+# from two Moxen, the search is still not offered.
+
+[Bot1 Deck]
+Myriad Landscape
+Mox Jet
+Mox Ruby
+Island x4
+Forest x6
+Plains x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Myriad Landscape.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Myriad Landscape.Activate(Ability: {T}: Add {C})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Myriad Landscape.Activate(Ability: {2}, {T}, Sacrifice this land)
+
+[Expect]
+Bot1.Battlefield.Myriad Landscape.Tapped = true
+Bot1.Graveyard.Count = 0
