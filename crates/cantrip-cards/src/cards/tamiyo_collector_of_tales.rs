@@ -12,7 +12,7 @@ fn opponents_cant_cause_you(_: &dyn Query, asker: &Asker, causer: PlayerId, play
 /// them go into your hand and the rest into your graveyard, in the order their owner chooses (CR 404.3), together.
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::Nonland };
+    let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::NONLAND };
     let Answer::Name(Some(name)) = g.ask(you, ask)? else { return Ok(()) };
     // The four, bottom of them first (as the C# engine lists them).
     let mut top = top_of_library(g, you, 4);

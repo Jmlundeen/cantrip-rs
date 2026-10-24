@@ -2046,6 +2046,7 @@ public static class PromptFixtures
                     Hand = TheirHand(view),
                     Names = ["Anointed Peacekeeper", "Lightning Bolt", "Plains", "Wrath of God"],
                     Suggestion = "Wrath of God",
+                    Kind = "a card name",
                 };
 
             case "name-card-empty-hand":
@@ -2058,6 +2059,7 @@ public static class PromptFixtures
                     Owner = Rival,
                     Names = ["Anointed Peacekeeper", "Lightning Bolt", "Plains", "Wrath of God"],
                     Suggestion = "Anointed Peacekeeper",
+                    Kind = "a card name",
                 };
 
             case "choose-starting-player":

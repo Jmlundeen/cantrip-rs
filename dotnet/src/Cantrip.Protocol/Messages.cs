@@ -1994,8 +1994,9 @@ public sealed class NameCardPromptMessage : PromptPayload
     public string Suggestion { get; set; } = string.Empty;
 
     /// <summary>
-    /// What the name must be the name of, in the card's own words before "card name" (CR 201.4a): empty for any card,
-    /// "nonland" (Tamiyo, Collector of Tales) or "land" (Petrified Hamlet). <see cref="Names"/> already holds only those.
+    /// What the name must be the name of, in the card's own words (CR 201.4a): "a card name", "a nonland card name" (Tamiyo,
+    /// Collector of Tales), "a land card name" (Petrified Hamlet), "a card name other than a basic land card name"
+    /// (Necromentia). <see cref="Names"/> already holds only those.
     /// </summary>
     [Key(6)]
     public string Kind { get; set; } = string.Empty;

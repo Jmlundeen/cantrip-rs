@@ -23,7 +23,7 @@ fn choose_land_name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         }
     }
     let suggestion = seen.iter().max_by_key(|(_, n)| *n).map(|(card, _)| *card);
-    let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion, kind: NameKind::Land };
+    let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion, kind: NameKind::LAND };
     if let Answer::Name(Some(name)) = g.ask(you, ask)? {
         g.remember_chosen_name(g.linked(item), name);
     }

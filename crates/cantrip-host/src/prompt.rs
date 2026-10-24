@@ -1085,7 +1085,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 .filter(|&(_, &named)| named)
                 .map(|(c, _)| c)
                 // A split card has two names and a player names one of them (CR 709.4a): its halves are listed, not the whole.
-                .filter(|c| c.split.is_none() && kind.allows(c.is(CardType::Land)))
+                .filter(|c| c.split.is_none() && kind.allows(c.types, c.supertypes))
                 .map(|c| c.name.to_string())
                 .collect();
             names.sort();
@@ -1098,7 +1098,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 hand: handles_of(handles, looked_at),
                 suggestion: suggestion.map_or_else(|| names.first().cloned().unwrap_or_default(), |c| game.cards.get(c).name.to_string()),
                 names,
-                kind: kind.word().to_string(),
+                kind: kind.words(),
             })
         }
         RequestKind::May { source, purpose: Purpose::Ask(question) } => PromptPayload::MayPromptMessage(MayPrompt {

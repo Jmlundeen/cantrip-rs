@@ -239,7 +239,7 @@ fn exile_up_to_four_named(g: &mut dyn Game, item: &StackItem) -> Result<Option<(
     const MOST: u8 = 4;
     let you = item.controller;
     let Some(owner) = crate::targets::player(g, item, 0) else { return Ok(None) };
-    let name = g.ask(you, RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::Any })?;
+    let name = g.ask(you, RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::ANY })?;
     // A card has "that name" when it is the card name chosen; with no name chosen nothing has it.
     let named = |q: &dyn Query, c: ObjectId| matches!(name, Answer::Name(Some(wanted)) if object_has_name(q, c, wanted));
     let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner)).iter().copied().filter(|&c| named(g, c)).collect();

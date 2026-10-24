@@ -1339,11 +1339,12 @@ public sealed partial class MainPage
         string source = client.Object(prompt.Source)?.Name ?? "This permanent";
         bool looking = prompt.Owner > 0;
         string owner = looking ? NameOf(client, prompt.Owner) : string.Empty;
-        string kind = prompt.Kind.Length > 0 ? prompt.Kind + " " : string.Empty;
+        // What the card asks for, in its words: "a nonland card name", "a card name other than a basic land card name".
+        string kind = prompt.Kind.Length > 0 ? prompt.Kind : "a card name";
 
         Prompt(
-            $"{source}: choose a {kind}card name",
-            !looking ? $"Type the name of any {kind}card"
+            $"{source}: choose {kind}",
+            !looking ? $"Type {kind}"
             : prompt.Hand.Count == 0 ? $"{owner}'s hand is empty  ·  type any name"
             : $"Looking at {owner}'s hand  ·  click a card, or type any name");
 
@@ -1371,7 +1372,7 @@ public sealed partial class MainPage
 
         var field = new TextBox
         {
-            PlaceholderText = $"Any {kind}card name",
+            PlaceholderText = "Card name",
             Text = _selection.NameTyped,
             Width = 220,
             FontSize = 13,
@@ -1382,7 +1383,7 @@ public sealed partial class MainPage
         string? Match() => CardNameMatch(prompt.Names, _selection.NameTyped);
 
         DockButton naming = AddButton(
-            Match() is { } matched ? $"Name {matched}" : $"Name a {kind}card",
+            Match() is { } matched ? $"Name {matched}" : "Name a card",
             () =>
             {
                 if (Match() is { } chosen)
@@ -1397,7 +1398,7 @@ public sealed partial class MainPage
         {
             _selection.NameTyped = field.Text;
             string? matched = Match();
-            naming.Caption = matched is null ? $"Name a {kind}card" : $"Name {matched}";
+            naming.Caption = matched is null ? "Name a card" : $"Name {matched}";
             naming.Enabled = matched is not null;
         };
 

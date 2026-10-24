@@ -22,7 +22,7 @@ fn chapter_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         }
     }
     let suggestion = suggestion.map(|(_, name)| name);
-    let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion, kind: NameKind::Any };
+    let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion, kind: NameKind::ANY };
     if let Answer::Name(Some(name)) = g.ask(item.controller, ask)? {
         g.remember_chosen_name(g.linked(item), name);
     }

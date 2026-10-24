@@ -164,7 +164,7 @@ pub fn look_at_an_opponents_hand_then_choose_a_name(g: &mut dyn Game, entering: 
             suggestion = Some((def.cost.mana_value(), named));
         }
     }
-    if let Answer::Name(name) = g.ask(you, RequestKind::ChooseName { source, looked_at: hand, suggestion: suggestion.map(|s| s.1), kind: NameKind::Any })? {
+    if let Answer::Name(name) = g.ask(you, RequestKind::ChooseName { source, looked_at: hand, suggestion: suggestion.map(|s| s.1), kind: NameKind::ANY })? {
         entering.chosen_card = name;
     }
     Ok(())

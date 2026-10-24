@@ -1353,7 +1353,8 @@ pub struct NameCardPrompt {
     pub hand: Vec<ViewHandle>,
     pub names: Vec<String>,
     pub suggestion: String,
-    /// What the name must be the name of, in the card's words before "card name" (CR 201.4a): "", "nonland" or "land".
+    /// What the name must be the name of, in the card's words (CR 201.4a): "a card name", "a nonland card name", "a card
+    /// name other than a basic land card name".
     pub kind: String,
 }
 

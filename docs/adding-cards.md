@@ -463,8 +463,10 @@ shapes have an example:
   `TargetingRule { kind: TargetingRuleKind::Forbid(f), applies }` in `CardDef::targeting_rules`: `applies` names the
   objects, `f` reads the `Asker` (`spell` or ability, its controller) and its source's characteristics, a color word
   through the words of the card's text (engine-design.md, "Can't be the target of" restrictions).
-- **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`; its `kind`, `NameKind::Any`,
-  `Nonland` or `Land`, is what the name must be the name of, CR 201.4a, and the core refuses any other) and `ChoosePlayer`;
+- **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`; its `kind` is what the name must
+  be the name of, CR 201.4a, and the core refuses any other: card types the card has, card types it has none of, and
+  "other than a basic land card name" - `NameKind::ANY`, `NONLAND`, `LAND`, `OTHER_THAN_BASIC_LAND`, or a `NameKind { .. }`
+  for any other printed one, "a noncreature, nonland card name") and `ChoosePlayer`;
   a name chosen as a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`, and one chosen for a
   permanent as its ability resolves ("when this land enters, choose a land card name", a Saga's "choose a card name") is
   `Game::remember_chosen_name`, kept there too (CR 607.2d): Petrified Hamlet, Medomai's Prophecy.

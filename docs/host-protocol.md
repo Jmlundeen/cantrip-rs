@@ -165,6 +165,11 @@ their turn and the stack empty, its owner is offered a `TakeCompanion` option on
 in hand."; taking it pays {3} as a special action and puts the card into their hand, where it is a card like any other (CR
 702.139c). Version 209.
 
+**Naming a card.** A `NameCardPromptMessage` lists in `Names` only the names the question allows, and its `Kind` is what
+the name must be the name of in the card's own words, article and all (CR 201.4a): "a card name", "a nonland card name", "a
+card name other than a basic land card name" (Necromentia), "a noncreature, nonland card name". A client captions the question
+"[source]: choose [Kind]"; the host refuses a name outside `Names` with `IllegalAnswer`. Version 215.
+
 A draw the players agree to (`docs/rules-exceptions.md`, RX-4) is not a request of the host's: the offer and the answers to it
 are the server's (`GameSession.OfferDraw`, `AnswerDraw`, over the C# protocol's `OfferDrawMessage`, `AnswerDrawMessage` and
 `DrawOfferMessage`, version 201). Offering passes the offerer's priority, which the host is sent as any `PassAnswer`; once

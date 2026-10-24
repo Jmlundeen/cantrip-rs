@@ -1641,7 +1641,7 @@ public sealed class Decisions
 
         int pick = One(new Question
         {
-            Heading = $"{GameText.Named(client, prompt.Source)}: name a card. "
+            Heading = $"{GameText.Named(client, prompt.Source)}: choose {(prompt.Kind.Length > 0 ? prompt.Kind : "a card name")}. "
                 + $"You are looking at {GameText.Whose(client, prompt.Owner)} hand.",
             Choices = names,
         });

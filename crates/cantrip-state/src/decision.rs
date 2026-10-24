@@ -258,34 +258,58 @@ impl Action {
     }
 }
 
-/// What a chosen card name must be the name of (CR 201.4a): "a card name" (any card), "a nonland card name" (Cabal
-/// Therapy, Tamiyo, Collector of Tales), "a land card name" (Petrified Hamlet). The name's own card is what is judged, a
-/// back face by the back face's characteristics alone (CR 201.4d).
+/// What a chosen card name must be the name of (CR 201.4a: "a name chosen with certain characteristics must be the name
+/// of a card that has them"), as the card words it: every printed restriction is card types the named card has, card types
+/// it has none of, and "other than a basic land card name". "A card name" (`ANY`), "a nonland card name" (`NONLAND`: Cabal
+/// Therapy, Tamiyo, Collector of Tales), "a land card name" (`LAND`: Petrified Hamlet), "a creature card name" (Infinite
+/// Obliteration), "an artifact card name" (Dispossess), "a noncreature, nonland card name" (Council of the Absolute), "a
+/// card name other than a basic land card name" (`OTHER_THAN_BASIC_LAND`: Necromentia, Booby Trap, Desperate Research, Null
+/// Chamber), and "a nonbasic land card name" (Alpine Moon), which is a land card name other than a basic land card name.
+/// The name's own card is what is judged, a back face by the back face's characteristics alone (CR 201.4d).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub enum NameKind {
-    #[default]
-    Any,
-    Nonland,
-    Land,
+pub struct NameKind {
+    /// The card types the named card has, every one of them ("a land card name").
+    pub types: TypeSet,
+    /// The card types it has none of ("a noncreature, nonland card name").
+    pub non_types: TypeSet,
+    /// "Other than a basic land card name": it is not a basic land, a land with the supertype basic (CR 205.4c).
+    pub other_than_basic_land: bool,
 }
 
 impl NameKind {
-    /// Whether the name of a card that is (`land`) or is not a land may be chosen.
-    pub fn allows(self, land: bool) -> bool {
-        match self {
-            NameKind::Any => true,
-            NameKind::Nonland => !land,
-            NameKind::Land => land,
-        }
+    /// "A card name": any card's.
+    pub const ANY: NameKind = NameKind { types: TypeSet::NONE, non_types: TypeSet::NONE, other_than_basic_land: false };
+    /// "A nonland card name".
+    pub const NONLAND: NameKind = NameKind { non_types: TypeSet::of(&[CardType::Land]), ..NameKind::ANY };
+    /// "A land card name".
+    pub const LAND: NameKind = NameKind { types: TypeSet::of(&[CardType::Land]), ..NameKind::ANY };
+    /// "A card name other than a basic land card name".
+    pub const OTHER_THAN_BASIC_LAND: NameKind = NameKind { other_than_basic_land: true, ..NameKind::ANY };
+
+    /// Whether the name of a card with these card types and supertypes may be chosen.
+    pub fn allows(self, types: TypeSet, supertypes: Supertypes) -> bool {
+        types.0 & self.types.0 == self.types.0
+            && types.0 & self.non_types.0 == 0
+            && !(self.other_than_basic_land && supertypes.basic && types.has(CardType::Land))
     }
 
-    /// The words a card uses for the name it asks for, before "card name": "", "nonland", "land".
-    pub fn word(self) -> &'static str {
-        match self {
-            NameKind::Any => "",
-            NameKind::Nonland => "nonland",
-            NameKind::Land => "land",
+    /// What the card asks for, in its words: "a card name", "a nonland card name", "an artifact card name", "a
+    /// noncreature, nonland card name", "a card name other than a basic land card name", "a nonbasic land card name".
+    pub fn words(self) -> String {
+        let mut words: Vec<String> = self.non_types.iter().map(|t| format!("non{}", t.name().to_lowercase())).collect();
+        let nonbasic_land = self.other_than_basic_land && self.types.has(CardType::Land);
+        let types: Vec<String> = self.types.iter().map(|t| t.name().to_lowercase()).collect();
+        if !types.is_empty() {
+            let types = types.join(" ");
+            words.push(if nonbasic_land { format!("nonbasic {types}") } else { types });
         }
+        let mut phrase = words.join(", ");
+        phrase.push_str(if phrase.is_empty() { "card name" } else { " card name" });
+        if self.other_than_basic_land && !nonbasic_land {
+            phrase.push_str(" other than a basic land card name");
+        }
+        let article = if phrase.starts_with(['a', 'e', 'i', 'o', 'u']) { "an" } else { "a" };
+        format!("{article} {phrase}")
     }
 }
 

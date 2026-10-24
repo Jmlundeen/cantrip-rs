@@ -44,6 +44,8 @@ mod loser_check_tests;
 #[cfg(test)]
 mod history_cut_tests;
 #[cfg(test)]
+mod name_kind_tests;
+#[cfg(test)]
 mod inherent_trigger_tests;
 #[cfg(test)]
 mod copy_card_tests;
