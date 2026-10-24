@@ -179,7 +179,7 @@ pub(crate) fn verify_reveal_carried(cx: &Cx, id: ObjectId) {
             Event::Revealed { card, .. } if card == id => panic!(
                 "{} ({id:?}) was revealed by the effect putting it into a hand or a library, with a move not marked revealed: the \
                  instruction that reveals it moves it with a reveal-and-move verb (`Game::return_to_hand_revealed`, \
-                 `move_together_revealed`, `bring_into_hand_revealed`; CR 701.20a, 603.10a)",
+                 `move_together_revealed`, `bring_into_hand_revealed`, `discard_revealed`; CR 701.20a, 603.10a)",
                 cx.g.name(id)
             ),
             Event::Resolved { source, ability } if cause == (Cause::Ability { source, ability }) => return,
@@ -2402,12 +2402,25 @@ pub fn discard_together(cx: &mut Cx, cards: &[ObjectId]) -> Vec<ObjectId> {
 /// 118.12): no replacement that would put one into a hidden zone unrevealed is offered for it (CR 701.9c,
 /// `ZoneChange::pays_characteristic`).
 pub fn discard_paying(cx: &mut Cx, cards: &[ObjectId], paying: &[ObjectId]) -> Vec<ObjectId> {
+    discard_moving(cx, cards, paying, false)
+}
+
+/// `discard_together` for cards the instruction discarding them revealed ("target opponent reveals their hand. You choose a
+/// card from it. That player discards that card"): a card stays revealed through the parts of the effect it is relevant to
+/// (CR 701.20a), its discard among them, so one a replacement puts into a hand or a library instead goes there seen by all
+/// (CR 603.10a), its characteristics known (CR 701.9c applies only to a card put there without being revealed).
+pub fn discard_revealed(cx: &mut Cx, cards: &[ObjectId]) -> Vec<ObjectId> {
+    discard_moving(cx, cards, &[], true)
+}
+
+/// The discard of `discard_paying` and `discard_revealed`: each move marked as paying a characteristic or as revealed.
+fn discard_moving(cx: &mut Cx, cards: &[ObjectId], paying: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
     // CR 101.2: a card an opponent's spell or ability can't make its owner discard stays where it is.
     let causer = cx.effect_controller();
     let moves: Vec<Moving> = cards
         .iter()
         .filter(|&&c| causer.is_none_or(|by| cantrip_api::may_cause(&*cx, by, cx.s().obj(c).owner, cantrip_api::CauseKind::Discard)))
-        .map(|&c| Moving { pays_characteristic: paying.contains(&c), ..Moving::to(c, Zone::graveyard(cx.s().obj(c).owner)) })
+        .map(|&c| Moving { pays_characteristic: paying.contains(&c), revealed, ..Moving::to(c, Zone::graveyard(cx.s().obj(c).owner)) })
         .collect();
     let (new, seen) = move_together_seen(cx, &moves, ZoneReason::Discard);
     // A card a replacement put into a hidden zone instead of its owner's graveyard (Library of Leng), and not revealed as it

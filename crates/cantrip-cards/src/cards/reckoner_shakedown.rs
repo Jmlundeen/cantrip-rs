@@ -14,7 +14,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         chosen = choose::select(g, item.controller, item.object, Purpose::Discard, hand, select::NONLAND_CARD)?;
     }
     if !chosen.is_empty() {
-        g.discard_together(&chosen);
+        g.discard_revealed(&chosen);
         return Ok(());
     }
     let candidates: Vec<ObjectId> = g

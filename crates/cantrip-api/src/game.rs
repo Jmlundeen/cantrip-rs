@@ -411,6 +411,10 @@ pub trait Game: Query {
     /// card instead". Those can't be put into a hidden zone unrevealed (CR 701.9c): no replacement that would is offered
     /// for them (`ZoneChange::pays_characteristic`).
     fn discard_paying(&mut self, cards: &[ObjectId], paying: &[ObjectId]) -> Vec<ObjectId>;
+    /// `discard_together` for cards the same instruction revealed ("target opponent reveals their hand. You choose a card
+    /// from it. That player discards that card", CR 701.20a): each moves revealed, so a replacement that puts it into a hand
+    /// or a library puts it there seen by all, not undefined (CR 603.10a, 701.9c).
+    fn discard_revealed(&mut self, cards: &[ObjectId]) -> Vec<ObjectId>;
     /// `player` discards their hand (CR 701.9): every card in it, at once, through `discard_together`. The new objects.
     fn discard_hand(&mut self, player: PlayerId) -> Vec<ObjectId> {
         let hand = self.state().zone(Zone::hand(player)).to_vec();

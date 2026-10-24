@@ -37,7 +37,8 @@ pub fn choose_from_revealed_hand_of_kind(
     Ok(choose::cards_from_kind(g, item.controller, item.object, purpose, kind, hand, eligible, 1, false)?.into_iter().take(1).collect())
 }
 
-/// `choose_from_revealed_hand`, then the player discards what was chosen, together (CR 701.9a). The cards discarded.
+/// `choose_from_revealed_hand`, then the player discards what was chosen, together (CR 701.9a), still revealed (CR
+/// 701.20a, `Game::discard_revealed`). The cards discarded.
 pub fn discard_chosen_from_revealed_hand(
     g: &mut dyn Game,
     item: &StackItem,
@@ -58,7 +59,7 @@ pub fn discard_chosen_from_revealed_hand_of_kind(
     eligible: fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let chosen = choose_from_revealed_hand_of_kind(g, item, player, purpose, kind, eligible)?;
-    g.discard_together(&chosen);
+    g.discard_revealed(&chosen);
     Ok(chosen)
 }
 

@@ -16,7 +16,7 @@ fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(&card) = choose::cards_from(g, item.controller, item.object, Purpose::Discard, hand, eligible, 1, true)?.first() else {
         return Ok(());
     };
-    g.discard(card);
+    g.discard_revealed(&[card]);
     g.draw(opponent, 1);
     Ok(())
 }

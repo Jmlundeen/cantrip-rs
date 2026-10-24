@@ -16,7 +16,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let nonland: Vec<ObjectId> = hand.iter().copied().filter(|&c| !g.chars(c).is(CardType::Land)).collect();
     let chosen = choose::cards_from_kind(g, you, item.object, Purpose::TakeFromHand, "nonland", hand, nonland, 1, true)?;
     if !chosen.is_empty() {
-        g.discard_together(&chosen);
+        g.discard_revealed(&chosen);
         return Ok(());
     }
     let exiled: Vec<ObjectId> = g.state().zone(Zone::exile(opponent)).iter().copied().filter(|&c| !g.obj(c).face_down).collect();

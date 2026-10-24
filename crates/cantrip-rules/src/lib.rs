@@ -1447,6 +1447,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::discard_paying(self, cards, paying)
     }
 
+    fn discard_revealed(&mut self, cards: &[ObjectId]) -> Vec<ObjectId> {
+        ops::discard_revealed(self, cards)
+    }
+
     fn create_tokens_together(&mut self, tokens: &[(CardId, PlayerId)]) -> Result<Vec<ObjectId>, Suspend> {
         ops::create_tokens_batch(self, tokens, false, None, &[]).map_err(|_| Suspend)
     }

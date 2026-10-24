@@ -28,7 +28,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.reveal(opponent, &hand);
     let ask = question(item, hand);
     if let Answer::Cards(cards) = g.ask(item.controller, ask)? {
-        g.discard_together(&cards);
+        g.discard_revealed(&cards);
     }
     Ok(())
 }
@@ -49,7 +49,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         }
         _ => {
             if let Some(Answer::Cards(cards)) = g.staged_answer() {
-                g.discard_together(&cards);
+                g.discard_revealed(&cards);
             }
             Ok(())
         }

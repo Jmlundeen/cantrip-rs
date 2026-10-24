@@ -1218,3 +1218,49 @@ Bot1.Hand = Island; Island; Island; Island
 ",
     );
 }
+
+/// Visage of Dread has Bot2 reveal their hand and discard the Probe Bones chosen from it: the card stays revealed through the
+/// discard (CR 701.20a), so the Leng puts it on top of the library seen by all, its characteristics known (CR 701.9c applies
+/// only without a reveal), and its "when you discard this card" triggers from there (CR 113.6k): Bot2 gains 3.
+#[test]
+fn a_card_discarded_from_a_revealed_hand_into_a_library_is_known() {
+    play(
+        "revealed-hand-discard-under-leng",
+        "
+[Bot1 Deck]
+Probe Leng
+Mox Jet
+Mox Ruby
+Visage of Dread
+Island x16
+
+[Bot2 Deck]
+Probe Bones
+Island x19
+
+[Actions]
+Bot1.Hand.Probe Leng.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Visage of Dread.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Probe Bones)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 23
+Bot2.Library.Count = 14
+Bot2.Graveyard.Count = 0
+",
+    );
+}

@@ -20,7 +20,7 @@ fn reveal_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         })
         .collect();
     let chosen = choose::cards_from_kind(g, item.controller, item.object, Purpose::Discard, "artifact or creature", hand, eligible, 1, false)?;
-    g.discard_together(&chosen);
+    g.discard_revealed(&chosen);
     Ok(())
 }
 
