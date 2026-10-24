@@ -193,10 +193,8 @@ fn conspiracy_and_arcane_adaptation_in_hand_and_library_apply_in_timestamp_order
         // Chosen as each entered, by its own text (CR 607.2d).
         for (id, value) in [(ids[0], Subtype::Goblin), (ids[1], Subtype::Saproling)] {
             let text = game.cards.linked_to(&game.state, id).text;
-            game.state.update_obj(id, |o| {
-                o.chosen_subtype = Some(value);
-                o.marks.chosen_by = Some(text);
-            });
+            let choices = <cantrip_state::Choices as cantrip_state::ChoiceRecord>::entered(text, cantrip_state::Entered { subtype: Some(value), ..Default::default() });
+            game.state.update_obj(id, |o| o.marks.choices = choices);
         }
         for &card in &ids[2..] {
             let c = game.chars(card);

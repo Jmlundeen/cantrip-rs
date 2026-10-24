@@ -158,7 +158,7 @@ fn entering(id: ObjectId, controller: PlayerId, tapped: bool) -> Entering {
         protector: None,
         instead: None,
         becomes: None,
-        own: [None; 2],
+        own: None,
     }
 }
 
@@ -194,7 +194,7 @@ fn its_own_static_ability_can_take_its_enters_with_abilities() {
     let mut judged = |id| {
         let mut e = entering(id, P0, false);
         ops::prepare_entry(&mut cx, &mut e).expect("nothing is asked");
-        e.own[0].is_some()
+        e.own.is_some()
     };
     assert!(judged(grown));
     assert!(!judged(humble));
@@ -396,9 +396,7 @@ fn a_bestowed_aura_applies_its_enters_with_once() {
     let mut e = entering(bestower, P0, false);
     e.copy = Some(Copiable::of(table.id_of(&BESTOWED)));
     ops::prepare_entry(&mut cx, &mut e).expect("nothing is asked");
-    assert_eq!(e.own, [Some(table.id_of(&BESTOWED)), None], "the Aura face's alone");
-    for slot in 0..e.own.len() {
-        ops::apply_own_entering(&mut cx, &mut e, slot, P0, false);
-    }
+    assert_eq!(e.own, Some(table.id_of(&BESTOWED)), "the Aura face's alone");
+    ops::apply_own_entering(&mut cx, &mut e, P0, false);
     assert_eq!(e.counters[CounterKind::PlusOne as usize], 2);
 }

@@ -2305,10 +2305,8 @@ fn contract_scene(cards: &CardTable, card: CardId, target: CardId, scene: usize)
     if scene == 4 {
         source.class_level = 3;
         // Made by the source's own text, as an entering permanent's own `enters` makes them.
-        source.marks.chosen_by = Some(cards.linked_card(card));
-        source.chosen_subtype = Some(Subtype::Goblin);
-        source.chosen_color = Some(Color::Black);
-        source.marks.chosen_player = Some(PlayerId(1));
+        let made = cantrip_state::Entered { subtype: Some(Subtype::Goblin), color: Some(Color::Black), player: Some(PlayerId(1)), ..Default::default() };
+        source.marks.choices = <cantrip_state::Choices as cantrip_state::ChoiceRecord>::entered(cards.linked_card(card), made);
     }
     let source = state.push_obj(source);
     state.zone_push(Zone::BATTLEFIELD, source);

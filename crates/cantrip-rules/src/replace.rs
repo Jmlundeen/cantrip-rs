@@ -474,7 +474,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
         && z.to.is(ZoneKind::Battlefield)
         && !cx.entering.is_some_and(|w| w.object == e.object && w.lost)
     {
-        let own = e.own.iter().enumerate().filter_map(|(slot, card)| Some(Candidate { source: e.object, index: slot as u8, origin: Origin::Enters((*card)?) }));
+        let own = e.own.map(|card| Candidate { source: e.object, index: 0, origin: Origin::Enters(card) });
         found.splice(0..0, own);
     }
     // The discarded card's own madness (CR 702.35a), ordered with the rest (CR 616.1). It is offered first, as the
@@ -722,7 +722,7 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
             // elsewhere instead, is no entry at all.
             Origin::Enters(_) => {
                 if let (Some(e), Proposal::ZoneChange(z)) = (entry.as_deref_mut(), &mut *proposal) {
-                    crate::ops::apply_own_entering(cx, e, index as usize, z.controller, z.tapped);
+                    crate::ops::apply_own_entering(cx, e, z.controller, z.tapped);
                     z.controller = e.controller;
                     z.tapped = e.tapped;
                     if let Some(instead) = e.instead {

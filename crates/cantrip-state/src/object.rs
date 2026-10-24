@@ -77,11 +77,6 @@ pub struct Obj {
     /// (CR 722.3c). The link is severed for good when that permanent becomes unprepared or phases out (CR 702.26f), even
     /// if it prepares again or phases in before the next state-based check ends the copy (CR 704.5e).
     pub prepared_from: Option<ObjectId>,
-    /// A color chosen as it entered ("as this enters, choose a color", CR 614.12a), by the text `Marks::chosen_by`: read
-    /// with `GameState::chosen_color`.
-    pub chosen_color: Option<Color>,
-    /// A creature or land type chosen as it entered: `GameState::chosen_subtype`.
-    pub chosen_subtype: Option<Subtype>,
     /// Exiled "on an adventure" (CR 715.3d): by the player who controlled the Adventure spell as it resolved, who "may play
     /// it" for as long as it remains exiled - its owner's exile zone holds it, whoever that player is.
     pub on_adventure: Option<PlayerId>,
@@ -154,23 +149,9 @@ pub struct Marks {
     pub cant_be_countered: bool,
     /// The number of the turn it was saddled (CR 702.171b): saddled until that turn ends. Zero for never.
     pub saddled_turn: u32,
-    /// A player chosen as it entered ("as this enters, choose a player", CR 614.12a): `GameState::chosen_player`.
-    pub chosen_player: Option<PlayerId>,
-    /// A card name chosen as it entered ("choose a card name", CR 614.12a: Anointed Peacekeeper's) or for it as an ability
-    /// of it resolved (Petrified Hamlet's): `GameState::chosen_card`.
-    pub chosen_card: Option<Chosen<CardId>>,
-    /// One of the words its text offered to choose between as it entered (CR 614.12a, 607.2f): "choose Khans or
-    /// Dragons", "choose odd or even".
-    pub chosen_option: Option<ChosenOption>,
-    /// An object chosen as it entered ("as this creature enters, choose another creature you control", CR 614.12a,
-    /// 607.2d), which "the chosen creature" of its text refers to: `GameState::chosen_object`.
-    pub chosen_object: Option<ObjectId>,
-    /// The text that made the choices above as it entered (CR 614.12a), as linked abilities know it (`Linked::text`): the
-    /// text it entered with, printed or of the copiable values it entered with, whose own "as this enters" made them -
-    /// one text, the only one whose own replacements modify how it enters (CR 614.12, 707.9a). Only an ability of that text
-    /// it has as its own reads them (CR 607.2d, 607.2f, 607.5). None while it chose nothing as it entered. A name chosen as
-    /// an ability resolved is kept with that ability (`chosen_card`).
-    pub chosen_by: Option<CardId>,
+    /// What was chosen for it - as it entered, or as an ability of it resolved - each with the ability that chose it
+    /// (CR 607.2d, 607.2f): read only through `GameState::chosen_color` and its siblings, with the asking ability's link.
+    pub choices: Choices,
     /// Who controlled it before the control-changing effects that apply to it now (CR 613.1b): it goes back to them
     /// when the last of those ends. `None` while no such effect applies.
     pub control_base: Option<PlayerId>,
@@ -181,6 +162,147 @@ pub struct Marks {
     /// whose values its face-down status gives it in layer 1b, over its copy effects (CR 613.2b). Set as it enters face
     /// down, gone as it is turned face up.
     pub face_down_as: Option<CardId>,
+}
+
+/// The names an object keeps, chosen by different abilities of it as they resolved (Petrified Hamlet's, Medomai's
+/// Prophecy's) or as it entered: one for each ability that chose one.
+pub const CHOSEN_NAMES: usize = 2;
+
+/// What was chosen for a permanent (CR 607.2d, 607.2f), each choice with the ability that made it (`Chosen`), its fields the
+/// engine's alone (`ChoiceRecord`): card code reads a choice only through `GameState::chosen_color` and its siblings, with
+/// the link of the ability that asks, so a permanent that has become a copy of something else, or an ability an effect
+/// gave it, reads no choice that ability didn't make (CR 607.5).
+///
+/// The choices made as it entered are all made by one text, the text it entered with (`by`): its own "as this enters" is
+/// the only one of its own that modifies how it enters (CR 614.12, 707.9a). A name may also be chosen as an ability of it
+/// resolves (`names`), each ability's name kept apart; a later choice by the same ability replaces its earlier one. A
+/// permanent that changes zones is a new object with none (CR 400.7).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+pub struct Choices {
+    /// The text that made the choices as it entered, as linked abilities know it (`Linked::text`). None while it chose
+    /// nothing as it entered.
+    by: Option<CardId>,
+    color: Option<Color>,
+    subtype: Option<Subtype>,
+    player: Option<PlayerId>,
+    option: Option<ChosenOption>,
+    object: Option<ObjectId>,
+    /// Card names, each with the ability that chose it: one chosen as it entered is its entering text's.
+    names: [Option<Chosen<CardId>>; CHOSEN_NAMES],
+}
+
+/// What a permanent chose as it entered (CR 614.12a), for `ChoiceRecord::entered`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct Entered {
+    pub color: Option<Color>,
+    pub subtype: Option<Subtype>,
+    pub player: Option<PlayerId>,
+    pub card: Option<CardId>,
+    pub option: Option<ChosenOption>,
+    pub object: Option<ObjectId>,
+}
+
+impl Entered {
+    /// Whether anything was chosen.
+    pub fn any(&self) -> bool {
+        *self != Entered::default()
+    }
+}
+
+/// The engine's own access to what a permanent chose (`Choices`): writing it, and reading it without asking which ability
+/// reads. Not part of `cantrip_api`, so card code can't name it.
+pub trait ChoiceRecord {
+    /// The choices `text` made as the permanent entered (CR 614.12a), acquired as its own text.
+    fn entered(text: CardId, made: Entered) -> Choices;
+    /// `name` chosen by `by`, an ability of the permanent, as it resolved: replacing that ability's earlier name. Every
+    /// ability's place taken (`CHOSEN_NAMES`), it is kept no more (beyond practical scale, docs/known-issues.md). Whether it
+    /// was kept.
+    fn name(&mut self, by: Linked, name: CardId) -> bool;
+    /// What was chosen, with no ability asking: the scenario dump's and the loop watch's.
+    fn entered_raw(&self) -> (Option<CardId>, Entered);
+    /// The names, each with the ability that chose it.
+    fn names_raw(&self) -> [Option<Chosen<CardId>>; CHOSEN_NAMES];
+    /// The object chosen, renamed (the loop watch's canonical names).
+    fn with_object(&self, object: Option<ObjectId>) -> Choices;
+}
+
+impl ChoiceRecord for Choices {
+    fn entered(text: CardId, made: Entered) -> Choices {
+        let own = |value| Chosen { value, text, acquired: Acquired::OWN };
+        Choices {
+            by: made.any().then_some(text),
+            color: made.color,
+            subtype: made.subtype,
+            player: made.player,
+            option: made.option,
+            object: made.object,
+            names: [made.card.map(own), None],
+        }
+    }
+
+    fn name(&mut self, by: Linked, name: CardId) -> bool {
+        let chosen = Chosen { value: name, text: by.text, acquired: by.acquired };
+        let mine = |c: &Option<Chosen<CardId>>| c.is_some_and(|c| c.text == by.text && c.acquired == by.acquired);
+        let slot = self.names.iter().position(mine).or_else(|| self.names.iter().position(Option::is_none));
+        match slot {
+            Some(at) => {
+                self.names[at] = Some(chosen);
+                true
+            }
+            None => false,
+        }
+    }
+
+    fn entered_raw(&self) -> (Option<CardId>, Entered) {
+        let card = self.names.iter().flatten().find(|c| Some(c.text) == self.by && c.acquired == Acquired::OWN).map(|c| c.value);
+        (self.by, Entered { color: self.color, subtype: self.subtype, player: self.player, card, option: self.option, object: self.object })
+    }
+
+    fn names_raw(&self) -> [Option<Chosen<CardId>>; CHOSEN_NAMES] {
+        self.names
+    }
+
+    fn with_object(&self, object: Option<ObjectId>) -> Choices {
+        Choices { object, ..*self }
+    }
+}
+
+impl Choices {
+    /// The choices made as it entered, to `by`: only if `by` is an ability of the text that made them, which the permanent
+    /// has as its own (CR 607.2d, 607.2f, 607.5).
+    fn entered_to(&self, by: Linked) -> Option<&Choices> {
+        (by.acquired == Acquired::OWN && self.by == Some(by.text)).then_some(self)
+    }
+
+    /// The color chosen, to `by` (`GameState::chosen_color`).
+    pub fn color(&self, by: Linked) -> Option<Color> {
+        self.entered_to(by)?.color
+    }
+
+    /// The creature or land type chosen, to `by`.
+    pub fn subtype(&self, by: Linked) -> Option<Subtype> {
+        self.entered_to(by)?.subtype
+    }
+
+    /// The player chosen, to `by`.
+    pub fn player(&self, by: Linked) -> Option<PlayerId> {
+        self.entered_to(by)?.player
+    }
+
+    /// The word chosen, to `by`.
+    pub fn option(&self, by: Linked) -> Option<ChosenOption> {
+        self.entered_to(by)?.option
+    }
+
+    /// The object chosen, to `by`, wherever it is now.
+    pub fn object(&self, by: Linked) -> Option<ObjectId> {
+        self.entered_to(by)?.object
+    }
+
+    /// The card name `by` chose (`Chosen::to`): as the permanent entered, or as `by` resolved.
+    pub fn card(&self, by: Linked) -> Option<CardId> {
+        self.names.iter().flatten().find_map(|c| c.to(by))
+    }
 }
 
 /// One of the words a card's text offers to choose between, words that otherwise have no rules meaning (CR 607.2f): the
@@ -332,8 +454,6 @@ impl Obj {
             card_copy: _,
             one_face: _,
             prepared_from,
-            chosen_color: _,
-            chosen_subtype: _,
             on_adventure: _,
             cast_from: _,
             activated_turn: _,
@@ -359,11 +479,7 @@ impl Obj {
             cast_untimely: _,
             cant_be_countered: _,
             saddled_turn: _,
-            chosen_player: _,
-            chosen_card: _,
-            chosen_option: _,
-            chosen_object,
-            chosen_by: _,
+            choices,
             control_base: _,
             phased,
             face_down_as: _,
@@ -374,7 +490,7 @@ impl Obj {
             || entered_with.is_some()
             || exiled.is_some()
             || phased.is_some_and(|p| p.until_leaves.is_some())
-            || chosen_object.is_some()
+            || choices.entered_raw().1.object.is_some()
     }
 
     /// A fresh object in `zone`, with nothing about it set: the rules' own source for an ability no card has (the
@@ -407,8 +523,6 @@ impl Obj {
             card_copy: false,
             one_face: false,
             prepared_from: None,
-            chosen_color: None,
-            chosen_subtype: None,
             on_adventure: None,
             cast_from: None,
             activated_turn: 0,
@@ -2299,6 +2413,24 @@ mod tests {
         let by_copy = Chosen { value: CardId(6), text: CardId(4), acquired: copy };
         assert_eq!(by_copy.to(by(CardId(4), copy)), Some(CardId(6)));
         assert_eq!(by_copy.to(by(CardId(4), Acquired::OWN)), None);
+    }
+
+    /// Each ability that chose a name keeps its own (CR 607.2d): a second ability's name doesn't take the first's place, the
+    /// same ability choosing again replaces its own, and with every place taken (`CHOSEN_NAMES`) a new one is kept no more.
+    #[test]
+    fn each_ability_keeps_the_name_it_chose() {
+        let entered = <Choices as ChoiceRecord>::entered(CardId(4), Entered { card: Some(CardId(10)), ..Default::default() });
+        let own = Linked { object: ObjectId(2), text: CardId(4), acquired: Acquired::OWN };
+        let given = Linked { object: ObjectId(2), text: CardId(5), acquired: Acquired { by: AcquiredBy::Grant, stamp: 3, part: 0 } };
+        let other = Linked { object: ObjectId(2), text: CardId(6), acquired: Acquired::OWN };
+        let mut choices = entered;
+        assert_eq!(choices.card(own), Some(CardId(10)), "the name chosen as it entered");
+        assert!(choices.name(given, CardId(11)));
+        assert_eq!((choices.card(own), choices.card(given)), (Some(CardId(10)), Some(CardId(11))), "each its own");
+        assert!(choices.name(given, CardId(12)));
+        assert_eq!((choices.card(own), choices.card(given)), (Some(CardId(10)), Some(CardId(12))), "the same ability's replaced");
+        assert!(!choices.name(other, CardId(13)), "every place taken");
+        assert_eq!((choices.card(own), choices.card(given), choices.card(other)), (Some(CardId(10)), Some(CardId(12)), None));
     }
 
     /// A subtype restriction's name reads back as the same restriction, whatever its subtypes hold: "or" inside a name

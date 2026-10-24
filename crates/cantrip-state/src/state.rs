@@ -927,43 +927,36 @@ impl GameState {
         }
     }
 
-    /// `by`'s object, if `by` is linked to the ability that made the choices it made as it entered (CR 607.2d, 607.2f): an
-    /// ability of the text that made them (`Marks::chosen_by`), which the object has as its own (CR 607.5).
-    fn entered_choices(&self, by: Linked) -> Option<&Obj> {
-        let obj = self.obj(by.object);
-        (by.acquired == Acquired::OWN && obj.marks.chosen_by == Some(by.text)).then_some(obj)
-    }
-
     /// The color chosen for `by`'s object (CR 607.2d), to `by`, one of its abilities: only if `by` is linked to the ability
     /// that chose it. A resolving ability asks with `Query::linked`; a static, mana or triggered ability of the object's text
     /// with `Query::linked_to`.
     pub fn chosen_color(&self, by: Linked) -> Option<Color> {
-        self.entered_choices(by)?.chosen_color
+        self.obj(by.object).marks.choices.color(by)
     }
 
     /// The creature or land type chosen for `by`'s object, to `by` (`chosen_color`).
     pub fn chosen_subtype(&self, by: Linked) -> Option<Subtype> {
-        self.entered_choices(by)?.chosen_subtype
+        self.obj(by.object).marks.choices.subtype(by)
     }
 
     /// The player chosen for `by`'s object, to `by` (`chosen_color`).
     pub fn chosen_player(&self, by: Linked) -> Option<PlayerId> {
-        self.entered_choices(by)?.marks.chosen_player
+        self.obj(by.object).marks.choices.player(by)
     }
 
     /// The card name chosen for `by`'s object, to `by` (`chosen_color`).
     pub fn chosen_card(&self, by: Linked) -> Option<CardId> {
-        self.obj(by.object).marks.chosen_card?.to(by)
+        self.obj(by.object).marks.choices.card(by)
     }
 
     /// The word chosen for `by`'s object (CR 607.2f), to `by` (`chosen_color`).
     pub fn chosen_option(&self, by: Linked) -> Option<ChosenOption> {
-        self.entered_choices(by)?.marks.chosen_option
+        self.obj(by.object).marks.choices.option(by)
     }
 
     /// The object chosen for `by`'s object, to `by` (`chosen_color`), wherever it is now.
     pub fn chosen_object(&self, by: Linked) -> Option<ObjectId> {
-        self.entered_choices(by)?.marks.chosen_object
+        self.obj(by.object).marks.choices.object(by)
     }
 
     /// How `id` has the abilities of the text it has now (CR 607.5, 707.2): by the latest copy effect still on it, which

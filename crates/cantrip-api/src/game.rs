@@ -337,7 +337,9 @@ pub trait Query {
 
     /// An ability `source` has from the text it has now (CR 607.1, 607.5): its card's, the face that is up, or a copy effect's
     /// (CR 707.2), acquired with that text (`CardTable::linked_to`) - what a card's own hook of that text links and asks for,
-    /// one asked with the object alone: a cost change. A function asked with an `Asker` asks `linked_to` of it.
+    /// one asked with the object alone: a cost change. A function asked with an `Asker` asks `linked_to` of it; a triggered
+    /// ability's matcher that reads a choice or an exile is asked with its controller (`when_asked`) for that asker, never
+    /// with this, which an ability an effect gave the object would misread (CR 607.5).
     fn text_linked(&self, source: ObjectId) -> Linked;
 
     /// The ability `asker` asks as, as linked abilities know it (CR 607.1, 607.5): the one an effect gave its source, which

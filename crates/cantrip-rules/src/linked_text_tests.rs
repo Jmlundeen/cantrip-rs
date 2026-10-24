@@ -6,6 +6,12 @@
 use crate::{Game, Setup};
 use cantrip_api::*;
 
+/// Blue chosen for `source` as it entered, by the text `text`.
+fn blue(game: &mut Game, source: ObjectId, text: CardId) {
+    let choices = <cantrip_state::Choices as cantrip_state::ChoiceRecord>::entered(text, cantrip_state::Entered { color: Some(Color::Blue), ..Default::default() });
+    game.state.update_obj(source, |o| o.marks.choices = choices);
+}
+
 /// A transforming card's back face has no mana cost of its own (CR 202.3b, 712.8e).
 fn nothing(_: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
     Ok(())
@@ -163,10 +169,7 @@ fn a_static_ability_given_by_an_effect_reads_no_choice_the_permanents_own_text_m
     let source = game.state.push_obj(Obj::new(t.id_of(&CHOOSER), me, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, source);
     let text = t.linked_card(t.id_of(&CHOOSER));
-    game.state.update_obj(source, |o| {
-        o.chosen_color = Some(Color::Blue);
-        o.marks.chosen_by = Some(text);
-    });
+    blue(&mut game, source, text);
     assert_eq!(crate::layers::chars(t, &game.state, &game.log, source).power, Some(2), "its own ability reads its own choice");
     let lender = game.state.push_obj(Obj::new(t.id_of(&EXILED), me, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, lender);
@@ -219,10 +222,7 @@ fn given_by_another(index: u8) -> (Game, ObjectId) {
     let source = game.state.push_obj(Obj::new(t.id_of(&TRIGGERED_CHOOSER), me, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, source);
     let text = t.linked_card(t.id_of(&TRIGGERED_CHOOSER));
-    game.state.update_obj(source, |o| {
-        o.chosen_color = Some(Color::Blue);
-        o.marks.chosen_by = Some(text);
-    });
+    blue(&mut game, source, text);
     let lender = game.state.push_obj(Obj::new(t.id_of(&EXILED), me, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, lender);
     let timestamp = game.state.timestamp();
@@ -310,10 +310,7 @@ fn chooser(t: &'static CardTable, game: &mut Game, card: &'static CardDef) -> Ob
     let source = game.state.push_obj(Obj::new(t.id_of(card), PlayerId(0), Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, source);
     let text = t.linked_card(t.id_of(card));
-    game.state.update_obj(source, |o| {
-        o.chosen_color = Some(Color::Blue);
-        o.marks.chosen_by = Some(text);
-    });
+    blue(game, source, text);
     source
 }
 

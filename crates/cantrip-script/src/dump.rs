@@ -578,16 +578,19 @@ impl StateDump {
                         must.sort();
                         d.set(format!("{key}.MustAttack"), must.join("; "));
                     }
-                    if let Some(chosen) = obj.marks.chosen_player {
+                    // What was chosen for it, as an ability of the text it has now reads it (CR 607.2d, 607.5): a choice made by
+                    // a text it no longer has as its own is no part of it.
+                    let own = game.cards.linked_to(s, id);
+                    if let Some(chosen) = s.chosen_player(own) {
                         d.set(format!("{key}.ChosenPlayer"), chosen.0 + 1);
                     }
                     // The word chosen as it entered (CR 607.2f): "Jeskai", "Odd".
-                    if let Some(chosen) = obj.marks.chosen_option {
+                    if let Some(chosen) = s.chosen_option(own) {
                         d.set(format!("{key}.ChosenOption"), label_text(&Label::Option(chosen.card, chosen.index)));
                     }
                     // The permanent chosen as it entered (CR 614.12a, 607.2d), while it is still that permanent on the
                     // battlefield: one that left, or came back as a new object (CR 400.7), is chosen no longer.
-                    if let Some(chosen) = obj.marks.chosen_object
+                    if let Some(chosen) = s.chosen_object(own)
                         && s.obj(chosen).became.is_none()
                         && s.obj(chosen).zone.is(ZoneKind::Battlefield)
                     {
@@ -602,8 +605,8 @@ impl StateDump {
                         let taken: Vec<String> = (0..32).filter(|&m| chosen & (1 << m) != 0).map(|m| (m + 1).to_string()).collect();
                         d.set(format!("{key}.ChosenModes"), taken.join(", "));
                     }
-                    if let Some(chosen) = obj.marks.chosen_card {
-                        d.set(format!("{key}.ChosenName"), game.cards.get(chosen.value).name);
+                    if let Some(chosen) = s.chosen_card(own) {
+                        d.set(format!("{key}.ChosenName"), game.cards.get(chosen).name);
                     }
                     if obj.class_level > 0 {
                         d.set(format!("{key}.ClassLevel"), obj.class_level);
@@ -670,11 +673,12 @@ impl StateDump {
                         d.set(format!("{key}.SummoningSick"), summoning_sick(game.cards, s, &game.log, id));
                     }
                     // A colour chosen as it entered and kept on it (CR 614.12a).
-                    if let Some(color) = obj.chosen_color {
+                    let own = game.cards.linked_to(s, id);
+                    if let Some(color) = s.chosen_color(own) {
                         d.set(format!("{key}.ChosenColor"), color.name());
                     }
                     // A creature type chosen as it entered and kept on it (CR 614.12a).
-                    if let Some(subtype) = obj.chosen_subtype {
+                    if let Some(subtype) = s.chosen_subtype(own) {
                         d.set(format!("{key}.ChosenSubtype"), subtype.name());
                     }
                     for kind in CounterKind::ALL {

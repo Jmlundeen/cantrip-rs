@@ -520,7 +520,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.Saddled`, `true` for a permanent saddled this turn (CR 702.171b) and absent otherwise
 - `BotN.Battlefield.<Name>.Prepared`, `true` for a prepared permanent (CR 722.3a) and absent otherwise; while it is
   set, that permanent's preparation card is the copy in `Exile`
-- `BotN.Battlefield.<Name>.Chosen<Key>`, one per quality chosen about a permanent and kept on it (CR 614.12a, 607.2d):
+- `BotN.Battlefield.<Name>.Chosen<Key>`, one per quality chosen about a permanent and kept on it (CR 614.12a, 607.2d), as an
+  ability of the text it has now reads it: a choice made by a text it no longer has as its own (it has since become a copy
+  of something else, CR 607.5) is not dumped, and `ChosenPlayer` and `ChosenObject` are the player and the object chosen:
   `ChosenName` for a card name (chosen as it entered, or for it as its ability resolved: Petrified Hamlet), `ChosenOption` for the word chosen as it entered (CR 607.2f: Gollum's `Odd` or `Even`, a Siege's `Khans`), `ChosenColor` for a chosen colour,
   `ChosenSubtype` for a chosen creature type (Three Tree City), `ChosenObject` for the permanent chosen as it entered
   (Dauntless Bodyguard's creature), while that permanent is still on the battlefield (CR 400.7); and `ChosenModes`, the modes its modal abilities have

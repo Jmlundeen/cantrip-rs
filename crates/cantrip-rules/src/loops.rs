@@ -44,7 +44,7 @@ use std::hash::{Hash, Hasher};
 
 use cantrip_api::history::{note_read, take_reads};
 use cantrip_api::*;
-use cantrip_state::{GameState, LastKnown, LoopWatch};
+use cantrip_state::{ChoiceRecord, GameState, LastKnown, LoopWatch};
 
 use crate::Cx;
 
@@ -343,7 +343,7 @@ impl Hash for Name<'_> {
             o.entered_with = None;
             o.prepared_from = None;
             o.exiled = None;
-            o.marks.chosen_object = None;
+            o.marks.choices = o.marks.choices.with_object(None);
             let known = s.last_known(id).map(|k| LastKnown { id: ObjectId::NONE, ..*k });
             (o, known).hash(h);
         };
@@ -482,7 +482,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
                 o.entered_with.map(|id| canon.id(id)),
                 o.prepared_from.map(|id| canon.id(id)),
                 o.exiled.map(|e| (canon.id(e.by), e.text, e.from, e.until_leaves, e.encoded)),
-                o.marks.chosen_object.map(|c| canon.id(c)),
+                o.marks.choices.entered_raw().1.object.map(|c| canon.id(c)),
                 stamp,
             )
                 .hash(h);
@@ -492,7 +492,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
             o.entered_with = None;
             o.prepared_from = None;
             o.exiled = None;
-            o.marks.chosen_object = None;
+            o.marks.choices = o.marks.choices.with_object(None);
             if hashed {
                 row(id, &o).hash(h);
             } else {

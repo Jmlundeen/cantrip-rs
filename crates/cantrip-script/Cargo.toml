@@ -16,3 +16,4 @@ cantrip-engine.workspace = true
 cantrip-cards.workspace = true
 cantrip-mechanics.workspace = true
 cantrip-api.workspace = true
+cantrip-state.workspace = true

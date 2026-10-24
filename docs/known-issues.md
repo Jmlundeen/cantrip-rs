@@ -75,6 +75,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-133](#ki-133-a-refusal-written-while-its-question-cannot-yet-be-asked-holds-vacuously) | A refusal written while its question cannot yet be asked holds vacuously | Pri-3 | Open |
 | [KI-134](#ki-134-the-browser-scenario-for-lands-planned-for-x-fails-on-main) | The browser scenario for lands planned for X fails on main | Pri-2 | Open |
 | [KI-136](#ki-136-a-choice-listing-an-opponents-face-down-permanent-records-it-as-shown-to-the-chooser) | A choice listing an opponent's face-down permanent records it as shown to the chooser | Pri-2 | Open |
+| [KI-135](#ki-135-a-permanent-keeps-the-names-of-at-most-two-abilities-that-chose-one) | A permanent keeps the names of at most two abilities that chose one | Pri-3 | Won't fix: beyond practical scale |
 
 ## Issues
 
@@ -484,6 +485,22 @@ nothing that plays a real game uses its search; the host and the client never re
 whatever `hidden_from` hides from the chooser.
 
 **Scenarios.** None: the history record only; a `cantrip-ai` redaction test can pin it.
+### KI-135: A permanent keeps the names of at most two abilities that chose one
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Won't fix: beyond practical scale | engine | 2026-10-24, review of the chosen-choice links |
+
+**Notes.** A card name chosen for a permanent is kept with the ability that chose it (`cantrip_state::Choices`, CR 607.2d),
+one place for each such ability, `CHOSEN_NAMES` (two) in all; the same ability choosing again replaces its own. A third
+ability's name is not kept, so that ability reads no chosen name: never another ability's. An ability is told apart by
+its text and how the permanent acquired it, so the same card's ability given at two different times - two effects, two
+timestamps - is two abilities, each with its own place, the earlier one's never read again once its effect has ended.
+Reaching it takes three such abilities that each choose a name, all on one permanent that stays the same object: a name
+chosen as it entered (Anointed Peacekeeper) and as abilities of it resolved (Petrified Hamlet's, Medomai's Prophecy's) - a
+copy effect does not make it enter or its enters abilities trigger again. No printed card reaches it.
+
+**Scenarios.** None: no printed card reaches it.
 
 ### KI-134: The browser scenario for lands planned for X fails on main
 

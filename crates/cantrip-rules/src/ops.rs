@@ -2,7 +2,7 @@
 //! procedure, each writes through the journal, and each announces what it did.
 
 use cantrip_api::*;
-use cantrip_state::PendingTrigger;
+use cantrip_state::{ChoiceRecord, Choices, Entered, PendingTrigger};
 
 use crate::layers::{self, live};
 use crate::{Cx, R, counters, replace};
@@ -811,7 +811,10 @@ pub fn remember_chosen_name(cx: &mut Cx, by: Linked, name: CardId) {
         return;
     }
     // Kept with the ability that chose it (CR 607.2d): only abilities linked to that one refer to it.
-    cx.st().update_obj(id, |o| o.marks.chosen_card = Some(Chosen { value: name, text: by.text, acquired: by.acquired }));
+    let mut choices = cx.s().obj(id).marks.choices;
+    if choices.name(by, name) {
+        cx.st().update_obj(id, |o| o.marks.choices = choices);
+    }
 }
 
 /// CR 610.3: cards exiled "until [a permanent] leaves the battlefield" return, as a one-shot effect that follows the
@@ -986,24 +989,19 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     Ok(())
 }
 
-/// Notes `card`'s `CardDef::enters` as one of the entering permanent's own replacements still to apply (`Entering::own`).
-/// There are two places: its face's, and those of what it enters as a copy of (CR 707.9a).
+/// Notes `card`'s `CardDef::enters` as the entering permanent's own replacements still to apply (`Entering::own`): its
+/// face's, or those of what it enters as a copy of (CR 707.9a) - `prepare_entry` notes the one text it enters with.
 fn own_to_apply(entering: &mut Entering, card: CardId) {
-    // One text's own replacements modify how it enters, the text it enters with (`keep_chosen` keeps its choices with it).
-    if layers::verifying() && entering.own.iter().any(Option::is_some) {
-        panic!("a permanent enters with the own replacements of one text");
-    }
-    if let Some(slot) = entering.own.iter_mut().find(|c| c.is_none()) {
-        *slot = Some(card);
-    }
+    debug_assert!(entering.own.is_none(), "a permanent enters with the own replacements of one text");
+    entering.own = Some(card);
 }
 
-/// Applies the entering permanent's own replacement in `Entering::own[slot]` (CR 614.1c-d): its card's `CardDef::enters`, to
-/// the entry as the replacements applied so far have left it - under `controller`, tapped or not. Applied once: the slot
-/// is emptied. One that asks a question with no answer yet leaves the entry as far as it got; the run goes on and is
+/// Applies the entering permanent's own replacement (`Entering::own`, CR 614.1c-d): its card's `CardDef::enters`, to the
+/// entry as the replacements applied so far have left it - under `controller`, tapped or not. Applied once: it is
+/// emptied. One that asks a question with no answer yet leaves the entry as far as it got; the run goes on and is
 /// replayed with the answer (`Cx::ask_core`), as for every question a zone change asks.
-pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, slot: usize, controller: PlayerId, tapped: bool) {
-    let Some(card) = entering.own[slot].take() else { return };
+pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, controller: PlayerId, tapped: bool) {
+    let Some(card) = entering.own.take() else { return };
     let Some(enters) = cx.cards().get(card).enters else { return };
     entering.controller = controller;
     entering.tapped = tapped;
@@ -1017,27 +1015,22 @@ pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, slot: usi
 }
 
 /// What `entering` chose as it entered (CR 614.12a), put on the permanent it is, kept with the text that made the choices
-/// (`Marks::chosen_by`, CR 607.2d, 607.2f): the text it enters with (`entering_card`), whose own "as this enters" is the
-/// only one of its own that modifies how it enters (`prepare_entry`: its face's, or what it enters as a copy of, CR 707.9a),
-/// printed or of the copiable values it enters with, acquired as its own (CR 607.5).
+/// (`Choices`, CR 607.2d, 607.2f): the text it enters with (`entering_card`), whose own "as this enters" is the only one of
+/// its own that modifies how it enters (`prepare_entry`: its face's, or what it enters as a copy of, CR 707.9a), printed or
+/// of the copiable values it enters with, acquired as its own (CR 607.5).
 fn keep_chosen(cx: &Cx, entering: &Entering) -> impl Fn(&mut Obj) + use<> {
     let e = *entering;
-    let chose = e.chosen_color.is_some()
-        || e.chosen_subtype.is_some()
-        || e.chosen_player.is_some()
-        || e.chosen_card.is_some()
-        || e.chosen_option.is_some()
-        || e.chosen_object.is_some();
-    let by = chose.then(|| cx.cards().linked_card(entering_card(cx, entering)));
-    move |o: &mut Obj| {
-        o.chosen_color = e.chosen_color;
-        o.chosen_subtype = e.chosen_subtype;
-        o.marks.chosen_player = e.chosen_player;
-        o.marks.chosen_card = e.chosen_card.zip(by).map(|(value, text)| Chosen { value, text, acquired: Acquired::OWN });
-        o.marks.chosen_option = e.chosen_option;
-        o.marks.chosen_object = e.chosen_object;
-        o.marks.chosen_by = by;
-    }
+    let made = Entered {
+        color: e.chosen_color,
+        subtype: e.chosen_subtype,
+        player: e.chosen_player,
+        card: e.chosen_card,
+        option: e.chosen_option,
+        object: e.chosen_object,
+    };
+    let text = if made.any() { cx.cards().linked_card(entering_card(cx, entering)) } else { CardId(0) };
+    let choices = Choices::entered(text, made);
+    move |o: &mut Obj| o.marks.choices = choices
 }
 
 /// The replacement effects that modify how a permanent enters (CR 614.12) applied to its entry `proposed`: its own
@@ -1050,16 +1043,14 @@ fn keep_chosen(cx: &Cx, entering: &Entering) -> impl Fn(&mut Obj) + use<> {
 ///
 /// Where nothing could apply but its own, there is nothing to order: they are applied as they are, and nothing is judged.
 fn entry_replacements(cx: &mut Cx, entering: &mut Entering, proposed: ZoneChange) -> ZoneChange {
-    let own = entering.own.iter().any(Option::is_some);
+    let own = entering.own.is_some();
     // A copy's own replacements that function from every zone are its, not its card's (`judged_entering`).
     let copy_replaces = copy_over(cx, entering) && cx.cards().replaces[entering_card(cx, entering).0 as usize];
     if !own || !(copy_replaces || crate::replace::zone_change_possible(cx, &proposed)) {
         let mut proposed = proposed;
-        for slot in 0..entering.own.len() {
-            apply_own_entering(cx, entering, slot, proposed.controller, proposed.tapped);
-            proposed.controller = entering.controller;
-            proposed.tapped = entering.tapped;
-        }
+        apply_own_entering(cx, entering, proposed.controller, proposed.tapped);
+        proposed.controller = entering.controller;
+        proposed.tapped = entering.tapped;
         // An entry its own replacement turned into a move elsewhere (CR 614.12): it does not enter at all.
         if let Some(instead) = entering.instead {
             return crate::replace::zone_change(cx, crate::replace::sent_instead(cx, proposed, instead));
@@ -1359,7 +1350,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None, own: [None; 2] };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None, own: None };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1425,7 +1416,7 @@ pub fn put_onto_battlefield_as(
         protector: None,
         instead: None,
         becomes: None,
-        own: [None; 2],
+        own: None,
     };
     prepare_entry(cx, &mut entering)?;
     // Turned over by its own daybound as it would enter (CR 702.145b), it is judged as that face (CR 304.4, 307.4).
@@ -1511,7 +1502,7 @@ pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: Play
         protector: None,
         instead: None,
         becomes: Some(becomes),
-        own: [None; 2],
+        own: None,
     };
     prepare_entry(cx, &mut entering)?;
     if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1844,7 +1835,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None, own: [None; 2] };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None, own: None };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -4003,7 +3994,7 @@ mod tests {
             protector: None,
             instead: None,
             becomes: None,
-            own: [None; 2],
+            own: None,
         }
     }
 
@@ -4040,9 +4031,7 @@ mod tests {
             let mut entering = entering(id);
             assert!(prepare_entry(&mut cx, &mut entering).is_ok());
             // Its own replacements left to apply (`Entering::own`), applied as they would be with nothing else to order.
-            for slot in 0..entering.own.len() {
-                apply_own_entering(&mut cx, &mut entering, slot, PlayerId(0), false);
-            }
+            apply_own_entering(&mut cx, &mut entering, PlayerId(0), false);
             assert!(cx.s().obj(id).zone == hand && cx.s().zone(hand).contains(&id) && !cx.s().battlefield().contains(&id));
             out.push((cx.cards().get(cx.s().obj(id).card).name, entering.counters[CounterKind::PlusOne as usize]));
         }
