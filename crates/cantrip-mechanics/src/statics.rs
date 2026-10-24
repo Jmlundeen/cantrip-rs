@@ -77,6 +77,13 @@ pub fn itself_with_delirium(q: &dyn LayerQuery, source: ObjectId, affected: Obje
     source == affected && delirium(q, source)
 }
 
+/// "During your turn, this creature has [keyword]" (CR 604.1, 613.1f) as a static ability's `StaticDef::affects`: only the
+/// source itself, and only while its controller is the active player (CR 102.1), asked again whenever characteristics are
+/// computed. Razorkin Needlehead, Skilled Battlecarver and Thrun, Breaker of Silence use it.
+pub fn itself_during_your_turn(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected && q.state().turn.active == q.state().obj(source).controller
+}
+
 /// "... has haste" (CR 702.10, layer 6) as a static ability's `StaticDef::apply`. Anger, Samut, Lavaspur Boots, Skateboard
 /// and dash's haste print it.
 pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
@@ -135,6 +142,18 @@ pub fn does_not_untap(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// Man Armor's equipped creature print it.
 pub fn have_flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Flying);
+}
+
+/// "... has first strike" (CR 702.7, layer 6) as a static ability's `StaticDef::apply`. Razorkin Needlehead and Skilled
+/// Battlecarver print it.
+pub fn have_first_strike(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::FirstStrike);
+}
+
+/// "... has indestructible" (CR 702.12, layer 6) as a static ability's `StaticDef::apply`. Doctor Doom, Hammer of Nazahn's
+/// equipped creature and Thrun, Breaker of Silence print it.
+pub fn have_indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Indestructible);
 }
 
 /// "... has hexproof" (CR 702.11, layer 6) as a static ability's `StaticDef::apply`. Kaito, Bane of Nightmares' ninja form,

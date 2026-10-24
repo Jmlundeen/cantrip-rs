@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip, may_attach_that_equipment};
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{statics, targets};
 use cantrip_oracle as oracle;
 
 /// "Whenever Hammer of Nazahn or another Equipment you control enters" (CR 603.6a): one ability over both entries. The
@@ -18,10 +18,6 @@ fn equipment_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
     }
 }
 
-fn indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Indestructible);
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, equipment_enters), may_attach_that_equipment, "Whenever Hammer of Nazahn or another Equipment you control enters, you may attach that Equipment to target creature you control.")
@@ -30,7 +26,7 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<2, 0>, "Equipped creature gets +2/+0."),
-        static_ability(Layer::Ability, attached_object, indestructible, "Equipped creature has indestructible."),
+        static_ability(Layer::Ability, attached_object, statics::have_indestructible, "Equipped creature has indestructible."),
     ],
     ..oracle::HAMMER_OF_NAZAHN
 };

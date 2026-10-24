@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::{THIS_ENTERS, YOUR_END_STEP};
-use cantrip_mechanics::{effects, lands, tokens};
+use cantrip_mechanics::{effects, lands, statics, tokens};
 use cantrip_oracle as oracle;
 
 /// "Create two 3/3 colorless Robot Villain artifact creature tokens named Doombot."
@@ -16,11 +16,6 @@ fn itself_while_you_control_an_artifact_creature_or_a_plan(q: &dyn LayerQuery, s
         && lands::count_you_control(q, source, &|c| (c.is(CardType::Artifact) && c.is(CardType::Creature)) || c.has_subtype(Subtype::Plan)) > 0
 }
 
-/// "... Doctor Doom has indestructible" (CR 702.12, layer 6).
-fn have_indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Indestructible);
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, create_two_doombots, "When Doctor Doom enters, create two 3/3 colorless Robot Villain artifact creature tokens named Doombot."),
@@ -29,7 +24,7 @@ pub static CARD: CardDef = CardDef {
     statics: &[static_ability(
         Layer::Ability,
         itself_while_you_control_an_artifact_creature_or_a_plan,
-        have_indestructible,
+        statics::have_indestructible,
         "As long as you control an artifact creature or a Plan, Doctor Doom has indestructible.",
     )],
     ..oracle::DOCTOR_DOOM
