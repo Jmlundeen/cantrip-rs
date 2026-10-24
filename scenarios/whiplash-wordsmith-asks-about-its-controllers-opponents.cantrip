@@ -1,0 +1,39 @@
+# Bot2 takes Whiplash Wordsmith with Act of Treason, then Shocks Bot1, the Wordsmith's owner: Bot1 is an opponent of its
+# controller, so it has flying (CR 109.5, 611.3a); Act of Treason alone gives it only haste.
+[Bot1 Deck]
+Whiplash Wordsmith
+Black Lotus
+Mox Jet
+Swamp
+Swamp x18
+[Bot2 Deck]
+Mountain
+Black Lotus
+Act of Treason
+Shock
+Mountain x18
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Whiplash Wordsmith.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Whiplash Wordsmith)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Whiplash Wordsmith.Keywords = Haste
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 18
+? Bot2.Battlefield.Whiplash Wordsmith.Keywords = Flying; Haste
+[T2 Bot2.Main2]
+[Expect]
+Bot1.Life = 18
+Bot2.Battlefield.Whiplash Wordsmith.Keywords = Flying; Haste

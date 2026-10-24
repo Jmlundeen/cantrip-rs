@@ -1,0 +1,43 @@
+# Vicious Verse deals exactly one to an opponent and immediately grants only the Wordsmith flying and haste.
+# The haste allows a same-turn attack, and the history condition resets next turn (CR 611.3a, 722.3c).
+[Bot1 Deck]
+Whiplash Wordsmith
+Black Lotus
+Mox Ruby
+Ornithopter
+Mountain
+Mountain
+Mountain
+Mountain x15
+[Bot2 Deck]
+Island x22
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Whiplash Wordsmith.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Whiplash Wordsmith.Prepared = true
+? Bot1.Battlefield.Whiplash Wordsmith.Keywords = (absent)
+! Bot1.Exile.Vicious Verse.Cast(Bot1)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Vicious Verse.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Battlefield.Whiplash Wordsmith.Prepared = (absent)
+? Bot1.Battlefield.Whiplash Wordsmith.Keywords = Flying; Haste
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Attack(Whiplash Wordsmith > Bot2)
+[T1 Bot1.Main2]
+? Bot2.Life = 16
+[T2 Bot2.Main1]
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Whiplash Wordsmith.Keywords = (absent)
+Bot1.Battlefield.Whiplash Wordsmith.Power = 3
+Bot1.Battlefield.Whiplash Wordsmith.Toughness = 3

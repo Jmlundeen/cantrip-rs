@@ -1,0 +1,57 @@
+# Damage to you or a creature, life loss without damage, and combat damage do not meet the condition.
+# Contrast the positive prepared-spell case in the other scenario (CR 120.2, 119.3, 611.3a).
+[Bot1 Deck]
+Whiplash Wordsmith
+Black Lotus
+Mox Jet
+Swamp
+Tendrils of Agony
+Lightning Bolt
+Sol Ring
+Mountain
+Mountain x15
+[Bot2 Deck]
+Mountain
+Shock
+Ornithopter
+Island x19
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Whiplash Wordsmith.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Whiplash Wordsmith.Keywords = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Tendrils of Agony.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot1.Battlefield.Whiplash Wordsmith.Keywords = (absent)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Whiplash Wordsmith.Keywords = (absent)
+Bot1.Attack(Whiplash Wordsmith > Bot2)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 15
+Bot1.Battlefield.Whiplash Wordsmith.Keywords = (absent)
+Bot1.Battlefield.Whiplash Wordsmith.Prepared = true
