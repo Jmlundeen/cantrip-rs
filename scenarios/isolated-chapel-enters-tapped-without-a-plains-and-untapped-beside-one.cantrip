@@ -2,7 +2,7 @@
 # battlefield as it enters, the land itself never counted). Beside a Forest only the first copy enters tapped (turn 3);
 # once a Plains is out the second enters untapped (turn 7), the positive control for the first. It also taps for {W} or
 # {B}: green is refused beside the white it does add, and the {W} and {B} activations are the positive controls.
-# Bot2 controls Plains and Swamps, which do not count for "you control".
+# Bot2 plays a Plains on turn 2, which does not count for "you control".
 
 [Bot1 Deck]
 Forest
@@ -17,6 +17,9 @@ Swamp x8
 
 [Actions]
 Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+? Bot2.Battlefield.Plains.Tapped = false
 [T3 Bot1.Main1]
 Bot1.Hand.Isolated Chapel.Play
 ? Bot1.Battlefield.Isolated Chapel.Tapped = true
