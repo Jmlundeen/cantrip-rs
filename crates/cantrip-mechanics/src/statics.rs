@@ -273,6 +273,13 @@ pub fn creatures_entering_dont_trigger(q: &dyn Query, _: &Asker, event: &Event, 
     entering(event).is_some_and(|permanent| q.chars(permanent).is(CardType::Creature))
 }
 
+/// "Players can't cast spells from graveyards or libraries" (CR 101.2, 601.3) as a `CardDef::cast_rules` entry: anyone's, from any
+/// of them. A card exiled from a library and cast is cast from exile, and playing a land is not casting (CR 305.1).
+/// Grafdigger's Cage and Weathered Runestone print it.
+pub fn players_cant_cast_from_graveyards_or_libraries(_: &dyn Query, _: &Asker, _: PlayerId, from: ZoneKind) -> bool {
+    !matches!(from, ZoneKind::Graveyard | ZoneKind::Library)
+}
+
 /// "Players can't gain life" (CR 119.7) as a `CardDef::cant_gain_life` entry: every player, its controller included, while
 /// the permanent is on the battlefield. Sunspine Lynx, Giant Cindermaw, Rampaging Ferocidon, Leyline of Punishment, Everlasting
 /// Torment and Havoc Festival print it.
