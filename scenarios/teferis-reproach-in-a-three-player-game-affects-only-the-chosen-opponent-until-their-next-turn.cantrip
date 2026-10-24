@@ -2,8 +2,11 @@
 # out." Bot1 has two opponents - Bot2 and Bot3 - and names Bot3 (turn 4). Bot3's Mox Ruby and Brazen Borrower phase out
 # and their Tundra stays; Bot2's and Bot1's permanents do not, and Bot2's life is still changeable and Bot2 still
 # targetable: Bot1's Lightning Bolt is refused at Bot3 - protected from everything - and the same action is accepted at
-# Bot2 (CR 702.16b, 702.16j). The effects last "until that player's next turn", which for Bot3 is turn 6, when it phases
-# in; on turn 7 Bot3 can be bolted (the positive control that the effect has ended).
+# Bot2 (CR 702.16b, 702.16j). The effects last "until that player's next turn" (CR 611.2a), which for Bot3 is turn 6,
+# not the end of turn 4 and not the caster's next turn (turn 7): on turn 5 (Bot2's) Bot3 is still protected - Bolt
+# refused - and its life total still can't change when Bot2's Cauldron Familiar makes each opponent lose 1 life (Bot1
+# does lose it, the control); on turn 6, once Bot3's turn has begun and its permanents phased in, the same Bolt is
+# accepted and Bot3's life drops.
 
 [Bot1 Deck]
 Mox Pearl
@@ -12,15 +15,16 @@ Mox Ruby
 Teferi's Reproach
 Mountain
 Island
-Island
+Lightning Bolt
 Lightning Bolt
 Lightning Bolt
 Island x8
 
 [Bot2 Deck]
 Island
-Mox Ruby
-Island x15
+Mox Jet
+Cauldron Familiar
+Island x14
 
 [Bot3 Deck]
 Tundra
@@ -36,7 +40,7 @@ Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Mox Ruby.Cast
 [T2 Bot2.Main1]
 Bot2.Hand.Island.Play
-Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
 [T3 Bot3.Main1]
 Bot3.Hand.Tundra.Play
 Bot3.Hand.Black Lotus.Cast
@@ -47,7 +51,7 @@ Bot3.Hand.Brazen Borrower.Cast
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Ruby#1.Activate
-Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Island.Activate
 ! Bot1.Hand.Teferi's Reproach.Cast(Bot1)
 Bot1.Hand.Teferi's Reproach.Cast(Bot3)
 Bot1.Pass
@@ -66,20 +70,30 @@ Bot3.Pass
 ? Bot3.Life = 20
 [T5 Bot2.Main1]
 Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cauldron Familiar.Cast
+Bot2.Pass
+Bot1.Pass
+Bot3.Pass
+Bot2.Pass
+Bot1.Pass
+Bot3.Pass
+? Bot3.Life = 20
+? Bot1.Life = 19
+! Bot1.Hand.Lightning Bolt.Cast(Bot3)
 [T6 Bot3.Main1]
 Bot3.Hand.Island.Play
 ? Bot3.PhasedOut.Count = 0
-[T7 Bot1.Main1]
-Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
 Bot1.Hand.Lightning Bolt.Cast(Bot3)
 Bot1.Pass
 Bot2.Pass
 Bot3.Pass
 
 [Expect]
-Turn = 7
-Bot2.Life = 17
+Turn = 6
+Bot1.Life = 19
+Bot2.Life = 18
 Bot3.Life = 17
-Bot3.Battlefield.Tundra.Tapped = false
 Exile = Teferi's Reproach
 Bot1.Graveyard = Lightning Bolt; Lightning Bolt
