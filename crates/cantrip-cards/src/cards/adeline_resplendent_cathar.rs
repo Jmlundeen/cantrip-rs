@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::combat::{choose_among, create_attacking, player_or_their_planeswalkers};
-use cantrip_mechanics::triggers;
+use cantrip_mechanics::{lands, triggers};
 use cantrip_oracle as oracle;
 
 /// The 1/1 white Human creature token it makes.
@@ -15,14 +15,7 @@ pub static HUMAN: CardDef = CardDef {
 /// "Adeline's power is equal to the number of creatures you control" (CR 604.3, layer 7a): a characteristic-defining
 /// ability, itself included.
 fn power_is_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let controller = q.state().obj(source).controller;
-    let count = q
-        .state()
-        .battlefield()
-        .iter()
-        .filter(|&&id| q.state().obj(id).controller == controller && q.chars(id).is(CardType::Creature))
-        .count();
-    chars.power = Some(count as i16);
+    chars.power = Some(lands::count_you_control(q, source, &|c| c.is(CardType::Creature)));
 }
 
 /// "For each opponent, create a 1/1 white Human creature token that's tapped and attacking that player or a planeswalker

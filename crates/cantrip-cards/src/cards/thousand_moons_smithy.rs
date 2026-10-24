@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, effects, tokens, triggers};
+use cantrip_mechanics::{choose, effects, lands, tokens, triggers};
 use cantrip_oracle as oracle;
 
 const GNOME_SOLDIER_TEXT: &str = "This creature's power and toughness are each equal to the number of artifacts and/or creatures you control.";
@@ -8,16 +8,7 @@ const GNOME_SOLDIER_TEXT: &str = "This creature's power and toughness are each e
 /// layer 7a): each permanent its controller controls that is an artifact, a creature or both counts once, the token itself
 /// among them, as the earlier layers left them.
 fn artifacts_and_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let state = q.state();
-    let you = state.obj(source).controller;
-    let n = state
-        .battlefield()
-        .iter()
-        .filter(|&&id| state.obj(id).controller == you && {
-            let c = q.chars(id);
-            c.is(CardType::Artifact) || c.is(CardType::Creature)
-        })
-        .count() as i16;
+    let n = lands::count_you_control(q, source, &|c| c.is(CardType::Artifact) || c.is(CardType::Creature));
     chars.power = Some(n);
     chars.toughness = Some(n);
 }

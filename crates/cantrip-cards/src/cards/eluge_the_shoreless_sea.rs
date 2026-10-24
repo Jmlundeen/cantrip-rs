@@ -1,15 +1,13 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers};
+use cantrip_mechanics::{lands, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "Eluge's power and toughness are each equal to the number of Islands you control" (CR 604.3, 613.4a): a
 /// characteristic-defining ability, in every zone (the ruling); "you" is its controller, its owner off the battlefield.
 /// Island is read through the words of Eluge's text (CR 612).
 fn islands_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let s = q.state();
-    let you = s.obj(source).controller;
     let island = q.words(source).subtype(Subtype::Island);
-    let n = s.battlefield().iter().filter(|&&id| s.obj(id).controller == you && q.chars(id).subtypes.has(island)).count() as i16;
+    let n = lands::count_you_control(q, source, &|c| c.subtypes.has(island));
     chars.power = Some(n);
     chars.toughness = Some(n);
 }
