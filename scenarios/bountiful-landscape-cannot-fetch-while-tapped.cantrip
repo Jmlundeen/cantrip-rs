@@ -1,0 +1,20 @@
+# Bountiful Landscape's {T} in "{T}, Sacrifice this land: Search ..." (CR 602.2b, 118.3): once the land is tapped for {C} it cannot
+# be sacrificed to search, even though sacrificing needs no other mana.
+
+[Bot1 Deck]
+Bountiful Landscape
+Forest x8
+Island x8
+Mountain x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Bountiful Landscape.Play
+Bot1.Battlefield.Bountiful Landscape.Activate(Ability: {T}: Add {C})
+! Bot1.Battlefield.Bountiful Landscape.Activate(Ability: {T}, Sacrifice this land)
+
+[Expect]
+Bot1.Battlefield.Bountiful Landscape.Tapped = true
+Bot1.Graveyard.Count = 0
