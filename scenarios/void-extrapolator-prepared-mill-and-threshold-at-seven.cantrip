@@ -1,0 +1,71 @@
+# Omit Variables mills exactly three cards and unprepares its creature (CR 701.17a, 722.3c).
+# Six graveyard cards leave it 2/2; Opt gives exactly seven and +1/+1, then Ghost Vacuum
+# removes one and the bonus immediately ends (CR 604.1, 613.4c). The other creature never gets it.
+[Bot1 Deck]
+Void Extrapolator
+Swamp
+Island
+Thought Scour
+Opt
+Ghost Vacuum
+Island
+Swamp
+Mountain
+Forest
+Plains
+Mountain
+Forest
+Plains
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Swamp x25
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Void Extrapolator.Cast
+[T3 Bot1.Main2]
+? Bot1.Graveyard.Count = 3
+? Bot1.Battlefield.Void Extrapolator.Prepared = true
+? Exile = Omit Variables
+? Bot1.Battlefield.Void Extrapolator.Power = 2
+? Bot1.Battlefield.Void Extrapolator.Toughness = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Exile.Omit Variables.Cast
+[T5 Bot1.Main2]
+? Bot1.Graveyard.Count = 6
+? Bot1.Battlefield.Void Extrapolator.Power = 2
+? Bot1.Battlefield.Void Extrapolator.Toughness = 2
+? Bot1.Battlefield.Void Extrapolator.Prepared = (absent)
+? Exile.Count = 0
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+[T5 Bot1.End]
+? Bot1.Graveyard.Count = 7
+? Bot1.Battlefield.Void Extrapolator.Power = 3
+? Bot1.Battlefield.Void Extrapolator.Toughness = 3
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ghost Vacuum.Cast
+[T7 Bot1.Main2]
+Bot1.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Thought Scour)
+[T7 Bot1.End]
+
+[Expect]
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Void Extrapolator.Power = 2
+Bot1.Battlefield.Void Extrapolator.Toughness = 2
+Exile = Thought Scour
