@@ -1,0 +1,65 @@
+# CR 702.145b: daybound means "if it is night and this permanent is represented by a double-faced card, it enters
+# transformed" - the permanent's daybound, whatever gives it (the example under CR 712.13a: a double-faced card entering
+# as a copy of a daybound creature at night enters with its back face up). Glasspool Mimic, a modal double-faced card
+# (CR 712.3: one may transform), enters at night as a copy of a Clone that copied Outland Liberator: the Mimic has daybound
+# as it would enter, so it enters transformed - back face up, still a copy of Outland Liberator (CR 707.2), and never
+# transformed after (CR 712.14a: entering transformed is no transformation). The Clone, no double-faced card, stays front
+# face up at night (CR 701.27c); the Liberator itself became Frenzied Trapbreaker as night came.
+#
+# Turn 1: Forest and Mox Emerald cast Outland Liberator (it becomes day, CR 702.145d); Black Lotus and Mox Sapphire cast
+# Clone, copying it. Bot2 casts nothing on turn 2, so turn 3 is night (CR 731.2). Turn 3: Forest, Emerald and Sapphire
+# cast Glasspool Mimic, copying the Clone.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Mox Sapphire
+Outland Liberator
+Clone
+Island
+Glasspool Mimic
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[T1 Bot1.Main2]
+? DayNight = Day
+[T3 Bot1.Main1]
+? DayNight = Night
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Glasspool Mimic.Cast
+Bot1.Accept
+Bot1.Target(Outland Liberator)
+[T3 Bot1.Main2]
+
+[Expect]
+DayNight = Night
+Bot1.Battlefield = Forest; Frenzied Trapbreaker; Mox Emerald; Mox Sapphire; Outland Liberator; Outland Liberator
+Bot1.Battlefield.Frenzied Trapbreaker.Transformed = true
+Bot1.Battlefield.Outland Liberator#1.Subtypes = Human; Werewolf
+Bot1.Battlefield.Outland Liberator#1.Keywords = Daybound
+Bot1.Battlefield.Outland Liberator#1.Transformed = (absent)
+Bot1.Battlefield.Outland Liberator#2.Subtypes = Human; Rogue; Shapeshifter; Werewolf
+Bot1.Battlefield.Outland Liberator#2.Keywords = Daybound
+Bot1.Battlefield.Outland Liberator#2.Power = 2
+Bot1.Battlefield.Outland Liberator#2.Transformed = true

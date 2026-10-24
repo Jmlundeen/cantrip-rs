@@ -8,6 +8,8 @@ mod actions;
 #[cfg(test)]
 mod as_transforms_tests;
 #[cfg(test)]
+mod daybound_copy_tests;
+#[cfg(test)]
 mod attack_effect_tests;
 #[cfg(test)]
 mod attack_option_tests;

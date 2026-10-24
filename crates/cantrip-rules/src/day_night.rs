@@ -77,11 +77,16 @@ pub fn check_untap_step(cx: &mut Cx) -> R<()> {
 
 /// CR 702.145b's first static ability: "if it is night and this permanent is represented by a double-faced card, it
 /// enters transformed", asked of a card on its way to the battlefield from wherever it is coming.
+/// Asked first of its printed daybound; one entering as a copy is judged again as that copy once the copy is chosen
+/// (`ops::prepare_entry`).
 pub fn enters_transformed(cx: &Cx, card: ObjectId) -> bool {
-    cx.s().turn.day_night == DayNight::Night && {
-        let printed = cx.s().obj(card).card;
-        cx.cards().backs[printed.0 as usize].is_some() && cx.card(printed).keywords.has(Keyword::Daybound)
-    }
+    night_and_double_faced(cx, card) && cx.card(cx.s().obj(card).card).keywords.has(Keyword::Daybound)
+}
+
+/// Whether it is night and `card` is represented by a double-faced card (CR 702.145b), so that daybound it would have
+/// makes it enter transformed.
+pub fn night_and_double_faced(cx: &Cx, card: ObjectId) -> bool {
+    cx.s().turn.day_night == DayNight::Night && cx.cards().backs[cx.s().obj(card).card.0 as usize].is_some()
 }
 
 /// Every permanent with daybound or nightbound on the battlefield.
@@ -95,10 +100,13 @@ fn permanents(cx: &Cx) -> Vec<Bound> {
 
 /// CR 702.145c and 702.145f: any time a permanent is front face up with daybound and it is night, or back face up
 /// with nightbound and it is day, it is turned over. One at a time and read again between each, because turning a
-/// permanent over changes which of the two keywords it has.
+/// permanent over changes which of the two keywords it has. Which face is up is the permanent's, not its keyword's: a
+/// copy of a daybound creature that entered with its back face up (CR 702.145b) keeps daybound and is not turned over,
+/// and one that can't be turned over (a back face that is a sorcery, CR 712.10) is asked no more.
 fn turn_disagreeing(cx: &mut Cx, bound: &[Bound]) -> R<bool> {
     let mut acted = false;
     let mut bound: Vec<Bound> = bound.iter().map(|b| Bound { id: b.id, daybound: b.daybound }).collect();
+    let mut stuck: Vec<ObjectId> = Vec::new();
     // A rules bug should surface as a clear stop rather than a hung game.
     for _ in 0..100 {
         let designation = cx.s().turn.day_night;
@@ -107,14 +115,19 @@ fn turn_disagreeing(cx: &mut Cx, bound: &[Bound]) -> R<bool> {
             live(cx.s(), b.id)
                 && obj.zone.is(ZoneKind::Battlefield)
                 && cx.cards().backs[obj.card.0 as usize].is_some()
-                && ((b.daybound && designation == DayNight::Night) || (!b.daybound && designation == DayNight::Day))
+                && !stuck.contains(&b.id)
+                && ((b.daybound && !obj.transformed && designation == DayNight::Night)
+                    || (!b.daybound && obj.transformed && designation == DayNight::Day))
         }) else {
             return Ok(acted);
         };
         let id = next.id;
-        ops::turn_over(cx, id)?;
-        acted = true;
-        bound = permanents(cx);
+        if ops::turn_over(cx, id)? {
+            acted = true;
+            bound = permanents(cx);
+        } else {
+            stuck.push(id);
+        }
     }
     Ok(acted)
 }

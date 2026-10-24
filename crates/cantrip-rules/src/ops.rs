@@ -889,6 +889,13 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     {
         enters(cx, entering)?;
     }
+    // CR 702.145b: the daybound of a permanent entering as a copy is the copy's, judged as it would exist (CR 614.12) - the
+    // example under CR 712.13a: a double-faced card entering at night as a copy of a daybound creature enters transformed,
+    // and one entering as a copy of something without daybound does not. Its back face up, it is still that copy (CR 707.2).
+    if entering.copy.is_some() && crate::day_night::night_and_double_faced(cx, entering.object) {
+        let face_up = Entering { transformed: false, ..*entering };
+        entering.transformed = as_it_would_exist(cx, &face_up).chars.has(Keyword::Daybound);
+    }
     Ok(())
 }
 
@@ -1312,7 +1319,7 @@ pub fn transform(cx: &mut Cx, id: ObjectId, by: Option<&StackItem>) -> R<()> {
     {
         return Ok(());
     }
-    turn_over(cx, id)
+    turn_over(cx, id).map(|_| ())
 }
 
 /// CR 701.27f: "If an activated or triggered ability of a permanent that isn't a delayed triggered ability of that
@@ -1341,17 +1348,28 @@ fn transformed_since(cx: &Cx, item: &StackItem, id: ObjectId) -> bool {
 /// is read from the permanent as it is once turned over - the face now up (`CardDef::as_transforms`), unless it has lost
 /// all its abilities there (CR 613.1f) - and applied here, before the transformation's event, by whatever turned it
 /// over. Entering the battlefield transformed is no transformation (CR 712.14a) and never comes here.
-pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<()> {
+///
+/// Only a permanent represented by a double-faced card or token transforms (CR 701.27a, 701.27c, 712.9): a card with a
+/// copy effect on it is still that card (Glasspool Mimic as a copy of a daybound creature), and stays that copy with its
+/// other face up (CR 707.2); a face-down permanent, and a token whose copiable values a copy effect set, do not. Nor does
+/// one whose other face is an instant or sorcery face (CR 701.27d, 712.10). Whether it turned over.
+pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
     if !live(cx.s(), id) {
-        return Ok(());
+        return Ok(false);
     }
     let obj = cx.s().obj(id);
-    if !obj.zone.is(ZoneKind::Battlefield) || obj.copied_card().is_some() || cx.cards().backs[obj.card.0 as usize].is_none() {
-        return Ok(());
+    if !obj.zone.is(ZoneKind::Battlefield)
+        || obj.marks.face_down_as.is_some()
+        || (obj.token && obj.copy.is_some())
+        || cx.cards().backs[obj.card.0 as usize].is_none()
+        || instant_or_sorcery(cx.card(cx.cards().face(obj.card, !obj.transformed)))
+    {
+        return Ok(false);
     }
-    let face = cx.cards().face(obj.card, !obj.transformed);
     cx.st().update_obj(id, |o| o.transformed = !o.transformed);
     note_statics(cx, id);
+    // The face now up, or what a copy effect makes it (CR 707.2).
+    let face = cx.cards().current(cx.s().obj(id));
     if let Some(as_transforms) = cx.cards().get(face).as_transforms
         && !cx.lost_all_abilities(id)
     {
@@ -1359,7 +1377,7 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<()> {
         as_transforms(cx, &Asker { source: id, controller })?;
     }
     cx.emit(Event::Transformed { object: id });
-    Ok(())
+    Ok(true)
 }
 
 /// Creates an emblem (CR 114.2): an object in the command zone, owned by the player, that nothing moves.

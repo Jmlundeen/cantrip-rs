@@ -1,0 +1,48 @@
+# CR 702.145c: any time a permanent is front face up with daybound and it is night, it transforms. Glasspool Mimic, a
+# modal double-faced card (CR 712.3: one may transform), enters by day as a copy of Outland Liberator, so it has daybound;
+# a copy effect on it does not stop it being represented by a double-faced card (CR 701.27a, 701.27c). When night comes,
+# the Liberator becomes Frenzied Trapbreaker and the Mimic transforms too - back face up, yet still the copy of Outland
+# Liberator its copy effect makes it (CR 707.2), so it keeps daybound and is not turned over again: back face up, it is
+# no longer front face up with daybound.
+#
+# Turn 1: Forest and Mox Emerald cast Outland Liberator (it becomes day, CR 702.145d); Black Lotus casts Glasspool Mimic,
+# copying it. Bot2 casts nothing on turn 2, so turn 3 is night (CR 731.2).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Outland Liberator
+Glasspool Mimic
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Glasspool Mimic.Cast
+Bot1.Accept
+[T1 Bot1.Main2]
+? DayNight = Day
+? Bot1.Battlefield.Outland Liberator#2.Transformed = (absent)
+[T3 Bot1.Main2]
+
+[Expect]
+DayNight = Night
+Bot1.Battlefield = Forest; Frenzied Trapbreaker; Mox Emerald; Outland Liberator
+Bot1.Battlefield.Frenzied Trapbreaker.Subtypes = Werewolf
+Bot1.Battlefield.Outland Liberator.Subtypes = Human; Rogue; Shapeshifter; Werewolf
+Bot1.Battlefield.Outland Liberator.Keywords = Daybound
+Bot1.Battlefield.Outland Liberator.Transformed = true

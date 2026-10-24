@@ -508,6 +508,10 @@ impl StateDump {
                     if obj.token {
                         d.set(format!("{key}.Token"), true);
                     }
+                    // Back face up (CR 701.27g), whatever a copy effect makes it look like (CR 707.2).
+                    if obj.transformed {
+                        d.set(format!("{key}.Transformed"), true);
+                    }
                     // Its mana value (CR 202.3): a Room's unlocked doors' (CR 709.5), a transformed permanent's front face's
                     // (CR 202.3b), 0 for a copy of a back face or a face-down permanent.
                     d.set(format!("{key}.ManaValue"), game.mana_value(id));
