@@ -1,5 +1,5 @@
-# Second exact callback composition: Knight of Autumn chooses counters, then phases out (CR 702.26b). Its independent
-# ETB ability resolves, but cannot put counters on the phased-out permanent. Independent review F1 repro.
+# A phased-out permanent is treated as though it doesn't exist (CR 702.26b): Knight of Autumn's enters ability, its
+# two +1/+1 counters mode chosen, resolves after Teferi's Protection has phased the Knight out, and puts no counters on it.
 
 [Bot1 Deck]
 Forest

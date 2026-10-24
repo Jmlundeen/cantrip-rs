@@ -1,5 +1,6 @@
-# Source exile makes a new object and removes Ultron as counter recipient (CR 400.7). Its power-up must still create
-# the 2/2 artifact creature token for its ability's controller (CR 113.7a, 609.3), not return early with the counters.
+# Ultron Drone exiled in response to its power-up is a new object (CR 400.7), so the ability's counters have no
+# recipient; the rest of the ability still resolves (CR 113.7a, 609.3) and creates the 2/2 artifact creature token for
+# the ability's controller.
 
 [Bot1 Deck]
 Island

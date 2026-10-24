@@ -1074,6 +1074,11 @@ permanents too (514.2). Events: `PhasedOut`, `PhasedIn` (recorded; nothing trigg
 (`Game::phase_out_until_leaves`) use it; the host shows a phased-out permanent with the battlefield, marked
 `ObjectView::phased_out`, and the script dump lists them as `BotN.PhasedOut`.
 
+Counters and phasing (CR 702.26b-d): `counters::put_all` excludes phased-out recipients before replacements and rechecks
+presence after their continuations; removal rejects phased-out recipients too. Existing counters remain through phasing;
+normal placements on cards in other zones still work. Identity liveness is unchanged, so phasing does not become a zone
+change or erase a source's history. A failed counter placement never stops the rest of a card's effect.
+
 "Your life total can't change" (CR 119.7, 119.8) is `EffectKind::LifeTotalCantChange`, a player effect `ops::change_life`
 asks before any replacement (nothing replaces what can't happen) and `actions::can_pay_life` asks of a cost of more than 0
 life. Damage is still dealt; only its loss of life doesn't happen.
@@ -2137,11 +2142,6 @@ engine does not have yet is skipped; one that can run must pass.
 
 ## Correctness
 
-- **Counter placement and phasing (CR 702.26b-d).** `counters::put_all` excludes phased-out recipients before
-  replacements and rechecks presence after their continuations; removal rejects phased-out recipients too. Existing
-  counters remain through phasing; normal placements on cards in other zones still work. Identity liveness is
-  unchanged, so phasing does not become a zone
-  change or erase a source's history. A failed counter placement never stops the rest of a card's effect.
 - **The scenarios are the reference.** A card is done when it is exact and its scenarios pass; a scenario that is
   wrong by the rules is fixed, with the rule.
 - **`CANTRIP_VERIFY=1`** runs the engine's own consistency checks while it plays; `tools\test.cmd` sets it.
