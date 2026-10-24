@@ -287,6 +287,12 @@ def _face(face, names, index, core):
         for pattern, keyword in index.TEXT_KEYWORDS:
             if re.fullmatch(pattern, line.strip(), re.I) and keyword not in keywords:
                 keywords.append(keyword)
+        # Toxic N (CR 702.164a): a core keyword with its number, "Toxic 2", alone or in a keyword list ("Menace, toxic 1"),
+        # each part as crates/cantrip-oracle/build.rs reads it.
+        for part in re.split(r"[,;]", line):
+            toxic = re.fullmatch(r"toxic (\d+)", part.strip(), re.I)
+            if toxic:
+                keywords.append(f"Toxic {toxic.group(1)}")
     if keywords:
         out["keywords"] = keywords
     for flag in ("convoke", "delve", "improvise"):

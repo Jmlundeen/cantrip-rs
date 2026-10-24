@@ -1696,6 +1696,7 @@ pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
         power: c.power,
         toughness: c.toughness,
         keywords: c.keywords,
+        toxic: c.toxic,
         mana_value: cantrip_api::mana_value_of(&|card| cx.cards().get(card), cx.s(), id, c),
         abilities: c.abilities,
         words: cantrip_api::words(cx.s(), id),
@@ -2877,14 +2878,21 @@ pub fn deal_damage_with(
                 return prevented(cx, by);
             }
 
-            if source_chars.has(Keyword::Infect) || batch.as_though_infect(cx, p) {
-                // Damage from a source with infect is dealt to a player as that many poison counters (CR 702.90b,
-                // 120.3b), and so is damage dealt "as though its source had infect" (Phyrexian Unlife): "that source's
-                // controller" gives them, so "if you would put one or more counters" is theirs.
-                let by = cx.s().obj(source).controller;
-                counters::put_on_player(cx, p, counters::PlayerCounts { poison: amount, ..Default::default() }, by);
-            } else {
+            // Damage from a source with infect is dealt to a player as that many poison counters (CR 702.90b, 120.3b), and
+            // so is damage dealt "as though its source had infect" (Phyrexian Unlife).
+            let infect = source_chars.has(Keyword::Infect) || batch.as_though_infect(cx, p);
+            // Combat damage dealt to a player by a creature with toxic also gives them poison counters equal to its total
+            // toxic value, whatever the amount dealt (CR 702.164c, 120.3g): prevented, no damage is dealt and none are given.
+            let toxic = if combat && source_chars.is(CardType::Creature) { source_chars.toxic } else { 0 };
+            if !infect {
                 change_life(cx, p, -(amount as i32));
+            }
+            let poison = if infect { amount } else { 0 } + toxic;
+            if poison > 0 {
+                // "That source's controller" (CR 120.3b) and "that creature's controller" (CR 702.164c) gives them, at once
+                // as results of the one damage, so "if you would put one or more counters" is theirs.
+                let by = cx.s().obj(source).controller;
+                counters::put_on_player(cx, p, counters::PlayerCounts { poison, ..Default::default() }, by);
             }
             lifelink(cx, source, &source_chars, amount, batch);
             Some(Event::Damage { source, target, amount, combat, controller: cx.s().obj(source).controller, colors: source_chars.colors })

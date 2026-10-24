@@ -2546,6 +2546,9 @@ pub struct CardDef {
     /// A battle's printed defense (CR 310.4a): it enters with that many defense counters (CR 310.4b).
     pub defense: Option<i16>,
     pub keywords: Keywords,
+    /// Its printed toxic N (CR 702.164a), 0 for none: a keyword ability, part of its copiable values and lost as keywords
+    /// are. What the layers grant is added to it (`Chars::toxic`, its total toxic value, CR 702.164b).
+    pub toxic: u16,
     /// Its printed "hexproof from [quality]" abilities (CR 702.11d): a keyword ability, so it is part of its copiable values
     /// and is lost as keywords are (CR 702.11e). A color word in it is a word of its text (CR 612.2): a text-changing effect
     /// changes the color.
@@ -2922,6 +2925,7 @@ impl CardDef {
         loyalty: None,
         defense: None,
         keywords: Keywords::NONE,
+        toxic: 0,
         hexproof_from: HexproofFrom::NONE,
         protection: ColorSet::NONE,
         pay_with: PayWith::NONE,

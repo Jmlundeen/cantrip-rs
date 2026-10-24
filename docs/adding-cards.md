@@ -494,6 +494,7 @@ shapes have an example:
   rule with its land type (`Keyword::LANDWALKS`); a card that grants one names it through its words,
   `Keyword::landwalk(q.words(source).subtype(Subtype::Island))` (Lord of Atlantis).
   A scenario refuses an attack or a block with `! Bot2.Attack(A > B)` / `! Bot2.Block(A > B)`.
+  **Toxic N** (CR 702.164) is the core's: printed, a JSON `keywords` entry `"Toxic 2"` (`CardDef::toxic`); granted, `EffectKind::Toxic(n)` or a layer-6 static's `chars.toxic += n`. `Chars::toxic` is the total toxic value (CR 702.164b), which combat damage to a player gives as poison counters (`ops::deal_damage_with`); the dump's `.Toxic` key shows it.
 - **Reflexive triggers** (CR 603.12, "when you do"): `Game::reflexive_trigger`; one whose quantity is what the first part
   did ("tap up to that many target creatures") is `Game::reflexive_trigger_counted(.., count)`, and its slot's
   `TargetSpec::COUNTED` bound and its stack item's `x` are that count (Seasoned Cryomancer, Miasma Demon, Loamcrafter

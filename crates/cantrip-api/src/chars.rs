@@ -36,6 +36,9 @@ pub struct Chars {
     /// How many times it has "attacks each combat if able" (CR 508.1d): each instance of the ability, printed or gained, is a
     /// requirement of its own on a declaration of attackers.
     pub must_attack: u32,
+    /// Its total toxic value (CR 702.164b): the sum of the N of every toxic N it has, printed and granted, 0 for none.
+    /// Combat damage it deals a player gives that many poison counters as well (CR 702.164c, 120.3g).
+    pub toxic: u16,
     pub abilities: [Option<AbilityRef>; MAX_ABILITIES],
     /// It has no mana cost (CR 118.6, 707.9b): a copy that says so, whatever the card it copies prints. Its mana
     /// value is 0.
@@ -86,6 +89,7 @@ impl Chars {
         self.power = last.power;
         self.toughness = last.toughness;
         self.keywords = last.keywords;
+        self.toxic = last.toxic;
         self.abilities = last.abilities;
         self
     }
@@ -142,6 +146,7 @@ impl Chars {
         self.protection_everything = false;
         self.hexproof_from = HexproofFrom::NONE;
         self.must_attack = 0;
+        self.toxic = 0;
         self.abilities = [None; MAX_ABILITIES];
     }
 

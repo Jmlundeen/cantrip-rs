@@ -932,6 +932,15 @@ impl<'a> Projector<'a> {
                 }
             }
         }
+        // Toxic N (CR 702.164): its printed toxic is on its text, so what it has beyond that is granted, as one line of its
+        // total (CR 702.164b), and printed toxic it has no more is lost - unless it lost all its abilities, which the walk of
+        // its text below says, and after which all the toxic it has was granted.
+        let printed_toxic = if c.lost_all { 0 } else { def.toxic };
+        if c.toxic > printed_toxic {
+            view.granted_abilities.push(AbilityTextView { text: format!("Toxic {}", c.toxic - printed_toxic), spent: false });
+        } else if c.toxic < printed_toxic {
+            view.lost_abilities.push(format!("Toxic {printed_toxic}"));
+        }
         // "Hexproof from [quality]" (CR 702.11d): the qualities it has and did not start with are granted, those it started
         // with and has not are lost.
         if c.hexproof_from != def.hexproof_from {

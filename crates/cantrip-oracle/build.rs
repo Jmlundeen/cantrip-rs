@@ -328,9 +328,19 @@ fn is_plain(card: &Card) -> bool {
     if ["backFace", "adventure", "omen", "prepare", "halves", "split"].iter().any(|k| card.contains_key(*k)) {
         return false;
     }
+    without_reminder(&str_of(card, "oracleText")).split('\n').filter(|l| !l.trim().is_empty()).all(|line| {
+        line.split([',', ';']).all(|part| {
+            let part = part.trim().to_lowercase();
+            KEYWORD_WORDS.contains(&part.as_str()) || toxic_n(&part).is_some()
+        })
+    })
+}
+
+/// Oracle text without its reminder text (CR 207.2a), the parenthesized parts.
+fn without_reminder(oracle: &str) -> String {
     let mut text = String::new();
     let mut in_reminder = false;
-    for c in str_of(card, "oracleText").chars() {
+    for c in oracle.chars() {
         match c {
             '(' if !in_reminder => in_reminder = true,
             ')' if in_reminder => in_reminder = false,
@@ -338,9 +348,20 @@ fn is_plain(card: &Card) -> bool {
             c => text.push(c),
         }
     }
-    text.split('\n')
-        .filter(|l| !l.trim().is_empty())
-        .all(|line| line.split([',', ';']).all(|part| KEYWORD_WORDS.contains(&part.trim().to_lowercase().as_str())))
+    text
+}
+
+/// The toxic N its Oracle text prints, added up (CR 702.164b): each keyword part of a line - alone ("Toxic 2") or in a
+/// keyword list ("Menace, toxic 1") - that is "toxic N".
+fn printed_toxic(card: &Card) -> u16 {
+    let text = without_reminder(&str_of(card, "oracleText"));
+    text.split('\n').flat_map(|line| line.split([',', ';'])).filter_map(|part| toxic_n(&part.to_lowercase())).sum()
+}
+
+/// The N of a toxic N (CR 702.164a), as content's `keywords` ("Toxic 2") or Oracle text ("toxic 2") words it.
+fn toxic_n(word: &str) -> Option<u16> {
+    let word = word.trim();
+    word.strip_prefix("Toxic ").or_else(|| word.strip_prefix("toxic "))?.parse().ok()
 }
 
 /// The `CardDef` fields of one face: a card, or the back face of a double-faced card (CR 711).
@@ -405,6 +426,26 @@ fn face_fields(card: &Card, is_back: bool, source: &str, known: &HashSet<String>
     }
     if !keywords.is_empty() {
         fields.push(format!("    keywords: Keywords::of(&[{}]),", keywords.join(", ")));
+    }
+    // Toxic N (CR 702.164a), "Toxic 2" in `keywords`: each instance's N, added up (CR 702.164b).
+    let toxic: u16 = card
+        .get("keywords")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+        .filter_map(toxic_n)
+        .sum();
+    // A content file that leaves out a toxic its text prints, or gives another N, would build the card without it.
+    let printed = printed_toxic(card);
+    if toxic != printed {
+        panic!(
+            "{source}: {name}'s Oracle text prints toxic {printed} in all, but its `keywords` give toxic {toxic}: list \"Toxic N\" \
+             in `keywords` for each toxic N the text prints (CR 702.164a)"
+        );
+    }
+    if toxic > 0 {
+        fields.push(format!("    toxic: {toxic},"));
     }
     // Convoke, delve and improvise (CR 702.51, 702.66, 702.126): what else may pay the total cost.
     let flag = |k: &str| card.get(k) == Some(&Value::Bool(true));

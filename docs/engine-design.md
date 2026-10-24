@@ -978,7 +978,7 @@ or beside the life total of the player it shields, or of its controller for dama
 A replacement effect may change whom damage is dealt to as well as how much (CR 614.1a: "all damage that would be dealt to
 you and other permanents you control is dealt to this creature instead"): `DamageEvent::target` is the recipient, and
 `ops::deal_damage_with` deals what the effects leave to whomever they leave it with, by the same source and still combat
-damage if it was (the rulings). Everything about the recipient is judged there: protection, infect's counters or poison,
+damage if it was (the rulings). Everything about the recipient is judged there: protection, infect's counters or poison, toxic's poison (combat damage to a player alone, CR 702.164c),
 lifelink, deathtouch, a planeswalker's loyalty, a battle's defense, the monarch's combat-damage steal and the `Damage`
 event "deals combat damage to a player" triggers read. Once one effect has applied, the others are judged again against the
 changed event and its recipient's controller orders them (CR 614.6, 616.1f), each applying once (CR 614.5), so with two such

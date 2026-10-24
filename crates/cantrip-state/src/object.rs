@@ -1101,6 +1101,9 @@ pub enum EffectKind {
     /// Gains "this creature attacks each combat if able" (CR 508.1d), layer 6: an ability, which "loses all abilities" later
     /// takes (Carnage, Crimson Chaos).
     MustAttack,
+    /// Gains toxic N (CR 702.164a), layer 6: an instance of its own, added to the ones it has (CR 702.164b), which "loses
+    /// all abilities" later takes.
+    Toxic(u16),
     /// "Attacks [that player or permanent] if able" (CR 508.1d): an attack requirement that names what to attack, and only
     /// that - Ursine Monstrosity's "attacks that player this combat if able", Gideon, Battle-Forged's "attacks Gideon during
     /// its controller's next turn if able". Where the creature can't attack that one - a cost to pay, a planeswalker gone or
@@ -1625,6 +1628,8 @@ pub struct LastKnown {
     pub power: Option<i16>,
     pub toughness: Option<i16>,
     pub keywords: Keywords,
+    /// Its total toxic value as it last had it (CR 702.164b).
+    pub toxic: u16,
     /// Its mana value as it last had it (CR 202.3; on the stack, X counted, CR 202.3e): a cast's is its mana value as it
     /// became cast (`history::Cast::value`).
     pub mana_value: u32,

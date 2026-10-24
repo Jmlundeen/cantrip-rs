@@ -646,6 +646,10 @@ impl StateDump {
                         keywords.sort();
                         d.list(&format!("{key}.Keywords"), keywords, true);
                     }
+                    // Its total toxic value (CR 702.164b).
+                    if c.toxic > 0 {
+                        d.set(format!("{key}.Toxic"), c.toxic.to_string());
+                    }
                     // Its "hexproof from [quality]" abilities (CR 702.11d), as the qualities' words: `Black; White`, `Monocolored`.
                     if !c.hexproof_from.is_empty() {
                         let h = c.hexproof_from;

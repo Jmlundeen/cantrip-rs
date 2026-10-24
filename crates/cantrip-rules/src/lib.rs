@@ -108,6 +108,8 @@ mod cycled_tests;
 #[cfg(test)]
 mod counters_together_tests;
 #[cfg(test)]
+mod toxic_tests;
+#[cfg(test)]
 mod remove_up_to_tests;
 #[cfg(test)]
 mod room_copy_tests;
@@ -809,6 +811,7 @@ impl Game {
                     power: c.power,
                     toughness: c.toughness,
                     keywords: c.keywords,
+                    toxic: c.toxic,
                     mana_value,
                     abilities: c.abilities,
                     words: Words::NONE,

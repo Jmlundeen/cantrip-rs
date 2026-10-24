@@ -510,6 +510,7 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.Counters.PlusOnePlusOne` (or `.Lifelink`, any `CounterKind`), for a permanent that has
   counters of that kind
 - `BotN.Battlefield.<Name>.Keywords` (`Indestructible; Lifelink`, sorted), computed keywords, absent when it has none
+- `BotN.Battlefield.<Name>.Toxic` (`3`), its total toxic value (CR 702.164b), printed and granted, absent when it has none
 - `BotN.Battlefield.<Name>.HexproofFrom` (`Black; White`, `Monocolored`, sorted), the qualities of its "hexproof from"
   abilities (CR 702.11d), printed or granted, absent when it has none
 - `BotN.Battlefield.<Name>.ProtectionFrom` (`Black; Red`, sorted), the colors of its "protection from [color]" abilities

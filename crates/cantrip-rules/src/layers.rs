@@ -1175,6 +1175,8 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         protection_everything: false,
         hexproof_from: worded_hexproof(def.hexproof_from, words),
         must_attack: 0,
+        // Printed toxic N (CR 702.164a): the card's, or the one it copies.
+        toxic: def.toxic,
         abilities,
         no_cost,
         name_set: false,
@@ -2103,7 +2105,7 @@ enum Field {
     Plain(u64),
 }
 
-fn fields(c: &Chars) -> [(&'static str, Field); 18] {
+fn fields(c: &Chars) -> [(&'static str, Field); 19] {
     use std::hash::{Hash, Hasher};
     let plain = |v: &dyn Fn(&mut std::collections::hash_map::DefaultHasher)| {
         let mut h = std::collections::hash_map::DefaultHasher::new();
@@ -2135,6 +2137,8 @@ fn fields(c: &Chars) -> [(&'static str, Field); 18] {
         ),
         // A count: the same change is the same instances added (an audit's field; past i16 it reads as the most).
         ("must_attack", Field::Number(Some(i16::try_from(c.must_attack).unwrap_or(i16::MAX)))),
+        // The total toxic value (CR 702.164b), a sum of instances as `must_attack` is.
+        ("toxic", Field::Number(Some(i16::try_from(c.toxic).unwrap_or(i16::MAX)))),
         ("losses", bits(u64::from(c.lost_all) | u64::from(c.text_lost) << 1)),
         ("marks", bits(u64::from(c.spell) | u64::from(c.no_cost) << 1 | u64::from(c.name_set) << 2)),
         ("card", plain(&|h| c.card.hash(h))),
@@ -2275,6 +2279,7 @@ fn contract_pairs(base: Chars, ability: AbilityRef) -> Vec<(Chars, Chars)> {
     vary(&|c| c.protection_colored_spells = !c.protection_colored_spells);
     vary(&|c| c.protection_everything = !c.protection_everything);
     vary(&|c| c.must_attack += 1);
+    vary(&|c| c.toxic += 1);
     // losses
     vary(&|c| c.lost_all = !c.lost_all);
     vary(&|c| c.text_lost = !c.text_lost);
@@ -2629,7 +2634,8 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
         | EffectKind::AddAbility(_)
         | EffectKind::Enchant(_)
         | EffectKind::LoseEnchant(_)
-        | EffectKind::MustAttack => Layer::Ability,
+        | EffectKind::MustAttack
+        | EffectKind::Toxic(_) => Layer::Ability,
         EffectKind::SetPt(..) => Layer::PtSet,
         EffectKind::Pump(..) => Layer::PtModify,
         EffectKind::SwitchPt => Layer::PtSwitch,
@@ -2785,6 +2791,8 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             // A gained "this creature attacks each combat if able" (Carnage, Crimson Chaos). Goad and "attacks that player this
             // combat if able" are effects, not abilities: they are read from the effects as attackers are declared.
             (Layer::Ability, EffectKind::MustAttack) => chars.must_attack += 1,
+            // A gained toxic N (CR 702.164a): another instance, its N added to the total toxic value (CR 702.164b).
+            (Layer::Ability, EffectKind::Toxic(n)) => chars.toxic += n,
             // CR 613.4d: power and toughness switch, whatever set and modified them first.
             (Layer::PtSwitch, EffectKind::SwitchPt) => std::mem::swap(&mut chars.power, &mut chars.toughness),
             (Layer::PtModify, EffectKind::Pump(p, t)) => {
@@ -3200,6 +3208,7 @@ mod tests {
             protection_everything: false,
             hexproof_from: HexproofFrom::NONE,
             must_attack: 0,
+            toxic: 0,
             abilities,
             no_cost: false,
             name_set: false,
