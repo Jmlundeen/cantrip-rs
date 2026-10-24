@@ -572,21 +572,71 @@ fn ward_sacrifice_question(n: u8) -> &'static Question {
     }
 }
 
-fn ward_sacrifice_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+/// What ward's "sacrifice N nonland permanents" asks the player whose spell or ability targeted.
+fn ward_sacrifice_nonland_question(n: u8) -> &'static Question {
+    const DETAIL: &str = "Ward: what it targeted can't be targeted for free";
+    const THREE: Question = Question::new(
+        "SacrificeNonlandUnlessCountered",
+        "Sacrifice three nonland permanents, or {source} is countered?",
+        DETAIL,
+        "Sacrifice three nonland permanents",
+        "Let it be countered",
+    )
+    .amount(3)
+    .no_default();
+    const ANY: Question =
+        Question::new("SacrificeNonlandUnlessCountered", "Sacrifice the nonland permanents, or {source} is countered?", DETAIL, "Sacrifice them", "Let it be countered")
+            .no_default();
+    match n {
+        3 => &THREE,
+        _ => &ANY,
+    }
+}
+
+/// Ward--Sacrifice `n` of a kind of permanent (CR 702.21a, 118.12): counters the spell or ability that targeted unless the
+/// player who controls it sacrifices `n` permanents they control that `kind` admits. A cost is paid only with what it needs
+/// (CR 118.3): a player controlling fewer than `n` such permanents can't pay and is not asked, nor is one whom the ward's
+/// controller's abilities can't make sacrifice (CR 101.2; Tamiyo, Collector of Tales's ruling: "something happens unless you
+/// sacrifice" can't be paid). The payer then chooses which `n`, all sacrificed at once.
+fn ward_sacrifice_among(
+    g: &mut dyn Game,
+    item: &StackItem,
+    n: u8,
+    kind: fn(&dyn Query, &Asker, ObjectId) -> bool,
+    question: &'static Question,
+) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    // A cost is paid only with what it needs (CR 118.3): a player controlling fewer than N permanents can't pay and is not
-    // asked, nor is one whom the ward's controller's abilities can't make sacrifice (CR 101.2; Tamiyo, Collector of Tales's
-    // ruling: "something happens unless you sacrifice" can't be paid). The payer then chooses which N, all sacrificed at once.
-    let permanents = g.permanents_of(payer);
-    if permanents.len() >= N as usize
+    let asker = Asker { source: item.object, controller: payer };
+    let eligible: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| kind(&*g, &asker, id)).collect();
+    if eligible.len() >= n as usize
         && may_cause(&*g, item.controller, payer, CauseKind::Sacrifice)
-        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(ward_sacrifice_question(N)) })? == Answer::Yes
+        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(question) })? == Answer::Yes
     {
-        return crate::sacrifice_one_of(g, payer, item.object, N, permanents).map(drop);
+        return crate::sacrifice_one_of(g, payer, item.object, n, eligible).map(drop);
     }
     g.counter_item(by, item.data[1] as usize);
     Ok(())
+}
+
+fn any_permanent(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
+    true
+}
+
+fn ward_sacrifice_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    ward_sacrifice_among(g, item, N, any_permanent, ward_sacrifice_question(N))
+}
+
+fn ward_sacrifice_nonland_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    ward_sacrifice_among(g, item, N, crate::targets::filters::nonland, ward_sacrifice_nonland_question(N))
+}
+
+/// Ward--Sacrifice N nonland permanents (CR 702.21a, 118.12): "Whenever this becomes the target of a spell or ability an
+/// opponent controls, counter it unless that player sacrifices N nonland permanents." Valgavoth, Terror Eater prints it with
+/// three.
+pub const fn ward_sacrifice_nonland<const N: u8>(text: &'static str) -> AbilityDef {
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_sacrifice_nonland_effect::<N>, text)
+        .ward()
 }
 
 /// Ward--Sacrifice N permanents (CR 702.21a, 118.12): "Whenever this becomes the target of a spell or ability an opponent
@@ -608,19 +658,7 @@ const WARD_SACRIFICE_FOOD: Question = Question::new(
 .no_default();
 
 fn ward_sacrifice_a_food_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Object(by) = item.subject else { return Ok(()) };
-    let payer = PlayerId(item.data[0] as u8);
-    // A cost is paid only with what it needs (CR 118.3): a player who controls no Food can't pay and is not asked, nor is one
-    // whom the ward's controller's abilities can't make sacrifice (CR 101.2). The payer chooses which Food among theirs.
-    let foods: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| crate::targets::filters::food(&*g, &Asker { source: item.object, controller: payer }, id)).collect();
-    if !foods.is_empty()
-        && may_cause(&*g, item.controller, payer, CauseKind::Sacrifice)
-        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_SACRIFICE_FOOD) })? == Answer::Yes
-    {
-        return crate::sacrifice_one_of(g, payer, item.object, 1, foods).map(drop);
-    }
-    g.counter_item(by, item.data[1] as usize);
-    Ok(())
+    ward_sacrifice_among(g, item, 1, crate::targets::filters::food, &WARD_SACRIFICE_FOOD)
 }
 
 /// Ward--Sacrifice a Food (CR 702.21a, 118.12): "Whenever this becomes the target of a spell or ability an opponent controls,

@@ -1,16 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::{choose, replacements};
 use cantrip_oracle as oracle;
 
 /// "If a card would be put into an opponent's graveyard from anywhere, instead exile it with a void counter on it."
-/// (CR 614.1a.) It belongs to Dauthi Voidwalker, so it functions only while it is on the battlefield (CR 604.1). "An
-/// opponent's graveyard" is read off the destination zone's owner rather than the moving card's, since a card someone
-/// else owns can be discarded, milled or destroyed from anywhere; "a card" (CR 108.2) is not a token or a copy of a
-/// spell. The void counter is given as the card arrives, because counters do not survive a zone change (CR 122.2).
-fn applies(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
-    matches!(proposal, Proposal::ZoneChange(z) if z.to.is(ZoneKind::Graveyard) && z.to.player != asker.controller && z.is_card)
-}
-
+/// (CR 614.1a, `replacements::card_to_an_opponents_graveyard`.) It belongs to Dauthi Voidwalker, so it functions only while
+/// it is on the battlefield (CR 604.1). The void counter is given as the card arrives, because counters do not survive a
+/// zone change (CR 122.2).
 fn apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     if let Proposal::ZoneChange(z) = proposal {
         z.to = Zone::exile(z.to.player);
@@ -43,6 +38,6 @@ fn play_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP.and(SACRIFICE_THIS), play_exiled, "{T}, Sacrifice Dauthi Voidwalker: Choose an exiled card an opponent owns with a void counter on it. You may play it this turn without paying its mana cost.")],
-    replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "exiles a card an opponent's graveyard would receive")],
+    replacements: &[replacement(ReplacementKind::ZoneChange, replacements::card_to_an_opponents_graveyard, apply, "exiles a card an opponent's graveyard would receive")],
     ..oracle::DAUTHI_VOIDWALKER
 };

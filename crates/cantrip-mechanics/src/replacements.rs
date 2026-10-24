@@ -97,6 +97,28 @@ pub fn exile_instead_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     }
 }
 
+/// "... exile it instead" by a permanent that has an ability referring to the cards "exiled with" it, as the `apply` of a
+/// replacement it prints: `exile_instead_apply`, and the card is exiled with the permanent (CR 607.2b, 406.6;
+/// `ZoneChange::exiled_with`) by the text the effect is printed in, as the object it is now, so a permanent that leaves and
+/// returns finds none of them (CR 400.7). Valgavoth, Terror Eater, Gisa, Glorious Resurrector and Void Maw print it.
+pub fn exile_instead_linked_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
+    exile_instead_apply(q, asker, proposal);
+    if let Proposal::ZoneChange(z) = proposal {
+        z.exiled_with = Some(q.linked_to(asker.source));
+    }
+}
+
+/// "If a card would be put into an opponent's graveyard from anywhere" (CR 614.1a, 400.3): a card, not a token or a copy of a
+/// spell (CR 108.2), going to the graveyard of a player who is an opponent of the effect's controller, from any zone - a
+/// spell resolving or countered, a creature dying, a discard, a mill. "An opponent's graveyard" is the destination's owner,
+/// whoever controlled the card. Leyline of the Void, Dauthi Voidwalker and Valgavoth, Terror Eater print it.
+pub fn card_to_an_opponents_graveyard(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::ZoneChange(z)
+        if z.is_card
+            && z.to.is(ZoneKind::Graveyard)
+            && q.state().opponents(asker.controller).any(|opponent| opponent == z.to.player))
+}
+
 /// "If a creature an opponent controls would die" (CR 614.1a, 700.4): a creature controlled by an opponent of this
 /// effect's controller, moving from the battlefield to a graveyard. A token is a creature too. Garruk, Vren and Malicious
 /// Eclipse (for the turn, as a granted replacement) read it.

@@ -513,7 +513,8 @@ shapes have an example:
   you cast a spell this way, pay life equal to its mana value rather than pay its mana cost" (CR 118.9, 119.4), the one
   alternative cost, additional costs paid as usual (Valgavoth, Terror Eater).
 - **Ward with a cost other than mana** (CR 702.21a, 118.12): `triggers::ward_life::<N>`, `ward_discard`, and
-  `ward_sacrifice::<N>` ("Sacrifice N permanents": refused with fewer, and under Tamiyo, Collector of Tales).
+  `ward_sacrifice::<N>` ("Sacrifice N permanents": refused with fewer, and under Tamiyo, Collector of Tales),
+  `ward_sacrifice_nonland::<N>` ("Sacrifice N nonland permanents") and `ward_sacrifice_a_food`.
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `DelayedWhen::EachStep` for "at the beginning of each [step] ... for the
   rest of the game", never used up and on no object (paradigm, CR 702.192a); `CardDef.turn_begin` skips a turn (Time Vault, CR 614.10); "end the
   turn" is `g.end_the_turn()?` (CR 724.1, Time Stop), after which the rest of the effect still runs (Glorious End), and
