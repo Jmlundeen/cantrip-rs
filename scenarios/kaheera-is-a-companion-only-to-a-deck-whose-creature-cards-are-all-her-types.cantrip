@@ -1,0 +1,33 @@
+# Kaheera, the Orphanguard: "Companion - Each creature card in your starting deck is a Cat, Elemental, Nightmare, Dinosaur, or
+# Beast card" (CR 702.139a). Bot1's creature cards are one of each type (a Cat Soldier, an Elemental Raccoon, a Nightmare, a
+# Dinosaur, a Beast), each qualifying by one of the five types; its lands and Lightning Bolt are no creature cards, so they need no
+# type. Both chose Kaheera as their companion: Bot1's is revealed before the game (CR 103.2b); Bot2's Hired Blade (a Human
+# Assassin) is none of the types, so Bot2's stays a sideboard card even though its other creature is a Cat.
+
+[Bot1 Deck]
+Solarium Sentry
+Bramble Familiar
+Fiend Artisan
+Rampaging Ferocidon
+Loot, the Nexus
+Lightning Bolt
+Forest x21
+
+[Bot1 Companion]
+Kaheera, the Orphanguard
+
+[Bot2 Deck]
+Solarium Sentry
+Hired Blade
+Island x25
+
+[Bot2 Companion]
+Kaheera, the Orphanguard
+
+[Actions]
+
+[Expect]
+Bot1.Companion = Kaheera, the Orphanguard
+Bot1.Revealed = Kaheera, the Orphanguard
+Bot2.Companion =
+Bot2.Sideboard = Kaheera, the Orphanguard

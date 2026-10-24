@@ -1,0 +1,73 @@
+# Kaheera, the Orphanguard: "Each other creature you control that's a Cat, Elemental, Nightmare, Dinosaur, or Beast gets +1/+1
+# and has vigilance" (CR 613.4c, 613.1f). Bot1 controls Kaheera (3/2, not pumped by herself: "other"), a Woodland Changeling (every
+# creature type, so all five at once, and it is pumped once, not five times) and an Ornithopter (a Thopter: not one of the types).
+# Bot2's own Woodland Changeling matches the types but is not Bot1's creature, so it is unchanged. Bot1's lands and Moxen pay
+# for Kaheera and the Changeling on turn 1; the Ornithopter is cast for {0} on turn 3.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Kaheera, the Orphanguard
+Woodland Changeling
+Ornithopter
+Forest x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Woodland Changeling
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kaheera, the Orphanguard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kaheera, the Orphanguard.Power = 3
+? Bot1.Battlefield.Kaheera, the Orphanguard.Toughness = 2
+? Bot1.Battlefield.Kaheera, the Orphanguard.Keywords = Vigilance
+? Bot1.Battlefield.Woodland Changeling.Power = 3
+? Bot1.Battlefield.Woodland Changeling.Toughness = 3
+? Bot1.Battlefield.Woodland Changeling.Keywords = Changeling; Vigilance
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+? Bot2.Battlefield.Woodland Changeling.Power = 2
+? Bot2.Battlefield.Woodland Changeling.Toughness = 2
+? Bot2.Battlefield.Woodland Changeling.Keywords = Changeling
+
+[Expect]
+Bot1.Battlefield.Count = 8

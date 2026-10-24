@@ -1,0 +1,63 @@
+# Kaheera, the Orphanguard: "Each other creature you control that's a Cat, Elemental, Nightmare, Dinosaur, or Beast gets +1/+1
+# and has vigilance": one of the types is enough - Bot1's Solarium Sentry is a Cat Soldier, of no other of the five, and is 4/4
+# with vigilance; Hired Blade, a Human Assassin, is not pumped. Cat is a creature type word of Kaheera's text (CR 612.2):
+# Artificial Evolution replaces it with Human, and then the Human Hired Blade is pumped and the Cat is not.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Kaheera, the Orphanguard
+Solarium Sentry
+Hired Blade
+Artificial Evolution
+Forest x16
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaheera, the Orphanguard.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solarium Sentry.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hired Blade.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Solarium Sentry.Power = 4
+? Bot1.Battlefield.Solarium Sentry.Toughness = 4
+? Bot1.Battlefield.Solarium Sentry.Keywords = Vigilance
+? Bot1.Battlefield.Hired Blade.Power = 3
+? Bot1.Battlefield.Hired Blade.Keywords = Flash
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Kaheera, the Orphanguard)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Cat)
+Bot1.Modes(Human)
+
+[Expect]
+Bot1.Battlefield.Solarium Sentry.Power = 3
+Bot1.Battlefield.Solarium Sentry.Toughness = 3
+Bot1.Battlefield.Hired Blade.Power = 4
+Bot1.Battlefield.Hired Blade.Toughness = 3
+Bot1.Battlefield.Hired Blade.Keywords = Flash; Vigilance
