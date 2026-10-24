@@ -1,0 +1,59 @@
+# Thor, God of Thunder: "Thor deals damage equal to that spell's mana value to any target" reads the mana value as the
+# trigger resolves, from the spell as it last was on the stack once it has left (CR 608.2h). Bot1 casts Mind Twist with
+# X = 1, mana value 2 there (CR 202.3e), and aims Thor's trigger at Bot2; Bot2 counters the Mind Twist in response, and
+# Thor still deals 2: the X the spell had on the stack counts, not its card's printed mana value of 1.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Thor, God of Thunder
+Mox Jet
+Mox Jet
+Mind Twist
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thor, God of Thunder.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 1)
+Bot1.Target(Bot2)
+Bot1.Pass
+? Stack = Thor, God of Thunder; Mind Twist
+? Stack.Mind Twist.ManaValue = 2
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Mind Twist)
+Bot2.Pass
+Bot1.Pass
+? Stack = Thor, God of Thunder
+? Bot1.Graveyard = Mind Twist; Black Lotus; Black Lotus
+? Bot2.Life = 20
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot2.Graveyard = Counterspell

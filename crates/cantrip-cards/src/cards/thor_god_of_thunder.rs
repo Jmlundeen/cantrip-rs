@@ -26,26 +26,24 @@ fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Whenever you cast a noncreature spell": the spell's mana value is read as it is cast, X included (CR 202.3e), so
-/// the ability deals it even if the spell has left the stack by then (CR 608.2h).
+/// "Whenever you cast a noncreature spell": the ability is about the spell.
 fn you_cast_a_noncreature_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, player, .. } if *player == q.controller(source) => {
-            let chars = q.chars(*spell);
-            if chars.is(CardType::Creature) {
-                return None;
-            }
-            let cost = q.card(chars.card).cost;
-            let x = q.state().stack.iter().find(|i| i.object == *spell).map_or(0, |i| i.x as u32);
-            Some(Fired { subject: Target::Object(*spell), data: [cost.mana_value() + cost.x as u32 * x, 0] })
+        Event::SpellCast { spell, player, .. } if *player == q.controller(source) && !q.chars(*spell).is(CardType::Creature) => {
+            Fired::about(Target::Object(*spell))
         }
         _ => None,
     }
 }
 
+/// "Thor deals damage equal to that spell's mana value to any target": the spell's as the ability resolves, or as it last
+/// was on the stack if it has left (CR 608.2h) - an {X} in its cost counting as the X announced (CR 202.3e).
 fn spell_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if item.data[0] > 0 {
-        damage_target(g, item, 0, item.data[0] as u16);
+    let Target::Object(spell) = item.subject else { return Ok(()) };
+    let amount = g.mana_value(spell);
+    if amount > 0 {
+        // A mana value past what damage holds (RX-5) deals that limit, never a wrapped amount.
+        damage_target(g, item, 0, amount.min(u16::MAX as u32) as u16);
     }
     Ok(())
 }
