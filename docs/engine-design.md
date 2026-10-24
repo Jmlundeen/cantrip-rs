@@ -1499,6 +1499,16 @@ permanents a sacrifice may take (`pays_permanents`, `variable_candidates`), "sac
 can be paid only that way can't be paid, so the spell or ability isn't offered; one with another way (a land for "sacrifice a
 permanent", a Phyrexian symbol's color) is paid that way. 0 life can always be paid (CR 119.4b). What a resolving spell or ability
 has a player pay (CR 118.12: `may_pay`), and a special action's cost (CR 116.2), are paid for none of these, and pass `None`.
+A permanent that "can't be sacrificed" (CR 101.2, 701.21a) can't be sacrificed by anything: it has the ability
+(`Keyword::CantBeSacrificed`, printed or granted, so "loses all abilities" ends it), a resolved effect says so
+(`EffectKind::CantBeSacrificed`, which outlasts its abilities), or another permanent's static ability does
+(`CardDef::sacrifice_bans`, Assault Suit's equipped creature) - all read by `static_rules::cant_be_sacrificed`. It pays no
+cost that sacrifices, whatever the cost is for (`may_sacrifice_for`); `ops::sacrifice`, `sacrifice_and_return` and a Saga's
+state-based sacrifice (CR 714.4) leave it; and a choice of what to sacrifice asked by card code (`Purpose::Sacrifice`, through
+`Cx::as_allowed`, for `ask` and `ask_then` alike) offers only what `ops::sacrificeable` allows - which also leaves out a
+permanent whose controller the resolving spell or ability can't make sacrifice (Sigarda) - taking as many as it can when fewer
+remain than it asks, and answered with nothing unasked when none does. Card code that takes what it sacrifices without asking,
+or offers a sacrifice as one option among others, asks `Game::can_sacrifice`.
 The permanent's controller orders the replacements (CR 616.1), told the counters as the effects so far have left them
 (`RequestKind::ChooseReplacement::counters`, which the host words "1 +1/+1 counter would be put on Walking Ballista"); the
 tactical bot has one that adds a counter apply before one that doubles them.

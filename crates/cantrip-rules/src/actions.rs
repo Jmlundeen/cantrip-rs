@@ -9433,12 +9433,25 @@ pub fn payable_life_for(cx: &Cx, player: PlayerId, paid: Option<CostFor>) -> i32
     }
 }
 
-/// Whether `player` may sacrifice `id` to pay a cost paid for `paid` (CR 701.21a): always, but to cast a spell or activate an
-/// ability while a static ability says it can't be sacrificed for that (CR 101.2, `CardDef::cost_bans`: Yasharn,
-/// Implacable Earth's nonland permanents, Angel of Jubilation's creatures). `None` is a cost paid for anything else (a
-/// resolving spell or ability's "sacrifice ... If you do"), which they leave alone.
+/// Whether `player` may sacrifice `id` to pay a cost paid for `paid` (CR 701.21a, 118.3): not a permanent that can't be
+/// sacrificed at all (CR 101.2, `static_rules::cant_be_sacrificed`: Hithlain Rope), whatever the cost is for; not to cast
+/// a spell or activate an ability while a static ability says it can't be sacrificed for that (`CardDef::cost_bans`:
+/// Yasharn, Implacable Earth's nonland permanents, Angel of Jubilation's creatures), which leave a cost paid for anything
+/// else (`None`) alone; and, for a cost a resolving spell or ability has the player pay ("unless [they] sacrifice", "you
+/// may sacrifice ... If you do", CR 118.12), not when that spell or ability can't cause them to sacrifice (CR 101.2,
+/// Tamiyo, Collector of Tales's ruling: "something happens unless you sacrifice" can't be paid).
 fn may_sacrifice_for(cx: &Cx, player: PlayerId, id: ObjectId, paid: Option<CostFor>) -> bool {
-    paid.is_none_or(|f| !static_rules::cost_banned(cx, cx.cards(), player, f, CostPayment::Sacrifice(id)))
+    !static_rules::cant_be_sacrificed(cx, cx.cards(), id)
+        && match paid {
+            Some(f) => !static_rules::cost_banned(cx, cx.cards(), player, f, CostPayment::Sacrifice(id)),
+            None => resolution_may_cause(cx, player, CauseKind::Sacrifice),
+        }
+}
+
+/// Whether the spell or ability resolving now, if any, may cause `player` to do `kind` (CR 101.2, `cantrip_api::may_cause`):
+/// what a cost it has them pay may take (CR 118.12). Nothing is resolving for a special action's cost, which it leaves alone.
+fn resolution_may_cause(cx: &Cx, player: PlayerId, kind: CauseKind) -> bool {
+    cx.effect_controller().is_none_or(|by| cantrip_api::may_cause(cx, by, player, kind))
 }
 
 /// The most life `player` may pay (CR 119.4): their life total, or none at all while they can't lose life (CR 119.8: "a cost
@@ -9808,6 +9821,15 @@ fn resolution_rest_payable(cx: &Cx, payer: PlayerId, source: ObjectId, cost: &Co
         || (cost.exile_self && !(yours_on_battlefield || in_your(Zone::hand(payer)) || in_your(Zone::graveyard(payer))))
         || ((cost.remove_counters.is_some() || cost.remove_any_counter || cost.put_counters.is_some()) && !live)
     {
+        return false;
+    }
+    // A discard the resolving spell or ability can't cause the payer to make can't pay (CR 101.2, 118.3; Tamiyo, Collector of
+    // Tales's ruling), as a sacrifice can't (`may_sacrifice_for`). Discarding an empty hand discards nothing.
+    let discards = cost.discard_self
+        || !cost.discard.is_none()
+        || (cost.discard_hand && !cx.s().zone(Zone::hand(payer)).is_empty())
+        || matches!(cost.variable, Some(VariableCost::DiscardOneOrMore(_)));
+    if discards && !resolution_may_cause(cx, payer, CauseKind::Discard) {
         return false;
     }
     // "Sacrifice X" takes X of them (CR 107.3f).

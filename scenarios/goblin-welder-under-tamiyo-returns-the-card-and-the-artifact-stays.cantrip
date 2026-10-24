@@ -1,0 +1,38 @@
+# Tamiyo, Collector of Tales: "Spells and abilities your opponents control can't cause you to ... sacrifice permanents." Bot1's
+# Goblin Welder targets Bot2's Mox Jet and the Black Lotus in Bot2's graveyard: as it resolves, Bot2 can't be made to sacrifice
+# the Mox, so that part of the effect does nothing (Sigarda's ruling: "That part of the effect does nothing", CR 101.2) - the
+# Mox stays, and the Lotus still returns to the battlefield under Bot2's control (CR 101.3).
+
+[Bot1 Deck]
+Mountain
+Goblin Welder
+Island x18
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Mox Jet
+Tamiyo, Collector of Tales
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Welder.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Tamiyo, Collector of Tales.Cast
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Black Lotus
+Bot1.Battlefield.Goblin Welder.Activate
+Bot1.Target(Mox Jet)
+Bot1.Target(Black Lotus)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Mox Jet; Tamiyo, Collector of Tales; Black Lotus
+Bot2.Graveyard.Count = 0

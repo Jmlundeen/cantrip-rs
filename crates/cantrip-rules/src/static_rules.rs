@@ -509,3 +509,14 @@ pub fn player_counters_banned(q: &dyn Query, cards: &'static CardTable, player: 
 pub fn cost_banned(q: &dyn Query, cards: &'static CardTable, player: PlayerId, paid_for: CostFor, payment: CostPayment) -> bool {
     any_static(q, cards, |d| d.cost_bans, |rule, asker| rule(q, asker, player, paid_for, payment))
 }
+
+/// Whether the permanent `id` can't be sacrificed (CR 101.2, 701.21a), for any reason and by anyone: it has "this permanent
+/// can't be sacrificed" (`Keyword::CantBeSacrificed`, printed or granted, so losing its abilities ends it), a resolved effect
+/// says so (`EffectKind::CantBeSacrificed`, which it keeps whatever abilities it loses), or a static ability of a permanent on
+/// the battlefield does (`CardDef::sacrifice_bans`: Assault Suit's equipped creature). Asked only where a sacrifice would be
+/// made, chosen or paid.
+pub fn cant_be_sacrificed(q: &dyn Query, cards: &'static CardTable, id: ObjectId) -> bool {
+    q.chars(id).has(Keyword::CantBeSacrificed)
+        || q.state().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantBeSacrificed)
+        || any_static(q, cards, |d| d.sacrifice_bans, |rule, asker| rule(q, asker, id))
+}

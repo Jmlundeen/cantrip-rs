@@ -1387,16 +1387,52 @@ impl Query for Cx<'_> {
     }
 }
 
+impl Cx<'_> {
+    /// A question card code asks, as the rules let it be asked (CR 101.2): a discard the resolving spell or ability can't
+    /// cause `player` to make is answered with nothing, unasked; and a choice of what to sacrifice takes only the permanents
+    /// that can be sacrificed now (`ops::sacrificeable`: not one that can't be sacrificed, nor one its controller can't be made
+    /// to sacrifice) - the rulings' "you can't try to sacrifice [it], fail, and therefore ignore the effect" - answered with
+    /// nothing, unasked, when the rule then lets nothing be chosen. A choice of exactly N with fewer that can be then takes
+    /// as many as it can (CR 701.21a).
+    fn as_allowed(&self, player: PlayerId, mut kind: RequestKind) -> Result<RequestKind, Answer> {
+        match &mut kind {
+            RequestKind::ChooseCards { purpose: Purpose::Discard, .. }
+                if self.effect_controller().is_some_and(|causer| !cantrip_api::may_cause(self, causer, player, CauseKind::Discard)) =>
+            {
+                Err(Answer::Cards(Vec::new()))
+            }
+            RequestKind::ChooseCards { purpose: Purpose::Sacrifice, source, cards, rule } => {
+                if cards.iter().any(|&c| rule.listed_card(c) && !ops::sacrificeable(self, c)) {
+                    let among: Vec<ObjectId> = cards.iter().copied().filter(|&c| rule.listed_card(c) && ops::sacrificeable(self, c)).collect();
+                    if let Count::Exactly(n) = rule.count
+                        && among.len() < n as usize
+                    {
+                        rule.count = Count::AsManyAsCan(n);
+                    }
+                    rule.among = Some(among);
+                }
+                // The player's own permanents are nothing to be shown: with none the rule lets be chosen, nothing is asked.
+                let none = cantrip_api::select::Choice { chooser: player, source: *source, candidates: cards, selected: &[] };
+                if !cantrip_api::select::judge(self, rule, &none).addable.any() {
+                    return Err(Answer::Cards(Vec::new()));
+                }
+                Ok(kind)
+            }
+            _ => Ok(kind),
+        }
+    }
+}
+
 impl cantrip_api::Game for Cx<'_> {
     fn ask(&mut self, player: PlayerId, kind: RequestKind) -> Result<Answer, Suspend> {
-        // CR 101.2: a discard or sacrifice an opponent's spell or ability can't cause is not offered as a choice.
-        if let RequestKind::ChooseCards { purpose: purpose @ (Purpose::Discard | Purpose::Sacrifice), .. } = &kind
-            && let Some(causer) = self.effect_controller()
-            && !cantrip_api::may_cause(&*self, causer, player, if *purpose == Purpose::Sacrifice { CauseKind::Sacrifice } else { CauseKind::Discard })
-        {
-            return Ok(Answer::Cards(Vec::new()));
+        match self.as_allowed(player, kind) {
+            Ok(kind) => self.ask_core(player, kind, false).map_err(|_| Suspend),
+            Err(answer) => Ok(answer),
         }
-        self.ask_core(player, kind, false).map_err(|_| Suspend)
+    }
+
+    fn can_sacrifice(&self, permanent: ObjectId) -> bool {
+        ops::sacrificeable(self, permanent)
     }
 
     fn stage(&self) -> u16 {
@@ -1423,6 +1459,21 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn ask_then(&mut self, next: u16, player: PlayerId, kind: RequestKind) -> Suspend {
+        // A question the rules let be asked only in part, or not at all (`as_allowed`): the run goes on at the next stage with
+        // the answer they give.
+        let kind = match self.as_allowed(player, kind) {
+            Ok(kind) => kind,
+            Err(answer) => {
+                let at = self.frame;
+                self.g.state.update_frame(at, |f| {
+                    f.staged = true;
+                    f.pending = None;
+                    f.answers = vec![(None, answer)];
+                    f.stage = next;
+                });
+                return Suspend;
+            }
+        };
         // A question asked of a player who has left the game (CR 800.4f-h), as `ask_core` treats it: a cost is not paid - the
         // run goes on at the next stage with nothing given - and anything else is asked of the player who makes it instead,
         // once the object's controller has chosen them where they choose.

@@ -262,7 +262,9 @@ pub fn may_sacrifice_an_artifact_or_discard_to_draw(g: &mut dyn Game, item: &Sta
     const DISCARD: u8 = 1;
     const NEITHER: u8 = 2;
     let you = item.controller;
-    let artifacts: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact)).collect();
+    // An artifact that can't be sacrificed is nothing to do it with (CR 101.2: the option can't be taken).
+    let artifacts: Vec<ObjectId> =
+        g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact) && g.can_sacrifice(id)).collect();
     let mut options = Vec::new();
     if !artifacts.is_empty() {
         options.push(SACRIFICE);

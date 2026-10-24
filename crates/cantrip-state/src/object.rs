@@ -1009,6 +1009,9 @@ pub enum EffectKind {
     CantActivateAbilities,
     /// "Can't attack" (CR 508.1c) for as long as the effect lasts: a restriction on declaring the creature as an attacker.
     CantAttack,
+    /// "It can't be sacrificed" (CR 101.2, 701.21a) for as long as the effect lasts (Slicer, Hired Muscle's "this turn"): as
+    /// `Keyword::CantBeSacrificed`, but an effect, not an ability, so a permanent that loses its abilities is still under it.
+    CantBeSacrificed,
     /// The permanent is harnessed (CR 701.64): a designation it keeps as long as it stays where it is
     /// (`Duration::Indefinite`), which turns its infinity abilities on (CR 702.186).
     Harnessed,

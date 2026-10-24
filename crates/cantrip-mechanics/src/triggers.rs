@@ -595,9 +595,9 @@ fn ward_sacrifice_nonland_question(n: u8) -> &'static Question {
 
 /// Ward--Sacrifice `n` of a kind of permanent (CR 702.21a, 118.12): counters the spell or ability that targeted unless the
 /// player who controls it sacrifices `n` permanents they control that `kind` admits. A cost is paid only with what it needs
-/// (CR 118.3): a player controlling fewer than `n` such permanents can't pay and is not asked, nor is one whom the ward's
-/// controller's abilities can't make sacrifice (CR 101.2; Tamiyo, Collector of Tales's ruling: "something happens unless you
-/// sacrifice" can't be paid). The payer then chooses which `n`, all sacrificed at once.
+/// (CR 118.3): a player controlling fewer than `n` such permanents that they can sacrifice can't pay and is not asked - one
+/// that can't be sacrificed pays nothing, and none does for a player whom the ward's controller's abilities can't make
+/// sacrifice (CR 101.2; Tamiyo, Collector of Tales's ruling: "something happens unless you sacrifice" can't be paid). The payer then chooses which `n`, all sacrificed at once.
 fn ward_sacrifice_among(
     g: &mut dyn Game,
     item: &StackItem,
@@ -608,9 +608,10 @@ fn ward_sacrifice_among(
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
     let asker = Asker { source: item.object, controller: payer };
-    let eligible: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| kind(&*g, &asker, id)).collect();
+    // Only what the payer can sacrifice pays (CR 118.3, `Game::can_sacrifice`): a permanent that can't be sacrificed, or any
+    // at all when the ward's controller can't cause them to sacrifice (CR 101.2), is no resource for it.
+    let eligible: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| kind(&*g, &asker, id) && g.can_sacrifice(id)).collect();
     if eligible.len() >= n as usize
-        && may_cause(&*g, item.controller, payer, CauseKind::Sacrifice)
         && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(question) })? == Answer::Yes
     {
         return crate::sacrifice_one_of(g, payer, item.object, n, eligible).map(drop);

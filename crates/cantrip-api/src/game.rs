@@ -468,10 +468,16 @@ pub trait Game: Query {
     fn destroy_no_regen(&mut self, permanent: ObjectId) {
         self.destroy_all_no_regen(&[permanent]);
     }
-    /// Sacrifices permanents (CR 701.21a), together, in the order given. One an opponent's spell or ability can't make its
-    /// controller sacrifice stays (CR 101.2). The new objects, in order, of what was sacrificed: "if you do" asks whether
-    /// this is empty.
+    /// Sacrifices permanents (CR 701.21a), together, in the order given. One that can't be sacrificed, or that an opponent's
+    /// spell or ability can't make its controller sacrifice, stays (CR 101.2, `can_sacrifice`). The new objects, in order, of
+    /// what was sacrificed: "if you do" asks whether this is empty.
     fn sacrifice(&mut self, permanents: &[ObjectId]) -> Vec<ObjectId>;
+    /// Whether `sacrifice` would sacrifice this permanent now (CR 701.21a, 101.2): it is on the battlefield, nothing says it
+    /// can't be sacrificed (`Keyword::CantBeSacrificed`, `EffectKind::CantBeSacrificed`, `CardDef::sacrifice_bans`), and the
+    /// resolving spell or ability may cause its controller to sacrifice (`may_cause`). A choice of what to sacrifice asked
+    /// with `Purpose::Sacrifice` already offers only these; an effect that takes what it sacrifices without asking, or offers
+    /// a sacrifice as one option among others, or as a cost to pay "unless", asks it (CR 118.3).
+    fn can_sacrifice(&self, permanent: ObjectId) -> bool;
     /// Returns objects to their owners' hands at once (CR 400.3, 101.4): from the battlefield, a graveyard, exile or
     /// anywhere else, whoever controls them. A token that leaves the battlefield ceases to exist (CR 111.7, 704.5d). Something
     /// that is no longer the object it was is not returned (CR 400.7). The new objects, in order.

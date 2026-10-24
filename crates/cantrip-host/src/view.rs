@@ -273,7 +273,7 @@ pub fn hexproof_from_text(qualities: HexproofFrom) -> String {
 }
 
 /// The keywords as a card's text words them, for the ones an effect gave an object or took from it.
-const KEYWORD_WORDS: [(Keyword, &str); 42] = [
+const KEYWORD_WORDS: [(Keyword, &str); 43] = [
     (Keyword::Flying, "Flying"),
     (Keyword::Haste, "Haste"),
     (Keyword::Vigilance, "Vigilance"),
@@ -316,6 +316,7 @@ const KEYWORD_WORDS: [(Keyword, &str); 42] = [
     (Keyword::Forestwalk, "Forestwalk"),
     (Keyword::Banding, "Banding"),
     (Keyword::SaddlesAsThoughPowerTwoGreater, "This creature saddles Mounts as though its power were 2 greater."),
+    (Keyword::CantBeSacrificed, "This permanent can't be sacrificed."),
 ];
 
 /// A rules line without its parenthesized reminder text, trimmed.
@@ -1285,6 +1286,7 @@ impl<'a> Projector<'a> {
                         continue;
                     }
                     EffectKind::CantActivateAbilities => "Its activated abilities can't be activated",
+                    EffectKind::CantBeSacrificed => "Can't be sacrificed",
                     // A resolved control-changing effect (CR 613.1b): who has it and for how long, named for where it came
                     // from, as nothing else on the permanent says so. A permanent given for good says nothing.
                     EffectKind::Control(p) if e.duration != Duration::Indefinite => {

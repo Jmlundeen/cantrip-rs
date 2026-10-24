@@ -2268,6 +2268,13 @@ pub enum CostPayment {
 /// ("Players can't pay life to cast spells or to activate abilities that aren't mana abilities").
 pub type CostBan = fn(&dyn Query, &Asker, PlayerId, CostFor, CostPayment) -> bool;
 
+/// A static ability that says permanents can't be sacrificed (CR 101.2, 701.21a): true for a permanent on the battlefield that
+/// can't be, judged as it is now. It is the source's effect, no ability of the permanent, so one that loses its abilities is
+/// still under it: Assault Suit's "equipped creature ... can't be sacrificed", Garland, Royal Kidnapper's "creatures you
+/// control but don't own ... can't be sacrificed". A permanent's own "this permanent can't be sacrificed", printed or
+/// granted, is `Keyword::CantBeSacrificed`; the core reads both (`Game::can_sacrifice`).
+pub type SacrificeBan = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability makes this creature assign combat damage equal to its toughness rather than its power
 /// (CR 510.1a): given the rule's own asker.
 pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
@@ -2738,6 +2745,9 @@ pub struct CardDef {
     /// 601.2h, 602.2b), while it is on the battlefield with its abilities: Yasharn, Implacable Earth's "players can't pay life
     /// or sacrifice nonland permanents to cast spells or activate abilities". See `CostBan`.
     pub cost_bans: &'static [CostBan],
+    /// Its static abilities that say permanents can't be sacrificed (CR 101.2, 701.21a), while it is on the battlefield with
+    /// its abilities: Assault Suit's "equipped creature ... can't be sacrificed". See `SacrificeBan`.
+    pub sacrifice_bans: &'static [SacrificeBan],
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
     /// Assault Formation, Doran, the Siege Tower.
     pub damage_by_toughness: &'static [DamageByToughnessRule],
@@ -2926,6 +2936,7 @@ impl CardDef {
         enter_rules: &[],
         player_counter_bans: &[],
         cost_bans: &[],
+        sacrifice_bans: &[],
         damage_by_toughness: &[],
         damage_by_absolute_power: &[],
         damage_stays: &[],
@@ -3013,6 +3024,7 @@ impl CardDef {
             (!self.enter_rules.is_empty(), "enter rules"),
             (!self.player_counter_bans.is_empty(), "player counter bans"),
             (!self.cost_bans.is_empty(), "cost bans"),
+            (!self.sacrifice_bans.is_empty(), "sacrifice bans"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),
             (!self.damage_by_absolute_power.is_empty(), "damage by absolute power"),
             (!self.damage_stays.is_empty(), "a damage-stays rule"),

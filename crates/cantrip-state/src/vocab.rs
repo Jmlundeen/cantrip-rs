@@ -906,6 +906,13 @@ pub enum Keyword {
     /// counts towards the total power as though its power were 2 greater. Printed only beside crew's, "saddles Mounts and
     /// crews Vehicles as though its power were 2 greater" (Defend the Rider's Pilot, Deathless Pilot): both keywords.
     SaddlesAsThoughPowerTwoGreater = 41,
+    /// "This permanent can't be sacrificed" (CR 101.2, 701.21a): no spell, ability or rule can have its controller sacrifice
+    /// it - an instruction to sacrifice it does nothing, a choice of what to sacrifice can't take it, and it pays no cost
+    /// that sacrifices (CR 118.3). Printed (Hithlain Rope, Alexios, Deimos of Kosmos) or granted, an ability that "loses all
+    /// abilities" takes (Jon Irenicus's "it gains 'This creature can't be sacrificed'"). Where it is no ability of the
+    /// permanent - "equipped creature can't be sacrificed", "it can't be sacrificed this turn" - it is
+    /// `CardDef::sacrifice_bans` or `EffectKind::CantBeSacrificed`; the core reads all three (`Game::can_sacrifice`).
+    CantBeSacrificed = 42,
 }
 
 impl Keyword {

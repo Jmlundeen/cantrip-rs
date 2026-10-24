@@ -334,7 +334,8 @@ fn check_once(cx: &mut Cx) -> R<bool> {
         let chapter_ability = |ability: AbilityRef| matches!(cx.cards().ability(ability), AbilityDef::Triggered(t) if t.chapter > 0);
         let pending = cx.s().triggers.iter().any(|t| t.source == id && chapter_ability(t.ability))
             || cx.s().stack.iter().any(|i| i.kind == StackKind::Triggered && i.object == id && chapter_ability(i.ability));
-        if !pending {
+        // One that can't be sacrificed stays, its lore counters as they are (CR 101.2, 701.21a).
+        if !pending && !crate::static_rules::cant_be_sacrificed(&*cx, cx.cards(), id) {
             sacrificed.push(id);
         }
     }

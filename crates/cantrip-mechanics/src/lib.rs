@@ -345,9 +345,11 @@ pub fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, co
     Ok(g.sacrifice(&chosen))
 }
 
-/// What `player` will sacrifice of `eligible`: all of them when there are no more than `count`, otherwise `count` of their
-/// choice. Nothing is sacrificed yet, so that several players' choices can be sacrificed together (CR 101.4).
+/// What `player` will sacrifice of `eligible`: of those they can sacrifice (`Game::can_sacrifice`, CR 101.2 - "you can't try
+/// to sacrifice [it], fail, and therefore ignore the effect"), all of them when there are no more than `count`, otherwise
+/// `count` of their choice. Nothing is sacrificed yet, so that several players' choices can be sacrificed together (CR 101.4).
 fn chosen_to_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<Vec<ObjectId>, Suspend> {
+    let eligible: Vec<ObjectId> = eligible.into_iter().filter(|&id| g.can_sacrifice(id)).collect();
     if eligible.len() <= count as usize {
         return Ok(eligible);
     }
