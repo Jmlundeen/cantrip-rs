@@ -373,7 +373,8 @@ def mechanics_for(keyword):
             return f"{crate}::{module}{m.group(1)}"
     for (crate, module), src in _crate_sources().items():
         if field.search(src):
-            return f"the `{stem}` field ({crate}::{module.rstrip(':')})"
+            return (f"the `{stem}` field ({crate}::{module.rstrip(':')}), set in the card's Rust file (`{stem}: Some(..)`, as an"
+                    f" implemented card with it does): the content JSON and the oracle build don't carry it")
     if "_" in stem:  # "Empower Jace" is empower's
         return mechanics_for(stem.split("_")[0])
     return None
