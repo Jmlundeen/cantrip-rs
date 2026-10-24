@@ -5,7 +5,7 @@ use crate::top_of_library;
 use cantrip_api::*;
 
 /// `player` looks at the top two cards of their library, manifests one (CR 701.40a: onto the battlefield face down as a
-/// 2/2 creature) and puts the other into their graveyard. A library of one card manifests that one; of none, nothing
+/// 2/2 creature) and puts the other into their graveyard - both, when the one chosen can't enter (CR 701.40f, 701.62a). A library of one card manifests that one; of none, nothing
 /// happens. The player is always asked, as the prompt names which card is which.
 pub fn manifest_dread(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
     manifest_dread_object(g, player, source).map(|_| ())
@@ -35,8 +35,10 @@ pub fn manifest_dread_object(g: &mut dyn Game, player: PlayerId, source: ObjectI
         manifested = card;
     }
     let made = g.put_onto_battlefield_face_down(manifested, player, FaceDown::Manifested, false)?;
+    // "Then put the cards you looked at that were not manifested this way into your graveyard" (CR 701.62a): the chosen one
+    // too when it wasn't, a rule or effect keeping it from entering (CR 701.40f) - every looked-at card still where it was.
     let rest: Vec<(ObjectId, Zone)> =
-        looked.into_iter().filter(|&c| c != manifested).map(|c| (c, Zone::graveyard(player))).collect();
+        looked.into_iter().filter(|&c| g.obj(c).became.is_none()).map(|c| (c, Zone::graveyard(player))).collect();
     g.move_together(&rest, ZoneReason::Other);
     Ok(made)
 }
