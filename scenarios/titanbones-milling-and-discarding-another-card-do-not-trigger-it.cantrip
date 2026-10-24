@@ -1,5 +1,5 @@
 # A mill is not a discard (CR 701.17/701.9). Thought Scour mills Titanbones, then Iron-Shield Elf discards an Island
-# while that Titanbones is in the graveyard: neither event is this card's own discard. Positive self-discard in sibling tests.
+# while that Titanbones is in the graveyard: neither event is this card's own discard.
 
 [Bot1 Deck]
 Island

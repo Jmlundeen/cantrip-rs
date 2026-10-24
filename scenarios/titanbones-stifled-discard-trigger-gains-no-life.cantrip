@@ -1,5 +1,5 @@
 # Discarding Titanbones puts its ability on the stack; Stifle counters that ability, not the already completed discard
-# (CR 603.3/701.6). No life is gained, while the unstifled sibling scenarios gain exactly 3.
+# (CR 603.3/701.6). No life is gained.
 
 [Bot1 Deck]
 Mountain

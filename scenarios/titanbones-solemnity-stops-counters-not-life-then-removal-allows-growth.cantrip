@@ -1,5 +1,5 @@
 # Solemnity stops counter placement, not Titanbones's trigger or the life gain (CR 101.2/122.6). Removing it permits
-# the next identical gain to place two counters. Both amounts and the refusal's positive control are asserted.
+# the next identical gain to place two counters. Both the life and the counters are asserted.
 
 [Bot1 Deck]
 Forest

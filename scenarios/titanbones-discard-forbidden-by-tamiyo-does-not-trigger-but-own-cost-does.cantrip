@@ -1,5 +1,5 @@
 # Tamiyo prevents Go Blank causing its controller to discard, so no choice and no Titanbones trigger are produced
-# (CR 101.2/603.2g). The same Titanbones can still pay that player's own discard cost and gain 3, a positive control.
+# (CR 101.2/603.2g). The same Titanbones can still pay that player's own discard cost and gain 3.
 
 [Bot1 Deck]
 Forest
