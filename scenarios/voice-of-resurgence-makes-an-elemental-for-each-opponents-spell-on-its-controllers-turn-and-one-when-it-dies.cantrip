@@ -1,0 +1,68 @@
+# Voice of Resurgence: "Whenever an opponent casts a spell during your turn and when this creature dies, create a green and
+# white Elemental creature token with 'This token's power and toughness are each equal to the number of creatures you
+# control.'" Bot1's own Voice cast (turn 1) and Ornithopter cast with Voice out (turn 3), and Bot2's Ornithopter and Mox Ruby on Bot2's own turn (2) make nothing. On turn 3
+# (Bot1's) Bot2 casts Lightning Bolt at Voice: the cast trigger resolves first and makes a token, which counts only Bot1's three
+# creatures (Voice, Ornithopter and itself; Bot2's Ornithopter is not "you control"): 3/3. The Bolt then kills Voice (until the death trigger resolves the token is 2/2: the count fell), whose death trigger makes
+# a second token: each of the two is 3/3 (Ornithopter and the two tokens), with Voice gone.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Voice of Resurgence
+Ornithopter
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Swamp x4
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voice of Resurgence.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Emerald; Mox Pearl; Voice of Resurgence
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield = Mox Emerald; Mox Pearl; Voice of Resurgence
+? Bot2.Battlefield = Mox Ruby; Ornithopter
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Emerald; Mox Pearl; Voice of Resurgence; Ornithopter
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Voice of Resurgence)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Elemental Token.Power = 3
+? Bot1.Battlefield.Elemental Token.Toughness = 3
+? Bot1.Battlefield.Elemental Token.Colors = Green; White
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Elemental Token.Power = 2
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Ornithopter; Elemental Token; Elemental Token
+Bot1.Graveyard = Voice of Resurgence
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Elemental Token#1.Power = 3
+Bot1.Battlefield.Elemental Token#2.Power = 3
+Bot1.Battlefield.Elemental Token#2.Toughness = 3
+Stack.Count = 0

@@ -1,0 +1,43 @@
+# Voice of Resurgence dying on Bot2's own turn: Bot2's Lightning Bolt is cast during Bot2's turn, not Bot1's, so only the death
+# trigger makes a token (one, not two). The token counts only Bot1's creatures, itself: 1/1, though Bot2 controls an Ornithopter.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Voice of Resurgence
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Swamp x4
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voice of Resurgence.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Voice of Resurgence)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield = Mox Emerald; Mox Pearl; Elemental Token
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Elemental Token
+Bot1.Graveyard = Voice of Resurgence
+Bot1.Battlefield.Elemental Token.Power = 1
+Bot1.Battlefield.Elemental Token.Toughness = 1
+Bot2.Battlefield = Mox Ruby; Ornithopter

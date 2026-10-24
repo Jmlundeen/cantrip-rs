@@ -1,0 +1,8 @@
+{
+  "name": "Voice of Resurgence",
+  "manaCost": "{G}{W}",
+  "type": "Creature — Elemental",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Whenever an opponent casts a spell during your turn and when this creature dies, create a green and white Elemental creature token with \"This token's power and toughness are each equal to the number of creatures you control.\""
+}
