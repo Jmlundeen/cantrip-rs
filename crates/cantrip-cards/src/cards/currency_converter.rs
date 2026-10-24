@@ -12,7 +12,7 @@ fn exile_discarded(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     if cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
-        g.exile_with(&[card], item.object, false);
+        g.exile_with(&[card], g.linked(item), false);
     }
     Ok(())
 }
@@ -29,7 +29,7 @@ pub static ROGUE: CardDef = CardDef {
 /// it's a nonland card, create a 2/2 black Rogue creature token." A lone card in the store is no choice; an empty store
 /// does nothing at all. Whether it is a land is read while it is still in exile.
 fn cash_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let store = g.exiled_with(item.object);
+    let store = g.exiled_with(g.linked(item));
     let Some(&first) = store.first() else { return Ok(()) };
     let mut chosen = first;
     if store.len() > 1 {

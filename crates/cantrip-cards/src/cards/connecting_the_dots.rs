@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// (CR 607.2a), so its last ability finds it. Nobody looks at it: it came off a library.
 fn exile_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(&card) = top_of_library(g, item.controller, 1).first() {
-        g.exile_face_down(&[card], Some(item.object));
+        g.exile_face_down(&[card], Some(g.linked(item)));
     }
     Ok(())
 }
@@ -15,7 +15,7 @@ fn exile_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Put all cards exiled with this enchantment into their owners' hands." (CR 607.2a.) The cost sacrificed the
 /// enchantment, so the cards are found off the object the ability came from (CR 113.7a), and they go together.
 fn return_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let exiled = g.exiled_with(item.object);
+    let exiled = g.exiled_with(g.linked(item));
     g.return_to_hand(&exiled);
     Ok(())
 }

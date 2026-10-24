@@ -5,14 +5,9 @@ use cantrip_oracle as oracle;
 /// Four or more card types among the cards exiled with this creature (CR 610.3): the cards in exile whose link points
 /// back at it, their types counted without regard to how many cards have each.
 fn collection(q: &dyn LayerQuery, source: ObjectId) -> bool {
-    let s = q.state();
     let mut types = TypeSet::NONE;
-    for seat in s.seats() {
-        for &id in s.zone(Zone::exile(seat)) {
-            if s.obj(id).exiled.is_some_and(|link| link.by == source) {
-                types = TypeSet(types.0 | q.chars(id).types.0);
-            }
-        }
+    for id in q.exiled_with(q.linked_to(source)) {
+        types = TypeSet(types.0 | q.chars(id).types.0);
     }
     types.0.count_ones() >= 4
 }
@@ -29,7 +24,7 @@ fn plus_four(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// Exile target card from a graveyard; it is exiled with this creature (CR 607.2a).
 fn exile_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
-        g.exile_with(&[card], item.object, false);
+        g.exile_with(&[card], g.linked(item), false);
     }
     Ok(())
 }

@@ -245,6 +245,14 @@ pub struct Given<'a> {
 }
 
 impl Query for Given<'_> {
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.q.linked_card(card)
+    }
+
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.q.linked_to(source)
+    }
+
     fn state(&self) -> &GameState {
         self.q.state()
     }
@@ -311,6 +319,14 @@ pub struct Reader<'a> {
 }
 
 impl Query for Reader<'_> {
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.cards.linked_card(card)
+    }
+
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.cards.linked_to(self.state, source)
+    }
+
     fn state(&self) -> &GameState {
         self.state
     }

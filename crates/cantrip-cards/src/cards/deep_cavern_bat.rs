@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn look_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.target(0).player() else { return Ok(()) };
     if let Some(card) = hand::look_and_may_choose(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))? {
-        g.exile_with(&[card], item.object, true);
+        g.exile_with(&[card], g.linked(item), true);
     }
     Ok(())
 }

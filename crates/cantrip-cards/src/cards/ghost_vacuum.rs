@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// Exile it; it is exiled with this artifact (CR 607.2a), where the second ability finds it.
 fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
-        g.exile_with(&[card], item.object, false);
+        g.exile_with(&[card], g.linked(item), false);
     }
     Ok(())
 }
@@ -15,7 +15,7 @@ fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// its other types (CR 611.2c, 613.4b). The artifact was sacrificed as a cost, and the exile link outlives it (CR 113.7a).
 fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cards: Vec<(ObjectId, PlayerId, bool)> =
-        g.exiled_with(item.object).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).map(|id| (id, item.controller, false)).collect();
+        g.exiled_with(g.linked(item)).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).map(|id| (id, item.controller, false)).collect();
     let spirit = g.words(item.object).subtype(Subtype::Spirit);
     let arrived = g.put_all_onto_battlefield_with_counters(&cards, &[(CounterKind::Flying, 1)])?;
     g.end_sentence();

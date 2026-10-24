@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// card exiled this way returns as this enchantment leaves.
 fn exile_until_leaves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(permanent) = targets::object(g, item, 0) {
-        g.exile_with(&[permanent], item.object, true);
+        g.exile_with(&[permanent], g.linked(item), true);
     }
     Ok(())
 }

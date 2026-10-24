@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn exile_all_others(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let others: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| id != item.object).collect();
     if !others.is_empty() {
-        g.exile_with(&others, item.object, false);
+        g.exile_with(&others, g.linked(item), false);
     }
     Ok(())
 }

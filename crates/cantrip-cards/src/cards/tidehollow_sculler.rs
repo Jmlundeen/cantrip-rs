@@ -9,14 +9,14 @@ fn reveal_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let chosen = choose_from_revealed_hand_of_kind(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))?;
     if !chosen.is_empty() {
-        g.exile_with(&chosen, item.object, false);
+        g.exile_with(&chosen, g.linked(item), false);
     }
     Ok(())
 }
 
 /// "Return the exiled card to its owner's hand."
 fn return_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let exiled = g.exiled_with(item.object);
+    let exiled = g.exiled_with(g.linked(item));
     g.return_to_hand(&exiled);
     Ok(())
 }

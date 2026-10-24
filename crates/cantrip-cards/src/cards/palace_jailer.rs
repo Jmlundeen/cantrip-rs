@@ -21,7 +21,7 @@ fn exile_until_crowned(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
         return Ok(());
     }
     let Some(prey) = targets::object(g, item, 0) else { return Ok(()) };
-    let exiled = g.exile_with(&[prey], item.object, false);
+    let exiled = g.exile_with(&[prey], g.linked(item), false);
     if let Some(&card) = exiled.first() {
         let me = g.card_id(&CARD);
         g.delayed_trigger(DelayedWhen::UntilEvent, item.object, you, AbilityRef::delayed(me, 0), Target::Object(card));

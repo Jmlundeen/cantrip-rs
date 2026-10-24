@@ -1285,6 +1285,14 @@ impl Query for Game {
         &self.state
     }
 
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.cards.linked_card(card)
+    }
+
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.cards.linked_to(&self.state, source)
+    }
+
     fn events(&self) -> &[Record] {
         &self.log
     }
@@ -1317,6 +1325,14 @@ impl Query for Game {
 impl Query for Cx<'_> {
     fn state(&self) -> &GameState {
         &self.g.state
+    }
+
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.g.cards.linked_card(card)
+    }
+
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.g.cards.linked_to(&self.g.state, source)
     }
 
     fn events(&self) -> &[Record] {
@@ -1525,15 +1541,15 @@ impl cantrip_api::Game for Cx<'_> {
         ops::move_to(self, object, to)
     }
 
-    fn exile_with(&mut self, cards: &[ObjectId], by: ObjectId, until_leaves: bool) -> Vec<ObjectId> {
+    fn exile_with(&mut self, cards: &[ObjectId], by: Linked, until_leaves: bool) -> Vec<ObjectId> {
         ops::exile_with(self, cards, by, until_leaves)
     }
 
-    fn link_exiled(&mut self, cards: &[ObjectId], by: ObjectId) {
+    fn link_exiled(&mut self, cards: &[ObjectId], by: Linked) {
         ops::link_exiled(self, cards, by);
     }
 
-    fn exile_face_down(&mut self, cards: &[ObjectId], by: Option<ObjectId>) -> Vec<ObjectId> {
+    fn exile_face_down(&mut self, cards: &[ObjectId], by: Option<Linked>) -> Vec<ObjectId> {
         ops::exile_face_down(self, cards, by)
     }
 

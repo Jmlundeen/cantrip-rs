@@ -15,7 +15,7 @@ fn domain(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Tar
 /// "Exile target nonland permanent an opponent controls until this enchantment leaves the battlefield" (CR 610.3).
 fn exile_until_it_leaves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(permanent) = targets::object(g, item, 0) {
-        g.exile_with(&[permanent], item.object, true);
+        g.exile_with(&[permanent], g.linked(item), true);
     }
     Ok(())
 }

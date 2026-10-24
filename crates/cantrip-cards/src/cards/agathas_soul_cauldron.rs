@@ -13,11 +13,7 @@ fn creature_you_control(q: &dyn Query, asker: &Asker, spending: &Spending) -> bo
 
 /// The creature cards exiled with this permanent (CR 607.2a), in exile order.
 fn exiled_creature_cards(view: &dyn LayerQuery, by: ObjectId) -> Vec<ObjectId> {
-    let s = view.state();
-    s.seats()
-        .flat_map(|p| s.zone(Zone::exile(p)).iter().copied())
-        .filter(|&id| s.obj(id).exiled.is_some_and(|l| l.by == by) && view.cards().get(s.obj(id).card).is(CardType::Creature))
-        .collect()
+    view.exiled_with(view.linked_to(by)).into_iter().filter(|&id| view.cards().get(view.state().obj(id).card).is(CardType::Creature)).collect()
 }
 
 /// "Creatures you control with +1/+1 counters on them" (CR 613.1f).
@@ -42,7 +38,7 @@ fn grant_abilities(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 fn exile_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
     let creature = g.chars(card).is(CardType::Creature);
-    let moved = g.exile_with(&[card], item.object, false);
+    let moved = g.exile_with(&[card], g.linked(item), false);
     if creature && moved.first().is_some_and(|&c| g.obj(c).zone.is(ZoneKind::Exile)) {
         let me = g.obj(item.object).card;
         g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(me, 0), Target::None);

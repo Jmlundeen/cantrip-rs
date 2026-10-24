@@ -1,0 +1,66 @@
+# Linked abilities are linked only within one text (CR 607.1, 607.2a, 607.5): Keen-Eyed Curator exiles Bot2's Ornithopter
+# from its graveyard with its own "{1}: Exile target card from a graveyard". Two turns later Mirrorweave makes the Curator
+# a copy of Emperor of Bones until end of turn (CR 707.2), and Bot1 adapts it: the +1/+1 counters trigger the copied
+# "put a creature card exiled with this creature onto the battlefield", which refers only to cards Emperor of Bones's own
+# exile ability exiled. The Ornithopter was exiled by the Curator's text, so it is not among them and stays in exile.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Keen-Eyed Curator
+Emperor of Bones
+Mirrorweave
+Island x10
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Keen-Eyed Curator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Emperor of Bones.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Exile = Ornithopter
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mirrorweave.Cast(Emperor of Bones)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Emperor of Bones#1.Activate(Ability: Adapt)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Ornithopter
+Bot1.Battlefield.Emperor of Bones#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter = (absent)

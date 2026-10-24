@@ -5,7 +5,7 @@ use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn hide_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    hideaway(g, item.controller, item.object, 4)
+    hideaway(g, item, 4)
 }
 
 /// "You may play the exiled card without paying its mana cost if a library has twenty or fewer cards in it": no player is named,
@@ -13,7 +13,7 @@ fn hide_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let small = g.state().apnap().any(|p| g.state().zone(Zone::library(p)).len() <= 20);
     if small {
-        play_exiled_card(g, item.object, item.controller)?;
+        play_exiled_card(g, item, item.controller)?;
     }
     Ok(())
 }

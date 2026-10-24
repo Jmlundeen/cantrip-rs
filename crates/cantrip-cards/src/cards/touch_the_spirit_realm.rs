@@ -13,7 +13,7 @@ fn exile_until_leaves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 /// beginning of the next end step." The delayed ability is made even if the target is gone by then (CR 603.7).
 fn channel(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(permanent) = targets::object(g, item, 0) {
-        let exiled = g.exile_with(&[permanent], item.object, false);
+        let exiled = g.exile_with(&[permanent], g.linked(item), false);
         if !exiled.is_empty() {
             delayed::at_next_end_step(g, item, 0, Target::None);
         }

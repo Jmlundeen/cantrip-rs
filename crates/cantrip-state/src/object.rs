@@ -196,17 +196,38 @@ pub struct Phased {
     pub tapped_as_it_returns: bool,
 }
 
+/// An ability as linked abilities know it (CR 607.1, 607.2a): the object it is an ability of, and the card whose text it is
+/// printed in - the object's own card, the card a copy effect gives it (CR 707.2), or the card of an effect that granted it
+/// the ability (CR 607.1a, 607.5) - read as a whole: either face of a transforming double-faced card (CR 607.1b) and either
+/// door of a Room are that card (`CardTable::linked_card`). Two abilities of one object are linked only when both are
+/// printed in the same card's text, so cards one exiled are not "exiled with" the object to an ability of another text.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Linked {
+    pub object: ObjectId,
+    pub text: CardId,
+}
+
 /// A card exiled by a permanent's ability, and remembered as exiled with it (CR 607.2a, 610.3).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct ExileLink {
     /// The permanent whose ability exiled it, as the object it was then.
     pub by: ObjectId,
+    /// The card whose text that ability is printed in (`Linked::text`): only an ability of the same text refers to it (CR
+    /// 607.2a, 607.5).
+    pub text: CardId,
     /// Where it was exiled from, and where it returns to.
     pub from: Zone,
     /// "Until [by] leaves the battlefield" (CR 610.3): it returns as soon as `by` is no longer there.
     pub until_leaves: bool,
     /// Exiled encoded on `by` by cipher (CR 702.99b): it is encoded on that creature while both stay where they are.
     pub encoded: bool,
+}
+
+impl ExileLink {
+    /// Whether it was exiled by `ability` (CR 607.2a): by that object, with an ability of that text.
+    pub fn is_by(&self, ability: Linked) -> bool {
+        self.by == ability.object && self.text == ability.text
+    }
 }
 
 impl Obj {

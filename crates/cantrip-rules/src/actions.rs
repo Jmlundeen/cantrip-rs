@@ -1048,10 +1048,10 @@ fn choose_variable_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, v
     }
 }
 
-/// Pays the permanents part of a cost, once the rest is paid. `ability` is the source of the activated ability whose cost
-/// it is: the permanents its cost exiles are "exiled with" it, linked to its other abilities (CR 406.6, 607.2a). A spell's
-/// are not: that rule is of abilities.
-fn pay_permanents(cx: &mut Cx, cost: &Cost, chosen: &[ObjectId], ability: Option<ObjectId>) {
+/// Pays the permanents part of a cost, once the rest is paid. `ability` is the activated ability whose cost it is: the
+/// permanents its cost exiles are "exiled with" its source, linked to the other abilities of its text (CR 406.6, 607.2a). A
+/// spell's are not: that rule is of abilities.
+fn pay_permanents(cx: &mut Cx, cost: &Cost, chosen: &[ObjectId], ability: Option<Linked>) {
     if cost.tap_permanents {
         for &id in chosen {
             ops::tap(cx, id);
@@ -1422,6 +1422,14 @@ struct Announcing<'a> {
 }
 
 impl Query for Announcing<'_> {
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.q.linked_card(card)
+    }
+
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.q.linked_to(source)
+    }
+
     fn state(&self) -> &GameState {
         self.q.state()
     }
@@ -1493,6 +1501,14 @@ impl Watch<'_> {
 }
 
 impl Query for Watch<'_> {
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.q.linked_card(card)
+    }
+
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.q.linked_to(source)
+    }
+
     fn state(&self) -> &GameState {
         self.w.told.set(true);
         self.q.state()
@@ -2145,6 +2161,14 @@ struct AsFace<'a> {
 }
 
 impl Query for AsFace<'_> {
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.cx.linked_card(card)
+    }
+
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.cx.linked_to(source)
+    }
+
     fn state(&self) -> &GameState {
         self.cx.s()
     }
@@ -5000,6 +5024,14 @@ struct QueryAsFace<'a> {
 }
 
 impl Query for QueryAsFace<'_> {
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.q.linked_card(card)
+    }
+
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.q.linked_to(source)
+    }
+
     fn state(&self) -> &GameState {
         self.q.state()
     }
@@ -7972,7 +8004,7 @@ fn activate(
     // Counters put on and taken off permanents next, so a permanent the cost also sacrifices leaves with them.
     pay_blight(cx, player, &def.cost, blighted);
     pay_counters_among(cx, &removed);
-    pay_permanents(cx, &def.cost, &chosen, Some(source));
+    pay_permanents(cx, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card) }));
     let revealed = pay_behold(cx, player, &beheld);
     let at = cx.s().stack.len() - 1;
     add_revealed_to_item(cx, at, &revealed);
@@ -8181,7 +8213,7 @@ pub fn activate_mana(
         let hand = choose_discards(cx, player, source, &def.cost)?;
         pay_discards(cx, &hand);
     }
-    pay_permanents(cx, &def.cost, &chosen, Some(source));
+    pay_permanents(cx, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card) }));
     pay_life_and_counters(cx, player, source, &def.cost);
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, &[source]);

@@ -11,7 +11,7 @@ use cantrip_oracle as oracle;
 fn exile_a_nonland_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.target(0).player() else { return Ok(()) };
     let chosen = choose_from_revealed_hand_of_kind(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))?;
-    g.exile_with(&chosen, item.object, false);
+    g.exile_with(&chosen, g.linked(item), false);
     Ok(())
 }
 
@@ -21,7 +21,7 @@ fn exile_a_nonland_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 /// rules meaning of its own (CR 207.2c). It is a permission, so the card is cast at the time its type allows, for its mana
 /// cost or an alternative cost it has. It functions only while this permanent is on the battlefield with its abilities.
 fn may_cast_the_exiled_card(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> bool {
-    player == asker.controller && threshold(q, player) && q.exiled_with(asker.source).contains(&card)
+    player == asker.controller && threshold(q, player) && q.exiled_with(q.linked_to(asker.source)).contains(&card)
 }
 
 pub static CARD: CardDef = CardDef {

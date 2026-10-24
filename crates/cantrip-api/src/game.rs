@@ -315,12 +315,27 @@ pub trait Query {
         None
     }
 
-    /// The cards in exile that were exiled with `by` (CR 607.2a): what its linked abilities refer to. A permanent that
-    /// left and came back is a new object (CR 400.7) with none; in exile order.
-    fn exiled_with(&self, by: ObjectId) -> Vec<ObjectId> {
+    /// The cards in exile that were exiled with `by` (CR 607.2a): what an ability linked to the one that exiled them refers
+    /// to - an ability of the same object printed in the same text (`Linked`), so cards exiled by an ability of another text
+    /// the object has (a copy effect's, a granted one's) are not among them (CR 607.5). A permanent that left and came back
+    /// is a new object (CR 400.7) with none; in exile order.
+    fn exiled_with(&self, by: Linked) -> Vec<ObjectId> {
         let s = self.state();
-        s.seats().flat_map(|p| s.zone(Zone::exile(p)).iter().copied()).filter(|&id| self.obj(id).exiled.is_some_and(|l| l.by == by)).collect()
+        s.seats().flat_map(|p| s.zone(Zone::exile(p)).iter().copied()).filter(|&id| self.obj(id).exiled.is_some_and(|l| l.is_by(by))).collect()
     }
+
+    /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): `CardTable::linked_card`.
+    fn linked_card(&self, card: CardId) -> CardId;
+
+    /// A spell or ability on the stack, resolving or about to (`StackItem`), as linked abilities know it (CR 607.1): its source
+    /// and the card whose text it is printed in. What `exile_with` links and `exiled_with` asks for, from a resolving ability.
+    fn linked(&self, item: &StackItem) -> Linked {
+        Linked { object: item.object, text: self.linked_card(item.ability.card) }
+    }
+
+    /// An ability `source` has from the text it has now (CR 607.1): its card's, the face that is up, or a copy effect's (CR
+    /// 707.2) - what a static ability, a replacement effect or a mana ability of that text links and asks for.
+    fn linked_to(&self, source: ObjectId) -> Linked;
 
     /// The object `left` became when it moved to a public zone, if that object is still where the move put it (CR 400.7e):
     /// "return it to the battlefield" from a "when this dies" ability finds the card in the graveyard it went to, and
@@ -766,21 +781,22 @@ pub trait Game: Query {
     /// that could not equip it is created unattached (CR 301.5e), and any other token enters unattached (CR 303.4h). Every token a replacement makes of it
     /// (CR 614.1a) enters so. The tokens created.
     fn create_token_attached(&mut self, def: CardId, controller: PlayerId, host: ObjectId) -> Result<Vec<ObjectId>, Suspend>;
-    /// Exiles cards together and remembers them as exiled with `by` (CR 607.2a, 610.3). With `until_leaves` they return
-    /// to where they were exiled from the moment `by` is no longer on the battlefield (CR 610.3), no stack and nothing
+    /// Exiles cards together and remembers them as exiled with `by`, the ability exiling them (`Query::linked`; CR 607.2a,
+    /// 610.3). With `until_leaves` they return to where they were exiled from the moment `by`'s object is no longer on the
+    /// battlefield (CR 610.3), no stack and nothing
     /// to respond to; and if `by` has already left, nothing is exiled at all (CR 610.3b). The new objects.
-    fn exile_with(&mut self, cards: &[ObjectId], by: ObjectId, until_leaves: bool) -> Vec<ObjectId>;
-    /// Cards already in exile become linked to `by` as though exiled with it (CR 607.2a), for `exiled_with(by)` to find: the
+    fn exile_with(&mut self, cards: &[ObjectId], by: Linked, until_leaves: bool) -> Vec<ObjectId>;
+    /// Cards already in exile become linked to `by` as though exiled by it (CR 607.2a), for `exiled_with(by)` to find: the
     /// exiled cards used to craft a permanent (CR 702.167c), linked to the craft card in exile that is about to return as it.
     /// Nothing returns them (CR 610.3 does not apply). A card no longer in exile, or no longer the object it was, is left
     /// alone.
-    fn link_exiled(&mut self, cards: &[ObjectId], by: ObjectId);
+    fn link_exiled(&mut self, cards: &[ObjectId], by: Linked);
     /// Exiles a spell card encoded on a creature (CR 702.99a): linked to it as `exile_with` links, and marked encoded
     /// (`ExileLink::encoded`), which only cipher's encoding is. The card in exile, if it got there.
     fn encode(&mut self, card: ObjectId, creature: ObjectId) -> Option<ObjectId>;
     /// Exiles cards together face down (CR 406.3), linked to `by` if an ability exiled them (CR 607.2a). Each is hidden
     /// from every player who could not see where it came from; `look_at` shows it to one more. The new objects.
-    fn exile_face_down(&mut self, cards: &[ObjectId], by: Option<ObjectId>) -> Vec<ObjectId>;
+    fn exile_face_down(&mut self, cards: &[ObjectId], by: Option<Linked>) -> Vec<ObjectId>;
     /// `player` looks at face-down cards in exile (CR 406.3), and may from now on.
     fn look_at(&mut self, player: PlayerId, cards: &[ObjectId]);
     /// Puts an object onto the battlefield face down under `controller`'s control (CR 708.3), tapped if `tapped`: what it is

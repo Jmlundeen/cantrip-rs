@@ -565,10 +565,10 @@ pub fn unattach(cx: &mut Cx, attachment: ObjectId) {
 }
 
 /// Exiles cards with a permanent's ability (CR 607.2a, 610.3), linking each to it and to where it came from.
-pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: ObjectId, until_leaves: bool) -> Vec<ObjectId> {
+pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: Linked, until_leaves: bool) -> Vec<ObjectId> {
     // CR 610.3b: the duration has ended before the exile began, so nothing is exiled. A permanent phased out has not left
     // (CR 702.26d).
-    if until_leaves && !crate::phasing::still_on_battlefield(cx.s(), by) {
+    if until_leaves && !crate::phasing::still_on_battlefield(cx.s(), by.object) {
         return Vec::new();
     }
     let from: Vec<Zone> = cards.iter().map(|&c| cx.s().obj(c).zone).collect();
@@ -576,7 +576,7 @@ pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: ObjectId, until_leaves: b
     let new = move_together(cx, &moves, ZoneReason::Exile);
     for (&n, from) in new.iter().zip(from) {
         if cx.s().obj(n).zone.is(ZoneKind::Exile) {
-            cx.st().update_obj(n, |o| o.exiled = Some(ExileLink { by, from, until_leaves, encoded: false }));
+            cx.st().update_obj(n, |o| o.exiled = Some(ExileLink { by: by.object, text: by.text, from, until_leaves, encoded: false }));
         }
     }
     new
@@ -584,18 +584,21 @@ pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: ObjectId, until_leaves: b
 
 /// Links cards already in exile to `by` (CR 607.2a): `Game::link_exiled`, for the exiled cards used to craft a permanent
 /// (CR 702.167c). Each keeps the zone it came from; none is "until" anything.
-pub fn link_exiled(cx: &mut Cx, cards: &[ObjectId], by: ObjectId) {
+pub fn link_exiled(cx: &mut Cx, cards: &[ObjectId], by: Linked) {
     for &c in cards {
         if live(cx.s(), c) && cx.s().obj(c).zone.is(ZoneKind::Exile) {
             let from = cx.s().obj(c).exiled.map_or(cx.s().obj(c).zone, |l| l.from);
-            cx.st().update_obj(c, |o| o.exiled = Some(ExileLink { by, from, until_leaves: false, encoded: false }));
+            cx.st().update_obj(c, |o| o.exiled = Some(ExileLink { by: by.object, text: by.text, from, until_leaves: false, encoded: false }));
         }
     }
 }
 
 /// Exiles a spell card encoded on a creature (CR 702.99a, 702.99b): exiled linked to it, and marked as encoded there.
 pub fn encode(cx: &mut Cx, card: ObjectId, creature: ObjectId) -> Option<ObjectId> {
-    let new = *exile_with(cx, &[card], creature, false).first()?;
+    // Encoded on the creature, not exiled by an ability of its own: what is linked to it is the encoding, which no ability
+    // of the creature reads but cipher's (`ExileLink::encoded`), named by the card encoded.
+    let text = cx.g.cards.linked_card(cx.s().obj(card).card);
+    let new = *exile_with(cx, &[card], Linked { object: creature, text }, false).first()?;
     if !cx.s().obj(new).zone.is(ZoneKind::Exile) {
         return None;
     }
@@ -610,7 +613,7 @@ pub fn encode(cx: &mut Cx, card: ObjectId, creature: ObjectId) -> Option<ObjectI
 /// Exiles cards together face down (CR 406.3, 708.2): linked to `by` when an ability exiled them (CR 607.2a). A face-down
 /// card in exile has no characteristics for a player who may not look at it; those who could see where it came from may
 /// (CR 406.3): its owner for a card from a hand, everyone for one from a public zone, nobody for one from a library.
-pub fn exile_face_down(cx: &mut Cx, cards: &[ObjectId], by: Option<ObjectId>) -> Vec<ObjectId> {
+pub fn exile_face_down(cx: &mut Cx, cards: &[ObjectId], by: Option<Linked>) -> Vec<ObjectId> {
     let from: Vec<Zone> = cards.iter().map(|&c| cx.s().obj(c).zone).collect();
     let owners: Vec<PlayerId> = cards.iter().map(|&c| cx.s().obj(c).owner).collect();
     let new = match by {

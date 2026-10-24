@@ -14,7 +14,7 @@ fn imprint(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         })
         .collect();
     let cards = choose::cards(g, item.controller, item.object, Purpose::Exile, eligible, 1, true)?;
-    g.exile_with(&cards, item.object, false);
+    g.exile_with(&cards, g.linked(item), false);
     Ok(())
 }
 

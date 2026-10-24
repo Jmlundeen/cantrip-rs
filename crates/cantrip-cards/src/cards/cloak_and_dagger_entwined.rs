@@ -26,7 +26,7 @@ fn reveal_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         eligible.push(creature);
     }
     let cards = choose::cards_from(g, item.controller, item.object, Purpose::Exile, shown, eligible, 1, true)?;
-    g.exile_with(&cards, item.object, true);
+    g.exile_with(&cards, g.linked(item), true);
     Ok(())
 }
 

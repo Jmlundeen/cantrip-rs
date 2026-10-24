@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// Exile up to one target card from a graveyard: it is exiled with this creature (CR 607.2a), for its other ability.
 fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
-        g.exile_with(&[card], item.object, false);
+        g.exile_with(&[card], g.linked(item), false);
     }
     Ok(())
 }
@@ -29,7 +29,7 @@ fn plus_one_counters_put(_: &dyn Query, source: ObjectId, event: &Event) -> Opti
 /// gains haste. Sacrifice it at the beginning of the next end step. A lone card is no choice; several are asked.
 fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let eligible: Vec<ObjectId> =
-        g.exiled_with(item.object).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+        g.exiled_with(g.linked(item)).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     let chosen = if eligible.len() == 1 {
         eligible.first().copied()
     } else {

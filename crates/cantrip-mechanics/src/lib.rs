@@ -535,7 +535,7 @@ pub fn counter_unless_pays(g: &mut dyn Game, item: &StackItem, slot: usize, cost
 /// (Portable Hole and Sheltered by Ghosts as well).
 pub fn exile_target_until_leaves(g: &mut dyn Game, item: &StackItem, slot: usize) -> Option<ObjectId> {
     let id = targets::object(g, item, slot)?;
-    g.exile_with(&[id], item.object, true);
+    g.exile_with(&[id], g.linked(item), true);
     Some(id)
 }
 
@@ -545,7 +545,7 @@ pub fn exile_target_until_leaves(g: &mut dyn Game, item: &StackItem, slot: usize
 pub fn exile_all_until_leaves(g: &mut dyn Game, item: &StackItem, mut keep: impl FnMut(&mut dyn Game, ObjectId) -> bool) {
     let on_battlefield: Vec<ObjectId> = g.state().battlefield().iter().copied().collect();
     let chosen: Vec<ObjectId> = on_battlefield.into_iter().filter(|&id| keep(&mut *g, id)).collect();
-    g.exile_with(&chosen, item.object, true);
+    g.exile_with(&chosen, g.linked(item), true);
 }
 
 /// The resolution of "exile target ... until this leaves the battlefield" as a triggered ability's effect: exiles the
@@ -952,9 +952,10 @@ pub fn shuffle_hands_and_graveyards_in_and_draw_seven(g: &mut dyn Game) {
 
 /// Hideaway N (CR 702.75a): look at the top N cards of the library, exile one of them (exactly one, with fewer than N
 /// cards it is one of those there are), and put the rest on the bottom in a random order. The exiled card is linked to
-/// `source` (CR 607.2a), so its own "play the exiled card" ability finds it with `Query::exiled_with`. Windbrisk Heights,
+/// the resolving ability (CR 607.2a), so its own "play the exiled card" ability finds it with `Query::exiled_with`. Windbrisk Heights,
 /// Shelldock Isle and Collector's Cage print it.
-pub fn hideaway(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) -> Result<(), Suspend> {
+pub fn hideaway(g: &mut dyn Game, item: &StackItem, count: usize) -> Result<(), Suspend> {
+    let (player, source) = (item.controller, item.object);
     let looked = top_of_library(g, player, count);
     if looked.is_empty() {
         return Ok(());
@@ -976,7 +977,7 @@ pub fn hideaway(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usi
     let rest: Vec<ObjectId> = looked.into_iter().filter(|&c| Some(c) != chosen).collect();
     if let Some(card) = chosen {
         // Exiled face down (CR 406.3); the player who looked at it may go on looking.
-        let exiled = g.exile_face_down(&[card], Some(source));
+        let exiled = g.exile_face_down(&[card], Some(g.linked(item)));
         g.look_at(player, &exiled);
     }
     g.bottom_in_random_order(player, &rest);

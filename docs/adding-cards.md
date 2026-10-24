@@ -504,7 +504,7 @@ shapes have an example:
   long as it remains exiled" (Emrakul, the Exigent Doom; Glamorous Outlaw and its cycle).
 - **Casting cards in exile by a permanent's static ability** (CR 601.3, 604.1): `CardDef.exile_casts`, an `ExileCast { text,
   allows, additional, any_type }` - `allows(q, asker, card, player)` asked of the permanent with the card as the face that would be cast
-  ("you may cast creature spells from among cards you own exiled with this creature": `q.exiled_with(asker.source)`, its
+  ("you may cast creature spells from among cards you own exiled with this creature": `q.exiled_with(q.linked_to(asker.source))`, its
   controller, its owner, the turn), and `additional` the cost owed on top of whatever it is cast for (Dawnhand Dissident's
   `remove_counters_among(3, targets::filters::creature)`; `Cost::NONE` for Rona, Disciple of Gix). The card's own alternative
   costs stay open to it. `any_type: true` is "and mana of any type can be spent to cast that spell" (CR 609.4b, Null

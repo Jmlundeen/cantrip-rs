@@ -1096,6 +1096,12 @@ a resolution (the card back before the spell's next instruction), the state-base
 are then made together, 610.3d). The link is the exiled card's `ExileLink` (`until_leaves`) or the phased-out permanent's `Phased::until_leaves`;
 `phasing::still_on_battlefield` says the permanent has not left (phasing out is no leaving, 702.26d).
 
+"Exiled with [this]" is per ability, not per object (CR 607.1, 607.2a, 607.5): an `ExileLink` names the object and the card
+whose text the exiling ability is printed in (`Linked`: `Query::linked` for a resolving ability, `Query::linked_to` for one of
+the text the object has now; either face of a transforming card and either door of a Room are one text, 607.1b,
+`CardTable::linked_card`), and `Query::exiled_with` answers only an ability of that same text. So a creature that copies
+another (Mirrorweave) does not see, through the copied text's linked ability, the cards its own text exiled.
+
 `ops::return_until_left` carries both out (`ops::returns_due`: `return_exiled`, `phasing::phase_in_returning`), and is
 called by whatever can make a permanent leave: `move_together`, after the move's events and their triggers (so "leaves"
 abilities and the return's "enters" ones are collected in that order, and the history has the return after the leaving),
@@ -1519,8 +1525,8 @@ begins). It is a permission, not a way of paying: `castable` treats the card as 
 alternative cost it has (Solitude's evoke), at the speed its type gives (a flash creature at instant speed, the rulings), and the
 additional cost joins `extra` in `actions::cast`, read from the permission the action names as the cast begins (`CastBy`), so the
 permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling). A permanent that has lost its abilities gives
-none, and "cards exiled with this" are those its own ability linked (`Query::exiled_with`, CR 607.2a), so a flickered one finds
-none (CR 400.7). A card that a play permission of its own lets be cast, or a card on an Adventure, is cast by that instead; two
+none, and "cards exiled with this" are those an ability of its own text linked (`Query::exiled_with`, CR 607.2a), so a
+flickered one finds none (CR 400.7). A card that a play permission of its own lets be cast, or a card on an Adventure, is cast by that instead; two
 such permissions on one card are not offered as a choice, since no card in content can have both. The host shows the
 permission's text on the card while it would allow the cast (`exile_cast_texts`). Rona, Disciple of Gix and Kheru Mind-Eater
 print the same kind of ability with no additional cost.

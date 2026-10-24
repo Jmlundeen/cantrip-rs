@@ -480,7 +480,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
                 o.attached_to.map(|id| canon.id(id)),
                 o.entered_with.map(|id| canon.id(id)),
                 o.prepared_from.map(|id| canon.id(id)),
-                o.exiled.map(|e| (canon.id(e.by), e.from, e.until_leaves, e.encoded)),
+                o.exiled.map(|e| (canon.id(e.by), e.text, e.from, e.until_leaves, e.encoded)),
                 stamp,
             )
                 .hash(h);

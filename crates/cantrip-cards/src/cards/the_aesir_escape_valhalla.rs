@@ -18,7 +18,7 @@ fn exile_a_permanent_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
         }
     };
     let value = g.mana_value(chosen) as i32;
-    g.exile_with(&[chosen], item.object, false);
+    g.exile_with(&[chosen], g.linked(item), false);
     if value > 0 {
         g.gain_life(you, value);
     }
@@ -28,7 +28,7 @@ fn exile_a_permanent_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
 /// Chapter II: "Put a number of +1/+1 counters on target creature you control equal to the mana value of the exiled card."
 /// Read as the chapter resolves: a card that has since left exile is a new object and counts for nothing.
 fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let amount: i32 = g.exiled_with(item.object).into_iter().map(|c| g.mana_value(c) as i32).sum();
+    let amount: i32 = g.exiled_with(g.linked(item)).into_iter().map(|c| g.mana_value(c) as i32).sum();
     if amount > 0
         && let Some(creature) = targets::object(g, item, 0)
     {
@@ -44,7 +44,7 @@ fn return_both(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if is_live(g, saga) && g.is_on_battlefield(saga) {
         returning.push(saga);
     }
-    returning.extend(g.exiled_with(saga));
+    returning.extend(g.exiled_with(g.linked(item)));
     g.return_to_hand(&returning);
     Ok(())
 }

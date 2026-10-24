@@ -5,7 +5,7 @@ use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn hide_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    hideaway(g, item.controller, item.object, 4)
+    hideaway(g, item, 4)
 }
 
 /// How many different creatures the player declared as attackers this turn (CR 508.1): one that attacked in two combats
@@ -30,7 +30,7 @@ fn play_the_exiled_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
     if attacked_with(g, you) < 3 {
         return Ok(());
     }
-    play_exiled_card(g, item.object, you)
+    play_exiled_card(g, item, you)
 }
 
 pub static CARD: CardDef = CardDef {

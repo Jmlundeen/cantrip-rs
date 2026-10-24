@@ -17,7 +17,7 @@ fn remains_attached(q: &dyn Query, e: &ContinuousEffect) -> bool {
 /// exiled with it). With none the creature is left as it is.
 fn become_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(creature) = item.subject else { return Ok(()) };
-    let Some(card) = g.exiled_with(item.object).into_iter().find(|&c| g.chars(c).is(CardType::Creature)) else { return Ok(()) };
+    let Some(card) = g.exiled_with(g.linked(item)).into_iter().find(|&c| g.chars(c).is(CardType::Creature)) else { return Ok(()) };
     let values = g.copiable_values(card);
     g.become_copy(item.object, creature, values, Duration::AsLongAs(g.card_id(&CARD), 0));
     Ok(())

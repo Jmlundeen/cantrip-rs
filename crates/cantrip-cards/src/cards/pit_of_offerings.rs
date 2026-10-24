@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// (CR 400.7).
 fn exile_up_to_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cards = targets::legal_objects(g, item);
-    g.exile_with(&cards, item.object, false);
+    g.exile_with(&cards, g.linked(item), false);
     Ok(())
 }
 

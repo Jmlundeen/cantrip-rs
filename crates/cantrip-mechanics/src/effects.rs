@@ -606,7 +606,7 @@ pub fn return_first_target_to_hand(g: &mut dyn Game, item: &StackItem) -> Result
 /// Wave and Skyclave Apparition print it.
 pub fn exile_first_target_with_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(permanent) = crate::targets::object(g, item, 0) {
-        g.exile_with(&[permanent], item.object, false);
+        g.exile_with(&[permanent], g.linked(item), false);
     }
     Ok(())
 }
@@ -616,7 +616,7 @@ pub fn exile_first_target_with_this(g: &mut dyn Game, item: &StackItem) -> Resul
 /// enchants as it enters (CR 303.4f). The cards are new objects (CR 400.7). Oblivion Ring, Worldgorger Dragon, Parallax
 /// Wave ("each player returns ... all cards they own exiled with it") and Touch the Spirit Realm print it.
 pub fn return_exiled_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let cards: Vec<(ObjectId, PlayerId)> = g.exiled_with(item.object).into_iter().map(|card| (card, g.obj(card).owner)).collect();
+    let cards: Vec<(ObjectId, PlayerId)> = g.exiled_with(g.linked(item)).into_iter().map(|card| (card, g.obj(card).owner)).collect();
     if !cards.is_empty() {
         g.put_all_onto_battlefield(&cards)?;
     }

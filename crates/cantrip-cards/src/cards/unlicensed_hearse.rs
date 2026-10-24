@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// toughness count them.
 fn exile_cards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cards: Vec<ObjectId> = (0..2).filter_map(|slot| targets::object(g, item, slot)).collect();
-    g.exile_with(&cards, item.object, false);
+    g.exile_with(&cards, g.linked(item), false);
     Ok(())
 }
 
@@ -15,8 +15,7 @@ fn exile_cards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// cards in exile whose link points back at it, a characteristic-defining ability in every zone. A Vehicle that left and
 /// came back is a new object (CR 400.7) with none.
 fn exiled_with_it(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let s = q.state();
-    let n = s.seats().flat_map(|p| s.zone(Zone::exile(p)).iter().copied()).filter(|&id| s.obj(id).exiled.is_some_and(|l| l.by == source)).count();
+    let n = q.exiled_with(q.linked_to(source)).len();
     chars.power = Some(n as i16);
     chars.toughness = Some(n as i16);
 }

@@ -10,7 +10,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let players: Vec<PlayerId> = g.state().apnap().collect();
     let hands: Vec<ObjectId> = players.iter().flat_map(|&p| g.state().zone(Zone::hand(p)).to_vec()).collect();
-    g.exile_face_down(&hands, Some(item.object));
+    g.exile_face_down(&hands, Some(g.linked(item)));
     for &p in &players {
         g.draw(p, 7);
     }
@@ -25,7 +25,7 @@ fn give_back(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for &p in &players {
         g.discard_hand(p);
     }
-    let exiled = g.exiled_with(item.object);
+    let exiled = g.exiled_with(g.linked(item));
     g.return_to_hand(&exiled);
     Ok(())
 }

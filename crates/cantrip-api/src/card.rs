@@ -206,6 +206,16 @@ pub trait LayerQuery {
     /// long as you've lost life this turn" (CR 611.3a: its effect is not locked in, so the layers ask it again whenever
     /// characteristics are computed, and the answer follows each event as it is recorded and each turn as it begins).
     fn history(&self) -> History<'_>;
+    /// An ability `source` has from the text it has now, as linked abilities know it (CR 607.1; `Query::linked_to`): what
+    /// a static ability of that text asks `exiled_with` for.
+    fn linked_to(&self, source: ObjectId) -> Linked {
+        self.cards().linked_to(self.state(), source)
+    }
+    /// The cards in exile exiled by `by` (CR 607.2a; `Query::exiled_with`), in exile order.
+    fn exiled_with(&self, by: Linked) -> Vec<ObjectId> {
+        let s = self.state();
+        s.seats().flat_map(|p| s.zone(Zone::exile(p)).iter().copied()).filter(|&id| s.obj(id).exiled.is_some_and(|l| l.is_by(by))).collect()
+    }
     /// Another object's characteristics, through the layers before the one being applied.
     fn chars(&self, id: ObjectId) -> Chars;
     /// Another object's characteristics with its own characteristic-defining abilities of power and toughness applied too
@@ -3230,6 +3240,9 @@ pub struct CardTable {
     pub backs: Vec<Option<CardId>>,
     /// The front face of a back face, by the back's id: a decklist may name either face.
     pub fronts: Vec<Option<CardId>>,
+    /// The card a face's abilities are printed on as linked abilities know it (CR 607.1b), by the face's id: a transforming
+    /// double-faced card's back face is that card, and so is a Room's door. None for a card that is its own.
+    pub wholes: Vec<Option<CardId>>,
     /// The Undercity dungeon card, which the initiative ventures into (CR 726.2), if the game has it.
     pub undercity: Option<CardId>,
     /// A card's characteristics when nothing acts on it (the layers' fast path), made on first use: `[0]` before the
@@ -3529,6 +3542,7 @@ impl CardTable {
             backs: Vec::new(),
             halves: Vec::new(),
             fronts: Vec::new(),
+            wholes: Vec::new(),
             printed: Vec::new(),
         };
         let count = table.cards.len();
@@ -3536,11 +3550,18 @@ impl CardTable {
         table.backs = vec![None; count];
         table.halves = vec![None; count];
         table.fronts = vec![None; count];
+        table.wholes = vec![None; count];
         for front in 0..count {
             if let Some(back) = table.cards[front].back {
                 let back = table.find(back.name).expect("a back face is in the table");
                 table.backs[front] = Some(back);
                 table.fronts[back.0 as usize] = Some(CardId(front as u16));
+                // A nonmodal double-faced card's abilities are printed on it whichever face is up (CR 607.1b); a modal one's
+                // back face (one with a mana cost, or a land) is a face of its own.
+                let modal = table.cards[front].back_land || table.cards[back.0 as usize].has_cost;
+                if !modal {
+                    table.wholes[back.0 as usize] = Some(CardId(front as u16));
+                }
             }
             // A Room's doors (CR 709.5): the abilities and play rules of an unlocked one are the permanent's. What a door's
             // text does beyond those is read off the card, not off the door, so a door that has any is refused until it
@@ -3565,6 +3586,10 @@ impl CardTable {
                 table.mana_triggers[front] |= triggered(|t| t.mana_ability);
                 let ids = (table.find(left.name), table.find(right.name));
                 table.halves[front] = Some((ids.0.expect("a door is in the card table"), ids.1.expect("a door is in the card table")));
+                // Both doors are printed on the Room card (CR 607.1, 709.5).
+                for door in [ids.0, ids.1].into_iter().flatten() {
+                    table.wholes[door.0 as usize] = Some(CardId(front as u16));
+                }
             }
         }
         table
@@ -3595,6 +3620,18 @@ impl CardTable {
     /// (CR 707.2, 708.2a, 712.3). The printed card of a transformed permanent is its front.
     pub fn current(&self, obj: &Obj) -> CardId {
         obj.copied_card().unwrap_or_else(|| self.face(obj.card, obj.transformed))
+    }
+
+    /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): a transforming
+    /// double-faced card for either face, a Room for either door, any other card itself.
+    pub fn linked_card(&self, id: CardId) -> CardId {
+        self.wholes.get(id.0 as usize).copied().flatten().unwrap_or(id)
+    }
+
+    /// An ability `source` has from the text it has now, as linked abilities know it (CR 607.1; `Query::linked_to`): the
+    /// definition it has (`current`: a copy's, the face up), read as a whole card (`linked_card`).
+    pub fn linked_to(&self, s: &GameState, source: ObjectId) -> Linked {
+        Linked { object: source, text: self.linked_card(self.current(s.obj(source))) }
     }
 
     /// The face of a card that shows when it is transformed (CR 712.3), or the card itself when it has no back.

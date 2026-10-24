@@ -6,7 +6,7 @@ use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn hide_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    hideaway(g, item.controller, item.object, 5)
+    hideaway(g, item, 5)
 }
 
 /// How many different powers there are among the creatures this player controls.
@@ -31,7 +31,7 @@ fn counter_then_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
         g.add_counters(creature, CounterKind::PlusOne, 1);
     }
     if different_powers(g, item.controller) >= 3 {
-        play_exiled_card(g, item.object, item.controller)?;
+        play_exiled_card(g, item, item.controller)?;
     }
     Ok(())
 }

@@ -29,11 +29,11 @@ fn exile_and_drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(you)).to_vec();
     let chosen = choose::select(g, you, item.object, Purpose::Exile, graveyard, select::CREATURE_CARD)?;
-    if g.exile_with(&chosen, item.object, false).is_empty() {
+    if g.exile_with(&chosen, g.linked(item), false).is_empty() {
         return Ok(());
     }
     g.end_sentence();
-    let x = g.exiled_with(item.object).into_iter().filter(|&card| g.chars(card).is(CardType::Creature)).count() as i32;
+    let x = g.exiled_with(g.linked(item)).into_iter().filter(|&card| g.chars(card).is(CardType::Creature)).count() as i32;
     g.each_opponent_loses_life(you, x);
     g.gain_life(you, x);
     Ok(())

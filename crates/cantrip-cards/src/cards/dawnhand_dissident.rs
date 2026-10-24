@@ -13,7 +13,7 @@ fn surveil_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// that finds none of them (CR 400.7).
 fn exile_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
-        g.exile_with(&[card], item.object, false);
+        g.exile_with(&[card], g.linked(item), false);
     }
     Ok(())
 }
@@ -25,7 +25,7 @@ fn allows(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> boo
     player == asker.controller
         && your_turn(q, asker)
         && q.obj(card).owner == player
-        && q.exiled_with(asker.source).contains(&card)
+        && q.exiled_with(q.linked_to(asker.source)).contains(&card)
         && q.chars(card).is(CardType::Creature)
 }
 

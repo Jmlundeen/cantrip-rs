@@ -28,7 +28,7 @@ pub fn add_green_for_each_creature(g: &mut dyn Game, asker: &Asker, _: Option<Co
 /// offered and adds no mana (CR 106.5). Chrome Mox ("the exiled card") and Pit of Offerings read it.
 pub fn colors_of_cards_exiled_with_this(q: &dyn Query, asker: &Asker) -> ColorSet {
     let mut colors = ColorSet::NONE;
-    for card in q.exiled_with(asker.source) {
+    for card in q.exiled_with(q.linked_to(asker.source)) {
         colors = ColorSet(colors.0 | q.chars(card).colors.0);
     }
     colors

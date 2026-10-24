@@ -13,7 +13,7 @@ fn target_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// of them manifests dread, once, in turn order from the active player (its ruling; CR 101.4). With nothing exiled (the
 /// enter ability has not resolved, or exiled nothing) it does nothing.
 fn owner_manifests_dread(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let owners: Vec<PlayerId> = g.exiled_with(item.object).into_iter().map(|card| g.obj(card).owner).collect();
+    let owners: Vec<PlayerId> = g.exiled_with(g.linked(item)).into_iter().map(|card| g.obj(card).owner).collect();
     let players: Vec<PlayerId> = g.state().apnap().filter(|p| owners.contains(p)).collect();
     for player in players {
         if !cantrip_mechanics::players::reached(g, player) {

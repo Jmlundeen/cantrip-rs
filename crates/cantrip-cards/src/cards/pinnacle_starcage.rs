@@ -19,7 +19,7 @@ fn exile_cheap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// creature token for each card put into a graveyard this way. Sacrifice this artifact." (CR 607.2a): a card a
 /// replacement effect sent elsewhere is not put into a graveyard, so it makes no Robot.
 fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let exiled = g.exiled_with(item.object);
+    let exiled = g.exiled_with(g.linked(item));
     let moved = g.put_into_graveyard(&exiled);
     let count = moved.iter().filter(|&&id| g.obj(id).zone.is(ZoneKind::Graveyard)).count();
     if count > 0 {
