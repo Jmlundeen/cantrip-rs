@@ -129,6 +129,8 @@ TEST_POINTS = [
     (r"\b(?:\d+|one|two|three|four|five|six|seven|x) or (?:more|less|greater|fewer)\b",
      "the limit '{m}': an object exactly at it qualifies, one just past it doesn't"),
     (r"\bup to (?:one|two|three|four|five|x|\d+)\b", "'{m}': fewer than the most (or none) as well as the most"),
+    (r"[+-][\dxX]+/\+0\b|\+0/[+-][\dxX]+",
+     "'{m}': the unchanged half checked too (power and toughness both expected), so a pump of the wrong half fails"),
     (r"\btarget\b", "'target': one of your own (or you) accepted as a target"),
     (r"\btarget\b", "'target': one of an opponent's (or the opponent) accepted as a target"),
     (r"\btarget\b", "'target': one just outside the filter refused"),
