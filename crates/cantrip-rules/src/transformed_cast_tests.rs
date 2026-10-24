@@ -61,9 +61,9 @@ fn cx(game: &mut Game) -> Cx<'_> {
 #[test]
 fn a_back_face_cast_transformed_is_held_to_its_own_cast_only_restriction() {
     let (mut game, card) = game();
-    assert!(could_cast_transformed_during_resolution(&cx(&mut game), card), "at 20 life the back face may be cast");
+    assert!(could_cast_transformed_during_resolution(&mut cx(&mut game), card), "at 20 life the back face may be cast");
     game.state.update_player(YOU, |p| p.life = 5);
-    assert!(!could_cast_transformed_during_resolution(&cx(&mut game), card), "at 5 life its restriction forbids the cast");
+    assert!(!could_cast_transformed_during_resolution(&mut cx(&mut game), card), "at 5 life its restriction forbids the cast");
 }
 
 /// "Spells with mana value 3 or greater can't be cast" (as Gaddock Teeg's, for every spell).
@@ -118,7 +118,7 @@ fn squire_game(warden: bool) -> (Game, ObjectId) {
 #[test]
 fn a_back_face_cast_transformed_is_judged_by_its_front_faces_mana_value_before_the_cast() {
     let (mut game, card) = squire_game(true);
-    assert!(!could_cast_transformed_during_resolution(&cx(&mut game), card), "the cast is offered under the Warden");
+    assert!(!could_cast_transformed_during_resolution(&mut cx(&mut game), card), "the cast is offered under the Warden");
     let cast = crate::actions::cast_transformed_during_resolution(&mut cx(&mut game), card).ok();
     assert_eq!(cast, Some(false), "the spell of mana value 4 was cast");
     assert!(game.state.obj(card).zone.is(ZoneKind::Exile), "the card left exile");

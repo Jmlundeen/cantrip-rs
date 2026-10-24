@@ -74,14 +74,19 @@ fn exile_copy_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     loop {
         // A copy is a spell to cast as one face (CR 709.3, 715.3): the half or the Adventure chosen is the spell's, and only it
         // is evaluated to be cast (CR 709.3a, 715.3a), so a copy can be cast when one of its faces fits what is left of the six.
-        let fitting = |g: &dyn Game, c: ObjectId| -> Vec<CastWay> {
+        let fitting = |g: &mut dyn Game, c: ObjectId| -> Vec<CastWay> {
             g.cast_ways_during_resolution(c).into_iter().filter(|w| w.mana_value <= left).collect()
         };
-        let castable: Vec<ObjectId> = found.iter().copied().filter(|&c| !fitting(g, c).is_empty()).collect();
+        let mut castable: Vec<ObjectId> = Vec::new();
+        for &c in &found {
+            if !fitting(&mut *g, c).is_empty() {
+                castable.push(c);
+            }
+        }
         let chosen = choose::cards_from(g, you, item.object, Purpose::CastCopyFreeWithin(left.min(255) as u8), found.clone(), castable, 1, true)?;
         let Some(&card) = chosen.first() else { return Ok(()) };
         // The face is chosen before the spell is put onto the stack (CR 709.3), asked only when there is a choice.
-        let ways = fitting(g, card);
+        let ways = fitting(&mut *g, card);
         let Some(way) = choose::cast_way(g, you, card, ways)? else { return Ok(()) };
         let terms = CastTerms { instead: Some(ManaCost::ZERO), copy: true, way: Some(way.way), ..CastTerms::default() };
         // A cast the player gives up is undone (CR 733.1): the copy is not cast and counts for nothing, and they may choose again.

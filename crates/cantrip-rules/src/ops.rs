@@ -1186,6 +1186,39 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
     WouldExist { object: id, entering: *entering, chars, lost }
 }
 
+/// Runs `f` with `card` judged as the spell it would be, cast by `player` as `face` (its own card's face where `None`): a
+/// spell is put on the stack before its modes and targets are announced (CR 601.2a-c), with the characteristics of the face
+/// it is cast as alone (CR 709.3 a split card's half, 715.3 an Adventure, 712.8 a double-faced card's back, 720.3 an Omen)
+/// and under its caster's control, so what may be targeted is judged on it there: with every effect that applies to it on
+/// the stack - static abilities that read the zone or the controller among them - and none of those on the card where it is
+/// (CR 400.7). Worked out by putting it there for the moment of the question, as the cast does, and taking that back.
+/// The object is the card's own (no new object), so what `f` asks of `card` it asks of the spell.
+pub(crate) fn as_cast<T>(cx: &mut Cx, card: ObjectId, face: Option<CardId>, player: PlayerId, f: impl FnOnce(&mut Cx) -> T) -> T {
+    let mark = cx.s().mark();
+    let from = cx.s().obj(card).zone;
+    cx.st().zone_remove(from, card);
+    cx.st().update_obj(card, |o| {
+        o.zone = Zone::STACK;
+        o.controller = player;
+        o.cast_from = Some(from.kind());
+        o.face_down = false;
+        if let Some(face) = face {
+            o.copy = Some(Copiable::of(face));
+        }
+    });
+    cx.st().zone_push(Zone::STACK, card);
+    if cx.s().effects.iter().any(|e| e.affected == card) {
+        let keep: Vec<bool> = cx.s().effects.iter().map(|e| e.affected != card).collect();
+        cx.st().effects_keep(&keep);
+    }
+    let ability = AbilityRef { card: face.unwrap_or(cx.s().obj(card).card), index: u8::MAX };
+    cx.st().stack_push(crate::actions::stack_item(StackKind::Spell, card, ability, player, &[]));
+    note_statics(cx, card);
+    let done = f(cx);
+    cx.st().revert(mark);
+    done
+}
+
 /// Runs `f` with `entering` judged as it would exist on the battlefield (CR 614.12) by every effect that reads it
 /// (`Query::chars`, `Query::lost_all_abilities`): the replacement effects that modify how it enters ("creatures your opponents
 /// control enter tapped") and the rules that limit the counters it enters with (CR 122.6). Worked out only where some effect

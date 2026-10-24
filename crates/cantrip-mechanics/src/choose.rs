@@ -222,15 +222,21 @@ pub fn may_cast_from_hand_free(
     kind: &'static str,
     fits: impl Fn(&dyn Game, &CastWay) -> bool,
 ) -> Result<(), Suspend> {
-    let ways_of = |g: &dyn Game, card: ObjectId| -> Vec<CastWay> {
-        g.cast_ways_during_resolution(card).into_iter().filter(|w| fits(g, w)).collect()
+    let ways_of = |g: &mut dyn Game, card: ObjectId| -> Vec<CastWay> {
+        let ways = g.cast_ways_during_resolution(card);
+        ways.into_iter().filter(|w| fits(&*g, w)).collect()
     };
     let hand = g.state().zone(Zone::hand(player)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !ways_of(&*g, c).is_empty()).collect();
+    let mut eligible: Vec<ObjectId> = Vec::new();
+    for &c in &hand {
+        if !ways_of(&mut *g, c).is_empty() {
+            eligible.push(c);
+        }
+    }
     let Some(&card) = cards_from_kind(g, player, source, Purpose::CastFree, kind, hand, eligible, 1, true)?.first() else {
         return Ok(());
     };
-    let ways = ways_of(&*g, card);
+    let ways = ways_of(&mut *g, card);
     let way = cast_way(g, player, card, ways)?.map(|w| w.way);
     g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way, ..CastTerms::default() })?;
     Ok(())

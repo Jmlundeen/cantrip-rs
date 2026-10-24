@@ -52,7 +52,7 @@ fn has_ward(cx: &Cx, id: ObjectId) -> bool {
 }
 
 /// Whether `YOU` are offered turning `id` face up (CR 701.58b), a special action they can afford.
-fn offered_face_up(cx: &Cx, id: ObjectId) -> bool {
+fn offered_face_up(cx: &mut Cx, id: ObjectId) -> bool {
     priority_options(cx, YOU).iter().any(|o| {
         o.kind == ActionKind::ActivateAbility
             && o.source == Some(id)
@@ -112,11 +112,11 @@ fn a_cloaked_creature_card_is_turned_face_up_for_its_mana_cost_and_loses_ward() 
     let cloaked = face_down(&mut cx, beast, FaceDown::Cloaked).expect("it enters face down");
     // CR 701.58b: its card's mana cost, {2}, which one mana does not pay.
     cx.g.state.add_mana(YOU, Mana::C, 1, cloaked, None, false);
-    assert!(!offered_face_up(&cx, cloaked));
+    assert!(!offered_face_up(&mut cx, cloaked));
     cx.g.state.add_mana(YOU, Mana::C, 1, cloaked, None, false);
-    assert!(offered_face_up(&cx, cloaked));
+    assert!(offered_face_up(&mut cx, cloaked));
     // Its controller alone may (CR 701.58b).
-    assert!(!priority_options(&cx, THEM).iter().any(|o| o.source == Some(cloaked)));
+    assert!(!priority_options(&mut cx, THEM).iter().any(|o| o.source == Some(cloaked)));
     ops::turn_face_up(&mut cx, cloaked, YOU);
     assert!(!cx.s().obj(cloaked).face_down);
     assert_eq!(cx.chars(cloaked).name, "Cloak Test Beast");
@@ -132,7 +132,7 @@ fn a_cloaked_instant_is_not_offered_face_up_and_stays_face_down_if_it_would_turn
     let cloaked = face_down(&mut cx, bolt, FaceDown::Cloaked).expect("it enters face down");
     cx.g.state.add_mana(YOU, Mana::C, 5, cloaked, None, false);
     // CR 701.58b: not a creature card, so it can't be turned face up this way.
-    assert!(!offered_face_up(&cx, cloaked));
+    assert!(!offered_face_up(&mut cx, cloaked));
     // CR 701.58g: revealed and left face down, and nothing triggers on its turning face up.
     ops::turn_face_up(&mut cx, cloaked, YOU);
     assert!(cx.s().obj(cloaked).face_down);

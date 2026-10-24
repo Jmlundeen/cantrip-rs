@@ -1,0 +1,48 @@
+# A split card cast as one half is that half alone on the stack (CR 709.3, 709.3b), and its targets are chosen there
+# (CR 601.2a-c): Turn // Burn is blue and red in Bot2's hand, but Burn is a red spell. Mother of Runes gives itself
+# protection from blue (CR 702.16b), so Bot2 can't aim Turn (blue) at it, though Turn could go at Bot2's own Ornithopter,
+# while Burn targets it and its 2 damage kills it.
+
+[Bot1 Deck]
+Plains
+Mother of Runes
+Plains x18
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ornithopter
+Turn // Burn
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mother of Runes.Activate(Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Blue)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+! Bot2.Hand.Turn // Burn.Cast(Bot1.Battlefield.Mother of Runes; Ability: Turn)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Turn // Burn.Cast(Bot1.Battlefield.Mother of Runes; Ability: Burn)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Mother of Runes
+Bot2.Graveyard = Turn // Burn

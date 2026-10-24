@@ -2237,7 +2237,7 @@ impl cantrip_api::Game for Cx<'_> {
         actions::may_pay_times(self, payer, source, subject, mana, most, question).map_err(|_| Suspend)
     }
 
-    fn could_cast_during_resolution(&self, card: ObjectId) -> bool {
+    fn could_cast_during_resolution(&mut self, card: ObjectId) -> bool {
         actions::could_cast_during_resolution(self, card)
     }
 
@@ -2253,7 +2253,7 @@ impl cantrip_api::Game for Cx<'_> {
         actions::cast_during_resolution(self, card, CastTerms { instead, ..Default::default() }).map_err(|_| Suspend)
     }
 
-    fn cast_ways_during_resolution(&self, card: ObjectId) -> Vec<CastWay> {
+    fn cast_ways_during_resolution(&mut self, card: ObjectId) -> Vec<CastWay> {
         actions::cast_ways_during_resolution(self, card)
     }
 
@@ -2280,7 +2280,7 @@ impl cantrip_api::Game for Cx<'_> {
         }
     }
 
-    fn could_cast_transformed_during_resolution(&self, card: ObjectId) -> bool {
+    fn could_cast_transformed_during_resolution(&mut self, card: ObjectId) -> bool {
         actions::could_cast_transformed_during_resolution(self, card)
     }
 

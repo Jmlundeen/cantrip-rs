@@ -98,6 +98,17 @@ impl Chars {
         self.keywords.has(k)
     }
 
+    /// Whether it has any protection (CR 702.16a) - a quality `protected_from` or `protected_from_by` reads: from a color,
+    /// colorless, a player, a card type, colored spells or everything.
+    pub fn has_protection(&self) -> bool {
+        !self.protection.is_empty()
+            || self.protection_colorless
+            || self.protection_players != 0
+            || self.protection_types != TypeSet::NONE
+            || self.protection_colored_spells
+            || self.protection_everything
+    }
+
     /// Whether its protection covers a source with these characteristics (CR 702.16a): a color it is protected
     /// from, or colorless.
     pub fn protected_from(&self, source: &Chars) -> bool {

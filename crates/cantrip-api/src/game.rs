@@ -1000,7 +1000,7 @@ pub trait Game: Query {
     /// Whether `card` could be cast now by the ability's controller as an effect resolves (CR 608.2g), from where it
     /// is: it is not a land and has a legal target for every target it needs. The mana is not asked: a player who
     /// finds they cannot pay gives the cast up (CR 733.1).
-    fn could_cast_during_resolution(&self, card: ObjectId) -> bool;
+    fn could_cast_during_resolution(&mut self, card: ObjectId) -> bool;
     /// Whether the resolving effect's controller could play `card` as a land now (CR 305.1, 608.2g): it is their own turn
     /// (CR 305.3) and they have a land play left (CR 305.2); the phase and the stack do not matter.
     fn could_play_land_during_resolution(&self, card: ObjectId) -> bool;
@@ -1025,7 +1025,7 @@ pub trait Game: Query {
     /// and as its Adventure or Omen; a modal double-faced card's two faces. A fused cast of a fuse card in a hand (CR 702.102a,
     /// mana value the sum of both halves, CR 702.102c) is a way too: a limit on mana value is judged against that sum. Empty
     /// when `could_cast_during_resolution` is false.
-    fn cast_ways_during_resolution(&self, card: ObjectId) -> Vec<CastWay>;
+    fn cast_ways_during_resolution(&mut self, card: ObjectId) -> Vec<CastWay>;
     /// `player` may play or cast `card` from where it is (CR 601.3, 305.1) under `grant`: a card in exile or a
     /// graveyard, a new object after a move (CR 400.7), so the permission is for this object only.
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant);
@@ -1046,7 +1046,7 @@ pub trait Game: Query {
     fn increase_speed(&mut self, player: PlayerId, amount: u8);
     /// Whether the resolving effect's controller could cast `card` transformed now, from where it is (CR 608.2g,
     /// 712.11a): a double-faced card that is not modal, judged as its back face alone.
-    fn could_cast_transformed_during_resolution(&self, card: ObjectId) -> bool;
+    fn could_cast_transformed_during_resolution(&mut self, card: ObjectId) -> bool;
     /// The resolving effect's controller casts `card` transformed, for nothing (CR 712.11a, 118.9): put on the stack
     /// with its back face up, it resolves into a permanent back face up (CR 712.13). Whether it was cast.
     fn cast_transformed_during_resolution(&mut self, card: ObjectId) -> Result<bool, Suspend>;

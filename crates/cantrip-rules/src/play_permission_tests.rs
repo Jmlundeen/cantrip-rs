@@ -63,7 +63,7 @@ fn allow(cx: &mut Cx, source: ObjectId, cards: &[ObjectId]) {
     }
 }
 
-fn land_playable(cx: &Cx, land: ObjectId) -> bool {
+fn land_playable(cx: &mut Cx, land: ObjectId) -> bool {
     priority_options(cx, YOU).iter().any(|o| o.kind == ActionKind::PlayLand && o.source == Some(land))
 }
 
@@ -73,7 +73,7 @@ fn a_land_is_played_and_a_spell_cast_from_exile_while_you_control_it_and_transfo
     let mut cx = cx(&mut game);
     allow(&mut cx, spider, &[land, spell]);
     // "Play": the land is a land play from exile (CR 305.1), the sorcery may be cast (CR 601.3).
-    assert!(land_playable(&cx, land));
+    assert!(land_playable(&mut cx, land));
     assert!(permissions_for(&cx, spell, YOU).next().is_some());
     // The opponent holds no permission.
     assert!(permissions_for(&cx, spell, THEM).next().is_none());
@@ -81,7 +81,7 @@ fn a_land_is_played_and_a_spell_cast_from_exile_while_you_control_it_and_transfo
     ops::turn_over(&mut cx, spider).unwrap();
     assert!(cx.s().obj(spider).transformed && live(cx.s(), spider));
     crate::settle::state_based_actions_alone(&mut cx).unwrap();
-    assert!(land_playable(&cx, land));
+    assert!(land_playable(&mut cx, land));
     assert!(permissions_for(&cx, spell, YOU).next().is_some());
     assert_eq!(cx.s().permissions.len(), 2);
 }
@@ -93,7 +93,7 @@ fn it_ends_when_the_permanent_leaves_and_does_not_come_back_with_it() {
     allow(&mut cx, spider, &[land, spell]);
     ops::move_to(&mut cx, spider, Zone::graveyard(YOU));
     // Over at once, before the state-based check drops it (CR 611.2b).
-    assert!(!land_playable(&cx, land));
+    assert!(!land_playable(&mut cx, land));
     assert!(permissions_for(&cx, spell, YOU).next().is_none());
     crate::settle::state_based_actions_alone(&mut cx).unwrap();
     assert!(cx.s().permissions.is_empty());
@@ -101,7 +101,7 @@ fn it_ends_when_the_permanent_leaves_and_does_not_come_back_with_it() {
     let dead = cx.s().obj(spider).became.unwrap();
     let back = ops::move_to(&mut cx, dead, Zone::BATTLEFIELD);
     assert!(live(cx.s(), back) && cx.s().obj(back).controller == YOU);
-    assert!(!land_playable(&cx, land));
+    assert!(!land_playable(&mut cx, land));
     assert!(permissions_for(&cx, spell, YOU).next().is_none());
 }
 
@@ -114,12 +114,12 @@ fn it_ends_when_control_changes_and_stays_ended_once_control_comes_back() {
     cantrip_api::Game::add_effect(&mut cx, spider, spider, EffectKind::Control(THEM), Duration::EndOfTurn);
     assert_eq!(cx.s().obj(spider).controller, THEM);
     assert!(cx.s().permissions.is_empty());
-    assert!(!land_playable(&cx, land));
+    assert!(!land_playable(&mut cx, land));
     // The effect ends and the permanent comes back to you: the permission does not begin again (CR 611.2b).
     cx.st().effects_retain(|e| !matches!(e.kind, EffectKind::Control(_)));
     ops::settle_control(&mut cx);
     assert_eq!(cx.s().obj(spider).controller, YOU);
-    assert!(!land_playable(&cx, land));
+    assert!(!land_playable(&mut cx, land));
     assert!(permissions_for(&cx, spell, YOU).next().is_none());
 }
 
@@ -149,6 +149,6 @@ fn it_ends_when_the_permanent_phases_out_and_stays_ended_once_it_phases_in() {
     assert!(cx.s().permissions.is_empty());
     phasing::untap_step(&mut cx, YOU);
     assert!(cx.s().obj(spider).zone.is(ZoneKind::Battlefield) && live(cx.s(), spider));
-    assert!(!land_playable(&cx, land));
+    assert!(!land_playable(&mut cx, land));
     assert!(permissions_for(&cx, spell, YOU).next().is_none());
 }

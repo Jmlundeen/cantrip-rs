@@ -428,7 +428,7 @@ fn answer(g: &mut Game, r: &Request, a: Answer) {
 }
 
 fn offered(g: &mut Game, source: ObjectId) -> Option<ActionOption> {
-    priority_options(&cx(g), YOU).into_iter().find(|o| o.source == Some(source))
+    priority_options(&mut cx(g), YOU).into_iter().find(|o| o.source == Some(source))
 }
 
 /// Your Bear and theirs, and `def` in your hand (or on your battlefield) with one mana in your pool.
@@ -648,7 +648,7 @@ fn a_spell_whose_cost_reads_its_kicker_is_offered_kicked_where_that_is_cheaper()
 #[test]
 fn a_bestowed_aura_is_offered_for_the_creatures_it_could_be_paid_for_at() {
     let (mut g, wings, yours, _) = board(&WINGS, true);
-    let options: Vec<ActionOption> = priority_options(&cx(&mut g), YOU).into_iter().filter(|o| o.source == Some(wings)).collect();
+    let options: Vec<ActionOption> = priority_options(&mut cx(&mut g), YOU).into_iter().filter(|o| o.source == Some(wings)).collect();
     assert_eq!(options.len(), 1, "only bestowed, for {{1}} at the caster's Bear (CR 702.103a, 601.2c, 601.2f)");
     assert_eq!(options[0].target_candidates, vec![Target::Object(yours)]);
     let (mut g, wings, _, _) = board(&WINGS, false);

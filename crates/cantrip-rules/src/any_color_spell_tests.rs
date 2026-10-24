@@ -66,7 +66,7 @@ fn offered(oath: bool) -> Vec<u8> {
         t.set_step(Step::PrecombatMain);
     });
     let mut ways: Vec<u8> =
-        priority_options(&cx(&mut game), YOU).iter().filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).map(|o| o.index).collect();
+        priority_options(&mut cx(&mut game), YOU).iter().filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).map(|o| o.index).collect();
     ways.sort_unstable();
     ways
 }

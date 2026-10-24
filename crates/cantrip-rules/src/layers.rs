@@ -199,22 +199,14 @@ fn watching_givers(cards: &CardTable, id: ObjectId, giver: Giver, chars: &mut Ch
     GIVERS.with(|g| g.set(after));
 }
 
-/// An object's characteristics as if it were the face `face` of its card (CR 715.4, 709.3, 712.8a): a card in hand
-/// judged as the Adventure, Omen, half or back face it would be cast as. The face's own printed values replace the card's.
+/// An object's characteristics as if it were the face `face` of its card (CR 715.4, 709.3, 712.8a, 720.3): a card in hand
+/// judged as the Adventure, Omen, half or back face it would be cast as - a spell with that face's values, worked out through
+/// the layers with every effect that applies to the card where it is (Painter's Servant's color among them) and none that
+/// applies only to the card (CR 400.7). Where the stack itself must be read, `ops::as_cast` puts it there.
 pub fn chars_as_face(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, face: CardId) -> Chars {
-    let mut chars = chars(cards, state, log, id);
-    let printed = initial(cards, face, None);
-    chars.card = face;
-    chars.name = printed.name;
-    chars.types = printed.types;
-    chars.supertypes = printed.supertypes;
-    chars.subtypes = printed.subtypes;
-    chars.colors = printed.colors;
-    chars.power = printed.power;
-    chars.toughness = printed.toughness;
-    chars.keywords = printed.keywords;
-    chars.abilities = printed.abilities;
-    chars.spell = true;
+    let was = state.judged_as.replace(Some((id, face)));
+    let chars = chars(cards, state, log, id);
+    state.judged_as.set(was);
     chars
 }
 
@@ -458,7 +450,7 @@ fn cross_check(cards: &CardTable, state: &GameState, log: &[Record], o: &ObjCtx,
         return;
     }
     CHECKING.with(|c| c.set(true));
-    let fresh = Pass::new(PassKey { epoch: state.chars_epoch, judged: state.judged_face_up.get() }, state.epoch);
+    let fresh = Pass::new(PassKey { epoch: state.chars_epoch, judged: state.judged_face_up.get(), judged_as: state.judged_as.get() }, state.epoch);
     let again = before(&Ctx { cards, state, log, pass: &fresh }, o, layers, false).chars;
     CHECKING.with(|c| c.set(false));
     assert!(again == *kept, "the layers' pass kept other characteristics for {:?} than a pass of its own works out", o.id);
@@ -518,17 +510,20 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
     if obj.face_down_card() && state.judged_face_up.get() != Some(id) {
         return Object::Fixed(Box::new(*printed(cards, cards.no_characteristics, false)));
     }
-    let spell = obj.zone.is(ZoneKind::Stack);
+    // A card judged as the face it would be cast as (`chars_as_face`): a spell with that face's values.
+    let judged_as = state.judged_as.get().filter(|&(card, _)| card == id).map(|(_, face)| face);
+    let spell = obj.zone.is(ZoneKind::Stack) || judged_as.is_some();
     // The copiable values (CR 707.2): a copy effect's (layer 1a) under a face-down permanent's face-down values (layer 1b,
     // CR 613.2b), or the face of the card that is up (CR 711.2).
     // The face-down values are a card's own printed values (no exceptions), so a face-down permanent starts from that card
     // as an object with no copy effect does.
-    let copy: Option<&Copiable> = if obj.marks.face_down_as.is_some() { None } else { obj.copy.as_ref() };
+    let copy: Option<&Copiable> = if obj.marks.face_down_as.is_some() || judged_as.is_some() { None } else { obj.copy.as_ref() };
     // A double-faced token's own copy values (CR 707.8a) are its card's faces, the one up, under its exceptions.
-    let card = match (obj.marks.face_down_as, copy) {
-        (Some(values), _) => values,
-        (None, Some(c)) if !obj.own_faces(c) => c.card,
-        (None, _) => cards.face(obj.card, obj.transformed),
+    let card = match (judged_as, obj.marks.face_down_as, copy) {
+        (Some(face), _, _) => face,
+        (None, Some(values), _) => values,
+        (None, None, Some(c)) if !obj.own_faces(c) => c.card,
+        (None, None, _) => cards.face(obj.card, obj.transformed),
     };
     let def = cards.get(card);
     // A Room on the battlefield (CR 709.5): the name, mana cost and abilities of its unlocked doors alone, which no
@@ -545,7 +540,8 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
     let on_battlefield = (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) && obj.became.is_none();
     // What could apply at all, found once: most objects have no effects, no statics touch them, and no counters.
     // A spell's text can be changed too (CR 612.1: "target spell or permanent").
-    let has_effects = (on_battlefield || spell) && state.effects.iter().any(|e| e.affected == id);
+    // The effects on a card do not follow it to the stack (CR 400.7): a card judged as a spell has none.
+    let has_effects = (on_battlefield || spell) && judged_as.is_none() && state.effects.iter().any(|e| e.affected == id);
     let has_counters = on_battlefield && obj.has_counters();
     let has_own = !def.statics.is_empty();
     // `statics_seen` is set by hone counters as well (CR 122.1j), which need no card with a static ability.
@@ -661,6 +657,7 @@ type Memo = std::collections::HashMap<(ObjectId, u8, u32, u32), std::rc::Rc<Snap
 struct PassKey {
     epoch: u64,
     judged: Option<ObjectId>,
+    judged_as: Option<(ObjectId, CardId)>,
 }
 
 /// An object's characteristics at a point of the layers, with the parts of effects (CR 613.6) that began to apply to it.
@@ -706,7 +703,7 @@ pub(crate) fn verifying() -> bool {
 /// The pass for this position and history, made if there is none.
 fn pass(cards: &CardTable, state: &GameState, log: &[Record]) -> std::rc::Rc<Pass> {
     let _ = cards;
-    let key = PassKey { epoch: state.chars_epoch, judged: state.judged_face_up.get() };
+    let key = PassKey { epoch: state.chars_epoch, judged: state.judged_face_up.get(), judged_as: state.judged_as.get() };
     {
         let cache = state.layer_pass.0.borrow();
         for kept in cache.iter().rev() {
@@ -2940,15 +2937,15 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
                     return false;
                 }
             }
-            let mut source_chars = chars(cards, state, log, asker.source);
-            // A card that is not on the battlefield or the stack and is asked about as a spell is about to be cast: it moves
-            // to the stack before its targets are chosen (CR 601.2a), so it is judged as the spell it will be, which
-            // protection from spells (CR 702.16a) turns away. An ability that functions from there (channel, scavenge, a
-            // cycled card's trigger, CR 115.1a) is an ability of a card, not a spell.
+            // A spell not yet cast - a card in a hand, a graveyard, exile or a library - is put on the stack before its targets
+            // are chosen (CR 601.2a-c), and has there the characteristics of the face it is cast as and the effects that apply
+            // to it there (CR 709.3, 715.3, 712.8), which the card where it is need not have. What reads them is judged with it
+            // there (`ops::as_cast`); here it is judged on everything else.
             let source = state.obj(asker.source);
             if asker.spell && !source.zone.is(ZoneKind::Battlefield) && !source.zone.is(ZoneKind::Stack) {
-                source_chars.spell = true;
+                return true;
             }
+            let source_chars = chars(cards, state, log, asker.source);
             if let Some(target_chars) = &target_chars {
                 // Hexproof from [quality] (CR 702.11d): no [quality] spell an opponent controls, nor an ability an opponent
                 // controls from a [quality] source, the source as it is now (a spell, or an ability's source on the
@@ -2964,6 +2961,44 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
                 }
             }
             !targeting_forbidden(cards, state, log, &forbidders, id, asker, &source_chars)
+        }
+    }
+}
+
+/// What now could refuse a target for what the spell or ability targeting it is (`can_target`): `None` where nothing could;
+/// otherwise the permanents with a hexproof from a quality (CR 702.11d) or a protection (CR 702.16), which only they could
+/// be refused for, or every object (`Readers::Any`) where a permanent's static ability says what can't target what
+/// (`TargetingRuleKind::Forbid`). Where nothing could, a spell not yet cast is judged on all there is by `can_target` where
+/// its card is, and need not be judged on the stack (`actions::priority_options`).
+pub fn targeting_readers(cards: &CardTable, state: &GameState, log: &[Record]) -> Option<Readers> {
+    if !static_sources(cards, state).targeting.is_empty() {
+        return Some(Readers::Any);
+    }
+    let some: Vec<ObjectId> = state
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| {
+            let c = chars(cards, state, log, id);
+            c.hexproof_from != HexproofFrom::NONE || c.has_protection()
+        })
+        .collect();
+    (!some.is_empty()).then_some(Readers::Some(some))
+}
+
+/// The targets whose legality reads the spell or ability targeting them (`targeting_readers`).
+pub enum Readers {
+    Any,
+    Some(Vec<ObjectId>),
+}
+
+impl Readers {
+    /// Whether `target` is one of them.
+    pub fn read_by(&self, target: Target) -> bool {
+        match (self, target) {
+            (Readers::Any, _) => true,
+            (Readers::Some(some), Target::Object(id)) => some.contains(&id),
+            _ => false,
         }
     }
 }
@@ -3544,6 +3579,31 @@ mod tests {
     };
     static SPROUT: CardDef =
         CardDef { name: "Sprout", types: TypeSet::of(&[CardType::Creature]), colors: Some(ColorSet::of(Color::Green)), ..CardDef::BLANK };
+
+    static STOMPING: CardDef =
+        CardDef { name: "Stomping", types: TypeSet::of(&[CardType::Instant]), colors: Some(ColorSet::of(Color::Red)), ..CardDef::BLANK };
+    static STOMPER: CardDef = CardDef {
+        name: "Stomper",
+        types: TypeSet::of(&[CardType::Creature]),
+        colors: Some(ColorSet::of(Color::Red)),
+        adventure: Some(&STOMPING),
+        ..CardDef::BLANK
+    };
+
+    /// CR 715.3, 601.2a: a card judged as the Adventure it would be cast as is that instant alone, with what applies to it
+    /// where it is through the layers - the Painter makes it blue - and the card itself is unchanged after.
+    #[test]
+    fn a_card_judged_as_its_adventure_has_the_face_and_what_applies_to_it() {
+        let cards = CardTable::new([&PAINTER, &STOMPER, &STOMPING]);
+        let (mut state, _) = battlefield(&cards, &["Painter"]);
+        let card = state.push_obj(Obj::new(cards.find("Stomper").unwrap(), PlayerId(0), Zone::hand(PlayerId(0))));
+        state.zone_push(Zone::hand(PlayerId(0)), card);
+        let face = chars_as_face(&cards, &state, &[], card, cards.id_of(&STOMPING));
+        assert!(face.is(CardType::Instant) && !face.is(CardType::Creature) && face.spell);
+        assert_eq!(face.colors, ColorSet::of(Color::Blue));
+        let whole = chars(&cards, &state, &[], card);
+        assert!(whole.is(CardType::Creature) && !whole.spell);
+    }
 
     /// CR 406.3a: a card exiled face down has no characteristics; judged as the card it is (`judged_face_up`), it is the
     /// card with what applies to it (blue, under the Painter). Asked again once the judgment is over, it has none: what was

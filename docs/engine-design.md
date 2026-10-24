@@ -458,6 +458,15 @@ only the candidates the host's verdict on those picked says may be added.
   601.3): while the offers, the costs a menu row shows and a cast during resolution are worked out, `layers::judged_face_up`
   names that one card on `GameState::judged_face_up` and the layers give it the card's characteristics; as it is played,
   `ops::turn_up_to_play` turns it face up just before the announcement (601.2) or the land play.
+- **A spell not yet cast is judged as the spell it would be (601.2a-c)**: a spell is on the stack, as the face it is cast as
+  (709.3, 715.3, 712.8, 720.3), under its caster, before its modes and targets are announced. `layers::can_target` judges a
+  spell whose card is elsewhere on everything that does not read it; where something on the board reads the spell that would
+  target (`layers::targeting_readers`: a hexproof from a quality, a protection, a `TargetingRuleKind::Forbid`),
+  `actions::priority_options` and the casts an effect makes (`cast_ways_during_resolution`,
+  `could_cast_transformed_during_resolution`) judge each cast with modes or targets again with the card put on the stack for
+  the moment as that spell (`ops::as_cast`, taken back after), so every effect that applies to it there applies. The cost
+  changes and casting bans read a face through `layers::chars_as_face`: the card where it is, with the face's values
+  (`GameState::judged_as`), through the layers.
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.
@@ -645,6 +654,7 @@ and Arcane Adaptation on turn 5.
   panics; otherwise it is answered from the working copy.
 - The pass is never built or read while any of these is set:
   - `judged_face_up`;
+  - `judged_as`;
   - the `GIVERS`, `WATCHED` or `WATCHING` ability-giver tracking;
   - the 305.7 and "loses all" `finding` flags.
 

@@ -179,7 +179,7 @@ fn next(g: &mut Game) -> Request {
 
 /// The ways `source` is offered at `YOU`'s priority: an ability's index, or a cast's way number.
 fn offered(g: &mut Game, source: ObjectId) -> Vec<u8> {
-    priority_options(&cx(g), YOU).iter().filter(|o| o.source == Some(source)).map(|o| o.index).collect()
+    priority_options(&mut cx(g), YOU).iter().filter(|o| o.source == Some(source)).map(|o| o.index).collect()
 }
 
 /// Takes the first option `source` has, and gives back the announcement it asks.
@@ -265,7 +265,7 @@ fn a_spell_whose_x_cant_be_0_is_cast_with_x_1_or_more_and_never_for_a_cost_witho
 
 /// Every option `source` has at `YOU`'s priority, with what pays for it instead of its cost.
 fn options_of(g: &mut Game, source: ObjectId) -> Vec<(u8, Option<Grant>)> {
-    priority_options(&cx(g), YOU).iter().filter(|o| o.source == Some(source)).map(|o| (o.index, o.paid_by)).collect()
+    priority_options(&mut cx(g), YOU).iter().filter(|o| o.source == Some(source)).map(|o| (o.index, o.paid_by)).collect()
 }
 
 #[test]

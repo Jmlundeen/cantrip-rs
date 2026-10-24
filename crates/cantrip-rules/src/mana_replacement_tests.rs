@@ -360,7 +360,7 @@ fn a_mana_abilitys_row_is_told_the_replaced_mana() {
     assert_eq!(yields.len(), 5, "one for each color it may name");
     assert!(yields.iter().all(|(_, o)| o == &vec![pool(&[(Mana::C, 1)])]), "{yields:?}");
     // Offered still, and named a color as before.
-    assert!(priority_options(&cx(&mut g), YOU).iter().any(|o| o.source == Some(tower) && !o.color_choices.is_empty()));
+    assert!(priority_options(&mut cx(&mut g), YOU).iter().any(|o| o.source == Some(tower) && !o.color_choices.is_empty()));
 }
 
 /// CR 106.12b: the whole production is the event, whoever's pool it goes to. Tapped by you for an opponent's {G}, "if you tap a

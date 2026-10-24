@@ -98,6 +98,10 @@ pub struct GameState {
     /// characteristics, though the card in exile has none. Set only for the length of that judgment
     /// (`cantrip_rules::layers::judged_face_up`), `None` at any other time; no part of the position.
     pub judged_face_up: std::cell::Cell<Option<ObjectId>>,
+    /// The card outside the stack that is being judged as the face it would be cast as, where it is (CR 709.3, 715.3, 712.8,
+    /// 720.3): the face's characteristics with the effects that apply to the card there, as a spell. Set only for the length
+    /// of that judgment (`cantrip_rules::layers::chars_as_face`), `None` at any other time; no part of the position.
+    pub judged_as: std::cell::Cell<Option<(ObjectId, CardId)>>,
     /// The permanents leaving the battlefield in the move whose entering permanents are being worked out (CR 101.4,
     /// 614.12: Goblin Welder's sacrifice and return), which a permanent judged as it would exist there does not see. Set only
     /// for the length of that work, empty at any other time; no part of the position.
@@ -461,6 +465,7 @@ impl GameState {
             chars_epoch: 0,
             static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), controllers: Vec::new(), honed: Vec::new(), granted: Vec::new(), targeting: Vec::new(), continuing: false }),
             judged_face_up: std::cell::Cell::new(None),
+            judged_as: std::cell::Cell::new(None),
             leaving_together: std::cell::RefCell::new(Vec::new()),
             settle_held: std::cell::Cell::new(0),
             returning: std::cell::Cell::new(false),

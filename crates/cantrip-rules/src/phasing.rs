@@ -407,16 +407,16 @@ mod tests {
             }
             let [aviator, other] = permanents[..] else { unreachable!() };
             let mut cx = cx(&mut game);
-            let can_cast = |cx: &Cx, copy| {
+            let can_cast = |cx: &mut Cx, copy| {
                 crate::actions::priority_options(cx, PlayerId(0)).iter().any(|o| o.kind == ActionKind::CastSpell && o.source == Some(copy))
             };
             let old_copy = cx.s().zone(Zone::exile(PlayerId(0)))[0];
             let other_copy = cx.s().zone(Zone::exile(PlayerId(0)))[1];
-            assert!(can_cast(&cx, old_copy) && can_cast(&cx, other_copy));
+            assert!(can_cast(&mut cx, old_copy) && can_cast(&mut cx, other_copy));
             phase_out(&mut cx, &[aviator], None, false);
             assert!(cx.s().obj(aviator).prepared && cx.s().obj(old_copy).prepared_from.is_none());
-            assert!(live(cx.s(), old_copy) && !can_cast(&cx, old_copy));
-            assert!(cx.s().obj(other_copy).prepared_from == Some(other) && can_cast(&cx, other_copy));
+            assert!(live(cx.s(), old_copy) && !can_cast(&mut cx, old_copy));
+            assert!(cx.s().obj(other_copy).prepared_from == Some(other) && can_cast(&mut cx, other_copy));
             if settle_while_phased_out {
                 crate::settle::state_based_actions_alone(&mut cx).expect("no choices");
                 assert!(!live(cx.s(), old_copy));
@@ -426,8 +426,8 @@ mod tests {
             let new_copy = *cx.s().zone(Zone::exile(PlayerId(0))).last().expect("a new prepare copy");
             assert_ne!(new_copy, old_copy);
             assert_eq!(cx.s().obj(new_copy).prepared_from, Some(aviator));
-            assert!(can_cast(&cx, new_copy));
-            assert!(!can_cast(&cx, old_copy));
+            assert!(can_cast(&mut cx, new_copy));
+            assert!(!can_cast(&mut cx, old_copy));
             crate::settle::state_based_actions_alone(&mut cx).expect("no choices");
             assert!(!live(cx.s(), old_copy));
             assert_eq!(cx.s().zone(Zone::exile(PlayerId(0))), &[other_copy, new_copy]);

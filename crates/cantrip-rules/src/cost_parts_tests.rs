@@ -278,7 +278,7 @@ fn an_activated_ability_beholds_a_permanent_once_its_mana_is_paid_and_not_withou
     let seer = put(&mut g, &SEER, Zone::BATTLEFIELD);
     add_mana(&mut g, 1);
     // Nothing to behold: not offered (CR 602.2b, 118.3).
-    assert!(!priority_options(&cx(&mut g), YOU).iter().any(|o| o.source == Some(seer)));
+    assert!(!priority_options(&mut cx(&mut g), YOU).iter().any(|o| o.source == Some(seer)));
     let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
     let r = next(&mut g);
     let option = option_of(&g, &r, seer).expect("the Seer's ability is offered");
@@ -354,7 +354,7 @@ fn a_mana_ability_returns_a_tapped_creature_chosen_once_its_own_mana_is_paid() {
     let mut g = game();
     let returner = put(&mut g, &RETURNER, Zone::BATTLEFIELD);
     // No creature at all: not offered.
-    assert!(!priority_options(&cx(&mut g), YOU).iter().any(|o| o.source == Some(returner)));
+    assert!(!priority_options(&mut cx(&mut g), YOU).iter().any(|o| o.source == Some(returner)));
     let dork = put(&mut g, &DORK, Zone::BATTLEFIELD);
     let r = next(&mut g);
     let option = option_of(&g, &r, returner).expect("the Dork could be tapped for its mana: offered");

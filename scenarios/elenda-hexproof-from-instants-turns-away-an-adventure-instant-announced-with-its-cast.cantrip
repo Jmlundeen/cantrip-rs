@@ -1,0 +1,42 @@
+# Elenda, Saint of Dusk has "hexproof from instants" (CR 702.11d). Stomp, Bonecrusher Giant's Adventure, is an instant
+# spell on the stack (CR 715.3), so Bot2 can't target Elenda with it, though the card in hand is a creature card; Stomp
+# goes at Bot1 instead (2 damage) and the Giant goes on its adventure to exile.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Ruby
+Elenda, Saint of Dusk
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Bonecrusher Giant
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Elenda, Saint of Dusk.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+! Bot2.Hand.Bonecrusher Giant.Cast(Bot1.Battlefield.Elenda, Saint of Dusk; Ability: Stomp)
+Bot2.Hand.Bonecrusher Giant.Cast(Bot1; Ability: Stomp)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 2
+Bot1.Life = 18
+Exile = Bonecrusher Giant

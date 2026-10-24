@@ -118,7 +118,7 @@ fn a_triggered_mana_ability_a_static_ability_gives_triggers() {
     let mut g = game();
     put(&mut g, &BLESSING);
     let grove = put(&mut g, &GROVE);
-    assert!(priority_options(&cx(&mut g), YOU).iter().any(|o| o.source == Some(grove)));
+    assert!(priority_options(&mut cx(&mut g), YOU).iter().any(|o| o.source == Some(grove)));
     assert_eq!(tap_for_green(&mut g, grove), 2);
 }
 

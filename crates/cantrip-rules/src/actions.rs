@@ -18,7 +18,69 @@ pub fn sorcery_timing(cx: &Cx, player: PlayerId) -> bool {
 }
 
 /// Everything `player` may do now beyond passing.
-pub fn priority_options(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
+pub fn priority_options(cx: &mut Cx, player: PlayerId) -> Vec<ActionOption> {
+    let mut options = options_offered(cx, player);
+    casts_judged_on_the_stack(cx, player, &mut options);
+    options
+}
+
+/// The casts among `options` judged as the spells they would be (CR 601.2a-c): a spell is put on the stack before its modes
+/// and targets are announced, as the face it is cast as (CR 709.3, 715.3, 712.8, 720.3) with the effects that apply to it
+/// there, and what may be targeted is judged on that spell (`ops::as_cast`). The offer judged the card where it is on
+/// everything that does not read it (`layers::can_target`); where something on the board reads the spell that would target
+/// it (`layers::targeting_readers`), each cast with targets is judged again there: its targets announced with it
+/// are those both judgements allow, and one with no legal announcement there is not offered.
+fn casts_judged_on_the_stack(cx: &mut Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
+    // Overload (CR 702.96a) has "each" for "target": nothing is targeted.
+    let judged = |o: &ActionOption, cx: &Cx| {
+        o.kind == ActionKind::CastSpell
+            && o.index != WAY_OVERLOAD
+            && o.source.is_some_and(|card| {
+                let face = cast_face(cx.card(cx.s().obj(card).card), o.index);
+                !matches!(cx.s().obj(card).zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack)
+                    && (face.modal.is_some() || !cx.cards().spell_targets_of(face).is_empty())
+            })
+    };
+    if !options.iter().any(|o| judged(o, cx)) {
+        return;
+    }
+    let Some(readers) = layers::targeting_readers(cx.cards(), cx.s(), &cx.g.log) else { return };
+    let mut kept = Vec::with_capacity(options.len());
+    for mut o in std::mem::take(options) {
+        if judged(&o, cx)
+            && let Some(card) = o.source
+        {
+            let whole = cx.card(cx.s().obj(card).card);
+            let face = cast_face(whole, o.index);
+            let face_id = (!std::ptr::eq(face, whole)).then(|| cx.card_id(face));
+            let (way, announced) = (o.index, targets_with_cast(cx.cards(), face));
+            // Targets announced with the cast, none of which anything refuses for the spell targeting it, are its own there.
+            if announced && !o.target_candidates.iter().any(|&t| readers.read_by(t)) {
+                kept.push(o);
+                continue;
+            }
+            let (legal, candidates) = ops::as_cast(cx, card, face_id, player, |cx| {
+                let mut there = ActionOption::on(ActionKind::CastSpell, card, way);
+                let legal = offer_spell(cx, &Asker::spell(card, player), face, &mut there);
+                (legal, there.target_candidates)
+            });
+            if !legal {
+                continue;
+            }
+            if announced {
+                o.target_candidates.retain(|t| candidates.contains(t));
+                if o.target_candidates.is_empty() && !o.targets_optional {
+                    continue;
+                }
+            }
+        }
+        kept.push(o);
+    }
+    *options = kept;
+}
+
+/// Everything `player` may do now beyond passing, a spell not yet cast judged where its card is (`priority_options`).
+fn options_offered(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
     let mut options = Vec::new();
     mana_ability_options(cx, player, &mut options);
     // Split second (CR 702.61a-b): with such a spell on the stack, mana abilities and special actions are all anyone may do
@@ -6930,7 +6992,7 @@ fn cast(
 
 /// Whether the resolving effect's controller could cast `card` now (CR 608.2g): it is not a land and every target it
 /// needs has a legal choice.
-pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
+pub fn could_cast_during_resolution(cx: &mut Cx, card: ObjectId) -> bool {
     !cast_ways_during_resolution(cx, card).is_empty()
 }
 
@@ -6941,7 +7003,37 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 /// back face. A fused cast (CR 702.102a: a fuse split card cast from its owner's hand, both halves at once, its mana value the
 /// sum of theirs, CR 702.102c, 709.4b) is a way too, from a hand only: the ruling has a fuse card cast from a hand without
 /// paying its mana cost cast fused.
-pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
+pub fn cast_ways_during_resolution(cx: &mut Cx, card: ObjectId) -> Vec<CastWay> {
+    let ways = cast_ways_where_it_is(cx, card);
+    let Some(player) = cx.resolving().map(|i| i.controller) else { return ways };
+    let mut kept = Vec::with_capacity(ways.len());
+    for way in ways {
+        if targets_as_cast(cx, card, way.way, player) {
+            kept.push(way);
+        }
+    }
+    kept
+}
+
+/// Whether `card` cast by `player` its way `way` could announce its modes and targets as the spell it would be on the stack
+/// (CR 601.2a-c, `ops::as_cast`), where something reads the spell that would target (`layers::targeting_readers`):
+/// judged where the card is, it was judged on everything else.
+fn targets_as_cast(cx: &mut Cx, card: ObjectId, way: u8, player: PlayerId) -> bool {
+    let whole = cx.card(cx.s().obj(card).card);
+    let face = cast_face(whole, way);
+    if way == WAY_OVERLOAD || (face.modal.is_none() && cx.cards().spell_targets_of(face).is_empty()) || layers::targeting_readers(cx.cards(), cx.s(), &cx.g.log).is_none() {
+        return true;
+    }
+    let face_id = (!std::ptr::eq(face, whole)).then(|| cx.card_id(face));
+    let asker = Asker::spell(card, player);
+    ops::as_cast(cx, card, face_id, player, |cx| match face.modal {
+        Some(modal) => modes_possible(cx, &asker, modal),
+        None => slots_satisfiable(cx, &asker, cx.cards().spell_targets_of(face)),
+    })
+}
+
+/// `cast_ways_during_resolution` judged where the card is (`layers::can_target`).
+fn cast_ways_where_it_is(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     let Some(resolving) = cx.resolving() else { return Vec::new() };
     let (player, serial) = (resolving.controller, resolving.serial);
     let obj = cx.s().obj(card);
@@ -7175,7 +7267,13 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
 
 /// Whether the resolving effect's controller could cast `card` transformed now (CR 608.2g, 712.11a): a double-faced
 /// card that is not modal (CR 712.11c-d: its back face has no mana cost of its own), judged as that back face alone.
-pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool {
+pub fn could_cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> bool {
+    let Some(player) = cx.resolving().map(|i| i.controller) else { return false };
+    could_cast_transformed_where_it_is(cx, card) && targets_as_cast(cx, card, WAY_TRANSFORMED, player)
+}
+
+/// `could_cast_transformed_during_resolution` judged where the card is (`layers::can_target`).
+fn could_cast_transformed_where_it_is(cx: &Cx, card: ObjectId) -> bool {
     let Some(player) = cx.resolving().map(|i| i.controller) else { return false };
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
@@ -10139,8 +10237,8 @@ mod tests {
 
     /// The casts `player` is offered of `card` now: each one's way number, and the permanent whose alternative cost it pays.
     fn casts(game: &mut Game, player: PlayerId, card: ObjectId) -> Vec<(u8, Option<ObjectId>)> {
-        let cx = cx(game);
-        priority_options(&cx, player)
+        let mut cx = cx(game);
+        priority_options(&mut cx, player)
             .into_iter()
             .filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card))
             .map(|o| (o.index, o.paid_by.map(|g| g.object)))

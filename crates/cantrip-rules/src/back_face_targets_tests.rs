@@ -65,7 +65,7 @@ fn cx(game: &mut Game) -> Cx<'_> {
 fn offered(artifact: bool) -> Vec<u8> {
     let (mut game, card) = game(artifact);
     let mut ways: Vec<u8> =
-        priority_options(&cx(&mut game), YOU).iter().filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).map(|o| o.index).collect();
+        priority_options(&mut cx(&mut game), YOU).iter().filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).map(|o| o.index).collect();
     ways.sort_unstable();
     ways
 }
@@ -81,8 +81,8 @@ fn during_resolution(artifact: bool) -> Vec<u8> {
     let serial = game.state.stack.last().expect("the caster").serial;
     game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
     let frame = game.state.agenda.len() - 1;
-    let resolving = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
-    let mut ways: Vec<u8> = cast_ways_during_resolution(&resolving, card).iter().map(|w| w.way).collect();
+    let mut resolving = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    let mut ways: Vec<u8> = cast_ways_during_resolution(&mut resolving, card).iter().map(|w| w.way).collect();
     ways.sort_unstable();
     ways
 }
@@ -132,7 +132,7 @@ fn offered_on_their_turn(flasher: bool) -> Vec<u8> {
         t.set_step(Step::PrecombatMain);
     });
     let mut ways: Vec<u8> =
-        priority_options(&cx(&mut game), YOU).iter().filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).map(|o| o.index).collect();
+        priority_options(&mut cx(&mut game), YOU).iter().filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).map(|o| o.index).collect();
     ways.sort_unstable();
     ways
 }
