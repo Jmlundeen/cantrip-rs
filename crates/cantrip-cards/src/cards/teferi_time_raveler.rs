@@ -21,13 +21,6 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn artifact_creature_or_enchantment(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::PERMANENT.filter)(q, asker, t) && matches!(t, Target::Object(id) if {
-        let c = q.chars(id);
-        c.is(CardType::Artifact) || c.is(CardType::Creature) || c.is(CardType::Enchantment)
-    })
-}
-
 /// -3: return up to one target artifact, creature, or enchantment to its owner's hand. Draw a card.
 fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(id) = targets::object(g, item, 0) {
@@ -41,7 +34,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Until your next turn, you may cast sorcery spells as though they had flash."),
         ability(loyalty(-3), minus_three, "\u{2212}3: Return up to one target artifact, creature, or enchantment to its owner's hand. Draw a card.")
-            .targets(&[up_to_one(artifact_creature_or_enchantment)]),
+            .targets(&[up_to_one(targets::artifact_creature_or_enchantment_filter)]),
     ],
     cast_rules: &[opponents_cast_as_sorcery],
     ..oracle::TEFERI_TIME_RAVELER

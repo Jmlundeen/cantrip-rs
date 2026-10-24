@@ -444,6 +444,14 @@ pub fn artifact_or_creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool 
 }
 /// "Target artifact or enchantment". Disenchant and Cathar Commando print it.
 pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_filter);
+/// "Target artifact, creature, or enchantment": a permanent that is any of them (CR 115.1). March of Otherworldly Light (with
+/// a mana value limit of its own) and Teferi, Time Raveler (up to one) print it.
+pub fn artifact_creature_or_enchantment_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if on_battlefield(q, id) && {
+        let c = q.chars(id);
+        c.is(CardType::Artifact) || c.is(CardType::Creature) || c.is(CardType::Enchantment)
+    })
+}
 /// "Target permanent". Alpha Deathclaw and Argentum Armor print it.
 pub const PERMANENT: TargetSpec = target(permanent_filter);
 /// "Target permanent you control". Harmless Offering and Deceiver Exarch print it.
