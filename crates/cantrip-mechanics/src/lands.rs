@@ -306,15 +306,16 @@ fn search_three_basic_types<const A: u16, const B2: u16, const C: u16>(g: &mut d
     let (a, b, c) = (word(g, item.object, A), word(g, item.object, B2), word(g, item.object, C));
     search_to_battlefield(g, item.controller, item.object, Find::ONE, true, move |q, card| {
         let chars = q.chars(card);
-        chars.is(CardType::Land) && chars.supertypes.basic && (chars.has_subtype(a) || chars.has_subtype(b) || chars.has_subtype(c))
+        is_basic_land_card(q, card) && (chars.has_subtype(a) || chars.has_subtype(b) || chars.has_subtype(c))
     })?;
     Ok(())
 }
 
 /// A landscape's ability (CR 701.23): "{T}, Sacrifice this land: Search your library for a basic [type A], [type B], or
 /// [type C] card, put it onto the battlefield tapped, then shuffle." `text` is the full text. A card that is basic (CR
-/// 205.4a) and has one of the three land types, as the land's text named them when it was sacrificed (CR 612.2, 113.7a).
-/// Contaminated Landscape and Perilous Landscape print it.
+/// 205.4a, 305.6) and has one of the three land types, as the land's text named them when it was sacrificed (CR 612.2,
+/// 113.7a). The Landscape cycle prints it: Bountiful, Contaminated, Deceptive, Foreboding, Perilous, Seething, Shattered,
+/// Sheltering, Tranquil and Twisted Landscape.
 pub const fn fetch_three_basic_types<const A: u16, const B2: u16, const C: u16>(text: &'static str) -> AbilityDef {
     ability(TAP.and(SACRIFICE_THIS), search_three_basic_types::<A, B2, C>, text)
 }
