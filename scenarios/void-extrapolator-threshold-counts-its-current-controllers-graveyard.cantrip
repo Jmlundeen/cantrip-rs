@@ -1,0 +1,66 @@
+# Threshold counts the graveyard of the ability's current controller, not the owner's (CR 109.5, 207.2c).
+# Bot1's Void Extrapolator is 3/3 with seven cards in Bot1's graveyard; Act of Treason gives it to Bot2,
+# whose graveyard holds one card, so it is 2/2 until it returns.
+[Bot1 Deck]
+Void Extrapolator
+Swamp
+Island
+Thought Scour
+Opt
+Ghost Vacuum
+Island
+Swamp
+Mountain
+Forest
+Plains
+Mountain
+Forest
+Plains
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Act of Treason
+Mountain
+Swamp x23
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Void Extrapolator.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Exile.Omit Variables.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+[T5 Bot1.End]
+? Bot1.Graveyard.Count = 7
+? Bot1.Battlefield.Void Extrapolator.Power = 3
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Void Extrapolator)
+[T6 Bot2.Main2]
+? Bot2.Graveyard.Count = 1
+? Bot1.Graveyard.Count = 7
+? Bot2.Battlefield.Void Extrapolator.Power = 2
+? Bot2.Battlefield.Void Extrapolator.Toughness = 2
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Void Extrapolator.Power = 3
+
+[Expect]
+Bot1.Battlefield.Void Extrapolator.Power = 3
