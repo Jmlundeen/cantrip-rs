@@ -146,6 +146,30 @@ pub fn search_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, sour
     Ok(())
 }
 
+/// "Each of these players searches their library for up to N basic land cards, puts them onto the battlefield [tapped], then
+/// shuffles", done by the players together (CR 101.4, 701.23i): `searchers` are the players and how many basic lands each
+/// looks for, asked in turn order starting with the active player; every land found enters in one event, and only then does
+/// each player shuffle. A player who has left the game by their turn to choose does not search (CR 800.4a). Winds of Abandon
+/// (the players who lost creatures) and Field of Ruin (each player) print it.
+pub fn each_searches_basic_lands_together(g: &mut dyn Game, searchers: &[(PlayerId, u32)], source: ObjectId, tapped: bool) -> Result<(), Suspend> {
+    let order: Vec<PlayerId> = g.state().apnap().filter(|p| searchers.iter().any(|&(s, _)| s == *p)).collect();
+    let destination = if tapped { SearchDestination::BattlefieldTapped } else { SearchDestination::Battlefield };
+    let mut lands: Vec<(ObjectId, PlayerId, bool)> = Vec::new();
+    for &player in &order {
+        if !crate::players::reached(g, player) {
+            continue;
+        }
+        let count: u32 = searchers.iter().filter(|&&(s, _)| s == player).map(|&(_, n)| n).sum();
+        let found = crate::library::search(g, player, player, source, destination, select::basic_land_cards(select::up_to(count)))?;
+        lands.extend(found.into_iter().map(|land| (land, player, tapped)));
+    }
+    g.put_all_onto_battlefield_as(&lands)?;
+    for &player in &order {
+        g.shuffle(player);
+    }
+    Ok(())
+}
+
 /// `search_basic_land_to_battlefield`, giving the land that arrived (none if the player found none) for an ability that goes
 /// on to do something to it: Elven Passage's "untap that land".
 pub fn fetch_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, source: ObjectId, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{overload, search_library, targets};
+use cantrip_mechanics::{lands, overload, targets};
 use cantrip_oracle as oracle;
 
 /// Exile target creature you don't control. For each creature exiled this way, its controller searches their library
@@ -12,23 +12,14 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let controllers: Vec<PlayerId> = creatures.iter().map(|&c| g.controller(c)).collect();
     g.exile_all(&creatures);
 
-    let order: Vec<PlayerId> = g.state().apnap().filter(|p| controllers.contains(p)).collect();
-    let mut lands: Vec<(ObjectId, PlayerId, bool)> = Vec::new();
-    for &player in &order {
-        if !cantrip_mechanics::players::reached(g, player) {
-            continue;
+    let mut searchers: Vec<(PlayerId, u32)> = Vec::new();
+    for &player in &controllers {
+        match searchers.iter_mut().find(|(p, _)| *p == player) {
+            Some((_, n)) => *n += 1,
+            None => searchers.push((player, 1)),
         }
-        let count = u32::try_from(controllers.iter().filter(|&&p| p == player).count()).unwrap_or(u32::MAX);
-        let found = search_library(g, player, player, item.object, SearchDestination::BattlefieldTapped, count, true, |q, c| {
-            let chars = q.chars(c);
-            chars.is(CardType::Land) && chars.supertypes.basic
-        })?;
-        lands.extend(found.into_iter().map(|land| (land, player, true)));
     }
-    g.put_all_onto_battlefield_as(&lands)?;
-    for &player in &order {
-        g.shuffle(player);
-    }
+    lands::each_searches_basic_lands_together(g, &searchers, item.object, true)?;
     Ok(())
 }
 
