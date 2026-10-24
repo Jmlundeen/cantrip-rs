@@ -1,10 +1,11 @@
-# Tranquil Landscape: cycle the second copy for its exact printed cost, using one matching land source for each colored symbol; then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
+# Tranquil Landscape: cycle the second copy for its exact printed cost, paid with a Forest, a Plains and an Island while a Mountain is tapped as well, so that the {R} left over shows each colored symbol took its own color (a {3} or {1}{W}{U} cost would leave something else); then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
 
 [Bot1 Deck]
 Tranquil Landscape x2
 Forest
 Plains
 Island
+Mountain
 Plains x6
 Island x6
 Forest x6
@@ -22,18 +23,22 @@ Bot1.Hand.Forest.Play
 Bot1.Hand.Plains.Play
 [T7 Bot1.Main1]
 Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
 Bot1.Hand.Tranquil Landscape.Activate(Ability: Cycling)
+Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Island.Activate
-? Bot1.Mana =
+? Bot1.Mana = {R}
 Bot1.Pass
 Bot2.Pass
-[T9 Bot1.Main1]
+[T11 Bot1.Main1]
 Bot1.Battlefield.Tranquil Landscape.Activate(Ability: {T}: Add {C})
 ? Bot1.Mana = {C}
 
 [Expect]
-Turn = 9
+Turn = 11
 Bot1.Graveyard = Tranquil Landscape
+Bot1.Hand = Island; Plains; Plains; Plains; Plains; Plains; Plains
 Bot1.Battlefield.Tranquil Landscape.Tapped = true
