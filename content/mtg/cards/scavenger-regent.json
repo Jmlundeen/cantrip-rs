@@ -1,0 +1,17 @@
+{
+  "name": "Scavenger Regent",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Dragon",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying\nWard—Discard a card.",
+  "keywords": [
+    "Flying"
+  ],
+  "omen": {
+    "name": "Exude Toxin",
+    "manaCost": "{X}{B}{B}",
+    "type": "Sorcery — Omen",
+    "oracleText": "Each non-Dragon creature gets -X/-X until end of turn. (Then shuffle this card into its owner's library.)"
+  }
+}
