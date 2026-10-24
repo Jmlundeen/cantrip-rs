@@ -71,6 +71,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-129](#ki-129-a-cost-holds-at-most-six-discard-instructions) | A cost holds at most six discard instructions | Pri-3 | Won't fix: beyond practical scale |
 | [KI-130](#ki-130-an-unless-pays-prompts-remaining-hint-lists-a-phyrexian-symbol-under-its-color-when-any-color-may-pay-it) | An "unless pays" prompt's remaining hint lists a Phyrexian symbol under its color when any color may pay it | Pri-2 | Open |
 | [KI-131](#ki-131-harmonizes-tap-a-creature-caption-says-up-to-or-an-exact-amount-a-little-off-in-rare-costs) | Harmonize's tap-a-creature caption says "up to", or an exact amount, a little off in rare costs | Pri-2 | Open |
+| [KI-132](#ki-132-an-absent-expectation-on-a-key-the-dump-never-writes-always-holds) | An `(absent)` expectation on a key the dump never writes always holds | Pri-3 | Open |
 
 ## Issues
 
@@ -448,6 +449,23 @@ reduction or a `VariableCost::SacrificeAnyNumber { less_each }`. No printed harm
 false, only less precise.
 
 **Scenarios.** None: display. `HarmonizeTests` covers the X case.
+
+### KI-132: An `(absent)` expectation on a key the dump never writes always holds
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Open | harness | 2026-10-24, PR reviews (#566 onward) |
+
+**Notes.** `Dump::mismatches` (`crates/cantrip-script/src/dump.rs`) passes `Key = (absent)` whenever the key is missing
+and its owner (`Bot1.Battlefield.X`) is in the dump. A key the dump never writes at all is therefore always "absent":
+`Bot1.Battlefield.X.Counters = (absent)` holds whatever counters X has, because the dump writes only
+`X.Counters.<Kind>`. Such an expectation can never fail. A fix refuses `(absent)` on a key that is not one the dump can
+write (a parent such as `.Counters`, or a misspelling), as a key with a value already is ("not a key the dump has").
+
+**Scenarios.** These use the vacuous form and need their expectation rewritten once the harness refuses it:
+- [`scenarios/darksteel-angel-keeps-minus-counters-off-its-controllers-creature.cantrip`](../scenarios/darksteel-angel-keeps-minus-counters-off-its-controllers-creature.cantrip)
+- [`scenarios/dispelling-exhale-beholding-a-dragon-and-an-opponent-who-pays-the-four-keeps-the-bolt.cantrip`](../scenarios/dispelling-exhale-beholding-a-dragon-and-an-opponent-who-pays-the-four-keeps-the-bolt.cantrip)
+- [`scenarios/dispelling-exhale-beholding-a-dragon-permanent-asks-four-and-the-bolt-is-countered.cantrip`](../scenarios/dispelling-exhale-beholding-a-dragon-permanent-asks-four-and-the-bolt-is-countered.cantrip)
 
 ### KI-128: The non-tactical bots drop an attack whose Phyrexian cost only life could pay
 
