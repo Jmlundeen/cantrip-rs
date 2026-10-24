@@ -422,10 +422,11 @@ pub fn look_at_top(
 /// shows what it has, CR 609.3) and chooses among those `wanted` says qualify, read where they are (an {X} in the
 /// library is 0, CR 202.3e); with `total`, the cards chosen together have mana values adding up to at most it
 /// (`choose::cards_within_total`), without it each card is judged alone. The cards chosen enter the battlefield at
-/// once, under the player's control (CR 110.2a), and the others still in the library go to the bottom, as `rest` says.
+/// once, under the player's control (CR 110.2a), `tapped` or not, and the others still in the library go to the bottom, as `rest` says.
 /// With nothing qualifying nobody is asked. The permanents that arrived are returned. Aang, at the Crossroads ("you may
 /// put a creature card with mana value 4 or less", one), United Battlefront and Storm the Festival (up to two), and
-/// Michelangelo's Technique (up to two, total mana value 6 or less) print it with a random order; Collected Company (up
+/// Michelangelo's Technique (up to two, total mana value 6 or less) print it with a random order, untapped; Kaslem's
+/// Stonetree, Silverback Elder, Elvish Rejuvenator, Ignis Scientia and Freestrider Lookout (one land card, `tapped`) too; Collected Company (up
 /// to two) and Mayael the Anima (one) with the player's.
 pub fn look_at_top_onto_battlefield(
     g: &mut dyn Game,
@@ -436,6 +437,7 @@ pub fn look_at_top_onto_battlefield(
     kind: &'static str,
     wanted: impl Fn(&dyn Query, ObjectId) -> bool,
     total: Option<u32>,
+    tapped: bool,
     rest: Rest,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let looked = top_of_library(g, player, count);
@@ -451,8 +453,8 @@ pub fn look_at_top_onto_battlefield(
     let arrived = if chosen.is_empty() {
         Vec::new()
     } else {
-        let entering: Vec<(ObjectId, PlayerId)> = chosen.into_iter().map(|c| (c, player)).collect();
-        g.put_all_onto_battlefield(&entering)?
+        let entering: Vec<(ObjectId, PlayerId, bool)> = chosen.into_iter().map(|c| (c, player, tapped)).collect();
+        g.put_all_onto_battlefield_as(&entering)?
     };
     match rest {
         Rest::BottomRandom => rest_to_bottom_in_random_order(g, player, &looked),

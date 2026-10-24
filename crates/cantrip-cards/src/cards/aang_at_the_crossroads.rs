@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// others still in the library go to the bottom in a random order (CR 401.4).
 fn look_for_a_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creature = |q: &dyn Query, c: ObjectId| q.chars(c).is(CardType::Creature) && q.mana_value(c) <= 4;
-    library::look_at_top_onto_battlefield(g, item.controller, item.object, 5, 1, "creature", creature, None, library::Rest::BottomRandom)?;
+    library::look_at_top_onto_battlefield(g, item.controller, item.object, 5, 1, "creature", creature, None, false, library::Rest::BottomRandom)?;
     Ok(())
 }
 

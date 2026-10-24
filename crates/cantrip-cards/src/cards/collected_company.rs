@@ -12,7 +12,7 @@ fn eligible(q: &dyn Query, card: ObjectId) -> bool {
 /// the battlefield. Put the rest on the bottom of your library in any order." They enter under your control (CR 110.2a); the rest
 /// go to the bottom in the order you choose (CR 401.4); a library of fewer than six shows what it has (CR 609.3).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::look_at_top_onto_battlefield(g, item.controller, item.object, 6, 2, "creature with mana value 3 or less", eligible, None, library::Rest::BottomChosen)?;
+    library::look_at_top_onto_battlefield(g, item.controller, item.object, 6, 2, "creature with mana value 3 or less", eligible, None, false, library::Rest::BottomChosen)?;
     Ok(())
 }
 
