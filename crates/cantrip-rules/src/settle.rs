@@ -628,11 +628,13 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         // A modal ability's modes are chosen as it is put on the stack (CR 603.3c, 700.2), then each chosen mode's
         // target, in printed order. A mode whose required target has no candidate cannot be chosen (CR 700.2a), and with
         // too few left the ability is removed. As many eligible modes as it chooses is no choice, and is not asked.
+        // "Choose up to that many" (`ModalDef::COUNTED`, CR 603.12a): as many as the ability's count, read now.
+        let most = modal.most(trigger_counted(cx, &trigger));
         let eligible = crate::actions::eligible_modes(cx, &asker, modal);
-        if eligible.len() < modal.min.max(1) as usize {
+        if eligible.len() < modal.min.max(1) as usize || most == 0 {
             return Ok(());
         }
-        let chosen = if modal.max == modal.min && eligible.len() == modal.min as usize {
+        let chosen = if most == modal.min && eligible.len() == modal.min as usize {
             eligible
         } else {
             if left_the_game(cx, trigger.controller) {
@@ -643,7 +645,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
                 modes: (0..modal.modes.len() as u8).map(|i| Label::Mode(trigger.ability, i)).collect(),
                 eligible: eligible.clone(),
                 count: modal.min,
-                at_most: if modal.max > modal.min { modal.max } else { 0 },
+                at_most: if most > modal.min { most } else { 0 },
                 affordable: Vec::new(),
                 additional_cost: false,
                 repeat: modal.repeat,

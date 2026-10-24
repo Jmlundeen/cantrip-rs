@@ -1512,6 +1512,18 @@ pub struct ModalDef {
 }
 
 impl ModalDef {
+    /// A `max` of this is "choose up to that many" (CR 603.12a, 700.2b): a triggered ability's most modes is its count, read
+    /// as it is put on the stack - what a reflexive ability was given (`Game::reflexive_trigger_counted`; Tranquil Frillback,
+    /// Hawkeye, Master Marksman) - as a `TargetSpec::COUNTED` slot reads it (`most`). Only a triggered ability has a count to
+    /// read: a spell or an activated ability can't be given this (`modal_ability`, `AbilityDef::modal`).
+    pub const COUNTED: u8 = u8::MAX;
+
+    /// The most modes it may choose, with `counted` the count a `COUNTED` maximum reads. More than it has modes only
+    /// matters for a modal that repeats; a count past a byte allows 255, more choices than any mask holds (`COUNT_BITS`).
+    pub fn most(&self, counted: u16) -> u8 {
+        if self.max == Self::COUNTED { u8::try_from(counted).unwrap_or(u8::MAX) } else { self.max }
+    }
+
     /// How many bits a mode's count takes in a `StackItem::modes` mask, for a modal that repeats: counts up to 15, past the
     /// five the Seasons choose of one mode (CR 700.2d), for up to eight modes.
     const COUNT_BITS: usize = 4;
@@ -3507,6 +3519,19 @@ impl CardTable {
             &card.delayed[(ability.index - AbilityRef::DELAYED) as usize]
         } else {
             &card.abilities[ability.index as usize]
+        }
+    }
+
+    /// The modes of the modal spell or ability a mode label names (`Label::Mode`): `u8::MAX` for the card's spell, or one of
+    /// its abilities - a delayed or reflexive one among them (`AbilityRef::delayed`, CR 603.7, 603.12).
+    pub fn modal_of(&self, ability: AbilityRef) -> Option<&'static ModalDef> {
+        if ability.index == u8::MAX {
+            return self.get(ability.card).modal;
+        }
+        match self.ability(ability) {
+            AbilityDef::Activated(a) => a.modal,
+            AbilityDef::Triggered(t) => t.modal,
+            AbilityDef::Static(_) => None,
         }
     }
 

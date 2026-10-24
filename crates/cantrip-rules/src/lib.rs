@@ -38,6 +38,8 @@ mod copy_spell_tests;
 #[cfg(test)]
 mod cost_parts_tests;
 #[cfg(test)]
+mod pay_times_tests;
+#[cfg(test)]
 mod mode_counts_tests;
 #[cfg(test)]
 mod special_action_cost_tests;
@@ -2004,6 +2006,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn may_pay_x(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: Cost, question: &'static Question) -> Result<Option<u16>, Suspend> {
         actions::may_pay_x(self, payer, source, subject, &cost, question).map_err(|_| Suspend)
+    }
+
+    fn may_pay_times(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u16, question: &'static Question) -> Result<u16, Suspend> {
+        actions::may_pay_times(self, payer, source, subject, mana, most, question).map_err(|_| Suspend)
     }
 
     fn could_cast_during_resolution(&self, card: ObjectId) -> bool {

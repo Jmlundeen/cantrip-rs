@@ -160,6 +160,10 @@ pub const PAY_CONVOKE: u8 = 2;
 /// Waterbend (CR 701.67a): an untapped artifact or creature tapped pays {1}.
 pub const PAY_WATERBEND: u8 = 3;
 
+/// The `most` of a cost a player "may pay any number of times" as an effect resolves (`RequestKind::UnlessPays::times`,
+/// `Game::may_pay_times`): no number but what the cost's shape holds (`ManaCost::times`).
+pub const ANY_NUMBER_OF_TIMES: u16 = u16::MAX;
+
 /// One thing a player could do: an option of a priority, payment or "unless" question, as a prototype the answer
 /// fills in (targets, a color).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -344,6 +348,11 @@ pub enum RequestKind {
     /// "{X}" and the payer chooses X as they pay it ("you may pay {X}", CR 107.3f): `total` is then the cost at that X (its
     /// {X} as that much generic mana), `IncreaseX` and
     /// `DecreaseX` among the options change it, and paying pays that X. `None` for a cost with no X.
+    ///
+    /// `times` is `Some(most)` for a cost the payer "may pay up to [most] times" or "any number of times"
+    /// (`ANY_NUMBER_OF_TIMES`), as one payment whose number is chosen as it is paid (CR 603.12a): `x` is then the number of
+    /// times so far, from 1 (declining is paying it no times), `total` the cost that many times over, and `IncreaseX` and
+    /// `DecreaseX` change the number within 1 to `most`.
     UnlessPays {
         source: ObjectId,
         subject: ObjectId,
@@ -354,6 +363,7 @@ pub enum RequestKind {
         question: &'static Question,
         options: Vec<ActionOption>,
         x: Option<u16>,
+        times: Option<u16>,
     },
     /// Choose cards from among `cards`, every one of which the player sees: which sets of them are an answer is `rule`'s to
     /// say (`Selection`; the core checks every answer with it), and what may be chosen next as the player picks is asked of

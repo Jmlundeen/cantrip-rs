@@ -261,6 +261,7 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
 | may | `May { purpose }` | `Accept` / `Decline` |
 | a payment ("you may pay", "unless pays") | `g.may_pay(...)` asks it (`UnlessPays`) | `PayCost` (`Accept` for one of life alone) / `Decline` |
 | "you may pay {X}", X the payer's (CR 107.3f) | `g.may_pay_x(...)` asks it (`UnlessPays` with `x`), the X paid or `None` | `PayCost(X: 3)` / `Decline` |
+| "you may pay {G} up to three times", "any number of times" (CR 603.12a) | `g.may_pay_times(.., mana, most, ..)` asks it as one payment (`UnlessPays` with `times`), the number of times paid or 0; "when you pay this cost one or more times" is `reflexive_trigger_counted` with it, and "choose up to that many" `modes(..).up_to_that_many()` on a `modal_delayed_trigger` | `PayCost(Times: 2)` / `Decline` |
 | distribute cards | `DistributeCards { cards, destinations, may_shuffle }` | `Arrange(... \| ...)` |
 | search a library | `SearchLibrary { library, rule, destination }` (use `library::search` or a `find_to_*` wrapper with a rule from `select`, which names where the cards found go: the question says it; a search the effect can't cause, `Game::may_search`, finds nothing) | `Search(...)` |
 | "you may search" | `library::ask_may_search(..)`, never `ask_may`: not asked when the search can't be made (CR 101.2), and the search and its shuffle run only on a yes | `Accept` / `Decline` |

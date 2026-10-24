@@ -2167,6 +2167,19 @@ public sealed class UnlessPaysPromptMessage : PromptPayload
     [Key(18)]
     public int X { get; set; }
 
+    /// <summary>
+    /// "You may pay {G} up to three times", "any number of times" (CR 603.12a), as Tranquil Frillback's: the number of times is
+    /// chosen as it is paid. <see cref="X"/> is the number so far (from 1), <see cref="Total"/> the cost that many times over;
+    /// IncreaseX and DecreaseX among the <see cref="Options"/> change it within 1 to <see cref="MostTimes"/>, and paying pays
+    /// it that many times.
+    /// </summary>
+    [Key(19)]
+    public bool ChoosingTimes { get; set; }
+
+    /// <summary>The most times it may be paid, when <see cref="ChoosingTimes"/>; 0 for any number of times.</summary>
+    [Key(20)]
+    public int MostTimes { get; set; }
+
     /// <summary>The whole cost in words: "{W}{B} and 2 life", "{3}", "2 life".</summary>
     public string CostText()
     {

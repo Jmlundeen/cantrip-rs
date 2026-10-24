@@ -398,6 +398,29 @@ impl ManaCost {
         sum
     }
 
+    /// The cost paid `n` times over, each symbol `n` times (CR 603.12a: "you may pay {G} up to three times" is {G}{G} paid
+    /// twice). `None` when the result does not fit the cost's shape: a symbol count past a byte, or more hybrid symbols
+    /// than its slots hold. Never a smaller cost than `n` payments.
+    pub fn times(&self, n: u16) -> Option<ManaCost> {
+        let mul = |k: u8| u8::try_from(u32::from(k) * u32::from(n)).ok();
+        let mut out = ManaCost { generic: mul(self.generic)?, x: mul(self.x)?, hybrid: [None; 6], ..*self };
+        for i in 0..6 {
+            out.symbols[i] = mul(self.symbols[i])?;
+        }
+        for i in 0..5 {
+            out.phyrexian[i] = mul(self.phyrexian[i])?;
+            out.twobrid[i] = mul(self.twobrid[i])?;
+        }
+        let mut slot = 0;
+        for _ in 0..n {
+            for pair in self.hybrid.iter().flatten() {
+                *out.hybrid.get_mut(slot)? = Some(*pair);
+                slot += 1;
+            }
+        }
+        Some(out)
+    }
+
     pub fn colors(&self) -> ColorSet {
         let mut set = ColorSet::NONE;
         for color in Color::ALL {
@@ -1468,6 +1491,22 @@ impl AbilityRef {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A cost paid `n` times over (CR 603.12a): each symbol `n` times, none past what the cost's shape holds.
+    #[test]
+    fn a_mana_cost_times_n_holds_each_symbol_n_times_or_nothing() {
+        let mut one = ManaCost { generic: 1, ..ManaCost::ZERO };
+        one.symbols[Mana::G as usize] = 1;
+        one.hybrid[0] = Some((Mana::W, Mana::U));
+        let three = one.times(3).expect("fits");
+        assert_eq!((three.generic, three.symbols[Mana::G as usize], three.hybrid.iter().flatten().count()), (3, 3, 3));
+        assert_eq!(three.mana_value(), 9);
+        assert_eq!(one.times(0).expect("fits").mana_value(), 0);
+        assert!(one.times(7).is_none(), "seven hybrid symbols don't fit six slots");
+        let g = ManaCost { symbols: [0, 0, 0, 0, 1, 0], ..ManaCost::ZERO };
+        assert_eq!(g.times(255).map(|c| c.symbols[Mana::G as usize]), Some(255));
+        assert!(g.times(256).is_none(), "past a byte");
+    }
 
     /// CR 613.7, 613.8a(b): text changes chain whichever order they came in; a loop of two changes of one word applies the
     /// earlier.

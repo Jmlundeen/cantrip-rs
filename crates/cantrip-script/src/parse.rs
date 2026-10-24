@@ -358,7 +358,7 @@ pub struct ScriptArgument {
 impl ScriptArgument {
     /// The keys recognised before a colon. Anything else is a name, so "Circle of Protection:
     /// Red" stays whole.
-    const KEYS: [&'static str; 13] = ["X", "Kicked", "Color", "Colors", "Ability", "Target", "Attacker", "Sacrifice", "Tap", "Spend", "Convoke", "Delve", "Count"];
+    const KEYS: [&'static str; 14] = ["X", "Kicked", "Times", "Color", "Colors", "Ability", "Target", "Attacker", "Sacrifice", "Tap", "Spend", "Convoke", "Delve", "Count"];
 
     pub fn split(raw: &str) -> Vec<ScriptArgument> {
         let mut arguments = Vec::new();

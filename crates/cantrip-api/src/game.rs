@@ -914,6 +914,12 @@ pub trait Game: Query {
     /// "when you do" asks whether it was paid (CR 603.12), and a reflexive ability that reads X is given it
     /// (`reflexive_trigger_counted`).
     fn may_pay_x(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: crate::card::Cost, question: &'static Question) -> Result<Option<u16>, Suspend>;
+    /// "You may pay [mana] up to `most` times" (`ANY_NUMBER_OF_TIMES`: "any number of times") as the effect resolves (CR
+    /// 118.12, 608.2d): one payment whose number the payer chooses as they pay it, from 1 up to `most`, in one question that
+    /// raises and lowers it and makes mana, and pays `mana` that many times over. How many times it was paid, 0 when the
+    /// payer declined: "when you pay this cost one or more times" (CR 603.12a) triggers once for any number above 0, and
+    /// is given it (`reflexive_trigger_counted`): "that many".
+    fn may_pay_times(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u16, question: &'static Question) -> Result<u16, Suspend>;
     /// Whether `card` could be cast now by the ability's controller as an effect resolves (CR 608.2g), from where it
     /// is: it is not a land and has a legal target for every target it needs. The mana is not asked: a player who
     /// finds they cannot pay gives the cast up (CR 733.1).

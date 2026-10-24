@@ -876,7 +876,13 @@ and a choice given up is undone and the payer asked again. The parts only a spel
 craft's materials, a granted ability's "sacrifice the permanent that gives it") are never paid. The whole is paid together,
 and "if they do" asks whether they paid (CR 118.12). "You may pay {X}" where the text leaves X to the payer (CR 107.3f) is `Game::may_pay_x`
 (`actions::may_pay_x`): the same question with its `x`, raised and lowered (`IncreaseX`, `DecreaseX`) while mana is made, any
-X from 0 up, and the X paid is what it returns, for "when you do" to carry (Fire Lord Sozin). Not built, because no card in content has one: exchanges of life totals, costs
+X from 0 up, and the X paid is what it returns, for "when you do" to carry (Fire Lord Sozin). "You may pay {G} up to three
+times" and "any number of times" are `Game::may_pay_times` (`actions::may_pay_times`): the same question with its `times`, the
+number raised and lowered from 1 to the most (`ANY_NUMBER_OF_TIMES`: what the mana cost's shape holds, `ManaCost::times`) and
+the mana that many times over paid at once, its number returned. "When you pay this cost one or more times" triggers once
+for any number above 0 (CR 603.12a), given that number (`reflexive_trigger_counted`), and a modal reflexive ability's "choose up
+to that many" is `ModalDef::up_to_that_many` (`max` `ModalDef::COUNTED`), its most modes read from that count as it is put on
+the stack (`settle::put_trigger`, CR 603.3c, 700.2b) - Tranquil Frillback, Hawkeye, Master Marksman. Not built, because no card in content has one: exchanges of life totals, costs
 that gain life, and an effect a spell or ability makes that a player can't lose life (CR 119.8: "can't lose life this turn").
 
 "Damage can't be prevented" (CR 615.12) is asked by `ops::damage_can_be_prevented` before any prevention: a turn an effect said

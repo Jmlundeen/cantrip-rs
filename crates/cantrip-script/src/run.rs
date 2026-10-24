@@ -592,12 +592,27 @@ impl<'s> Run<'s> {
             }
 
             // `Bot1.PayCost(X: 3)`: "you may pay {X}" with X chosen as it is paid (CR 107.3f) raises or lowers X to what the line
-            // says, one step at a time, and then pays it as `PayCost` does.
+            // says, one step at a time, and then pays it as `PayCost` does. `Bot1.PayCost(Times: 2)` does the same for a cost
+            // paid up to a number of times (CR 603.12a), and each says which of the two the question must be.
+            if let Some(ScriptStep::Action(step)) = self.current()
+                && step.verb == ScriptVerb::PayCost
+                && request.player == player_of(step.bot)
+                && let RequestKind::UnlessPays { x: Some(_), times, .. } = &request.kind
+                && (x_of(step)?.is_some() || times_of(step)?.is_some())
+            {
+                let (line, text) = (step.line, step.text.clone());
+                if step.named("Times").is_some() != times.is_some() {
+                    return fail(format!(
+                        "line {line}: {text}: the question chooses {}",
+                        if times.is_some() { "how many times the cost is paid, `Times:`" } else { "X, `X:`" }
+                    ));
+                }
+            }
             if let Some(ScriptStep::Action(step)) = self.current()
                 && step.verb == ScriptVerb::PayCost
                 && request.player == player_of(step.bot)
                 && let RequestKind::UnlessPays { options, x: Some(x), .. } = &request.kind
-                && let Some(wanted) = x_of(step)?
+                && let Some(wanted) = x_of(step)?.or(times_of(step)?)
                 && wanted != *x
             {
                 let (line, text) = (step.line, step.text.clone());
@@ -609,6 +624,22 @@ impl<'s> Run<'s> {
                     }
                     None => return fail(format!("line {line}: {text}: X cannot be chosen as {wanted} (it stops at {x})")),
                 }
+                continue;
+            }
+
+            // `! Bot1.PayCost(Times: 4)`: at the player's next question to pay a cost up to a number of times (CR 603.12a), that
+            // number can't be chosen - it is past the most the question allows.
+            if let Some(ScriptStep::Refused { action, line, text }) = self.current()
+                && matches!(action.verb, ScriptVerb::PayCost)
+                && request.player == player_of(action.bot)
+                && let RequestKind::UnlessPays { times, .. } = &request.kind
+                && let Some(wanted) = times_of(action)?
+            {
+                let Some(most) = times else { return fail(format!("line {line}: {text}: the question is not of a number of times")) };
+                if wanted >= 1 && wanted <= *most {
+                    return fail(format!("line {line} says {text} must not be allowed, but the cost may be paid up to {most} times"));
+                }
+                self.next();
                 continue;
             }
 
@@ -2295,6 +2326,17 @@ impl<'s> Run<'s> {
 }
 
 /// The X or kicker count a line names (`X: 3`, `Kicked: 2`).
+/// The number of times a line pays a cost it may pay up to a number of times (`PayCost(Times: 2)`, CR 603.12a).
+fn times_of(step: &ActionStep) -> R<Option<u16>> {
+    match step.named("Times") {
+        None => Ok(None),
+        Some(text) => match text.trim().parse::<u16>() {
+            Ok(n) => Ok(Some(n)),
+            Err(_) => fail(format!("line {}: {text} is not a number", step.line)),
+        },
+    }
+}
+
 fn x_of(step: &ActionStep) -> R<Option<u16>> {
     match step.named("X").or_else(|| step.named("Kicked")) {
         None => Ok(None),

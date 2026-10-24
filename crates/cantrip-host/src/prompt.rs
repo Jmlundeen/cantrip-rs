@@ -528,16 +528,7 @@ fn may_verb(purpose: Purpose) -> (String, i32) {
 /// The modal spell or ability whose modes `modes` are the labels of.
 fn modal_of(game: &Game, modes: &[Label]) -> Option<&'static ModalDef> {
     let Some(Label::Mode(ability, _)) = modes.first() else { return None };
-    let def = game.cards.get(ability.card);
-    if ability.index == u8::MAX {
-        def.modal
-    } else {
-        match def.abilities.get(ability.index as usize) {
-            Some(AbilityDef::Activated(a)) => a.modal,
-            Some(AbilityDef::Triggered(t)) => t.modal,
-            _ => None,
-        }
-    }
+    game.cards.modal_of(*ability)
 }
 
 /// What a choice of modes says beyond its heading, and whether choosing more of them than the fewest costs something: a
@@ -788,7 +779,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
+        RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x, times } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
             player,
             source: source_handle(game, handles, *source),
             subject: source_handle(game, handles, *subject),
@@ -807,8 +798,14 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             yes: question.yes.into(),
             no: question.no.into(),
             // "You may pay {X}" (CR 107.3f): X is chosen as it is paid, raised and lowered by the options.
-            choosing_x: x.is_some(),
+            choosing_x: x.is_some() && times.is_none(),
             x: x.map_or(0, i32::from),
+            // "You may pay [cost] up to N times" (CR 603.12a): the number of times is chosen as it is paid.
+            choosing_times: times.is_some(),
+            most_times: match times {
+                Some(cantrip_engine::ANY_NUMBER_OF_TIMES) | None => 0,
+                Some(most) => i32::from(*most),
+            },
         }),
         RequestKind::ChooseCards { source, purpose, cards, rule } => {
             let kind = &rule.kind;

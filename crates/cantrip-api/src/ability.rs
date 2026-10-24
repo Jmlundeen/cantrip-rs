@@ -329,6 +329,7 @@ pub const fn state_triggered(state: TriggerCondition, effect: Effect, text: &'st
 
 /// A modal activated ability (CR 700.2): pay `cost`, choose among `modes` as it is activated (CR 602.2b).
 pub const fn modal_ability(cost: Cost, modes: &'static ModalDef, text: &'static str) -> AbilityDef {
+    assert!(modes.max != ModalDef::COUNTED, "an activated ability has no count for \"that many\" modes");
     AbilityDef::Activated(ActivatedDef {
         text,
         cost,
@@ -356,6 +357,13 @@ pub const fn paid_as_it_attacks(option: AttackOption, effect: Effect, text: &'st
 /// triggers (`Game::delayed_trigger`), and `effect` is what it does then.
 pub const fn delayed_trigger(effect: Effect, text: &'static str) -> AbilityDef {
     AbilityDef::Triggered(TriggeredDef { text, effect, ..TriggeredDef::BLANK })
+}
+
+/// A modal delayed or reflexive triggered ability (CR 603.7, 603.12, 700.2): "when you do, choose one -" (Caesar, Legion's
+/// Emperor; Gorbag of Minas Morgul), "choose up to that many -" (Tranquil Frillback, `ModalDef::up_to_that_many`). Its
+/// modes and their targets are chosen as it is put on the stack (CR 603.3c).
+pub const fn modal_delayed_trigger(modes: &'static ModalDef, text: &'static str) -> AbilityDef {
+    AbilityDef::Triggered(TriggeredDef { text, modal: Some(modes), ..TriggeredDef::BLANK })
 }
 
 /// A Saga's chapter ability (CR 714.2): it triggers when lore counters on its Saga reach `n`, and the core owns that
@@ -557,6 +565,7 @@ impl AbilityDef {
     /// Its modes (CR 700.2): chosen on activation, or as the triggered ability is put on the stack.
     pub const fn modal(self, modal: &'static ModalDef) -> AbilityDef {
         match self {
+            AbilityDef::Activated(_) if modal.max == ModalDef::COUNTED => panic!("an activated ability has no count for \"that many\" modes"),
             AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { modal: Some(modal), ..d }),
             AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { modal: Some(modal), ..t }),
             AbilityDef::Static(_) => panic!("a static ability has no modes"),
@@ -754,6 +763,13 @@ impl ModalDef {
     /// "Choose one or both", "choose one or more": between `min` and `max` modes.
     pub const fn choose(self, min: u8, max: u8) -> ModalDef {
         ModalDef { min, max, ..self }
+    }
+
+    /// "Choose up to that many" (CR 603.12a, 700.2b): a triggered ability's modes, as many as its count at most - the number
+    /// of times a cost was paid for a reflexive ability (`Game::may_pay_times`, `Game::reflexive_trigger_counted`). With
+    /// none chosen it is removed from the stack (CR 603.3c).
+    pub const fn up_to_that_many(self) -> ModalDef {
+        ModalDef { min: 0, max: ModalDef::COUNTED, ..self }
     }
 
     /// Escalate (CR 702.120a): each mode beyond the first costs this more.

@@ -9184,7 +9184,7 @@ pub fn payable_life(cx: &Cx, player: PlayerId) -> i32 {
 /// Whether it was paid.
 pub fn may_pay(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<bool> {
     let x = (cost.mana.x > 0).then_some(0);
-    Ok(pay_during_resolution(cx, payer, source, subject, cost, question, x)?.is_some())
+    Ok(pay_during_resolution(cx, payer, source, subject, cost, question, x, None)?.is_some())
 }
 
 /// The most X a payer may raise "you may pay {X}" to while choosing it: past what any game could produce, a bound for a
@@ -9197,11 +9197,28 @@ const MOST_X_PAID: u16 = 1000;
 /// paying, CR 118.5). The X paid, or `None` when the payer declined: "when you do" (CR 603.12) asks whether it was paid, and
 /// "X" afterwards is the X paid. `cost` is the cost with its {X} (and any other mana or life beside it).
 pub fn may_pay_x(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<Option<u16>> {
-    pay_during_resolution(cx, payer, source, subject, cost, question, Some(0))
+    pay_during_resolution(cx, payer, source, subject, cost, question, Some(0), None)
 }
 
-/// The payment `may_pay` and `may_pay_x` ask: with `x` the X chosen so far for a cost with an {X}, else none (a cost
-/// without one has an X of 0). What was paid: the X (0 for a cost without one), or `None` declined.
+/// "You may pay [mana] up to `most` times" (`ANY_NUMBER_OF_TIMES`: "any number of times") as a spell or ability resolves
+/// (CR 118.12, 608.2d): one payment, its number chosen by the payer as they pay it (CR 603.12a: "a choice to pay a cost
+/// multiple times"), in one question that raises and lowers it from 1 to `most`, makes mana (CR 605.3a), and pays the
+/// mana that many times over once the pool covers it, or declines. How many times it was paid, 0 when the payer declined:
+/// "when you pay this cost one or more times" triggers once for any number above 0, given that number (CR 603.12a,
+/// `Game::reflexive_trigger_counted`). A number whose cost the mana cost's shape can't hold (`ManaCost::times`) is not
+/// offered.
+pub fn may_pay_times(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u16, question: &'static Question) -> R<u16> {
+    if most == 0 {
+        return Ok(0);
+    }
+    let cost = Cost { mana, ..Cost::NONE };
+    Ok(pay_during_resolution(cx, payer, source, subject, &cost, question, Some(1), Some(most))?.unwrap_or(0))
+}
+
+/// The payment `may_pay`, `may_pay_x` and `may_pay_times` ask: with `x` the X chosen so far for a cost with an {X}, else
+/// none (a cost without one has an X of 0). With `times` (`Some(most)`), `x` is instead how many times the cost's mana is
+/// paid, 1 to `most`, and the mana paid is that many times over (`ManaCost::times`). What was paid: the X or the number of
+/// times (0 for a cost with neither), or `None` declined.
 ///
 /// Every part of the cost is paid as a cost is (CR 118.3, 118.12): mana abilities may be activated while the payer is asked
 /// (CR 605.3a), then the payer chooses what the other parts take - the permanents, cards and counters, tapped permanents
@@ -9216,6 +9233,7 @@ fn pay_during_resolution(
     cost: &Cost,
     question: &'static Question,
     mut x: Option<u16>,
+    times: Option<u16>,
 ) -> R<Option<u16>> {
     // A part no payment during a resolution can have - a spell's or an activated ability's own - can't be paid, and
     // nothing is asked.
@@ -9229,8 +9247,9 @@ fn pay_during_resolution(
     }
     // CR 118.13b: how a monocolored hybrid symbol is paid is chosen immediately before the cost is paid. No cost paid during
     // a resolution has a Phyrexian symbol (none is printed), so none is announced here.
+    // A cost paid a number of times is announced as it is paid, that many times over (`pay_mana`).
     let announced;
-    let cost = if cost.mana.twobrid != [0; 5] {
+    let cost = if cost.mana.twobrid != [0; 5] && times.is_none() {
         let mut mana = cost.mana;
         announce_twobrids(cx, payer, source, &mut mana, false)?;
         announced = Cost { mana, ..*cost };
@@ -9241,6 +9260,7 @@ fn pay_during_resolution(
     loop {
         // The cost as X now stands: each {X} is X generic mana (CR 107.3f).
         let total = match x {
+            Some(n) if times.is_some() => cost.mana.times(n).unwrap_or(cost.mana),
             Some(n) => {
                 let generic = u32::from(cost.mana.generic) + u32::from(n) * u32::from(cost.mana.x);
                 ManaCost { generic: generic.min(255) as u8, x: 0, ..cost.mana }
@@ -9263,7 +9283,15 @@ fn pay_during_resolution(
                 options.push(ActionOption::simple(ActionKind::PayCost));
             }
         }
-        if let Some(n) = x
+        if let (Some(n), Some(most)) = (x, times) {
+            // The number of times: from 1 to `most`, and no more than the cost's shape holds that many times over.
+            if n < most && cost.mana.times(n + 1).is_some() {
+                options.push(ActionOption::simple(ActionKind::IncreaseX));
+            }
+            if n > 1 {
+                options.push(ActionOption::simple(ActionKind::DecreaseX));
+            }
+        } else if let Some(n) = x
             && (payable || cost.pay_x_life || cost.variable.is_some())
         {
             // The generic mana a cost holds is a byte: X goes no higher than that leaves room for.
@@ -9275,7 +9303,7 @@ fn pay_during_resolution(
             }
         }
         options.push(ActionOption::simple(ActionKind::DeclineCost));
-        let ask = RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x };
+        let ask = RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x, times };
         let answer = cx.ask_core(payer, ask, false)?;
         let Answer::Act(action) = answer else { return Ok(None) };
         match action.kind {

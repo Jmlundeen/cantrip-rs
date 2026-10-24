@@ -203,7 +203,7 @@ game goes back to before it and Bot1 is asked again. It is offered while that ac
 tapped, sacrificed from the battlefield, removed counters, added mana or cost life (a land, Black Lotus, Lotus Petal,
 Pentad Prism, a Treasure); never for an ability whose cost discards (Lion's Eye Diamond) or one that triggered
 anything (Chromatic Star). Any other answer clears it, a pass or a cast spell included, so tap after the spell you
-want to pay with has resolved. `! Bot1.Undo` says nothing may be taken back at Bot1's next priority or payment. `! Bot1.PayCost` says Bot1's next "unless pays" question does not offer paying (the mana they hold cannot pay it).
+want to pay with has resolved. `! Bot1.Undo` says nothing may be taken back at Bot1's next priority or payment. `! Bot1.PayCost` says Bot1's next "unless pays" question does not offer paying (the mana they hold cannot pay it); `! Bot1.PayCost(Times: 4)` says the next question to pay a cost a number of times does not allow that many (past "up to three").
 
 The script ends when every line is played and the stack is empty. A line that isn't possible within 4 turns fails.
 The failure report shows what each player was last offered, written as script lines, followed by a trace and a full
@@ -241,6 +241,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot3.Concede` | the player concedes the game (CR 104.3a: at any time) the moment the cursor reaches the line, whoever is asked; the question outstanding is asked again of the players left. Fails if the player has already left. Place it after the passes that bring the game to the question it is to interrupt |
 | `Bot1.Pass` · `Bot1.PayCost` · `Bot1.Decline` · `Bot1.Undo` · `Bot1.Cancel` | priority, unless-costs, mana undo, cancel a spell or ability at any question before it is on the stack |
 | `Bot1.PayCost(X: 3)` | "you may pay {X}" with X chosen as it is paid (CR 107.3f): X is raised (or lowered) to the number one step at a time, then paid from the pool like any `PayCost` |
+| `Bot1.PayCost(Times: 2)` | "you may pay {G} up to three times" / "any number of times" (CR 603.12a): the number of times is raised (or lowered) from 1 to the number one step at a time, then the cost that many times over is paid like any `PayCost`; `Times:` on an X question, or `X:` on a number of times, fails |
 | `Bot1.Accept` · `Bot1.Decline` | a "you may" choice, such as Path to Exile's search (default: decline); `Accept` also pays a payment of life alone (a shockland's 2 life, ward's), which has no mana to make first |
 | `Bot1.Choose(Lightning Bolt; Island)` | Duress, Brainstorm (last chosen ends on top) |
 | `Bot1.Choose(Burst Lightning; Kicked: 1)` | the card chosen to be cast as an effect resolves ("you may cast a spell from your hand without paying its mana cost", Buster Sword) announces that X or those kicks, paid from the pool like any cast's additional cost (CR 118.9d); unsaid, X is 0 and it is unkicked |

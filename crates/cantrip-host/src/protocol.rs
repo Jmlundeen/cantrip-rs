@@ -1215,6 +1215,11 @@ pub struct UnlessPaysPrompt {
     /// that X, and `IncreaseX` and `DecreaseX` among the options change it.
     pub choosing_x: bool,
     pub x: i32,
+    /// "You may pay {G} up to three times", "any number of times" (CR 603.12a): the number of times is chosen as it is paid,
+    /// `X` the number so far (from 1), `Total` the cost that many times over, and `IncreaseX` and `DecreaseX` among the
+    /// options change it within 1 to `MostTimes` - 0 for any number of times.
+    pub choosing_times: bool,
+    pub most_times: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

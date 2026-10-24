@@ -116,20 +116,9 @@ pub fn label_text(label: &Label) -> &'static str {
         Label::Pile { first: true, empty: false } => "First pile",
         Label::Pile { first: false, empty: true } => "Second pile: nothing",
         Label::Pile { first: false, empty: false } => "Second pile",
-        // A modal spell's or ability's mode, from the card's own definition (its spell's, or its first modal ability's).
-        Label::Mode(ability, i) => {
-            let def = cards().get(ability.card);
-            let modal = if ability.index == u8::MAX {
-                def.modal
-            } else {
-                match def.abilities.get(ability.index as usize) {
-                    Some(AbilityDef::Activated(a)) => a.modal,
-                    Some(AbilityDef::Triggered(t)) => t.modal,
-                    _ => None,
-                }
-            };
-            modal.and_then(|m| m.modes.get(i as usize)).map_or("", |m| m.text)
-        }
+        // A modal spell's or ability's mode, from the card's own definition (its spell's, or the modal ability's, a reflexive
+        // one among them).
+        Label::Mode(ability, i) => cards().modal_of(ability).and_then(|m| m.modes.get(i as usize)).map_or("", |m| m.text),
         Label::Extra(card, i) => cards().get(card).additional_choice.get(i as usize).map_or("", |c| c.text),
         Label::PayLife(Color::White) => "Pay 2 life for {W/P}",
         Label::PayLife(Color::Blue) => "Pay 2 life for {U/P}",
