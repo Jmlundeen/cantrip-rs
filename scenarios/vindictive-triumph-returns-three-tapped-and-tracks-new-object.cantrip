@@ -1,0 +1,54 @@
+# Mana value three is returned tapped under the caster's control, then exiled next end step (CR 608.2h, 603.7c).
+# Liliana is the opponent's; Ornithopter proves one's own creature is also a legal target and is saved by a bounce.
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Jet
+Vindictive Triumph
+Vindictive Triumph
+Ornithopter
+Mox Sapphire
+Unsummon
+Island x15
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: B)
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Vindictive Triumph.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Vindictive Triumph.Cast(Bot2.Battlefield.Liliana of the Veil)
+[Bot1.Main2]
+? Bot1.Battlefield.Liliana of the Veil.Tapped = true
+? Bot1.Battlefield.Liliana of the Veil.ManaValue = 3
+? Bot2.Battlefield =
+[T4 Bot2.Main1]
+? Exile = Liliana of the Veil
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Vindictive Triumph.Cast(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+[T6 Bot2.Main1]
+[Expect]
+Exile = Liliana of the Veil
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Graveyard = Unsummon; Vindictive Triumph; Vindictive Triumph

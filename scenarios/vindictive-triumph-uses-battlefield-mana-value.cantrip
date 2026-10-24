@@ -1,0 +1,57 @@
+# A mana value four creature stays exiled. Clone copying a zero-mana creature has battlefield mana value zero;
+# it returns although its printed mana value is four, then copies the surviving creature (CR 608.2h, 707.2).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Jet
+Clone
+Vindictive Triumph
+Vindictive Triumph
+Island x15
+[Bot2 Deck]
+Ornithopter
+Black Lotus
+Mox Pearl
+Auriok Salvagers
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: W)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Auriok Salvagers.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Vindictive Triumph.Cast(Auriok Salvagers)
+Bot1.Pass
+Bot2.Pass
+? Exile = Auriok Salvagers
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.ManaValue = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Vindictive Triumph.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Accept
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+[T6 Bot2.Main1]
+[Expect]
+Exile = Auriok Salvagers; Clone
+Bot1.Battlefield = Mox Sapphire; Mox Pearl; Mox Jet; Mox Jet
+Bot2.Battlefield.Ornithopter.Tapped = false
