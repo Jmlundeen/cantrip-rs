@@ -587,6 +587,22 @@ public sealed class Decisions
                 _paying = picked > 0;
                 _xWanted = Math.Max(0, picked - 1);
             }
+            else if (prompt.ChoosingTimes)
+            {
+                // "You may pay {G} up to three times" (CR 603.12a): how many times, up to the most it allows and the mana there
+                // is to make, or not at all. Total is the cost at the number shown, X times its one payment.
+                int pool = client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Mana.Sum() ?? 0;
+                int mana = pool + prompt.Options.Where(option => option.Kind == ActionKindView.ActivateAbility).Select(option => option.Source).Distinct().Count();
+                int most = Math.Max(1, prompt.MostTimes > 0 ? Math.Min(prompt.MostTimes, mana) : mana);
+                int picked = One(new Question
+                {
+                    Heading = $"{source}: {question}{(detail.Length > 0 ? $" ({detail}.)" : string.Empty)}{no} "
+                        + $"Paying it {(prompt.X == 1 ? "once" : $"{prompt.X} times")} costs {prompt.CostText()}; you can make about {mana} mana. How many times do you pay it?",
+                    Choices = ["Don't pay.", .. Enumerable.Range(1, most).Select(n => n == 1 ? "Pay it once." : $"Pay it {n} times.")],
+                });
+                _paying = picked > 0;
+                _xWanted = Math.Max(1, picked);
+            }
             else
             {
                 _paying = Yes($"{source}: {question}{(detail.Length > 0 ? $" ({detail}.)" : string.Empty)}{no} "
@@ -595,7 +611,7 @@ public sealed class Decisions
         }
 
         // The X decided on, raised or lowered to before anything is paid.
-        ActionKindView step = !_paying || !prompt.ChoosingX ? ActionKindView.PayCost
+        ActionKindView step = !_paying || !(prompt.ChoosingX || prompt.ChoosingTimes) ? ActionKindView.PayCost
             : prompt.X < _xWanted ? ActionKindView.IncreaseX : prompt.X > _xWanted ? ActionKindView.DecreaseX : ActionKindView.PayCost;
         TakeActionAnswer answer = prompt.Options.Find(option => option.Kind == step && step != ActionKindView.PayCost) is { } change
             ? AutoPlay.Answer(change)

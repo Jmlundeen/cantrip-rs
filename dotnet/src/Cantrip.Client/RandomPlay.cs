@@ -407,8 +407,9 @@ public sealed class RandomPlay : IAutoPlayer
             _paying = Coin();
         }
 
-        // "You may pay {X}" with X its own to choose (CR 107.3f): now and then raised by one before paying, so X is drawn too.
-        if (_paying && prompt.ChoosingX && Coin() && prompt.Options.Find(option => option.Kind == ActionKindView.IncreaseX) is { } raise)
+        // "You may pay {X}" with X its own to choose (CR 107.3f), or a cost paid up to a number of times (CR 603.12a): now and
+        // then raised by one before paying, so the number is drawn too.
+        if (_paying && (prompt.ChoosingX || prompt.ChoosingTimes) && Coin() && prompt.Options.Find(option => option.Kind == ActionKindView.IncreaseX) is { } raise)
         {
             return AutoPlay.Answer(raise);
         }

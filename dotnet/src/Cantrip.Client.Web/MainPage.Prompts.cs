@@ -1640,7 +1640,11 @@ public sealed partial class MainPage
             : prompt.Words(prompt.Detail, subject);
 
         // "You may pay {X}" (CR 107.3f): X is chosen here, as it is paid, and the payment is of the X shown.
-        string chosen = prompt.ChoosingX ? $"X = {prompt.X}, so {prompt.Total}  ·  − and + change X" : "";
+        // "You may pay {G} up to three times" (CR 603.12a): how many times is chosen here too, and the payment is the cost
+        // that many times over.
+        string chosen = prompt.ChoosingX ? $"X = {prompt.X}, so {prompt.Total}  ·  − and + change X"
+            : prompt.ChoosingTimes ? $"{Times(prompt.X)}, so {prompt.Total}  ·  − and + change how many times{(prompt.MostTimes > 0 ? $" (up to {Spelled(prompt.MostTimes)})" : string.Empty)}"
+            : "";
 
         Prompt(title, string.Join("  ·  ", new[] { detail, chosen, standing }.Where(part => part.Length > 0)));
 
@@ -1662,6 +1666,16 @@ public sealed partial class MainPage
                 new SymbolText(13, Theme.Fg, semibold: true) { Text = $"X = {prompt.X}" },
                 XStep("+", "Raise X by one", _actions.IncreaseX)));
         }
+        else if (prompt.ChoosingTimes)
+        {
+            _buttons.Children.Add(Stepper(
+                8,
+                XStep("−", "Pay it one time fewer", _actions.DecreaseX),
+                new SymbolText(13, Theme.Fg, semibold: true) { Text = Times(prompt.X) },
+                XStep("+", "Pay it one time more", _actions.IncreaseX)));
+        }
+
+        static string Times(int n) => n == 1 ? "once" : $"{n} times";
 
         DockButton XStep(string text, string tooltip, ActionOptionMessage? option)
         {
