@@ -66,7 +66,9 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    (`Engine: ...`), no card work. Gaps several waiting cards share go to one feature agent; feature agents work on
    separate rules areas. As soon as the feature passes its review, a fresh card agent, given the gap report, finishes
    the waiting card in a new lease, cherry-picking the reviewed core commits rather than waiting for them to land. Other
-   running agents are told what landed so they rebase. Only a gap the coordinator decides not to build is released,
+   running agents are told what landed so they rebase. A pri-0/1 fix in progress pauses nothing else: card agents and
+   the PR reviewer keep building, reviewing and landing, and the fix rebases over them before it lands. Only work that
+   needs the fix waits for it, and the coordinator says which. Only a gap the coordinator decides not to build is released,
    with the gap recorded on the issue.
 4. **Review agents** (Opus) review inside the card's lease - let in by a `--read-only` token once the card agent has
    left, on the commit as it stands, using its warm build - never in a worktree of their own, and change no files,
