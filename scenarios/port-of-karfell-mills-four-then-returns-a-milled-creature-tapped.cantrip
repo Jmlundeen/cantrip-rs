@@ -1,0 +1,53 @@
+# Port of Karfell (Bot2's own Woodland Changeling is discarded on turn 2 and is not offered): {3}{U}{B}{B}, {T}, sacrifice it: exactly four cards are milled, then the controller returns a creature card of their choice from their graveyard (here one just milled, with another
+# creature left behind), tapped (CR 701.17, 608.2c). Paid from U, B, BBB (Lotus), R, W: six of the seven mana, so {B} is left. The fifth card of the library is not milled.
+
+[Bot1 Deck]
+Port of Karfell
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Island
+Island
+Misshapen Fiend
+Mesa Pegasus
+Island
+Consider
+Island x20
+
+[Bot2 Deck]
+Mountain x7
+Woodland Changeling
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Port of Karfell.Play
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Port of Karfell.Activate(Ability: Mill; Spend: U, B, B, B, R, W)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}
+! Bot1.Choose()
+! Bot1.Choose(Woodland Changeling)
+! Bot1.Choose(Misshapen Fiend; Mesa Pegasus)
+Bot1.Choose(Mesa Pegasus)
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Mesa Pegasus.Tapped = true
+Bot1.Graveyard = Consider; Island; Misshapen Fiend; Port of Karfell; Black Lotus
+Bot1.Library.Count = 20
+Bot2.Graveyard = Woodland Changeling

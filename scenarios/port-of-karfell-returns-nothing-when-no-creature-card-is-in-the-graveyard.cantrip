@@ -1,0 +1,43 @@
+# Port of Karfell: with no creature card in the graveyard after the four cards are milled, nothing returns (the Port itself is a land card in the graveyard).
+
+[Bot1 Deck]
+Port of Karfell
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Island
+Island
+Island
+Island
+Island
+Consider
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Port of Karfell.Play
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Port of Karfell.Activate(Ability: Mill; Spend: U, B, B, B, R, W)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Count = 4

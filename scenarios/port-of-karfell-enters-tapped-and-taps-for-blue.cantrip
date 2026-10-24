@@ -1,0 +1,18 @@
+# Port of Karfell: it enters tapped (CR 614.1c) and, once it untaps on turn 3, taps for {U} (CR 605.1a); the mana is checked in the step it is made.
+
+[Bot1 Deck]
+Port of Karfell
+Island x30
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Port of Karfell.Play
+? Bot1.Battlefield.Port of Karfell.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Port of Karfell.Activate(Ability: {T}: Add)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield.Port of Karfell.Tapped = true

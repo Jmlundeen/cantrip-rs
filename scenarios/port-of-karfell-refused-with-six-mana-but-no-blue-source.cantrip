@@ -1,0 +1,31 @@
+# Port of Karfell: {3}{U}{B}{B} needs blue. Turn 5, Port untapped, empty stack, pool empty: Jet, Ruby, Pearl, Emerald and two Swamps make six mana with plenty of black but no blue, so the activation is not
+# offered (CR 602.2b, 118.3).
+
+[Bot1 Deck]
+Port of Karfell
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Swamp
+Swamp
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Port of Karfell.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+? Bot1.Battlefield.Port of Karfell.Tapped = false
+! Bot1.Battlefield.Port of Karfell.Activate(Ability: Mill)
+
+[Expect]
+Bot1.Battlefield.Port of Karfell.Tapped = false
