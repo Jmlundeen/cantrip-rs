@@ -208,6 +208,9 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         moves
     };
     let before: Vec<ObjectId> = cx.s().battlefield().to_vec();
+    // A permanent leaving, phased in or out (CR 702.26d: a phased-out permanent is still on the battlefield, and leaves it when
+    // its owner leaves the game, CR 702.26n): what it held "until" it left comes back (`return_until_left`).
+    let left_battlefield = moves.iter().any(|m| matches!(cx.s().obj(m.id).zone.kind(), ZoneKind::Battlefield | ZoneKind::PhasedOut));
     // The permanents that could look back, as they are just before the moves (CR 603.10a): only for moves a look-back
     // ability can trigger on - leaving the battlefield or a graveyard, or a public object put into a hand or library (one
     // from a hand or a library, public while a reveal of it is in effect, is known once its move is planned, below).
@@ -487,6 +490,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
     for player in shuffled {
         cx.record(Event::Shuffled { player });
     }
+    // A permanent left the battlefield: what was exiled or phased out until it left comes back now (CR 610.3, 610.4).
+    if left_battlefield {
+        return_until_left(cx);
+    }
     created
 }
 
@@ -740,7 +747,8 @@ pub fn remember_chosen_name(cx: &mut Cx, id: ObjectId, name: CardId) {
 }
 
 /// CR 610.3: cards exiled "until [a permanent] leaves the battlefield" return, as a one-shot effect that follows the
-/// event, to the zone they were exiled from; a permanent comes back under its owner's control. Whether any did.
+/// event, to the zone they were exiled from; a permanent comes back under its owner's control (610.3c), all of them in one
+/// move (610.3d). Carried out the moment the permanent leaves (`return_until_left`). Whether any did.
 pub fn return_exiled(cx: &mut Cx) -> R<bool> {
     let mut due: Vec<(ObjectId, ExileLink)> = Vec::new();
     for p in cx.s().seats() {
@@ -765,12 +773,8 @@ pub fn return_exiled(cx: &mut Cx) -> R<bool> {
         .filter(|(_, l)| !l.from.is(ZoneKind::Battlefield))
         .map(|&(id, l)| Moving::to(id, Zone::new(l.from.kind(), owner(cx, id))))
         .collect();
-    if !elsewhere.is_empty() {
-        move_together(cx, &elsewhere, ZoneReason::Other);
-    }
-    if !to_battlefield.is_empty() {
-        put_onto_battlefield(cx, &to_battlefield, ZoneReason::Other)?;
-    }
+    // One move (CR 610.3d): the cards going back to a hand or a graveyard and the permanents entering arrive together.
+    put_onto_battlefield_along(cx, elsewhere, &to_battlefield, ZoneReason::Other, &[])?;
     // The return is one one-shot effect, created once (CR 610.3): the duration is over whether or not the card got where
     // it went. One that could not - an Aura with nothing to enchant (CR 303.4g), a move a replacement left in exile - stays
     // there as a card exiled with that permanent and nothing more, never returned again. Cleared once the moves are done,
@@ -785,6 +789,43 @@ pub fn return_exiled(cx: &mut Cx) -> R<bool> {
         }
     }
     Ok(true)
+}
+
+/// CR 610.3, 610.4: "A second one-shot effect is created immediately after the specified event": what was exiled "until [a
+/// permanent] leaves the battlefield" returns (`return_exiled`), and what phased out until then phases in
+/// (`phasing::phase_in_returning`), the moment that permanent has left - a move off the battlefield (`move_together`) or
+/// its owner leaving the game (`leave_game`) - whatever is under way: a cost being paid (CR 601.2g-h), a spell or ability
+/// resolving (CR 608.2), the state-based actions being performed (CR 704.3). Neither is a triggered ability or a
+/// state-based action, so neither waits for a player to receive priority or for the next check. The returns go on until
+/// none is due: one that makes another such permanent leave (an "as enters" sacrifice) is followed by the returns that
+/// leaving makes due.
+///
+/// A return can ask a question - the permanent an Aura returns attached to (CR 303.4f), an "as [this] enters" choice - and
+/// the operation it follows has no suspension to give back. The question waits on the frame, and the run goes on and is
+/// wound back to it and redone with the answer (`Game::run`), as one a replacement effect asks mid-move is; nothing more
+/// is returned while it waits. Outside a run (a rules test's bare `Cx`, a concession between runs) no one could be asked,
+/// so the returns are left to the next settling, which carries out any that are due (`settle::settle`) as a backstop.
+pub fn return_until_left(cx: &mut Cx) {
+    if cx.s().returning.get() || cx.s().agenda.get(cx.frame).is_none_or(|f| f.pending.is_some()) {
+        return;
+    }
+    // The moves the returns make look for no returns of their own: this goes round until none is due. Lowered however it
+    // ends, a host that catches a panic going on with the game.
+    cx.s().returning.set(true);
+    let done = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        loop {
+            // A question asked: the run is redone with its answer, and the rest is returned then.
+            let Ok(returned) = return_exiled(&mut *cx) else { break };
+            let phased_in = crate::phasing::phase_in_returning(&mut *cx);
+            if !returned && !phased_in {
+                break;
+            }
+        }
+    }));
+    cx.s().returning.set(false);
+    if let Err(panic) = done {
+        std::panic::resume_unwind(panic);
+    }
 }
 
 pub fn move_to(cx: &mut Cx, id: ObjectId, to: Zone) -> ObjectId {
@@ -3526,6 +3567,9 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
     if !moves.is_empty() {
         move_together(cx, &moves, ZoneReason::Exile);
     }
+    // Their permanents that left with them leave what they exiled or phased out "until" they left to come back
+    // (CR 610.3, 610.4).
+    return_until_left(cx);
 }
 
 #[cfg(test)]

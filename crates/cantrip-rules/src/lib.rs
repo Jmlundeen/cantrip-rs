@@ -30,6 +30,8 @@ mod cloak_tests;
 #[cfg(test)]
 mod control_at_once_tests;
 #[cfg(test)]
+mod return_at_once_tests;
+#[cfg(test)]
 mod history_cut_tests;
 #[cfg(test)]
 mod inherent_trigger_tests;
@@ -436,6 +438,20 @@ impl Game {
                     // asked which to discard are still there to be chosen.
                     let pending = self.state.agenda[at].pending.clone();
                     let (back_to, log_to) = asked_at.unwrap_or((mark, log_mark as usize));
+                    self.state.revert(back_to);
+                    self.log.truncate(log_to);
+                    self.state.update_frame(at, |f| f.pending = pending);
+                    Err(Stop::Suspend)
+                }
+                // The same, for a run that went on past such a question (the return of a card exiled "until", CR 610.3) and
+                // then stopped at another point that asks, which finds the question waiting: it too is put to the position
+                // it was asked in, the answer judged there. A run that stopped at its question is there already.
+                Err(Stop::Suspend)
+                    if let Some((back_to, log_to)) = asked_at
+                        && (back_to != self.state.mark() || log_to != self.log.len())
+                        && self.state.agenda.get(at).is_some_and(|f| f.pending.is_some() && !f.staged) =>
+                {
+                    let pending = self.state.agenda[at].pending.clone();
                     self.state.revert(back_to);
                     self.log.truncate(log_to);
                     self.state.update_frame(at, |f| f.pending = pending);

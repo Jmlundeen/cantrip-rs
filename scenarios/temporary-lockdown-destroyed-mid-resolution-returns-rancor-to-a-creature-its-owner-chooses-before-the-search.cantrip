@@ -1,0 +1,81 @@
+# A returned Aura asks for its host partway through the resolution that made its exiler leave (CR 610.3, 303.4f). Bot2's
+# Temporary Lockdown has exiled Bot2's Sazh's Chocobo, the Rancor enchanting it and a Mox Emerald (mana value 2 or less);
+# Bot1's Hired Blade and Elvish Spirit Guide (3 each) stayed. Bot1's Assassin's Trophy destroys the Lockdown: the three
+# return at once, under Bot2's control (CR 610.3c, 610.3d), and Bot2 chooses what the Rancor enchants as it enters - of
+# Bot1's two creatures, the Elvish Spirit Guide (the Chocobo entering with it is not there to be chosen) - all before the
+# Trophy's next instruction. Only then does Bot2 search for a basic land and put it onto the battlefield, which the
+# returned Chocobo sees enter (its landfall counter). The question is asked of the position just after the Lockdown
+# left, with no Forest searched for yet, and the resolution goes on with the answer.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Black Lotus
+Hired Blade
+Elvish Spirit Guide
+Assassin's Trophy
+Forest
+Swamp x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sazh's Chocobo
+Rancor
+Black Lotus
+Temporary Lockdown
+Island
+Island
+Forest
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Hired Blade.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Elvish Spirit Guide.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sazh's Chocobo.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Rancor.Cast(Bot2.Battlefield.Sazh's Chocobo)
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Temporary Lockdown.Cast
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Exile.Count = 3
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Assassin's Trophy.Cast(Bot2.Battlefield.Temporary Lockdown)
+Bot2.Target(Elvish Spirit Guide)
+? Bot1.Battlefield.Elvish Spirit Guide.Power = 4
+? Bot2.Battlefield = Forest; Mox Emerald; Rancor; Sazh's Chocobo
+Bot2.Accept
+Bot2.Search(Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Temporary Lockdown; Black Lotus
+Bot2.Battlefield = Forest; Forest; Mox Emerald; Rancor; Sazh's Chocobo
+Bot2.Battlefield.Rancor.AttachedTo = Elvish Spirit Guide
+Bot1.Battlefield.Elvish Spirit Guide.Power = 4
+Bot1.Battlefield.Elvish Spirit Guide.Keywords = Trample
+Bot1.Battlefield.Hired Blade.Power = 3
+Bot2.Battlefield.Sazh's Chocobo.Counters.PlusOnePlusOne = 1

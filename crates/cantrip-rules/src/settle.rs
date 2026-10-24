@@ -47,6 +47,9 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
         if cx.s().is_over() {
             break;
         }
+        // CR 610.3, 610.4: what was exiled or phased out until a permanent left has come back as it left
+        // (`ops::return_until_left`); one whose permanent left where no question could be asked (a concession between runs)
+        // comes back here, before anyone receives priority.
         if ops::return_exiled(cx)? || crate::phasing::phase_in_returning(cx) {
             continue;
         }
@@ -60,9 +63,10 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
     Ok(Flow::Done)
 }
 
-/// State-based actions checked and performed until none applies (CR 704.3), with the returns of cards exiled until a
-/// permanent left that follow from them (CR 610.3), and no triggered ability put on the stack: the check of the cleanup
-/// step (CR 514.3a) and of a turn being ended (CR 724.1c). Whether anything was done.
+/// State-based actions checked and performed until none applies (CR 704.3), and no triggered ability put on the stack: the
+/// check of the cleanup step (CR 514.3a) and of a turn being ended (CR 724.1c). A permanent they make leave gives back what
+/// was exiled or phased out until it left as it leaves, before the next check (CR 610.3, 610.4; `ops::return_until_left`),
+/// and any such return still due is carried out here, as in `settle`. Whether anything was done.
 pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
     let mut acted = false;
     let mut progress = Progress::default();

@@ -1,0 +1,56 @@
+# A permanent phased out "until [a permanent] leaves the battlefield" phases in immediately after that permanent leaves
+# (CR 610.4), partway through the resolution that made it leave (CR 608.2), not once the resolution is over. Bot2's
+# Oubliette has phased out Bot2's own Sazh's Chocobo ("Landfall - Whenever a land you control enters, put a +1/+1 counter
+# on this creature"), the only creature to target. Bot1's Assassin's Trophy destroys the Oubliette: the Chocobo phases in
+# at once, tapped (Oubliette's "Tap that creature as it phases in this way"), before the Trophy's next instruction has Bot2
+# search for a basic land and put it onto the battlefield, so the Chocobo sees the Forest enter and gets its counter.
+# Had it phased in only after the resolution, the Forest would have entered while it was treated as though it did not
+# exist (CR 702.26b), and nothing would have triggered.
+
+[Bot1 Deck]
+Swamp
+Assassin's Trophy
+Forest
+Swamp x15
+
+[Bot2 Deck]
+Forest
+Sazh's Chocobo
+Black Lotus
+Oubliette
+Island
+Island
+Island
+Island
+Forest
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sazh's Chocobo.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Oubliette.Cast
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.PhasedOut = Sazh's Chocobo
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Assassin's Trophy.Cast(Bot2.Battlefield.Oubliette)
+Bot2.Accept
+Bot2.Search(Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.PhasedOut.Count = 0
+Bot2.Graveyard = Oubliette; Black Lotus
+Bot2.Battlefield = Forest; Forest; Sazh's Chocobo
+Bot2.Battlefield.Sazh's Chocobo.Tapped = true
+Bot2.Battlefield.Sazh's Chocobo.Counters.PlusOnePlusOne = 1

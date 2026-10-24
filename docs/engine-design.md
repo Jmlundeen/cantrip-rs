@@ -1049,7 +1049,7 @@ whole of it: `phase_out` (attachments phase out indirectly, recursively, and eve
 "until" a permanent that has already left phases nothing out, 610.4b), the untap step's first turn-based action (502.1:
 what phased out directly under the active player phases in, with what phased out indirectly with it, before anything
 untaps; not one phased out "until", 610.4a), and `phase_in_returning`, the one-shot effect that phases a permanent in once
-the permanent it waited for has left (610.4), checked with the returns of exiled cards after the state-based actions. An
+the permanent it waited for has left (610.4), carried out with the returns of exiled cards the moment it leaves (below). An
 attachment that phased out directly phases in unattached if what it was attached to is gone (702.26i), for the state-based
 actions. "Until [this] leaves the battlefield" goes on while its source is phased out (`phasing::still_on_battlefield`:
 Banishing Light's ruling), "for as long as" durations end (702.26f: `WhileSourceOnBattlefield` asks the battlefield), and a
@@ -1062,6 +1062,31 @@ permanents too (514.2). Events: `PhasedOut`, `PhasedIn` (recorded; nothing trigg
 "Your life total can't change" (CR 119.7, 119.8) is `EffectKind::LifeTotalCantChange`, a player effect `ops::change_life`
 asks before any replacement (nothing replaces what can't happen) and `actions::can_pay_life` asks of a cost of more than 0
 life. Damage is still dealt; only its loss of life doesn't happen.
+
+### Exiled or phased out until a permanent leaves
+
+"Exile [it] until [this] leaves the battlefield" (CR 610.3) and "phases out until [this] leaves the battlefield" (CR 610.4)
+are one-shot effects that each create a second one: it "is created immediately after the specified event" and gives the
+card back - to the zone it came from, a permanent under its owner's control (610.3c) - or phases the permanent in. It is
+neither a triggered ability nor a state-based action, so it waits for no player to receive priority and for no check: it
+happens in the middle of whatever made the permanent leave - a cost being paid (Yasharn back on the battlefield as the White
+Auracite holding it is sacrificed to Krark-Clan Ironworks, so a sacrifice later in the same payment can't be made, 601.2h),
+a resolution (the card back before the spell's next instruction), the state-based actions (back before the next check,
+704.3). The link is the exiled card's `ExileLink` (`until_leaves`) or the phased-out permanent's `Phased::until_leaves`;
+`phasing::still_on_battlefield` says the permanent has not left (phasing out is no leaving, 702.26d).
+
+`ops::return_until_left` carries both out (`return_exiled`, `phasing::phase_in_returning`), and is called by whatever can
+make a permanent leave: `move_together`, after the move's events and their triggers (so "leaves" abilities and the return's
+"enters" ones are collected in that order, and the history has the return after the leaving), and `leave_game`, whose
+leaving player's permanents cease to exist (800.4a). The returns of one event are one move (610.3d, 610.4d), and it goes round
+until nothing is due, since a return can make another such permanent leave; the moves it makes don't call it again
+(`GameState::returning`). A return can ask a question - what a returning Aura enchants (303.4f), an "as enters" choice - and
+the move it follows returns no suspension. The question waits on the frame and the run goes on, as for a replacement
+effect's question asked mid-move (`Cx::ask_core`); the run is then wound back to the position the question was asked in
+(`Cx::asked_at`) whether it ends or stops at a later question, so the question is judged and answered there, and redone
+from the frame's start with the answer. Outside a run (a rules test's bare `Cx`, a concession between runs) nothing could be
+asked, so it does nothing; settling (`settle::settle`, `state_based_actions_alone`) still calls `return_exiled` and
+`phase_in_returning` after the state-based actions as a backstop, and they find nothing due when the moves have done it.
 
 ### Winning, losing and drawing
 

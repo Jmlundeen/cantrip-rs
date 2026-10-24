@@ -106,6 +106,10 @@ pub struct GameState {
     /// any is, what continuous effects say of control and "for as long as" durations is not settled between their parts,
     /// only once the outermost has finished (`cantrip_rules::ops::settle_at_once`). No part of the position.
     pub settle_held: std::cell::Cell<u32>,
+    /// Whether the one-shot effects that return what was exiled or phased out "until [a permanent] leaves the battlefield"
+    /// are being carried out (CR 610.3, 610.4; `cantrip_rules::ops::return_until_left`): the moves they make look for no
+    /// more returns of their own until they are done. No part of the position.
+    pub returning: std::cell::Cell<bool>,
     /// The layers' work for one position and history (`cantrip_rules::layers`): each layer's application order (CR 613.8) and
     /// the characteristics worked out with it. Derived, shared by a clone until either moves on; no part of the position.
     pub layer_pass: LayerCache,
@@ -455,6 +459,7 @@ impl GameState {
             judged_face_up: std::cell::Cell::new(None),
             leaving_together: std::cell::RefCell::new(Vec::new()),
             settle_held: std::cell::Cell::new(0),
+            returning: std::cell::Cell::new(false),
             layer_pass: LayerCache::default(),
         }
     }

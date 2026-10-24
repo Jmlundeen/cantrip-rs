@@ -1,0 +1,85 @@
+# A card exiled "until [a permanent] leaves the battlefield" returns as a one-shot effect immediately after that permanent
+# leaves (CR 610.3), not at the next state-based check - even partway through paying a cost (CR 601.2g-h). Bot1's White
+# Auracite has exiled Bot2's Yasharn, Implacable Earth ("Players can't ... sacrifice nonland permanents to cast spells or
+# activate abilities"), so Bot1's Ornithopter, equipped with Deconstruction Hammer, may begin "{3}, {T}, Sacrifice
+# Deconstruction Hammer" at Bot2's Sol Ring. Bot1 pays the {3} with Krark-Clan Ironworks, sacrificing a Mox Pearl and then
+# White Auracite: Yasharn is back on the battlefield the moment the Auracite is gone, so the Hammer can't be sacrificed
+# and the activation is taken back (CR 601.2h, 733.1). Everything is as it was before the activation: the Hammer and the
+# Auracite still on the battlefield, Yasharn still in exile, the Sol Ring alive and the Ornithopter untapped. The Mox
+# Pearl goes first because once Yasharn is back the Ironworks itself could sacrifice nothing more.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Deconstruction Hammer
+Krark-Clan Ironworks
+White Auracite
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Yasharn, Implacable Earth
+Island
+Sol Ring
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Krark-Clan Ironworks.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Yasharn, Implacable Earth.Cast
+Bot2.Pass
+Bot2.Search()
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.White Auracite.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Yasharn, Implacable Earth)
+Bot1.Pass
+Bot2.Pass
+? Exile = Yasharn, Implacable Earth
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Sol Ring)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Mox Pearl)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: White Auracite)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Yasharn, Implacable Earth
+Bot2.Battlefield = Island; Mox Pearl; Sol Ring
+Bot1.Battlefield = Deconstruction Hammer; Island; Krark-Clan Ironworks; Mox Pearl; Mox Sapphire; Ornithopter; Plains; White Auracite
+Bot1.Battlefield.Ornithopter.Tapped = false
