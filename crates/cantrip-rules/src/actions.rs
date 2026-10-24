@@ -6526,7 +6526,7 @@ fn cast(
     if let Some(creature) = reducer {
         ops::tap(cx, creature);
     }
-    let life_owed = cost.life as u32 + extra.life as u32 + life as u32 + x_life as u32;
+    let life_owed = cost.life as u32 + extra.life as u32 + life + x_life as u32;
     // CR 601.2f-h: what besides mana may pay for it, its own convoke, delve and improvise and what a permanent gives the spell.
     let with = pay_with(cx, &pay_with_grantors(cx), player, spell, def, None);
     let helpers = Helpers {
@@ -6629,8 +6629,8 @@ fn cast(
     pay_life_and_counters(cx, player, spell, &extra);
     pay_exert_and_tappers(cx, spell, &extra, &extra_tappers);
     // CR 119.4: the life paid for Phyrexian symbols and for X, with the rest of the cost.
-    if life as u16 + x_life > 0 {
-        ops::change_life(cx, player, -(life as i32 + x_life as i32));
+    if life + u32::from(x_life) > 0 {
+        ops::change_life(cx, player, -life_paid(life + u32::from(x_life)));
     }
     let targets = &targets[..];
 
@@ -7276,21 +7276,30 @@ fn announce_twobrids(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut
     } else {
         Vec::new()
     };
-    let ask = RequestKind::ChooseModes {
-        source,
-        modes: symbols.iter().map(|&c| Label::PayGeneric(c)).collect(),
-        eligible: (0..n as u8).collect(),
-        count: 0,
-        at_most: n as u8,
-        affordable,
-        additional_cost: true,
-        repeat: false,
-    };
-    let chosen = match cx.ask_core(player, ask, true)? {
-        Answer::Modes(chosen) => chosen,
-        _ => return Err(Stop::Cancel),
-    };
-    let generic: Vec<bool> = (0..n as u8).map(|i| chosen.contains(&i)).collect();
+    // A choice of modes holds at most 255 (its indices are a byte), and a cost can hold more of these symbols (255 of each
+    // color): past that they are asked about a page at a time, in order, each still the player's choice.
+    const PAGE: usize = u8::MAX as usize;
+    let mut generic = vec![false; n];
+    for start in (0..n).step_by(PAGE) {
+        let page = start..n.min(start + PAGE);
+        let ask = RequestKind::ChooseModes {
+            source,
+            modes: symbols[page.clone()].iter().map(|&c| Label::PayGeneric(c)).collect(),
+            eligible: (0..page.len() as u8).collect(),
+            count: 0,
+            at_most: page.len() as u8,
+            affordable: if start == 0 { affordable.clone() } else { Vec::new() },
+            additional_cost: true,
+            repeat: false,
+        };
+        let chosen = match cx.ask_core(player, ask, true)? {
+            Answer::Modes(chosen) => chosen,
+            _ => return Err(Stop::Cancel),
+        };
+        for i in chosen {
+            generic[page.start + i as usize] = true;
+        }
+    }
     *cost = cost.with_twobrids_paid(&generic);
     Ok(())
 }
@@ -7426,63 +7435,70 @@ fn announce_hybrids(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Cos
 /// up to as many as the life total covers, cheapest first. The symbols not paid with life become colored mana in
 /// `cost`. Returns the life to pay with the rest of the cost. `any_type`: mana of any type may pay it (CR 609.4b), which
 /// the advice of how few to pay with life reads. `paid` is what the cost is paid for (`payable_life_for`).
-fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut ManaCost, any_type: bool, paid: Option<CostFor>) -> R<u8> {
+///
+/// A choice of modes holds at most `PAGE` of them (its indices are a byte), and a cost can hold more Phyrexian symbols
+/// than that (one of each color 255 times: a cost to attack, Norn's Annex beside other colors' taxes). Then the symbols are
+/// asked about a page at a time, in order, each page up to as many as the life left over from the pages before covers:
+/// every symbol is still the player's choice, and the life asked never passes what they can pay.
+fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut ManaCost, any_type: bool, paid: Option<CostFor>) -> R<u32> {
+    const PAGE: usize = u8::MAX as usize;
     let mut symbols: Vec<Color> = Vec::new();
     for (i, &n) in cost.phyrexian.iter().enumerate() {
         for _ in 0..n {
             symbols.push(Color::ALL[i]);
         }
     }
-    let mut life = 0u8;
-    if !symbols.is_empty() {
-        let have = payable_life_for(cx, player, paid).max(0) as usize;
-        let most = symbols.len().min(have / 2) as u8;
-        if most > 0 {
-            // Advice: the fewest symbols that, paid with life, leave a cost the player could pay.
-            let affordable = (0..=most)
-                .find(|&k| {
-                    let mut rest = *cost;
-                    for c in &symbols[k as usize..] {
-                        rest.symbols[c.mana() as usize] += 1;
-                    }
-                    rest.phyrexian = [0; 5];
-                    can_afford(cx, player, source, &if any_type { rest.paid_with_any_type() } else { rest })
-                })
-                .map(|k| (0..k).collect())
-                .unwrap_or_default();
-            let ask = RequestKind::ChooseModes {
-                source,
-                modes: symbols.iter().map(|&c| Label::PayLife(c)).collect(),
-                eligible: (0..symbols.len() as u8).collect(),
-                count: 0,
-                at_most: most,
-                affordable,
-                additional_cost: true,
-                repeat: false,
-            };
-            let chosen = match cx.ask_core(player, ask, true)? {
-                Answer::Modes(chosen) => chosen,
-                _ => return Err(Stop::Cancel),
-            };
-            let mut paid = vec![false; symbols.len()];
-            for i in chosen {
-                paid[i as usize] = true;
-                life += 2;
-            }
-            for (i, c) in symbols.iter().enumerate() {
-                if !paid[i] {
-                    cost.symbols[c.mana() as usize] += 1;
-                }
-            }
-            cost.phyrexian = [0; 5];
-            return Ok(life);
+    // The cost with the symbols not paid with life as their colors' mana (CR 107.4f). A colored symbol past what a cost
+    // holds stays at the most it holds, as every count of a cost's symbols does (`ManaCost::plus`).
+    let with_colors = |with_life: &[bool]| {
+        let mut rest = *cost;
+        for (c, _) in symbols.iter().zip(with_life).filter(|(_, life)| !**life) {
+            let mana = &mut rest.symbols[c.mana() as usize];
+            *mana = mana.saturating_add(1);
         }
-        // Without the life for any, every symbol is paid with its color.
-        for c in &symbols {
-            cost.symbols[c.mana() as usize] += 1;
+        rest.phyrexian = [0; 5];
+        rest
+    };
+    let have = payable_life_for(cx, player, paid).max(0) as u32;
+    let mut with_life = vec![false; symbols.len()];
+    let mut life = 0u32;
+    for start in (0..symbols.len()).step_by(PAGE) {
+        let page = start..symbols.len().min(start + PAGE);
+        // Without the life for any, every symbol left is paid with its color.
+        let most = page.len().min(((have - life) / 2) as usize) as u8;
+        if most == 0 {
+            break;
         }
-        cost.phyrexian = [0; 5];
+        // Advice: the fewest symbols of the page that, paid with life, leave a cost the player could pay.
+        let affordable = (0..=most)
+            .find(|&k| {
+                let mut trial = with_life.clone();
+                trial[page.start..page.start + k as usize].fill(true);
+                let rest = with_colors(&trial);
+                can_afford(cx, player, source, &if any_type { rest.paid_with_any_type() } else { rest })
+            })
+            .map(|k| (0..k).collect())
+            .unwrap_or_default();
+        let ask = RequestKind::ChooseModes {
+            source,
+            modes: symbols[page.clone()].iter().map(|&c| Label::PayLife(c)).collect(),
+            eligible: (0..page.len() as u8).collect(),
+            count: 0,
+            at_most: most,
+            affordable,
+            additional_cost: true,
+            repeat: false,
+        };
+        let chosen = match cx.ask_core(player, ask, true)? {
+            Answer::Modes(chosen) => chosen,
+            _ => return Err(Stop::Cancel),
+        };
+        for i in chosen {
+            with_life[page.start + i as usize] = true;
+            life += 2;
+        }
     }
+    *cost = with_colors(&with_life);
     Ok(life)
 }
 
@@ -7738,7 +7754,7 @@ fn activate(
         let (cost, life, least) = change_parts_split(cx, &cost_change_sources(cx), player, Costed::Ability(source, ability), mana, None, &targets, &split);
         (at_least(cost, least), life)
     };
-    let life = life as u32 + added_life;
+    let life = life + added_life;
     if added_life > 0 && payable_life_for(cx, player, paid) < life as i32 + def.cost.life as i32 {
         return Err(Stop::Cancel);
     }
@@ -7803,7 +7819,7 @@ fn activate(
     let beheld = choose_behold(cx, player, source, &def.cost)?;
     // The energy and life, judged again after the mana abilities (CR 601.2g-h by way of 602.2b), and the permanents the cost
     // sacrifices by naming them, which a static ability may forbid it to (CR 101.2, `may_sacrifice_for`).
-    if !rest_payable(cx, player, def.cost.energy as u32, life as u32 + def.cost.life as u32, paid)
+    if !rest_payable(cx, player, def.cost.energy as u32, life + def.cost.life as u32, paid)
         || def.cost.sacrifice_self && !may_sacrifice_for(cx, player, source, paid)
         || granter.is_some_and(|g| !may_sacrifice_for(cx, player, g, paid))
     {
@@ -7950,11 +7966,11 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
         pay_mana(cx, player, source, mana)?;
     }
     // The life, judged again once the mana is paid (CR 601.2g-h, 119.4): a mana ability may have spent it.
-    if !rest_payable(cx, player, 0, u32::from(life), None) {
+    if !rest_payable(cx, player, 0, life, None) {
         return Err(Stop::Cancel);
     }
     if life > 0 {
-        ops::change_life(cx, player, -i32::from(life));
+        ops::change_life(cx, player, -life_paid(life));
     }
     let item = stack_item(StackKind::Activated, source, ability, player, &[]);
     // A special action's effect is done at once; a question it asked would have nowhere to be answered.
@@ -8500,7 +8516,7 @@ fn pays(owed: &ManaCost, mana: Mana) -> bool {
 }
 
 /// How the pool would pay `owed`: none (it cannot), exactly one way, or more than one.
-enum Ways {
+pub(crate) enum Ways {
     None,
     One([u8; 6]),
     Many,
@@ -8536,7 +8552,20 @@ fn uncovered(pool: &ManaPool, owed: &ManaCost) -> ManaCost {
     out
 }
 
-fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
+pub(crate) fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
+    // How a Phyrexian or a monocolored hybrid symbol is paid is announced before the pool pays it (`announce_life`,
+    // `announce_twobrids`, `pool_pays`). One not announced is never free: mana pays a Phyrexian symbol only with its color
+    // (CR 107.4f), and a {2/C} symbol is paid with its color or {2} (CR 107.4e), a choice of the payer's.
+    let mut owed = *owed;
+    for (color, n) in std::mem::take(&mut owed.phyrexian).into_iter().enumerate() {
+        let mana = &mut owed.symbols[Color::ALL[color].mana() as usize];
+        let Some(more) = mana.checked_add(n) else { return Ways::None };
+        *mana = more;
+    }
+    if owed.twobrid != [0; 5] {
+        return if pool_pays(pool, &owed, 0) { Ways::Many } else { Ways::None };
+    }
+    let owed = &owed;
     let mut left = pool.0;
     let mut spent = [0u8; 6];
     for mana in Mana::ALL {
@@ -8953,9 +8982,15 @@ pub(crate) fn pay_mana_with(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 
 /// `pay_mana_with`, and what the mana spent does to what it paid for (`ManaRestriction::effects`, CR 106.6).
 pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
+    // A Phyrexian symbol not yet announced is announced now, each paid with its color or 2 life (CR 107.4f), before any mana
+    // ability is activated to pay it, and its life is paid with the mana. A cost to attack is the one that gets here so
+    // (CR 508.1h-j: the total is determined, then mana abilities are activated, then all of it is paid): a spell's or an
+    // ability's symbols are announced as it is proposed (CR 118.13a, 601.2b), and a cost paid as one resolves announces its
+    // own (`pay_announced`, CR 118.13b). A payment that is neither for a cast nor for an activation is what reaches here
+    // with one, so no ban on paying life to cast or activate (`payable_life_for`) applies to it.
+    let life = if total.phyrexian != [0; 5] { announce_life(cx, player, source, &mut total, helpers.any_type, None)? } else { 0 };
     // A monocolored hybrid symbol not yet announced (a cost changed after the announcement) is announced now, as the cost
-    // is paid (CR 118.13b). No Phyrexian symbol reaches here unannounced: `announce_life` runs before the cost changes,
-    // and a change adds only generic mana (`CostDelta::more`).
+    // is paid (CR 118.13b).
     if total.twobrid != [0; 5] {
         announce_twobrids(cx, player, source, &mut total, helpers.any_type)?;
     }
@@ -9060,7 +9095,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life, governs: "" };
+        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life + u32::from(life), governs: "" };
         let answer = cx.ask_core(player, ask, true)?;
         match answer {
             Answer::Act(action) => match action.kind {
@@ -9117,6 +9152,14 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
             _ => return Err(Stop::Cancel),
         }
     }
+    // The life its Phyrexian symbols take, paid with the mana (CR 508.1j: all costs, no partial payment): a mana ability
+    // that cost life while paying (Mana Confluence) may have left too little, which gives the whole payment up.
+    if !rest_payable(cx, player, 0, life, None) {
+        return Err(Stop::Cancel);
+    }
+    if life > 0 {
+        ops::change_life(cx, player, -life_paid(life));
+    }
     if !taken.is_empty() {
         let cast = helpers.purpose == Paying::Casting && cx.s().obj(source).zone.is(ZoneKind::Stack);
         record_spent(cx, player, source, cast, &taken);
@@ -9125,6 +9168,12 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         ops::exile_all(cx, &delved);
     }
     Ok((paid, used))
+}
+
+/// Life being paid, as the change to a life total: never more than the payer has (CR 119.4, judged before it is paid), so
+/// it is a life total's width.
+fn life_paid(life: u32) -> i32 {
+    i32::try_from(life).unwrap_or(i32::MAX)
 }
 
 /// Whether `player` could pay `life` life now (CR 119.4): any amount of 0 (CR 119.4b), otherwise only with a life total
@@ -9387,11 +9436,11 @@ pub(crate) fn pool_pays(pool: &ManaPool, owed: &ManaCost, life_room: i32) -> boo
 /// Pays a resolution's cost with `total` its mana and `life` its life: its Phyrexian symbols are announced first, each
 /// paid with its color or 2 life, immediately before the cost is paid (CR 118.13b, 107.4f), and the life they take is paid
 /// with the rest. A choice of more life than the payer can pay gives the payment up, to be asked again.
-fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mut total: ManaCost, mut life: u16, x: u16) -> R<()> {
+fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mut total: ManaCost, life: u16, x: u16) -> R<()> {
+    let mut life = u32::from(life);
     if total.phyrexian != [0; 5] {
-        let extra = announce_life(cx, payer, source, &mut total, false, None)?;
-        life = life.checked_add(u16::from(extra)).ok_or(Stop::Cancel)?;
-        if !can_pay_life(cx, payer, life) {
+        life += announce_life(cx, payer, source, &mut total, false, None)?;
+        if !rest_payable(cx, payer, 0, life, None) {
             return Err(Stop::Cancel);
         }
     }
@@ -9401,7 +9450,7 @@ fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mu
 /// Chooses what the parts of a resolution's cost other than mana and life take, then pays the whole (CR 118.3, 601.2h):
 /// the mana from the pool, the life, and each other part as an activated ability's cost pays it (`activate`). `x` is the
 /// X paid, for a "sacrifice X" part.
-fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, total: ManaCost, life: u16, x: u16) -> R<()> {
+fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, total: ManaCost, life: u32, x: u16) -> R<()> {
     // A cost paid as a spell or ability resolves is paid for no cast or activation (CR 118.12): nothing that forbids paying
     // for those touches it (Yasharn, Implacable Earth's ruling).
     let chosen = choose_permanents(cx, payer, source, cost, None)?;
@@ -9418,7 +9467,7 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
         pay_mana(cx, payer, source, total)?;
     }
     if life > 0 {
-        ops::change_life(cx, payer, -i32::from(life));
+        ops::change_life(cx, payer, -life_paid(life));
     }
     // {T} first, so a permanent the cost also moves was tapped as it left (CR 118.3), as `activate` pays it.
     if cost.tap {

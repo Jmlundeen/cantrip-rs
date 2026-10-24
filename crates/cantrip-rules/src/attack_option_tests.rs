@@ -95,12 +95,31 @@ fn one_to_attack_them(q: &dyn Query, me: &Asker, _: ObjectId, target: Target) ->
 
 /// "Creatures can't attack you unless their controller pays {1} for each creature they control that's attacking you."
 static TOLL: CardDef = CardDef { name: "Attack Option Toll", types: TypeSet::of(&[CardType::Enchantment]), attack_costs: &[one_to_attack_them], ..CardDef::BLANK };
+/// "Creatures can't attack you unless their controller pays {W/P} for each creature they control that's attacking you" (Norn's
+/// Annex's cost, on the player alone).
+fn white_phyrexian_to_attack_them(q: &dyn Query, me: &Asker, _: ObjectId, target: Target) -> Option<ManaCost> {
+    let mut phyrexian = [0; 5];
+    phyrexian[Color::White as usize] = 1;
+    (target == Target::Player(q.obj(me.source).controller)).then_some(ManaCost { phyrexian, ..ManaCost::ZERO })
+}
+
+static ANNEX: CardDef = CardDef { name: "Attack Option Annex", types: TypeSet::of(&[CardType::Artifact]), attack_costs: &[white_phyrexian_to_attack_them], ..CardDef::BLANK };
+
+/// The same with {U/P}: a cost no printed card asks, beside Norn's Annex's, for a payment of more Phyrexian symbols than one
+/// color holds.
+fn blue_phyrexian_to_attack_them(q: &dyn Query, me: &Asker, _: ObjectId, target: Target) -> Option<ManaCost> {
+    let mut phyrexian = [0; 5];
+    phyrexian[Color::Blue as usize] = 1;
+    (target == Target::Player(q.obj(me.source).controller)).then_some(ManaCost { phyrexian, ..ManaCost::ZERO })
+}
+
+static BLUE_ANNEX: CardDef = CardDef { name: "Attack Option Blue Annex", types: TypeSet::of(&[CardType::Artifact]), attack_costs: &[blue_phyrexian_to_attack_them], ..CardDef::BLANK };
 /// The ability enlist, to be given by an effect.
 static GIFT: CardDef = CardDef { name: "Attack Option Gift", types: TypeSet::of(&[CardType::Sorcery]), delayed: &[ENLIST], ..CardDef::BLANK };
 
 fn game() -> Game {
     let table: &'static CardTable =
-        Box::leak(Box::new(CardTable::new([&FILLER, &RECRUITER, &DOUBLE, &BEAR, &PUMPER, &VIGILANT, &HASTY, &ELF, &EXERTER, &TOLL, &GIFT])));
+        Box::leak(Box::new(CardTable::new([&FILLER, &RECRUITER, &DOUBLE, &BEAR, &PUMPER, &VIGILANT, &HASTY, &ELF, &EXERTER, &TOLL, &GIFT, &ANNEX, &BLUE_ANNEX])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     g.verify = true;
@@ -409,4 +428,74 @@ fn exerting_as_it_attacks_is_a_choice_with_its_own_trigger() {
         assert_eq!(g.state.obj(exerter).marks.exerted_by, exert.then_some(YOU));
         assert_eq!(g.state.player(YOU).life, if exert { 21 } else { 20 });
     }
+}
+
+/// A cost to attack of 128 {W/P} - four Annexes and 32 attackers - each paid with 2 life (CR 107.4f, 508.1h-j): 256 life,
+/// paid in full. The life is counted 32-bit, so it never wraps to nothing and lets the attack go free.
+#[test]
+fn a_cost_to_attack_of_many_phyrexian_symbols_paid_with_life_takes_all_of_it() {
+    let mut g = game();
+    for _ in 0..4 {
+        put(&mut g, &ANNEX, THEM);
+    }
+    let bears: Vec<ObjectId> = (0..32).map(|_| put(&mut g, &BEAR, YOU)).collect();
+    g.state.update_player(YOU, |p| p.life = 300);
+    attack(&mut g, &bears);
+    let r = next(&mut g);
+    let RequestKind::ChooseModes { modes, at_most, .. } = &r.kind else { panic!("which {{W/P}} to pay with life, not {:?}", r.kind) };
+    assert_eq!((modes.len(), *at_most), (128, 128));
+    answer(&mut g, &r, Answer::Modes((0..128).collect()));
+    // Nothing is left to pay in mana, so nothing more is asked: the attackers are declared.
+    g.run();
+    assert_eq!(g.state.player(YOU).life, 300 - 256);
+    assert_eq!(g.state.attackers.len(), 32);
+}
+
+/// 320 Phyrexian symbols to attack - three {W/P} and two {U/P} for each of 64 attackers - are more than a choice of modes
+/// holds (255): the player is asked about them a page at a time, 255 then 65, each up to what the life left covers, and every
+/// one paid with 2 life takes 640 life (CR 107.4f, 508.1h-j). None is lost to a count cut to a byte.
+#[test]
+fn more_phyrexian_symbols_than_a_choice_holds_are_asked_a_page_at_a_time() {
+    let mut g = game();
+    for _ in 0..3 {
+        put(&mut g, &ANNEX, THEM);
+    }
+    for _ in 0..2 {
+        put(&mut g, &BLUE_ANNEX, THEM);
+    }
+    let bears: Vec<ObjectId> = (0..64).map(|_| put(&mut g, &BEAR, YOU)).collect();
+    g.state.update_player(YOU, |p| p.life = 1000);
+    attack(&mut g, &bears);
+    let r = next(&mut g);
+    let RequestKind::ChooseModes { modes, at_most, .. } = &r.kind else { panic!("which to pay with life, not {:?}", r.kind) };
+    assert_eq!((modes.len(), *at_most), (255, 255));
+    answer(&mut g, &r, Answer::Modes((0..255).collect()));
+    let r = next(&mut g);
+    let RequestKind::ChooseModes { modes, at_most, .. } = &r.kind else { panic!("the rest, not {:?}", r.kind) };
+    assert_eq!((modes.len(), *at_most), (65, 65));
+    answer(&mut g, &r, Answer::Modes((0..65).collect()));
+    g.run();
+    assert_eq!(g.state.player(YOU).life, 1000 - 640);
+    assert_eq!(g.state.attackers.len(), 64);
+}
+
+/// The second page of Phyrexian symbols is offered only as many as the life the first left covers (CR 119.4): at 520 life,
+/// 255 paid with life on the first page leave 10, so 5 of the second page's 65 at most.
+#[test]
+fn a_later_page_of_phyrexian_symbols_offers_only_what_the_life_left_covers() {
+    let mut g = game();
+    for _ in 0..3 {
+        put(&mut g, &ANNEX, THEM);
+    }
+    for _ in 0..2 {
+        put(&mut g, &BLUE_ANNEX, THEM);
+    }
+    let bears: Vec<ObjectId> = (0..64).map(|_| put(&mut g, &BEAR, YOU)).collect();
+    g.state.update_player(YOU, |p| p.life = 520);
+    attack(&mut g, &bears);
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Modes((0..255).collect()));
+    let r = next(&mut g);
+    let RequestKind::ChooseModes { modes, at_most, .. } = &r.kind else { panic!("the rest, not {:?}", r.kind) };
+    assert_eq!((modes.len(), *at_most), (65, 5));
 }

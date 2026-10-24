@@ -212,3 +212,16 @@ fn the_pool_pays_a_cost_of_symbols_paid_more_than_one_way_only_with_enough_of_so
     assert!(crate::actions::pool_pays(&pool(0, 0), &mana("{G/P}"), 2), "2 life");
     assert!(crate::actions::pool_pays(&pool(0, 1), &mana("{G/P}"), 0), "{{G}}");
 }
+
+/// How the pool pays a cost with a symbol nobody has said how to pay (CR 107.4e, 107.4f): never as if it were free. A {W/P}
+/// is paid by mana only with {W}, and a {2/G} with {G} or {2}, which is the payer's choice.
+#[test]
+fn the_pool_never_pays_an_unannounced_phyrexian_or_monocolored_hybrid_symbol_for_nothing() {
+    use crate::actions::{ways, Ways};
+    let pool = |w: u32, g: u32, c: u32| ManaPool([w, 0, 0, 0, g, c]);
+    assert!(matches!(ways(&pool(0, 0, 0), &mana("{W/P}")), Ways::None), "an empty pool pays no {{W/P}}");
+    assert!(matches!(ways(&pool(0, 0, 3), &mana("{1}{W/P}")), Ways::None), "colorless pays no {{W/P}}");
+    assert!(matches!(ways(&pool(1, 0, 1), &mana("{1}{W/P}")), Ways::One([1, 0, 0, 0, 0, 1])), "{{W}} and {{1}}");
+    assert!(matches!(ways(&pool(0, 0, 1), &mana("{2/G}")), Ways::None), "one colorless pays no {{2/G}}");
+    assert!(matches!(ways(&pool(0, 1, 2), &mana("{2/G}")), Ways::Many), "{{G}} or {{2}}");
+}

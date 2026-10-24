@@ -108,6 +108,15 @@ fn phyrexian_cost(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(),
     may_pay_with(g, item, cost("{B/P}"))
 }
 
+/// "You may pay {2/G} 150 times and {2/U} 150 times. If you do, you gain 5 life." - more monocolored hybrid symbols than a
+/// choice of modes holds, which no printed card asks: how each is paid is still announced (CR 107.4e, 118.13b).
+fn many_twobrids(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    let mut twobrid = [0; 5];
+    twobrid[Color::Blue as usize] = 150;
+    twobrid[Color::Green as usize] = 150;
+    may_pay_with(g, item, Cost::mana(ManaCost { twobrid, ..ManaCost::ZERO }))
+}
+
 /// A loyalty cost, which no resolving spell asks for (CR 606.4): never paid.
 fn loyalty_cost(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
     may_pay_with(g, item, Cost { loyalty: Some(-1), ..Cost::NONE })
@@ -117,6 +126,7 @@ static OFFER: CardDef = CardDef { name: "Cost Test Offer", types: TypeSet::of(&[
 static RECALL: CardDef = CardDef { name: "Cost Test Recall", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], return_tapped), ..CardDef::BLANK };
 static TITHE: CardDef = CardDef { name: "Cost Test Tithe", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], discard_and_energy), ..CardDef::BLANK };
 static TOLL: CardDef = CardDef { name: "Cost Test Toll", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], phyrexian_cost), ..CardDef::BLANK };
+static HOARD: CardDef = CardDef { name: "Cost Test Hoard", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], many_twobrids), ..CardDef::BLANK };
 static VOW: CardDef = CardDef { name: "Cost Test Vow", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], loyalty_cost), ..CardDef::BLANK };
 
 /// "Whenever a card is put into a hand or a library, you gain 2 life" (CR 603.10a: it looks back for a card all players can
@@ -189,7 +199,7 @@ static STOWER: CardDef = CardDef {
 
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &DORK, &SEER, &GAZER, &RETURNER, &OFFER, &RECALL, &TITHE, &VOW, &RECOILER, &LIBRARIAN, &RITE, &GRAFT, &STOWER, &TOLL])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &DORK, &SEER, &GAZER, &RETURNER, &OFFER, &RECALL, &TITHE, &VOW, &RECOILER, &LIBRARIAN, &RITE, &GRAFT, &STOWER, &TOLL, &HOARD])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -579,4 +589,26 @@ fn a_phyrexian_symbol_in_a_cost_paid_as_a_spell_resolves_is_paid_with_its_color_
     g.state.update_player(YOU, |p| p.life = 1);
     let r = cast_to_payment(&mut g, toll);
     assert!(pays(&r).is_none(), "a {{B/P}} with no {{B}} and 1 life can't be paid");
+}
+
+/// 300 monocolored hybrid symbols in a cost paid as a spell resolves, more than a choice of modes holds (255): which are
+/// paid with {2} is asked a page at a time, 255 then 45, none of them lost to a count cut to a byte (CR 107.4e, 118.13b).
+#[test]
+fn more_monocolored_hybrid_symbols_than_a_choice_holds_are_asked_a_page_at_a_time() {
+    let mut g = game();
+    let hoard = put(&mut g, &HOARD, Zone::hand(YOU));
+    let r = next(&mut g);
+    let cast = option_of(&g, &r, hoard).expect("the spell is offered");
+    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
+    let r = resolve_all(&mut g);
+    let RequestKind::ChooseModes { modes, at_most, .. } = &r.kind else { panic!("which {{2/C}} to pay with {{2}}, not {:?}", r.kind) };
+    assert_eq!((modes.len(), *at_most), (255, 255));
+    assert!(modes.iter().all(|m| matches!(m, Label::PayGeneric(_))));
+    answer(&mut g, &r, Answer::Modes(Vec::new()));
+    let r = next(&mut g);
+    let RequestKind::ChooseModes { modes, at_most, .. } = &r.kind else { panic!("the rest, not {:?}", r.kind) };
+    assert_eq!((modes.len(), *at_most), (45, 45));
+    answer(&mut g, &r, Answer::Modes(Vec::new()));
+    let r = next(&mut g);
+    assert!(matches!(r.kind, RequestKind::UnlessPays { .. }), "then the payment, not {:?}", r.kind);
 }
