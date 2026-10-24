@@ -1,0 +1,56 @@
+# Fiend Artisan with X = 0 costs just {B/G}, paid with green (Mox Emerald) and checked empty right after. The sacrificed
+# creature must be another creature: alone the Artisan cannot activate (! before the Raider is cast, beside the activation after).
+# A card with {X} in its mana cost in the library has X = 0 (CR 107.3g), so Walking Ballista (mana value 0) qualifies for X = 0 and
+# Misshapen Fiend (2) does not. The Ballista enters with no counters and dies, so Artisan counts two creature cards (the
+# sacrificed Ravine Raider and the Ballista) and is 3/3 (Bot2's discarded Elvish Mystic, in the other graveyard, is not counted).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Fiend Artisan
+Ravine Raider
+Swamp
+Swamp
+Swamp
+Misshapen Fiend
+Walking Ballista
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Elvish Mystic
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Fiend Artisan.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Fiend Artisan.Activate
+Bot1.Hand.Ravine Raider.Cast
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Pass
+Bot1.Battlefield.Fiend Artisan.Activate(X: 0)
+Bot1.Choose(Ravine Raider)
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana = 
+! Bot1.Search(Misshapen Fiend)
+Bot1.Search(Walking Ballista)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Walking Ballista; Ravine Raider
+Bot2.Graveyard = Elvish Mystic
+Bot1.Battlefield.Fiend Artisan.Power = 3
+Bot1.Battlefield.Fiend Artisan.Toughness = 3
+Bot1.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Swamp#1.Tapped = true
+Bot1.Battlefield.Swamp#2.Tapped = false

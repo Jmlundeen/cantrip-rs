@@ -1,0 +1,57 @@
+# Fiend Artisan: {X}{B/G}, {T}, Sacrifice another creature, sorcery speed - search for a creature card with mana value X or
+# less onto the battlefield. X = 2 costs exactly three mana (Dark Ritual's BBB, the pool checked empty right after); the
+# library holds a mana value 3 creature (Hired Blade, just past X: not offered) and a mana value 2 one (Misshapen Fiend, exactly
+# X: found). Artisan gets +1/+1 for each creature card in its controller's graveyard only: the sacrificed Ravine Raider counts,
+# sorcery speed: refused with Dark Ritual on the stack, allowed once it resolved. Dark Ritual (not a creature) and Bot2's Elvish Mystic (discarded to hand size, in Bot2's graveyard) do not.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Fiend Artisan
+Ravine Raider
+Dark Ritual
+Swamp
+Swamp
+Hired Blade
+Misshapen Fiend
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Elvish Mystic
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Fiend Artisan.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Hand.Ravine Raider.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+! Bot1.Battlefield.Fiend Artisan.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Swamp#1.Activate
+! Bot1.Battlefield.Fiend Artisan.Activate
+Bot1.Battlefield.Fiend Artisan.Activate(X: 2)
+Bot1.Choose(Ravine Raider)
+? Bot1.Mana = 
+! Bot1.Search(Hired Blade)
+Bot1.Search(Misshapen Fiend)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ravine Raider; Dark Ritual
+Bot1.Battlefield.Fiend Artisan.Tapped = true
+Bot1.Battlefield.Fiend Artisan.Power = 2
+Bot1.Battlefield.Fiend Artisan.Toughness = 2
+Bot1.Battlefield.Misshapen Fiend.Power = 1
+Bot2.Graveyard = Elvish Mystic
