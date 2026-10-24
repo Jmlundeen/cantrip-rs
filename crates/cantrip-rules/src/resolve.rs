@@ -409,6 +409,7 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
             subject: Target::None,
             members: cantrip_state::Span::default(),
             since,
+            acquired: Acquired::OWN,
         });
         return;
     }

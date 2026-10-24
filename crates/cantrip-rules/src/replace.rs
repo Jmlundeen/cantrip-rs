@@ -1022,7 +1022,7 @@ mod tests {
     /// linking it, keeps the link.
     #[test]
     fn a_later_effect_that_sends_the_card_elsewhere_unlinks_it() {
-        let linked = Linked { object: ObjectId(5), text: CardId(3) };
+        let linked = Linked { object: ObjectId(5), text: CardId(3), acquired: Acquired::OWN };
         let exiling = ZoneChange {
             object: ObjectId(1),
             from: Zone::hand(ME),

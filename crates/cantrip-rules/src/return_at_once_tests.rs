@@ -64,7 +64,7 @@ fn exile_until(game: &mut Game, table: &CardTable, owner: PlayerId, by: ObjectId
     let id = game.state.push_obj(Obj::new(table.id_of(&CAPTIVE), owner, Zone::exile(owner)));
     game.state.zone_push(Zone::exile(owner), id);
     let text = game.state.obj(by).card;
-    game.state.update_obj(id, |o| o.exiled = Some(ExileLink { by, text, from: Zone::BATTLEFIELD, until_leaves: true, encoded: false }));
+    game.state.update_obj(id, |o| o.exiled = Some(ExileLink { by, text, acquired: Acquired::OWN, from: Zone::BATTLEFIELD, until_leaves: true, encoded: false }));
     id
 }
 

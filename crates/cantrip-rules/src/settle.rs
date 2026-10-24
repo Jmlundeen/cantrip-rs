@@ -762,6 +762,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         since: trigger.since.unwrap_or(cx.g.log.len() as u32),
         copied: false,
         cast_known: u32::MAX,
+        acquired: trigger.acquired,
     };
     // Its controller left as one of its choices was asked (CR 800.4d).
     if cx.s().player(trigger.controller).lost {
@@ -809,6 +810,13 @@ fn consider(
         Some(None) => return,
         None => (layers::chars(cx.cards(), cx.s(), &cx.g.log, source), cx.s().obj(source).controller),
     };
+    // How it acquired each ability (CR 607.5), as it was then where it looks back (`Then`): worked out only for one that
+    // triggers.
+    let taken = then.and_then(|t| t.acquired(source));
+    let acquired_at = |nth: usize| match &taken {
+        Some((text, slots)) => slots.as_ref().map_or(*text, |a| a[slot_of(&chars, nth)]),
+        None => layers::acquired(cx.cards(), cx.s(), &cx.g.log, source, &chars, slot_of(&chars, nth)),
+    };
     for (nth, ability) in chars.abilities().enumerate() {
         // A state trigger (CR 603.8) triggers as soon as its state is true, so it is asked after every event, of the board as
         // it is now (never of a look-back pass), as well as each time a player would receive priority (`state_triggers`).
@@ -819,7 +827,7 @@ fn consider(
                 && state(cx, &Asker { source, controller })
                 && !state_trigger_waiting(cx, source, ability, found, later.as_deref())
             {
-                found.push((state_trigger(source, ability, controller), t, Again::new()));
+                found.push((state_trigger(source, ability, controller, acquired_at(nth)), t, Again::new()));
             }
             continue;
         }
@@ -859,7 +867,17 @@ fn consider(
                 _ => &mut *found,
             };
             into.push((
-                PendingTrigger { source, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None, since: None },
+                PendingTrigger {
+                    source,
+                    ability,
+                    controller,
+                    subject: fired.subject,
+                    data: fired.data,
+                    members: Span::default(),
+                    count: None,
+                    since: None,
+                    acquired: acquired_at(nth),
+                },
                 t,
                 again,
             ));
@@ -896,12 +914,17 @@ fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event
     if index == cantrip_api::intrinsic::SPEED_UP {
         cx.record(Event::Triggered { source, ability });
     }
-    found.push((PendingTrigger { source, ability, controller, subject, data: [0; 2], members: Span::default(), count: None, since: None }, t, again));
+    found.push((PendingTrigger { source, ability, controller, subject, data: [0; 2], members: Span::default(), count: None, since: None, acquired: Acquired::OWN }, t, again));
+}
+
+/// The slot of `chars`'s abilities that the `nth` of `Chars::abilities()` is in.
+fn slot_of(chars: &Chars, nth: usize) -> usize {
+    chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(nth).map_or(0, |(slot, _)| slot)
 }
 
 /// The triggering of a state trigger (CR 603.8): about no event, so nothing is its subject.
-fn state_trigger(source: ObjectId, ability: AbilityRef, controller: PlayerId) -> PendingTrigger {
-    PendingTrigger { source, ability, controller, subject: Target::None, data: [0; 2], members: Span::default(), count: None, since: None }
+fn state_trigger(source: ObjectId, ability: AbilityRef, controller: PlayerId, acquired: Acquired) -> PendingTrigger {
+    PendingTrigger { source, ability, controller, subject: Target::None, data: [0; 2], members: Span::default(), count: None, since: None, acquired }
 }
 
 /// Whether a state trigger of `source` has triggered and not yet left the stack (CR 603.8): found for this batch, waiting
@@ -924,13 +947,14 @@ fn state_triggers(cx: &mut Cx) {
     for source in sources {
         let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
         let controller = cx.s().obj(source).controller;
-        for ability in chars.abilities() {
+        let acquired_at = |nth: usize| layers::acquired(cx.cards(), cx.s(), &cx.g.log, source, &chars, slot_of(&chars, nth));
+        for (nth, ability) in chars.abilities().enumerate() {
             if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                 && let Some(state) = t.state
                 && state(cx, &Asker { source, controller })
                 && !state_trigger_waiting(cx, source, ability, &found, None)
             {
-                found.push((state_trigger(source, ability, controller), t, Again::new()));
+                found.push((state_trigger(source, ability, controller, acquired_at(nth)), t, Again::new()));
             }
         }
     }
@@ -960,13 +984,14 @@ pub(crate) fn state_triggers_now(cx: &mut Cx) {
     for source in sources {
         let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
         let controller = cx.s().obj(source).controller;
-        for ability in chars.abilities() {
+        let acquired_at = |nth: usize| layers::acquired(cx.cards(), cx.s(), &cx.g.log, source, &chars, slot_of(&chars, nth));
+        for (nth, ability) in chars.abilities().enumerate() {
             if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                 && let Some(state) = t.state
                 && state(cx, &Asker { source, controller })
                 && !state_trigger_waiting(cx, source, ability, &found, None)
             {
-                found.push((state_trigger(source, ability, controller), t, Again::new()));
+                found.push((state_trigger(source, ability, controller, acquired_at(nth)), t, Again::new()));
             }
         }
     }
@@ -1079,7 +1104,14 @@ pub struct Then {
     taken: bool,
     /// By object, for `of`.
     objects: Vec<(ObjectId, Chars, PlayerId)>,
+    /// By object, parallel to `objects`: how it had acquired its abilities then (CR 607.5; `layers::acquisitions`), the text
+    /// it had and each slot's where an effect could have given one. Empty where nothing could have (`acquisition_possible`).
+    acquired: Vec<Taken>,
 }
+
+/// How an object had acquired its abilities as a `Then` was taken: by the text it had, and each slot's where an effect could
+/// have given one (`layers::acquisitions`).
+type Taken = (Acquired, Option<Box<[Acquired; cantrip_state::MAX_ABILITIES]>>);
 
 impl Then {
     /// Whether anything was taken (`now`), rather than `none`.
@@ -1095,9 +1127,15 @@ impl Then {
         Some(self.objects.binary_search_by_key(&id, |&(o, _, _)| o).ok().map(|at| (self.objects[at].1, self.objects[at].2)))
     }
 
+    /// How `id` had acquired its abilities, if it was taken: all its own where nothing could have given one then.
+    fn acquired(&self, id: ObjectId) -> Option<Taken> {
+        let at = self.objects.binary_search_by_key(&id, |&(o, _, _)| o).ok()?;
+        Some(self.acquired.get(at).cloned().unwrap_or((Acquired::OWN, None)))
+    }
+
     /// Nothing taken: the look-back pass judges the permanents as they are now.
     pub(crate) fn none() -> Then {
-        Then { taken: false, objects: Vec::new() }
+        Then { taken: false, objects: Vec::new(), acquired: Vec::new() }
     }
 
     /// The permanents on the battlefield now that could look back, as they are now: called just before the events.
@@ -1124,7 +1162,13 @@ impl Then {
                 );
             }
         }
-        Then { taken: true, objects }
+        // How each had acquired its abilities (CR 607.5), where anything could have given one: else all are its own.
+        let acquired = if layers::acquisition_possible(cards, s) {
+            objects.iter().map(|(id, chars, _)| (s.copy_acquired(*id), layers::acquisitions(cards, s, &cx.g.log, *id, chars))).collect()
+        } else {
+            Vec::new()
+        };
+        Then { taken: true, objects, acquired }
     }
 }
 
@@ -1282,6 +1326,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                 count: None,
                                 // A delayed ability goes on the stack with the moment it was created (CR 701.27f).
                                 since: Some(d.since),
+                                acquired: d.acquired,
                             },
                             t,
                             Again::new(),
@@ -1321,7 +1366,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             for id in elsewhere {
                 let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
                 let zone = cx.s().obj(id).zone.kind();
-                for ability in chars.abilities() {
+                for (nth, ability) in chars.abilities().enumerate() {
                     if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                         && t.functions.contains(zone)
                         && t.listens.intersects(mask)
@@ -1346,7 +1391,17 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                         let mut again = Again::new();
                         statics.additional(cx, event, &triggering, &mut again);
                         found.push((
-                            PendingTrigger { source: id, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None, since: None },
+                            PendingTrigger {
+                                source: id,
+                                ability,
+                                controller,
+                                subject: fired.subject,
+                                data: fired.data,
+                                members: Span::default(),
+                                count: None,
+                                since: None,
+                                acquired: layers::acquired(cx.cards(), cx.s(), &cx.g.log, id, &chars, slot_of(&chars, nth)),
+                            },
                             t,
                             again,
                         ));
@@ -1462,7 +1517,7 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             } else {
                 at += 1;
             }
-            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None, since: Some(d.since) });
+            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None, since: Some(d.since), acquired: d.acquired });
         } else {
             at += 1;
         }
@@ -1495,6 +1550,7 @@ fn suspended_cards(cx: &mut Cx, active: PlayerId) {
             members: Span::default(),
             count: None,
             since: None,
+            acquired: Acquired::OWN,
         });
     }
 }

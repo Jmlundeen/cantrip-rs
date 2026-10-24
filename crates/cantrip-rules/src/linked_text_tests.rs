@@ -7,14 +7,29 @@ use crate::{Game, Setup};
 use cantrip_api::*;
 
 /// A transforming card's back face has no mana cost of its own (CR 202.3b, 712.8e).
-static TRANSFORMED: CardDef =
-    CardDef { name: "Linked Test Transformed", types: TypeSet::of(&[CardType::Creature]), power: Some(2), toughness: Some(2), has_cost: false, ..CardDef::BLANK };
+fn nothing(_: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
+    Ok(())
+}
+
+/// The back face, with an ability of its own ("... cast a spell from among the cards exiled with this permanent", Hauken's
+/// Insight's).
+static TRANSFORMED: CardDef = CardDef {
+    name: "Linked Test Transformed",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    has_cost: false,
+    abilities: &[ability(TAP, nothing, "{T}: Back.")],
+    ..CardDef::BLANK
+};
+/// The front face, with the ability the back's is linked to ("... exile a card from your hand face down", Jacob Hauken's).
 static TRANSFORMING: CardDef = CardDef {
     name: "Linked Test Transforming",
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(1),
     toughness: Some(1),
     back: Some(&TRANSFORMED),
+    abilities: &[ability(TAP, nothing, "{T}: Front.")],
     ..CardDef::BLANK
 };
 
@@ -73,7 +88,7 @@ fn exiled_by(card: &'static CardDef) -> (Game, ObjectId, ObjectId) {
     let exiled = game.state.push_obj(Obj::new(t.id_of(&EXILED), PlayerId(1), Zone::exile(PlayerId(1))));
     game.state.zone_push(Zone::exile(PlayerId(1)), exiled);
     let by = game.linked_to(source);
-    game.state.update_obj(exiled, |o| o.exiled = Some(ExileLink { by: by.object, text: by.text, from: Zone::graveyard(PlayerId(1)), until_leaves: false, encoded: false }));
+    game.state.update_obj(exiled, |o| o.exiled = Some(ExileLink::new(by, Zone::graveyard(PlayerId(1)), false)));
     (game, source, exiled)
 }
 
@@ -88,4 +103,32 @@ fn an_exile_by_one_face_is_found_from_the_other_face_of_a_transforming_card_only
     let (mut game, source, _) = exiled_by(&MODAL);
     game.state.update_obj(source, |o| o.transformed = true);
     assert!(game.exiled_with(game.linked_to(source)).is_empty(), "the other face of a modal card finds nothing");
+}
+
+/// A transforming card's two faces are one text (CR 607.1b), but an ability of its front face an effect gives it while its
+/// back face is up was acquired by that effect, and is linked to nothing it prints (CR 607.5): Agatha's Soul Cauldron lending
+/// Jacob Hauken's ability to an animated Hauken's Insight. The back face's own ability is its own.
+#[test]
+fn a_front_face_ability_given_to_the_back_face_is_acquired_by_the_effect() {
+    let (mut game, source, _) = exiled_by(&TRANSFORMING);
+    let t = game.cards;
+    game.state.update_obj(source, |o| o.transformed = true);
+    // Given by another object's effect, as the Cauldron's.
+    let lender = game.state.push_obj(Obj::new(t.id_of(&EXILED), PlayerId(0), Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, lender);
+    let timestamp = game.state.timestamp();
+    game.state.effect_push(ContinuousEffect {
+        source: lender,
+        controller: PlayerId(0),
+        timestamp,
+        affected: source,
+        kind: EffectKind::AddAbility(AbilityRef { card: t.id_of(&TRANSFORMING), index: 0 }),
+        duration: Duration::EndOfTurn,
+    });
+    let chars = crate::layers::chars(t, &game.state, &game.log, source);
+    let slot = |card: &'static CardDef| chars.abilities.iter().position(|a| a.is_some_and(|a| a.card == t.id_of(card))).expect("the ability");
+    let given = crate::layers::acquired(t, &game.state, &game.log, source, &chars, slot(&TRANSFORMING));
+    assert_eq!(given, Acquired { by: AcquiredBy::Grant, stamp: timestamp, part: 0 }, "the given front-face ability is the effect's");
+    let printed = crate::layers::acquired(t, &game.state, &game.log, source, &chars, slot(&TRANSFORMED));
+    assert_eq!(printed, Acquired::OWN, "the back face's printed ability is its own");
 }

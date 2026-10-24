@@ -146,6 +146,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
         members: cantrip_state::Span::default(),
         count: None,
         since: None,
+        acquired: Acquired::OWN,
     });
 }
 

@@ -327,14 +327,15 @@ pub trait Query {
     /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): `CardTable::linked_card`.
     fn linked_card(&self, card: CardId) -> CardId;
 
-    /// A spell or ability on the stack, resolving or about to (`StackItem`), as linked abilities know it (CR 607.1): its source
-    /// and the card whose text it is printed in. What `exile_with` links and `exiled_with` asks for, from a resolving ability.
+    /// A spell or ability on the stack, resolving or about to (`StackItem`), as linked abilities know it (CR 607.1, 607.5): its
+    /// source, the card whose text it is printed in, and how its source acquired it (`StackItem::acquired`). What `exile_with` links and `exiled_with` asks for, from a resolving ability.
     fn linked(&self, item: &StackItem) -> Linked {
-        Linked { object: item.object, text: self.linked_card(item.ability.card) }
+        Linked { object: item.object, text: self.linked_card(item.ability.card), acquired: item.acquired }
     }
 
-    /// An ability `source` has from the text it has now (CR 607.1): its card's, the face that is up, or a copy effect's (CR
-    /// 707.2) - what a static ability, a replacement effect or a mana ability of that text links and asks for.
+    /// An ability `source` has from the text it has now (CR 607.1, 607.5): its card's, the face that is up, or a copy effect's
+    /// (CR 707.2), acquired with that text - what a static ability, a replacement effect or a mana ability of that text
+    /// links and asks for (`CardTable::linked_to`).
     fn linked_to(&self, source: ObjectId) -> Linked;
 
     /// The object `left` became when it moved to a public zone, if that object is still where the move put it (CR 400.7e):

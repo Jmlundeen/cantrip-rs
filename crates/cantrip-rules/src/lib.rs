@@ -944,6 +944,20 @@ impl<'a> Cx<'a> {
 
     /// A player who conceded at this point of the run leaves the game here, on every replay (`Game::concede`). Again at the
     /// same point does nothing more: a player who has left does not leave again.
+    /// How the source of the spell or ability resolving now acquired that ability (CR 607.5), where `source` is that source:
+    /// what a delayed or reflexive triggered ability it creates is linked by. Own for anything else.
+    pub(crate) fn resolving_acquired(&self, source: ObjectId) -> Acquired {
+        let s = &self.g.state;
+        let serial = s.agenda.iter().rev().find_map(|f| match f.kind {
+            cantrip_state::FrameKind::Resolve { serial } => Some(serial),
+            _ => None,
+        });
+        serial
+            .and_then(|serial| s.stack.iter().find(|i| i.serial == serial))
+            .filter(|i| i.object == source)
+            .map_or(Acquired::OWN, |i| i.acquired)
+    }
+
     pub(crate) fn concessions_here(&mut self) {
         if self.g.state.agenda[self.frame].conceded.is_empty() {
             return;
@@ -1069,6 +1083,7 @@ impl<'a> Cx<'a> {
             members: cantrip_state::Span::default(),
             count,
             since: None,
+            acquired: self.resolving_acquired(source),
         });
     }
 
@@ -1701,12 +1716,14 @@ impl cantrip_api::Game for Cx<'_> {
     fn delayed_trigger_about(&mut self, when: DelayedWhen, source: ObjectId, controller: PlayerId, ability: AbilityRef, objects: &[ObjectId]) {
         let members = self.g.state.members_push(objects);
         let since = self.g.log.len() as u32;
-        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject: Target::None, members, since });
+        let acquired = self.resolving_acquired(source);
+        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject: Target::None, members, since, acquired });
     }
 
     fn delayed_trigger(&mut self, when: DelayedWhen, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target) {
         let since = self.g.log.len() as u32;
-        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject, members: cantrip_state::Span::default(), since });
+        let acquired = self.resolving_acquired(source);
+        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject, members: cantrip_state::Span::default(), since, acquired });
     }
 
     fn reflexive_trigger(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target) {

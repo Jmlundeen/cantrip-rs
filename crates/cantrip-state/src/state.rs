@@ -926,6 +926,18 @@ impl GameState {
         }
     }
 
+    /// How `id` has the abilities of the text it has now (CR 607.5, 707.2): by the latest copy effect still on it, which
+    /// made its copiable values what they are (`EffectKind::RestoreCopy`), or as its own. What an ability of that text is
+    /// linked by (`Linked::acquired`); an ability an effect granted it is not of that text.
+    pub fn copy_acquired(&self, id: ObjectId) -> Acquired {
+        self.effects
+            .iter()
+            .filter(|e| e.affected == id && matches!(e.kind, EffectKind::RestoreCopy(_)))
+            .map(|e| e.timestamp)
+            .max()
+            .map_or(Acquired::OWN, |stamp| Acquired { by: AcquiredBy::Copy, stamp, part: 0 })
+    }
+
     pub fn permission_push(&mut self, permission: PlayPermission) {
         self.permissions.push(permission);
         self.log(Undo::PermissionPushed);
@@ -1779,6 +1791,7 @@ mod tests {
             since: 0,
             copied: false,
             cast_known: u32::MAX,
+            acquired: Acquired::OWN,
         }
     }
 

@@ -348,7 +348,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         if to.is(ZoneKind::Exile)
             && let Some(by) = change.exiled_with
         {
-            new.exiled = Some(ExileLink { by: by.object, text: by.text, from, until_leaves: false, encoded: false });
+            new.exiled = Some(ExileLink::new(by, from, false));
         }
         if entering {
             new.controller = change.controller;
@@ -468,6 +468,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
                 members: cantrip_state::Span::default(),
                 count: None,
                 since: None,
+                acquired: Acquired::OWN,
             });
         }
 
@@ -584,7 +585,7 @@ pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: Linked, until_leaves: boo
     let new = move_together(cx, &moves, ZoneReason::Exile);
     for (&n, from) in new.iter().zip(from) {
         if cx.s().obj(n).zone.is(ZoneKind::Exile) {
-            cx.st().update_obj(n, |o| o.exiled = Some(ExileLink { by: by.object, text: by.text, from, until_leaves, encoded: false }));
+            cx.st().update_obj(n, |o| o.exiled = Some(ExileLink::new(by, from, until_leaves)));
         }
     }
     new
@@ -596,7 +597,7 @@ pub fn link_exiled(cx: &mut Cx, cards: &[ObjectId], by: Linked) {
     for &c in cards {
         if live(cx.s(), c) && cx.s().obj(c).zone.is(ZoneKind::Exile) {
             let from = cx.s().obj(c).exiled.map_or(cx.s().obj(c).zone, |l| l.from);
-            cx.st().update_obj(c, |o| o.exiled = Some(ExileLink { by: by.object, text: by.text, from, until_leaves: false, encoded: false }));
+            cx.st().update_obj(c, |o| o.exiled = Some(ExileLink::new(by, from, false)));
         }
     }
 }
@@ -606,7 +607,7 @@ pub fn encode(cx: &mut Cx, card: ObjectId, creature: ObjectId) -> Option<ObjectI
     // Encoded on the creature, not exiled by an ability of its own: what is linked to it is the encoding, which no ability
     // of the creature reads but cipher's (`ExileLink::encoded`), named by the card encoded.
     let text = cx.g.cards.linked_card(cx.s().obj(card).card);
-    let new = *exile_with(cx, &[card], Linked { object: creature, text }, false).first()?;
+    let new = *exile_with(cx, &[card], Linked { object: creature, text, acquired: Acquired::OWN }, false).first()?;
     if !cx.s().obj(new).zone.is(ZoneKind::Exile) {
         return None;
     }
@@ -2351,6 +2352,7 @@ pub fn draw(cx: &mut Cx, player: PlayerId) {
                 members: cantrip_state::Span::default(),
                 count: None,
                 since: None,
+                acquired: Acquired::OWN,
             });
         }
     }

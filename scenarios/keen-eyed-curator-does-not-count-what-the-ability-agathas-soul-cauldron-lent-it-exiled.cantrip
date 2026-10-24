@@ -1,0 +1,69 @@
+# An ability an object acquired is linked only to abilities acquired with it (CR 607.5): Agatha's Soul Cauldron exiles one
+# Keen-Eyed Curator, and the +1/+1 counter it puts on the other Curator lends that one a second "{1}: Exile target card
+# from a graveyard" (CR 613.1f). The second Curator exiles Dryad Arbor, Ornithopter and Lightning Bolt with the lent
+# ability - land, creature, artifact and instant - yet its own "as long as there are four or more card types among cards
+# exiled with this creature" counts only what its printed ability exiled, so it stays 4/4 with no trample.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Keen-Eyed Curator
+Keen-Eyed Curator
+Agatha's Soul Cauldron
+Lightning Bolt
+Mountain
+Black Lotus
+Island x10
+
+[Bot2 Deck]
+Island x7
+Dryad Arbor
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Keen-Eyed Curator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Keen-Eyed Curator.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Keen-Eyed Curator#1)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Keen-Eyed Curator)
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Dryad Arbor; Ability: #2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Ornithopter; Ability: #2)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Lightning Bolt; Ability: #2)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Dryad Arbor; Keen-Eyed Curator; Lightning Bolt; Ornithopter
+Bot1.Battlefield.Keen-Eyed Curator.Power = 4
+Bot1.Battlefield.Keen-Eyed Curator.Toughness = 4
+Bot1.Battlefield.Keen-Eyed Curator.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Keen-Eyed Curator.Keywords = (absent)

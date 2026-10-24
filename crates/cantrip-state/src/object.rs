@@ -196,15 +196,44 @@ pub struct Phased {
     pub tapped_as_it_returns: bool,
 }
 
-/// An ability as linked abilities know it (CR 607.1, 607.2a): the object it is an ability of, and the card whose text it is
-/// printed in - the object's own card, the card a copy effect gives it (CR 707.2), or the card of an effect that granted it
-/// the ability (CR 607.1a, 607.5) - read as a whole: either face of a transforming double-faced card (CR 607.1b) and either
-/// door of a Room are that card (`CardTable::linked_card`). Two abilities of one object are linked only when both are
-/// printed in the same card's text, so cards one exiled are not "exiled with" the object to an ability of another text.
+/// How an object came to have an ability, as linked abilities know it (CR 607.1, 607.5): by its own text - what is printed
+/// on it, or the copiable values it entered the battlefield with - or by an effect that gave it the ability later: a copy
+/// effect (CR 707.2), named by the timestamp of the `EffectKind::RestoreCopy` it left, or an effect that granted the ability
+/// (CR 613.1f), named by its timestamp and, for a static ability, which of its source's static abilities it is. Abilities
+/// an object acquired by one effect are linked only to one another (CR 607.5).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+pub struct Acquired {
+    pub by: AcquiredBy,
+    pub stamp: u32,
+    pub part: u8,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+pub enum AcquiredBy {
+    /// Its own text.
+    #[default]
+    Own,
+    /// A copy effect applied to it after it entered.
+    Copy,
+    /// An effect that granted it the ability.
+    Grant,
+}
+
+impl Acquired {
+    pub const OWN: Acquired = Acquired { by: AcquiredBy::Own, stamp: 0, part: 0 };
+}
+
+/// An ability as linked abilities know it (CR 607.1, 607.2a, 607.5): the object it is an ability of, the card whose text it
+/// is printed in - the object's own card, the card a copy effect gives it (CR 707.2), or the card whose ability an effect
+/// granted (CR 607.1a) - read as a whole (either face of a transforming double-faced card, CR 607.1b, and either door of a
+/// Room are that card: `CardTable::linked_card`), and how the object acquired it (`Acquired`). Two abilities of one object
+/// are linked only when all three agree, so cards one exiled are not "exiled with" the object to an ability of another
+/// text, nor to one a copy or grant effect gave it before or after (CR 607.5).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Linked {
     pub object: ObjectId,
     pub text: CardId,
+    pub acquired: Acquired,
 }
 
 /// A card exiled by a permanent's ability, and remembered as exiled with it (CR 607.2a, 610.3).
@@ -215,6 +244,8 @@ pub struct ExileLink {
     /// The card whose text that ability is printed in (`Linked::text`): only an ability of the same text refers to it (CR
     /// 607.2a, 607.5).
     pub text: CardId,
+    /// How `by` acquired that ability (`Linked::acquired`): only an ability it acquired the same way refers to it (CR 607.5).
+    pub acquired: Acquired,
     /// Where it was exiled from, and where it returns to.
     pub from: Zone,
     /// "Until [by] leaves the battlefield" (CR 610.3): it returns as soon as `by` is no longer there.
@@ -224,9 +255,14 @@ pub struct ExileLink {
 }
 
 impl ExileLink {
-    /// Whether it was exiled by `ability` (CR 607.2a): by that object, with an ability of that text.
+    /// Whether it was exiled by `ability` (CR 607.2a, 607.5): by that object, with an ability of that text it acquired so.
     pub fn is_by(&self, ability: Linked) -> bool {
-        self.by == ability.object && self.text == ability.text
+        self.by == ability.object && self.text == ability.text && self.acquired == ability.acquired
+    }
+
+    /// A link to the ability `by`, from `from`.
+    pub fn new(by: Linked, from: Zone, until_leaves: bool) -> ExileLink {
+        ExileLink { by: by.object, text: by.text, acquired: by.acquired, from, until_leaves, encoded: false }
     }
 }
 
@@ -851,6 +887,9 @@ pub struct StackItem {
     /// For a spell that was cast: the row of `GameState::last_known` that keeps it as it became cast (CR 601.2i), which
     /// `history::Cast::chars` reads. `u32::MAX` for anything else, a copy of a spell included (CR 707.10).
     pub cast_known: u32,
+    /// How its source acquired the ability it is (CR 607.5): what an ability linked to it is linked by (`Query::linked`).
+    /// Own for a spell.
+    pub acquired: Acquired,
 }
 
 impl StackItem {
@@ -1295,6 +1334,8 @@ pub struct PendingTrigger {
     /// For a delayed triggered ability, the history's head when it was created (`Delayed::since`), which its stack item
     /// keeps (CR 701.27f); none for any other, whose item takes the head as it is put on the stack.
     pub since: Option<u32>,
+    /// How its source acquired the ability (CR 607.5): its stack item's `acquired`.
+    pub acquired: Acquired,
 }
 
 /// A run of `GameState::members`: the objects of one batch of simultaneous events, kept for the ability they
@@ -1319,6 +1360,8 @@ pub struct Delayed {
     pub members: Span,
     /// The history's head when it was created: "since that delayed triggered ability was created" (CR 701.27f).
     pub since: u32,
+    /// How the source of the ability that created it acquired that ability (CR 607.5): what it is linked by as it resolves.
+    pub acquired: Acquired,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

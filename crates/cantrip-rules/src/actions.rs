@@ -4485,7 +4485,7 @@ fn granted_by(
     chars: Option<&Chars>,
     index: usize,
     ability: AbilityRef,
-    givers: &std::cell::OnceCell<[ObjectId; cantrip_state::MAX_ABILITIES]>,
+    givers: &std::cell::OnceCell<[layers::Giver; cantrip_state::MAX_ABILITIES]>,
 ) -> Option<Grant> {
     let obj = cx.s().obj(id);
     if ability.card == cx.cards().intrinsic || ability.card == obj.card || obj.copy.is_some_and(|c| c.card == ability.card) {
@@ -4503,8 +4503,18 @@ fn granted_by(
         return None;
     }
     let slot = chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(index)?.0;
-    let giver = givers.get_or_init(|| layers::ability_givers(cx.cards(), cx.s(), &cx.g.log, id))[slot];
+    let giver = givers.get_or_init(|| layers::ability_givers(cx.cards(), cx.s(), &cx.g.log, id))[slot].object;
     (giver != ObjectId::NONE && giver != id).then_some(Grant { object: giver, ability })
+}
+
+/// How `source` acquired its `index`th ability, as `Chars::abilities()` counts them (CR 607.5; `layers::acquired`).
+fn acquired_nth(cx: &Cx, source: ObjectId, index: usize) -> Acquired {
+    if !layers::acquisition_possible(cx.cards(), cx.s()) {
+        return Acquired::OWN;
+    }
+    let chars = cx.chars(source);
+    let slot = chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(index).map_or(0, |(slot, _)| slot);
+    layers::acquired(cx.cards(), cx.s(), &cx.g.log, source, &chars, slot)
 }
 
 /// The marker in the history of an effect having allowed one more loyalty activation this turn (CR 606.3): an
@@ -6210,6 +6220,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         since: 0,
         copied: false,
         cast_known: u32::MAX,
+        acquired: Acquired::OWN,
     };
     // Targets announced with the action are one at most (`targets_with_action`); more are set by `set_item_targets`.
     assert!(targets.len() <= cantrip_state::INLINE_TARGETS, "a stack item made with more targets than it holds");
@@ -6827,6 +6838,7 @@ fn cast(
                 subject: Target::Object(spell),
                 members: cantrip_state::Span::default(),
                 since,
+                acquired: Acquired::OWN,
             });
         }
     }
@@ -7872,6 +7884,8 @@ fn activate(
         None
     };
     let mut item = stack_item(StackKind::Activated, source, ability, player, targets);
+    // How the source acquired the ability (CR 607.5), read before any cost moves it: what it is linked by.
+    item.acquired = acquired_nth(cx, source, index as usize);
     let mut mana = def.cost.mana;
     // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost: the
     // option it was offered as names which (`ActionOption::paid_by`), and it is paid if it still applies.
@@ -8018,7 +8032,7 @@ fn activate(
     // Counters put on and taken off permanents next, so a permanent the cost also sacrifices leaves with them.
     pay_blight(cx, player, &def.cost, blighted);
     pay_counters_among(cx, &removed);
-    pay_permanents(cx, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card) }));
+    pay_permanents(cx, &def.cost, &chosen, Some(cx.linked(&item)));
     let revealed = pay_behold(cx, player, &beheld);
     let at = cx.s().stack.len() - 1;
     add_revealed_to_item(cx, at, &revealed);
@@ -8177,6 +8191,8 @@ pub fn activate_mana(
     }
     let ability = cx.chars(source).abilities().nth(index as usize).expect("ability");
     let def = activated(cx, ability).expect("activated");
+    // How the source acquired the ability (CR 607.5), read before any cost moves it: what it is linked by.
+    let acquired = acquired_nth(cx, source, index as usize);
     // What restricts its mana, read from the source as it is activated, before a cost may take it away (CR 106.6).
     let restricted = def.restricted.map(|r| restriction_from(cx, source, r));
     // "Sacrifice a creature: Add ..." (Phyrexian Altar): the permanents come with the activation, as its option's
@@ -8227,7 +8243,7 @@ pub fn activate_mana(
         let hand = choose_discards(cx, player, source, &def.cost)?;
         pay_discards(cx, &hand);
     }
-    pay_permanents(cx, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card) }));
+    pay_permanents(cx, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card), acquired }));
     pay_life_and_counters(cx, player, source, &def.cost);
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, &[source]);

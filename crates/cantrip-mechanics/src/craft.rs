@@ -23,7 +23,7 @@ fn return_transformed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     }
     let materials = exiled_materials(g, item.object, item.ability);
     // Linked to the craft card by its own text (CR 702.167c): the face it returns as is that card (CR 607.1b).
-    let by = Linked { object: card, text: g.linked_card(g.obj(card).card) };
+    let by = Linked { object: card, text: g.linked_card(g.obj(card).card), acquired: Acquired::OWN };
     g.link_exiled(&materials, by);
     let owner = g.obj(card).owner;
     g.put_onto_battlefield_transformed(card, owner, false)?;

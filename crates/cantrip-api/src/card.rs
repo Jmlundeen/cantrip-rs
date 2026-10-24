@@ -3635,10 +3635,11 @@ impl CardTable {
         self.wholes.get(id.0 as usize).copied().flatten().unwrap_or(id)
     }
 
-    /// An ability `source` has from the text it has now, as linked abilities know it (CR 607.1; `Query::linked_to`): the
-    /// definition it has (`current`: a copy's, the face up), read as a whole card (`linked_card`).
+    /// An ability `source` has from the text it has now, as linked abilities know it (CR 607.1, 607.5; `Query::linked_to`):
+    /// the definition it has (`current`: a copy's, the face up), read as a whole card (`linked_card`), acquired with that
+    /// text (`GameState::copy_acquired`).
     pub fn linked_to(&self, s: &GameState, source: ObjectId) -> Linked {
-        Linked { object: source, text: self.linked_card(self.current(s.obj(source))) }
+        Linked { object: source, text: self.linked_card(self.current(s.obj(source))), acquired: s.copy_acquired(source) }
     }
 
     /// The face of a card that shows when it is transformed (CR 712.3), or the card itself when it has no back.

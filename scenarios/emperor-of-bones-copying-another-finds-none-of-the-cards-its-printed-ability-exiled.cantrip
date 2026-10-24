@@ -1,0 +1,64 @@
+# Abilities a copy effect gives an object are linked only to one another (CR 607.5, 707.2): Emperor of Bones A exiles Bot2's
+# Ornithopter at the beginning of combat with its printed ability. Two turns later Mirrorweave makes A a copy of Emperor of
+# Bones B until end of turn - the same text, acquired by the copy effect - and Bot1 adapts A: the +1/+1 counters trigger
+# its copied "put a creature card exiled with this creature onto the battlefield", which refers only to what the copied
+# exile ability exiled. The Ornithopter stays in exile.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Emperor of Bones
+Emperor of Bones
+Black Lotus
+Swamp
+Mirrorweave
+Island x10
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emperor of Bones.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.BeginCombat]
+Bot1.Target(Ornithopter)
+Bot1.Pass
+[T5 Bot1.Main1]
+? Exile = Ornithopter
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Emperor of Bones.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mirrorweave.Cast(Emperor of Bones#2)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Emperor of Bones#1.Activate(Ability: Adapt)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Ornithopter
+Bot1.Battlefield.Emperor of Bones#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter = (absent)

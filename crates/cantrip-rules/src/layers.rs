@@ -26,7 +26,19 @@ thread_local! {
     /// The object whose abilities' givers are being worked out (`ability_givers`), `ObjectId::NONE` the rest of the time.
     static WATCHED: std::cell::Cell<ObjectId> = const { std::cell::Cell::new(ObjectId::NONE) };
     /// For each of the watched object's ability slots, the object whose effect put the ability there.
-    static GIVERS: std::cell::Cell<[ObjectId; cantrip_state::MAX_ABILITIES]> = const { std::cell::Cell::new([ObjectId::NONE; cantrip_state::MAX_ABILITIES]) };
+    static GIVERS: std::cell::Cell<[Giver; cantrip_state::MAX_ABILITIES]> = const { std::cell::Cell::new([Giver::NONE; cantrip_state::MAX_ABILITIES]) };
+}
+
+/// What gave an object one of its abilities (`ability_givers`): the other object whose effect did, and the effect, by how
+/// the object acquired the ability (CR 607.5). `Giver::NONE` for one of its own.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Giver {
+    pub object: ObjectId,
+    pub acquired: Acquired,
+}
+
+impl Giver {
+    pub const NONE: Giver = Giver { object: ObjectId::NONE, acquired: Acquired::OWN };
 }
 
 /// For each of `id`'s abilities (`Chars::abilities`, slot for slot), the other object whose effect gave it the ability (CR
@@ -34,7 +46,7 @@ thread_local! {
 /// ability that did; `ObjectId::NONE` for one of its own (printed, copied, its own static's, a basic land type's). Its
 /// characteristics are worked out again, watching each entry of layer 6 that applies to it: asked only of an object that has
 /// an ability another card's, which is rare, so nothing is paid for it the rest of the time.
-pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> [ObjectId; cantrip_state::MAX_ABILITIES] {
+pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> [Giver; cantrip_state::MAX_ABILITIES] {
     /// Ends the watch however `chars` returns, a panic included, so the layers never go on paying for it.
     struct Watch(ObjectId);
     impl Drop for Watch {
@@ -43,7 +55,7 @@ pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: 
             WATCHED.with(|w| w.set(self.0));
         }
     }
-    GIVERS.with(|g| g.set([ObjectId::NONE; cantrip_state::MAX_ABILITIES]));
+    GIVERS.with(|g| g.set([Giver::NONE; cantrip_state::MAX_ABILITIES]));
     let watch = Watch(WATCHED.with(|w| w.replace(id)));
     WATCHING.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     // Abilities are settled by layer 6: the layers after it give and take none.
@@ -52,8 +64,55 @@ pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: 
     GIVERS.with(|g| g.get())
 }
 
+/// Whether an object could now have an ability by anything but its own text (CR 607.5): a copy effect applied to a permanent
+/// after it entered (`EffectKind::RestoreCopy`), a resolved effect that gives an ability, or a static ability that gives
+/// other objects abilities. With none, every ability is of its object's own text, and nothing is worked out.
+pub fn acquisition_possible(cards: &CardTable, state: &GameState) -> bool {
+    state.effects.iter().any(|e| matches!(e.kind, EffectKind::RestoreCopy(_) | EffectKind::AddAbility(_))) || ability_granting_present(cards, state)
+}
+
+/// Whether the ability in `slot` of `chars`, an object's characteristics, is surely one of the text it has (CR 607.5), with
+/// nothing worked out: of the face that is up (`Chars::card`) or a door of the Room it is, or the rules' own, with no other
+/// ability of the object the same and none of its abilities lost, so no effect can have given it (an ability given an
+/// object that has the same one printed is a second one, CR 113.2c). An ability of the other face of a transforming card,
+/// though that face is the same text (CR 607.1b), can only have been given (Agatha's Soul Cauldron lending Jacob Hauken's
+/// to an animated Hauken's Insight), and is worked out.
+fn surely_its_text(cards: &CardTable, chars: &Chars, slot: usize) -> bool {
+    let Some(ability) = chars.abilities.get(slot).copied().flatten() else { return true };
+    let of_face_up = ability.card == chars.card
+        || cards.halves.get(chars.card.0 as usize).copied().flatten().is_some_and(|(left, right)| ability.card == left || ability.card == right);
+    ability.card == cards.intrinsic
+        || (of_face_up && !chars.lost_all && !chars.text_lost && chars.abilities.iter().filter(|a| **a == Some(ability)).count() == 1)
+}
+
+/// How `id` acquired the ability in `slot` of `chars`, its characteristics now (CR 607.5): by the text it has (its own, or the
+/// latest copy effect's, `GameState::copy_acquired`), or by the effect that granted it (`ability_givers`). Worked out only
+/// where an effect could have given it the ability; what a stack item, a pending trigger and an exile link remember.
+pub fn acquired(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, chars: &Chars, slot: usize) -> Acquired {
+    if !acquisition_possible(cards, state) {
+        return Acquired::OWN;
+    }
+    let text = state.copy_acquired(id);
+    if surely_its_text(cards, chars, slot) {
+        return text;
+    }
+    let giver = ability_givers(cards, state, log, id)[slot];
+    if giver.object == ObjectId::NONE { text } else { giver.acquired }
+}
+
+/// `acquired` for each of `chars`'s slots, of an object as it is now: none worked out (`None`) where every one is surely
+/// of its text, which is nearly always.
+pub fn acquisitions(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, chars: &Chars) -> Option<Box<[Acquired; cantrip_state::MAX_ABILITIES]>> {
+    if (0..cantrip_state::MAX_ABILITIES).all(|slot| surely_its_text(cards, chars, slot)) {
+        return None;
+    }
+    let text = state.copy_acquired(id);
+    let givers = ability_givers(cards, state, log, id);
+    Some(Box::new(givers.map(|g| if g.object == ObjectId::NONE { text } else { g.acquired })))
+}
+
 /// `ability_givers` within a pass (`chars_in`).
-fn givers_in(cx: &Ctx, id: ObjectId) -> [ObjectId; cantrip_state::MAX_ABILITIES] {
+fn givers_in(cx: &Ctx, id: ObjectId) -> [Giver; cantrip_state::MAX_ABILITIES] {
     struct Watch(ObjectId);
     impl Drop for Watch {
         fn drop(&mut self) {
@@ -61,7 +120,7 @@ fn givers_in(cx: &Ctx, id: ObjectId) -> [ObjectId; cantrip_state::MAX_ABILITIES]
             WATCHED.with(|w| w.set(self.0));
         }
     }
-    let outer = GIVERS.with(|g| g.replace([ObjectId::NONE; cantrip_state::MAX_ABILITIES]));
+    let outer = GIVERS.with(|g| g.replace([Giver::NONE; cantrip_state::MAX_ABILITIES]));
     let watch = Watch(WATCHED.with(|w| w.replace(id)));
     WATCHING.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     let _ = chars_in(cx, id, Layer::PtDefine);
@@ -70,7 +129,7 @@ fn givers_in(cx: &Ctx, id: ObjectId) -> [ObjectId; cantrip_state::MAX_ABILITIES]
 }
 
 /// The givers noted so far, where `id`'s are being worked out.
-fn watched_givers(id: ObjectId) -> Option<[ObjectId; cantrip_state::MAX_ABILITIES]> {
+fn watched_givers(id: ObjectId) -> Option<[Giver; cantrip_state::MAX_ABILITIES]> {
     if WATCHING.load(std::sync::atomic::Ordering::Relaxed) == 0 {
         return None;
     }
@@ -80,7 +139,7 @@ fn watched_givers(id: ObjectId) -> Option<[ObjectId; cantrip_state::MAX_ABILITIE
 /// Applies `f`, an entry of the layers, to `id`'s characteristics, and while its abilities' givers are being worked out
 /// (`ability_givers`), notes `giver` beside each ability the entry put there (an ability the entry only moved keeps its
 /// giver).
-fn watching_givers(id: ObjectId, giver: ObjectId, chars: &mut Chars, f: impl FnOnce(&mut Chars)) {
+fn watching_givers(id: ObjectId, giver: Giver, chars: &mut Chars, f: impl FnOnce(&mut Chars)) {
     let Some(givers) = watched_givers(id) else { return f(chars) };
     let before = chars.abilities;
     f(chars);
@@ -98,7 +157,7 @@ fn watching_givers(id: ObjectId, giver: ObjectId, chars: &mut Chars, f: impl FnO
                 moved[from] = true;
                 givers[from]
             }
-            None if giver == id => ObjectId::NONE,
+            None if giver.object == id => Giver::NONE,
             None => giver,
         };
     }
@@ -1233,12 +1292,17 @@ impl GEntry {
         }
     }
 
-    /// The object whose effect it is, for the abilities' givers (`ability_givers`).
-    fn giver(&self) -> ObjectId {
+    /// The object whose effect it is, and the effect, for the abilities' givers (`ability_givers`): its timestamp (CR 613.7),
+    /// and for a static ability, which of its source's static abilities it is, so two are two effects (CR 607.5).
+    fn giver(&self, cards: &CardTable, state: &GameState) -> Giver {
+        let grant = |part: usize| Acquired { by: AcquiredBy::Grant, stamp: self.timestamp, part: u8::try_from(part).unwrap_or(u8::MAX) };
+        let part_of = |source: ObjectId, st: &'static StaticDef| {
+            cards.get(cards.current(state.obj(source))).statics.iter().position(|s| std::ptr::eq(s, st)).unwrap_or(0)
+        };
         match self.kind {
-            GKind::Static { source, .. } => source,
-            GKind::Given { holder, .. } | GKind::Granted { holder, .. } => holder,
-            GKind::Effect(e) => e.source,
+            GKind::Static { source, st, .. } => Giver { object: source, acquired: grant(part_of(source, st)) },
+            GKind::Given { holder, st, .. } | GKind::Granted { holder, st, .. } => Giver { object: holder, acquired: grant(part_of(holder, st)) },
+            GKind::Effect(e) => Giver { object: e.source, acquired: grant(0) },
         }
     }
 
@@ -1431,10 +1495,10 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
                         continue;
                     }
                     let givers = *givers.get_or_insert_with(|| givers_in(cx, holder));
-                    if givers[slot] == ObjectId::NONE {
+                    if givers[slot].object == ObjectId::NONE {
                         continue;
                     }
-                    let timestamp = state.obj(holder).timestamp.max(state.obj(givers[slot]).timestamp);
+                    let timestamp = state.obj(holder).timestamp.max(state.obj(givers[slot].object).timestamp);
                     let kind = if st.own { GKind::Granted { holder, st, ability: None } } else { GKind::Given { holder, st, ability: None } };
                     entries.push(GEntry { kind, timestamp, seq: if st.own { 3 } else { 1 } });
                 }
@@ -1538,7 +1602,7 @@ fn apply_entry(cx: &Ctx, o: &ObjCtx, entry: &GEntry, stage: &Stage, snap: &mut S
     let layer = LAYERS[stage.li];
     let text_lost = snap.chars.text_lost;
     if watch {
-        watching_givers(o.id, entry.giver(), &mut snap.chars, |chars| apply_raw(&view, layer, o.id, entry, chars));
+        watching_givers(o.id, entry.giver(cx.cards, cx.state), &mut snap.chars, |chars| apply_raw(&view, layer, o.id, entry, chars));
     } else {
         apply_raw(&view, layer, o.id, entry, &mut snap.chars);
     }

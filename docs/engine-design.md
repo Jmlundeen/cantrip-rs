@@ -1099,8 +1099,14 @@ are then made together, 610.3d). The link is the exiled card's `ExileLink` (`unt
 "Exiled with [this]" is per ability, not per object (CR 607.1, 607.2a, 607.5): an `ExileLink` names the object and the card
 whose text the exiling ability is printed in (`Linked`: `Query::linked` for a resolving ability, `Query::linked_to` for one of
 the text the object has now; either face of a transforming card and either door of a Room are one text, 607.1b,
-`CardTable::linked_card`), and `Query::exiled_with` answers only an ability of that same text. So a creature that copies
-another (Mirrorweave) does not see, through the copied text's linked ability, the cards its own text exiled. A replacement
+`CardTable::linked_card`), and how the object acquired the ability (`Acquired`: by its own text, by a copy effect applied
+to it later - the timestamp of its `EffectKind::RestoreCopy`, `GameState::copy_acquired` - or by the effect that granted it,
+which `layers::ability_givers` names), and `Query::exiled_with` answers only an ability of that same text acquired the same
+way. A stack item, a pending trigger and a delayed trigger carry how their ability was acquired (worked out as it is
+activated or triggers, `layers::acquired`, with nothing to work out unless an effect could have given it; a look-back
+trigger as it was then, `Then`). So a creature that copies another (Mirrorweave) does not see, through the copied text's
+linked ability, the cards its own text exiled, nor a creature the cards an ability lent to it exiled (Agatha's Soul
+Cauldron). A replacement
 effect that exiles links what it exiles the same way when its card has an ability that refers to them (607.2b:
 `ZoneChange::exiled_with`, set by `replacements::exile_instead_linked_apply`); only its direct result is linked, so an effect
 that applies afterwards and sends the card elsewhere leaves it unlinked (`replace::unlink_if_sent_elsewhere`).
