@@ -1,10 +1,11 @@
-# Seething Landscape: cycle the second copy for its exact printed cost, using one matching land source for each colored symbol; then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
+# Seething Landscape: cycle the second copy for its exact printed cost, paid with an Island, a Swamp and a Mountain while a Plains is tapped as well, so that the {W} left over shows each colored symbol took its own color (a {3} or {1}{B}{R} cost would leave something else); then tap the land copy for {C}. Cycling is the keyword ability in CR 702.29.
 
 [Bot1 Deck]
 Seething Landscape x2
 Island
 Swamp
 Mountain
+Plains
 Plains x6
 Island x6
 Forest x6
@@ -22,18 +23,22 @@ Bot1.Hand.Island.Play
 Bot1.Hand.Swamp.Play
 [T7 Bot1.Main1]
 Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
 Bot1.Hand.Seething Landscape.Activate(Ability: Cycling)
+Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Mountain.Activate
-? Bot1.Mana =
+? Bot1.Mana = {W}
 Bot1.Pass
 Bot2.Pass
-[T9 Bot1.Main1]
+[T11 Bot1.Main1]
 Bot1.Battlefield.Seething Landscape.Activate(Ability: {T}: Add {C})
 ? Bot1.Mana = {C}
 
 [Expect]
-Turn = 9
+Turn = 11
 Bot1.Graveyard = Seething Landscape
+Bot1.Hand = Island; Plains; Plains; Plains; Plains; Plains; Plains
 Bot1.Battlefield.Seething Landscape.Tapped = true
