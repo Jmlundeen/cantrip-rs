@@ -1,0 +1,33 @@
+# Ruling 2020-09-25: a legal target that is not destroyed (Darksteel Citadel is indestructible) still lets its controller
+# search for a basic land card, and you still draw. Bot2 keeps the Citadel and gains a tapped Forest.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Cleansing Wildfire
+Mountain x4
+Mountain x15
+
+[Bot2 Deck]
+Darksteel Citadel
+Island x8
+Forest
+Island x8
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Darksteel Citadel.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Cleansing Wildfire.Cast(Bot2.Battlefield.Darksteel Citadel)
+Bot2.Accept
+Bot2.Search(Forest)
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Darksteel Citadel; Forest
+Bot2.Battlefield.Forest.Tapped = true
+Bot1.Hand.Count = 6

@@ -1,0 +1,39 @@
+# Cleansing Wildfire on Bot2's Island: Bot2 (the land's controller, not the caster) accepts and fetches a Forest, which
+# enters tapped, after the Island is destroyed; Bot1 then draws a card. An Ornithopter (a creature) is not a legal target (`!` with a
+# positive control: the land is accepted). Hand 7 - Wildfire - 2 lands + the turn-3 draw + the spell's draw = 6.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Cleansing Wildfire
+Mountain x4
+Mountain x15
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x5
+Island x2
+Forest
+Island x9
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+! Bot1.Hand.Cleansing Wildfire.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Cleansing Wildfire.Cast(Bot2.Battlefield.Island)
+Bot2.Accept
+Bot2.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Cleansing Wildfire
+Bot2.Graveyard = Island
+Bot2.Battlefield = Forest; Ornithopter
+Bot2.Battlefield.Forest.Tapped = true
+Bot1.Hand.Count = 6

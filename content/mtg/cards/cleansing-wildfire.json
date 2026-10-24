@@ -1,0 +1,6 @@
+{
+  "name": "Cleansing Wildfire",
+  "manaCost": "{1}{R}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.\nDraw a card."
+}

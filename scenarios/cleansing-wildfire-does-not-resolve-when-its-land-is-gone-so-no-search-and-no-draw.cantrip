@@ -1,0 +1,35 @@
+# Ruling 2020-09-25: if the target land is illegal on resolution the spell does not resolve (CR 608.2b) - no search, no draw. Bot2
+# sacrifices the targeted Ghost Quarter in response (its cost), destroying Bot1's tapped Mountain; Bot1 declines that
+# search. Wildfire fizzles: Bot1's hand stays at 7 - 2 lands + 1 draw - Wildfire = 5, and Bot2 is never asked to search.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Cleansing Wildfire
+Mountain x4
+Mountain x15
+
+[Bot2 Deck]
+Ghost Quarter
+Island x6
+Forest
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ghost Quarter.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Cleansing Wildfire.Cast(Bot2.Battlefield.Ghost Quarter)
+Bot2.Battlefield.Ghost Quarter.Activate(Ability: Destroy; Bot1.Battlefield.Mountain#1)
+Bot1.Decline
+
+[Expect]
+Bot2.Graveyard = Ghost Quarter
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = Cleansing Wildfire; Mountain
+Bot1.Battlefield = Mountain
+Bot1.Hand.Count = 5

@@ -1,0 +1,26 @@
+# Cleansing Wildfire on Bot1's own Mountain: Bot1 is the land's controller, so it is the one asked, and it declines, so
+# nothing is fetched and no basic is found. "Draw a card" is not part of the "may": Bot1 still draws.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Cleansing Wildfire
+Mountain x4
+Mountain x15
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Cleansing Wildfire.Cast(Bot1.Battlefield.Mountain#1)
+Bot1.Decline
+
+[Expect]
+Bot1.Graveyard = Cleansing Wildfire; Mountain
+Bot1.Battlefield = Mountain
+Bot1.Hand.Count = 6
