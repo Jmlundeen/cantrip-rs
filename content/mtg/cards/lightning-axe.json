@@ -1,0 +1,6 @@
+{
+  "name": "Lightning Axe",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "As an additional cost to cast this spell, discard a card or pay {5}.\nLightning Axe deals 5 damage to target creature."
+}

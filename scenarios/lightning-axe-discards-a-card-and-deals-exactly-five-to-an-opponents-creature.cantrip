@@ -1,0 +1,43 @@
+# Lightning Axe, the discard branch of "discard a card or pay {5}" (CR 601.2b): Bot1 pays only {R} (one Mox Ruby) and
+# discards an Island, keeping 20 life. "5 damage to target creature" (CR 120.3): Bot2's Baloth Prime (10/10) survives with
+# exactly 5 damage marked, so the amount is neither lower nor higher; Bot2 itself is not a legal target (the refusal).
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Axe
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Baloth Prime
+Island x20
+
+[Actions]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Baloth Prime.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Lightning Axe.Cast(Bot2)
+Bot1.Hand.Lightning Axe.Cast(Bot2.Battlefield.Baloth Prime)
+Bot1.Modes(Discard a card)
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot2.Battlefield.Baloth Prime.Damage = 5
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Lightning Axe; Island
