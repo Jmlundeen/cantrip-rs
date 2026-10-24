@@ -69,6 +69,8 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-125](#ki-125-a-mana-abilitys-row-can-show-what-its-ability-lists-or-the-best-of-several-outcomes-under-replacement-effects-on-its-mana) | A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana | Pri-2 | Open |
 | [KI-128](#ki-128-the-non-tactical-bots-drop-an-attack-whose-phyrexian-cost-only-life-could-pay) | The non-tactical bots drop an attack whose Phyrexian cost only life could pay | Pri-2 | Open |
 | [KI-129](#ki-129-a-cost-holds-at-most-six-discard-instructions) | A cost holds at most six discard instructions | Pri-3 | Won't fix: beyond practical scale |
+| [KI-130](#ki-130-an-unless-pays-prompts-remaining-hint-lists-a-phyrexian-symbol-under-its-color-when-any-color-may-pay-it) | An "unless pays" prompt's remaining hint lists a Phyrexian symbol under its color when any color may pay it | Pri-2 | Open |
+| [KI-131](#ki-131-harmonizes-tap-a-creature-caption-says-up-to-or-an-exact-amount-a-little-off-in-rare-costs) | Harmonize's tap-a-creature caption says "up to", or an exact amount, a little off in rare costs | Pri-2 | Open |
 
 ## Issues
 
@@ -416,6 +418,36 @@ read it (`AutoMana`, `AutoPlay`, the tactical bot), can be off. A fix is a proto
 color" apart from how much of it the ability adds, or the outcomes listed per color.
 
 **Scenarios.** None: display. `prompt::row_yield_tests` shows which rows fall back.
+
+### KI-130: An "unless pays" prompt's remaining hint lists a Phyrexian symbol under its color when any color may pay it
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | engine (display) | 2026-10-24, review of Oath of Nissa |
+
+**Notes.** Whether an "unless pays" cost is offered as payable is right: `pay_during_resolution` asks
+`spend_any_color_for(.., SpendingFor::Other)` and `pool_pays` converts the cost to any color after its Phyrexian and {2/C}
+symbols are announced (CR 609.4b, 118.12). But the prompt's `remaining` hint, the mana still owed that the client and bots
+read, is built with `paid_with_any_color`, which leaves Phyrexian symbols alone, so under Mycosynth Lattice a {B/P} is still
+listed as needing black. A fix converts the Phyrexian symbols' colored halves too when any color may pay them.
+
+**Scenarios.** None: display.
+
+### KI-131: Harmonize's tap-a-creature caption says "up to", or an exact amount, a little off in rare costs
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | engine (display) | 2026-10-24, review of Nature's Rhythm |
+
+**Notes.** The reduction harmonize's tapped creature makes is right (its power off the total cost after X and increases,
+before a minimum; CR 702.180a, 601.2f); only what `choose_reducer` shows can be imprecise. (1) A targeted harmonize spell
+says "up to" whenever any cost changer is in play, though most changers don't read targets; `Watching` / `deltas_watched`
+already knows which do. A spell with the Arcane subtype says "up to" with no splice card in hand. (2) It shows an exact
+amount though the cost can still change when the harmonize cost has {2/C} symbols, an `exile_from_hand_for_less`
+reduction or a `VariableCost::SacrificeAnyNumber { less_each }`. No printed harmonize card reaches (2), and (1) is never
+false, only less precise.
+
+**Scenarios.** None: display. `HarmonizeTests` covers the X case.
 
 ### KI-128: The non-tactical bots drop an attack whose Phyrexian cost only life could pay
 
