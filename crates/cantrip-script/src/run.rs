@@ -1364,8 +1364,6 @@ impl<'s> Run<'s> {
             .collect()
     }
 
-    /// A mana ability the player has of their own (CR 605.1a, 611.2a), named by the card that gave it and no zone,
-    /// `Bot1.Channel.Activate`: it has no source, so it is offered wherever that card has gone.
     /// Whether a refused `Activate` is checked at this payment rather than left for the player's next priority: the payment
     /// asks for mana, so mana abilities may be activated during it (CR 605.3a) - a spell's or ability's cost, a cost to
     /// attack, an "unless pays" cost with mana in it - and the line names only mana abilities. A payment of life alone (a
@@ -1409,6 +1407,8 @@ impl<'s> Run<'s> {
         any
     }
 
+    /// A mana ability the player has of their own (CR 605.1a, 611.2a), named by the card that gave it and no zone,
+    /// `Bot1.Channel.Activate`: it has no source, so it is offered wherever that card has gone.
     fn is_players_ability(&self, step: &ActionStep, option: &ActionOption) -> bool {
         let (Some(source), Some(card)) = (option.source, &step.card) else { return false };
         option.index >= PLAYER_MANA_ABILITY
