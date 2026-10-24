@@ -19,10 +19,8 @@ fn apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 /// One such card is no choice at all. The permission is for this turn (CR 118.9, 305.1).
 fn play_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut eligible: Vec<ObjectId> = Vec::new();
-    for owner in g.state().seats() {
-        if owner == item.controller {
-            continue;
-        }
+    let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
+    for owner in opponents {
         for &card in g.state().zone(Zone::exile(owner)) {
             if g.obj(card).counters(CounterKind::Void) > 0 && g.obj(card).became.is_none() {
                 eligible.push(card);
