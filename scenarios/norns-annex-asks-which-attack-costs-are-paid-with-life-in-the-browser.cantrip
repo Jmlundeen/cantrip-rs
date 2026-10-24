@@ -1,0 +1,60 @@
+# Browser
+# What a player sees of Norn's Annex's cost to attack (CR 508.1d, 508.1h-j; CR 107.4f): having declared two attackers at
+# Bot2, Bot1 is asked which of the two {W/P} to pay with 2 life - worded for the symbols, not as an additional cost of
+# Norn's Annex, which is not being cast - and then to pay the rest, the title naming the {W} and the 2 life chosen. Bot1
+# pays one with life and the other with Mox Pearl: Bot1 goes to 18, Bot2 takes 2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Pearl
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Norn's Annex
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Norn's Annex.Cast
+Bot2.Modes()
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot1.Attack(Llanowar Elves; Llanowar Elves)
+? Client.Bot1.Prompt.Title = Norn's Annex: choose which {W/P} to pay with 2 life
+? Client.Bot1.Prompt.Detail = Each one not chosen is paid with {W}
+Bot1.Modes(1)
+? Combat.AttackCost = {W}
+? Client.Bot1.Prompt.Title = Pay {W} and 2 life to attack with 2 creatures
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Mana =

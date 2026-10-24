@@ -1,0 +1,65 @@
+# Norn's Annex: the life its {W/P} takes is paid with the rest of the cost to attack (CR 508.1j: all costs, no partial
+# payment). Bot1 starts at 2 life. On turn 3 it attacks Bot2 with both Llanowar Elves: {W/P}{W/P}. It pays one with its
+# 2 life (the most it can) and taps Mana Confluence for the other's {W}, which costs 1 life (the mana ability
+# is activated while paying, CR 508.1i) and leaves too little to pay the 2: the payment can't be made, and the
+# declaration is taken back (CR 508.1, 733) - Mana Confluence untapped and Bot1 back at 2. Bot1 then attacks with one
+# Elves, paying its {W} with Mana Confluence: Bot1 ends at 1, Bot2 at 19.
+
+[Life]
+Bot1: 2
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mana Confluence
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Norn's Annex
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Norn's Annex.Cast
+Bot2.Modes()
+[T3 Bot1.Main1]
+Bot1.Hand.Mana Confluence.Play
+Bot1.Attack(Llanowar Elves#1; Llanowar Elves#2)
+Bot1.Modes(1)
+Bot1.Battlefield.Mana Confluence.Activate(Color: White)
+Bot1.Attack(Llanowar Elves#1)
+? Bot1.Life = 2
+? Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Modes()
+Bot1.Battlefield.Mana Confluence.Activate(Color: White)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 1
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Battlefield.Mana Confluence.Tapped = true
+Bot1.Mana =

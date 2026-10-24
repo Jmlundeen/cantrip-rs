@@ -1,0 +1,62 @@
+# Norn's Annex at 1 life: "If you're at 1 life or less, you can't pay 2 life" (the rulings; CR 119.4). Bot1 starts at 1
+# life with one white mana, Mox Pearl. On turn 3 it attacks Bot2 with both Llanowar Elves: {W/P}{W/P}, and no life choice
+# is offered, since 2 life can't be paid - each symbol is {W} (CR 107.4f). One {W} can't pay it, so Bot1 gives the payment
+# up and the declaration is taken back (CR 508.1, 733), both Elves untapped again; it attacks with one, paying {W} with Mox
+# Pearl. Bot1 stays at 1, Bot2 takes 1, and the second Elves never attacked.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Pearl
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Norn's Annex
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Norn's Annex.Cast
+Bot2.Modes()
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves#1; Llanowar Elves#2)
+? Combat.AttackCost = {W}{W}
+Bot1.Cancel
+Bot1.Attack(Llanowar Elves#1)
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 1
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves#1.Tapped = true
+Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Mana =

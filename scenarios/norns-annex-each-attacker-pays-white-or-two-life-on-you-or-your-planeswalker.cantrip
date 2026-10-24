@@ -1,0 +1,60 @@
+# Norn's Annex: "Creatures can't attack you or planeswalkers you control unless their controller pays {W/P} for each of
+# those creatures" (CR 508.1d, 508.1h). Bot2 casts it paying both of its own {W/P} with 4 life and controls Liliana of the
+# Veil. On turn 3 Bot1 attacks Liliana with one Llanowar Elves and Bot2 with the other: {W/P}{W/P}, and the player chooses
+# how each is paid (CR 107.4f; the rulings: "you may pay {W} for one cost and 2 life for the other"). Bot1 pays one with 2
+# life and the other with Mox Pearl's {W}, which is the only mana spent: Mox Emerald and Forest stay untapped. Bot1 goes to
+# 18, Liliana to 2 loyalty and Bot2 from 16 to 15.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Pearl
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Norn's Annex
+Black Lotus
+Liliana of the Veil
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Norn's Annex.Cast
+Bot2.Modes(1; 2)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Liliana of the Veil; Llanowar Elves > Bot2)
+Bot1.Modes(1)
+? Combat.AttackCost = {W}
+? Combat.AttackCost.Attackers = Llanowar Elves; Llanowar Elves
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 18
+Bot2.Life = 15
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Mana =

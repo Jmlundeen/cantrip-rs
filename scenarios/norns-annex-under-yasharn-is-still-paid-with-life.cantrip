@@ -1,0 +1,51 @@
+# Norn's Annex beside Yasharn, Implacable Earth: "Players can't pay life ... to cast spells or activate abilities" leaves
+# a cost to attack alone (Yasharn's ruling: "Other things may still cause players to pay life"; CR 508.1h). Bot2 casts
+# Norn's Annex paying both of its {W/P} with 4 life, then Yasharn. On turn 3 Bot1, with no white mana, attacks Bot2 with one
+# Llanowar Elves and is still offered 2 life for its {W/P}: it pays it, going to 18, and Bot2 goes from 16 to 15.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Norn's Annex
+Black Lotus
+Mox Pearl
+Yasharn, Implacable Earth
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Norn's Annex.Cast
+Bot2.Modes(1; 2)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Yasharn, Implacable Earth.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+Bot1.Modes(1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 18
+Bot2.Life = 15
+Bot2.Battlefield.Yasharn, Implacable Earth.Tapped = false
+Bot1.Battlefield.Mox Emerald.Tapped = false
