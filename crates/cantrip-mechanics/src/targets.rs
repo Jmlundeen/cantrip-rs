@@ -798,6 +798,10 @@ pub mod filters {
     pub fn land(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         q.chars(id).is(CardType::Land)
     }
+    /// "Another creature" (CR 109.1, 701.21a): a creature other than the source of the cost. Fiend Artisan and Blood Host sacrifice one.
+    pub fn another_creature(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+        id != asker.source && creature(q, asker, id)
+    }
     /// An artifact. Crabomination (emerge) and Time Sieve sacrifice one.
     pub fn artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         q.chars(id).is(CardType::Artifact)
