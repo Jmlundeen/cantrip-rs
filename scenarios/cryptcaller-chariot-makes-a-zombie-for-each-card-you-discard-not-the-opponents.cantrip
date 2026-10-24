@@ -1,0 +1,47 @@
+# Cryptcaller Chariot: "Whenever you discard one or more cards, create that many tapped 2/2 black Zombie creature tokens."
+# Bot1's Wheel of Fortune (turn 3) makes both players discard: Bot1 its 2 remaining cards (one trigger, "that many" = 2
+# tapped Zombies, CR 603.2c) and Bot2 its 7 (8 cards in its graveyard with an earlier cleanup discard; not "you", no Zombies for Bot1 from them).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Cryptcaller Chariot
+Mox Ruby
+Wheel of Fortune
+Forest
+Forest
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cryptcaller Chariot.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard.Count = 8
+Bot1.Battlefield.Zombie Token#1.Colors = Black
+Bot1.Battlefield.Zombie Token#1.Power = 2
+Bot1.Battlefield.Zombie Token#1.Tapped = true
+Bot1.Battlefield.Zombie Token#2.Tapped = true
+Bot1.Battlefield = Cryptcaller Chariot; Mox Ruby; Swamp; Swamp; Zombie Token; Zombie Token

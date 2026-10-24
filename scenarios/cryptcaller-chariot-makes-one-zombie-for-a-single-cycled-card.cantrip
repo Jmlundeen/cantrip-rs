@@ -1,0 +1,49 @@
+# Cryptcaller Chariot: "one or more" includes exactly one. On turn 3 Bot1 cycles Marauding Mako ({2}, discard it as a cost):
+# one card discarded, one tapped 2/2 black Zombie. A Chain of Smog that Bot1 aims at Bot2 on turn 5 makes Bot2 discard two
+# and gives Bot1 none, so the count stays one.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Cryptcaller Chariot
+Marauding Mako
+Chain of Smog
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cryptcaller Chariot.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Marauding Mako.Activate(Ability: Cycling)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Zombie Token.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Chain of Smog.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 5
+Bot1.Battlefield = Cryptcaller Chariot; Swamp; Swamp; Swamp; Zombie Token
