@@ -1,0 +1,60 @@
+# "As this creature enters, choose a player" and "This creature has protection from the chosen player" are linked (CR
+# 607.2d): the second refers only to a choice the first made. Bot1's two True-Name Nemeses both chose Bot2. Mirrorweave makes
+# the first a copy of the second until end of turn: the abilities it has now come from that copy effect, and are linked only
+# to each other (CR 607.5); they made no choice, so it has protection from no one, and its own choice, made by the text it
+# no longer has, is not theirs. Bot2's Lightning Bolt may target it and kills it; the second Nemesis, still protected from
+# Bot2, is no target at all.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Pearl
+True-Name Nemesis
+True-Name Nemesis
+Mirrorweave
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.ChoosePlayer(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mirrorweave.Cast(True-Name Nemesis#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(True-Name Nemesis)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Pearl; True-Name Nemesis
+Bot1.Battlefield.True-Name Nemesis.ChosenPlayer = 2
+Bot1.Graveyard = True-Name Nemesis; Mirrorweave; Black Lotus
+Bot2.Graveyard = Lightning Bolt

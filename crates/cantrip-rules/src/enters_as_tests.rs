@@ -392,6 +392,7 @@ fn an_aura_with_no_enchant_ability_may_enchant_anything() {
         chosen_card: None,
         chosen_option: None,
         chosen_object: None,
+        chosen_by: ChosenBy::default(),
         attach: None,
         attach_player: None,
         x: 0,

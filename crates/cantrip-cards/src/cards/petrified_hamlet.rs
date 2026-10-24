@@ -25,7 +25,7 @@ fn choose_land_name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let suggestion = seen.iter().max_by_key(|(_, n)| *n).map(|(card, _)| *card);
     let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion, kind: NameKind::Land };
     if let Answer::Name(Some(name)) = g.ask(you, ask)? {
-        g.remember_chosen_name(item.object, name);
+        g.remember_chosen_name(g.linked(item), name);
     }
     Ok(())
 }
@@ -34,7 +34,7 @@ fn choose_land_name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// delayed ability 0 for as long as it has the name and the Hamlet is on the battlefield.
 fn named_land(view: &dyn LayerQuery, source: ObjectId, _: ObjectId, chars: &Chars) -> bool {
     chars.is(CardType::Land)
-        && view.state().obj(source).marks.chosen_card.is_some_and(|name| chars.name == view.cards().get(name).name)
+        && view.state().chosen_card(view.linked_to(source)).is_some_and(|name| chars.name == view.cards().get(name).name)
 }
 
 pub static CARD: CardDef = CardDef {

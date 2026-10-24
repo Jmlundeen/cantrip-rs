@@ -1134,21 +1134,24 @@ impl<'a> Projector<'a> {
             .collect();
         counters.sort_by(|a, b| a.name.cmp(&b.name));
 
+        // What was chosen for it that the text it has now refers to (CR 607.2d, 607.5): a choice made by a text it no longer
+        // has as its own - before it became a copy of something else - is no part of the permanent shown.
         let mut choices = Vec::new();
-        if let Some(color) = obj.chosen_color {
+        let text = game.cards.linked_to(s, id);
+        if let Some(color) = s.chosen_color(text) {
             choices.push(ChoiceView { key: "color".into(), value: color.name().to_string() });
         }
-        if let Some(sub) = obj.chosen_subtype {
+        if let Some(sub) = s.chosen_subtype(text) {
             choices.push(ChoiceView { key: "creature type".into(), value: sub.name().to_string() });
         }
-        if let Some(p) = obj.marks.chosen_player {
+        if let Some(p) = s.chosen_player(text) {
             choices.push(ChoiceView { key: "player".into(), value: seat(p).to_string() });
         }
-        if let Some(card) = obj.marks.chosen_card {
+        if let Some(card) = s.chosen_card(text) {
             choices.push(ChoiceView { key: "name".into(), value: game.cards.get(card).name.to_string() });
         }
         // One of the words its text offered to choose between as it entered (CR 607.2f), by the word: "Jeskai", "Odd".
-        if let Some(chosen) = obj.marks.chosen_option {
+        if let Some(chosen) = s.chosen_option(text) {
             choices.push(ChoiceView { key: "option".into(), value: label_text(&Label::Option(chosen.card, chosen.index)).to_string() });
         }
         choices.sort_by(|a, b| a.key.cmp(&b.key));

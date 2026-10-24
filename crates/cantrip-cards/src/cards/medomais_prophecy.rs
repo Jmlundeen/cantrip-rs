@@ -24,7 +24,7 @@ fn chapter_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let suggestion = suggestion.map(|(_, name)| name);
     let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion, kind: NameKind::Any };
     if let Answer::Name(Some(name)) = g.ask(item.controller, ask)? {
-        g.remember_chosen_name(item.object, name);
+        g.remember_chosen_name(g.linked(item), name);
     }
     Ok(())
 }
@@ -44,7 +44,7 @@ fn chapter_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn first_named_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     let Event::SpellCast { spell, player, .. } = *event else { return None };
     let you = me.controller;
-    let name = q.obj(me.source).marks.chosen_card?;
+    let name = q.state().chosen_card(q.linked_to(me.source))?;
     let earlier = q.history().casts_by(you).any(|c| c.spell != spell && object_has_name(q, c.spell, name));
     if player == you && object_has_name(q, spell, name) && !earlier { Fired::PLAIN } else { None }
 }

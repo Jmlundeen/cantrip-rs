@@ -77,10 +77,11 @@ pub struct Obj {
     /// (CR 722.3c). The link is severed for good when that permanent becomes unprepared or phases out (CR 702.26f), even
     /// if it prepares again or phases in before the next state-based check ends the copy (CR 704.5e).
     pub prepared_from: Option<ObjectId>,
-    /// A color chosen as it entered ("as this enters, choose a color", CR 614.12).
-    pub chosen_color: Option<Color>,
-    /// A creature or land type chosen as it entered.
-    pub chosen_subtype: Option<Subtype>,
+    /// A color chosen as it entered ("as this enters, choose a color", CR 614.12a), with the text that chose it (`Chosen`):
+    /// read with `GameState::chosen_color`.
+    pub chosen_color: Option<Chosen<Color>>,
+    /// A creature or land type chosen as it entered: `GameState::chosen_subtype`.
+    pub chosen_subtype: Option<Chosen<Subtype>>,
     /// Exiled "on an adventure" (CR 715.3d): by the player who controlled the Adventure spell as it resolved, who "may play
     /// it" for as long as it remains exiled - its owner's exile zone holds it, whoever that player is.
     pub on_adventure: Option<PlayerId>,
@@ -153,16 +154,17 @@ pub struct Marks {
     pub cant_be_countered: bool,
     /// The number of the turn it was saddled (CR 702.171b): saddled until that turn ends. Zero for never.
     pub saddled_turn: u32,
-    /// A player chosen as it entered ("as this enters, choose a player", CR 614.12a).
-    pub chosen_player: Option<PlayerId>,
-    /// A card name chosen as it entered ("choose a card name", CR 614.12): Anointed Peacekeeper's.
-    pub chosen_card: Option<CardId>,
+    /// A player chosen as it entered ("as this enters, choose a player", CR 614.12a): `GameState::chosen_player`.
+    pub chosen_player: Option<Chosen<PlayerId>>,
+    /// A card name chosen as it entered ("choose a card name", CR 614.12a: Anointed Peacekeeper's) or for it as an ability
+    /// of it resolved (Petrified Hamlet's): `GameState::chosen_card`.
+    pub chosen_card: Option<Chosen<CardId>>,
     /// One of the words its text offered to choose between as it entered (CR 614.12a, 607.2f): "choose Khans or
     /// Dragons", "choose odd or even".
-    pub chosen_option: Option<ChosenOption>,
+    pub chosen_option: Option<Chosen<ChosenOption>>,
     /// An object chosen as it entered ("as this creature enters, choose another creature you control", CR 614.12a,
-    /// 607.2d), which "the chosen creature" of its text refers to.
-    pub chosen_object: Option<ChosenObject>,
+    /// 607.2d), which "the chosen creature" of its text refers to: `GameState::chosen_object`.
+    pub chosen_object: Option<Chosen<ObjectId>>,
     /// Who controlled it before the control-changing effects that apply to it now (CR 613.1b): it goes back to them
     /// when the last of those ends. `None` while no such effect applies.
     pub control_base: Option<PlayerId>,
@@ -176,32 +178,35 @@ pub struct Marks {
 }
 
 /// One of the words a card's text offers to choose between, words that otherwise have no rules meaning (CR 607.2f): the
-/// `index`th of `card`'s `labels`. The card is kept with the choice because the ability that refers to it is linked to the
-/// ability that made it (CR 607.2f): a permanent that has since become a copy of a different card has no such choice.
+/// `index`th of `card`'s `labels` (the face whose text offered them).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct ChosenOption {
     pub card: CardId,
     pub index: u8,
 }
 
-/// An object chosen as a permanent entered (CR 614.12a): "as this creature enters, choose another creature you control"
-/// (Dauntless Bodyguard, Tyrannical Pitlord), "you may choose a nonland permanent" (Scheming Fence). The ability that refers
-/// to "the chosen [object]" is linked to the one that made the choice (CR 607.2d), so the choice is kept with the card whose
-/// text made it, and only an ability of that text the permanent has as its own - printed, or of the copiable values it
-/// entered with - refers to it (CR 607.5): one it has from a copy effect that began later, or that an effect granted it,
-/// does not. The object is the one chosen, as it was then (CR 400.7).
+/// A choice kept on a permanent - a color, a type, a player, a card name, a word, an object - with the ability that made
+/// it, as linked abilities know it (CR 607.1, 607.5): the card whose text it is printed in (`Linked::text`) and how the
+/// permanent acquired it. "Choose a [value]" and "the chosen [value]" are linked (CR 607.2d, 607.2f): the second refers
+/// only to a choice the first made, so only an ability of the same text, acquired the same way, reads it (`to`). A choice
+/// made as the permanent entered was made by its own text, printed or of the copiable values it entered with; one a copy
+/// effect that began later gives it, or an effect granted it, is another ability, linked to no such choice (CR 607.5). A
+/// permanent that changes zones is a new object with none (CR 400.7). The value is as it was chosen: an object chosen is
+/// that object (CR 400.7), whatever has become of it.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub struct ChosenObject {
-    pub object: ObjectId,
+pub struct Chosen<T> {
+    pub value: T,
     /// The card whose text made the choice, as linked abilities know it (`Linked::text`).
     pub text: CardId,
+    /// How the permanent had the ability that made it (`Linked::acquired`).
+    pub acquired: Acquired,
 }
 
-impl ChosenObject {
-    /// The object chosen, to `by`, an ability of the chooser: the object only if `by` is linked to the ability that chose
-    /// it (CR 607.2d, 607.5) - of the same text, which the chooser has as its own - whatever has become of it since.
-    pub fn to(&self, by: Linked) -> Option<ObjectId> {
-        (by.text == self.text && by.acquired == Acquired::OWN).then_some(self.object)
+impl<T: Copy> Chosen<T> {
+    /// The value chosen, to `by`, an ability of the permanent: only if `by` is linked to the ability that made the choice
+    /// (CR 607.2d, 607.2f, 607.5) - of the same text, acquired the same way.
+    pub fn to(&self, by: Linked) -> Option<T> {
+        (by.text == self.text && by.acquired == self.acquired).then_some(self.value)
     }
 }
 
@@ -2277,13 +2282,18 @@ mod tests {
     /// chose it (CR 607.2d, 607.5): of the same text, which the permanent has as its own. One of another text, or one it
     /// acquired by a copy effect or a grant since, even of the same card, refers to nothing.
     #[test]
-    fn a_chosen_object_is_read_only_by_an_ability_linked_to_its_choice() {
-        let chosen = ChosenObject { object: ObjectId(9), text: CardId(4) };
+    fn a_choice_is_read_only_by_an_ability_linked_to_the_one_that_made_it() {
+        let chosen = Chosen { value: ObjectId(9), text: CardId(4), acquired: Acquired::OWN };
         let by = |text, acquired| Linked { object: ObjectId(2), text, acquired };
+        let copy = Acquired { by: AcquiredBy::Copy, stamp: 7, part: 0 };
         assert_eq!(chosen.to(by(CardId(4), Acquired::OWN)), Some(ObjectId(9)));
         assert_eq!(chosen.to(by(CardId(5), Acquired::OWN)), None);
-        assert_eq!(chosen.to(by(CardId(4), Acquired { by: AcquiredBy::Copy, stamp: 7, part: 0 })), None);
+        assert_eq!(chosen.to(by(CardId(4), copy)), None);
         assert_eq!(chosen.to(by(CardId(4), Acquired { by: AcquiredBy::Grant, stamp: 7, part: 1 })), None);
+        // A choice an ability a copy effect gave it made is read by that copy effect's abilities alone (CR 607.5).
+        let by_copy = Chosen { value: Color::Blue, text: CardId(4), acquired: copy };
+        assert_eq!(by_copy.to(by(CardId(4), copy)), Some(Color::Blue));
+        assert_eq!(by_copy.to(by(CardId(4), Acquired::OWN)), None);
     }
 
     /// A subtype restriction's name reads back as the same restriction, whatever its subtypes hold: "or" inside a name

@@ -14,7 +14,7 @@ fn choose_a_player(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Susp
 }
 
 fn protection_from_the_chosen_player(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    if let Some(player) = q.state().obj(source).marks.chosen_player {
+    if let Some(player) = q.state().chosen_player(q.linked_to(source)) {
         chars.protection_players |= 1 << player.0;
     }
 }

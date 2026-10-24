@@ -579,19 +579,19 @@ impl StateDump {
                         d.set(format!("{key}.MustAttack"), must.join("; "));
                     }
                     if let Some(chosen) = obj.marks.chosen_player {
-                        d.set(format!("{key}.ChosenPlayer"), chosen.0 + 1);
+                        d.set(format!("{key}.ChosenPlayer"), chosen.value.0 + 1);
                     }
                     // The word chosen as it entered (CR 607.2f): "Jeskai", "Odd".
                     if let Some(chosen) = obj.marks.chosen_option {
-                        d.set(format!("{key}.ChosenOption"), label_text(&Label::Option(chosen.card, chosen.index)));
+                        d.set(format!("{key}.ChosenOption"), label_text(&Label::Option(chosen.value.card, chosen.value.index)));
                     }
                     // The permanent chosen as it entered (CR 614.12a, 607.2d), while it is still that permanent on the
                     // battlefield: one that left, or came back as a new object (CR 400.7), is chosen no longer.
                     if let Some(chosen) = obj.marks.chosen_object
-                        && s.obj(chosen.object).became.is_none()
-                        && s.obj(chosen.object).zone.is(ZoneKind::Battlefield)
+                        && s.obj(chosen.value).became.is_none()
+                        && s.obj(chosen.value).zone.is(ZoneKind::Battlefield)
                     {
-                        d.set(format!("{key}.ChosenObject"), game.known_name(chosen.object));
+                        d.set(format!("{key}.ChosenObject"), game.known_name(chosen.value));
                     }
                     // The modes its modal abilities have chosen, from the history (`Event::ModesChosen`), numbered from 1.
                     let chosen = game.history().all().iter().fold(0u32, |acc, r| match r.event {
@@ -603,7 +603,7 @@ impl StateDump {
                         d.set(format!("{key}.ChosenModes"), taken.join(", "));
                     }
                     if let Some(chosen) = obj.marks.chosen_card {
-                        d.set(format!("{key}.ChosenName"), game.cards.get(chosen).name);
+                        d.set(format!("{key}.ChosenName"), game.cards.get(chosen.value).name);
                     }
                     if obj.class_level > 0 {
                         d.set(format!("{key}.ClassLevel"), obj.class_level);
@@ -671,11 +671,11 @@ impl StateDump {
                     }
                     // A colour chosen as it entered and kept on it (CR 614.12a).
                     if let Some(color) = obj.chosen_color {
-                        d.set(format!("{key}.ChosenColor"), color.name());
+                        d.set(format!("{key}.ChosenColor"), color.value.name());
                     }
                     // A creature type chosen as it entered and kept on it (CR 614.12a).
                     if let Some(subtype) = obj.chosen_subtype {
-                        d.set(format!("{key}.ChosenSubtype"), subtype.name());
+                        d.set(format!("{key}.ChosenSubtype"), subtype.value.name());
                     }
                     for kind in CounterKind::ALL {
                         let n = obj.counters(kind);

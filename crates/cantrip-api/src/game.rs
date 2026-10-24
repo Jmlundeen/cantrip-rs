@@ -831,13 +831,13 @@ pub trait Game: Query {
     /// triggers "when you unlock this door" (CR 709.5h). `door` is `DOOR_LEFT` or `DOOR_RIGHT`. Nothing if the permanent is
     /// not a Room on the battlefield or the door is already unlocked.
     fn unlock_door(&mut self, permanent: ObjectId, door: u8, player: PlayerId);
-    /// A card name chosen for a permanent as an ability of it resolves, remembered by that permanent (CR 607.2d): "When this
-    /// land enters, choose a land card name" (Petrified Hamlet), "II — Choose a card name" (Medomai's Prophecy). Its
-    /// abilities that refer to "the chosen name" read it from `Marks::chosen_card`, as they read a name chosen as it entered
-    /// (`Entering::chosen_card`, CR 614.12a). It is the object's alone: a new object the permanent becomes has no chosen
-    /// name (CR 400.7), and a later choice for the same object replaces the earlier one. Nothing if the permanent is no
-    /// longer on the battlefield.
-    fn remember_chosen_name(&mut self, permanent: ObjectId, name: CardId);
+    /// A card name chosen for a permanent as `by`, an ability of it, resolves (`Query::linked` of the resolving ability),
+    /// remembered by that permanent (CR 607.2d): "When this land enters, choose a land card name" (Petrified Hamlet), "II —
+    /// Choose a card name" (Medomai's Prophecy). Kept with that ability (`Chosen`): the abilities linked to it read it with
+    /// `GameState::chosen_card`, as they read a name chosen as it entered (`Entering::chosen_card`, CR 614.12a). It is the
+    /// object's alone: a new object the permanent becomes has no chosen name (CR 400.7), and a later choice for the same
+    /// object replaces the earlier one. Nothing if the permanent is no longer on the battlefield.
+    fn remember_chosen_name(&mut self, by: Linked, name: CardId);
     fn exile(&mut self, object: ObjectId) -> ObjectId {
         let owner = self.obj(object).owner;
         self.move_to(object, Zone::exile(owner))

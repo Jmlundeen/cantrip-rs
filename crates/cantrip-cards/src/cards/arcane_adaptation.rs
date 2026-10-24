@@ -10,7 +10,7 @@ use cantrip_oracle as oracle;
 /// counter). Its reach - what is a creature - can change as other layer-4 effects apply (Opalescence), and the dependency
 /// system orders them (CR 613.8). No type chosen (it entered with its abilities lost, CR 614.12), nothing is added.
 fn add_chosen_type(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    if let Some(chosen) = q.state().obj(source).chosen_subtype {
+    if let Some(chosen) = q.state().chosen_subtype(q.linked_to(source)) {
         chars.subtypes = chars.subtypes.with(chosen);
     }
 }

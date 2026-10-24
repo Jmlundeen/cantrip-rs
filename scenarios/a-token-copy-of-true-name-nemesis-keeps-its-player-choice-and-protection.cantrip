@@ -1,0 +1,46 @@
+# A token made as a copy of True-Name Nemesis chooses a player as it is created (CR 614.12a, 707.5) and keeps the choice, with
+# the protection it gives (CR 702.16): Three Steps Ahead copies Bot1's Nemesis, and the token chooses Bot2 as the original
+# did. On turn 2 Bot2's Lightning Bolt can target neither.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Mox Sapphire
+True-Name Nemesis
+Three Steps Ahead
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(2)
+Bot1.Target(True-Name Nemesis)
+Bot1.Pass
+Bot2.Pass
+Bot1.ChoosePlayer(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(True-Name Nemesis#1)
+! Bot2.Hand.Lightning Bolt.Cast(True-Name Nemesis#2)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire; True-Name Nemesis; True-Name Nemesis
+Bot1.Battlefield.True-Name Nemesis#1.ChosenPlayer = 2
+Bot1.Battlefield.True-Name Nemesis#2.ChosenPlayer = 2

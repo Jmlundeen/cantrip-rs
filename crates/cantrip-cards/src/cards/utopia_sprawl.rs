@@ -29,7 +29,7 @@ fn enchanted_forest_tapped_for_mana(q: &dyn Query, source: ObjectId, event: &Eve
 /// once (CR 605.4a): the Forest's controller adds it, whoever controls the Aura. The color was chosen as the Aura entered;
 /// "the chosen color" is no color word (CR 612.2). An Aura that entered without choosing (none does) adds nothing.
 fn add_chosen_color(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let (Some(color), Target::Object(forest)) = (g.obj(item.object).chosen_color, item.subject) else { return Ok(()) };
+    let (Some(color), Target::Object(forest)) = (g.state().chosen_color(g.linked(item)), item.subject) else { return Ok(()) };
     let controller = g.controller(forest);
     g.add_mana(controller, color.mana(), 1);
     Ok(())

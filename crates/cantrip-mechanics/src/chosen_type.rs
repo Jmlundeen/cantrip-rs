@@ -38,7 +38,7 @@ pub fn enters_choosing_a_creature_type(g: &mut dyn Game, entering: &mut Entering
 /// use it as `StaticDef::affects`.
 pub fn creatures_you_control_of_chosen_type(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
     let s = q.state();
-    s.obj(source).chosen_subtype.is_some_and(|t| so_far.is(CardType::Creature) && so_far.has_subtype(t))
+    s.chosen_subtype(q.linked_to(source)).is_some_and(|t| so_far.is(CardType::Creature) && so_far.has_subtype(t))
         && s.obj(affected).controller == s.obj(source).controller
 }
 
@@ -69,7 +69,7 @@ pub fn your_creatures_spells_and_cards(q: &dyn LayerQuery, source: ObjectId, aff
 pub fn you_cast_chosen_type(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::SpellCast { spell, player, .. } if *player == q.controller(source) => {
-            let chosen = q.obj(source).chosen_subtype?;
+            let chosen = q.state().chosen_subtype(q.linked_to(source))?;
             q.chars(*spell).has_subtype(chosen).then_some(Fired::default())
         }
         _ => None,

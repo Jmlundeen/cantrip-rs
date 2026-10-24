@@ -20,7 +20,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 
 /// "This land is the chosen type" (CR 305.7): sets its land subtype; the mana ability follows from the subtype (CR 305.6).
 fn apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    if let Some(chosen) = q.state().obj(source).chosen_subtype {
+    if let Some(chosen) = q.state().chosen_subtype(q.linked_to(source)) {
         chars.set_land_subtypes(SubtypeSet::NONE.with(chosen));
     }
 }

@@ -1703,8 +1703,8 @@ impl cantrip_api::Game for Cx<'_> {
         ops::unlock_door(self, permanent, door, player);
     }
 
-    fn remember_chosen_name(&mut self, permanent: ObjectId, name: CardId) {
-        ops::remember_chosen_name(self, permanent, name);
+    fn remember_chosen_name(&mut self, by: Linked, name: CardId) {
+        ops::remember_chosen_name(self, by, name);
     }
 
     fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId> {

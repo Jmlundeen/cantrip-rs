@@ -421,7 +421,7 @@ pub fn spell_you_cast(view: &dyn LayerQuery, source: ObjectId, affected: ObjectI
 /// ability in. It binds every player, the permanent's controller too; with no name chosen it stops nothing. Petrified Hamlet (a
 /// land card name) and Sorcerous Spyglass (any card name) print it.
 pub fn chosen_name_activations_barred(q: &dyn Query, asker: &Asker, source: ObjectId, def: &ActivatedDef) -> bool {
-    def.is_mana_ability() || !q.obj(asker.source).marks.chosen_card.is_some_and(|name| crate::library::object_has_name(q, source, name))
+    def.is_mana_ability() || !q.state().chosen_card(q.linked_to(asker.source)).is_some_and(|name| crate::library::object_has_name(q, source, name))
 }
 
 /// "Has all activated abilities of [these cards]" (CR 602.1, 613.1f), a layer-6 apply: each activated ability each of

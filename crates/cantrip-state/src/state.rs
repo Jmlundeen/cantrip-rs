@@ -927,6 +927,38 @@ impl GameState {
         }
     }
 
+    /// The color chosen for `by`'s object (CR 607.2d), to `by`, one of its abilities: only if `by` is linked to the ability
+    /// that chose it (`Chosen::to`). A resolving ability asks with `Query::linked`; a static, mana or triggered ability of
+    /// the object's text with `Query::linked_to`.
+    pub fn chosen_color(&self, by: Linked) -> Option<Color> {
+        self.obj(by.object).chosen_color?.to(by)
+    }
+
+    /// The creature or land type chosen for `by`'s object, to `by` (`chosen_color`).
+    pub fn chosen_subtype(&self, by: Linked) -> Option<Subtype> {
+        self.obj(by.object).chosen_subtype?.to(by)
+    }
+
+    /// The player chosen for `by`'s object, to `by` (`chosen_color`).
+    pub fn chosen_player(&self, by: Linked) -> Option<PlayerId> {
+        self.obj(by.object).marks.chosen_player?.to(by)
+    }
+
+    /// The card name chosen for `by`'s object, to `by` (`chosen_color`).
+    pub fn chosen_card(&self, by: Linked) -> Option<CardId> {
+        self.obj(by.object).marks.chosen_card?.to(by)
+    }
+
+    /// The word chosen for `by`'s object (CR 607.2f), to `by` (`chosen_color`).
+    pub fn chosen_option(&self, by: Linked) -> Option<ChosenOption> {
+        self.obj(by.object).marks.chosen_option?.to(by)
+    }
+
+    /// The object chosen for `by`'s object, to `by` (`chosen_color`), wherever it is now.
+    pub fn chosen_object(&self, by: Linked) -> Option<ObjectId> {
+        self.obj(by.object).marks.chosen_object?.to(by)
+    }
+
     /// How `id` has the abilities of the text it has now (CR 607.5, 707.2): by the latest copy effect still on it, which
     /// made its copiable values what they are (`EffectKind::RestoreCopy`), or as its own. What an ability of that text is
     /// linked by (`Linked::acquired`); an ability an effect granted it is not of that text.

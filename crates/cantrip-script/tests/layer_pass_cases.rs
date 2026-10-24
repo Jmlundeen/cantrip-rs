@@ -190,8 +190,11 @@ fn conspiracy_and_arcane_adaptation_in_hand_and_library_apply_in_timestamp_order
             ("Llanowar Elves", Zone::hand(PlayerId(0)), 30),
             ("Llanowar Elves", Zone::library(PlayerId(0)), 31),
         ]);
-        game.state.update_obj(ids[0], |o| o.chosen_subtype = Some(Subtype::Goblin));
-        game.state.update_obj(ids[1], |o| o.chosen_subtype = Some(Subtype::Saproling));
+        // Chosen as each entered, by its own text (CR 607.2d).
+        for (id, value) in [(ids[0], Subtype::Goblin), (ids[1], Subtype::Saproling)] {
+            let text = game.cards.linked_to(&game.state, id).text;
+            game.state.update_obj(id, |o| o.chosen_subtype = Some(Chosen { value, text, acquired: Acquired::OWN }));
+        }
         for &card in &ids[2..] {
             let c = game.chars(card);
             let creature_types: Vec<Subtype> = c.subtypes.iter().filter(|t| t.is_creature_type()).collect();

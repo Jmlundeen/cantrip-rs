@@ -269,10 +269,11 @@ pub fn option_as_enters(g: &mut dyn Game, entering: &mut Entering, def: &'static
 }
 
 /// The word chosen as `id` entered (`option_as_enters`), by index into `def`'s `labels`, for "the chosen [word]" or "• Jeskai
-/// — ..." of `def`'s text: none if no choice was made, or if it was made by another card's ability, which `def`'s abilities
-/// are not linked to (CR 607.2f): a permanent that entered as one card and has since become a copy of another.
+/// — ..." of `def`'s text, which `id` has now (`Query::linked_to`): none if no choice was made, or if it was made by an
+/// ability its abilities are not linked to (CR 607.2f, 607.5) - another card's, or its own before a copy effect gave it this
+/// text: a permanent that entered as one card and has since become a copy of another.
 pub fn chosen_option(q: &dyn Query, id: ObjectId, def: &'static CardDef) -> Option<u8> {
-    q.obj(id).marks.chosen_option.filter(|c| std::ptr::eq(q.card(c.card), def)).map(|c| c.index)
+    q.state().chosen_option(q.linked_to(id)).filter(|c| std::ptr::eq(q.card(c.card), def)).map(|c| c.index)
 }
 
 /// The labels "choose odd or even" offers, odd first: a card that asks it lists them as its `labels`.
@@ -323,5 +324,5 @@ pub fn mana_value_of_quality(q: &dyn Query, id: ObjectId, odd: bool) -> bool {
 /// `chosen_option` for a static ability's `affects`, which reads through the layers (CR 613): a Siege's "• Temur — Creatures
 /// you control get +1/+0 ..." applies only while its source has the word chosen.
 pub fn chosen_option_in_layers(q: &dyn LayerQuery, id: ObjectId, def: &'static CardDef) -> Option<u8> {
-    q.state().obj(id).marks.chosen_option.filter(|c| std::ptr::eq(q.cards().get(c.card), def)).map(|c| c.index)
+    q.state().chosen_option(q.linked_to(id)).filter(|c| std::ptr::eq(q.cards().get(c.card), def)).map(|c| c.index)
 }

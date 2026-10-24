@@ -10,7 +10,7 @@ use cantrip_oracle as oracle;
 /// change as other layer-4 effects apply, so it waits for Opalescence however new that is (CR 613.8a). No type chosen (it
 /// entered with its abilities lost, CR 614.12), it changes nothing.
 fn set_chosen_type(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    if let Some(chosen) = q.state().obj(source).chosen_subtype {
+    if let Some(chosen) = q.state().chosen_subtype(q.linked_to(source)) {
         let kept = chars.subtypes.iter().filter(|t| !t.is_creature_type()).fold(SubtypeSet::NONE, SubtypeSet::with);
         chars.subtypes = kept.with(chosen);
     }

@@ -3528,7 +3528,7 @@ fn tap_triggers(cx: &Cx, waiting: &[(Asker, &'static TriggeredDef)], id: ObjectI
             TriggeredMana::One(mana) => extra[mana as usize] = extra[mana as usize].saturating_add(1),
             TriggeredMana::OneOfProduced => produced_count = produced_count.saturating_add(1),
             TriggeredMana::ChosenColor => {
-                if let Some(color) = cx.s().obj(asker.source).chosen_color {
+                if let Some(color) = cx.s().chosen_color(cx.cards().linked_to(cx.s(), asker.source)) {
                     let mana = color.mana() as usize;
                     extra[mana] = extra[mana].saturating_add(1);
                 }
@@ -8972,7 +8972,7 @@ fn spell_payment(cx: &Cx, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
 pub fn restriction_from(cx: &Cx, source: ObjectId, restriction: ManaRestriction) -> ManaRestriction {
     let ManaRestriction::Subtypes(mut s) = restriction else { return restriction };
     if s.chosen {
-        s.subtypes = [cx.s().obj(source).chosen_subtype, None];
+        s.subtypes = [cx.s().chosen_subtype(cx.cards().linked_to(cx.s(), source)), None];
         s.chosen = false;
     } else {
         let words = cantrip_api::words(cx.s(), source);

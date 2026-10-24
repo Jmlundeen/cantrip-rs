@@ -12,7 +12,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 /// Permanents, spells on the stack (an ability is not an object here, a spell always has card types), and cards
 /// in every other zone: not a token, not a copy of a card (CR 108.2, 722.3c).
 fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    if q.state().obj(source).chosen_color.is_none() {
+    if q.state().chosen_color(q.linked_to(source)).is_none() {
         return false;
     }
     let obj = q.state().obj(affected);
@@ -26,7 +26,7 @@ fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Ch
 
 /// "In addition to their other colors" (CR 105.3, 613.1e).
 fn apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    if let Some(color) = q.state().obj(source).chosen_color {
+    if let Some(color) = q.state().chosen_color(q.linked_to(source)) {
         chars.colors = chars.colors.with(color);
     }
 }

@@ -13,7 +13,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 /// "Creatures you control of the chosen color" (CR 613.4c): creatures under the Banner's controller's control that are the
 /// chosen color after the color layer (CR 613.1e), a multicolored one included, a colorless one never.
 fn your_creatures_of_the_chosen_color(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    q.state().obj(source).chosen_color.is_some_and(|color| so_far.colors.has(color)) && your_creatures(q, source, affected, so_far)
+    q.state().chosen_color(q.linked_to(source)).is_some_and(|color| so_far.colors.has(color)) && your_creatures(q, source, affected, so_far)
 }
 
 pub static CARD: CardDef = CardDef {
