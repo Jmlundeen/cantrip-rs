@@ -99,7 +99,11 @@ pub fn cant_be_countered(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 /// "Doesn't untap during its controller's untap step" (CR 502.3, 613.1f): the untap step reads this restriction from
-/// the permanent's characteristics, so it persists even after the permanent loses its abilities.
+/// the permanent's characteristics, and the layer the caller declares it in decides whether it outlasts the permanent
+/// losing its abilities. A rule of another object (Intruder Alarm, Infinite Coursework) applies it after layer 6, in
+/// `Layer::PtModify`, so an ability-removing effect (CR 613.1f) cannot take it away; the permanent's own ability
+/// (Bombur, Gentle Dreamer) is in `Layer::Ability` and goes with its abilities. Never put it in `Layer::Ability` for an
+/// effect that is not the creature's own ability.
 /// Intruder Alarm, Bombur, Gentle Dreamer and Infinite Coursework use it as `StaticDef::apply`.
 pub fn does_not_untap(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::DoesNotUntap);
