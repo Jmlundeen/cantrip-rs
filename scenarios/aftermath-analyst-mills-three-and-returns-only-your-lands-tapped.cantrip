@@ -1,0 +1,66 @@
+# Aftermath Analyst: "When this creature enters, mill three cards." and "{3}{G}, Sacrifice this creature: Return all land cards from your graveyard to the battlefield tapped."
+# Turn 1 Bot1 casts it: exactly three cards are milled (Forest, Island, Consider; the Island under them stays in the library). Turn 2 Bot2 sacrifices Fabled Passage, so a
+# land card is in the opponent's graveyard too. Right after it resolves the ability is refused with four mana but no green (Ruby, Pearl, Sapphire and a Mountain; Emerald is tapped). Turn 3 it is paid with exactly {3}{G} out of five mana (one
+# blue floats): Forest and Island return tapped together, Consider and the Analyst stay in the graveyard, and Bot2's Fabled Passage stays in Bot2's graveyard.
+
+[Bot1 Deck]
+Aftermath Analyst
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mountain
+Forest
+Island
+Consider
+Island x20
+
+[Bot2 Deck]
+Fabled Passage
+Mountain x7
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Aftermath Analyst.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Consider; Island; Forest
+? Bot1.Library.Count = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Battlefield.Aftermath Analyst.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Fabled Passage.Play
+Bot2.Battlefield.Fabled Passage.Activate
+Bot2.Search(Mountain)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Aftermath Analyst.Activate(Spend: B, R, W)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U}
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Island; Mountain; Mox Emerald; Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Graveyard = Aftermath Analyst; Consider
+Bot2.Graveyard = Fabled Passage

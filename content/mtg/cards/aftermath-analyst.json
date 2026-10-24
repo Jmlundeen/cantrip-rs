@@ -1,0 +1,8 @@
+{
+  "name": "Aftermath Analyst",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Elf Detective",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "When this creature enters, mill three cards. (Put the top three cards of your library into your graveyard.)\n{3}{G}, Sacrifice this creature: Return all land cards from your graveyard to the battlefield tapped."
+}
