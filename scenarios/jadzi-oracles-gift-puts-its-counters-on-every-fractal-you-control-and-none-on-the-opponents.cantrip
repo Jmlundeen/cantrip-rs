@@ -1,0 +1,111 @@
+# Jadzi, Steward of Fate enters prepared (CR 722.3a) and "draw two cards, then discard two cards": Bot1 draws Mox Pearl and Mox
+# Emerald (not a third card) and discards both Plains. Turn 3 Bot1 casts the Oracle's Gift copy from exile for X=1 ({1}{1}{U}):
+# one 0/0 green and blue Fractal token with one counter; Jadzi is unprepared, then bounced by Unsummon and recast on turn 5
+# (prepared again). Bot2 made its own Fractal the same way on turn 4. The turn 5 copy for X=2 (Black Lotus' UUU and two Moxen)
+# makes two Fractals and the sentence ends at "then" (CR 608.2c): all three of Bot1's Fractals get two counters, the older
+# 1/1 becoming 3/3 and the new two 2/2, while Bot2's Fractal stays 1/1 ("each Fractal you control").
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Jadzi, Steward of Fate
+Unsummon
+Plains
+Plains
+Mox Pearl
+Mox Emerald
+Island
+Black Lotus
+Plains x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Jadzi, Steward of Fate
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Jadzi, Steward of Fate.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Plains; Plains)
+? Bot1.Battlefield.Jadzi, Steward of Fate.Prepared = true
+? Exile = Oracle's Gift
+? Bot1.Graveyard = Plains; Plains
+? Bot1.Hand = Unsummon; Mox Pearl; Mox Emerald
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Jadzi, Steward of Fate.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Exile.Oracle's Gift.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fractal Token.Power = 1
+? Bot1.Battlefield.Fractal Token.Toughness = 1
+? Bot1.Battlefield.Fractal Token.Colors = Blue; Green
+? Bot1.Battlefield.Fractal Token.Subtypes = Fractal
+? Bot1.Battlefield.Jadzi, Steward of Fate.Prepared = (absent)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Jadzi, Steward of Fate)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Exile.Oracle's Gift.Cast(X: 1)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Jadzi, Steward of Fate.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Plains; Plains)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Oracle's Gift.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Fractal Token#1.Power = 3
+Bot1.Battlefield.Fractal Token#1.Toughness = 3
+Bot1.Battlefield.Fractal Token#2.Power = 2
+Bot1.Battlefield.Fractal Token#2.Toughness = 2
+Bot1.Battlefield.Fractal Token#3.Power = 2
+Bot1.Battlefield.Fractal Token#3.Toughness = 2
+Bot2.Battlefield.Fractal Token.Power = 1
+Bot2.Battlefield.Fractal Token.Toughness = 1
+Bot1.Battlefield.Jadzi, Steward of Fate.Prepared = (absent)

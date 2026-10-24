@@ -1,0 +1,14 @@
+{
+  "name": "Jadzi, Steward of Fate",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Human Wizard",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Jadzi enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)\nWhen Jadzi enters, draw two cards, then discard two cards.",
+  "prepare": {
+    "name": "Oracle's Gift",
+    "manaCost": "{X}{X}{U}",
+    "type": "Sorcery",
+    "oracleText": "Create X 0/0 green and blue Fractal creature tokens, then put X +1/+1 counters on each Fractal you control."
+  }
+}
