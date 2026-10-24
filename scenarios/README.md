@@ -526,8 +526,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   chosen, numbered from 1 and read from the history (`1, 3` for Gollum's counter and draw)
 - `BotN.Battlefield.<Name>.Exerted`, `true` for an exerted permanent (CR 701.43a) and absent otherwise
 - `BotN.Battlefield.<Name>.GoadedBy` (`Bot2`), the players who goaded a creature (CR 701.15a), absent otherwise
-- `BotN.Battlefield.<Name>.MustAttack` (`Bot2`, `Bot2; Bot3`), the player each "attacks that player this combat if able"
-  effect on a creature names (CR 508.1d), one entry per effect, absent otherwise
+- `BotN.Battlefield.<Name>.MustAttack` (`Bot2`, `Bot2; Bot3`, `Gideon, Battle-Forged`), the player or permanent each
+  "attacks [that player or permanent] if able" effect on a creature names (CR 508.1d), one entry per effect while it lasts -
+  one "during its controller's next turn" before that turn as well - and absent otherwise
 - `BotN.Battlefield.<Name>.AttachedTo` (`Grizzly Bears`), what an Aura or Equipment enchants or equips, or the player an
   Aura enchants (`Bot2`, CR 303.4), absent otherwise
 

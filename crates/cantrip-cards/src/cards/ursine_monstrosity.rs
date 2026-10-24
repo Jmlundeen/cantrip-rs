@@ -9,7 +9,7 @@ fn combat(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let opponents: Vec<PlayerId> = g.state().opponents(me).collect();
     if !opponents.is_empty() {
         if let Some(chosen) = cantrip_mechanics::library::random_of(g, &opponents) {
-            g.add_effect(item.object, item.object, EffectKind::MustAttackPlayer(chosen), Duration::EndOfCombat);
+            g.add_effect(item.object, item.object, EffectKind::MustAttackAt(Target::Player(chosen)), Duration::EndOfCombat);
         }
     }
     g.end_sentence();

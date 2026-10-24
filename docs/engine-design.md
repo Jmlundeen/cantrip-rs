@@ -1902,7 +1902,12 @@ Requirements on a declaration of attackers are counted as CR 508.1d says, as blo
 one `RequiredAttack` per source in the question's `AttackRules` - each instance of "attacks each combat if able"
 (`Chars::must_attack` counts them, printed or gained in layer 6), two for each player who goaded the creature (attack; attack
 a player other than that one, CR 701.15b-d - goad is an effect, read from the effects, so losing abilities keeps it), and one
-per "attacks that player this combat if able" (`EffectKind::MustAttackPlayer`, `Duration::EndOfCombat`). The declaration must
+per "attacks [that player or permanent] if able" (`EffectKind::MustAttackAt`: Ursine Monstrosity's player this combat,
+`Duration::EndOfCombat`; Gideon, Battle-Forged's planeswalker during the creature's controller's next turn,
+`Duration::DuringControllersNextTurn`, in force only during the first turn its controller then begins after both the effect
+and their gaining the creature (`controlled_since`) -
+asked of the history's `TurnBegan` records, `turn::in_force` - spent with that turn once attackers are declared or its
+cleanup comes, whoever controls the creature afterwards, `turn::spend_next_turn_effects`). An aim that is not among what may be attacked (the planeswalker gone) obeys nothing. The declaration must
 obey as many as any declaration can attacking for free (a cost is never a requirement): a goaded creature told to attack its
 goader may attack the goader or another player, each obeying two of three. `AttackRules::judge` (`cantrip_state::attacks`) is
 the one validator - complete, issue, addable, cost - that the core, the scenario harness and the host (`CheckAttacks`) use,

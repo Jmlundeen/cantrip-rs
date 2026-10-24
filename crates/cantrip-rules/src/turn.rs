@@ -627,6 +627,7 @@ fn defending_player(cx: &Cx, attack: Target) -> Option<PlayerId> {
 }
 
 fn declare_attackers(cx: &mut Cx) -> R<()> {
+    spend_next_turn_effects(cx);
     let active = cx.s().turn.active;
     let eligible: Vec<ObjectId> = cx
         .s()
@@ -641,7 +642,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
                 && !chars.is(CardType::Battle)
                 && !obj.tapped
                 // CR 508.1c: an effect saying it can't attack, or a static ability.
-                && !cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantAttack)
+                && !cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantAttack && in_force(cx, e))
                 && crate::static_rules::attack_rules_allow(&*cx, cx.cards(), id)
                 && !summoning_sick(cx.cards(), cx.s(), &cx.g.log, id)
                 // CR 702.3b: defender, unless an effect or a static ability lets it attack as though it didn't have it
@@ -930,7 +931,8 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
 /// The requirements on a declaration of attackers by `eligible` among `targets` (CR 508.1d), one for each source: each
 /// instance of "attacks each combat if able" it has (printed or gained, `Chars::must_attack`); for each player who goaded it,
 /// two (CR 701.15b-c: attack, and attack a player other than that one), goad being an effect and no ability, which a creature
-/// that loses its abilities is still under; and each "attacks that player this combat if able" (`EffectKind::MustAttackPlayer`).
+/// that loses its abilities is still under; and each "attacks [that player or permanent] if able" in force now
+/// (`EffectKind::MustAttackAt`, `in_force`).
 /// With the most of them any declaration obeys attacking for free, and one that does (`AttackRules::solve`).
 fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[AttackCost]) -> AttackRules {
     let mut required = Vec::new();
@@ -947,7 +949,7 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[Att
                     required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
                     required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(e.controller) });
                 }
-                EffectKind::MustAttackPlayer(p) => required.push(RequiredAttack { attacker: id, aim: AttackAim::At(Target::Player(p)) }),
+                EffectKind::MustAttackAt(at) if in_force(cx, e) => required.push(RequiredAttack { attacker: id, aim: AttackAim::At(at) }),
                 _ => {}
             }
         }
@@ -957,6 +959,50 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[Att
         (rules.most, rules.suggested) = rules.solve(eligible, targets, costs);
     }
     rules
+}
+
+/// Whether a resolved effect on a declaration of attackers applies now, as its duration has it (CR 611.2a). One "during its
+/// controller's next turn" (`Duration::DuringControllersNextTurn`) does only during the first turn its affected creature's
+/// controller - whoever controls it now - has begun since both the turn the effect began in and the turn they gained the
+/// creature (`controlled_since`): a creature that changes controllers before its chance to attack is under it during its new
+/// controller's next turn (Gideon, Battle-Forged's ruling), though a turn of theirs came before they had it. This is that
+/// player's turn, after both, and no turn of theirs began in between, as the history's `TurnBegan` records have it (extra
+/// turns are turns; a skipped one never began, CR 500.7, 614.10). Every other duration applies for as long as the effect lasts.
+fn in_force(cx: &Cx, e: &ContinuousEffect) -> bool {
+    let Duration::DuringControllersNextTurn(began) = e.duration else { return true };
+    let s = cx.s();
+    let creature = s.obj(e.affected);
+    let controller = creature.controller;
+    let since = began.max(creature.controlled_since);
+    let now = s.turn.number;
+    if s.turn.active != controller || now <= since {
+        return false;
+    }
+    let history = History::new(&cx.g.log, now);
+    !history
+        .all()
+        .iter()
+        .rev()
+        .skip_while(|r| r.turn >= now)
+        .take_while(|r| r.turn > since)
+        .any(|r| r.event == Event::TurnBegan { player: controller })
+}
+
+/// "During its controller's next turn" is this turn for each such effect in force now (`in_force`): from here it lasts until
+/// end of turn, whoever controls its creature later this turn (CR 611.2a). A change of control moves it to the new
+/// controller's next turn only before the creature has had its chance to attack (Gideon, Battle-Forged's ruling): asked as
+/// attackers are declared, and at the cleanup step for a turn with no declaration (no combat, no creature able to attack).
+fn spend_next_turn_effects(cx: &mut Cx) {
+    let spent: Vec<usize> = (0..cx.s().effects.len())
+        .filter(|&i| {
+            let e = &cx.s().effects[i];
+            matches!(e.duration, Duration::DuringControllersNextTurn(_)) && in_force(cx, e)
+        })
+        .collect();
+    for i in spent {
+        let effect = ContinuousEffect { duration: Duration::EndOfTurn, ..cx.s().effects[i] };
+        cx.st().effect_set(i, effect);
+    }
 }
 
 /// "Can't block" (CR 509.1b): from an effect on this creature, or the turn's rule that no creature can.
@@ -1402,6 +1448,10 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
     if cx.s().effects.iter().any(|e| e.duration == Duration::EndOfCombat) {
         cx.st().effects_retain(|e| e.duration != Duration::EndOfCombat);
     }
+    // "During its controller's next turn" ends with that turn (`spend_next_turn_effects`), however long it waits for it: a
+    // change of control before then moves it to the new controller's next turn, so no earlier moment says it never comes.
+    // Its creature leaving ends it with the creature (CR 400.7).
+    spend_next_turn_effects(cx);
     if cx.s().effects.iter().any(|e| e.duration == Duration::EndOfTurn) {
         // A permanent that was only a copy until end of turn is what it was again (CR 707.2, 611.2b), as far as the copy
         // effects that are left say: the state undoes a copy effect as it removes it (`GameState::effect_remove`).

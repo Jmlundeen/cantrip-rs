@@ -950,10 +950,13 @@ pub enum EffectKind {
     /// Gains "this creature attacks each combat if able" (CR 508.1d), layer 6: an ability, which "loses all abilities" later
     /// takes (Carnage, Crimson Chaos).
     MustAttack,
-    /// "Attacks that player this combat if able" (CR 508.1d): an attack requirement that names the player to attack, and only
-    /// that: where the creature can't attack that player without paying a cost, it may attack anything else, or nothing (Ursine
-    /// Monstrosity's ruling). An effect, not an ability: a creature that loses its abilities is still under it.
-    MustAttackPlayer(PlayerId),
+    /// "Attacks [that player or permanent] if able" (CR 508.1d): an attack requirement that names what to attack, and only
+    /// that - Ursine Monstrosity's "attacks that player this combat if able", Gideon, Battle-Forged's "attacks Gideon during
+    /// its controller's next turn if able". Where the creature can't attack that one - a cost to pay, a planeswalker gone or
+    /// that can't be attacked - it may attack anything else, or nothing (the rulings of both). A permanent is named as the
+    /// object it is: one that left and came back is a new object it never names (CR 400.7). An effect, not an ability: a
+    /// creature that loses its abilities is still under it.
+    MustAttackAt(Target),
     /// It becomes this subtype in addition to its other subtypes (CR 613.1d), layer 4.
     AddSubtype(Subtype),
     /// Its creature type becomes this one (CR 205.1a, 613.1d), layer 4: every creature type it had is replaced, its card types
@@ -1197,6 +1200,17 @@ pub enum Duration {
     WhileSourceOnBattlefield,
     /// Until the next turn of this player begins (CR 611.2b): "until your next turn".
     UntilNextTurnOf(PlayerId),
+    /// "During its controller's next turn" (CR 611.2a): the effect does something only during the first turn the affected
+    /// object's controller - whoever controls it then - begins after both the turn they gained it and the turn the effect
+    /// began in, `began`, which the core
+    /// sets as the effect begins (a card passes `Duration::DURING_ITS_CONTROLLERS_NEXT_TURN`). The turn it began in is never
+    /// that turn. A change of control before the creature has had its chance to attack makes it the new controller's next
+    /// turn instead (Gideon, Battle-Forged's ruling); once its chance has come - attackers declared, or the turn's cleanup
+    /// - the effect lasts until end of turn and no further, whoever controls the creature next. Every declare attackers
+    /// step of that turn is under it (CR 508.1d). Until then it waits, however long. Only the declaration of attackers
+    /// reads whether it is that turn, so only an effect on it may last so (`EffectKind::MustAttackAt`, Gideon,
+    /// Battle-Forged; `EffectKind::CantAttack`, Wall of Dust's "can't attack during its controller's next turn").
+    DuringControllersNextTurn(u32),
     /// "Until this card is cast from exile" (CR 611.2a, 400.7): until this object, a card in exile, becomes cast (CR
     /// 601.2i) - after its costs are paid, so a mana ability the effect grants may help pay for it. A card that leaves
     /// exile any other way is a new object (CR 400.7) that can never be cast as this one, so the effect then lasts as long
@@ -1219,6 +1233,9 @@ pub enum Duration {
 }
 
 impl Duration {
+    /// "During its controller's next turn", the turn it began in set as the effect begins (`DuringControllersNextTurn`).
+    pub const DURING_ITS_CONTROLLERS_NEXT_TURN: Duration = Duration::DuringControllersNextTurn(0);
+
     /// Whether an effect of this duration on `affected` still lasts as far as the object itself goes (CR 611.2b): false
     /// once the condition a "for as long as" duration names about it is no longer true.
     pub fn holds_for(self, affected: &Obj) -> bool {

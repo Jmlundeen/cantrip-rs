@@ -563,12 +563,14 @@ impl StateDump {
                         let names: Vec<String> = goaders.iter().map(|n| format!("Bot{n}")).collect();
                         d.set(format!("{key}.GoadedBy"), names.join("; "));
                     }
-                    // The players it must attack this combat if able (CR 508.1d), one for each such effect.
+                    // The players and permanents it must attack if able (CR 508.1d), one for each such effect, whether or not
+                    // it is yet the turn the effect applies in.
                     let mut must: Vec<String> = s
                         .effects
                         .iter()
                         .filter_map(|e| match e.kind {
-                            EffectKind::MustAttackPlayer(p) if e.affected == id => Some(format!("Bot{}", p.0 + 1)),
+                            EffectKind::MustAttackAt(Target::Player(p)) if e.affected == id => Some(format!("Bot{}", p.0 + 1)),
+                            EffectKind::MustAttackAt(Target::Object(o)) if e.affected == id => Some(game.name(o).to_string()),
                             _ => None,
                         })
                         .collect();

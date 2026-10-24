@@ -807,6 +807,7 @@ impl<'a> Projector<'a> {
             Duration::EndOfCombat => " this combat".to_string(),
             Duration::UntilNextTurnOf(q) if q == self.viewer => " until your next turn".to_string(),
             Duration::UntilNextTurnOf(q) => format!(" until {}'s next turn", self.names.get(q.index()).cloned().unwrap_or_default()),
+            Duration::DuringControllersNextTurn(_) => " during its controller's next turn".to_string(),
             Duration::WhileTapped => " for as long as it remains tapped".to_string(),
             Duration::WhileCounter(kind) => format!(" for as long as it has a {} counter on it", kind.name()),
             _ => String::new(),
@@ -1283,6 +1284,18 @@ impl<'a> Projector<'a> {
                             when => when,
                         };
                         view.granted_abilities.push(AbilityTextView { text: format!("Blocks{until} if able."), spent: false });
+                        continue;
+                    }
+                    // A requirement to attack (CR 508.1d), and what: "Attacks Gideon, Battle-Forged during its controller's next
+                    // turn if able."
+                    EffectKind::MustAttackAt(at) => {
+                        let whom = match at {
+                            Target::Player(p) if p == self.viewer => "you".to_string(),
+                            Target::Player(p) => self.names.get(p.index()).cloned().unwrap_or_default(),
+                            Target::Object(o) => game.name(o).to_string(),
+                            _ => continue,
+                        };
+                        view.granted_abilities.push(AbilityTextView { text: format!("Attacks {whom}{} if able.", self.until_text(e.duration)), spent: false });
                         continue;
                     }
                     EffectKind::CantActivateAbilities => "Its activated abilities can't be activated",

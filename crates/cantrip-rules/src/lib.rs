@@ -1157,6 +1157,17 @@ impl<'a> Cx<'a> {
         if self.g.state.obj(affected).zone.is(ZoneKind::PhasedOut) && !kind.outlives_affected() {
             return;
         }
+        // "During its controller's next turn" counts from the turn it begins in, which the core reads, never the card.
+        let duration = match duration {
+            Duration::DuringControllersNextTurn(_) => {
+                debug_assert!(
+                    matches!(kind, EffectKind::MustAttackAt(_) | EffectKind::CantAttack),
+                    "only the declaration of attackers reads whether it is the controller's next turn"
+                );
+                Duration::DuringControllersNextTurn(self.g.state.turn.number)
+            }
+            other => other,
+        };
         let controller = self.g.state.obj(source).controller;
         let timestamp = self.g.state.timestamp();
         let effect = ContinuousEffect { source, controller, timestamp, affected, kind, duration };
