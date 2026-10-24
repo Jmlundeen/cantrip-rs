@@ -1,0 +1,22 @@
+# Branchloft Pathway is a modal double-faced card (CR 712.3) whose faces are both lands: one copy is played as its front
+# face (taps for {G}), the other as its back face Boulderloft Pathway (taps for {W}); neither enters tapped.
+
+[Bot1 Deck]
+Branchloft Pathway
+Branchloft Pathway
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Branchloft Pathway.Play(Ability: #1)
+Bot1.Battlefield.Branchloft Pathway.Activate
+? Bot1.Mana = {G}
+[T3 Bot1.Main1]
+Bot1.Hand.Branchloft Pathway.Play(Ability: back face)
+Bot1.Battlefield.Boulderloft Pathway.Activate
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Battlefield = Branchloft Pathway; Boulderloft Pathway

@@ -1,0 +1,11 @@
+{
+  "name": "Branchloft Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {G}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Boulderloft Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {W}."
+  }
+}
