@@ -1,0 +1,46 @@
+# Wolverine, Fierce Fighter (3/5) fights Bot2's Guerrilla Gorilla as he enters and is left with 2 damage. Violent Echoes
+# then deals him 6: his replacement deals it but heals the damage already marked (CR 614.1a), so the 6 is measured
+# against his whole toughness of 5 - one excess, a Jace token with one loyalty (CR 120.4a, 120.10, 701.71a). Counting
+# the healed 2 as still marked would give three.
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Black Lotus
+Wolverine, Fierce Fighter
+Violent Echoes
+Mountain
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x22
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wolverine, Fierce Fighter.Cast
+Bot1.Target(Guerrilla Gorilla)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wolverine, Fierce Fighter.Damage = 2
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Violent Echoes.Cast(Bot1.Battlefield.Wolverine, Fierce Fighter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 1
+Bot1.Graveyard = Wolverine, Fierce Fighter; Violent Echoes; Black Lotus; Black Lotus

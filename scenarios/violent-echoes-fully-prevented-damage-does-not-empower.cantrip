@@ -1,0 +1,39 @@
+# Two shields prevent all six damage. No damage is dealt and no Jace is made
+# (CR 615.6, 701.71a).
+[Bot1 Deck]
+Violent Echoes
+Black Lotus
+Mox Ruby
+Island x22
+
+[Bot2 Deck]
+Ornithopter
+Mox Pearl x2
+Healing Salve x2
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Violent Echoes.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Prevent the next 3 damage)
+Bot2.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Prevent the next 3 damage)
+Bot2.Target(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot2.Graveyard = Healing Salve; Healing Salve

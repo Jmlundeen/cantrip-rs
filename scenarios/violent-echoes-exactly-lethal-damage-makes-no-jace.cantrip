@@ -1,0 +1,35 @@
+# Six damage to our own 6/6 Elder Gargaroth (put onto the battlefield by Show and Tell) is exactly lethal: no excess
+# was dealt, so Violent Echoes empowers nothing and no Jace token is made (CR 120.4a, 120.10). Jace's absence is the
+# point: a 0-loyalty token would be made and then die (CR 701.71a, 704.5i), which only an empty battlefield and
+# LeftBattlefield tell apart.
+[Bot1 Deck]
+Show and Tell
+Elder Gargaroth
+Black Lotus
+Mox Ruby
+Island
+Violent Echoes
+Black Lotus
+Island x18
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Elder Gargaroth)
+Bot2.Choose()
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Violent Echoes.Cast(Bot1.Battlefield.Elder Gargaroth)
+[T3 Bot1.Main2]
+
+[Expect]
+LeftBattlefield = Black Lotus (tapped); Black Lotus (tapped); Elder Gargaroth
+Bot1.Battlefield = Island; Mox Ruby
