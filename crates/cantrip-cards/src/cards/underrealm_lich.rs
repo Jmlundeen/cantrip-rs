@@ -30,9 +30,13 @@ fn look_take_one_rest_to_graveyard(g: &mut dyn Game, player: PlayerId, source: O
     if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
         taken = placements[0].clone();
     }
-    g.return_to_hand(&taken);
-    let rest: Vec<ObjectId> = looked.into_iter().filter(|c| !taken.contains(c)).collect();
-    g.put_into_graveyard(&rest);
+    // "Put one into your hand and the rest into your graveyard" is one action (CR 608.2f): every card moves at once, each
+    // replacement judged against the state before any of them moves. Looked at, not revealed: the moves are not marked.
+    let moves: Vec<(ObjectId, Zone)> = looked.iter().map(|&c| {
+        let owner = g.obj(c).owner;
+        (c, if taken.contains(&c) { Zone::hand(owner) } else { Zone::graveyard(owner) })
+    }).collect();
+    g.move_together(&moves, ZoneReason::Other);
     Ok(())
 }
 
