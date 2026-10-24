@@ -83,6 +83,9 @@ pub struct Entering {
     /// One of the words its text offers to choose between, chosen as it enters (CR 614.12a, 607.2f): Gollum, Riddle
     /// Master's odd or even, a Siege's "Khans or Dragons" (`cantrip_mechanics::choose::option_as_enters`).
     pub chosen_option: Option<ChosenOption>,
+    /// The object chosen as it enters (CR 614.12a, 607.2d): Dauntless Bodyguard's "another creature you control"
+    /// (`cantrip_mechanics::choose::object_as_enters`).
+    pub chosen_object: Option<ChosenObject>,
     /// It enters attached to this permanent (CR 303.4f): an Aura entering from the stack, or choosing its host as it
     /// is put onto the battlefield (CR 303.4g).
     pub attach: Option<ObjectId>,

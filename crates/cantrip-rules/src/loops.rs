@@ -343,6 +343,7 @@ impl Hash for Name<'_> {
             o.entered_with = None;
             o.prepared_from = None;
             o.exiled = None;
+            o.marks.chosen_object = None;
             let known = s.last_known(id).map(|k| LastKnown { id: ObjectId::NONE, ..*k });
             (o, known).hash(h);
         };
@@ -481,6 +482,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
                 o.entered_with.map(|id| canon.id(id)),
                 o.prepared_from.map(|id| canon.id(id)),
                 o.exiled.map(|e| (canon.id(e.by), e.text, e.from, e.until_leaves, e.encoded)),
+                o.marks.chosen_object.map(|c| (canon.id(c.object), c.text)),
                 stamp,
             )
                 .hash(h);
@@ -490,6 +492,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
             o.entered_with = None;
             o.prepared_from = None;
             o.exiled = None;
+            o.marks.chosen_object = None;
             if hashed {
                 row(id, &o).hash(h);
             } else {

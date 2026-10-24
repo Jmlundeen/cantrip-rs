@@ -585,6 +585,14 @@ impl StateDump {
                     if let Some(chosen) = obj.marks.chosen_option {
                         d.set(format!("{key}.ChosenOption"), label_text(&Label::Option(chosen.card, chosen.index)));
                     }
+                    // The permanent chosen as it entered (CR 614.12a, 607.2d), while it is still that permanent on the
+                    // battlefield: one that left, or came back as a new object (CR 400.7), is chosen no longer.
+                    if let Some(chosen) = obj.marks.chosen_object
+                        && s.obj(chosen.object).became.is_none()
+                        && s.obj(chosen.object).zone.is(ZoneKind::Battlefield)
+                    {
+                        d.set(format!("{key}.ChosenObject"), game.known_name(chosen.object));
+                    }
                     // The modes its modal abilities have chosen, from the history (`Event::ModesChosen`), numbered from 1.
                     let chosen = game.history().all().iter().fold(0u32, |acc, r| match r.event {
                         Event::ModesChosen { source, modes, .. } if source == id => acc | modes,

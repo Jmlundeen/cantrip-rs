@@ -390,6 +390,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             new.marks.chosen_player = e.chosen_player;
             new.marks.chosen_card = e.chosen_card;
             new.marks.chosen_option = e.chosen_option;
+            new.marks.chosen_object = e.chosen_object;
             new.marks.protector = e.protector;
             new.attached_to = e.attach;
             new.attached_player = e.attach_player;
@@ -1012,6 +1013,13 @@ pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, slot: usi
     {
         panic!("{}'s `CardDef::enters` {fault}", cx.cards().get(card).name);
     }
+    // The object it chose is linked to this text's abilities (CR 607.2d): a verifying run stops on a choice kept with another.
+    if layers::verifying()
+        && entering.chosen_object != before.chosen_object
+        && entering.chosen_object.is_some_and(|c| c.text != cx.cards().linked_card(card))
+    {
+        panic!("{}'s `CardDef::enters` kept its chosen object with another card's text", cx.cards().get(card).name);
+    }
 }
 
 /// The replacement effects that modify how a permanent enters (CR 614.12) applied to its entry `proposed`: its own
@@ -1149,6 +1157,7 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
         o.marks.chosen_player = entering.chosen_player;
         o.marks.chosen_card = entering.chosen_card;
         o.marks.chosen_option = entering.chosen_option;
+        o.marks.chosen_object = entering.chosen_object;
         o.attached_to = entering.attach;
         o.attached_player = entering.attach_player;
     });
@@ -1336,7 +1345,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None, own: [None; 2] };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes: None, own: [None; 2] };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1395,6 +1404,7 @@ pub fn put_onto_battlefield_as(
         chosen_player: None,
         chosen_card: None,
         chosen_option: None,
+        chosen_object: None,
         attach: None, attach_player: None,
         x: 0,
         transformed,
@@ -1479,6 +1489,7 @@ pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: Play
         chosen_player: None,
         chosen_card: None,
         chosen_option: None,
+        chosen_object: None,
         attach: None,
         attach_player: None,
         x: 0,
@@ -1819,7 +1830,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None, own: [None; 2] };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None, own: [None; 2] };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -3968,6 +3979,7 @@ mod tests {
             chosen_player: None,
             chosen_card: None,
             chosen_option: None,
+            chosen_object: None,
             attach: None,
             attach_player: None,
             x: 0,
