@@ -49,7 +49,8 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    make. It says: claim before any work; `new-card.py` first; the core is closed to it (a missing keyword module may go
    in `cantrip-mechanics`); run only its card's scenarios and coverage and those of a card whose file or shared
    mechanic it changed; one commit per card, `Closes #N`, mechanics and client commits before it; no push; every command in the
-   foreground, never in the background (an agent that stops to wait on one is made to leave its slot, and loses it); and a short
+   foreground with a long timeout (up to 600000 ms: a shorter one moves a long run to the background), never in the
+   background (an agent that stops to wait on one is made to leave its slot, and loses it); and a short
    report when committed - its commits, its own scenarios' pass line run on the commit as it stands (again after each
    round of fixes; a report without it is not sent to review), coverage, each test point with the line that catches it and what it
    broke, client needs, anything odd in the core, and what in `new-card.py`'s
