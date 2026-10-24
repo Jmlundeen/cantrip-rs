@@ -35,8 +35,8 @@ fn damage_and_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Whenever an opponent is dealt noncombat damage" (CR 120.3): any source's, to any opponent of the source's controller.
 fn an_opponent_is_dealt_noncombat_damage(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { target: Target::Player(player), amount, combat: false, .. }
-            if *amount > 0 && q.state().opponents(q.controller(source)).any(|o| o == *player) =>
+        Event::Damage { target: Target::Player(player), amount, kind, .. }
+            if !kind.is_combat() && *amount > 0 && q.state().opponents(q.controller(source)).any(|o| o == *player) =>
         {
             Fired::PLAIN
         }

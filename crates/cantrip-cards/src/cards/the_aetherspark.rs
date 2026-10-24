@@ -29,8 +29,8 @@ fn grant(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 /// dealt in the one event, to anything, as one trigger (CR 603.2c) carrying that much.
 fn equipped_creature_deals_combat_damage(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, amount, combat: true, .. }
-            if *amount > 0 && q.attached_to(source) == Some(*from) && q.state().turn.active == q.controller(source) =>
+        Event::Damage { source: from, amount, kind, .. }
+            if kind.is_combat() && *amount > 0 && q.attached_to(source) == Some(*from) && q.state().turn.active == q.controller(source) =>
         {
             Some(Fired { subject: Target::Object(*from), data: [*amount as u32, 0] })
         }

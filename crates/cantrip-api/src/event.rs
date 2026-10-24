@@ -15,6 +15,25 @@ pub enum CoinFlip {
     Tails,
 }
 
+/// The damage's combat designation and its source's five colors as it dealt damage (CR 120.3, 609.7).
+/// Kept in one byte so adding excess information does not enlarge every event in the history.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct DamageKind(u8);
+
+impl DamageKind {
+    pub const fn new(combat: bool, colors: ColorSet) -> Self {
+        Self(colors.0 | ((combat as u8) << 5))
+    }
+
+    pub const fn is_combat(self) -> bool {
+        self.0 & (1 << 5) != 0
+    }
+
+    pub const fn colors(self) -> ColorSet {
+        ColorSet(self.0 & 0b1_1111)
+    }
+}
+
 /// A single source's damage after replacement and prevention (CR 120.3, 120.10).
 /// `target` is the actual recipient, including redirection; `excess` is damage actually dealt above lethal damage,
 /// or the recipient's loyalty or defense before the damage. Players have no excess damage.
@@ -35,11 +54,11 @@ pub enum Event {
     BecameTarget { target: Target, by: ObjectId, controller: PlayerId },
     /// An object moved between zones. A token's creation comes from no zone (`Zone::GONE`).
     ZoneChange { old: ObjectId, new: ObjectId, from: Zone, to: Zone, reason: ZoneReason },
-    /// Damage was dealt. `controller` and `colors` are the source's as it dealt it (CR 120.3, 609.7): "damage red sources
+    /// Damage was dealt. `controller` and `kind.colors()` are the source's as it dealt it (CR 120.3, 609.7): "damage red sources
     /// you controlled dealt this turn" counts a source that has since changed controller or color, or left (Temple of
     /// Power's ruling), and a spell's or an ability's source by what it was on the stack or the battlefield then.
     Damage {
-        source: ObjectId, target: Target, amount: u16, combat: bool, controller: PlayerId, colors: ColorSet,
+        source: ObjectId, target: Target, amount: u16, kind: DamageKind, controller: PlayerId,
         /// Total excess damage this recipient was dealt by ALL sources in this simultaneous damage event (CR 120.10).
         /// Repeated on each source's record for that recipient: never sum it across those records or attribute it to
         /// that source alone. A trigger about the recipient uses the batch's other records for its source restrictions.
@@ -544,6 +563,18 @@ impl EventMask {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn damage_kind_preserves_every_color_set_and_combat_designation() {
+        for bits in 0..32 {
+            for combat in [false, true] {
+                let kind = DamageKind::new(combat, ColorSet(bits));
+                assert_eq!(kind.is_combat(), combat);
+                assert_eq!(kind.colors(), ColorSet(bits));
+            }
+        }
+        assert_eq!(std::mem::size_of::<DamageKind>(), 1);
+    }
 
     /// The history holds an `Event` for everything since the game began, so its size is every record's: the mana in one
     /// is a `ManaTally` (a `u8` a kind), never a pool's `u32` counts, and a cast's mana value is in its last-known row

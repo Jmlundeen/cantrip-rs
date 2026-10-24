@@ -8,8 +8,8 @@ use cantrip_oracle as oracle;
 /// triggers once for the batch, its members those creatures. Only creatures deal combat damage (CR 510.1, 506.4), so the source is not type-checked.
 fn creature_deals_combat_damage_to_you(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source, target: Target::Player(p), combat: true, .. }
-            if *p == me.controller && q.state().player(me.controller).monarch =>
+        Event::Damage { source, target: Target::Player(p), kind, .. }
+            if kind.is_combat() && *p == me.controller && q.state().player(me.controller).monarch =>
         {
             Fired::about(Target::Object(*source))
         }

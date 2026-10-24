@@ -338,8 +338,8 @@ pub fn equipped_creature_attacks_subject(q: &dyn Query, source: ObjectId, event:
 /// Sword print it.
 pub fn equipped_creature_deals_combat_damage_to_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: dealer, target: Target::Player(p), amount, combat: true, .. }
-            if *amount > 0 && q.attached_to(source) == Some(*dealer) =>
+        Event::Damage { source: dealer, target: Target::Player(p), amount, kind, .. }
+            if kind.is_combat() && *amount > 0 && q.attached_to(source) == Some(*dealer) =>
         {
             Some(Fired { subject: Target::Player(*p), data: [*amount as u32, 0] })
         }
@@ -1094,7 +1094,7 @@ pub fn artifact_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Opti
 /// subject and the amount of damage its `data[0]`. Etali, Primal Conqueror and Fallen Shinobi print it.
 pub fn deals_combat_damage_to_player_subject(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Player(p), amount, combat: true, .. } if *from == source && *amount > 0 => {
+        Event::Damage { source: from, target: Target::Player(p), amount, kind, .. } if kind.is_combat() && *from == source && *amount > 0 => {
             Some(Fired { subject: Target::Player(*p), data: [*amount as u32, 0] })
         }
         _ => None,
@@ -1105,7 +1105,7 @@ pub fn deals_combat_damage_to_player_subject(_: &dyn Query, source: ObjectId, ev
 /// Bejeweled Warg prints it; Carnage, Crimson Chaos's granted ability has the same condition.
 pub fn deals_combat_damage_to_player(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Player(_), amount, combat: true, .. } if *from == source && *amount > 0 => {
+        Event::Damage { source: from, target: Target::Player(_), amount, kind, .. } if kind.is_combat() && *from == source && *amount > 0 => {
             Fired::PLAIN
         }
         _ => None,
@@ -1116,8 +1116,8 @@ pub fn deals_combat_damage_to_player(_: &dyn Query, source: ObjectId, event: &Ev
 /// as the damage is dealt, with "that creature" the trigger's subject. Stinkweed Imp prints it, and Kaldra Compleat grants it.
 pub fn deals_combat_damage_to_a_creature(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Object(id), amount, combat: true, .. }
-            if *from == source && *amount > 0 && q.chars(*id).is(CardType::Creature) =>
+        Event::Damage { source: from, target: Target::Object(id), amount, kind, .. }
+            if kind.is_combat() && *from == source && *amount > 0 && q.chars(*id).is(CardType::Creature) =>
         {
             Fired::about(Target::Object(*id))
         }
@@ -1129,8 +1129,8 @@ pub fn deals_combat_damage_to_a_creature(q: &dyn Query, source: ObjectId, event:
 /// player, with "that player" fixed as the trigger's subject. Vraska, Golgari Queen's emblem and Enduring Curiosity print it.
 pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Player(p), amount, combat: true, .. }
-            if *amount > 0 && q.controller(*from) == me.controller && q.chars(*from).is(CardType::Creature) =>
+        Event::Damage { source: from, target: Target::Player(p), amount, kind, .. }
+            if kind.is_combat() && *amount > 0 && q.controller(*from) == me.controller && q.chars(*from).is(CardType::Creature) =>
         {
             Fired::about(Target::Player(*p))
         }
@@ -1404,7 +1404,7 @@ pub const THIS_ENTERS_OR_TRANSFORMS: Trigger = when(EventMask(EventMask::ZONE_CH
 /// Wanderwine Wisdom grants it.
 pub fn deals_combat_damage_to_player_or_planeswalker(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: dealer, target, amount, combat: true, .. } if *dealer == source && *amount > 0 => match target {
+        Event::Damage { source: dealer, target, amount, kind, .. } if kind.is_combat() && *dealer == source && *amount > 0 => match target {
             Target::Player(_) => Fired::PLAIN,
             Target::Object(id) if q.chars(*id).is(CardType::Planeswalker) => Fired::PLAIN,
             _ => None,

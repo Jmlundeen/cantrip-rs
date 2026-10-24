@@ -44,7 +44,7 @@ fn cx(game: &mut RulesGame) -> Cx<'_> {
 }
 
 fn damage_events(cx: &Cx) -> usize {
-    cx.g.log.iter().filter(|r| matches!(r.event, Event::Damage { combat: true, .. })).count()
+    cx.g.log.iter().filter(|r| matches!(r.event, Event::Damage { kind, .. } if kind.is_combat())).count()
 }
 
 #[test]

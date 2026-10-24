@@ -90,7 +90,7 @@ pub(crate) fn inherent_triggers(cx: &Cx, event: &Event) -> Vec<(u8, PlayerId, Ta
         }
         // Taking the initiative ventures into Undercity (CR 726.2), even for one who had it (CR 726.5).
         Event::TookInitiative { player } if in_game(cx, player) => found.push((INITIATIVE_VENTURE, player, Target::None)),
-        Event::Damage { source, target: Target::Player(victim), amount, combat: true, .. } => {
+        Event::Damage { source, target: Target::Player(victim), amount, kind, .. } if kind.is_combat() => {
             combat_damage(cx, source, victim, amount, &mut found);
         }
         Event::LifeChange { player, delta } if delta < 0 => {

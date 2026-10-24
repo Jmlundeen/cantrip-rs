@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// recipients, it triggers once.
 fn equipped_creature_deals_combat_damage(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: dealer, amount, combat: true, .. } if *amount > 0 && q.attached_to(source) == Some(*dealer) => {
+        Event::Damage { source: dealer, amount, kind, .. } if kind.is_combat() && *amount > 0 && q.attached_to(source) == Some(*dealer) => {
             Fired::PLAIN
         }
         _ => None,

@@ -5,8 +5,8 @@ use cantrip_oracle as oracle;
 /// Combat damage to opponents during your turn; `.once_per_batch()` groups simultaneous hits (CR 603.2c).
 fn opponents_dealt_combat_damage(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { target: Target::Player(p), amount, combat: true, .. }
-            if *amount > 0 && your_turn(q, me) && q.state().opponents(me.controller).any(|o| o == *p) =>
+        Event::Damage { target: Target::Player(p), amount, kind, .. }
+            if kind.is_combat() && *amount > 0 && your_turn(q, me) && q.state().opponents(me.controller).any(|o| o == *p) =>
         {
             Fired::PLAIN
         }

@@ -3051,7 +3051,7 @@ pub fn deal_damage_with(
                 counters::put_on_player(cx, p, counters::PlayerCounts { poison, ..Default::default() }, by);
             }
             lifelink(cx, source, &source_chars, amount, batch);
-            Some(Event::Damage { source, target, amount, combat, controller: cx.controller(source), colors: source_chars.colors, recipient_excess: 0 })
+            Some(Event::Damage { source, target, amount, kind: DamageKind::new(combat, source_chars.colors), controller: cx.controller(source), recipient_excess: 0 })
         }
         Target::Object(id) => {
             if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
@@ -3109,7 +3109,7 @@ pub fn deal_damage_with(
                 counters::remove(cx, id, CounterKind::Loyalty, amount.min(i16::MAX as u16) as i16);
             }
             lifelink(cx, source, &source_chars, amount, batch);
-            Some(Event::Damage { source, target, amount, combat, controller: cx.controller(source), colors: source_chars.colors, recipient_excess: 0 })
+            Some(Event::Damage { source, target, amount, kind: DamageKind::new(combat, source_chars.colors), controller: cx.controller(source), recipient_excess: 0 })
         }
     }
 }

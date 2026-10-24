@@ -104,7 +104,7 @@ fn damage_to(cx: &mut Cx, attacked: ObjectId) -> u32 {
     cx.g.log
         .iter()
         .filter_map(|r| match r.event {
-            Event::Damage { combat: true, target: Target::Object(id), amount, .. } if id == attacked => Some(u32::from(amount)),
+            Event::Damage { kind, target: Target::Object(id), amount, .. } if kind.is_combat() && id == attacked => Some(u32::from(amount)),
             _ => None,
         })
         .sum()
