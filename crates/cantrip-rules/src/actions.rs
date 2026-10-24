@@ -5265,7 +5265,6 @@ impl<'a> Offer<'a> {
             ZoneKind::Exile => {
                 // A prepare spell's copy, by the prepared permanent's controller (CR 722.3).
                 if obj.card_copy
-                    && !obj.prepare_expired
                     && obj.prepared_from.is_some_and(|from| {
                         let f = cx.s().obj(from);
                         live(cx.s(), from) && f.zone.is(ZoneKind::Battlefield) && f.prepared && f.controller == player
@@ -9502,8 +9501,8 @@ mod tests {
     }
 
     /// CR 722.3b/c, 704.5e: becoming unprepared ends only this permanent's copy's permission and exemption, without
-    /// performing state-based actions in the middle of an effect. A new preparation cannot revive the expired copy.
-    /// Both changes to the object rows undo and redo together.
+    /// performing state-based actions in the middle of an effect: its link to the permanent is severed, so a new
+    /// preparation cannot revive the expired copy. Both changes to the object rows undo and redo together.
     #[test]
     fn becoming_unprepared_expires_the_old_copy_even_if_the_permanent_prepares_again_before_state_based_actions() {
         let (mut game, creature, copy) = preparation();
@@ -9514,14 +9513,13 @@ mod tests {
         assert_eq!(casts(&mut game, ME, copy), [(0, None)]);
         let mark = game.state.mark();
         cantrip_api::Game::become_unprepared(&mut cx(&mut game), creature);
-        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepare_expired);
-        assert_eq!(game.state.obj(copy).prepared_from, Some(creature));
+        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepared_from.is_none());
         assert_eq!(game.state.zone(Zone::exile(ME)), &[copy]);
         assert!(casts(&mut game, ME, copy).is_empty());
         let (undos, redos) = game.state.step_back(mark);
-        assert!(game.state.obj(creature).prepared && !game.state.obj(copy).prepare_expired);
+        assert!(game.state.obj(creature).prepared && game.state.obj(copy).prepared_from == Some(creature));
         game.state.step_forward(undos, redos);
-        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepare_expired);
+        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepared_from.is_none());
         let mark = game.state.mark();
         cantrip_api::Game::become_unprepared(&mut cx(&mut game), creature);
         assert_eq!(game.state.mark(), mark);
@@ -9532,7 +9530,7 @@ mod tests {
         crate::settle::state_based_actions_alone(&mut cx(&mut game)).expect("no choices");
         assert_eq!(game.state.zone(Zone::exile(ME)), &[new_copy]);
         assert!(!live(&game.state, copy));
-        assert!(game.state.obj(other).prepared && !game.state.obj(other_copy).prepare_expired);
+        assert!(game.state.obj(other).prepared && game.state.obj(other_copy).prepared_from == Some(other));
         assert_eq!(game.state.zone(Zone::exile(THEM)), &[other_copy]);
     }
 
@@ -9546,7 +9544,7 @@ mod tests {
         assert_eq!(cx(&mut game).chars(creature).card, bear);
         assert!(cx(&mut game).lost_all_abilities(creature));
         cantrip_api::Game::become_unprepared(&mut cx(&mut game), creature);
-        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepare_expired);
+        assert!(!game.state.obj(creature).prepared && game.state.obj(copy).prepared_from.is_none());
         crate::settle::state_based_actions_alone(&mut cx(&mut game)).expect("no choices");
         assert!(game.state.zone(Zone::exile(ME)).is_empty());
     }

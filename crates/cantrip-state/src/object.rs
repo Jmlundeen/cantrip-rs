@@ -70,11 +70,10 @@ pub struct Obj {
     /// A copy of a card (CR 707.12, 722.3): not a card; it ceases to exist anywhere but where it may be, and leaves
     /// the stack for nowhere.
     pub card_copy: bool,
-    /// For a prepare spell's copy in exile: the prepared permanent it belongs to.
+    /// For a prepare spell's copy in exile: the prepared permanent it belongs to, for as long as its exemption lasts
+    /// (CR 722.3c). The link is severed for good when that permanent becomes unprepared or phases out (CR 702.26f), even
+    /// if it prepares again or phases in before the next state-based check ends the copy (CR 704.5e).
     pub prepared_from: Option<ObjectId>,
-    /// Its permanent became unprepared or phased out: this copy's exemption from ceasing to exist has ended for good,
-    /// even if it prepares again or phases in before the next state-based check (CR 722.3b/c, 702.26f, 704.5e).
-    pub prepare_expired: bool,
     /// A color chosen as it entered ("as this enters, choose a color", CR 614.12).
     pub chosen_color: Option<Color>,
     /// A creature or land type chosen as it entered.
@@ -310,7 +309,6 @@ impl Obj {
             prepared: false,
             card_copy: false,
             prepared_from: None,
-            prepare_expired: false,
             chosen_color: None,
             chosen_subtype: None,
             on_adventure: None,

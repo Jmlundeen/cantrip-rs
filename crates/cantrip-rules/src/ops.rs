@@ -1621,7 +1621,8 @@ pub fn become_unprepared(cx: &mut Cx, permanent: ObjectId) {
 }
 
 /// The "for as long as" exemption of a permanent's prepare copies ends permanently when it becomes unprepared or
-/// phases out (CR 722.3c, 702.26f). The copies keep their provenance until the next state-based check ends them.
+/// phases out (CR 722.3c, 702.26f): their link to it is severed, so a later preparation or phasing in revives none of
+/// them, and the next state-based check ends them (CR 704.5e).
 pub(crate) fn expire_prepared_copies(cx: &mut Cx, permanent: ObjectId) {
     let copies: Vec<ObjectId> = cx
         .s()
@@ -1631,7 +1632,7 @@ pub(crate) fn expire_prepared_copies(cx: &mut Cx, permanent: ObjectId) {
         .filter(|&id| cx.s().obj(id).card_copy && cx.s().obj(id).prepared_from == Some(permanent))
         .collect();
     for copy in copies {
-        cx.st().update_obj(copy, |o| o.prepare_expired = true);
+        cx.st().update_obj(copy, |o| o.prepared_from = None);
     }
 }
 
