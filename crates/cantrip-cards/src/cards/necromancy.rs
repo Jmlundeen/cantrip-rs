@@ -2,12 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
-/// "Enchant creature put onto the battlefield with Necromancy" (CR 303.4a, 704.5m): legal exactly for the creature that entered
-/// with this permanent as its Aura.
-fn enchant_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).entered_with == Some(asker.source))
-}
-
 /// It becomes an Aura with "enchant creature put onto the battlefield with Necromancy": the Aura subtype (CR 613.1d) and the
 /// enchant ability (CR 613.1f, `becomes_aura_enchant`), kept as long as it is this object. Put target creature card from a
 /// graveyard onto the battlefield under your control and attach Necromancy to it, as part of the same move.
@@ -39,7 +33,7 @@ fn cast_untimely(q: &dyn Query, id: ObjectId) -> bool {
 pub static CARD: CardDef = CardDef {
     cast_as_though_flash: true,
     sacrifice_at_cleanup: Some(cast_untimely),
-    becomes_aura_enchant: Some(target(enchant_filter)),
+    becomes_aura_enchant: Some(targets::CREATURE_PUT_ONTO_THE_BATTLEFIELD_WITH_THIS),
     abilities: &[
         triggered(triggers::THIS_ENTERS, reanimate, "When this enchantment enters, if it's on the battlefield, it becomes an Aura with \"enchant creature put onto the battlefield with Necromancy.\" Put target creature card from a graveyard onto the battlefield under your control and attach this enchantment to it.")
             .targets(&[targets::CREATURE_CARD_IN_A_GRAVEYARD])

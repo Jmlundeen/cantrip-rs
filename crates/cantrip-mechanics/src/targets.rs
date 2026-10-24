@@ -540,6 +540,15 @@ fn creature_card_in_a_graveyard_filter(q: &dyn Query, _: &Asker, t: Target) -> b
 /// the Catacombs, Portal to Phyrexia and Virtue of Persistence print it.
 pub const CREATURE_CARD_IN_A_GRAVEYARD: TargetSpec = target(creature_card_in_a_graveyard_filter);
 
+fn creature_put_onto_the_battlefield_with_this(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    (CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).entered_with == Some(asker.source))
+}
+
+/// "Enchant creature put onto the battlefield with [this]" (CR 303.4a, 704.5m): legal exactly for the creature that entered
+/// with this permanent as its Aura (`Game::put_onto_battlefield_with_aura`). The enchant ability Animate Dead gains and the
+/// one Necromancy becomes an Aura with (`CardDef::becomes_aura_enchant`).
+pub const CREATURE_PUT_ONTO_THE_BATTLEFIELD_WITH_THIS: TargetSpec = target(creature_put_onto_the_battlefield_with_this);
+
 /// The second slot of "up to two target cards from a single graveyard" (CR 115.1, 601.2c): a card of the graveyard the
 /// first slot's card is in, and not that card itself. When the first slot chose nothing, any card in any graveyard: one
 /// target is a legal choice of "up to two", and the two slots together allow exactly the choices of zero, one or two
