@@ -290,3 +290,14 @@ pub fn creatures_attacked_with(q: &dyn Query, player: PlayerId) -> usize {
     }
     seen.len()
 }
+
+/// This combat's records (CR 506.1): those of this turn since its latest beginning of combat step began, so a second combat
+/// phase in a turn (CR 500.8) has its own; empty before the turn's first combat. Melee's "each opponent you attacked this
+/// combat" and Kytheon, Hero of Akros's "if Kytheon and at least two other creatures attacked this combat" ask it.
+pub fn this_combat(q: &dyn Query) -> &[Record] {
+    let turn = q.history().this_turn();
+    match turn.iter().rposition(|r| matches!(r.event, Event::StepBegan { step: Step::BeginCombat })) {
+        Some(began) => &turn[began..],
+        None => &[],
+    }
+}

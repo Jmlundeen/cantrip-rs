@@ -937,3 +937,39 @@ pub fn loses_all_abilities_and_becomes(g: &mut dyn Game, item: &StackItem, slot:
         g.add_effect(source, creature, EffectKind::SetPt(power, toughness), Duration::EndOfTurn);
     });
 }
+
+/// A Gideon's "Until end of turn, Gideon becomes a P/T [colors] [creature types] creature [with keywords] that's still a
+/// planeswalker. Prevent all damage that would be dealt to him this turn." (CR 205.1b, 611.2a, 613.1d, 615.1): the
+/// animation is laid over him until the cleanup step as a manland's is (`animate`: the creature type, the colors where the
+/// text names some, the keywords, the base power and toughness), the creature types and colors read through his words (CR
+/// 612); then, in its own sentence, all damage that would be dealt to him this turn is prevented, by any source, combat or
+/// not. Neither happens to a new object, should he have left (CR 400.7). Gideon, Battle-Forged and Gideon of the Trials
+/// (a 4/4 Human Soldier with indestructible), Gideon, Martial Paragon (5/5), Gideon, Ally of Zendikar (a 5/5 Human Soldier
+/// Ally), Gideon Jura (a 6/6 Human Soldier, no keyword) and Gideon, the Oathsworn (a 5/5 white Soldier) print it. The card
+/// lists `prevention::ANY_DAMAGE` `index`th in its `granted_preventions`.
+pub fn planeswalker_becomes_creature_preventing_damage(
+    g: &mut dyn Game,
+    item: &StackItem,
+    (power, toughness): (i16, i16),
+    colors: Option<ColorSet>,
+    subtypes: &[Subtype],
+    keywords: Keywords,
+    index: u8,
+) {
+    let words = g.words(item.object);
+    let subtypes: Vec<Subtype> = subtypes.iter().map(|&s| words.subtype(s)).collect();
+    let animation = crate::Animation {
+        power,
+        toughness,
+        colors: colors.map(|c| words.colors(c)),
+        types: TypeSet::NONE,
+        subtypes: &subtypes,
+        all_creature_types: false,
+        replaces_creature_types: false,
+        keywords,
+        ability: None,
+    };
+    crate::animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
+    g.end_sentence();
+    crate::prevention::this_turn(g, item, Target::Object(item.object), index, Shield::All);
+}

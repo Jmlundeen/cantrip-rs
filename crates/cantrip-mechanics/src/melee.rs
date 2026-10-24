@@ -18,10 +18,8 @@ fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired>
 /// creatures are still attacking or the player still in the game; a planeswalker or battle attacked is not its controller,
 /// and a creature put onto the battlefield attacking was never declared (CR 508.4).
 fn opponents_attacked_this_combat(q: &dyn Query, you: PlayerId) -> i16 {
-    let turn = q.history().this_turn();
-    let combat = turn.iter().rposition(|r| matches!(r.event, Event::StepBegan { step: Step::BeginCombat })).unwrap_or(0);
     let mut attacked: Vec<PlayerId> = Vec::new();
-    for r in &turn[combat..] {
+    for r in crate::history::this_combat(q) {
         if let Event::Attacks { defender: Target::Player(p), .. } = r.event
             && r.active == you
             && p != you

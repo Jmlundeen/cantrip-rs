@@ -872,6 +872,15 @@ pub fn each_end_step(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
     }
 }
 
+/// "At end of combat" (CR 511.2): it triggers as the end of combat step begins, in any player's turn - each combat phase's,
+/// where a turn has more than one. Kytheon, Hero of Akros, Clockwork Avian and Kjeldoran Frostbeast print it.
+pub fn end_of_combat(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::StepBegan { step: Step::EndOfCombat } => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "Whenever a creature you control enters" (CR 603.6a): any creature, this one included, under your control as it
 /// entered. Aura Shards and Warleader's Call print it.
 pub fn creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -1313,6 +1322,7 @@ pub const EACH_OPPONENTS_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, eac
 pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, beginning_of_your_combat);
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
+pub const END_OF_COMBAT: Trigger = when(EventMask::STEP_BEGAN, end_of_combat);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
 pub const CREATURE_WITH_POWER_FOUR_OR_MORE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_with_power_four_or_more_you_control_enters);
 pub const CREATURE_YOU_CONTROL_ATTACKS: Trigger = when_asked(EventMask::ATTACKS, creature_you_control_attacks);
