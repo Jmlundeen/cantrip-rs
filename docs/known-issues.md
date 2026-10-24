@@ -73,6 +73,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-131](#ki-131-harmonizes-tap-a-creature-caption-says-up-to-or-an-exact-amount-a-little-off-in-rare-costs) | Harmonize's tap-a-creature caption says "up to", or an exact amount, a little off in rare costs | Pri-2 | Open |
 | [KI-132](#ki-132-an-absent-expectation-on-a-key-the-dump-never-writes-always-holds) | An `(absent)` expectation on a key the dump never writes always holds | Pri-3 | Open |
 | [KI-133](#ki-133-a-refusal-written-while-its-question-cannot-yet-be-asked-holds-vacuously) | A refusal written while its question cannot yet be asked holds vacuously | Pri-3 | Open |
+| [KI-134](#ki-134-the-browser-scenario-for-lands-planned-for-x-fails-on-main) | The browser scenario for lands planned for X fails on main | Pri-2 | Open |
 
 ## Issues
 
@@ -467,6 +468,19 @@ write (a parent such as `.Counters`, or a misspelling), as a key with a value al
 - [`scenarios/darksteel-angel-keeps-minus-counters-off-its-controllers-creature.cantrip`](../scenarios/darksteel-angel-keeps-minus-counters-off-its-controllers-creature.cantrip)
 - [`scenarios/dispelling-exhale-beholding-a-dragon-and-an-opponent-who-pays-the-four-keeps-the-bolt.cantrip`](../scenarios/dispelling-exhale-beholding-a-dragon-and-an-opponent-who-pays-the-four-keeps-the-bolt.cantrip)
 - [`scenarios/dispelling-exhale-beholding-a-dragon-permanent-asks-four-and-the-bolt-is-countered.cantrip`](../scenarios/dispelling-exhale-beholding-a-dragon-permanent-asks-four-and-the-bolt-is-countered.cantrip)
+
+### KI-134: The browser scenario for lands planned for X fails on main
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client | 2026-10-24, the Dauntless Bodyguard work (`test.cmd` browser run) |
+
+**Notes.** `ScenarioInBrowserTests.Lands_planned_for_x_raise_it_and_are_tapped_as_the_spell_is_paid_for` fails on a clean
+origin/main (a3276106b), with the host rebuilt: the page does not tap the Mountains it planned for X itself
+("Mountain#2.Activate ... answered by the page itself"). The engine side is unaffected; what the page does with lands it
+planned for X as the spell is paid for has regressed. Needs bisecting.
+
+**Scenarios.** The browser scenario named above.
 
 ### KI-133: A refusal written while its question cannot yet be asked holds vacuously
 
