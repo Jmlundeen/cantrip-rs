@@ -1,0 +1,51 @@
+# Way of the Mind Sculptor draws only when two or more loyalty counters are removed (CR 606.4, 603.4): Jace, the Mind Sculptor's +2 puts two on, removes none, so it draws nothing (a hand of 1 before and after; loyalty 3 to 5).
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Mox Jet
+Mox Pearl
+Way of the Mind Sculptor
+Jace, the Mind Sculptor
+Island
+Island x20
+
+[Bot2 Deck]
+Plains x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Mind Sculptor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot2; Ability: #1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 5
+Bot1.Hand.Count = 1

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{empower, triggers};
+use cantrip_mechanics::{effects, empower, triggers};
 use cantrip_oracle as oracle;
 
 /// "When Way of the Mind Sculptor enters, empower Jace 5."
@@ -22,18 +22,12 @@ fn you_removed_two_or_more_loyalty_counters(q: &dyn Query, me: &Asker, event: &E
     if removed >= 2 { Fired::PLAIN } else { None }
 }
 
-/// "draw a card."
-fn draw_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.draw(item.controller, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, empower_jace, "When Way of the Mind Sculptor enters, empower Jace 5."),
         triggered(
             when_asked(EventMask::ABILITY_ACTIVATED, you_removed_two_or_more_loyalty_counters),
-            draw_a_card,
+            |g, item| effects::draw(g, item, 1),
             "Whenever you activate a loyalty ability, if you removed two or more loyalty counters to activate it, draw a card.",
         ),
     ],
