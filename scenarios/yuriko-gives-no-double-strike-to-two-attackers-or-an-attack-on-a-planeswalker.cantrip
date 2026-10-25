@@ -1,0 +1,72 @@
+# Yuriko, Blade of the Mighty: only "a creature you control attacks a player alone" gives double strike (CR 506.5, 508.1).
+# Turn 3: Yuriko and Woodland Changeling attack Bot2 together, so neither is alone and Bot2 takes just 2 + 2. Turn 5:
+# the Changeling attacks alone but at Bot2's Liliana of the Veil (3 loyalty), not at a player, and takes off 2 loyalty rather
+# than 4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Ruby
+Yuriko, Blade of the Mighty
+Woodland Changeling
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Mountain x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Yuriko, Blade of the Mighty.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Yuriko, Blade of the Mighty; Woodland Changeling > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Yuriko, Blade of the Mighty.Keywords = (absent)
+? Bot1.Battlefield.Woodland Changeling.Keywords = Changeling
+[T5 Bot1.Main1]
+Bot1.Attack(Woodland Changeling > Liliana of the Veil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1
+Bot1.Battlefield.Woodland Changeling.Keywords = Changeling

@@ -1,0 +1,65 @@
+# Yuriko, Blade of the Mighty: "Whenever a creature you control attacks a player alone, it gains double strike until end
+# of turn" (CR 506.5, 611.2a, 702.4). Bot1's Woodland Changeling attacks alone on turn 3 (not Yuriko, who stays home): 4
+# damage and double strike that is gone by turn 5. Bot2's Changeling attacks alone on turn 4 for just 2: it is not a
+# creature Bot1 controls.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Ruby
+Yuriko, Blade of the Mighty
+Woodland Changeling
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Woodland Changeling
+Mountain x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Yuriko, Blade of the Mighty.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Woodland Changeling > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Woodland Changeling.Keywords = Changeling; DoubleStrike
+? Bot2.Life = 16
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Woodland Changeling > Bot1)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Life = 18
+? Bot1.Battlefield.Woodland Changeling.Keywords = Changeling
+
+[Expect]
+Bot2.Life = 16

@@ -1,0 +1,86 @@
+# Yuriko, Blade of the Mighty: "During combat, players can't cast spells or activate abilities that aren't mana abilities"
+# (CR 101.2, 506.1, 605.1a). Both players are refused a Lightning Bolt in each of the five combat steps, and a Mishra's
+# Bauble, while the same Bolts and Baubles are used in the main phases around it; Mox Ruby's mana ability still works in
+# combat. Yuriko attacking alone has double strike (4 damage), which is the 13 life with the main phase Bolt.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Yuriko, Blade of the Mighty
+Mishra's Bauble
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mishra's Bauble
+Mountain x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Yuriko, Blade of the Mighty.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mishra's Bauble.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Step = Main1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Attack(Yuriko, Blade of the Mighty > Bot2)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.DeclareBlockers]
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.CombatDamage]
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot1.Battlefield.Mishra's Bauble.Activate
+! Bot2.Battlefield.Mishra's Bauble.Activate
+? Step = Damage
+[T3 Bot1.EndCombat]
+Bot1.Battlefield.Mox Ruby.Activate
+? Step = EndCombat
+? Bot1.Mana = {R}
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot2)
+Bot2.Battlefield.Mountain.Activate
+? Step = Main2
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Step = Main2
+Bot2.Battlefield.Mishra's Bauble.Activate(Bot1)
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 13
+Bot1.Battlefield.Mishra's Bauble = (absent)
+Bot2.Battlefield.Mishra's Bauble = (absent)
