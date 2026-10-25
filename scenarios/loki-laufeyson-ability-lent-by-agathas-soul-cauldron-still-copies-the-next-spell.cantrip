@@ -1,7 +1,7 @@
 # Agatha's Soul Cauldron lends Loki Laufeyson's activated abilities (CR 613.1f) to a creature with a +1/+1 counter. Faithless Looting
 # discards Loki on turn 3, the Cauldron exiles it and counters Ornithopter, and Ornithopter ({1}, {T}: "When you next cast an instant or
 # sorcery spell with mana value less than or equal to Loki's power this turn, copy that spell") sets up Loki's delayed ability, which
-# belongs to Loki's card, not to the Ornithopter that has the ability (CR 113.6). Lightning Bolt (mana value 1, Loki's power 2) at Bot2
+# belongs to Loki's card, not to the Ornithopter that has the ability (CR 113.6). Lightning Bolt (mana value 1, power 1 of the Ornithopter that has the ability: "Loki" in a lent ability means the creature with it) at Bot2
 # is copied, the copy kept on Bot2: Bot2 takes 3 + 3.
 
 [Bot1 Deck]

@@ -1,0 +1,65 @@
+# Way of the Cryomancer (turn 1, off a Black Lotus): empower Jace 5 makes a Jace token at 5 loyalty, and the planeswalkers Bot1
+# controls have "[-3]: When you next cast an instant or sorcery spell this turn, copy that spell." The token activates it (5 to 2,
+# a delayed ability waits, CR 603.7b). Casting Ornithopter, a creature spell, neither triggers it nor uses it up. The first Lightning
+# Bolt, at Bot2, is then copied, and Bot1 aims the copy at itself (CR 707.10c): 3 damage each. The second Bolt, at Bot2, is not copied
+# ("next" is once; Delayed is empty again): Bot2 ends at 14 (20 - 3 - 3), Bot1 at 17.
+
+[Bot1 Deck]
+Black Lotus
+Way of the Cryomancer
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Ornithopter
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Way of the Cryomancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 5
+Bot1.Battlefield.Jace Token.Activate(Ability: When you next)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 2
+? Delayed.Count = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 1
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 17
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 2
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Black Lotus
+Delayed.Count = 0

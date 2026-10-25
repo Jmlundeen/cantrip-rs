@@ -1,0 +1,64 @@
+# Way of the Cryomancer (Bot1, turn 1, off a Black Lotus; Jace token at 5 loyalty, unactivated). On turn 3 Bot1 activates the granted
+# "[-3]: When you next cast an instant or sorcery spell this turn, copy that spell" (5 to 2). Bot2 answers by casting Lightning Bolt at
+# Bot1: "you cast" means an opponent's spell is not copied, and it does not use the ability up (Delayed still 1): Bot1 takes 3, not 6.
+# The ability ends with the turn (CR 603.7b): on turn 5 Bot1's own Lightning Bolt at Bot2 is not copied (Bot2 takes 3, not 6), and
+# the Jace token, at 2 loyalty, is refused the -3 again (loyalty must cover it, CR 606.6) while its -1 is offered (the control).
+
+[Bot1 Deck]
+Black Lotus
+Way of the Cryomancer
+Mountain
+Lightning Bolt
+Island x4
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Way of the Cryomancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace Token.Activate(Ability: When you next)
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+? Delayed.Count = 1
+[T5 Bot1.Main1]
+? Delayed.Count = 0
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Jace Token.Activate(Ability: When you next)
+Bot1.Battlefield.Jace Token.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mountain |)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 17
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 1
+Delayed.Count = 0

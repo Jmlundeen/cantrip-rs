@@ -1,0 +1,60 @@
+# Way of the Cryomancer: Dack Fayden (3 loyalty) activates the granted -3 and dies to 0 loyalty (CR 704.5i); the delayed ability it set up
+# still copies the next instant (CR 603.7, 113.7a): Bot2 takes 3 + 3.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Way of the Cryomancer
+Dack Fayden
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Way of the Cryomancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Dack Fayden.Activate(Ability: When you next)
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 1
+? Bot1.Graveyard = Dack Fayden; Black Lotus
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Delayed.Count = 0
