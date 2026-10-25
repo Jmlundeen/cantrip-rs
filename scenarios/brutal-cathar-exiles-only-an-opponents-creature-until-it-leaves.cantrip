@@ -1,0 +1,63 @@
+# Brutal Cathar's enters trigger takes only a creature an opponent controls: Bot1's own Ornithopter and Bot2's Mox Ruby
+# (not a creature) are refused as targets, Bot2's Ornithopter is exiled (not its Dryad Arbor, a land creature, which
+# stays). Daybound shows on the Cathar while it is day, and the day face has no ward: Bot2 bolts it paying nothing, and
+# the exiled Ornithopter comes back under Bot2's control (CR 610.3, 400.7).
+
+[Dice]
+1; 1; 1; 1; 1; 1
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Brutal Cathar
+Ornithopter
+Island x20
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Dryad Arbor
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Dryad Arbor.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Brutal Cathar.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+! Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+? DayNight = Day
+? Bot1.Battlefield.Brutal Cathar.Keywords = Daybound
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Brutal Cathar)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Exile.Count = 0
+Bot2.Life = 20
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Dryad Arbor.Power = 1
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Graveyard = Brutal Cathar
+Bot2.Graveyard = Lightning Bolt

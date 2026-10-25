@@ -1,0 +1,25 @@
+{
+  "name": "Brutal Cathar",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Soldier Werewolf",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Whenever this creature enters or transforms into Brutal Cathar, exile target creature an opponent controls until this creature leaves the battlefield.\nDaybound (If a player casts no spells during their own turn, it becomes night next turn.)",
+  "keywords": [
+    "Daybound"
+  ],
+  "backFace": {
+    "name": "Moonrage Brute",
+    "colorIndicator": [
+      "Red"
+    ],
+    "type": "Creature — Werewolf",
+    "power": 3,
+    "toughness": 3,
+    "oracleText": "First strike\nWard—Pay 3 life.\nNightbound (If a player casts at least two spells during their own turn, it becomes day next turn.)",
+    "keywords": [
+      "FirstStrike",
+      "Nightbound"
+    ]
+  }
+}

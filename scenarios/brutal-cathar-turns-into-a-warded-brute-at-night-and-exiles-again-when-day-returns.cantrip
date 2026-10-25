@@ -1,0 +1,88 @@
+# Day and night turn Brutal Cathar over (CR 702.145, 731), and transforming is not leaving the battlefield: Bot1 casts the
+# Cathar on turn 3 and exiles Bot2's Ornithopter - a choice, since Bot2's Dryad Arbor, a land creature, is a target too.
+# Bot2 casts nothing on turn 4, so it is night on turn 5 and the Cathar is Moonrage Brute, a 3/3 with first strike and
+# ward-pay 3 life, with the Ornithopter still exiled. On turn 6 Bot2 targets the Brute with Giant Growth and pays 3 life
+# (17), then with Lightning Bolt and does not pay, so the Bolt is countered. Bot2 has cast two spells on its turn, so on
+# turn 7 it is day again, the Brute is the Cathar once more and "transforms into Brutal Cathar" exiles the Dryad Arbor, the
+# lone target. Bot1 bolts its own Cathar, and both cards return together (CR 610.3).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Ruby
+Brutal Cathar
+Lightning Bolt
+Island x20
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Ornithopter
+Dryad Arbor
+Giant Growth
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Dryad Arbor.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Brutal Cathar.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? DayNight = Day
+? Exile = Ornithopter
+? Bot1.Battlefield.Brutal Cathar.Keywords = Daybound
+[T5 Bot1.Main1]
+? DayNight = Night
+? Exile = Ornithopter
+? Bot1.Battlefield.Moonrage Brute.Keywords = FirstStrike; Nightbound
+? Bot1.Battlefield.Moonrage Brute.Power = 3
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot1.Battlefield.Moonrage Brute)
+Bot2.Accept
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Moonrage Brute)
+Bot2.Decline
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 17
+? Bot1.Battlefield.Moonrage Brute.Damage = 0
+[T7 Bot1.Main1]
+? DayNight = Day
+? Exile = Dryad Arbor; Ornithopter
+? Bot1.Battlefield.Brutal Cathar.Keywords = Daybound
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Brutal Cathar)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt; Giant Growth
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Dryad Arbor.Power = 1
+Bot1.Graveyard = Brutal Cathar; Lightning Bolt
