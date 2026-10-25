@@ -1,0 +1,45 @@
+# The second target is optional even when a legal opponent creature exists (CR 603.3d, 701.14b).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Woodland Changeling
+Yoshimaru, Scrappy Stray
+Ornithopter
+Forest
+Forest
+Forest x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Voice of Victory
+Island
+Unsummon
+Island
+Island
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Voice of Victory.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Yoshimaru, Scrappy Stray.Cast
+Bot1.Target(Woodland Changeling)
+Bot1.Target()
+
+[Expect]
+Bot1.Battlefield.Woodland Changeling.Damage = 0
+Bot2.Battlefield.Voice of Victory.Damage = 0
