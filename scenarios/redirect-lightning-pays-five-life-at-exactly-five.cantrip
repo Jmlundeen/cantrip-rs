@@ -1,0 +1,33 @@
+# Redirect Lightning's "pay 5 life" at exactly 5 life (CR 119.4): allowed. Bot2 pays it (to 0) with its one Mox Ruby's
+# {R} and redirects the Bolt to Bot1 (17); at 0 life Bot2 then loses the game (CR 704.5a).
+
+[Life]
+Bot2: 5
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Bot2 Deck]
+Mox Ruby
+Redirect Lightning
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Redirect Lightning.Cast(Stack.Lightning Bolt)
+Bot2.Modes(Pay 5 life)
+
+[Expect]
+Bot2.Status = Lost
+Bot2.LostTo = Life

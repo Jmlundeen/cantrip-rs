@@ -1,0 +1,38 @@
+# Redirect Lightning's "pay 5 life" (CR 119.4): a player may pay life only up to their life total. Bot2, at 4 life with
+# a single Mox Ruby, can pay neither "5 life" nor {R}{2}, so the cast is refused for the cost (`Mana: short`: it would be
+# offered with mana for {2}); the Bolt resolves and Bot2 is at 1.
+
+[Life]
+Bot2: 4
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Bot2 Deck]
+Mox Ruby
+Redirect Lightning
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Redirect Lightning.Cast(Stack.Lightning Bolt; Mana: short)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 1
+Bot1.Graveyard = Lightning Bolt

@@ -1,0 +1,6 @@
+{
+  "name": "Redirect Lightning",
+  "manaCost": "{R}",
+  "type": "Instant — Lesson",
+  "oracleText": "As an additional cost to cast this spell, pay 5 life or pay {2}.\nChange the target of target spell or ability with a single target."
+}
