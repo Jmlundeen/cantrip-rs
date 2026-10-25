@@ -50,3 +50,9 @@ inherits = "release"
 inherits = "release"
 incremental = true
 codegen-units = 256
+
+# The cards profile with the debug assertions on: the engine's own claims about itself (`debug_assert!`), checked over the
+# workspace's tests and the scenario corpus at release speed (tools\test.cmd).
+[profile.checked]
+inherits = "cards"
+debug-assertions = true

@@ -118,7 +118,7 @@ calling, means it was not the same thing. Leave that in its own card.
    llvm-tools-preview` and `cargo install cargo-llvm-cov --locked`).
    A line no scenario can reach is wrong code or a missing scenario, never an exception.
 8. **Verify:** plain `cargo run --profile cards -p cantrip-script --bin corpus` shows `0 fail` and no fewer passing
-   than before; `set CANTRIP_VERIFY=1 & cargo test --profile cards --workspace` is green; if the core or mechanics
+   than before; `set CANTRIP_VERIFY=1 & cargo test --profile checked --workspace` (debug assertions on) is green; if the core or mechanics
    changed, the benchmark and `tools\test.cmd`; wall-clock tests only when the change touches what they cover
    (CLAUDE.md).
 9. **Review** (below), then commit: `Card: <Name>` - the content JSON, the card file and its scenarios - one card per

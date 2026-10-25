@@ -1,7 +1,8 @@
 @echo off
 rem ---------------------------------------------------------------------------
 rem Builds the solution, the web client included, and runs the tests: the .NET ones, then the native engine's (cargo
-rem test over the workspace at the root, which plays every scenario of scenarios\ whose cards it has).
+rem test --profile checked over the workspace at the root, debug assertions on, which plays every scenario of
+rem scenarios\ whose cards it has).
 rem
 rem   test.cmd                          the fast tests: everything that does not
 rem                                     run on the wall clock
@@ -135,15 +136,17 @@ set "RESULT=%ERRORLEVEL%"
 
 rem The rules engine (the Rust workspace at the root): its unit tests and the scenario corpus. Run from the workspace's
 rem directory so its rust-toolchain.toml chooses the toolchain; the first build takes minutes, later ones seconds.
-rem CANTRIP_VERIFY=1 turns on the engine's own consistency checks while it plays (docs\engine-design.md). A /filter
-rem names dotnet tests, so it leaves these out.
+rem CANTRIP_VERIFY=1 turns on the engine's own consistency checks while it plays (docs\engine-design.md). The profile is
+rem `checked`, the cards profile with the debug assertions on (Cargo.toml): the engine's claims about itself
+rem (`debug_assert!`) are checked over every test and scenario at release speed, where the cards profile drops them. A
+rem /filter names dotnet tests, so it leaves these out.
 if "%RESULT%"=="0" if not defined FILTERED (
   pushd "%ROOT%"
   set "CANTRIP_VERIFY=1"
   if defined DETAILED (
-    cargo test --profile cards --workspace --quiet
+    cargo test --profile checked --workspace --quiet
   ) else (
-    cargo test --profile cards --workspace --quiet > "%LOG%-engine.txt" 2>&1
+    cargo test --profile checked --workspace --quiet > "%LOG%-engine.txt" 2>&1
   )
   if errorlevel 1 set "RESULT=1"
   popd
