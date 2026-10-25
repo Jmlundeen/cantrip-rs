@@ -1,0 +1,65 @@
+# Way of the Mind Sculptor counts a loyalty ability its planeswalker was granted (CR 606.2, 606.4): Way of the
+# Cryomancer (turn 1) gives Bot1's Jace token "[-3]: When you next cast an instant or sorcery spell this turn, copy that
+# spell", and Way of the Mind Sculptor (turn 3) empowers it to 10. Activating the granted -3 removes three counters (10
+# to 7), so Bot1 draws a card (a hand of 0 to 1) before the ability resolves.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Way of the Cryomancer
+Way of the Mind Sculptor
+Island
+Plains x20
+
+[Bot2 Deck]
+Plains x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Cryomancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate(Ability: {U})
+Bot1.Battlefield.Island#2.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Way of the Mind Sculptor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 10
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Jace Token.Activate(Ability: When you next)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 1
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 7
+Bot1.Hand.Count = 1
+Delayed.Count = 1
