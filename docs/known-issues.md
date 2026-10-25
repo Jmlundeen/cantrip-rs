@@ -77,6 +77,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-137](#ki-137-the-host-shows-an-attacker-attacking-nothing-as-attacking-a-player-at-seat-0) | The host shows an attacker attacking nothing as attacking a player at seat 0 | Pri-2 | Open |
 | [KI-138](#ki-138-a-cast-menu-rows-cost-reads-the-card-where-it-is-not-the-spell-it-would-be) | A cast menu row's cost reads the card where it is, not the spell it would be | Pri-2 | Open |
 | [KI-139](#ki-139-the-language-model-clients-dack-fayden-prompt-runs-words-together) | The language-model client's Dack Fayden prompt runs words together | Pri-2 | Open |
+| [KI-140](#ki-140-every-pending-effect-tooltip-says-it-ends-with-the-turn-if-no-spell-is-cast) | Every pending-effect tooltip says it ends with the turn if no spell is cast | Pri-2 | Open |
 
 ## Issues
 
@@ -551,3 +552,17 @@ attack is paid. But the declare-attackers prompt's `CanPay` is the mana the play
 by mana value, so those bots never attack into Norn's Annex with no white mana though 2 life would pay. The web client's
 attackers dock says "(you can make up to N mana)", which is true but says nothing of life. A fix gives the prompt the life
 that could pay the Phyrexian symbols beside the mana, and `Within` counts each symbol payable either way.
+
+### KI-140: Every pending-effect tooltip says it ends with the turn if no spell is cast
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client | 2026-10-25, review of Way of the Paradox |
+
+**Notes.** `PlayerRail.cs` appends " It ends with the turn if no spell is cast." to the tooltip of every line in a player's
+`PendingEffects`, which is true only of "the next spell you cast can't be countered". It is wrong for "You may play an additional
+land this turn." (it ends with the turn whether or not a spell is cast), and already for the skip-turn, legend-rule and
+control-of-a-player lines. A fix gives each line its own tooltip text (or none), from the host, beside the line.
+
+**Scenarios.** None yet: a browser check of the tooltip would show it; the host test
+`an_additional_land_play_is_shown_to_both_seats_and_gone_after_the_turn` covers the line only.

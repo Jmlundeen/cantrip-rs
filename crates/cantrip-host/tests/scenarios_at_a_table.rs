@@ -585,6 +585,33 @@ fn phyrexian_unlife_and_melira_are_shown_to_both_players() {
     assert!(unlife && infect && melira, "not everything was shown: {unlife} {infect} {melira}");
 }
 
+/// "You may play an additional land this turn" (CR 305.2): Way of the Paradox's trigger, once for Bot1's token's loyalty ability
+/// on turn 1 and twice (the token's and Ajani's) on turn 3, is shown beside Bot1's life total as the extra plays it gives - in
+/// the second person to Bot1 and the third to Bot2 - summed, and gone after turn 1's cleanup and on Bot2's own turn. Nothing is
+/// ever said of Bot2, whose planeswalker activation on turn 2 gave nobody a land.
+#[test]
+fn an_additional_land_play_is_shown_to_both_seats_and_gone_after_the_turn() {
+    // How many extra plays `viewer` is told of beside Bot1's life total (0, 1 or 2), in the words of "You" or "They".
+    let told = |views: &[cantrip_host::protocol::PlayerView; 2], viewer: usize, who: &str| -> usize {
+        let one = says(views, viewer, 0, &format!("{who} may play an additional land this turn."));
+        let two = says(views, viewer, 0, &format!("{who} may play 2 additional lands this turn."));
+        assert!(!(one && two), "both counts are shown");
+        usize::from(one) + 2 * usize::from(two)
+    };
+    let mut seen: Vec<usize> = Vec::new();
+    play_looking("way-of-the-paradox-each-loyalty-activation-gains-life-and-one-more-land-this-turn-only", |_, views, _| {
+        let (own, other) = (told(views, 0, "You"), told(views, 1, "They"));
+        let any = |viewer: usize, about: usize| views[viewer].players[about].pending_effects.iter().any(|f| f.contains("additional land"));
+        assert_eq!(own, other, "the seats are told different counts");
+        assert!(!any(0, 1) && !any(1, 1), "Bot2 is told it may play an additional land");
+        if seen.last() != Some(&own) {
+            seen.push(own);
+        }
+        false
+    });
+    assert_eq!(seen, [0, 1, 0, 1, 2], "the extra plays were shown, in order: none, one (turn 1), none (turn 2), one then two (turn 3)");
+}
+
 /// The granted lines of the permanent named `name` in `view`, if it is shown.
 fn granted_lines(view: &cantrip_host::protocol::PlayerView, name: &str) -> Option<Vec<String>> {
     view.objects.iter().find(|o| o.name == name).map(|o| o.granted_abilities.iter().map(|a| a.text.clone()).collect())

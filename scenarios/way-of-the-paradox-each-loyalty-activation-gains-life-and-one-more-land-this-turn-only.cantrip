@@ -1,0 +1,96 @@
+# Way of the Paradox: "Whenever you activate a loyalty ability, you gain 1 life. You may play an additional land this turn." On turn 1
+# (Black Lotus pays) it empowers a Jace token to 5; Mishra's Bauble's activation (a nonmana ability that is not a loyalty ability)
+# gains no life (20); with a land already played a second is refused, then the token's -1 makes the
+# trigger: 1 life (21) and exactly one more land (the second is played, a third refused). On turn 2 Bot2's own planeswalker activation
+# does nothing for Bot1 (still 21; "you"). On turn 3 the permission is gone: one land, the second refused; then two activations
+# (the token's, Ajani Resolute's) give 1 life each plus Ajani's own 1 (24) and two more lands, of which one is played ("may").
+
+[Bot1 Deck]
+Black Lotus
+Way of the Paradox
+Ajani Resolute
+Mishra's Bauble
+Plains
+Plains
+Plains
+Plains x21
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Ajani Resolute
+Plains
+Plains x25
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Way of the Paradox.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 5
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Plains.Play
+Bot1.Battlefield.Jace Token.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 21
+? Bot1.Life = 21
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace Token.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot1.LandsPlayed = 2
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 3
+Bot1.Hand.Count = 1
