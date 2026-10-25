@@ -1,0 +1,8 @@
+{
+  "name": "Yuriko, Blade of the Mighty",
+  "manaCost": "{3}{W}",
+  "type": "Legendary Creature — Human Samurai",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "During combat, players can't cast spells or activate abilities that aren't mana abilities.\nWhenever a creature you control attacks a player alone, it gains double strike until end of turn."
+}

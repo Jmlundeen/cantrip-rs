@@ -1,0 +1,38 @@
+# Yuriko, Blade of the Mighty bars casting spells and activating abilities in combat, but foretelling is a special action,
+# not an activated ability (CR 116.2h, 602.5): in Bot1's turn 3 beginning of combat, with Yuriko on the battlefield, Bot1
+# pays {2} with two Moxen (mana abilities) and Delayed Blast Fireball goes to exile foretold. The step check shows it was
+# done in combat, not in a later step.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Ruby
+Yuriko, Blade of the Mighty
+Delayed Blast Fireball
+Mountain x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Yuriko, Blade of the Mighty.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Delayed Blast Fireball.Foretell
+? Step = BeginCombat
+? Exile.FaceDown = Delayed Blast Fireball
+
+[Expect]
+Exile.FaceDown = Delayed Blast Fireball

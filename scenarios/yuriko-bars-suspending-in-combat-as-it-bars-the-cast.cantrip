@@ -1,0 +1,49 @@
+# Yuriko, Blade of the Mighty: "During combat, players can't cast spells" (CR 101.2, 506.1) also stops suspend, a special
+# action taken only if the card could be begun to be cast (CR 116.2f, 702.62a), though the special action itself is no
+# activated ability. With Valley Floodcaller letting noncreature spells be cast as though they had flash, Bot1 is refused
+# suspending Lotus Bloom in its turn 3 beginning of combat, and suspends it in the end step, outside combat.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Yuriko, Blade of the Mighty
+Valley Floodcaller
+Lotus Bloom
+Island x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Yuriko, Blade of the Mighty.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+? Bot1.Hand = Lotus Bloom
+! Bot1.Hand.Lotus Bloom.Suspend
+? Step = BeginCombat
+[T3 Bot1.End]
+Bot1.Hand.Lotus Bloom.Suspend
+? Step = End
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Exile.Lotus Bloom.Counters.Time = 3
