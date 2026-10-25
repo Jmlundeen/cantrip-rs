@@ -27,16 +27,21 @@ fn look_take_one_rest_to_graveyard(g: &mut dyn Game, player: PlayerId, source: O
         may_shuffle: false,
     };
     let mut taken = Vec::new();
+    let mut order = Vec::new();
     if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
         taken = placements[0].clone();
+        // The cards reaching the graveyard together go there in the order their owner chooses (CR 404.3).
+        order = placements.get(1).cloned().unwrap_or_default();
     }
-    // "Put one into your hand and the rest into your graveyard" is one action (CR 608.2f): every card moves at once, each
-    // replacement judged against the state before any of them moves. Looked at, not revealed: the moves are not marked.
-    let moves: Vec<(ObjectId, Zone)> = looked.iter().map(|&c| {
-        let owner = g.obj(c).owner;
-        (c, if taken.contains(&c) { Zone::hand(owner) } else { Zone::graveyard(owner) })
-    }).collect();
-    g.move_together(&moves, MoveReason::Other);
+    // "Put one into your hand and the rest into your graveyard" is two actions, followed in the order written (CR 608.2c):
+    // the card into the hand, then the rest into the graveyard together (CR 608.2f). Looked at, not revealed.
+    g.return_to_hand(&taken);
+    let mut rest: Vec<ObjectId> = looked.iter().copied().filter(|c| !taken.contains(c)).collect();
+    if order.len() == rest.len() && rest.iter().all(|c| order.contains(c)) {
+        rest = order;
+    }
+    let rest: Vec<(ObjectId, Zone)> = rest.into_iter().map(|c| (c, Zone::graveyard(g.obj(c).owner))).collect();
+    g.move_together(&rest, MoveReason::Other);
     Ok(())
 }
 

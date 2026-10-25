@@ -1,5 +1,6 @@
-//! Simultaneous moves to different zones plan replacements against the same prior state (CR 608.2f, 614.12): Underrealm
-//! Lich puts one card into a hand and the rest into a graveyard as one `move_together`.
+//! Simultaneous moves to different zones plan every replacement against the same prior state (CR 614.12): the one
+//! `move_together` that `return_until_left` (CR 610.3) and `sacrifice_and_return` make, a card to a hand and another to a
+//! graveyard, is replaced by the state before either moves.
 
 use crate::{Cx, Game, Setup};
 use cantrip_api::*;

@@ -1,0 +1,47 @@
+# Underrealm Lich: the cards put into the graveyard together go there in the order their owner chooses (CR 404.3), not the
+# order they were looked at. Bot1's turn 3 draw is replaced by a look at Ornithopter, Llanowar Elves and a Forest; it takes
+# the Forest and places the Ornithopter last, on top of the Elves. Shallow Grave then returns the top creature card of the
+# graveyard: the Ornithopter (exiled again at the end step), not the Elves, which stay.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Emerald
+Mox Jet
+Underrealm Lich
+Shallow Grave
+Mox Pearl
+Ornithopter
+Llanowar Elves
+Forest
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Underrealm Lich.Cast
+Bot1.Pass
+[T3 Bot1.Draw]
+Bot1.Arrange(Forest | Llanowar Elves; Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Shallow Grave.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Shallow Grave; Llanowar Elves; Black Lotus
