@@ -1,0 +1,44 @@
+# "Whenever another Spirit you control enters, this creature gets +1/+1 until end of turn", and Flying.
+# Bot2's Wanderer entering (an opponent's Spirit) leaves Bot1's at 1/1; Bot1's second Wanderer entering makes the first 2/2
+# and does not grow itself ("another"); an Ornithopter (not a Spirit) adds nothing; on Bot2's turn the bonus has ended.
+
+[Bot1 Deck]
+Island
+Mausoleum Wanderer
+Island
+Mausoleum Wanderer
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island
+Mausoleum Wanderer
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mausoleum Wanderer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mausoleum Wanderer.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Mausoleum Wanderer.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Mausoleum Wanderer.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Mausoleum Wanderer#1.Power = 2
+? Bot2.Battlefield.Mausoleum Wanderer.Power = 1
+? Bot1.Battlefield.Mausoleum Wanderer#2.Power = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Mausoleum Wanderer#1.Power = 1
+Bot1.Battlefield.Mausoleum Wanderer#2.Power = 1
+Bot1.Battlefield.Mausoleum Wanderer#1.Keywords = Flying

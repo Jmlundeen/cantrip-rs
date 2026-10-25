@@ -1,0 +1,40 @@
+# "Counter target instant or sorcery spell unless its controller pays {X}, where X is this creature's power": the Wanderer is
+# 1/1, so X is 1 and Bot2 pays it exactly with a Mox Jet; the Bolt resolves and Bot1 takes 3. A creature spell (Bot1's
+# Ornithopter) is not a legal target (the refusal, with the Bolt as its positive control).
+
+[Bot1 Deck]
+Island
+Mausoleum Wanderer
+Island
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mausoleum Wanderer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Battlefield.Mausoleum Wanderer.Activate(Stack.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mausoleum Wanderer.Activate(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.PayCost
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17

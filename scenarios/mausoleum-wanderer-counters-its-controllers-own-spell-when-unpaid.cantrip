@@ -1,0 +1,30 @@
+# "Counter target instant or sorcery spell": one of the Wanderer controller's own spells is a legal target (the other side's
+# is taken in the neighbouring scenarios). Bot1 casts Brainstorm, sacrifices its Wanderer to it, and (the default) does not
+# pay {1} though an Island is untapped, so Brainstorm is countered and nothing is drawn.
+
+[Bot1 Deck]
+Island
+Mausoleum Wanderer
+Island
+Brainstorm
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mausoleum Wanderer.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Battlefield.Mausoleum Wanderer.Activate(Stack.Brainstorm)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Brainstorm; Mausoleum Wanderer
+Bot1.Hand.Count = 4

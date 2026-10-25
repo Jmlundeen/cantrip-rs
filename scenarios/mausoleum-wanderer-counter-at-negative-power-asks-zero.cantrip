@@ -1,0 +1,43 @@
+# Mausoleum Wanderer: "Sacrifice Mausoleum Wanderer: Counter target instant or sorcery spell unless its controller pays {X},
+# where X is Mausoleum Wanderer's power." X is the power as it last existed (CR 608.2h), and a negative power makes X 0
+# (CR 107.1b): Icy Reception makes the Wanderer -4/1, Bot2 pays {0}, and the Bolt resolves.
+
+[Bot1 Deck]
+Island
+Mausoleum Wanderer
+Island
+Icy Reception
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mausoleum Wanderer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Icy Reception.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Mausoleum Wanderer)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mausoleum Wanderer.Power = -4
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mausoleum Wanderer.Activate(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot2.PayCost
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
