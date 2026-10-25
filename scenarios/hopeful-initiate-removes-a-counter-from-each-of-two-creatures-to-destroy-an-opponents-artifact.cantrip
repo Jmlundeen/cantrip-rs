@@ -1,0 +1,67 @@
+# Hopeful Initiate's "{2}{W}, Remove two +1/+1 counters from among creatures you control: Destroy target artifact or
+# enchantment" (CR 118.3, 122.1, 602.2b). Bot1's Walking Ballista has two +1/+1 counters. On turn 3 Bot1's only white source,
+# Mox Pearl, is tapped in the upkeep, so with five other mana sources the ability can't be paid (the {W}). The Initiate then
+# trains attacking beside the 2/2 Ballista. On turn 5 a land is refused as a target, and the ability is activated for exactly
+# {2}{W} (Mox Pearl, Mox Jet, Mox Ruby: nothing left in the pool), paid with one +1/+1 counter from each of the two creatures.
+# Bot2's Mox Sapphire is destroyed; Bot2's own Ballista keeps its counter.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Hopeful Initiate
+Walking Ballista
+Island x12
+
+[Bot2 Deck]
+Forest
+Mox Sapphire
+Walking Ballista
+Forest x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hopeful Initiate.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Hopeful Initiate.Activate(Bot2.Battlefield.Mox Sapphire; Mana: short)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Hopeful Initiate > Bot2; Walking Ballista > Bot2)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Hopeful Initiate.Counters.PlusOnePlusOne = 1
+! Bot1.Battlefield.Hopeful Initiate.Activate(Bot2.Battlefield.Forest)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hopeful Initiate.Activate(Bot2.Battlefield.Mox Sapphire)
+Bot1.RemoveCounters(Hopeful Initiate: 1; Walking Ballista: 1)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Mox Sapphire = (absent)
+Bot2.Graveyard = Mox Sapphire
+Bot1.Battlefield.Hopeful Initiate.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,64 @@
+# Hopeful Initiate's cost removes two +1/+1 counters from among creatures you control (CR 118.3, 122.1): no other kind pays
+# it. On turn 3 Bot1's Loch Mare has three -1/-1 counters and Bot2's Walking Ballista a +1/+1 counter, and Bot1 controls no
+# creature with a +1/+1 counter, so the ability is not offered (it would be under a reading of "counters" of any kind). Bot1
+# casts its own Walking Ballista with two +1/+1 counters; on turn 5 the choice of counters refuses one of Loch Mare's and one
+# of Bot2's Ballista's, the Ballista's two pay, and the ability destroys Bot1's own Mox Jet. The Ballista, left 0/0, dies
+# (CR 704.5f) as soon as the cost is paid, before the Mox Jet is destroyed; Loch Mare keeps its counters.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Hopeful Initiate
+Loch Mare
+Walking Ballista
+Plains x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Walking Ballista
+Forest x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hopeful Initiate.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Loch Mare.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Loch Mare.Counters.MinusOneMinusOne = 3
+? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+! Bot1.Battlefield.Hopeful Initiate.Activate(Bot2.Battlefield.Mox Emerald)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Hopeful Initiate.Activate(Bot1.Battlefield.Mox Jet)
+! Bot1.RemoveCounters(Loch Mare: 1; Bot1.Battlefield.Walking Ballista: 1)
+! Bot1.RemoveCounters(Bot2.Battlefield.Walking Ballista: 1; Bot1.Battlefield.Walking Ballista: 1)
+Bot1.RemoveCounters(Walking Ballista: 2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mox Jet = (absent)
+Bot1.Graveyard = Mox Jet; Walking Ballista
+Bot1.Battlefield.Loch Mare.Counters.MinusOneMinusOne = 3

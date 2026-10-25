@@ -1,0 +1,68 @@
+# Hopeful Initiate removes +1/+1 counters "from among creatures you control" (CR 118.3, 122.1): a land's counters pay it only
+# while the land is a creature. On turn 3 Bot1 animates Mutavault, Luminarch Aspirant puts a +1/+1 counter on it, and the
+# Initiate trains attacking beside the 3/3 Mutavault. On turn 5 the Initiate's counter and the counter on Mutavault, a land
+# and no creature now, are two counters on two permanents but one on a creature: the ability is not offered. Once Mutavault
+# is animated again, the two counters pay it and it destroys Bot2's Weaponize the Monsters, an enchantment.
+
+[Bot1 Deck]
+Mutavault
+Mox Pearl
+Black Lotus
+Hopeful Initiate
+Luminarch Aspirant
+Mox Jet
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Weaponize the Monsters
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hopeful Initiate.Cast
+[T1 Bot1.Main2]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Luminarch Aspirant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Weaponize the Monsters.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Target(Mutavault)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Hopeful Initiate > Bot2; Mutavault > Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Mutavault.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Hopeful Initiate.Counters.PlusOnePlusOne = 1
+! Bot1.Battlefield.Hopeful Initiate.Activate(Bot2.Battlefield.Weaponize the Monsters)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Hopeful Initiate.Activate(Bot2.Battlefield.Weaponize the Monsters)
+Bot1.RemoveCounters(Hopeful Initiate: 1; Mutavault: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Weaponize the Monsters = (absent)
+Bot2.Graveyard = Weaponize the Monsters
+Bot1.Battlefield.Mutavault.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Hopeful Initiate.Counters.PlusOnePlusOne = (absent)

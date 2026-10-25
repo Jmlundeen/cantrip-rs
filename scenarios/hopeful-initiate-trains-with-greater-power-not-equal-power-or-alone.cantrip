@@ -1,0 +1,69 @@
+# Hopeful Initiate's training (CR 702.149a): "Whenever this creature and at least one other creature with power greater than
+# this creature's power attack, put a +1/+1 counter on this creature." On turn 3 the 1/2 Initiate attacks with Woodland
+# Changeling (2/2): training triggers, and Bot2 Lightning Bolts the Changeling in response - the counter is still put (the
+# ruling: the other creature dying doesn't stop it). On turn 5 the Initiate, now 2/3, attacks with Elvish Spirit Guide (2/2):
+# equal power is not greater, so nothing triggers. On turn 7 it attacks alone while Yargle, Glutton of Urborg (9/3) stays
+# home: a greater power that doesn't attack makes nothing trigger.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Jet
+Hopeful Initiate
+Woodland Changeling
+Elvish Spirit Guide
+Plains
+Yargle, Glutton of Urborg
+Plains x11
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hopeful Initiate.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Woodland Changeling.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Hopeful Initiate > Bot2; Woodland Changeling > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Woodland Changeling)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Woodland Changeling
+? Bot1.Battlefield.Hopeful Initiate.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Spirit Guide.Cast
+[T5 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Hopeful Initiate.Power = 2
+? Bot1.Battlefield.Elvish Spirit Guide.Power = 2
+Bot1.Attack(Hopeful Initiate > Bot2; Elvish Spirit Guide > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Hopeful Initiate.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Yargle, Glutton of Urborg.Cast
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Hopeful Initiate > Bot2)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Yargle, Glutton of Urborg.Power = 9
+
+[Expect]
+Bot1.Battlefield.Hopeful Initiate.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Hopeful Initiate.Keywords = (absent)
+Bot2.Life = 12
