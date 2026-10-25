@@ -862,7 +862,8 @@ public sealed partial class MainPage
     /// control") or as an effect resolves (Dyadrine's "a +1/+1 counter from each of two creatures you control"). Each kind of
     /// counter on each permanent the question may take from is a button that takes one more of them, saying how many of how many
     /// are taken; a click on a permanent takes one of its own, the first kind with some left. The answer is sent once the total
-    /// is reached. When every pool holds a single counter on a different permanent, the subtitle says one counter comes from each.
+    /// is reached. When every pool holds a single counter on a different permanent, the subtitle says one counter comes from each;
+    /// when every pool is of one kind (a cost that names it, "two +1/+1 counters"), it names the kind.
     /// An effect's "remove up to three counters from target creature" (<see cref="RemoveCountersPromptMessage.UpTo"/>: Heartless
     /// Act, CR 608.2d) is captioned "remove up to 3 counters", and its button removes however many are chosen, none included,
     /// saying how many: "Remove 2 counters", "Remove no counters".
@@ -875,7 +876,10 @@ public sealed partial class MainPage
 
         // One counter on each of different permanents (Dyadrine): a counter from each of that many permanents, not any kinds.
         bool oneEach = prompt.Pools.All(pool => pool.Count == 1) && prompt.Pools.Select(pool => pool.Object).Distinct().Count() == prompt.Pools.Count;
-        string which = oneEach ? $"One counter from each of {prompt.Total} different permanents" : "Any kinds, from among the permanents shown";
+        // A cost of one kind ("two +1/+1 counters", Hopeful Initiate) offers only that kind's pools, and is captioned with it.
+        List<string> kinds = [.. prompt.Pools.Select(pool => pool.Counter).Distinct()];
+        string among = kinds.Count == 1 ? $"{kinds[0]} counters, from among the permanents shown" : "Any kinds, from among the permanents shown";
+        string which = oneEach ? $"One counter from each of {prompt.Total} different permanents" : among;
 
         if (prompt.UpTo)
         {
