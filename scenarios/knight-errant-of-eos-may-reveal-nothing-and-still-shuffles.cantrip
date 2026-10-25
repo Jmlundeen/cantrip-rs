@@ -1,0 +1,48 @@
+# Knight-Errant of Eos convoked by one Ornithopter: X is 1, and Llanowar Elves among the top six could be revealed (Misshapen
+# Fiend, of mana value 2, could not). The player reveals nothing ("you may", "up to two"): nothing is revealed or put into
+# the hand, the six stay in the library, and it is shuffled all the same (CR 701.24).
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Mox Jet
+Ornithopter
+Knight-Errant of Eos
+Island
+Island
+Llanowar Elves
+Magus of the Moon
+Misshapen Fiend
+Plains
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Knight-Errant of Eos.Cast(Convoke: Ornithopter)
+! Bot1.Choose(Misshapen Fiend)
+Bot1.Choose()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Mox Jet; Ornithopter; Knight-Errant of Eos
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Hand = Island; Island
+Bot1.Revealed = (absent)
+Bot1.Looked = Llanowar Elves; Magus of the Moon; Misshapen Fiend; Plains; Plains; Plains
+Bot1.Library.Count = 14
+Bot1.Library != Llanowar Elves; Magus of the Moon; Misshapen Fiend; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains

@@ -1,0 +1,64 @@
+# Knight-Errant of Eos convoked by two Ornithopters (CR 702.51a, 702.51c): X is 2. One Ornithopter is Bolted while the
+# enters trigger waits; it still counts (the 2023-04-14 ruling), so a creature card of mana value exactly 2 (Misshapen
+# Fiend) may be taken and one of 3 (Magus of the Moon) may not. Of the top six cards only creature cards qualify (Shock, of
+# mana value 1, does not), and only the top six (Birds of Paradise, seventh, is not among them); Bot2's library, whose top
+# card is a creature of mana value 1, is not looked at. "Up to two": three qualifying cards together are refused, and two
+# are taken, revealed, and put into the hand; then the library is shuffled.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Ornithopter
+Ornithopter
+Knight-Errant of Eos
+Mountain
+Lightning Bolt
+Misshapen Fiend
+Magus of the Moon
+Llanowar Elves
+Elvish Mystic
+Shock
+Plains
+Birds of Paradise
+Plains x10
+
+[Bot2 Deck]
+Island x8
+Avacyn's Pilgrim
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Knight-Errant of Eos.Cast(Convoke: Ornithopter, Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+? Stack = Lightning Bolt; Knight-Errant of Eos
+! Bot1.Choose(Magus of the Moon)
+! Bot1.Choose(Shock)
+! Bot1.Choose(Birds of Paradise)
+! Bot1.Choose(Avacyn's Pilgrim)
+! Bot1.Choose(Misshapen Fiend; Llanowar Elves; Elvish Mystic)
+Bot1.Choose(Misshapen Fiend; Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mountain; Mox Pearl; Mox Jet; Ornithopter; Knight-Errant of Eos
+Bot1.Battlefield.Knight-Errant of Eos.Keywords = (absent)
+Bot1.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Hand = Misshapen Fiend; Llanowar Elves
+Bot1.Looked = Misshapen Fiend; Magus of the Moon; Llanowar Elves; Elvish Mystic; Shock; Plains
+Bot1.Revealed = Misshapen Fiend; Llanowar Elves
+Bot1.Library.Count = 15
+Bot1.Library != Magus of the Moon; Elvish Mystic; Shock; Plains; Birds of Paradise; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains
+Bot2.Library = Avacyn's Pilgrim; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island

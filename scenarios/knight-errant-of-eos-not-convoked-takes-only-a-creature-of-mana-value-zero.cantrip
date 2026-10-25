@@ -1,0 +1,49 @@
+# Knight-Errant of Eos paid for with mana alone, Llanowar Elves among the sources: a creature tapped for mana convoked
+# nothing (CR 702.51c), so X is 0. Ornithopter, a creature card of mana value exactly 0, may be revealed and is; Elvish
+# Mystic, of mana value 1, may not. One card is taken where two could be ("up to two").
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Llanowar Elves
+Mox Pearl
+Mox Jet
+Mox Ruby
+Knight-Errant of Eos
+Plains
+Ornithopter
+Elvish Mystic
+Magus of the Moon
+Misshapen Fiend
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Knight-Errant of Eos.Cast
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+! Bot1.Choose(Elvish Mystic)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Emerald; Llanowar Elves; Mox Pearl; Mox Jet; Mox Ruby; Knight-Errant of Eos
+Bot1.Hand = Plains; Ornithopter
+Bot1.Revealed = Ornithopter
+Bot1.Library.Count = 15
