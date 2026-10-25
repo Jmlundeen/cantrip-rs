@@ -67,4 +67,5 @@ Bot1.Life = 23
 Bot1.Battlefield.Jace Token.Counters.Loyalty = 6
 Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 6
 Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 5
+Bot1.Battlefield.Way of the Mentor.Counters.Loyalty = (absent)
 Stack.Count = 0
