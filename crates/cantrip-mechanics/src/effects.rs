@@ -132,8 +132,8 @@ pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kin
 }
 
 /// "Put a loyalty counter on each planeswalker you control": on the planeswalkers `item`'s controller controls as it resolves, all
-/// at once (CR 608.2, 101.4: one event, CR 306.5b, 122.1). Brokers Ascendancy, Worzel, the Protector, Way of the Mentor and Way of
-/// the Necromancer print it.
+/// at once (CR 608.2, 101.4: one event; CR 306.5c, 122.1e: loyalty counters). Way of the Mentor, Way of the Necromancer and the Cat
+/// token of Worzel, the Protector ("{T}: Put a loyalty counter on each planeswalker you control") print it.
 pub fn put_loyalty_counter_on_each_planeswalker_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let walkers: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Planeswalker)).collect();
     counters_on_each(g, &walkers, CounterKind::Loyalty, 1);
