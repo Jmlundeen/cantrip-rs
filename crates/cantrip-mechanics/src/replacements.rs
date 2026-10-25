@@ -63,6 +63,24 @@ fn twice_that_many_tokens(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     }
 }
 
+fn plus_one_counters_on_your_creatures(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    plus_one_counters_applies(q, asker, proposal, &[CardType::Creature])
+}
+
+fn plus_one_counters_apply_to_proposal(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    plus_one_counters_apply(proposal);
+}
+
+/// "If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on
+/// it instead." Hardened Scales, Michelangelo, Weirdness to 11 and Yoshimaru, Beloved Companion print it. Each effect
+/// applies once (CR 614.5), so each adds one.
+pub const PLUS_ONE_COUNTERS_ON_YOUR_CREATURES: ReplacementDef = replacement(
+    ReplacementKind::Counters,
+    plus_one_counters_on_your_creatures,
+    plus_one_counters_apply_to_proposal,
+    "puts that many plus one +1/+1 counters instead",
+);
+
 /// "If one or more tokens would be created under your control, twice that many of those tokens are created instead."
 /// Elspeth, Storm Slayer and Exalted Sunborn print it.
 pub const DOUBLE_TOKENS: ReplacementDef =
