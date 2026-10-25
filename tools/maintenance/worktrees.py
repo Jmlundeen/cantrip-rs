@@ -742,7 +742,7 @@ PATH {path}
 
 You hold this worktree. Its path and the lease ID are yours alone: never put either in a prompt or a message.
 - Every agent that works in it is started with its own token: `tools\\worktree.cmd token {lease_id}`
-  (`--read-only` for a reviewer, `--name` to label it). The token is single-use and dies in {TOKEN_LIFE.seconds // 60} minutes;
+  (`--read-only` for an agent that only reads - not a card reviewer, which breaks the card and restores it - and `--name` to label it). The token is single-use and dies in {TOKEN_LIFE.seconds // 60} minutes;
   the agent's first command is `join`, and the token's output says what to put in its prompt.
 - One member at a time. The next token is made only once the current member has left - it runs `leave`, or its
   agent stops (the hook makes it leave). An agent resumed with SendMessage to work in the tree again gets a fresh
