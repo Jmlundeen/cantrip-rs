@@ -1,0 +1,44 @@
+# Supreme Phantom's +1/+1 is layer 7c (CR 613.4c), after every effect that sets power and toughness (layer 7b) whatever
+# its timestamp. Bot1 has two Phantoms, each a 2/4 from the other; Kasmina's Transmutation, later, on the second one takes
+# its abilities and sets its base power and toughness to 1/1 (CR 613.4b): the first Phantom is back to 1/3, and the
+# second is 1/1 plus the first's +1/+1, a 2/2 - not the 1/1 a 7b pump, overwritten by the later Aura, would leave.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Supreme Phantom
+Supreme Phantom
+Kasmina's Transmutation
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Supreme Phantom.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Supreme Phantom.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Kasmina's Transmutation.Cast(Supreme Phantom#2)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Supreme Phantom#1.Power = 1
+Bot1.Battlefield.Supreme Phantom#1.Toughness = 3
+Bot1.Battlefield.Supreme Phantom#2.Power = 2
+Bot1.Battlefield.Supreme Phantom#2.Toughness = 2

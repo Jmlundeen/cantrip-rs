@@ -1,0 +1,11 @@
+{
+  "name": "Supreme Phantom",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Spirit",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Flying\nOther Spirits you control get +1/+1.",
+  "keywords": [
+    "Flying"
+  ]
+}
