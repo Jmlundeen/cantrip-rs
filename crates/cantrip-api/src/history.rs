@@ -355,6 +355,19 @@ impl<'a> History<'a> {
         self.mana_spent_to_cast(spell).any(|(from, _)| from == source)
     }
 
+    /// The spell `spell` is a copy of, through a copy of a copy, or `spell` itself if it is no copy (CR 707.10): an effect of a
+    /// copy that refers to the objects used to pay its costs uses those of the original spell. Fling and Kazuul's Fury
+    /// (`cantrip_mechanics::history::sacrificed_creatures_power`) and "creatures that convoked it" (`convoked`) ask it.
+    pub fn original_spell(&self, mut spell: ObjectId) -> ObjectId {
+        while let Some(original) = self.records.iter().rev().find_map(|r| match r.event {
+            Event::Copied { copy, original, .. } if copy == spell && original != spell => Some(original),
+            _ => None,
+        }) {
+            spell = original;
+        }
+        spell
+    }
+
     /// The creatures that convoked `object` (CR 702.51c), in the order they were tapped: `object` is a spell on the stack, or
     /// the permanent a spell became as it resolved (CR 608.3), which "each creature that convoked it" names. A copy of a
     /// spell was not cast, but its effects that refer to objects used to pay its costs use those of the original (CR 707.10):
@@ -370,16 +383,11 @@ impl<'a> History<'a> {
         let made = |object: ObjectId| {
             records.iter().rposition(|r| matches!(r.event, Event::ZoneChange { new, .. } if new == object))
         };
-        let mut spell = match made(object).map(|at| records[at].event) {
+        let spell = match made(object).map(|at| records[at].event) {
             Some(Event::ZoneChange { old, from, to, .. }) if from.is(ZoneKind::Stack) && to.is(ZoneKind::Battlefield) => old,
             _ => object,
         };
-        while let Some(original) = records.iter().rev().find_map(|r| match r.event {
-            Event::Copied { copy, original, .. } if copy == spell && original != spell => Some(original),
-            _ => None,
-        }) {
-            spell = original;
-        }
+        let spell = self.original_spell(spell);
         // Nothing before the spell was put on the stack names it (an object's id is never reused).
         let from = made(spell).unwrap_or(0);
         records[from..].iter().filter_map(move |r| match r.event {

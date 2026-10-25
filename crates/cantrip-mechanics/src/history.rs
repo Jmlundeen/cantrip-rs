@@ -190,13 +190,7 @@ pub fn mode_not_chosen_before(q: &dyn Query, asker: &Asker, mode: u8) -> bool {
 /// 707.10, whose example is Fling), through a copy of a copy too. Kazuul's Fury and Fling print it.
 pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
     let records = q.history().all();
-    let mut spell = spell;
-    while let Some(original) = records.iter().find_map(|r| match r.event {
-        Event::Copied { copy, original, .. } if copy == spell && original != spell => Some(original),
-        _ => None,
-    }) {
-        spell = original;
-    }
+    let spell = q.history().original_spell(spell);
     let Some(cast) = records.iter().rposition(|r| matches!(r.event, Event::Cast(c) if c.spell == spell)) else { return 0 };
     records[..cast]
         .iter()
