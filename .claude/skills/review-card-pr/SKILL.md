@@ -27,7 +27,7 @@ git cherry-pick origin/main..pr-<N>        # the PR's own commits, in order, aut
 A cherry-pick conflict stops here and goes to the user; never resolve the contributor's code by guesswork. Note the
 card(s) the PR adds or changes, every other card or shared function it touches, and the card's issue (`Closes #N` in
 the commits, or `gh issue list --search "<Card Name> in:title" --state all`; a card with no issue gets one with
-`card-issues.py claim "Card Name"` only if the user agrees - the claim may be the contributor's).
+`card-issues.py claim --pr "Card Name"` (the PR's own branch has the card, so `--pr`) only if the user agrees - the claim may be the contributor's).
 
 ## 2. Straight to the review: an Opus agent
 

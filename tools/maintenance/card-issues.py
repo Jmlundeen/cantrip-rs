@@ -433,9 +433,10 @@ def find_or_open(repo, issues, name):
     return made
 
 
-def take(repo, issues, me, name):
-    """Claim one card: True when it is now ours, False when someone else holds it or has implemented it."""
-    if slug(name) in done_anywhere():
+def take(repo, issues, me, name, branch_ok=False):
+    """Claim one card: True when it is now ours, False when someone else holds it or has implemented it. `branch_ok`
+    claims a card that is implemented only on a local branch - a pull request's under review, whose cards have no issue."""
+    if slug(name) in (missing.implemented() if branch_ok else done_anywhere()):
         print(f"{name}: already implemented, here or on a local branch")
         return False
     issue = find_or_open(repo, issues, name)
@@ -469,7 +470,7 @@ def claim(args, repo):
     me = claimant(args)
     issues = read_state(repo)
     if args.names:
-        sys.exit(0 if all([take(repo, issues, me, name) for name in args.names]) else 3)
+        sys.exit(0 if all([take(repo, issues, me, name, args.pr) for name in args.names]) else 3)
     if not args.format:
         sys.exit("name the cards to claim, or --format to claim the format's next free card")
     args.n = args.n or BATCH
@@ -602,6 +603,8 @@ def main():
     one.add_argument("names", nargs="*")
     one.add_argument("--format", help="with no names, claim this format's next free cards")
     one.add_argument("-n", type=int, default=0, help=f"how many (default {BATCH})")
+    one.add_argument("--pr", action="store_true",
+                     help="the named cards are a pull request's under review: claim them though a local branch has them")
     one = commands.add_parser("release")
     one.add_argument("names", nargs="+")
     commands.add_parser("status")
