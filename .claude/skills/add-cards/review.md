@@ -50,7 +50,9 @@ decision its code makes (a number, a filter, whose objects, a condition): one te
 worktree, run, then restored at once with `git checkout -- <file>`; a scenario it proposes is written to its scratchpad
 and tried there the same way. It commits nothing, cleans nothing, never clones the repository elsewhere, and leaves
 `git status` clean. It reaches that worktree only by the token in its prompt (`tools\worktree.cmd join`, its first
-command, and `leave` its last), never by a path it was given.
+command, and `leave` its last), never by a path it was given. Every command runs in the foreground with a long timeout
+(up to 600000 ms: a shorter one moves a long run to the background), never in the background: a reviewer that stops to
+wait on one is made to leave its worktree with its break edit still in place.
 
 The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
 land. Self-reported "exact" is not proof. A finding **blocks** the card when it is a rules deviation, a code defect
