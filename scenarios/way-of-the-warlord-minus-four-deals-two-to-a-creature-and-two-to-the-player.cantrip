@@ -1,7 +1,7 @@
 # Way of the Warlord (turn 1) empowers Jace 5 and gives the Jace token "[-4]: ... deals 2 damage to up to one target creature or
 # planeswalker and 2 damage to target player". On turn 3 it is used on Bot2's Woodland Changeling (2/2, which two damage destroys) and on Bot2
 # (20 -> 18): exactly 2 to each. The cost is exactly four loyalty (5 -> 1), and the token's other abilities are then refused for
-# the turn (CR 606.3). Bot1 has no Woodland Changeling, so "you control" is not vacuous.
+# the turn (CR 606.3).
 
 [Bot1 Deck]
 Mox Pearl

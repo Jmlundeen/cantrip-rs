@@ -626,7 +626,7 @@ pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u1
 
 /// "[Source] deals `amount` damage to each of [up to N / one or two] targets" (CR 120.3, 608.2b): every target of the resolving
 /// item that is still legal is dealt `amount` by the item's source, all together as one event. A target that has become
-/// illegal is left out. Prismari Charm and Batroc the Leaper print it.
+/// illegal is left out. Prismari Charm, Batroc the Leaper and Way of the Warlord print it.
 pub fn damage_each_target(g: &mut dyn Game, item: &StackItem, amount: u16) {
     let hits: Vec<(ObjectId, Target, u16)> =
         (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).map(|slot| (item.object, g.state().target(item, slot), amount)).collect();

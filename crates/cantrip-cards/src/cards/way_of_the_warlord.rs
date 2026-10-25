@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{empower, statics, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{damage_each_target, empower, statics, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "When Way of the Warlord enters, empower Jace 5."
@@ -8,18 +8,9 @@ fn empower_jace(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "[-4]: This planeswalker deals 2 damage to up to one target creature or planeswalker and 2 damage to target player." The
-/// planeswalker that has the ability is the item's source. Both amounts are dealt at once as one event (CR 120.3), each only
-/// to a target still legal (CR 608.2b): the creature or planeswalker is the first target slot (possibly chosen none), the player the second.
+/// planeswalker that has the ability is the item's source; each target is dealt 2 only if still legal (CR 608.2b).
 fn two_damage_each(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let mut hits = Vec::new();
-    // The creature or planeswalker (first spec, possibly none chosen) and the player (second): each only while its target is legal.
-    if let Some(object) = g.state().spec_targets(item, 0).next().and_then(|slot| targets::object(g, item, slot)) {
-        hits.push((item.object, Target::Object(object), 2));
-    }
-    if let Some(player) = g.state().spec_targets(item, 1).next().and_then(|slot| targets::player(g, item, slot)) {
-        hits.push((item.object, Target::Player(player), 2));
-    }
-    g.damage_together(&hits);
+    damage_each_target(g, item, 2);
     Ok(())
 }
 
