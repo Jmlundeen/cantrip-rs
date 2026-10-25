@@ -21,20 +21,21 @@ fn player_ahead_on_creatures(q: &dyn Query, _: &Asker, t: Target) -> bool {
 }
 
 /// The first player may reveal cards from the top of their library until they reveal a creature card. If they do, they put
-/// that card onto the battlefield and all other cards revealed this way into their graveyard. The whole reveal is worked out
-/// before anything moves; a library with no creature card is revealed to the last card and every one of them is buried.
+/// that card onto the battlefield and all other cards revealed this way into their graveyard, in that order (CR 608.2c): a
+/// permanent the creature card becomes sees the rest go to the graveyard. A library with no creature card is revealed to the
+/// last card and every one of them is buried.
 fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Player(who) = item.subject else { return Ok(()) };
     if !effects::ask_may(g, who, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let (creature, rest) = library::reveal_until(g, who, &|q, card| q.chars(card).is(CardType::Creature));
+    if let Some(card) = creature {
+        g.put_onto_battlefield(card, who, false)?;
+    }
     let buried: Vec<(ObjectId, Zone)> = rest.into_iter().map(|c| (c, Zone::graveyard(who))).collect();
     if !buried.is_empty() {
         g.move_together(&buried, MoveReason::Other);
-    }
-    if let Some(card) = creature {
-        g.put_onto_battlefield(card, who, false)?;
     }
     Ok(())
 }

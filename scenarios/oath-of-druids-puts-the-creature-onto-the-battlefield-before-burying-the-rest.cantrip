@@ -1,0 +1,38 @@
+# Oath of Druids "puts that card onto the battlefield and all other cards revealed this way into their graveyard", in that
+# order (CR 608.2c): Bot1 reveals Swamp, Swamp, Moonshadow at its upkeep. Moonshadow enters with six -1/-1 counters first,
+# then the two Swamps - permanent cards - go to Bot1's graveyard while it has one, so it triggers once and loses a counter.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Oath of Druids
+Swamp x4
+Swamp
+Swamp
+Moonshadow
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Oath of Druids.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Accept
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Swamp; Swamp
+Bot1.Battlefield = Forest; Mox Emerald; Oath of Druids; Moonshadow
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 5
+Bot1.Hand.Count = 5
