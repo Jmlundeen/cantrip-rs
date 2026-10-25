@@ -784,8 +784,8 @@ pub fn scry(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) 
     Ok(())
 }
 
-/// Surveil N (CR 701.25): look at the top N cards of your library, put any number into your graveyard (together, in
-/// the order chosen, so the last is on top) and the rest back on top in any order. Nothing is asked of an empty
+/// Surveil N (CR 701.25): look at the top N cards of your library, put any number into your graveyard (together, their
+/// owner arranging them as they arrive when the order can matter, CR 404.3) and the rest back on top in any order. Nothing is asked of an empty
 /// library. Second card: Consider, Thought Monitor's surveil, any "surveil 2".
 pub fn surveil(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) -> Result<(), Suspend> {
     surveil_into_graveyard(g, player, source, count).map(|_| ())

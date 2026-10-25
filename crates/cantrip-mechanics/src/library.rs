@@ -491,7 +491,8 @@ pub fn rest_to_bottom_in_random_order(g: &mut dyn Game, player: PlayerId, looked
 }
 
 /// "Reveal the top `count` cards of your library. You may put a card that passes `wanted` from among them into your hand.
-/// Put the rest into your graveyard" (CR 701.20, 400.3): the rest go in the order they were revealed. With nothing to take
+/// Put the rest into your graveyard" (CR 701.20, 400.3): the rest go together, in the order their owner arranges them (CR
+/// 404.3, asked by the core). With nothing to take
 /// nobody is asked. Satyr Wayfinder (a land card) and Malevolent Rumble (a permanent card) print it.
 pub fn reveal_top_take_one_rest_to_graveyard(
     g: &mut dyn Game,

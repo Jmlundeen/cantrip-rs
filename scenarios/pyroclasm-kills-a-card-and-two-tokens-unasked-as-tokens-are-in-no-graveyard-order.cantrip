@@ -1,0 +1,41 @@
+# CR 404.3, 111.7: Pyroclasm kills Ornithopter and Lingering Souls's two Spirit tokens at once. Shallow Grave is in the game,
+# so a graveyard's order can be told apart, but a token put into a graveyard ceases to exist there (CR 704.5d): one card
+# arrives, and there is nothing to arrange, so Bot1 is not asked.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Ornithopter
+Lingering Souls
+Pyroclasm
+Mountain
+Shallow Grave
+Island x12
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+! Bot1.Arrange
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Pyroclasm; Lingering Souls
+Bot1.Battlefield = Plains; Mox Pearl; Mox Emerald; Mox Ruby; Mountain

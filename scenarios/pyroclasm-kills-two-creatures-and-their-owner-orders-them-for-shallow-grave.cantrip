@@ -1,0 +1,41 @@
+# CR 404.3, 704.3: Pyroclasm deals 2 damage to Llanowar Elves and Ornithopter, and the state-based actions put both into
+# Bot1's graveyard at once. With Shallow Grave in the game their order can be told apart, so Bot1 is asked it and puts the
+# Elves on top. Shallow Grave returns the Elves, the top creature card, and exiles them at the next end step; the
+# Ornithopter stays, above Pyroclasm, which was put into the graveyard as it finished resolving, before they died.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Mox Ruby
+Mox Jet
+Pyroclasm
+Shallow Grave
+Mountain
+Island x12
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Arrange(Llanowar Elves; Ornithopter)
+? Bot1.Graveyard = Llanowar Elves; Ornithopter; Pyroclasm
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shallow Grave.Cast
+[T4 Bot2.Main1]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Graveyard = Shallow Grave; Ornithopter; Pyroclasm

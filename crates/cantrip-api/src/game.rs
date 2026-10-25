@@ -573,7 +573,8 @@ pub trait Game: Query {
     /// Exiles objects at once (CR 406.2, 101.4), each to its owner's exile zone. Something that is no longer the object it
     /// was is not exiled (CR 400.7). The new objects, in order, of what was exiled.
     fn exile_all(&mut self, objects: &[ObjectId]) -> Vec<ObjectId>;
-    /// Puts objects into their owners' graveyards at once (CR 400.3, 101.4), in the order given, from wherever they are but
+    /// Puts objects into their owners' graveyards at once (CR 400.3, 101.4), in the order given unless their owner arranges
+    /// them (CR 404.3, asked by the core as they arrive when the order can matter), from wherever they are but
     /// the battlefield (a permanent among them is not moved): "put the rest into your graveyard" is no discard, no mill and no
     /// destruction. Something that is no longer the object it was is not moved (CR 400.7). The new objects, in order. Malevolent Rumble and Satyr Wayfinder
     /// put what they did not take there.

@@ -3,8 +3,8 @@ use cantrip_mechanics::{delayed, haste_until_end_of_turn};
 use cantrip_oracle as oracle;
 
 /// Return the top creature card of your graveyard to the battlefield. It gains haste until end of turn. Exile it at
-/// the beginning of the next end step. Nothing is chosen or targeted: a graveyard is ordered (CR 404.3) and its last
-/// card is its top one.
+/// the beginning of the next end step. Nothing is chosen or targeted: a graveyard is ordered (CR 404.2), its last
+/// card its top one, and cards put into it together are in the order their owner chose (CR 404.3).
 fn grave(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
     let top_creature = g
@@ -27,5 +27,7 @@ fn grave(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], grave),
     delayed: &[delayed_trigger(delayed::exile_subject, "Exile it.")],
+    // "The top creature card of your graveyard" (CR 404.2): its owner orders cards put there together (CR 404.3).
+    reads_graveyard_order: true,
     ..oracle::SHALLOW_GRAVE
 };

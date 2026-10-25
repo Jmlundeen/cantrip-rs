@@ -1286,7 +1286,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         kind: match d.kind {
                             DestinationKind::LibraryTop => CardDestinationKindView::LibraryTop,
                             DestinationKind::LibraryBottom => CardDestinationKindView::LibraryBottom,
-                            DestinationKind::Graveyard => CardDestinationKindView::Graveyard,
+                            DestinationKind::Graveyard | DestinationKind::GraveyardOrder => CardDestinationKindView::Graveyard,
                             DestinationKind::Hand => CardDestinationKindView::Hand,
                             DestinationKind::Exile => CardDestinationKindView::Exile,
                             DestinationKind::BattlefieldFaceDown => CardDestinationKindView::BattlefieldFaceDown,
@@ -1295,7 +1295,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         min: i32::from(d.min),
                         max: if d.max == u8::MAX { i32::MAX } else { i32::from(d.max) },
                         eligible: handles_of(handles, &d.eligible),
-                        ordered: matches!(d.kind, DestinationKind::LibraryTop | DestinationKind::LibraryBottom),
+                        // A graveyard's order, the first on top (CR 404.3), as a library top's is.
+                        ordered: matches!(d.kind, DestinationKind::LibraryTop | DestinationKind::LibraryBottom | DestinationKind::GraveyardOrder),
                         randomized: false,
                         groups: Vec::new(),
                         group_names: Vec::new(),

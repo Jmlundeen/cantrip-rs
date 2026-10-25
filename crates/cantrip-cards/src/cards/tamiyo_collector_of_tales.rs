@@ -9,7 +9,8 @@ fn opponents_cant_cause_you(_: &dyn Query, asker: &Asker, causer: PlayerId, play
 }
 
 /// +1: choose a nonland card name, then reveal the top four cards of your library; all cards with that name from among
-/// them go into your hand and the rest into your graveyard, in the order their owner chooses (CR 404.3): the hand first (CR 608.2c).
+/// them go into your hand and the rest into your graveyard: the hand first (CR 608.2c), then the rest together, their owner
+/// ordering them as they arrive (CR 404.3).
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::NONLAND };
@@ -22,21 +23,7 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     top.reverse();
     g.reveal(you, &top);
     let matches: Vec<ObjectId> = top.iter().copied().filter(|&c| object_has_name(g, c, name)).collect();
-    let mut rest: Vec<ObjectId> = top.iter().copied().filter(|c| !matches.contains(c)).collect();
-    if rest.len() > 1 {
-        let ask = RequestKind::DistributeCards {
-            source: item.object,
-            cards: rest.clone(),
-            destinations: vec![Destination { kind: DestinationKind::Graveyard, min: 0, max: u8::MAX, eligible: rest.clone() }],
-            may_shuffle: false,
-        };
-        if let Answer::Placements { placements, .. } = g.ask(you, ask)?
-            && let Some(order) = placements.first()
-            && order.len() == rest.len()
-        {
-            rest = order.clone();
-        }
-    }
+    let rest: Vec<ObjectId> = top.iter().copied().filter(|c| !matches.contains(c)).collect();
     // Two actions in the order written (CR 608.2c): the matches into the hand, then the rest into the graveyard.
     g.return_to_hand_revealed(&matches);
     let moves: Vec<(ObjectId, Zone)> = rest.iter().map(|&c| (c, Zone::graveyard(you))).collect();

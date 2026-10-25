@@ -8,7 +8,7 @@ const ASK: Question = Question::new("ExileCavalier", "exile Cavalier of Thorns t
 
 /// "When this creature enters, reveal the top five cards of your library. Put a land card from among them onto the
 /// battlefield and the rest into your graveyard." (CR 701.20): the land is not optional, one is chosen whenever any
-/// revealed card is a land; every other revealed card is put into the graveyard (CR 701.20a: revealing moves nothing), in the order revealed.
+/// revealed card is a land; every other revealed card is put into the graveyard (CR 701.20a: revealing moves nothing), together, in the order their owner arranges them (CR 404.3).
 fn reveal_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
     let revealed = top_of_library(g, player, 5);

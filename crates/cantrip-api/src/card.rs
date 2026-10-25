@@ -2787,6 +2787,12 @@ pub struct CardDef {
     /// becomes a permanent (CR 608.3g, 603.7a), about that permanent and controlled by the spell's controller (CR 603.7d). It
     /// triggers at the beginning of the next cleanup step (CR 514.3a).
     pub untimely_cleanup_rider: bool,
+    /// Its text reads the order of a graveyard (CR 404.2): "the top creature card of your graveyard" (Corpse Dance, Shallow
+    /// Grave), "with a creature card directly above it". While any object of the game is (or is a copy of) such a card, the
+    /// owner of cards put into a graveyard together is asked their order (CR 404.3, `ops::move_together`); without one no
+    /// order can ever be told apart, and nobody is asked. A card that creates an object whose text reads it declares it too.
+    /// `cantrip-cards/tests/graveyard_order_matches_oracle.rs` holds it to the Oracle text.
+    pub reads_graveyard_order: bool,
     /// Splice onto Arcane (CR 702.47): the cost paid to add this card's spell effect to an Arcane spell as it is cast. The
     /// spell ability it adds must have no targets.
     pub splice: Option<ManaCost>,
@@ -3030,6 +3036,7 @@ impl CardDef {
         start_your_engines: false,
         face_down: false,
         untimely_cleanup_rider: false,
+        reads_graveyard_order: false,
         splice: None,
         dungeon: &[],
         cast_rules: &[],

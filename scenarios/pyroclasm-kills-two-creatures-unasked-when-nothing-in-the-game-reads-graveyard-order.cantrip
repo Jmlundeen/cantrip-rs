@@ -1,0 +1,36 @@
+# CR 404.3 lets the owner of cards put into a graveyard together arrange them, but with no card in the game that reads a
+# graveyard's order (no Corpse Dance, no Shallow Grave, in any zone of either player) no order can be told apart from any
+# other, so nobody is asked: Pyroclasm's 2 damage kills Llanowar Elves and Ornithopter at once, and they stay in the order
+# the state-based action put them there.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Mox Ruby
+Mountain
+Pyroclasm
+Island
+Mountain
+Island x12
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+! Bot1.Arrange
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Llanowar Elves; Pyroclasm

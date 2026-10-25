@@ -13,7 +13,7 @@ pub static ELDRAZI_SPAWN: CardDef = CardDef {
 };
 
 /// Reveal the top four cards of your library; you may put a permanent card from among them into your hand; put the rest
-/// into your graveyard, in the order they were revealed. With no permanent card among them there is nothing to decide.
+/// into your graveyard, together, in the order their owner arranges them (CR 404.3). With no permanent card among them there is nothing to decide.
 /// Then create an Eldrazi Spawn.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;

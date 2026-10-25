@@ -1197,7 +1197,12 @@ pub struct Destination {
 pub enum DestinationKind {
     LibraryTop,
     LibraryBottom,
+    /// Into a graveyard, as one of the cards of the distribution: which cards, not their order, which the rules ask of their
+    /// owner as they arrive when it can matter (`GraveyardOrder`).
     Graveyard,
+    /// The order of cards put into their owner's graveyard together (CR 404.3), the first on top: the rules' own question
+    /// (`ops::move_together`), its one destination taking every card.
+    GraveyardOrder,
     Hand,
     Exile,
     /// Onto the battlefield face down (CR 701.40a, 708.3): manifest.

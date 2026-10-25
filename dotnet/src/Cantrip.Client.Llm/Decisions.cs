@@ -1726,6 +1726,11 @@ public sealed class Decisions
             return prompt.Default();
         }
 
+        if (prompt.Destinations is [{ Kind: CardDestinationKindView.Graveyard, Ordered: true }])
+        {
+            return GraveyardOrder(client, prompt);
+        }
+
         var answer = new CardsDistributedAnswer
         {
             Placements = [.. prompt.Destinations.Select(_ => new List<ViewHandle>())],
@@ -1753,6 +1758,35 @@ public sealed class Decisions
             answer.Placements[places[pick]].Add(card);
         }
 
+        return prompt.Problem(answer) is null ? answer : prompt.Default();
+    }
+
+    /// <summary>
+    /// Orders cards put into the graveyard together (CR 404.3): asked as "which goes on top", one card at a time, the
+    /// answer's first card the top one.
+    /// </summary>
+    private AnswerPayload GraveyardOrder(GameClient client, DistributeCardsPromptMessage prompt)
+    {
+        List<ViewHandle> left = [.. prompt.Cards];
+        List<ViewHandle> top = [];
+
+        while (left.Count > 1)
+        {
+            int pick = One(new Question
+            {
+                Heading = top.Count == 0
+                    ? "These cards are going to your graveyard together, and you choose their order. Which one goes on top?"
+                    : "Which of the rest goes next, under it?",
+                Note = top.Count > 0 ? "Above it, top first: " + string.Join(", ", top.Select(card => GameText.Named(client, card))) + "." : string.Empty,
+                Choices = [.. left.Select(card => GameText.Named(client, card))],
+            });
+
+            top.Add(left[pick]);
+            left.RemoveAt(pick);
+        }
+
+        top.AddRange(left);
+        var answer = new CardsDistributedAnswer { Placements = [top] };
         return prompt.Problem(answer) is null ? answer : prompt.Default();
     }
 

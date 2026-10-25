@@ -30,7 +30,9 @@ internal static class PromptPresentation
         DistributeCardsPromptMessage distribute => new()
         {
             Action = PromptActionView.Distribute,
-            Cause = PromptCauseView.Effect,
+            // The order of cards put into a graveyard together is the rules' question (CR 404.3), whatever put them there.
+            Cause = distribute.Destinations is [{ Kind: CardDestinationKindView.Graveyard, Ordered: true }]
+                ? PromptCauseView.Rule : PromptCauseView.Effect,
             Chooser = distribute.Player,
             Owner = distribute.Player,
             Source = distribute.Source,

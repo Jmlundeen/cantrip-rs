@@ -1,0 +1,56 @@
+# CR 404.3, 101.4: Wrath of God destroys Bot1's Llanowar Elves and Ornithopter and Bot2's two Ornithopters at once. Each
+# owner arranges their own cards, the active player first: Bot2, then Bot1, who puts the Ornithopter on top. With Shallow
+# Grave in the game the order can be told apart: cast in response to nothing, after Wrath of God, it returns the
+# Ornithopter, the top creature card of Bot1's graveyard, and exiles it at the beginning of the next end step.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Mox Jet
+Mox Emerald
+Shallow Grave
+Island
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Wrath of God
+Ornithopter
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot2.Arrange(Ornithopter; Ornithopter)
+Bot1.Arrange(Ornithopter; Llanowar Elves)
+? Bot1.Graveyard = Ornithopter; Llanowar Elves
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shallow Grave.Cast
+[T3 Bot1.Main1]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Shallow Grave; Llanowar Elves
+Bot2.Graveyard = Wrath of God; Ornithopter; Ornithopter

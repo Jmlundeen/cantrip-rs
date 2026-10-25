@@ -2260,6 +2260,28 @@ as-cast observations and the completed cast record the live original permanent l
 are collected. Cancelling reverts the whole announcement, including mana abilities. A copy cast by a stolen permanent's
 current controller is controlled by its caster (CR 601.2a), not its exile zone's owner.
 
+### Graveyard order
+
+A graveyard is kept in order (CR 404.2), and "if an effect or rule puts two or more cards into the same graveyard at the
+same time, the owner of those cards may arrange them in any order" (CR 404.3). Every simultaneous move goes through
+`ops::move_together`, so that is where it is asked (`arrange_graveyards`), whatever the cause - a mill, a discard, a
+destruction, a state-based action, "put the rest into your graveyard" - and no card can put cards in together without it:
+card code has no verb that orders a graveyard. Once the cards have arrived, in the order the move listed them, each owner
+with two or more of them, in APNAP order (CR 101.4), is asked with the ordering question the library's ends use, a
+`DistributeCards` with one destination, `DestinationKind::GraveyardOrder`, the cards listed top first (the host shows it as
+an ordered graveyard pile); they are rearranged as answered before the move is announced. A token or a copy of a card
+ceases to exist there (CR 111.7, 704.5d-e) and is not among them. A card's own question with a graveyard destination
+(surveil's, Underrealm Lich's) chooses which cards go, not their order.
+
+It is asked only while the order can be told apart: while some object of the game - in any zone, outside the game
+included, or a copy - is a card whose text reads a graveyard's order (`CardDef::reads_graveyard_order`: Corpse Dance,
+Shallow Grave; `cantrip-cards/tests/graveyard_order_matches_oracle.rs` holds it to the Oracle text). That is a guard on the
+game state, every object row the game has had, not on the card table: without such an object nothing that can happen in
+the game distinguishes one order of those cards from another, so the order they arrived in is as good as any the owner
+could choose, as several effects that each prevent all of some damage are not ordered (CR 616.1, `replace::prevents_all`).
+The question is the rules' own (`Cx::ask_rule`): a run that reaches it unanswered goes on with the order they arrived in and
+is replayed with the answer. The bots answer it as they answer any placement, in one pass over the cards.
+
 ### Cards outside the game
 
 Outside the game is not a zone (CR 400.11), but the cards a player owns outside it - in a match, their sideboard (CR 100.4,

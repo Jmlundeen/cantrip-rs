@@ -5,7 +5,8 @@ namespace Cantrip.Client.Web;
 
 /// <summary>
 /// Looking at cards and saying where each one goes: scry (CR 701.22), surveil (CR 701.25), Ponder's "in any order",
-/// Stock Up's "two into your hand and the rest on the bottom". Shown as a labelled pile per destination above, and
+/// Stock Up's "two into your hand and the rest on the bottom", and the order of cards put into a graveyard together (CR 404.3).
+/// Shown as a labelled pile per destination above, and
 /// below, the cards still to place, each with a button per pile that will take it. The answer is checked by the prompt itself - the same <c>CardDistribution</c> check the engine makes - so Done is
 /// enabled exactly when it would be taken.
 /// </summary>
@@ -38,7 +39,7 @@ public sealed partial class MainPage
         string source = client.Object(prompt.Source)?.Name ?? "A spell";
 
         Prompt(
-            client.Prompt?.Presentation is null ? Headline(prompt, source) : $"{source}: place {prompt.Cards.Count} card{(prompt.Cards.Count == 1 ? "" : "s")}",
+            client.Prompt?.Presentation is null || GraveyardOrder(prompt) ? Headline(prompt, source) : $"{source}: place {prompt.Cards.Count} card{(prompt.Cards.Count == 1 ? "" : "s")}",
             unplaced.Count > 0
                 ? places > 1
                     ? $"Choose where each card goes  ·  drag to reorder or move between piles  ·  {unplaced.Count} left"
@@ -155,7 +156,7 @@ public sealed partial class MainPage
                 }
 
                 List<int> pile = piles[i];
-                int at = destination.Kind == CardDestinationKindView.LibraryTop ? 0 : pile.Count;
+                int at = TopFirst(destination) ? 0 : pile.Count;
 
                 var button = new DockButton(PlaceName(destination), primary: false) { Tooltip = PlaceTooltip(destination) };
                 button.Clicked += () =>
@@ -249,6 +250,11 @@ public sealed partial class MainPage
     {
         int count = prompt.Cards.Count;
 
+        if (GraveyardOrder(prompt))
+        {
+            return $"{count} cards go to your graveyard together: put them in any order";
+        }
+
         return prompt.Destinations.Select(destination => destination.Kind).ToList() switch
         {
             [CardDestinationKindView.LibraryTop] => $"{source}: put the top {count} back in any order",
@@ -275,12 +281,25 @@ public sealed partial class MainPage
     private static string PlaceName(CardDestinationMessage destination) => destination.Kind switch
     {
         CardDestinationKindView.LibraryTop => "Top",
+        CardDestinationKindView.Graveyard when destination.Ordered => "On top",
         CardDestinationKindView.LibraryBottom => "Bottom",
         CardDestinationKindView.Graveyard => "Graveyard",
         CardDestinationKindView.Hand => "Hand",
         CardDestinationKindView.BattlefieldFaceDown => "Manifest",
         _ => "Exile",
     };
+
+    /// <summary>
+    /// The rules' question of the order of cards put into a graveyard together (CR 404.3): one ordered graveyard pile, which
+    /// takes them all, the leftmost on top.
+    /// </summary>
+    private static bool GraveyardOrder(DistributeCardsPromptMessage prompt) =>
+        prompt.Destinations is [{ Kind: CardDestinationKindView.Graveyard, Ordered: true }];
+
+    /// <summary>Whether a pile's leftmost card is its top one, so a card placed there goes on top of those already in it.</summary>
+    private static bool TopFirst(CardDestinationMessage destination) =>
+        destination.Kind == CardDestinationKindView.LibraryTop
+        || destination.Kind == CardDestinationKindView.Graveyard && destination.Ordered;
 
     private static string LastGoes(CardDestinationMessage destination) =>
         destination.Kind == CardDestinationKindView.LibraryBottom ? "on the bottom" : "on top";
@@ -289,6 +308,7 @@ public sealed partial class MainPage
     {
         CardDestinationKindView.LibraryTop => "Put this card on top of the ones already there",
         CardDestinationKindView.LibraryBottom => "Put this card on the bottom, under the ones already there",
+        CardDestinationKindView.Graveyard when destination.Ordered => "Put this card into your graveyard, on top of the ones already there",
         CardDestinationKindView.Graveyard => "Put this card into your graveyard",
         CardDestinationKindView.Hand => "Put this card into your hand",
         CardDestinationKindView.BattlefieldFaceDown =>
@@ -317,5 +337,5 @@ public sealed partial class MainPage
             ? $"one of each: {string.Join(", ", destination.GroupNames)}"
             : !destination.Ordered || placed <= 1
             ? destination.Randomized && placed > 1 ? "in a random order" : null
-            : destination.Kind == CardDestinationKindView.LibraryTop ? "leftmost on top" : "rightmost at the bottom";
+            : TopFirst(destination) ? "leftmost on top" : "rightmost at the bottom";
 }

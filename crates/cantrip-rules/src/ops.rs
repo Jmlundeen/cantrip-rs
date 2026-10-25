@@ -202,7 +202,8 @@ pub(crate) fn verify_reveal_carried(cx: &Cx, id: ObjectId) {
 
 /// Moves objects at once (CR 400.7: each arrives as a new object). Leaves-the-battlefield abilities are judged on
 /// the board as it was before any of them moved (CR 603.10a); everything else on the board after. A library is
-/// entered on top. Returns the new objects, in order.
+/// entered on top; cards put into a graveyard together are in the order their owner arranges (CR 404.3,
+/// `arrange_graveyards`). Returns the new objects, in order.
 pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<ObjectId> {
     move_together_seen(cx, moves, reason).0
 }
@@ -443,6 +444,9 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         then
     };
     let seen: Vec<ObjectId> = plans.iter().filter(|p| p.seen_by_all).map(|p| p.m.id).collect();
+    // The cards put into a graveyard, by that graveyard's player, as they arrive: their owner may arrange them (CR 404.3).
+    // A token or a copy of a card ceases to exist there (CR 111.7, 704.5d-e), so it is in no order anyone can ask.
+    let mut binned: Vec<(PlayerId, ObjectId)> = Vec::new();
     for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known, .. } in plans {
         let m = &m;
         let row = cx.st().last_known_push(last_known);
@@ -468,6 +472,9 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             cx.st().zone_insert(to, 0, new_id);
         } else {
             cx.st().zone_push(to, new_id);
+        }
+        if to.is(ZoneKind::Graveyard) && !old.token && !old.card_copy {
+            binned.push((to.player, new_id));
         }
         cx.st().update_obj(m.id, |o| {
             o.became = Some(new_id);
@@ -526,6 +533,9 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             become_prepared(cx, new_id);
         }
     }
+    if binned.len() > 1 {
+        arrange_graveyards(cx, &binned);
+    }
     cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then, seen_by_all: &seen }));
     for player in shuffled {
         cx.record(Event::Shuffled { player });
@@ -549,6 +559,67 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         return_until_left(cx);
     }
     (created, seen)
+}
+
+/// "If an effect or rule puts two or more cards into the same graveyard at the same time, the owner of those cards may
+/// arrange them in any order" (CR 404.3): every simultaneous move into graveyards comes through here (`move_together`), the
+/// cards already in place in the order the move listed them, `binned` by the graveyard's player. Each owner with two or more
+/// of them is asked, in APNAP order (CR 101.4), with the rules' own ordering question (`DestinationKind::GraveyardOrder`,
+/// the cards listed top first, so that answering them as listed keeps the order they arrived in), and they are rearranged
+/// as answered before the move is announced: nothing sees them in any other order.
+///
+/// Asked only while the order can be told apart: while some object of the game reads a graveyard's order
+/// (`graveyard_order_read`). Without one, no order of these cards is distinguishable from any other by anything that can
+/// happen in the game, so the order they arrived in is as good as any their owner could choose, and no game pays a prompt
+/// for it - as several effects that each prevent all of some damage are not ordered (`replace::prevents_all`).
+fn arrange_graveyards(cx: &mut Cx, binned: &[(PlayerId, ObjectId)]) {
+    if !graveyard_order_read(cx) {
+        return;
+    }
+    let players: Vec<PlayerId> = cx.s().apnap().collect();
+    for owner in players {
+        let arrived: Vec<ObjectId> = binned.iter().filter(|&&(p, _)| p == owner).map(|&(_, c)| c).collect();
+        if arrived.len() < 2 {
+            continue;
+        }
+        // Top first: the last to arrive is on top.
+        let listed: Vec<ObjectId> = arrived.iter().rev().copied().collect();
+        let source = match cx.cause() {
+            Cause::Spell(spell) => spell,
+            Cause::Ability { source, .. } => source,
+            _ => listed[0],
+        };
+        let ask = RequestKind::DistributeCards {
+            source,
+            cards: listed.clone(),
+            destinations: vec![Destination { kind: DestinationKind::GraveyardOrder, min: 0, max: u8::MAX, eligible: listed.clone() }],
+            may_shuffle: false,
+        };
+        // Unanswered yet, the run goes on with the order they arrived in and is replayed with the answer (`Cx::ask_core`).
+        let order = match cx.ask_rule(owner, ask) {
+            Ok(Some(Answer::Placements { placements, .. })) => placements.into_iter().next().unwrap_or_default(),
+            _ => continue,
+        };
+        if order == listed || order.len() != listed.len() {
+            continue;
+        }
+        let zone = Zone::graveyard(owner);
+        for &card in &arrived {
+            cx.st().zone_remove(zone, card);
+        }
+        for &card in order.iter().rev() {
+            cx.st().zone_push(zone, card);
+        }
+    }
+}
+
+/// Whether anything in the game can read the order of a graveyard (CR 404.2): an object, in any zone or outside the game,
+/// that is - or once was, or is a copy of - a card whose text reads it (`CardDef::reads_graveyard_order`). Every object the
+/// game has had keeps its row, and nothing enters a game but from its players' cards and what they create, so this is
+/// every card that could ever look.
+fn graveyard_order_read(cx: &Cx) -> bool {
+    let cards = cx.cards();
+    cx.s().objects.iter().any(|o| cards.get(o.card).reads_graveyard_order || o.copy.is_some_and(|c| cards.get(c.card).reads_graveyard_order))
 }
 
 /// Attaches an Aura or Equipment to a permanent (CR 701.3a). Nothing happens when it could not be attached there
@@ -2655,7 +2726,8 @@ fn discard_events(cx: &mut Cx, cards: &[ObjectId], paying: &[ObjectId], revealed
     (new, events)
 }
 
-/// Mills (CR 701.17): the top cards together, top first, so the second card milled ends up above the first.
+/// Mills (CR 701.17): the top cards together, top first, so the second card milled ends up above the first unless their
+/// owner arranges them otherwise (CR 404.3, `arrange_graveyards`).
 pub fn mill(cx: &mut Cx, player: PlayerId, count: u32) -> Vec<ObjectId> {
     mill_together(cx, &[(player, count)])
 }
@@ -3142,7 +3214,8 @@ fn live_ones(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     ids.iter().copied().filter(|&id| live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut)).collect()
 }
 
-/// Puts objects together into their owners' graveyards (CR 400.3), in the order given, from anywhere but the battlefield
+/// Puts objects together into their owners' graveyards (CR 400.3), in the order given unless their owner arranges them (CR
+/// 404.3, `arrange_graveyards`), from anywhere but the battlefield
 /// (`Game::put_into_graveyard`): a permanent among them is not moved, as a permanent goes to a graveyard by the verbs that
 /// say why (destroy, sacrifice, CR 701.8, 701.21) or a move that names its reason (`Game::move_together`).
 pub fn put_into_graveyard(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {

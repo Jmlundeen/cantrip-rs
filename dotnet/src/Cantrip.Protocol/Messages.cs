@@ -1077,7 +1077,10 @@ public sealed class CardDestinationMessage
     [Key(4)]
     public List<ViewHandle> Eligible { get; set; } = [];
 
-    /// <summary>Whether the order cards are put here in matters, as it does for either end of a library.</summary>
+    /// <summary>
+    /// Whether the order cards are put here in matters, as it does for either end of a library, and for the rules' question
+    /// of the order of cards put into a graveyard together (CR 404.3), which is a lone graveyard pile, the first on top.
+    /// </summary>
     [Key(5)]
     public bool Ordered { get; set; }
 

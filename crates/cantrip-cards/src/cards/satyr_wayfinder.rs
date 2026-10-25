@@ -4,7 +4,7 @@ use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// Reveal the top four cards of your library; you may put a land card from among them into your hand; put the rest
-/// into your graveyard, in the order they were revealed. With no land among them there is nothing to decide.
+/// into your graveyard, together, in the order their owner arranges them (CR 404.3). With no land among them there is nothing to decide.
 fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     reveal_top_take_one_rest_to_graveyard(g, item.controller, item.object, 4, |chars| chars.is(CardType::Land))
 }

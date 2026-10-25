@@ -1,0 +1,52 @@
+# Browser
+# CR 404.3: "If an effect or rule puts two or more cards into the same graveyard at the same time, the owner of those cards
+# may arrange them in any order." Satyr Wayfinder reveals Guerrilla Gorilla, Lightning Bolt, Llanowar Elves and Counterspell -
+# no land - and puts all four into Bot1's graveyard together. With Corpse Dance in the game the order can be told apart, so
+# Bot1 is asked it, and puts the Gorilla on top (the order revealed would have left the Elves the top creature card). Corpse
+# Dance then returns the Gorilla, the top creature card, which attacks at once (haste) for 2.
+# Bot1 Deck: Corpse Dance reads the graveyard's order.
+
+[Bot1 Deck]
+Forest
+Forest
+Swamp
+Satyr Wayfinder
+Corpse Dance
+Island
+Island
+Island
+Guerrilla Gorilla
+Lightning Bolt
+Llanowar Elves
+Counterspell
+Island x8
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Satyr Wayfinder.Cast
+Bot1.Pass
+Bot1.Pass
+? Client.Bot1.Prompt.Title = 4 cards go to your graveyard together: put them in any order
+Bot1.Arrange(Guerrilla Gorilla; Counterspell; Llanowar Elves; Lightning Bolt)
+? Bot1.Graveyard = Guerrilla Gorilla; Counterspell; Llanowar Elves; Lightning Bolt
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Corpse Dance.Cast
+Bot1.Pass
+Bot1.Attack(Guerrilla Gorilla > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Corpse Dance; Counterspell; Llanowar Elves; Lightning Bolt
+Bot1.Battlefield = Satyr Wayfinder; Forest; Forest; Swamp; Guerrilla Gorilla
+Bot2.Life = 18

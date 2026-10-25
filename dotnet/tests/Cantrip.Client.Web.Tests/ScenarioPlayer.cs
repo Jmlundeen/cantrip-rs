@@ -582,8 +582,9 @@ public sealed class ScenarioPlayer
 
     /// <summary>
     /// Cards looked at and placed (scry, surveil, Ponder): each card still to place is shown with a button per pile that takes
-    /// it, in the piles' order ("Top", "Bottom", "Graveyard"). "Top" puts the card on top of those already there, so that pile
-    /// is clicked from its lowest card up; every other pile adds at its end, so in order. Then Done.
+    /// it, in the piles' order ("Top", "Bottom", "Graveyard"). "Top" puts the card on top of those already there, as "On top"
+    /// does in the order of cards put into a graveyard together (CR 404.3), so those piles are clicked from their lowest card
+    /// up; every other pile adds at its end, so in order. Then Done.
     /// </summary>
     private async Task DistributeAsync(CardsDistributedAnswer distributed, TableState state)
     {
@@ -606,7 +607,7 @@ public sealed class ScenarioPlayer
 
         for (int i = 0; i < distributed.Placements.Count; i++)
         {
-            IEnumerable<ViewHandle> order = piles[i] == "Top" ? Enumerable.Reverse(distributed.Placements[i]) : distributed.Placements[i];
+            IEnumerable<ViewHandle> order = piles[i] is "Top" or "On top" ? Enumerable.Reverse(distributed.Placements[i]) : distributed.Placements[i];
             foreach (ViewHandle card in order)
             {
                 TableState now = await _page.SettledAsync();
