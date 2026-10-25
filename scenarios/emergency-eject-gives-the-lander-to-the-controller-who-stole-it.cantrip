@@ -1,0 +1,41 @@
+# "Its controller" is the permanent's controller, not its owner: Bot1 steals Bot2's Ornithopter with Act of Treason, then
+# destroys it with Emergency Eject, so Bot1 (the controller) creates the Lander token and Bot2 (the owner) does not.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Act of Treason
+Emergency Eject
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Mountain x21
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Emergency Eject.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Lander Token; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Plains

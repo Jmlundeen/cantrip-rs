@@ -1,0 +1,27 @@
+# Emergency Eject may target the caster's own nonland permanent; its controller (the caster) creates the Lander token.
+# Mox Ruby is the target; Bot2 gets nothing.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Emergency Eject
+Plains x20
+
+[Bot2 Deck]
+Mountain x21
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Emergency Eject.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Lander Token
+Bot1.Graveyard = Emergency Eject; Mox Ruby
+Bot2.Battlefield.Count = 0
