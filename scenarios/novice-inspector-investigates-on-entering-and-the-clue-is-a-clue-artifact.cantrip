@@ -1,0 +1,32 @@
+# "When this creature enters, investigate": casting Novice Inspector ({W}, a 1/2 Human Detective) with one Plains makes
+# its controller a Clue token (CR 701.16a), an artifact Clue; nothing happens for the opponent, and the creature itself
+# is not a Clue. The trigger is the Inspector's own entering only: on turn 3 Dryad Arbor, another creature of Bot1's,
+# enters and makes no second Clue.
+
+[Bot1 Deck]
+Plains
+Novice Inspector
+Dryad Arbor
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Novice Inspector.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Clue Token; Dryad Arbor; Novice Inspector; Plains
+Bot1.Battlefield.Novice Inspector.Power = 1
+Bot1.Battlefield.Novice Inspector.Toughness = 2
+Bot1.Battlefield.Novice Inspector.Subtypes = Detective; Human
+Bot1.Battlefield.Clue Token.Types = Artifact
+Bot1.Battlefield.Clue Token.Subtypes = Clue
+Bot2.Battlefield.Count = 0
