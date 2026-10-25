@@ -551,7 +551,8 @@ pub trait Game: Query {
     /// entering it is `put_onto_battlefield`, which applies entering replacements.
     fn move_to(&mut self, object: ObjectId, to: Zone) -> ObjectId;
     /// Moves several objects at once (CR 603.10a: a leaves-the-battlefield ability sees all of them leave), for a
-    /// reason triggers can read. The new objects, in order.
+    /// reason triggers can read. The new objects, in order. Never for `ZoneReason::Sacrifice`, which moves nothing: a
+    /// sacrifice is `sacrifice` or `sacrifice_each`, which name who sacrifices (CR 701.21a).
     fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId>;
     /// `move_together` for the instruction that reveals the cards it moves ("reveal it, put it into your hand", "put the
     /// cards revealed this way into your hand and the rest into your graveyard", CR 701.20a): each is a card all players can
