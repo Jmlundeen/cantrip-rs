@@ -3,7 +3,7 @@ use cantrip_mechanics::library::card_has_name;
 use cantrip_oracle as oracle;
 
 /// Choose a card name. Exile the top six cards of your library, then reveal cards from the top until you reveal a card with the chosen
-/// name (CR 201.3, 701.20). Put that card into your hand and exile all other cards revealed this way, together; a miss
+/// name (CR 201.3, 701.20). Put that card into your hand, then exile all other cards revealed this way, together; a miss
 /// reveals and exiles what is left. Never a shuffle.
 fn consult(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
@@ -27,8 +27,11 @@ fn consult(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     g.reveal(you, &revealed);
-    let moves: Vec<(ObjectId, Zone)> =
-        revealed.iter().map(|&c| (c, if Some(c) == found { Zone::hand(you) } else { Zone::exile(you) })).collect();
+    // Two actions in the order written (CR 608.2c): the named card into the hand, then the others into exile together.
+    if let Some(card) = found {
+        g.return_to_hand_revealed(&[card]);
+    }
+    let moves: Vec<(ObjectId, Zone)> = revealed.iter().filter(|&&c| Some(c) != found).map(|&c| (c, Zone::exile(you))).collect();
     g.move_together_revealed(&moves, MoveReason::Other);
     Ok(())
 }
