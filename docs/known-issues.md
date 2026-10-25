@@ -78,6 +78,8 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-138](#ki-138-a-cast-menu-rows-cost-reads-the-card-where-it-is-not-the-spell-it-would-be) | A cast menu row's cost reads the card where it is, not the spell it would be | Pri-2 | Open |
 | [KI-139](#ki-139-the-language-model-clients-dack-fayden-prompt-runs-words-together) | The language-model client's Dack Fayden prompt runs words together | Pri-2 | Open |
 | [KI-140](#ki-140-every-pending-effect-tooltip-says-it-ends-with-the-turn-if-no-spell-is-cast) | Every pending-effect tooltip says it ends with the turn if no spell is cast | Pri-2 | Open |
+| [KI-141](#ki-141-a-creature-type-chosen-past-the-encoders-128-tokens-makes-no-training-sample) | A creature type chosen past the encoder's 128 tokens makes no training sample | Pri-3 | Open |
+| [KI-142](#ki-142-the-ai-encoder-cannot-tell-apart-options-that-differ-only-by-their-grant-or-a-companion-from-exiling-to-pay) | The AI encoder cannot tell apart options that differ only by their grant, or a companion from exiling to pay | Pri-3 | Open |
 
 ## Issues
 
@@ -566,3 +568,37 @@ control-of-a-player lines. A fix gives each line its own tooltip text (or none),
 
 **Scenarios.** None yet: a browser check of the tooltip would show it; the host test
 `an_additional_land_play_is_shown_to_both_seats_and_gone_after_the_turn` covers the line only.
+
+### KI-141: A creature type chosen past the encoder's 128 tokens makes no training sample
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Open | harness | 2026-10-19, the recorder's whole-corpus test (`crates/cantrip-ai/tests/record.rs`, ignored) |
+
+**Notes.** A "choose a creature type" question (Arcane Adaptation, Conspiracy, Artificial Evolution and the like) offers
+every creature type, some 300 options. `cantrip_obs::encode` holds a position in at most 128 tokens and cuts options
+past what fits; when the type chosen is one of those cut, the network cannot be shown the answer, and the recorder
+(`cantrip_ai::record`) skips that decision with "chosen option cut by the cap". The whole corpus has 58 such answers;
+the test lists the kind in `EXPECTED`. Generation 0's decks ask no such question. The network will equally be unable to
+pick a cut type when it plays. A fix splits a long list of names into steps (a first letter, then the name) in
+`cantrip_obs::factor`, or ranks the types by the creatures in the game before cutting.
+
+**Scenarios.** the corpus's creature-type choices whose type falls past the cut, which the recorder's ignored
+whole-corpus run counts (`cargo test --profile cards -p cantrip-ai --test record -- --ignored`).
+
+### KI-142: The AI encoder cannot tell apart options that differ only by their grant, or a companion from exiling to pay
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Open | harness (AI player) | 2026-10-25, bringing the AI player up to main |
+
+**Notes.** The engine is right; only what the network sees is coarser. `cantrip_obs::encode` gives each option its
+kind, source and ability index. Two options that differ only by `granted_by` or `paid_by` (Kili, the Resourceful's free
+first equip beside the paid one; two permissions to cast the same card) encode alike, and `ActionKind::TakeCompanion`,
+newer than the encoder's action vocabulary (`ACTIONS`, 12 kinds), is encoded as `ExileToPay`. Answers are still exact:
+`OptionObs` keeps the kind and both grants, so the canonical order and the way back to the engine's option tell them apart,
+and the search plays each out. A fix adds the grants and the companion to the encoding, which changes the layout and
+`encoder_hash`, so it waits for the next model that is trained from scratch, and its tiny test model is exported again.
+
+**Scenarios.** `kili-the-resourceful-the-first-equip-each-turn-is-free-with-an-enduring-story` (the factoring's round
+trip, `crates/cantrip-ai/tests/factoring.rs`).
