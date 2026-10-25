@@ -25,13 +25,18 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         may_shuffle: false,
     };
     if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
-        let mut moves: Vec<(ObjectId, Zone)> = placements[0].iter().map(|&c| (c, Zone::hand(player))).collect();
-        let exiling = placements[2].first().copied();
-        if let Some(card) = exiling {
-            moves.push((card, Zone::exile(g.obj(card).owner)));
-        }
-        let moved = g.move_together(&moves, MoveReason::Other);
+        // Three instructions in the order written (CR 608.2c): the hand, then the bottom of the library (nothing changes
+        // zones), then the exile.
+        g.return_to_hand(&placements[0]);
         g.arrange_library(player, &[], &placements[1]);
+        let exiling = placements[2].first().copied();
+        let moved = match exiling {
+            Some(card) => {
+                let owner = g.obj(card).owner;
+                g.move_together(&[(card, Zone::exile(owner))], MoveReason::Other)
+            }
+            None => Vec::new(),
+        };
         // Only a card that really arrived in exile may be played: a replacement effect could have sent it elsewhere.
         if exiling.is_some()
             && let Some(&new) = moved.last()
