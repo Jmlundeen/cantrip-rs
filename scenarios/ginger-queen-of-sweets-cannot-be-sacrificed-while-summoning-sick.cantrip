@@ -1,0 +1,38 @@
+# Ginger, Queen of Sweets: "{2}, {T}, Sacrifice Ginger" includes {T}, so on the turn she comes under Bot1's control (CR
+# 302.6) the ability cannot be activated even with the mana in hand: Bot1 casts her with Black Lotus and three Moxen and keeps
+# an untapped Sol Ring, whose {C}{C} pays the {2}, and the refusal can come only from the {T} symbol. Ginger stays.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Emerald
+Sol Ring
+Ginger, Queen of Sweets
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ginger, Queen of Sweets.Cast
+Bot1.Pass
+! Bot1.Battlefield.Ginger, Queen of Sweets.Activate(Ability: You gain 6 life)
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot1.Battlefield = Gingerbrute; Gingerbrute; Ginger, Queen of Sweets; Sol Ring; Mox Emerald; Mox Jet; Mox Ruby; Mox Sapphire

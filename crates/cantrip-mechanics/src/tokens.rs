@@ -413,10 +413,11 @@ pub fn create(g: &mut dyn Game, controller: PlayerId, def: &'static CardDef, cou
 }
 
 /// Creates `count` tokens of `def` under `controller`, a token whose characteristics a rule defines and no printed text:
-/// a predefined token (CR 111.10: a Treasure, a Clue, a Heartwood) or a keyword's own (job select's Hero, recruit's Human
-/// Soldier, a gift's Fish). A text change of the text making it changes nothing of it (CR 612.2): its color words and
-/// creature types are not that text's, and a keyword's reminder text is no rules text (CR 207.2a). Created together
-/// (CR 101.4), `tapped` as given.
+/// a predefined token (CR 111.10: a Treasure, a Clue, a Heartwood), a keyword's own (job select's Hero, recruit's Human
+/// Soldier, a gift's Fish), or one created by name, whose characteristics are the Oracle card's of that name (CR 111.11:
+/// Ginger, Queen of Sweets's Gingerbrute, made of Gingerbrute's own definition). A text change of the text making
+/// it changes nothing of it (CR 612.2): its color words and creature types are not that text's, and a keyword's
+/// reminder text is no rules text (CR 207.2a). Created together (CR 101.4), `tapped` as given.
 pub fn create_by_rule(g: &mut dyn Game, controller: PlayerId, def: &'static CardDef, count: u32, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
     let def = g.card_id(def);
     g.create_tokens_worded(&vec![(def, controller); count as usize], tapped, None, Words::NONE)
