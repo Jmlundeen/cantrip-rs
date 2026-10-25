@@ -1,0 +1,55 @@
+# Way of the Deathbringer empowers a Jace token to 5 as it enters. The granted "[-2]: You may sacrifice a creature. If you do, create a 4/4
+# green Beast creature token with trample" is activated on the token: 5 - 2 = 3, Bot1 sacrifices its Ornithopter (the sacrifice is chosen as
+# the ability resolves) and gets the Beast. Bot2's Dryad Arbor is a creature too but is not Bot1's to sacrifice ("a creature" from the
+# activator's own, CR 701.21a) and stays.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Ornithopter
+Way of the Deathbringer
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Dryad Arbor
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Deathbringer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Dryad Arbor.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace Token.Activate(Ability: sacrifice)
+Bot1.Pass
+! Bot1.Choose(Dryad Arbor)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 3
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Beast Token.Token = true
+Bot1.Battlefield.Beast Token.Power = 4
+Bot1.Battlefield.Beast Token.Toughness = 4
+Bot1.Battlefield.Beast Token.Colors = Green
+Bot1.Battlefield.Beast Token.Keywords = Trample
+Bot2.Battlefield.Dryad Arbor.Types = Land; Creature
