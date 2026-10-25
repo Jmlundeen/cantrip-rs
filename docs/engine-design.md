@@ -1470,6 +1470,11 @@ of Defiance's "you may cast that card") announces the cost as it is cast (CR 601
 `Label::ManaCost`, each of the card's own ways open from where it is (`Label::Way`: evoke from exile; flashback from its
 owner's graveyard only, CR 702.34a) and each `Label::AlternativeCost` that applies. The battlefield is searched for these once
 per offer, and only once something could be cast.
+The caster is the resolving effect's controller unless the effect names another player (`CastTerms::caster`, CR 608.2g:
+Spell Queller's "the exiled card's owner may cast that card", Knowledge Pool's "that player", Allure of the Unknown's "that
+opponent"). Whether that player could cast it is asked for them (`could_cast_during_resolution_by`,
+`cast_ways_during_resolution_by`: their targets, their "you", what keeps them from casting), the "may" is asked of them, and
+they announce the spell, choose its face, modes, targets and costs, pay them and control it (CR 601.2, 405.4).
 
 ### Hexproof from a quality
 

@@ -2281,7 +2281,12 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn could_cast_during_resolution(&mut self, card: ObjectId) -> bool {
-        actions::could_cast_during_resolution(self, card)
+        let Some(player) = self.resolving().map(|i| i.controller) else { return false };
+        actions::could_cast_during_resolution(self, card, player)
+    }
+
+    fn could_cast_during_resolution_by(&mut self, card: ObjectId, player: PlayerId) -> bool {
+        actions::could_cast_during_resolution(self, card, player)
     }
 
     fn could_play_land_during_resolution(&self, card: ObjectId) -> bool {
@@ -2297,7 +2302,12 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn cast_ways_during_resolution(&mut self, card: ObjectId) -> Vec<CastWay> {
-        actions::cast_ways_during_resolution(self, card)
+        let Some(player) = self.resolving().map(|i| i.controller) else { return Vec::new() };
+        actions::cast_ways_during_resolution(self, card, player)
+    }
+
+    fn cast_ways_during_resolution_by(&mut self, card: ObjectId, player: PlayerId) -> Vec<CastWay> {
+        actions::cast_ways_during_resolution(self, card, player)
     }
 
     fn cast_during_resolution_as(&mut self, card: ObjectId, terms: CastTerms) -> Result<bool, Suspend> {

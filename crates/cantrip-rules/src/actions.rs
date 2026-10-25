@@ -6437,7 +6437,7 @@ fn cast(
     by: CastBy,
     resolving: bool,
 ) -> R<()> {
-    let CastTerms { instead, any_type, exile_instead, flashback, life, more, less, copy: _, way: _ } = terms;
+    let CastTerms { instead, any_type, exile_instead, flashback, life, more, less, copy: _, way: _, caster: _ } = terms;
     // CR 406.3a: a card exiled face down is turned face up just before it is announced.
     ops::turn_up_to_play(cx, card);
     let printed = cx.s().obj(card).card;
@@ -7043,22 +7043,22 @@ fn cast(
     Ok(())
 }
 
-/// Whether the resolving effect's controller could cast `card` now (CR 608.2g): it is not a land and every target it
-/// needs has a legal choice.
-pub fn could_cast_during_resolution(cx: &mut Cx, card: ObjectId) -> bool {
-    !cast_ways_during_resolution(cx, card).is_empty()
+/// Whether `player` could cast `card` now as the resolving effect has them (CR 608.2g): it is not a land and every target
+/// it needs has a legal choice for them. `player` is the effect's controller, or the player it names
+/// (`CastTerms::caster`).
+pub fn could_cast_during_resolution(cx: &mut Cx, card: ObjectId, player: PlayerId) -> bool {
+    !cast_ways_during_resolution(cx, card, player).is_empty()
 }
 
-/// Each way the resolving effect's controller could cast `card` now (CR 608.2g), each face judged alone (CR 709.3a, 715.3a,
+/// Each way `player` (the resolving effect's controller, or the player it names: `CastTerms::caster`) could cast `card` now (CR 608.2g), each face judged alone (CR 709.3a, 715.3a,
 /// 712.8a): the card itself unless it is a land or a split card (whose halves are what is cast, CR 709.3), a split card's two
 /// halves (an aftermath half only from a graveyard, CR 702.127a), an Adventurer's Adventure, an omen card's Omen (CR 720.3a),
 /// and a modal double-faced card's
 /// back face. A fused cast (CR 702.102a: a fuse split card cast from its owner's hand, both halves at once, its mana value the
 /// sum of theirs, CR 702.102c, 709.4b) is a way too, from a hand only: the ruling has a fuse card cast from a hand without
 /// paying its mana cost cast fused.
-pub fn cast_ways_during_resolution(cx: &mut Cx, card: ObjectId) -> Vec<CastWay> {
-    let ways = cast_ways_where_it_is(cx, card);
-    let Some(player) = cx.resolving().map(|i| i.controller) else { return ways };
+pub fn cast_ways_during_resolution(cx: &mut Cx, card: ObjectId, player: PlayerId) -> Vec<CastWay> {
+    let ways = cast_ways_where_it_is(cx, card, player);
     let mut kept = Vec::with_capacity(ways.len());
     for way in ways {
         if targets_as_cast(cx, card, way.way, player) {
@@ -7086,9 +7086,8 @@ fn targets_as_cast(cx: &mut Cx, card: ObjectId, way: u8, player: PlayerId) -> bo
 }
 
 /// `cast_ways_during_resolution` judged where the card is (`layers::can_target`).
-fn cast_ways_where_it_is(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
-    let Some(resolving) = cx.resolving() else { return Vec::new() };
-    let (player, serial) = (resolving.controller, resolving.serial);
+fn cast_ways_where_it_is(cx: &Cx, card: ObjectId, player: PlayerId) -> Vec<CastWay> {
+    let Some(serial) = cx.resolving().map(|i| i.serial) else { return Vec::new() };
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
         return Vec::new();
@@ -7191,10 +7190,12 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
     Ok(land)
 }
 
-/// Casts `card` as an effect resolves (CR 608.2g). A cast given up (CR 733.1) is undone, and nothing happens.
+/// Casts `card` as an effect resolves (CR 608.2g), by the player the terms name (`CastTerms::caster`) or else the effect's
+/// controller: they announce it, make its choices, pay its costs (CR 601.2) and control it (CR 405.4). A cast given up
+/// (CR 733.1) is undone, and nothing happens.
 pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> R<bool> {
-    let ways = cast_ways_during_resolution(cx, card);
-    let Some(player) = cx.resolving().map(|i| i.controller) else { return Ok(false) };
+    let Some(player) = terms.caster.or_else(|| cx.resolving().map(|i| i.controller)) else { return Ok(false) };
+    let ways = cast_ways_during_resolution(cx, card, player);
     // CR 709.3, 715.3, 712.8a: which face is cast is chosen as it is cast, before it goes on the stack.
     let mut way = match (terms.way, ways.len()) {
         (_, 0) => return Ok(false),

@@ -70,6 +70,13 @@ pub struct CastTerms {
     /// can be cast as a half, its Adventure or Omen, or its back face. Left out, a card with one way is cast that way and one with
     /// several asks its caster which, as they choose it as they cast it.
     pub way: Option<u8>,
+    /// The player who casts it (CR 608.2g, 601.2), where the effect names one other than its controller: "the exiled card's
+    /// owner may cast that card" (Spell Queller), "that player may cast" (Knowledge Pool, Eye of the Storm), "that opponent
+    /// may cast" (Allure of the Unknown). They announce it, choose its modes, targets and costs, pay them and control the
+    /// spell; its face is asked of them, and what keeps them from casting it is judged for them. Left out, the resolving
+    /// effect's controller casts it. Whether they may is judged by `could_cast_during_resolution_by` and
+    /// `cast_ways_during_resolution_by` with the same player.
+    pub caster: Option<PlayerId>,
 }
 
 /// One way a card could be cast as an effect resolves (CR 608.2g): the card as itself, one half of a split card (CR 709.3),
@@ -1025,6 +1032,9 @@ pub trait Game: Query {
     /// is: it is not a land and has a legal target for every target it needs. The mana is not asked: a player who
     /// finds they cannot pay gives the cast up (CR 733.1).
     fn could_cast_during_resolution(&mut self, card: ObjectId) -> bool;
+    /// `could_cast_during_resolution` for `player`, who the effect has cast it (`CastTerms::caster`; CR 608.2g): judged for
+    /// them - their targets, what keeps them from casting spells - rather than for the effect's controller.
+    fn could_cast_during_resolution_by(&mut self, card: ObjectId, player: PlayerId) -> bool;
     /// Whether the resolving effect's controller could play `card` as a land now (CR 305.1, 608.2g): it is their own turn
     /// (CR 305.3) and they have a land play left (CR 305.2); the phase and the stack do not matter.
     fn could_play_land_during_resolution(&self, card: ObjectId) -> bool;
@@ -1050,6 +1060,8 @@ pub trait Game: Query {
     /// mana value the sum of both halves, CR 702.102c) is a way too: a limit on mana value is judged against that sum. Empty
     /// when `could_cast_during_resolution` is false.
     fn cast_ways_during_resolution(&mut self, card: ObjectId) -> Vec<CastWay>;
+    /// `cast_ways_during_resolution` for `player`, who the effect has cast it (`CastTerms::caster`; CR 608.2g).
+    fn cast_ways_during_resolution_by(&mut self, card: ObjectId, player: PlayerId) -> Vec<CastWay>;
     /// `player` may play or cast `card` from where it is (CR 601.3, 305.1) under `grant`: a card in exile or a
     /// graveyard, a new object after a move (CR 400.7), so the permission is for this object only.
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant);
