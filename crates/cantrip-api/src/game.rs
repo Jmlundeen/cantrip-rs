@@ -953,6 +953,10 @@ pub trait Game: Query {
     /// came off, for "for each counter removed this way" (Hex Parasite). Heartless Act, Hex Parasite, Price of Betrayal.
     fn remove_counters_up_to(&mut self, player: PlayerId, source: ObjectId, object: ObjectId, maximum: u8) -> Result<u16, Suspend>;
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration);
+    /// `add_effect`, controlled by `controller`, the player who controls the resolving spell or ability, rather than whoever
+    /// controls `source` now: for an effect whose meaning names its controller (a goad's "a player other than the controller
+    /// of the ... ability that caused it to be goaded", CR 701.15b) once the source has changed hands or left.
+    fn add_effect_by(&mut self, controller: PlayerId, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration);
     /// An effect about `controller` and not an object (`EffectKind::outlives_affected`), for the player who controls the
     /// resolving ability or spell (CR 109.5: "you") even if its source has since changed hands or left.
     fn add_player_effect(&mut self, controller: PlayerId, source: ObjectId, kind: EffectKind, duration: Duration);
