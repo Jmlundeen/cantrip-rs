@@ -595,6 +595,19 @@ pub fn card_in_an_opponents_graveyard(q: &dyn Query, asker: &Asker, t: Target) -
 /// "Target card from an opponent's graveyard": see `card_in_an_opponents_graveyard`.
 pub const CARD_IN_AN_OPPONENTS_GRAVEYARD: TargetSpec = target(card_in_an_opponents_graveyard);
 
+/// "Target card from defending player's graveyard" (CR 115.1, 508.5): any card in the graveyard of the defending player of
+/// the ability's source - the player it attacks, or, once it has left combat, the one it was attacking
+/// (`Query::defending_player`) - still that card (CR 400.7). Hive of the Eye Tyrant and Graven Abomination print it.
+pub fn card_in_defending_players_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if {
+        let o = q.obj(id);
+        o.zone.is(ZoneKind::Graveyard) && o.became.is_none() && q.defending_player(asker.source) == Some(o.zone.player)
+    })
+}
+
+/// "Target card from defending player's graveyard": see `card_in_defending_players_graveyard`.
+pub const CARD_IN_DEFENDING_PLAYERS_GRAVEYARD: TargetSpec = target(card_in_defending_players_graveyard);
+
 fn instant_or_sorcery_spell_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     spell_filter(q, asker, t) && matches!(t, Target::Object(id) if { let c = q.chars(id); c.is(CardType::Instant) || c.is(CardType::Sorcery) })
 }
