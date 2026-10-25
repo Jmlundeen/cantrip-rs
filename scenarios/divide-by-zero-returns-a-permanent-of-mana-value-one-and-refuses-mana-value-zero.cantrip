@@ -1,0 +1,48 @@
+# Divide by Zero (Black Lotus pays {2}{U}) on turn 3: its target needs mana value 1 or greater (CR 202.3). Bot2's Mox Pearl
+# (mana value 0) is refused, its Sol Ring (exactly 1) is returned to Bot2's hand. Learn (CR 701.48a) then lets Bot1 discard
+# the spare Island to draw, so the Lesson in the sideboard stays outside the game. Bot1's own Mox Sapphire (0) is refused
+# too, so the limit reads both sides' permanents.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Divide by Zero
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot1 Sideboard]
+Firebending Lesson
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Sol Ring
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+! Bot1.Hand.Divide by Zero.Cast(Bot2.Battlefield.Mox Pearl)
+! Bot1.Hand.Divide by Zero.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Hand.Divide by Zero.Cast(Bot2.Battlefield.Sol Ring)
+Bot1.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Sideboard = Firebending Lesson
+Bot1.Graveyard = Divide by Zero; Island; Black Lotus
+Bot2.Hand.Sol Ring.Colors.Count = 0
+Bot2.Hand.Count = 6
+Bot2.Battlefield.Mox Pearl.Tapped = false
+Bot2.Battlefield.Count = 2

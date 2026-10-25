@@ -1,0 +1,42 @@
+# Divide by Zero targets a spell "with mana value 1 or greater" (CR 115.1); a spell's mana value counts X as the value
+# chosen for it (CR 202.3e). Bot2's Walking Ballista cast with X = 0 has mana value 0 on the stack and is refused; with
+# X = 1 it is a creature spell of mana value 1, so it is returned to Bot2's hand (Bot1 declines both halves of Learn).
+# The X = 0 Ballista enters with no counters and dies.
+
+[Bot1 Deck]
+Black Lotus
+Divide by Zero
+Island x15
+
+[Bot1 Sideboard]
+Firebending Lesson
+
+[Bot2 Deck]
+Island
+Black Lotus
+Walking Ballista
+Walking Ballista
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Walking Ballista.Cast(X: 0)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+! Bot1.Hand.Divide by Zero.Cast(Stack.Walking Ballista)
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Hand.Divide by Zero.Cast(Stack.Walking Ballista)
+Bot1.Pass
+Bot1.Choose()
+Bot1.Choose()
+[T3 Bot1.Upkeep]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Black Lotus; Walking Ballista
+Bot2.Hand.Walking Ballista.Colors.Count = 0
+Bot2.Battlefield = Island
+Bot1.Graveyard = Divide by Zero; Black Lotus
