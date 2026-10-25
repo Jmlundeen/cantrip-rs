@@ -1966,6 +1966,21 @@ yet; restricted mana is told apart by its restriction alone, since no card yet t
 (`cantrip-bench --games 128`, "engine answering", 2026-10-17, main 13a3944f against the branch, three back-to-back pairs):
 9.82/9.93, 9.53/9.92, 9.81/10.06 us, about 2.5% for keeping every unit's source and recording each payment.
 
+### Creatures that convoked a spell
+
+A creature tapped to pay for mana in a spell's total cost convoked it (CR 702.51a, 702.51c). `actions::pay_mana_used` records
+`Event::Convoked { creature, spell }` as it taps one for convoke, right after its `Tapped`, so a spell's come before its
+`Cast`; a creature tapped for mana or for improvise while paying convoked nothing. It is recorded only, and costs nothing
+where nothing convokes. "Creatures that convoked it" asks `History::convoked(object)`: the creatures, in the order they were
+tapped, of the spell `object` is, or of the spell a permanent was (its move from the stack, CR 608.3), counted whether or not
+they are still on the battlefield (Knight-Errant of Eos's ruling) and read through `chars` as they are now or as they last
+existed (CR 608.2h) - the record copies nothing out of them. A copy of a spell was not cast, but an effect of it that refers
+to the objects used to pay its costs uses the original's (CR 707.10, as Fling's example has it): a copy, a copy of a copy and
+the token a copy of a permanent spell becomes (CR 707.10f, whose move from the stack names the copy) read the original's
+creatures. Venerated Loxodon, Zephyr Singer, Knight-Errant of Eos, Ancient Imperiosaur, Lethal Scheme and Everything Comes
+to Dust print it; `cantrip-rules/src/convoked_tests.rs` proves it over test cards. The benchmark (`cantrip-bench --games 128`,
+"engine answering", 2026-10-24) measured 14.70, 14.82, 14.86 us before and 15.29, 14.32, 14.29 us after: within the noise.
+
 ### Spells in an inset frame: Adventures and Omens
 
 An adventurer card (CR 715) and an omen card (CR 720) print a second set of characteristics in an inset frame:

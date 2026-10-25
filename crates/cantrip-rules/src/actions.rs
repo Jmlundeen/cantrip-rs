@@ -9982,6 +9982,8 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
                     ops::tap(cx, id);
                     if action.index == PAY_CONVOKE {
                         convoking.push(colors);
+                        // CR 702.51c: it convoked the spell, for "creatures that convoked it" to ask the history.
+                        cx.record(Event::Convoked { creature: id, spell: source });
                     } else {
                         generic_paid += 1;
                         if action.index == PAY_WATERBEND {

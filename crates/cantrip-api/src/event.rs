@@ -87,6 +87,12 @@ pub enum Event {
     /// payment is made, so a spell's come before its `Cast`: "using mana produced by [this]", "mana from a Treasure was spent
     /// to cast it" (`History::mana_spent_to_cast`). Only recorded.
     ManaSpent { player: PlayerId, source: ObjectId, on: ObjectId, cast: bool, mana: ManaTally },
+    /// `creature` convoked `spell` (CR 702.51c): it was tapped to pay for mana in the spell's total cost (CR 702.51a,
+    /// 601.2h) as the spell was cast. Recorded as it is tapped, right after its `Tapped`, so a spell's come before its
+    /// `Cast`; a tap for mana or for improvise is no convoke. It names the creature and copies nothing out of it: what it
+    /// is now, or was as it last existed, is its row (CR 608.2h). Only recorded: "creatures that convoked it" asks
+    /// `History::convoked`.
+    Convoked { creature: ObjectId, spell: ObjectId },
     /// A player became the monarch (CR 725.1, 725.4): it was not theirs before.
     BecameMonarch { player: PlayerId },
     /// A player took the initiative (CR 726.1), even one who had it (CR 726.5): what makes them venture into Undercity
@@ -339,6 +345,7 @@ impl Event {
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
+            Event::Convoked { creature, spell } => creature == object || spell == object,
             Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } | Event::Shuffled { .. } => false,
         }
     }
@@ -418,6 +425,8 @@ impl EventMask {
     pub const PHASED_OUT: EventMask = EventMask(1 << 56);
     /// An optional cost to attack was paid (CR 508.1g, 508.1j).
     pub const PAID_TO_ATTACK: EventMask = EventMask(1 << 57);
+    /// A creature convoked a spell (CR 702.51c): recorded only, for the history.
+    pub const CONVOKED: EventMask = EventMask(1 << 58);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -440,6 +449,7 @@ impl EventMask {
             Event::DungeonCompleted { .. } => EventMask::DUNGEON_COMPLETED,
             Event::GameLost { .. } | Event::GameDrawn { .. } => EventMask::GAME_OVER,
             Event::ManaSpent { .. } => EventMask::MANA_SPENT,
+            Event::Convoked { .. } => EventMask::CONVOKED,
             Event::Shown { .. } => EventMask::SHOWN,
             Event::Shuffled { .. } => EventMask::SHUFFLED,
             Event::Randomized { .. } => EventMask::RANDOMIZED,
