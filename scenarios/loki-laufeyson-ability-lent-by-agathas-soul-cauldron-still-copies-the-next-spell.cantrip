@@ -1,0 +1,61 @@
+# Agatha's Soul Cauldron lends Loki Laufeyson's activated abilities (CR 613.1f) to a creature with a +1/+1 counter. Faithless Looting
+# discards Loki on turn 3, the Cauldron exiles it and counters Ornithopter, and Ornithopter ({1}, {T}: "When you next cast an instant or
+# sorcery spell with mana value less than or equal to Loki's power this turn, copy that spell") sets up Loki's delayed ability, which
+# belongs to Loki's card, not to the Ornithopter that has the ability (CR 113.6). Lightning Bolt (mana value 1, Loki's power 2) at Bot2
+# is copied, the copy kept on Bot2: Bot2 takes 3 + 3.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Agatha's Soul Cauldron
+Faithless Looting
+Loki Laufeyson
+Lightning Bolt
+Mountain x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Loki Laufeyson; Mountain)
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot1.Graveyard.Loki Laufeyson)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Ornithopter.Activate(Ability: When you next)
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Delayed.Count = 0
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

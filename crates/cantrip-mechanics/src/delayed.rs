@@ -3,16 +3,17 @@
 
 use cantrip_api::*;
 
-/// The card whose `delayed` list the resolving object's delayed ability is in: the card it copies, if it is a copy (CR 707.2),
-/// else its own.
-fn ability_card(g: &dyn Game, item: &StackItem) -> CardId {
-    let o = g.obj(item.object);
-    o.copied_card().unwrap_or(o.card)
+/// The card whose `delayed` list the resolving ability's delayed ability is in: the card the ability being resolved belongs to
+/// (`item.ability`). That is the source's card for its own ability, the card it copies for a copy (CR 707.2), and the card that
+/// granted it for an ability the source has been given (CR 113.6, 613.1f: Agatha's Soul Cauldron lending an exiled creature's
+/// ability, Way of the Cryomancer's planeswalkers), whatever the source is.
+fn ability_card(_: &dyn Game, item: &StackItem) -> CardId {
+    item.ability.card
 }
 
 /// Sets up the card's delayed ability number `ability` (an index into its `delayed` list) to trigger at the beginning of
 /// the next end step (CR 603.7), about `subject`, controlled by the resolving ability's controller. Sneak Attack, Through
-/// the Breach, Flickerwisp and Daretti, Scrap Savant's emblem use it. The ability is the card's as the source has it now:
+/// the Breach, Flickerwisp and Daretti, Scrap Savant's emblem use it. The ability is the resolving ability's card:
 /// the card it copies, for a copy (Phantasmal Image as Flickerwisp, CR 707.2).
 pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject: Target) {
     let this = ability_card(g, item);
@@ -30,8 +31,8 @@ pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject
 /// ability's `matches` is asked of: the spell for "whenever a creature you control dies this turn", the creature it
 /// is about for "when it dies this turn". A `matches` that says "you" is written `when_asked`: the ability's controller it
 /// is told is this resolving ability's controller (CR 603.7d-e), whoever controls `source` later. Forth Eorlingas!, Glimpse of Nature, Rite of Harmony, Showdown of the Skalds,
-/// Thunder of Unity, Warhost's Frenzy, Okoye and Turn Inside Out use it. The ability is the card's as the resolving object has
-/// it now, the card it copies for a copy.
+/// Thunder of Unity, Warhost's Frenzy, Okoye and Turn Inside Out use it. The ability is the card's as the resolving ability has
+/// it, the card it copies for a copy.
 pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
     let this = ability_card(g, item);
     g.delayed_trigger(DelayedWhen::ThisTurn, source, item.controller, AbilityRef::delayed(this, 0), Target::None);
@@ -40,8 +41,8 @@ pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
 /// Sets up the card's delayed ability number `ability` to trigger "when you next [event] this turn" (CR 603.7b): once, the
 /// first time its `listens`/`matches` accept an event this turn, controlled by the resolving ability's controller; it ends
 /// with the turn if it never does. `source` is the object its `matches` is asked of, as for `this_turn`. Each call is a
-/// separate ability, so two activations both trigger on the same next event. The ability is the card as the source has it
-/// now, or the card it copies. Loki Laufeyson uses it; Doublecast, Teach by Example and Galvanic Iteration print it.
+/// separate ability, so two activations both trigger on the same next event. The ability is the resolving ability's card
+/// (the card it copies, for a copy). Loki Laufeyson uses it; Doublecast, Teach by Example and Galvanic Iteration print it.
 pub fn next_this_turn(g: &mut dyn Game, item: &StackItem, ability: u8, source: ObjectId) {
     let card = ability_card(g, item);
     g.delayed_trigger(DelayedWhen::NextThisTurn, source, item.controller, AbilityRef::delayed(card, ability), Target::None);
@@ -63,7 +64,7 @@ pub fn at_your_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: 
 
 /// Sets up the card's delayed ability number `ability` to trigger at the beginning of the next end step (CR 603.7), carrying
 /// the objects `created` (CR 603.7c) to the moment it triggers, where `event_objects` of its stack item gives them back.
-/// The ability is the card as the source has it now, or the card it copies. Mobilize's Warriors and Dalkovan Encampment's
+/// The ability is the card as the resolving ability has it: its card, or the card it copies or was granted by. Mobilize's Warriors and Dalkovan Encampment's
 /// use it with `sacrifice_created`.
 pub fn at_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: u8, created: &[ObjectId]) {
     let card = ability_card(g, item);
