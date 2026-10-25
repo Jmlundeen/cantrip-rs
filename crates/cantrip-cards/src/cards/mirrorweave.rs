@@ -2,14 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// "Target nonlegendary creature" (CR 115.1, 205.4a): a creature on the battlefield without the legendary supertype now.
-fn nonlegendary_creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if targets::permanent(q, id) && {
-        let c = q.chars(id);
-        c.is(CardType::Creature) && !c.supertypes.legendary
-    })
-}
-
 /// "Each other creature becomes a copy of target nonlegendary creature until end of turn." The target's copiable values as
 /// the spell resolves (CR 707.2: its printed values or what it is copying, never counters, an animation or other effects;
 /// the rulings), applied to every creature on the battlefield then but the target (CR 611.2c: one that becomes a creature or
@@ -31,6 +23,6 @@ fn each_other_creature_becomes_a_copy(g: &mut dyn Game, item: &StackItem) -> Res
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(nonlegendary_creature)], each_other_creature_becomes_a_copy),
+    spell: spell(&[targets::NONLEGENDARY_CREATURE], each_other_creature_becomes_a_copy),
     ..oracle::MIRRORWEAVE
 };
