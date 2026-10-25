@@ -1338,6 +1338,17 @@ permanent with such a rule forbids it (`castable`, the casts an effect makes as 
 complete (CR 601.2a-d) the spell on the stack is judged again, its X announced, and a cast no longer allowed is taken back
 (CR 601.6). The battlefield is searched for these only when something could be cast.
 
+A static ability that forbids some land plays ("your opponents can't play land cards from graveyards", Tomik, Distinguished
+Advokist; "you can't play lands", Aggressive Mining; "players can't play nonbasic lands with the same name as a nontoken
+permanent", Cornered Market) is `CardDef::land_play_rules` (`LandPlayRule`, CR 101.2, 305.1): asked of the player, the card
+where it is and the face it would be played as (the card, or a modal double-faced card's land back face, CR 712.12). It is
+asked of every land play whatever allows it - the rules from a hand, a rule for the graveyard or the library's top, a way a
+permanent gives, a permission an effect gave, an Adventure's exile - and of a land an effect plays as it resolves
+(`could_play_land_during_resolution`, CR 608.2g), and it overrules each (CR 101.2). A land put onto the battlefield by an effect
+is not played, so it is not asked (that is `enter_rules`). One look at the battlefield finds these and the enter rules together
+(`static_rules::land_play_bans`), made only once the player has a land play left; a permanent that lost its abilities has none
+(CR 613.1f). An effect that says a player can't play lands (Solfatara) is not built: no card in content has one.
+
 A special action with a cost (CR 116.2: plotting, suspending, foretelling, turning a face-down permanent up, unlocking a
 door) is costed as `Costed::SpecialAction`: it is no activated ability (CR 116.1), so what changes the cost of activating
 abilities (Forensic Gadgeteer, Anointed Peacekeeper) leaves it alone, and only a change that names it applies - Doc Aurlock,

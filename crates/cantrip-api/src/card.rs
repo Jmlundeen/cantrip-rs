@@ -2356,6 +2356,17 @@ pub type CounterBan = fn(&dyn Query, &Asker, ObjectId, PlayerId, CounterKind) ->
 /// cards in graveyards and libraries ..." (Weathered Runestone).
 pub type EnterRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// A static ability that says some lands can't be played (CR 101.2, 305.1, 116.2a): whether `player` may play `land`, a card
+/// where it is now, as `face` - the card itself, or the land back face of a modal double-faced card (CR 712.12) - false
+/// forbidding it. It is asked of every land play whatever allows it: from a hand by the rules, from a graveyard, a
+/// library's top or exile by a permission or a way a permanent gives, and a land an effect has its controller play as it
+/// resolves (CR 305.1, 608.2g). A restriction takes precedence over any permission to play (CR 101.2). It says nothing of a
+/// land put onto the battlefield by an effect, which is not played (`EnterRule` is for that). "Your opponents can't play
+/// land cards from graveyards" (Tomik, Distinguished Advokist) reads the player and the zone; "you can't play lands"
+/// (Aggressive Mining) the player alone; "players can't play nonbasic lands with the same name as a nontoken permanent"
+/// (Cornered Market) the face.
+pub type LandPlayRule = fn(&dyn Query, &Asker, PlayerId, ObjectId, CardId) -> bool;
+
 /// The counters a player may get (CR 122.1), for `PlayerCounterBan`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum PlayerCounter {
@@ -2899,6 +2910,9 @@ pub struct CardDef {
     /// battlefield with its abilities: Grafdigger's Cage's "creature cards in graveyards and libraries can't enter the
     /// battlefield".
     pub enter_rules: &'static [EnterRule],
+    /// Its static abilities that keep some lands from being played (CR 101.2, 305.1), while it is on the battlefield with its
+    /// abilities: Tomik, Distinguished Advokist's "your opponents can't play land cards from graveyards". See `LandPlayRule`.
+    pub land_play_rules: &'static [LandPlayRule],
     /// Its static abilities that keep players from getting counters (CR 122.1, 101.2), while it is on the battlefield with
     /// its abilities: Melira's "you can't get poison counters", Solemnity's "players can't get counters".
     pub player_counter_bans: &'static [PlayerCounterBan],
@@ -3102,6 +3116,7 @@ impl CardDef {
         infect_damage_to: &[],
         counter_bans: &[],
         enter_rules: &[],
+        land_play_rules: &[],
         player_counter_bans: &[],
         cost_bans: &[],
         sacrifice_bans: &[],
@@ -3192,6 +3207,7 @@ impl CardDef {
             (!self.infect_damage_to.is_empty(), "an infect damage rule"),
             (!self.counter_bans.is_empty(), "counter bans"),
             (!self.enter_rules.is_empty(), "enter rules"),
+            (!self.land_play_rules.is_empty(), "land play rules"),
             (!self.player_counter_bans.is_empty(), "player counter bans"),
             (!self.cost_bans.is_empty(), "cost bans"),
             (!self.sacrifice_bans.is_empty(), "sacrifice bans"),

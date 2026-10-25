@@ -100,6 +100,23 @@ pub fn enter_banned(q: &dyn Query, bans: &[(ObjectId, PlayerId, &'static CardDef
         && bans.iter().any(|&(id, controller, def)| def.enter_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller, by: None, spell: false }, card)))
 }
 
+/// The permanents on the battlefield with a static ability that keeps some land plays from being made: one that keeps cards
+/// from entering the battlefield from where they are (`CardDef::enter_rules`, as playing a land puts it there, CR 305.1) or
+/// one that forbids playing some lands (`CardDef::land_play_rules`, CR 101.2), with their controllers. One look at the
+/// battlefield for both, made only where a land could be played; empty, so unallocated, in nearly every game.
+pub fn land_play_bans(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> {
+    sources(cx, |d| !d.enter_rules.is_empty() || !d.land_play_rules.is_empty()).collect()
+}
+
+/// Whether one of `bans` (`land_play_bans`) forbids `player` to play `land`, where it is now, as `face` (`LandPlayRule`, CR
+/// 101.2, 305.1, 712.12). A restriction takes precedence over whatever allows the play (CR 101.2). Whether the land could
+/// enter the battlefield from there is `enter_banned`'s, over the same list.
+pub fn land_play_forbidden(q: &dyn Query, bans: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, land: ObjectId, face: CardId) -> bool {
+    bans.iter().any(|&(id, controller, def)| {
+        def.land_play_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller, by: None, spell: false }, player, land, face))
+    })
+}
+
 /// Whether a static ability of a permanent on the battlefield keeps `card` from being put onto the battlefield from where it
 /// is now (`enter_banned`, CR 101.2).
 pub fn cant_enter(cx: &Cx, card: ObjectId) -> bool {

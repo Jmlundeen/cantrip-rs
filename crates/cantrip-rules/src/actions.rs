@@ -5155,8 +5155,10 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
         return;
     }
     // Playing a land puts it onto the battlefield (CR 305.1): one a static ability keeps from entering from where it is
-    // can't be played (CR 101.2), judged as the card it is there - a modal double-faced card by its front face.
-    let bans = crate::static_rules::enter_bans(cx);
+    // can't be played (CR 101.2), judged as the card it is there - a modal double-faced card by its front face. And a static
+    // ability may forbid the play itself, whatever allows it (CR 101.2, `LandPlayRule`). One look at the battlefield finds both.
+    let bans = crate::static_rules::land_play_bans(cx);
+    let forbidden = |id: ObjectId, face: CardId| !bans.is_empty() && crate::static_rules::land_play_forbidden(cx, &bans, player, id, face);
     // A land card is played as itself; a modal double-faced card whose back face is a land may be played as that
     // (CR 712.12), from wherever a land could be played.
     let offer = |id: ObjectId, by: Option<Grant>, options: &mut Vec<ActionOption>| {
@@ -5165,10 +5167,14 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
         }
         // A card exiled face down is judged as the land it would be (CR 406.3a).
         let _face_up = layers::judged_face_up(cx.s(), id);
-        if cx.chars(id).is(CardType::Land) {
+        let card = cx.s().obj(id).card;
+        if cx.chars(id).is(CardType::Land) && !forbidden(id, card) {
             options.push(ActionOption { granted_by: by, ..ActionOption::on(ActionKind::PlayLand, id, 0) });
         }
-        if cx.card(cx.s().obj(id).card).back_land {
+        if let Some(back) = cx.card(card).back
+            && cx.card(card).back_land
+            && !forbidden(id, cx.card_id(back))
+        {
             options.push(ActionOption { granted_by: by, ..ActionOption::on(ActionKind::PlayLand, id, WAY_BACK_FACE) });
         }
     };
@@ -5214,7 +5220,7 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     // their turns, say. Looked for only when the graveyard holds a land card.
     let mut granted: Option<Vec<Given<GrantedWay>>> = None;
     for &id in cx.s().zone(Zone::graveyard(player)) {
-        if !cx.chars(id).is(CardType::Land) || (!bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id)) {
+        if !cx.chars(id).is(CardType::Land) || (!bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id)) || forbidden(id, cx.s().obj(id).card) {
             continue;
         }
         for way in granted.get_or_insert_with(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)).iter() {
@@ -7553,8 +7559,13 @@ pub fn could_play_land_during_resolution(cx: &Cx, card: ObjectId) -> bool {
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) || cx.s().turn.active != player {
         return false;
     }
-    // One a static ability keeps from entering can't be played (CR 305.1, 101.2).
-    if !cx.card(obj.card).is(CardType::Land) || cx.s().player(player).lost || crate::static_rules::cant_enter(cx, card) {
+    // One a static ability keeps from entering can't be played (CR 305.1, 101.2), nor one a static ability forbids to be
+    // played (`LandPlayRule`): the effect is a permission to play it, and a restriction takes precedence (CR 101.2).
+    if !cx.card(obj.card).is(CardType::Land) || cx.s().player(player).lost {
+        return false;
+    }
+    let bans = crate::static_rules::land_play_bans(cx);
+    if !bans.is_empty() && (crate::static_rules::enter_banned(cx, &bans, card) || crate::static_rules::land_play_forbidden(cx, &bans, player, card, obj.card)) {
         return false;
     }
     let LandRules { extra, unlimited, .. } = land_rules(cx, player);
