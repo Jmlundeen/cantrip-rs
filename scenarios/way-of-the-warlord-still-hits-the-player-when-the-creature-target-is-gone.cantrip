@@ -1,0 +1,66 @@
+# Bot2 responds to the -4 by killing its own Woodland Changeling (the creature target) with Lightning Bolt: the ability still resolves
+# for the target still legal (CR 608.2b), so Bot2 is dealt 2 (20 -> 18) while nothing else is dealt damage by it. Bot1's Jace token goes to 1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Way of the Warlord
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Emerald
+Woodland Changeling
+Mox Ruby
+Lightning Bolt
+Island x2
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Warlord.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate(Ability: {U})
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace Token.Activate(Ability: 2 damage)
+Bot1.Target(Bot2.Battlefield.Woodland Changeling)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Woodland Changeling)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Woodland Changeling = (absent)
+Bot2.Graveyard.Count = 2
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 1
