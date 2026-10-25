@@ -1,0 +1,76 @@
+# Way of the Necromancer leaving in the same event as a creature Bot1 controls still sees it die (CR 603.10a, 603.6c:
+# a leaves-the-battlefield trigger looks back in time). Turn 1 Bot1 casts Karn, Scion of Urza (5 loyalty) off four Moxen
+# and an Ornithopter; turn 3 Way of the Necromancer empowers Jace 2. Turn 4 Bot2's Culling Ritual destroys every nonland
+# permanent of mana value 2 or less at once: the Moxen, the Ornithopter, the Way and the Jace token. The Way's trigger
+# for the Ornithopter puts one loyalty counter on Karn (mana value 4, the only planeswalker left): 5 to 6.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Plains
+Ornithopter
+Karn, Scion of Urza
+Way of the Necromancer
+Plains x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Swamp
+Forest
+Culling Ritual
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Way of the Necromancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Culling Ritual.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Colors(Black; Black; Black; Black; Black; Black; Black; Black; Black)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Karn, Scion of Urza
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 6

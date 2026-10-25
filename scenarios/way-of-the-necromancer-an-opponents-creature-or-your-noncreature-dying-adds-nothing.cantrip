@@ -1,0 +1,76 @@
+# Way of the Necromancer (turn 1, off Moxen): empower Jace 2 makes a Jace token with 2 loyalty. "Whenever a creature you control
+# dies" is narrow on both sides: on turn 2 Bot2 destroys Bot1's Mox Pearl with Vandalblast (a noncreature permanent Bot1 controls
+# dies), and on turn 3 Bot1's Flame Slash kills Bot2's Ornithopter (a creature Bot1 does not control dies). Neither adds a loyalty
+# counter: Bot1's Jace token stays at 2, and Bot2's own Jace token (Way of the Healer) stays at 5.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Way of the Necromancer
+Mountain
+Flame Slash
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Way of the Healer
+Vandalblast
+Ornithopter
+Mountain
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Way of the Necromancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Way of the Healer.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Vandalblast.Cast(Bot1.Battlefield.Mox Pearl)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Mox Pearl
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Flame Slash.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Way of the Necromancer; Mountain; Jace Token
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 2
+Bot2.Battlefield.Jace Token.Counters.Loyalty = 5
+Bot2.Graveyard = Ornithopter; Vandalblast
