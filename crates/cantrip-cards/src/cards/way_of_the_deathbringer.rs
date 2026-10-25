@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, empower, statics, tokens, triggers::THIS_ENTERS};
+use cantrip_mechanics::{effects, empower, select, statics, tokens, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "When Way of the Deathbringer enters, empower Jace 5."
@@ -12,10 +12,7 @@ fn empower_jace(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// creature that can't be sacrificed is not one to choose (CR 101.2), and the token is made only if one was sacrificed (CR 608.2c).
 fn sacrifice_for_beast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature) && g.can_sacrifice(you, id)).collect();
-    let chosen = choose::cards(g, you, item.object, Purpose::Sacrifice, creatures, 1, true)?;
-    if !chosen.is_empty() && !g.sacrifice(you, &chosen).is_empty() {
+    if !effects::may_sacrifice(g, you, item.object, select::creature_cards(select::up_to(1)))?.is_empty() {
         g.end_sentence();
         tokens::create(g, you, &tokens::BEAST_4_4_TRAMPLE, 1)?;
     }
