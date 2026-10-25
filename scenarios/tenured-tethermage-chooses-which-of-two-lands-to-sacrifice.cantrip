@@ -1,6 +1,6 @@
 # Tenured Tethermage with two lands: the trigger offers both and its controller picks the Mountain, so the Forest stays
 # on the battlefield (CR 701.21a), the Mountain reaches the graveyard and the two tapped Heartwood tokens are made. Only
-# a land may be sacrificed, and only one the controller has: Mox Ruby (a nonland) and Bot2's Island are refused.
+# a land may be sacrificed, and only one the controller has: Mox Ruby (a nonland) and Bot2's Island are refused, and so is the Forest with the Mountain (a land is one).
 
 [Bot1 Deck]
 Forest
@@ -31,6 +31,7 @@ Bot1.Hand.Tenured Tethermage.Cast
 Bot1.Pass
 ! Bot1.Choose(Mox Ruby)
 ! Bot1.Choose(Island)
+! Bot1.Choose(Forest; Mountain)
 Bot1.Choose(Mountain)
 [T3 Bot1.Main2]
 

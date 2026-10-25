@@ -1,0 +1,46 @@
+# Entrust the Spark with two planeswalkers: "a planeswalker" is one (CR 701.21a), so Ajani Resolute and Karn, Scion of Urza
+# together are refused, as is the Plains (not a planeswalker). Bot1 sacrifices Karn alone, Ajani Resolute stays, and the
+# search finds Ajani, Outland Chaperone, which enters with its three loyalty counters (CR 608.2c).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Black Lotus
+Black Lotus
+Ajani Resolute
+Karn, Scion of Urza
+Entrust the Spark
+Island
+Ajani, Outland Chaperone
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Karn, Scion of Urza.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Entrust the Spark.Cast
+! Bot1.Choose(Ajani Resolute; Karn, Scion of Urza)
+! Bot1.Choose(Plains)
+Bot1.Choose(Karn, Scion of Urza)
+Bot1.Search(Ajani, Outland Chaperone)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 2
+Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 3
+Bot1.Battlefield.Karn, Scion of Urza = (absent)
+Bot1.Graveyard = Entrust the Spark; Karn, Scion of Urza; Black Lotus; Black Lotus; Black Lotus

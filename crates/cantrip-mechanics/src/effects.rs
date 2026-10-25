@@ -319,6 +319,20 @@ pub fn may_discard_a_card(g: &mut dyn Game, item: &StackItem) -> Result<bool, Su
     Ok(!g.discard_together(&[card]).is_empty())
 }
 
+/// "You may sacrifice a [quality]" (CR 701.21a): the player chooses, as the effect resolves and not as a cost (CR 608.2d), up to
+/// what `rule` allows of their permanents, or none. The engine offers only what the player controls and can sacrifice (CR 101.2),
+/// and nothing is asked when none qualifies. Returns what was actually sacrificed, so "if you do" and "when you do" (CR 608.2c,
+/// 603.12) are a non-empty check. Tenured Tethermage (a land), Way of the Deathbringer and Grist, the Hunger Tide (a creature), Winter,
+/// Tormented Loner (a creature or planeswalker), Entrust the Spark (a planeswalker) and Witherbloom Charm (a permanent) print it.
+pub fn may_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection) -> Result<Vec<ObjectId>, Suspend> {
+    let permanents = g.permanents_of(player);
+    let chosen = crate::choose::select(g, player, source, Purpose::Sacrifice, permanents, rule)?;
+    if chosen.is_empty() {
+        return Ok(chosen);
+    }
+    Ok(g.sacrifice(player, &chosen))
+}
+
 /// "You may sacrifice an artifact or discard a card. If you do, draw `n` cards" (CR 608.2c-d, 701.9, 701.21). The player chooses
 /// as the effect resolves which of the two to do, or neither; an option with nothing to do it with (no artifact, an empty hand)
 /// is not offered, and nothing is asked with neither possible. The cards are drawn only if the sacrifice or the discard actually

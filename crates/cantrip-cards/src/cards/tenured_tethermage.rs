@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::{choose, select, tokens};
+use cantrip_mechanics::{effects, select, tokens};
 use cantrip_oracle as oracle;
 
 /// "When this creature enters, you may sacrifice a land. If you do, create two tapped Heartwood tokens." (CR 603.6a,
@@ -8,15 +8,9 @@ use cantrip_oracle as oracle;
 /// may be sacrificed. The two Heartwood tokens are created together, tapped, under the trigger's controller.
 fn may_trade_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let permanents = g.permanents_of(you);
-    if !permanents.iter().any(|&id| g.chars(id).is(CardType::Land)) {
-        return Ok(());
-    }
+    // "If you do": the tokens follow only a sacrifice that happened (CR 608.2c).
     let rule = Selection::new(select::up_to(1)).with(select::LAND).called("land");
-    // A land that can't be sacrificed is no choice (CR 101.2, 701.21a): with none other, nothing is asked. "If you do": the
-    // tokens follow only a sacrifice that happened (CR 608.2c).
-    let chosen = choose::select(g, you, item.object, Purpose::Sacrifice, permanents, rule)?;
-    if chosen.is_empty() || g.sacrifice(you, &chosen).is_empty() {
+    if effects::may_sacrifice(g, you, item.object, rule)?.is_empty() {
         return Ok(());
     }
     let heartwood = g.card_id(&tokens::HEARTWOOD);

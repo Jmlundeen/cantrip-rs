@@ -1,5 +1,6 @@
 # Sacrificing a planeswalker creates a separate reflexive trigger. Winter can leave in response; each opponent
-# still chooses a creature, while their artifacts cannot be chosen (CR 603.12, 701.21a, 101.4).
+# still chooses a creature, while their artifacts cannot be chosen (CR 603.12, 701.21a, 101.4). Karn and Winter together are
+# refused: "a creature or planeswalker" is one.
 [Bot1 Deck]
 Mox Jet
 Mox Pearl
@@ -43,6 +44,7 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Winter, Tormented Loner.Cast
 ! Bot1.Choose(Mox Pearl)
 ! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+! Bot1.Choose(Karn, Scion of Urza; Winter, Tormented Loner)
 Bot1.Choose(Karn, Scion of Urza)
 ? Stack.Count = 1
 ? Bot1.Battlefield.Winter, Tormented Loner.Power = 1

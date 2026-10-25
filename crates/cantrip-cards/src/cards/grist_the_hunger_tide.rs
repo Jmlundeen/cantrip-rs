@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::{effects, select};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
@@ -52,10 +52,9 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// whether or not Grist is still on the battlefield.
 fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    let chosen = choose::cards(g, player, item.object, Purpose::Sacrifice, creatures, 1, true)?;
-    let Some(&creature) = chosen.first() else { return Ok(()) };
-    g.sacrifice(player, &[creature]);
+    if effects::may_sacrifice(g, player, item.object, select::creature_cards(select::up_to(1)))?.is_empty() {
+        return Ok(());
+    }
     let me = g.card_id(&CARD);
     g.reflexive_trigger(item.object, player, AbilityRef::delayed(me, 0), Target::None);
     Ok(())

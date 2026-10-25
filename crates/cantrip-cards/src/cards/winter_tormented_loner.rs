@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, each_opponent_sacrifices, select, statics, triggers};
+use cantrip_mechanics::{each_opponent_sacrifices, effects, select, statics, triggers};
 use cantrip_oracle as oracle;
 
 /// "You may sacrifice a creature or planeswalker" (CR 701.21a): the chosen permanent must be one you control.
@@ -15,9 +15,7 @@ fn sacrifice_for_edict(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     let rule = Selection::new(select::up_to(1))
         .with(select::part(&(creature_or_planeswalker as SelectFn), 0, ""))
         .called("creature or planeswalker");
-    let yours = g.permanents_of(item.controller);
-    let chosen = choose::select(g, item.controller, item.object, Purpose::Sacrifice, yours, rule)?;
-    if !g.sacrifice(item.controller, &chosen).is_empty() {
+    if !effects::may_sacrifice(g, item.controller, item.object, rule)?.is_empty() {
         let this = g.card_id(&CARD);
         g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
     }

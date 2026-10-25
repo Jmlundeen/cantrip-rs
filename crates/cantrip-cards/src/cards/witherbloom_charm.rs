@@ -1,15 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, destroy_target, targets};
+use cantrip_mechanics::{destroy_target, effects, select, targets};
 use cantrip_oracle as oracle;
 
 /// "You may sacrifice a permanent. If you do, draw two cards." The permanent is chosen as the spell resolves (CR 608.2d)
 /// among those its controller controls; declining is an answer, and "if you do" is read off whether it really left.
 fn sacrifice_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let permanents = g.permanents_of(item.controller);
-    let Some(&permanent) = choose::cards(g, item.controller, item.object, Purpose::Sacrifice, permanents, 1, true)?.first() else {
-        return Ok(());
-    };
-    if !g.sacrifice(item.controller, &[permanent]).is_empty() {
+    if !effects::may_sacrifice(g, item.controller, item.object, Selection::new(select::up_to(1)))?.is_empty() {
         g.draw(item.controller, 2);
     }
     Ok(())

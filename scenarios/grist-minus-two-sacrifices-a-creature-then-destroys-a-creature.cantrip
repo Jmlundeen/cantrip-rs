@@ -1,11 +1,11 @@
 # Grist's −2: "You may sacrifice a creature. When you do, destroy target creature or planeswalker." Bot1 sacrifices
-# its own Llanowar Elves and the reflexive trigger destroys Bot2's.
+# its own Llanowar Elves (Elves and Ornithopter together are refused: "a creature" is one) and the reflexive trigger destroys Bot2's.
 
 [Bot1 Deck]
 Bayou x3
 Grist, the Hunger Tide
 Llanowar Elves
-Forest
+Ornithopter
 Forest x17
 
 [Bot2 Deck]
@@ -22,6 +22,7 @@ Bot2.Hand.Llanowar Elves.Cast
 Bot1.Hand.Bayou.Play
 Bot1.Battlefield.Bayou#1.Activate(Ability: Add {G})
 Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
 [T5 Bot1.Main1]
 Bot1.Hand.Bayou.Play
 Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
@@ -30,6 +31,7 @@ Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
 Bot1.Hand.Grist, the Hunger Tide.Cast
 [T5 Bot1.Main2]
 Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: sacrifice)
+! Bot1.Choose(Llanowar Elves; Ornithopter)
 Bot1.Choose(Llanowar Elves)
 Bot1.Target(Bot2.Battlefield.Llanowar Elves)
 [T5 Bot1.End]

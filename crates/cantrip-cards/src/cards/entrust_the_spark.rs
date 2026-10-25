@@ -1,10 +1,21 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose,library};
+use cantrip_mechanics::{effects, library, select};
 use cantrip_oracle as oracle;
-/// Optional sacrifice happens on resolution, before the conditional search (CR 608.2d, 701.21).
-fn effect(g:&mut dyn Game,i:&StackItem)->Result<(),Suspend>{
- let eligible=g.permanents_of(i.controller).into_iter().filter(|&id|g.chars(id).is(CardType::Planeswalker)).collect();
- let chosen=choose::cards(g,i.controller,i.object,Purpose::Sacrifice,eligible,1,true)?;
- if !chosen.is_empty(){g.sacrifice(i.controller,&chosen);library::search_to_battlefield(g,i.controller,i.object,library::Find::ONE,false,|q,id|q.chars(id).is(CardType::Planeswalker))?;}Ok(())
+
+/// "A planeswalker" (CR 701.21a): the chosen permanent must be a planeswalker.
+fn planeswalker(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |card| q.chars(card).is(CardType::Planeswalker))
 }
-pub static CARD:CardDef=CardDef{spell:spell(&[],effect),..oracle::ENTRUST_THE_SPARK};
+
+/// "You may sacrifice a planeswalker. If you do, search your library for a planeswalker card, put it onto the battlefield,
+/// then shuffle." The sacrifice is chosen as the spell resolves (CR 608.2d) and may be declined; the search follows only a
+/// sacrifice that happened (CR 608.2c).
+fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let rule = Selection::new(select::up_to(1)).with(select::part(&(planeswalker as SelectFn), 0, "")).called("planeswalker");
+    if !effects::may_sacrifice(g, item.controller, item.object, rule)?.is_empty() {
+        library::search_to_battlefield(g, item.controller, item.object, library::Find::ONE, false, |q, id| q.chars(id).is(CardType::Planeswalker))?;
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::ENTRUST_THE_SPARK };
