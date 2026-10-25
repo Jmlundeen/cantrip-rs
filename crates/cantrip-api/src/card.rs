@@ -2512,7 +2512,9 @@ pub type FlashRule = fn(&dyn Query, &Asker, ObjectId, PlayerId) -> bool;
 /// A static ability that says whether an activated ability may be activated at all (CR 602.5, 605): asked of the permanent
 /// that has the rule, the object whose ability it would be (in whatever zone it functions from) and that ability. False
 /// forbids it, mana abilities included. "Activated abilities of artifacts, creatures, and planeswalkers can't be
-/// activated" (Clarion Conqueror); Null Rod's and Stony Silence's "of artifacts" is the same rule over fewer types.
+/// activated" (Clarion Conqueror); Null Rod's and Stony Silence's "of artifacts" is the same rule over fewer types. A
+/// special action (CR 116.2: turning a face-down creature face up, foretelling, suspending, plotting, unlocking a door) is
+/// no activated ability, so the rules never ask a rule about one: a card need not tell them apart.
 pub type ActivationRule = fn(&dyn Query, &Asker, ObjectId, &ActivatedDef) -> bool;
 
 /// A permanent's standing rule about what its controller may play (CR 305.2, 305.1).
