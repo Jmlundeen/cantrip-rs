@@ -562,7 +562,9 @@ class Pool:
 
     def member_line(self, mid, member):
         kind = "read-only" if member["read_only"] else "writing"
-        return f"{member['name'] or mid} ({kind}, agent {member['agent']}, since {member['joined']})"
+        # The ID is what `evict --member` takes; a name alone sends a coordinator looking for it.
+        label = f"{member['name']} {mid}" if member["name"] else mid
+        return f"{label} ({kind}, agent {member['agent']}, since {member['joined']})"
 
     def pool_table(self, state):
         self.purge_tokens(state)
