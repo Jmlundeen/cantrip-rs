@@ -1,0 +1,99 @@
+# Chandra, Awakened Inferno -X: "Chandra deals X damage to target creature or planeswalker. If a permanent dealt damage this
+# way would die this turn, exile it instead." Turn 1: +2 (8 loyalty). Turn 3, X=3 on Bot2's Spellskite (0/4): 3 damage, alive;
+# a Lightning Bolt then kills it the same turn and it is exiled, not put into the graveyard, though lethal damage was not
+# Chandra's (CR 614.1a, 700.4). Turn 5, X=2 on Bot2's Ajani Resolute (loyalty 2): the damage removes both counters (CR 120.3c) and
+# Ajani is exiled, a planeswalker. An artifact Mox and a player are no legal targets (the two refusals). Turn 7, X=1 on Bot2's Ornithopter (0/2)
+# leaves it with 1 damage; on turn 9 a Bolt kills it and it goes to the graveyard (the replacement lasted only turn 7), and X=1 on
+# Bot1's own Ornithopter is accepted (1 damage). Loyalty: 8, 5, 3, 2, 1. Bot2's emblem needs no care: it only burns Bot2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Chandra, Awakened Inferno
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ajani Resolute
+Spellskite
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chandra, Awakened Inferno.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Ability: Each opponent)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Spellskite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Bot2.Battlefield.Spellskite; Ability: X damage; X: 3)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Spellskite.Damage = 3
+? Bot1.Battlefield.Chandra, Awakened Inferno.Counters.Loyalty = 5
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Spellskite)
+Bot1.Pass
+Bot2.Pass
+? Exile = Spellskite
+? Bot2.Graveyard.Count = 0
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Bot2.Battlefield.Mox Jet; Ability: X damage; X: 1)
+! Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Bot2; Ability: X damage; X: 1)
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Bot2.Battlefield.Ajani Resolute; Ability: X damage; X: 2)
+Bot1.Pass
+Bot2.Pass
+? Exile = Spellskite; Ajani Resolute
+[T7 Bot1.Main1]
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Bot2.Battlefield.Ornithopter; Ability: X damage; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Damage = 1
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Bot1.Battlefield.Ornithopter; Ability: X damage; X: 1)
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Chandra, Awakened Inferno.Counters.Loyalty = 1
+Bot1.Battlefield.Ornithopter.Damage = 1
+Bot2.Battlefield.Ornithopter = (absent)
+Bot2.Graveyard = Ornithopter
+Exile = Spellskite; Ajani Resolute

@@ -1,0 +1,58 @@
+# Chandra, Awakened Inferno -3 spares "Elemental" creatures by the word in her own text, which a text-changing effect changes (CR 612):
+# Artificial Evolution turns Elemental to Thopter, so the -3 spares Thopters and hits Bot2's Flamebraider (an Elemental, dies) but not its
+# Ornithopter (a Thopter, damage 0). Red if the -3 names Elemental without reading her words.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Chandra, Awakened Inferno
+Island
+Artificial Evolution
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Flamebraider
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chandra, Awakened Inferno.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Flamebraider.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Chandra, Awakened Inferno)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Elemental)
+Bot1.Modes(Thopter)
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Ability: 3 damage)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Flamebraider
+Bot2.Battlefield.Ornithopter.Damage = 0

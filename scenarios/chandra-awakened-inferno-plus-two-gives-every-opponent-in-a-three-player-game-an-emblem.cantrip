@@ -1,0 +1,59 @@
+# Chandra, Awakened Inferno +2 in a three-player game gives each opponent (Bot2 and Bot3) an emblem, and Bot1 none (CR 114.2); each emblem
+# burns its owner at that owner's own upkeep (turn 2 Bot2, turn 3 Bot3). A -X of 0 on Bot1's own Ornithopter pays no damage and leaves
+# loyalty 8 (6+2) minus 0: X can be zero, so it removes no counters and deals none (CR 107.1b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Chandra, Awakened Inferno
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chandra, Awakened Inferno.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Ability: Each opponent)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Emblems.Count = 1
+? Bot3.Emblems.Count = 1
+? Bot1.Emblems.Count = 0
+[T2 Bot2.Main1]
+? Bot2.Life = 19
+? Bot3.Life = 20
+[T3 Bot3.Main1]
+? Bot3.Life = 19
+? Bot2.Life = 19
+[T4 Bot1.Main1]
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Bot1.Battlefield.Ornithopter; Ability: X damage; X: 0)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T4 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Bot3.Life = 19
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield.Chandra, Awakened Inferno.Counters.Loyalty = 8

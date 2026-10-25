@@ -1,0 +1,76 @@
+# Chandra, Awakened Inferno -3: "Chandra deals 3 damage to each non-Elemental creature." Turn 1 she enters and +2s (8 loyalty);
+# Bot1 also has an Ornithopter. Turn 2 Bot2 puts out an Ornithopter, a Yargle (9/3), and an Elemental, Flamebraider (2/2).
+# Turn 3 Bot1 adds a Spellskite (0/4), then -3: exactly 3 damage kills the 0/2 and the 9/3 of both players (3, not 2) while the
+# 0/4 survives with 3 damage, and the Elemental Flamebraider, which would die to 2 damage, is not dealt any (CR 608.2c, 120.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Chandra, Awakened Inferno
+Ornithopter
+Spellskite
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Yargle, Glutton of Urborg
+Flamebraider
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chandra, Awakened Inferno.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Ability: Each opponent)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: B)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Yargle, Glutton of Urborg.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Flamebraider.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spellskite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Ability: 3 damage)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Chandra, Awakened Inferno.Counters.Loyalty = 5
+Bot1.Battlefield.Spellskite.Damage = 3
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot2.Graveyard = Yargle, Glutton of Urborg; Ornithopter; Black Lotus
+Bot2.Battlefield.Flamebraider.Damage = 0
+Bot2.Battlefield.Ornithopter = (absent)

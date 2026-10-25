@@ -1,0 +1,66 @@
+# Chandra, Awakened Inferno: "This spell can't be countered." Bot2's Force of Will (exiling Brainstorm, paying 1 life) targets
+# the Chandra spell and resolves, but she is not countered (CR 101.2) and enters. "+2: Each opponent gets an emblem with 'At the
+# beginning of your upkeep, this emblem deals 1 damage to you.'" (CR 114.2): the emblem is Bot2's, so it triggers in Bot2's
+# upkeep and not Bot1's. Turn 2: Bot2 takes 1 (19 after Force of Will, then 18). Turn 3: Bot1's own upkeep deals Bot1 nothing,
+# and a second +2 gives Bot2 a second emblem, whose trigger is separate. Turn 4: Bot2 takes 2 more (16).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Chandra, Awakened Inferno
+Island x20
+
+[Bot2 Deck]
+Force of Will
+Brainstorm
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chandra, Awakened Inferno.Cast
+Bot2.Hand.Force of Will.Cast(Stack.Chandra, Awakened Inferno; Ability: exile a blue card)
+Bot2.Choose(Brainstorm)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Ability: Each opponent)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Emblems.Count = 1
+? Bot1.Emblems.Count = 0
+[T2 Bot2.Upkeep]
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot2.Life = 18
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Ability: Each opponent)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Chandra, Awakened Inferno.Counters.Loyalty = 10
+Bot1.Emblems.Count = 0
+Bot2.Emblems.Count = 2
+Bot1.Life = 20
+Bot2.Life = 16
+Bot2.Graveyard = Force of Will
+Exile = Brainstorm

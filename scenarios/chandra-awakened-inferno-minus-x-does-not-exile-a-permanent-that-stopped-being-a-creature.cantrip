@@ -1,0 +1,65 @@
+# Chandra, Awakened Inferno -X: the exile replacement is for a permanent that would *die* (CR 700.4): a creature or planeswalker put
+# into a graveyard from the battlefield. Lion Sash (an Equipment creature) is dealt 1 by -X on turn 5, then becomes an Equipment (no longer a
+# creature) by attaching to Ornithopter, and Disenchant destroys it: it goes to the graveyard, not exile (only Black Lotus, exiled by Lion Sash's own
+# ability, is there). Red with the replacement applying to any battlefield-to-graveyard move.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Chandra, Awakened Inferno
+Plains
+Ornithopter
+Lion Sash
+Disenchant
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chandra, Awakened Inferno.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lion Sash.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Black Lotus; Ability: Exile target card)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lion Sash.Toughness = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Chandra, Awakened Inferno.Activate(Bot1.Battlefield.Lion Sash; Ability: X damage; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lion Sash.Damage = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot1.Battlefield.Ornithopter; Ability: Attach)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lion Sash.Types = Artifact
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Lion Sash)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Disenchant; Lion Sash
+Exile = Black Lotus
