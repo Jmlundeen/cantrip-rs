@@ -1581,6 +1581,7 @@ public sealed class Decisions
                     ? $" to {prompt.Verb.ToLowerInvariant()}"
                         + (prompt.Amount > 0 ? " " + prompt.Amount.ToString(CultureInfo.InvariantCulture) : string.Empty)
                     : string.Empty)
+                + (prompt.Subject.IsNone ? string.Empty : $" {GameText.Named(client, prompt.Subject)}")
                 + ".",
             Choices = [.. prompt.Candidates.Select(seat => GameText.Player(client, seat))],
         });

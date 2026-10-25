@@ -354,7 +354,7 @@ fn check_once(cx: &mut Cx) -> R<bool> {
             continue;
         }
         let protector = if candidates.len() > 1 {
-            let ask = RequestKind::ChoosePlayer { source: id, candidates: candidates.clone(), verb: "Protect", amount: 0 };
+            let ask = RequestKind::ChoosePlayer { source: id, candidates: candidates.clone(), verb: "Protect", amount: 0, subject: None };
             match cx.ask_rule(controller, ask)? {
                 Some(Answer::Player(p)) if candidates.contains(&p) => p,
                 // A controller who has left has taken the battle with them (CR 800.4a).

@@ -714,7 +714,7 @@ impl Game {
                 cantrip_state::StandIn::Chosen { controller, source, candidates } => {
                     let id = self.state.request_id();
                     let next = self.state.agenda[at].next_stage;
-                    let ask = RequestKind::ChoosePlayer { source, candidates, verb: "makes the choice", amount: 0 };
+                    let ask = RequestKind::ChoosePlayer { source, candidates, verb: "makes the choice", amount: 0, subject: None };
                     self.state.update_frame(at, |f| {
                         f.stand_in = Some(Box::new((next, pending.kind)));
                         f.pending = Some(Request { id, player: controller, kind: ask, may_cancel: false });
@@ -1065,7 +1065,7 @@ impl<'a> Cx<'a> {
                 cantrip_state::StandIn::Unpaid | cantrip_state::StandIn::NotAsked => Ok(Answer::Pass),
                 cantrip_state::StandIn::By(other) => self.ask_core(other, kind, may_cancel),
                 cantrip_state::StandIn::Chosen { controller, source, candidates } => {
-                    let ask = RequestKind::ChoosePlayer { source, candidates: candidates.clone(), verb: "makes the choice", amount: 0 };
+                    let ask = RequestKind::ChoosePlayer { source, candidates: candidates.clone(), verb: "makes the choice", amount: 0, subject: None };
                     let chosen = match self.ask_core(controller, ask, may_cancel)? {
                         Answer::Player(p) if candidates.contains(&p) => p,
                         _ => candidates[0],
@@ -1616,7 +1616,7 @@ impl cantrip_api::Game for Cx<'_> {
                 cantrip_state::StandIn::Chosen { controller, source, candidates } => {
                     let id = self.g.state.request_id();
                     let at = self.frame;
-                    let ask = RequestKind::ChoosePlayer { source, candidates, verb: "makes the choice", amount: 0 };
+                    let ask = RequestKind::ChoosePlayer { source, candidates, verb: "makes the choice", amount: 0, subject: None };
                     loops::asked(&mut self.g.state, &ask);
                     self.g.state.update_frame(at, |f| {
                         f.staged = true;

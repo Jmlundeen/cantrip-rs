@@ -162,7 +162,7 @@ pub fn player(g: &mut dyn Game, chooser: PlayerId, source: ObjectId, candidates:
     if candidates.is_empty() {
         return Ok(None);
     }
-    match g.ask(chooser, RequestKind::ChoosePlayer { source, candidates, verb, amount })? {
+    match g.ask(chooser, RequestKind::ChoosePlayer { source, candidates, verb, amount, subject: None })? {
         Answer::Player(p) => Ok(Some(p)),
         _ => Ok(None),
     }

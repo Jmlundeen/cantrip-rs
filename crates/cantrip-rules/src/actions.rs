@@ -7115,7 +7115,7 @@ fn cast(
         let to = if opponents.len() == 1 {
             opponents[0]
         } else {
-            let ask = RequestKind::ChoosePlayer { source: spell, candidates: opponents, verb: "Gift", amount: 0 };
+            let ask = RequestKind::ChoosePlayer { source: spell, candidates: opponents, verb: "Gift", amount: 0, subject: None };
             match cx.ask_core(player, ask, true)? {
                 Answer::Player(p) => p,
                 _ => return Err(Stop::Cancel),

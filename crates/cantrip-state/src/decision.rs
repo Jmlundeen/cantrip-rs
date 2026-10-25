@@ -428,8 +428,9 @@ pub enum RequestKind {
     May { source: ObjectId, purpose: Purpose },
     /// A player chosen without targeting (CR 608.2d, 614.12a): True-Name Nemesis's "as this enters, choose a player",
     /// Baleful Mastery's "an opponent draws a card". Answered with `Answer::Player`. `verb` and `amount` say what the
-    /// chosen player will do, as hint text.
-    ChoosePlayer { source: ObjectId, candidates: Vec<PlayerId>, verb: &'static str, amount: u16 },
+    /// chosen player will do, as hint text; `subject` is the object the choice is for, when it is one of several the effect
+    /// treats one at a time (Dack Fayden, Helping Hand's "for each of those permanents, choose a different opponent").
+    ChoosePlayer { source: ObjectId, candidates: Vec<PlayerId>, verb: &'static str, amount: u16, subject: Option<ObjectId> },
     /// Tap any number of untapped creatures with total power `minimum` or more (CR 702.122a crew, CR 702.171a saddle):
     /// any subset of `cards` whose `powers` (what each counts as towards the total, CR 702.122b) add up to it. A negative
     /// power is added as it is (CR 107.1b), taking from the total.
@@ -616,8 +617,11 @@ impl RequestKind {
             }
             RequestKind::ChooseColors { source, .. }
             | RequestKind::ChooseSubtype { source, .. }
-            | RequestKind::May { source, .. }
-            | RequestKind::ChoosePlayer { source, .. } => add(&[*source]),
+            | RequestKind::May { source, .. } => add(&[*source]),
+            RequestKind::ChoosePlayer { source, subject, .. } => {
+                add(&[*source]);
+                add(subject.as_slice());
+            }
             RequestKind::ChooseName { source, looked_at, .. } => {
                 add(&[*source]);
                 add(looked_at);

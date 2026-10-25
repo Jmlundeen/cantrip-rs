@@ -1172,6 +1172,7 @@ public sealed partial class MainPage
     private void FillChoosePlayer(GameClient client, ChoosePlayerPromptMessage prompt)
     {
         string source = client.Object(prompt.Source)?.Name ?? "A spell";
+        string subject = client.Object(prompt.Subject)?.Name ?? "it";
         string action = prompt.Verb switch
         {
             "Draw" => prompt.Amount == 1 ? "draws a card" : $"draws {prompt.Amount} cards",
@@ -1179,6 +1180,7 @@ public sealed partial class MainPage
             "LookAtHand" => "shows you their hand, then you choose a card name",
             "ChooseRevealedCard" => "chooses which revealed card goes into your hand; the other is exiled with a silver counter",
             "GainControl" => "gains control of this artifact",
+            "GainControlOf" => $"gains control of {subject}",
             "SeparatePiles" => $"separates the {(prompt.Amount == 1 ? "revealed card" : $"{prompt.Amount} revealed cards")} into two piles",
             _ => prompt.Verb,
         };

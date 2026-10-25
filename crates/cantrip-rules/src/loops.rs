@@ -737,7 +737,7 @@ mod tests {
         let source = game.state.battlefield()[0];
         let may = RequestKind::May { source, purpose: Purpose::Optional };
         assert!(!round(&mut game, |g| asked(&mut g.state, &may)), "a may");
-        let lone = RequestKind::ChoosePlayer { source, candidates: vec![PlayerId(1)], verb: "", amount: 0 };
+        let lone = RequestKind::ChoosePlayer { source, candidates: vec![PlayerId(1)], verb: "", amount: 0, subject: None };
         for _ in 2..DRAWN_IN {
             assert!(!round(&mut game, |g| asked(&mut g.state, &lone)), "a lone choice is none");
         }

@@ -170,6 +170,11 @@ the name must be the name of in the card's own words, article and all (CR 201.4a
 card name other than a basic land card name" (Necromentia), "a noncreature, nonland card name". A client captions the question
 "[source]: choose [Kind]"; the host refuses a name outside `Names` with `IllegalAnswer`. Version 215.
 
+**A player chosen for one of several objects.** A `ChoosePlayerPromptMessage` whose effect chooses a player for each of
+several objects in turn names the one it is asking about as `Subject` (no handle otherwise): Dack Fayden, Helping Hand's "for
+each of those permanents, choose a different opponent", verb `GainControlOf`, the permanent the chosen opponent gains
+control of. A client captions it with the subject's name, "The player you choose gains control of [Subject]". Version 216.
+
 A draw the players agree to (`docs/rules-exceptions.md`, RX-4) is not a request of the host's: the offer and the answers to it
 are the server's (`GameSession.OfferDraw`, `AnswerDraw`, over the C# protocol's `OfferDrawMessage`, `AnswerDrawMessage` and
 `DrawOfferMessage`, version 201). Offering passes the offerer's priority, which the host is sent as any `PassAnswer`; once

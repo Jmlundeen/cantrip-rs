@@ -1809,6 +1809,13 @@ public sealed class ChoosePlayerPromptMessage : PromptPayload
     [Key(4)]
     public int Amount { get; set; }
 
+    /// <summary>
+    /// The object the choice is for, when the effect treats several one at a time and chooses a player for each (Dack Fayden,
+    /// Helping Hand's <c>GainControlOf</c>: the permanent the chosen opponent gains control of). No handle otherwise.
+    /// </summary>
+    [Key(5)]
+    public ViewHandle Subject { get; set; }
+
     /// <summary>The first candidate in turn order.</summary>
     public override AnswerPayload Default() => new PlayerChosenAnswer { Player = Candidates.Count > 0 ? Candidates[0] : 0 };
 }

@@ -1366,6 +1366,9 @@ pub struct ChoosePlayerPrompt {
     pub candidates: Vec<i32>,
     pub verb: String,
     pub amount: i32,
+    /// The object the choice is for, of several the effect treats one at a time (Dack Fayden, Helping Hand's permanents);
+    /// no handle otherwise.
+    pub subject: ViewHandle,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

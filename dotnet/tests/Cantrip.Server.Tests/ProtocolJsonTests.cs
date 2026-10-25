@@ -34,7 +34,7 @@ public sealed class ProtocolJsonTests
         """{"$type":"ChooseReplacementPromptMessage","Player":1,"Subject":3,"Event":"enters the battlefield","Sources":[4,5],"Hints":["tapped","with a counter"],"SourceNames":["Hardened Scales","Corpsejack Menace"]}""",
         """{"$type":"OrderTriggersPromptMessage","Player":1,"Sources":[4,5],"Texts":["draw a card","gain 1 life"]}""",
         """{"$type":"NameCardPromptMessage","Player":1,"Source":4,"Owner":2,"Hand":[6,7],"Names":["Island","Lightning Bolt"],"Suggestion":"Lightning Bolt","Kind":"a card name other than a basic land card name"}""",
-        """{"$type":"ChoosePlayerPromptMessage","Player":1,"Source":4,"Candidates":[2,3],"Verb":"Draw","Amount":1}""",
+        """{"$type":"ChoosePlayerPromptMessage","Player":1,"Source":4,"Candidates":[2,3],"Verb":"Draw","Amount":1,"Subject":0}""",
         """{"$type":"ChooseColorsPromptMessage","Player":1,"Source":4,"Choices":["White","Blue","Black","Red","Green"],"Count":1,"MayRepeat":false,"Verb":"AddMana"}""",
         """{"$type":"ChooseDividedTargetsPromptMessage","Player":1,"Ability":4,"Source":4,"Text":"divided as you choose","Candidates":[{"Player":2,"Object":0},{"Player":0,"Object":5}],"Total":3,"MaxTargets":0,"Optional":false}""",
         """{"$type":"ChooseStartingPlayerPromptMessage","Player":2,"Candidates":[1,2]}""",

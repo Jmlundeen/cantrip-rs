@@ -1130,12 +1130,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             let (verb, amount) = may_verb(*purpose);
             PromptPayload::MayPromptMessage(MayPrompt { player, source: source_handle(game, handles, *source), verb, amount, ..MayPrompt::default() })
         }
-        RequestKind::ChoosePlayer { source, candidates, verb, amount } => PromptPayload::ChoosePlayerPromptMessage(ChoosePlayerPrompt {
+        RequestKind::ChoosePlayer { source, candidates, verb, amount, subject } => PromptPayload::ChoosePlayerPromptMessage(ChoosePlayerPrompt {
             player,
             source: source_handle(game, handles, *source),
             candidates: candidates.iter().map(|&p| seat(p)).collect(),
             verb: (*verb).to_string(),
             amount: i32::from(*amount),
+            subject: subject.map_or(ViewHandle::NONE, |s| source_handle(game, handles, s)),
         }),
         // Counters removed from among permanents (CR 118.3, 122.1) - as a cost (Dawnhand Dissident's casts) or as an effect
         // resolves (Dyadrine's "a +1/+1 counter from each of two creatures", a pool of one each; Heartless Act's "up to three

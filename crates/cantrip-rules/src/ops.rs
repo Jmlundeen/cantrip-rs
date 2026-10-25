@@ -1289,7 +1289,7 @@ fn choose_protector(cx: &mut Cx, entering: &mut Entering) -> R<()> {
         0 => None,
         1 => Some(candidates[0]),
         _ => {
-            let ask = RequestKind::ChoosePlayer { source: entering.object, candidates: candidates.clone(), verb: "Protect", amount: 0 };
+            let ask = RequestKind::ChoosePlayer { source: entering.object, candidates: candidates.clone(), verb: "Protect", amount: 0, subject: None };
             match cx.ask_core(entering.controller, ask, false)? {
                 Answer::Player(p) if candidates.contains(&p) => Some(p),
                 _ => Some(candidates[0]),
