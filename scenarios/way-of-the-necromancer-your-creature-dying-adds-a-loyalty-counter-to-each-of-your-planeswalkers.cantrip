@@ -1,0 +1,86 @@
+# Way of the Necromancer (turn 1, off Moxen): empower Jace 2 makes a Jace token with 2 loyalty; Wrenn and Six (3 loyalty) is a second
+# planeswalker. Turn 2 Bot2 empowers its own Jace to 5 with Way of the Healer. Turn 3 Bot1 adds a second Ornithopter. Turn 4 Bot2's
+# Pyroclasm kills both Ornithopters at once: "Whenever a creature you control dies" triggers once for each (CR 603.10a, the Way
+# still on the battlefield), and each trigger puts a loyalty counter on each planeswalker Bot1 controls (CR 306.5c, 122.1e): the Jace
+# token 2 to 4 and Wrenn and Six 3 to 5, while Bot2's Jace token stays at 5 (Bot2 controls the creatures that did not die).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Way of the Necromancer
+Wrenn and Six
+Ornithopter
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Way of the Healer
+Pyroclasm
+Mountain
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Way of the Necromancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Way of the Healer.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Jace Token.Counters.Loyalty = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Pyroclasm.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Emerald; Way of the Necromancer; Wrenn and Six; Jace Token
+Bot1.Graveyard.Count = 2
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 4
+Bot1.Battlefield.Wrenn and Six.Counters.Loyalty = 5
+Bot2.Battlefield.Jace Token.Counters.Loyalty = 5
