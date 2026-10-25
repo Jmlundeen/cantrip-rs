@@ -24,7 +24,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let moves: Vec<(ObjectId, Zone)> = keep.iter().map(|&c| (c, Zone::hand(g.obj(c).owner)))
         .chain(rest.iter().map(|&c| (c, Zone::graveyard(g.obj(c).owner))))
         .collect();
-    g.move_together_revealed(&moves, ZoneReason::Other);
+    g.move_together_revealed(&moves, MoveReason::Other);
     Ok(())
 }
 

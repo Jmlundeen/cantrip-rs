@@ -1594,7 +1594,7 @@ remain than it asks, and answered with nothing unasked when none does. Card code
 or offers a sacrifice as one option among others, asks `Game::can_sacrifice`.
 A sacrifice always names who sacrifices (CR 701.21a: a player can't sacrifice a permanent they don't control):
 `Game::sacrifice(player, ..)` and `can_sacrifice(player, ..)`, `sacrifice_each` for several players at once ("each player
-sacrifices"), and `ops::sacrificeable` checks the permanent is that player's, so a card can't forget it. The player is the one
+sacrifices"), and `ops::sacrificeable` checks the permanent is that player's, so a card can't forget it. Nor can it sacrifice by moving: `Game::move_together` takes a `MoveReason`, which has only the reasons no verb of its own carries out (no sacrifice, destruction, discard, draw or mill), so the type refuses it. The player is the one
 the text names: "you" is the spell's or ability's controller, a delayed ability's included (CR 603.7d-e: Kiki-Jiki's token,
 decayed, Underworld Breach), whoever controls the permanent by then; "its controller sacrifices it" (evoke, CR 702.74a; Animate
 Dead) is the permanent's controller as it resolves; a cost's sacrifices are its payer's (`may_sacrifice_for`). "You may

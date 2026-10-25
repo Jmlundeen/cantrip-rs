@@ -1532,14 +1532,6 @@ impl Cx<'_> {
     }
 }
 
-/// Whether a plain move together is refused for `reason`: a sacrifice is made only by the sacrifice verbs (`Game::sacrifice`,
-/// `sacrifice_each`, `sacrifice_and_return`), which name who sacrifices and move only what that player controls (CR 701.21a).
-/// A move for the reason `Sacrifice` would skip that check, so it moves nothing.
-fn refuse_sacrifice(reason: ZoneReason) -> bool {
-    debug_assert!(reason != ZoneReason::Sacrifice, "a sacrifice goes through the sacrifice verbs, which name who sacrifices (CR 701.21a)");
-    reason == ZoneReason::Sacrifice
-}
-
 impl cantrip_api::Game for Cx<'_> {
     fn ask(&mut self, player: PlayerId, kind: RequestKind) -> Result<Answer, Suspend> {
         match self.as_allowed(player, kind) {
@@ -1778,20 +1770,14 @@ impl cantrip_api::Game for Cx<'_> {
         ops::remember_chosen_name(self, by, name);
     }
 
-    fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId> {
-        if refuse_sacrifice(reason) {
-            return Vec::new();
-        }
+    fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: MoveReason) -> Vec<ObjectId> {
         let moves: Vec<ops::Moving> = moves.iter().map(|&(id, to)| ops::Moving::to(id, to)).collect();
-        ops::move_together(self, &moves, reason)
+        ops::move_together(self, &moves, reason.into())
     }
 
-    fn move_together_revealed(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId> {
-        if refuse_sacrifice(reason) {
-            return Vec::new();
-        }
+    fn move_together_revealed(&mut self, moves: &[(ObjectId, Zone)], reason: MoveReason) -> Vec<ObjectId> {
         let moves: Vec<ops::Moving> = moves.iter().map(|&(id, to)| ops::Moving { revealed: true, ..ops::Moving::to(id, to) }).collect();
-        ops::move_together(self, &moves, reason)
+        ops::move_together(self, &moves, reason.into())
     }
 
     fn put_onto_battlefield(&mut self, object: ObjectId, controller: PlayerId, tapped: bool) -> Result<ObjectId, Suspend> {

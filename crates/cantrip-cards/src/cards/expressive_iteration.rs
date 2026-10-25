@@ -30,7 +30,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         if let Some(card) = exiling {
             moves.push((card, Zone::exile(g.obj(card).owner)));
         }
-        let moved = g.move_together(&moves, ZoneReason::Other);
+        let moved = g.move_together(&moves, MoveReason::Other);
         g.arrange_library(player, &[], &placements[1]);
         // Only a card that really arrived in exile may be played: a replacement effect could have sent it elsewhere.
         if exiling.is_some()

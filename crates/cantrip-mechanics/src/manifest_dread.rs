@@ -39,6 +39,6 @@ pub fn manifest_dread_object(g: &mut dyn Game, player: PlayerId, source: ObjectI
     // too when it wasn't, a rule or effect keeping it from entering (CR 701.40f) - every looked-at card still where it was.
     let rest: Vec<(ObjectId, Zone)> =
         looked.into_iter().filter(|&c| g.obj(c).became.is_none()).map(|c| (c, Zone::graveyard(player))).collect();
-    g.move_together(&rest, ZoneReason::Other);
+    g.move_together(&rest, MoveReason::Other);
     Ok(made)
 }

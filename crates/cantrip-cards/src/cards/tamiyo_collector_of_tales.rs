@@ -39,7 +39,7 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let moves: Vec<(ObjectId, Zone)> =
         matches.iter().map(|&c| (c, Zone::hand(you))).chain(rest.iter().map(|&c| (c, Zone::graveyard(you)))).collect();
-    g.move_together_revealed(&moves, ZoneReason::Other);
+    g.move_together_revealed(&moves, MoveReason::Other);
     Ok(())
 }
 

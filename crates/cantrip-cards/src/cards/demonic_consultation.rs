@@ -29,7 +29,7 @@ fn consult(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.reveal(you, &revealed);
     let moves: Vec<(ObjectId, Zone)> =
         revealed.iter().map(|&c| (c, if Some(c) == found { Zone::hand(you) } else { Zone::exile(you) })).collect();
-    g.move_together_revealed(&moves, ZoneReason::Other);
+    g.move_together_revealed(&moves, MoveReason::Other);
     Ok(())
 }
 

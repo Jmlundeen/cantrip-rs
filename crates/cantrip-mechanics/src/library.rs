@@ -82,14 +82,14 @@ pub fn find_to_top(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: S
 /// `Game::move_together_revealed`).
 fn into_hand(g: &mut dyn Game, player: PlayerId, found: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
     let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::hand(player))).collect();
-    let moved = if revealed { g.move_together_revealed(&moves, ZoneReason::Search) } else { g.move_together(&moves, ZoneReason::Search) };
+    let moved = if revealed { g.move_together_revealed(&moves, MoveReason::Search) } else { g.move_together(&moves, MoveReason::Search) };
     g.shuffle(player);
     moved
 }
 
 fn into_graveyard(g: &mut dyn Game, player: PlayerId, found: &[ObjectId]) -> Vec<ObjectId> {
     let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::graveyard(player))).collect();
-    let moved = g.move_together(&moves, ZoneReason::Search);
+    let moved = g.move_together(&moves, MoveReason::Search);
     g.shuffle(player);
     moved
 }
@@ -179,7 +179,7 @@ pub fn search_to_exile(
         g.reveal(searcher, &found);
     }
     let moves: Vec<(ObjectId, Zone)> = also.iter().chain(found.iter()).map(|&c| (c, Zone::exile(g.obj(c).owner))).collect();
-    let moved = g.move_together(&moves, ZoneReason::Exile);
+    let moved = g.move_together(&moves, MoveReason::Exile);
     g.shuffle(owner);
     Ok(moved)
 }
@@ -343,8 +343,8 @@ pub fn search_land_tapped_else_hand(
     let found = find(g, player, source, SearchDestination::LandTappedElseHand, how, eligible)?;
     let went = match found.first() {
         Some(&land) if g.chars(land).is(CardType::Land) => Some(g.put_onto_battlefield(land, player, true)?),
-        Some(&card) if how.reveal => g.move_together_revealed(&[(card, Zone::hand(player))], ZoneReason::Search).first().copied(),
-        Some(&card) => g.move_together(&[(card, Zone::hand(player))], ZoneReason::Search).first().copied(),
+        Some(&card) if how.reveal => g.move_together_revealed(&[(card, Zone::hand(player))], MoveReason::Search).first().copied(),
+        Some(&card) => g.move_together(&[(card, Zone::hand(player))], MoveReason::Search).first().copied(),
         None => None,
     };
     g.shuffle(player);

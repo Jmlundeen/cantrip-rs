@@ -3140,9 +3140,12 @@ fn live_ones(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     ids.iter().copied().filter(|&id| live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut)).collect()
 }
 
-/// Puts objects together into their owners' graveyards (CR 400.3), in the order given.
+/// Puts objects together into their owners' graveyards (CR 400.3), in the order given, from anywhere but the battlefield
+/// (`Game::put_into_graveyard`): a permanent among them is not moved, as a permanent goes to a graveyard by the verbs that
+/// say why (destroy, sacrifice, CR 701.8, 701.21) or a move that names its reason (`Game::move_together`).
 pub fn put_into_graveyard(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
-    let moves: Vec<Moving> = live_ones(cx, ids).into_iter().map(|id| Moving::to(id, Zone::graveyard(cx.s().obj(id).owner))).collect();
+    let ids: Vec<ObjectId> = ids.iter().copied().filter(|&id| !cx.s().obj(id).zone.is(ZoneKind::Battlefield)).collect();
+    let moves: Vec<Moving> = live_ones(cx, &ids).into_iter().map(|id| Moving::to(id, Zone::graveyard(cx.s().obj(id).owner))).collect();
     move_together(cx, &moves, ZoneReason::Other)
 }
 

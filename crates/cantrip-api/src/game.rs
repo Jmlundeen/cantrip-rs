@@ -440,6 +440,30 @@ pub trait Query {
 }
 
 /// Changing the game.
+/// Why a plain move together moves objects (`Game::move_together`), for the triggers that read it (`ZoneReason`): only the
+/// reasons no verb of its own carries out. Sacrificing, destroying, discarding, drawing and milling each have theirs, which
+/// apply what the rules ask of them (who sacrifices and what they control, CR 701.21a; regeneration and indestructible, CR
+/// 701.19); a move can't be made for those reasons.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MoveReason {
+    /// "Put ... into", "return ... to": a move no keyword action names.
+    Other,
+    /// "Exile" a set of objects at once (CR 701.13a).
+    Exile,
+    /// The cards a search found (CR 701.23), put where it says.
+    Search,
+}
+
+impl From<MoveReason> for ZoneReason {
+    fn from(reason: MoveReason) -> ZoneReason {
+        match reason {
+            MoveReason::Other => ZoneReason::Other,
+            MoveReason::Exile => ZoneReason::Exile,
+            MoveReason::Search => ZoneReason::Search,
+        }
+    }
+}
+
 pub trait Game: Query {
     /// Asks `player` a question. The first time, the effect stops here (`Err(Suspend)`); once answered, the effect
     /// runs again from its start and this returns the answer.
@@ -550,21 +574,21 @@ pub trait Game: Query {
     /// was is not exiled (CR 400.7). The new objects, in order, of what was exiled.
     fn exile_all(&mut self, objects: &[ObjectId]) -> Vec<ObjectId>;
     /// Puts objects into their owners' graveyards at once (CR 400.3, 101.4), in the order given, from wherever they are but
-    /// the battlefield: "put the rest into your graveyard" is no discard, no mill and no destruction. Something that is no
-    /// longer the object it was is not moved (CR 400.7). The new objects, in order. Malevolent Rumble and Satyr Wayfinder
+    /// the battlefield (a permanent among them is not moved): "put the rest into your graveyard" is no discard, no mill and no
+    /// destruction. Something that is no longer the object it was is not moved (CR 400.7). The new objects, in order. Malevolent Rumble and Satyr Wayfinder
     /// put what they did not take there.
     fn put_into_graveyard(&mut self, objects: &[ObjectId]) -> Vec<ObjectId>;
     /// Moves an object to a zone (top of a library), returning the new object it becomes. Not for the battlefield:
     /// entering it is `put_onto_battlefield`, which applies entering replacements.
     fn move_to(&mut self, object: ObjectId, to: Zone) -> ObjectId;
     /// Moves several objects at once (CR 603.10a: a leaves-the-battlefield ability sees all of them leave), for a
-    /// reason triggers can read. The new objects, in order. Never for `ZoneReason::Sacrifice`, which moves nothing: a
-    /// sacrifice is `sacrifice` or `sacrifice_each`, which name who sacrifices (CR 701.21a).
-    fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId>;
+    /// reason triggers can read (`MoveReason`: none that a verb of its own carries out, so a sacrifice is `sacrifice` or
+    /// `sacrifice_each`, which name who sacrifices, CR 701.21a). The new objects, in order.
+    fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: MoveReason) -> Vec<ObjectId>;
     /// `move_together` for the instruction that reveals the cards it moves ("reveal it, put it into your hand", "put the
     /// cards revealed this way into your hand and the rest into your graveyard", CR 701.20a): each is a card all players can
     /// see as it moves (CR 603.10a), as `return_to_hand_revealed` says.
-    fn move_together_revealed(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId>;
+    fn move_together_revealed(&mut self, moves: &[(ObjectId, Zone)], reason: MoveReason) -> Vec<ObjectId>;
     /// Puts an object onto the battlefield under `controller` (CR 110.2a), its entering replacements applied.
     fn put_onto_battlefield(&mut self, object: ObjectId, controller: PlayerId, tapped: bool) -> Result<ObjectId, Suspend>;
     /// `put_onto_battlefield`, the object entering with these counters as well (CR 122.6, 614.1c): persist's and undying's

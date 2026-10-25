@@ -44,7 +44,7 @@ fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let buried: Vec<(ObjectId, Zone)> =
         revealed.iter().copied().filter(|&c| Some(c) != creature).map(|c| (c, Zone::graveyard(who))).collect();
     if !buried.is_empty() {
-        g.move_together(&buried, ZoneReason::Other);
+        g.move_together(&buried, MoveReason::Other);
     }
     if let Some(card) = creature {
         g.put_onto_battlefield(card, who, false)?;

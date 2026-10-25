@@ -196,7 +196,7 @@ fn stow(g: &mut dyn cantrip_api::Game, asker: &Asker, _: Option<Color>) -> Resul
         .map(|&c| (c, Zone::library(asker.controller)))
         .chain(librarians.iter().map(|&l| (l, Zone::graveyard(asker.controller))))
         .collect();
-    g.move_together(&moves, ZoneReason::Other);
+    g.move_together(&moves, MoveReason::Other);
     Ok(())
 }
 

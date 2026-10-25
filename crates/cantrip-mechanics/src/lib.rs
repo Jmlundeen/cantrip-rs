@@ -822,7 +822,7 @@ pub fn surveil_into_graveyard(
         };
         if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
             let moves: Vec<(ObjectId, Zone)> = placements[1].iter().map(|&c| (c, Zone::graveyard(player))).collect();
-            let moved = g.move_together(&moves, ZoneReason::Other);
+            let moved = g.move_together(&moves, MoveReason::Other);
             binned = moved.into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Graveyard)).collect();
             g.arrange_library(player, &placements[0], &[]);
         }
@@ -913,7 +913,7 @@ pub fn explore(g: &mut dyn Game, permanent: ObjectId) -> Result<(), Suspend> {
     if let Some(top) = top {
         g.reveal(who, &[top]);
         if g.chars(top).is(CardType::Land) {
-            g.move_together_revealed(&[(top, Zone::hand(who))], ZoneReason::Other);
+            g.move_together_revealed(&[(top, Zone::hand(who))], MoveReason::Other);
             return Ok(());
         }
     }

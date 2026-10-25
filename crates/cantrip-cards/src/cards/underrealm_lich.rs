@@ -36,7 +36,7 @@ fn look_take_one_rest_to_graveyard(g: &mut dyn Game, player: PlayerId, source: O
         let owner = g.obj(c).owner;
         (c, if taken.contains(&c) { Zone::hand(owner) } else { Zone::graveyard(owner) })
     }).collect();
-    g.move_together(&moves, ZoneReason::Other);
+    g.move_together(&moves, MoveReason::Other);
     Ok(())
 }
 

@@ -33,7 +33,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
                     g.put_onto_battlefield(card, player, false)?;
                 } else {
                     let owner = g.obj(card).owner;
-                    g.move_together(&[(card, Zone::graveyard(owner))], ZoneReason::Search);
+                    g.move_together(&[(card, Zone::graveyard(owner))], MoveReason::Search);
                 }
             }
         }
