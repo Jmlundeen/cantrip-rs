@@ -722,6 +722,13 @@ pub static WHITE_FLYING_SPIRIT: CardDef = CardDef {
     ..token!(Spirit)
 };
 
+/// "Create a 4/4 green Beast creature token with trample" as an effect (CR 111.2): one Beast under the controller of the resolving
+/// spell or ability. Bestial Incursion, Garruk, Curse Breaker (-3) and Way of the Wildspeaker print it.
+pub fn create_a_beast_4_4_trample(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    create(g, item.controller, &BEAST_4_4_TRAMPLE, 1)?;
+    Ok(())
+}
+
 /// "Create a Treasure token" as an effect (CR 111.10a): one Treasure under the controller of the resolving spell or ability. Bejeweled
 /// Warg, Fable of the Mirror-Breaker's Reflection, Fountainport, Magda, Brazen Outlaw, Monument to Endurance, Sanar, Unfinished
 /// Genius and Smaug the Magnificent print it.

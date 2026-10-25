@@ -30,13 +30,6 @@ fn attackers_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// +2: Untap up to two target lands.
-/// −3: Create a 4/4 green Beast creature token with trample.
-fn create_beast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &tokens::BEAST_4_4_TRAMPLE, 1)?;
-    Ok(())
-}
-
 /// −4: Until your next turn (CR 611.2b), the delayed ability watches every attack on your opponents.
 fn minus_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let o = g.obj(item.object);
@@ -49,7 +42,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::CREATURE_WITH_POWER_FOUR_OR_MORE_YOU_CONTROL_ENTERS, |g, item| effects::draw(g, item, 1), "Whenever a creature you control with power 4 or greater enters, draw a card."),
         ability(loyalty(2), effects::untap_targets, "+2: Untap up to two target lands.").targets(&[targets::LAND.between(0, 2)]),
-        ability(loyalty(-3), create_beast, "\u{2212}3: Create a 4/4 green Beast creature token with trample."),
+        ability(loyalty(-3), tokens::create_a_beast_4_4_trample, "\u{2212}3: Create a 4/4 green Beast creature token with trample."),
         ability(loyalty(-4), minus_four, "\u{2212}4: Until your next turn, whenever one or more creatures attack one of your opponents, those creatures get +2/+2 and gain trample until end of turn."),
     ],
     delayed: &[triggered(
