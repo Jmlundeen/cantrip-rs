@@ -561,6 +561,14 @@ impl<'a> Projector<'a> {
             let whose = if p == self.viewer { "you" } else { "they" };
             summary.pending_effects.push(format!("The next spell {whose} cast this turn can't be countered."));
         }
+        // "You may play an additional land this turn" (CR 305.2, 611.2c): a permission about the player, one effect for each
+        // resolution that gave it, on no object; the lands they add are summed, so the page says how many more may be played.
+        let extra_lands: u32 = s.effects.iter().filter(|e| e.controller == p).map(|e| if let EffectKind::ExtraLandPlays(n) = e.kind { n } else { 0 }).sum();
+        if extra_lands > 0 {
+            let who = if p == self.viewer { "You" } else { "They" };
+            let lands = if extra_lands == 1 { "an additional land".to_string() } else { format!("{extra_lands} additional lands") };
+            summary.pending_effects.push(format!("{who} may play {lands} this turn."));
+        }
         // "Target opponent skips their next X turns" (CR 500.11, 614.10): one effect for each turn still to skip, about the
         // player and on no object.
         let skips = s.effects.iter().filter(|e| e.kind == EffectKind::SkipNextTurn(p)).count();
