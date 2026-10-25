@@ -1,0 +1,45 @@
+# Spectral Sailor: Flash, Flying, "{3}{U}: Draw a card." Bot1 has Mox Sapphire as its only blue source. On Bot2's turn 4 it
+# flashes the Sailor in with the Mox (Flash), leaving two Mountains and Sol Ring: four mana but no blue, so the ability is
+# refused (the {U} is required). On turn 5 the Mox untaps and the ability is paid with exactly {3}{U} (Mox, Sol Ring and one
+# Mountain), the pool is empty afterwards and one card is drawn (CR 602.2, 118.1).
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Sol Ring
+Spectral Sailor
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spectral Sailor.Cast
+Bot1.Pass
+! Bot1.Battlefield.Spectral Sailor.Activate(Mana: short)
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Spectral Sailor.Activate
+? Bot1.Mana = 
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Spectral Sailor.Keywords = Flash;Flying

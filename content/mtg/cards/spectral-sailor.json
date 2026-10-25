@@ -1,0 +1,12 @@
+{
+  "name": "Spectral Sailor",
+  "manaCost": "{U}",
+  "type": "Creature — Spirit Pirate",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flash (You may cast this spell any time you could cast an instant.)\nFlying\n{3}{U}: Draw a card.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}
