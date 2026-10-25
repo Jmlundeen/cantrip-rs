@@ -1343,7 +1343,11 @@ door) is costed as `Costed::SpecialAction`: it is no activated ability (CR 116.1
 abilities (Forensic Gadgeteer, Anointed Peacekeeper) leaves it alone, and only a change that names it applies - Doc Aurlock,
 Grizzled Genius's "plotting cards from your hand costs {2} less" (CR 116.2k, 118.7), which knows plot's action by
 `ActivatedDef::plot`. `special_action_cost` applies the changes to the printed cost, for the advice and the payment alike;
-the host's menu row says what it costs when that differs ("(costs {B}{G})").
+the host's menu row says what it costs when that differs ("(costs {B}{G})"). For the same reason nothing that forbids
+activating abilities (CR 602.5) forbids a special action: `static_rules::activation_barred`, the one place an effect's
+"can't be activated" and a static ability's `activation_rules` are asked, passes every special action before asking them,
+so Clarion Conqueror leaves a face-down creature to be turned up and Sorcerous Spyglass leaves its named card to be
+foretold or suspended. What would stop suspend's cast stops suspending, judged as a cast (`cast_barred`, CR 116.2f).
 
 "As an additional cost to cast this spell, you may sacrifice any number of nonland permanents. This spell costs {1} less
 to cast for each permanent sacrificed this way" (Rottenmouth Viper) is `VariableCost::SacrificeAnyNumber`: how many is

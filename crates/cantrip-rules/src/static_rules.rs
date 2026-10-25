@@ -412,9 +412,14 @@ pub fn activation_forbidders(cx: &Cx) -> Vec<ObjectId> {
 
 /// Whether one of the `forbidders` (from `activation_forbidders`) stops `source`'s ability `def` being activated (CR 602.5).
 pub fn activation_barred(cx: &Cx, forbidders: &[ObjectId], source: ObjectId, def: &ActivatedDef) -> bool {
-    // "Its activated abilities can't be activated", from a resolved effect on the object itself (CR 602.5, 611.2). A special
-    // action is no activated ability (CR 116.2): turning it face up, unlocking a door, are still allowed.
-    if !def.special_action && cx.s().effects.iter().any(|e| e.affected == source && e.kind == EffectKind::CantActivateAbilities) {
+    // A special action is no activated ability (CR 116.2, 602.1): what forbids activating abilities (CR 602.5) - an effect on
+    // the object, a static ability's rule - forbids none of them. Turning a face-down creature face up, foretelling,
+    // suspending, plotting and unlocking a door stay allowed; what stops the cast suspend needs is judged as a cast is.
+    if def.special_action {
+        return false;
+    }
+    // "Its activated abilities can't be activated", from a resolved effect on the object itself (CR 602.5, 611.2).
+    if cx.s().effects.iter().any(|e| e.affected == source && e.kind == EffectKind::CantActivateAbilities) {
         return true;
     }
     forbidders.iter().any(|&id| {

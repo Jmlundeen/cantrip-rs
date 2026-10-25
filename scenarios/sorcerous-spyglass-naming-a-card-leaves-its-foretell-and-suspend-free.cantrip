@@ -1,0 +1,62 @@
+# Foretelling a card and suspending one are special actions (CR 116.2h, 702.143b; CR 116.2f, 702.62a), not activated
+# abilities (CR 602.1), so Sorcerous Spyglass's "activated abilities of sources with the chosen name can't be activated"
+# (CR 602.5) does not stop them. On turn 2 Bot2 casts three Spyglasses, looks at Bot1's hand and names Delayed Blast
+# Fireball, Lotus Bloom and Miscalculation. On turn 3 Bot1, with four mana available, is refused Miscalculation's cycling
+# (an activated ability of a named card, still stopped), then suspends Lotus Bloom and foretells Delayed Blast Fireball.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Delayed Blast Fireball
+Miscalculation
+Lotus Bloom
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Sorcerous Spyglass
+Sorcerous Spyglass
+Sorcerous Spyglass
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sorcerous Spyglass.Cast
+Bot2.Name(Delayed Blast Fireball)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sorcerous Spyglass.Cast
+Bot2.Name(Lotus Bloom)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Sorcerous Spyglass.Cast
+Bot2.Name(Miscalculation)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Miscalculation.Activate(Ability: Cycling)
+Bot1.Hand.Lotus Bloom.Suspend
+Bot1.Hand.Delayed Blast Fireball.Foretell
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island; Mox Jet; Mox Pearl; Mox Sapphire; Sorcerous Spyglass; Sorcerous Spyglass; Sorcerous Spyglass
+Bot1.Hand = Miscalculation; Island
+Exile.Count = 2
+Bot1.Exile.Lotus Bloom.Counters.Time = 3

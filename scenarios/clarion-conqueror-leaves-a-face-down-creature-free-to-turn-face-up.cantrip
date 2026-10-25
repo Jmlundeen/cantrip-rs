@@ -1,0 +1,61 @@
+# Turning a face-down creature face up is a special action (CR 116.2b, 701.40b), not an activated ability (CR 602.1), so
+# Clarion Conqueror's "activated abilities of artifacts, creatures, and planeswalkers can't be activated" (CR 602.5) leaves
+# it alone. On turn 1 Bot1 has Turn Inside Out and Lightning Bolt kill its Llanowar Elves, and manifest dread puts a second
+# Llanowar Elves onto the battlefield face down. On turn 5 Bot1 casts the Conqueror, then turns the face-down creature face
+# up for {G} from its Forest (the special action allowed). Face up, the Elves is a creature, and its mana ability is refused
+# (an activated ability still stopped by the same card).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Plains
+Llanowar Elves
+Island
+Plains
+Clarion Conqueror
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Llanowar Elves | Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield..FaceDown = true
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Clarion Conqueror.Power = 3
+Bot1.Battlefield.#1.Activate
+Bot1.Battlefield.Forest.Activate
+? Bot1.Battlefield.Llanowar Elves.FaceDown = (absent)
+! Bot1.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.FaceDown = (absent)
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Graveyard = Island; Llanowar Elves; Lightning Bolt; Turn Inside Out; Black Lotus
