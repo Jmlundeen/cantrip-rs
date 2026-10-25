@@ -1,0 +1,11 @@
+{
+  "name": "Tomik, Distinguished Advokist",
+  "manaCost": "{W}{W}",
+  "type": "Legendary Creature — Human Advisor",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flying\nLands on the battlefield and land cards in graveyards can't be the targets of spells or abilities your opponents control.\nYour opponents can't play land cards from graveyards.",
+  "keywords": [
+    "Flying"
+  ]
+}

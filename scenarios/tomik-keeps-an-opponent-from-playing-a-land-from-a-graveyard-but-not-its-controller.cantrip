@@ -1,0 +1,64 @@
+# Tomik, Distinguished Advokist: "Your opponents can't play land cards from graveyards" (CR 101.2, 305.1), which takes
+# precedence over Crucible of Worlds' permission (the card's ruling). Both players crack a Marsh Flats and have a Crucible.
+# On turn 3 Bot1, Tomik's controller and no opponent of its own, plays its Flats from its graveyard. On turn 4 Bot2 can't
+# play its Flats from its graveyard, its land play still unused, and plays an Island from its hand. Once Tomik dies to a
+# Lightning Bolt, on turn 6, Bot2's Crucible lets it play the Flats from its graveyard.
+
+[Bot1 Deck]
+Marsh Flats
+Black Lotus
+Tomik, Distinguished Advokist
+Mox Pearl
+Mox Jet
+Crucible of Worlds
+Plains x14
+
+[Bot2 Deck]
+Marsh Flats
+Black Lotus
+Crucible of Worlds
+Island
+Mox Ruby
+Lightning Bolt
+Island x4
+Swamp
+Island x9
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Plains)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Tomik, Distinguished Advokist.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Crucible of Worlds.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Marsh Flats.Play
+Bot2.Battlefield.Marsh Flats.Activate
+Bot2.Search(Swamp)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Crucible of Worlds.Cast
+[T3 Bot1.Main1]
+Bot1.Graveyard.Marsh Flats.Play
+[T4 Bot2.Main1]
+! Bot2.Graveyard.Marsh Flats.Play
+Bot2.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Tomik, Distinguished Advokist)
+Bot2.Pass
+Bot2.Graveyard.Marsh Flats.Play
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot1.Battlefield = Plains; Marsh Flats; Mox Pearl; Mox Jet; Crucible of Worlds
+Bot2.Battlefield = Swamp; Crucible of Worlds; Island; Mox Ruby; Marsh Flats
+Bot2.LandsPlayed = 1

@@ -1,0 +1,66 @@
+# Tomik, Distinguished Advokist: "Lands on the battlefield and land cards in graveyards can't be the targets of spells or
+# abilities your opponents control" (CR 601.2c, 602.2b) - any land and any graveyard's land card, the opponent's own too. Bot1
+# casts Tomik (flying) on turn 1 with Black Lotus. On turn 3 Bot1, no opponent of its own, aims Strip Mine at Bot2's Swamp and
+# Cling to Dust at its own Strip Mine in its graveyard. On turn 4 Bot2 can't aim Strip Mine at Bot1's Plains or its own Strip
+# Mine, Deathrite Shaman at the Swamp in its own graveyard, or Cling to Dust at that Swamp; Cling to Dust still exiles Bot1's
+# Black Lotus, a nonland card. Bolted, Tomik is gone, and Bot2's Deathrite exiles the Swamp and Strip Mine destroys the Plains.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Tomik, Distinguished Advokist
+Strip Mine
+Mox Jet
+Cling to Dust
+Plains x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Deathrite Shaman
+Strip Mine
+Cling to Dust
+Lightning Bolt
+Swamp x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Tomik, Distinguished Advokist.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+? Bot1.Battlefield.Tomik, Distinguished Advokist.Keywords = Flying
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+Bot1.Battlefield.Strip Mine.Activate(Bot2.Battlefield.Swamp; Ability: Destroy)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cling to Dust.Cast(Bot1.Graveyard.Strip Mine)
+Bot1.Pass
+? Bot2.Graveyard = Swamp
+[T4 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+! Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Plains; Ability: Destroy)
+! Bot2.Battlefield.Strip Mine.Activate(Bot2.Battlefield.Strip Mine; Ability: Destroy)
+! Bot2.Battlefield.Deathrite Shaman.Activate(Bot2.Graveyard.Swamp; Ability: land card)
+Bot2.Battlefield.Mox Jet.Activate
+! Bot2.Hand.Cling to Dust.Cast(Bot2.Graveyard.Swamp)
+Bot2.Hand.Cling to Dust.Cast(Bot1.Graveyard.Black Lotus)
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Tomik, Distinguished Advokist)
+Bot2.Pass
+Bot2.Battlefield.Deathrite Shaman.Activate(Bot2.Graveyard.Swamp; Ability: land card)
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Plains; Ability: Destroy)
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Mox Jet
+Exile = Black Lotus; Strip Mine; Swamp
+Bot2.Battlefield = Mox Jet; Mox Ruby; Deathrite Shaman

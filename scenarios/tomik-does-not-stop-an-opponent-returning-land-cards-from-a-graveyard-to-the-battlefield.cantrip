@@ -1,0 +1,50 @@
+# Tomik, Distinguished Advokist forbids an opponent to play land cards from graveyards (CR 305.1), not to put them onto the
+# battlefield by an effect, which is no land play (CR 305.1). Bot1 casts Tomik on turn 1. On turn 2 Bot2 casts
+# Aftermath Analyst, milling three Forests, and sacrifices it: "return all land cards from your graveyard to the battlefield
+# tapped" puts all three onto the battlefield untargeted, and Bot2 has still played one land this turn.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Tomik, Distinguished Advokist
+Plains x17
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Aftermath Analyst
+Island
+Island
+Island
+Forest
+Forest
+Forest
+Island x9
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Tomik, Distinguished Advokist.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Aftermath Analyst.Cast
+Bot2.Hand.Black Lotus.Cast
+? Bot2.Graveyard = Forest; Forest; Forest
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Aftermath Analyst.Activate
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield = Plains; Tomik, Distinguished Advokist
+Bot2.Battlefield = Forest; Mox Emerald; Mox Sapphire; Forest; Forest; Forest
+Bot2.Graveyard = Aftermath Analyst; Black Lotus
+Bot2.LandsPlayed = 1
