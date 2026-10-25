@@ -1,0 +1,53 @@
+# Glistening Deluge's sets are fixed as it resolves (CR 611.2c): a noncreature permanent that becomes a creature later
+# in the turn gets neither the -1/-1 nor the additional -2/-2, though it is green (the ruling of 2023-04-14). Bot1's
+# Esika's Chariot is an uncrewed Vehicle when the Deluge resolves (its two 2/2 green Cats die to -3/-3); Bot1 then casts
+# Bonecrusher Giant and crews the Chariot with it, and the Chariot attacks as a 4/4 for 4.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Emerald
+Mox Ruby
+Sol Ring
+Esika's Chariot
+Glistening Deluge
+Bonecrusher Giant
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esika's Chariot.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glistening Deluge.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bonecrusher Giant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Esika's Chariot.Activate(Ability: Crew)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Esika's Chariot.Power = 4
+? Bot1.Battlefield.Esika's Chariot.Toughness = 4
+Bot1.Attack(Esika's Chariot > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16

@@ -1,0 +1,59 @@
+# Glistening Deluge's "green" is a color word of its text (CR 612.1, 612.2): Bot1 casts it and, holding priority, changes
+# it with Sleight of Mind to "black". It resolves as "Creatures that are black and/or white get an additional -2/-2":
+# Bot1's green Sentinel of the Nameless City (3/4) gets only the -1/-1 and is a 2/3, and Bot2's black Screeching
+# Soulbreaker (1/4) gets -3/-3 and is a -2/1.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Jet
+Mox Sapphire
+Sentinel of the Nameless City
+Glistening Deluge
+Sleight of Mind
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Screeching Soulbreaker
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Sentinel of the Nameless City.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Jet#3.Activate
+Bot2.Hand.Screeching Soulbreaker.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Glistening Deluge.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Stack.Glistening Deluge)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Green)
+Bot1.Colors(Black)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sentinel of the Nameless City.Power = 2
+? Bot1.Battlefield.Sentinel of the Nameless City.Toughness = 3
+? Bot2.Battlefield.Screeching Soulbreaker.Power = -2
+? Bot2.Battlefield.Screeching Soulbreaker.Toughness = 1
+
+[Expect]
+Bot1.Graveyard = Glistening Deluge; Sleight of Mind

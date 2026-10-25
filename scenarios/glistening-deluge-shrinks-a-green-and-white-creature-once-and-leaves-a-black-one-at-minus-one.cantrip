@@ -1,0 +1,55 @@
+# A creature that is both green and white is one creature and gets the extra -2/-2 once: Bot2's Bloombrute (4/4, green
+# and white) is a 1/1, not dead at -5/-1 as two applications would leave it. Bot1's own black Screeching Soulbreaker
+# (1/4) gets only the -1/-1 and is a 0/3: a creature of some other color is spared the extra -2/-2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Screeching Soulbreaker
+Glistening Deluge
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Jet
+Bloombrute
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Screeching Soulbreaker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Hand.Bloombrute.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Glistening Deluge.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Bloombrute.Power = 1
+? Bot2.Battlefield.Bloombrute.Toughness = 1
+? Bot1.Battlefield.Screeching Soulbreaker.Power = 0
+? Bot1.Battlefield.Screeching Soulbreaker.Toughness = 3
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Glistening Deluge
