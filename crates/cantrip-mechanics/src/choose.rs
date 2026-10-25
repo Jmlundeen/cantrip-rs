@@ -282,8 +282,8 @@ pub fn option(g: &mut dyn Game, player: PlayerId, source: ObjectId, card: CardId
 /// `options` of its `labels`) before it enters, and the permanent keeps the choice while it is on the battlefield; it is
 /// no copiable value (CR 707.2), so a copy entering makes its own choice (CR 707.5). `def` is the card whose text this is,
 /// the caller's `&CARD`. The Khans of Tarkir Sieges ("Khans or Dragons": Monastery, Outpost, Palace, Citadel and Frontier
-/// Siege), the Tarkir: Dragonstorm Sieges ("Jeskai or Temur": Frostcliff Siege; Barrensteppe, Glacierwood, Hollowmurk and
-/// Windcrag Siege), Mirrodin Besieged ("Mirran or Phyrexian"), Gollum, Riddle Master and Lavabrink Venturer ("odd or even")
+/// Siege), the Tarkir: Dragonstorm Sieges ("Jeskai or Temur": Frostcliff Siege; "Mardu or Jeskai": Windcrag Siege; the other
+/// Tarkir: Dragonstorm Sieges name their own pair), Mirrodin Besieged ("Mirran or Phyrexian"), Gollum, Riddle Master and Lavabrink Venturer ("odd or even")
 /// print it. The linked abilities read it with `chosen_option`.
 pub fn option_as_enters(g: &mut dyn Game, entering: &mut Entering, def: &'static CardDef, options: core::ops::Range<u8>) -> Result<(), Suspend> {
     let card = g.card_id(def);
