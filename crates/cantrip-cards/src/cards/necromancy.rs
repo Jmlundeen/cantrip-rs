@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers, untimely};
+use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
 /// It becomes an Aura with "enchant creature put onto the battlefield with Necromancy": the Aura subtype (CR 613.1d) and the
@@ -27,8 +27,7 @@ fn sacrifice_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     cast_as_though_flash: true,
-    untimely_cleanup_rider: untimely::RIDER,
-    delayed: &[untimely::SACRIFICE],
+    untimely_cleanup_rider: true,
     becomes_aura_enchant: Some(targets::CREATURE_PUT_ONTO_THE_BATTLEFIELD_WITH_THIS),
     abilities: &[
         triggered(triggers::THIS_ENTERS, reanimate, "When this enchantment enters, if it's on the battlefield, it becomes an Aura with \"enchant creature put onto the battlefield with Necromancy.\" Put target creature card from a graveyard onto the battlefield under your control and attach this enchantment to it.")

@@ -552,6 +552,10 @@ fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
     if faces {
         return ("Only the face you choose is cast, with its own cost and mana value".into(), false);
     }
+    // More than one permission lets the spell be cast now (CR 601.3), and only its own has the permanent sacrificed.
+    if matches!(modes.first(), Some(Label::CastPermission { .. })) {
+        return ("More than one permission lets you cast it now; the one you cast it by decides whether it is sacrificed".into(), false);
+    }
     // The Phyrexian symbols paid with life (CR 107.4f): what is not chosen is paid with mana.
     if let Some(&Label::PayLife(color)) = modes.first()
         && modes.iter().all(|l| matches!(l, Label::PayLife(_)))
@@ -1002,6 +1006,11 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         Label::Miracle(m) => miracle_label(game, *m),
                         // The slot's text and what it holds now, so two slots worded alike are told apart.
                         Label::TargetSlot(text, held) => format!("{text}: {}", target_words(game, *held)),
+                        // Which permission casts it now (CR 601.3): only its own has the permanent it becomes sacrificed at the
+                        // next cleanup step (`CardDef::untimely_cleanup_rider`).
+                        Label::CastPermission { own: true, .. } => "By its own permission: the permanent it becomes is sacrificed at the beginning of the next cleanup step".into(),
+                        Label::CastPermission { by: Some(card), .. } => format!("By {}'s permission: it isn't sacrificed", game.cards.get(*card).name),
+                        Label::CastPermission { by: None, .. } => "As an instant or with flash: it isn't sacrificed".into(),
                         Label::Pile { cards, .. } if !cards.is_empty() => format!("{}: {}", label_text(l), cards.iter()
                             .map(|&id| {
                                 let name = game.name(id);
@@ -1022,6 +1031,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose which type of mana to add".into()
                 } else if matches!(modes.first(), Some(Label::ManaCost)) {
                     "Choose how to pay for it".into()
+                } else if matches!(modes.first(), Some(Label::CastPermission { .. })) {
+                    "Choose which permission you cast it by".into()
                 } else if matches!(modes.first(), Some(Label::TargetSlot(..))) {
                     // Two instances of "target" hold the same object (CR 115.3): which one changes to the source (CR 115.7b).
                     format!("Choose which target to change to {}", game.cards.get(game.chars(*source).card).name)
@@ -1609,6 +1620,40 @@ mod tests {
         assert_eq!(heading, "Gollum, Riddle Master: choose Odd or Even");
         assert_eq!(modes, vec!["Odd".to_string(), "Even".to_string()]);
         assert_eq!(ask(vec![Label::Card(card, 0), Label::Card(card, 1)]).0, "");
+    }
+
+    /// Which permission a spell is cast by, where its text asks (CR 601.3: Necromancy beside Valley Floodcaller): the question
+    /// says so, and each choice says what it means for the cleanup sacrifice, the other naming the card that gives it.
+    #[test]
+    fn a_choice_of_permission_says_which_one_has_it_sacrificed() {
+        let (game, hand) = game_with(&["Necromancy", "Valley Floodcaller"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let floodcaller = game.obj(hand[1]).card;
+        let request = Request {
+            id: 1,
+            player: seat,
+            kind: RequestKind::ChooseModes {
+                source: hand[0],
+                modes: vec![Label::CastPermission { own: true, by: None }, Label::CastPermission { own: false, by: Some(floodcaller) }],
+                eligible: vec![0, 1],
+                count: 1,
+                at_most: 0,
+                affordable: Vec::new(),
+                additional_cost: false,
+                repeat: false,
+            },
+            may_cancel: false,
+        };
+        let PromptPayload::ChooseModesPromptMessage(p) = prompt(&game, &request, &mut HandleSpace::new()).expect("a prompt").0 else { panic!("a choice of modes") };
+        assert_eq!(p.heading, "Choose which permission you cast it by");
+        assert_eq!(
+            p.modes,
+            vec![
+                "By its own permission: the permanent it becomes is sacrificed at the beginning of the next cleanup step".to_string(),
+                "By Valley Floodcaller's permission: it isn't sacrificed".to_string(),
+            ]
+        );
+        assert!(!p.detail.is_empty());
     }
 
     #[test]

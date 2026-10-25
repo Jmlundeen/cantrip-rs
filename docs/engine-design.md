@@ -1062,9 +1062,15 @@ Meditation, Discontinuity and Obeka, Brute Chronologist end the turn.
 is one of the triggered abilities 514.3a puts on the stack. Necromancy's cycle ("if you cast it any time a sorcery couldn't
 have been cast, the controller of the permanent it becomes sacrifices it at the beginning of the next cleanup step") is
 `CardDef::untimely_cleanup_rider`: a static ability that functions on the stack, so `resolve` creates the delayed ability
-as the spell becomes a permanent (CR 608.3g), about that permanent, when the spell was cast at such a time by its own
-permission (`Marks::cast_untimely`, never set for a spell an effect casts as it resolves); its body is
-`cantrip_mechanics::untimely::SACRIFICE`.
+(the rules' own, `intrinsic::UNTIMELY_SACRIFICE`, so no card names it by an index of its own) as the spell becomes a
+permanent (CR 608.3g), about that permanent, when the spell was cast at such a time by its own "you may cast this spell as
+though it had flash" (`Marks::untimely_by_own_flash`; Necromancy's 2022-12-08 ruling). Where another permission would let
+it be cast then too - an effect's or a permanent's (Valley Floodcaller), an alternative cost's (Primal Prayers) - its
+caster chooses which one they cast it by (CR 601.3): `actions::cast` judges the other permissions on the spell as it is on
+the stack under its caster (CR 601.2a, 601.3b: an opponent's Necromancy cast from exile under Encroaching Mycosynth is an
+artifact spell there, so Raff Capashen's permission applies) and asks it then, a
+`ChooseModes` of `Label::CastPermission`s, its own first, since the sacrifice may be what they want. A spell an effect casts
+as it resolves is cast by that effect's permission and is never marked.
 
 ### Extra turns and "that turn"
 
@@ -1679,7 +1685,7 @@ effect reads it with `History::fact_as_cast(spell)`. A copy of the spell was not
 its fact is 0, which is the rulings' "the copy wasn't cast, so whether you controlled a Dragon won't matter". Nor has it
 what its object carries of a cast: `ops::copy_spell` gives it no `cast_from` (Sevinne's Reclamation's copy was not cast from a
 graveyard and does not copy itself; `statics::spell_you_cast` is `cast_from` alone, so a cast copy of a card, a prepare
-spell's, is a spell you cast), no `cast_untimely` and no granted way's `gains`. What was chosen and paid as the original
+spell's, is a spell you cast), no `untimely_by_own_flash` and no granted way's `gains`. What was chosen and paid as the original
 was cast it does copy: X, kicks, other additional costs, gift and the alternative cost (`cast_way`, the item's `way`: a copy
 of a sneak-cast spell had its sneak cost paid). The `Cast`
 record grew from 12 to 16 bytes and the `Event` stayed 20; a card with no fact costs one `Option` test per cast. Steer

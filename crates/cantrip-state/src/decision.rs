@@ -1454,6 +1454,11 @@ pub enum Label {
     /// One instance of the word "target" on a spell or ability (CR 115.3), named by its slot's text, with what it holds:
     /// which of the instances that hold the same object a "change a target" effect changes (CR 115.7b, Spellskite).
     TargetSlot(&'static str, Target),
+    /// The permission a spell is cast by at a time a sorcery couldn't have been cast (CR 601.3, 307.5), where its card's text
+    /// asks which (Necromancy's cycle, `CardDef::untimely_cleanup_rider`): its own "you may cast this spell as though it had
+    /// flash" (`own`), or another one - `by` the card that gives it, where a card does (Valley Floodcaller), none for a rule
+    /// of the spell's own (an instant, flash).
+    CastPermission { own: bool, by: Option<CardId> },
 }
 
 /// One miracle ability of a card (CR 702.94a), named without the object, which a question asked as the card is drawn may not

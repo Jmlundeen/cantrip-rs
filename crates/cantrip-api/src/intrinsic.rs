@@ -56,6 +56,9 @@ pub const DECAYED: u8 = 14;
 pub const DECAYED_SACRIFICE: u8 = 15;
 /// The triggered ability a player with speed has (CR 702.179d).
 pub const SPEED_UP: u8 = 16;
+/// "The controller of the permanent it becomes sacrifices it at the beginning of the next cleanup step": the delayed
+/// triggered ability `CardDef::untimely_cleanup_rider` creates (Necromancy's cycle).
+pub const UNTIMELY_SACRIFICE: u8 = 17;
 /// The highest speed, max speed (CR 702.179e): "once your speed reaches 4 ... [you] can't increase it any higher" (the
 /// Aetherdrift release notes).
 pub const MAX_SPEED: u8 = 4;
@@ -92,6 +95,20 @@ fn decayed_attacks(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// controller (CR 603.7e: the attack trigger's) still controls it (CR 701.21a).
 fn decayed_sacrifice(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.sacrifice(item.controller, &[item.object]);
+    Ok(())
+}
+
+/// "The controller of the permanent it becomes sacrifices it": the permanent the delayed ability is about, if it is still that
+/// object on the battlefield (CR 603.7c, 400.7), sacrificed by whoever controls it as the ability resolves (CR 701.21a), not
+/// by the ability's controller.
+fn untimely_sacrifice(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(it) = item.subject
+        && crate::game::is_live(g, it)
+        && g.is_on_battlefield(it)
+    {
+        let controller = g.controller(it);
+        g.sacrifice(controller, &[it]);
+    }
     Ok(())
 }
 
@@ -216,6 +233,7 @@ pub static INTRINSIC: CardDef = CardDef {
             speed_up,
         )
         .condition(speed_below_max),
+        inherent("At the beginning of the next cleanup step, the controller of the permanent it became sacrifices it.", untimely_sacrifice),
     ],
     lasting: &[Lasting { text: "you control {source}", holds: caster_controls }],
     ..CardDef::BLANK

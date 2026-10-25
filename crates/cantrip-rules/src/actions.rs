@@ -6295,7 +6295,9 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             // it lets the card be cast, for what it names instead of the mana cost or with what it adds - and for the
             // alternative cost the option names, if any (CR 118.9).
             let through = through(&*cx, cx.cards(), player, source, action.granted_by).expect("an offered cast names what it is made by");
-            let alternative = action.paid_by.and_then(|g| named_alternative(cx.s(), cx.cards(), g)).map(|a| a.what.cost.cost());
+            let paid_by = action.paid_by.and_then(|g| named_alternative(cx.s(), cx.cards(), g));
+            let alternative = paid_by.map(|a| a.what.cost.cost());
+            let flash_alternative = paid_by.filter(|a| a.what.flash).map(|a| a.grant);
             let (route, way) = match through {
                 Through::Route(route) => (route, None),
                 Through::Way(way) => (Route { by: action.granted_by, ..Route::RULES }, Some(way)),
@@ -6312,7 +6314,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 exile_instead: route.terms.exile_instead,
                 ..CastTerms::default()
             };
-            let by = CastBy { by: action.granted_by, way, additional: route.additional, life_for_mana_value: route.life(), alternative };
+            let by = CastBy { by: action.granted_by, way, additional: route.additional, life_for_mana_value: route.life(), alternative, flash_alternative };
             cast(cx, player, source, action.index, &action.targets, terms, by, false)?
         }
         ActionKind::ActivateAbility if action.index >= PLAYER_MANA_ABILITY => {
@@ -6414,12 +6416,73 @@ struct CastBy {
     life_for_mana_value: bool,
     /// What an alternative cost another object gives has paid rather than the mana cost (CR 118.9, `ActionOption::paid_by`).
     alternative: Option<Cost>,
+    /// That alternative cost, where it lets the spell be cast as though it had flash (Primal Prayers): a permission of its own
+    /// to cast it at a time a sorcery couldn't have been cast (CR 307.5).
+    flash_alternative: Option<Grant>,
 }
 
 impl Default for CastBy {
     fn default() -> CastBy {
-        CastBy { by: None, way: None, additional: Cost::NONE, life_for_mana_value: false, alternative: None }
+        CastBy { by: None, way: None, additional: Cost::NONE, life_for_mana_value: false, alternative: None, flash_alternative: None }
     }
+}
+
+/// The permissions other than the card's own "you may cast this spell as though it had flash" that let `player` cast
+/// `spell` (`whole`, cast by `way` as itself) now, at a time a sorcery couldn't have been cast (CR 601.3, 307.5): each by the
+/// card that gives it - an effect's (`static_rules::flash_type_grants`), a permanent's static ability (Valley Floodcaller),
+/// an alternative cost that says so (Primal Prayers) - or none for a rule of the spell's own (an instant, flash, a way of its
+/// own cast whenever an instant could be). One entry for each card. A permission for "a spell with certain qualities" is
+/// judged on the spell as it is on the stack, under its caster, with the effects that apply to it there (CR 601.2a,
+/// 601.3b): an opponent's card cast from exile is an artifact spell under Encroaching Mycosynth's "nonland permanents you
+/// control are artifacts in addition to their other types, and the same is true for permanent spells you control".
+fn other_flash_permissions(cx: &Cx, player: PlayerId, spell: ObjectId, whole: &'static CardDef, way: u8, alternative: Option<Grant>) -> Vec<Option<CardId>> {
+    let mut others: Vec<Option<CardId>> = Vec::new();
+    let mut add = |by: Option<CardId>| {
+        if !others.contains(&by) {
+            others.push(by);
+        }
+    };
+    let own_way_at_instant_speed = way > 0 && whole.ways.get(way as usize - 1).is_some_and(|w| w.instant_speed);
+    let chars = cx.chars(spell);
+    if chars.is(CardType::Instant) || chars.has(Keyword::Flash) || own_way_at_instant_speed {
+        add(None);
+    }
+    for (source, types) in static_rules::flash_type_grants(cx, player) {
+        if chars.types.0 & types.0 != 0 {
+            add(Some(cx.cards().current(cx.s().obj(source))));
+        }
+    }
+    for (id, controller, granter) in static_rules::flash_granters(cx) {
+        if static_rules::grants_flash(cx, &[(id, controller, granter)], player, spell) {
+            add(Some(cx.cards().current(cx.s().obj(id))));
+        }
+    }
+    if let Some(grant) = alternative {
+        add(Some(grant.ability.card));
+    }
+    others
+}
+
+/// Whether `player` casts `spell` by its card's own "you may cast this spell as though it had flash" rather than by one of
+/// `others` that would let it be cast now too (CR 601.3; Necromancy's 2022-12-08 ruling: only a cast by its own permission
+/// has it sacrificed at the next cleanup step). Theirs to choose, as either may be what they want.
+fn choose_own_flash(cx: &mut Cx, player: PlayerId, spell: ObjectId, others: &[Option<CardId>]) -> R<bool> {
+    let modes: Vec<Label> =
+        std::iter::once(Label::CastPermission { own: true, by: None }).chain(others.iter().map(|&by| Label::CastPermission { own: false, by })).collect();
+    let ask = RequestKind::ChooseModes {
+        source: spell,
+        eligible: (0..modes.len() as u8).collect(),
+        modes,
+        count: 1,
+        at_most: 0,
+        affordable: Vec::new(),
+        additional_cost: false,
+        repeat: false,
+    };
+    Ok(match cx.ask_core(player, ask, false)? {
+        Answer::Modes(chosen) => chosen.first().is_none_or(|&n| n == 0),
+        _ => true,
+    })
 }
 
 /// Casting a spell (CR 601.2): it moves to the stack, its costs are chosen and paid, and it becomes cast. Cast as an
@@ -6500,16 +6563,27 @@ fn cast(
     let prepared_from = cx.s().obj(card).prepared_from;
     let from = cx.s().obj(card).zone.kind();
     let cast_from = from;
-    // CR 307.1: whether a sorcery could have been cast now, read before the spell goes on the stack. A spell an effect casts
-    // as it resolves is cast by that effect's permission, never by its own "as though it had flash" (Necromancy's 2022-12-08
-    // ruling), so it is not counted as cast at such a time.
-    let untimely = !resolving && !(cx.s().turn.active == player && matches!(cx.s().turn.step(), Step::PrecombatMain | Step::PostcombatMain) && cx.s().stack.is_empty());
+    // "If you cast it any time a sorcery couldn't have been cast" (`CardDef::untimely_cleanup_rider`): whether a sorcery could
+    // have been cast now (CR 307.1), read before the spell goes on the stack, and whether the card's own "you may cast this
+    // spell as though it had flash" is what lets it be cast (Necromancy's 2022-12-08 ruling). A spell an effect casts as it
+    // resolves is cast by that effect's permission, never by its own. Where another permission would let it be cast now as
+    // well, its caster chooses which one they cast it by (CR 601.3), asked once it is on the stack (below), where the other
+    // permissions are judged on the spell it is there (CR 601.2a, 601.3b).
+    let untimely = !resolving
+        && whole.untimely_cleanup_rider
+        && whole.cast_as_though_flash
+        && std::ptr::eq(def, whole)
+        && !(cx.s().turn.active == player && matches!(cx.s().turn.step(), Step::PrecombatMain | Step::PostcombatMain) && cx.s().stack.is_empty());
     let spell = ops::move_to_for(cx, card, Zone::STACK, ZoneReason::Cast);
     cx.st().update_obj(spell, |o| {
         o.controller = player;
         o.cast_from = Some(from);
-        o.marks.cast_untimely = untimely;
     });
+    if untimely {
+        let other_permissions = other_flash_permissions(cx, player, spell, whole, way, by.flash_alternative);
+        let by_own = other_permissions.is_empty() || choose_own_flash(cx, player, spell, &other_permissions)?;
+        cx.st().update_obj(spell, |o| o.marks.untimely_by_own_flash = by_own);
+    }
     // "If you do, it gains ...": the spell carries it to the permanent it becomes, from the way a permanent gives it was cast
     // by (Serra Paragon's, its permission or its cost).
     if let Some(g) = by.by

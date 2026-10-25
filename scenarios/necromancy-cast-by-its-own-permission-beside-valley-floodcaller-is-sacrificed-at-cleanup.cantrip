@@ -1,0 +1,39 @@
+# Necromancy's 2022-12-08 ruling: it is sacrificed at the beginning of the next cleanup step only if it was cast using its own
+# permission to be cast as though it had flash. With Valley Floodcaller on the battlefield ("You may cast noncreature spells
+# as though they had flash"), two permissions let Bot1 cast it in Bot2's turn, a time a sorcery couldn't have been cast, and
+# Bot1 chooses which one it casts it by (CR 601.3). Cast by its own, its delayed triggered ability is made as it becomes a
+# permanent (CR 608.3g) and sacrifices it at the beginning of Bot2's cleanup step (CR 514.3a).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Valley Floodcaller
+Sol Ring
+Mox Jet
+Necromancy
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Necromancy.Cast
+Bot1.Modes(Its own permission)
+[T2 Bot2.End]
+? Bot1.Battlefield.Necromancy.Types = Enchantment
+? Delayed.Count = 1
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Necromancy; Black Lotus

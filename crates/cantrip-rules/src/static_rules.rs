@@ -303,15 +303,16 @@ pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
 
 /// The card types `player` may cast as though they had flash (CR 307.5, 702.8): from effects that gave them that.
 pub fn flash_types(cx: &Cx, player: PlayerId) -> TypeSet {
-    let mut types = TypeSet::NONE;
-    for e in &cx.s().effects {
-        if let EffectKind::CastAsThoughFlash(t) = e.kind
-            && e.controller == player
-        {
-            types = TypeSet(types.0 | t.0);
-        }
-    }
-    types
+    flash_type_grants(cx, player).fold(TypeSet::NONE, |types, (_, t)| TypeSet(types.0 | t.0))
+}
+
+/// Each effect that lets `player` cast spells of some card types as though they had flash (CR 307.5, 702.8): its source and
+/// the types.
+pub fn flash_type_grants<'a>(cx: &'a Cx, player: PlayerId) -> impl Iterator<Item = (ObjectId, TypeSet)> + 'a {
+    cx.s().effects.iter().filter_map(move |e| match e.kind {
+        EffectKind::CastAsThoughFlash(t) if e.controller == player => Some((e.source, t)),
+        _ => None,
+    })
 }
 
 /// The permanents whose static abilities let their controller cast some spells as though they had flash (CR 307.5): found

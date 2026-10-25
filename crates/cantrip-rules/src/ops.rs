@@ -355,7 +355,6 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         }
         new.card_copy = old.card_copy;
         new.marks = Marks {
-            cast_untimely: from_stack && old.marks.cast_untimely,
             // CR 709.5d: a Room enters with the unlocked designation of the half that was cast as a spell, and with
             // neither if neither was.
             doors: if from_stack && cx.cards().get(old.card).is_room() { cast_door(old.cast_way) } else { 0 },
@@ -2110,7 +2109,7 @@ pub fn copy_spell_as(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets
     // cost (`x`, `kicked`, `paid`, `gift`, `cast_way`), with its copiable values (`card`, `copy`, CR 707.2) and the
     // face it is (`transformed`, `face_down`). Its object was never cast, so the history has no cast of it either.
     obj.cast_from = None;
-    obj.marks = Marks { cant_be_countered: false, gains_haste: false, cast_untimely: false, gains: None, ..original.marks };
+    obj.marks = Marks { cant_be_countered: false, gains_haste: false, untimely_by_own_flash: false, gains: None, ..original.marks };
     (obj.card_copy, obj.prepared_from, obj.prepared, obj.became) = (true, None, false, None);
     // A new object, with no counters (CR 707.2: counters are not copied).
     obj.clear_counters();

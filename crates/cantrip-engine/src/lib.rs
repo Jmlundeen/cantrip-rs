@@ -278,12 +278,28 @@ pub fn label_text_in(table: &'static CardTable, label: &Label) -> &'static str {
         Label::ManaCost => "Pay its mana cost",
         Label::AlternativeCost(card, i) => cards().get(card).spell_alternatives.get(i as usize).map_or("", |a| a.text),
         Label::Way(card, i) => cards().get(card).ways.get(i as usize).map_or("", |w| w.text),
+        Label::CastPermission { own: true, .. } => "Its own permission",
+        Label::CastPermission { by: Some(card), .. } => cards().get(card).name,
+        Label::CastPermission { by: None, .. } => "Its own speed",
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// "If you cast it any time a sorcery couldn't have been cast, ..." (`CardDef::untimely_cleanup_rider`) is about a cast by
+    /// the card's own "you may cast this spell as though it had flash", which every card that prints it prints first
+    /// (Weatherlight's cycle): a card with the rider and not the permission would never be cast by its own. And a card has
+    /// the rider exactly when its text has the sentence, so none can forget it or carry it unprinted.
+    #[test]
+    fn a_cleanup_rider_comes_with_its_own_flash_permission() {
+        const RIDER: &str = "If you cast it any time a sorcery couldn't have been cast, the controller of the permanent it becomes sacrifices it at the beginning of the next cleanup step.";
+        for def in &cards().cards {
+            assert!(!def.untimely_cleanup_rider || def.cast_as_though_flash, "{}: a cleanup rider without its own flash permission", def.name);
+            assert_eq!(def.untimely_cleanup_rider, def.text.contains(RIDER), "{}: the cleanup rider and its text disagree", def.name);
+        }
+    }
 
     /// Craft's materials (CR 702.167a) are exiled by activating an ability, which exiles its source with them: no way of
     /// casting a spell pays them, so a card whose spell costs carry them, or whose craft ability does not exile itself, is

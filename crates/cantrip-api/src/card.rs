@@ -1457,7 +1457,7 @@ pub fn fused_half_unbuilt(half: &CardDef) -> Option<&'static str> {
         (half.cost_of_targets.is_some(), "a cost read from its targets"),
         (half.cast_fact.is_some(), "a fact kept as it is cast"),
         (!half.end_step_riders.is_empty(), "an end step rider"),
-        (half.untimely_cleanup_rider.is_some(), "a cleanup rider"),
+        (half.untimely_cleanup_rider, "a cleanup rider"),
         (!half.ways.is_empty(), "ways of its own to be cast"),
         (half.overload.is_some(), "overload"),
         (half.cast_only_if.is_some(), "a condition on casting it"),
@@ -2778,13 +2778,15 @@ pub struct CardDef {
     /// whose copiable values are such a definition was turned face down before it entered (CR 708.3); its first ability
     /// turns it face up (`intrinsic::TURN_FACE_UP`). Only the rules' own definitions (`crate::intrinsic`) set it.
     pub face_down: bool,
-    /// "If you cast it any time a sorcery couldn't have been cast, ... at the beginning of the next cleanup step": the index
-    /// in `delayed` of the delayed triggered ability this static ability, which functions on the stack, creates as the spell
-    /// becomes a permanent (CR 608.3g, 603.7a), if it was cast at such a time by its own "as though it had flash" permission
-    /// (`Marks::cast_untimely`; Necromancy's 2022-12-08 ruling). It triggers at the beginning of the next cleanup step (CR
-    /// 514.3a), about that permanent, and is controlled by the spell's controller (CR 603.7d). Necromancy, Armor of Thorns,
-    /// Spider Climb and the rest of Weatherlight's cycle (`cantrip_mechanics::untimely`).
-    pub untimely_cleanup_rider: Option<u8>,
+    /// "If you cast it any time a sorcery couldn't have been cast, the controller of the permanent it becomes sacrifices it at
+    /// the beginning of the next cleanup step", which follows `cast_as_though_flash`'s "you may cast this spell as though it
+    /// had flash" (Necromancy, Armor of Thorns, Spider Climb and the rest of Weatherlight's cycle). A static ability that
+    /// functions on the stack: if the spell was cast at such a time by that permission of its own (`Marks::untimely_by_own_flash`;
+    /// where another permission would allow the cast too, its caster chooses which they cast it by, CR 601.3, Necromancy's
+    /// 2022-12-08 ruling), the core creates the rules' delayed triggered ability `intrinsic::UNTIMELY_SACRIFICE` as the spell
+    /// becomes a permanent (CR 608.3g, 603.7a), about that permanent and controlled by the spell's controller (CR 603.7d). It
+    /// triggers at the beginning of the next cleanup step (CR 514.3a).
+    pub untimely_cleanup_rider: bool,
     /// Splice onto Arcane (CR 702.47): the cost paid to add this card's spell effect to an Arcane spell as it is cast. The
     /// spell ability it adds must have no targets.
     pub splice: Option<ManaCost>,
@@ -3027,7 +3029,7 @@ impl CardDef {
         storied: false,
         start_your_engines: false,
         face_down: false,
-        untimely_cleanup_rider: None,
+        untimely_cleanup_rider: false,
         splice: None,
         dungeon: &[],
         cast_rules: &[],
@@ -3162,7 +3164,7 @@ impl CardDef {
             (!self.additional_triggers.is_empty(), "additional triggers"),
             (self.ascend || self.storied || self.start_your_engines, "a designation keyword"),
             (self.may_not_untap || self.granted_once_each_turn.is_some(), "a permanent's rule"),
-            (self.untimely_cleanup_rider.is_some(), "a cleanup rider"),
+            (self.untimely_cleanup_rider, "a cleanup rider"),
             (!self.basic_land_types.is_empty(), "basic land types"),
         ];
         refused.into_iter().find(|&(has, _)| has).map(|(_, what)| what)

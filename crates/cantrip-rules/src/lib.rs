@@ -32,6 +32,8 @@ mod any_color_spell_tests;
 #[cfg(test)]
 mod back_face_targets_tests;
 #[cfg(test)]
+mod cast_permission_tests;
+#[cfg(test)]
 mod cloak_tests;
 #[cfg(test)]
 mod control_at_once_tests;

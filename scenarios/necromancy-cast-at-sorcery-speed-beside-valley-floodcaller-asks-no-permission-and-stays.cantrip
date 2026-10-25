@@ -1,0 +1,40 @@
+# Necromancy's 2022-12-08 ruling: which permission it was cast by matters only when it is cast at a time a sorcery couldn't
+# have been cast. Bot1 casts it in its own later main phase with an empty stack, beside Valley Floodcaller ("You may cast noncreature
+# spells as though they had flash"): it is cast by the rules every player has, so Bot1 is asked no choice of permission, no
+# delayed sacrifice is made, and Necromancy (a plain enchantment, with no creature card in any graveyard) is still on the
+# battlefield in Bot1's next turn.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Valley Floodcaller
+Sol Ring
+Mox Jet
+Necromancy
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+? Stack.Count = 0
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Necromancy.Cast
+! Bot1.Modes
+[T3 Bot1.End]
+? Delayed.Count = 0
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Necromancy.Types = Enchantment
+Bot1.Graveyard = Black Lotus
