@@ -1,0 +1,53 @@
+# Spell Queller's enters ability exiles a creature spell at its limit: Bot2's Argothian Elder, mana value exactly 4. When
+# Bot2's Bolt kills the Queller, its leaves-the-battlefield ability asks Bot2, the Elder's owner, whether to cast it
+# (CR 608.2g, a "may"); Bot2 declines, and the Elder stays in exile, never to be cast (it cannot wait, the ruling).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Spell Queller
+Island x16
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Argothian Elder
+Mox Ruby
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Argothian Elder.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spell Queller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Argothian Elder
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Spell Queller)
+Bot2.Pass
+Bot1.Pass
+Bot2.Decline
+[Bot2.Main2]
+
+[Expect]
+Exile = Argothian Elder
+Bot2.Battlefield.Argothian Elder = (absent)
+Bot1.Graveyard = Spell Queller
+Stack.Count = 0

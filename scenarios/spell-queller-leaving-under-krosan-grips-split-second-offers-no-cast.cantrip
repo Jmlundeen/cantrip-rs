@@ -1,0 +1,57 @@
+# No spell is cast while a spell with split second is on the stack, by a resolving ability either (CR 702.61a, 608.2g,
+# Krosan Grip's ruling). Spell Queller exiles Bot2's Lightning Bolt. Bot2 casts Krosan Grip at Bot1's Ashnod's Altar;
+# in response Bot1 sacrifices the Queller to the Altar (a mana ability, which split second allows, CR 702.61b). Its
+# leaves-the-battlefield ability resolves above the Grip: Bot2, the Bolt's owner, could not cast it, so is not asked (the
+# refusal), and the Bolt stays in exile. (Asked and accepted without split second:
+# spell-queller-exiles-an-opponents-bolt-whose-owner-casts-it-free-at-a-new-target-when-it-dies.)
+
+[Bot1 Deck]
+Black Lotus
+Ashnod's Altar
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Spell Queller
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mountain
+Lightning Bolt
+Krosan Grip
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ashnod's Altar.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spell Queller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Krosan Grip.Cast(Ashnod's Altar)
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: Spell Queller)
+Bot1.Pass
+Bot2.Pass
+! Bot2.Accept
+[Bot2.Main2]
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Graveyard = Ashnod's Altar; Spell Queller; Black Lotus
+Bot2.Graveyard = Krosan Grip; Black Lotus
+Bot1.Life = 20

@@ -1,0 +1,56 @@
+# Whether the exiled card's owner could cast it is judged for the owner, not the Queller's controller (CR 608.2g, 101.2).
+# Bot1 controls Drannith Magistrate ("Your opponents can't cast spells from anywhere other than their hands") and Spell
+# Queller, which exiles Bot2's Lightning Bolt. When Bot2's second Bolt kills the Queller, Bot2 - an opponent of the
+# Magistrate's controller - can't cast the exiled Bolt from exile, so is not asked (the refusal); judged for Bot1, who may
+# cast from exile, it would be. The Bolt stays in exile.
+
+[Bot1 Deck]
+Black Lotus
+Drannith Magistrate
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Spell Queller
+Island x14
+
+[Bot2 Deck]
+Mountain x2
+Lightning Bolt x2
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Drannith Magistrate.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spell Queller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Spell Queller)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+! Bot2.Accept
+[Bot2.Main2]
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Graveyard = Spell Queller; Black Lotus
+Bot1.Battlefield.Drannith Magistrate.Tapped = false
+Bot1.Life = 20

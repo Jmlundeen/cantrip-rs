@@ -1,0 +1,72 @@
+# Spell Queller's enters ability targets a spell of its controller's own as well as an opponent's, and none of mana value 5:
+# Bot2 casts Traumatic Critique with X 3 at Bot1 (mana value 5, the X counted, CR 202.3e and the ruling); Bot1 responds
+# with two Bolts at Bot2, then flashes in Spell Queller, whose ability cannot target the Critique (the refusal) and exiles
+# one of Bot1's own Bolts (CR 115.1: its "target spell" has no "an opponent controls"). The Critique deals Bot1 3 and the
+# other Bolt Bot2 3. The Queller has flying. On turn 3 Bot1 sacrifices it to Ashnod's Altar: the exiled card's owner is
+# Bot1 itself, who casts the Bolt free (CR 608.2g, 118.9) at Bot2 - the Altar's {C}{C} still floating.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Lightning Bolt x2
+Spell Queller
+Island
+Ashnod's Altar
+Island x12
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Traumatic Critique
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Traumatic Critique.Cast(Bot1; X: 3)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Traumatic Critique.ManaValue = 5
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spell Queller.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Traumatic Critique)
+Bot1.Target(Lightning Bolt)
+[Bot2.Main2]
+? Exile = Lightning Bolt
+? Bot1.Life = 17
+? Bot2.Life = 17
+? Bot1.Battlefield.Spell Queller.Keywords = Flash; Flying
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ashnod's Altar.Cast
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: Spell Queller)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot2)
+? Stack = Lightning Bolt
+? Bot1.Mana = {C}{C}
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 17
+Bot1.Graveyard = Lightning Bolt; Spell Queller; Lightning Bolt; Black Lotus
+Exile.Count = 0

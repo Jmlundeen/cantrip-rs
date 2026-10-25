@@ -1,0 +1,69 @@
+# Panharmonicon doubles Spell Queller's enters ability: one exiles Bot2's Shock, the other Bot2's Lightning Bolt, both
+# linked to the Queller (CR 607.2a). When it dies, Bot2 owns both and casts them as its leaves ability resolves in the order
+# Bot2 chooses (CR 608.2g, 101.4c): the Bolt first, then the Shock, which resolves first - not the order they were exiled in.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Panharmonicon
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Spell Queller
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Shock
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Panharmonicon.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Shock.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Spell Queller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(Spell Queller; Spell Queller)
+Bot1.Target(Lightning Bolt)
+Bot1.Target(Shock)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt; Shock
+? Stack.Count = 0
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Spell Queller)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Lightning Bolt)
+Bot2.Target(Bot1)
+Bot2.Choose(Shock)
+Bot2.Target(Bot1)
+? Stack = Shock; Lightning Bolt
+[Bot2.Main2]
+
+[Expect]
+Bot1.Life = 15
