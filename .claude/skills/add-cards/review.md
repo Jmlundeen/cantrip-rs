@@ -48,18 +48,27 @@ A reviewer runs only the card's scenarios and coverage (`corpus -- --card "Name"
 card whose shared code the change touched - nothing wider. It **breaks the card** to see which expectation catches each
 decision its code makes (a number, a filter, whose objects, a condition): one temporary edit at a time in the card's own
 worktree, run, then restored at once with `git checkout -- <file>`; a scenario it proposes is written to its scratchpad
-and tried there the same way. It commits nothing, cleans nothing, never clones the repository elsewhere, and leaves
-`git status` clean. It reaches that worktree only by the token in its prompt (`tools\worktree.cmd join`, its first
+and tried there the same way. It commits only the fixes the next paragraph but one gives it, cleans nothing, never
+clones the repository elsewhere, and leaves `git status` clean. It reaches that worktree only by the token in its prompt (`tools\worktree.cmd join`, its first
 command, and `leave` its last), never by a path it was given. Every command runs in the foreground with a long timeout
 (up to 600000 ms: a shorter one moves a long run to the background), never in the background: a reviewer that stops to
 wait on one is made to leave its worktree with its break edit still in place.
 
-The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
-land. Self-reported "exact" is not proof. A finding **blocks** the card when it is a rules deviation, a code defect
-(an overflow included), an item on the "never" list, or a test that is obviously insufficient - and a decision of the
-card's own code (a number, a limit, a narrowing, whose objects) that no expectation would catch being wrong is
-obviously insufficient, however small. A wrong citation is fixed in the same pass; the rest (wording, optional
-sharing) does not hold the card.
+Self-reported "exact" is not proof. A finding **blocks** the card when it is a rules deviation, a code defect (an
+overflow included), an item on the "never" list, overlap, or a test that is obviously insufficient - and a decision of
+the card's own code (a number, a limit, a narrowing, whose objects) that no expectation would catch being wrong is
+obviously insufficient, however small. The rest (wording, optional sharing) does not hold the card.
+
+Who fixes a finding depends on what it changes. **The reviewer fixes, itself, what changes no code**: a missing or weak
+expectation or scenario, a wrong citation, a stale comment, a missing `Closes #N`, and folding the card's fix-up commits
+into one commit per card. It has already written and broken the probe; handing that to another agent only reloads the
+card. Each expectation it adds is break-tested (it fails under the break and passes as written), and its fixes are folded
+into the commit they belong to, the author kept (`git commit --fixup` and `GIT_SEQUENCE_EDITOR=true git rebase
+--autosquash origin/main`); it logs `fixes-committed` and then `review-passed`. **A finding that changes code** - the
+card's logic, shared code, the core - goes back to an author, so that what the fix decides is reviewed by someone who
+did not write it: the reviewer reports it, logs `review-blocked`, and confirms the fix when it comes back. The
+reviewer's verdict is final: the coordinator lands on it and does not review the card again. Nothing is changed
+silently: every fix is in the report.
 
 **A reviewer never accepts a rules deviation, or anything that risks one** (`CLAUDE.md`, "No rules deviations"): a
 clamp, a floor, a fixed-size list that cuts down or drops, an approximation that holds only for today's cards, a path
@@ -70,5 +79,6 @@ A rules finding needs a card that reaches it: any card legal in a format Cantrip
 card the engine implements, legal or not (`CLAUDE.md`, "Bug priority"). Name the cards; a case no such card can reach
 is not raised.
 
-Report briefly: PASS, or the blocking findings - each with file:line, what is wrong and the rule - then any
-non-blocking notes apart.
+Report briefly: PASS (with the commits the card now stands at, ready to land, and each fix the reviewer made, with the
+break that proves it), or the blocking findings an author must fix - each with file:line, what is wrong and the rule -
+then any non-blocking notes apart.

@@ -46,11 +46,13 @@ of corner cases. Add only what a PR makes different:
   given it; a new or widened shared function names a second printed card that uses it exactly as written, is the same
   for every caller, and does real rules or game-state work rather than glue over a call that is already shared.
 
-Read its report before acting on it; a finding that is wrong is dropped, and the user is told which and why.
+The reviewer also fixes, itself, what changes no code (`review.md`): a missing expectation, a citation or comment, the
+`Closes #N` trailer, and folding the PR's fix-up commits so each card lands as one commit, the contributor's authorship
+kept. Its verdict is final; the coordinator does not review the PR a second time.
 
-## 3. Fixes: a fresh Sonnet agent
+## 3. Fixes that change code: a fresh Sonnet agent
 
-With blocking findings (or a non-blocking note that `coordinator.md` step 4 says to send back), start a fresh agent
+With a finding that changes code (the card's logic, shared code, the core), start a fresh agent
 (`model: "sonnet"`, no worktree isolation) in the same lease, with a write token once the reviewer has left, as the
 card agent that would have written the card: its
 prompt is a card agent's (`coordinator.md` step 2 - `SKILL.md` read with the Read tool, the `write-game-script` skill,
