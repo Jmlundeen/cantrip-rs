@@ -1,0 +1,55 @@
+# Venerated Loxodon ({4}{W}) is cast with Bot1's Ornithopters A and B tapped for convoke (CR 702.51a) and three Moxen
+# paying the rest. Ornithopter C (Bot1's, did not convoke) and Bot2's Ornithopter did not convoke, so they get nothing
+# ("each creature that convoked it"). With the enters trigger on the stack Lightning Bolt kills convoker B: it
+# convoked, but it is no longer the same object on the battlefield (CR 400.7), so only Ornithopter A gets its one
+# counter (+1/+1, power 1 and toughness 3 from 0/2) and the Loxodon itself, which did not convoke, stays 4/4.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Ornithopter
+Ornithopter
+Lightning Bolt
+Venerated Loxodon
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Venerated Loxodon.Cast(Convoke: Ornithopter, Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter#2)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Emerald; Ornithopter; Ornithopter; Venerated Loxodon
+Bot1.Battlefield.Venerated Loxodon.Power = 4
+Bot1.Battlefield.Venerated Loxodon.Toughness = 4
+Bot1.Battlefield.Venerated Loxodon.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Ornithopter#1.Toughness = 3
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot1.Graveyard = Ornithopter; Lightning Bolt

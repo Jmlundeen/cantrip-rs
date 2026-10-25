@@ -1,0 +1,68 @@
+# Bot2's March of the Machines makes Bot1's Sol Ring a 1/1 artifact creature. Venerated Loxodon is cast with Sol Ring
+# and one Ornithopter tapped for convoke (CR 702.51a) and three Plains paying the rest. With the enters trigger on the
+# stack Bot2's Disenchant destroys March: Sol Ring convoked (CR 702.51c) but is no longer a creature, and "each creature
+# that convoked it" means each creature permanent on the battlefield that did (CR 109.2), so it gets no counter. The
+# Ornithopter that convoked gets its one (1/3 from 0/2); the other Ornithopter, which did not convoke, gets none.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Ornithopter
+Ornithopter
+Venerated Loxodon
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+March of the Machines
+Disenchant
+Plains
+Plains
+Island x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.March of the Machines.Cast
+Bot2.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Sol Ring.Power = 1
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Venerated Loxodon.Cast(Convoke: Sol Ring, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(March of the Machines)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Disenchant; March of the Machines; Mox Emerald; Mox Ruby; Mox Jet; Mox Sapphire
+Bot1.Battlefield.Sol Ring.Types = Artifact
+Bot1.Battlefield.Sol Ring.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Venerated Loxodon.Counters.PlusOnePlusOne = (absent)
