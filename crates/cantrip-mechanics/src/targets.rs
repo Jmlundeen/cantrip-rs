@@ -77,6 +77,14 @@ fn spell_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
 pub const ANY: TargetSpec = target(any_target_filter);
 pub const CREATURE: TargetSpec = target(creature_filter);
 
+fn nonlegendary_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if !q.chars(id).supertypes.legendary)
+}
+
+/// "Target nonlegendary creature" (CR 115.1, 205.4a): a creature on the battlefield without the legendary supertype.
+/// Mirrorweave and Yoshimaru, Scrappy Stray print it; checked again as the ability resolves (CR 608.2b).
+pub const NONLEGENDARY_CREATURE: TargetSpec = target(nonlegendary_creature_filter);
+
 fn legendary_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).supertypes.legendary)
 }
