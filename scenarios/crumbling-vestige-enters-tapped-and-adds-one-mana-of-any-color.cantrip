@@ -1,0 +1,28 @@
+# Crumbling Vestige: "This land enters tapped. When this land enters, add one mana of any color." The trigger goes on the stack
+# (it is not a mana ability, CR 605.1b) and the color is chosen as it resolves: Bot1 picks green, which nothing else of Bot1's makes,
+# and the pool holds exactly {G}. The land is tapped, so it can't make {C} that turn; next turn it taps for exactly {C} (CR 106.1b).
+
+[Bot1 Deck]
+Crumbling Vestige
+Plains x6
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Crumbling Vestige.Play
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Crumbling Vestige.Tapped = true
+Bot1.Colors(Green)
+? Bot1.Mana = {G}
+? Stack.Count = 0
+! Bot1.Battlefield.Crumbling Vestige.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Crumbling Vestige.Activate
+? Bot1.Mana = {C}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Crumbling Vestige.Tapped = true
