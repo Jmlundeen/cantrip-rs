@@ -1,0 +1,46 @@
+# Anzrag's Rampage under Containment Priest: Black Lotus, sacrificed for the Rampage's mana, is an artifact put into a
+# graveyard from the battlefield this turn, so X is 1 and the top card, Llanowar Elves, is exiled. Bot1 puts it onto the
+# battlefield, but it wasn't cast, so the Priest exiles it instead (CR 614.1a): it never became a permanent, so "it gains
+# haste" and "return it to your hand at the beginning of the next end step" are about nothing (CR 603.7c, 400.7). At the
+# end step the Elves stay in exile, and Bot1's hand stays empty.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Containment Priest
+Anzrag's Rampage
+Llanowar Elves
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Containment Priest.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Anzrag's Rampage.Cast
+Bot1.Pass
+Bot1.Choose(Llanowar Elves)
+[T1 Bot1.Main2]
+? Exile = Llanowar Elves
+[T2 Bot2.Upkeep]
+
+[Expect]
+Turn = 2
+Exile = Llanowar Elves
+Bot1.Hand.Count = 0
+Bot1.Battlefield = Containment Priest; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Graveyard = Anzrag's Rampage; Black Lotus
+Bot1.Library.Count = 15

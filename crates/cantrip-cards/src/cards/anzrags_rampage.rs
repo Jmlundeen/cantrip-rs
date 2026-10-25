@@ -29,6 +29,11 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         exiled.iter().copied().filter(|&c| g.obj(c).zone.is(ZoneKind::Exile) && g.chars(c).is(CardType::Creature)).collect();
     let Some(&card) = choose::cards(g, you, item.object, Purpose::PutOntoBattlefield, creatures, 1, true)?.first() else { return Ok(()) };
     let creature = g.put_onto_battlefield(card, you, false)?;
+    // "It" is the permanent: a card a replacement sent elsewhere (Containment Priest's exile) never became one, so it gains
+    // nothing and nothing returns it (CR 603.7c, 400.7).
+    if !g.is_on_battlefield(creature) {
+        return Ok(());
+    }
     cantrip_mechanics::effects::gain_haste(g, item.object, creature);
     delayed::at_next_end_step(g, item, 0, Target::Object(creature));
     Ok(())
