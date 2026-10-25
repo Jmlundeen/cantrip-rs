@@ -1631,13 +1631,16 @@ spell's additional cost does (CR 601.2g-h by way of 602.2b): from what is there 
 taken back (CR 701.68b). The creature need not survive the counters (the rulings). 701.68d's "whenever a player blights" has no
 event yet: no card in content triggers on it.
 
-"Remove N counters from among [permanents you control]" (CR 118.3, 122.1) is `Cost::remove_counters_among`, a count and a filter
-over the payer's permanents: counters of any kinds, from any of them. It is payable while there are that many among them, and
-is asked as `RequestKind::RemoveCounters` - each kind on each permanent a `CounterPool` with how many there are, answered with
+"Remove N counters from among [permanents you control]" (CR 118.3, 122.1) is `Cost::remove_counters_among`, a `CountersAmong`: a
+count and a filter over the payer's permanents, and the kind of counter it names - none for "counters" of any kinds (Dawnhand
+Dissident, Tayam), one for "remove two +1/+1 counters from among creatures you control" (`remove_kind_counters_among`: Hopeful
+Initiate, Novijen Sages; The Filigree Sylex's oil counters), which no counter of another kind pays. It is payable while there
+are that many such counters among them, and is asked as `RequestKind::RemoveCounters` - each kind on each permanent a
+`CounterPool` with how many there are (only the cost's kind, when it names one), answered with
 `Answer::Counters` (how many of which kind from which permanent, adding up to the total, which `validate` checks) - chosen
 after the mana like blight and removed as the cost is paid (`counters::remove`, so a Siege's last defense counter still
 triggers). The host sends it as `RemoveCountersPromptMessage`; the web client offers a button for each kind on each permanent
-and takes one of a permanent's counters on a click on it. Dawnhand Dissident's casts pay it; Tayam, Luminous Enigma's ability is
+and takes one of a permanent's counters on a click on it, naming the kind in its subtitle when every pool is of one. Dawnhand Dissident's casts pay it; Tayam, Luminous Enigma's ability is
 the same cost on an activated ability, which `activate` pays too, though no card in content has it there yet.
 
 "Remove up to N counters from target creature" as an effect resolves (CR 608.2d, 122.1: Heartless Act, Hex Parasite, Price of

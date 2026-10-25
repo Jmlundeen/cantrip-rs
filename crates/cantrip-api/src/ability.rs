@@ -98,7 +98,13 @@ pub const fn remove_counters(kind: CounterKind, n: u8) -> Cost {
 
 /// "Remove N counters from among [permanents you control that pass the filter]", of any kinds (CR 118.3, 122.1).
 pub const fn remove_counters_among(n: u8, filter: ObjectFilter) -> Cost {
-    Cost { remove_counters_among: Some((n, filter)), ..Cost::NONE }
+    Cost { remove_counters_among: Some(CountersAmong { count: n, filter, kind: None }), ..Cost::NONE }
+}
+
+/// "Remove N [kind] counters from among [permanents you control that pass the filter]": only counters of that kind pay it
+/// (CR 118.3, 122.1). "Remove two +1/+1 counters from among creatures you control" (Hopeful Initiate).
+pub const fn remove_kind_counters_among(kind: CounterKind, n: u8, filter: ObjectFilter) -> Cost {
+    Cost { remove_counters_among: Some(CountersAmong { count: n, filter, kind: Some(kind) }), ..Cost::NONE }
 }
 
 /// "Put N [kind] counters on this [permanent]" as a cost (CR 118.3, 602.2b): Mazemind Tome's page counter.

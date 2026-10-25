@@ -794,17 +794,21 @@ fn pay_blight(cx: &mut Cx, player: PlayerId, cost: &Cost, chosen: Option<ObjectI
     }
 }
 
-/// What a cost that removes counters from among permanents may take them from (CR 118.3, 122.1): each kind of counter on
-/// each permanent the payer controls that passes the filter, with how many there are, in battlefield order.
-fn counter_pools(cx: &Cx, source: ObjectId, controller: PlayerId, filter: ObjectFilter, by: Option<Linked>) -> Vec<CounterPool> {
+/// What a cost that removes counters from among permanents may take them from (CR 118.3, 122.1): each kind of counter the
+/// cost names (every kind, or its one) on each permanent the payer controls that passes the filter, with how many there
+/// are, in battlefield order.
+fn counter_pools(cx: &Cx, source: ObjectId, controller: PlayerId, among: CountersAmong, by: Option<Linked>) -> Vec<CounterPool> {
     let asker = Asker { source, controller, by, spell: false };
     let mut pools = Vec::new();
     for id in cx.permanents_of(controller) {
-        if !filter(cx, &asker, id) {
+        if !(among.filter)(cx, &asker, id) {
             continue;
         }
         let obj = cx.s().obj(id);
         for kind in CounterKind::ALL {
+            if among.kind.is_some_and(|k| k != kind) {
+                continue;
+            }
             let count = obj.counters(kind);
             if count > 0 {
                 pools.push(CounterPool { object: id, kind, count: count as u16 });
@@ -817,14 +821,15 @@ fn counter_pools(cx: &Cx, source: ObjectId, controller: PlayerId, filter: Object
 /// Whether there are counters enough among the permanents a cost removes them from (CR 118.3).
 fn counters_among_payable(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> bool {
     cost.remove_counters_among
-        .is_none_or(|(n, filter)| counter_pools(cx, source, controller, filter, None).iter().map(|p| p.count as u32).sum::<u32>() >= n as u32)
+        .is_none_or(|among| counter_pools(cx, source, controller, among, None).iter().map(|p| p.count as u32).sum::<u32>() >= among.count as u32)
 }
 
 /// Chooses the counters a cost removes from among permanents (CR 601.2h), always asked, even when the choice is forced. Too
 /// few left (some gone since the action was offered) is a cost that can't be paid, and the spell or ability is taken back.
 fn choose_counters_among(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<(ObjectId, CounterKind, u16)>> {
-    let Some((total, filter)) = cost.remove_counters_among else { return Ok(Vec::new()) };
-    let pools = counter_pools(cx, source, player, filter, None);
+    let Some(among) = cost.remove_counters_among else { return Ok(Vec::new()) };
+    let total = among.count;
+    let pools = counter_pools(cx, source, player, among, None);
     if pools.iter().map(|p| p.count as u32).sum::<u32>() < total as u32 {
         return Err(Stop::Cancel);
     }
@@ -11115,4 +11120,52 @@ mod tests {
         assert_eq!(reduce(cost, &less), ManaCost::ZERO);
         assert_eq!(reduce(cost, &ManaCost { symbols: [0, 255, 0, 0, 0, 0], ..ManaCost::ZERO }), ManaCost { generic: 1, ..ManaCost::ZERO });
     }
+
+    fn creatures(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
+        q.chars(id).is(CardType::Creature)
+    }
+
+    /// Two creatures of the first player's: one with two -1/-1 counters and a stun counter, the other with one +1/+1
+    /// counter.
+    fn countered_creatures() -> (Game, ObjectId, ObjectId) {
+        let (mut game, ids) = table(&[(&BEAR, Zone::BATTLEFIELD, ME), (&BEAR, Zone::BATTLEFIELD, ME)]);
+        let mut c = cx(&mut game);
+        counters::put(&mut c, ids[0], CounterKind::MinusOne, 2, ME, counters::How::Cost);
+        counters::put(&mut c, ids[0], CounterKind::Stun, 1, ME, counters::How::Cost);
+        counters::put(&mut c, ids[1], CounterKind::PlusOne, 1, ME, counters::How::Cost);
+        (game, ids[0], ids[1])
+    }
+
+    /// CR 118.3, 122.1: "remove two +1/+1 counters from among creatures you control" (Hopeful Initiate) can't be paid with
+    /// -1/-1 or stun counters, so one +1/+1 counter among them is too few, and the choice offers only +1/+1 counters.
+    #[test]
+    fn a_cost_of_one_kind_of_counters_from_among_creatures_takes_only_that_kind() {
+        let (mut game, shrunk, grown) = countered_creatures();
+        let cost = cantrip_api::remove_kind_counters_among(CounterKind::PlusOne, 2, creatures);
+        let among = cost.remove_counters_among.expect("a removal");
+        let c = cx(&mut game);
+        assert!(!counters_among_payable(&c, grown, ME, &cost));
+        let pools: Vec<_> = counter_pools(&c, grown, ME, among, None).iter().map(|p| (p.object, p.kind, p.count)).collect();
+        assert_eq!(pools, [(grown, CounterKind::PlusOne, 1)]);
+        let mut c = cx(&mut game);
+        counters::put(&mut c, shrunk, CounterKind::PlusOne, 1, ME, counters::How::Cost);
+        assert!(counters_among_payable(&c, grown, ME, &cost));
+        let pools: Vec<_> = counter_pools(&c, grown, ME, among, None).iter().map(|p| (p.object, p.kind, p.count)).collect();
+        assert_eq!(pools, [(shrunk, CounterKind::PlusOne, 1), (grown, CounterKind::PlusOne, 1)]);
+    }
+
+    /// CR 118.3, 122.1: "remove three counters from among creatures you control" (Tayam, Luminous Enigma) takes counters of
+    /// any kinds, -1/-1 and stun counters too.
+    #[test]
+    fn a_cost_of_any_counters_from_among_creatures_takes_every_kind() {
+        let (mut game, shrunk, grown) = countered_creatures();
+        let cost = cantrip_api::remove_counters_among(4, creatures);
+        let c = cx(&mut game);
+        assert!(counters_among_payable(&c, grown, ME, &cost));
+        assert!(!counters_among_payable(&c, grown, ME, &cantrip_api::remove_counters_among(5, creatures)));
+        let pools: Vec<_> = counter_pools(&c, grown, ME, cost.remove_counters_among.expect("a removal"), None).iter().map(|p| (p.object, p.kind)).collect();
+        assert_eq!(pools.len(), 3);
+        assert!(pools.contains(&(shrunk, CounterKind::MinusOne)) && pools.contains(&(shrunk, CounterKind::Stun)) && pools.contains(&(grown, CounterKind::PlusOne)));
+    }
+
 }

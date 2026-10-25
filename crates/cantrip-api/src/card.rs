@@ -735,11 +735,10 @@ pub struct Cost {
     pub put_counters: Option<(CounterKind, u8)>,
     /// Remove a counter of any kind from the source (CR 118.3): the payer names the kind when it has more than one.
     pub remove_any_counter: bool,
-    /// Remove this many counters, of any kinds, from among the permanents the payer controls that pass the filter (CR 118.3,
-    /// 122.1): "remove three counters from among creatures you control" (the casts Dawnhand Dissident permits; Tayam,
-    /// Luminous Enigma's ability). Which counters, from which permanents, is chosen as the cost is chosen (CR 601.2h), and
-    /// they are removed as it is paid. Payable only while there are that many counters among them.
-    pub remove_counters_among: Option<(u8, ObjectFilter)>,
+    /// Remove counters from among the permanents the payer controls that pass the filter (CR 118.3, 122.1), of any kinds or
+    /// of one (`CountersAmong`). Which counters, from which permanents, is chosen as the cost is chosen (CR 601.2h), and
+    /// they are removed as it is paid. Payable only while there are that many such counters among them.
+    pub remove_counters_among: Option<CountersAmong>,
     /// Exile this card (from the zone the ability functions in: eternalize, CR 702.129a).
     pub exile_self: bool,
     /// Discard cards from your hand (CR 701.9), chosen as the cost is chosen: each instruction any cards ("discard a card"),
@@ -916,6 +915,18 @@ pub enum PermanentAction {
     Exile,
 }
 
+/// "Remove N [kind] counters from among [permanents you control]" (CR 118.3, 122.1): `count` counters from among the payer's
+/// permanents that pass `filter`. `kind` None takes counters of any kinds - "remove three counters from among creatures you
+/// control" (the casts Dawnhand Dissident permits; Tayam, Luminous Enigma; Lieutenant Commander Data). `Some` takes only
+/// that kind - "remove two +1/+1 counters from among creatures you control" (Hopeful Initiate, Novijen Sages), "ten oil
+/// counters from among permanents you control" (The Filigree Sylex): a -1/-1 or stun counter pays none of it.
+#[derive(Clone, Copy)]
+pub struct CountersAmong {
+    pub count: u8,
+    pub filter: ObjectFilter,
+    pub kind: Option<CounterKind>,
+}
+
 #[derive(Clone, Copy)]
 pub struct PermanentCost {
     pub count: u8,
@@ -1019,7 +1030,7 @@ impl Cost {
         c.energy = self.energy.saturating_mul(n);
         c.exile_from_graveyard = self.exile_from_graveyard.saturating_mul(n);
         c.blight = self.blight.saturating_mul(n);
-        c.remove_counters_among = self.remove_counters_among.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
+        c.remove_counters_among = self.remove_counters_among.map(|r| CountersAmong { count: r.count.saturating_mul(n), ..r }).filter(|_| n > 0);
         c.exile_from_hand = self.exile_from_hand.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
         c.discard = self.discard.times(n);
         c.permanents = self.permanents.map(|p| PermanentCost { count: p.count.saturating_mul(n), ..p }).filter(|_| n > 0);
@@ -1067,8 +1078,12 @@ impl Cost {
             c.remove_counters = other.remove_counters;
         }
         // Two removals from among permanents are one choice, of the first's permanents: no card has two with different filters.
+        // Nor with different kinds, which one choice can't stand for.
         c.remove_counters_among = match (self.remove_counters_among, other.remove_counters_among) {
-            (Some((a, f)), Some((b, _))) => Some((a.saturating_add(b), f)),
+            (Some(a), Some(b)) => {
+                assert!(same_kind(a.kind, b.kind), "two removals of counters from among permanents of different kinds can't be combined");
+                Some(CountersAmong { count: a.count.saturating_add(b.count), ..a })
+            }
             (None, b) => b,
             (a, None) => a,
         };
@@ -1216,6 +1231,15 @@ pub struct SuspendDef {
 }
 
 /// Whether two texts are the same, as the compiler can ask it.
+/// Whether two optional counter kinds are the same, in a const context.
+const fn same_kind(a: Option<CounterKind>, b: Option<CounterKind>) -> bool {
+    match (a, b) {
+        (None, None) => true,
+        (Some(a), Some(b)) => a as u8 == b as u8,
+        _ => false,
+    }
+}
+
 pub(crate) const fn same_str(a: &str, b: &str) -> bool {
     let (a, b) = (a.as_bytes(), b.as_bytes());
     if a.len() != b.len() {
