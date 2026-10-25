@@ -472,6 +472,13 @@ pub fn nonland_permanent_with_mana_value_at_most<const N: u32>(q: &dyn Query, as
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
 }
 
+/// "Target spell with mana value `N` or less" (CR 115.1, 202.3): a spell on the stack, its mana value asked of the spell as it
+/// is (an {X} counts as the value chosen for it, CR 202.3e; a face-down spell is 0, CR 708.2), as it is cast and again as it
+/// resolves (CR 608.2b). Change the Equation (2) and Spell Queller (4) print it.
+pub fn spell_with_mana_value_at_most<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    spell_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
+}
+
 /// "Target creature with mana value `N` or less" (CR 115.1, 202.3: X in a mana cost is 0 on the battlefield), whoever
 /// controls it. Requiting Hex (2) and Claim the Firstborn (3) print it.
 pub fn creature_with_mana_value_at_most<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {

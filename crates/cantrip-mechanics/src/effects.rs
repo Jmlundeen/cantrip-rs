@@ -576,6 +576,19 @@ pub fn ask_may(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Pu
     Ok(g.ask(player, RequestKind::May { source, purpose })? == Answer::Yes)
 }
 
+/// "[Player] may cast [card] without paying its mana cost" as the effect resolves (CR 608.2g, 118.9): `player` casts it then
+/// or not at all, its timing waived, X 0 (CR 107.3b), its additional costs paid. Nothing is asked when they could not cast
+/// it at all (a land, no legal target for them, split second on the stack); asked, they may decline, and a cast they give
+/// up (CR 733.1) leaves it where it was. `player` is the effect's controller or the player it names (`CastTerms::caster`:
+/// the card's owner, "that player"). Whether it was cast. Spell Queller (its owner), Ore-Rich Stalactite and the hideaway
+/// lands' "play the exiled card" print it.
+pub fn may_cast_without_paying(g: &mut dyn Game, player: PlayerId, card: ObjectId) -> Result<bool, Suspend> {
+    if !g.could_cast_during_resolution_by(card, player) || !ask_may(g, player, card, Purpose::CastFree)? {
+        return Ok(false);
+    }
+    g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), caster: Some(player), ..CastTerms::default() })
+}
+
 /// "You may draw `n` cards" (CR 121.3, 121.2b): not offered when `player` can't draw that many ("can't draw more than one
 /// card each turn" forbids a choice of two even before any card is drawn, Narset, Parter of Veils' ruling); asked with
 /// `question`, and the cards drawn on a yes. Whether they chose to draw. Leovold, Emissary of Trest, Consecrated Sphinx and

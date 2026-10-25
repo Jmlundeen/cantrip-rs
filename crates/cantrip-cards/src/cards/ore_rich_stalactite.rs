@@ -22,9 +22,7 @@ fn cast_one_at_random(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
         return Ok(());
     }
     let card = crafted[g.choose_at_random(crafted.len())];
-    if g.could_cast_during_resolution(card) && effects::ask_may(g, item.controller, card, Purpose::CastFree)? {
-        g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
-    }
+    effects::may_cast_without_paying(g, item.controller, card)?;
     Ok(())
 }
 

@@ -113,8 +113,8 @@ pub fn create_token_copy_of_it(
 /// print it.
 pub fn may_cast_a_copy_without_paying(g: &mut dyn Game, player: PlayerId, of: ObjectId) -> Result<(), Suspend> {
     let copy = g.create_copy_in_exile(of, player);
-    if g.could_cast_during_resolution(copy) && g.ask(player, RequestKind::May { source: copy, purpose: Purpose::CastCopyFree })? == Answer::Yes {
-        g.cast_during_resolution_as(copy, CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() })?;
+    if g.could_cast_during_resolution_by(copy, player) && g.ask(player, RequestKind::May { source: copy, purpose: Purpose::CastCopyFree })? == Answer::Yes {
+        g.cast_during_resolution_as(copy, CastTerms { instead: Some(ManaCost::ZERO), caster: Some(player), ..CastTerms::default() })?;
     }
     Ok(())
 }

@@ -12,10 +12,8 @@ pub fn play_exiled_card(g: &mut dyn Game, item: &StackItem, you: PlayerId) -> Re
         if g.ask(you, RequestKind::May { source: card, purpose: Purpose::Ask(&PLAY_EXILED_LAND) })? == Answer::Yes {
             g.play_land_during_resolution(card)?;
         }
-    } else if g.could_cast_during_resolution(card)
-        && g.ask(you, RequestKind::May { source: card, purpose: Purpose::CastFree })? == Answer::Yes
-    {
-        g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
+    } else {
+        crate::effects::may_cast_without_paying(g, you, card)?;
     }
     Ok(())
 }

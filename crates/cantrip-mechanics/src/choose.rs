@@ -223,7 +223,7 @@ pub fn may_cast_from_hand_free(
     fits: impl Fn(&dyn Game, &CastWay) -> bool,
 ) -> Result<(), Suspend> {
     let ways_of = |g: &mut dyn Game, card: ObjectId| -> Vec<CastWay> {
-        let ways = g.cast_ways_during_resolution(card);
+        let ways = g.cast_ways_during_resolution_by(card, player);
         ways.into_iter().filter(|w| fits(&*g, w)).collect()
     };
     let hand = g.state().zone(Zone::hand(player)).to_vec();
@@ -238,7 +238,7 @@ pub fn may_cast_from_hand_free(
     };
     let ways = ways_of(&mut *g, card);
     let way = cast_way(g, player, card, ways)?.map(|w| w.way);
-    g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way, ..CastTerms::default() })?;
+    g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(player), ..CastTerms::default() })?;
     Ok(())
 }
 
@@ -258,10 +258,10 @@ pub fn cast_any_number_free(g: &mut dyn Game, player: PlayerId, source: ObjectId
 pub fn cast_up_to_free(g: &mut dyn Game, player: PlayerId, source: ObjectId, cards: &[ObjectId], most: usize) -> Result<(), Suspend> {
     let mut cast = 0;
     while cast < most {
-        let castable: Vec<ObjectId> = cards.iter().copied().filter(|&c| g.could_cast_during_resolution(c)).collect();
+        let castable: Vec<ObjectId> = cards.iter().copied().filter(|&c| g.could_cast_during_resolution_by(c, player)).collect();
         let chosen = cards_from(g, player, source, Purpose::CastFree, cards.to_vec(), castable, 1, true)?;
         let Some(&card) = chosen.first() else { return Ok(()) };
-        g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
+        g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), caster: Some(player), ..CastTerms::default() })?;
         if g.obj(card).became.is_some() {
             cast += 1;
         }
