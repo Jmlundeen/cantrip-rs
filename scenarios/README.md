@@ -516,6 +516,11 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   `BotN.Sideboard.<Name>.Colors` for each (CR 400.11c: nothing but its own characteristic-defining abilities changes them)
 - `BotN.Hand.<Name>.Power`, `.Toughness` and `.Subtypes` (absent with none), and the same for `BotN.Graveyard.<Name>` and `BotN.Library.<Name>`, for a creature card there (CR 604.3: a characteristic-defining ability such as Sandman's works in every zone; a static ability that works in every zone, Arcane Adaptation's chosen type, too); a name held twice there is `Name#1`, `Name#2` in zone order: a library's top first, a hand's and a graveyard's first arrived first (so a graveyard's bottom first, though the `Graveyard` list is top first)
 - `BotN.Hand.<Name>.Colors`, `BotN.Graveyard.<Name>.Colors` and `BotN.Library.<Name>.Colors` (computed, sorted, empty when colorless), for every card there: an effect that works in every zone may change them (Mycosynth Lattice)
+- `BotN.Exile.<Name>`, the cards BotN owns in exile, by what each is (face down too), with the same keys as a card in a hand:
+  `.Colors`, and `.Power`, `.Toughness`, `.Subtypes` for a creature card
+- `BotN.<Zone>.<Name>.Counters.PlusOnePlusOne` (or any `CounterKind`) for a card in a hand, a graveyard, a library, a sideboard
+  or exile that has counters of that kind (suspend's time counters in exile); `(absent)` shows a card has none, such as one a
+  replacement exiled instead of letting it enter, which "put a counter on each of them" must not reach
 - `BotN.Battlefield.<Name>.ManaValue` for every permanent (CR 202.3): a transformed permanent's is its front face's
   (CR 202.3b), a copy of a back face's or a melded permanent's is 0 (CR 202.3b-c), a face-down one's 0 (CR 708.2a)
 - `BotN.Battlefield.<Name>.X` for a permanent whose spell was cast with an X above 0 (CR 107.3): absent otherwise

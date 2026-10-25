@@ -452,8 +452,11 @@ impl StateDump {
             // is `Name#1`, `Name#2` in zone order (a library's top first, a graveyard's bottom first). Every card there has
             // `.Colors` (empty when colorless): an effect may change a card's colors outside the battlefield (Mycosynth Lattice's
             // "all cards that aren't on the battlefield ... are colorless"), and outside the game (CR 400.11c) only its own
-            // characteristic-defining abilities do.
-            for (zone, label) in [(Zone::hand(p), "Hand"), (Zone::graveyard(p), "Graveyard"), (Zone::library(p), "Library"), (Zone::sideboard(p), "Sideboard")] {
+            // characteristic-defining abilities do. A card the player owns in exile has the same keys, `Bot1.Exile.<Name>`
+            // (by what it is, face down or not: the `Exile` list is the one that hides it). Counters on a card in any of these
+            // zones are `.Counters.<Kind>`, as on a permanent: a card in exile can have them (suspend's time counters, CR
+            // 702.62a), and an effect must not put them on one it means for a permanent that never arrived.
+            for (zone, label) in [(Zone::hand(p), "Hand"), (Zone::graveyard(p), "Graveyard"), (Zone::library(p), "Library"), (Zone::sideboard(p), "Sideboard"), (Zone::exile(p), "Exile")] {
                 let ids = s.zone(zone).to_vec();
                 for &id in &ids {
                     let c = game.chars(id);
@@ -468,6 +471,12 @@ impl StateDump {
                     let mut colors: Vec<String> = c.colors.iter().map(|c| c.name().to_string()).collect();
                     colors.sort();
                     d.list(&format!("{key}.Colors"), colors, true);
+                    for kind in CounterKind::ALL {
+                        let n = s.obj(id).counters(kind);
+                        if n != 0 {
+                            d.set(format!("{key}.Counters.{}", counter_token(kind)), n);
+                        }
+                    }
                     if outside || !c.is(CardType::Creature) {
                         continue;
                     }
@@ -773,11 +782,15 @@ const PERMANENT_KEYS: &[&str] = &[
     "ProtectionFrom", "Power", "Toughness", "Damage", "SummoningSick", "ChosenColor", "ChosenSubtype",
 ];
 
-/// The keys the dump writes of a card in a hand, a graveyard, a library or a sideboard, after `BotN.<zone>.<name>.`.
+/// The keys the dump writes of a card in a hand, a graveyard, a library, a sideboard or exile, after `BotN.<zone>.<name>.`,
+/// beside `Counters.<Kind>`.
 const CARD_KEYS: &[&str] = &["Colors", "Power", "Toughness", "Subtypes"];
 
+/// The zones a player's cards are written in, `BotN.<zone>.<name>.<property>`.
+const CARD_ZONES: [&str; 5] = ["Hand", "Graveyard", "Library", "Sideboard", "Exile"];
+
 /// The zones whose objects the dump writes keys of, `BotN.<zone>.<name>.<property>`.
-const OBJECT_ZONES: [&str; 6] = ["Battlefield", "PhasedOut", "Hand", "Graveyard", "Library", "Sideboard"];
+const OBJECT_ZONES: [&str; 7] = ["Battlefield", "PhasedOut", "Hand", "Graveyard", "Library", "Sideboard", "Exile"];
 
 /// `key` without its last segment.
 fn parent(key: &str) -> &str {
@@ -815,17 +828,19 @@ fn writable(key: &str) -> bool {
         return true;
     }
     let property = |zone: &str| rest.strip_prefix(zone).and_then(|r| r.strip_prefix('.')).and_then(|r| r.rsplit_once('.')).map(|(_, p)| p);
-    for zone in ["Battlefield", "PhasedOut"] {
+    for zone in ["Battlefield", "PhasedOut"].into_iter().chain(CARD_ZONES) {
         if let Some(object) = rest.strip_prefix(zone).and_then(|r| r.strip_prefix('.'))
             && let Some((_, kind)) = object.rsplit_once(".Counters.")
         {
             return CounterKind::ALL.iter().any(|k| k.token() == kind);
         }
+    }
+    for zone in ["Battlefield", "PhasedOut"] {
         if let Some(p) = property(zone) {
             return PERMANENT_KEYS.contains(&p);
         }
     }
-    ["Hand", "Graveyard", "Library", "Sideboard"].iter().any(|zone| property(zone).is_some_and(|p| CARD_KEYS.contains(&p)))
+    CARD_ZONES.iter().any(|zone| property(zone).is_some_and(|p| CARD_KEYS.contains(&p)))
 }
 
 fn owner(key: &str) -> Option<String> {
@@ -889,12 +904,15 @@ mod tests {
         assert!(writable("Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne"));
         assert!(writable("Bot1.Battlefield.Grizzly Bears#2.Tapped"));
         assert!(writable("Bot2.Graveyard.Sandman, Shifting Scoundrel.Power"));
+        assert!(writable("Bot1.Exile.Llanowar Elves.Counters.PlusOnePlusOne"));
+        assert!(writable("Bot1.Exile.Llanowar Elves.Colors"));
         assert!(writable("Bot1.Battlefield.Grizzly Bears.Keywords.Count"));
         assert!(writable("Monarch"));
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Counters"));
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Counters.MinusOne"));
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Taped"));
         assert!(!writable("Bot1.Hand.Lightning Bolt.Tapped"));
+        assert!(!writable("Bot1.Exile.Llanowar Elves.Counters"));
         assert!(!writable("Bot1.Lfie"));
         assert!(!writable("Monarchy"));
     }
