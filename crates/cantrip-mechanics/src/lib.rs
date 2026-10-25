@@ -121,6 +121,7 @@ pub mod targets;
 pub mod text_change;
 pub mod tokens;
 pub mod untap;
+pub mod untimely;
 pub mod vote;
 
 use cantrip_api::*;

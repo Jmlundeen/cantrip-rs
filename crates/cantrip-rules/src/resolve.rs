@@ -536,6 +536,26 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     if attacking {
                         ops::enter_attacking(cx, &[new], item.subject);
                     }
+                    // "If you cast it any time a sorcery couldn't have been cast, ... at the beginning of the next cleanup
+                    // step": a static ability that functions on the stack creates its delayed triggered ability as the
+                    // permanent is put onto the battlefield (CR 608.3g, 603.7a), about that permanent, controlled by the
+                    // spell's controller (CR 603.7d).
+                    if let Some(delayed) = def.untimely_cleanup_rider
+                        && cx.s().obj(item.object).marks.cast_untimely
+                    {
+                        let since = cx.g.log.len() as u32;
+                        let ability = AbilityRef::delayed(face(cx.s(), item.object), delayed);
+                        cx.st().delayed_push(cantrip_state::Delayed {
+                            when: DelayedWhen::Step { step: Step::Cleanup, on_turn_of: None },
+                            source: item.object,
+                            controller: item.controller,
+                            ability,
+                            subject: Target::Object(new),
+                            members: cantrip_state::Span::default(),
+                            since,
+                            acquired: Acquired::OWN,
+                        });
+                    }
                 }
                 // A creature spell paid for with mana that gives it haste has it until end of turn (CR 106.6).
                 if cx.s().obj(item.object).marks.gains_haste

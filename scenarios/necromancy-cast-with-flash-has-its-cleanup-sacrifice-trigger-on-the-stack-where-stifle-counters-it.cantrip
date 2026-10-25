@@ -1,0 +1,55 @@
+# "Sacrifices it at the beginning of the next cleanup step" is a delayed triggered ability (CR 603.7), created as Necromancy,
+# cast in Bot2's main phase as though it had flash, becomes a permanent (CR 608.3g). It triggers as Bot2's cleanup step
+# begins and goes on the stack after the cleanup's turn-based actions, and players get priority (CR 514.3a): Bot1 Stifles
+# it there. Countered, it does nothing, and it triggers only once (CR 603.7b), so Necromancy and the Ornithopter it returned
+# stay through the cleanup step that follows and into Bot1's turn.
+
+[Bot1 Deck]
+Mox Jet
+Sol Ring
+Damn
+Necromancy
+Swamp
+Mox Sapphire
+Stifle
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+[T4 Bot2.Main1]
+Bot1.Hand.Necromancy.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T4 Bot2.End]
+? Bot1.Battlefield = Swamp; Swamp; Mox Jet; Mox Sapphire; Sol Ring; Necromancy; Ornithopter
+? Delayed.Count = 1
+[T4 Bot2.Cleanup]
+? Stack.Count = 1
+? Bot1.Battlefield.Necromancy.Subtypes = Aura
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stifle.Cast(Stack.Necromancy)
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Delayed.Count = 0
+Bot1.Graveyard = Stifle; Damn
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Mox Sapphire; Sol Ring; Necromancy; Ornithopter

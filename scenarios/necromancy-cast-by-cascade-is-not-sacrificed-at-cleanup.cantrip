@@ -1,0 +1,43 @@
+# Necromancy is sacrificed at cleanup only if it was cast at a time a sorcery couldn't have been by its own "as though it had
+# flash" permission (its 2022-12-08 ruling: cast by some other effect, it isn't). Bot1's Bloodbraid Challenger cascades into
+# it (CR 702.85a), and Bot1 casts it as the cascade trigger resolves, with the Challenger still on the stack: by cascade's
+# permission, not its own. With no creature card in any graveyard it stays a plain enchantment, and nothing sacrifices it at
+# the cleanup step: no delayed triggered ability was created (CR 608.3g).
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Bloodbraid Challenger
+Island
+Mountain
+Necromancy
+Island x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodbraid Challenger.Cast
+Bot1.Accept
+[Bot1.Main2]
+? Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Jet; Mox Pearl; Bloodbraid Challenger; Necromancy
+? Delayed.Count = 0
+[T2 Bot2.Upkeep]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Jet; Mox Pearl; Bloodbraid Challenger; Necromancy
+Bot1.Graveyard.Count = 0

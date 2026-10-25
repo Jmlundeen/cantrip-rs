@@ -6500,8 +6500,10 @@ fn cast(
     let prepared_from = cx.s().obj(card).prepared_from;
     let from = cx.s().obj(card).zone.kind();
     let cast_from = from;
-    // CR 307.1: whether a sorcery could have been cast now, read before the spell goes on the stack.
-    let untimely = !(cx.s().turn.active == player && matches!(cx.s().turn.step(), Step::PrecombatMain | Step::PostcombatMain) && cx.s().stack.is_empty());
+    // CR 307.1: whether a sorcery could have been cast now, read before the spell goes on the stack. A spell an effect casts
+    // as it resolves is cast by that effect's permission, never by its own "as though it had flash" (Necromancy's 2022-12-08
+    // ruling), so it is not counted as cast at such a time.
+    let untimely = !resolving && !(cx.s().turn.active == player && matches!(cx.s().turn.step(), Step::PrecombatMain | Step::PostcombatMain) && cx.s().stack.is_empty());
     let spell = ops::move_to_for(cx, card, Zone::STACK, ZoneReason::Cast);
     cx.st().update_obj(spell, |o| {
         o.controller = player;

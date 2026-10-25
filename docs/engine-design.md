@@ -1054,6 +1054,15 @@ once its turn-based actions are done (514.3a), and then marks `Turn::cleanup_aga
 everyone has passed. Ultima, Time Stop, Sundial of the Infinite, Glorious End, Day's Undoing, Hurkyl's Final
 Meditation, Discontinuity and Obeka, Brute Chronologist end the turn.
 
+"At the beginning of the next cleanup step" is a delayed triggered ability like any other (`DelayedWhen::Step` with
+`Step::Cleanup`): it triggers as the step begins, waits through the discard and the damage wearing off (514.1-514.2), and
+is one of the triggered abilities 514.3a puts on the stack. Necromancy's cycle ("if you cast it any time a sorcery couldn't
+have been cast, the controller of the permanent it becomes sacrifices it at the beginning of the next cleanup step") is
+`CardDef::untimely_cleanup_rider`: a static ability that functions on the stack, so `resolve` creates the delayed ability
+as the spell becomes a permanent (CR 608.3g), about that permanent, when the spell was cast at such a time by its own
+permission (`Marks::cast_untimely`, never set for a spell an effect casts as it resolves); its body is
+`cantrip_mechanics::untimely::SACRIFICE`.
+
 ### Extra turns and "that turn"
 
 An extra turn (CR 500.7) is a `cantrip_state::ExtraTurn` in `GameState::extra_turns`, the most recently created last and taken

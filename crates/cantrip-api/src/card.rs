@@ -1457,6 +1457,7 @@ pub fn fused_half_unbuilt(half: &CardDef) -> Option<&'static str> {
         (half.cost_of_targets.is_some(), "a cost read from its targets"),
         (half.cast_fact.is_some(), "a fact kept as it is cast"),
         (!half.end_step_riders.is_empty(), "an end step rider"),
+        (half.untimely_cleanup_rider.is_some(), "a cleanup rider"),
         (!half.ways.is_empty(), "ways of its own to be cast"),
         (half.overload.is_some(), "overload"),
         (half.cast_only_if.is_some(), "a condition on casting it"),
@@ -2760,9 +2761,13 @@ pub struct CardDef {
     /// whose copiable values are such a definition was turned face down before it entered (CR 708.3); its first ability
     /// turns it face up (`intrinsic::TURN_FACE_UP`). Only the rules' own definitions (`crate::intrinsic`) set it.
     pub face_down: bool,
-    /// A permanent of this card whose controller sacrifices it at the beginning of the cleanup step when this says so (CR 514.1, 603.7):
-    /// Necromancy's \"if you cast it any time a sorcery couldn't have been cast\".
-    pub sacrifice_at_cleanup: Option<fn(&dyn Query, ObjectId) -> bool>,
+    /// "If you cast it any time a sorcery couldn't have been cast, ... at the beginning of the next cleanup step": the index
+    /// in `delayed` of the delayed triggered ability this static ability, which functions on the stack, creates as the spell
+    /// becomes a permanent (CR 608.3g, 603.7a), if it was cast at such a time by its own "as though it had flash" permission
+    /// (`Marks::cast_untimely`; Necromancy's 2022-12-08 ruling). It triggers at the beginning of the next cleanup step (CR
+    /// 514.3a), about that permanent, and is controlled by the spell's controller (CR 603.7d). Necromancy, Armor of Thorns,
+    /// Spider Climb and the rest of Weatherlight's cycle (`cantrip_mechanics::untimely`).
+    pub untimely_cleanup_rider: Option<u8>,
     /// Splice onto Arcane (CR 702.47): the cost paid to add this card's spell effect to an Arcane spell as it is cast. The
     /// spell ability it adds must have no targets.
     pub splice: Option<ManaCost>,
@@ -3000,7 +3005,7 @@ impl CardDef {
         storied: false,
         start_your_engines: false,
         face_down: false,
-        sacrifice_at_cleanup: None,
+        untimely_cleanup_rider: None,
         splice: None,
         dungeon: &[],
         cast_rules: &[],
@@ -3130,7 +3135,8 @@ impl CardDef {
             (!self.trigger_rules.is_empty(), "trigger rules"),
             (!self.additional_triggers.is_empty(), "additional triggers"),
             (self.ascend || self.storied || self.start_your_engines, "a designation keyword"),
-            (self.may_not_untap || self.sacrifice_at_cleanup.is_some() || self.granted_once_each_turn.is_some(), "a permanent's rule"),
+            (self.may_not_untap || self.granted_once_each_turn.is_some(), "a permanent's rule"),
+            (self.untimely_cleanup_rider.is_some(), "a cleanup rider"),
             (!self.basic_land_types.is_empty(), "basic land types"),
         ];
         refused.into_iter().find(|&(has, _)| has).map(|(_, what)| what)

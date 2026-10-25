@@ -142,8 +142,9 @@ pub struct Marks {
     /// An ability the permanent a spell becomes gains (a granted way's "if you do, it gains ...", Serra Paragon): a delayed
     /// ability of the card that gave the way, added as the spell resolves.
     pub gains: Option<AbilityRef>,
-    /// A spell cast at a time a sorcery could not have been cast (CR 307.1, 117.1a), carried to the permanent it becomes: Necromancy's
-    /// "if you cast it any time a sorcery couldn't have been cast".
+    /// A spell cast at a time a sorcery could not have been cast (CR 307.1, 117.1a), and not by an effect as it resolves, carried
+    /// to the permanent it becomes: Necromancy's "if you cast it any time a sorcery couldn't have been cast"
+    /// (`CardDef::untimely_cleanup_rider`), which its 2022-12-08 ruling applies only to a cast by its own permission.
     pub cast_untimely: bool,
     /// A spell paid for with mana that makes it uncounterable (CR 106.6, 701.5).
     pub cant_be_countered: bool,

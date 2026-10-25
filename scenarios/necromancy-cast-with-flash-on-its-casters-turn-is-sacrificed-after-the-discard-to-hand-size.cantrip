@@ -1,0 +1,71 @@
+# Necromancy's "sacrifices it at the beginning of the next cleanup step" is a delayed triggered ability (CR 603.7): it
+# triggers as the cleanup step begins but goes on the stack only after the turn-based actions (CR 514.1, 514.3a), so the
+# creature it returned is still there as its controller discards down to their hand size. Bot1 casts Necromancy in its own
+# draw step, a time a sorcery couldn't have been cast, returning Bot2's Marauding Mako; Bot2's Ancestral Recall leaves Bot1
+# with ten cards. Bot1 discards three at cleanup, which triggers the Mako ("whenever you discard one or more cards"), and
+# both triggers go on the stack together. Bot1 puts the Mako's on top: it gets three +1/+1 counters, then the sacrifice
+# trigger resolves and Bot1, who controls it, sacrifices it to Bot2's graveyard; Necromancy, enchanting nothing, follows it
+# to Bot1's graveyard (CR 704.5m).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Necromancy
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Marauding Mako
+Island
+Ancestral Recall
+Island
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Cleanup]
+Bot2.Discard(Marauding Mako)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T9 Bot1.Draw]
+? Bot1.Hand.Count = 8
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Necromancy.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot1)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Marauding Mako.Power = 1
+? Bot1.Hand.Count = 10
+[T9 Bot1.Cleanup]
+? Bot1.Battlefield.Marauding Mako.Power = 1
+Bot1.Discard(Mountain; Mountain; Mountain)
+Bot1.Triggers(Necromancy; Marauding Mako)
+? Bot1.Hand.Count = 7
+? Stack.Count = 2
+? Stack = Marauding Mako; Necromancy
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 3
+[T10 Bot2.Upkeep]
+
+[Expect]
+Turn = 10
+Bot1.Battlefield = Swamp; Swamp; Swamp
+Bot2.Graveyard = Marauding Mako; Ancestral Recall
+Bot1.Graveyard = Necromancy; Mountain; Mountain; Mountain

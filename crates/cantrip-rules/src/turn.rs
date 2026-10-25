@@ -1430,22 +1430,9 @@ mod removed_from_combat_tests;
 /// Cleanup (CR 514): discard to hand size, then damage wears off and "until end of turn" effects end.
 pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
     let active = cx.s().turn.active;
-    // CR 514.1: "sacrifice it at the beginning of the next cleanup step", for the permanents whose card says so, each by its
-    // controller, together.
-    let doomed: Vec<ObjectId> = cx
-        .s()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| {
-            let obj = cx.s().obj(id);
-            cx.card(obj.copied_card().unwrap_or(obj.card)).sacrifice_at_cleanup.is_some_and(|rule| rule(&*cx, id))
-        })
-        .collect();
-    if !doomed.is_empty() {
-        let each: Vec<(PlayerId, ObjectId)> = doomed.iter().map(|&id| (cx.s().obj(id).controller, id)).collect();
-        ops::sacrifice_each(cx, &each);
-    }
+    // CR 514.1: the active player discards down to their maximum hand size. What triggers "at the beginning of the next
+    // cleanup step" (CR 603.7) triggered as the step began (`settle::step_began`) and waits until after these actions (CR
+    // 514.3a, `begin_step`).
     let hand = cx.s().zone(Zone::hand(active)).to_vec();
     if hand.len() > 7 && !crate::actions::no_maximum_hand_size(cx, active) {
         let count = count_u32(hand.len() - 7);

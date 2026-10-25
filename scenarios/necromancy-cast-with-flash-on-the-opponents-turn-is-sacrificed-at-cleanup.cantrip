@@ -1,4 +1,4 @@
-# Necromancy may be cast as though it had flash. Bot1 casts it in Bot2's main phase, a time a sorcery couldn't have been cast, so it is sacrificed at the beginning of that turn's cleanup step (CR 514.1) and its creature, the Ornithopter, is sacrificed with it and goes back to Bot2's graveyard.
+# Necromancy may be cast as though it had flash. Bot1 casts it in Bot2's main phase, a time a sorcery couldn't have been cast, so the delayed triggered ability it made as it became a permanent (CR 608.3g) triggers at the beginning of that turn's cleanup step and sacrifices it (CR 603.7, 514.3a); its creature, the Ornithopter, is then sacrificed by Necromancy's leaves-the-battlefield trigger and goes back to Bot2's graveyard.
 
 [Bot1 Deck]
 Mox Jet
