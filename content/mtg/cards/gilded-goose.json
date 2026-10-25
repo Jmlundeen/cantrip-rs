@@ -1,0 +1,11 @@
+{
+  "name": "Gilded Goose",
+  "manaCost": "{G}",
+  "type": "Creature — Bird",
+  "power": 0,
+  "toughness": 2,
+  "oracleText": "Flying\nWhen this creature enters, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\n{1}{G}, {T}: Create a Food token.\n{T}, Sacrifice a Food: Add one mana of any color.",
+  "keywords": [
+    "Flying"
+  ]
+}

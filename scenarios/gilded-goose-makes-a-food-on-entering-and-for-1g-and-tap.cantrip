@@ -1,0 +1,52 @@
+# Gilded Goose: "When this creature enters, create a Food token" and "{1}{G}, {T}: Create a Food token" (the green symbol
+# pinned, the cost paid exactly). T1: Goose #1 enters (Food 1). T3: Goose #2 is cast with the Forest, entering (Food 2), so
+# Goose #1 has only Mox Sapphire, Mox Jet and an Island: three mana in all but no green, refused. T5: Forest #2 plus Mox
+# Sapphire pay {1}{G} exactly (pool empty right after) and a third Food comes; Goose #1 is tapped, so its second activation
+# is refused (it is tapped).
+
+[Bot1 Deck]
+Forest
+Gilded Goose
+Gilded Goose
+Mox Sapphire
+Mox Jet
+Island
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gilded Goose.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield = Food Token; Forest; Gilded Goose; Mox Jet; Mox Sapphire
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gilded Goose.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield = Food Token; Food Token; Forest; Gilded Goose; Gilded Goose; Island; Mox Jet; Mox Sapphire
+! Bot1.Battlefield.Gilded Goose#1.Activate(Ability: Create a Food; Mana: short)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Gilded Goose#1.Activate(Ability: Create a Food)
+? Bot1.Mana = 
+? Bot1.Battlefield.Gilded Goose#1.Tapped = true
+! Bot1.Battlefield.Gilded Goose#1.Activate(Ability: Create a Food)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Food Token; Food Token; Food Token; Forest; Forest; Gilded Goose; Gilded Goose; Island; Mox Jet; Mox Sapphire

@@ -1,0 +1,53 @@
+# Gilded Goose: "{T}, Sacrifice a Food: Add one mana of any color." T1: Goose enters and makes a Food; Mox Sapphire is an
+# artifact but no Food. T3: the Goose taps and sacrifices the Food token for {U} (any color: blue, a color no land of this
+# deck makes), exactly one mana, which pays Elusive Otter's {U}. T5: the Mox is not a Food, so sacrificing it is refused;
+# Nutrient Block, a nontoken Food artifact, is a Food (CR 701.21a, the 2024-11-08 ruling) and is sacrificed for {B}.
+
+[Bot1 Deck]
+Forest
+Gilded Goose
+Mox Sapphire
+Elusive Otter
+Forest
+Forest
+Forest
+Nutrient Block
+Forest x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gilded Goose.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gilded Goose.Activate(Ability: Sacrifice a Food; Sacrifice: Food Token; Color: U)
+? Bot1.Mana = {U}
+Bot1.Hand.Elusive Otter.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana = 
+? Bot1.Battlefield = Elusive Otter; Forest; Gilded Goose; Mox Sapphire
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Gilded Goose.Activate(Ability: Sacrifice a Food; Sacrifice: Mox Sapphire)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Nutrient Block.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Gilded Goose.Activate(Ability: Sacrifice a Food; Sacrifice: Nutrient Block; Color: B)
+? Bot1.Mana = {B}
+? Bot1.Graveyard = Nutrient Block
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Elusive Otter; Forest; Forest; Gilded Goose; Mox Sapphire
+Bot1.Battlefield.Gilded Goose.Keywords = Flying
