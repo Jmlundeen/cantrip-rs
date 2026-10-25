@@ -1,0 +1,48 @@
+# "You may sacrifice a creature" is one creature (CR 701.21a): with Ornithopter and Gingerbrute both Bot1's, choosing both is refused; choosing
+# Ornithopter alone sacrifices it, leaving Gingerbrute, and makes one Beast (CR 608.2c). Loyalty 5 - 2 = 3.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Ornithopter
+Way of the Deathbringer
+Mox Sapphire
+Gingerbrute
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Deathbringer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Gingerbrute.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace Token.Activate(Ability: sacrifice)
+Bot1.Pass
+! Bot1.Choose(Ornithopter; Gingerbrute)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 3
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Gingerbrute.Types = Artifact; Creature
+Bot1.Battlefield.Beast Token.Token = true
