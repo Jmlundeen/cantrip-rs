@@ -1,0 +1,35 @@
+# Bot1 is left with 4 cards in hand as the spell resolves and Bot2 with 5 (three Mox Rubies cast): one more is enough for two cards, and not three. Had the spell itself been counted in Bot1's hand, 5 would not be more.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Island
+Teachings of the Archaics
+Island x13
+
+[Bot2 Deck]
+Mox Ruby x3
+Island x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Teachings of the Archaics.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Graveyard.Count = 1

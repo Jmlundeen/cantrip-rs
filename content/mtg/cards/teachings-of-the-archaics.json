@@ -1,0 +1,6 @@
+{
+  "name": "Teachings of the Archaics",
+  "manaCost": "{2}{U}",
+  "type": "Sorcery — Lesson",
+  "oracleText": "If an opponent has more cards in hand than you, draw two cards. Draw three cards instead if an opponent has at least four more cards in hand than you."
+}

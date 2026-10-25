@@ -1,0 +1,31 @@
+# Bot1 is left with 3 cards in hand (four Moxen) against Bot2's 7: exactly four more, so three cards are drawn instead of two (and not five).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Mox Jet
+Teachings of the Archaics
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Teachings of the Archaics.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Graveyard.Count = 1

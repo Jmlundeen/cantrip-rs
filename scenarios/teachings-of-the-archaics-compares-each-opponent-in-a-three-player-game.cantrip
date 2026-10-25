@@ -1,0 +1,43 @@
+# In a game of three "an opponent" is judged opponent by opponent. Bot1 (8 cards on turn 4, as it drew on turn 1 too) casts four Moxen
+# and the spell, leaving 3. Bot2 cast four Mox Rubies on turn 2 and has 4 (one more: two cards); Bot3 cast nothing and has 7 (four
+# more: three cards). Bot3 alone qualifies for the three, so Bot1 draws three, not the two the first opponent alone would give.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Mox Jet
+Teachings of the Archaics
+Island x14
+
+[Bot2 Deck]
+Mox Ruby x4
+Island x14
+
+[Bot3 Deck]
+Island x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Teachings of the Archaics.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Graveyard.Count = 2

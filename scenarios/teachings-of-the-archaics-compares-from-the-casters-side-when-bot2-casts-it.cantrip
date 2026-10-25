@@ -1,0 +1,30 @@
+# "You" is the caster, whoever sits where: Bot2 casts it on turn 2, leaving 4 cards in hand (8 drawn, three Moxen and the spell cast) against Bot1's 7 - three more, so two cards, and Bot1 (the opponent) draws nothing. A card that read Bot1 as "you" would draw nothing here.
+
+[Bot1 Deck]
+Island x18
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Teachings of the Archaics
+Island x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Teachings of the Archaics.Cast
+Bot2.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 1
