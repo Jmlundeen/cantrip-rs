@@ -1,0 +1,52 @@
+# Hive of the Eye Tyrant: "If you control two or more other lands, this land enters tapped" (CR 614.1d). The first Hive, played
+# on turn 3 with one other land (an Island; Bot2's Mountain does not count, "you control"), enters untapped and taps for {B}.
+# The second, on turn 5 with two other lands (Island and the first Hive), enters tapped. The ability's {B} is a colored cost:
+# in the second main phase, with both Hives tapped and only an Island and four non-black Moxen, it is refused (Mana: short);
+# after casting Mox Jet it is paid by exactly four sources ({3}{B}), leaving the pool empty.
+
+[Bot1 Deck]
+Island
+Hive of the Eye Tyrant
+Hive of the Eye Tyrant
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Hive of the Eye Tyrant.Play
+? Bot1.Battlefield.Hive of the Eye Tyrant.Tapped = false
+Bot1.Battlefield.Hive of the Eye Tyrant.Activate(Ability: Add)
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Hand.Hive of the Eye Tyrant.Play
+? Bot1.Battlefield.Hive of the Eye Tyrant#2.Tapped = true
+Bot1.Battlefield.Hive of the Eye Tyrant#1.Activate(Ability: Add)
+[T5 Bot1.Main2]
+! Bot1.Battlefield.Hive of the Eye Tyrant#1.Activate(Ability: Until end of turn; Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Hive of the Eye Tyrant#1.Activate(Ability: Until end of turn)
+Bot1.Pass
+? Bot1.Mana = 
+
+[Expect]
+Turn = 5

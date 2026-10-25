@@ -1,0 +1,52 @@
+# Hive of the Eye Tyrant's attack trigger still knows its defending player once Hive has left combat (CR 508.5: "If that
+# creature is no longer attacking, the defending player it's referring to is the player that creature was attacking"). Bot2
+# puts a Lotus Petal in its graveyard; Bot1 animates Hive and attacks Bot2, and the trigger targets the Petal (the only card
+# there, so it is chosen without asking). Bot2 answers the trigger with a Lightning Bolt that kills the 3/3 Hive; the trigger
+# resolves after Hive is gone, its target still legal, and the Petal is exiled (CR 608.2b).
+
+[Bot1 Deck]
+Hive of the Eye Tyrant
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lotus Petal
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Hive of the Eye Tyrant.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Battlefield.Lotus Petal.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hive of the Eye Tyrant.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot1.Attack(Hive of the Eye Tyrant > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Hive of the Eye Tyrant)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Hive of the Eye Tyrant
+? Exile = Lotus Petal
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Exile.Count = 1
+Exile = Lotus Petal

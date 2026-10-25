@@ -1,0 +1,71 @@
+# Hive of the Eye Tyrant is the first land, so it enters untapped (one other land would not matter, none is here). Bot1 puts a
+# Shock in its own graveyard; Bot2 puts a Lotus Petal and two Lightning Bolts in theirs. On turn 3 Bot1 pays {3}{B} with four
+# Moxen and Hive becomes a 3/3 black Beholder land creature with menace until end of turn (CR 613.1d, 613.1e, 613.4b).
+# Attacking, its trigger may not target Bot1's own Shock (only "defending player's graveyard", CR 508.5) and exiles Bot2's Lotus
+# Petal, an artifact card ("target card" is any card, not only an instant). The animation is gone on turn 4.
+
+[Bot1 Deck]
+Hive of the Eye Tyrant
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Shock
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lotus Petal
+Lightning Bolt
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Hive of the Eye Tyrant.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hive of the Eye Tyrant.Activate(Ability: Until end of turn)
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Attack(Hive of the Eye Tyrant > Bot2)
+! Bot1.Target(Shock)
+Bot1.Target(Lotus Petal)
+? Bot1.Battlefield.Hive of the Eye Tyrant.Types = Land; Creature
+? Bot1.Battlefield.Hive of the Eye Tyrant.Subtypes = Beholder
+? Bot1.Battlefield.Hive of the Eye Tyrant.Colors = Black
+? Bot1.Battlefield.Hive of the Eye Tyrant.Power = 3
+? Bot1.Battlefield.Hive of the Eye Tyrant.Toughness = 3
+? Bot1.Battlefield.Hive of the Eye Tyrant.Keywords = Menace
+[T3 Bot1.Main2]
+? Bot2.Life = 15
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 15
+Bot1.Graveyard.Count = 1
+Bot2.Graveyard.Count = 2
+Exile.Count = 1
+Exile = Lotus Petal
+Bot1.Battlefield.Hive of the Eye Tyrant.Types = Land
+Bot1.Battlefield.Hive of the Eye Tyrant.Colors = (absent)
+Bot1.Battlefield.Hive of the Eye Tyrant.Keywords = (absent)
