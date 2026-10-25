@@ -9,7 +9,7 @@ fn opponents_cant_cause_you(_: &dyn Query, asker: &Asker, causer: PlayerId, play
 }
 
 /// +1: choose a nonland card name, then reveal the top four cards of your library; all cards with that name from among
-/// them go into your hand and the rest into your graveyard, in the order their owner chooses (CR 404.3), together.
+/// them go into your hand and the rest into your graveyard, in the order their owner chooses (CR 404.3): the hand first (CR 608.2c).
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::NONLAND };
@@ -37,8 +37,9 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             rest = order.clone();
         }
     }
-    let moves: Vec<(ObjectId, Zone)> =
-        matches.iter().map(|&c| (c, Zone::hand(you))).chain(rest.iter().map(|&c| (c, Zone::graveyard(you)))).collect();
+    // Two actions in the order written (CR 608.2c): the matches into the hand, then the rest into the graveyard.
+    g.return_to_hand_revealed(&matches);
+    let moves: Vec<(ObjectId, Zone)> = rest.iter().map(|&c| (c, Zone::graveyard(you))).collect();
     g.move_together_revealed(&moves, MoveReason::Other);
     Ok(())
 }
