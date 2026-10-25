@@ -539,7 +539,7 @@ fn modal_of(game: &Game, modes: &[Label]) -> Option<&'static ModalDef> {
 /// What a target holds, in words: an object's name, or the seat of a player.
 fn target_words(game: &Game, target: Target) -> String {
     match target {
-        Target::Object(id) => game.cards.get(game.chars(id).card).name.to_string(),
+        Target::Object(id) => game.name(id).to_string(),
         Target::Player(p) => format!("Player {}", seat(p)),
         _ => String::new(),
     }
@@ -992,7 +992,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             let faces = !modes.is_empty() && modes.iter().all(|l| matches!(l, Label::Face(_) | Label::Fused(_)));
             let (mut detail, extra_modes_cost) = modes_detail(game, modes, faces);
             if matches!(modes.first(), Some(Label::TargetSlot(..))) {
-                detail = format!("That target becomes {}", game.cards.get(game.chars(*source).card).name);
+                detail = format!("That target becomes {}", game.name(*source));
             }
             PromptPayload::ChooseModesPromptMessage(ChooseModesPrompt {
                 player,
@@ -1035,7 +1035,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose which permission you cast it by".into()
                 } else if matches!(modes.first(), Some(Label::TargetSlot(..))) {
                     // Two instances of "target" hold the same object (CR 115.3): which one changes to the source (CR 115.7b).
-                    format!("Choose which target to change to {}", game.cards.get(game.chars(*source).card).name)
+                    format!("Choose which target to change to {}", game.name(*source))
                 } else if let Some(heading) = phyrexian_heading(game, *source, modes) {
                     heading
                 } else if let Some(heading) = options_heading(game, modes) {
@@ -1064,7 +1064,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             eligible: (0..choices.len() as i32).collect(),
             count: 1,
             at_most: 1,
-            heading: subtype_heading(game.cards.get(game.chars(*source).card).name, choices, *purpose),
+            heading: subtype_heading(game.name(*source), choices, *purpose),
             detail: match purpose {
                 WordUse::Chosen => String::new(),
                 WordUse::Replaced => "Every instance of it in the target's text is replaced".into(),
@@ -1721,6 +1721,38 @@ mod tests {
         assert_eq!(p.modes, ["First pile: Renamed permanent", "Second pile: Face-down permanent"]);
     }
 
+    /// A prompt names the source and a held target by the name each has (CR 111.4, 612.2a, 707.2), not by its definition's: a
+    /// permanent whose copiable values are renamed is captioned with the new name.
+    #[test]
+    fn captions_name_a_renamed_object_by_the_name_it_has() {
+        let (mut game, hand) = game_with(&["Lightning Bolt"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let printed = game.obj(hand[0]).card;
+        let renamed = game.state.push_obj(Obj::new(printed, seat, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, renamed);
+        game.state.update_obj(renamed, |o| o.copy = Some(Copiable::of(printed).named("Renamed permanent")));
+        let mut handles = HandleSpace::new();
+        let modes = |source, modes: Vec<Label>| Request {
+            id: 1, player: seat, may_cancel: false,
+            kind: RequestKind::ChooseModes {
+                source, eligible: (0..modes.len() as u8).collect(), modes,
+                count: 1, at_most: 0, affordable: Vec::new(), additional_cost: false, repeat: false,
+            },
+        };
+        let request = modes(renamed, vec![Label::TargetSlot("target creature", Target::Object(renamed)), Label::TargetSlot("target spell", Target::Object(renamed))]);
+        let PromptPayload::ChooseModesPromptMessage(p) = prompt(&game, &request, &mut handles).expect("a prompt").0 else { panic!("modes") };
+        assert_eq!(p.modes, ["target creature: Renamed permanent", "target spell: Renamed permanent"]);
+        assert_eq!(p.detail, "That target becomes Renamed permanent");
+        assert_eq!(p.heading, "Choose which target to change to Renamed permanent");
+
+        let request = Request {
+            id: 2, player: seat, may_cancel: false,
+            kind: RequestKind::ChooseSubtype { source: renamed, choices: vec![Subtype::Goblin, Subtype::Zombie], purpose: WordUse::Replaced },
+        };
+        let PromptPayload::ChooseModesPromptMessage(p) = prompt(&game, &request, &mut handles).expect("a prompt").0 else { panic!("subtypes") };
+        assert_eq!(p.heading, "Renamed permanent: choose the creature type to replace");
+    }
+
     #[test]
     fn casts_during_resolution_are_asked_in_the_words_of_what_they_cost() {
         assert_eq!(may_verb(Purpose::CastFree), ("CastDuringResolution".to_string(), 1));
@@ -1837,7 +1869,7 @@ fn phyrexian_heading(game: &Game, source: ObjectId, modes: &[Label]) -> Option<S
     if !modes.iter().all(|l| matches!(l, Label::PayLife(_))) {
         return None;
     }
-    let name = game.cards.get(game.chars(source).card).name;
+    let name = game.name(source);
     let symbols = if modes.iter().all(|l| *l == Label::PayLife(color)) { format!("{{{}/P}}", color.symbol()) } else { "Phyrexian symbols".into() };
     Some(format!("{name}: choose which {symbols} to pay with 2 life"))
 }
