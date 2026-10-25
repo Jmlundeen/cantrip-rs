@@ -1,0 +1,40 @@
+# Origin of the Avengers under Containment Priest: chapter II "You may put a Hero creature card with mana value 3 or less from
+# your hand onto the battlefield. If you don't, draw a card." Bot1 chooses Brave Brawler, but it wasn't cast, so the Priest
+# exiles it instead (CR 614.1a): the event it replaced never happened (CR 614.6), so Bot1 didn't put a Hero onto the
+# battlefield, and draws a card. Turn 3's draw and chapter II's leave two cards in hand, the Brawler gone to exile.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Jet
+Origin of the Avengers
+Containment Priest
+Brave Brawler
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Origin of the Avengers.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Containment Priest.Cast
+[T3 Bot1.Main1]
+Bot1.Choose(Brave Brawler)
+? Exile = Brave Brawler
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile = Brave Brawler
+Bot1.Hand = Plains; Plains
+Bot1.Library.Count = 12
+Bot1.Battlefield = Containment Priest; Mox Emerald; Mox Jet; Mox Pearl; Origin of the Avengers; Plains
