@@ -1575,6 +1575,13 @@ state-based sacrifice (CR 714.4) leave it; and a choice of what to sacrifice ask
 permanent whose controller the resolving spell or ability can't make sacrifice (Sigarda) - taking as many as it can when fewer
 remain than it asks, and answered with nothing unasked when none does. Card code that takes what it sacrifices without asking,
 or offers a sacrifice as one option among others, asks `Game::can_sacrifice`.
+A sacrifice always names who sacrifices (CR 701.21a: a player can't sacrifice a permanent they don't control):
+`Game::sacrifice(player, ..)` and `can_sacrifice(player, ..)`, `sacrifice_each` for several players at once ("each player
+sacrifices"), and `ops::sacrificeable` checks the permanent is that player's, so a card can't forget it. The player is the one
+the text names: "you" is the spell's or ability's controller, a delayed ability's included (CR 603.7d-e: Kiki-Jiki's token,
+decayed, Underworld Breach), whoever controls the permanent by then; "its controller sacrifices it" (evoke, CR 702.74a; Animate
+Dead) is the permanent's controller as it resolves; a cost's sacrifices are its payer's (`may_sacrifice_for`). "You may
+sacrifice it" is not offered when `can_sacrifice` says no (CR 608.2d: Cacophony Scamp taken by Old Man of the Sea).
 The permanent's controller orders the replacements (CR 616.1), told the counters as the effects so far have left them
 (`RequestKind::ChooseReplacement::counters`, which the host words "1 +1/+1 counter would be put on Walking Ballista"); the
 tactical bot has one that adds a counter apply before one that doubles them.

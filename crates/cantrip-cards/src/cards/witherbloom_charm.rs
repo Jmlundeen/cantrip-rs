@@ -9,7 +9,7 @@ fn sacrifice_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     let Some(&permanent) = choose::cards(g, item.controller, item.object, Purpose::Sacrifice, permanents, 1, true)?.first() else {
         return Ok(());
     };
-    if !g.sacrifice(&[permanent]).is_empty() {
+    if !g.sacrifice(item.controller, &[permanent]).is_empty() {
         g.draw(item.controller, 2);
     }
     Ok(())

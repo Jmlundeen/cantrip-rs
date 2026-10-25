@@ -10,7 +10,7 @@ use cantrip_engine::*;
 
 /// "{T}: Sacrifice this artifact. You gain 3 life. Choose a card in your hand."
 fn give_way(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    g.sacrifice(&[item.object]);
+    g.sacrifice(item.controller, &[item.object]);
     g.gain_life(item.controller, 3);
     let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
     let eligible = hand.iter().copied().take(1).collect();

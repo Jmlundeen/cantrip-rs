@@ -17,7 +17,7 @@ fn equalize(g: &mut dyn Game, source: ObjectId, from_hand: bool, kind: Option<Ca
         }
     };
     let Some(fewest) = players.iter().map(|&who| theirs(g, who).len()).min() else { return Ok(()) };
-    let mut going: Vec<ObjectId> = Vec::new();
+    let mut going: Vec<(PlayerId, ObjectId)> = Vec::new();
     for &who in &players {
         if !cantrip_mechanics::players::reached(g, who) {
             continue;
@@ -28,21 +28,21 @@ fn equalize(g: &mut dyn Game, source: ObjectId, from_hand: bool, kind: Option<Ca
         }
         let count = mine.len() - fewest;
         if count == mine.len() {
-            going.extend(mine);
+            going.extend(mine.into_iter().map(|c| (who, c)));
             continue;
         }
         if from_hand {
             let cards = choose::cards(g, who, source, Purpose::Discard, mine.clone(), u32::try_from(count).unwrap_or(u32::MAX), false)?;
-            going.extend(mine.iter().copied().filter(|c| cards.contains(c)));
+            going.extend(mine.iter().copied().filter(|c| cards.contains(c)).map(|c| (who, c)));
         } else {
             let kept = choose::cards(g, who, source, Purpose::Keep, mine.clone(), u32::try_from(fewest).unwrap_or(u32::MAX), false)?;
-            going.extend(mine.iter().copied().filter(|c| !kept.contains(c)));
+            going.extend(mine.iter().copied().filter(|c| !kept.contains(c)).map(|c| (who, c)));
         }
     }
     if from_hand {
-        g.discard_together(&going);
+        g.discard_together(&going.iter().map(|&(_, c)| c).collect::<Vec<_>>());
     } else {
-        g.sacrifice(&going);
+        g.sacrifice_each(&going);
     }
     Ok(())
 }

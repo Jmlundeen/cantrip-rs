@@ -31,7 +31,7 @@ fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
                 break;
             }
             let permanents: Vec<ObjectId> =
-                g.permanents_of(opponent).into_iter().filter(|&id| nonland(g, &asker, id) && !sacrificed.contains(&id) && g.can_sacrifice(id)).collect();
+                g.permanents_of(opponent).into_iter().filter(|&id| nonland(g, &asker, id) && !sacrificed.iter().any(|&(_, s)| s == id) && g.can_sacrifice(opponent, id)).collect();
             let hand = g.state().zone(Zone::hand(opponent)).to_vec();
             let cards: Vec<ObjectId> = hand.iter().copied().filter(|c| !discarded.contains(c)).collect();
             let mut options = Vec::new();
@@ -49,13 +49,13 @@ fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
                 options[choose::one_of(g, opponent, item.object, labels)? as usize]
             };
             match choice {
-                SACRIFICE => sacrificed.extend(choose::cards(g, opponent, item.object, Purpose::Sacrifice, permanents, 1, false)?),
+                SACRIFICE => sacrificed.extend(choose::cards(g, opponent, item.object, Purpose::Sacrifice, permanents, 1, false)?.into_iter().map(|id| (opponent, id))),
                 DISCARD => discarded.extend(choose::cards_from(g, opponent, item.object, Purpose::Discard, hand, cards, 1, false)?),
                 _ => losses.push(opponent),
             }
         }
     }
-    g.sacrifice(&sacrificed);
+    g.sacrifice_each(&sacrificed);
     g.discard_together(&discarded);
     for player in losses {
         g.lose_life(player, 4);

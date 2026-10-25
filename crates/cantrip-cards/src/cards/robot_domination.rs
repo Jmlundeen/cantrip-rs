@@ -33,7 +33,7 @@ fn draw_lose_and_plan(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 /// "When the third plan counter is put on this enchantment, sacrifice it and create three 2/2 colorless Robot Villain
 /// artifact creature tokens." The tokens are made whether or not it is still there to be sacrificed.
 fn robots(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.sacrifice(&[item.object]);
+    g.sacrifice(item.controller, &[item.object]);
     tokens::create(g, item.controller, &ROBOT_VILLAIN, 3)?;
     Ok(())
 }

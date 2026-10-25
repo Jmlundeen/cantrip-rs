@@ -12,11 +12,7 @@ fn exile_until_it_leaves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 /// Iceberg already gone, or not controlled by the ability's controller, scries nothing.
 fn sacrifice_and_scry(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let this = item.object;
-    if !is_live(g, this) || g.controller(this) != item.controller {
-        return Ok(());
-    }
-    g.sacrifice(&[this]);
-    if is_live(g, this) {
+    if g.sacrifice(item.controller, &[this]).is_empty() {
         return Ok(());
     }
     scry(g, item.controller, this, 2)

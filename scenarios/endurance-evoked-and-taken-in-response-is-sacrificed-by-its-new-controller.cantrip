@@ -1,0 +1,59 @@
+# Evoke's sacrifice is "its controller sacrifices it" (CR 702.74a): whoever controls the permanent as the trigger resolves,
+# not the trigger's controller. Bot1 evokes Endurance (exiling Llanowar Elves). With its enters triggers on the stack, Bot2
+# Giant Growths Old Man of the Sea (5/6) and takes the 3/4 Endurance with it (Bot2 has controlled Old Man since their turn
+# began, CR 302.6). The evoke trigger resolves: Bot2 controls Endurance now and sacrifices it (CR 701.21a), into its
+# owner's graveyard, Bot1's.
+
+[Bot1 Deck]
+Llanowar Elves
+Endurance
+Forest x22
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Mox Emerald
+Giant Growth
+Island x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Endurance.Cast(Ability: Evoke)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Old Man of the Sea.Power = 5
+Bot1.Pass
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Endurance)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Endurance.Power = 3
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Endurance
+Bot2.Battlefield.Endurance = (absent)
+Bot2.Battlefield.Old Man of the Sea.Tapped = true
+Exile = Llanowar Elves

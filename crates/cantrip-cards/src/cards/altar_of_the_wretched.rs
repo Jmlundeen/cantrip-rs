@@ -13,7 +13,7 @@ fn sacrifice_to_draw_and_mill(g: &mut dyn Game, item: &StackItem) -> Result<(), 
     let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Sacrifice, "nontoken creature", creatures.clone(), creatures, 1, true)?;
     let Some(&creature) = chosen.first() else { return Ok(()) };
     // A permanent of your own is always yours to sacrifice to your own ability (CR 701.21a): chosen, it is sacrificed.
-    g.sacrifice(&[creature]);
+    g.sacrifice(you, &[creature]);
     let x = g.chars(creature).power.unwrap_or(0).max(0) as u32;
     g.draw(you, x);
     g.mill(you, x);

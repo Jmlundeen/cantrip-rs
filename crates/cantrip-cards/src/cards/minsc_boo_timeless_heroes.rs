@@ -64,7 +64,7 @@ fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             None => return Ok(()),
         },
     };
-    if g.sacrifice(&[chosen]).is_empty() {
+    if g.sacrifice(player, &[chosen]).is_empty() {
         return Ok(());
     }
     let me = g.card_id(&CARD);

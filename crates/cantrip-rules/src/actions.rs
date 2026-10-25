@@ -1126,7 +1126,7 @@ fn choose_variable_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, v
 /// Pays the permanents part of a cost, once the rest is paid. `ability` is the activated ability whose cost it is: the
 /// permanents its cost exiles are "exiled with" its source, linked to the other abilities of its text (CR 406.6, 607.2a). A
 /// spell's are not: that rule is of abilities.
-fn pay_permanents(cx: &mut Cx, cost: &Cost, chosen: &[ObjectId], ability: Option<Linked>) {
+fn pay_permanents(cx: &mut Cx, player: PlayerId, cost: &Cost, chosen: &[ObjectId], ability: Option<Linked>) {
     if cost.tap_permanents {
         for &id in chosen {
             ops::tap(cx, id);
@@ -1138,7 +1138,7 @@ fn pay_permanents(cx: &mut Cx, cost: &Cost, chosen: &[ObjectId], ability: Option
             ops::return_to_hand(cx, chosen);
         }
         Some(PermanentAction::Sacrifice) => {
-            ops::sacrifice(cx, chosen);
+            ops::sacrifice(cx, player, chosen);
         }
         // Exiled together (CR 118.3), each into its owner's exile; one that is no longer the permanent chosen stays where
         // it is (CR 400.7), as a sacrifice's does.
@@ -6951,23 +6951,23 @@ fn cast(
     pay_blight(cx, player, &extra, extra_blighted);
     pay_counters_among(cx, &removed);
     pay_counters_among(cx, &extra_removed);
-    pay_permanents(cx, &cost, &chosen, None);
+    pay_permanents(cx, player, &cost, &chosen, None);
     pay_discards(cx, &discards);
     pay_discards(cx, &way_discards);
     pay_exiles(cx, &exiles);
     pay_exiles(cx, &hand_exiles);
-    ops::sacrifice(cx, &way_sacrifices);
+    ops::sacrifice(cx, player, &way_sacrifices);
     pay_exiles(cx, &extra_exiles);
     pay_exiles(cx, &extra_evidence);
     pay_exiles(cx, &hand_exiled);
     pay_life_and_counters(cx, player, spell, &cost);
-    pay_permanents(cx, &extra, &extra_chosen, None);
+    pay_permanents(cx, player, &extra, &extra_chosen, None);
     let mut revealed = pay_behold(cx, player, &beheld);
     revealed.extend(pay_behold(cx, player, &extra_beheld));
     if let Some(at) = cx.s().stack.iter().rposition(|i| i.kind == StackKind::Spell && i.object == spell) {
         add_revealed_to_item(cx, at, &revealed);
     }
-    ops::sacrifice(cx, &extra_sacrifices);
+    ops::sacrifice(cx, player, &extra_sacrifices);
     pay_discards(cx, &extra_discards);
     pay_discards(cx, &extra_variable_discards);
     pay_life_and_counters(cx, player, spell, &extra);
@@ -8232,7 +8232,7 @@ fn activate(
     // Counters put on and taken off permanents next, so a permanent the cost also sacrifices leaves with them.
     pay_blight(cx, player, &def.cost, blighted);
     pay_counters_among(cx, &removed);
-    pay_permanents(cx, &def.cost, &chosen, Some(cx.linked(&item)));
+    pay_permanents(cx, player, &def.cost, &chosen, Some(cx.linked(&item)));
     let revealed = pay_behold(cx, player, &beheld);
     let at = cx.s().stack.len() - 1;
     add_revealed_to_item(cx, at, &revealed);
@@ -8271,10 +8271,10 @@ fn activate(
         }
     }
     if def.cost.sacrifice_self {
-        ops::sacrifice(cx, &[source]);
+        ops::sacrifice(cx, player, &[source]);
     }
     if let Some(granter) = granter {
-        ops::sacrifice(cx, &[granter]);
+        ops::sacrifice(cx, player, &[granter]);
     }
     if def.cost.return_self {
         ops::move_to_for(cx, source, Zone::hand(cx.s().obj(source).owner), ZoneReason::Other);
@@ -8465,10 +8465,10 @@ fn activate_mana_as(
         let hand = choose_discards(cx, player, source, &def.cost, by)?;
         pay_discards(cx, &hand);
     }
-    pay_permanents(cx, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card), acquired }));
+    pay_permanents(cx, player, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card), acquired }));
     pay_life_and_counters(cx, player, source, &def.cost);
     if def.cost.sacrifice_self {
-        ops::sacrifice(cx, &[source]);
+        ops::sacrifice(cx, player, &[source]);
     }
     let asker = Asker { source, controller: player, by, spell: false };
     // What the ability itself produces (CR 106.12a), told from every pool before and after it - its tapper's, and another's
@@ -9652,15 +9652,16 @@ pub fn payable_life_for(cx: &Cx, player: PlayerId, paid: Option<CostFor>) -> i32
     }
 }
 
-/// Whether `player` may sacrifice `id` to pay a cost paid for `paid` (CR 701.21a, 118.3): not a permanent that can't be
-/// sacrificed at all (CR 101.2, `static_rules::cant_be_sacrificed`: Hithlain Rope), whatever the cost is for; not to cast
+/// Whether `player` may sacrifice `id` to pay a cost paid for `paid` (CR 701.21a, 118.3): only a permanent they control ("a
+/// player can't sacrifice ... a permanent they don't control"); not a permanent that can't be sacrificed at all (CR 101.2, `static_rules::cant_be_sacrificed`: Hithlain Rope), whatever the cost is for; not to cast
 /// a spell or activate an ability while a static ability says it can't be sacrificed for that (`CardDef::cost_bans`:
 /// Yasharn, Implacable Earth's nonland permanents, Angel of Jubilation's creatures), which leave a cost paid for anything
 /// else (`None`) alone; and, for a cost a resolving spell or ability has the player pay ("unless [they] sacrifice", "you
 /// may sacrifice ... If you do", CR 118.12), not when that spell or ability can't cause them to sacrifice (CR 101.2,
 /// Tamiyo, Collector of Tales's ruling: "something happens unless you sacrifice" can't be paid).
 fn may_sacrifice_for(cx: &Cx, player: PlayerId, id: ObjectId, paid: Option<CostFor>) -> bool {
-    !static_rules::cant_be_sacrificed(cx, cx.cards(), id)
+    cx.s().obj(id).controller == player
+        && !static_rules::cant_be_sacrificed(cx, cx.cards(), id)
         && match paid {
             Some(f) => !static_rules::cost_banned(cx, cx.cards(), player, f, CostPayment::Sacrifice(id)),
             None => resolution_may_cause(cx, player, CauseKind::Sacrifice),
@@ -9949,7 +9950,7 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     }
     pay_blight(cx, payer, cost, blighted);
     pay_counters_among(cx, &removed);
-    pay_permanents(cx, cost, &chosen, None);
+    pay_permanents(cx, payer, cost, &chosen, None);
     // Revealed for the effect paying it, as part of that effect (CR 701.20a): no reveal of the effect's own lasts past the
     // instruction it is for (`ops::seen_by_all`).
     pay_behold(cx, payer, &beheld);
@@ -9957,7 +9958,7 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     pay_discards(cx, &variable_discards);
     pay_exiles(cx, &exiles);
     pay_exiles(cx, &hand_exiles);
-    ops::sacrifice(cx, &sacrifices);
+    ops::sacrifice(cx, payer, &sacrifices);
     pay_exiles(cx, &variable_exiles);
     // The life is paid above, with any X of it.
     pay_life_and_counters(cx, payer, source, &Cost { life: 0, ..*cost });
@@ -9972,7 +9973,7 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
         ops::discard(cx, source);
     }
     if cost.sacrifice_self {
-        ops::sacrifice(cx, &[source]);
+        ops::sacrifice(cx, payer, &[source]);
     }
     if cost.return_self {
         ops::move_to_for(cx, source, Zone::hand(cx.s().obj(source).owner), ZoneReason::Other);

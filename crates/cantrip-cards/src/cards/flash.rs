@@ -18,7 +18,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut cost = def.cost;
     cost.generic = cost.generic.saturating_sub(2);
     if !def.has_cost || !g.may_pay(player, item.object, entered, of_mana(cost), &KEEP)? {
-        g.sacrifice(&[entered]);
+        g.sacrifice(player, &[entered]);
     }
     Ok(())
 }

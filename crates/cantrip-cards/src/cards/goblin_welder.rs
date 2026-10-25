@@ -27,7 +27,7 @@ fn weld(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let (Target::Object(artifact), Target::Object(card)) = (item.target(0), item.target(1)) else { return Ok(()) };
     let player = g.controller(artifact);
-    g.sacrifice_and_return(&[artifact], &[(card, player)])
+    g.sacrifice_and_return(player, &[artifact], &[(card, player)])
 }
 
 pub static CARD: CardDef = CardDef {

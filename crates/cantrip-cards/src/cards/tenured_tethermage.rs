@@ -16,7 +16,7 @@ fn may_trade_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // A land that can't be sacrificed is no choice (CR 101.2, 701.21a): with none other, nothing is asked. "If you do": the
     // tokens follow only a sacrifice that happened (CR 608.2c).
     let chosen = choose::select(g, you, item.object, Purpose::Sacrifice, permanents, rule)?;
-    if chosen.is_empty() || g.sacrifice(&chosen).is_empty() {
+    if chosen.is_empty() || g.sacrifice(you, &chosen).is_empty() {
         return Ok(());
     }
     let heartwood = g.card_id(&tokens::HEARTWOOD);

@@ -65,7 +65,7 @@ fn return_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// opponent, in turn order, when several tie; all of them sacrificed together.
 fn sacrifice_greatest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
-    let mut doomed: Vec<ObjectId> = Vec::new();
+    let mut doomed: Vec<(PlayerId, ObjectId)> = Vec::new();
     for who in opponents {
         if !cantrip_mechanics::players::reached(g, who) {
             continue;
@@ -79,14 +79,14 @@ fn sacrifice_greatest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
         let Some(greatest) = mine.iter().map(|&(_, p)| p).max() else { continue };
         let eligible: Vec<ObjectId> = mine.iter().filter(|&&(_, p)| p == greatest).map(|&(id, _)| id).collect();
         if eligible.len() == 1 {
-            doomed.push(eligible[0]);
+            doomed.push((who, eligible[0]));
             continue;
         }
         if let Some(card) = choose::card(g, who, item.object, Purpose::Sacrifice, eligible)? {
-            doomed.push(card);
+            doomed.push((who, card));
         }
     }
-    g.sacrifice(&doomed);
+    g.sacrifice_each(&doomed);
     Ok(())
 }
 

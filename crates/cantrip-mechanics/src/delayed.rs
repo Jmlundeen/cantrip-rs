@@ -77,16 +77,11 @@ pub fn at_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: u8, c
 }
 
 /// "Sacrifice them": the objects the delayed ability carries (`at_next_end_step_about`) that are still on the battlefield
-/// as the objects they were (CR 603.7c, 400.7), sacrificed in one action; one another player controls now cannot be
-/// sacrificed by this ability's controller (CR 701.21a).
+/// as the objects they were (CR 603.7c, 400.7), sacrificed in one action by this ability's controller (CR 603.7d-e), who
+/// can't sacrifice one another player controls now (CR 701.21a).
 pub fn sacrifice_created(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let survivors: Vec<ObjectId> = g
-        .event_objects(item)
-        .iter()
-        .copied()
-        .filter(|&id| is_live(g, id) && g.is_on_battlefield(id) && g.controller(id) == item.controller)
-        .collect();
-    g.sacrifice(&survivors);
+    let created = g.event_objects(item).to_vec();
+    g.sacrifice(item.controller, &created);
     Ok(())
 }
 
@@ -95,15 +90,11 @@ pub fn sacrifice_created(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 pub const SACRIFICE_CREATED: AbilityDef = delayed_trigger(sacrifice_created, "Sacrifice them at the beginning of the next end step.");
 
 /// "Sacrifice it": the delayed ability's subject, if it is still the object it was on the battlefield (CR 603.7c, 400.7)
-/// and its controller is the one sacrificing it (CR 701.21a). Sneak Attack and Through the Breach print it at the next
-/// end step.
+/// and this ability's controller (CR 603.7d-e) still controls it (CR 701.21a). Sneak Attack and Through the Breach print it
+/// at the next end step.
 pub fn sacrifice_subject(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(it) = item.subject
-        && is_live(g, it)
-        && g.is_on_battlefield(it)
-        && g.controller(it) == item.controller
-    {
-        g.sacrifice(&[it]);
+    if let Target::Object(it) = item.subject {
+        g.sacrifice(item.controller, &[it]);
     }
     Ok(())
 }

@@ -26,7 +26,7 @@ fn skeleton(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .collect();
     let chosen = choose::cards(g, you, gut, Purpose::Sacrifice, eligible, 1, true)?;
     let Some(&victim) = chosen.first() else { return Ok(()) };
-    if g.sacrifice(&[victim]).is_empty() {
+    if g.sacrifice(you, &[victim]).is_empty() {
         return Ok(());
     }
     let token = g.card_id(&SKELETON);

@@ -20,7 +20,8 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn sacrifice_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let entered: Vec<ObjectId> =
         g.state().battlefield().iter().copied().filter(|&id| g.obj(id).entered_with == Some(item.object)).collect();
-    g.sacrifice(&entered);
+    let each: Vec<(PlayerId, ObjectId)> = entered.into_iter().map(|id| (g.controller(id), id)).collect();
+    g.sacrifice_each(&each);
     Ok(())
 }
 

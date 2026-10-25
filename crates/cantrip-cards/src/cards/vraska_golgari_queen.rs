@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn sacrifice_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let others: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| id != item.object).collect();
     let Some(&permanent) = choose::cards(g, item.controller, item.object, Purpose::Sacrifice, others, 1, true)?.first() else { return Ok(()) };
-    if !g.sacrifice(&[permanent]).is_empty() {
+    if !g.sacrifice(item.controller, &[permanent]).is_empty() {
         g.gain_life(item.controller, 1);
         g.draw(item.controller, 1);
     }

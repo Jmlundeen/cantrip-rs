@@ -26,7 +26,7 @@ fn hope(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.obj(this).counters(CounterKind::Hope) > 0 {
         return Ok(());
     }
-    g.sacrifice(&[this]);
+    g.sacrifice(item.controller, &[this]);
     g.gain_life(item.controller, 4);
     Ok(())
 }

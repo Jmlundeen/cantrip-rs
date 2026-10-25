@@ -1,0 +1,71 @@
+# "At the beginning of the end step, sacrifice this creature." The trigger's controller, Bot1, sacrifices it - and a player
+# can't sacrifice a permanent they don't control (CR 701.21a). With the trigger on the stack in Bot1's end step, Bot2 Giant
+# Growths Old Man of the Sea (5/6) and takes the 4/4 Frostbite Pyromental with it (Bot2 has controlled Old Man since their
+# turn began, CR 302.6). The trigger resolves and sacrifices nothing: the Pyromental is Bot2's. At cleanup Giant Growth ends,
+# Old Man's power (2) is less than the Pyromental's, and Bot1 has it back (CR 611.2b).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Frostbite Pyromental
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Mox Emerald
+Giant Growth
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Frostbite Pyromental.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.End]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Frostbite Pyromental)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Frostbite Pyromental.Power = 4
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot2.Battlefield.Frostbite Pyromental.Power = 4
+? Bot1.Graveyard.Count = 0
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Frostbite Pyromental.Power = 4
+Bot1.Graveyard.Count = 0

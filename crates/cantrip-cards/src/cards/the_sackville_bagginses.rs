@@ -18,7 +18,7 @@ fn sacrifice_for_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
         .collect();
     let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Sacrifice, "other creature or artifact", eligible.clone(), eligible, 1, true)?;
     let Some(&victim) = chosen.first() else { return Ok(()) };
-    g.sacrifice(&[victim]);
+    g.sacrifice(you, &[victim]);
     effects::draw(g, item, 1)?;
     tokens::create_treasure(g, you)
 }

@@ -38,7 +38,7 @@ fn sacrifice_an_artifact(g: &mut dyn Rules, item: &StackItem) -> Result<(), Susp
 fn sacrifice_two_asked(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     let eligible = other_artifacts(g, item);
     let chosen = cantrip_mechanics::choose::cards(g, item.controller, item.object, Purpose::Sacrifice, eligible, 2, false)?;
-    g.sacrifice(&chosen);
+    g.sacrifice(item.controller, &chosen);
     Ok(())
 }
 
@@ -73,7 +73,7 @@ fn sacrifice_an_artifact_staged(g: &mut dyn Rules, item: &StackItem) -> Result<(
         }
         _ => {
             if let Some(Answer::Cards(chosen)) = g.staged_answer() {
-                g.sacrifice(&chosen);
+                g.sacrifice(item.controller, &chosen);
             }
             Ok(())
         }

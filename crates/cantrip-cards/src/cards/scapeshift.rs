@@ -10,7 +10,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let lands: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&p| g.chars(p).is(CardType::Land)).collect();
     let chosen = choose::select(g, you, item.object, Purpose::Sacrifice, lands, select::land_cards(select::ANY_NUMBER))?;
-    let sacrificed = g.sacrifice(&chosen).len();
+    let sacrificed = g.sacrifice(you, &chosen).len();
     g.end_sentence();
     library::find_to_battlefield(g, you, item.object, select::land_cards(select::up_to(sacrificed as u32)), true)?;
     Ok(())

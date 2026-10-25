@@ -22,7 +22,7 @@ fn minus_six(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let permanents = g.permanents_of(victim);
     let (first, second) = choose::separate(g, Some(item.controller), item.object, permanents)?;
     let (pile, _) = choose::pile(g, victim, item.object, first, second)?;
-    g.sacrifice(&pile);
+    g.sacrifice(victim, &pile);
     Ok(())
 }
 

@@ -17,7 +17,7 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// reflexive ability triggers only if the enchantment was sacrificed, and is put on the stack with its target only if
 /// there is a creature to target.
 fn sacrifice_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if g.sacrifice(&[item.object]).is_empty() {
+    if g.sacrifice(item.controller, &[item.object]).is_empty() {
         return Ok(());
     }
     let this = g.card_id(&CARD);

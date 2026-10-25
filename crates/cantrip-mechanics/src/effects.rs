@@ -322,7 +322,7 @@ pub fn may_sacrifice_an_artifact_or_discard_to_draw(g: &mut dyn Game, item: &Sta
     let you = item.controller;
     // An artifact that can't be sacrificed is nothing to do it with (CR 101.2: the option can't be taken).
     let artifacts: Vec<ObjectId> =
-        g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact) && g.can_sacrifice(id)).collect();
+        g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact) && g.can_sacrifice(you, id)).collect();
     let mut options = Vec::new();
     if !artifacts.is_empty() {
         options.push(SACRIFICE);
@@ -339,7 +339,7 @@ pub fn may_sacrifice_an_artifact_or_discard_to_draw(g: &mut dyn Game, item: &Sta
     let done = match options[crate::choose::one_of(g, you, item.object, labels)? as usize] {
         SACRIFICE => {
             let chosen = crate::choose::cards(g, you, item.object, Purpose::Sacrifice, artifacts, 1, false)?;
-            !g.sacrifice(&chosen).is_empty()
+            !g.sacrifice(you, &chosen).is_empty()
         }
         DISCARD => {
             let chosen = crate::choose_from_hand(g, you, item.object, 1)?;
@@ -505,9 +505,10 @@ pub fn each_opponent_discards_a_card(g: &mut dyn Game, item: &StackItem) -> Resu
     Ok(())
 }
 
-/// "Sacrifice this [permanent]" (CR 701.21): the ability's source. City of Traitors and Carnage, Crimson Chaos print it.
+/// "Sacrifice this [permanent]" (CR 701.21a): the ability's source, sacrificed by the ability's controller - by no one when
+/// another player has gained control of it since. City of Traitors and Carnage, Crimson Chaos print it.
 pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.sacrifice(&[item.object]);
+    g.sacrifice(item.controller, &[item.object]);
     Ok(())
 }
 

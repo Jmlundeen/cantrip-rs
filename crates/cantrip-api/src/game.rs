@@ -490,16 +490,24 @@ pub trait Game: Query {
     fn destroy_no_regen(&mut self, permanent: ObjectId) {
         self.destroy_all_no_regen(&[permanent]);
     }
-    /// Sacrifices permanents (CR 701.21a), together, in the order given. One that can't be sacrificed, or that an opponent's
-    /// spell or ability can't make its controller sacrifice, stays (CR 101.2, `can_sacrifice`). The new objects, in order, of
-    /// what was sacrificed: "if you do" asks whether this is empty.
-    fn sacrifice(&mut self, permanents: &[ObjectId]) -> Vec<ObjectId>;
-    /// Whether `sacrifice` would sacrifice this permanent now (CR 701.21a, 101.2): it is on the battlefield, nothing says it
-    /// can't be sacrificed (`Keyword::CantBeSacrificed`, `EffectKind::CantBeSacrificed`, `CardDef::sacrifice_bans`), and the
-    /// resolving spell or ability may cause its controller to sacrifice (`may_cause`). A choice of what to sacrifice asked
-    /// with `Purpose::Sacrifice` already offers only these; an effect that takes what it sacrifices without asking, or offers
-    /// a sacrifice as one option among others, or as a cost to pay "unless", asks it (CR 118.3).
-    fn can_sacrifice(&self, permanent: ObjectId) -> bool;
+    /// `player` sacrifices permanents (CR 701.21a), together, in the order given. One `player` doesn't control ("a player
+    /// can't sacrifice ... a permanent they don't control"), one that can't be sacrificed, or any when an opponent's spell or
+    /// ability can't make `player` sacrifice, stays (CR 101.2, `can_sacrifice`). The player is the one the text names: "you"
+    /// (the spell's or ability's controller, a delayed ability's included, CR 603.7d-e), "target player", or for "its
+    /// controller sacrifices it" that permanent's controller as it resolves. The new objects, in order, of what was
+    /// sacrificed: "if you do" asks whether this is empty.
+    fn sacrifice(&mut self, player: PlayerId, permanents: &[ObjectId]) -> Vec<ObjectId>;
+    /// Several players sacrifice at once (CR 701.21a, 101.4): "each player sacrifices", each pair who sacrifices and what,
+    /// each judged as `sacrifice` judges it. The new objects, in order.
+    fn sacrifice_each(&mut self, sacrifices: &[(PlayerId, ObjectId)]) -> Vec<ObjectId>;
+    /// Whether `player` could sacrifice this permanent now, as `sacrifice` would (CR 701.21a, 101.2): it is on the
+    /// battlefield and `player` controls it, nothing says it can't be sacrificed (`Keyword::CantBeSacrificed`,
+    /// `EffectKind::CantBeSacrificed`, `CardDef::sacrifice_bans`), and the resolving spell or ability may cause `player` to
+    /// sacrifice (`may_cause`). A choice of what to sacrifice asked with `Purpose::Sacrifice` already offers the chooser
+    /// only these; an effect that takes what it sacrifices without asking, offers "you may sacrifice it" (CR 608.2d: not
+    /// offered when it is impossible), offers a sacrifice as one option among others, or as a cost to pay "unless", asks it
+    /// (CR 118.3).
+    fn can_sacrifice(&self, player: PlayerId, permanent: ObjectId) -> bool;
     /// Returns objects to their owners' hands at once (CR 400.3, 101.4): from the battlefield, a graveyard, exile or
     /// anywhere else, whoever controls them. A token that leaves the battlefield ceases to exist (CR 111.7, 704.5d). Something
     /// that is no longer the object it was is not returned (CR 400.7). The new objects, in order.
@@ -567,8 +575,9 @@ pub trait Game: Query {
     /// `put_all_onto_battlefield_as`, each entering with these counters as well (CR 122.6, 614.1c): Ghost Vacuum puts each
     /// creature card exiled with it onto the battlefield together, each with a flying counter.
     fn put_all_onto_battlefield_with_counters(&mut self, objects: &[(ObjectId, PlayerId, bool)], counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend>;
-    /// Sacrifices permanents and puts cards onto the battlefield at the same moment (CR 101.4): Goblin Welder.
-    fn sacrifice_and_return(&mut self, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend>;
+    /// `player` sacrifices permanents as cards are put onto the battlefield at the same moment (CR 101.4, 701.21a): Goblin
+    /// Welder. What `player` can't sacrifice (`can_sacrifice`) stays.
+    fn sacrifice_and_return(&mut self, player: PlayerId, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend>;
     /// Puts an object onto the battlefield transformed, its back face up (CR 712.14a): "exile it, then return it to
     /// the battlefield transformed", or "tapped and transformed" with `tapped` (CR 110.5b). A card with no back face stays
     /// where it is (CR 712.14a).

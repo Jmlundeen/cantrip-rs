@@ -22,9 +22,11 @@ pub fn evoked(q: &dyn Query, asker: &Asker) -> bool {
     q.obj(asker.source).cast_way == 1
 }
 
+/// "Its controller sacrifices it" (CR 702.74a): whoever controls the permanent as the ability resolves, not necessarily the
+/// ability's controller.
 fn sacrifice_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if g.is_on_battlefield(item.object) && g.obj(item.object).became.is_none() && g.controller(item.object) == item.controller {
-        g.sacrifice(&[item.object]);
+    if g.obj(item.object).became.is_none() {
+        g.sacrifice(g.controller(item.object), &[item.object]);
     }
     Ok(())
 }

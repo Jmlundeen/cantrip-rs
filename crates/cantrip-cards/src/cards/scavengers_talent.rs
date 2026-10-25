@@ -45,12 +45,12 @@ const ASK: Question = Question::new(
 fn sacrifice_three_to_reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let me = item.controller;
     let eligible: Vec<ObjectId> =
-        g.permanents_of(me).into_iter().filter(|&p| p != item.object && !g.chars(p).is(CardType::Land) && g.can_sacrifice(p)).collect();
+        g.permanents_of(me).into_iter().filter(|&p| p != item.object && !g.chars(p).is(CardType::Land) && g.can_sacrifice(me, p)).collect();
     if eligible.len() < 3 || !effects::ask_may(g, me, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let chosen = if eligible.len() == 3 { eligible } else { choose::cards(g, me, item.object, Purpose::Sacrifice, eligible, 3, false)? };
-    g.sacrifice(&chosen);
+    g.sacrifice(me, &chosen);
     let creatures: Vec<ObjectId> =
         g.state().zone(Zone::graveyard(me)).iter().copied().filter(|&c| g.chars(c).is(CardType::Creature)).collect();
     if let Some(card) = choose::card(g, me, item.object, Purpose::PutOntoBattlefield, creatures)? {

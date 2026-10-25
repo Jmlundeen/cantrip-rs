@@ -26,7 +26,7 @@ fn burn_together(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         let power = g.chars(creature).power.unwrap_or(0).max(0) as u16;
         g.damage(creature, item.target(1), power);
     }
-    g.sacrifice(&[creature]);
+    g.sacrifice(item.controller, &[creature]);
     Ok(())
 }
 

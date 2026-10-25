@@ -25,7 +25,7 @@ fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if count > 0 {
         tokens::create(g, item.controller, &ROBOT_2_2, count as u32)?;
     }
-    g.sacrifice(&[item.object]);
+    g.sacrifice(item.controller, &[item.object]);
     Ok(())
 }
 

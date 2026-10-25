@@ -88,9 +88,10 @@ fn decayed_attacks(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Sacrifice it": the creature that attacked, if it is still that permanent (CR 400.7, 701.21a).
+/// "Sacrifice it": the creature that attacked, if it is still that permanent (CR 400.7) and this delayed ability's
+/// controller (CR 603.7e: the attack trigger's) still controls it (CR 701.21a).
 fn decayed_sacrifice(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.sacrifice(&[item.object]);
+    g.sacrifice(item.controller, &[item.object]);
     Ok(())
 }
 

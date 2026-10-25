@@ -15,7 +15,7 @@ fn sacrifice_another_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     let you = item.controller;
     let eligible = other_creatures(g, you, item.object);
     let chosen = choose::cards(g, you, item.object, Purpose::Sacrifice, eligible, 1, true)?;
-    if !g.sacrifice(&chosen).is_empty() {
+    if !g.sacrifice(you, &chosen).is_empty() {
         g.draw(you, 1);
     }
     Ok(())
@@ -70,7 +70,7 @@ fn sacrifice_any_number_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<()
     let you = item.controller;
     let eligible = other_creatures(g, you, item.object);
     let chosen = choose::any_number_of(g, you, item.object, Purpose::Sacrifice, "", eligible.clone(), eligible)?;
-    let sacrificed = g.sacrifice(&chosen).len() as u32;
+    let sacrificed = g.sacrifice(you, &chosen).len() as u32;
     if sacrificed > 0 {
         g.draw(you, sacrificed);
     }

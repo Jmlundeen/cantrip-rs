@@ -55,7 +55,7 @@ fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     let chosen = choose::cards(g, player, item.object, Purpose::Sacrifice, creatures, 1, true)?;
     let Some(&creature) = chosen.first() else { return Ok(()) };
-    g.sacrifice(&[creature]);
+    g.sacrifice(player, &[creature]);
     let me = g.card_id(&CARD);
     g.reflexive_trigger(item.object, player, AbilityRef::delayed(me, 0), Target::None);
     Ok(())

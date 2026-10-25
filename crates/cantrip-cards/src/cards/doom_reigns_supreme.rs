@@ -29,7 +29,7 @@ fn drain_and_plan(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// reflexive ability triggers only if the enchantment was sacrificed, and its target opponent is chosen as it is put on the
 /// stack.
 fn sacrifice_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if g.sacrifice(&[item.object]).is_empty() {
+    if g.sacrifice(item.controller, &[item.object]).is_empty() {
         return Ok(());
     }
     let this = g.card_id(&CARD);

@@ -18,13 +18,13 @@ fn ritual(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.look_at(you, &looked);
     let mut maximum = None;
     // Only a creature that can be sacrificed is one to sacrifice (CR 101.2): with none, nothing is asked.
-    let creatures = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature) && g.can_sacrifice(id)).collect::<Vec<_>>();
+    let creatures = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature) && g.can_sacrifice(you, id)).collect::<Vec<_>>();
     if !creatures.is_empty()
         && effects::ask_may(g, you, item.object, Purpose::Ask(&SACRIFICE))?
         && let Some(creature) = choose::card(g, you, item.object, Purpose::Sacrifice, creatures)?
     {
         let mana_value = g.mana_value(creature);
-        let sacrificed = g.sacrifice(&[creature]);
+        let sacrificed = g.sacrifice(you, &[creature]);
         if !sacrificed.is_empty() {
             maximum = Some(1 + mana_value);
         }

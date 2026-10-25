@@ -119,6 +119,8 @@ mod room_copy_tests;
 mod many_static_sources_tests;
 mod replace;
 mod resolve;
+#[cfg(test)]
+mod sacrifice_controller_tests;
 mod settle;
 mod speed;
 mod static_rules;
@@ -1493,8 +1495,9 @@ impl Cx<'_> {
     }
     /// A question card code asks, as the rules let it be asked (CR 101.2): a discard the resolving spell or ability can't
     /// cause `player` to make is answered with nothing, unasked; and a choice of what to sacrifice takes only the permanents
-    /// that can be sacrificed now (`ops::sacrificeable`: not one that can't be sacrificed, nor one its controller can't be made
-    /// to sacrifice) - the rulings' "you can't try to sacrifice [it], fail, and therefore ignore the effect" - answered with
+    /// `player` can sacrifice now (`ops::sacrificeable`: not one another player controls, CR 701.21a, nor one that can't be
+    /// sacrificed, nor any when `player` can't be made to sacrifice) - the rulings' "you can't try to sacrifice [it], fail,
+    /// and therefore ignore the effect" - answered with
     /// nothing, unasked, when the rule then lets nothing be chosen. A choice of exactly N with fewer that can be then takes
     /// as many as it can (CR 701.21a).
     fn as_allowed(&self, player: PlayerId, mut kind: RequestKind) -> Result<RequestKind, Answer> {
@@ -1505,8 +1508,8 @@ impl Cx<'_> {
                 Err(Answer::Cards(Vec::new()))
             }
             RequestKind::ChooseCards { purpose: Purpose::Sacrifice, source, cards, rule } => {
-                if cards.iter().any(|&c| rule.listed_card(c) && !ops::sacrificeable(self, c)) {
-                    let among: Vec<ObjectId> = cards.iter().copied().filter(|&c| rule.listed_card(c) && ops::sacrificeable(self, c)).collect();
+                if cards.iter().any(|&c| rule.listed_card(c) && !ops::sacrificeable(self, player, c)) {
+                    let among: Vec<ObjectId> = cards.iter().copied().filter(|&c| rule.listed_card(c) && ops::sacrificeable(self, player, c)).collect();
                     if let Count::Exactly(n) = rule.count
                         && among.len() < n as usize
                     {
@@ -1534,8 +1537,8 @@ impl cantrip_api::Game for Cx<'_> {
         }
     }
 
-    fn can_sacrifice(&self, permanent: ObjectId) -> bool {
-        ops::sacrificeable(self, permanent)
+    fn can_sacrifice(&self, player: PlayerId, permanent: ObjectId) -> bool {
+        ops::sacrificeable(self, player, permanent)
     }
 
     fn stage(&self) -> u16 {
@@ -1672,8 +1675,12 @@ impl cantrip_api::Game for Cx<'_> {
         ops::destroy_together(self, permanents, ZoneReason::DestroyNoRegen)
     }
 
-    fn sacrifice(&mut self, permanents: &[ObjectId]) -> Vec<ObjectId> {
-        ops::sacrifice(self, permanents)
+    fn sacrifice(&mut self, player: PlayerId, permanents: &[ObjectId]) -> Vec<ObjectId> {
+        ops::sacrifice(self, player, permanents)
+    }
+
+    fn sacrifice_each(&mut self, sacrifices: &[(PlayerId, ObjectId)]) -> Vec<ObjectId> {
+        ops::sacrifice_each(self, sacrifices)
     }
 
     fn return_to_hand(&mut self, objects: &[ObjectId]) -> Vec<ObjectId> {
@@ -1794,8 +1801,8 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield_becoming(self, object, controller, becomes).map_err(|_| Suspend)
     }
 
-    fn sacrifice_and_return(&mut self, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend> {
-        ops::sacrifice_and_return(self, sacrificed, returned).map_err(|_| Suspend)
+    fn sacrifice_and_return(&mut self, player: PlayerId, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend> {
+        ops::sacrifice_and_return(self, player, sacrificed, returned).map_err(|_| Suspend)
     }
 
     fn put_all_onto_battlefield_as(&mut self, objects: &[(ObjectId, PlayerId, bool)]) -> Result<Vec<ObjectId>, Suspend> {

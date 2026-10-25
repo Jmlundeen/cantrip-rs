@@ -1389,13 +1389,14 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
 /// Sacrifices permanents and returns cards to the battlefield at the same moment (CR 101.4, 701.21): Goblin Welder's "simultaneously
 /// sacrifices the artifact and returns the artifact card". One move, so the returning permanent's entering abilities see the
 /// sacrificed one already gone, and the sacrificed one's leaving abilities see its replacement already there; each entering
-/// replacement is applied as for any entry (CR 614.12). The sacrificed are moved for the reason `Sacrifice`; one that is not
-/// `sacrificeable` stays, and the cards are returned all the same (CR 101.2: only that part of the effect does nothing).
-pub fn sacrifice_and_return(cx: &mut Cx, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> R<()> {
+/// replacement is applied as for any entry (CR 614.12). `player` sacrifices, and the sacrificed are moved for the reason
+/// `Sacrifice`; one they can't sacrifice (`sacrificeable`) stays, and the cards are returned all the same (CR 101.2: only that
+/// part of the effect does nothing).
+pub fn sacrifice_and_return(cx: &mut Cx, player: PlayerId, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> R<()> {
     let moves: Vec<Moving> = sacrificed
         .iter()
         .copied()
-        .filter(|&id| sacrificeable(cx, id))
+        .filter(|&id| sacrificeable(cx, player, id))
         .map(|id| Moving { reason: Some(ZoneReason::Sacrifice), ..Moving::to(id, Zone::graveyard(cx.s().obj(id).owner)) })
         .collect();
     let arriving: Vec<(ObjectId, PlayerId, bool)> = returned.iter().map(|&(id, p)| (id, p, false)).collect();
@@ -3101,22 +3102,35 @@ pub fn destroy_together(cx: &mut Cx, ids: &[ObjectId], reason: ZoneReason) -> Ve
     move_together(cx, &moves, reason)
 }
 
-/// Whether `id` is a permanent its controller can sacrifice now, as what is happening would have them (CR 701.21a, 101.2):
-/// still the object it was and on the battlefield, nothing says it can't be sacrificed (`static_rules::cant_be_sacrificed`),
-/// and, while a spell or ability resolves, nothing forbids that spell or ability to cause its controller to sacrifice
-/// (Sigarda, Host of Herons). What `sacrifice` sacrifices, and what a choice of what to sacrifice may take.
-pub fn sacrificeable(cx: &Cx, id: ObjectId) -> bool {
+/// Whether `player` can sacrifice `id` now, as what is happening would have them (CR 701.21a, 101.2): still the object it
+/// was, on the battlefield and controlled by `player` ("a player can't sacrifice ... a permanent they don't control"),
+/// nothing says it can't be sacrificed (`static_rules::cant_be_sacrificed`), and, while a spell or ability resolves,
+/// nothing forbids that spell or ability to cause `player` to sacrifice (Sigarda, Host of Herons). What `sacrifice`
+/// sacrifices, and what a choice of what to sacrifice may take.
+pub fn sacrificeable(cx: &Cx, player: PlayerId, id: ObjectId) -> bool {
     live(cx.s(), id)
         && cx.s().obj(id).zone.is(ZoneKind::Battlefield)
+        && cx.s().obj(id).controller == player
         && !crate::static_rules::cant_be_sacrificed(cx, cx.cards(), id)
-        && cx.effect_controller().is_none_or(|by| cantrip_api::may_cause(cx, by, cx.s().obj(id).controller, cantrip_api::CauseKind::Sacrifice))
+        && cx.effect_controller().is_none_or(|by| cantrip_api::may_cause(cx, by, player, cantrip_api::CauseKind::Sacrifice))
 }
 
-/// Sacrifices permanents (CR 701.21), together, in the order given: each that is `sacrificeable`, so one that can't be
-/// sacrificed, or whose controller the resolving spell or ability can't make sacrifice, stays (CR 101.2).
-pub fn sacrifice(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
-    let moves: Vec<Moving> =
-        ids.iter().copied().filter(|&id| sacrificeable(cx, id)).map(|id| Moving::to(id, Zone::graveyard(cx.s().obj(id).owner))).collect();
+/// `player` sacrifices permanents (CR 701.21a), together, in the order given: each that is `sacrificeable` by them, so one
+/// they don't control, one that can't be sacrificed, or any when the resolving spell or ability can't make them sacrifice,
+/// stays (CR 101.2). The new objects.
+pub fn sacrifice(cx: &mut Cx, player: PlayerId, ids: &[ObjectId]) -> Vec<ObjectId> {
+    let each: Vec<(PlayerId, ObjectId)> = ids.iter().map(|&id| (player, id)).collect();
+    sacrifice_each(cx, &each)
+}
+
+/// Several players sacrifice permanents at once (CR 701.21a, 101.4): each pair is who sacrifices and what, and each that
+/// player can't sacrifice (`sacrificeable`) stays. The new objects, in order.
+pub fn sacrifice_each(cx: &mut Cx, each: &[(PlayerId, ObjectId)]) -> Vec<ObjectId> {
+    let moves: Vec<Moving> = each
+        .iter()
+        .filter(|&&(player, id)| sacrificeable(cx, player, id))
+        .map(|&(_, id)| Moving::to(id, Zone::graveyard(cx.s().obj(id).owner)))
+        .collect();
     move_together(cx, &moves, ZoneReason::Sacrifice)
 }
 

@@ -13,7 +13,7 @@ fn add_one_of_any_color(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -
     g.add_mana(asker.controller, color.unwrap_or(Color::White).mana(), 1);
     let land = asker.source;
     if g.is_on_battlefield(land) && g.obj(land).counters(CounterKind::Mining) == 0 {
-        g.sacrifice(&[land]);
+        g.sacrifice(asker.controller, &[land]);
     }
     Ok(())
 }

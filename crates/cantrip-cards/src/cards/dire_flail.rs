@@ -62,7 +62,7 @@ fn may_sacrifice(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let chosen = choose::cards(g, you, item.object, Purpose::Sacrifice, artifacts, 1, true)?;
     let Some(&artifact) = chosen.first() else { return Ok(()) };
     // A permanent of your own is always yours to sacrifice to your own ability (CR 701.21a): chosen, it is sacrificed.
-    g.sacrifice(&[artifact]);
+    g.sacrifice(you, &[artifact]);
     let back = g.card_id(&BACK);
     g.reflexive_trigger(item.object, you, AbilityRef::delayed(back, INSTANCES as u8), Target::None);
     Ok(())

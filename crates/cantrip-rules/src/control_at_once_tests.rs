@@ -340,7 +340,7 @@ fn control_for_as_long_as_its_source_remains_ends_as_the_source_leaves() {
     let mut cx = cx(&mut game);
     cantrip_api::Game::add_effect(&mut cx, plain, bear, EffectKind::Control(YOU), Duration::WhileSourceOnBattlefield);
     assert_eq!(cx.s().obj(bear).controller, YOU);
-    crate::ops::sacrifice(&mut cx, &[plain]);
+    crate::ops::sacrifice(&mut cx, YOU, &[plain]);
     assert_eq!(cx.s().obj(bear).controller, THEM);
     assert!(cx.s().effects.is_empty());
 }

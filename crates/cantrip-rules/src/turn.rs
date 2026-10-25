@@ -1443,7 +1443,8 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
         })
         .collect();
     if !doomed.is_empty() {
-        ops::sacrifice(cx, &doomed);
+        let each: Vec<(PlayerId, ObjectId)> = doomed.iter().map(|&id| (cx.s().obj(id).controller, id)).collect();
+        ops::sacrifice_each(cx, &each);
     }
     let hand = cx.s().zone(Zone::hand(active)).to_vec();
     if hand.len() > 7 && !crate::actions::no_maximum_hand_size(cx, active) {

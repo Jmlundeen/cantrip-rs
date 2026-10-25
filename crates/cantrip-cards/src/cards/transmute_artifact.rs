@@ -19,7 +19,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact)).collect();
     if let Some(sacrificed) = choose::card(g, player, item.object, Purpose::Sacrifice, artifacts)? {
         let value = g.mana_value(sacrificed);
-        if !g.sacrifice(&[sacrificed]).is_empty() {
+        if !g.sacrifice(player, &[sacrificed]).is_empty() {
             let found = search_library(g, player, player, item.object, SearchDestination::Found, 1, true, |q, c| q.chars(c).is(CardType::Artifact))?;
             if let Some(&card) = found.first() {
                 let cost = g.mana_value(card);

@@ -30,7 +30,7 @@ fn fade(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.remove_counters(this, CounterKind::Fade, 1);
         return Ok(());
     }
-    g.sacrifice(&[this]);
+    g.sacrifice(item.controller, &[this]);
     Ok(())
 }
 

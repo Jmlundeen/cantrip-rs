@@ -8,9 +8,15 @@ use cantrip_oracle as oracle;
 /// new objects it returns and are left there. Then every player's other creature cards enter at once (CR 110.2a), each
 /// under the control of the player whose graveyard it was in.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let others: Vec<ObjectId> =
-        g.state().battlefield().iter().copied().filter(|&id| id != item.object && g.chars(id).is(CardType::Creature)).collect();
-    let sacrificed = g.sacrifice(&others);
+    let others: Vec<(PlayerId, ObjectId)> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature))
+        .map(|id| (g.controller(id), id))
+        .collect();
+    let sacrificed = g.sacrifice_each(&others);
     let mut returning = Vec::new();
     for player in g.state().apnap().collect::<Vec<_>>() {
         for &card in g.state().zone(Zone::graveyard(player)) {

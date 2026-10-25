@@ -19,9 +19,7 @@ fn escape_cost(q: &dyn Query, asker: &Asker, card: ObjectId, caster: PlayerId) -
 }
 
 fn sacrifice_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if g.is_on_battlefield(item.object) && g.controller(item.object) == item.controller {
-        g.sacrifice(&[item.object]);
-    }
+    g.sacrifice(item.controller, &[item.object]);
     Ok(())
 }
 

@@ -21,7 +21,7 @@ static DRAGON: CardDef = CardDef {
 fn treasure_and_dragon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_treasure(g, item.controller)?;
     let treasures = tokens::treasures_controlled(g, item.controller).len();
-    if treasures >= 4 && !g.sacrifice(&[item.object]).is_empty() {
+    if treasures >= 4 && !g.sacrifice(item.controller, &[item.object]).is_empty() {
         tokens::create(g, item.controller, &DRAGON, 1)?;
     }
     Ok(())

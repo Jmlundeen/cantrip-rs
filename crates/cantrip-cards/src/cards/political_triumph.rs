@@ -13,7 +13,7 @@ fn scry_and_plan(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "When the fourth plan counter is put on this enchantment, sacrifice it, draw a card, and put a +1/+1 counter on each
 /// creature you control." (CR 701.21a) Each part is done whether or not the enchantment is still there to be sacrificed.
 fn triumph(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.sacrifice(&[item.object]);
+    g.sacrifice(item.controller, &[item.object]);
     g.draw(item.controller, 1);
     effects::counters_on_creatures_you_control(g, item.controller, CounterKind::PlusOne, 1);
     Ok(())

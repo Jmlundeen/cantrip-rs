@@ -58,12 +58,8 @@ pub fn escaped(q: &dyn Query, id: ObjectId) -> bool {
 
 /// "Sacrifice it unless it escaped": always triggers, and is judged as it resolves (CR 702.138b, 701.21a).
 fn sacrifice_unless_escaped_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !escaped(g, item.object)
-        && g.is_on_battlefield(item.object)
-        && g.obj(item.object).became.is_none()
-        && g.controller(item.object) == item.controller
-    {
-        g.sacrifice(&[item.object]);
+    if !escaped(g, item.object) && g.obj(item.object).became.is_none() {
+        g.sacrifice(item.controller, &[item.object]);
     }
     Ok(())
 }

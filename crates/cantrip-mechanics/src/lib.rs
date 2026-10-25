@@ -308,9 +308,9 @@ pub fn each_opponent_keeps_one_of_each_type(
             };
             kept.extend(choose::cards_from_kind(g, who, source, Purpose::Keep, word, theirs.clone(), eligible, 1, false)?);
         }
-        doomed.extend(theirs.into_iter().filter(|id| !kept.contains(id)));
+        doomed.extend(theirs.into_iter().filter(|id| !kept.contains(id)).map(|id| (who, id)));
     }
-    g.sacrifice(&doomed);
+    g.sacrifice_each(&doomed);
     Ok(())
 }
 
@@ -331,8 +331,7 @@ fn sacrifice_together(
         let eligible: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| kind(&*g, id)).collect();
         chosen.extend(chosen_to_sacrifice(g, who, source, count, eligible)?.into_iter().map(|id| (who, id)));
     }
-    let doomed: Vec<ObjectId> = chosen.iter().map(|&(_, id)| id).collect();
-    g.sacrifice(&doomed);
+    g.sacrifice_each(&chosen);
     Ok(chosen)
 }
 
@@ -342,14 +341,14 @@ fn sacrifice_together(
 /// greatest mana value among creatures and planeswalkers they control" cannot be a kind.
 pub fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<Vec<ObjectId>, Suspend> {
     let chosen = chosen_to_sacrifice(g, player, source, count, eligible)?;
-    Ok(g.sacrifice(&chosen))
+    Ok(g.sacrifice(player, &chosen))
 }
 
-/// What `player` will sacrifice of `eligible`: of those they can sacrifice (`Game::can_sacrifice`, CR 101.2 - "you can't try
+/// What `player` will sacrifice of `eligible`: of those they can sacrifice (`Game::can_sacrifice`, CR 701.21a, 101.2 - "you can't try
 /// to sacrifice [it], fail, and therefore ignore the effect"), all of them when there are no more than `count`, otherwise
 /// `count` of their choice. Nothing is sacrificed yet, so that several players' choices can be sacrificed together (CR 101.4).
 fn chosen_to_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<Vec<ObjectId>, Suspend> {
-    let eligible: Vec<ObjectId> = eligible.into_iter().filter(|&id| g.can_sacrifice(id)).collect();
+    let eligible: Vec<ObjectId> = eligible.into_iter().filter(|&id| g.can_sacrifice(player, id)).collect();
     if eligible.len() <= count as usize {
         return Ok(eligible);
     }

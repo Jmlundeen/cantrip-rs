@@ -43,10 +43,9 @@ fn fourth_noncreature_spell(q: &dyn Query, me: &Asker, event: &Event) -> Option<
 fn sacrifice_and_create(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let me = item.object;
-    // Not offered when it can't be sacrificed (CR 101.2: the option can't be taken).
-    let here = |g: &dyn Game| is_live(g, me) && g.is_on_battlefield(me) && g.obj(me).controller == you && g.can_sacrifice(me);
+    // Not offered when you can't sacrifice it (CR 608.2d, 701.21a: the option can't be taken).
     // "If you do" (CR 608.2c): the tokens follow only the sacrifice that happened.
-    if !here(g) || !ask_may(g, you, me, Purpose::Ask(&ASK_2))? || g.sacrifice(&[me]).is_empty() {
+    if !g.can_sacrifice(you, me) || !ask_may(g, you, me, Purpose::Ask(&ASK_2))? || g.sacrifice(you, &[me]).is_empty() {
         return Ok(());
     }
     tokens::create(g, you, &CONSTRUCT, 4)?;

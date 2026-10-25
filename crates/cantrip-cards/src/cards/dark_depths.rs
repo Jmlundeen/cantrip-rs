@@ -40,7 +40,7 @@ fn no_ice(q: &dyn Query, asker: &Asker) -> bool {
 /// left the battlefield it is a new object (CR 400.7), nothing is sacrificed and no Marit Lage is made (the ruling). "If you
 /// do" is that it was sacrificed (CR 608.2c).
 fn sacrifice_for_marit_lage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !g.sacrifice(&[item.object]).is_empty() {
+    if !g.sacrifice(item.controller, &[item.object]).is_empty() {
         cantrip_mechanics::tokens::create(g, item.controller, &MARIT_LAGE, 1)?;
     }
     Ok(())

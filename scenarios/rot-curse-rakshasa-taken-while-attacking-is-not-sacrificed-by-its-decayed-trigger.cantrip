@@ -1,0 +1,60 @@
+# Decayed: "When this creature attacks, sacrifice it at end of combat" (CR 702.147a). The delayed ability is controlled by
+# the attack trigger's controller (CR 603.7e), Bot1, who sacrifices it - and a player can't sacrifice a permanent they
+# don't control (CR 701.21a). Bot1's Rot-Curse Rakshasa (5/5) attacks; Bot2 Giant Growths Old Man of the Sea (5/6) and
+# takes the Rakshasa with it, which removes it from combat (CR 506.4). At end of combat the delayed ability resolves and
+# sacrifices nothing: the Rakshasa stays Bot2's, and no combat damage was dealt.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Rot-Curse Rakshasa
+Island x17
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Mox Emerald
+Giant Growth
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rot-Curse Rakshasa.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Rot-Curse Rakshasa > Bot2)
+[T5 Bot1.DeclareBlockers]
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Rot-Curse Rakshasa)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Rot-Curse Rakshasa.Power = 5
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Rot-Curse Rakshasa.Power = 5
+Bot1.Graveyard.Count = 0
+Bot2.Life = 20
+Delayed.Count = 0
