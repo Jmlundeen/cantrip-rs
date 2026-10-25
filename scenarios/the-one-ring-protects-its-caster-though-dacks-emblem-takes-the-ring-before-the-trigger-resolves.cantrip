@@ -1,0 +1,90 @@
+# A continuous effect from a resolving ability is controlled by that ability's controller (CR 611.2a, 113.8), whoever
+# controls its source by then. On turn 13 Bot1 casts The One Ring; with its "you gain protection from everything until your
+# next turn" trigger on the stack, Bot2 - holding Dack Fayden's emblem since turn 12 - casts Pyroblast at the Ring (not
+# blue, so it does nothing else) and the emblem gives Bot2 the Ring (checked). "You" is still Bot1: Bot2's Ragavan attacking
+# Bot1 on turn 14 has all its damage prevented, so Bot1 stays at 20.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Island
+The One Ring
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Pyroblast
+Ragavan, Nimble Pilferer
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot2.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot2.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot2.Hand.Dack Fayden.Cast
+[T6 Bot2.Main2]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Forest; Forest)
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Forest; Forest)
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {R})
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+[T10 Bot2.Main1]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Forest; Forest)
+[T12 Bot2.Main1]
+? Bot2.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot2.Battlefield.Dack Fayden.Activate(Ability: emblem)
+[T13 Bot1.Main1]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Island#4.Activate
+Bot1.Hand.The One Ring.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = The One Ring
+Bot1.Pass
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {R})
+Bot2.Hand.Pyroblast.Cast
+Bot2.Modes(Destroy target permanent)
+Bot2.Target(Bot1.Battlefield.The One Ring)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.The One Ring.Tapped = false
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T14 Bot2.Main1]
+Bot2.Attack(Ragavan, Nimble Pilferer > Bot1)
+[T14 Bot2.Main2]
+
+[Expect]
+Turn = 14
+Bot2.Emblems.Count = 1
+Bot1.Life = 20
+Prevented = 2 Ragavan, Nimble Pilferer > Bot1 by The One Ring

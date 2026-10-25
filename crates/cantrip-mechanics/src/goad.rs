@@ -16,12 +16,12 @@ pub fn goad(g: &mut dyn Game, item: &StackItem, creature: ObjectId) {
 
 /// `item`'s controller goads `creature` for the `duration` the card prints in place of "until your next turn" ("for the rest
 /// of the game" is `Duration::Indefinite`, CR 611.2a). The goader is the controller of the spell or ability (CR 701.15b),
-/// and stays that player whoever later controls its source or the creature. Goading a creature that player has already
+/// the effect's controller (`Game::add_effect`), and stays that player whoever later controls its source or the creature. Goading a creature that player has already
 /// goaded has no effect (CR 701.15d), whatever either duration.
 pub fn goad_for(g: &mut dyn Game, item: &StackItem, creature: ObjectId, duration: Duration) {
     let goader = item.controller;
     if g.state().effects.iter().any(|e| e.affected == creature && e.kind == EffectKind::Goaded && e.controller == goader) {
         return;
     }
-    g.add_effect_by(goader, item.object, creature, EffectKind::Goaded, duration);
+    g.add_effect(item.object, creature, EffectKind::Goaded, duration);
 }

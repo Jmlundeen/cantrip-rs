@@ -1188,9 +1188,11 @@ impl<'a> Cx<'a> {
         }
     }
 
-    /// A continuous effect begins (`Game::add_effect`), controlled by `controller` (`Game::add_effect_by`) or else by
-    /// whoever controls its source now.
-    fn begin_effect(&mut self, controller: Option<PlayerId>, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {
+    /// A continuous effect begins (`Game::add_effect`). Its controller is the controller of what made it (CR 611.2a, 113.8,
+    /// 603.3a): the replacement effect or mana ability being carried out (`Cx::doer`), else the spell or ability resolving -
+    /// whoever controls its source by then (CR 603.7d) - and only for an effect no instruction makes, whoever controls the
+    /// source now.
+    fn begin_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {
         // An object that has changed zones is a new object the effect knows nothing of (CR 400.7, 611.2c), and "for as long
         // as [the source] remains on the battlefield" is over before it begins once the source has left (CR 611.2b).
         if !(live(&self.g.state, affected) || kind.outlives_affected()) {
@@ -1211,7 +1213,7 @@ impl<'a> Cx<'a> {
             }
             other => other,
         };
-        let controller = controller.unwrap_or(self.g.state.obj(source).controller);
+        let controller = self.doer.or_else(|| self.effect_controller()).unwrap_or(self.g.state.obj(source).controller);
         let timestamp = self.g.state.timestamp();
         let effect = ContinuousEffect { source, controller, timestamp, affected, kind, duration };
         // A duration already over as the effect would begin never starts, and the effect does nothing (CR 611.2b).
@@ -2206,11 +2208,7 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {
         // One change, though control and the "for as long as" durations it ends are settled with it.
-        self.instruction(|cx| cx.begin_effect(None, source, affected, kind, duration), |_| true);
-    }
-
-    fn add_effect_by(&mut self, controller: PlayerId, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {
-        self.instruction(|cx| cx.begin_effect(Some(controller), source, affected, kind, duration), |_| true);
+        self.instruction(|cx| cx.begin_effect(source, affected, kind, duration), |_| true);
     }
 
     fn add_player_effect(&mut self, controller: PlayerId, source: ObjectId, kind: EffectKind, duration: Duration) {
