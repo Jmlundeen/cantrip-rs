@@ -1,0 +1,58 @@
+# Scout for Survivors under Containment Priest: the two creature cards it returns were not cast, so the Priest exiles each
+# instead of letting it enter (CR 614.1a). "Put a +1/+1 counter on each of them" is about the creatures that entered, and none
+# did, so the cards in exile get no counter (CR 400.7). Wheel of Fortune (cast off Black Lotus) puts Llanowar Elves and
+# Elvish Mystic in Bot1's graveyard and draws the Priest and Scout, each then cast off the Moxen and a Plains.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Wheel of Fortune
+Llanowar Elves
+Elvish Mystic
+Ornithopter
+Ornithopter
+Scout for Survivors
+Mox Pearl
+Mox Jet
+Containment Priest
+Mox Sapphire
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Plains x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Containment Priest.Cast
+Bot1.Pass
+Bot1.Hand.Scout for Survivors.Cast
+Bot1.Target(Llanowar Elves; Elvish Mystic)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Containment Priest; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Plains
+Exile = Elvish Mystic; Llanowar Elves
+Bot1.Exile.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+Bot1.Exile.Elvish Mystic.Counters.PlusOnePlusOne = (absent)
