@@ -15,7 +15,7 @@ core-feature agents and review agents run on Opus. Agents read only what their w
      clean slot on today's `origin/main`, its path and a lease ID that stay with you - never in a prompt or a message.
      `NO WORKTREE AVAILABLE` means wait for a release; growing the pool (`create`) is the user's call. A lease is
      never reused for the next card.
-   - **Every agent in the slot is let in by a token**: `worktree.cmd token <lease>` (`--read-only` for a reviewer) -
+   - **Every agent in the slot is let in by a token**: `worktree.cmd token <lease>` (a reviewer's too: it breaks the card in place and restores it, `review.md`) -
      single-use, dead in two minutes - pasted into its prompt as the token's output says; the agent's first command is
      `join`. That includes an agent resumed with SendMessage to work in the slot again: the message carries a fresh
      token, since an agent that stopped has left.
@@ -70,16 +70,16 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    the PR reviewer keep building, reviewing and landing, and the fix rebases over them before it lands. Only work that
    needs the fix waits for it, and the coordinator says which. Only a gap the coordinator decides not to build is released,
    with the gap recorded on the issue.
-4. **Review agents** (Opus) review inside the card's lease - let in by a `--read-only` token once the card agent has
-   left, on the commit as it stands, using its warm build - never in a worktree of their own, and change no files,
-   check out nothing and clean nothing there; they log `review-started` and their verdict on the card's issue, and
+4. **Review agents** (Opus) review inside the card's lease - let in by a token once the card agent has
+   left, on the commit as it stands, using its warm build - never in a worktree of their own or a clone; they break the
+   card one temporary edit at a time and restore it (`review.md`), commit nothing and leave `git status` clean; they log `review-started` and their verdict on the card's issue, and
    leave. Their prompt points them at
    `review.md`, the card's issue number, the commit, the card's Oracle text and the CR rules it
    touches, and at correctness, safety and rules adherence; it hands them no list of corner cases to demand tests for.
    Each card is reviewed as soon as it is committed. The coordinator sends back the blocking findings, and a
    non-blocking note that is a real test gap (a limit not met exactly, one player's side untested) when the fix is a
    line of a scenario - to the card agent with SendMessage, a fresh write token in the message, once the reviewer has
-   left; the reviewer confirms the fixes the same way, with a fresh read-only token.
+   left; the reviewer confirms the fixes the same way, with a fresh token.
 5. **Land** each reviewed card or core change on `main` (cherry-pick its commits; a conflict stops for a look), then
    one test run for everything ready to land together: `tools\test.cmd /engine` (the Rust workspace, about a minute and
    a half: the corpus with 0 fail - known bugs reported beside it - and the verify tests) when the batch touches only

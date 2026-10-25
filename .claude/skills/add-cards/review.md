@@ -45,9 +45,12 @@ checked for sufficiency, not exhaustiveness:
   card needs nothing the client did not already do, and no browser scenario is owed. The tactical bot is never checked.
 
 A reviewer runs only the card's scenarios and coverage (`corpus -- --card "Name"`, `python tools/maintenance/card-coverage.py "Name"`), and those of a
-card whose shared code the change touched - nothing wider - and, in another's worktree, changes no files, checks out
-nothing and cleans nothing. It reaches that worktree only by the read-only token in its prompt (`tools\worktree.cmd
-join`, its first command, and `leave` its last), never by a path it was given.
+card whose shared code the change touched - nothing wider. It **breaks the card** to see which expectation catches each
+decision its code makes (a number, a filter, whose objects, a condition): one temporary edit at a time in the card's own
+worktree, run, then restored at once with `git checkout -- <file>`; a scenario it proposes is written to its scratchpad
+and tried there the same way. It commits nothing, cleans nothing, never clones the repository elsewhere, and leaves
+`git status` clean. It reaches that worktree only by the token in its prompt (`tools\worktree.cmd join`, its first
+command, and `leave` its last), never by a path it was given.
 
 The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
 land. Self-reported "exact" is not proof. A finding **blocks** the card when it is a rules deviation, a code defect
