@@ -1,0 +1,85 @@
+# Kenrith, the Returned King: "{4}{B}: Put target creature card from a graveyard onto the battlefield under its owner's
+# control." Bot2 Lightning Bolts both Ornithopters on turn 2, so each graveyard holds an Ornithopter. On turn 3 Bot1 has
+# five sources but none black (Jet is drawn later), so the ability is refused; Jet is cast, and a Lightning Bolt in a graveyard
+# is no target. It pays with Jet and four others (Sapphire stays untapped) and brings back Bot1's own Ornithopter. On turn 5
+# it brings back Bot2's, which returns under Bot2's control (its owner), not Bot1's.
+
+[Bot1 Deck]
+Kenrith, the Returned King
+Island
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Mox Jet
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Kenrith, the Returned King.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: from a graveyard; Bot2.Graveyard.Ornithopter; Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: from a graveyard; Bot2.Graveyard.Lightning Bolt)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: from a graveyard; Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Graveyard.Ornithopter = (absent)
+? Bot1.Battlefield.Ornithopter.Tapped = false
+? Bot1.Battlefield.Mox Sapphire.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: from a graveyard; Bot2.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield = Island; Kenrith, the Returned King; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter
+Bot2.Battlefield = Mountain; Mox Ruby; Ornithopter
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Bot1.Graveyard =

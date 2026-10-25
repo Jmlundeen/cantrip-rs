@@ -1,0 +1,63 @@
+# Kenrith, the Returned King: "{1}{G}: Put a +1/+1 counter on target creature." Kenrith is cast on turn 1 from a land and
+# four Moxen (Emerald stays in hand), so on turn 3 five mana but no green is untapped and the ability is refused. Emerald
+# is cast and pays with one more source, exactly {1}{G}: the opponent's Ornithopter (0/2) becomes 1/3. A noncreature
+# permanent is no target. On turn 5 it targets Kenrith itself, 5/5 to 6/6.
+
+[Bot1 Deck]
+Kenrith, the Returned King
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Kenrith, the Returned King.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: +1/+1 counter; Bot2.Battlefield.Ornithopter; Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: +1/+1 counter; Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: +1/+1 counter; Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot2.Battlefield.Ornithopter.Power = 1
+? Bot2.Battlefield.Ornithopter.Toughness = 3
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: +1/+1 counter; Kenrith, the Returned King)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Kenrith, the Returned King.Power = 6
+Bot1.Battlefield.Kenrith, the Returned King.Toughness = 6
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mox Pearl.Tapped = false

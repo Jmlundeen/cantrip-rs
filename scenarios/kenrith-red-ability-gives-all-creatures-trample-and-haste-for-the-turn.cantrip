@@ -1,0 +1,59 @@
+# Kenrith, the Returned King: "{R}: All creatures gain trample and haste until end of turn." Kenrith is cast on turn 1
+# from a land and four Moxen (Ruby stays in hand). On turn 3 only W, U, B, G and a land are untapped, so the {R} ability is
+# refused for want of red; Ruby is cast and pays exactly. Both players' creatures (Kenrith and Bot2's Ornithopter) gain
+# trample and haste, but an Ornithopter Bot1 casts afterwards does not (CR 611.2c), and on turn 5 it has all worn off.
+
+[Bot1 Deck]
+Kenrith, the Returned King
+Island
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Kenrith, the Returned King.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: All creatures; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: All creatures)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Kenrith, the Returned King.Keywords = Haste; Trample
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Haste; Trample
+? Bot1.Battlefield.Mox Pearl.Keywords = (absent)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Kenrith, the Returned King.Keywords = (absent)
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ornithopter.Keywords = Flying

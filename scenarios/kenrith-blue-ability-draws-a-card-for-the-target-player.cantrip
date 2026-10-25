@@ -1,0 +1,61 @@
+# Kenrith, the Returned King: "{3}{U}: Target player draws a card." Kenrith is cast on turn 1 from a land and four Moxen
+# (Sapphire stays in hand; the land is a Mountain), so on turn 3 five mana but no blue is untapped and it is refused. Sapphire is cast and
+# pays with exactly three others (one source stays untapped): the opponent draws one card. On turn 5 the controller targets
+# themselves and draws one.
+
+[Bot1 Deck]
+Kenrith, the Returned King
+Mountain
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mountain x10
+
+[Bot2 Deck]
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Kenrith, the Returned King.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: draws a card; Bot2; Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Hand.Count = 7
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: draws a card; Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot2.Hand.Count = 8
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: draws a card; Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Library.Count = 7

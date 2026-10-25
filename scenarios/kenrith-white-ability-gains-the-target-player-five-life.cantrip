@@ -1,0 +1,57 @@
+# Kenrith, the Returned King: "{2}{W}: Target player gains 5 life." Kenrith is cast on turn 1 with Black Lotus (white), Jet
+# and Ruby, so on turn 3 Jet, Ruby, and the Emerald and Sapphire cast now are untapped: four mana but no white, refused.
+# Pearl is cast and, with Jet and Ruby, pays exactly {2}{W}, so the opponent goes 20 to 25 (the opponent is a legal target,
+# and 5, not 4 or 6). On turn 5 the controller targets themselves, 20 to 25.
+
+[Bot1 Deck]
+Kenrith, the Returned King
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Kenrith, the Returned King.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: gains 5 life; Bot2; Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: gains 5 life; Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot2.Life = 25
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Kenrith, the Returned King.Activate(Ability: gains 5 life; Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana =
+Bot1.Life = 25
+Bot2.Life = 25
+Bot1.Battlefield.Mox Jet.Tapped = false
