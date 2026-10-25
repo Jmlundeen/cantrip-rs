@@ -32,8 +32,8 @@ the commits, or `gh issue list --search "<Card Name> in:title" --state all`; a c
 ## 2. Straight to the review: an Opus agent
 
 Start a fresh agent (`model: "opus"`, no worktree isolation) exactly as `coordinator.md` step 4 says for a review
-agent: let into the lease by a `--read-only` token (`worktree.cmd token <lease> --read-only`, the token in its prompt,
-never the path), on the commits as they stand, pointed at `review.md`, the card's issue number,
+agent: let into the lease by a token (`worktree.cmd token <lease>`, the token in its prompt, never the path; not
+`--read-only`, since `review.md` has it break the card one temporary edit at a time and restore it), on the commits as they stand, pointed at `review.md`, the card's issue number,
 the commits, the card's Oracle text and the CR rules it touches - and nothing else, no opinion of the card and no list
 of corner cases. Add only what a PR makes different:
 
@@ -58,7 +58,7 @@ the core closed to it, only the touched cards' scenarios and coverage, no push),
 it fixes them on top of the PR's commits, logs `fixes-committed` on the issue and reports how each was fixed. A fix
 that needs the core is a gap report, handled as `coordinator.md` step 3 says.
 
-Send the fix commits back to the review agent (SendMessage, its context kept, a fresh read-only token in the message
+Send the fix commits back to the review agent (SendMessage, its context kept, a fresh token in the message
 once the fix agent has left) to confirm each finding is resolved and
 nothing new is broken; loop until it passes, or stop and tell the user when a finding needs a decision only they can
 make. No blocking findings: nothing to fix.
