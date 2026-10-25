@@ -2312,11 +2312,6 @@ fn contract_scene(cards: &CardTable, card: CardId, target: CardId, scene: usize)
     source.timestamp = 1;
     let mut object = Obj::new(target, PlayerId(if scene == 3 { 1 } else { 0 }), Zone::BATTLEFIELD);
     object.timestamp = 2;
-    if scene == 2 {
-        let every = [1; CounterKind::COUNT];
-        crate::counters::hypothetical(&mut source, &every);
-        crate::counters::hypothetical(&mut object, &every);
-    }
     if scene == 4 {
         source.class_level = 3;
         // Made by the source's own text, as an entering permanent's own `enters` makes them.
@@ -2327,6 +2322,13 @@ fn contract_scene(cards: &CardTable, card: CardId, target: CardId, scene: usize)
     state.zone_push(Zone::BATTLEFIELD, source);
     let object = state.push_obj(object);
     state.zone_push(Zone::BATTLEFIELD, object);
+    // On the objects once they exist: a new object has none (`GameState::push_obj`, CR 400.7).
+    if scene == 2 {
+        let every = [1; CounterKind::COUNT];
+        for id in [source, object] {
+            state.update_obj(id, |o| crate::counters::hypothetical(o, &every));
+        }
+    }
     if scene != 1 {
         state.update_obj(source, |o| o.attached_to = Some(object));
     }

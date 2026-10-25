@@ -85,6 +85,13 @@ fn cx(game: &mut RulesGame) -> Cx<'_> {
     Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
 }
 
+/// Ten counters of `kind` on `on`, what a planeswalker or battle enters with (CR 306.5b, 310.4b): its controller's doing, as
+/// the frame of the spell or action that put it onto the battlefield would say (`Cx::doer`).
+fn counters(cx: &mut Cx, on: ObjectId, kind: CounterKind) {
+    let controller = cx.s().obj(on).controller;
+    cx.acting_as(controller, |cx| cantrip_api::Game::add_counters(cx, on, kind, 10));
+}
+
 /// An effect from the attacked permanent itself on it: what a resolved spell's would be.
 fn effect(cx: &mut Cx, on: ObjectId, kind: EffectKind) {
     cantrip_api::Game::add_effect(cx, on, on, kind, Duration::EndOfTurn);
@@ -131,7 +138,7 @@ fn an_attacked_battle_whose_protector_changes_is_dealt_no_combat_damage() {
     let (mut game, attacker, battle) = game(2, &BATTLE, THEM, Some(THEM), THEM);
     let mut cx = cx(&mut game);
     // Defense counters, so the state-based actions keep it on the battlefield (CR 704.5v).
-    cantrip_api::Game::add_counters(&mut cx, battle, CounterKind::Defense, 10);
+    counters(&mut cx, battle, CounterKind::Defense);
     effect(&mut cx, battle, EffectKind::AddSubtype(Subtype::Siege));
     crate::settle::state_based_actions(&mut cx).unwrap();
     assert_eq!(cx.s().obj(battle).marks.protector, Some(YOU), "the state-based actions chose a new protector");
@@ -206,7 +213,7 @@ fn an_attacked_planeswalker_left_alone_is_dealt_the_combat_damage() {
     let (mut game, _, walker) = game(2, &WALKER, THEM, None, THEM);
     let mut cx = cx(&mut game);
     // Loyalty counters, so the state-based actions keep it on the battlefield (CR 704.5i).
-    cantrip_api::Game::add_counters(&mut cx, walker, CounterKind::Loyalty, 10);
+    counters(&mut cx, walker, CounterKind::Loyalty);
     crate::settle::state_based_actions(&mut cx).unwrap();
     crate::ops::settle_lasting_and_control(&mut cx);
     assert_eq!(cx.s().attackers[0].target, Target::Object(walker));
@@ -221,7 +228,7 @@ fn an_attacked_battle_that_becomes_only_a_planeswalker_is_dealt_no_combat_damage
     let (mut game, attacker, battle) = game(2, &BATTLE, THEM, Some(THEM), THEM);
     let mut cx = cx(&mut game);
     effect(&mut cx, battle, EffectKind::SetTypes(TypeSet::of(&[CardType::Planeswalker])));
-    cantrip_api::Game::add_counters(&mut cx, battle, CounterKind::Loyalty, 10);
+    counters(&mut cx, battle, CounterKind::Loyalty);
     attacks_nothing(&cx, attacker, THEM);
     assert_eq!(damage_to(&mut cx, battle), 0);
 }
@@ -233,7 +240,7 @@ fn an_attacked_planeswalker_that_becomes_only_a_battle_is_dealt_no_combat_damage
     let (mut game, attacker, walker) = game(2, &WALKER, THEM, Some(THEM), THEM);
     let mut cx = cx(&mut game);
     effect(&mut cx, walker, EffectKind::SetTypes(TypeSet::of(&[CardType::Battle])));
-    cantrip_api::Game::add_counters(&mut cx, walker, CounterKind::Defense, 10);
+    counters(&mut cx, walker, CounterKind::Defense);
     attacks_nothing(&cx, attacker, THEM);
     assert_eq!(damage_to(&mut cx, walker), 0);
 }
@@ -334,7 +341,7 @@ fn a_blocking_planeswalker_creature_that_stops_being_a_creature_is_still_attacke
     ]);
     game.state.set_blocks(vec![Block { blocker: gideon, attacker: blocked, first_strike: false }]);
     let mut cx = cx(&mut game);
-    cantrip_api::Game::add_counters(&mut cx, gideon, CounterKind::Loyalty, 10);
+    counters(&mut cx, gideon, CounterKind::Loyalty);
     effect(&mut cx, gideon, EffectKind::SetTypes(TypeSet::of(&[CardType::Planeswalker])));
     assert!(cx.s().blocks.is_empty(), "it blocks no more");
     assert_eq!(cx.s().attackers.len(), 2);
