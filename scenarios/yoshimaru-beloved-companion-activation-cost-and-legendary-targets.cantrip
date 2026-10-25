@@ -1,0 +1,68 @@
+# Yoshimaru's {6} ability can target either player's legendary creature, including itself (CR 602.2, 115.1c).
+# Its replacement adds one only to its controller's creature, not the opponent's (CR 614.1a).
+
+[Bot1 Deck]
+Karakas
+Sol Ring
+Black Lotus
+Yoshimaru, Beloved Companion
+Ornithopter
+Mox Pearl
+Mox Emerald
+Black Lotus
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Marwyn, the Clearcutter
+Plains x13
+
+[Actions]
+Bot1.Hand.Karakas.Play
+Bot1.Battlefield.Karakas.Activate(Ability: Add)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Yoshimaru, Beloved Companion.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Marwyn, the Clearcutter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Yoshimaru, Beloved Companion.Activate(Ornithopter)
+! Bot1.Battlefield.Yoshimaru, Beloved Companion.Activate(Karakas)
+Bot1.Battlefield.Yoshimaru, Beloved Companion.Activate(Yoshimaru, Beloved Companion)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Yoshimaru, Beloved Companion.Counters.PlusOnePlusOne = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Karakas.Activate(Ability: Add)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Yoshimaru, Beloved Companion.Activate(Marwyn, the Clearcutter)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Yoshimaru, Beloved Companion.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Yoshimaru, Beloved Companion.Power = 4
+Bot2.Battlefield.Marwyn, the Clearcutter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Marwyn, the Clearcutter.Power = 3

@@ -1,0 +1,8 @@
+{
+  "name": "Yoshimaru, Beloved Companion",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Dog",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on it instead.\n{6}: Put a +1/+1 counter on target legendary creature."
+}
