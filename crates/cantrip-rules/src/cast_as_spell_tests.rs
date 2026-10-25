@@ -55,19 +55,47 @@ static BEAR: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A bear that costs {1}, cast with no mana: only for nothing, or for {1} less.
+static CUB: CardDef = CardDef {
+    name: "Cast As Spell Test Cub",
+    types: TypeSet::of(&[CardType::Creature]),
+    cost: mana("{1}"),
+    power: Some(1),
+    toughness: Some(1),
+    spell: spell(&[], nothing),
+    ..CardDef::BLANK
+};
+
+/// "You may cast Spirit spells without paying their mana costs" (Dracogenesis's, for Dragons).
+static FREEDOM: CardDef = CardDef {
+    name: "Cast As Spell Test Freedom",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: spirit_you_cast_free, cost: InsteadOfManaCost::WithoutPaying, flash: false }],
+    ..CardDef::BLANK
+};
+
+fn spirit_you_cast_free(q: &dyn Query, asker: &Asker, spell: ObjectId, player: PlayerId) -> bool {
+    player == asker.controller && q.chars(spell).has_subtype(Subtype::Spirit)
+}
+
 static CASTER: CardDef = CardDef { name: "Cast As Spell Test Caster", types: TypeSet::of(&[CardType::Sorcery]), ..CardDef::BLANK };
 
 /// A game with the bear in your hand and `permanents` of yours on the battlefield, in a main phase of `active`'s with you
 /// holding priority.
 fn game(permanents: &[&'static CardDef], active: PlayerId) -> (Game, ObjectId) {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&BANNER, &FLASHER, &WARDEN, &BEAR, &CASTER])));
+    game_with(&BEAR, permanents, active)
+}
+
+/// `game` with `hand` in your hand for the bear.
+fn game_with(hand: &'static CardDef, permanents: &[&'static CardDef], active: PlayerId) -> (Game, ObjectId) {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&BANNER, &FLASHER, &WARDEN, &BEAR, &CUB, &FREEDOM, &CASTER])));
     let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
     let put = |game: &mut Game, def: &'static CardDef, zone: Zone| {
         let id = game.state.push_obj(Obj::new(table.id_of(def), YOU, zone));
         game.state.zone_push(zone, id);
         id
     };
-    let bear = put(&mut game, &BEAR, Zone::hand(YOU));
+    let bear = put(&mut game, hand, Zone::hand(YOU));
     for &def in permanents {
         put(&mut game, def, Zone::BATTLEFIELD);
     }
@@ -121,4 +149,18 @@ fn a_ban_on_spells_reads_the_spell_the_card_would_be() {
     assert!(!offered(&[&WARDEN, &BANNER], YOU), "a Spirit as your spell, so banned");
     assert!(castable_during_resolution(&[&WARDEN]));
     assert!(!castable_during_resolution(&[&WARDEN, &BANNER]));
+}
+
+/// Whether you are offered to cast the cub, which costs {1}, with no mana, in your main phase.
+fn cub_offered(permanents: &[&'static CardDef]) -> bool {
+    let (mut game, cub) = game_with(&CUB, permanents, YOU);
+    priority_options(&mut cx(&mut game), YOU).iter().any(|o| o.kind == ActionKind::CastSpell && o.source == Some(cub))
+}
+
+/// CR 118.9, 601.2b, 601.3e: "You may cast Spirit spells without paying their mana costs" lets the cub, a Spirit as your
+/// spell, be cast for nothing, though it is none in your hand.
+#[test]
+fn an_alternative_cost_reads_the_spell_the_card_would_be() {
+    assert!(!cub_offered(&[&FREEDOM]), "no Spirit spell, no alternative cost, and no mana for {{1}}");
+    assert!(cub_offered(&[&FREEDOM, &BANNER]), "a Spirit as your spell, cast without paying its mana cost");
 }

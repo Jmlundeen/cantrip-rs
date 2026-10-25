@@ -1,0 +1,58 @@
+# An alternative cost a static ability gives some spells is judged on the spell the card would be on the stack, under its
+# caster, with the continuous effects that would apply to it there (CR 601.2a-b, 601.3e, 118.9), not on the card where it
+# is. Bot1 controls Dracogenesis ("You may cast Dragon spells without paying their mana costs") and Arcane Adaptation
+# naming Dragon ("The same is true for creature spells you control"). Cruelclaw's Heist with its gift exiles Bot2's
+# Gigantic Big Bear and lets Bot1 cast it. In Bot2's exile, owned by Bot2, the Bear is no Dragon; as Bot1's creature spell
+# it is one (CR 611.3a), so Bot1 casts it without paying its mana cost - with three mana left, {5}{G}{G} could not be paid
+# - and it enters a Dragon.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Black Lotus
+Dracogenesis
+Arcane Adaptation
+Cruelclaw's Heist
+Swamp x12
+
+[Bot2 Deck]
+Gigantic Big Bear
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dracogenesis.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot1.Modes(Dragon)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cruelclaw's Heist.Cast
+Bot1.Accept
+Bot1.Choose(Gigantic Big Bear)
+? Exile = Gigantic Big Bear
+Bot1.Exile.Gigantic Big Bear.Cast(Ability: Without paying)
+? Turn = 5
+
+[Expect]
+Bot1.Battlefield.Gigantic Big Bear.Subtypes = Bear; Dragon
+Bot1.Mana = 

@@ -55,8 +55,9 @@ fn cast_face_id(cx: &Cx, card: ObjectId, way: u8) -> Option<CardId> {
 
 /// What the offer of `priority_options` asks of the spells the cards `player` could cast would be (CR 601.2a, 601.3e): a
 /// spell is put on the stack before anything about it is announced, as the face it is cast as alone, under its caster, and a
-/// permission that reads it reads that spell - with the effects that apply to it there, not the card where it is. Open only
-/// for the length of that question (`Game::spells_as_cast`), closed at any other time; no part of the position.
+/// permission or an alternative cost that reads it reads that spell - with the effects that apply to it there, not the card
+/// where it is. Open only for the length of that question (`Game::spells_as_cast`), closed at any other time; no part of the
+/// position.
 ///
 /// The card where it is has the face's own values (`layers::chars_as_face`) and the same effects as the spell would, unless
 /// a static ability that functions outside the battlefield exists (`layers::statics_everywhere`: Arcane Adaptation's
@@ -77,10 +78,13 @@ pub(crate) struct SpellsAsCast {
     /// permanents whose static abilities may let them (`static_rules::flash_granters`).
     flash_types: TypeSet,
     granters: Vec<(ObjectId, PlayerId, &'static CardDef)>,
-    /// Each card and face (`None`: the card itself) judged: whether a permission lets it be cast as though it had flash.
+    /// Each card and face (`None`: the card itself) judged: whether a permission lets it be cast as though it had flash, and
+    /// the characteristics of the spell, where they are not those of the card where it is.
     flash: Vec<(SpellFace, bool)>,
+    chars: Vec<(SpellFace, Option<Chars>)>,
     /// Those the offer asked about that are not judged yet.
     asked_flash: Vec<SpellFace>,
+    asked_chars: Vec<SpellFace>,
 }
 
 /// A card and the face it would be cast as (`None`: the card itself), as `SpellsAsCast` keeps what it judges of them.
@@ -151,13 +155,34 @@ fn ask_as_though_flash(cx: &Cx, card: ObjectId, face: Option<CardId>) {
     }
 }
 
+/// The characteristics `card` cast as `face` (`None`: itself) would have as the spell on the stack under the player
+/// `priority_options` asks for, where they are not those of the card where it is (`SpellsAsCast`): what an alternative cost's
+/// rule reads of the spell.
+fn spell_chars(cx: &Cx, card: ObjectId, face: Option<CardId>) -> Option<Chars> {
+    let key = (card, face);
+    {
+        let t = cx.g.spells_as_cast.borrow();
+        if !t.open || !t.judged(cx, card) {
+            return None;
+        }
+        if let Some(&(_, chars)) = t.chars.iter().find(|(k, _)| *k == key) {
+            return chars;
+        }
+        if t.asked_chars.contains(&key) {
+            return None;
+        }
+    }
+    cx.g.spells_as_cast.borrow_mut().asked_chars.push(key);
+    None
+}
+
 /// Judges what the offer asked of the spells the cards would be and had not judged (`SpellsAsCast`), each with the card put
 /// on the stack for the moment as that spell (`ops::as_cast`). Whether any answer differs from the one the offer took for
 /// granted, so that it must be made again.
 fn judge_spells_as_cast(cx: &mut Cx) -> bool {
-    let (player, granters, asked_flash) = {
+    let (player, granters, asked_flash, asked_chars) = {
         let mut t = cx.g.spells_as_cast.borrow_mut();
-        (t.player, t.granters.clone(), std::mem::take(&mut t.asked_flash))
+        (t.player, t.granters.clone(), std::mem::take(&mut t.asked_flash), std::mem::take(&mut t.asked_chars))
     };
     let mut changed = false;
     for (card, face) in asked_flash {
@@ -165,7 +190,92 @@ fn judge_spells_as_cast(cx: &mut Cx) -> bool {
         changed |= granted;
         cx.g.spells_as_cast.borrow_mut().flash.push(((card, face), granted));
     }
+    for (card, face) in asked_chars {
+        let differs = chars_as_cast(cx, card, face, player);
+        changed |= differs.is_some();
+        cx.g.spells_as_cast.borrow_mut().chars.push(((card, face), differs));
+    }
     changed
+}
+
+/// `chars_as_cast` where it could be other than the card where it is (`SpellsAsCast`), for a cast an effect makes as it
+/// resolves.
+fn chars_as_cast_now(cx: &mut Cx, card: ObjectId, face: Option<CardId>, player: PlayerId) -> Option<Chars> {
+    if !layers::statics_everywhere(cx.cards(), cx.s()) && !own_characteristic_defining(cx, card) {
+        return None;
+    }
+    chars_as_cast(cx, card, face, player)
+}
+
+/// The characteristics `card` cast by `player` as `face` (`None`: itself) would have as the spell on the stack (`ops::as_cast`),
+/// where they are not those of the card where it is, judged as that face: what an alternative cost reads.
+fn chars_as_cast(cx: &mut Cx, card: ObjectId, face: Option<CardId>, player: PlayerId) -> Option<Chars> {
+    let here = {
+        let _face_up = layers::judged_face_up(cx.s(), card);
+        match face {
+            Some(face) => layers::chars_as_face(cx.cards(), cx.s(), &cx.g.log, card, face),
+            None => cx.chars(card),
+        }
+    };
+    let mut there = ops::as_cast(cx, card, face, player, |cx| cx.chars(card));
+    // A spell is one (CR 112.1), which the card where it is was not: no alternative cost's rule asks.
+    there.spell = here.spell;
+    (there != here).then_some(there)
+}
+
+/// Any query, with the spell a card would be read as `chars` (`spell_chars`): an alternative cost's rule asks its
+/// characteristics of the spell, and everything else of the card where it is (Omniscience's "from your hand").
+struct AsSpell<'a> {
+    q: &'a dyn Query,
+    spell: ObjectId,
+    chars: Chars,
+}
+
+impl Query for AsSpell<'_> {
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.q.linked_card(card)
+    }
+
+    fn text_linked(&self, source: ObjectId) -> Linked {
+        self.q.text_linked(source)
+    }
+
+    fn state(&self) -> &GameState {
+        self.q.state()
+    }
+
+    fn card(&self, id: CardId) -> &'static CardDef {
+        self.q.card(id)
+    }
+
+    fn chars(&self, id: ObjectId) -> Chars {
+        if id == self.spell { self.chars } else { self.q.chars(id) }
+    }
+
+    /// Its mana cost is the face's, as the card where it is has it (CR 202.3).
+    fn mana_value(&self, id: ObjectId) -> u32 {
+        self.q.mana_value(id)
+    }
+
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        self.q.token_chars(card, copy)
+    }
+
+    fn card_id(&self, def: &'static CardDef) -> CardId {
+        self.q.card_id(def)
+    }
+
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        self.q.lost_all_abilities(id)
+    }
+
+    fn events(&self) -> &[Record] {
+        self.q.events()
+    }
+
+    fn can_target(&self, asker: &Asker, target: Target) -> bool {
+        self.q.can_target(asker, target)
+    }
 }
 
 /// The casts among `options`, and the suspends among them (CR 702.62a: "any time you could begin to cast this card"), that a
@@ -5384,8 +5494,11 @@ impl Query for QueryAsFace<'_> {
 
 /// The alternative costs among `all` (`spell_alternatives_of`) that `player` may pay rather than the mana cost of `card` cast
 /// as `face` (CR 118.9, 601.2b), `whole` when that is the card itself: judged on that face (CR 709.3a, 715.3a, 712.8a), in
-/// the zone the card is in. One that two permanents of a player give (two copies of a card) is offered once, by the first,
+/// the zone the card is in, the spell's characteristics those it would have on the stack under `player` where they are not
+/// the card's there (`spell`, `SpellsAsCast`: Dracogenesis's "Dragon spells" finds an opponent's creature card the caster's
+/// Arcane Adaptation makes a Dragon as their spell). One that two permanents of a player give (two copies of a card) is offered once, by the first,
 /// since paying it is one choice.
+#[allow(clippy::too_many_arguments)]
 fn alternatives_for(
     q: &dyn Query,
     cards: &CardTable,
@@ -5394,14 +5507,20 @@ fn alternatives_for(
     card: ObjectId,
     face: &'static CardDef,
     whole: bool,
+    spell: Option<Chars>,
 ) -> Vec<Given<SpellAlternative>> {
     if all.is_empty() {
         return Vec::new();
     }
     let view = (!whole).then(|| QueryAsFace { q, cards, spell: card, face: cards.id_of(face) });
-    let judged: &dyn Query = match &view {
+    let at_face: &dyn Query = match &view {
         Some(view) => view,
         None => q,
+    };
+    let as_spell = spell.map(|chars| AsSpell { q: at_face, spell: card, chars });
+    let judged: &dyn Query = match &as_spell {
+        Some(view) => view,
+        None => at_face,
     };
     let mut applying: Vec<Given<SpellAlternative>> = Vec::new();
     for given in all {
@@ -5550,7 +5669,11 @@ impl<'a> Offer<'a> {
 
     fn alternatives(&self, card: ObjectId, face: &'static CardDef, whole: bool) -> Vec<Given<SpellAlternative>> {
         let all = self.alternatives.get_or_init(|| spell_alternatives_of(self.cx.cards(), self.cx.s(), &self.cx.g.log));
-        alternatives_for(self.cx, self.cx.cards(), all, self.player, card, face, whole)
+        if all.is_empty() {
+            return Vec::new();
+        }
+        let spell = spell_chars(self.cx, card, (!whole).then(|| self.cx.card_id(face)));
+        alternatives_for(self.cx, self.cx.cards(), all, self.player, card, face, whole, spell)
     }
 
     /// Whether an alternative cost another object gives lets a spell cast for it be cast as though it had flash (Primal
@@ -7485,6 +7608,9 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
     let face = cast_face(whole, way);
     let mut alternative: Option<Cost> = None;
     if pays_mana_cost && !terms.flashback {
+        // What the alternative costs read of the spell is the spell it would be on the stack (`SpellsAsCast`).
+        let all = spell_alternatives_of(cx.cards(), cx.s(), &cx.g.log);
+        let spell = if all.is_empty() { None } else { chars_as_cast_now(cx, card, cast_face_id(cx, card, way), player) };
         // A card exiled face down is judged as the spell it would be (CR 406.3a-b); the question below is asked of the
         // card, and `cast` turns it face up.
         let (ways, alternatives) = {
@@ -7508,8 +7634,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
             } else {
                 Vec::new()
             };
-            let all = spell_alternatives_of(cx.cards(), cx.s(), &cx.g.log);
-            let alternatives: Vec<Given<SpellAlternative>> = alternatives_for(&*cx, cx.cards(), &all, player, card, face, way == 0)
+            let alternatives: Vec<Given<SpellAlternative>> = alternatives_for(&*cx, cx.cards(), &all, player, card, face, way == 0, spell)
                 .into_iter()
                 .filter(|a| can_pay_other(cx, card, player, &a.what.cost.cost()))
                 // An X that can't be 0 has nothing to be for a cost with no {X} (CR 107.3a-b): not a choice.

@@ -476,7 +476,9 @@ only the candidates the host's verdict on those picked says may be added.
   judged as having no permission, asks for it where a cast at instant speed could be paid, and is made again once a
   judgment grants one (Rattlechains flashes an opponent's creature card that their own Arcane Adaptation makes a Spirit as
   their spell); suspend's timing (702.62a) reads the same. With neither, the card where it is has what its spell would have,
-  and is read there. A ban
+  and is read there. An alternative cost another permanent gives (118.9: Dracogenesis's "Dragon spells") reads the spell's
+  characteristics so judged (`actions::spell_chars`, through the view `AsSpell`), and the card where it is for anything
+  else (Omniscience's "from your hand"); a cast an effect makes judges them at once (`chars_as_cast_now`). A ban
   on spells with some qualities (`spell_rules`) is judged on the spell there too, for each cast offered and each suspend
   (`casts_forbidden_on_the_stack`) and each cast an effect makes. The cost changes read a face through
   `layers::chars_as_face`: the card where it is, with the face's values (`GameState::judged_as`), through the layers.
