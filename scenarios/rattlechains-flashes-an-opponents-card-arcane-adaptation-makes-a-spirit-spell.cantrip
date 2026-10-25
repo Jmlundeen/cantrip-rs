@@ -1,0 +1,68 @@
+# A permission to cast spells as though they had flash is judged on the spell the card would be on the stack, under its
+# caster, with the continuous effects that would apply to it there (CR 601.2a, 601.3b, 601.3e), not on the card where it
+# is. Bot1 controls Arcane Adaptation naming Spirit ("The same is true for creature spells you control"), Rattlechains
+# ("You may cast Spirit spells as though they had flash") and Dauthi Voidwalker. Bot2's Llanowar Elves, discarded to
+# Faithless Looting, is exiled with a void counter; in Bot2's turn Bot1 sacrifices the Voidwalker to choose it. In Bot2's
+# exile, owned by Bot2, the Elves is no Spirit; as Bot1's creature spell it is one (CR 611.3a), so Bot1 casts it in Bot2's
+# turn (CR 702.8a), and it enters a Spirit. Its control, with Bot1's own Spirit of the Labyrinth in place of the Elves, is
+# rattlechains-lets-its-controller-flash-spirit-spells-and-targets-an-opponents-spirit.
+
+[Bot1 Deck]
+Swamp
+Mox Sapphire
+Mox Jet
+Black Lotus
+Sol Ring
+Dauthi Voidwalker
+Arcane Adaptation
+Rattlechains
+Swamp x15
+
+[Bot2 Deck]
+Mountain
+Faithless Looting
+Llanowar Elves
+Mountain x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot1.Modes(Spirit)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Rattlechains.Cast
+Bot1.Pass
+Bot1.Target(Rattlechains)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Llanowar Elves; Mountain)
+Bot1.Battlefield.Dauthi Voidwalker.Activate
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Spirit

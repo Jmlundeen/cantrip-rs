@@ -1,0 +1,12 @@
+{
+  "name": "Rattlechains",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Spirit",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flash\nFlying\nWhen this creature enters, target Spirit gains hexproof until end of turn.\nYou may cast Spirit spells as though they had flash.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

@@ -1,0 +1,47 @@
+# Rattlechains: its enters trigger targets a Spirit. With Bot1's Spirit of the Labyrinth beside it, Rattlechains itself
+# is accepted as a target and the Ornithopter (not a Spirit) is refused at the same prompt (CR 115.1). It has hexproof
+# for the turn (CR 702.11b, 611.2a) and the other Spirit does not; on turn 3 the hexproof has ended (CR 514.2) and the
+# printed Flash and Flying remain.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Spirit of the Labyrinth
+Ornithopter
+Rattlechains
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Rattlechains.Cast
+Bot1.Pass
+! Bot1.Target(Ornithopter)
+Bot1.Target(Rattlechains)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Rattlechains.Keywords = Flash; Flying; Hexproof
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Rattlechains.Keywords = Flash; Flying
+Bot1.Battlefield.Ornithopter.Keywords = Flying

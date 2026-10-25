@@ -1,0 +1,69 @@
+# Rattlechains: on turn 2 Bot2 casts a Spirit of the Labyrinth and Bot1 flashes in Rattlechains, whose enters trigger
+# targets Bot2's Spirit (an opponent's Spirit is accepted: it has hexproof; CR 702.11b,
+# 611.2a). With Rattlechains out Bot1 may then cast its own Spirit of the Labyrinth in Bot2's turn (CR 601.3b, 702.8a) but
+# not the Ornithopter, which is no Spirit. On turn 3 Bot2, who controls no Rattlechains, cannot cast its second Spirit
+# in Bot1's turn.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Spirit of the Labyrinth
+Ornithopter
+Rattlechains
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Spirit of the Labyrinth
+Spirit of the Labyrinth
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Spirit of the Labyrinth.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Rattlechains.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Spirit of the Labyrinth)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Spirit of the Labyrinth.Keywords = Hexproof
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spirit of the Labyrinth.Types = Enchantment; Creature
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot2.Hand.Spirit of the Labyrinth.Cast
+
+[Expect]
+Bot1.Battlefield = Island; Island; Mox Jet; Mox Pearl; Mox Sapphire; Rattlechains; Spirit of the Labyrinth
