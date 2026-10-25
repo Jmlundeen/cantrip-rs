@@ -32,9 +32,189 @@ impl ManaWindow {
 
 /// Everything `player` may do now beyond passing.
 pub fn priority_options(cx: &mut Cx, player: PlayerId) -> Vec<ActionOption> {
+    // The spells the cards would be are judged as the offer asks (`SpellsAsCast`): where an answer it took for granted turns
+    // out otherwise, it is made again with what is now known, until it asks nothing new.
+    let outer = cx.g.spells_as_cast.replace(SpellsAsCast::open(cx, player));
     let mut options = options_offered(cx, player);
+    while judge_spells_as_cast(cx) {
+        options = options_offered(cx, player);
+    }
+    cx.g.spells_as_cast.replace(outer);
+    casts_forbidden_on_the_stack(cx, player, &mut options);
     casts_judged_on_the_stack(cx, player, &mut options);
     options
+}
+
+/// The face of `card` a cast by the way `way` casts, as `ops::as_cast` names it: `None` for the card itself (CR 709.3,
+/// 715.3, 720.3, 712.8a, 702.103b).
+fn cast_face_id(cx: &Cx, card: ObjectId, way: u8) -> Option<CardId> {
+    let whole = cx.card(cx.s().obj(card).card);
+    let face = cast_face(whole, way);
+    (!std::ptr::eq(face, whole)).then(|| cx.card_id(face))
+}
+
+/// What the offer of `priority_options` asks of the spells the cards `player` could cast would be (CR 601.2a, 601.3e): a
+/// spell is put on the stack before anything about it is announced, as the face it is cast as alone, under its caster, and a
+/// permission that reads it reads that spell - with the effects that apply to it there, not the card where it is. Open only
+/// for the length of that question (`Game::spells_as_cast`), closed at any other time; no part of the position.
+///
+/// The card where it is has the face's own values (`layers::chars_as_face`) and the same effects as the spell would, unless
+/// a static ability that functions outside the battlefield exists (`layers::statics_everywhere`: Arcane Adaptation's
+/// "creature spells you control" reads the controller and the zone), or the card has a characteristic-defining ability of
+/// its own, which could read its zone or controller (CR 604.3): only then is anything put on the stack for the moment
+/// (`ops::as_cast`), and only for the card and face the offer asks about, once each. An answer not yet judged is taken as the
+/// card where it is, and the question is asked again once it is judged, if it turns out otherwise (`judge_spells_as_cast`).
+#[derive(Default)]
+pub(crate) struct SpellsAsCast {
+    open: bool,
+    player: PlayerId,
+    /// A static ability that functions outside the battlefield exists.
+    everywhere: bool,
+    /// The question is asked with sorcery timing (CR 307.5): whether a cast is as though it had flash changes only which
+    /// pass of the offer makes it, so it is not judged.
+    sorcery: bool,
+    /// The card types an effect lets the player cast as though they had flash (`static_rules::flash_types`), and the
+    /// permanents whose static abilities may let them (`static_rules::flash_granters`).
+    flash_types: TypeSet,
+    granters: Vec<(ObjectId, PlayerId, &'static CardDef)>,
+    /// Each card and face (`None`: the card itself) judged: whether a permission lets it be cast as though it had flash.
+    flash: Vec<(SpellFace, bool)>,
+    /// Those the offer asked about that are not judged yet.
+    asked_flash: Vec<SpellFace>,
+}
+
+/// A card and the face it would be cast as (`None`: the card itself), as `SpellsAsCast` keeps what it judges of them.
+type SpellFace = (ObjectId, Option<CardId>);
+
+impl SpellsAsCast {
+    fn open(cx: &Cx, player: PlayerId) -> SpellsAsCast {
+        SpellsAsCast {
+            open: true,
+            player,
+            everywhere: layers::statics_everywhere(cx.cards(), cx.s()),
+            sorcery: sorcery_timing(cx, player),
+            flash_types: static_rules::flash_types(cx, player),
+            granters: static_rules::flash_granters(cx),
+            ..SpellsAsCast::default()
+        }
+    }
+
+    /// Whether the spell `card` would be may differ from the card where it is: see the type.
+    fn judged(&self, cx: &Cx, card: ObjectId) -> bool {
+        self.everywhere || own_characteristic_defining(cx, card)
+    }
+}
+
+/// Whether `card`'s card has a characteristic-defining ability (CR 604.3), which functions in every zone and could read the
+/// zone or controller of its object.
+fn own_characteristic_defining(cx: &Cx, card: ObjectId) -> bool {
+    cx.card(cx.cards().current(cx.s().obj(card))).statics.iter().any(|st| st.own)
+}
+
+/// Whether a permission lets the player `priority_options` asks for cast `card` as `face` (`None`: itself) as though it had
+/// flash (CR 307.5, 601.3b, 702.8a): an effect's for some card types (Teferi, Time Raveler's "sorcery spells"), a static
+/// ability's for some spells (Rattlechains's "Spirit spells", Sigarda's Aid's "Aura and Equipment spells"), judged on the spell
+/// it would be (`SpellsAsCast`). Not yet judged, it is taken as not, and the offer asks for it to be (`ask_as_though_flash`).
+fn as_though_flash(cx: &Cx, card: ObjectId, face: Option<CardId>) -> bool {
+    as_though_flash_judged(cx, card, face).unwrap_or_else(|| {
+        ask_as_though_flash(cx, card, face);
+        false
+    })
+}
+
+/// `as_though_flash`, or `None` where it is not yet judged on the spell the card would be.
+fn as_though_flash_judged(cx: &Cx, card: ObjectId, face: Option<CardId>) -> Option<bool> {
+    let key = (card, face);
+    let t = cx.g.spells_as_cast.borrow();
+    if !t.open || (t.granters.is_empty() && t.flash_types == TypeSet::NONE) {
+        return Some(false);
+    }
+    if !t.judged(cx, card) {
+        let view = face.map(|face| AsFace { cx, spell: card, face });
+        let q: &dyn Query = match &view {
+            Some(view) => view,
+            None => cx,
+        };
+        return Some(!flash_permissions(cx, q, &t.granters, t.player, card).is_empty());
+    }
+    if t.sorcery {
+        return Some(false);
+    }
+    t.flash.iter().find(|(k, _)| *k == key).map(|&(_, granted)| granted)
+}
+
+/// Asks for `as_though_flash` of `card` cast as `face` to be judged on the spell it would be (`judge_spells_as_cast`).
+fn ask_as_though_flash(cx: &Cx, card: ObjectId, face: Option<CardId>) {
+    let mut t = cx.g.spells_as_cast.borrow_mut();
+    if !t.asked_flash.contains(&(card, face)) {
+        t.asked_flash.push((card, face));
+    }
+}
+
+/// Judges what the offer asked of the spells the cards would be and had not judged (`SpellsAsCast`), each with the card put
+/// on the stack for the moment as that spell (`ops::as_cast`). Whether any answer differs from the one the offer took for
+/// granted, so that it must be made again.
+fn judge_spells_as_cast(cx: &mut Cx) -> bool {
+    let (player, granters, asked_flash) = {
+        let mut t = cx.g.spells_as_cast.borrow_mut();
+        (t.player, t.granters.clone(), std::mem::take(&mut t.asked_flash))
+    };
+    let mut changed = false;
+    for (card, face) in asked_flash {
+        let granted = ops::as_cast(cx, card, face, player, |cx| !flash_permissions(cx, cx, &granters, player, card).is_empty());
+        changed |= granted;
+        cx.g.spells_as_cast.borrow_mut().flash.push(((card, face), granted));
+    }
+    changed
+}
+
+/// The casts among `options`, and the suspends among them (CR 702.62a: "any time you could begin to cast this card"), that a
+/// static ability forbids for the qualities of the spell each would cast (CR 101.2, 601.3: Gaddock Teeg, Deafening Silence),
+/// judged on that spell on the stack under its caster, the face it is cast as alone (CR 601.2a, 601.3e, 709.3a, 715.3a,
+/// 712.8a, `ops::as_cast`): what an effect makes it there as their spell (Arcane Adaptation's "creature spells you control")
+/// is what the ban reads. Judged only where such a ban exists, each face once.
+fn casts_forbidden_on_the_stack(cx: &mut Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
+    let forbidders = static_rules::spell_forbidders(cx);
+    if forbidders.is_empty() {
+        return;
+    }
+    let mut judged: Vec<((ObjectId, Option<CardId>), bool)> = Vec::new();
+    let mut kept = Vec::with_capacity(options.len());
+    for o in std::mem::take(options) {
+        let cast = match (o.kind, o.source) {
+            (ActionKind::CastSpell, Some(card)) => Some((card, cast_face_id(cx, card, o.index))),
+            (ActionKind::ActivateAbility, Some(card)) if suspends(cx, card, o.index) => Some((card, None)),
+            _ => None,
+        };
+        if let Some(key) = cast {
+            let forbidden = match judged.iter().find(|(k, _)| *k == key) {
+                Some(&(_, forbidden)) => forbidden,
+                None => {
+                    let forbidden = forbidden_as_cast(cx, &forbidders, key.0, key.1, player);
+                    judged.push((key, forbidden));
+                    forbidden
+                }
+            };
+            if forbidden {
+                continue;
+            }
+        }
+        kept.push(o);
+    }
+    *options = kept;
+}
+
+/// Whether the activated ability `index` of `card` is one that may be activated only when the card could be cast (suspend,
+/// CR 702.62a: `Timing::AsCast`), from a zone that is not the battlefield.
+fn suspends(cx: &Cx, card: ObjectId, index: u8) -> bool {
+    !cx.s().obj(card).zone.is(ZoneKind::Battlefield)
+        && cx.chars(card).abilities().nth(index as usize).and_then(|ability| activated(cx, ability)).is_some_and(|def| def.timing == Timing::AsCast)
+}
+
+/// Whether one of `forbidders` (`static_rules::spell_forbidders`) forbids `player` to cast `card` as `face` (`None`: the card
+/// itself), judged on the spell it would be on the stack under them (CR 101.2, 601.3, 601.3e, `ops::as_cast`).
+fn forbidden_as_cast(cx: &mut Cx, forbidders: &[(ObjectId, PlayerId, &'static CardDef)], card: ObjectId, face: Option<CardId>, player: PlayerId) -> bool {
+    ops::as_cast(cx, card, face, player, |cx| static_rules::spell_forbidden(&*cx, forbidders, player, card))
 }
 
 /// The casts among `options` judged as the spells they would be (CR 601.2a-c): a spell is put on the stack before its modes
@@ -92,7 +272,8 @@ fn casts_judged_on_the_stack(cx: &mut Cx, player: PlayerId, options: &mut Vec<Ac
     *options = kept;
 }
 
-/// Everything `player` may do now beyond passing, a spell not yet cast judged where its card is (`priority_options`).
+/// Everything `player` may do now beyond passing, a spell not yet cast judged where its card is (`priority_options`) but for
+/// what reads the spell it would be (`SpellsAsCast`).
 fn options_offered(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
     let mut options = Vec::new();
     mana_ability_options(cx, player, ManaWindow::Priority, &mut options);
@@ -103,10 +284,10 @@ fn options_offered(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
         return options;
     }
     let available = std::cell::OnceCell::new();
-    castable(cx, player, &available, true, &mut options);
+    castable_ways(cx, player, &available, true, &mut options);
     if sorcery_timing(cx, player) {
         land_plays(cx, player, &mut options);
-        castable(cx, player, &available, false, &mut options);
+        castable_ways(cx, player, &available, false, &mut options);
         take_companion_option(cx, player, &available, &mut options);
     }
     options
@@ -2311,7 +2492,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
         return Vec::new();
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     // The ability asked as it is (CR 607.5): its own cost change reads its own links.
     let by = cx.link_of_nth(source, index as usize);
@@ -2365,7 +2546,7 @@ pub fn cast_face_of(game: &crate::Game, card: ObjectId, index: u8) -> &'static C
 
 /// A copy of the position (no tree) to ask the rules of, through a frame's view, for a menu row's advice.
 fn advice_game(game: &crate::Game) -> crate::Game {
-    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE }
+    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default() }
 }
 
 /// What `player` would be offered at this priority with a thousand mana of every type in their pool: what a script's refusal
@@ -4459,16 +4640,18 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 // that cast - a spell limit already reached (Archon of Emeria), the card's own "cast this spell only", a
                 // ban on spells like it (the suspend rulings: "any other effects that could stop you from casting it"), a
                 // spell with split second on the stack (CR 702.61a: suspend is a special action, which split second lets be
-                // taken, but the card could not be cast).
+                // taken, but the card could not be cast). It could be cast as an instant could where a permission lets it
+                // be cast as though it had flash, judged on the spell it would be (`as_though_flash`: Valley Floodcaller's
+                // "noncreature spells"); a ban on spells like it is judged there too (`casts_forbidden_on_the_stack`).
                 Timing::AsCast
-                    if !(chars.is(CardType::Instant) || chars.has(Keyword::Flash) || sorcery_timing(cx, player))
-                        || split
+                    if split
                         || cast_barred(cx, player).contains(zone)
                         || !cast_only_if_met(cx, cx.card(cx.s().obj(id).card), &Asker { source: id, controller: player, by, spell: true })
-                        || {
-                            let forbidders = static_rules::spell_forbidders(cx);
-                            !forbidders.is_empty() && static_rules::spell_forbidden(cx, &forbidders, player, id)
-                        } =>
+                        || !(chars.is(CardType::Instant)
+                            || chars.has(Keyword::Flash)
+                            || cx.card(cx.s().obj(id).card).cast_as_though_flash
+                            || sorcery_timing(cx, player)
+                            || as_though_flash(cx, id, None)) =>
                 {
                     continue;
                 }
@@ -5086,79 +5269,54 @@ fn extra_payable(cx: &Cx, id: ObjectId, player: PlayerId, def: &CardDef) -> bool
 }
 
 /// Whether a card, or the face of it that would be cast, may be cast whenever its caster could cast an instant (CR 307.5,
-/// 702.8): an instant, a spell with flash, one of a type an effect lets them cast as though it had flash, or one a static
-/// ability lets them (Sigarda's Aid, Valley Floodcaller). A face is judged as the spell it would be on the stack, its own
-/// characteristics alone (CR 709.3a, 712.8a, 715.3a, 720.3a, 702.103b), so "noncreature spells" finds a creature's sorcery
-/// Adventure and a bestowed Aura is an Aura spell.
+/// 702.8): an instant, a spell with flash, or one a permission lets them cast as though it had flash - an effect's for some
+/// card types, a static ability's (Sigarda's Aid, Valley Floodcaller, Rattlechains) - judged on the spell it would be on
+/// the stack (`as_though_flash`): the face alone (CR 709.3a, 712.8a, 715.3a, 720.3a, 702.103b), so "noncreature spells" finds
+/// a creature's sorcery Adventure and a bestowed Aura is an Aura spell, under its caster.
 struct Speed<'a> {
     cx: &'a Cx<'a>,
-    /// The card types an effect lets the player cast as though they had flash (`static_rules::flash_types`).
-    flash: TypeSet,
-    /// The permanents whose static abilities may let them (`static_rules::flash_granters`).
-    granters: &'a [(ObjectId, PlayerId, &'static CardDef)],
-    player: PlayerId,
     card: ObjectId,
 }
 
 impl Speed<'_> {
     /// The card cast as itself, with the card's own "you may cast this spell as though it had flash".
     fn whole(&self, def: &'static CardDef) -> bool {
-        def.cast_as_though_flash
-            || own_speed(def, self.flash)
-            || (!self.granters.is_empty() && static_rules::grants_flash(self.cx, self.granters, self.player, self.card))
+        def.cast_as_though_flash || own_speed(def) || as_though_flash(self.cx, self.card, None)
     }
 
     /// The card cast as `face`: a split card's half or a Room's door, an Adventure or an Omen, a back face, a bestowed Aura.
     fn face(&self, face: &'static CardDef) -> bool {
-        own_speed(face, self.flash)
-            || (!self.granters.is_empty() && {
-                let view = AsFace { cx: self.cx, spell: self.card, face: self.cx.card_id(face) };
-                static_rules::grants_flash(&view, self.granters, self.player, self.card)
-            })
+        own_speed(face) || as_though_flash(self.cx, self.card, Some(self.cx.card_id(face)))
     }
 
     /// The card cast as the face a way number names.
     fn of(&self, whole: &'static CardDef, way: u8, face: &'static CardDef) -> bool {
         if way == 0 { self.whole(whole) } else { self.face(face) }
     }
+
+    /// `of`, or `None` where a permission is not yet judged on the spell the card would be (`as_though_flash_judged`): asked
+    /// for (`ask`) only where it would change what is offered.
+    fn of_judged(&self, whole: &'static CardDef, way: u8, face: &'static CardDef) -> Option<bool> {
+        if way == 0 && (whole.cast_as_though_flash || own_speed(whole)) || way != 0 && own_speed(face) {
+            return Some(true);
+        }
+        as_though_flash_judged(self.cx, self.card, self.face_id(way, face))
+    }
+
+    /// Asks for `of_judged` to be judged.
+    fn ask(&self, way: u8, face: &'static CardDef) {
+        ask_as_though_flash(self.cx, self.card, self.face_id(way, face));
+    }
+
+    /// The face a way number names, as `as_though_flash` names it: `None` for the card itself.
+    fn face_id(&self, way: u8, face: &'static CardDef) -> Option<CardId> {
+        (way != 0).then(|| self.cx.card_id(face))
+    }
 }
 
-/// An instant, a spell with flash, or one of the `flash` types (CR 307.5, 702.8).
-fn own_speed(def: &CardDef, flash: TypeSet) -> bool {
-    def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.types.0 & flash.0 != 0
-}
-
-/// The casts `player` may begin now (CR 601.3): `castable_ways`, less those a static ability forbids for the qualities of the
-/// spell each would cast (CR 101.2, 601.3e: judged as the face it casts).
-fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
-    let start = options.len();
-    castable_ways(cx, player, available, instants, options);
-    if options.len() == start {
-        return;
-    }
-    let forbidders = static_rules::spell_forbidders(cx);
-    if forbidders.is_empty() {
-        return;
-    }
-    let offered = options.split_off(start);
-    options.extend(offered.into_iter().filter(|o| {
-        o.source.is_none_or(|card| {
-            let _face_up = layers::judged_face_up(cx.s(), card);
-            !face_forbidden(cx, &forbidders, player, card, o.index)
-        })
-    }));
-}
-
-/// Whether a static ability forbids `player` to cast `card` by the way `way` (CR 101.2, 601.3), judged on the face that way
-/// casts (CR 601.3e, 709.3a, 715.3a, 712.8a).
-fn face_forbidden(cx: &Cx, forbidders: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, card: ObjectId, way: u8) -> bool {
-    let whole = cx.card(cx.s().obj(card).card);
-    let face = cast_face(whole, way);
-    if std::ptr::eq(face, whole) {
-        static_rules::spell_forbidden(cx, forbidders, player, card)
-    } else {
-        static_rules::spell_forbidden(&AsFace { cx, spell: card, face: cx.card_id(face) }, forbidders, player, card)
-    }
+/// An instant, or a spell with flash (CR 307.5, 702.8).
+fn own_speed(def: &CardDef) -> bool {
+    def.is(CardType::Instant) || def.keywords.has(Keyword::Flash)
 }
 
 /// The face of the card `whole` a cast by the way `way` casts (CR 709.3, 715.3, 720.3, 712.8a, 702.103b): an inset face (an
@@ -5370,10 +5528,6 @@ struct Offer<'a> {
     player: PlayerId,
     instants: bool,
     available: &'a std::cell::OnceCell<Available>,
-    /// Types of spell the player may cast as though they had flash (CR 307.5).
-    flash: TypeSet,
-    /// Permanents whose static ability lets a kind of spell be cast as though it had flash (Sigarda's Aid).
-    flash_granters: Vec<(ObjectId, PlayerId, &'static CardDef)>,
     /// What lets the player cast spells from their graveyard (Yawgmoth's Will), each its own permission.
     graveyard: Vec<Grant>,
     granted: std::cell::OnceCell<Vec<Given<GrantedWay>>>,
@@ -5406,7 +5560,7 @@ impl<'a> Offer<'a> {
     }
 
     fn speed(&'a self, card: ObjectId) -> Speed<'a> {
-        Speed { cx: self.cx, flash: self.flash, granters: &self.flash_granters, player: self.player, card }
+        Speed { cx: self.cx, card }
     }
 
     fn asker(&self, card: ObjectId) -> Asker {
@@ -5440,7 +5594,27 @@ impl<'a> Offer<'a> {
     /// Offers casting `face` of `card` by `route` for its mana cost (or what the route names instead), and for each
     /// alternative cost another object gives (CR 118.9) where the route names none, each at its speed: the face's own, or
     /// "as though it had flash" where an alternative cost cast says so (Primal Prayers).
-    fn offer_costs(&self, card: ObjectId, face: &'static CardDef, way: u8, route: &Route, instant: bool, options: &mut Vec<ActionOption>) {
+    ///
+    /// `instant` is `None` where whether a permission lets it be cast as though it had flash is not yet judged on the spell
+    /// (`Speed::of_judged`), on the instant-speed pass: offered as though it had not, and asked for (`ask`) only where it could
+    /// then be offered more - where some cast at instant speed could be paid - since a judgment puts the card on the stack
+    /// for the moment (`SpellsAsCast`).
+    #[allow(clippy::too_many_arguments)]
+    fn offer_costs(&self, card: ObjectId, face: &'static CardDef, way: u8, route: &Route, instant: Option<bool>, ask: impl Fn(), options: &mut Vec<ActionOption>) {
+        let Some(instant) = instant else {
+            let mut would = Vec::new();
+            self.offer_costs_at(card, face, way, route, true, &mut would);
+            if !would.is_empty() {
+                ask();
+                self.offer_costs_at(card, face, way, route, false, options);
+            }
+            return;
+        };
+        self.offer_costs_at(card, face, way, route, instant, options);
+    }
+
+    /// `offer_costs` at a known speed.
+    fn offer_costs_at(&self, card: ObjectId, face: &'static CardDef, way: u8, route: &Route, instant: bool, options: &mut Vec<ActionOption>) {
         if instant == self.instants
             && let Some(base) = route.base(face)
         {
@@ -5463,7 +5637,9 @@ impl<'a> Offer<'a> {
     /// those that name no zone (Force of Will's, web-slinging, sneak; not warp, CR 702.185a).
     fn offer_ways(&self, card: ObjectId, def: &'static CardDef, route: &Route, open: impl Fn(&WayDef) -> bool, options: &mut Vec<ActionOption>) {
         let (cx, player) = (self.cx, self.player);
-        let instant = self.speed(card).whole(def) && !route.terms.sorcery_speed;
+        // Asked only of a way that is open and goes at the card's speed.
+        let speed = std::cell::OnceCell::new();
+        let instant = || *speed.get_or_init(|| self.speed(card).whole(def) && !route.terms.sorcery_speed);
         let asker = self.asker(card);
         for (n, way) in def.ways.iter().enumerate() {
             if !open(way) {
@@ -5471,7 +5647,7 @@ impl<'a> Offer<'a> {
             }
             // Sneak and the like may be used whenever an instant could be cast, whatever the card is (CR 702.190a), unless
             // the permission says when (CR 601.3).
-            let on_instants = if way.instant_speed { !route.terms.sorcery_speed } else { instant };
+            let on_instants = if way.instant_speed { !route.terms.sorcery_speed } else { instant() };
             if on_instants != self.instants || (way.instant_speed && route.terms.sorcery_speed) {
                 continue;
             }
@@ -5540,8 +5716,8 @@ impl<'a> Offer<'a> {
             if !extra_payable(cx, card, player, face) {
                 continue;
             }
-            let instant = speed.of(def, way, face) && !route.terms.sorcery_speed;
-            self.offer_costs(card, face, way, route, instant, options);
+            let instant = if route.terms.sorcery_speed { Some(false) } else { speed.of_judged(def, way, face) };
+            self.offer_costs(card, face, way, route, instant, || speed.ask(way, face), options);
         }
         if whole_allowed && !route.imposes() && route.kind != RouteKind::Prepared {
             self.offer_ways(card, def, route, ways, options);
@@ -5608,12 +5784,12 @@ impl<'a> Offer<'a> {
                     routes.push(Route::RULES);
                 }
                 routes.extend(self.graveyard.iter().map(|&by| Route::permission(Some(by), PlayGrant::CAST)));
-                // Retrace (CR 702.81a), printed or given: a permission of the card's own, for a land card discarded. Its
-                // characteristics are read only on a pass that could cast it.
+                // Retrace (CR 702.81a), printed or given: a permission of the card's own, for a land card discarded. Its speed
+                // is asked only of a card with retrace that could pay for it.
                 if !def.is(CardType::Land)
-                    && (self.speed(card).whole(def) == self.instants || (self.instants && self.may_flash()))
                     && cx.chars(card).has(Keyword::Retrace)
                     && can_pay_other(cx, card, player, &RETRACE)
+                    && (self.speed(card).whole(def) == self.instants || (self.instants && self.may_flash()))
                 {
                     routes.push(Route::retrace(card, obj.card));
                 }
@@ -5675,7 +5851,7 @@ impl<'a> Offer<'a> {
             return;
         }
         let instant = self.speed(card).whole(def);
-        self.offer_costs(card, def, WAY_FUSED, &Route::RULES, instant, options);
+        self.offer_costs_at(card, def, WAY_FUSED, &Route::RULES, instant, options);
     }
 
     /// Bestow (CR 702.103a): as the Aura it becomes, which needs a creature to enchant (CR 601.2c), at the Aura's speed.
@@ -5702,7 +5878,7 @@ impl<'a> Offer<'a> {
         for (way, half) in [(WAY_SPLIT_LEFT, left), (WAY_SPLIT_RIGHT, right)] {
             if half.aftermath {
                 let instant = self.speed(card).face(half);
-                self.offer_costs(card, half, way, &Route::RULES, instant, options);
+                self.offer_costs_at(card, half, way, &Route::RULES, instant, options);
             }
         }
     }
@@ -5757,6 +5933,7 @@ impl<'a> Offer<'a> {
 /// The casts `player` may begin on this pass (`instants`: the instant-speed one or the sorcery-speed one): from their hand,
 /// their graveyard, any player's exile and the top of their library, each by everything that lets it be cast from there
 /// (CR 601.3), every permission an option of its own.
+/// A cast a static ability forbids for the qualities of its spell is left out after (`casts_forbidden_on_the_stack`).
 fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
     let barred = cast_barred(cx, player);
     if ZoneKinds::CAST_FROM.iter().all(|&from| barred.contains(from)) {
@@ -5767,31 +5944,19 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
         player,
         instants,
         available,
-        flash: static_rules::flash_types(cx, player),
-        // Or by a static ability's say-so about a kind of spell (Sigarda's Aid): looked for once, empty unless one is on the board.
-        flash_granters: static_rules::flash_granters(cx),
         graveyard: graveyard_play(cx, player),
         granted: std::cell::OnceCell::new(),
         exile_casts: std::cell::OnceCell::new(),
         alternatives: std::cell::OnceCell::new(),
     };
-    // Any player's exile, for a card a permission lets them cast from there; their own other zones.
-    // A zone a rule forbids them to cast from is not looked in (CR 101.2).
-    let zones = [Zone::hand(player), Zone::graveyard(player)]
-        .into_iter()
-        .chain(cx.s().seats().map(Zone::exile))
-        .filter(|zone| !barred.contains(zone.kind()));
-    for zone in zones {
+    for zone in cast_zones(cx, player, barred) {
         for &card in cx.s().zone(zone) {
             offer.card(card, zone, options);
         }
     }
     // The top card of the library, for a player a permanent lets cast spells from there (CR 601.3): for life rather than its
     // mana cost (Bolas's Citadel, CR 118.9), or for its costs (Mystic Forge, Case of the Locked Hothouse), each its own.
-    if cx.cards().any_play_rules
-        && !barred.contains(ZoneKind::Library)
-        && let Some(&top) = cx.s().zone(Zone::library(player)).first()
-    {
+    if let Some(top) = library_top_castable(cx, player, barred) {
         let mut routes = Vec::new();
         each_play_rule_named(cx, cx.cards(), player, false, |source, ability, rule| {
             let by = Some(Grant { object: source, ability });
@@ -5812,6 +5977,21 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             }
         }
     }
+}
+
+/// The zones `player` may cast from other than a library (CR 601.3): any player's exile, for a card a permission lets them
+/// cast from there; their own hand and graveyard. A zone a rule forbids them to cast from (`barred`, CR 101.2) is not looked in.
+fn cast_zones<'a>(cx: &'a Cx, player: PlayerId, barred: ZoneKinds) -> impl Iterator<Item = Zone> + 'a {
+    [Zone::hand(player), Zone::graveyard(player)].into_iter().chain(cx.s().seats().map(Zone::exile)).filter(move |zone| !barred.contains(zone.kind()))
+}
+
+/// The top card of `player`'s library, where a permanent may let them cast spells from there (CR 601.3) and no rule forbids
+/// them to cast from a library (`barred`, CR 101.2).
+fn library_top_castable(cx: &Cx, player: PlayerId, barred: ZoneKinds) -> Option<ObjectId> {
+    if !cx.cards().any_play_rules || barred.contains(ZoneKind::Library) {
+        return None;
+    }
+    cx.s().zone(Zone::library(player)).first().copied()
 }
 
 /// What a cast is made by, as `act` reads it back from the action's `Grant` (`ActionOption::granted_by`): a permission's
@@ -6447,20 +6627,25 @@ fn other_flash_permissions(cx: &Cx, player: PlayerId, spell: ObjectId, whole: &'
     if chars.is(CardType::Instant) || chars.has(Keyword::Flash) || own_way_at_instant_speed {
         add(None);
     }
-    for (source, types) in static_rules::flash_type_grants(cx, player) {
-        if chars.types.0 & types.0 != 0 {
-            add(Some(cx.cards().current(cx.s().obj(source))));
-        }
-    }
-    for (id, controller, granter) in static_rules::flash_granters(cx) {
-        if static_rules::grants_flash(cx, &[(id, controller, granter)], player, spell) {
-            add(Some(cx.cards().current(cx.s().obj(id))));
-        }
+    for source in flash_permissions(cx, cx, &static_rules::flash_granters(cx), player, spell) {
+        add(Some(cx.cards().current(cx.s().obj(source))));
     }
     if let Some(grant) = alternative {
         add(Some(grant.ability.card));
     }
     others
+}
+
+/// The sources of the permissions that let `player` cast `spell` as though it had flash (CR 307.5, 601.3b, 702.8a), read
+/// through `q`: an effect's for some card types (`static_rules::flash_type_grants`: Teferi, Time Raveler's "sorcery
+/// spells"), and one of the `granters`' static abilities (`static_rules::flash_granters`: Valley Floodcaller's "noncreature
+/// spells", Rattlechains's "Spirit spells"). Asked of the spell on the stack, as it is cast (`other_flash_permissions`) or as
+/// it would be (`SpellsAsCast`), or of the card where it is where that is the same.
+fn flash_permissions(cx: &Cx, q: &dyn Query, granters: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, spell: ObjectId) -> Vec<ObjectId> {
+    let types = q.chars(spell).types;
+    let mut by: Vec<ObjectId> = static_rules::flash_type_grants(cx, player).filter(|&(_, t)| types.0 & t.0 != 0).map(|(source, _)| source).collect();
+    by.extend(granters.iter().filter(|&&granter| static_rules::grants_flash(q, &[granter], player, spell)).map(|&(id, _, _)| id));
+    by
 }
 
 /// Whether `player` casts `spell` by its card's own "you may cast this spell as though it had flash" rather than by one of
@@ -7131,11 +7316,16 @@ pub fn could_cast_during_resolution(cx: &mut Cx, card: ObjectId, player: PlayerI
 /// back face. A fused cast (CR 702.102a: a fuse split card cast from its owner's hand, both halves at once, its mana value the
 /// sum of theirs, CR 702.102c, 709.4b) is a way too, from a hand only: the ruling has a fuse card cast from a hand without
 /// paying its mana cost cast fused.
+///
+/// A static ability that forbids casting spells with some qualities (CR 101.2, 601.3) and what may be targeted are judged on
+/// the spell each would be on the stack (CR 601.3e, `ops::as_cast`).
 pub fn cast_ways_during_resolution(cx: &mut Cx, card: ObjectId, player: PlayerId) -> Vec<CastWay> {
     let ways = cast_ways_where_it_is(cx, card, player);
+    let forbidders = if ways.is_empty() { Vec::new() } else { static_rules::spell_forbidders(cx) };
     let mut kept = Vec::with_capacity(ways.len());
     for way in ways {
-        if targets_as_cast(cx, card, way.way, player) {
+        let face = cast_face_id(cx, card, way.way);
+        if (forbidders.is_empty() || !forbidden_as_cast(cx, &forbidders, card, face, player)) && targets_as_cast(cx, card, way.way, player) {
             kept.push(way);
         }
     }
@@ -7159,7 +7349,7 @@ fn targets_as_cast(cx: &mut Cx, card: ObjectId, way: u8, player: PlayerId) -> bo
     })
 }
 
-/// `cast_ways_during_resolution` judged where the card is (`layers::can_target`).
+/// `cast_ways_during_resolution` judged where the card is (`layers::can_target`), but for what static abilities forbid.
 fn cast_ways_where_it_is(cx: &Cx, card: ObjectId, player: PlayerId) -> Vec<CastWay> {
     let Some(serial) = cx.resolving().map(|i| i.serial) else { return Vec::new() };
     let obj = cx.s().obj(card);
@@ -7179,18 +7369,8 @@ fn cast_ways_where_it_is(cx: &Cx, card: ObjectId, player: PlayerId) -> Vec<CastW
     let _face_up = layers::judged_face_up(cx.s(), card);
     let def = cx.card(obj.card);
     let asker = Asker { source: card, controller: player, by: None, spell: true };
-    let forbidders = static_rules::spell_forbidders(cx);
-    let forbidden = |face: &'static CardDef| {
-        !forbidders.is_empty()
-            && if std::ptr::eq(face, def) {
-                static_rules::spell_forbidden(cx, &forbidders, player, card)
-            } else {
-                static_rules::spell_forbidden(&AsFace { cx, spell: card, face: cx.card_id(face) }, &forbidders, player, card)
-            }
-    };
     let castable = |face: &'static CardDef| {
         cast_only_if_met(cx, face, &asker)
-            && !forbidden(face)
             && match face.modal {
                 Some(modal) => modes_possible(cx, &asker, modal),
                 None => slots_satisfiable(cx, &asker, cx.cards().spell_targets_of(face)),
@@ -7397,10 +7577,19 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
 /// card that is not modal (CR 712.11c-d: its back face has no mana cost of its own), judged as that back face alone.
 pub fn could_cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> bool {
     let Some(player) = cx.resolving().map(|i| i.controller) else { return false };
-    could_cast_transformed_where_it_is(cx, card) && targets_as_cast(cx, card, WAY_TRANSFORMED, player)
+    if !could_cast_transformed_where_it_is(cx, card) {
+        return false;
+    }
+    // A ban on spells like it is judged on the back face as the spell it would be (CR 601.3e, 712.8a, `ops::as_cast`).
+    let forbidders = static_rules::spell_forbidders(cx);
+    if !forbidders.is_empty() && forbidden_as_cast(cx, &forbidders, card, cast_face_id(cx, card, WAY_TRANSFORMED), player) {
+        return false;
+    }
+    targets_as_cast(cx, card, WAY_TRANSFORMED, player)
 }
 
-/// `could_cast_transformed_during_resolution` judged where the card is (`layers::can_target`).
+/// `could_cast_transformed_during_resolution` judged where the card is (`layers::can_target`), but for what static abilities
+/// forbid.
 fn could_cast_transformed_where_it_is(cx: &Cx, card: ObjectId) -> bool {
     let Some(player) = cx.resolving().map(|i| i.controller) else { return false };
     let obj = cx.s().obj(card);
@@ -7417,10 +7606,6 @@ fn could_cast_transformed_where_it_is(cx: &Cx, card: ObjectId) -> bool {
     let _face_up = layers::judged_face_up(cx.s(), card);
     let asker = Asker { source: card, controller: player, by: None, spell: true };
     if !cast_only_if_met(cx, back, &asker) {
-        return false;
-    }
-    let forbidders = static_rules::spell_forbidders(cx);
-    if !forbidders.is_empty() && face_forbidden(cx, &forbidders, player, card, WAY_TRANSFORMED) {
         return false;
     }
     if let Some(modal) = back.modal {
@@ -8413,7 +8598,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
     if !changers {
         return None;
     }
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);

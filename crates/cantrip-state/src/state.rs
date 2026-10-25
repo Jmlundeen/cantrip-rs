@@ -84,7 +84,8 @@ pub struct GameState {
     /// Set by any write that could change what a state-based action or trigger sees; cleared by the check.
     pub unsettled: bool,
     pub journal: Journal,
-    /// Counts every write and every undo, never going back: two reads of a state at one `epoch` see the same position.
+    /// Counts every write and every undo, never going back but to a position reverted to (`restore_derived`): two reads of
+    /// a state at one `epoch` see the same position.
     /// Derived data below is valid for the epoch it was made at, so it is journal-safe by construction. No part of the
     /// position.
     pub epoch: u64,
@@ -211,7 +212,46 @@ pub struct StaticSources {
     pub continuing: bool,
 }
 
+impl StaticSources {
+    /// None found yet: found again at the next question.
+    pub fn none() -> StaticSources {
+        StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), controllers: Vec::new(), honed: Vec::new(), granted: Vec::new(), targeting: Vec::new(), continuing: false }
+    }
+}
+
+/// What the layers derived from a position (`GameState::static_sources`, `GameState::layer_pass`), with the counters it is
+/// valid for, set aside while a question changes the position for the moment and reverts it (`GameState::set_derived_aside`).
+pub struct DerivedAside {
+    epoch: u64,
+    chars_epoch: u64,
+    static_sources: StaticSources,
+    layer_pass: Vec<std::rc::Rc<dyn std::any::Any>>,
+}
+
 impl GameState {
+    /// Sets aside what the layers derived from the position as it is now, for a question that changes it for the moment and
+    /// reverts it to `mark()` taken now (a spell judged on the stack before it is cast, `cantrip_rules::ops::as_cast`): put back
+    /// with `restore_derived`, what was worked out for the position before the question is used after it again, rather than
+    /// worked out anew because the counters moved on.
+    pub fn set_derived_aside(&self) -> DerivedAside {
+        DerivedAside {
+            epoch: self.epoch,
+            chars_epoch: self.chars_epoch,
+            static_sources: self.static_sources.replace(StaticSources::none()),
+            layer_pass: std::mem::take(&mut *self.layer_pass.0.borrow_mut()),
+        }
+    }
+
+    /// Puts back what `set_derived_aside` set aside, once the position is again the one it was derived for (`revert` to the
+    /// mark taken with it). The counters go back with it, and nothing derived in between is kept, so no derived data is
+    /// held for a count the position will next reach with something else.
+    pub fn restore_derived(&mut self, aside: DerivedAside) {
+        self.epoch = aside.epoch;
+        self.chars_epoch = aside.chars_epoch;
+        *self.static_sources.borrow_mut() = aside.static_sources;
+        *self.layer_pass.0.borrow_mut() = aside.layer_pass;
+    }
+
     fn position(
         &self,
     ) -> (
@@ -463,7 +503,7 @@ impl GameState {
             journal: Journal::default(),
             epoch: 0,
             chars_epoch: 0,
-            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), controllers: Vec::new(), honed: Vec::new(), granted: Vec::new(), targeting: Vec::new(), continuing: false }),
+            static_sources: std::cell::RefCell::new(StaticSources::none()),
             judged_face_up: std::cell::Cell::new(None),
             judged_as: std::cell::Cell::new(None),
             leaving_together: std::cell::RefCell::new(Vec::new()),

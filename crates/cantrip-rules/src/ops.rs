@@ -1185,6 +1185,8 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
 /// (CR 400.7). Worked out by putting it there for the moment of the question, as the cast does, and taking that back.
 /// The object is the card's own (no new object), so what `f` asks of `card` it asks of the spell.
 pub(crate) fn as_cast<T>(cx: &mut Cx, card: ObjectId, face: Option<CardId>, player: PlayerId, f: impl FnOnce(&mut Cx) -> T) -> T {
+    // The position is the same after: what the layers worked out for it is still good (`GameState::set_derived_aside`).
+    let aside = cx.s().set_derived_aside();
     let mark = cx.s().mark();
     let from = cx.s().obj(card).zone;
     cx.st().zone_remove(from, card);
@@ -1207,6 +1209,7 @@ pub(crate) fn as_cast<T>(cx: &mut Cx, card: ObjectId, face: Option<CardId>, play
     note_statics(cx, card);
     let done = f(cx);
     cx.st().revert(mark);
+    cx.st().restore_derived(aside);
     done
 }
 

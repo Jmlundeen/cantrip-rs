@@ -1,0 +1,28 @@
+# Suspending a card is a special action taken any time its owner could begin to cast it from their hand (CR 702.62a,
+# 116.2f), so a permission to cast it as though it had flash lets it be suspended at instant speed (CR 601.3b, 702.8a).
+# Valley Floodcaller lets Bot1 cast noncreature spells as though they had flash: in Bot2's turn Bot1 suspends Lotus Bloom,
+# an artifact, which goes to exile. Without the Floodcaller the same suspend is refused out of
+# timing (lotus-bloom-cannot-be-cast-or-suspended-out-of-timing).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Valley Floodcaller
+Lotus Bloom
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+[T2 Bot2.Main1]
+Bot1.Hand.Lotus Bloom.Suspend
+? Turn = 2
+? Exile = Lotus Bloom
+
+[Expect]
+Exile = Lotus Bloom

@@ -3057,6 +3057,16 @@ pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], 
     c.lost_all || c.text_lost
 }
 
+/// Whether a static ability that functions outside the battlefield exists now (`StaticDef::everywhere`, CR 611.3a: Painter's
+/// Servant, Arcane Adaptation): the only thing that gives a card outside the battlefield or a spell an effect, beside its own
+/// static abilities - a resolved effect and an ability granted to a permanent apply to neither until the spell exists
+/// (`applies`). Where none does, a card judged as the face it would be cast as where it is (`chars_as_face`) has what that
+/// spell would have on the stack.
+pub fn statics_everywhere(cards: &CardTable, state: &GameState) -> bool {
+    state.statics_seen
+        && static_sources(cards, state).list.iter().any(|&(source, _, _)| cards.get(cards.current(state.obj(source))).statics.iter().any(|st| st.everywhere))
+}
+
 /// Whether any static ability could apply to an object on the battlefield: a permanent, emblem or card whose card has static
 /// abilities, or a hone counter, is where its abilities function. The guard of `ops::judged_entering`: without one, a
 /// permanent about to enter is on the battlefield what its card or copy effect makes it.

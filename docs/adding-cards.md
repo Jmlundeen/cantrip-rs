@@ -416,11 +416,12 @@ shapes have an example:
   `CardDef.cast_rules` (`fn(&dyn Query, &Asker, caster, from: ZoneKind) -> bool`, false forbids casting from that zone:
   Teferi, Drannith Magistrate's "from anywhere other than their hands"); a ban on spells with certain qualities is
   `CardDef.spell_rules` (`fn(&dyn Query, &Asker, caster, spell) -> bool`, false forbids it, the spell read through the query
-  as the face it would be cast as: Gaddock Teeg's "noncreature spells with mana value 4 or greater can't be cast"); and a resolved spell's bar on a player casting from
+  as the face it would be cast as, on the stack under the caster: Gaddock Teeg's "noncreature spells with mana value 4 or greater can't be cast"); and a resolved spell's bar on a player casting from
   some zones is `EffectKind::CantCastSpellsFrom(player, ZoneKinds)` (Avatar's Wrath), both read by the core wherever a
   cast is begun, during a resolution too (CR 101.2, 601.3); **as though it had flash** is
   `EffectKind::CastAsThoughFlash(types)` for a resolved spell's effect and `CardDef.flash_rules` for a static ability
-  ("You may cast Aura and Equipment spells as though they had flash", Sigarda's Aid); a static lifting a loyalty ability's timing is `CardDef.instant_activation`
+  ("You may cast Aura and Equipment spells as though they had flash", Sigarda's Aid; `fn(q, asker, spell, caster)`, the spell
+  read through the query as it would be on the stack under the caster); a static lifting a loyalty ability's timing is `CardDef.instant_activation`
   (The Wandering Emperor), and a resolved spell's "you may activate loyalty abilities of [Jace] planeswalkers you control
   ... any time you could cast an instant" is `EffectKind::InstantLoyalty(Some(Subtype::Jace))` (Jace's Machinations; `None`
   for every planeswalker), which changes only the timing (CR 606.3). The board is searched for these only when something is cast or activated.

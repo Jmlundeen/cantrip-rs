@@ -321,9 +321,8 @@ pub fn flash_granters(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> {
     sources(cx, |d| !d.flash_rules.is_empty()).collect()
 }
 
-/// Whether one of the `granters` (from `flash_granters`) lets `player` cast `spell`, a card in the zone it is cast from, as
-/// though it had flash (CR 307.5, 702.8). `q` is what the rule reads the spell through: a view of the face being cast,
-/// where that is not the card itself.
+/// Whether one of the `granters` (from `flash_granters`) lets `player` cast `spell` as though it had flash (CR 307.5, 601.3b,
+/// 702.8), asked of the spell it would be on the stack under `player` (CR 601.3e, `actions::SpellsAsCast`).
 pub fn grants_flash(q: &dyn Query, granters: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, spell: ObjectId) -> bool {
     granters.iter().any(|&(id, controller, def)| {
         let asker = Asker { source: id, controller, by: None, spell: false };

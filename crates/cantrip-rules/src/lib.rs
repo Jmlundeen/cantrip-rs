@@ -32,6 +32,8 @@ mod any_color_spell_tests;
 #[cfg(test)]
 mod back_face_targets_tests;
 #[cfg(test)]
+mod cast_as_spell_tests;
+#[cfg(test)]
 mod cast_permission_tests;
 #[cfg(test)]
 mod cloak_tests;
@@ -163,6 +165,9 @@ pub struct Game {
     pub(crate) history_end: Option<usize>,
     /// Where the state triggers stand in the run of a resolution (`StateCheck`). Bookkeeping of a call, not of the game.
     pub(crate) check: StateCheck,
+    /// What the offer of the actions a player may take asks of the spells cards would be (`actions::SpellsAsCast`), while
+    /// `actions::priority_options` answers. Bookkeeping of a call, not of the game.
+    pub(crate) spells_as_cast: std::cell::RefCell<actions::SpellsAsCast>,
 }
 
 /// When the state triggers judge a change that records no event (CR 603.8: a state trigger "triggers as soon as the game
@@ -222,6 +227,7 @@ impl Clone for Game {
             max_events: self.max_events,
             history_end: self.history_end,
             check: StateCheck::NONE,
+            spells_as_cast: Default::default(),
         }
     }
 }
@@ -337,7 +343,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default() };
         // CR 103.2b: the companion chosen as the deck was built is revealed once the starting player is known, if the starting
         // deck - the library as dealt - fulfils its condition; one that doesn't is a sideboard card, and nothing is said of it.
         for (p, id) in companions {
@@ -745,7 +751,7 @@ impl Game {
         let state = self.state.clone_with_journal_from(floor);
         let root = self.tree.next();
         let tree = tree::Tree::rooted(root, (state.mark(), self.log.len()));
-        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE }
+        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default() }
     }
 
     /// Gives the game's generator another seed (`GameState::reseed`): a fork for search that must not shuffle or roll

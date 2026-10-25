@@ -467,9 +467,19 @@ only the candidates the host's verdict on those picked says may be added.
   target (`layers::targeting_readers`: a hexproof from a quality, a protection, a `TargetingRuleKind::Forbid`),
   `actions::priority_options` and the casts an effect makes (`cast_ways_during_resolution`,
   `could_cast_transformed_during_resolution`) judge each cast with modes or targets again with the card put on the stack for
-  the moment as that spell (`ops::as_cast`, taken back after), so every effect that applies to it there applies. The cost
-  changes and casting bans read a face through `layers::chars_as_face`: the card where it is, with the face's values
-  (`GameState::judged_as`), through the layers.
+  the moment as that spell (`ops::as_cast`, taken back after, with what the layers had worked out for the position set
+  aside and put back: `GameState::set_derived_aside`), so every effect that applies to it there applies. A permission to
+  cast as though it had flash (601.3b, 601.3e) is judged the same way (`actions::SpellsAsCast`, open while
+  `priority_options` answers): where one exists (an effect's `CastAsThoughFlash`, a permanent's `flash_rules`) and the spell
+  could differ from the card where it is - a static ability that functions outside the battlefield exists
+  (`layers::statics_everywhere`), or the card has a characteristic-defining ability - the offer takes a cast it has not
+  judged as having no permission, asks for it where a cast at instant speed could be paid, and is made again once a
+  judgment grants one (Rattlechains flashes an opponent's creature card that their own Arcane Adaptation makes a Spirit as
+  their spell); suspend's timing (702.62a) reads the same. With neither, the card where it is has what its spell would have,
+  and is read there. A ban
+  on spells with some qualities (`spell_rules`) is judged on the spell there too, for each cast offered and each suspend
+  (`casts_forbidden_on_the_stack`) and each cast an effect makes. The cost changes read a face through
+  `layers::chars_as_face`: the card where it is, with the face's values (`GameState::judged_as`), through the layers.
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.
