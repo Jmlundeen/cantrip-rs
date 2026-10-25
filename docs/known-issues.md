@@ -75,6 +75,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-136](#ki-136-a-choice-listing-an-opponents-face-down-permanent-records-it-as-shown-to-the-chooser) | A choice listing an opponent's face-down permanent records it as shown to the chooser | Pri-2 | Open |
 | [KI-135](#ki-135-a-permanent-keeps-the-names-of-at-most-two-abilities-that-chose-one) | A permanent keeps the names of at most two abilities that chose one | Pri-3 | Won't fix: beyond practical scale |
 | [KI-137](#ki-137-the-host-shows-an-attacker-attacking-nothing-as-attacking-a-player-at-seat-0) | The host shows an attacker attacking nothing as attacking a player at seat 0 | Pri-2 | Open |
+| [KI-138](#ki-138-a-cast-menu-rows-cost-reads-the-card-where-it-is-not-the-spell-it-would-be) | A cast menu row's cost reads the card where it is, not the spell it would be | Pri-2 | Open |
 
 ## Issues
 
@@ -452,6 +453,20 @@ reduction or a `VariableCost::SacrificeAnyNumber { less_each }`. No printed harm
 false, only less precise.
 
 **Scenarios.** None: display. `HarmonizeTests` covers the X case.
+
+### KI-138: A cast menu row's cost reads the card where it is, not the spell it would be
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host / client | 2026-10-25, review of the as-cast cost changes |
+
+**Notes.** What the engine offers and what a cast is paid with read the spell the card would be on the stack (CR
+601.3e, 601.2f). The menu's cost figures - `cast_costs`, `cast_total` and `alternative_cast_total`, read by
+`crates/cantrip-host/src/prompt.rs` - still read the card where it is, so a reduction that applies only to the spell
+(Herald's Horn with Arcane Adaptation, on an opponent's card you cast) shows the unreduced figure on the row. No
+implemented card combination reaches it. A fix reads those helpers through the same `AsSpell` judgement.
+
+**Scenarios.** None yet: no implemented combination shows it.
 
 ### KI-137: The host shows an attacker attacking nothing as attacking a player at seat 0
 
