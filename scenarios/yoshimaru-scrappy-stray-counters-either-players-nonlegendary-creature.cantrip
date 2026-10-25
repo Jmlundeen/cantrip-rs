@@ -1,0 +1,53 @@
+# The activated ability costs exactly six mana and adds one counter to either player's nonlegendary creature.
+# Yoshimaru (legendary) and a Mox (not a creature) are refused beside the legal targets (CR 602.2b, 122.1a).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Yoshimaru, Scrappy Stray
+Ornithopter
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Forest x15
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Yoshimaru, Scrappy Stray.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+! Bot1.Battlefield.Yoshimaru, Scrappy Stray.Activate(Yoshimaru, Scrappy Stray)
+! Bot1.Battlefield.Yoshimaru, Scrappy Stray.Activate(Mox Emerald)
+Bot1.Battlefield.Yoshimaru, Scrappy Stray.Activate(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Yoshimaru, Scrappy Stray.Activate(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Power = 1
+Bot2.Battlefield.Ornithopter.Toughness = 3

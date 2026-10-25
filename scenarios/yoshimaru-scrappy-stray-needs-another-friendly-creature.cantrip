@@ -1,0 +1,30 @@
+# Yoshimaru alone cannot supply the mandatory other friendly creature (CR 603.3d).
+# Its trigger asks no targets even with an opposing creature available; the fight scenario is the positive control.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Yoshimaru, Scrappy Stray
+Forest x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Yoshimaru, Scrappy Stray.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Yoshimaru, Scrappy Stray.Damage = 0
+Bot2.Battlefield.Ornithopter.Damage = 0

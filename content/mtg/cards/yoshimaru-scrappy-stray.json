@@ -1,0 +1,8 @@
+{
+  "name": "Yoshimaru, Scrappy Stray",
+  "manaCost": "{1}{G}",
+  "type": "Legendary Creature — Dog",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "When Yoshimaru enters, another target creature you control fights up to one target creature an opponent controls. (Each deals damage equal to its power to the other.)\n{6}: Put a +1/+1 counter on target nonlegendary creature."
+}
