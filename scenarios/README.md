@@ -572,6 +572,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.CantBeBlocked`, `true` while a resolved spell or ability's "it can't be blocked this turn" is on
   a creature (CR 509.1b, 611.2c: an effect, not an ability, so it is not in `Keywords` and losing its abilities leaves it),
   absent otherwise; a printed or granted "can't be blocked" is the `CantBeBlocked` of `Keywords`
+- `BotN.Battlefield.<Name>.BlockRestriction` (`Can't be blocked except by creatures with haste`), each restriction on
+  blocking a resolved spell or ability put on a permanent (CR 509.1b, 611.2c: Gingerbrute's), in its card's words, sorted
+  and joined with `; `, while it lasts, and absent otherwise; like `CantBeBlocked`, an effect and not in `Keywords`
 - `BotN.Battlefield.<Name>.AttachedTo` (`Grizzly Bears`), what an Aura or Equipment enchants or equips, or the player an
   Aura enchants (`Bot2`, CR 303.4), absent otherwise
 

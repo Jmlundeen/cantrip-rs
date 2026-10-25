@@ -891,7 +891,8 @@ fn up_to_one_without_banding(q: &dyn Query, choice: &Choice, _: u32) -> Verdict 
 const BAND: Part = cantrip_api::select::part(&(up_to_one_without_banding as SelectFn), 0, "");
 
 /// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block (decayed's too, CR 702.147a), one that
-/// can't be blocked (an ability, or a resolved effect: `EffectKind::CantBeBlocked`), one that can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.111b) is about the
+/// can't be blocked (an ability, or a resolved effect: `EffectKind::CantBeBlocked`), a resolved restriction on the pair
+/// (`EffectKind::BlockRestriction`), one that can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.111b) is about the
 /// whole declaration, not a pair.
 fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[ObjectId]) -> bool {
     let a = cx.chars(attacker);
@@ -903,6 +904,15 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
     // whatever abilities the attacker has lost since (CR 113.1a, 611.2c, 613.1f).
     if cx.s().effects.iter().any(|e| e.affected == attacker && e.kind == EffectKind::CantBeBlocked) {
         return false;
+    }
+    // A resolved restriction on who may block whom ("it can't be blocked this turn except by creatures with haste"): an
+    // effect too, so it holds whatever abilities its source or the creature have lost since (CR 113.1a, 611.2c, 613.1f).
+    for e in &cx.s().effects {
+        if let EffectKind::BlockRestriction { card, index } = e.kind
+            && cx.card(card).lasting_block_rules.get(index as usize).is_some_and(|r| !(r.allows)(cx, e.affected, blocker, attacker))
+        {
+            return false;
+        }
     }
     if a.has(Keyword::Flying) && !b.has(Keyword::Flying) && !b.has(Keyword::Reach) {
         return false;

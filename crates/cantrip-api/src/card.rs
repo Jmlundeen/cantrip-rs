@@ -2077,6 +2077,21 @@ pub type SpellRule = fn(&dyn Query, &Asker, PlayerId, ObjectId) -> bool;
 /// Lookout).
 pub type BlockRule = fn(&dyn Query, ObjectId, ObjectId, ObjectId) -> bool;
 
+/// A restriction on blocking that a resolving spell or ability makes for a duration (CR 509.1b, 611.2a): "this creature can't
+/// be blocked this turn except by creatures with haste" (Gingerbrute; Resilient Roadrunner, Run for Your Life and Joven's Tools
+/// say the like). The effect (`EffectKind::BlockRestriction`) is on its `affected` object, not an ability of it or of its
+/// source (CR 113.1a, 611.2c), so it holds whatever abilities either loses afterwards (CR 613.1f) and ends when that object
+/// leaves (CR 400.7). A card lists these in its `lasting_block_rules`.
+#[derive(Clone, Copy)]
+pub struct LastingBlockRule {
+    /// What it says of the object it is on, without its duration ("Can't be blocked except by creatures with haste"): shown
+    /// on that object, with how long it lasts, while it does.
+    pub text: &'static str,
+    /// Whether it allows `blocker` to block `attacker`, asked of every possible block while the effect lasts: a `BlockRule`
+    /// whose `source` is the effect's `affected` object; false forbids the block.
+    pub allows: BlockRule,
+}
+
 /// A static ability that limits how many creatures may block an attacker (CR 509.1b), a restriction on the whole declaration
 /// rather than on one block: asked, while the object that has it is on the battlefield with its abilities, of each attacker
 /// (the object itself or another), `Some(n)` saying it can't be blocked by more than `n` creatures. Another permanent's
@@ -2723,6 +2738,9 @@ pub struct CardDef {
     /// The cost changes its resolving spells and abilities make for a duration (CR 611.2c, 601.2f): `EffectKind::SpellCostChange`
     /// names the nth. Not standing abilities: they function only while such an effect lasts.
     pub lasting_cost_changes: &'static [LastingCostChange],
+    /// The restrictions on blocking its resolving spells and abilities make for a duration (CR 509.1b, 611.2a):
+    /// `EffectKind::BlockRestriction` names the nth. Not standing abilities: they function only while such an effect lasts.
+    pub lasting_block_rules: &'static [LastingBlockRule],
     /// Its static abilities that give the spells a player casts convoke, delve or improvise (CR 601.2f-h), while it is on the
     /// battlefield.
     pub grants_pay_with: &'static [PayWithGrant],
@@ -3016,6 +3034,7 @@ impl CardDef {
         cost_changes: &[],
         own_cost_changes: &[],
         lasting_cost_changes: &[],
+        lasting_block_rules: &[],
         grants_pay_with: &[],
         ability_alternatives: &[],
         granted_ways: &[],

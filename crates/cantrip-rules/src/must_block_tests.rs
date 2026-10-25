@@ -2,7 +2,8 @@
 //! by blocking any attacker the creature may block; none where the creature is tapped, can't block or may block nothing; with
 //! menace, obeyed only with a second blocker and not required without one; and counted with Lure-style requirements in the
 //! most a declaration must obey. Every declaration is judged by the core's validator (`BlockRequirements::judge`). Beside them, the
-//! restriction "it can't be blocked this turn" (`EffectKind::CantBeBlocked`), which outlasts the attacker losing its abilities.
+//! restriction "it can't be blocked this turn" (`EffectKind::CantBeBlocked`), which outlasts the attacker losing its abilities,
+//! and a resolved "can't be blocked this turn except by ..." (`EffectKind::BlockRestriction`), which does too.
 
 use crate::{Game, Setup};
 use cantrip_api::*;
@@ -40,9 +41,18 @@ static FLYER: CardDef = creature("Must Block Test Flyer", Keywords::of(&[Keyword
 static LONE: CardDef = creature("Must Block Test Lone", Keywords::of(&[Keyword::CantBeBlockedByMoreThanOne]));
 static LURE: CardDef = CardDef { block_requirements: &[lures], ..creature("Must Block Test Lure", Keywords::NONE) };
 static UNBLOCKABLE: CardDef = creature("Must Block Test Unblockable", Keywords::of(&[Keyword::CantBeBlocked]));
+static HASTY: CardDef = creature("Must Block Test Hasty", Keywords::of(&[Keyword::Haste]));
+/// "This creature can't be blocked this turn except by creatures with haste": the creature it is on, as an attacker.
+fn except_by_haste(q: &dyn Query, on: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
+    on != attacker || q.chars(blocker).has(Keyword::Haste)
+}
+static RESTRICTING: CardDef = CardDef {
+    lasting_block_rules: &[LastingBlockRule { text: "Can't be blocked except by creatures with haste", allows: except_by_haste }],
+    ..creature("Must Block Test Restricting", Keywords::NONE)
+};
 
 fn table() -> &'static CardTable {
-    Box::leak(Box::new(CardTable::new([&FILLER, &PROVOKE, &BEAR, &MENACE, &FLYER, &LONE, &LURE, &UNBLOCKABLE])))
+    Box::leak(Box::new(CardTable::new([&FILLER, &PROVOKE, &BEAR, &MENACE, &FLYER, &LONE, &LURE, &UNBLOCKABLE, &HASTY, &RESTRICTING])))
 }
 
 /// A game of two on turn 1, P0's deck starting with three Provokes, and `permanents` on the battlefield.
@@ -249,4 +259,28 @@ fn a_resolved_cant_be_blocked_outlasts_losing_all_abilities_and_a_printed_one_do
     let ask = declare(&mut g, &[], &[effect, printed]);
     assert_eq!(allowed(&ask), &[(x, printed)]);
     assert!(!legal(&g, &ask, &[(x, effect)]));
+}
+
+/// A resolved "it can't be blocked this turn except by creatures with haste" (`EffectKind::BlockRestriction`, Gingerbrute's)
+/// is an effect, not an ability (CR 113.1a, 611.2c): after the creature loses all abilities (CR 613.1f) only the hasty
+/// creature is offered to block it, while a creature it is not on may still be blocked by either.
+#[test]
+fn a_resolved_block_restriction_outlasts_losing_all_abilities_and_is_only_on_its_creature() {
+    let (mut g, ids) = game(&[(&RESTRICTING, P0), (&BEAR, P0), (&BEAR, P1), (&HASTY, P1)]);
+    let (restricted, other, x, y) = (ids[0], ids[1], ids[2], ids[3]);
+    let card = g.cards.id_of(&RESTRICTING);
+    let push = |g: &mut Game, affected: ObjectId, kind: EffectKind| {
+        let timestamp = g.state.timestamp();
+        g.state.effect_push(ContinuousEffect { source: affected, controller: P0, timestamp, affected, kind, duration: Duration::EndOfTurn });
+    };
+    push(&mut g, restricted, EffectKind::BlockRestriction { card, index: 0 });
+    push(&mut g, restricted, EffectKind::LoseAllAbilities);
+    let ask = declare(&mut g, &[], &[restricted, other]);
+    let mut pairs = allowed(&ask).to_vec();
+    pairs.sort();
+    let mut expected = vec![(x, other), (y, restricted), (y, other)];
+    expected.sort();
+    assert_eq!(pairs, expected);
+    assert!(!legal(&g, &ask, &[(x, restricted)]));
+    assert!(legal(&g, &ask, &[(y, restricted)]));
 }

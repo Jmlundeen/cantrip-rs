@@ -591,6 +591,22 @@ impl StateDump {
                     if s.effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantBeBlocked) {
                         d.set(format!("{key}.CantBeBlocked"), true);
                     }
+                    // Each resolved restriction on blocking it (CR 509.1b, 611.2c), while it lasts, in its card's words: an effect, not a
+                    // keyword.
+                    let mut restrictions: Vec<&str> = s
+                        .effects
+                        .iter()
+                        .filter_map(|e| match e.kind {
+                            EffectKind::BlockRestriction { card, index } if e.affected == id => {
+                                game.cards.get(card).lasting_block_rules.get(index as usize).map(|r| r.text)
+                            }
+                            _ => None,
+                        })
+                        .collect();
+                    if !restrictions.is_empty() {
+                        restrictions.sort_unstable();
+                        d.set(format!("{key}.BlockRestriction"), restrictions.join("; "));
+                    }
                     // What was chosen for it, as an ability of the text it has now reads it (CR 607.2d, 607.5): a choice made by
                     // a text it no longer has as its own is no part of it.
                     let own = game.cards.linked_to(s, id);
@@ -777,7 +793,7 @@ const PLAYER_KEYS: &[&str] = &[
 /// The keys the dump writes of a permanent, after `BotN.Battlefield.<name>.` (or `.PhasedOut.`), beside `Counters.<Kind>`.
 const PERMANENT_KEYS: &[&str] = &[
     "Tapped", "Toxic", "FaceDown", "FaceDownName", "Token", "Transformed", "ManaValue", "X", "Doors", "Prepared", "AttachedTo", "Monstrous",
-    "Solved", "Suspected", "Saddled", "Exerted", "GoadedBy", "MustAttack", "CantBeBlocked", "ChosenPlayer", "ChosenOption", "ChosenObject",
+    "Solved", "Suspected", "Saddled", "Exerted", "GoadedBy", "MustAttack", "CantBeBlocked", "BlockRestriction", "ChosenPlayer", "ChosenOption", "ChosenObject",
     "ChosenModes", "ChosenName", "ClassLevel", "Types", "Supertypes", "Subtypes", "Colors", "Keywords", "HexproofFrom",
     "ProtectionFrom", "Power", "Toughness", "Damage", "SummoningSick", "ChosenColor", "ChosenSubtype",
 ];

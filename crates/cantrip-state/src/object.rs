@@ -1164,6 +1164,12 @@ pub enum EffectKind {
     /// can't be blocked. "Gains 'this creature can't be blocked'" and a printed "can't be blocked" are
     /// `Keyword::CantBeBlocked`, which losing its abilities takes.
     CantBeBlocked,
+    /// A restriction on blocking (CR 509.1b) a resolved spell or ability made, for as long as the effect lasts: the `index`th
+    /// of the `lasting_block_rules` of `card`, the card whose spell or ability made it, which says which blocks it forbids.
+    /// Gingerbrute's "this creature can't be blocked this turn except by creatures with haste". An effect, not an ability
+    /// (CR 113.1a, 611.2c): it holds whatever abilities its source or the creature loses afterwards (CR 613.1f), and it ends
+    /// with its `affected` object (CR 400.7).
+    BlockRestriction { card: CardId, index: u8 },
     /// "Blocks this turn if able" (CR 509.1c): a requirement that the creature block, any attacker it is able to, in each
     /// declaration of blockers while the effect lasts - with `Duration::EndOfTurn`, each declare blockers step of the turn
     /// (CR 509.1c's last sentence). One requirement however many creatures it could block. It is an effect, not an ability

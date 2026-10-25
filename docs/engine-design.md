@@ -2059,7 +2059,12 @@ abilities (CR 613.1f) leaves it and the source's losing its own ends it. "Can't 
 gained, `Keyword::CantBeBlocked`; another permanent's (Cryptic Coat; Wrecking Ball Arm's "by creatures with power 2 or
 less"), that permanent's `CardDef::block_rules`; a resolved "it can't be blocked this turn" (Escape Tunnel, Manifold Key,
 Creeping Tar Pit), `EffectKind::CantBeBlocked`, an effect on the creature that `turn::can_block` reads (CR 611.2c), as
-`EffectKind::CantBlock` is. `Chars::maximum_blockers` is the counterpart of `minimum_blockers`: a declaration giving an
+`EffectKind::CantBlock` is; and a resolved "can't be blocked this turn except by ..." (Gingerbrute's "except by creatures with
+haste"), `EffectKind::BlockRestriction { card, index }`, which names the `index`th of the `CardDef::lasting_block_rules` of the
+card that made it - a `BlockRule` asked of each possible block, with the effect's `affected` object as its source, while the
+effect lasts, as `EffectKind::SpellCostChange` names a `lasting_cost_changes` entry. It is read beside the
+static block rules in `turn::can_block`, but from the effects, not from a source permanent's abilities, so neither the
+creature's nor the source's losing abilities ends it. `Chars::maximum_blockers` is the counterpart of `minimum_blockers`: a declaration giving an
 attacker more blockers is refused (`validate`, CR 509.1b), and an attacker whose minimum is above its maximum (menace as well:
 the restrictions are cumulative) is offered no block at all (`turn::declare_blockers`). The question carries both per attacker
 (`DeclareBlockersPrompt::maximum_blockers`, 0 for any number); the web client sends at most that many of the creatures picked up

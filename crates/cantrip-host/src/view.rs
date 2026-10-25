@@ -1296,7 +1296,7 @@ impl<'a> Projector<'a> {
         if (on_battlefield || zone.is(ZoneKind::Stack)) && !obj.face_down {
             self.ability_changes(&mut view, id, &c, obj.copy);
         }
-        // "Can't attack", "can't block", "can't be blocked" and "blocks if able" from a resolved effect (CR 508.1c, 509.1b-c), with how long they last: no ability
+        // "Can't attack", "can't block", "can't be blocked [except by ...]" and "blocks if able" from a resolved effect (CR 508.1c, 509.1b-c), with how long they last: no ability
         // of the creature says so, so its face does.
         if on_battlefield {
             for e in s.effects.iter().filter(|e| e.affected == id) {
@@ -1304,6 +1304,12 @@ impl<'a> Projector<'a> {
                     EffectKind::CantAttack => "Can't attack",
                     EffectKind::CantBlock => "Can't block",
                     EffectKind::CantBeBlocked => "Can't be blocked",
+                    // A resolved restriction on blocking it, in its card's words: "Can't be blocked except by creatures with
+                    // haste this turn."
+                    EffectKind::BlockRestriction { card, index } => match game.cards.get(card).lasting_block_rules.get(index as usize) {
+                        Some(rule) => rule.text,
+                        None => continue,
+                    },
                     // A requirement to block (CR 509.1c): "Blocks this turn if able."
                     EffectKind::MustBlock => {
                         let until = match self.until_text(e.duration) {
