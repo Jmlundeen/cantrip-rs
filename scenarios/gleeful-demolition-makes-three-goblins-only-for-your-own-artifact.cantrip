@@ -1,0 +1,53 @@
+# Gleeful Demolition: destroy target artifact; "if you controlled that artifact" makes three 1/1 red Phyrexian Goblins.
+# Turn 1 Bot1 destroys its own Mox Pearl: three Goblins. A creature token (not an artifact) is refused as a target.
+# Turn 3 it destroys Bot2's Sol Ring: destroyed, but no more tokens (still three). Each cast is paid with exactly {R}.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Gleeful Demolition
+Gleeful Demolition
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Jet
+Sol Ring
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gleeful Demolition.Cast(Mox Pearl)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Phyrexian Goblin Token#3.Power = 1
+? Bot1.Battlefield.Phyrexian Goblin Token#3.Colors = Red
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Gleeful Demolition.Cast(Bot1.Battlefield.Phyrexian Goblin Token#1)
+! Bot1.Hand.Gleeful Demolition.Cast(Bot1.Battlefield.Mountain)
+Bot1.Hand.Gleeful Demolition.Cast(Sol Ring)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Phyrexian Goblin Token; Phyrexian Goblin Token; Phyrexian Goblin Token
+Bot1.Battlefield.Count = 5
+Bot2.Graveyard = Sol Ring
+Bot1.Graveyard = Gleeful Demolition; Gleeful Demolition; Mox Pearl

@@ -1,0 +1,28 @@
+# Gleeful Demolition on Bot1's own Darksteel Citadel: indestructible, so it is not destroyed (CR 702.12b), but Bot1
+# controlled that artifact, so the three Goblins are still made (the ruling: a legal target that isn't destroyed still
+# gives the tokens). Each token is a 1/1 red Phyrexian Goblin creature: its toughness, card type and subtypes are pinned.
+
+[Bot1 Deck]
+Darksteel Citadel
+Mox Ruby
+Gleeful Demolition
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Darksteel Citadel.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gleeful Demolition.Cast(Darksteel Citadel)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Phyrexian Goblin Token#2.Toughness = 1
+? Bot1.Battlefield.Phyrexian Goblin Token#2.Types = Creature
+? Bot1.Battlefield.Phyrexian Goblin Token#2.Subtypes = Goblin; Phyrexian
+
+[Expect]
+Bot1.Battlefield = Darksteel Citadel; Mox Ruby; Phyrexian Goblin Token; Phyrexian Goblin Token; Phyrexian Goblin Token
+Bot1.Graveyard = Gleeful Demolition
