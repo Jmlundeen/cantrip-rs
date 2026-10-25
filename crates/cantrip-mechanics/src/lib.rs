@@ -120,6 +120,7 @@ pub mod web_slinging;
 pub mod targets;
 pub mod text_change;
 pub mod tokens;
+pub mod training;
 pub mod untap;
 pub mod vote;
 
