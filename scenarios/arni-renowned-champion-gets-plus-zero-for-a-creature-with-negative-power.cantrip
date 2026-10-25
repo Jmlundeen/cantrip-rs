@@ -1,0 +1,42 @@
+# Arni, Renowned Champion: "Arni gets +X/+0 until end of turn, where X is that creature's power." Ornithopter (0/2)
+# enters and, with Arni's trigger on the stack, Ray of Enfeeblement makes it -4/1. X is read as the trigger resolves
+# (CR 608.2h) and is -4: a calculation that yields a negative number uses zero instead (CR 107.1b), so Arni stays 1/5
+# rather than becoming -3/5.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Arni, Renowned Champion
+Ornithopter
+Ray of Enfeeblement
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Arni, Renowned Champion.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ray of Enfeeblement.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = -4
+? Bot1.Battlefield.Arni, Renowned Champion.Power = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Arni, Renowned Champion.Power = 1
+Bot1.Battlefield.Arni, Renowned Champion.Toughness = 5
+Bot1.Battlefield.Ornithopter.Power = -4

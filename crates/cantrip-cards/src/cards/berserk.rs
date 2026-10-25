@@ -8,10 +8,11 @@ fn before_combat_damage(q: &dyn Query, _: &Asker) -> bool {
 }
 
 /// "Target creature gains trample and gets +X/+0 until end of turn, where X is its power. At the beginning of the next end
-/// step, destroy that creature if it attacked this turn." X is the power as Berserk resolves.
+/// step, destroy that creature if it attacked this turn." X is the power as Berserk resolves; a negative power gives +0/+0
+/// (CR 107.1b: this is not doubling, which keeps a negative value).
 fn frenzy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let power = g.chars(creature).power.unwrap_or(0);
+    let power = g.chars(creature).power.unwrap_or(0).max(0);
     instruction(g, |g| {
         g.add_effect(item.object, creature, EffectKind::Pump(power, 0), Duration::EndOfTurn);
         cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);

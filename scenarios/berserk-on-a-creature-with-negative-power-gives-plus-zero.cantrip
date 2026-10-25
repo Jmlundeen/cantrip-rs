@@ -1,0 +1,42 @@
+# Berserk gives "+X/+0 until end of turn, where X is its power". Arni, Renowned Champion (1/5) is -3/4 after Ray of
+# Enfeeblement's -4/-1, so X would be -3: a calculation that yields a negative number uses zero instead (CR 107.1b), and
+# Arni stays -3/4 rather than becoming -6/4. Every spell is paid on turn 1 from Black Lotus and the Moxen, so Ray's
+# -4/-1 still applies.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Emerald
+Arni, Renowned Champion
+Ray of Enfeeblement
+Berserk
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Arni, Renowned Champion.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ray of Enfeeblement.Cast(Bot1.Battlefield.Arni, Renowned Champion)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Arni, Renowned Champion.Power = -3
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Berserk.Cast(Bot1.Battlefield.Arni, Renowned Champion)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Arni, Renowned Champion.Power = -3
+Bot1.Battlefield.Arni, Renowned Champion.Toughness = 4
+Bot1.Battlefield.Arni, Renowned Champion.Keywords = Trample
