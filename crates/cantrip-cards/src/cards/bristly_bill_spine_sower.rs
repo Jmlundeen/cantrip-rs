@@ -4,10 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Landfall: put a +1/+1 counter on target creature.
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 /// Double the number of +1/+1 counters on each creature you control (CR 701.10e): each gets as many more as it has.

@@ -22,10 +22,7 @@ const UP_TO_ONE_CARD: TargetSpec = up_to_one(card_in_your_graveyard);
 
 /// Put a +1/+1 counter on target creature.
 fn counter_on_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 /// Bow of Nylea deals 2 damage to target creature with flying.

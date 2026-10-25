@@ -4,10 +4,7 @@ use cantrip_mechanics::{class, statics, targets, triggers::ward};
 use cantrip_oracle as oracle;
 
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 /// Level 2: "Permanents you control with counters on them have ward {1}": from level 2 on, each permanent its controller

@@ -29,10 +29,7 @@ fn creature_you_control_other_than_that_creature(q: &dyn Query, asker: &Asker, t
 /// "Put a +1/+1 counter on target creature you control other than that creature." A target no longer legal means the
 /// ability does nothing (CR 608.2b).
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 pub static CARD: CardDef = CardDef {

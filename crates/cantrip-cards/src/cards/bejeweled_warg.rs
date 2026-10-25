@@ -12,10 +12,7 @@ fn wolf_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 
 /// Mode 0: a +1/+1 counter on the Wolf (CR 700.2).
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(wolf) = targets::object(g, item, 0) {
-        g.add_counters(wolf, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 static MODAL: ModalDef = modes(&[
