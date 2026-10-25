@@ -1415,7 +1415,9 @@ first-found: Citadel and Mystic Forge both out offer both casts of the top card,
 the graveyard, and the player chooses (CR 601.2b). Land plays are offered the same way (`land_plays`): by the rules from a
 hand, and by each rule for the graveyard or the library's top (Crucible-like rules, Yawgmoth's Will, Bolas's Citadel, Case of
 the Locked Hothouse), each way a permanent gives (Serra Paragon) and each permission, every one its own option. Additional
-land plays (CR 305.2) are counted together, as no card cares which allowed a play. The
+land plays (CR 305.2) are counted together, as no card cares which allowed a play: a permanent's static rule
+(`PlayRule::ExtraLandPlays`) and the "you may play an additional land this turn" effect a resolved spell or ability makes
+for its controller (`Game::additional_land_plays`, `EffectKind::ExtraLandPlays`, until end of turn). The
 common case pays as before: a card in hand has the one route, and the rest is looked for only where a card is in another
 zone, each list built lazily once per pass, and a face other than the card itself judged through a view of it only where
 there is a face to judge. The records keep a grant in eight bytes (`Grant::NONE` for none) rather than an `Option`'s twelve.
