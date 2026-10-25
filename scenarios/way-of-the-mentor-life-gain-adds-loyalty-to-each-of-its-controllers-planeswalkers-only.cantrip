@@ -1,0 +1,70 @@
+# Way of the Mentor (turn 1): empower Jace 5 gives Bot1 a Jace token at 5. On turn 3 Bot1 also casts Narset, Parter of Veils (5), and
+# Lightning Helix at Bot2 gains Bot1 3 life: one trigger puts exactly one loyalty counter on each planeswalker Bot1 controls (Jace 5 to 6,
+# Narset 5 to 6) and none on Bot2's own Narset, which stays at 5 ("you control"; "each" shows in two of Bot1's both getting one).
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Way of the Mentor
+Narset, Parter of Veils
+Lightning Helix
+Island
+Plains x12
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Narset, Parter of Veils
+Island x13
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Mentor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate(Ability: {U})
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Narset, Parter of Veils.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 5
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 6
+Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 6
+Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 5
+Bot1.Battlefield.Way of the Mentor.Counters.Loyalty = (absent)
+Stack.Count = 0
