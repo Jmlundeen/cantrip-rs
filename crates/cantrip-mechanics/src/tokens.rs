@@ -476,6 +476,15 @@ pub static GOBLIN: CardDef = CardDef {
     ..token!(Goblin)
 };
 
+/// The 1/1 red Phyrexian Goblin creature token. Charforger, Chimney Rabble and Gleeful Demolition make it.
+pub static PHYREXIAN_GOBLIN: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Red)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Phyrexian Goblin)
+};
+
 /// The 2/2 black Zombie creature token (CR 111.1, 111.4). Liliana, Dreadhorde General and Cryptcaller Chariot make it.
 pub static ZOMBIE: CardDef = CardDef {
     colors: Some(ColorSet::of(Color::Black)),
