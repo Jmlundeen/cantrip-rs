@@ -1,0 +1,57 @@
+# "Up to one target creature or planeswalker" may be left empty: Bot1 chooses none (Bot2's Woodland Changeling, in play, stays undamaged)
+# and picks itself as "target player", which is legal (not "target opponent"): Bot1 20 -> 18, Bot2 unchanged. Bot1's Jace token (5)
+# goes to 1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Way of the Warlord
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Emerald
+Woodland Changeling
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Warlord.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate(Ability: {U})
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace Token.Activate(Ability: 2 damage)
+Bot1.Target()
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot2.Battlefield.Woodland Changeling.Damage = 0
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 1
