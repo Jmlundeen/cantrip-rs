@@ -55,9 +55,9 @@ fn cast_face_id(cx: &Cx, card: ObjectId, way: u8) -> Option<CardId> {
 
 /// What the offer of `priority_options` asks of the spells the cards `player` could cast would be (CR 601.2a, 601.3e): a
 /// spell is put on the stack before anything about it is announced, as the face it is cast as alone, under its caster, and a
-/// permission or an alternative cost that reads it reads that spell - with the effects that apply to it there, not the card
-/// where it is. Open only for the length of that question (`Game::spells_as_cast`), closed at any other time; no part of the
-/// position.
+/// permission, an alternative cost or a cost change that reads it reads that spell - with the effects that apply to it there,
+/// not the card where it is. Open only for the length of that question (`Game::spells_as_cast`), closed at any other time; no
+/// part of the position.
 ///
 /// The card where it is has the face's own values (`layers::chars_as_face`) and the same effects as the spell would, unless
 /// a static ability that functions outside the battlefield exists (`layers::statics_everywhere`: Arcane Adaptation's
@@ -157,7 +157,7 @@ fn ask_as_though_flash(cx: &Cx, card: ObjectId, face: Option<CardId>) {
 
 /// The characteristics `card` cast as `face` (`None`: itself) would have as the spell on the stack under the player
 /// `priority_options` asks for, where they are not those of the card where it is (`SpellsAsCast`): what an alternative cost's
-/// rule reads of the spell.
+/// or a cost change's rule reads of the spell.
 fn spell_chars(cx: &Cx, card: ObjectId, face: Option<CardId>) -> Option<Chars> {
     let key = (card, face);
     {
@@ -208,7 +208,7 @@ fn chars_as_cast_now(cx: &mut Cx, card: ObjectId, face: Option<CardId>, player: 
 }
 
 /// The characteristics `card` cast by `player` as `face` (`None`: itself) would have as the spell on the stack (`ops::as_cast`),
-/// where they are not those of the card where it is, judged as that face: what an alternative cost reads.
+/// where they are not those of the card where it is, judged as that face: what an alternative cost or a cost change reads.
 fn chars_as_cast(cx: &mut Cx, card: ObjectId, face: Option<CardId>, player: PlayerId) -> Option<Chars> {
     let here = {
         let _face_up = layers::judged_face_up(cx.s(), card);
@@ -218,13 +218,13 @@ fn chars_as_cast(cx: &mut Cx, card: ObjectId, face: Option<CardId>, player: Play
         }
     };
     let mut there = ops::as_cast(cx, card, face, player, |cx| cx.chars(card));
-    // A spell is one (CR 112.1), which the card where it is was not: no alternative cost's rule asks.
+    // A spell is one (CR 112.1), which the card where it is was not: no alternative cost's or cost change's rule asks.
     there.spell = here.spell;
     (there != here).then_some(there)
 }
 
-/// Any query, with the spell a card would be read as `chars` (`spell_chars`): an alternative cost's rule asks its
-/// characteristics of the spell, and everything else of the card where it is (Omniscience's "from your hand").
+/// Any query, with the spell a card would be read as `chars` (`spell_chars`): an alternative cost's or a cost change's rule
+/// asks its characteristics of the spell, and everything else of the card where it is (Omniscience's "from your hand").
 struct AsSpell<'a> {
     q: &'a dyn Query,
     spell: ObjectId,
@@ -3019,33 +3019,6 @@ fn deltas_watched(
     announced: Option<&Obj>,
     watching: Option<&Watching>,
 ) -> (u32, ManaCost, u32, u8, u32) {
-    let view;
-    let as_face: &dyn Query = match (face, costed) {
-        (Some(face), Costed::Spell(spell)) => {
-            view = AsFace { cx, spell, face };
-            &view
-        }
-        _ => cx,
-    };
-    let patched;
-    let announced_q: &dyn Query = match (announced, costed) {
-        (Some(obj), Costed::Spell(spell)) => {
-            patched = Announcing { q: as_face, spell, obj: *obj };
-            &patched
-        }
-        _ => as_face,
-    };
-    let watch;
-    let q: &dyn Query = match watching {
-        Some(w) => {
-            watch = Watch { q: announced_q, w, spell: match costed {
-                Costed::Spell(id) => Some(id),
-                _ => None,
-            } };
-            &watch
-        }
-        None => announced_q,
-    };
     // The thing costed is its own source for the changes it carries itself (affinity, channel's reduction).
     let (id, ability) = match costed {
         Costed::Spell(id) => (id, None),
@@ -3067,6 +3040,44 @@ fn deltas_watched(
     if sources.is_empty() && own.is_empty() && ability_own.is_none() && !lasting {
         return (0, ManaCost::ZERO, 0, 0, 0);
     }
+    let view;
+    let as_face: &dyn Query = match (face, costed) {
+        (Some(face), Costed::Spell(spell)) => {
+            view = AsFace { cx, spell, face };
+            &view
+        }
+        _ => cx,
+    };
+    // A change reads the characteristics of the spell it would be on the stack (`SpellsAsCast`): Herald's Horn's "creature
+    // spells you cast of the chosen type" finds an opponent's creature card the caster's Arcane Adaptation makes that type as
+    // their spell.
+    let as_spell = match costed {
+        Costed::Spell(spell) => spell_chars(cx, spell, face).map(|chars| AsSpell { q: as_face, spell, chars }),
+        _ => None,
+    };
+    let as_face: &dyn Query = match &as_spell {
+        Some(view) => view,
+        None => as_face,
+    };
+    let patched;
+    let announced_q: &dyn Query = match (announced, costed) {
+        (Some(obj), Costed::Spell(spell)) => {
+            patched = Announcing { q: as_face, spell, obj: *obj };
+            &patched
+        }
+        _ => as_face,
+    };
+    let watch;
+    let q: &dyn Query = match watching {
+        Some(w) => {
+            watch = Watch { q: announced_q, w, spell: match costed {
+                Costed::Spell(id) => Some(id),
+                _ => None,
+            } };
+            &watch
+        }
+        None => announced_q,
+    };
     let mut more = 0u32;
     let mut less = ManaCost::ZERO;
     let mut life = 0u32;

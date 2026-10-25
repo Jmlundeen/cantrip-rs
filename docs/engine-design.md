@@ -481,7 +481,9 @@ only the candidates the host's verdict on those picked says may be added.
   else (Omniscience's "from your hand"); a cast an effect makes judges them at once (`chars_as_cast_now`). A ban
   on spells with some qualities (`spell_rules`) is judged on the spell there too, for each cast offered and each suspend
   (`casts_forbidden_on_the_stack`) and each cast an effect makes. The cost changes read a face through
-  `layers::chars_as_face`: the card where it is, with the face's values (`GameState::judged_as`), through the layers.
+  `layers::chars_as_face`: the card where it is, with the face's values (`GameState::judged_as`), through the layers - and,
+  in the offer, the spell's characteristics judged on the stack where they differ (`spell_chars` in `deltas_watched`: Herald's
+  Horn with Arcane Adaptation makes an opponent's creature card the caster casts cheaper).
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.

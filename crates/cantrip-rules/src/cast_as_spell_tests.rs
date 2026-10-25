@@ -78,6 +78,19 @@ fn spirit_you_cast_free(q: &dyn Query, asker: &Asker, spell: ObjectId, player: P
     player == asker.controller && q.chars(spell).has_subtype(Subtype::Spirit)
 }
 
+/// "Spirit spells you cast cost {1} less to cast" (Herald's Horn's, for the chosen type).
+fn spirits_cost_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    match costed {
+        Costed::Spell(spell) if player == q.controller(source) && q.chars(spell).has_subtype(Subtype::Spirit) => {
+            CostDelta { less: mana("{1}"), ..CostDelta::NONE }
+        }
+        _ => CostDelta::NONE,
+    }
+}
+
+static HORN: CardDef =
+    CardDef { name: "Cast As Spell Test Horn", types: TypeSet::of(&[CardType::Artifact]), cost_changes: &[spirits_cost_less], ..CardDef::BLANK };
+
 static CASTER: CardDef = CardDef { name: "Cast As Spell Test Caster", types: TypeSet::of(&[CardType::Sorcery]), ..CardDef::BLANK };
 
 /// A game with the bear in your hand and `permanents` of yours on the battlefield, in a main phase of `active`'s with you
@@ -88,7 +101,7 @@ fn game(permanents: &[&'static CardDef], active: PlayerId) -> (Game, ObjectId) {
 
 /// `game` with `hand` in your hand for the bear.
 fn game_with(hand: &'static CardDef, permanents: &[&'static CardDef], active: PlayerId) -> (Game, ObjectId) {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&BANNER, &FLASHER, &WARDEN, &BEAR, &CUB, &FREEDOM, &CASTER])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&BANNER, &FLASHER, &WARDEN, &BEAR, &CUB, &FREEDOM, &HORN, &CASTER])));
     let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
     let put = |game: &mut Game, def: &'static CardDef, zone: Zone| {
         let id = game.state.push_obj(Obj::new(table.id_of(def), YOU, zone));
@@ -163,4 +176,12 @@ fn cub_offered(permanents: &[&'static CardDef]) -> bool {
 fn an_alternative_cost_reads_the_spell_the_card_would_be() {
     assert!(!cub_offered(&[&FREEDOM]), "no Spirit spell, no alternative cost, and no mana for {{1}}");
     assert!(cub_offered(&[&FREEDOM, &BANNER]), "a Spirit as your spell, cast without paying its mana cost");
+}
+
+/// CR 601.2f, 601.3e: "Spirit spells you cast cost {1} less" takes the cub's {1} off where it would be a Spirit as your
+/// spell, though it is none in your hand: a cast that is affordable only so is offered.
+#[test]
+fn a_cost_change_reads_the_spell_the_card_would_be() {
+    assert!(!cub_offered(&[&HORN]), "no Spirit spell, no reduction, and no mana for {{1}}");
+    assert!(cub_offered(&[&HORN, &BANNER]), "a Spirit as your spell, so it costs nothing");
 }
