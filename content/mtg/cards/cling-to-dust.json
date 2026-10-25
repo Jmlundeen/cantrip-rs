@@ -1,0 +1,6 @@
+{
+  "name": "Cling to Dust",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Exile target card from a graveyard. If it was a creature card, you gain 3 life. Otherwise, you draw a card.\nEscape—{3}{B}, Exile five other cards from your graveyard. (You may cast this card from your graveyard for its escape cost.)"
+}

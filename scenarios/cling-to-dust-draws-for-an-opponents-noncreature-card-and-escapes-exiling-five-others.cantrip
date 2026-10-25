@@ -1,0 +1,73 @@
+# Bot2 discards its drawn eighth card each turn (Island on turn 2, Yargle on turn 4). Faithless Looting (Black Lotus) puts
+# Black Lotus, itself and two Mountains in Bot1's graveyard. On turn 3 Cling to Dust exiles Bot2's Island, a noncreature
+# card: Bot1 draws and gains nothing. Cling is then in the graveyard with exactly four other cards: its escape is refused
+# (needs five, CR 702.138a). Lightning Bolt, also on turn 3, makes the fifth. On turn 5 Mox Jet, the only black source, is
+# tapped and its mana empties: with four non-black sources untapped the escape is refused for want of {B} (`Mana: short`).
+# On turn 7 the escape {3}{B} is cast with four sources tapped for exactly its cost, exiling exactly five, and exiles
+# Bot2's Yargle, a creature card: 3 life.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Emerald
+Faithless Looting
+Cling to Dust
+Lightning Bolt
+Mountain
+Mountain
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x7
+Island
+Yargle, Glutton of Urborg
+Swamp x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mountain#1; Mountain#2)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cling to Dust.Cast(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+? Bot1.Life = 20
+! Bot1.Graveyard.Cling to Dust.Cast(Ability: Escape)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+[T5 Bot1.Main2]
+! Bot1.Graveyard.Cling to Dust.Cast(Bot2.Graveyard.Yargle, Glutton of Urborg; Ability: Escape; Mana: short)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Cling to Dust.Cast(Bot2.Graveyard.Yargle, Glutton of Urborg; Ability: Escape)
+Bot1.Pass
+? Bot1.Mana = 
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 17
+Exile.Count = 7
+Bot1.Graveyard = Cling to Dust

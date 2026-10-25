@@ -1,0 +1,46 @@
+# Faithless Looting (Black Lotus's red) discards Yargle, Glutton of Urborg and Ornithopter. Cling to Dust exiles Yargle (Mox Jet pays):
+# a creature card, so 3 life and no draw. A second Cling (Swamp) exiles the artifact creature Ornithopter: a creature card
+# that is also another type still gains the 3 life and does not draw (the ruling). A card on the battlefield is no legal
+# target (CR 115.2: only a card in a graveyard). Hand ends at one card: nothing was drawn.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Faithless Looting
+Cling to Dust
+Cling to Dust
+Swamp
+Island
+Yargle, Glutton of Urborg
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Yargle, Glutton of Urborg; Ornithopter)
+! Bot1.Hand.Cling to Dust.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cling to Dust.Cast(Bot1.Graveyard.Yargle, Glutton of Urborg)
+? Bot1.Mana = {R}{R}
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cling to Dust.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 26
+Bot1.Hand.Count = 1
+Exile = Yargle, Glutton of Urborg; Ornithopter
