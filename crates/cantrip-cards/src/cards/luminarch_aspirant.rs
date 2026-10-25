@@ -4,10 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Put a +1/+1 counter on target creature you control, if it is still a legal target.
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 pub static CARD: CardDef = CardDef {

@@ -77,6 +77,13 @@ fn spell_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
 pub const ANY: TargetSpec = target(any_target_filter);
 pub const CREATURE: TargetSpec = target(creature_filter);
 
+fn legendary_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).supertypes.legendary)
+}
+
+/// "Target legendary creature" (CR 115.1, 205.4a), whoever controls it. Karakas and Yoshimaru, Beloved Companion print it.
+pub const LEGENDARY_CREATURE: TargetSpec = target(legendary_creature_filter);
+
 fn creature_with_toughness_four_or_greater_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).toughness.is_some_and(|v| v >= 4))
 }

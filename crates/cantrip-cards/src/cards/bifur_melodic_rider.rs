@@ -9,10 +9,7 @@ fn enters_or_attacks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<F
 
 /// "Put a +1/+1 counter on target creature."
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 /// "As long as you have an enduring story, if a triggered ability of a Dwarf you control triggers, that ability triggers an

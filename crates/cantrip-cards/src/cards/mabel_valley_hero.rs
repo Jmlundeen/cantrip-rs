@@ -17,10 +17,7 @@ fn mabel_or_another_creature_enters(q: &dyn Query, me: &Asker, event: &Event) ->
     }
 }
 fn add_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.add_counters(creature, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 pub static CARD: CardDef = CardDef {

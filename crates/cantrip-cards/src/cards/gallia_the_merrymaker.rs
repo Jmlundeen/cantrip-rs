@@ -21,9 +21,7 @@ fn entered_this_turn_creature(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 
 /// "Put a +1/+1 counter on target creature that entered this turn."
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    g.add_counters(creature, CounterKind::PlusOne, 1);
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 pub static CARD: CardDef = CardDef {

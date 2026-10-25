@@ -1085,3 +1085,12 @@ pub fn planeswalker_becomes_creature_preventing_damage(
     g.end_sentence();
     crate::prevention::this_turn(g, item, Target::Object(item.object), index, Shield::All);
 }
+
+/// "Put a +1/+1 counter on target [permanent]" (CR 122.1a, 608.2b), the first target still legal on resolution.
+/// Bristly Bill, Spine Sower, Bow of Nylea, Yoshimaru, Beloved Companion, Kenrith, the Returned King and
+/// Gallia, the Merrymaker print it.
+pub fn plus_one_counter_on_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(object) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    g.add_counters(object, CounterKind::PlusOne, 1);
+    Ok(())
+}

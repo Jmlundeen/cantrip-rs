@@ -5,10 +5,7 @@ use cantrip_oracle as oracle;
 
 /// "Put a +1/+1 counter on target creature an opponent controls."
 fn counter_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(id) = targets::object(g, item, 0) {
-        g.add_counters(id, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 pub static CARD: CardDef = CardDef {

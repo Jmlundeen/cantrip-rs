@@ -23,9 +23,7 @@ fn all_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "{1}{G}: Put a +1/+1 counter on target creature."
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    g.add_counters(creature, CounterKind::PlusOne, 1);
-    Ok(())
+    effects::plus_one_counter_on_target(g, item)
 }
 
 /// "{2}{W}: Target player gains 5 life."

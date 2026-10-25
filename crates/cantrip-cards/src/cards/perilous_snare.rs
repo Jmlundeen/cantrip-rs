@@ -7,10 +7,7 @@ use cantrip_oracle as oracle;
 /// "Put a +1/+1 counter on target creature or Vehicle you control" (CR 122.1a): nothing if the target is gone or no
 /// longer a creature or Vehicle you control (CR 608.2b).
 fn counter_on_creature_or_vehicle(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(permanent) = targets::object(g, item, 0) {
-        g.add_counters(permanent, CounterKind::PlusOne, 1);
-    }
-    Ok(())
+    cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
 }
 
 pub static CARD: CardDef = CardDef {
