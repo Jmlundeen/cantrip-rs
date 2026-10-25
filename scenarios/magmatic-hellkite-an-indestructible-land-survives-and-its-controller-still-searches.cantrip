@@ -68,6 +68,7 @@ Bot2.Search(Forest)
 [Expect]
 Bot1.Graveyard.Count = 0
 Bot1.Battlefield.Magmatic Hellkite.Tapped = false
-Bot2.Battlefield.Creeping Tar Pit.Keywords = CantBeBlocked; Indestructible
+Bot2.Battlefield.Creeping Tar Pit.Keywords = Indestructible
+Bot2.Battlefield.Creeping Tar Pit.CantBeBlocked = true
 Bot2.Battlefield.Forest.Tapped = true
 Bot2.Battlefield.Forest.Counters.Stun = 1

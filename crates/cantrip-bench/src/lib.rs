@@ -237,7 +237,7 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
         RequestKind::AssignCombatDamage { divisions } => Answer::Shares(DamageDivision::suggested_shares(divisions)),
         // A declaration an effect makes requirements of (CR 509.1c): the engine's own, which obeys them.
         RequestKind::DeclareBlockers { requirements, .. } if requirements.most > 0 => Answer::Block(requirements.suggested.clone()),
-        RequestKind::DeclareBlockers { allowed, .. } => {
+        RequestKind::DeclareBlockers { allowed, requirements, .. } => {
             let mut blocks: Vec<(ObjectId, ObjectId)> = Vec::new();
             for pair in random.some(allowed, allowed.len()) {
                 if random.coin() && !blocks.iter().any(|b| b.0 == pair.0) {
@@ -248,13 +248,13 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             let once: Vec<ObjectId> = blocks
                 .iter()
                 .map(|b| b.1)
-                .filter(|&a| blocks.iter().filter(|b| b.1 == a).count() < game.chars(a).minimum_blockers())
+                .filter(|&a| u32::try_from(blocks.iter().filter(|b| b.1 == a).count()).unwrap_or(u32::MAX) < requirements.limits_of(a).0)
                 .collect();
             blocks.retain(|b| !once.contains(&b.1));
             // "Can't be blocked by more than one creature": the blockers past the most it allows are left out.
             let mut kept: Vec<(ObjectId, ObjectId)> = Vec::new();
             for b in blocks {
-                if kept.iter().filter(|k| k.1 == b.1).count() < game.chars(b.1).maximum_blockers() {
+                if u32::try_from(kept.iter().filter(|k| k.1 == b.1).count()).unwrap_or(u32::MAX) < requirements.limits_of(b.1).1 {
                     kept.push(b);
                 }
             }

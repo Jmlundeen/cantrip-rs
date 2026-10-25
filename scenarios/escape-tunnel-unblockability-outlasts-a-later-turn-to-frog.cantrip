@@ -1,0 +1,57 @@
+# Escape Tunnel's "target creature with power 2 or less can't be blocked this turn" is an effect of a resolved ability on
+# the creature, not an ability it gains (CR 113.1a: abilities are granted with "has" or "gains"; CR 611.2c). Bot2's Turn to
+# Frog, cast after it resolved, takes every ability Llanowar Elves has (CR 613.1f) - its "{T}: Add {G}" is gone - but not
+# the restriction on blocking it (CR 509.1b): Bot2's Ornithopter may not block the 1/1 blue Frog (the refusal), and Bot2
+# takes 1. On turn 5, the turn over, the same attack can be blocked (the positive control).
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Escape Tunnel
+Forest x17
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Turn to Frog
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Escape Tunnel.Play
+Bot1.Battlefield.Escape Tunnel.Activate(Ability: can't be blocked; Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Llanowar Elves.Subtypes = Frog
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+! Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Attack(Llanowar Elves > Bot2)
+! Bot2.Block(Ornithopter > Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot1.Battlefield.Llanowar Elves.CantBeBlocked = true
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.CantBeBlocked = (absent)
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot2.Block(Ornithopter > Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Escape Tunnel
+Bot2.Graveyard = Turn to Frog
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf

@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
@@ -16,7 +15,7 @@ fn another_creature_you_control_with_power_two_or_less(q: &dyn Query, asker: &As
 /// The creature can't be blocked this turn (CR 509.1b, 611.2).
 fn cant_be_blocked(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::CantBeBlocked);
+        g.add_effect(item.object, creature, EffectKind::CantBeBlocked, Duration::EndOfTurn);
     }
     Ok(())
 }

@@ -1,7 +1,8 @@
 //! "Target creature blocks this turn if able" (CR 509.1c, `EffectKind::MustBlock`), over test cards: one requirement, obeyed
 //! by blocking any attacker the creature may block; none where the creature is tapped, can't block or may block nothing; with
 //! menace, obeyed only with a second blocker and not required without one; and counted with Lure-style requirements in the
-//! most a declaration must obey. Every declaration is judged by the core's validator (`BlockRequirements::judge`).
+//! most a declaration must obey. Every declaration is judged by the core's validator (`BlockRequirements::judge`). Beside them, the
+//! restriction "it can't be blocked this turn" (`EffectKind::CantBeBlocked`), which outlasts the attacker losing its abilities.
 
 use crate::{Game, Setup};
 use cantrip_api::*;
@@ -38,9 +39,10 @@ static MENACE: CardDef = creature("Must Block Test Menace", Keywords::of(&[Keywo
 static FLYER: CardDef = creature("Must Block Test Flyer", Keywords::of(&[Keyword::Flying]));
 static LONE: CardDef = creature("Must Block Test Lone", Keywords::of(&[Keyword::CantBeBlockedByMoreThanOne]));
 static LURE: CardDef = CardDef { block_requirements: &[lures], ..creature("Must Block Test Lure", Keywords::NONE) };
+static UNBLOCKABLE: CardDef = creature("Must Block Test Unblockable", Keywords::of(&[Keyword::CantBeBlocked]));
 
 fn table() -> &'static CardTable {
-    Box::leak(Box::new(CardTable::new([&FILLER, &PROVOKE, &BEAR, &MENACE, &FLYER, &LONE, &LURE])))
+    Box::leak(Box::new(CardTable::new([&FILLER, &PROVOKE, &BEAR, &MENACE, &FLYER, &LONE, &LURE, &UNBLOCKABLE])))
 }
 
 /// A game of two on turn 1, P0's deck starting with three Provokes, and `permanents` on the battlefield.
@@ -228,4 +230,23 @@ fn two_effects_on_one_creature_are_two_requirements() {
     assert_eq!(rules(&ask).most, 2);
     assert!(legal(&g, &ask, &[(x, a)]));
     assert!(!legal(&g, &ask, &[(y, a)]));
+}
+
+/// A resolved "it can't be blocked this turn" (`EffectKind::CantBeBlocked`) is an effect on the creature, not an ability it
+/// gains (CR 113.1a, 611.2c), so a later "loses all abilities" (CR 613.1f: Turn to Frog) leaves it: no block of that attacker
+/// is offered. The printed "can't be blocked" (`Keyword::CantBeBlocked`) is an ability, and the same loss takes it.
+#[test]
+fn a_resolved_cant_be_blocked_outlasts_losing_all_abilities_and_a_printed_one_does_not() {
+    let (mut g, ids) = game(&[(&BEAR, P0), (&UNBLOCKABLE, P0), (&BEAR, P1)]);
+    let (effect, printed, x) = (ids[0], ids[1], ids[2]);
+    let push = |g: &mut Game, affected: ObjectId, kind: EffectKind| {
+        let timestamp = g.state.timestamp();
+        g.state.effect_push(ContinuousEffect { source: affected, controller: P0, timestamp, affected, kind, duration: Duration::EndOfTurn });
+    };
+    push(&mut g, effect, EffectKind::CantBeBlocked);
+    push(&mut g, effect, EffectKind::LoseAllAbilities);
+    push(&mut g, printed, EffectKind::LoseAllAbilities);
+    let ask = declare(&mut g, &[], &[effect, printed]);
+    assert_eq!(allowed(&ask), &[(x, printed)]);
+    assert!(!legal(&g, &ask, &[(x, effect)]));
 }

@@ -40,5 +40,5 @@ Bot2.Life = 23
 Bot1.Battlefield.Edge Rover.Damage = 1
 Bot1.Battlefield.Edge Rover.Power = 2
 Bot1.Battlefield.Edge Rover.Toughness = 4
-Bot1.Battlefield.Edge Rover.Keywords = CantBeBlockedByMoreThanOne; Reach
+Bot1.Battlefield.Edge Rover.Keywords = Reach
 Bot1.Battlefield.Meltstrider's Resolve.AttachedTo = Edge Rover

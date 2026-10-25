@@ -34,5 +34,6 @@ Bot1.Pass
 
 [Expect]
 Bot1.Graveyard = Escape Tunnel
-Bot1.Battlefield.Embereth Shieldbreaker.Keywords = CantBeBlocked
+Bot1.Battlefield.Embereth Shieldbreaker.CantBeBlocked = true
+Bot1.Battlefield.Cathar Commando.CantBeBlocked = (absent)
 Bot1.Battlefield.Cathar Commando.Keywords = Flash

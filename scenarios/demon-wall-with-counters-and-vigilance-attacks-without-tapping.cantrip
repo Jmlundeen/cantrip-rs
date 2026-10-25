@@ -1,7 +1,7 @@
 # Demon Wall attacking as though it didn't have defender (CR 609.4) is otherwise an ordinary attack: a creature with
 # vigilance doesn't tap to attack (CR 508.1f, 702.20b). On turn 3 Bot1 pays {5}{B} for the Wall's two +1/+1 counters and
 # casts Pym Particles on it ("Target creature gains vigilance until end of turn and can't be blocked this turn"). The Wall
-# attacks as a 5/5 and stays untapped; Bot2 goes from 20 to 15. It still has defender beside the keywords Pym Particles gave.
+# attacks as a 5/5 and stays untapped; Bot2 goes from 20 to 15. It still has defender beside the vigilance Pym Particles gave.
 
 [Bot1 Deck]
 Swamp
@@ -46,4 +46,5 @@ Bot1.Attack(Demon Wall > Bot2)
 Bot2.Life = 15
 Bot1.Battlefield.Demon Wall.Tapped = false
 Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
-Bot1.Battlefield.Demon Wall.Keywords = CantBeBlocked; Defender; Menace; Vigilance
+Bot1.Battlefield.Demon Wall.Keywords = Defender; Menace; Vigilance
+Bot1.Battlefield.Demon Wall.CantBeBlocked = true

@@ -2077,6 +2077,15 @@ pub type SpellRule = fn(&dyn Query, &Asker, PlayerId, ObjectId) -> bool;
 /// Lookout).
 pub type BlockRule = fn(&dyn Query, ObjectId, ObjectId, ObjectId) -> bool;
 
+/// A static ability that limits how many creatures may block an attacker (CR 509.1b), a restriction on the whole declaration
+/// rather than on one block: asked, while the object that has it is on the battlefield with its abilities, of each attacker
+/// (the object itself or another), `Some(n)` saying it can't be blocked by more than `n` creatures. Another permanent's
+/// "enchanted creature ... can't be blocked by more than one creature" (Meltstrider's Resolve) gives the creature no ability
+/// (CR 113.1a), so a creature that loses its abilities is still under it; the creature's own is
+/// `Keyword::CantBeBlockedByMoreThanOne`. Familiar Ground and Challenger Troll say the same of creatures their controller
+/// controls.
+pub type BlockerLimit = fn(&dyn Query, ObjectId, ObjectId) -> Option<usize>;
+
 /// A static ability that requires a creature to block a particular attacker if able (CR 509.1c): asked, while the object that
 /// has it is on the battlefield with its abilities, of each block the restrictions allow - the object as `source`, then the
 /// blocker and the attacker; true makes that block a requirement. "All creatures able to block enchanted creature do so"
@@ -2781,6 +2790,8 @@ pub struct CardDef {
     pub spell_rules: &'static [SpellRule],
     /// Its static abilities that limit blocking (CR 509.1b), while it is on the battlefield.
     pub block_rules: &'static [BlockRule],
+    /// Its static abilities that limit how many creatures may block an attacker (CR 509.1b), while it is on the battlefield.
+    pub blocker_limits: &'static [BlockerLimit],
     /// Its static abilities that require creatures to block (CR 509.1c), while it is on the battlefield.
     pub block_requirements: &'static [BlockRequirement],
     /// Its static abilities that keep creatures from attacking (CR 508.1c), while it is on the battlefield.
@@ -3011,6 +3022,7 @@ impl CardDef {
         cast_rules: &[],
         spell_rules: &[],
         block_rules: &[],
+        blocker_limits: &[],
         block_requirements: &[],
         attack_rules: &[],
         attack_costs: &[],
@@ -3099,6 +3111,7 @@ impl CardDef {
             (!self.cast_rules.is_empty(), "cast rules"),
             (!self.spell_rules.is_empty(), "spell rules"),
             (!self.block_rules.is_empty(), "block rules"),
+            (!self.blocker_limits.is_empty(), "blocker limits"),
             (!self.block_requirements.is_empty(), "block requirements"),
             (!self.attack_rules.is_empty(), "attack rules"),
             (!self.attack_costs.is_empty(), "attack costs"),
@@ -3300,7 +3313,7 @@ pub struct CardTable {
     pub mana_replaces: Vec<bool>,
     /// Whether any card limits the spells cast each turn.
     pub any_cast_limit: bool,
-    /// Which cards have block rules (CR 509.1b): looked at only for the blocker and the attacker of a possible block.
+    /// Which cards have block rules or blocker limits (CR 509.1b): the permanents whose static abilities limit blocking.
     pub block_rules: Vec<bool>,
     /// Which cards have attack rules (CR 508.1c).
     pub attack_rules: Vec<bool>,
@@ -3572,7 +3585,7 @@ impl CardTable {
         let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty() || !c.additional_triggers.is_empty()).collect();
         let designators: Vec<bool> = cards.iter().map(|c| c.ascend || c.storied).collect();
         let engines: Vec<bool> = cards.iter().map(|c| c.start_your_engines).collect();
-        let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
+        let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty() || !c.blocker_limits.is_empty()).collect();
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let player_keywords: Vec<bool> = cards.iter().map(|c| !c.player_keywords.is_empty() || !c.player_protection.is_empty()).collect();

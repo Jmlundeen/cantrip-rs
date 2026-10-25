@@ -578,6 +578,10 @@ impl StateDump {
                         must.sort();
                         d.set(format!("{key}.MustAttack"), must.join("; "));
                     }
+                    // A resolved "it can't be blocked this turn" (CR 509.1b, 611.2c), while it lasts: an effect, not a keyword.
+                    if s.effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantBeBlocked) {
+                        d.set(format!("{key}.CantBeBlocked"), true);
+                    }
                     // What was chosen for it, as an ability of the text it has now reads it (CR 607.2d, 607.5): a choice made by
                     // a text it no longer has as its own is no part of it.
                     let own = game.cards.linked_to(s, id);
@@ -764,7 +768,7 @@ const PLAYER_KEYS: &[&str] = &[
 /// The keys the dump writes of a permanent, after `BotN.Battlefield.<name>.` (or `.PhasedOut.`), beside `Counters.<Kind>`.
 const PERMANENT_KEYS: &[&str] = &[
     "Tapped", "Toxic", "FaceDown", "FaceDownName", "Token", "Transformed", "ManaValue", "X", "Doors", "Prepared", "AttachedTo", "Monstrous",
-    "Solved", "Suspected", "Saddled", "Exerted", "GoadedBy", "MustAttack", "ChosenPlayer", "ChosenOption", "ChosenObject",
+    "Solved", "Suspected", "Saddled", "Exerted", "GoadedBy", "MustAttack", "CantBeBlocked", "ChosenPlayer", "ChosenOption", "ChosenObject",
     "ChosenModes", "ChosenName", "ClassLevel", "Types", "Supertypes", "Subtypes", "Colors", "Keywords", "HexproofFrom",
     "ProtectionFrom", "Power", "Toughness", "Damage", "SummoningSick", "ChosenColor", "ChosenSubtype",
 ];

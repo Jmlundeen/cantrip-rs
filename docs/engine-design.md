@@ -2010,10 +2010,18 @@ the stack with the attack triggers, about the creature enlisted; "whenever this 
 
 ### Blocked by at most one creature
 
-"Can't be blocked by more than one creature" (CR 509.1b) is `Keyword::CantBeBlockedByMoreThanOne`, an evasion ability, so
-"loses all abilities" takes it: printed (a content `keywords` entry: Stalking Tiger, Charging Rhino, Ironhoof Ox, none in
-content yet) or given in layer 6 (Meltstrider's Resolve; Familiar Ground, Challenger Troll, Vorrac Battlehorns, Sunder Shaman
-and Bristling Boar print the same). `Chars::maximum_blockers` is the counterpart of `minimum_blockers`: a declaration giving an
+"Can't be blocked by more than one creature" (CR 509.1b) is `Keyword::CantBeBlockedByMoreThanOne`, an evasion ability when
+the creature prints it, so "loses all abilities" takes it (a content `keywords` entry: Stalking Tiger, Charging Rhino, Ironhoof
+Ox, none in content yet; Sunder Shaman and Bristling Boar print the same). Another permanent's "enchanted creature ... can't be
+blocked by more than one creature" (Meltstrider's Resolve; Familiar Ground, Challenger Troll and Vorrac Battlehorns say the
+same) gives the creature no ability - there is no "has" or "gains" (CR 113.1a) - so it is never in the creature's keywords,
+which are the abilities it has ("creatures with no abilities", Muraganda Petroglyphs, asks them): it is that permanent's
+`CardDef::blocker_limits`, read with the block rules' sources (`turn::maximum_blockers`), so the creature's losing its
+abilities (CR 613.1f) leaves it and the source's losing its own ends it. "Can't be blocked" follows the same split: printed or
+gained, `Keyword::CantBeBlocked`; another permanent's (Cryptic Coat; Wrecking Ball Arm's "by creatures with power 2 or
+less"), that permanent's `CardDef::block_rules`; a resolved "it can't be blocked this turn" (Escape Tunnel, Manifold Key,
+Creeping Tar Pit), `EffectKind::CantBeBlocked`, an effect on the creature that `turn::can_block` reads (CR 611.2c), as
+`EffectKind::CantBlock` is. `Chars::maximum_blockers` is the counterpart of `minimum_blockers`: a declaration giving an
 attacker more blockers is refused (`validate`, CR 509.1b), and an attacker whose minimum is above its maximum (menace as well:
 the restrictions are cumulative) is offered no block at all (`turn::declare_blockers`). The question carries both per attacker
 (`DeclareBlockersPrompt::maximum_blockers`, 0 for any number); the web client sends at most that many of the creatures picked up

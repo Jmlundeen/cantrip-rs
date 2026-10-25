@@ -8,9 +8,11 @@ fn equipped_creature(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId
     attached_object(view, source, affected, so_far) && view.chars(affected).is(CardType::Creature)
 }
 
-/// An ability the creature gains in layer 6 (CR 613.1f), so losing all abilities takes it away.
-fn evasion(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::CantBeBlockedByPowerTwoOrLess);
+/// "Equipped creature ... can't be blocked by creatures with power 2 or less" (CR 509.1b): no "has", so a rule of the
+/// Equipment's, not an ability the creature gains (CR 113.1a); a creature that loses all its abilities is still under it
+/// (CR 613.1f). A blocker with no power can't block it either, as with the keyword.
+fn evasion(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
+    q.obj(source).attached_to != Some(attacker) || q.chars(blocker).power.is_some_and(|p| p > 2)
 }
 
 fn legendary_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -27,7 +29,7 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::PtSet, equipped_creature, base_pt::<7, 7>, "Equipped creature has base power and toughness 7/7."),
-        static_ability(Layer::Ability, equipped_creature, evasion, "Equipped creature can't be blocked by creatures with power 2 or less."),
     ],
+    block_rules: &[evasion],
     ..oracle::WRECKING_BALL_ARM
 };

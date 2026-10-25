@@ -15,9 +15,11 @@ fn cloak_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Equipped creature ... can't be blocked": an ability granted in layer 6 (CR 613.1f).
-fn unblockable(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::CantBeBlocked);
+/// "Equipped creature ... can't be blocked" (CR 509.1b): no "has", so a rule of the Equipment's, not an ability the creature
+/// gains (CR 113.1a). A creature that loses all its abilities is still under it (CR 613.1f), and it is no ability of the
+/// creature's for anything that asks ("creatures with no abilities").
+fn equipped_creature_cant_be_blocked(q: &dyn Query, source: ObjectId, _: ObjectId, attacker: ObjectId) -> bool {
+    q.obj(source).attached_to != Some(attacker)
 }
 
 pub static CARD: CardDef = CardDef {
@@ -27,7 +29,7 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::PtModify, attached_object, plus_pt::<1, 0>, "Equipped creature gets +1/+0."),
-        static_ability(Layer::Ability, attached_object, unblockable, "Equipped creature can't be blocked."),
     ],
+    block_rules: &[equipped_creature_cant_be_blocked],
     ..oracle::CRYPTIC_COAT
 };

@@ -30,7 +30,7 @@ Bot2.Pass
 ? Bot1.Battlefield..FaceDownName = Snapcaster Mage
 ? Bot1.Battlefield..Power = 3
 ? Bot1.Battlefield..Toughness = 2
-? Bot1.Battlefield..Keywords = CantBeBlocked
+? Bot1.Battlefield..Keywords = (absent)
 Bot1.Hand.Island.Play
 Bot1.Hand.Sol Ring.Cast
 Bot1.Battlefield.Island.Activate
@@ -43,6 +43,6 @@ Bot1.Battlefield.#1.Activate
 [Expect]
 Bot1.Battlefield.Snapcaster Mage.Power = 3
 Bot1.Battlefield.Snapcaster Mage.Toughness = 1
-Bot1.Battlefield.Snapcaster Mage.Keywords = CantBeBlocked; Flash
+Bot1.Battlefield.Snapcaster Mage.Keywords = Flash
 Bot1.Battlefield.Cryptic Coat.AttachedTo = Snapcaster Mage
 Bot1.Library.Count = 10

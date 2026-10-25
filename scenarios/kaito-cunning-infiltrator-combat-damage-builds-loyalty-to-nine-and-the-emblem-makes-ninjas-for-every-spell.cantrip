@@ -45,7 +45,7 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Llanowar Elves.Cast
 Bot1.Battlefield.Kaito, Cunning Infiltrator.Activate(Ability: Up to one; Bot1.Battlefield.Llanowar Elves#1)
 Bot1.Choose(Island)
-? Bot1.Battlefield.Llanowar Elves#1.Keywords = CantBeBlocked
+? Bot1.Battlefield.Llanowar Elves#1.CantBeBlocked = true
 ? Bot1.Battlefield.Kaito, Cunning Infiltrator.Counters.Loyalty = 5
 [T3 Bot1.DeclareAttackers]
 Bot1.Attack(Llanowar Elves#1 > Bot2)

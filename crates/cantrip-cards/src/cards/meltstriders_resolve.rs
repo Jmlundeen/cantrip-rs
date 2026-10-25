@@ -14,9 +14,10 @@ fn fight(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Enchanted creature ... can't be blocked by more than one creature" (CR 509.1b, layer 6).
-fn one_blocker_at_most(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::CantBeBlockedByMoreThanOne);
+/// "Enchanted creature ... can't be blocked by more than one creature" (CR 509.1b): no "has", so a rule of the Aura's, not
+/// an ability the creature gains (CR 113.1a); a creature that loses all its abilities is still under it (CR 613.1f).
+fn one_blocker_at_most(q: &dyn Query, source: ObjectId, attacker: ObjectId) -> Option<usize> {
+    (q.obj(source).attached_to == Some(attacker)).then_some(1)
 }
 
 pub static CARD: CardDef = CardDef {
@@ -29,7 +30,7 @@ pub static CARD: CardDef = CardDef {
     .targets(&[targets::CREATURE_AN_OPPONENT_CONTROLS.optional()])],
     statics: &[
         static_ability(Layer::PtModify, attached_object, plus_pt::<0, 2>, "Enchanted creature gets +0/+2."),
-        static_ability(Layer::Ability, attached_object, one_blocker_at_most, "Enchanted creature can't be blocked by more than one creature."),
     ],
+    blocker_limits: &[one_blocker_at_most],
     ..oracle::MELTSTRIDERS_RESOLVE
 };

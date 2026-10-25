@@ -886,12 +886,17 @@ fn up_to_one_without_banding(q: &dyn Query, choice: &Choice, _: u32) -> Verdict 
 const BAND: Part = cantrip_api::select::part(&(up_to_one_without_banding as SelectFn), 0, "");
 
 /// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block (decayed's too, CR 702.147a), one that
-/// can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.111b) is about the
+/// can't be blocked (an ability, or a resolved effect: `EffectKind::CantBeBlocked`), one that can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.111b) is about the
 /// whole declaration, not a pair.
 fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[ObjectId]) -> bool {
     let a = cx.chars(attacker);
     let b = cx.chars(blocker);
     if a.has(Keyword::CantBeBlocked) || b.has(Keyword::CantBlock) || b.has(Keyword::Decayed) || (b.has(Keyword::CanBlockOnlyCreaturesWithFlying) && !a.has(Keyword::Flying)) {
+        return false;
+    }
+    // "It can't be blocked this turn" from a resolved spell or ability: an effect on the attacker, not an ability, so it holds
+    // whatever abilities the attacker has lost since (CR 113.1a, 611.2c, 613.1f).
+    if cx.s().effects.iter().any(|e| e.affected == attacker && e.kind == EffectKind::CantBeBlocked) {
         return false;
     }
     if a.has(Keyword::Flying) && !b.has(Keyword::Flying) && !b.has(Keyword::Reach) {
@@ -930,6 +935,23 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
         }
     }
     !a.protected_from_by(&b, cx.s().obj(blocker).controller)
+}
+
+/// The most creatures that may block `attacker` (CR 509.1b): its own "can't be blocked by more than one creature"
+/// (`Chars::maximum_blockers`), and each limit a static ability of a permanent among `rule_sources` puts on it
+/// (`CardDef::blocker_limits`: Meltstrider's Resolve's on the creature it enchants, which is no ability of the creature and
+/// so outlasts its losing them, CR 113.1a, 613.1f). The restrictions are cumulative: the smallest holds.
+fn maximum_blockers(cx: &Cx, attacker: ObjectId, rule_sources: &[ObjectId]) -> usize {
+    let mut most = cx.chars(attacker).maximum_blockers();
+    for &id in rule_sources {
+        let obj = cx.s().obj(id);
+        for limit in cx.card(obj.copied_card().unwrap_or(obj.card)).blocker_limits {
+            if let Some(n) = limit(cx, id, attacker) {
+                most = most.min(n);
+            }
+        }
+    }
+    most
 }
 
 /// The requirements on a declaration of attackers by `eligible` among `targets` (CR 508.1d), one for each source: each
@@ -1037,7 +1059,8 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         .filter(|&id| cx.s().obj(id).controller == defender && cx.chars(id).is(CardType::Creature) && !cx.s().obj(id).tapped)
         .filter(|&id| !cant_block(cx, id))
         .collect();
-    // The permanents whose static abilities limit who may block whom (CR 509.1b), and which have not lost them (CR 613.1f).
+    // The permanents whose static abilities limit who may block whom, or by how many (CR 509.1b), and which have not lost
+    // them (CR 613.1f).
     let rule_sources: Vec<ObjectId> = cx
         .s()
         .battlefield()
@@ -1063,14 +1086,14 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         .iter()
         .copied()
         .filter(|&a| {
-            let c = cx.chars(a);
-            allowed.iter().filter(|p| p.1 == a).count() < c.minimum_blockers() || c.minimum_blockers() > c.maximum_blockers()
+            let fewest = cx.chars(a).minimum_blockers();
+            allowed.iter().filter(|p| p.1 == a).count() < fewest || fewest > maximum_blockers(cx, a, &rule_sources)
         })
         .collect();
     allowed.retain(|p| !menace.contains(&p.1));
     if !allowed.is_empty() {
         // CR 509.1b-c: each attacker's limits, and the blocks effects require if able, with the most of them a declaration can obey.
-        let requirements = block_rules(cx, &attackers, &allowed);
+        let requirements = block_rules(cx, &attackers, &allowed, &rule_sources);
         // A defending player who has left blocks with nothing (CR 800.4a): no one else declares their blocks.
         let answer = cx.ask_rule(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements })?;
         if let Some(Answer::Block(blocks)) = answer {
@@ -1134,13 +1157,10 @@ fn deals_now(cx: &Cx, id: ObjectId, had_first_strike: bool, first_strike_step: b
 /// says blocks if able (`EffectKind::MustBlock`) that may block something; and the most of them a declaration can obey, with
 /// one that does (`BlockRequirements::solve`). A creature that can't block, or may block nothing, is required nothing (CR
 /// 509.1c: a requirement is obeyed only as far as the restrictions allow).
-fn block_rules(cx: &Cx, attackers: &[ObjectId], allowed: &[(ObjectId, ObjectId)]) -> BlockRequirements {
+fn block_rules(cx: &Cx, attackers: &[ObjectId], allowed: &[(ObjectId, ObjectId)], rule_sources: &[ObjectId]) -> BlockRequirements {
     let limits = attackers
         .iter()
-        .map(|&a| {
-            let c = cx.chars(a);
-            (a, count_u32(c.minimum_blockers()), u32::try_from(c.maximum_blockers()).unwrap_or(u32::MAX))
-        })
+        .map(|&a| (a, count_u32(cx.chars(a).minimum_blockers()), u32::try_from(maximum_blockers(cx, a, rule_sources)).unwrap_or(u32::MAX)))
         .collect();
     let mut required = crate::static_rules::block_requirements(cx, allowed);
     // One requirement for each effect (CR 509.1c counts requirements): two "blocks this turn if able" on a creature are two.

@@ -28,7 +28,8 @@ Bot1.Hand.Pym Particles.Cast(Bot2.Battlefield.Ornithopter)
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Library.Count = 11
-? Bot2.Battlefield.Ornithopter.Keywords = CantBeBlocked; Flying; Vigilance
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Vigilance
+? Bot2.Battlefield.Ornithopter.CantBeBlocked = true
 
 [Expect]
 Bot1.Graveyard = Pym Particles

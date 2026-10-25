@@ -11,7 +11,7 @@ fn another_artifact(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// The creature can't be blocked this turn (CR 509.1b, 611.2).
 fn cant_be_blocked(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        effects::gain_until_end_of_turn(g, item.object, creature, Keyword::CantBeBlocked);
+        g.add_effect(item.object, creature, EffectKind::CantBeBlocked, Duration::EndOfTurn);
     }
     Ok(())
 }

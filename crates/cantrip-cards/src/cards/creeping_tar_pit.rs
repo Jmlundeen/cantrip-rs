@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, lands, mana};
+use cantrip_mechanics::{lands, mana};
 use cantrip_oracle as oracle;
 
 /// "Until end of turn, this land becomes a 3/2 blue and black Elemental creature. It's still a land. It can't be
@@ -9,7 +9,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     lands::becomes_creature_until_end_of_turn(g, item, (3, 2), colors, Subtype::Elemental, Keywords::NONE);
     // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
     g.end_sentence();
-    effects::gain_until_end_of_turn(g, item.object, item.object, Keyword::CantBeBlocked);
+    g.add_effect(item.object, item.object, EffectKind::CantBeBlocked, Duration::EndOfTurn);
     Ok(())
 }
 

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, targets};
+use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::{THIS_ENTERS, ward};
 use cantrip_oracle as oracle;
 
@@ -22,7 +22,7 @@ fn another_artifact_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Op
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if targets::permanent(g, item.object) {
         g.add_counters(item.object, CounterKind::PlusOne, 1);
-        effects::gain_until_end_of_turn(g, item.object, item.object, Keyword::CantBeBlocked);
+        g.add_effect(item.object, item.object, EffectKind::CantBeBlocked, Duration::EndOfTurn);
     }
     Ok(())
 }

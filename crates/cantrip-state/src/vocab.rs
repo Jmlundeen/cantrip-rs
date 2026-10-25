@@ -847,7 +847,10 @@ pub enum Keyword {
     /// counts towards the total power as though its power were 2 greater. Its saddle twin is
     /// `SaddlesAsThoughPowerTwoGreater`; a Pilot that "saddles Mounts and crews Vehicles" has both.
     CrewsAsThoughPowerTwoGreater = 21,
-    /// "This creature can't be blocked" (CR 509.1b).
+    /// "This creature can't be blocked" (CR 509.1b): printed, or granted as an ability ("has" or "gains", CR 113.1a), so losing
+    /// its abilities takes it. A resolved "it can't be blocked this turn" is `EffectKind::CantBeBlocked` instead, and another
+    /// permanent's "equipped creature can't be blocked" is that permanent's `CardDef::block_rules`: neither is an ability of
+    /// the creature, so neither is here.
     CantBeBlocked = 22,
     /// "You can't spend mana to cast this spell" (CR 601.2h, 106.4): only what else pays a cost (convoke's taps,
     /// delve's exiles) can pay for it.

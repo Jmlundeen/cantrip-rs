@@ -1,0 +1,56 @@
+# Cryptic Coat's "equipped creature ... can't be blocked" is the Equipment's static ability, not an ability the creature
+# has: there is no "has" or "gains" (CR 113.1a). Turn to Frog, cast later at the equipped Llanowar Elves (cloaked by the Coat,
+# then turned face up for {G}), takes the Elves' "{T}: Add {G}" (CR 613.1f) but not the Coat's restriction (CR 509.1b): Bot2's
+# Ornithopter may not block the Frog (the refusal), a 2/1 with the Coat's +1/+0, and Bot2 takes 2.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Island
+Mox Sapphire
+Mox Emerald
+Forest
+Turn to Frog
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield..FaceDownName = Llanowar Elves
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield..Activate
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Turn to Frog.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Subtypes = Frog
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+! Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Attack(Llanowar Elves > Bot2)
+! Bot2.Block(Ornithopter > Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Cryptic Coat.AttachedTo = Llanowar Elves
+Bot1.Graveyard = Turn to Frog; Black Lotus

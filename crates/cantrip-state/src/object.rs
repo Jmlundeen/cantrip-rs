@@ -1157,6 +1157,12 @@ pub enum EffectKind {
     Goaded,
     /// "Can't block" (CR 509.1b) for as long as the effect lasts.
     CantBlock,
+    /// "It can't be blocked this turn" (CR 509.1b) for as long as the effect lasts: Escape Tunnel's, Manifold Key's, Creeping
+    /// Tar Pit's. A resolved spell or ability that says so without "has" or "gains" makes an effect on the creature, not an
+    /// ability it gains (CR 113.1a, 611.2c), so a creature that loses its abilities afterwards (CR 613.1f: Turn to Frog) still
+    /// can't be blocked. "Gains 'this creature can't be blocked'" and a printed "can't be blocked" are
+    /// `Keyword::CantBeBlocked`, which losing its abilities takes.
+    CantBeBlocked,
     /// "Blocks this turn if able" (CR 509.1c): a requirement that the creature block, any attacker it is able to, in each
     /// declaration of blockers while the effect lasts - with `Duration::EndOfTurn`, each declare blockers step of the turn
     /// (CR 509.1c's last sentence). One requirement however many creatures it could block. It is an effect, not an ability

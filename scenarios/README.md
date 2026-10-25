@@ -564,6 +564,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.MustAttack` (`Bot2`, `Bot2; Bot3`, `Gideon, Battle-Forged`), the player or permanent each
   "attacks [that player or permanent] if able" effect on a creature names (CR 508.1d), one entry per effect while it lasts -
   one "during its controller's next turn" before that turn as well - and absent otherwise
+- `BotN.Battlefield.<Name>.CantBeBlocked`, `true` while a resolved spell or ability's "it can't be blocked this turn" is on
+  a creature (CR 509.1b, 611.2c: an effect, not an ability, so it is not in `Keywords` and losing its abilities leaves it),
+  absent otherwise; a printed or granted "can't be blocked" is the `CantBeBlocked` of `Keywords`
 - `BotN.Battlefield.<Name>.AttachedTo` (`Grizzly Bears`), what an Aura or Equipment enchants or equips, or the player an
   Aura enchants (`Bot2`, CR 303.4), absent otherwise
 
