@@ -1,0 +1,95 @@
+# Way of the Mind Sculptor draws a card when you activate a loyalty ability and removed two or more loyalty counters
+# (CR 606.4, 603.4), and only for you. Bot1's Narset, Parter of Veils (-2: exactly the limit) draws on turn 3, the Jace
+# token's -1 (just under it) draws nothing, and its -3 on turn 5 draws once for the trigger and once for the ability.
+# Bot2's own Liliana of the Veil -2 on turn 4 removes two counters too, but it is not Bot1's activation, so Bot1 draws nothing.
+# Narset's looking at cards (the default takes none) changes no hand. Bot1 draws one card a turn from turn 3 (skips turn 1).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Narset, Parter of Veils
+Way of the Mind Sculptor
+Island
+Plains x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Liliana of the Veil
+Plains
+Plains
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Narset, Parter of Veils.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate(Ability: {U})
+Bot1.Battlefield.Island#2.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Way of the Mind Sculptor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 5
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Look)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 1
+? Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3
+Bot1.Battlefield.Jace Token.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 1
+[T4 Bot2.Main1]
+Bot2.Battlefield.Liliana of the Veil.Activate(Bot1; Ability: sacrifices)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Jace Token.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 1
+Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1
+Bot1.Hand.Count = 4

@@ -1,0 +1,67 @@
+# Way of the Mind Sculptor reads a "-X" loyalty cost as the X announced (CR 606.4, 107.3): Chandra, Chill of Compliance
+# at 3 loyalty activates -X with X of 1 on turn 3 (one counter removed: no card), and with X of 2 on turn 5 (exactly two
+# removed: a card). Bot1 draws one card a turn from turn 3, so the hand count shows the extra card only on turn 5 (its stun counter comes off in Bot2's turn-4 untap step).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Chandra, Chill of Compliance
+Mox Pearl
+Mox Ruby
+Way of the Mind Sculptor
+Island
+Island
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Plains x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chandra, Chill of Compliance.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island#1.Activate(Ability: {U})
+Bot1.Battlefield.Island#2.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Way of the Mind Sculptor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Bot2.Battlefield.Ornithopter; Ability: Tap target; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Counters.Stun = 1
+? Bot1.Hand.Count = 1
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Bot2.Battlefield.Ornithopter; Ability: Tap target; X: 2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.Stun = 2
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Chandra, Chill of Compliance = (absent)
