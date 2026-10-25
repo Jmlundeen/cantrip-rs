@@ -449,6 +449,20 @@ fn lone_attacker(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired
     }
 }
 
+/// "Whenever a creature you control attacks a player alone" (CR 506.5, 508.1): the only creature declared as an attacker,
+/// attacking a player rather than a planeswalker or battle, and controlled by this ability's controller. The ability is
+/// about that attacker. Jiang Yanggu, Alone and Yuriko, Blade of the Mighty print it.
+pub fn creature_you_control_attacks_a_player_alone(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attacks { attacker, defender: Target::Player(_), .. }
+            if q.state().attackers.len() == 1 && q.controller(*attacker) == q.controller(source) =>
+        {
+            Fired::about(Target::Object(*attacker))
+        }
+        _ => None,
+    }
+}
+
 fn exalted_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(creature) = item.subject {
         crate::pump(g, item.object, creature, 1, 1);
