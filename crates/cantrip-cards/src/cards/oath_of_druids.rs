@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects;
+use cantrip_mechanics::{effects, library};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("RevealUntilCreature", "reveal until you reveal a creature card?", "It goes onto the battlefield; every other card revealed goes into your graveyard", "Reveal", "Don't reveal");
@@ -28,21 +28,8 @@ fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !effects::ask_may(g, who, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
-    let mut revealed: Vec<ObjectId> = Vec::new();
-    let mut creature = None;
-    for card in g.state().zone(Zone::library(who)).iter().copied() {
-        revealed.push(card);
-        if g.chars(card).is(CardType::Creature) {
-            creature = Some(card);
-            break;
-        }
-    }
-    if revealed.is_empty() {
-        return Ok(());
-    }
-    g.reveal(who, &revealed);
-    let buried: Vec<(ObjectId, Zone)> =
-        revealed.iter().copied().filter(|&c| Some(c) != creature).map(|c| (c, Zone::graveyard(who))).collect();
+    let (creature, rest) = library::reveal_until(g, who, &|q, card| q.chars(card).is(CardType::Creature));
+    let buried: Vec<(ObjectId, Zone)> = rest.into_iter().map(|c| (c, Zone::graveyard(who))).collect();
     if !buried.is_empty() {
         g.move_together(&buried, MoveReason::Other);
     }
