@@ -31,9 +31,9 @@ Bot2.Pass
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Birds of Paradise.Tapped = true
-? Bot1.Battlefield.Birds of Paradise.Keywords = DoesNotUntap
+? Bot1.Battlefield.Birds of Paradise.Keywords = (absent)
 [T7 Bot1.Main1]
 
 [Expect]
 Bot1.Battlefield.Birds of Paradise.Tapped = true
-Bot1.Battlefield.Birds of Paradise.Keywords = DoesNotUntap
+Bot1.Battlefield.Birds of Paradise.Keywords = (absent)

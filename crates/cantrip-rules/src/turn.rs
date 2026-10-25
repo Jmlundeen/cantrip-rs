@@ -518,7 +518,8 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
 }
 
 /// CR 502.3: the active player's permanents untap, all at once. Except an exerted one, for the untap step it sits out
-/// (CR 701.43a), and one that doesn't untap during its controller's untap step (CR 502.3); and one with a stun counter
+/// (CR 701.43a), and one that doesn't untap during its controller's untap step (CR 502.3: its own `Keyword::DoesNotUntap`,
+/// or another permanent's `CardDef::untap_bans`); and one with a stun counter
 /// has a counter removed from it instead (CR 122.1d). With them, the other players' permanents that a static ability of
 /// a permanent another player controls untaps "during each other player's untap step" (`CardDef::untap_in_others_untap_steps`).
 pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
@@ -538,7 +539,11 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
             }
             continue;
         }
-        if !obj.tapped || obj.marks.exerted_by == Some(active) || cx.chars(id).has(Keyword::DoesNotUntap) {
+        if !obj.tapped
+            || obj.marks.exerted_by == Some(active)
+            || cx.chars(id).has(Keyword::DoesNotUntap)
+            || crate::static_rules::untap_banned(cx, cx.cards(), id)
+        {
             continue;
         }
         if cx.card(cx.cards().current(obj)).may_not_untap && !cx.lost_all_abilities(id) {

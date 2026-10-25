@@ -510,6 +510,13 @@ pub fn cost_banned(q: &dyn Query, cards: &'static CardTable, player: PlayerId, p
     any_static(q, cards, |d| d.cost_bans, |rule, asker| rule(q, asker, player, paid_for, payment))
 }
 
+/// Whether a static ability of a permanent on the battlefield says the permanent `id` doesn't untap during its controller's
+/// untap step (CR 502.3, `CardDef::untap_bans`: Intruder Alarm, Infinite Coursework). No ability of `id`'s, so it holds
+/// whatever abilities `id` has lost (CR 613.1f); its own "doesn't untap" is `Keyword::DoesNotUntap`.
+pub fn untap_banned(q: &dyn Query, cards: &'static CardTable, id: ObjectId) -> bool {
+    any_static(q, cards, |d| d.untap_bans, |rule, asker| rule(q, asker, id))
+}
+
 /// Whether the permanent `id` can't be sacrificed (CR 101.2, 701.21a), for any reason and by anyone: it has "this permanent
 /// can't be sacrificed" (`Keyword::CantBeSacrificed`, printed or granted, so losing its abilities ends it), a resolved effect
 /// says so (`EffectKind::CantBeSacrificed`, which it keeps whatever abilities it loses), or a static ability of a permanent on

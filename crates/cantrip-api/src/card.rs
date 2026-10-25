@@ -2366,6 +2366,14 @@ pub type CostBan = fn(&dyn Query, &Asker, PlayerId, CostFor, CostPayment) -> boo
 /// granted, is `Keyword::CantBeSacrificed`; the core reads both (`Game::can_sacrifice`).
 pub type SacrificeBan = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// A static ability that says permanents don't untap during their controllers' untap steps (CR 502.3): true for a permanent
+/// of the active player, judged as it is now, before anything untaps. It is the source's effect, no ability of the
+/// permanent - "doesn't untap" has no "has" (CR 113.1a) - so one that loses its abilities is still under it (CR 613.1f), and
+/// it is never in that permanent's keywords ("creatures with no abilities", Muraganda Petroglyphs, asks them): Intruder
+/// Alarm's "creatures don't untap during their controllers' untap steps", Infinite Coursework's "enchanted creature ...
+/// doesn't untap during its controller's untap step". A permanent's own, printed or granted, is `Keyword::DoesNotUntap`.
+pub type UntapBan = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability makes this creature assign combat damage equal to its toughness rather than its power
 /// (CR 510.1a): given the rule's own asker.
 pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
@@ -2851,6 +2859,9 @@ pub struct CardDef {
     /// Its static abilities that say permanents can't be sacrificed (CR 101.2, 701.21a), while it is on the battlefield with
     /// its abilities: Assault Suit's "equipped creature ... can't be sacrificed". See `SacrificeBan`.
     pub sacrifice_bans: &'static [SacrificeBan],
+    /// Its static abilities that say permanents don't untap during their controllers' untap steps (CR 502.3), while it is on
+    /// the battlefield with its abilities. See `UntapBan`.
+    pub untap_bans: &'static [UntapBan],
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
     /// Assault Formation, Doran, the Siege Tower.
     pub damage_by_toughness: &'static [DamageByToughnessRule],
@@ -3042,6 +3053,7 @@ impl CardDef {
         player_counter_bans: &[],
         cost_bans: &[],
         sacrifice_bans: &[],
+        untap_bans: &[],
         damage_by_toughness: &[],
         damage_by_absolute_power: &[],
         damage_stays: &[],
@@ -3131,6 +3143,7 @@ impl CardDef {
             (!self.player_counter_bans.is_empty(), "player counter bans"),
             (!self.cost_bans.is_empty(), "cost bans"),
             (!self.sacrifice_bans.is_empty(), "sacrifice bans"),
+            (!self.untap_bans.is_empty(), "untap bans"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),
             (!self.damage_by_absolute_power.is_empty(), "damage by absolute power"),
             (!self.damage_stays.is_empty(), "a damage-stays rule"),

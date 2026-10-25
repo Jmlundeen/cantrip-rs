@@ -44,4 +44,4 @@ Bot2.Pass
 
 [Expect]
 Bot2.Battlefield.Birds of Paradise.Tapped = true
-Bot2.Battlefield.Birds of Paradise.Keywords = DoesNotUntap
+Bot2.Battlefield.Birds of Paradise.Keywords = (absent)

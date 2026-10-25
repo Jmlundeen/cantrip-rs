@@ -316,7 +316,10 @@ only the candidates the host's verdict on those picked says may be added.
   of the state-based actions, and before the effect begins: one false then does nothing, CR 611.2b - Old Man of the Sea's
   "for as long as this creature remains tapped and that creature's power remains less than or equal to this creature's
   power"). "You may choose not to untap this ... during your untap step" is `CardDef::may_not_untap`: the untap step asks
-  the active player of each such tapped permanent before anything untaps (CR 502.3).
+  the active player of each such tapped permanent before anything untaps (CR 502.3). "Doesn't untap during its controller's
+  untap step" is the permanent's own `Keyword::DoesNotUntap` (Mana Vault, Bombur), or another permanent's
+  `CardDef::untap_bans` (Intruder Alarm, Infinite Coursework): a rule of that source, no ability of the permanent (CR 113.1a),
+  so losing its abilities leaves it and no keyword of the permanent says it ("creatures with no abilities", CR 613.1f).
 - **Text-changing effects (612, layer 3)** are `EffectKind::ChangeText { from, to }`, a `Word` (a color word or a
   subtype) replaced by another. The layers change the type line; card code reads every word of its rules text through
   `Query::words` (`Words`, the changes in timestamp order unless one depends on another), so the card does what its changed text says. A token's
