@@ -751,6 +751,25 @@ pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
     damage_each_creature_dealt(g, item, n);
 }
 
+/// "[This spell] deals `n` damage to each non-[subtype] creature" (CR 608.2c, 120.2): one damage event for every creature on
+/// the battlefield without `subtype` as the effect is carried out, all dealt together. The caller reads the subtype through
+/// the words of the object whose text names it (`g.words(item.object).subtype(..)`, CR 612). Desolation of Smaug (non-Dragon)
+/// and Chandra, Awakened Inferno (non-Elemental) print it.
+pub fn damage_each_creature_not_of_subtype(g: &mut dyn Game, item: &StackItem, subtype: Subtype, n: u16) {
+    let hits: Vec<(ObjectId, Target, u16)> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| {
+            let chars = g.chars(id);
+            chars.is(CardType::Creature) && !chars.has_subtype(subtype)
+        })
+        .map(|id| (item.object, Target::Object(id), n))
+        .collect();
+    g.damage_together(&hits);
+}
+
 /// "[This spell] deals `n` damage to each creature and each planeswalker" (Brotherhood's End, Storm's Wrath, Burn Down the
 /// House, Temporal Firestorm, Dragonback Assault, Invasion of Karsus, Star of Extinction, Underworld Fires, Calamitous
 /// Cave-In): one damage event for every creature and planeswalker on the battlefield as the effect is carried out (CR 608.2c),

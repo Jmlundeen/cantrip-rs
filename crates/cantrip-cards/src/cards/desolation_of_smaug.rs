@@ -8,18 +8,7 @@ use cantrip_oracle as oracle;
 /// no Dragon spell). "Dragon" is a word of the spell's text, read through its words both times (CR 612).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let dragon = g.words(item.object).subtype(Subtype::Dragon);
-    let hits: Vec<(ObjectId, Target, u16)> = g
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| {
-            let chars = g.chars(id);
-            chars.is(CardType::Creature) && !chars.has_subtype(dragon)
-        })
-        .map(|id| (item.object, Target::Object(id), 3))
-        .collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_creature_not_of_subtype(g, item, dragon, 3);
     for color in cantrip_mechanics::choose_colors(g, item.controller, item.object, ColorSet(0b11111), 4)? {
         g.add_restricted_mana(item.controller, color.mana(), 1, ManaRestriction::Subtypes(SubtypeSpells::of(dragon)));
     }

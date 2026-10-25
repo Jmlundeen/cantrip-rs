@@ -139,9 +139,10 @@ pub const OPPONENTS_CREATURES_EXILED_INSTEAD_OF_DYING: ReplacementDef = replacem
     "exiles a creature an opponent controls instead of letting it die",
 );
 
-fn exile_instead_of_dying_applies(_: &dyn Query, _: &Asker, affected: ObjectId, proposal: &Proposal) -> bool {
+fn exile_instead_of_dying_applies(q: &dyn Query, _: &Asker, affected: ObjectId, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z)
-        if z.object == affected && z.from.is(ZoneKind::Battlefield) && z.to.is(ZoneKind::Graveyard))
+        if z.object == affected && z.from.is(ZoneKind::Battlefield) && z.to.is(ZoneKind::Graveyard)
+            && { let c = q.chars(affected); c.is(CardType::Creature) || c.is(CardType::Planeswalker) })
 }
 
 /// `exile_instead_apply` as the `apply` of a `granted_replacement`, which is also told the object it is about. Suplex, Mawloc
@@ -151,8 +152,9 @@ pub fn exile_instead_apply_granted(q: &dyn Query, asker: &Asker, _: ObjectId, pr
 }
 
 /// "If that creature would die this turn, exile it instead" (CR 614.1a, 700.4, 611.2c): a replacement effect the spell or
-/// ability makes about one object for the turn, not an ability the creature gains. Only a move from the battlefield to a
-/// graveyard is replaced, so a creature returned to its hand goes there. List it among a card's `granted_replacements`
+/// ability makes about one object for the turn, not an ability the creature gains. Only a creature or planeswalker moving
+/// from the battlefield to a graveyard "dies" (CR 700.4), so one returned to its hand goes there, and one that has stopped
+/// being a creature or planeswalker (Lion Sash made an Equipment) is put into the graveyard as an ordinary permanent. List it among a card's `granted_replacements`
 /// and make the effect with `exile_if_it_would_die` before anything can kill the creature. Suplex and Mawloc print it.
 pub const EXILE_INSTEAD_OF_DYING: GrantedReplacementDef =
     granted_replacement(ReplacementKind::ZoneChange, exile_instead_of_dying_applies, exile_instead_apply_granted, "exiled instead of dying");
