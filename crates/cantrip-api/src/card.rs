@@ -1230,7 +1230,6 @@ pub struct SuspendDef {
     pub cost: ManaCost,
 }
 
-/// Whether two texts are the same, as the compiler can ask it.
 /// Whether two optional counter kinds are the same, in a const context.
 const fn same_kind(a: Option<CounterKind>, b: Option<CounterKind>) -> bool {
     match (a, b) {
@@ -1240,6 +1239,7 @@ const fn same_kind(a: Option<CounterKind>, b: Option<CounterKind>) -> bool {
     }
 }
 
+/// Whether two texts are the same, as the compiler can ask it.
 pub(crate) const fn same_str(a: &str, b: &str) -> bool {
     let (a, b) = (a.as_bytes(), b.as_bytes());
     if a.len() != b.len() {
