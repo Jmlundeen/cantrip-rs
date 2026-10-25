@@ -1,0 +1,66 @@
+# Narset, Parter of Veils (five loyalty) is in play when Way of the Wildspeaker arrives on turn 3 and gains "[-4]: Create a 4/4 green
+# Beast creature token with trample": she activates it with 5 loyalty (4 is spent, leaving 1, CR 606.4) and the Jace token Way empowers
+# to 7 uses its own copy the same turn (one loyalty ability per planeswalker, CR 606.3), leaving 3. Two Beasts, 4/4 green, trample.
+# Then the Jace token, at exactly 3 loyalty, is refused its own "-3: Draw a card": it has already activated a loyalty ability this turn.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Narset, Parter of Veils
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Way of the Wildspeaker
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Narset, Parter of Veils.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Wildspeaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Beast)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 1
+Bot1.Battlefield.Jace Token.Activate(Ability: Beast)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Jace Token.Activate(Ability: Draw)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 1
+Bot1.Battlefield.Jace Token.Counters.Loyalty = 3
+Bot1.Battlefield.Beast Token#1.Token = true
+Bot1.Battlefield.Beast Token#1.Power = 4
+Bot1.Battlefield.Beast Token#1.Toughness = 4
+Bot1.Battlefield.Beast Token#1.Colors = Green
+Bot1.Battlefield.Beast Token#1.Keywords = Trample
+Bot1.Battlefield.Beast Token#2.Token = true

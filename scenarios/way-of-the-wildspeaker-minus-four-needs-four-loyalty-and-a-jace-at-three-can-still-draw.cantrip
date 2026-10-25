@@ -1,0 +1,48 @@
+# The granted "[-4]" costs four loyalty (CR 606.4, 606.6): the Jace token Way empowers to 7 makes a Beast on turn 1 (loyalty 3), and on
+# turn 3, with 3 loyalty, the Beast ability is refused (the Jace token has it) while its own "-3: Draw a card" is allowed at exactly 3,
+# putting it to 0 loyalty, where it dies as a state-based action (CR 704.5i). One Beast remains.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Way of the Wildspeaker
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Way of the Wildspeaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace Token.Activate(Ability: Beast)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Jace Token.Counters.Loyalty = 3
+! Bot1.Battlefield.Jace Token.Activate(Ability: Beast)
+Bot1.Battlefield.Jace Token.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Token = (absent)
+Bot1.Battlefield.Beast Token.Token = true
+Bot1.Hand.Count = 3
