@@ -1,0 +1,47 @@
+# Entering with counters also counts as putting them (CR 122.6). Each replacement applies once (CR 614.5).
+# Ordering the +1 and doubling effects changes two counters to 6 (CR 616.1).
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Doubling Season
+Yoshimaru, Beloved Companion
+Walking Ballista
+Black Lotus
+Forest x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Yoshimaru, Beloved Companion.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Replace(Yoshimaru, Beloved Companion)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 6
+Bot1.Battlefield.Walking Ballista.Power = 6
