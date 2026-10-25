@@ -791,6 +791,18 @@ pub trait Game: Query {
         let kind = EffectKind::SpellCostChange { card: item.ability.card, index, player };
         self.add_player_effect(item.controller, item.object, kind, Duration::EndOfTurn);
     }
+    /// "You may play [`count`] additional land[s] this turn" (CR 305.2, 611.2c), made by the resolving spell or ability
+    /// `item`: a permission for its controller (CR 109.5), asked nothing as it resolves, that adds `count` to the lands they
+    /// can play until the turn ends (CR 514.2), whatever happens to the source, and adds to every other effect and static
+    /// ability that does the same. Lands already played this turn count against the new total (CR 305.2a), and it lets
+    /// nothing be played on another player's turn (CR 305.3). Nothing for a count of zero. Explore, Urban Evolution, Scale
+    /// the Heights, Kiora, the Crashing Wave's −1, Way of the Paradox, Sword of Forge and Frontier; Journey of Discovery's
+    /// "up to two" is 2 and Nahiri's Lithoforming's "X additional lands" X.
+    fn additional_land_plays(&mut self, item: &StackItem, count: u32) {
+        if count > 0 {
+            self.add_player_effect(item.controller, item.object, EffectKind::ExtraLandPlays(count), Duration::EndOfTurn);
+        }
+    }
     /// A permanent with a prepare spell becomes prepared (CR 722.3a/c): a copy of the spell is put in exile, which its
     /// controller may cast while it stays prepared. Nothing if it already is, or is not on the battlefield.
     fn become_prepared(&mut self, permanent: ObjectId);

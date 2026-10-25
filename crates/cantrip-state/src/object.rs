@@ -1215,6 +1215,15 @@ pub enum EffectKind {
     /// The effect's controller has no maximum hand size (CR 402.2) for as long as it lasts: Spirit Water Revival's "for the rest
     /// of the game" (`Duration::Indefinite`). About the player, so it outlives its `affected` object, which is only the source.
     NoMaximumHandSize,
+    /// "You may play [N] additional land[s] this turn" (CR 305.2, 611.2c): the effect's controller may play N more lands than
+    /// they otherwise could for as long as it lasts (`Duration::EndOfTurn`). Added to every other such effect and to the
+    /// static abilities that do the same (`PlayRule::ExtraLandPlays`): the number of lands a player can play is the sum
+    /// (CR 305.2), compared with the lands they have already played this turn, however they were played (CR 305.2a/b), so
+    /// a land play made before the effect began still leaves the new one. It counts only lands played, never lands put onto
+    /// the battlefield (CR 305.4). Explore, Urban Evolution, Scale the Heights, Kiora, the Crashing Wave's −1, Way of the
+    /// Paradox; "up to two" (Journey of Discovery) is 2, "X additional lands" (Nahiri's Lithoforming) is X, so the count is
+    /// 32-bit. About the player, so it outlives its `affected` object, which is only the source.
+    ExtraLandPlays(u32),
     /// The player can't gain life (CR 119.7): Screaming Nemesis's "for the rest of the game" (`Duration::Indefinite`). It is
     /// about the player and outlives its `affected` object, which is only the source.
     CantGainLife(PlayerId),
@@ -1328,6 +1337,7 @@ impl EffectKind {
                 | EffectKind::CastAsThoughFlash(_)
                 | EffectKind::InstantLoyalty(_)
                 | EffectKind::NoMaximumHandSize
+                | EffectKind::ExtraLandPlays(_)
                 | EffectKind::CantGainLife(_)
                 | EffectKind::LifeTotalCantChange(_)
                 | EffectKind::CantCastSpellsFrom(..)

@@ -5095,10 +5095,11 @@ fn play_rule_at(cards: &CardTable, ability: AbilityRef) -> Option<&'static PlayR
     find(cards.get(ability.card).play_rules, &mut 0, ability.as_play_rule()?)
 }
 
-/// What `player`'s permanents let them do about land plays (CR 305.2) and the top of their library (CR 305.1, 601.3).
+/// What `player`'s permanents and the effects in force let them do about land plays (CR 305.2) and the top of their
+/// library (CR 305.1, 601.3).
 #[derive(Clone, Default)]
 struct LandRules {
-    /// The land plays beyond the one.
+    /// The land plays beyond the one: the static abilities' and the effects' together (CR 305.2).
     extra: u32,
     /// No limit to the land plays.
     unlimited: bool,
@@ -5123,6 +5124,15 @@ fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
         }
         PlayRule::LibraryTopSpells(_) | PlayRule::NoMaximumHandSize | PlayRule::LookAtLibraryTop | PlayRule::While(..) => {}
     });
+    // "You may play an additional land this turn" (CR 305.2, 611.2c): an effect a resolved spell or ability made, added to
+    // the rest - the number a player can play is the sum of everything that increases it.
+    for e in &cx.s().effects {
+        if let EffectKind::ExtraLandPlays(n) = e.kind
+            && e.controller == player
+        {
+            rules.extra += n;
+        }
+    }
     rules
 }
 
