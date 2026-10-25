@@ -202,6 +202,17 @@ pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
         .map_or(0, |creature| q.chars(creature).power.unwrap_or(0) as i32)
 }
 
+/// "Each creature that convoked it" (CR 702.51c, 109.2): the creatures that convoked `object` (a spell, or the permanent it
+/// became) that are creatures on the battlefield now. A convoker that has since left the battlefield is a new object
+/// wherever it went (CR 400.7), and one that is no longer a creature is not a creature that convoked it (CR 109.2: March of
+/// the Machines ended), so nothing happens to either. Venerated Loxodon and Zephyr Singer print it.
+pub fn convoking_creatures_on_the_battlefield(q: &dyn Query, object: ObjectId) -> Vec<ObjectId> {
+    q.history()
+        .convoked(object)
+        .filter(|&creature| is_live(q, creature) && q.obj(creature).zone.is(ZoneKind::Battlefield) && q.chars(creature).is(CardType::Creature))
+        .collect()
+}
+
 /// "Your first, second, or third turn of the game" (CR 500, 102.1): it is `player`'s own turn and they have begun at most `n`
 /// turns, an extra turn counting as one. Starting Town's enters-tapped clause and Jace Reawakened's casting restriction print it
 /// (with `n` = 3).
