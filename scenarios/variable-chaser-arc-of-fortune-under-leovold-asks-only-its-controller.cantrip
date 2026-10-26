@@ -1,0 +1,47 @@
+# Leovold stops only its controller's opponents from drawing more than one card, so Arc of Fortune offers its caster the wheel and never asks the opponent (CR 121.2b).
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Black Lotus x2
+Leovold, Emissary of Trest
+Variable Chaser
+Plains x15
+
+[Bot2 Deck]
+Island x7
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Leovold, Emissary of Trest.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: U)
+Bot1.Hand.Variable Chaser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Exile.Arc of Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+! Bot2.Accept
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Plains; Plains
+Bot2.Hand = Island; Island; Island; Island; Island; Island; Island
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

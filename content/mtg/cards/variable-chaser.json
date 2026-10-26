@@ -1,0 +1,17 @@
+{
+  "name": "Variable Chaser",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Human Wizard",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flying, prowess\nThis creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "keywords": [
+    "Flying"
+  ],
+  "prepare": {
+    "name": "Arc of Fortune",
+    "manaCost": "{2}{U}",
+    "type": "Sorcery",
+    "oracleText": "Each player may discard their hand and draw seven cards."
+  }
+}
