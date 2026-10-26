@@ -1087,18 +1087,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             },
         }),
         RequestKind::ChooseName { source, looked_at, suggestion, kind } => {
-            let mut names: Vec<String> = game
-                .cards
-                .cards
-                .iter()
-                .zip(&game.cards.card_named)
-                // Only a card's name is listed: a token's or an emblem's is not one unless a card has it too (CR 201.4).
-                .filter(|&(_, &named)| named)
-                .map(|(c, _)| c)
-                // A split card has two names and a player names one of them (CR 709.4a): its halves are listed, not the whole.
-                .filter(|c| c.split.is_none() && kind.allows(c.types, c.supertypes))
-                .map(|c| c.name.to_string())
-                .collect();
+            // Only a card's name is listed: a token's or an emblem's is not one unless a card has it too (CR 201.4), and a split
+            // card has two names and a player names one of them (CR 709.4a): its halves are listed, not the whole.
+            let mut names: Vec<String> = nameable(game.cards, *kind).map(|c| game.cards.get(c).name.to_string()).collect();
             names.sort();
             names.dedup();
             let owner = looked_at.first().map_or(0, |c| seat(game.state.obj(*c).owner));
@@ -1107,7 +1098,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 source: source_handle(game, handles, *source),
                 owner,
                 hand: handles_of(handles, looked_at),
-                suggestion: suggestion.map_or_else(|| names.first().cloned().unwrap_or_default(), |c| game.cards.get(c).name.to_string()),
+                suggestion: default_name(game.cards, *kind, *suggestion).map_or_else(String::new, |c| game.cards.get(c).name.to_string()),
                 names,
                 kind: kind.words(),
             })

@@ -2,7 +2,7 @@
 //! than a basic land card name" (Necromentia, Booby Trap, Desperate Research, Null Chamber) refuses a basic land's name,
 //! snow or not, and allows any other land's or nonland card's.
 
-use crate::name_problem;
+use crate::{Game, Setup, check_answer, default_name, name_problem};
 use cantrip_api::*;
 
 static ISLAND: CardDef = CardDef {
@@ -95,4 +95,34 @@ fn the_words_are_the_cards() {
     assert_eq!(NameKind { types: TypeSet::of(&[CardType::Artifact]), ..NameKind::ANY }.words(), "an artifact card name");
     assert_eq!(NameKind { non_types: TypeSet::of(&[CardType::Creature, CardType::Land]), ..NameKind::ANY }.words(), "a noncreature, nonland card name");
     assert_eq!(NameKind { other_than_basic_land: true, ..NameKind::LAND }.words(), "a nonbasic land card name");
+}
+
+/// A card name must be chosen (CR 201.3): no name is no answer to a name question, whatever it asks for, and a name it
+/// allows is one.
+#[test]
+fn naming_nothing_is_refused() {
+    let table = table();
+    let game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    for kind in [NameKind::ANY, NameKind::NONLAND, NameKind::LAND, NameKind::OTHER_THAN_BASIC_LAND] {
+        let ask = RequestKind::ChooseName { source: ObjectId(0), looked_at: Vec::new(), suggestion: None, kind };
+        let request = Request { id: 1, player: PlayerId(0), kind: ask, may_cancel: false };
+        assert!(check_answer(&game, &request, &Answer::Name(None)).is_err(), "{} was answered with no name", kind.words());
+        let named = default_name(table, kind, None).expect("some test card's name is allowed");
+        assert!(check_answer(&game, &request, &Answer::Name(Some(named))).is_ok(), "{} refused its default name", kind.words());
+    }
+}
+
+/// The name a player with none in mind takes is the suggestion when there is one, and otherwise the first name the question
+/// allows, alphabetically - never a name it refuses.
+#[test]
+fn the_default_name_is_the_suggestion_or_the_first_allowed() {
+    let table = table();
+    assert_eq!(default_name(table, NameKind::ANY, Some(table.id_of(&CREATURE))), Some(table.id_of(&CREATURE)));
+    assert_eq!(default_name(table, NameKind::ANY, None), Some(table.id_of(&CREATURE)), "Grizzly Bears is first of all");
+    assert_eq!(default_name(table, NameKind::LAND, None), Some(table.id_of(&NONBASIC_LAND)), "Hallowed Fountain is the first land");
+    assert_eq!(default_name(table, NameKind::NONLAND, None), Some(table.id_of(&CREATURE)));
+    let artifact = NameKind { types: TypeSet::of(&[CardType::Artifact]), ..NameKind::ANY };
+    assert_eq!(default_name(table, artifact, None), Some(table.id_of(&ARTIFACT_CREATURE)));
+    let planeswalker = NameKind { types: TypeSet::of(&[CardType::Planeswalker]), ..NameKind::ANY };
+    assert_eq!(default_name(table, planeswalker, None), None, "no test card is a planeswalker");
 }

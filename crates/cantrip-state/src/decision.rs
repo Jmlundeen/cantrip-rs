@@ -419,7 +419,9 @@ pub enum RequestKind {
     ChooseColors { source: ObjectId, choices: ColorSet, count: u8, purpose: ColorUse },
     /// A card name (CR 201.3, 614.12a): any card the game knows. `looked_at` are the cards the player has just been
     /// shown, and `suggestion` the name an unscripted player takes (the costliest nonland card among them).
-    /// `kind` is what the name must be the name of (CR 201.4a): any card, a nonland card or a land card.
+    /// `kind` is what the name must be the name of (CR 201.4a): any card, a nonland card or a land card. A name must be
+    /// chosen (CR 201.3): `Answer::Name(None)` is refused, and with no suggestion an unscripted player takes the first name
+    /// `kind` allows (`cantrip_rules::default_name`).
     ChooseName { source: ObjectId, looked_at: Vec<ObjectId>, suggestion: Option<CardId>, kind: NameKind },
     /// One subtype of `choices`, in order ("choose a creature type", CR 205.3m: the C# engine asks it as a modes
     /// question over every creature type, more than a mode index holds).

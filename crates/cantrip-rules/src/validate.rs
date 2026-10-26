@@ -100,6 +100,19 @@ pub fn name_problem(cards: &CardTable, kind: NameKind, card: CardId) -> Option<S
     None
 }
 
+/// Every card whose name a question asking for a `kind` of card name allows (`name_problem` of none), in the card table's
+/// order. A name may repeat: two cards of the table can share it.
+pub fn nameable(cards: &CardTable, kind: NameKind) -> impl Iterator<Item = CardId> + '_ {
+    (0..cards.cards.len()).map(|i| CardId(i as u16)).filter(move |&c| name_problem(cards, kind, c).is_none())
+}
+
+/// The name a player with none of their own in mind takes for a question asking for a `kind` of card name: its
+/// `suggestion`, or else the first name `kind` allows, alphabetically. A name must be chosen (CR 201.3), so this is what an
+/// unscripted player, a bot or a host with nothing to suggest answers. `None` only if no card's name is of `kind`.
+pub fn default_name(cards: &CardTable, kind: NameKind, suggestion: Option<CardId>) -> Option<CardId> {
+    suggestion.or_else(|| nameable(cards, kind).min_by(|&a, &b| cards.get(a).name.cmp(cards.get(b).name)))
+}
+
 /// Why a selection of `n` cards a rule refuses is refused, in its words: the count it takes, and what its parts ask.
 fn refusal(game: &Game, rule: &Selection, n: usize) -> String {
     let wanted = match rule.count {
@@ -385,7 +398,9 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         (RequestKind::ChooseReplacement { sources, .. }, Answer::Index(i)) => {
             if (*i as usize) < sources.len() { Ok(()) } else { no("not one of the replacement effects offered") }
         }
-        (RequestKind::ChooseName { kind, .. }, Answer::Name(name)) => match name.and_then(|card| name_problem(game.cards, *kind, card)) {
+        // A card name must be chosen (CR 201.3): no printed card lets its player name nothing.
+        (RequestKind::ChooseName { .. }, Answer::Name(None)) => no("a card name must be chosen"),
+        (RequestKind::ChooseName { kind, .. }, Answer::Name(Some(card))) => match name_problem(game.cards, *kind, *card) {
             Some(problem) => no(problem),
             None => Ok(()),
         },

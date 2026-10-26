@@ -220,9 +220,11 @@ pub fn translate(
         }
         AnswerPayload::ReplacementChosenAnswer(a) => Answer::Index(a.index.clamp(0, 255) as u8),
         AnswerPayload::TriggersOrderedAnswer(a) => Answer::Order(a.order.iter().map(|&m| u32::try_from(m).unwrap_or(u32::MAX)).collect()),
-        // An empty name is no name (`Answer::Name(None)`, what an unscripted player with nothing to suggest answers),
-        // as the answer is written back the other way: never the lookup of "", which a nameless token matches.
-        AnswerPayload::CardNamedAnswer(a) if a.name.is_empty() => Answer::Name(None),
+        // An empty name is no name, which no name question allows (CR 201.3): never the lookup of "", which a nameless
+        // token matches.
+        AnswerPayload::CardNamedAnswer(a) if a.name.is_empty() => {
+            return Err(Untranslatable::Illegal("a card name must be chosen".into()));
+        }
         AnswerPayload::CardNamedAnswer(a) => {
             Answer::Name(Some(card(&a.name).ok_or_else(|| Untranslatable::Illegal(format!("no card is named \"{}\"", a.name)))?))
         }

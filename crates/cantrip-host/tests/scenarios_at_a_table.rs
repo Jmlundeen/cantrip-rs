@@ -788,12 +788,12 @@ fn the_host_judges_a_declaration_of_attackers_under_goad() {
     panic!("the declaration never came");
 }
 
-/// A name question answered with no name (CR 201.3; `Answer::Name(None)`, which the host writes as an empty name) reads
-/// back as no name, not as the lookup of the name "" - which a nameless token's card matched, a name the core then refused
-/// as no card's (game 57 of the Phase 2 gate duel).
+/// A name question answered with an empty name is refused (CR 201.3: a card name must be chosen), and never read as the
+/// lookup of the name "" - which a nameless token's card matched, a name the core then refused as no card's (game 57 of
+/// the Phase 2 gate duel).
 #[test]
-fn an_empty_card_name_reads_back_as_no_name() {
-    use cantrip_engine::{Answer, NameKind, ObjectId, PlayerId, Request, RequestKind};
+fn an_empty_card_name_is_refused() {
+    use cantrip_engine::{NameKind, ObjectId, PlayerId, Request, RequestKind};
     let name = "demonic-consultation-names-a-card-and-exiles-everything-above-it";
     let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
     let mut scripted = cantrip_script::Scripted::deal(GameScript::parse(&text, name).unwrap()).map_err(|f| f.report).unwrap();
@@ -805,5 +805,5 @@ fn an_empty_card_name_reads_back_as_no_name() {
     let read = read.map_err(|e| match e {
         cantrip_host::answer::Untranslatable::Illegal(d) | cantrip_host::answer::Untranslatable::UnknownHandle(d) => d,
     });
-    assert!(matches!(read, Ok(Answer::Name(None))), "an empty name reads back as {read:?}");
+    assert_eq!(read, Err("a card name must be chosen".to_string()), "an empty name was read");
 }

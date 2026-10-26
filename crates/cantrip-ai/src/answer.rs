@@ -255,7 +255,11 @@ impl Answering {
             (_, F::Yes) => Answer::Yes,
             (_, F::No) => Answer::No,
             (_, F::Player(p)) => Answer::Player(PlayerId(*p)),
-            (_, F::Name(None)) => Answer::Name(None),
+            // No name of the network's own is the question's default (CR 201.3: a name must be chosen): its suggestion, or
+            // the first name it allows.
+            (RequestKind::ChooseName { suggestion, kind, .. }, F::Name(None)) => Answer::Name(Some(
+                default_name(game.cards, *kind, *suggestion).ok_or("no card's name is of the kind asked for")?,
+            )),
             (_, F::Name(Some(n))) => Answer::Name(Some(
                 game.cards
                     .find(n)

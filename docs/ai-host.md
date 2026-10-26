@@ -133,10 +133,11 @@ same handle spaces. A view mints handles, so `View` is mirrored too.
     source is filtered keeps only `DeclineCost`, so an unpayable ward is declined rather than paid and cancelled again.
   - The board after the undo matches the board before the action, so the same action is not offered again; a new
     board offers it again. Nothing is capped per turn and no card is named in the AI.
-- **Naming no card.** A `ChooseName` question may be answered with no name (`Answer::Name(None)`), which the wire
-  carries as `{"Name": ""}`. The native host reads an empty name back as no name
-  (`crates/cantrip-host/src/answer.rs`). Before that fix it looked up the name "", matched a nameless token's card,
-  and the core refused the answer.
+- **Naming a card.** A `ChooseName` question must be answered with a card name (CR 201.3): the core refuses
+  `Answer::Name(None)`, and the native host refuses an empty name (`{"Name": ""}`, `crates/cantrip-host/src/answer.rs`)
+  rather than looking up the name "", which a nameless token's card matched. The network's "no name" token
+  (`Tok::NoName`) is the question's default name (`cantrip_rules::default_name`): its suggestion, or the first name it
+  allows, alphabetically.
 
 ## In BotLab
 
@@ -225,5 +226,5 @@ cantrip-selfplay --model DIR --out DIR [--games N] [--hours H] [--simulations N]
 `crates/cantrip-ai/tests/search.rs` checks the search itself (docs/ai-player-plan.md, Phase 3).
 
 `crates/cantrip-ai/tests/pay.rs` checks the matching: a Plateau and a Mountain pay {R}{W}.
-`crates/cantrip-host/tests/scenarios_at_a_table.rs` (`an_empty_card_name_reads_back_as_no_name`) checks that an empty
-card name reads back as no name.
+`crates/cantrip-host/tests/scenarios_at_a_table.rs` (`an_empty_card_name_is_refused`) checks that an empty card name is
+refused.

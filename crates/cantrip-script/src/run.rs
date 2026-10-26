@@ -1142,7 +1142,8 @@ impl<'s> Run<'s> {
             RequestKind::Mulligan { .. } => Answer::No,
             RequestKind::OrderTriggers { sources, .. } => Answer::Order((0..count_u32(sources.len())).collect()),
             RequestKind::ChooseReplacement { .. } => Answer::Index(0),
-            RequestKind::ChooseName { suggestion, .. } => Answer::Name(*suggestion),
+            // A name must be chosen (CR 201.3): the suggestion, or the first name the question allows.
+            RequestKind::ChooseName { suggestion, kind, .. } => Answer::Name(default_name(self.game.cards, *kind, *suggestion)),
             RequestKind::ChooseSubtype { choices, .. } => Answer::Subtype(choices[0]),
             RequestKind::DistributeCards { cards, destinations, .. } => {
                 Answer::Placements { placements: greedy_distribution(cards, destinations), shuffle: false }
