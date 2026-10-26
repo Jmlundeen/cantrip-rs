@@ -1,0 +1,45 @@
+# The Saga's first chapter fights the pre-existing Llanowar Elves; both die. Chapter II gains exactly 3 life, then
+# chapter III returns Bot1's Elf from Bot1's graveyard while the Saga is sacrificed (CR 701.14, 714.2b, 714.4).
+
+[Bot1 Deck]
+Forest x3
+Llanowar Elves
+Amok Time
+Forest x12
+
+[Bot2 Deck]
+Forest x2
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot1.Hand.Forest.Play
+Bot1.Hand.Amok Time.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+! Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T7 Bot1.Main1]
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Hand.Llanowar Elves.Power = 1
+Bot2.Graveyard.Llanowar Elves.Power = 1
+Bot1.Graveyard.Amok Time.Colors = Green
+Bot1.Battlefield.Amok Time = (absent)
+Stack.Count = 0
+
+
+

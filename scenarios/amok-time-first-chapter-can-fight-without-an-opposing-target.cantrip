@@ -1,0 +1,35 @@
+# The first chapter still resolves with only its required target chosen: the opposing target is optional (CR 714.2b).
+# This proves the chapter can choose zero of the maximum one opposing creatures.
+
+[Bot1 Deck]
+Forest x3
+Llanowar Elves
+Amok Time
+Forest x12
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Forest.Play
+Bot1.Hand.Amok Time.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+? Stack.Count = 1
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot2.Life = 20
+Bot1.Life = 20
+Bot1.Battlefield.Amok Time.Counters.Lore = 1
+
+
+
