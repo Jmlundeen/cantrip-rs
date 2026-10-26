@@ -188,7 +188,9 @@ and the option it chose, decomposed into the policy's steps. A game still unfini
 dropped and counted. Recording is done by worker threads off the request path, and changes no reply
 (`crates/cantrip-host/tests/ai_record.rs`); once stdin closes the host finishes the queue, closes its shards, and writes
 `DIR/report-<pid>-<ms>.json` (games, samples, bytes, shards, unfinished games, and the answers that made no sample by
-request kind and why) before exiting. The flags:
+request kind and why) before exiting. The recorder is built only with the host's `ai-record` feature (`cargo build -p
+cantrip-host --features ai-record`, which `tools/bot-duel.sh`, and `toolsot-duel.cmd` given `--ai-record`, do), so the
+shipping host compiles neither the AI player nor zstd; a host built without it refuses the flags. The flags:
 
 | Flag | Default | |
 | --- | --- | --- |

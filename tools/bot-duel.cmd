@@ -24,6 +24,8 @@ set "ROOT=%~dp0.."
 set "COMMAND=duel"
 if /i "%~1"=="watch" set "COMMAND="
 
+rem Recording (--ai-record) needs the native host built with its recorder, which the shipping build leaves out.
+echo %* | findstr /c:"--ai-record" > nul && (cargo build --manifest-path "%ROOT%\Cargo.toml" --profile cards -p cantrip-host --bin cantrip-native-host --features ai-record || exit /b 2)
 dotnet build "%ROOT%\dotnet\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" -v q --nologo || exit /b 2
 dotnet run --project "%ROOT%\dotnet\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" --no-build -v q -- %COMMAND% %*
 

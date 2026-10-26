@@ -26,7 +26,7 @@ if [ "${1:-}" = "watch" ]; then
     shift
 fi
 
-cargo build --manifest-path "$ROOT/Cargo.toml" --profile cards -p cantrip-host --bin cantrip-native-host
+cargo build --manifest-path "$ROOT/Cargo.toml" --profile cards -p cantrip-host --bin cantrip-native-host --features ai-record
 case " $* " in
     *" neural"*) cargo build --manifest-path "$ROOT/Cargo.toml" --profile cards -p cantrip-ai-host --features ort ;;
 esac

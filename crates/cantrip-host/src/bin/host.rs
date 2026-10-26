@@ -3,18 +3,28 @@
 //! `protocol.rs`'s JSON, and `NativeRulesHost` (C#) drives this binary.
 //!
 //! With `--ai-record DIR` the host also records every game that ends as training samples for the AI player
-//! (`cantrip_ai::record`), into zstd shards in DIR (`cantrip_ai::shard`), on worker threads: see `Recorder`.
+//! (`cantrip_ai::record`), into zstd shards in DIR (`cantrip_ai::shard`), on worker threads: see `Recorder`. The
+//! recorder is built only with the `ai-record` feature (`cargo build -p cantrip-host --features ai-record`), so the
+//! shipping host compiles neither the AI player nor zstd; without it, `--ai-record` is refused.
 
 use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
+#[cfg(feature = "ai-record")]
 use std::path::PathBuf;
+#[cfg(feature = "ai-record")]
 use std::sync::mpsc::{Receiver, SyncSender, sync_channel};
+#[cfg(feature = "ai-record")]
 use std::sync::{Arc, Mutex};
+#[cfg(feature = "ai-record")]
 use std::thread::JoinHandle;
 
+#[cfg(feature = "ai-record")]
 use cantrip_ai::record::{Dealt, Ending, Failures, record, table};
+#[cfg(feature = "ai-record")]
 use cantrip_ai::shard::{Header, ShardWriter, mode_name, parse_mode};
+#[cfg(feature = "ai-record")]
 use cantrip_engine::Game;
+#[cfg(feature = "ai-record")]
 use cantrip_obs::InfoMode;
 
 use cantrip_host::protocol::{AnswerPayload, AttackMessage, BlockMessage, ViewHandle};
@@ -159,6 +169,7 @@ struct SeatSpec {
     companion: Option<String>,
     /// The deck's name, where the table has one: the recorder's archetype label.
     #[serde(rename = "DeckName", default)]
+    #[cfg_attr(not(feature = "ai-record"), allow(dead_code))]
     deck_name: Option<String>,
 }
 
@@ -166,6 +177,7 @@ struct Host {
     games: HashMap<u32, Session>,
     next_game: u32,
     /// Set by `--ai-record`; `None` costs the game loop nothing.
+    #[cfg(feature = "ai-record")]
     recorder: Option<Recorder>,
 }
 
@@ -181,6 +193,7 @@ impl Host {
     fn handle(&mut self, request: Request) -> Value {
         match request {
             Request::NewGame { seats, seed, shuffle, first_player, chooser, basic_lands_outside, minimum_deck_size, scenario } => {
+                #[cfg(feature = "ai-record")]
                 let dealt = self.recorder.as_ref().map(|_| Dealt {
                     seed: if scenario.is_some() { 0 } else { seed },
                     names: seats.iter().map(|s| s.name.clone()).collect(),
@@ -213,6 +226,7 @@ impl Host {
                         self.next_game += 1;
                         let decklists = session.decklists();
                         self.games.insert(id, session);
+                        #[cfg(feature = "ai-record")]
                         if let (Some(recorder), Some(dealt)) = (self.recorder.as_mut(), dealt) {
                             recorder.dealt.insert(id, dealt);
                         }
@@ -245,7 +259,11 @@ impl Host {
                 Err(r) => rejected(r),
             },
             Request::Close { game_id } => {
-                if let Some(session) = self.games.remove(&game_id)
+                let session = self.games.remove(&game_id);
+                #[cfg(not(feature = "ai-record"))]
+                drop(session);
+                #[cfg(feature = "ai-record")]
+                if let Some(session) = session
                     && let Some(recorder) = self.recorder.as_mut()
                     && let Some(dealt) = recorder.dealt.remove(&game_id)
                 {
@@ -259,6 +277,7 @@ impl Host {
     }
 
     /// A recorded game that has just ended is handed to the recorder, once.
+    #[cfg(feature = "ai-record")]
     fn ended(&mut self, game_id: u32) {
         let Some(recorder) = self.recorder.as_mut() else { return };
         if let Some(session) = self.games.get(&game_id)
@@ -269,6 +288,10 @@ impl Host {
             recorder.send(game.clone(), dealt, Ending::of(game, false));
         }
     }
+
+    /// Built without the recorder, nothing is recorded.
+    #[cfg(not(feature = "ai-record"))]
+    fn ended(&mut self, _game_id: u32) {}
 
     fn with(&mut self, game_id: u32, f: impl FnOnce(&mut Session) -> Result<Value, Rejection>) -> Value {
         match self.games.get_mut(&game_id) {
@@ -290,6 +313,7 @@ fn cantrip_engine_card(name: &str) -> Option<cantrip_host::protocol::ObjectView>
 const STACK_SIZE: usize = 256 << 20;
 
 /// `--ai-record DIR` and its options.
+#[cfg(feature = "ai-record")]
 struct RecordConfig {
     dir: PathBuf,
     mode: InfoMode,
@@ -301,9 +325,11 @@ struct RecordConfig {
     threads: usize,
 }
 
+#[cfg(feature = "ai-record")]
 const USAGE: &str = "usage: cantrip-native-host [--ai-record DIR [--ai-record-mode full|decklist|hidden] [--ai-record-producer NAME] \
 [--ai-record-seeds TEXT] [--ai-record-games N] [--ai-record-mb N] [--ai-record-threads N]]";
 
+#[cfg(feature = "ai-record")]
 fn config(args: &[String]) -> Result<Option<RecordConfig>, String> {
     let mut dir = None;
     let mut mode = InfoMode::Full;
@@ -329,6 +355,24 @@ fn config(args: &[String]) -> Result<Option<RecordConfig>, String> {
     Ok(dir.map(|dir| RecordConfig { dir, mode, producer, seeds, shard_games, shard_mb, threads }))
 }
 
+/// Built without the recorder, the host takes no arguments: `--ai-record` asks for a build with it.
+#[cfg(not(feature = "ai-record"))]
+enum RecordConfig {}
+
+#[cfg(not(feature = "ai-record"))]
+const USAGE: &str = "usage: cantrip-native-host (built without the `ai-record` feature, which `--ai-record` needs)";
+
+#[cfg(not(feature = "ai-record"))]
+fn config(args: &[String]) -> Result<Option<RecordConfig>, String> {
+    match args.first() {
+        None => Ok(None),
+        Some(a) if a.starts_with("--ai-record") => {
+            Err(format!("{a}: this host was built without the recorder; build it with `cargo build -p cantrip-host --features ai-record`"))
+        }
+        Some(a) => Err(format!("unknown argument {a}")),
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let config = match config(&args) {
@@ -349,9 +393,11 @@ fn main() {
 }
 
 /// A finished game to record: a copy of it, how it was dealt and how it ended.
+#[cfg(feature = "ai-record")]
 type Job = (Game, Dealt, Ending);
 
 /// What a recorder worker did.
+#[cfg(feature = "ai-record")]
 #[derive(Default)]
 struct Totals {
     games: u64,
@@ -363,6 +409,7 @@ struct Totals {
 
 /// Records ended games on worker threads, each writing shards of its own, so the table never waits on the walk or the
 /// compression. Shards are closed (and so readable) when the host's stdin ends; a game not yet ended then is dropped.
+#[cfg(feature = "ai-record")]
 struct Recorder {
     send: Option<SyncSender<Job>>,
     workers: Vec<JoinHandle<Totals>>,
@@ -372,6 +419,7 @@ struct Recorder {
     started: std::time::Instant,
 }
 
+#[cfg(feature = "ai-record")]
 impl Recorder {
     fn new(config: RecordConfig) -> io::Result<Recorder> {
         std::fs::create_dir_all(&config.dir)?;
@@ -440,6 +488,7 @@ impl Recorder {
     }
 }
 
+#[cfg(feature = "ai-record")]
 fn work(receive: &Mutex<Receiver<Job>>, writer: &mut ShardWriter, mode: InfoMode) -> Totals {
     let mut totals = Totals::default();
     loop {
@@ -470,6 +519,9 @@ fn work(receive: &Mutex<Receiver<Job>>, writer: &mut ShardWriter, mode: InfoMode
 
 fn serve(config: Option<RecordConfig>) {
     eprintln!("cantrip-native-host: {} cards loaded", cantrip_engine::cards().cards.len());
+    #[cfg(not(feature = "ai-record"))]
+    let _ = config;
+    #[cfg(feature = "ai-record")]
     let recorder = config.map(|c| {
         let dir = c.dir.display().to_string();
         let mode = mode_name(c.mode);
@@ -477,7 +529,12 @@ fn serve(config: Option<RecordConfig>) {
         eprintln!("cantrip-native-host: recording {mode} observations into {dir}");
         r
     });
-    let mut host = Host { games: HashMap::new(), next_game: 1, recorder };
+    let mut host = Host {
+        games: HashMap::new(),
+        next_game: 1,
+        #[cfg(feature = "ai-record")]
+        recorder,
+    };
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut out = stdout.lock();
@@ -498,6 +555,7 @@ fn serve(config: Option<RecordConfig>) {
             break;
         }
     }
+    #[cfg(feature = "ai-record")]
     if let Some(recorder) = host.recorder.take() {
         recorder.finish();
     }
