@@ -1,0 +1,57 @@
+# All Good Things...: I, II and III each "draw two cards, then exile a card from your hand" and IV "if all cards exiled
+# with this Saga share a card type, you gain 10 life" (CR 607.2a, 714). Chapter I exiles Ornithopter, a card it has just
+# drawn (the draw comes first, CR 608.2c); it is an artifact creature, the others plain artifacts, so they share only
+# artifact, which one type on every card is enough for. Bot2's Lightning Bolt in hand is never offered ("from your
+# hand"). Bot2's Simian Spirit Guide, exiled by its own ability before IV, is in exile but not exiled with this Saga, so a
+# creature card that is no artifact does not stop the life gain. The Saga is sacrificed after IV (CR 714.4).
+
+[Bot1 Deck]
+All Good Things...
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Island x3
+Ornithopter
+Mox Ruby
+Island
+Mox Jet
+Island
+Island
+Mox Pearl
+Island
+Island x10
+
+[Bot2 Deck]
+Lightning Bolt
+Simian Spirit Guide
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.All Good Things....Cast
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main1]
+? Exile.Count = 1
+Bot1.Choose(Mox Ruby)
+[T5 Bot1.Main1]
+? Exile.Count = 2
+? Bot1.Life = 20
+Bot1.Choose(Mox Pearl)
+[T6 Bot2.Main1]
+Bot2.Hand.Simian Spirit Guide.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 30
+Exile.Count = 4
+Exile = Mox Pearl; Mox Ruby; Ornithopter; Simian Spirit Guide
+Bot1.Battlefield.All Good Things... = (absent)
+Bot2.Hand = Island; Island; Island; Island; Island; Island; Lightning Bolt
