@@ -398,12 +398,19 @@ pub fn discard_hand_then_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Res
 /// and Reforge the Soul print it.
 pub fn each_player_discards_hand_then_draws_seven(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
     let players: Vec<PlayerId> = g.state().apnap().collect();
+    players_discard_hands_then_draw_seven(g, &players);
+    Ok(())
+}
+
+/// The discard-and-draw of the wheel for the given `players` (listed in turn order from the active player, CR 101.4): their
+/// hands go together (CR 701.9a), then each draws seven in that order (CR 121.2c). Wheel of Fortune and Reforge the Soul pass
+/// every player; Arc of Fortune passes those who chose it.
+pub fn players_discard_hands_then_draw_seven(g: &mut dyn Game, players: &[PlayerId]) {
     let hands: Vec<ObjectId> = players.iter().flat_map(|&p| g.state().zone(Zone::hand(p)).to_vec()).collect();
     g.discard_together(&hands);
-    for p in players {
+    for &p in players {
         g.draw(p, 7);
     }
-    Ok(())
 }
 
 /// "You gain N life" (CR 119.3). Zuran Orb and Inventor's Fair print it (two and one).
