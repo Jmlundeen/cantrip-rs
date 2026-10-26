@@ -1,0 +1,45 @@
+# Two Assault Drones stack: each is an artifact creature you control, so each gets +1/+0 from both and is a 4/4. Bot1's Eyetwitch
+# (a creature, not an artifact) stays a 1/1.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Assault Drone
+Assault Drone
+Eyetwitch
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Assault Drone.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Eyetwitch.Cast
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Assault Drone.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Assault Drone#1.Power = 4
+Bot1.Battlefield.Assault Drone#1.Toughness = 4
+Bot1.Battlefield.Assault Drone#2.Power = 4
+Bot1.Battlefield.Assault Drone#2.Toughness = 4
+Bot1.Battlefield.Eyetwitch.Power = 1
+Bot1.Battlefield.Eyetwitch.Toughness = 1

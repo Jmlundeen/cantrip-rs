@@ -1,0 +1,53 @@
+# Assault Drone (cast on turn 1 off a Swamp and three Moxen) is itself an artifact creature you control, so it is a 3/4, and
+# your Ornithopter is a 1/2 (only the power rises). Bot2's own Ornithopter stays a 0/2 and a Mox (an artifact, not a creature)
+# gets nothing. When Bot2's Disenchant destroys the Drone on turn two, the Ornithopter is a 0/2 again (CR 611.3b).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Assault Drone
+Ornithopter
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Ornithopter
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Assault Drone.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+? Bot1.Battlefield.Assault Drone.Power = 3
+? Bot1.Battlefield.Assault Drone.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Mox Jet.Types = Artifact
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Assault Drone)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Assault Drone

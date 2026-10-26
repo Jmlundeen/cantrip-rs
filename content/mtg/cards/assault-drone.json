@@ -1,0 +1,8 @@
+{
+  "name": "Assault Drone",
+  "manaCost": "{3}{B}",
+  "type": "Artifact Creature — Borg",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Artifact creatures you control get +1/+0."
+}
