@@ -1,0 +1,48 @@
+# Beam me up returns a creature you control as a cost, so with none it is not offered even with four mana (CR 118.3): Bot2's
+# Lightning Bolt kills the Illusion token the hard cast made, leaving Bot1 only mana and Bot2 a creature to look at. Then
+# Bot1 may not cast Adversary by Algorithm from the graveyard at all, and it stays there.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Adversary by Algorithm
+Forest
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Adversary by Algorithm.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Illusion Token)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+? Bot1.Mana = {G}{G}{G}{G}
+! Bot1.Graveyard.Adversary by Algorithm.Cast(Ability: Beam me up)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Adversary by Algorithm
+Bot1.Battlefield.Illusion Token = (absent)

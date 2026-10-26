@@ -1,0 +1,63 @@
+# Beam me up {3}{G} (Adversary by Algorithm): cast hard on turn 1 for {2}{G} (three Moxen) with Llanowar Elves already
+# out (paid with the Forest), it makes a 3/3 colorless Illusion artifact creature token. On turn 3 it is cast from the
+# graveyard for {3}{G}: four mana pay it exactly (the pool is empty right after paying). Bot2's Llanowar Elves cannot be
+# the creature returned (it must be one Bot1 controls); Bot1's own Elves can. The spell is exiled as it leaves the stack,
+# as a flashback or harmonize spell is (CR 702.34a, 702.180a), and the Illusion tokens stay: two of them, the first from
+# the hard cast.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Llanowar Elves
+Adversary by Algorithm
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Adversary by Algorithm.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Illusion Token.Power = 3
+? Bot1.Battlefield.Illusion Token.Toughness = 3
+? Bot1.Graveyard = Adversary by Algorithm
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Graveyard.Adversary by Algorithm.Cast(Ability: Beam me up)
+! Bot1.Choose(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Bot1.Battlefield.Llanowar Elves)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Forest; Llanowar Elves
+Bot1.Graveyard.Count = 0
+Exile = Adversary by Algorithm
+Bot1.Battlefield.Illusion Token#1.Power = 3
+Bot1.Battlefield.Illusion Token#2.Power = 3
