@@ -21,6 +21,16 @@ pub static MYR: CardDef = CardDef {
     ..token!(Myr)
 };
 
+/// A 3/3 colorless Illusion artifact creature token (CR 111). Adversary by Algorithm and Hologram Stalker create this exact
+/// token.
+pub static ILLUSION_3_3_ARTIFACT: CardDef = CardDef {
+    colors: Some(ColorSet::NONE),
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    power: Some(3),
+    toughness: Some(3),
+    ..token!(Illusion)
+};
+
 /// A Royal Role token (CR 111.10m, 303.7): "a colorless Aura Role enchantment token named Royal with enchant creature and
 /// 'Enchanted creature gets +1/+1 and has ward {1}.'" Royal Treatment, Charmed Clothier, Gylwain, Casting Director,
 /// Besotted Knight and Redtooth Genealogist make it, attached to a creature (`create_role`).
