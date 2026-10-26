@@ -578,7 +578,8 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
 /// "an effect is said to depend on another if ... applying the other would change ... what it applies to, or what it does
 /// to any of the things it applies to"; that is a question about the game, not about one object), and the characteristics
 /// worked out with it. Made when first needed, kept on the state (`GameState::layer_pass`) for as long as the position and
-/// history are the same, and shared by a clone until either moves on.
+/// history are the same. A copy of the state starts with none (`LayerCache`'s `Clone`): no pass is shared between
+/// games.
 struct Pass {
     key: PassKey,
     /// The state's `epoch` the pass was made at: a pass used at another is checked under `CANTRIP_VERIFY` (`chars_before`).

@@ -7,7 +7,7 @@
 #                                                the network (gen0, Full information, network only) against the tactical
 #                                                bot: the AI player's gate (docs/ai-player-plan.md, docs/ai-host.md)
 #   bot-duel.sh --a neural@256 --b neural --deck rw-aggro --deck ub-reanimator --mirrors --games 1600 --parallel 16 --sprt
-#                                                search (64 simulations an answer) against the same network alone,
+#                                                search (256 simulations an answer) against the same network alone,
 #                                                stopping when the SPRT (H0 50%, H1 55%) has its verdict: Phase 3's gate
 #   bot-duel.sh --a neural:hidden --model ../ai-data/models/gen1 --ai-backend tract
 #   bot-duel.sh watch                            one game, told turn by turn

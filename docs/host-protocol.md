@@ -180,6 +180,7 @@ are the server's (`GameSession.OfferDraw`, `AnswerDraw`, over the C# protocol's 
 `DrawOfferMessage`, version 201). Offering passes the offerer's priority, which the host is sent as any `PassAnswer`; once
 every other player still in the game has accepted, the session ends the game as a draw from outside the host, as a match
 clock running out does (`GameSession.Forfeit`), and nothing more is asked of it.
+
 **Recording for the AI player.** `cantrip-native-host --ai-record DIR` writes every game that ends - won, drawn,
 conceded, or closed before its end (a cap: every outcome 0) - into zstd training shards in `DIR`
 (`crates/cantrip-ai/src/shard.rs`; `docs/ai-player-plan.md`, "Data"), each decision as the answering seat observed it
