@@ -512,7 +512,8 @@ pub(crate) fn ask_of(
             can_pay,
         } => {
             // The most creatures that may attack each defender (CR 508.1c), as `AttackRules::limits` has them: u8::MAX where
-            // nothing caps it, as a cap no card prints would read too.
+            // nothing caps it. A cap of 255 or more reads as u8::MAX, "no cap", for the AI's mask only; the validator still
+            // judges the declaration against the real cap.
             let cap = |at: Target| {
                 requirements
                     .limits
