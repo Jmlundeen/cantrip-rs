@@ -430,10 +430,22 @@ fn picks_to_minimum(
 ) -> Flow<Vec<Ref>> {
     let mut chosen: Vec<Ref> = Vec::new();
     let mut sum = 0i32;
+    let value = |i: usize| values.get(i).copied().unwrap_or(0);
     while chosen.len() < cards.len() && !(one && !chosen.is_empty()) {
+        // A card is offered only while the minimum stays within reach: a negative value (a creature with negative power,
+        // CR 107.1b) takes from the total, and the cards left might no longer make it up. Every legal answer's picks pass
+        // this in any order, since its other cards are among those left.
+        let left: i32 = (0..cards.len())
+            .filter(|&i| !chosen.contains(&cards[i]))
+            .map(|i| value(i).max(0))
+            .sum();
         let mut step = Step::default();
-        for &c in cards {
-            step.push(Token::on(Tok::Pick, c), !chosen.contains(&c));
+        for (i, &c) in cards.iter().enumerate() {
+            let reach = sum + left - value(i).max(0) + value(i);
+            step.push(
+                Token::on(Tok::Pick, c),
+                !chosen.contains(&c) && (one || reach >= minimum as i32),
+            );
         }
         step.push(Token::new(Tok::Done), one || sum >= minimum as i32);
         let t = p.pick(step.or_done())?;
@@ -441,7 +453,7 @@ fn picks_to_minimum(
             break;
         }
         if let Some(i) = cards.iter().position(|&c| c == t.a) {
-            sum += values.get(i).copied().unwrap_or(0);
+            sum += value(i);
         }
         chosen.push(t.a);
     }
@@ -1428,6 +1440,34 @@ mod tests {
         )
         .unwrap();
         assert_eq!(tokens[0], Token::of(Tok::Block, o(1), o(3), 0));
+    }
+
+    #[test]
+    fn crew_offers_a_negative_power_only_while_the_total_stays_within_reach() {
+        let tap = |powers: Vec<i16>, minimum| {
+            ask(AskKind::TapForPower {
+                purpose: "TapToPay".into(),
+                cards: vec![o(1), o(2), o(3)],
+                powers,
+                minimum,
+            })
+        };
+        let pick = |i| Token::on(Tok::Pick, o(i));
+        // Crew 3 from powers 3, -2 and 1: the -2 creature would leave at most 2, whatever else is tapped.
+        let a = tap(vec![3, -2, 1], 3);
+        let m = Machine::new(&a, &[]);
+        assert!(!legal(&m, pick(2)));
+        let m = walk(&a, &[pick(3)]);
+        assert!(!legal(&m, pick(2)));
+        assert!(legal(&m, pick(1)));
+        let m = walk(&a, &[pick(1)]);
+        assert!(!legal(&m, pick(2)));
+        assert!(legal(&m, Token::new(Tok::Done)));
+        // From 3, -1 and 2 all three make 4: the -1 creature may be tapped, first or later.
+        let b = tap(vec![3, -1, 2], 3);
+        assert!(legal(&Machine::new(&b, &[]), pick(2)));
+        round_trip(&b, &FactoredAnswer::Refs(vec![o(2), o(1), o(3)]));
+        round_trip(&b, &FactoredAnswer::Refs(vec![o(1)]));
     }
 
     #[test]
