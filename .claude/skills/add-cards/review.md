@@ -45,7 +45,9 @@ checked for sufficiency, not exhaustiveness:
   card needs nothing the client did not already do, and no browser scenario is owed. The tactical bot is never checked.
 
 A reviewer runs only the card's scenarios and coverage (`corpus -- --card "Name"`, `python tools/maintenance/card-coverage.py "Name"`), and those of a
-card whose shared code the change touched - nothing wider. It **breaks the card** to see which expectation catches each
+card whose shared code the change touched - nothing wider, except that a card adding or granting a static ability also
+runs the layer contract check (`cargo test --profile checked -p cantrip-script --test layer_pass_cases`; an effect that
+changes no characteristic by design, such as a granted attack cap, is listed in its `INERT` table with the reason). It **breaks the card** to see which expectation catches each
 decision its code makes (a number, a filter, whose objects, a condition): one temporary edit at a time in the card's own
 worktree, run, then restored at once with `git checkout -- <file>`; a scenario it proposes is written to its scratchpad
 and tried there the same way. It commits only the fixes the next paragraph but one gives it, cleans nothing, never
