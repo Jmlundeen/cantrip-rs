@@ -2156,16 +2156,18 @@ pub type AttackCostRule = fn(&dyn Query, &Asker, ObjectId, Target) -> Option<Man
 /// A static ability that says how many creatures may attack a given player, planeswalker or battle in one declaration of
 /// attackers (CR 508.1c): asked, while the object that has it is on the battlefield with its abilities, of every player,
 /// planeswalker and battle a creature could attack; `None` when this ability limits none, else the most that may attack
-/// it, the smallest where several abilities limit the same target. It caps the declaration alone: an effect can still put
-/// another creature onto the battlefield attacking that target, or change what an already-attacking creature attacks (the
-/// ruling on Tomik, Orzhov Lawmage; CR 508.1d's example "No more than one creature can attack each turn").
+/// it, the smallest where several abilities limit the same target. It caps the declaration alone: a creature put onto the
+/// battlefield attacking that target, or stated to be attacking it, is not under it (CR 508.4c), nor is a change of what
+/// an already-attacking creature attacks (the ruling on Tomik, Orzhov Lawmage).
 ///
 /// What the target itself is, and what it has, is the rule's to check, not the core's: the core reads a rule only while
 /// its source has its abilities. A cap an ability gives the target - Tomik, Orzhov Lawmage's "Planeswalkers you control
-/// have 'No more than one creature can attack this planeswalker each combat.'" - must ask the target whether it has lost
-/// all its abilities (`q.lost_all_abilities(target)` for a `Target::Object`), since a planeswalker that has none has no
-/// such ability (CR 613.1f), and any condition on the source is the rule's too, as Mirri, Weatherlight Duelist's is on
-/// her being tapped. The same cap printed on the permanent it protects (The Eternal Wanderer) needs neither.
+/// have 'No more than one creature can attack this planeswalker each combat.'" - is the target's ability, which layer 6
+/// gives or takes in timestamp order (CR 613.1f, 613.7): the source grants it as a delayed ability
+/// (`statics::grant_delayed_ability`) and the rule asks whether the target has it (`q.chars(id).abilities` holds that
+/// `AbilityRef`), never whether the target has lost all its abilities - a "loses all abilities" older than the grant
+/// leaves the target the granted ability. Any condition on the source is the rule's too, as Mirri, Weatherlight Duelist's
+/// is on her being tapped. The same cap printed on the permanent it protects (The Eternal Wanderer) needs neither.
 /// Printed: The Eternal Wanderer and Tomik's granted form (a planeswalker); Judoon Enforcers and, while tapped, Mirri,
 /// Weatherlight Duelist (the source's controller).
 pub type AttackLimitRule = fn(&dyn Query, &Asker, Target) -> Option<u32>;
