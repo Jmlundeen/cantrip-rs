@@ -63,16 +63,22 @@ pub fn observe_indexed(game: &Game, knowledge: &Knowledge, seat: PlayerId, mode:
         .filter(|(_, slot)| !matches!(slot.obs, ObjectObs::Hidden { .. }))
         .map(|(i, slot)| (slot.id, i as u32))
         .collect();
+    // Each object as sorted, with its refs filled in: nothing else of it depends on them.
+    let index: Vec<ObjectId> = slots.iter().map(|slot| slot.id).collect();
     let objects: Vec<ObjectObs> = slots
-        .iter()
-        .map(|slot| match (&slot.obs, slot.stack) {
-            (ObjectObs::Hidden { .. }, _) => slot.obs.clone(),
-            (_, Some((i, entry))) => view.stacked(i, &entry, &refs),
-            (ObjectObs::Visible(v), None) => ObjectObs::Visible(Box::new(view.visible(slot.id, v.place, v.position, &refs))),
-            (ObjectObs::Ability { .. }, None) => unreachable!("an ability is only on the stack"),
+        .into_iter()
+        .map(|mut slot| {
+            match (&mut slot.obs, slot.stack) {
+                (ObjectObs::Hidden { .. }, _) => {}
+                (ObjectObs::Visible(v), _) => view.refer(slot.id, v, &refs),
+                (ObjectObs::Ability { source, targets, .. }, Some((_, StackEntry::Ability { item }))) => {
+                    (*source, *targets) = view.ability_refs(&item, &refs);
+                }
+                (ObjectObs::Ability { .. }, _) => unreachable!("an ability is only on the stack"),
+            }
+            slot.obs
         })
         .collect();
-    let index: Vec<ObjectId> = slots.iter().map(|slot| slot.id).collect();
 
     let observation = Observation {
         schema: SCHEMA_VERSION,
@@ -174,7 +180,6 @@ impl View<'_> {
         let o = s.obj(id);
         let on_battlefield = o.zone.is(ZoneKind::Battlefield) || o.zone.is(ZoneKind::PhasedOut);
         let looks = self.full || knows_face(s, self.seat, id);
-        let r = |t: Target| target_ref(t, refs);
         // Face down off the battlefield it has no characteristics at all (CR 406.3, 708.2a).
         let chars = if o.face_down && !on_battlefield {
             CharsObs { types: 0, supertypes: 0, colors: 0, subtypes: Vec::new(), power: None, toughness: None, keywords: 0, mana_value: 0 }
@@ -194,7 +199,7 @@ impl View<'_> {
         let name = if o.face_down { looks.then(|| game.cards.get(o.card).name.to_string()) } else { Some(game.name(id).to_string()) };
         let attacker = s.attackers.iter().find(|a| a.id == id);
         let item = s.stack.iter().find(|item| item.kind == StackKind::Spell && item.object == id);
-        VisibleObs {
+        let mut v = VisibleObs {
             place,
             position,
             owner: o.owner.0,
@@ -206,20 +211,38 @@ impl View<'_> {
             tapped: o.tapped,
             damage: o.damage,
             counters: o.counter_array().iter().enumerate().filter(|&(_, &n)| n != 0).map(|(k, &n)| (k as u16, n)).collect(),
-            attacking: attacker.map(|a| r(a.target)),
+            // The refs are `refer`'s.
+            attacking: None,
             blocked: attacker.is_some_and(|a| a.blocked),
-            blocking: s.blocks.iter().filter(|b| b.blocker == id).map(|b| r(Target::Object(b.attacker))).collect(),
+            blocking: Vec::new(),
             sick: on_battlefield && summoning_sick(game.cards, s, &game.log, id),
-            attached: match (o.attached_to, o.attached_player) {
-                (Some(host), _) => r(Target::Object(host)),
-                (None, Some(p)) => Ref::Player(p.0),
-                (None, None) => Ref::None,
-            },
+            attached: Ref::None,
             spell: o.zone.is(ZoneKind::Stack).then(|| SpellObs {
                 controller: item.map_or(o.controller, |i| i.controller).0,
-                targets: item.map_or_else(Vec::new, |i| s.targets(i).iter().map(|&t| r(t)).collect()),
+                targets: Vec::new(),
                 x: item.map_or(o.x, |i| i.x),
             }),
+        };
+        self.refer(id, &mut v, refs);
+        v
+    }
+
+    /// The fields of a visible object that name other objects, by `refs`: all that `refs` changes of it, so an object
+    /// first described with its refs left out (to sort by) needs only these again.
+    fn refer(&self, id: ObjectId, v: &mut VisibleObs, refs: &HashMap<ObjectId, u32>) {
+        let s = &self.game.state;
+        let o = s.obj(id);
+        let r = |t: Target| target_ref(t, refs);
+        v.attacking = s.attackers.iter().find(|a| a.id == id).map(|a| r(a.target));
+        v.blocking = s.blocks.iter().filter(|b| b.blocker == id).map(|b| r(Target::Object(b.attacker))).collect();
+        v.attached = match (o.attached_to, o.attached_player) {
+            (Some(host), _) => r(Target::Object(host)),
+            (None, Some(p)) => Ref::Player(p.0),
+            (None, None) => Ref::None,
+        };
+        if let Some(spell) = &mut v.spell {
+            let item = s.stack.iter().find(|item| item.kind == StackKind::Spell && item.object == id);
+            spell.targets = item.map_or_else(Vec::new, |i| s.targets(i).iter().map(|&t| r(t)).collect());
         }
     }
 
@@ -240,17 +263,23 @@ impl View<'_> {
                 } else {
                     self.game.cards.get(source.card).name.to_string()
                 };
+                let (source, targets) = self.ability_refs(&item, refs);
                 ObjectObs::Ability {
                     position: i as u16,
-                    source: target_ref(Target::Object(item.object), refs),
+                    source,
                     name,
                     kind: if item.kind == StackKind::Activated { 1 } else { 2 },
                     controller: item.controller.0,
-                    targets: s.targets(&item).iter().map(|&t| target_ref(t, refs)).collect(),
+                    targets,
                     x: item.x,
                 }
             }
         }
+    }
+
+    /// A stacked ability's source and targets, by `refs`: all that `refs` changes of it.
+    fn ability_refs(&self, item: &StackItem, refs: &HashMap<ObjectId, u32>) -> (Ref, Vec<Ref>) {
+        (target_ref(Target::Object(item.object), refs), self.game.state.targets(item).iter().map(|&t| target_ref(t, refs)).collect())
     }
 
     fn player(&self, p: PlayerId) -> PlayerObs {
