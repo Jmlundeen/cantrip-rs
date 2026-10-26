@@ -258,8 +258,10 @@ fn play(path: &Path, tally: &Mutex<Tally>) {
 }
 
 fn corpus(every: usize) {
-    let all = scenarios();
-    let sample: Vec<PathBuf> = all.into_iter().step_by(every).collect();
+    check(scenarios().into_iter().step_by(every).collect());
+}
+
+fn check(sample: Vec<PathBuf>) {
     let tally = Mutex::new(Tally::default());
     let threads = std::thread::available_parallelism().map_or(4, |n| n.get());
     let next = std::sync::atomic::AtomicUsize::new(0);
@@ -324,6 +326,22 @@ fn corpus(every: usize) {
 #[test]
 fn a_sample_of_the_corpus_factors() {
     corpus(50);
+}
+
+/// Scenarios that once failed, checked whatever the sample takes.
+#[test]
+fn scenarios_that_once_failed_factor() {
+    // "Remove up to three counters": two, of two kinds from one creature, is an answer the factoring makes.
+    check(
+        ["glissa-sunslayer-removes-fewer-counters-from-a-creature"]
+            .iter()
+            .map(|n| {
+                let path = root().join("scenarios").join(format!("{n}.cantrip"));
+                assert!(path.exists(), "{n} is no scenario");
+                path
+            })
+            .collect(),
+    );
 }
 
 #[test]

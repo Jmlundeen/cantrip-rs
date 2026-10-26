@@ -468,7 +468,7 @@ pub(crate) fn ask_of(
             source: s,
             pools,
             total,
-            ..
+            up_to,
         } => {
             source = r(*s);
             let mut pools: Vec<CounterPoolObs> = pools
@@ -483,6 +483,7 @@ pub(crate) fn ask_of(
             AskKind::RemoveCounters {
                 pools,
                 total: *total,
+                up_to: *up_to,
             }
         }
         RequestKind::ChooseDividedTargets {

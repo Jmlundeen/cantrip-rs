@@ -651,7 +651,11 @@ pub fn ask_numbers(kind: &AskKind) -> (usize, [u32; 6]) {
             13,
             [*maximum as u32, *minimum as u32, 0, l(cards.len()), 0, 0],
         ),
-        K::RemoveCounters { pools, total } => (14, [*total as u32, 0, 0, l(pools.len()), 0, 0]),
+        K::RemoveCounters {
+            pools,
+            total,
+            up_to,
+        } => (14, [*total as u32, 0, b(*up_to), l(pools.len()), 0, 0]),
         K::ChooseDividedTargets {
             candidates,
             total,

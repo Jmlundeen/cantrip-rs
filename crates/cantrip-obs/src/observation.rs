@@ -331,8 +331,8 @@ pub enum AskKind {
     TapForPower { purpose: String, cards: Vec<Ref>, powers: Vec<i16>, minimum: u8 },
     CollectEvidence { cards: Vec<Ref>, values: Vec<u8>, minimum: u8 },
     Craft { cards: Vec<Ref>, minimum: u8, maximum: u8 },
-    /// `total` counters from among the pools (sorted).
-    RemoveCounters { pools: Vec<CounterPoolObs>, total: u8 },
+    /// `total` counters from among the pools (sorted); with `up_to`, any number of them up to `total`, none included.
+    RemoveCounters { pools: Vec<CounterPoolObs>, total: u8, up_to: bool },
     /// A total divided among up to `max_targets` (0: any number) of `candidates`, each at least 1.
     ChooseDividedTargets { candidates: Vec<Ref>, total: u16, max_targets: u8, optional: bool },
     /// Each of `eligible` attacks one of `defenders` or stays home; each of `requirements` must attack if able.

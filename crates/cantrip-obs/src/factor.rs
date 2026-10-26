@@ -707,7 +707,11 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             }
             Ok(F::Index(p.pick(step)?.n as u8))
         }
-        AskKind::RemoveCounters { pools, total } => {
+        AskKind::RemoveCounters {
+            pools,
+            total,
+            up_to,
+        } => {
             let mut taken = vec![0u16; pools.len()];
             let mut n = 0;
             while n < *total && pools.iter().zip(&taken).any(|(pool, &t)| t < pool.count) {
@@ -718,7 +722,15 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                         taken[i] < pool.count,
                     );
                 }
-                taken[p.pick(step)?.n as usize] += 1;
+                // "Up to" (CR 608.2d): stopping short, with none taken too, is a choice.
+                if *up_to {
+                    step.push(Token::new(Tok::Done), true);
+                }
+                let t = p.pick(step)?;
+                if t.kind == Tok::Done {
+                    break;
+                }
+                taken[t.n as usize] += 1;
                 n += 1;
             }
             Ok(F::Counters(
@@ -1330,7 +1342,7 @@ pub fn kind_name(kind: &AskKind) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{DestinationObs, DivisionObs};
+    use crate::{CounterPoolObs, DestinationObs, DivisionObs};
 
     fn ask(kind: AskKind) -> Ask {
         Ask {
@@ -1692,6 +1704,40 @@ mod tests {
                 .collect::<Vec<_>>(),
             vec![2]
         );
+    }
+
+    #[test]
+    fn counters_removed_up_to_a_number_stop_anywhere_and_exactly_a_number_do_not() {
+        let pool = |object, kind, count| CounterPoolObs {
+            object,
+            kind,
+            count,
+        };
+        let pools = |up_to| {
+            ask(AskKind::RemoveCounters {
+                pools: vec![pool(o(1), 3, 1), pool(o(1), 7, 1), pool(o(2), 3, 2)],
+                total: 3,
+                up_to,
+            })
+        };
+        // Glissa Sunslayer's "up to three": two counters of two kinds from one creature, and none at all.
+        let a = pools(true);
+        assert!(legal(&Machine::new(&a, &[]), Token::new(Tok::Done)));
+        round_trip(&a, &FactoredAnswer::Counters(vec![(o(1), 3, 1), (o(1), 7, 1)]));
+        round_trip(&a, &FactoredAnswer::Counters(vec![]));
+        round_trip(&a, &FactoredAnswer::Counters(vec![(o(1), 7, 1), (o(2), 3, 2)]));
+        // A cost removes exactly its number: no stopping short.
+        let exact = pools(false);
+        let m = walk(
+            &exact,
+            &[
+                Token::of(Tok::Unit, o(1), Ref::None, 0),
+                Token::of(Tok::Unit, o(1), Ref::None, 1),
+            ],
+        );
+        assert!(!legal(&m, Token::new(Tok::Done)));
+        assert!(decompose(&exact, &[], &FactoredAnswer::Counters(vec![(o(1), 3, 1)])).is_err());
+        round_trip(&exact, &FactoredAnswer::Counters(vec![(o(1), 3, 1), (o(2), 3, 2)]));
     }
 
     #[test]
