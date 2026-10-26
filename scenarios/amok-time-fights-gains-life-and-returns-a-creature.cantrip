@@ -1,0 +1,67 @@
+# Setup: Haywire Mite sacrifices itself to exile one Lotus Petal, the other Petal having been sacrificed for mana, leaving a
+# second own creature card and a noncreature card in Bot1's graveyard for chapter III's refusals; the Mite's dies trigger
+# gains 2 life. Chapter I makes both Elves die; chapter II raises life to exactly 25 while the Saga has two lore counters,
+# before chapter III returns Bot1's Elf and the Saga is sacrificed (CR 701.14a, 714.2b, 714.4).
+
+[Bot1 Deck]
+Forest x3
+Llanowar Elves
+Lotus Petal x2
+Haywire Mite
+Amok Time
+Forest x12
+
+[Bot2 Deck]
+Forest x2
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot1.Hand.Forest.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal#1.Activate(Color: Green)
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Haywire Mite.Activate(Bot1.Battlefield.Lotus Petal)
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Amok Time.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+! Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T9 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Llanowar Elves.Power = 1
+? Bot1.Graveyard.Haywire Mite.Power = 1
+? Bot1.Life = 25
+? Bot1.Battlefield.Amok Time.Counters.Lore = 2
+! Bot1.Target(Bot2.Graveyard.Llanowar Elves)
+! Bot1.Target(Bot1.Graveyard.Lotus Petal)
+Bot1.Target(Bot1.Graveyard.Llanowar Elves)
+[T11 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 25
+Bot1.Hand.Llanowar Elves.Power = 1
+Bot2.Graveyard.Llanowar Elves.Power = 1
+Bot1.Graveyard.Amok Time.Colors = Green
+Bot1.Graveyard.Lotus Petal.Colors.Count = 0
+Bot1.Battlefield.Amok Time = (absent)
+Stack.Count = 0

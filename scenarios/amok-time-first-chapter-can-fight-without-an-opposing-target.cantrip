@@ -1,0 +1,32 @@
+# The first chapter still resolves with only its required target chosen: "up to one" lets its controller choose zero opposing
+# creatures as it is put on the stack (CR 603.3d, 601.2c).
+
+[Bot1 Deck]
+Forest x3
+Llanowar Elves
+Amok Time
+Forest x12
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Forest.Play
+Bot1.Hand.Amok Time.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+? Stack.Count = 1
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot2.Life = 20
+Bot1.Life = 20
+Bot1.Battlefield.Amok Time.Counters.Lore = 1

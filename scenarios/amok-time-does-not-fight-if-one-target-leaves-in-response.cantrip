@@ -1,0 +1,43 @@
+# Bot2 removes the creature Bot1 chose for chapter I before it resolves. Because the other target remains legal, the
+# chapter ability resolves but neither creature fights (CR 701.14b, 608.2b).
+
+[Bot1 Deck]
+Forest x3
+Llanowar Elves
+Amok Time
+Forest x12
+
+[Bot2 Deck]
+Forest
+Mountain
+Llanowar Elves
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot1.Hand.Forest.Play
+Bot1.Hand.Amok Time.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Llanowar Elves.Power = 1
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Life = 20
+Bot1.Battlefield.Amok Time.Counters.Lore = 1
+Stack.Count = 0

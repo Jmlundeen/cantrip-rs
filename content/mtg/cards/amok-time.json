@@ -1,0 +1,6 @@
+{
+  "name": "Amok Time",
+  "manaCost": "{2}{G}",
+  "type": "Enchantment — Saga",
+  "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — Target creature you control fights up to one target creature an opponent controls.\nII — You gain 3 life.\nIII — Return target creature card from your graveyard to your hand."
+}
