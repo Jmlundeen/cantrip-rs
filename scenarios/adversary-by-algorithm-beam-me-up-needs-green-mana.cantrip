@@ -1,0 +1,47 @@
+# Beam me up {3}{G} needs a green mana: after the hard cast on turn 1 (Black Lotus, sacrificed for {G}{G}{G}) leaves the Illusion token as the
+# creature to return, four mana of the other colors (Mox Ruby, Sapphire, Jet, Pearl) cannot pay {3}{G}, though they would pay
+# a cost of four generic; a Forest then supplies the {G}. The token returned is replaced by the new one the spell makes.
+
+[Bot1 Deck]
+Black Lotus
+Adversary by Algorithm
+Forest
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Adversary by Algorithm.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Graveyard.Adversary by Algorithm.Cast(Ability: Beam me up; Mana: short)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Graveyard.Adversary by Algorithm.Cast(Ability: Beam me up)
+Bot1.Choose(Bot1.Battlefield.Illusion Token)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Exile = Adversary by Algorithm
+Bot1.Battlefield.Illusion Token.Power = 3
+Bot1.Battlefield.Illusion Token.Types = Artifact; Creature
+Bot1.Battlefield.Illusion Token.Colors = (absent)
