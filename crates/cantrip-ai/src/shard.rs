@@ -50,7 +50,7 @@ pub struct Header {
     /// shards named their index; the training side is then told it (docs/ai-training.md).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub cards: Vec<String>,
-    /// The engine commit (`git rev-parse HEAD` at build time, `-dirty` for a changed tree), or "unknown".
+    /// The engine commit (`git rev-parse HEAD` at build time), or "unknown".
     pub commit: String,
     /// What made the answers: `tactical:<model hash>`, or a name.
     pub producer: String,
