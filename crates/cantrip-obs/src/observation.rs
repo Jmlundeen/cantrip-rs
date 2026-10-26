@@ -337,7 +337,9 @@ pub enum AskKind {
     ChooseDividedTargets { candidates: Vec<Ref>, total: u16, max_targets: u8, optional: bool },
     /// Each of `eligible` attacks one of `defenders` or stays home; each of `requirements` must attack if able.
     /// `costs` what an attack costs (attacker, defender, mana value of the cost); `can_pay` the most the seat can pay.
-    DeclareAttackers { eligible: Vec<Ref>, defenders: Vec<Ref>, requirements: Vec<Ref>, costs: Vec<(Ref, Ref, u16)>, can_pay: u16 },
+    /// `max_attackers` the most creatures that may attack each defender (CR 508.1c), index for index with `defenders`;
+    /// `u8::MAX` where nothing caps it.
+    DeclareAttackers { eligible: Vec<Ref>, defenders: Vec<Ref>, requirements: Vec<Ref>, costs: Vec<(Ref, Ref, u16)>, can_pay: u16, max_attackers: Vec<u8> },
     /// One division per creature with a choice, sorted by source.
     AssignCombatDamage { divisions: Vec<DivisionObs> },
     /// Each of `eligible` blocks one attacker of `allowed` or none. `required` the blocks effects require if able, of

@@ -511,12 +511,23 @@ pub(crate) fn ask_of(
             costs,
             can_pay,
         } => {
-            let mut defenders: Vec<Ref> = players
+            // The most creatures that may attack each defender (CR 508.1c), as `AttackRules::limits` has them: u8::MAX where
+            // nothing caps it, as a cap no card prints would read too.
+            let cap = |at: Target| {
+                requirements
+                    .limits
+                    .iter()
+                    .find(|l| l.0 == at)
+                    .map_or(u8::MAX, |l| u8::try_from(l.1).unwrap_or(u8::MAX))
+            };
+            let mut capped: Vec<(Ref, u8)> = players
                 .iter()
-                .map(|p| Ref::Player(p.0))
-                .chain(planeswalkers.iter().chain(battles).map(|&id| r(id)))
+                .map(|&p| (Ref::Player(p.0), cap(Target::Player(p))))
+                .chain(planeswalkers.iter().chain(battles).map(|&id| (r(id), cap(Target::Object(id)))))
                 .collect();
-            defenders.sort();
+            capped.sort();
+            let defenders: Vec<Ref> = capped.iter().map(|d| d.0).collect();
+            let max_attackers: Vec<u8> = capped.iter().map(|d| d.1).collect();
             let mut costs: Vec<(Ref, Ref, u16)> = costs
                 .iter()
                 .map(|c| {
@@ -536,6 +547,7 @@ pub(crate) fn ask_of(
                 requirements: rs(&requirements.required.iter().map(|q| q.attacker).collect::<Vec<_>>()),
                 costs,
                 can_pay: *can_pay,
+                max_attackers,
             }
         }
         RequestKind::AssignCombatDamage { divisions } => {

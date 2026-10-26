@@ -768,21 +768,32 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             eligible,
             defenders,
             requirements,
+            max_attackers,
             ..
         } => {
-            let players = defenders.iter().any(|d| matches!(d, Ref::Player(_)));
+            // A defender at its cap takes no more attackers (CR 508.1c). A creature under a requirement may not stay home
+            // while a player nothing caps may be attacked - attacking them obeys no fewer and takes no capped place - but
+            // where every defender is capped, staying may be what the most requirements need (CR 508.1d), which is the
+            // validator's to judge.
+            let cap = |i: usize| max_attackers.get(i).copied().unwrap_or(u8::MAX);
+            let open_player = defenders.iter().enumerate().any(|(i, d)| matches!(d, Ref::Player(_)) && cap(i) == u8::MAX);
+            let mut attacking = vec![0usize; defenders.len()];
             let mut attacks = Vec::new();
             for &c in eligible {
                 let mut step = Step::default();
                 step.push(
                     Token::on(Tok::Stay, c),
-                    !(players && requirements.contains(&c)) || defenders.is_empty(),
+                    !(open_player && requirements.contains(&c)) || defenders.is_empty(),
                 );
-                for &d in defenders {
-                    step.push(Token::of(Tok::Attack, c, d, 0), true);
+                for (i, &d) in defenders.iter().enumerate() {
+                    let room = cap(i) == u8::MAX || attacking[i] < usize::from(cap(i));
+                    step.push(Token::of(Tok::Attack, c, d, 0), room);
                 }
                 let t = p.pick(step)?;
                 if t.kind == Tok::Attack {
+                    if let Some(i) = defenders.iter().position(|&d| d == t.b) {
+                        attacking[i] += 1;
+                    }
                     attacks.push((c, t.b));
                 }
             }
@@ -1395,6 +1406,7 @@ mod tests {
             requirements: vec![o(2)],
             costs: vec![],
             can_pay: 0,
+            max_attackers: vec![u8::MAX, u8::MAX],
         });
         let mut m = Machine::new(&a, &[]);
         m.choose_token(Token::on(Tok::Stay, o(1)));
@@ -1404,6 +1416,43 @@ mod tests {
             m.answer(),
             Some(&FactoredAnswer::Attack(vec![(o(2), o(9))]))
         );
+    }
+
+    #[test]
+    fn attacks_mask_a_full_capped_defender_and_a_required_creature_stays_where_all_are_full() {
+        // Player 1 and planeswalker 9 may each be attacked by one creature at most (CR 508.1c: Judoon Enforcers, Tomik).
+        let a = ask(AskKind::DeclareAttackers {
+            eligible: vec![o(1), o(2), o(3)],
+            defenders: vec![Ref::Player(1), o(9)],
+            requirements: vec![o(3)],
+            costs: vec![],
+            can_pay: 0,
+            max_attackers: vec![1, 1],
+        });
+        let mut m = Machine::new(&a, &[]);
+        m.choose_token(Token::of(Tok::Attack, o(1), Ref::Player(1), 0));
+        // Player 1 has its one attacker: the second creature is not offered it.
+        assert!(!legal(&m, Token::of(Tok::Attack, o(2), Ref::Player(1), 0)));
+        m.choose_token(Token::of(Tok::Attack, o(2), o(9), 0));
+        // Both are full: the creature that must attack if able may only stay home.
+        assert!(!legal(&m, Token::of(Tok::Attack, o(3), o(9), 0)));
+        assert!(legal(&m, Token::on(Tok::Stay, o(3))));
+        m.choose_token(Token::on(Tok::Stay, o(3)));
+        assert_eq!(
+            m.answer(),
+            Some(&FactoredAnswer::Attack(vec![(o(1), Ref::Player(1)), (o(2), o(9))]))
+        );
+        round_trip(&a, &FactoredAnswer::Attack(vec![(o(3), o(9))]));
+        // Where nothing caps the player, the creature that must attack may not stay.
+        let open = ask(AskKind::DeclareAttackers {
+            eligible: vec![o(3)],
+            defenders: vec![Ref::Player(1), o(9)],
+            requirements: vec![o(3)],
+            costs: vec![],
+            can_pay: 0,
+            max_attackers: vec![u8::MAX, 1],
+        });
+        assert!(!legal(&Machine::new(&open, &[]), Token::on(Tok::Stay, o(3))));
     }
 
     #[test]
