@@ -11,10 +11,7 @@ fn effect(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
         .battlefield()
         .iter()
         .copied()
-        .filter(|&id| {
-            let chars = g.chars(id);
-            chars.is(CardType::Creature) || chars.has_subtype(Subtype::Spacecraft)
-        })
+        .filter(|&id| cantrip_mechanics::targets::creature_or_spacecraft(g, id))
         .collect();
     g.exile_all(&all);
     Ok(())
