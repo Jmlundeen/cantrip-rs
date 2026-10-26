@@ -13,6 +13,7 @@ pub mod bestow;
 pub mod boast;
 pub mod battle_cry;
 pub mod backup;
+pub mod beam_me_up;
 pub mod dash;
 pub mod discover;
 pub mod combat;
