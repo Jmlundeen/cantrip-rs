@@ -1800,4 +1800,15 @@ mod card_type_tests {
         assert!(Subtype::Forest.card_types().has(CardType::Land));
         assert!(Subtype::Lesson.card_types().has(CardType::Sorcery));
     }
+
+    /// `ALL[n]` is the subtype numbered `n`, which `SubtypeSet::iter` maps each set bit by.
+    #[test]
+    fn all_is_in_subtype_order() {
+        for (n, s) in Subtype::ALL.into_iter().enumerate() {
+            assert_eq!(s as usize, n, "{}", s.name());
+        }
+        assert!(Subtype::ALL.len() <= crate::vocab::SUBTYPE_WORDS * 64);
+        let set = crate::vocab::SubtypeSet::of(&[Subtype::Zubera, Subtype::Adventure, Subtype::Forest]);
+        assert_eq!(set.iter().collect::<Vec<_>>(), [Subtype::Adventure, Subtype::Forest, Subtype::Zubera]);
+    }
 }

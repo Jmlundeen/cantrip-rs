@@ -180,12 +180,11 @@ impl View<'_> {
             CharsObs { types: 0, supertypes: 0, colors: 0, subtypes: Vec::new(), power: None, toughness: None, keywords: 0, mana_value: 0 }
         } else {
             let c = game.chars(id);
-            let sub = &c.subtypes.0;
             CharsObs {
                 types: c.types.0,
                 supertypes: u8::from(c.supertypes.basic) | u8::from(c.supertypes.legendary) << 1 | u8::from(c.supertypes.snow) << 2,
                 colors: c.colors.0,
-                subtypes: (0..sub.len() * 64).filter(|&b| sub[b / 64] & (1 << (b % 64)) != 0).map(|b| b as u16).collect(),
+                subtypes: c.subtypes.iter().map(|t| t as u16).collect(),
                 power: c.power,
                 toughness: c.toughness,
                 keywords: c.keywords.0,

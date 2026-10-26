@@ -711,8 +711,36 @@ impl SubtypeSet {
         SubtypeSet(bits)
     }
 
-    pub fn iter(self) -> impl Iterator<Item = Subtype> {
-        Subtype::ALL.into_iter().filter(move |s| self.has(*s))
+    /// The subtypes in the set, in `Subtype` order: only the set bits are visited (`Subtype::ALL` is in that order).
+    pub fn iter(self) -> SubtypeIter {
+        SubtypeIter { bits: self.0, word: 0 }
+    }
+}
+
+/// `SubtypeSet::iter`: the set bits, lowest first, word by word.
+pub struct SubtypeIter {
+    bits: [u64; SUBTYPE_WORDS],
+    word: usize,
+}
+
+impl Iterator for SubtypeIter {
+    type Item = Subtype;
+
+    fn next(&mut self) -> Option<Subtype> {
+        while self.word < SUBTYPE_WORDS {
+            let bits = &mut self.bits[self.word];
+            if *bits == 0 {
+                self.word += 1;
+                continue;
+            }
+            let n = self.word * 64 + bits.trailing_zeros() as usize;
+            *bits &= *bits - 1;
+            // Every set bit is a subtype's (the set is only built from subtypes), so `get` never misses.
+            if let Some(&s) = Subtype::ALL.get(n) {
+                return Some(s);
+            }
+        }
+        None
     }
 }
 
