@@ -6,9 +6,7 @@ use cantrip_oracle as oracle;
 /// triggered ability (CR 603.7c) is fixed on that creature, so it triggers only when that very object dies (a creature
 /// that left and came back is a new object, CR 400.7).
 fn a_good_day_to_die(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    cantrip_mechanics::pump(g, item.object, creature, 2, 0);
-    delayed::this_turn(g, item, creature);
+    delayed::pump_target_then_when_it_dies(g, item, 2, 0);
     Ok(())
 }
 
