@@ -1,0 +1,45 @@
+# 70,000 Light-Years from Home exiles Bot2's Guerrilla Gorilla; Bot2 (its controller, not the caster) is asked, accepts and
+# puts a Swamp into hand (untouched by the battlefield, 7 cards in hand and one fewer in library). Mox Pearl, an artifact
+# that is neither a creature nor a Spacecraft, is refused as a target beside the accepted creature (CR 115.1, 608.2h).
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+70,000 Light-Years from Home
+Mox Pearl
+Plains x15
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Swamp x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+! Bot1.Hand.70,000 Light-Years from Home.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Hand.70,000 Light-Years from Home.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot2.Accept
+Bot2.Search(Swamp)
+
+[Expect]
+Turn = 5
+Exile = Guerrilla Gorilla
+Bot1.Graveyard = 70,000 Light-Years from Home
+Bot2.Battlefield = Forest; Forest
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 7

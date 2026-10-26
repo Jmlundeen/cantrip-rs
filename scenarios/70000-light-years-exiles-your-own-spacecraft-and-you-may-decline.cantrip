@@ -1,0 +1,45 @@
+# 70,000 Light-Years from Home targets the caster's own Wurmwall Sweeper, a Spacecraft that is not a creature
+# (CR 205.3g); its controller (the caster) declines the search, so no land is fetched and the hand is only what was drawn.
+# A creature card in Bot2's graveyard (Entombed there) is refused: a creature or Spacecraft is a permanent (CR 109.2).
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Wurmwall Sweeper
+70,000 Light-Years from Home
+Plains x15
+
+[Bot2 Deck]
+Swamp
+Entomb
+Swamp x6
+Guerrilla Gorilla
+Swamp x7
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Guerrilla Gorilla)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+! Bot1.Hand.70,000 Light-Years from Home.Cast(Bot2.Graveyard.Guerrilla Gorilla)
+Bot1.Hand.70,000 Light-Years from Home.Cast(Bot1.Battlefield.Wurmwall Sweeper)
+Bot1.Decline
+? Bot1.Library.Count = 11
+
+[Expect]
+Turn = 5
+Exile = Wurmwall Sweeper
