@@ -682,7 +682,11 @@ pub fn ask_numbers(kind: &AskKind) -> (usize, [u32; 6]) {
             16,
             [
                 0,
-                l(requirements.len()),
+                // The creatures a requirement is on.
+                l(eligible
+                    .iter()
+                    .filter(|&&c| requirements.iter().any(|r| r.0 == c))
+                    .count()),
                 0,
                 l(eligible.len()),
                 l(defenders.len()),

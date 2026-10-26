@@ -368,9 +368,13 @@ How it is built (`cantrip_obs::factor`, `cantrip_ai::answer`):
   then `Done` wherever the machine still asks.
 - **Masks and the validator.** The masks carry every local constraint. What only the whole answer shows is left to
   `check_answer` (`Rejection::global`): menace and "can't be blocked except by N", the block requirements' maximum
-  (CR 509.1c), a creature that must attack a certain player, goad, bands, a name that is no card or not of the kind
-  asked for, a total power or mana value short of its minimum, and more wanted than there is to choose. Any other
-  refusal is a fault of the factoring.
+  (CR 509.1c), bands, a name that is no card or not of the kind asked for, a total power or mana value short of its
+  minimum, and more wanted than there is to choose. Any other refusal is a fault of the factoring. The attack
+  requirements (CR 508.1d, goad among them) are masked by what each attack obeys and the most a declaration must, both
+  from the engine's `AttackRules`: an attack (or staying home) is offered where the creatures still to come, each at its
+  best, can make up the rest. Without a cap on attackers (CR 508.1c) each restriction is on one attacker at a time and
+  that is exact; a cap is room the attackers share, where it is only a bound - no legal declaration is masked, and one
+  the caps leave short is refused globally.
 - **The test** (`cantrip-ai/tests/factoring.rs`): at every request a scenario answers, the answer is put in canonical
   terms, decomposed, replayed through the machine, mapped back and validated; then three seeded random walks per
   request must be accepted or refused only globally. The fast test takes every 50th scenario; `-- --ignored` takes the

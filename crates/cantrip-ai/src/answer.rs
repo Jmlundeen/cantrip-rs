@@ -29,14 +29,14 @@ pub struct Rejection {
 impl Rejection {
     /// Whether it was refused for a property of the whole answer the factoring leaves to the validator (see
     /// `cantrip_obs::factor`): menace and the most blockers' requirements (CR 509.1b-c), the most attack requirements
-    /// (CR 508.1d, goad among them), a name, a total power or mana value short of its minimum, a selection rule, or more
-    /// wanted than there was to choose. Anything else refused is a fault of the factoring.
+    /// where a cap on attackers leaves a declaration short of them (CR 508.1c-d), a name, a total power or mana value
+    /// short of its minimum, a selection rule, or more wanted than there was to choose. Anything else refused is a fault
+    /// of the factoring.
     pub fn global(&self) -> bool {
-        const GLOBAL: [&str; 12] = [
+        const GLOBAL: [&str; 11] = [
             "can't be blocked except by",
             "(CR 509.1c)",
             "(CR 508.1d)",
-            "goaded creature",
             "not the name of a card",
             "card name",
             "split card's names",

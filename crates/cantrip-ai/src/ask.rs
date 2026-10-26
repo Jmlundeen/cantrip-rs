@@ -530,6 +530,21 @@ pub(crate) fn ask_of(
             capped.sort();
             let defenders: Vec<Ref> = capped.iter().map(|d| d.0).collect();
             let max_attackers: Vec<u8> = capped.iter().map(|d| d.1).collect();
+            // What each attack obeys of the requirements (CR 508.1d), by the engine's own count.
+            let targets: Vec<Target> = players
+                .iter()
+                .map(|&p| Target::Player(p))
+                .chain(planeswalkers.iter().chain(battles).map(|&id| Target::Object(id)))
+                .collect();
+            let mut obeyed: Vec<(Ref, Ref, u32)> = eligible
+                .iter()
+                .flat_map(|&a| targets.iter().map(move |&d| (a, d)))
+                .filter_map(|(a, d)| {
+                    let n = requirements.obeyed(&[(a, d)]);
+                    (n > 0).then(|| (r(a), t(d), n))
+                })
+                .collect();
+            obeyed.sort();
             let mut costs: Vec<(Ref, Ref, u16)> = costs
                 .iter()
                 .map(|c| {
@@ -544,9 +559,8 @@ pub(crate) fn ask_of(
             AskKind::DeclareAttackers {
                 eligible: rs(eligible),
                 defenders,
-                // The creatures a requirement is on (CR 508.1d); what each must attack, and how many requirements a
-                // declaration must obey, are the validator's.
-                requirements: rs(&requirements.required.iter().map(|q| q.attacker).collect::<Vec<_>>()),
+                requirements: obeyed,
+                most: requirements.most,
                 costs,
                 can_pay: *can_pay,
                 max_attackers,

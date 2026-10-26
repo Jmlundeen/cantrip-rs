@@ -335,11 +335,12 @@ pub enum AskKind {
     RemoveCounters { pools: Vec<CounterPoolObs>, total: u8, up_to: bool },
     /// A total divided among up to `max_targets` (0: any number) of `candidates`, each at least 1.
     ChooseDividedTargets { candidates: Vec<Ref>, total: u16, max_targets: u8, optional: bool },
-    /// Each of `eligible` attacks one of `defenders` or stays home; each of `requirements` must attack if able.
-    /// `costs` what an attack costs (attacker, defender, mana value of the cost); `can_pay` the most the seat can pay.
-    /// `max_attackers` the most creatures that may attack each defender (CR 508.1c), index for index with `defenders`;
-    /// `u8::MAX` where nothing caps it.
-    DeclareAttackers { eligible: Vec<Ref>, defenders: Vec<Ref>, requirements: Vec<Ref>, costs: Vec<(Ref, Ref, u16)>, can_pay: u16, max_attackers: Vec<u8> },
+    /// Each of `eligible` attacks one of `defenders` or stays home. `requirements` how many of the requirements (CR 508.1d)
+    /// each attack obeys (attacker, defender, how many; sorted, none for an attack that obeys none), of which a declaration
+    /// obeys `most`. `costs` what an attack costs (attacker, defender, mana value of the cost); `can_pay` the most the seat
+    /// can pay. `max_attackers` the most creatures that may attack each defender (CR 508.1c), index for index with
+    /// `defenders`; `u8::MAX` where nothing caps it.
+    DeclareAttackers { eligible: Vec<Ref>, defenders: Vec<Ref>, requirements: Vec<(Ref, Ref, u32)>, most: u32, costs: Vec<(Ref, Ref, u16)>, can_pay: u16, max_attackers: Vec<u8> },
     /// One division per creature with a choice, sorted by source.
     AssignCombatDamage { divisions: Vec<DivisionObs> },
     /// Each of `eligible` blocks one attacker of `allowed` or none. `required` the blocks effects require if able, of

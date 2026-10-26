@@ -331,16 +331,23 @@ fn a_sample_of_the_corpus_factors() {
 /// Scenarios that once failed, checked whatever the sample takes.
 #[test]
 fn scenarios_that_once_failed_factor() {
-    // "Remove up to three counters": two, of two kinds from one creature, is an answer the factoring makes.
     check(
-        ["glissa-sunslayer-removes-fewer-counters-from-a-creature"]
-            .iter()
-            .map(|n| {
-                let path = root().join("scenarios").join(format!("{n}.cantrip"));
-                assert!(path.exists(), "{n} is no scenario");
-                path
-            })
-            .collect(),
+        [
+            // "Remove up to three counters": two, of two kinds from one creature, is an answer the factoring makes.
+            "glissa-sunslayer-removes-fewer-counters-from-a-creature",
+            // A creature that must attack may stay home where attacking costs something (CR 508.1d) or what it must
+            // attack is gone or taxed.
+            "a-creature-that-attacks-each-combat-if-able-is-not-made-to-pay-ghostly-prison",
+            "gideon-battle-forged-gone-frees-the-creature-told-to-attack-him",
+            "ursine-monstrosity-told-to-attack-a-taxed-player-may-attack-nothing",
+        ]
+        .iter()
+        .map(|n| {
+            let path = root().join("scenarios").join(format!("{n}.cantrip"));
+            assert!(path.exists(), "{n} is no scenario");
+            path
+        })
+        .collect(),
     );
 }
 

@@ -8,7 +8,8 @@
 //! answer is validated, and an answer may be refused for it (the caller masks that answer and backtracks):
 //! - blockers: a creature with menace (or "can't be blocked except by N") blocked by too few, and the block
 //!   requirements' maximum (CR 509.1c);
-//! - attackers: a creature that must attack a certain player, a goaded creature attacking its goader (CR 701.15b);
+//! - attackers: where a cap on how many may attack a defender (CR 508.1c) leaves a declaration short of the most
+//!   requirements it must obey (CR 508.1d); without a cap the mask carries the requirements exactly;
 //! - a band with more than one creature without banding (CR 702.22c);
 //! - a chosen name that is no card name or not of the kind asked for (CR 201.4);
 //! - a total power or mana value short of its minimum (tapping for power, collecting evidence), when everything was
@@ -780,39 +781,49 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             eligible,
             defenders,
             requirements,
-            costs,
+            most,
             max_attackers,
             ..
         } => {
-            // A defender at its cap takes no more attackers (CR 508.1c). A creature under a requirement may not stay home
-            // while it may attack a player nothing caps for free - that attack obeys no fewer and takes no capped place -
-            // but where every such attack costs something (CR 508.1d: a cost is never a requirement, so a seat that can't
-            // or won't pay may leave it home) or every defender is capped (staying may be what the most requirements
-            // need), staying is offered and the validator judges it. Masked there, a seat with no mana would be made to
-            // attack, fail to pay, have the declaration taken back (CR 508.1h-j) and be asked again, forever.
+            // A defender at its cap takes no more attackers (CR 508.1c). A declaration obeys `most` requirements (CR
+            // 508.1d), never by paying (Ghostly Prison: `most` counts attacks that cost nothing). A choice is offered
+            // where the creatures still to come, each at its best attack (paying if need be), can make up the rest.
+            // With no cap that is exact: each restriction is on one attacker at a time (`cantrip_state::attacks`). A cap
+            // is room the attackers share, so there the best of each is only a bound: no legal declaration is ever
+            // masked, and one the caps leave short of the most is the validator's to refuse (a global refusal). Where
+            // the choices so far leave nothing that can make up the most, staying home is offered, for the validator.
             let cap = |i: usize| max_attackers.get(i).copied().unwrap_or(u8::MAX);
-            let free_open_player = |c: Ref| {
-                defenders.iter().enumerate().any(|(i, &d)| {
-                    matches!(d, Ref::Player(_)) && cap(i) == u8::MAX && !costs.iter().any(|x| x.0 == c && x.1 == d)
-                })
+            let gain = |c: Ref, d: Ref| {
+                requirements
+                    .iter()
+                    .find(|r| r.0 == c && r.1 == d)
+                    .map_or(0, |r| r.2)
             };
+            let best = |c: Ref| defenders.iter().map(|&d| gain(c, d)).max().unwrap_or(0);
+            let mut rest: u32 = eligible.iter().map(|&c| best(c)).sum();
+            let mut obeyed = 0u32;
             let mut attacking = vec![0usize; defenders.len()];
             let mut attacks = Vec::new();
             for &c in eligible {
+                rest -= best(c);
                 let mut step = Step::default();
-                step.push(
-                    Token::on(Tok::Stay, c),
-                    !(requirements.contains(&c) && free_open_player(c)) || defenders.is_empty(),
-                );
+                step.push(Token::on(Tok::Stay, c), obeyed + rest >= *most);
                 for (i, &d) in defenders.iter().enumerate() {
                     let room = cap(i) == u8::MAX || attacking[i] < usize::from(cap(i));
-                    step.push(Token::of(Tok::Attack, c, d, 0), room);
+                    step.push(
+                        Token::of(Tok::Attack, c, d, 0),
+                        room && obeyed + gain(c, d) + rest >= *most,
+                    );
+                }
+                if !step.mask.iter().any(|&m| m) {
+                    step.mask[0] = true;
                 }
                 let t = p.pick(step)?;
                 if t.kind == Tok::Attack {
                     if let Some(i) = defenders.iter().position(|&d| d == t.b) {
                         attacking[i] += 1;
                     }
+                    obeyed += gain(c, t.b);
                     attacks.push((c, t.b));
                 }
             }
@@ -1422,7 +1433,8 @@ mod tests {
         let a = ask(AskKind::DeclareAttackers {
             eligible: vec![o(1), o(2)],
             defenders: vec![Ref::Player(1), o(9)],
-            requirements: vec![o(2)],
+            requirements: vec![(o(2), Ref::Player(1), 1), (o(2), o(9), 1)],
+            most: 1,
             costs: vec![],
             can_pay: 0,
             max_attackers: vec![u8::MAX, u8::MAX],
@@ -1443,7 +1455,8 @@ mod tests {
         let a = ask(AskKind::DeclareAttackers {
             eligible: vec![o(1), o(2), o(3)],
             defenders: vec![Ref::Player(1), o(9)],
-            requirements: vec![o(3)],
+            requirements: vec![(o(3), Ref::Player(1), 1), (o(3), o(9), 1)],
+            most: 1,
             costs: vec![],
             can_pay: 0,
             max_attackers: vec![1, 1],
@@ -1466,7 +1479,8 @@ mod tests {
         let open = ask(AskKind::DeclareAttackers {
             eligible: vec![o(3)],
             defenders: vec![Ref::Player(1), o(9)],
-            requirements: vec![o(3)],
+            requirements: vec![(o(3), Ref::Player(1), 1), (o(3), o(9), 1)],
+            most: 1,
             costs: vec![],
             can_pay: 0,
             max_attackers: vec![u8::MAX, 1],
@@ -1476,12 +1490,67 @@ mod tests {
         let taxed = ask(AskKind::DeclareAttackers {
             eligible: vec![o(3)],
             defenders: vec![Ref::Player(1)],
-            requirements: vec![o(3)],
+            requirements: vec![(o(3), Ref::Player(1), 1)],
+            // A requirement is never obeyed by paying: the most is 0.
+            most: 0,
             costs: vec![(o(3), Ref::Player(1), 2)],
             can_pay: 0,
             max_attackers: vec![u8::MAX],
         });
         assert!(legal(&Machine::new(&taxed, &[]), Token::on(Tok::Stay, o(3))));
+        round_trip(&taxed, &FactoredAnswer::Attack(vec![(o(3), Ref::Player(1))]));
+    }
+
+    #[test]
+    fn attackers_obey_as_many_requirements_as_the_most() {
+        // Told to attack player 1 and goaded by player 1 (attack, and attack a player other than 1): attacking either
+        // player obeys two, the most; attacking the planeswalker one.
+        let goaded = ask(AskKind::DeclareAttackers {
+            eligible: vec![o(1)],
+            defenders: vec![Ref::Player(1), Ref::Player(2), o(9)],
+            requirements: vec![
+                (o(1), Ref::Player(1), 2),
+                (o(1), Ref::Player(2), 2),
+                (o(1), o(9), 1),
+            ],
+            most: 2,
+            costs: vec![],
+            can_pay: 0,
+            max_attackers: vec![u8::MAX; 3],
+        });
+        let m = Machine::new(&goaded, &[]);
+        assert!(!legal(&m, Token::on(Tok::Stay, o(1))));
+        assert!(!legal(&m, Token::of(Tok::Attack, o(1), o(9), 0)));
+        assert!(legal(&m, Token::of(Tok::Attack, o(1), Ref::Player(2), 0)));
+        // What the creature must attack is gone (Gideon, Battle-Forged): the most is 0, and it may stay home.
+        let gone = ask(AskKind::DeclareAttackers {
+            eligible: vec![o(1)],
+            defenders: vec![Ref::Player(1)],
+            requirements: vec![],
+            most: 0,
+            costs: vec![],
+            can_pay: 0,
+            max_attackers: vec![u8::MAX],
+        });
+        round_trip(&gone, &FactoredAnswer::Attack(vec![]));
+        // One creature may make up for another: one paying to obey two leaves the other free to stay home.
+        let paid = ask(AskKind::DeclareAttackers {
+            eligible: vec![o(1), o(2)],
+            defenders: vec![Ref::Player(1), o(9)],
+            requirements: vec![
+                (o(1), Ref::Player(1), 1),
+                (o(2), Ref::Player(1), 1),
+                (o(2), o(9), 2),
+            ],
+            most: 2,
+            costs: vec![(o(2), o(9), 3)],
+            can_pay: 3,
+            max_attackers: vec![u8::MAX; 2],
+        });
+        let m = walk(&paid, &[Token::on(Tok::Stay, o(1))]);
+        assert!(!legal(&m, Token::on(Tok::Stay, o(2))));
+        assert!(!legal(&m, Token::of(Tok::Attack, o(2), Ref::Player(1), 0)));
+        round_trip(&paid, &FactoredAnswer::Attack(vec![(o(2), o(9))]));
     }
 
     #[test]
