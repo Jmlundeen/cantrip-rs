@@ -879,6 +879,57 @@ mod tests {
         check_every_declaration(&creatures, &targets, &menu, &[&[(c, 1), (W, 1)]], &[&[]], &[Vec::new(), vec![(Y, W)], vec![(V, b)]]);
     }
 
+    /// A placing written out: each creature's best open attack (what it obeys), what it obeys at each capped target, where
+    /// it is, and the room at each capped target.
+    fn placing(open: &[u32], at_cap: &[[Option<u32>; 4]], at: &[Option<usize>], rooms: &[u32]) -> Assignment {
+        Assignment {
+            open: open.iter().map(|&g| (g, None)).collect(),
+            at_cap: at_cap.iter().map(|r| r.to_vec()).collect(),
+            capped: rooms.iter().copied().enumerate().collect(),
+            at: at.to_vec(),
+        }
+    }
+
+    /// Making room at a full capped target down a chain of three moves, which the creatures' order makes take a round
+    /// each: the creature at the first target moves to the second, the one there to the third, the one there to the
+    /// fourth, and the one there goes where nothing caps it for nothing; each move costs 1.
+    #[test]
+    fn shed_follows_a_chain_a_round_at_a_time() {
+        let a = placing(
+            &[0, 0, 0, 10],
+            &[
+                [Some(10), Some(9), None, None],
+                [None, Some(10), Some(9), None],
+                [None, None, Some(10), Some(9)],
+                [None, None, None, Some(10)],
+            ],
+            &[Some(0), Some(1), Some(2), Some(3)],
+            &[1, 1, 1, 1],
+        );
+        assert_eq!(a.shed(usize::MAX), vec![Some(-3), Some(-2), Some(-1), Some(0)]);
+    }
+
+    /// Filling a place freed at the last capped target down a chain of three moves, a round each: the creature at the
+    /// third target moves into it, the one at the second into the third, the one at the first into the second, and a
+    /// creature attacking where nothing caps it into the first, for 5 in all.
+    #[test]
+    fn fill_follows_a_chain_a_round_at_a_time() {
+        let mut a = placing(
+            &[0, 0, 0, 0, 0],
+            &[
+                [None, None, Some(6), Some(6)],
+                [None, Some(6), Some(6), None],
+                [Some(6), Some(6), None, None],
+                [Some(5), None, None, None],
+                [None, None, None, Some(100)],
+            ],
+            &[Some(2), Some(1), Some(0), None, None],
+            &[1, 1, 1, 1],
+        );
+        assert_eq!(a.fill(3, 4), 5);
+        assert_eq!(a.at, vec![Some(3), Some(2), Some(1), Some(0), None]);
+    }
+
     /// The assignment takes time polynomial in the creatures and targets: sixty creatures that each attack if able, against
     /// six capped planeswalkers and a capped player, obey as many as there are places.
     #[test]
