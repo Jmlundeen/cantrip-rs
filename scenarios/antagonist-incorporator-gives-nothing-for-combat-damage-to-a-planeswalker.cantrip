@@ -1,0 +1,47 @@
+# The granted trigger is "deals combat damage to a player": combat damage to a planeswalker is not to its controller
+# (CR 510.1b, 120.3c). Bot1's Antagonist Incorporator attacks Bot2's Ajani Resolute (loyalty 2) on turn 3 and kills it,
+# and Bot1, holding an untapped Mox Pearl, is never asked to pay; Bot2's life is untouched.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Antagonist Incorporator
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ajani Resolute
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Antagonist Incorporator.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Antagonist Incorporator > Bot2.Battlefield.Ajani Resolute)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Ajani Resolute
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Borg Token = (absent)

@@ -1,0 +1,57 @@
+# Combat damage must be to a player, and the creature must be one its controller has. Turn 2: Bot2's Clockwork
+# Percussionist (an artifact creature with haste, cast with the Mountain) hits Bot1 and Bot2 is never asked to pay
+# although it holds an untapped Mox Jet. Turn 3: Bot1's Antagonist Incorporator is blocked by Bot2's Ornithopter, so
+# its damage goes to a creature and Bot1 is not asked to pay either.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Antagonist Incorporator
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Clockwork Percussionist
+Ornithopter
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Antagonist Incorporator.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Clockwork Percussionist.Cast
+Bot2.Pass
+Bot2.Attack(Clockwork Percussionist > Bot1)
+[T2 Bot2.CombatDamage]
+Bot2.Pass
+! Bot2.Accept
+[T3 Bot1.Main1]
+Bot1.Attack(Antagonist Incorporator > Bot2)
+Bot2.Block(Ornithopter > Antagonist Incorporator)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Turn = 3
+Bot1.Life = 19
+Bot2.Life = 20
+Bot1.Battlefield.Borg Token = (absent)
+Bot2.Battlefield.Borg Token = (absent)
+Bot2.Battlefield.Mox Jet.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = false

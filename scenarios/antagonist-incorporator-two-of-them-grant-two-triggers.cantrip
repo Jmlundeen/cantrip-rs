@@ -1,0 +1,56 @@
+# Two Antagonist Incorporators each grant the ability (the second cast on turn 3), so an artifact creature Bot1 controls has it twice and triggers
+# twice for one hit (CR 113.2c, 603.2): Bot1's first Incorporator hits Bot2 on turn 3, both triggers resolve, and Bot1 pays
+# {1} for each (Mox Sapphire, then Mox Emerald) for two Borg tokens.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Antagonist Incorporator
+Antagonist Incorporator
+Plains x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Antagonist Incorporator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Antagonist Incorporator.Cast
+Bot1.Pass
+Bot1.Attack(Antagonist Incorporator#1 > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.PayCost
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Battlefield.Antagonist Incorporator#2.Tapped = false
+Bot1.Battlefield.Borg Token#1.Power = 1
+Bot1.Battlefield.Borg Token#2.Power = 1
+Bot1.Battlefield.Borg Token#3 = (absent)

@@ -1,0 +1,35 @@
+# The same hit as the paying scenario, but the controller declines to pay {1} ("you may pay"): no token, Mox Pearl
+# stays untapped and Bot2 still takes 2.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Antagonist Incorporator
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Antagonist Incorporator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Antagonist Incorporator > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Decline
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Borg Token = (absent)

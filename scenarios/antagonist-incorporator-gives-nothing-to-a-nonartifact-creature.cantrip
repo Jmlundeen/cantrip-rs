@@ -1,0 +1,40 @@
+# Only artifact creatures get the trigger: Bot1's Monastery Swiftspear (not an artifact, haste) hits Bot2 on turn 1 beside
+# the Antagonist Incorporator and Bot1, holding an untapped Mox Pearl, is never asked to pay.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Mox Ruby
+Antagonist Incorporator
+Monastery Swiftspear
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Antagonist Incorporator.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Monastery Swiftspear.Cast
+Bot1.Pass
+Bot1.Attack(Monastery Swiftspear > Bot2)
+[T1 Bot1.CombatDamage]
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Turn = 1
+Bot2.Life = 19
+Bot1.Battlefield.Borg Token = (absent)
+Bot1.Battlefield.Mox Pearl.Tapped = false
