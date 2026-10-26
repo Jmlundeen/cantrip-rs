@@ -10,8 +10,10 @@
 //! player other than that one - and "attacks that player this combat if able" is one: attacking either of two players may
 //! obey as many as the other, and both are legal. A restriction on one attacker at a time (who may attack, and what) leaves
 //! the most each attacker's best attack, added up; a cap on how many may attack one player, planeswalker or battle (CR
-//! 508.1c) is room the attackers share, which makes the most a maximum-weight assignment with capacities (`search`), solved
+//! 508.1c) is room the attackers share, which makes the most a maximum-weight assignment with capacities (`Assignment`), solved
 //! exactly in polynomial time.
+
+use std::collections::HashMap;
 
 use crate::{AttackCost, ManaCost, ObjectId, PlayerId, Target, count_u32};
 
@@ -103,21 +105,24 @@ impl AttackRules {
         attacks.iter().map(|&(a, t)| self.gain(a, t)).sum()
     }
 
-    /// The best `attacker` can obey: the most any one attack of it among `targets` obeys (and not attacking obeys none),
-    /// with one such attack; with `free_only`, among attacks that cost nothing (CR 508.1d). What it asks is what the
-    /// requirement demands; whether a cap leaves room for it is the declaration's business (CR 508.1c).
-    fn best(&self, attacker: ObjectId, targets: &[Target], costs: &[AttackCost], free_only: bool) -> (u32, Option<Target>) {
-        let mut best = (0, None);
-        for &t in targets {
-            if free_only && !AttackCost::free(costs, attacker, t) {
-                continue;
-            }
-            let g = self.gain(attacker, t);
-            if g > best.0 {
-                best = (g, Some(t));
+    /// What each of `creatures` obeys attacking each of `targets`, by index (CR 508.1d): the requirements read once, however
+    /// many creatures and attacks are asked about.
+    fn gains(&self, creatures: &[ObjectId], targets: &[Target]) -> Vec<Vec<u32>> {
+        let mut table = vec![vec![0u32; targets.len()]; creatures.len()];
+        if self.required.is_empty() {
+            return table;
+        }
+        let index: HashMap<ObjectId, usize> = creatures.iter().enumerate().map(|(i, &a)| (a, i)).collect();
+        for r in &self.required {
+            if let Some(&i) = index.get(&r.attacker) {
+                for (t, &at) in targets.iter().enumerate() {
+                    if Self::obeys(r, r.attacker, at) {
+                        table[i][t] += 1;
+                    }
+                }
             }
         }
-        best
+        table
     }
 
     /// Whether a cap applies to any of `targets` (CR 508.1c).
@@ -125,129 +130,14 @@ impl AttackRules {
         self.limits.iter().any(|l| targets.contains(&l.0))
     }
 
-    /// The most requirements a declaration of `free` creatures attacking among `targets` obeys on top of `fixed` (CR
-    /// 508.1d), with one that does, or `None` when `fixed` itself breaks a cap (CR 508.1c); with `free_only`, attacking only
-    /// where it costs nothing. Each creature attacks only once and its requirements count only its own attack, so what one
-    /// obeys depends on its attack alone, and a cap is room the creatures share: the most is a maximum-weight assignment of
-    /// creatures to targets with the caps as capacities, not each creature's best added up. Each creature first takes its
-    /// best attack where nothing caps it; the room at the capped targets then goes where it obeys the most beyond that, by
-    /// successive augmenting paths - each the one that adds the most (a creature moved onto a capped target, perhaps
-    /// moving the one there on to another), until none adds anything - which is exact (each step keeps the assignment the
-    /// best of its size, and what a step adds only falls) and takes time polynomial in the creatures and targets.
-    fn search(&self, free: &[ObjectId], targets: &[Target], costs: &[AttackCost], free_only: bool, fixed: &[(ObjectId, Target)]) -> Option<(u32, Vec<(ObjectId, Target)>)> {
-        // The capped targets among `targets`, with the room `fixed` leaves at each.
-        let mut capped: Vec<(Target, u32)> = Vec::new();
-        for &(t, most) in &self.limits {
-            let used = count_u32(fixed.iter().filter(|x| x.1 == t).count());
-            if used > most {
-                return None;
-            }
-            if targets.contains(&t) {
-                capped.push((t, most - used));
-            }
-        }
-        let allowed = |a: ObjectId, t: Target| !free_only || AttackCost::free(costs, a, t);
-        // Each creature's best attack where nothing caps it.
-        let open: Vec<(u32, Option<Target>)> = free
-            .iter()
-            .map(|&a| {
-                let mut best = (0, None);
-                for &t in targets.iter().filter(|&&t| allowed(a, t) && !capped.iter().any(|c| c.0 == t)) {
-                    let g = self.gain(a, t);
-                    if g > best.0 {
-                        best = (g, Some(t));
-                    }
-                }
-                best
-            })
-            .collect();
-        // What attacking each capped target obeys beyond that creature's best open attack, where it is more.
-        let more: Vec<Vec<u32>> = free
-            .iter()
-            .zip(&open)
-            .map(|(&a, &(base, _))| {
-                capped
-                    .iter()
-                    .map(|&(t, room)| {
-                        let g = if room > 0 && allowed(a, t) { self.gain(a, t) } else { 0 };
-                        if g > base { g - base } else { 0 }
-                    })
-                    .collect()
-            })
-            .collect();
-        let (n, k) = (free.len(), capped.len());
-        // The capped target each creature attacks, by index into `capped`, and how many attack each.
-        let mut at: Vec<Option<usize>> = vec![None; n];
-        let mut load = vec![0u32; k];
-        // Each augmenting path takes up one place of room, and there are at most `n` creatures to place.
-        for _ in 0..n.min(capped.iter().map(|c| c.1 as usize).sum()) {
-            // The most a path adds on reaching each creature (0..n) and each capped target (n..n + k): it starts at a
-            // creature attacking no capped target, moves it onto a capped target, which may move the creature attacking
-            // there onto another, and so on. A path visits each capped target at most once, so k + 1 rounds settle it.
-            let mut reach: Vec<Option<i64>> = (0..n + k).map(|v| (v < n && at[v].is_none()).then_some(0)).collect();
-            let mut came = vec![usize::MAX; k];
-            for _ in 0..=k + 1 {
-                let mut changed = false;
-                for i in 0..n {
-                    let Some(d) = reach[i] else { continue };
-                    for j in 0..k {
-                        if more[i][j] > 0 && at[i] != Some(j) {
-                            let v = d + i64::from(more[i][j]);
-                            if reach[n + j].is_none_or(|w| v > w) {
-                                reach[n + j] = Some(v);
-                                came[j] = i;
-                                changed = true;
-                            }
-                        }
-                    }
-                }
-                for i in 0..n {
-                    let Some(j) = at[i] else { continue };
-                    let Some(d) = reach[n + j] else { continue };
-                    let v = d - i64::from(more[i][j]);
-                    if reach[i].is_none_or(|w| v > w) {
-                        reach[i] = Some(v);
-                        changed = true;
-                    }
-                }
-                if !changed {
-                    break;
-                }
-            }
-            // The path that adds the most, ending where there is room left; none that adds anything, and this is the most.
-            let Some(end) = (0..k).filter(|&j| load[j] < capped[j].1 && reach[n + j].is_some_and(|v| v > 0)).max_by_key(|&j| reach[n + j]) else {
-                break;
-            };
-            load[end] += 1;
-            let mut j = end;
-            for _ in 0..=k {
-                let i = came[j];
-                let Some(was) = at.get_mut(i) else { break };
-                let left = was.replace(j);
-                match left {
-                    Some(prev) => j = prev,
-                    None => break,
-                }
-            }
-        }
-        let mut obeyed = self.obeyed(fixed);
-        let mut declaration = fixed.to_vec();
-        for (i, &a) in free.iter().enumerate() {
-            if let Some(j) = at[i] {
-                obeyed += open[i].0 + more[i][j];
-                declaration.push((a, capped[j].0));
-            } else if let (g, Some(t)) = open[i] {
-                obeyed += g;
-                declaration.push((a, t));
-            }
-        }
-        Some((obeyed, declaration))
-    }
-
     /// The most requirements any declaration of `eligible` attacking among `targets` obeys without paying a cost (CR
-    /// 508.1d), with one that does (`search`).
+    /// 508.1d), with one that does (`Assignment`).
     pub fn solve(&self, eligible: &[ObjectId], targets: &[Target], costs: &[AttackCost]) -> (u32, Vec<(ObjectId, Target)>) {
-        self.search(eligible, targets, costs, true, &[]).unwrap_or_default()
+        let gains = self.gains(eligible, targets);
+        let rows: Vec<&[u32]> = gains.iter().map(|r| &r[..]).collect();
+        let Some(mut best) = Assignment::new(self, &rows, eligible, targets, costs, true, &[]) else { return Default::default() };
+        best.maximize();
+        (best.total(), best.declaration(eligible, targets))
     }
 
     /// What the rules make of `attacks`, a declaration of `eligible` creatures attacking among `targets`, with what attacks
@@ -280,15 +170,19 @@ impl AttackRules {
                 }
             }
         }
-        if found.is_none() && self.obeyed(attacks) < self.most {
+        let declared = self.obeyed(attacks);
+        let short = found.is_none() && declared < self.most;
+        let gains = if short || (addable && mendable) { self.gains(eligible, targets) } else { Vec::new() };
+        if short {
             // An attacker obeying fewer than it could, and a requirement its best attack obeys that its attack does not.
             found = eligible
                 .iter()
-                .find_map(|&a| {
+                .zip(&gains)
+                .find_map(|(&a, row)| {
                     let now = attacks.iter().find(|x| x.0 == a).map(|x| x.1);
-                    let (best, at) = self.best(a, targets, costs, true);
+                    let (best, at) = best_of(row, a, targets, costs, true);
                     let have = now.map_or(0, |t| self.gain(a, t));
-                    let at = at?;
+                    let at = targets[at?];
                     (have < best).then(|| {
                         let r = self.required.iter().find(|r| Self::obeys(r, a, at) && now.is_none_or(|t| !Self::obeys(r, a, t)))?;
                         match r.aim {
@@ -303,38 +197,59 @@ impl AttackRules {
                 .or_else(|| issue(attacks.first().map_or(ObjectId::NONE, |x| x.0), "must attack", None, "508.1d"));
         }
         let complete = found.is_none();
+        let free: Vec<usize> = if addable && mendable { (0..eligible.len()).filter(|&i| !attacks.iter().any(|x| x.0 == eligible[i])).collect() } else { Vec::new() };
         let addable = if addable && mendable && !self.capped(targets) {
             // Every restriction is on one attacker at a time: an attack may be added where the others not yet attacking can
             // make up the rest at their best, paying if need be.
-            let declared = self.obeyed(attacks);
-            let free: Vec<ObjectId> = eligible.iter().copied().filter(|a| !attacks.iter().any(|x| x.0 == *a)).collect();
-            let rest: Vec<(ObjectId, u32)> = free.iter().map(|&a| (a, self.best(a, targets, costs, false).0)).collect();
+            let rest: Vec<(usize, u32)> = free.iter().map(|&i| (i, best_of(&gains[i], eligible[i], targets, costs, false).0)).collect();
             let all: u32 = rest.iter().map(|r| r.1).sum();
             let mut list = Vec::new();
-            for &(a, best) in &rest {
-                for &t in targets {
-                    if declared + self.gain(a, t) + all - best >= self.most {
-                        list.push((a, t));
+            for &(i, best) in &rest {
+                for (t, &at) in targets.iter().enumerate() {
+                    if declared + gains[i][t] + all - best >= self.most {
+                        list.push((eligible[i], at));
                     }
                 }
             }
             list
         } else if addable && mendable {
             // A cap is room several creatures share (CR 508.1c), so an attack may be added where that target has room and
-            // some declaration extending this one with it still obeys the most (CR 508.1d), paying if need be.
-            let free: Vec<ObjectId> = eligible.iter().copied().filter(|a| !attacks.iter().any(|x| x.0 == *a)).collect();
+            // some declaration extending this one with it still obeys the most (CR 508.1d), paying if need be. One best
+            // assignment of the creatures not attacking answers it for every attack: taking a creature out of it frees
+            // its place, which goes where it adds the most (`fill`), and placing it at a full capped target makes room
+            // there the way that loses the least (`shed`) - each the best change for one place more or less, so the
+            // result is the best declaration with that attack, exactly.
+            let creatures: Vec<ObjectId> = free.iter().map(|&i| eligible[i]).collect();
+            let rows: Vec<&[u32]> = free.iter().map(|&i| &gains[i][..]).collect();
             let mut list = Vec::new();
-            for &a in &free {
-                let rest: Vec<ObjectId> = free.iter().copied().filter(|&b| b != a).collect();
-                for &t in targets {
-                    if !self.room(t, attacks) {
-                        continue;
+            if let Some(mut best) = Assignment::new(self, &rows, &creatures, targets, costs, false, attacks) {
+                best.maximize();
+                let total = i64::from(best.total());
+                let kept = best.at.clone();
+                let room: Vec<bool> = targets.iter().map(|&t| self.room(t, attacks)).collect();
+                for (i, &a) in creatures.iter().enumerate() {
+                    let mut without = total - i64::from(best.value(i));
+                    if let Some(j) = best.at[i].take() {
+                        without += best.fill(j, i);
                     }
-                    let mut fixed = attacks.to_vec();
-                    fixed.push((a, t));
-                    if self.search(&rest, targets, costs, false, &fixed).is_some_and(|(n, _)| n >= self.most) {
-                        list.push((a, t));
+                    let shed = best.shed(i);
+                    let loads = best.loads();
+                    for (t, &at) in targets.iter().enumerate() {
+                        if !room[t] {
+                            continue;
+                        }
+                        let lose = match best.capped.iter().position(|c| c.0 == t) {
+                            Some(j) if loads[j] >= best.capped[j].1 => match shed[j] {
+                                Some(lose) => lose,
+                                None => continue,
+                            },
+                            _ => 0,
+                        };
+                        if i64::from(declared) + i64::from(rows[i][t]) + without + lose >= i64::from(self.most) {
+                            list.push((a, at));
+                        }
                     }
+                    best.at.copy_from_slice(&kept);
                 }
             }
             list
@@ -344,6 +259,285 @@ impl AttackRules {
         // Two attacks of `addable` may still be one too many for a capped target (CR 508.1c), so a capped declaration is
         // never free of asking.
         AttackVerdict { complete, addable, issue: found, cost: AttackCost::total(costs, attacks), free: self.most == 0 && !self.capped(targets) }
+    }
+}
+
+/// The best a creature can obey from its row of what each attack obeys: the most any one attack among `targets` obeys (and
+/// not attacking obeys none), with that attack's index; with `free_only`, among attacks that cost nothing (CR 508.1d).
+fn best_of(row: &[u32], attacker: ObjectId, targets: &[Target], costs: &[AttackCost], free_only: bool) -> (u32, Option<usize>) {
+    let mut best = (0, None);
+    for (t, &g) in row.iter().enumerate() {
+        if g > best.0 && (!free_only || AttackCost::free(costs, attacker, targets[t])) {
+            best = (g, Some(t));
+        }
+    }
+    best
+}
+
+/// Creatures placed among the targets of a declaration of attackers, some of which are capped (CR 508.1c): each creature at
+/// a capped target, or else at its best attack where nothing caps it (attacking nothing where no such attack obeys
+/// anything). A creature's requirements count only its own attack, so what the creatures obey is the sum of what each
+/// does, and the caps are room they share: the most they obey is a maximum-weight assignment of creatures to targets with
+/// the caps as capacities, which `maximize` finds exactly, in time polynomial in the creatures and targets.
+struct Assignment {
+    /// Each creature's best attack where nothing caps it: what it obeys, and the target's index.
+    open: Vec<(u32, Option<usize>)>,
+    /// What each creature obeys attacking each capped target; `None` where it may not (no room, or a cost where only
+    /// attacks that cost nothing count).
+    at_cap: Vec<Vec<Option<u32>>>,
+    /// Each capped target's index among the targets, and the room left there.
+    capped: Vec<(usize, u32)>,
+    /// The capped target each creature attacks, by index into `capped`.
+    at: Vec<Option<usize>>,
+}
+
+impl Assignment {
+    /// `creatures` (each with its row of what each attack obeys) placed beside `fixed`, nobody yet at a capped target; `None`
+    /// when `fixed` itself breaks a cap (CR 508.1c). With `free_only`, only attacks that cost nothing count (CR 508.1d).
+    fn new(
+        rules: &AttackRules,
+        rows: &[&[u32]],
+        creatures: &[ObjectId],
+        targets: &[Target],
+        costs: &[AttackCost],
+        free_only: bool,
+        fixed: &[(ObjectId, Target)],
+    ) -> Option<Self> {
+        let mut capped: Vec<(usize, u32)> = Vec::new();
+        for &(t, most) in &rules.limits {
+            let used = count_u32(fixed.iter().filter(|x| x.1 == t).count());
+            if used > most {
+                return None;
+            }
+            if let Some(i) = targets.iter().position(|&x| x == t) {
+                capped.push((i, most - used));
+            }
+        }
+        let allowed = |a: ObjectId, t: usize| !free_only || AttackCost::free(costs, a, targets[t]);
+        let open = creatures
+            .iter()
+            .zip(rows)
+            .map(|(&a, row)| {
+                let mut best = (0, None);
+                for (t, &g) in row.iter().enumerate() {
+                    if g > best.0 && !capped.iter().any(|c| c.0 == t) && allowed(a, t) {
+                        best = (g, Some(t));
+                    }
+                }
+                best
+            })
+            .collect();
+        let at_cap = creatures.iter().zip(rows).map(|(&a, row)| capped.iter().map(|&(t, room)| (room > 0 && allowed(a, t)).then_some(row[t])).collect()).collect();
+        Some(Assignment { open, at_cap, capped, at: vec![None; creatures.len()] })
+    }
+
+    /// What creature `i` obeys where it is placed.
+    fn value(&self, i: usize) -> u32 {
+        match self.at[i] {
+            Some(j) => self.at_cap[i][j].unwrap_or(0),
+            None => self.open[i].0,
+        }
+    }
+
+    /// What the creatures obey, placed as they are.
+    fn total(&self) -> u32 {
+        (0..self.at.len()).map(|i| self.value(i)).sum()
+    }
+
+    /// How many creatures attack each capped target.
+    fn loads(&self) -> Vec<u32> {
+        let mut loads = vec![0u32; self.capped.len()];
+        for j in self.at.iter().flatten() {
+            loads[*j] += 1;
+        }
+        loads
+    }
+
+    /// The declaration the placing is, in the order of `creatures`.
+    fn declaration(&self, creatures: &[ObjectId], targets: &[Target]) -> Vec<(ObjectId, Target)> {
+        let mut declaration = Vec::new();
+        for (i, &a) in creatures.iter().enumerate() {
+            if let Some(j) = self.at[i] {
+                declaration.push((a, targets[self.capped[j].0]));
+            } else if let (_, Some(t)) = self.open[i] {
+                declaration.push((a, targets[t]));
+            }
+        }
+        declaration
+    }
+
+    /// What creature `i` gains attacking capped target `j` over its best attack where nothing caps it, where it gains.
+    fn more(&self, i: usize, j: usize) -> u32 {
+        match self.at_cap[i][j] {
+            Some(g) if g > self.open[i].0 => g - self.open[i].0,
+            _ => 0,
+        }
+    }
+
+    /// Places the creatures to obey the most: from nobody at a capped target, by successive augmenting paths - each the one
+    /// that adds the most (a creature moved onto a capped target, perhaps moving the one there on to another), until none
+    /// adds anything. Each step keeps the placing the best of its size and what a step adds only falls, so it ends at the
+    /// best there is (an optimal flow by successive longest paths).
+    fn maximize(&mut self) {
+        let (n, k) = (self.at.len(), self.capped.len());
+        let mut load = self.loads();
+        // Each augmenting path takes up one place of room, and there are at most `n` creatures to place.
+        for _ in 0..n.min(self.capped.iter().map(|c| c.1 as usize).sum()) {
+            // The most a path adds on reaching each creature (0..n) and each capped target (n..n + k): it starts at a
+            // creature attacking no capped target, moves it onto a capped target, which may move the creature attacking
+            // there onto another, and so on. A path visits each capped target at most once, so k + 1 rounds settle it.
+            let mut reach: Vec<Option<i64>> = (0..n + k).map(|v| (v < n && self.at[v].is_none()).then_some(0)).collect();
+            let mut came = vec![usize::MAX; k];
+            for _ in 0..=k + 1 {
+                let mut changed = false;
+                for i in 0..n {
+                    let Some(d) = reach[i] else { continue };
+                    for j in 0..k {
+                        let more = self.more(i, j);
+                        if more > 0 && self.at[i] != Some(j) {
+                            let v = d + i64::from(more);
+                            if reach[n + j].is_none_or(|w| v > w) {
+                                reach[n + j] = Some(v);
+                                came[j] = i;
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+                for i in 0..n {
+                    let Some(j) = self.at[i] else { continue };
+                    let Some(d) = reach[n + j] else { continue };
+                    let v = d - i64::from(self.more(i, j));
+                    if reach[i].is_none_or(|w| v > w) {
+                        reach[i] = Some(v);
+                        changed = true;
+                    }
+                }
+                if !changed {
+                    break;
+                }
+            }
+            // The path that adds the most, ending where there is room left; none that adds anything, and this is the most.
+            let Some(end) = (0..k).filter(|&j| load[j] < self.capped[j].1 && reach[n + j].is_some_and(|v| v > 0)).max_by_key(|&j| reach[n + j]) else {
+                break;
+            };
+            load[end] += 1;
+            let mut j = end;
+            for _ in 0..=k {
+                let i = came[j];
+                let Some(was) = self.at.get_mut(i) else { break };
+                match was.replace(j) {
+                    Some(prev) => j = prev,
+                    None => break,
+                }
+            }
+        }
+    }
+
+    /// Fills a place freed at capped target `j` (creature `gone` taken out) the way that obeys the most, and says what that
+    /// adds: a creature moves into it from attacking where nothing caps it, or from another capped target, whose place is
+    /// filled the same way, and so on; or the place stays empty, adding nothing. From the best placing for the room there
+    /// was, this is the best for one place more (an optimal flow, and the best cycle through one unit of capacity more).
+    fn fill(&mut self, j: usize, gone: usize) -> i64 {
+        #[derive(Clone, Copy)]
+        enum From {
+            Nobody,
+            Open(usize),
+            Capped(usize, usize),
+        }
+        let k = self.capped.len();
+        let mut best: Vec<(i64, From)> = vec![(0, From::Nobody); k];
+        for i in (0..self.at.len()).filter(|&i| i != gone && self.at[i].is_none()) {
+            for (u, slot) in best.iter_mut().enumerate() {
+                if let Some(g) = self.at_cap[i][u] {
+                    let v = i64::from(g) - i64::from(self.open[i].0);
+                    if v > slot.0 {
+                        *slot = (v, From::Open(i));
+                    }
+                }
+            }
+        }
+        // A path visits each capped target at most once, so k + 1 rounds settle it.
+        for _ in 0..=k {
+            let mut changed = false;
+            for i in (0..self.at.len()).filter(|&i| i != gone) {
+                let Some(v) = self.at[i] else { continue };
+                let here = i64::from(self.at_cap[i][v].unwrap_or(0));
+                for u in (0..k).filter(|&u| u != v) {
+                    if let Some(g) = self.at_cap[i][u] {
+                        let w = i64::from(g) - here + best[v].0;
+                        if w > best[u].0 {
+                            best[u] = (w, From::Capped(i, v));
+                            changed = true;
+                        }
+                    }
+                }
+            }
+            if !changed {
+                break;
+            }
+        }
+        let gained = best[j].0;
+        let mut u = j;
+        for _ in 0..=k {
+            match best[u].1 {
+                From::Nobody => break,
+                From::Open(i) => {
+                    self.at[i] = Some(u);
+                    break;
+                }
+                From::Capped(i, v) => {
+                    self.at[i] = Some(u);
+                    u = v;
+                }
+            }
+        }
+        gained
+    }
+
+    /// What the creatures other than `gone` obey more (never more than nothing, from the best placing) once one place at
+    /// each capped target is made free the best way, the placing left as it is: a creature there moves to attacking where
+    /// nothing caps it, or to a capped target with room, or to a full one that makes room the same way. From the best
+    /// placing, this is the best with one place less there (an optimal flow, and the best cycle through one unit of
+    /// capacity less). `None` where nobody attacks it.
+    fn shed(&self, gone: usize) -> Vec<Option<i64>> {
+        fn raise(slot: &mut Option<i64>, v: i64) -> bool {
+            let higher = slot.is_none_or(|x| v > x);
+            if higher {
+                *slot = Some(v);
+            }
+            higher
+        }
+        let k = self.capped.len();
+        let loads = self.loads();
+        let spare: Vec<bool> = (0..k).map(|j| loads[j] < self.capped[j].1).collect();
+        let mut best: Vec<Option<i64>> = vec![None; k];
+        let placed: Vec<(usize, usize)> = (0..self.at.len()).filter(|&i| i != gone).filter_map(|i| self.at[i].map(|u| (i, u))).collect();
+        for &(i, u) in &placed {
+            let here = i64::from(self.at_cap[i][u].unwrap_or(0));
+            raise(&mut best[u], i64::from(self.open[i].0) - here);
+            for w in (0..k).filter(|&w| w != u && spare[w]) {
+                if let Some(g) = self.at_cap[i][w] {
+                    raise(&mut best[u], i64::from(g) - here);
+                }
+            }
+        }
+        // A path visits each capped target at most once, so k + 1 rounds settle it.
+        for _ in 0..=k {
+            let mut changed = false;
+            for &(i, u) in &placed {
+                let here = i64::from(self.at_cap[i][u].unwrap_or(0));
+                for w in (0..k).filter(|&w| w != u && !spare[w]) {
+                    if let (Some(g), Some(o)) = (self.at_cap[i][w], best[w]) {
+                        changed |= raise(&mut best[u], i64::from(g) - here + o);
+                    }
+                }
+            }
+            if !changed {
+                break;
+            }
+        }
+        best
     }
 }
 
@@ -538,11 +732,63 @@ mod tests {
         all
     }
 
-    /// The most, whether a declaration may be made and what may be added to one, against every declaration there is (CR
-    /// 508.1c-d): three creatures under every mix of requirements a goad, "attacks each combat if able" and "attacks that
-    /// player or planeswalker if able" make, three targets under caps of none, zero, one and two, with and without a cost to
-    /// one attack. A declaration within the caps is legal where it obeys as many as any declaration within them that pays
+    /// Checks the most, whether each declaration may be made and what may be added to each of `partial`, against every
+    /// declaration there is (CR 508.1c-d), for `creatures` under every mix of `menu`'s requirements, each of `caps` and each
+    /// of `costs`. A declaration within the caps is legal where it obeys as many as any declaration within them that pays
     /// nothing; an attack is addable where some legal declaration extends the declaration with it.
+    fn check_every_declaration(
+        creatures: &[ObjectId],
+        targets: &[Target],
+        menu: &[&[AttackAim]],
+        caps: &[&[(Target, u32)]],
+        costs: &[&[AttackCost]],
+        partial: &[Vec<(ObjectId, Target)>],
+    ) {
+        let declarations = every_declaration(creatures, targets);
+        for &costs in costs {
+            for &limits in caps {
+                for x in 0..menu.len().pow(count_u32(creatures.len())) {
+                    let picks: Vec<usize> = (0..creatures.len()).map(|i| x / menu.len().pow(count_u32(i)) % menu.len()).collect();
+                    let required = creatures
+                        .iter()
+                        .zip(&picks)
+                        .flat_map(|(&attacker, &p)| menu[p].iter().map(move |&aim| RequiredAttack { attacker, aim }))
+                        .collect();
+                    let mut r = AttackRules { required, limits: limits.to_vec(), ..Default::default() };
+                    let within = |d: &[(ObjectId, Target)]| limits.iter().all(|&(t, n)| count_u32(d.iter().filter(|x| x.1 == t).count()) <= n);
+                    let free = |d: &[(ObjectId, Target)]| d.iter().all(|&(a, t)| AttackCost::free(costs, a, t));
+                    let most = declarations.iter().filter(|d| within(d) && free(d)).map(|d| r.obeyed(d)).max().unwrap_or(0);
+                    (r.most, r.suggested) = r.solve(creatures, targets, costs);
+                    assert_eq!(r.most, most, "{limits:?} {picks:?}");
+                    assert!(within(&r.suggested) && free(&r.suggested) && r.obeyed(&r.suggested) == most, "{limits:?} {picks:?}");
+                    let mut legal = Vec::new();
+                    for d in &declarations {
+                        let ok = within(d) && r.obeyed(d) >= most;
+                        assert_eq!(r.judge(creatures, targets, costs, d, false).complete, ok, "{limits:?} {picks:?} {d:?}");
+                        if ok {
+                            legal.push(d);
+                        }
+                    }
+                    for p in partial.iter().filter(|p| within(p)) {
+                        let mut want: Vec<(ObjectId, Target)> = Vec::new();
+                        for &a in creatures.iter().filter(|&&a| !p.iter().any(|x| x.0 == a)) {
+                            for &t in targets {
+                                if legal.iter().any(|d| d.contains(&(a, t)) && p.iter().all(|x| d.contains(x))) {
+                                    want.push((a, t));
+                                }
+                            }
+                        }
+                        assert_eq!(r.judge(creatures, targets, costs, p, true).addable, want, "{limits:?} {picks:?} {p:?}");
+                    }
+                }
+            }
+        }
+    }
+
+    /// Three creatures under every mix of requirements a goad, "attacks each combat if able" and "attacks that player or
+    /// planeswalker if able" make, three targets under caps of none, zero, one and two, with and without a cost to one
+    /// attack: the most, every declaration and what may be added to an empty or one-attack declaration match every
+    /// declaration there is.
     #[test]
     fn the_most_and_addable_match_every_declaration() {
         const Y: ObjectId = ObjectId(8);
@@ -568,47 +814,69 @@ mod tests {
             &[(Target::Player(P2), 1), (Target::Player(P3), 0), (W, 2)],
         ];
         let cost = [AttackCost { attacker: U, target: Target::Player(P3), cost: ManaCost { generic: 2, ..ManaCost::ZERO }, source: ObjectId(20) }];
-        let declarations = every_declaration(&creatures, &targets);
         let mut partial = vec![Vec::new()];
         partial.extend(creatures.iter().flat_map(|&a| targets.iter().map(move |&t| vec![(a, t)])));
-        partial.push(vec![(U, W)]);
-        for costs in [&[][..], &cost[..]] {
-            for limits in caps {
-                for x in 0..menu.len() * menu.len() * menu.len() {
-                    let picks = [x % menu.len(), x / menu.len() % menu.len(), x / (menu.len() * menu.len())];
-                    let required = creatures
-                        .iter()
-                        .zip(picks)
-                        .flat_map(|(&attacker, p)| menu[p].iter().map(move |&aim| RequiredAttack { attacker, aim }))
-                        .collect();
-                    let mut r = AttackRules { required, limits: limits.to_vec(), ..Default::default() };
-                    let within = |d: &[(ObjectId, Target)]| limits.iter().all(|&(t, n)| count_u32(d.iter().filter(|x| x.1 == t).count()) <= n);
-                    let free = |d: &[(ObjectId, Target)]| d.iter().all(|&(a, t)| AttackCost::free(costs, a, t));
-                    let most = declarations.iter().filter(|d| within(d) && free(d)).map(|d| r.obeyed(d)).max().unwrap_or(0);
-                    (r.most, r.suggested) = r.solve(&creatures, &targets, costs);
-                    assert_eq!(r.most, most, "{limits:?} {picks:?}");
-                    assert!(within(&r.suggested) && free(&r.suggested) && r.obeyed(&r.suggested) == most, "{limits:?} {picks:?}");
-                    for d in &declarations {
-                        let legal = within(d) && r.obeyed(d) >= most;
-                        assert_eq!(r.judge(&creatures, &targets, costs, d, false).complete, legal, "{limits:?} {picks:?} {d:?}");
-                    }
-                    for p in partial.iter().filter(|p| within(p)) {
-                        let mut want: Vec<(ObjectId, Target)> = Vec::new();
-                        for &a in creatures.iter().filter(|&&a| !p.iter().any(|x| x.0 == a)) {
-                            for &t in &targets {
-                                let extends = declarations.iter().any(|d| {
-                                    d.contains(&(a, t)) && p.iter().all(|x| d.contains(x)) && within(d) && r.obeyed(d) >= most
-                                });
-                                if extends {
-                                    want.push((a, t));
-                                }
-                            }
-                        }
-                        assert_eq!(r.judge(&creatures, &targets, costs, p, true).addable, want, "{limits:?} {picks:?} {p:?}");
+        check_every_declaration(&creatures, &targets, &menu, &caps, &[&[], &cost], &partial);
+    }
+
+    /// Four creatures against three targets all capped, where taking a creature out of the best declaration and putting it
+    /// elsewhere moves others along a chain of capped targets: the most, every declaration and what may be added to an
+    /// empty, one-attack or two-attack declaration match every declaration there is.
+    #[test]
+    fn addable_matches_every_declaration_along_chains_of_caps() {
+        const Y: ObjectId = ObjectId(8);
+        const Z: ObjectId = ObjectId(9);
+        let creatures = [U, V, Y, Z];
+        let targets = [Target::Player(P2), Target::Player(P3), W];
+        let menu: [&[AttackAim]; 5] = [
+            &[],
+            &[AttackAim::Anything],
+            &[AttackAim::Anything, AttackAim::At(W)],
+            &[AttackAim::Anything, AttackAim::At(Target::Player(P2))],
+            &[AttackAim::At(Target::Player(P3)), AttackAim::At(Target::Player(P3))],
+        ];
+        let caps: [&[(Target, u32)]; 4] = [
+            &[(Target::Player(P2), 1), (Target::Player(P3), 1), (W, 1)],
+            &[(Target::Player(P2), 2), (Target::Player(P3), 1), (W, 1)],
+            &[(Target::Player(P2), 1), (W, 1)],
+            &[(W, 2), (Target::Player(P3), 1)],
+        ];
+        let mut partial = vec![Vec::new()];
+        partial.extend(creatures.iter().flat_map(|&a| targets.iter().map(move |&t| vec![(a, t)])));
+        for (i, &a) in creatures.iter().enumerate() {
+            for &b in &creatures[i + 1..] {
+                for &t in &targets {
+                    for &u in &targets {
+                        partial.push(vec![(a, t), (b, u)]);
                     }
                 }
             }
         }
+        check_every_declaration(&creatures, &targets, &menu, &caps, &[&[]], &partial);
+    }
+
+    /// Making room at a full capped target can take a chain of moves: with a cap of one on Player C and on the planeswalker,
+    /// U (three requirements to attack the planeswalker, two to attack Player C) there and V (attack, and attack Player C)
+    /// at Player C obey 5; Y (two to attack the planeswalker) may still attack it, as Y there, U at Player C and V at Player
+    /// B obey 5 too - U moved on, and V out of U's way. Every mix of these requirements matches every declaration there is.
+    #[test]
+    fn room_at_a_capped_target_is_made_along_a_chain() {
+        const Y: ObjectId = ObjectId(8);
+        let (b, c) = (Target::Player(P2), Target::Player(P3));
+        let creatures = [U, V, Y];
+        let targets = [b, c, W];
+        let menu: [&[AttackAim]; 4] = [
+            &[],
+            &[AttackAim::At(W), AttackAim::At(W), AttackAim::At(W), AttackAim::At(c), AttackAim::At(c)],
+            &[AttackAim::Anything, AttackAim::At(c)],
+            &[AttackAim::At(W), AttackAim::At(W)],
+        ];
+        let mut r = AttackRules { limits: vec![(c, 1), (W, 1)], ..Default::default() };
+        r.required = [(U, 1), (V, 2), (Y, 3)].iter().flat_map(|&(attacker, p)| menu[p].iter().map(move |&aim| RequiredAttack { attacker, aim })).collect();
+        (r.most, r.suggested) = r.solve(&creatures, &targets, &[]);
+        assert_eq!(r.most, 5);
+        assert!(r.judge(&creatures, &targets, &[], &[], true).addable.contains(&(Y, W)));
+        check_every_declaration(&creatures, &targets, &menu, &[&[(c, 1), (W, 1)]], &[&[]], &[Vec::new(), vec![(Y, W)], vec![(V, b)]]);
     }
 
     /// The assignment takes time polynomial in the creatures and targets: sixty creatures that each attack if able, against
@@ -629,5 +897,32 @@ mod tests {
         let verdict = r.judge(&creatures, &targets, &[], &r.suggested[..3], true);
         assert!(!verdict.complete);
         assert_eq!(verdict.addable.len(), (creatures.len() - 3) * 4);
+    }
+
+    /// What may be added to a declaration, which the host works out at every declaration of attackers, takes well under a
+    /// second for four hundred creatures that each attack if able against six capped planeswalkers and a player nothing
+    /// caps, and as long again with the planeswalkers wanted: one best declaration answers every attack.
+    #[test]
+    fn addable_for_hundreds_of_creatures_is_quick() {
+        let creatures: Vec<ObjectId> = (1000..1400).map(ObjectId).collect();
+        let walkers: Vec<Target> = (200..206).map(|i| Target::Object(ObjectId(i))).collect();
+        let mut targets = vec![Target::Player(P2)];
+        targets.extend(&walkers);
+        let mut required: Vec<RequiredAttack> = creatures.iter().map(|&attacker| RequiredAttack { attacker, aim: AttackAim::Anything }).collect();
+        let mut r = AttackRules { required: required.clone(), limits: walkers.iter().map(|&t| (t, 1)).collect(), ..Default::default() };
+        // Every other creature also told to attack a planeswalker, one each in turn: six of them get there.
+        required.extend(creatures.iter().step_by(2).zip(walkers.iter().cycle()).map(|(&attacker, &t)| RequiredAttack { attacker, aim: AttackAim::At(t) }));
+        let mut wanted = AttackRules { required, ..r.clone() };
+        let started = std::time::Instant::now();
+        (r.most, r.suggested) = r.solve(&creatures, &targets, &[]);
+        (wanted.most, wanted.suggested) = wanted.solve(&creatures, &targets, &[]);
+        assert_eq!((r.most, wanted.most), (400, 406));
+        let none = r.judge(&creatures, &targets, &[], &[], true);
+        let half = r.judge(&creatures, &targets, &[], &r.suggested[..200], true);
+        let some = wanted.judge(&creatures, &targets, &[], &wanted.suggested[..200], true);
+        let elapsed = started.elapsed();
+        assert_eq!((none.addable.len(), half.addable.len()), (400 * 7, 200 * 7));
+        assert!(!some.addable.is_empty());
+        assert!(elapsed < std::time::Duration::from_secs(3), "took {elapsed:?}");
     }
 }
