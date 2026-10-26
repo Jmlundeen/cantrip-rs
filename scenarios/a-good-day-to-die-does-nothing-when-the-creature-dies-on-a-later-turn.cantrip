@@ -1,0 +1,40 @@
+# "When that creature dies this turn": the delayed trigger (CR 603.7b) and the +2/+0 last only until the turn ends.
+# Ornithopter is back to 0 power on turn three, where Lightning Bolt kills it and Bot1 draws nothing beyond its
+# turn-three draw (Guerrilla Gorilla; the Island under it stays in the library). Beside the positive control in
+# a-good-day-to-die-draws-when-the-pumped-creature-dies.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Ornithopter
+A Good Day to Die
+Lightning Bolt
+Island x2
+Guerrilla Gorilla
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.A Good Day to Die.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Lightning Bolt; A Good Day to Die; Black Lotus
+Bot1.Hand = Guerrilla Gorilla; Island; Island

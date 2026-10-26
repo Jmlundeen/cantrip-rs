@@ -1,0 +1,46 @@
+# "When that creature dies this turn" watches only the creature A Good Day to Die targeted (CR 603.7c), not every
+# creature: Bot1 pumps its own Ornithopter, then bolts Bot2's, and draws nothing (Guerrilla Gorilla, its turn-three draw,
+# and the opening Islands stay its hand). A noncreature permanent is no legal target (the Mountain is refused).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Ornithopter
+A Good Day to Die
+Lightning Bolt
+Island x2
+Guerrilla Gorilla
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Hand.A Good Day to Die.Cast(Mountain)
+Bot1.Hand.A Good Day to Die.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Hand = Guerrilla Gorilla; Island; Island
