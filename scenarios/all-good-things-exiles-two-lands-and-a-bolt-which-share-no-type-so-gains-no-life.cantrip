@@ -1,0 +1,43 @@
+# All Good Things...: chapters I-III exile an Island, Lightning Bolt and an Island from Bot1's hand, so the cards exiled
+# with the Saga share no card type (land, instant, land) and chapter IV gains no life (CR 607.2a). Two of three share
+# a type, so a check of only some cards, or of any one pair, would gain the life.
+
+[Bot1 Deck]
+All Good Things...
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Island x3
+Island
+Island
+Lightning Bolt
+Mountain
+Island
+Island
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.All Good Things....Cast
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Choose(Lightning Bolt)
+[T5 Bot1.Main1]
+Bot1.Choose(Island)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Exile = Island; Island; Lightning Bolt
+Bot1.Battlefield.All Good Things... = (absent)

@@ -1,0 +1,61 @@
+# All Good Things... chapter IV with nothing exiled: Binding Negotiation takes each card All Good Things... exiled out of exile before IV, so IV resolves with no
+# cards exiled with the Saga, so "all cards exiled with this Saga share a card type" holds vacuously
+# and Bot1 gains 10 life (CR 607.2a).
+
+[Bot1 Deck]
+All Good Things...
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Island x3
+Island x30
+
+[Bot2 Deck]
+Mox Jet
+Binding Negotiation x3
+Swamp x3
+Swamp x30
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.All Good Things....Cast
+Bot1.Choose(Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+Bot2.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Choose(Island)
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+Bot2.Choose(Island)
+[T5 Bot1.Main1]
+Bot1.Choose(Island)
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+Bot2.Choose(Island)
+[T7 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = All Good Things...; Island; Island; Island; Island; Black Lotus
+Bot1.Battlefield.All Good Things... = (absent)
+Bot1.Life = 30
