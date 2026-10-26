@@ -1,0 +1,56 @@
+# Rulings: "If X is 0 for Agadeem's Awakening, you can target one creature card with mana value 0" and "If a card in a player's graveyard has {X} in its mana cost, X is considered
+# to be 0 for that card" (CR 202.3, 107.3g). Bot1's graveyard holds Ornithopter (0), Walking Ballista ({X}{X}: 0 there) and Llanowar Elves (1, above X), then Misshapen Fiend.
+# With X = 0 the cast costs {B}{B}{B} only (Black Lotus; the pool is empty after it). Refused: the Elves, and the two value-0 cards together. Allowed: the Ballista alone, which
+# comes back with no counters and dies (a 0/0), so it lands on top of the graveyard above the Awakening, which was put there first as it finished resolving (CR 608.2m, 704.5f).
+
+[Bot1 Deck]
+Faithless Looting
+Mox Ruby
+Mox Pearl
+Gleemox
+Mox Jet
+Black Lotus
+Swamp
+Ornithopter
+Walking Ballista
+Llanowar Elves
+Misshapen Fiend
+Agadeem's Awakening
+Swamp x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Walking Ballista)
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Choose(Llanowar Elves; Misshapen Fiend)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Agadeem's Awakening.Cast(X: 0)
+! Bot1.Target(Llanowar Elves)
+! Bot1.Target(Ornithopter; Walking Ballista)
+Bot1.Target(Walking Ballista)
+? Bot1.Mana =
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Walking Ballista; Agadeem's Awakening; Black Lotus; Misshapen Fiend; Llanowar Elves; Ornithopter

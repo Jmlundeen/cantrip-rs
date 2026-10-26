@@ -1,0 +1,61 @@
+# Ruling: "if X is 3, you may target up to four creature cards: one with mana value 3, one with mana value 2, one with mana value 1, and one with mana value 0" (CR 601.2c, 202.3).
+# Faithless Looting and its flashback put Ornithopter (0), Llanowar Elves (1), Misshapen Fiend (2) and Hired Blade (3, exactly X) into Bot1's graveyard on turn 1; on turn 3
+# Agadeem's Awakening, X = 3, costs {3}{B}{B}{B} = six mana (Black Lotus BBB, Mox Jet, Mox Ruby, Gleemox: the pool is empty right after the cast, so neither five nor seven)
+# and returns all four together (CR 608.2b, 110.2a); the Moxen of Pearl and Sapphire stay untapped.
+
+[Bot1 Deck]
+Faithless Looting
+Mox Ruby
+Mox Pearl
+Gleemox
+Mox Sapphire
+Mox Jet
+Black Lotus
+Ornithopter
+Llanowar Elves
+Misshapen Fiend
+Hired Blade
+Agadeem's Awakening
+Swamp x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Llanowar Elves)
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Choose(Misshapen Fiend; Hired Blade)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Agadeem's Awakening.Cast(X: 3)
+Bot1.Target(Ornithopter; Llanowar Elves; Misshapen Fiend; Hired Blade)
+? Bot1.Mana =
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Gleemox; Hired Blade; Llanowar Elves; Misshapen Fiend; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter
+Bot1.Graveyard = Agadeem's Awakening; Black Lotus
+Bot1.Battlefield.Mox Pearl.Tapped = false

@@ -1,0 +1,63 @@
+# One of several targets becoming illegal doesn't stop the spell (CR 608.2b): Awakening, X = 2, targets Llanowar Elves (1) and Misshapen Fiend (2) in Bot1's graveyard. In response
+# Bot2's Scavenging Ooze ({G}, paid by Gleemox, left untapped on Bot2's turn for it) exiles the Fiend. The set is judged again on resolution (CR 601.2c, 608.2b): the Elves, still
+# legal, return; the Fiend stays in exile.
+
+[Bot1 Deck]
+Faithless Looting
+Mox Ruby
+Mox Jet
+Black Lotus
+Swamp
+Swamp
+Swamp
+Llanowar Elves
+Misshapen Fiend
+Agadeem's Awakening
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Gleemox
+Scavenging Ooze
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Llanowar Elves; Misshapen Fiend)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Gleemox.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Scavenging Ooze.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Agadeem's Awakening.Cast(X: 2)
+Bot1.Target(Llanowar Elves; Misshapen Fiend)
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Battlefield.Scavenging Ooze.Activate(Bot1.Graveyard.Misshapen Fiend)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Misshapen Fiend
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Graveyard = Agadeem's Awakening; Black Lotus; Faithless Looting
