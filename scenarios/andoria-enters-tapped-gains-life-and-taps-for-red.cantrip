@@ -1,0 +1,24 @@
+# Andoria's same mana ability may produce red instead of blue after the land untaps. The output and tapped cost are
+# asserted exactly, along with the 1 life from entering (CR 614.1d, 605.1a, 605.3b, 118.3, 106.4, 119.3, 603.6a).
+
+[Bot1 Deck]
+Andoria
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Andoria.Play
+? Bot1.Battlefield.Andoria.Tapped = true
+! Bot1.Battlefield.Andoria.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Andoria.Activate(Color: Red)
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Andoria.Tapped = true
+
+[Expect]
+Bot1.Life = 21
+Bot1.Mana = {R}
+Bot1.Battlefield.Andoria.Tapped = true
+Stack.Count = 0
