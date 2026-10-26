@@ -2064,13 +2064,18 @@ and `GameClient.Answer` settles every declaration of attackers with the host. A 
 `AttackRules::solve` add up each attacker's best free attack. A cap on how many creatures may attack one player,
 planeswalker or battle (CR 508.1c, `CardDef::attack_limits`: Tomik, Orzhov Lawmage's and The Eternal Wanderer's "No more
 than one creature can attack this planeswalker each combat", Judoon Enforcers', Mirri, Weatherlight Duelist's while
-tapped) is a restriction on the declaration as a whole, so it makes `solve` the search blocks' is: the most is an exact
-assignment of each creature's attack, best first, cut by what the creatures still to come could obey, and a creature that
-must attack a capped target is not displaced by one that need not. `AttackRules::limits` carries each target's cap (the
-smallest where two apply), `judge` refuses a declaration over one (508.1c) and the most it is measured against counts them,
-and `addable` asks for each attack whether some declaration extending the declaration with it still reaches that most. The
-board is searched for these only as attackers are declared. The
-benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
+tapped) is room the attackers share, so the most is no longer each creature's best added up but a maximum-weight assignment
+of creatures to targets with the caps as capacities (`AttackRules::search`): each creature takes its best attack where
+nothing caps it, and the room at the capped targets goes where it obeys the most beyond that, by successive augmenting
+paths - exact, and polynomial in the creatures and targets, so sixty creatures that attack if able against seven capped
+targets are settled at once - and a creature that must attack a capped target is not displaced by one that need not.
+`AttackRules::limits` carries each target's cap (the smallest where two apply), `judge` refuses a declaration over one
+(508.1c) and the most it is measured against counts them, and `addable` asks for each attack whether some declaration
+extending the declaration with it still reaches that most; with no cap among the targets both are the sums they were. The
+cap is on the declaration alone: a creature put onto the battlefield attacking, or stated to be attacking, is not under it
+(CR 508.4c). The board is searched for these only as attackers are declared. The
+benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine); the caps
+(`attack_limits` and the assignment) 10.29 and 10.29 us against 10.25 and 10.41 us on main, alternating (2026-10-25).
 
 Optional costs to attack (CR 508.1g) are a static ability of the attacker and the "when you do" ability linked to it (CR
 607.2h), kept as one triggered ability (`paid_as_it_attacks`, `TriggeredDef::attack_option`: `AttackOption::Enlist`, CR
