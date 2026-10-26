@@ -92,7 +92,10 @@ kept as they are. `Verdict` is null for a slot that asks nothing of its targets 
 
 **Checking a declaration of attackers.** A declaration of attackers (`DeclareAttackersPromptMessage`) is judged the same way, by
 the engine's one validator (`AttackRules::judge`, `crates/cantrip-state/src/attacks.rs`): each attacker eligible and attacking
-something offered, and as many of the requirements obeyed as any declaration can attacking for free (CR 508.1d). The prompt's
+something offered, no more creatures attacking a player, planeswalker or battle than a static ability caps it at (CR
+508.1c: "No more than one creature can attack you each combat"), and as many of the requirements obeyed as any declaration
+within those caps can attacking for free (CR 508.1d). The caps are not in the prompt: a client learns of one from the
+verdict, whose `Addable` never offers an attack past a cap and whose `Free` is false wherever a target is capped. The prompt's
 `Requirements` are one per source, for showing the player - an `Attacker` that must attack (`TargetPlayer` `0`,
 `TargetPermanent` `0`), that must attack a seat or permanent, or that must attack a player other than `OtherThan` (a goad's,
 two per goader) - with `MostRequirements`, the engine's own declaration `Suggested`, and the `Verdict` on no attacks

@@ -2900,6 +2900,8 @@ public sealed class AttackVerdictView
     /// <summary>
     /// Nothing is required of the declaration: any declaration of <see cref="Addable"/> attacks, each creature attacking once,
     /// is legal, so a client need not ask the host about each one (the prompt's own verdict says so for the whole question).
+    /// False wherever a target caps how many creatures may attack it (CR 508.1c), as two attacks addable on their own may be
+    /// one too many together.
     /// </summary>
     [Key(4)]
     public bool Free { get; set; }
