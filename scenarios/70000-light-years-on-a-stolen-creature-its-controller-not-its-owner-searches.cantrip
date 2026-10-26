@@ -1,0 +1,45 @@
+# Bot1 takes Bot2's Guerrilla Gorilla with Claim the Firstborn, then exiles it with 70,000 Light-Years from Home: "its
+# controller" is the player who controlled it as it was exiled (CR 608.2h), Bot1, not its owner Bot2. Bot1 is asked,
+# accepts and puts a Plains into its own hand; Bot2's hand and library are untouched.
+
+[Bot1 Deck]
+Plains
+Mountain
+Plains
+Claim the Firstborn
+70,000 Light-Years from Home
+Plains x15
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Claim the Firstborn.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.70,000 Light-Years from Home.Cast(Bot1.Battlefield.Guerrilla Gorilla)
+Bot1.Accept
+Bot1.Search(Plains)
+
+[Expect]
+Turn = 5
+Exile = Guerrilla Gorilla
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 10
+Bot2.Hand.Count = 6
+Bot2.Library.Count = 8
