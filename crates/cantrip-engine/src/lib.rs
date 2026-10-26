@@ -3,6 +3,7 @@
 
 use std::sync::OnceLock;
 
+pub mod pay;
 pub mod undo;
 pub mod visibility;
 

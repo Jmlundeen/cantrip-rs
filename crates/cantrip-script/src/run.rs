@@ -4,7 +4,7 @@
 
 use std::collections::VecDeque;
 
-use cantrip_ai::pay::{PayPlan, Spend};
+use cantrip_engine::pay::{PayPlan, Spend};
 use cantrip_engine::undo::Undo;
 use cantrip_engine::*;
 
@@ -43,7 +43,7 @@ fn fail<T>(message: impl Into<String>) -> R<T> {
 }
 
 /// A cast or activation in progress, from the line that began it: what `Spend:` still has to say, and the rest of how
-/// the line pays (`cantrip_ai::PayPlan`).
+/// the line pays (`cantrip_engine::pay::PayPlan`).
 struct Casting {
     player: PlayerId,
     plan: PayPlan,
@@ -1013,14 +1013,14 @@ impl<'s> Run<'s> {
     }
 
     /// Paying from the pool without being told (`AutoPay`): `Spend:` first, then any pool mana that pays what is owed
-    /// (`cantrip_ai::pay::auto_pay`).
+    /// (`cantrip_engine::pay::auto_pay`).
     fn auto_pay(&mut self, request: &Request) -> R<Option<Answer>> {
         let mut none = PayPlan::default();
         let plan = match self.casting.as_mut() {
             Some(casting) => &mut casting.plan,
             None => &mut none,
         };
-        cantrip_ai::pay::auto_pay(&self.game, request, plan).map_err(Fail)
+        cantrip_engine::pay::auto_pay(&self.game, request, plan).map_err(Fail)
     }
 
     fn default(&mut self, request: &Request) -> R<Answer> {

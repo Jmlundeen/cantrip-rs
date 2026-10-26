@@ -337,7 +337,7 @@ Each request kind therefore gets its own factoring, in `cantrip-obs`, with the c
 | damage assignment, divided amounts, counter removal | one unit or chunk at a time, in the rules' order where they impose one |
 | trigger order, card order | one at a time, "next first" |
 | a card name | among the format's names the belief and the seat's own deck make plausible, not all names |
-| mana payment | the existing payment heuristic (`auto_pay`, moved from `cantrip-script/src/run.rs` to `cantrip-ai`); a policy step later only if duels show it loses games |
+| mana payment | the existing payment heuristic (`auto_pay`, moved from `cantrip-script/src/run.rs` to `cantrip_engine::pay`, which `cantrip_ai::pay` pays with first); a policy step later only if duels show it loses games |
 
 An assembled answer is checked with the engine's validator before it is sent. In the search, a rejected answer is
 masked and the step backtracks. In the browser (no validator), a rejected answer makes the seat fall back to
@@ -703,7 +703,7 @@ parity and gate runs.
 - `cantrip-ai-host` with network-only answers; the `neural` BotLab seat.
 - Done: the factoring for every request kind (`cantrip_obs::factor`; under Answers), the ask in each seat's own
   request, the mapping back to the engine's answer with the validator's check (`cantrip_ai::answer`), and `auto_pay`
-  moved to `cantrip_ai::pay`. Its test runs the whole scenario corpus (ignored; a 1-in-50 sample in the fast tests).
+  moved to `cantrip_engine::pay` (so the scenario runner does not depend on `cantrip-ai`). Its test runs the whole scenario corpus (ignored; a 1-in-50 sample in the fast tests).
 - Done: `encode` (`cantrip_obs::encode`; under Inputs) with buckets, pooling, the compact form and the vocabulary in
   `ai/encoding.json`; the card index (`cantrip_ai::CardIndex`, the engine's own cards). Its tests encode a sample of the
   corpus in every mode (the whole of it ignored), keep goldens (`CANTRIP_GOLDEN=1` rewrites them), and the redaction
