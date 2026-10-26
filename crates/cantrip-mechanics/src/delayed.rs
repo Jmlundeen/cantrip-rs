@@ -1,6 +1,7 @@
 //! "At the beginning of the next end step, [do something] to it" (CR 603.7): a delayed triggered ability a spell or ability
 //! sets up about one object. The card lists the ability in its `delayed`; these register it and are the bodies it names.
 
+use crate::{pump, targets};
 use cantrip_api::*;
 
 /// The card whose `delayed` list the resolving ability's delayed ability is in: the card the ability being resolved belongs to
@@ -31,11 +32,21 @@ pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject
 /// ability's `matches` is asked of: the spell for "whenever a creature you control dies this turn", the creature it
 /// is about for "when it dies this turn". A `matches` that says "you" is written `when_asked`: the ability's controller it
 /// is told is this resolving ability's controller (CR 603.7d-e), whoever controls `source` later. Forth Eorlingas!, Glimpse of Nature, Rite of Harmony, Showdown of the Skalds,
-/// Thunder of Unity, Warhost's Frenzy, Okoye and Turn Inside Out use it. The ability is the card's as the resolving ability has
+/// Thunder of Unity, Warhost's Frenzy, Okoye, Turn Inside Out and A Good Day to Die use it. The ability is the card's as the resolving ability has
 /// it, the card it copies for a copy.
 pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
     let this = ability_card(g, item);
     g.delayed_trigger(DelayedWhen::ThisTurn, source, item.controller, AbilityRef::delayed(this, 0), Target::None);
+}
+
+/// "Target creature gets +P/+T until end of turn. When it dies this turn, [do something]": the target gets the pump, and
+/// the card's delayed ability number 0 is set up about that creature (`this_turn`, CR 603.7c), so it triggers only when that
+/// very object dies. Turn Inside Out ("+3/+0 ... When it dies this turn, manifest dread.") and A Good Day to Die ("+2/+0
+/// ... When that creature dies this turn, you draw a card.") use it. Does nothing when the target is no longer legal.
+pub fn pump_target_then_when_it_dies(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) {
+    let Some(creature) = targets::object(g, item, 0) else { return };
+    pump(g, item.object, creature, power, toughness);
+    this_turn(g, item, creature);
 }
 
 /// Sets up the card's delayed ability number `ability` to trigger "when you next [event] this turn" (CR 603.7b): once, the
