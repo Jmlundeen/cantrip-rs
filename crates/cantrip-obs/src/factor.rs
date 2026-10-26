@@ -768,22 +768,29 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             eligible,
             defenders,
             requirements,
+            costs,
             max_attackers,
             ..
         } => {
             // A defender at its cap takes no more attackers (CR 508.1c). A creature under a requirement may not stay home
-            // while a player nothing caps may be attacked - attacking them obeys no fewer and takes no capped place - but
-            // where every defender is capped, staying may be what the most requirements need (CR 508.1d), which is the
-            // validator's to judge.
+            // while it may attack a player nothing caps for free - that attack obeys no fewer and takes no capped place -
+            // but where every such attack costs something (CR 508.1d: a cost is never a requirement, so a seat that can't
+            // or won't pay may leave it home) or every defender is capped (staying may be what the most requirements
+            // need), staying is offered and the validator judges it. Masked there, a seat with no mana would be made to
+            // attack, fail to pay, have the declaration taken back (CR 508.1h-j) and be asked again, forever.
             let cap = |i: usize| max_attackers.get(i).copied().unwrap_or(u8::MAX);
-            let open_player = defenders.iter().enumerate().any(|(i, d)| matches!(d, Ref::Player(_)) && cap(i) == u8::MAX);
+            let free_open_player = |c: Ref| {
+                defenders.iter().enumerate().any(|(i, &d)| {
+                    matches!(d, Ref::Player(_)) && cap(i) == u8::MAX && !costs.iter().any(|x| x.0 == c && x.1 == d)
+                })
+            };
             let mut attacking = vec![0usize; defenders.len()];
             let mut attacks = Vec::new();
             for &c in eligible {
                 let mut step = Step::default();
                 step.push(
                     Token::on(Tok::Stay, c),
-                    !(open_player && requirements.contains(&c)) || defenders.is_empty(),
+                    !(requirements.contains(&c) && free_open_player(c)) || defenders.is_empty(),
                 );
                 for (i, &d) in defenders.iter().enumerate() {
                     let room = cap(i) == u8::MAX || attacking[i] < usize::from(cap(i));
@@ -1453,6 +1460,16 @@ mod tests {
             max_attackers: vec![u8::MAX, 1],
         });
         assert!(!legal(&Machine::new(&open, &[]), Token::on(Tok::Stay, o(3))));
+        // Where attacking that player costs something (Ghostly Prison), the requirement is not to pay (CR 508.1d): it may.
+        let taxed = ask(AskKind::DeclareAttackers {
+            eligible: vec![o(3)],
+            defenders: vec![Ref::Player(1)],
+            requirements: vec![o(3)],
+            costs: vec![(o(3), Ref::Player(1), 2)],
+            can_pay: 0,
+            max_attackers: vec![u8::MAX],
+        });
+        assert!(legal(&Machine::new(&taxed, &[]), Token::on(Tok::Stay, o(3))));
     }
 
     #[test]
