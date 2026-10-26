@@ -21,6 +21,15 @@ pub static MYR: CardDef = CardDef {
     ..token!(Myr)
 };
 
+/// A 1/1 colorless Borg artifact creature token (CR 111). Antagonist Incorporator, Locutus of Borg, Conquest Mission and Join
+/// the Collective create this exact token.
+pub static BORG: CardDef = CardDef {
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Borg)
+};
+
 /// A Royal Role token (CR 111.10m, 303.7): "a colorless Aura Role enchantment token named Royal with enchant creature and
 /// 'Enchanted creature gets +1/+1 and has ward {1}.'" Royal Treatment, Charmed Clothier, Gylwain, Casting Director,
 /// Besotted Knight and Redtooth Genealogist make it, attached to a creature (`create_role`).
