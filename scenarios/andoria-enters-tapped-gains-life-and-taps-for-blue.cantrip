@@ -11,6 +11,9 @@ Island x20
 [Actions]
 Bot1.Hand.Andoria.Play
 ? Bot1.Battlefield.Andoria.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
 ! Bot1.Battlefield.Andoria.Activate(Color: Blue)
 [T3 Bot1.Main1]
 Bot1.Battlefield.Andoria.Activate(Color: Blue)
