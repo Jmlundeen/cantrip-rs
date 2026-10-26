@@ -340,6 +340,8 @@ fn scenarios_that_once_failed_factor() {
             "a-creature-that-attacks-each-combat-if-able-is-not-made-to-pay-ghostly-prison",
             "gideon-battle-forged-gone-frees-the-creature-told-to-attack-him",
             "ursine-monstrosity-told-to-attack-a-taxed-player-may-attack-nothing",
+            // Targets with different mana values together (CR 601.2c): the validator's, a refusal walks may meet.
+            "agadeems-awakening-at-x-zero-takes-one-value-zero-card-and-an-x-in-a-graveyard-card-counts-as-zero",
         ]
         .iter()
         .map(|n| {

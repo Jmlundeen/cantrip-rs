@@ -11,6 +11,8 @@
 //! - attackers: where a cap on how many may attack a defender (CR 508.1c) leaves a declaration short of the most
 //!   requirements it must obey (CR 508.1d); without a cap the mask carries the requirements exactly;
 //! - a band with more than one creature without banding (CR 702.22c);
+//! - targets that break their slot's rule together past a running total of mana value (different mana values: Agadeem's
+//!   Awakening), and cards that break a selection rule (CR 601.2c);
 //! - a chosen name that is no card name or not of the kind asked for (CR 201.4);
 //! - a total power or mana value short of its minimum (tapping for power, collecting evidence), when everything was
 //!   chosen and it is still short;

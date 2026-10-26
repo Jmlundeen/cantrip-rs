@@ -30,10 +30,10 @@ impl Rejection {
     /// Whether it was refused for a property of the whole answer the factoring leaves to the validator (see
     /// `cantrip_obs::factor`): menace and the most blockers' requirements (CR 509.1b-c), the most attack requirements
     /// where a cap on attackers leaves a declaration short of them (CR 508.1c-d), a name, a total power or mana value
-    /// short of its minimum, a selection rule, or more wanted than there was to choose. Anything else refused is a fault
-    /// of the factoring.
+    /// short of its minimum, a selection rule or a rule of a target slot's targets together (CR 601.2c), or more wanted
+    /// than there was to choose. Anything else refused is a fault of the factoring.
     pub fn global(&self) -> bool {
-        const GLOBAL: [&str; 11] = [
+        const GLOBAL: [&str; 12] = [
             "can't be blocked except by",
             "(CR 509.1c)",
             "(CR 508.1d)",
@@ -45,6 +45,7 @@ impl Rejection {
             " chosen, ",
             " found, ",
             "needs a destination",
+            " together (CR 601.2c)",
         ];
         GLOBAL.iter().any(|g| self.why.contains(g))
     }
