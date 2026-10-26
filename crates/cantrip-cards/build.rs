@@ -4,6 +4,12 @@
 
 use std::fmt::Write;
 
+/// A card file's module name: `r#name`, with a leading `_` where the name starts with a digit (70,000 Light-Years from
+/// Home), as the oracle crate names its constant.
+fn module(name: &str) -> String {
+    if name.starts_with(|c: char| c.is_ascii_digit()) { format!("_{name}") } else { format!("r#{name}") }
+}
+
 fn main() {
     let dir = std::path::Path::new("src/cards");
     println!("cargo:rerun-if-changed={}", dir.display());
@@ -19,16 +25,18 @@ fn main() {
     for name in &names {
         let path = dir.join(format!("{name}.rs"));
         println!("cargo:rerun-if-changed={}", path.display());
-        writeln!(out, "#[path = {:?}]\nmod r#{name};", std::fs::canonicalize(&path).unwrap().display().to_string()).unwrap();
+        let m = module(name);
+        writeln!(out, "#[path = {:?}]\nmod {m};", std::fs::canonicalize(&path).unwrap().display().to_string()).unwrap();
     }
     out.push_str("\n/// Every card definition the crate has.\npub fn all() -> Vec<&'static CardDef> {\n    let mut cards: Vec<&'static CardDef> = Vec::new();\n");
     for name in &names {
         let text = std::fs::read_to_string(dir.join(format!("{name}.rs"))).unwrap();
+        let m = module(name);
         if text.contains("pub static CARD:") {
-            writeln!(out, "    cards.push(&r#{name}::CARD);").unwrap();
+            writeln!(out, "    cards.push(&{m}::CARD);").unwrap();
         }
         if text.contains("pub static EXTRA:") {
-            writeln!(out, "    cards.extend(r#{name}::EXTRA.iter().copied());").unwrap();
+            writeln!(out, "    cards.extend({m}::EXTRA.iter().copied());").unwrap();
         }
     }
     // Cards that are their characteristics alone; a card's own file, pushed first, wins over its entry there.
@@ -40,9 +48,10 @@ fn main() {
     out.push_str("\n/// Each card file's `CARD`, with its `EXTRA` (empty when it has none).\npub fn files() -> Vec<(&'static CardDef, &'static [&'static CardDef])> {\n    vec![\n");
     for name in &names {
         let text = std::fs::read_to_string(dir.join(format!("{name}.rs"))).unwrap();
+        let m = module(name);
         if text.contains("pub static CARD:") {
-            let extra = if text.contains("pub static EXTRA:") { format!("r#{name}::EXTRA") } else { "&[]".to_string() };
-            writeln!(out, "        (&r#{name}::CARD, {extra}),").unwrap();
+            let extra = if text.contains("pub static EXTRA:") { format!("{m}::EXTRA") } else { "&[]".to_string() };
+            writeln!(out, "        (&{m}::CARD, {extra}),").unwrap();
         }
     }
     out.push_str("    ]\n}\n");
