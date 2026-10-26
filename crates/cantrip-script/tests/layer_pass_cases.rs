@@ -417,6 +417,10 @@ const INERT: &[(&str, &str)] = &[
         "its effect gives the activated abilities of the cards used to craft it, a link no synthetic state makes; it writes abilities only",
     ),
     (
+        "Tomik, Orzhov Lawmage",
+        "the ability it grants is a rule of the declaration of attackers (`CardDef::attack_limits`, CR 508.1c) that the core asks of Tomik; the granted ability's effect changes no characteristic",
+    ),
+    (
         "Wretched Bonemass",
         "its effect gives the keywords of the cards used to craft it, read through the view (`LayerQuery::chars`), a link no synthetic state makes",
     ),
