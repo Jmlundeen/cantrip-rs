@@ -1,0 +1,44 @@
+# Antagonist Incorporator is an artifact creature, so it has its own granted trigger (CR 613.1f): it hits Bot2 for 2
+# on turn 3, its controller accepts and pays {1} by tapping Mox Pearl (left untapped for it), and gets a 1/1 Borg
+# artifact creature token. The pool is checked right after, in the same step: the Mox is tapped and nothing is left.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Antagonist Incorporator
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Antagonist Incorporator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Antagonist Incorporator > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+? Bot1.Mana = 
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Borg Token.Types = Artifact; Creature
+Bot1.Battlefield.Borg Token.Power = 1
+Bot1.Battlefield.Borg Token.Toughness = 1
+Bot1.Battlefield.Borg Token.Subtypes = Borg
+Bot1.Battlefield.Borg Token.Colors = (absent)
+Bot1.Battlefield.Borg Token#2 = (absent)
+Bot1.Mana = 
