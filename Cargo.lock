@@ -95,6 +95,7 @@ dependencies = [
  "cantrip-engine",
  "cantrip-obs",
  "cantrip-script",
+ "foldhash",
  "ort",
  "postcard",
  "serde",

@@ -20,8 +20,7 @@
 //! The network's `Payment` uses the guard around each answer, and the search keeps one per line and per seat, filtering
 //! the requests it plays as the real game would (`crate::search`).
 
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
+use std::hash::{BuildHasher, Hash, Hasher};
 
 use cantrip_engine::*;
 
@@ -29,8 +28,11 @@ use cantrip_engine::*;
 /// timestamp, and the append-only history a cast or activation adds without moving a permanent (`members`,
 /// `left_stack`, `spill_targets` and `share_arena`). A cancelled action's undo leaves this board unchanged, so the
 /// same card is filtered from the next request's choices and a new position offers it again.
+///
+/// foldhash with a fixed seed: the hash is taken several times a search step, and it is the same in every process. The
+/// guard only compares it for equality, and it never leaves the process.
 pub(crate) fn board_hash(state: &GameState) -> u64 {
-    let mut h = DefaultHasher::new();
+    let mut h = foldhash::fast::FixedState::with_seed(0).build_hasher();
     (
         &state.players,
         &state.restricted_mana,
