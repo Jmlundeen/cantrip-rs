@@ -1,0 +1,43 @@
+# "Non-Pilot" is a creature type word of All Aboard's text (CR 612.2), and Artificial Evolution may target a spell. Bot1
+# casts the Conductor's All Aboard at its Ornithopter, a Thopter - non-Pilot, a legal target - then, in response, Artificial
+# Evolution replaces Pilot with Thopter in the copy's text. As All Aboard resolves its target is checked against the changed
+# text, "non-Thopter creature you control", and is illegal, so the spell does nothing (CR 608.2b): the Ornithopter stays
+# where it was, not summoning-sick, never having left the battlefield.
+
+[Bot1 Deck]
+Ornithopter
+Island x4
+Skycoach Conductor
+Artificial Evolution
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Skycoach Conductor.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Exile.All Aboard.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.All Aboard)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Pilot)
+Bot1.Modes(Thopter)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.SummoningSick = false
+LeftBattlefield.Count = 0
+Bot1.Graveyard = Artificial Evolution

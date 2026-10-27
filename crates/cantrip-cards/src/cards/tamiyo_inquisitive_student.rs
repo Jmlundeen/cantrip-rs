@@ -55,10 +55,11 @@ fn plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// -3: return the card to your hand; if it is a green card, add one mana of any color.
+/// -3: return the card to your hand; if it is a green card, add one mana of any color. "Green" is a word of Tamiyo's text,
+/// read through her, so a text-changing effect changes it (CR 612.2).
 fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
-    let green = g.chars(card).colors.has(Color::Green);
+    let green = g.chars(card).colors.has(g.words(item.object).color(Color::Green));
     g.return_to_hand(&[card]);
     if green {
         let color = choose_color(g, item.controller, item.object)?;
