@@ -478,10 +478,11 @@ pub enum Subtype {
     Zombie,
     Zubera,
     Borg,
+    Klingon,
 }
 
 impl Subtype {
-    pub const ALL: [Subtype; 465] = [
+    pub const ALL: [Subtype; 466] = [
         Subtype::Adventure,
         Subtype::Advisor,
         Subtype::Aetherborn,
@@ -947,6 +948,7 @@ impl Subtype {
         Subtype::Zombie,
         Subtype::Zubera,
         Subtype::Borg,
+        Subtype::Klingon,
     ];
 
     pub const fn name(self) -> &'static str {
@@ -1003,6 +1005,7 @@ impl Subtype {
             Subtype::Bolas => "Bolas",
             Subtype::Book => "Book",
             Subtype::Borg => "Borg",
+            Subtype::Klingon => "Klingon",
             Subtype::Bringer => "Bringer",
             Subtype::Brushwagg => "Brushwagg",
             Subtype::Calix => "Calix",
@@ -1452,14 +1455,14 @@ impl Subtype {
     pub fn is_creature_type(self) -> bool {
         matches!(
             self,
-            Subtype::Advisor | Subtype::Aetherborn | Subtype::Alien | Subtype::Ally | Subtype::Angel | Subtype::Antelope | Subtype::Ape | Subtype::Archer | Subtype::Archon | Subtype::Armadillo | Subtype::Army | Subtype::Artificer | Subtype::Assassin | Subtype::AssemblyWorker | Subtype::Astartes | Subtype::Atog | Subtype::Aurochs | Subtype::Avatar | Subtype::Azra | Subtype::Badger | Subtype::Balloon | Subtype::Barbarian | Subtype::Bard | Subtype::Basilisk | Subtype::Bat | Subtype::Bear | Subtype::Beast | Subtype::Beaver | Subtype::Beeble | Subtype::Beholder | Subtype::Berserker | Subtype::Bird | Subtype::Bison | Subtype::Blinkmoth | Subtype::Boar | Subtype::Borg | Subtype::Bringer | Subtype::Brushwagg | Subtype::Camarid | Subtype::Camel | Subtype::Capybara | Subtype::Caribou | Subtype::Carrier | Subtype::Cat | Subtype::Centaur | Subtype::Child | Subtype::Chimera | Subtype::Citizen | Subtype::Cleric | Subtype::Clown | Subtype::Cockatrice | Subtype::Construct | Subtype::Coward | Subtype::Coyote | Subtype::Crab | Subtype::Crocodile | Subtype::Custodes | Subtype::Cyberman | Subtype::Cyclops | Subtype::Ctan | Subtype::Dalek | Subtype::Dauthi | Subtype::Demigod | Subtype::Demon | Subtype::Deserter | Subtype::Detective | Subtype::Devil | Subtype::Dinosaur | Subtype::Djinn | Subtype::Doctor | Subtype::Dog | Subtype::Dragon | Subtype::Drake | Subtype::Dreadnought | Subtype::Drix | Subtype::Drone | Subtype::Druid | Subtype::Dryad | Subtype::Dwarf | Subtype::Echidna | Subtype::Efreet | Subtype::Egg | Subtype::Elder | Subtype::Eldrazi | Subtype::Elemental | Subtype::Elephant | Subtype::Elf | Subtype::Elk | Subtype::Employee | Subtype::Eternal | Subtype::Eye | Subtype::Faerie | Subtype::Ferret | Subtype::Fish | Subtype::Flagbearer | Subtype::Fox | Subtype::Fractal | Subtype::Frog | Subtype::Fungus | Subtype::Gamer | Subtype::Gamma | Subtype::Gargoyle | Subtype::Germ | Subtype::Giant | Subtype::Giraffe | Subtype::Gith | Subtype::Glimmer | Subtype::Gnoll | Subtype::Gnome | Subtype::Goat | Subtype::Goblin | Subtype::God | Subtype::Golem | Subtype::Gorgon | Subtype::Graveborn | Subtype::Gremlin | Subtype::Griffin | Subtype::Guest | Subtype::Hag | Subtype::Halfling | Subtype::Hamster | Subtype::Harpy | Subtype::Hedgehog | Subtype::Hellion | Subtype::Hero | Subtype::Hippo | Subtype::Hippogriff | Subtype::Homarid | Subtype::Homunculus | Subtype::Horror | Subtype::Horse | Subtype::Human | Subtype::Hydra | Subtype::Hyena | Subtype::Illusion | Subtype::Imp | Subtype::Incarnation | Subtype::Inhuman | Subtype::Inkling | Subtype::Inquisitor | Subtype::Insect | Subtype::Jackal | Subtype::Jellyfish | Subtype::Juggernaut | Subtype::Kangaroo | Subtype::Kavu | Subtype::Kirin | Subtype::Kithkin | Subtype::Knight | Subtype::Kobold | Subtype::Kor | Subtype::Kraken | Subtype::Kree | Subtype::Lamia | Subtype::Lammasu | Subtype::Leech | Subtype::Lemur | Subtype::Leviathan | Subtype::Lhurgoyf | Subtype::Licid | Subtype::Lizard | Subtype::Llama | Subtype::Lobster | Subtype::Manticore | Subtype::Masticore | Subtype::Mercenary | Subtype::Merfolk | Subtype::Metathran | Subtype::Minion | Subtype::Minotaur | Subtype::Mite | Subtype::Mole | Subtype::Monger | Subtype::Mongoose | Subtype::Monk | Subtype::Monkey | Subtype::Moogle | Subtype::Moonfolk | Subtype::Mount | Subtype::Mouse | Subtype::Mutant | Subtype::Myr | Subtype::Mystic | Subtype::Nautilus | Subtype::Necron | Subtype::Nephilim | Subtype::Nightmare | Subtype::Nightstalker | Subtype::Ninja | Subtype::Noble | Subtype::Noggle | Subtype::Nomad | Subtype::Nymph | Subtype::Octopus | Subtype::Ogre | Subtype::Ooze | Subtype::Orb | Subtype::Orc | Subtype::Orgg | Subtype::Otter | Subtype::Ouphe | Subtype::Ox | Subtype::Oyster | Subtype::Pangolin | Subtype::Peasant | Subtype::Pegasus | Subtype::Pentavite | Subtype::Performer | Subtype::Pest | Subtype::Phelddagrif | Subtype::Phoenix | Subtype::Phyrexian | Subtype::Pilot | Subtype::Pincher | Subtype::Pirate | Subtype::Plant | Subtype::Platypus | Subtype::Porcupine | Subtype::Possum | Subtype::Praetor | Subtype::Primarch | Subtype::Prism | Subtype::Processor | Subtype::Qu | Subtype::Rabbit | Subtype::Raccoon | Subtype::Ranger | Subtype::Rat | Subtype::Rebel | Subtype::Reflection | Subtype::Rhino | Subtype::Rigger | Subtype::Robot | Subtype::Rogue | Subtype::Sable | Subtype::Salamander | Subtype::Samurai | Subtype::Sand | Subtype::Saproling | Subtype::Satyr | Subtype::Scarecrow | Subtype::Scientist | Subtype::Scion | Subtype::Scorpion | Subtype::Scout | Subtype::Sculpture | Subtype::Seal | Subtype::Serf | Subtype::Serpent | Subtype::Servo | Subtype::Shade | Subtype::Shaman | Subtype::Shapeshifter | Subtype::Shark | Subtype::Sheep | Subtype::Shiar | Subtype::Siren | Subtype::Skeleton | Subtype::Skrull | Subtype::Skunk | Subtype::Slith | Subtype::Sliver | Subtype::Sloth | Subtype::Slug | Subtype::Snail | Subtype::Snake | Subtype::Soldier | Subtype::Soltari | Subtype::Sorcerer | Subtype::Spawn | Subtype::Specter | Subtype::Spellshaper | Subtype::Sphinx | Subtype::Spider | Subtype::Spike | Subtype::Spirit | Subtype::Splinter | Subtype::Sponge | Subtype::Spy | Subtype::Squid | Subtype::Squirrel | Subtype::Starfish | Subtype::Surrakar | Subtype::Survivor | Subtype::Symbiote | Subtype::Synth | Subtype::Tentacle | Subtype::Tetravite | Subtype::Thalakos | Subtype::Thopter | Subtype::Thrull | Subtype::Tiefling | Subtype::TimeLord | Subtype::Toy | Subtype::Treefolk | Subtype::Trilobite | Subtype::Triskelavite | Subtype::Troll | Subtype::Turtle | Subtype::Tyranid | Subtype::Unicorn | Subtype::Utrom | Subtype::Vampire | Subtype::Varmint | Subtype::Vedalken | Subtype::Villain | Subtype::Volver | Subtype::Wall | Subtype::Walrus | Subtype::Warlock | Subtype::Warrior | Subtype::Weasel | Subtype::Weird | Subtype::Werewolf | Subtype::Whale | Subtype::Wizard | Subtype::Wolf | Subtype::Wolverine | Subtype::Wombat | Subtype::Worm | Subtype::Wraith | Subtype::Wurm | Subtype::Yeti | Subtype::Zombie | Subtype::Zubera
+            Subtype::Advisor | Subtype::Aetherborn | Subtype::Alien | Subtype::Ally | Subtype::Angel | Subtype::Antelope | Subtype::Ape | Subtype::Archer | Subtype::Archon | Subtype::Armadillo | Subtype::Army | Subtype::Artificer | Subtype::Assassin | Subtype::AssemblyWorker | Subtype::Astartes | Subtype::Atog | Subtype::Aurochs | Subtype::Avatar | Subtype::Azra | Subtype::Badger | Subtype::Balloon | Subtype::Barbarian | Subtype::Bard | Subtype::Basilisk | Subtype::Bat | Subtype::Bear | Subtype::Beast | Subtype::Beaver | Subtype::Beeble | Subtype::Beholder | Subtype::Berserker | Subtype::Bird | Subtype::Bison | Subtype::Blinkmoth | Subtype::Boar | Subtype::Borg | Subtype::Bringer | Subtype::Brushwagg | Subtype::Camarid | Subtype::Camel | Subtype::Capybara | Subtype::Caribou | Subtype::Carrier | Subtype::Cat | Subtype::Centaur | Subtype::Child | Subtype::Chimera | Subtype::Citizen | Subtype::Cleric | Subtype::Clown | Subtype::Cockatrice | Subtype::Construct | Subtype::Coward | Subtype::Coyote | Subtype::Crab | Subtype::Crocodile | Subtype::Custodes | Subtype::Cyberman | Subtype::Cyclops | Subtype::Ctan | Subtype::Dalek | Subtype::Dauthi | Subtype::Demigod | Subtype::Demon | Subtype::Deserter | Subtype::Detective | Subtype::Devil | Subtype::Dinosaur | Subtype::Djinn | Subtype::Doctor | Subtype::Dog | Subtype::Dragon | Subtype::Drake | Subtype::Dreadnought | Subtype::Drix | Subtype::Drone | Subtype::Druid | Subtype::Dryad | Subtype::Dwarf | Subtype::Echidna | Subtype::Efreet | Subtype::Egg | Subtype::Elder | Subtype::Eldrazi | Subtype::Elemental | Subtype::Elephant | Subtype::Elf | Subtype::Elk | Subtype::Employee | Subtype::Eternal | Subtype::Eye | Subtype::Faerie | Subtype::Ferret | Subtype::Fish | Subtype::Flagbearer | Subtype::Fox | Subtype::Fractal | Subtype::Frog | Subtype::Fungus | Subtype::Gamer | Subtype::Gamma | Subtype::Gargoyle | Subtype::Germ | Subtype::Giant | Subtype::Giraffe | Subtype::Gith | Subtype::Glimmer | Subtype::Gnoll | Subtype::Gnome | Subtype::Goat | Subtype::Goblin | Subtype::God | Subtype::Golem | Subtype::Gorgon | Subtype::Graveborn | Subtype::Gremlin | Subtype::Griffin | Subtype::Guest | Subtype::Hag | Subtype::Halfling | Subtype::Hamster | Subtype::Harpy | Subtype::Hedgehog | Subtype::Hellion | Subtype::Hero | Subtype::Hippo | Subtype::Hippogriff | Subtype::Homarid | Subtype::Homunculus | Subtype::Horror | Subtype::Horse | Subtype::Human | Subtype::Hydra | Subtype::Hyena | Subtype::Illusion | Subtype::Imp | Subtype::Incarnation | Subtype::Inhuman | Subtype::Inkling | Subtype::Inquisitor | Subtype::Insect | Subtype::Jackal | Subtype::Jellyfish | Subtype::Juggernaut | Subtype::Kangaroo | Subtype::Kavu | Subtype::Kirin | Subtype::Kithkin | Subtype::Knight | Subtype::Klingon | Subtype::Kobold | Subtype::Kor | Subtype::Kraken | Subtype::Kree | Subtype::Lamia | Subtype::Lammasu | Subtype::Leech | Subtype::Lemur | Subtype::Leviathan | Subtype::Lhurgoyf | Subtype::Licid | Subtype::Lizard | Subtype::Llama | Subtype::Lobster | Subtype::Manticore | Subtype::Masticore | Subtype::Mercenary | Subtype::Merfolk | Subtype::Metathran | Subtype::Minion | Subtype::Minotaur | Subtype::Mite | Subtype::Mole | Subtype::Monger | Subtype::Mongoose | Subtype::Monk | Subtype::Monkey | Subtype::Moogle | Subtype::Moonfolk | Subtype::Mount | Subtype::Mouse | Subtype::Mutant | Subtype::Myr | Subtype::Mystic | Subtype::Nautilus | Subtype::Necron | Subtype::Nephilim | Subtype::Nightmare | Subtype::Nightstalker | Subtype::Ninja | Subtype::Noble | Subtype::Noggle | Subtype::Nomad | Subtype::Nymph | Subtype::Octopus | Subtype::Ogre | Subtype::Ooze | Subtype::Orb | Subtype::Orc | Subtype::Orgg | Subtype::Otter | Subtype::Ouphe | Subtype::Ox | Subtype::Oyster | Subtype::Pangolin | Subtype::Peasant | Subtype::Pegasus | Subtype::Pentavite | Subtype::Performer | Subtype::Pest | Subtype::Phelddagrif | Subtype::Phoenix | Subtype::Phyrexian | Subtype::Pilot | Subtype::Pincher | Subtype::Pirate | Subtype::Plant | Subtype::Platypus | Subtype::Porcupine | Subtype::Possum | Subtype::Praetor | Subtype::Primarch | Subtype::Prism | Subtype::Processor | Subtype::Qu | Subtype::Rabbit | Subtype::Raccoon | Subtype::Ranger | Subtype::Rat | Subtype::Rebel | Subtype::Reflection | Subtype::Rhino | Subtype::Rigger | Subtype::Robot | Subtype::Rogue | Subtype::Sable | Subtype::Salamander | Subtype::Samurai | Subtype::Sand | Subtype::Saproling | Subtype::Satyr | Subtype::Scarecrow | Subtype::Scientist | Subtype::Scion | Subtype::Scorpion | Subtype::Scout | Subtype::Sculpture | Subtype::Seal | Subtype::Serf | Subtype::Serpent | Subtype::Servo | Subtype::Shade | Subtype::Shaman | Subtype::Shapeshifter | Subtype::Shark | Subtype::Sheep | Subtype::Shiar | Subtype::Siren | Subtype::Skeleton | Subtype::Skrull | Subtype::Skunk | Subtype::Slith | Subtype::Sliver | Subtype::Sloth | Subtype::Slug | Subtype::Snail | Subtype::Snake | Subtype::Soldier | Subtype::Soltari | Subtype::Sorcerer | Subtype::Spawn | Subtype::Specter | Subtype::Spellshaper | Subtype::Sphinx | Subtype::Spider | Subtype::Spike | Subtype::Spirit | Subtype::Splinter | Subtype::Sponge | Subtype::Spy | Subtype::Squid | Subtype::Squirrel | Subtype::Starfish | Subtype::Surrakar | Subtype::Survivor | Subtype::Symbiote | Subtype::Synth | Subtype::Tentacle | Subtype::Tetravite | Subtype::Thalakos | Subtype::Thopter | Subtype::Thrull | Subtype::Tiefling | Subtype::TimeLord | Subtype::Toy | Subtype::Treefolk | Subtype::Trilobite | Subtype::Triskelavite | Subtype::Troll | Subtype::Turtle | Subtype::Tyranid | Subtype::Unicorn | Subtype::Utrom | Subtype::Vampire | Subtype::Varmint | Subtype::Vedalken | Subtype::Villain | Subtype::Volver | Subtype::Wall | Subtype::Walrus | Subtype::Warlock | Subtype::Warrior | Subtype::Weasel | Subtype::Weird | Subtype::Werewolf | Subtype::Whale | Subtype::Wizard | Subtype::Wolf | Subtype::Wolverine | Subtype::Wombat | Subtype::Worm | Subtype::Wraith | Subtype::Wurm | Subtype::Yeti | Subtype::Zombie | Subtype::Zubera
         )
     }
 
     /// Every creature type (CR 205.3m), in the order the removed C# engine offered them for "choose a creature type",
-    /// and after them each one added since (Borg). The order is load-bearing: a creature-type question's answer is its
+    /// and after them each one added since (Borg, Klingon). The order is load-bearing: a creature-type question's answer is its
     /// position here, so a new type is appended, never inserted.
-    pub const CREATURE_TYPES: [Subtype; 325] = [
+    pub const CREATURE_TYPES: [Subtype; 326] = [
         Subtype::Advisor,
         Subtype::Aetherborn,
         Subtype::Alien,
@@ -1785,6 +1788,7 @@ impl Subtype {
         Subtype::Zombie,
         Subtype::Zubera,
         Subtype::Borg,
+        Subtype::Klingon,
     ];
 
     pub fn named(name: &str) -> Option<Subtype> {
@@ -1826,6 +1830,17 @@ mod card_type_tests {
         assert!(Subtype::Borg.is_creature_type());
         assert!(Subtype::Borg.card_types().has(CardType::Creature));
         assert!(Subtype::CREATURE_TYPES.contains(&Subtype::Borg));
+    }
+
+    #[test]
+    fn klingon_is_a_creature_type() {
+        assert_eq!(Subtype::named("Klingon"), Some(Subtype::Klingon));
+        assert_eq!(Subtype::Klingon.name(), "Klingon");
+        assert!(Subtype::Klingon.is_creature_type());
+        assert!(Subtype::Klingon.card_types().has(CardType::Creature));
+        assert_eq!(Subtype::Klingon as u16, 465);
+        assert_eq!(Subtype::ALL[465], Subtype::Klingon);
+        assert_eq!(Subtype::CREATURE_TYPES[325], Subtype::Klingon);
     }
 
     /// A subtype's number (`Subtype as u16`) and a creature type's place in `CREATURE_TYPES` are recorded - the AI's
