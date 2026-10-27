@@ -22,7 +22,9 @@ sweeping seeds (CLAUDE.md).
 1. **Plan the turns on paper.** Bot1 plays on odd turns and Bot2 on even turns, until an extra turn (Time Walk)
    shifts them. Bot1 skips its turn-1 draw. One land per turn, so an N-mana spell is castable on the controller's Nth
    turn at the earliest.
-2. **Build the decks top first.** The first 7 lines are the opening hand, and the next lines are the draws in order.
+2. **Build the decks top first.** For a card's own scenario, `python tools\maintenance\new-card.py "Card Name"
+   --scenario <what-it-shows>` writes the start: both decks, the card cast on turn 1 off free mana (or a land a turn),
+   the pool checked right after, and a TODO expectation that fails until replaced. The first 7 lines are the opening hand, and the next lines are the draws in order.
    Give each deck at least 7 cards plus one per draw step the script reaches, and pad generously (`Island x10`). A
    player who draws from an empty library loses and fails the script. For the other cards on the board - a blocker
    of toughness 4, a creature with flying and nothing else, a cheap colorless artifact - take the plainest implemented
@@ -38,13 +40,19 @@ sweeping seeds (CLAUDE.md).
    That runs every scenario whose decks hold the card and prints the full report of any that fail. When it passes,
    the scenario is already a test: `cargo test` makes one test per file in `scenarios/` (nothing to list or
    regenerate), and `corpus` with no arguments runs them all. Run `tools\test.cmd` before finishing.
+   A draft anywhere else (a scratchpad) runs with `--file <path>`; `--scenario <part of its name>` runs one scenario
+   of `scenarios/` alone.
 5. **Read the failure report.** It gives the reason, the outstanding question with every option it offered (as the
    script would name them), a trace of the last lines with the turn each fired on and every default answer given, and
-   the full state dump.
-6. **Write the expectations from the dump.** To see the dump of a passing script, add a bogus expectation such as
-   `Dump = ?`: the mismatch fails the script and prints the dump, with the keys nearest the bogus one. Copy only the
-   keys that prove the behaviour, then remove the bogus line. Do this before writing any key you have not used before
-   rather than guessing: keywords are the engine's names (`Keywords = FirstStrike`, not "First strike"), counters
+   the full state dump. `--brief` leaves the dump out (the keys nearest a missing one are still named).
+   **Writing line by line:** `--next` plays every line, then stops at the next question that is not priority or a
+   payment and reports it with its options - the question your next line answers. Write the script up to the card's
+   cast, run it with `--next --brief`, add the line it asks for, and again.
+6. **Write the expectations from the dump.** `--dump` prints the state each scenario ended in, and `--diff N` the keys
+   that changed between just before line N (the card's cast, say) and the end, each with what it was - which keys the
+   card moved. Copy only the keys that prove the behaviour, with the values the rules say - a key the diff shows is a
+   key to consider, not a value to copy. Do this before writing any key you have not used before rather than
+   guessing: keywords are the engine's names (`Keywords = FirstStrike`, not "First strike"), counters
    their kind (`Counters.MinusOneMinusOne`, a planeswalker's `Counters.Loyalty`), counts are a zone's
    (`Bot1.Battlefield.Count`, never `<Name>.Count` or `.Name`), and exile is one list for everyone (`Exile`, not
    `Bot2.Exile`).

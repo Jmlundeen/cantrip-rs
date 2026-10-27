@@ -7,19 +7,43 @@
 //!   cargo run -p cantrip-script --bin corpus -- --card "Mind Stone"
 //!
 //! `--card` runs only the scenarios whose decks hold that card, and says of each what happened: the full report of a
-//! failure, the cards still missing for one that cannot run.
+//! failure, the cards still missing for one that cannot run. `--scenario <part of a file name>` runs only the scenarios
+//! whose names hold it, reported the same way; `--file <path>` runs one scenario file from anywhere (a draft in a
+//! scratchpad, a reviewer's probe).
+//!
+//! For writing a scenario, with `--card` or `--scenario`:
+//!
+//!   --dump      prints the state each scenario ended in, pass or fail (in place of a bogus `Dump = ?` expectation)
+//!   --diff N    prints the keys that changed between just before line N was answered and the end, as expectation
+//!               lines with what each was: which keys the card moved - the values to expect are the rules' to say
+//!   --next      once every line has played, stops at the next question that is not priority or a payment, and
+//!               reports it with what it offers: what the next line would answer
+//!   --brief     a failure's report without its state dump (the nearest keys of a missing one are still named)
 
 use std::collections::BTreeMap;
 use std::path::Path;
 
 use cantrip_engine::card;
-use cantrip_script::{GameScript, known_bug, run};
+use cantrip_script::{GameScript, Watch, known_bug, run_watched};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let show_failing = args.iter().any(|a| a == "--failing");
     let list = args.iter().any(|a| a == "--list");
-    let only: Option<String> = args.iter().position(|a| a == "--card").and_then(|i| args.get(i + 1)).cloned();
+    let card_only: Option<String> = args.iter().position(|a| a == "--card").and_then(|i| args.get(i + 1)).cloned();
+    let scenario_only: Option<String> = args.iter().position(|a| a == "--scenario").and_then(|i| args.get(i + 1)).cloned();
+    let dump = args.iter().any(|a| a == "--dump");
+    let watch = Watch {
+        before_line: args.iter().position(|a| a == "--diff").and_then(|i| args.get(i + 1)).and_then(|v| v.parse().ok()),
+        next: args.iter().any(|a| a == "--next"),
+        brief: args.iter().any(|a| a == "--brief"),
+    };
+    if args.iter().any(|a| a == "--diff") && watch.before_line.is_none() {
+        eprintln!("--diff takes the number of a line of the scenario file, as --diff 31");
+        std::process::exit(2);
+    }
+    let file: Option<String> = args.iter().position(|a| a == "--file").and_then(|i| args.get(i + 1)).cloned();
+    let only = card_only.clone().or(scenario_only.clone()).or(file.clone());
     let missing_top: usize = args
         .iter()
         .position(|a| a == "--missing")
@@ -28,12 +52,15 @@ fn main() {
         .unwrap_or(25);
     let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../scenarios");
 
-    let mut files: Vec<_> = std::fs::read_dir(&dir)
-        .expect("scripts")
-        .filter_map(|e| e.ok())
-        .map(|e| e.path())
-        .filter(|p| p.extension().is_some_and(|x| x == "cantrip"))
-        .collect();
+    let mut files: Vec<_> = match &file {
+        Some(path) => vec![Path::new(path).to_path_buf()],
+        None => std::fs::read_dir(&dir)
+            .expect("scripts")
+            .filter_map(|e| e.ok())
+            .map(|e| e.path())
+            .filter(|p| p.extension().is_some_and(|x| x == "cantrip"))
+            .collect(),
+    };
     files.sort();
 
     let mut passed = Vec::new();
@@ -52,8 +79,13 @@ fn main() {
                 continue;
             }
         };
-        if let Some(only) = &only
+        if let Some(only) = &card_only
             && !script.cards().into_iter().any(|c| c.eq_ignore_ascii_case(only))
+        {
+            continue;
+        }
+        if let Some(part) = &scenario_only
+            && !name.to_ascii_lowercase().contains(&part.to_ascii_lowercase())
         {
             continue;
         }
@@ -72,7 +104,27 @@ fn main() {
         }
         let detailed = only.is_some();
         let outcome = std::panic::catch_unwind(|| {
-            run(&script).map(|_| ()).map_err(|f| if detailed { f.report } else { f.message })
+            run_watched(&script, if detailed { watch } else { Watch::default() })
+                .map(|result| {
+                    if detailed && watch.next {
+                        println!("  {name}: --next: after its last line the script ends with nothing asked but priority");
+                    }
+                    if detailed && dump {
+                        println!("  state {name} ended in:\n{}", result.dump.render());
+                    }
+                    if let Some(line) = watch.before_line.filter(|_| detailed) {
+                        match &result.before {
+                            Some(before) => {
+                                println!("  {name}: what changed from just before line {line} to the end:");
+                                for change in result.dump.diff(before) {
+                                    println!("    {change}");
+                                }
+                            }
+                            None => println!("  {name}: line {line} was never answered (a line of the action list, by its number in the file)"),
+                        }
+                    }
+                })
+                .map_err(|f| if detailed { f.report } else { f.message })
         });
         if let Some(bug) = bug {
             match outcome {

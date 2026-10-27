@@ -20,6 +20,22 @@ pub struct ScriptResult {
     pub dump: StateDump,
     pub trace: Vec<String>,
     pub handed_over: bool,
+    /// The state just before the line `Watch::before_line` was answered, when it was.
+    pub before: Option<StateDump>,
+}
+
+/// What a run looks at besides the script, for someone writing one (`corpus --diff`, `--next`, `--brief`): nothing a
+/// scenario's verdict depends on.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct Watch {
+    /// The line (by its number in the file) whose state just before it is answered is kept (`ScriptResult::before`).
+    pub before_line: Option<usize>,
+    /// Once every line has been played, stop at the first question that is not priority or a payment - what the next
+    /// line would have to answer - and report it as a failure does.
+    pub next: bool,
+    /// A failure's report without the state dump: the message (with the keys nearest a missing one), the outstanding
+    /// question and the trace.
+    pub brief: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -97,6 +113,9 @@ struct Run<'s> {
     /// The refusal of a kind of question under the cursor (its index) and its window: what has happened since it was
     /// written, which must hold some point where that question could have been asked.
     refusal: Option<(usize, Window)>,
+    watch: Watch,
+    /// The state before the watched line was answered (`Watch::before_line`).
+    before_line: Option<StateDump>,
 }
 
 /// A point of the game a refusal's window opens at: the history's length then, and the stack's items by their serials.
@@ -116,11 +135,21 @@ pub fn run(script: &GameScript) -> Result<ScriptResult, ScriptFailure> {
 /// `run` on a card table of the caller's (`cantrip_engine::deal_on`): every card and some test-only ones, for a Rust test
 /// that plays a scenario with a card no printed card is.
 pub fn run_on(script: &GameScript, table: &'static CardTable) -> Result<ScriptResult, ScriptFailure> {
+    run_watched_on(script, table, Watch::default())
+}
+
+/// `run`, looking at what `watch` says as it goes.
+pub fn run_watched(script: &GameScript, watch: Watch) -> Result<ScriptResult, ScriptFailure> {
+    run_watched_on(script, cards(), watch)
+}
+
+fn run_watched_on(script: &GameScript, table: &'static CardTable, watch: Watch) -> Result<ScriptResult, ScriptFailure> {
     let mut run = Run::deal_on(script, table)?;
+    run.watch = watch;
     match run.play() {
         Ok(()) => {
             let dump = run.judge()?;
-            Ok(ScriptResult { game: run.game, dump, trace: run.trace, handed_over: run.handed_over })
+            Ok(ScriptResult { game: run.game, dump, trace: run.trace, handed_over: run.handed_over, before: run.before_line })
         }
         Err(Fail(message)) => Err(run.failure(message)),
     }
@@ -248,6 +277,8 @@ impl<'s> Run<'s> {
             asked: None,
             before: Window::default(),
             refusal: None,
+            watch: Watch::default(),
+            before_line: None,
         })
     }
 
@@ -410,8 +441,10 @@ impl<'s> Run<'s> {
         for line in self.trace.iter().rev().take(40).rev() {
             report.push_str(&format!("  {line}\n"));
         }
-        report.push_str("\nState:\n");
-        report.push_str(&StateDump::of(&self.game).render());
+        if !self.watch.brief {
+            report.push_str("\nState:\n");
+            report.push_str(&StateDump::of(&self.game).render());
+        }
         ScriptFailure { message, report }
     }
 
@@ -434,6 +467,18 @@ impl<'s> Run<'s> {
                 let words: String = rule.words(&|id| self.game.cards.get(CardId(id as u16)).name.to_string()).iter().map(|w| format!(" {w}")).collect();
                 let eligible = first_choices(g, r);
                 format!("ChooseCards {} of [{}]{words}", count_words(rule.count), eligible.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
+            }
+            RequestKind::ChooseTarget { candidates, least, count, label, .. } => {
+                let list: Vec<String> = candidates
+                    .iter()
+                    .map(|t| match *t {
+                        Target::Player(p) => bot(p),
+                        Target::Object(id) => format!("{}.{:?}.{}", bot(self.holder(id)), g.state.obj(id).zone.kind(), name(id)),
+                        Target::Ability(serial) => format!("ability #{serial}"),
+                        Target::None => "nothing".to_string(),
+                    })
+                    .collect();
+                format!("ChooseTarget {least} to {count} of [{}]: {label}", list.join("; "))
             }
             RequestKind::Craft { cards, minimum, maximum, .. } => {
                 format!("Craft {minimum} to {maximum} of [{}]", cards.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
@@ -523,6 +568,17 @@ impl<'s> Run<'s> {
                 && matches!(request.kind, RequestKind::Priority { .. })
             {
                 return Ok(Stop::Done);
+            }
+
+            if self.watch.next
+                && self.current().is_none()
+                && !matches!(request.kind, RequestKind::Priority { .. } | RequestKind::PayCosts { .. })
+            {
+                return fail(format!(
+                    "--next: every line has been played, and the next question is {}'s {} (the default would answer it)",
+                    bot(request.player),
+                    kind_name(&request.kind)
+                ));
             }
 
             if let Some(ScriptStep::Handover(h)) = self.current()
@@ -967,6 +1023,9 @@ impl<'s> Run<'s> {
         let Some(step) = decision.line else {
             return self.deliver(request, answer, None);
         };
+        if self.watch.before_line == Some(step.line) && self.before_line.is_none() {
+            self.before_line = Some(StateDump::of(&self.game));
+        }
         self.next();
         self.deliver(request, answer.clone(), Some(step))?;
         let act = match &answer {
