@@ -1,0 +1,77 @@
+# Bat'leth's enters trigger targets only an opponent's creature and gives -2/-2 until cleanup;
+# on turn 4 the Hill Giant is back to 3/3. Then Equip {2} attaches the Bat'leth to Bot1's
+# Ornithopter, which gets +2/+0 while its toughness remains 2.
+
+[Bot1 Deck]
+Mox Jet
+Sol Ring
+Mox Ruby
+Ornithopter
+Bat'leth
+Plains x15
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Sol Ring
+Hill Giant
+Ornithopter
+Mountain x16
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Hill Giant.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bat'leth.Cast
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+! Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Target(Bot2.Battlefield.Hill Giant)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Hill Giant.Power = 1
+? Bot2.Battlefield.Hill Giant.Toughness = 1
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Hill Giant.Power = 3
+? Bot2.Battlefield.Hill Giant.Toughness = 3
+[T5 Bot1.Main1]
+Bot1.Battlefield.Bat'leth.Activate(Ability: Equip; Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Mox Jet; Sol Ring; Mox Ruby; Ornithopter; Bat'leth; Plains; Plains
+Bot2.Battlefield = Mox Jet; Mox Ruby; Sol Ring; Hill Giant; Ornithopter; Mountain
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Bat'leth.AttachedTo = Ornithopter
+Bot2.Battlefield.Hill Giant.Power = 3
+Bot2.Battlefield.Hill Giant.Toughness = 3
