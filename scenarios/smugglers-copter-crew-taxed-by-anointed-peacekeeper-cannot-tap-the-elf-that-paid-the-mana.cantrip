@@ -1,0 +1,64 @@
+# A crew cost's creatures are chosen once the mana abilities have been activated (CR 601.2g-h by way of 602.2b). Bot2's
+# Anointed Peacekeeper names Smuggler's Copter, so Bot1's crew 1 costs {2} more. Bot1 crews it and pays the {2} with Mox
+# Emerald and Llanowar Elves, its only creature: the Elves are tapped for {G}, and no untapped creature is left to tap
+# for crew. The cost can't be paid (CR 601.2h): the activation is taken back (CR 733.1) - the Copter is no creature, the
+# Mox and the Elves untapped, the pool empty. Then Bot1 pays the {2} with two Moxen instead and taps the Elves to crew.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Llanowar Elves
+Smuggler's Copter
+Island
+Island x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Anointed Peacekeeper
+Plains
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Anointed Peacekeeper.Cast
+Bot2.Name(Smuggler's Copter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+? Stack.Count = 0
+? Bot1.Mana =
+? Bot1.Battlefield.Smuggler's Copter.Types = Artifact
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Battlefield.Smuggler's Copter.Types = Artifact; Creature
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = false

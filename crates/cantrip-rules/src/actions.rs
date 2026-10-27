@@ -870,10 +870,17 @@ fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatu
     (cards, powers)
 }
 
-/// Chooses the creatures a crew or saddle cost taps (CR 601.2h), always asked, even when the choice is forced.
+/// Chooses the creatures a crew, saddle or teamwork cost taps (CR 601.2h), always asked, even when the choice is forced.
+/// Chosen once the mana abilities have been activated (CR 601.2g), which may have tapped a creature the cost was to tap
+/// (one that taps for mana): with too little power left untapped the cost can't be paid (CR 601.2h), and the spell or
+/// ability is taken back (CR 733.1) - not asked, since no answer would do.
 fn choose_tappers(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     let Some(t) = cost.tap_creatures else { return Ok(Vec::new()) };
     let (cards, powers) = tap_candidates(cx, source, player, &t);
+    // As `can_pay_other` judges it: a negative power only takes from the total (CR 107.1b).
+    if powers.iter().map(|&p| p.max(0) as u32).sum::<u32>() < t.power as u32 {
+        return Err(Stop::Cancel);
+    }
     let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToPay, cards, powers, minimum: t.power, up_to: false };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
@@ -8580,7 +8587,6 @@ fn activate(
     let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, source, &def.cost, paid, by)? };
     let discards = choose_discards(cx, player, source, &def.cost, by)?;
     let exiles = choose_exiles(cx, player, source, &def.cost)?;
-    let tappers = choose_tappers(cx, player, source, &def.cost)?;
     let counter = choose_counter_kind(cx, player, source, &def.cost)?;
     pay_mana_with(
         cx,
@@ -8597,6 +8603,10 @@ fn activate(
     if late {
         chosen = choose_permanents(cx, player, source, &def.cost, paid, by)?;
     }
+    // The creatures a crew or saddle cost taps, once the mana is paid (CR 601.2g-h by way of 602.2b), as a spell's are
+    // (`cast`): a mana ability activated while paying a cost increase (Anointed Peacekeeper's) may have tapped one, and a
+    // tapped creature can't pay the cost.
+    let tappers = choose_tappers(cx, player, source, &def.cost)?;
     // What an attacking creature the cost returns or sacrifices was attacking, for the effect to read (ninjutsu,
     // CR 702.49a: the ninja attacks the same player, planeswalker or battle).
     if let Some(first) = chosen.first()

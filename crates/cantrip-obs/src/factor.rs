@@ -232,8 +232,13 @@ struct Picker<'c> {
 }
 
 impl Picker<'_> {
+    /// Whether the next step offers to cancel the request.
+    fn offers_cancel(&self) -> bool {
+        self.at == 0 && self.cancel
+    }
+
     fn pick(&mut self, mut step: Step) -> Flow<Token> {
-        if self.at == 0 && self.cancel {
+        if self.offers_cancel() {
             step.tokens.insert(0, Token::new(Tok::Cancel));
             step.mask.insert(0, true);
         }
@@ -420,7 +425,8 @@ fn picks(
 }
 
 /// Cards one at a time, `Done` legal once their values reach `minimum` (or with nothing left to choose); `one` stops at
-/// one.
+/// one. Where no choice reaches `minimum` and the request may be cancelled, cancelling is the only answer: the cost can't
+/// be paid (CR 601.2h), and the spell or ability is taken back (CR 733.1).
 fn picks_to_minimum(
     p: &mut Picker,
     cards: &[Ref],
@@ -431,6 +437,16 @@ fn picks_to_minimum(
     let mut chosen: Vec<Ref> = Vec::new();
     let mut sum = 0i32;
     let value = |i: usize| values.get(i).copied().unwrap_or(0);
+    let most: i32 = (0..cards.len()).map(|i| value(i).max(0)).sum();
+    if !one && most < minimum as i32 && p.offers_cancel() {
+        let mut step = Step::default();
+        for &c in cards {
+            step.push(Token::on(Tok::Pick, c), false);
+        }
+        step.push(Token::new(Tok::Done), false);
+        p.pick(step)?;
+        return Err(Stop::Cancel);
+    }
     while chosen.len() < cards.len() && !(one && !chosen.is_empty()) {
         // A card is offered only while the minimum stays within reach: a negative value (a creature with negative power,
         // CR 107.1b) takes from the total, and the cards left might no longer make it up. Every legal answer's picks pass
@@ -1468,6 +1484,71 @@ mod tests {
         assert!(legal(&Machine::new(&b, &[]), pick(2)));
         round_trip(&b, &FactoredAnswer::Refs(vec![o(2), o(1), o(3)]));
         round_trip(&b, &FactoredAnswer::Refs(vec![o(1)]));
+    }
+
+    #[test]
+    fn a_total_out_of_reach_from_the_start_is_cancelled_not_answered_short() {
+        let cancellable = |kind| Ask {
+            may_cancel: true,
+            ..ask(kind)
+        };
+        let tap = |cards: Vec<Ref>, powers: Vec<i16>, minimum| {
+            cancellable(AskKind::TapForPower {
+                purpose: "TapToPay".into(),
+                cards,
+                powers,
+                minimum,
+            })
+        };
+        let only_cancel = |a: &Ask| {
+            let m = Machine::new(a, &[]);
+            let step = m.step().expect("a step");
+            assert_eq!(
+                step.legal().map(|i| step.tokens[i]).collect::<Vec<_>>(),
+                vec![Token::new(Tok::Cancel)],
+                "{step:?}"
+            );
+            assert_eq!(
+                walk(a, &[Token::new(Tok::Cancel)]).answer(),
+                Some(&FactoredAnswer::Cancel)
+            );
+        };
+        // Teamwork 2 with one creature of power 1 left untapped once the mana was paid (CR 601.2g-h), and with none.
+        only_cancel(&tap(vec![o(1)], vec![1], 2));
+        only_cancel(&tap(vec![], vec![], 2));
+        // A negative power takes from the total (CR 107.1b): 1 and -2 make 2 neither alone nor together.
+        only_cancel(&tap(vec![o(1), o(2)], vec![1, -2], 2));
+        // Collect evidence 4 from mana values 1 and 2.
+        only_cancel(&cancellable(AskKind::CollectEvidence {
+            cards: vec![o(1), o(2)],
+            values: vec![1, 2],
+            minimum: 4,
+        }));
+        // Within reach, every legal answer is still made in any order, and `Done` waits for the total.
+        let a = tap(vec![o(1), o(2), o(3)], vec![3, -2, 1], 2);
+        let m = Machine::new(&a, &[]);
+        assert!(legal(&m, Token::new(Tok::Cancel)));
+        assert!(!legal(&m, Token::new(Tok::Done)));
+        round_trip(&a, &FactoredAnswer::Refs(vec![o(1)]));
+        round_trip(&a, &FactoredAnswer::Refs(vec![o(3), o(2), o(1)]));
+        round_trip(&a, &FactoredAnswer::Cancel);
+        // Harmonize's "up to one" needs no total: none is an answer, with or without a creature.
+        let reduce = cancellable(AskKind::TapForPower {
+            purpose: "TapToReduce".into(),
+            cards: vec![o(1)],
+            powers: vec![0],
+            minimum: 0,
+        });
+        round_trip(&reduce, &FactoredAnswer::Refs(vec![]));
+        round_trip(&reduce, &FactoredAnswer::Refs(vec![o(1)]));
+        // A request that may not be cancelled still has a step with something legal in it.
+        let stuck = ask(AskKind::TapForPower {
+            purpose: "TapToPay".into(),
+            cards: vec![o(1)],
+            powers: vec![1],
+            minimum: 2,
+        });
+        assert!(Machine::new(&stuck, &[]).step().unwrap().legal().count() > 0);
     }
 
     #[test]

@@ -1,0 +1,71 @@
+# Teamwork's creatures are chosen once the mana abilities have been activated (CR 601.2g-h). Bot1's only creature is
+# Restless Reef, animated into a 4/4 in response to Bot2's Lightning Bolt, so We Say Thee Nay! may be cast with
+# teamwork 2. Paying {1}{U}, Bot1 taps the Reef itself for {U} and an Island for {1}: no untapped creature is left, the
+# cost can't be paid (CR 601.2h), and the cast is taken back (CR 733.1) - not asked which creatures to tap, a question
+# with no creature in it and no answer. The spell is back in hand and the Reef and the Island untapped. Bot1 casts it
+# again without teamwork with the same two lands; Bot2 pays the ransom of {2} from Black Lotus, and the Bolt resolves.
+
+[Bot1 Deck]
+Restless Reef
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+We Say Thee Nay!
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Restless Reef.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Reef.Power = 4
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Teamwork 2)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Battlefield.Restless Reef.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+? Stack = Lightning Bolt
+? Bot1.Mana =
+? Bot1.Battlefield.Restless Reef.Tapped = false
+? Bot1.Battlefield.Island.Tapped = false
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Cast without teamwork)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Battlefield.Restless Reef.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Restless Reef.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Graveyard = We Say Thee Nay!
+Bot2.Graveyard = Lightning Bolt; Black Lotus

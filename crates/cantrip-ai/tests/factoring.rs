@@ -342,6 +342,12 @@ fn scenarios_that_once_failed_factor() {
             "ursine-monstrosity-told-to-attack-a-taxed-player-may-attack-nothing",
             // Targets with different mana values together (CR 601.2c): the validator's, a refusal walks may meet.
             "agadeems-awakening-at-x-zero-takes-one-value-zero-card-and-an-x-in-a-graveyard-card-counts-as-zero",
+            // Creatures tapped for a total power (CR 107.1b: a negative one takes from it), chosen once the mana is paid
+            // (CR 601.2g-h), and a cost made unpayable while paying taken back (CR 733.1).
+            "crew-counts-a-negative-power-against-the-total",
+            "smugglers-copter-crew-taxed-by-anointed-peacekeeper-cannot-tap-the-elf-that-paid-the-mana",
+            "we-say-thee-nay-teamwork-made-unpayable-by-tapping-an-elf-for-mana-is-taken-back",
+            "we-say-thee-nay-teamwork-taps-a-summoning-sick-creature-and-another-for-total-power-two",
         ]
         .iter()
         .map(|n| {

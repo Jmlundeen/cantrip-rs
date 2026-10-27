@@ -1,0 +1,61 @@
+# Teamwork announced, then made unpayable while the cast is paid for (CR 601.2g-h, 733.1). Bot1's two Llanowar Elves have
+# total power 2, so We Say Thee Nay! may be cast with teamwork. Mana abilities are activated before the costs are paid
+# (CR 601.2g): tapping one Elf for {G} towards the {1} leaves one untapped Elf of power 1, so teamwork's "tap creatures
+# with total power 2" cannot be paid. Unpayable costs can't be paid (CR 601.2h) and the cast is illegal: it is reversed
+# (CR 733.1) without asking which creatures to tap, a question that would have no answer. The spell is back in hand, the
+# Elf untapped, and the {U} floating from before the cast still in the pool. Bot1 casts it again without teamwork, paying
+# with that {U} and an Elf; Bot2 pays the ransom of {2} from Black Lotus, and the Bolt resolves.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+We Say Thee Nay!
+Island
+Island x14
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Teamwork 2)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Battlefield.Llanowar Elves.Activate
+? Stack = Lightning Bolt
+? Bot1.Mana = {U}
+? Bot1.Battlefield.Llanowar Elves#1.Tapped = false
+? Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Cast without teamwork)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Llanowar Elves#1.Tapped = true
+Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Graveyard = We Say Thee Nay!
+Bot2.Graveyard = Lightning Bolt; Black Lotus
