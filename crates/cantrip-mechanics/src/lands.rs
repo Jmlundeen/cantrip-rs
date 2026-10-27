@@ -490,3 +490,7 @@ pub fn return_all_land_cards_from_graveyard_tapped(g: &mut dyn Game, player: Pla
     g.put_all_onto_battlefield_as(&lands)?;
     Ok(())
 }
+
+/// The gain-life lands' "When this land enters, you gain 1 life." (CR 603.6a): with `enters: Some(mana::enters_tapped)`,
+/// Wind-Scarred Crag, Andoria and Bajor.
+pub const GAIN_LIFE_LAND: AbilityDef = triggered(triggers::THIS_ENTERS, effects::gain_one_life, "When this land enters, you gain 1 life.");
