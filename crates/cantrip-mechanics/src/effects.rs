@@ -535,6 +535,16 @@ pub fn each_opponent_discards_a_card(g: &mut dyn Game, item: &StackItem) -> Resu
     Ok(())
 }
 
+/// "Target player discards N cards": their choice (CR 701.9). With its only target illegal the ability does not resolve at
+/// all (CR 608.2b), so the target is always there; `targets::player` is the legality check all the same.
+/// Demonic Pact, Kolaghan's Command and Armus, Skin of Evil print it.
+pub fn target_player_discards<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(player) = crate::targets::player(g, item, 0) {
+        crate::discard_chosen(g, player, item.object, N)?;
+    }
+    Ok(())
+}
+
 /// "Sacrifice this [permanent]" (CR 701.21a): the ability's source, sacrificed by the ability's controller - by no one when
 /// another player has gained control of it since. City of Traitors and Carnage, Crimson Chaos print it.
 pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
