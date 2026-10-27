@@ -1,0 +1,50 @@
+# The same ability on another turn accepts an opponent's creature and wears off.
+[Bot1 Deck]
+Armus, Skin of Evil
+Sol Ring
+Mox Pearl
+Mox Jet
+Island x22
+
+[Bot2 Deck]
+Fortress Crab
+Black Lotus
+Sol Ring
+Mox Pearl
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: U)
+Bot2.Hand.Fortress Crab.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Armus, Skin of Evil.Activate(Bot2.Battlefield.Fortress Crab)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Bot2.Battlefield.Fortress Crab.Power = -3
+? Bot2.Battlefield.Fortress Crab.Toughness = 2
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield.Fortress Crab.Power = 1
+Bot2.Battlefield.Fortress Crab.Toughness = 6
+Bot1.Graveyard = Armus, Skin of Evil

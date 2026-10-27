@@ -1,0 +1,45 @@
+# The end-step trigger targets an opponent, never its controller, and discards exactly two.
+[Bot1 Deck]
+Armus, Skin of Evil
+Black Lotus
+Dark Ritual
+Dark Ritual
+Swamp
+Island x20
+
+[Bot2 Deck]
+Plains x24
+
+[Bot3 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Armus, Skin of Evil.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Battlefield.Armus, Skin of Evil.Keywords = Menace
+[Bot1.Main2]
+! Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Plains#1; Plains#2)
+? Bot2.Hand.Count = 5
+? Bot2.Graveyard.Count = 2
+
+[Expect]
+Bot2.Hand.Count = 5
+Bot2.Graveyard.Count = 2
+Bot3.Hand.Count = 7

@@ -1,0 +1,62 @@
+# Exact {2}{B}, discard cost, creature filter, -4/-4, and cleanup on our own creature.
+# Fortress Crab is 1/6: either stat being one off fails the -3/2 checks.
+[Bot1 Deck]
+Armus, Skin of Evil
+Fortress Crab
+Black Lotus
+Sol Ring
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Fortress Crab.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+! Bot1.Hand.Armus, Skin of Evil.Activate(Bot1.Battlefield.Fortress Crab; Mana: short)
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+? Bot1.Mana =
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Armus, Skin of Evil.Activate(Bot1.Battlefield.Fortress Crab; Mana: short)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Armus, Skin of Evil.Activate(Bot1.Battlefield.Sol Ring)
+! Bot1.Hand.Armus, Skin of Evil.Activate(Bot2)
+Bot1.Hand.Armus, Skin of Evil.Activate(Bot1.Battlefield.Fortress Crab)
+Bot1.Pass
+? Bot1.Mana =
+? Bot1.Graveyard.Armus, Skin of Evil.Power = 6
+Bot2.Pass
+? Bot1.Battlefield.Fortress Crab.Power = -3
+? Bot1.Battlefield.Fortress Crab.Toughness = 2
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Fortress Crab.Power = 1
+? Bot1.Battlefield.Fortress Crab.Toughness = 6
+
+[Expect]
+Bot1.Battlefield.Fortress Crab.Power = 1
+Bot1.Battlefield.Fortress Crab.Toughness = 6
