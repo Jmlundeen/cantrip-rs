@@ -1,0 +1,41 @@
+# Anthropological Mission trigger causes a discard until it has three quest counters
+# the first two zuran orbs put two counters on it, causing Bot1 to discard two cards.
+# The third zuran orb triggers and does not require a discard.
+
+[Bot1 Deck]
+Anthropological Mission
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Zuran Orb
+Zuran Orb
+Zuran Orb
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Anthropological Mission.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Choose(Island)
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Choose(Island)
+Bot1.Hand.Zuran Orb.Cast
+
+[Expect]
+Bot1.Battlefield.Anthropological Mission.Counters.Quest = 3
+Bot1.Hand.Count = 1
+Bot1.Battlefield = Mox Sapphire; Mox Pearl; Mox Jet; Anthropological Mission; Zuran Orb; Zuran Orb; Zuran Orb
+Bot1.Hand = Island
