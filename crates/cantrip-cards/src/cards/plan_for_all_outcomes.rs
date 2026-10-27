@@ -18,7 +18,7 @@ fn empower_jace(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// after this enchantment arrived (CR 603.2).
 fn first_noncreature(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     triggers::noncreature_spell_you_cast(q, me, event)?;
-    let Event::SpellCast { spell, player, .. } = event else { unreachable!() };
+    let Event::SpellCast { spell, player, .. } = event else { return None };
     if cantrip_mechanics::history::first_noncreature_spell_this_turn(q, *spell, *player) {
         Fired::PLAIN
     } else {

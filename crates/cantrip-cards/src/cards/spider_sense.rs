@@ -22,11 +22,14 @@ fn instant_sorcery_or_trigger(q: &dyn Query, _: &Asker, t: Target) -> bool {
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     match item.target(0) {
         Target::Ability(serial) => {
-            let at = g.state().stack.iter().position(|i| i.serial == serial).expect("a legal target is on the stack");
+            let Some(at) = g.state().stack.iter().position(|i| i.serial == serial) else { return Ok(()) };
             let countered = g.state().stack[at];
             g.counter_item(countered.object, at);
         }
-        spell => g.counter(spell.object().expect("an instant or sorcery spell")),
+        spell => {
+            let Some(object) = spell.object() else { return Ok(()) };
+            g.counter(object);
+        }
     }
     Ok(())
 }
