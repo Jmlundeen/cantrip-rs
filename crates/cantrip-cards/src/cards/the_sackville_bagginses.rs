@@ -1,6 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets::filters;
-use cantrip_mechanics::{choose, effects, targets, tokens, triggers};
+use cantrip_mechanics::{effects, select, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// "You may sacrifice another creature or artifact. If you do, draw a card and create a Treasure token." "Another" is any
@@ -9,16 +8,10 @@ use cantrip_oracle as oracle;
 /// nothing stops its controller sacrificing it), and only a chosen one draws and makes the Treasure.
 fn sacrifice_for_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let eligible: Vec<ObjectId> = g
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| g.controller(id) == you && filters::another_creature_or_artifact(g, &g.item_asker(item, you), id))
-        .collect();
-    let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Sacrifice, "other creature or artifact", eligible.clone(), eligible, 1, true)?;
-    let Some(&victim) = chosen.first() else { return Ok(()) };
-    g.sacrifice(you, &[victim]);
+    let rule = select::another_creature_or_artifact_permanents(select::up_to(1));
+    if effects::may_sacrifice(g, you, item.object, rule)?.is_empty() {
+        return Ok(());
+    }
     effects::draw(g, item, 1)?;
     tokens::create_treasure(g, you)
 }

@@ -78,6 +78,10 @@ fn artifact(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
     Verdict::each(choice, |card| q.chars(card).is(CardType::Artifact))
 }
 
+fn another_creature_or_artifact(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |id| id != choice.source && (q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Artifact)))
+}
+
 fn mana_value(q: &dyn Query, choice: &Choice, most: u32) -> Verdict {
     Verdict::each(choice, |card| q.mana_value(card) <= most)
 }
@@ -103,6 +107,10 @@ pub const NONLAND: Part = part(&(nonland as SelectFn), 0, "");
 
 /// "An artifact card". Tinker, Goblin Engineer, Inventors' Fair and Transmute Artifact search for it.
 pub const ARTIFACT: Part = part(&(artifact as SelectFn), 0, "");
+
+/// "Another creature or artifact": a creature or artifact permanent other than the object whose text asks (`Choice::source`).
+/// The Sackville-Bagginses and Automated Warfare System sacrifice one.
+pub const ANOTHER_CREATURE_OR_ARTIFACT: Part = part(&(another_creature_or_artifact as SelectFn), 0, "");
 
 /// "With mana value `most` or less" (CR 202.3), each card's read where it is (an {X} in a library or graveyard is 0, CR
 /// 202.3e). Trinket Mage (an artifact card, 1) and Green Sun's Zenith (a green creature card, X) search for it. Of targets,
@@ -315,6 +323,12 @@ pub const fn land_cards(count: Count) -> Selection {
 /// `count` creature cards: Survival of the Fittest's and Worldly Tutor's one (`CREATURE_CARD`).
 pub const fn creature_cards(count: Count) -> Selection {
     Selection::of(count, &[CREATURE]).called("creature")
+}
+
+/// `count` of "another creature or artifact" (CR 701.21a), chosen as an effect resolves: The Sackville-Bagginses's and
+/// Automated Warfare System's "you may sacrifice" is `up_to(1)`.
+pub const fn another_creature_or_artifact_permanents(count: Count) -> Selection {
+    Selection::of(count, &[ANOTHER_CREATURE_OR_ARTIFACT]).called("other creature or artifact")
 }
 
 /// `count` artifact cards: Tinker's and Goblin Engineer's one (`ARTIFACT_CARD`), and Trinket Mage's one with
