@@ -1,37 +1,41 @@
-# Proven Combatant's eternalize {4}{U}{U} (CR 702.129a): discarded to Faithless Looting, it is eternalized from the graveyard
-# (one mana short the ability is not offered) with Moxen worth exactly the rest and the two {R} left over from Black Lotus,
-# leaving the pool empty. The card is exiled and a 4/4 black token copy of it is made.
+# Proven Combatant's eternalize {4}{U}{U} (CR 702.129a): discarded to Faithless Looting (paid with a Mox Ruby), it is
+# eternalized from the graveyard, paid exactly with two Mana Crypts' {C}{C}{C}{C} for the generic and two Mox Sapphires'
+# {U}{U}, and the pool ends empty. The card is exiled and a 4/4 black token copy of it is made. With Mox Emerald's {G} in
+# place of one {U} (as much mana, one blue fewer) it is not offered: the cost's colored pips are pinned, and colorless mana
+# for the generic leaves no room for another.
 
 [Bot1 Deck]
-Black Lotus
+Mox Ruby
 Faithless Looting
 Proven Combatant
-Mox Jet
-Mox Ruby
+Mana Crypt x2
+Mox Emerald
 Mox Sapphire x2
-Island x14
+Island x13
 
 [Bot2 Deck]
 Island x24
 
 [Actions]
-Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
-Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
 Bot1.Choose(Proven Combatant; Island)
-Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mana Crypt.Cast
 Bot1.Pass
-Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Pass
 ! Bot1.Graveyard.Proven Combatant.Activate(Ability: Eternalize; Mana: short)
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Jet.Activate
-Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mana Crypt#1.Activate
+Bot1.Battlefield.Mana Crypt#2.Activate
 Bot1.Battlefield.Mox Sapphire#1.Activate
 Bot1.Battlefield.Mox Sapphire#2.Activate
 Bot1.Graveyard.Proven Combatant.Activate(Ability: Eternalize)
@@ -39,9 +43,9 @@ Bot1.Pass
 ? Bot1.Mana = 
 
 [Expect]
-Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Mox Sapphire; Proven Combatant
+Bot1.Battlefield = Mana Crypt; Mana Crypt; Mox Emerald; Mox Ruby; Mox Sapphire; Mox Sapphire; Proven Combatant
 Bot1.Battlefield.Proven Combatant.Power = 4
 Bot1.Battlefield.Proven Combatant.Toughness = 4
 Bot1.Battlefield.Proven Combatant.Colors = Black
 Exile = Proven Combatant
-Bot1.Graveyard = Faithless Looting; Island; Black Lotus
+Bot1.Graveyard = Faithless Looting; Island

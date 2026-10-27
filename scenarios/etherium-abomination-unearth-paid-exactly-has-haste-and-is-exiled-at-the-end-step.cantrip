@@ -1,15 +1,19 @@
-# Etherium Abomination's unearth {1}{U}{B} (CR 702.84a): discarded to Faithless Looting, it is unearthed from the graveyard
-# (one mana short the ability is not offered) with Moxen worth exactly {1}{U}{B}, leaving the pool empty. It has haste and
-# attacks for 4, and is exiled at the beginning of the next end step.
+# Etherium Abomination's unearth {1}{U}{B} (CR 702.84a): discarded to Faithless Looting (paid with a Mox Ruby) on turn 1, it
+# can't be unearthed with Blasted Landscape's {C}, Mox Pearl's {W} and Mox Jet's {B} (as much mana as the cost, no blue), nor
+# - Mox Jet tapped in the first main phase, its mana gone with the phase - with the {C}, {W} and Mox Sapphire's {U} (no
+# black): both colored pips are pinned. On turn 3 it is unearthed, paid exactly with Blasted Landscape's {C} for the generic
+# and the Jet's {B} and the Sapphire's {U}, leaving the pool empty (colorless mana for the generic leaves no room for another
+# colored pip). It has haste and attacks for 4, and is exiled at the beginning of the next end step.
 
 [Bot1 Deck]
 Mox Ruby
 Faithless Looting
 Etherium Abomination
-Mox Emerald
-Mox Sapphire
+Blasted Landscape
+Mox Pearl
 Mox Jet
-Island x15
+Mox Sapphire
+Island x14
 
 [Bot2 Deck]
 Island x24
@@ -21,16 +25,21 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
 Bot1.Choose(Etherium Abomination; Island)
-Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Hand.Mox Pearl.Cast
 Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+! Bot1.Graveyard.Etherium Abomination.Activate(Ability: Unearth; Mana: short)
+Bot1.Battlefield.Mox Jet.Activate
+[Bot1.Main2]
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Pass
 ! Bot1.Graveyard.Etherium Abomination.Activate(Ability: Unearth; Mana: short)
-Bot1.Hand.Mox Jet.Cast
-Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Blasted Landscape.Activate
 Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Graveyard.Etherium Abomination.Activate(Ability: Unearth)
 Bot1.Pass
 ? Bot1.Mana = 
@@ -40,5 +49,5 @@ Bot1.Attack(Etherium Abomination > Bot2)
 [Expect]
 Bot2.Life = 16
 Exile = Etherium Abomination
-Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Mox Sapphire
+Bot1.Battlefield = Blasted Landscape; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
 Bot1.Graveyard = Faithless Looting; Island

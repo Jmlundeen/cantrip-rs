@@ -1,14 +1,17 @@
-# Viscera Dragger's unearth {1}{B} (CR 702.84a): discarded to Faithless Looting, it is unearthed from the graveyard (one mana
-# short the ability is not offered) with Moxen worth exactly {1}{B}, leaving the pool empty. It has haste and attacks for 3,
-# and is exiled at the beginning of the next end step.
+# Viscera Dragger's unearth {1}{B} (CR 702.84a): discarded to Faithless Looting (paid with a Mox Ruby), it is unearthed from
+# the graveyard, paid exactly with Blasted Landscape's {C} for the generic and Mox Jet's {B}, and the pool ends empty. It has
+# haste and attacks for 3, and is exiled at the beginning of the next end step. With Mox Emerald's {G} in place of the {B}
+# (as much mana, one black fewer) it is not offered: the cost's colored pips are pinned, and colorless mana for the generic
+# leaves no room for another.
 
 [Bot1 Deck]
 Mox Ruby
 Faithless Looting
 Viscera Dragger
+Blasted Landscape
 Mox Emerald
 Mox Jet
-Island x16
+Island x15
 
 [Bot2 Deck]
 Island x24
@@ -20,12 +23,13 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
 Bot1.Choose(Viscera Dragger; Island)
+Bot1.Hand.Blasted Landscape.Play
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass
 ! Bot1.Graveyard.Viscera Dragger.Activate(Ability: Unearth; Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Blasted Landscape.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Graveyard.Viscera Dragger.Activate(Ability: Unearth)
 Bot1.Pass
@@ -36,5 +40,5 @@ Bot1.Attack(Viscera Dragger > Bot2)
 [Expect]
 Bot2.Life = 17
 Exile = Viscera Dragger
-Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby
+Bot1.Battlefield = Blasted Landscape; Mox Emerald; Mox Jet; Mox Ruby
 Bot1.Graveyard = Faithless Looting; Island

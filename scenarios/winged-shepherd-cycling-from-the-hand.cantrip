@@ -1,10 +1,12 @@
-# Winged Shepherd's cycling {W} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on top.
-# The cost {W} is paid with Moxen worth exactly that much: one short, the ability is not offered, and the pool ends empty.
+# Winged Shepherd's cycling {W} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on
+# top. The cost {W} is paid with Mox Pearl, exactly, and the pool ends empty; with Mox Emerald's {G} in its place (one mana,
+# no white) the ability is not offered, so the cost is that colored pip and not {1}.
 
 [Bot1 Deck]
+Mox Emerald
 Mox Pearl
 Winged Shepherd
-Plains x5
+Plains x4
 Forest
 Plains x12
 
@@ -12,6 +14,8 @@ Plains x12
 Island x24
 
 [Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
 ! Bot1.Hand.Winged Shepherd.Activate(Mana: short)
 Bot1.Hand.Mox Pearl.Cast
 Bot1.Pass
@@ -22,4 +26,4 @@ Bot1.Pass
 
 [Expect]
 Bot1.Graveyard.Winged Shepherd.Colors = White
-Bot1.Hand = Forest; Plains; Plains; Plains; Plains; Plains
+Bot1.Hand = Forest; Plains; Plains; Plains; Plains

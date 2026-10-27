@@ -1,9 +1,10 @@
 # Wasteland Scorpion's cycling {2} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on
-# top. The cost {2} is paid with Moxen worth exactly that much: one short, the ability is not offered, and the pool ends empty.
+# top. The cost {2} is paid exactly with Mana Crypt's {C}{C}, so it holds no colored pip, and the pool ends empty; with only
+# Blasted Landscape's {C} the ability is not offered.
 
 [Bot1 Deck]
-Mox Emerald
-Mox Sapphire
+Blasted Landscape
+Mana Crypt
 Wasteland Scorpion
 Plains x4
 Forest
@@ -13,13 +14,11 @@ Plains x12
 Island x24
 
 [Actions]
-Bot1.Hand.Mox Emerald.Cast
-Bot1.Pass
+Bot1.Hand.Blasted Landscape.Play
 ! Bot1.Hand.Wasteland Scorpion.Activate(Mana: short)
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mana Crypt.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mana Crypt.Activate
 Bot1.Hand.Wasteland Scorpion.Activate
 Bot1.Pass
 ? Bot1.Mana = 

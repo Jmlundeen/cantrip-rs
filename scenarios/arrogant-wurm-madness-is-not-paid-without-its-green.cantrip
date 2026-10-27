@@ -1,0 +1,36 @@
+# Arrogant Wurm's madness cost is {2}{G} (CR 702.35a): discarded to Faithless Looting (paid with a Mox Ruby) with Mana
+# Crypt's {C}{C} and Mox Sapphire's {U} in the pool - as much mana as the madness cost, no green - Bot1 accepts the cast, but
+# it can't be paid and is cancelled, so the card goes to the graveyard. A cost with a generic {1} in place of the {G} would
+# be payable here, so this pins the {G}.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Arrogant Wurm
+Mana Crypt
+Mox Sapphire
+Island x16
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Arrogant Wurm; Island)
+Bot1.Accept
+Bot1.Cancel
+
+[Expect]
+Bot1.Battlefield = Mana Crypt; Mox Ruby; Mox Sapphire
+Bot1.Graveyard.Arrogant Wurm.Colors = Green
+Exile.Count = 0

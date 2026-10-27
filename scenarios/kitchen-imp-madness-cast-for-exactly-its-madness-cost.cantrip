@@ -1,12 +1,14 @@
-# Kitchen Imp's madness {B} (CR 702.35a): discarded to Faithless Looting while Moxen worth exactly {B} (and a Mox Ruby for the
-# Looting) are tapped for mana, it is exiled and Bot1 casts it for its madness cost, which empties the pool.
+# Kitchen Imp's madness {B} (CR 702.35a): discarded to Faithless Looting (paid with a Mox Ruby) while Mox Jet's {B} are in
+# the pool, exactly the madness cost, it is exiled and Bot1 casts it for its madness cost, which empties the pool; colorless
+# mana for the generic leaves no room for another colored pip, and kitchen-imp-madness-is-not-paid-without-its-black shows
+# the {B} is needed.
 
 [Bot1 Deck]
 Mox Ruby
 Faithless Looting
 Kitchen Imp
 Mox Jet
-Island x17
+Island x16
 
 [Bot2 Deck]
 Island x24

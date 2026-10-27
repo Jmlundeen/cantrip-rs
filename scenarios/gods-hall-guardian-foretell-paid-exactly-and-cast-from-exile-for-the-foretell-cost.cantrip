@@ -1,11 +1,14 @@
-# Gods' Hall Guardian's foretell {3}{W} (CR 702.143a): on turn 1 Gods' Hall Guardian is foretold for exactly {2} (two Moxen,
-# and the pool ends empty), and on turn 3 it is cast from exile for its foretell cost with Moxen worth exactly {3}{W}, the pool
-# ending empty.
+# Gods' Hall Guardian's foretell {3}{W} (CR 702.143a): on turn 1 Gods' Hall Guardian is foretold for exactly {2}, Mana
+# Crypt's {C}{C} (the pool ends empty). On turn 3, with Mana Crypt's {C}{C}, Blasted Landscape's {C} and Mox Emerald's {G} -
+# as much mana as the foretell cost, one {W} fewer - it can't be cast from exile, so the cost's {W} is pinned; then it is
+# cast from exile for its foretell cost paid exactly with Mana Crypt's {C}{C} and Blasted Landscape's {C} for the generic and
+# Mox Pearl's {W}, the pool ending empty (colorless mana for the generic leaves no room for another colored pip). Mana Crypt
+# wins its flip on turn 3 (die 1).
 
 [Bot1 Deck]
+Mana Crypt
+Blasted Landscape
 Mox Emerald
-Mox Sapphire
-Mox Jet
 Mox Pearl
 Gods' Hall Guardian
 Island x16
@@ -13,21 +16,25 @@ Island x16
 [Bot2 Deck]
 Island x24
 
+[Dice]
+1
+
 [Actions]
-Bot1.Hand.Mox Emerald.Cast
-Bot1.Hand.Mox Sapphire.Cast
-Bot1.Hand.Mox Jet.Cast
-Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Hand.Mana Crypt.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
 Bot1.Hand.Gods' Hall Guardian.Foretell
 Bot1.Pass
 ? Bot1.Mana = 
 [T3 Bot1.Main1]
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
-Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Exile.Gods' Hall Guardian.Cast(Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Blasted Landscape.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Exile.Gods' Hall Guardian.Cast
 Bot1.Pass
@@ -35,5 +42,5 @@ Bot1.Pass
 [T3 Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield = Gods' Hall Guardian; Mox Emerald; Mox Jet; Mox Pearl; Mox Sapphire
+Bot1.Battlefield = Blasted Landscape; Gods' Hall Guardian; Mana Crypt; Mox Emerald; Mox Pearl
 Exile.Count = 0

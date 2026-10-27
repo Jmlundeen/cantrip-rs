@@ -1,13 +1,15 @@
-# Swarm, Being of Bees's mayhem {B} (CR 702.187b): discarded to Faithless Looting this turn, it is cast from the graveyard for
-# its mayhem cost; a Mox Ruby casts Faithless Looting and Moxen worth exactly the mayhem cost are cast after it. One mana short
-# the cast is not offered, and the pool ends empty.
+# Swarm, Being of Bees's mayhem {B} (CR 702.187b): discarded to Faithless Looting (paid with a Mox Ruby), it is cast from the
+# graveyard for its mayhem cost the same turn, paid exactly with Mox Jet's {B}, and the pool ends empty. With Mox Emerald's
+# {G} in place of the {B} (as much mana, one black fewer) it is not offered: the cost's colored pips are pinned, and none of
+# it is generic.
 
 [Bot1 Deck]
 Mox Ruby
 Faithless Looting
 Swarm, Being of Bees
+Mox Emerald
 Mox Jet
-Island x17
+Island x16
 
 [Bot2 Deck]
 Island x24
@@ -19,6 +21,8 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
 Bot1.Choose(Swarm, Being of Bees; Island)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
 ! Bot1.Graveyard.Swarm, Being of Bees.Cast(Ability: Mayhem; Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
@@ -28,5 +32,5 @@ Bot1.Pass
 ? Bot1.Mana = 
 
 [Expect]
-Bot1.Battlefield = Mox Jet; Mox Ruby; Swarm, Being of Bees
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Swarm, Being of Bees
 Bot1.Graveyard = Faithless Looting; Island

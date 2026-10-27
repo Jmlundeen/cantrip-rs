@@ -1,10 +1,12 @@
-# Kolaghan Skirmisher's dash {2}{B} (CR 702.109a): cast for its dash cost, paid with Moxen worth exactly that (one short, the
-# dash cast is not offered, and the pool ends empty), it has haste and attacks the turn it arrives for 2, and is returned to
-# its owner's hand at the beginning of the next end step.
+# Kolaghan Skirmisher's dash {2}{B} (CR 702.109a): cast for its dash cost, paid exactly with Mana Crypt's {C}{C} for the
+# generic and Mox Jet's {B} (the pool ends empty), it has haste and attacks the turn it arrives for 2, and is returned to its
+# owner's hand at the beginning of the next end step. With Mox Emerald's {G} in place of the {B} (three mana, no black) the
+# dash cast is not offered: the cost's {B} is pinned, and colorless mana for the generic leaves no room for another colored
+# pip.
 
 [Bot1 Deck]
+Mana Crypt
 Mox Emerald
-Mox Sapphire
 Mox Jet
 Kolaghan Skirmisher
 Island x17
@@ -13,15 +15,14 @@ Island x17
 Island x24
 
 [Actions]
-Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mana Crypt.Cast
 Bot1.Pass
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass
 ! Bot1.Hand.Kolaghan Skirmisher.Cast(Ability: Dash; Mana: short)
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mana Crypt.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Kolaghan Skirmisher.Cast(Ability: Dash)
 Bot1.Pass
@@ -32,4 +33,4 @@ Bot1.Attack(Kolaghan Skirmisher > Bot2)
 [Expect]
 Bot2.Life = 18
 Bot1.Hand = Island; Island; Island; Kolaghan Skirmisher
-Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Sapphire
+Bot1.Battlefield = Mana Crypt; Mox Emerald; Mox Jet

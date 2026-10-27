@@ -1,8 +1,9 @@
 # Imposing Vantasaur's cycling {1} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on
-# top. The cost {1} is paid with Moxen worth exactly that much: one short, the ability is not offered, and the pool ends empty.
+# top. The cost {1} is paid exactly with Blasted Landscape's {C}, so it holds no colored pip, and the pool ends empty; with
+# no mana the ability is not offered.
 
 [Bot1 Deck]
-Mox Emerald
+Blasted Landscape
 Imposing Vantasaur
 Plains x5
 Forest
@@ -13,9 +14,8 @@ Island x24
 
 [Actions]
 ! Bot1.Hand.Imposing Vantasaur.Activate(Mana: short)
-Bot1.Hand.Mox Emerald.Cast
-Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Battlefield.Blasted Landscape.Activate
 Bot1.Hand.Imposing Vantasaur.Activate
 Bot1.Pass
 ? Bot1.Mana = 

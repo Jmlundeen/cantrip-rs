@@ -1,14 +1,15 @@
-# Incorrigible Youths's madness {2}{R} (CR 702.35a): discarded to Faithless Looting while Moxen worth exactly {2}{R} (and a Mox
-# Ruby for the Looting) are tapped for mana, it is exiled and Bot1 casts it for its madness cost, which empties the pool.
+# Incorrigible Youths's madness {2}{R} (CR 702.35a): discarded to Faithless Looting (paid with a Mox Ruby) while Mana Crypt's
+# {C}{C} for the generic and Mox Ruby's {R} are in the pool, exactly the madness cost, it is exiled and Bot1 casts it for its
+# madness cost, which empties the pool; colorless mana for the generic leaves no room for another colored pip, and
+# incorrigible-youths-madness-is-not-paid-without-its-red shows the {R} is needed.
 
 [Bot1 Deck]
 Mox Ruby
 Faithless Looting
 Incorrigible Youths
-Mox Emerald
-Mox Sapphire
+Mana Crypt
 Mox Ruby
-Island x15
+Island x16
 
 [Bot2 Deck]
 Island x24
@@ -16,14 +17,13 @@ Island x24
 [Actions]
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
-Bot1.Hand.Mox Emerald.Cast
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
 Bot1.Battlefield.Mox Ruby.Activate
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
-Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
 Bot1.Choose(Incorrigible Youths; Island)
@@ -33,6 +33,6 @@ Bot1.Pass
 [Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield = Incorrigible Youths; Mox Emerald; Mox Ruby; Mox Ruby; Mox Sapphire
+Bot1.Battlefield = Incorrigible Youths; Mana Crypt; Mox Ruby; Mox Ruby
 Bot1.Graveyard = Faithless Looting; Island
 Exile.Count = 0

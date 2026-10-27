@@ -1,15 +1,21 @@
-# Fire-Field Ogre's unearth {U}{B}{R} (CR 702.84a): discarded to Faithless Looting, it is unearthed from the graveyard (one
-# mana short the ability is not offered) with Moxen worth exactly {U}{B}{R}, leaving the pool empty. It has haste and attacks
-# for 4, and is exiled at the beginning of the next end step.
+# Fire-Field Ogre's unearth {U}{B}{R} (CR 702.84a): discarded to Faithless Looting (paid with a Mox Ruby) on turn 1, it can't
+# be unearthed with Mox Pearl's {W}, Mox Jet's {B} and Mox Sapphire's {U} (no red); with the Jet tapped in the first main
+# phase, its mana gone with the phase, nor in the second with the {W}, the {U} and a second Mox Ruby's {R} (no black); and on
+# turn 3, the Sapphire tapped in the upkeep, nor with the {W}, the {B} and the two Rubies' {R}{R} (no blue): each colored pip
+# is pinned. Then a second Mox Sapphire is cast, and it is unearthed, paid exactly with the Jet's {B}, a Ruby's {R} and the
+# new Sapphire's {U}, leaving the pool empty. It has haste and attacks for 4, and is exiled at the beginning of the next end
+# step.
 
 [Bot1 Deck]
 Mox Ruby
 Faithless Looting
 Fire-Field Ogre
-Mox Sapphire
+Mox Pearl
 Mox Jet
+Mox Sapphire
 Mox Ruby
-Island x15
+Mox Sapphire
+Island x13
 
 [Bot2 Deck]
 Island x24
@@ -21,16 +27,27 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
 Bot1.Choose(Fire-Field Ogre; Island)
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
 Bot1.Pass
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
 ! Bot1.Graveyard.Fire-Field Ogre.Activate(Ability: Unearth; Mana: short)
+Bot1.Battlefield.Mox Jet.Activate
+[Bot1.Main2]
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
+! Bot1.Graveyard.Fire-Field Ogre.Activate(Ability: Unearth; Mana: short)
+[T3 Bot1.Upkeep]
 Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Fire-Field Ogre.Activate(Ability: Unearth; Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Graveyard.Fire-Field Ogre.Activate(Ability: Unearth)
 Bot1.Pass
 ? Bot1.Mana = 
@@ -40,5 +57,5 @@ Bot1.Attack(Fire-Field Ogre > Bot2)
 [Expect]
 Bot2.Life = 16
 Exile = Fire-Field Ogre
-Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Ruby; Mox Sapphire
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Ruby; Mox Sapphire; Mox Sapphire
 Bot1.Graveyard = Faithless Looting; Island

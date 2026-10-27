@@ -1,10 +1,10 @@
 # Sanctum Plowbeast's islandcycling {2} (CR 702.29e): paying it and discarding the card from the hand finds the Island in the
-# library and puts it into the hand. The cost {2} is paid with Moxen worth exactly that much: one short, the ability is not
-# offered, and the pool ends empty.
+# library and puts it into the hand. The cost {2} is paid exactly with Mana Crypt's {C}{C}, so it holds no colored pip, and
+# the pool ends empty; with only Blasted Landscape's {C} the ability is not offered.
 
 [Bot1 Deck]
-Mox Emerald
-Mox Sapphire
+Blasted Landscape
+Mana Crypt
 Sanctum Plowbeast
 Plains x4
 Island
@@ -14,13 +14,11 @@ Plains x12
 Island x24
 
 [Actions]
-Bot1.Hand.Mox Emerald.Cast
-Bot1.Pass
+Bot1.Hand.Blasted Landscape.Play
 ! Bot1.Hand.Sanctum Plowbeast.Activate(Ability: Islandcycling; Mana: short)
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mana Crypt.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mana Crypt.Activate
 Bot1.Hand.Sanctum Plowbeast.Activate(Ability: Islandcycling)
 Bot1.Pass
 ? Bot1.Mana = 

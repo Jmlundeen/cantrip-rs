@@ -1,27 +1,23 @@
-# Bygone Colossus's warp {3} (CR 702.185a): cast for its warp cost, paid with Moxen worth exactly that (one short, the warp
-# cast is not offered, and the pool ends empty), it is exiled at the beginning of the next end step.
+# Bygone Colossus's warp {3} (CR 702.185a): cast for its warp cost, paid exactly with Mana Crypt's {C}{C} and Blasted
+# Landscape's {C}, so it holds no colored pip (with only Mana Crypt's {C}{C} the warp cast is not offered, and the pool ends
+# empty), it is exiled at the beginning of the next end step.
 
 [Bot1 Deck]
-Mox Emerald
-Mox Sapphire
-Mox Pearl
+Mana Crypt
+Blasted Landscape
 Bygone Colossus
-Island x17
+Island x18
 
 [Bot2 Deck]
 Island x24
 
 [Actions]
-Bot1.Hand.Mox Emerald.Cast
-Bot1.Pass
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mana Crypt.Cast
 Bot1.Pass
 ! Bot1.Hand.Bygone Colossus.Cast(Ability: Warp; Mana: short)
-Bot1.Hand.Mox Pearl.Cast
-Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
-Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Blasted Landscape.Activate
 Bot1.Hand.Bygone Colossus.Cast(Ability: Warp)
 Bot1.Pass
 ? Bot1.Mana = 
@@ -29,4 +25,4 @@ Bot1.Pass
 
 [Expect]
 Exile = Bygone Colossus
-Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Sapphire
+Bot1.Battlefield = Blasted Landscape; Mana Crypt

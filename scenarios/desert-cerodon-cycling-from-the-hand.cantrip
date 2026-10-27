@@ -1,10 +1,12 @@
 # Desert Cerodon's cycling {R} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on top.
-# The cost {R} is paid with Moxen worth exactly that much: one short, the ability is not offered, and the pool ends empty.
+# The cost {R} is paid with Mox Ruby, exactly, and the pool ends empty; with Mox Emerald's {G} in its place (one mana, no
+# red) the ability is not offered, so the cost is that colored pip and not {1}.
 
 [Bot1 Deck]
+Mox Emerald
 Mox Ruby
 Desert Cerodon
-Plains x5
+Plains x4
 Forest
 Plains x12
 
@@ -12,6 +14,8 @@ Plains x12
 Island x24
 
 [Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
 ! Bot1.Hand.Desert Cerodon.Activate(Mana: short)
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
@@ -22,4 +26,4 @@ Bot1.Pass
 
 [Expect]
 Bot1.Graveyard.Desert Cerodon.Colors = Red
-Bot1.Hand = Forest; Plains; Plains; Plains; Plains; Plains
+Bot1.Hand = Forest; Plains; Plains; Plains; Plains

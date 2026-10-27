@@ -1,12 +1,13 @@
 # Spikewheel Acrobat's spectacle {2}{R} (CR 702.137a): not offered while no opponent has lost life this turn, offered after
-# Lightning Bolt takes Bot2 to 17, and then paid with Moxen worth exactly {2}{R} (one short, it is not offered, and the pool
-# ends empty).
+# Lightning Bolt takes Bot2 to 17, and then paid exactly with Mana Crypt's {C}{C} for the generic and Mox Ruby's {R} (the
+# pool ends empty). With Mox Emerald's {G} in place of the {R} (three mana, no red) it is not offered: the cost's {R} is
+# pinned, and colorless mana for the generic leaves no room for another colored pip.
 
 [Bot1 Deck]
 Mox Ruby
 Lightning Bolt
+Mana Crypt
 Mox Emerald
-Mox Sapphire
 Mox Ruby
 Spikewheel Acrobat
 Island x15
@@ -21,20 +22,19 @@ Bot1.Pass
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Lightning Bolt.Cast(Bot2)
 Bot1.Pass
-Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mana Crypt.Cast
 Bot1.Pass
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass
 ! Bot1.Hand.Spikewheel Acrobat.Cast(Ability: Spectacle; Mana: short)
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
-Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
 Bot1.Hand.Spikewheel Acrobat.Cast(Ability: Spectacle)
 Bot1.Pass
 ? Bot1.Mana = 
 
 [Expect]
 Bot2.Life = 17
-Bot1.Battlefield = Spikewheel Acrobat; Mox Emerald; Mox Ruby; Mox Ruby; Mox Sapphire
+Bot1.Battlefield = Mana Crypt; Mox Emerald; Mox Ruby; Mox Ruby; Spikewheel Acrobat

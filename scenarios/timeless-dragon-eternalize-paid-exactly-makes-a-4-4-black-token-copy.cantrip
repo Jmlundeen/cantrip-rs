@@ -1,29 +1,38 @@
-# Timeless Dragon's eternalize {2}{W}{W} (CR 702.129a): discarded to Faithless Looting, it is eternalized from the graveyard
-# (one mana short the ability is not offered) with Moxen worth exactly the rest and the two {R} left over from Black Lotus,
-# leaving the pool empty. The card is exiled and a 4/4 black token copy of it is made.
+# Timeless Dragon's eternalize {2}{W}{W} (CR 702.129a): discarded to Faithless Looting (paid with a Mox Ruby), it is
+# eternalized from the graveyard, paid exactly with Mana Crypt's {C}{C} for the generic and two Mox Pearls' {W}{W}, and the
+# pool ends empty. The card is exiled and a 4/4 black token copy of it is made. With Mox Emerald's {G} in place of one {W}
+# (as much mana, one white fewer) it is not offered: the cost's colored pips are pinned, and colorless mana for the generic
+# leaves no room for another.
 
 [Bot1 Deck]
-Black Lotus
+Mox Ruby
 Faithless Looting
 Timeless Dragon
+Mana Crypt
+Mox Emerald
 Mox Pearl x2
-Island x16
+Island x14
 
 [Bot2 Deck]
 Island x24
 
 [Actions]
-Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
-Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
 Bot1.Choose(Timeless Dragon; Island)
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
 Bot1.Hand.Mox Pearl.Cast
 Bot1.Pass
 ! Bot1.Graveyard.Timeless Dragon.Activate(Ability: Eternalize; Mana: short)
 Bot1.Hand.Mox Pearl.Cast
 Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
 Bot1.Battlefield.Mox Pearl#1.Activate
 Bot1.Battlefield.Mox Pearl#2.Activate
 Bot1.Graveyard.Timeless Dragon.Activate(Ability: Eternalize)
@@ -31,9 +40,9 @@ Bot1.Pass
 ? Bot1.Mana = 
 
 [Expect]
-Bot1.Battlefield = Mox Pearl; Mox Pearl; Timeless Dragon
+Bot1.Battlefield = Mana Crypt; Mox Emerald; Mox Pearl; Mox Pearl; Mox Ruby; Timeless Dragon
 Bot1.Battlefield.Timeless Dragon.Power = 4
 Bot1.Battlefield.Timeless Dragon.Toughness = 4
 Bot1.Battlefield.Timeless Dragon.Colors = Black
 Exile = Timeless Dragon
-Bot1.Graveyard = Faithless Looting; Island; Black Lotus
+Bot1.Graveyard = Faithless Looting; Island

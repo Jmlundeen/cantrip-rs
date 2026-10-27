@@ -1,10 +1,12 @@
 # Striped Riverwinder's cycling {U} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on
-# top. The cost {U} is paid with Moxen worth exactly that much: one short, the ability is not offered, and the pool ends empty.
+# top. The cost {U} is paid with Mox Sapphire, exactly, and the pool ends empty; with Mox Emerald's {G} in its place (one
+# mana, no blue) the ability is not offered, so the cost is that colored pip and not {1}.
 
 [Bot1 Deck]
+Mox Emerald
 Mox Sapphire
 Striped Riverwinder
-Plains x5
+Plains x4
 Forest
 Plains x12
 
@@ -12,6 +14,8 @@ Plains x12
 Island x24
 
 [Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
 ! Bot1.Hand.Striped Riverwinder.Activate(Mana: short)
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Pass
@@ -22,4 +26,4 @@ Bot1.Pass
 
 [Expect]
 Bot1.Graveyard.Striped Riverwinder.Colors = Blue
-Bot1.Hand = Forest; Plains; Plains; Plains; Plains; Plains
+Bot1.Hand = Forest; Plains; Plains; Plains; Plains

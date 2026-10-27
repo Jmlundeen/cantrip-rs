@@ -1,13 +1,14 @@
-# Raging Goblinoids's mayhem {2}{R} (CR 702.187b): discarded to Faithless Looting this turn, it is cast from the graveyard for
-# its mayhem cost; a Mox Ruby casts Faithless Looting and Moxen worth exactly the mayhem cost are cast after it. One mana short
-# the cast is not offered, and the pool ends empty.
+# Raging Goblinoids's mayhem {2}{R} (CR 702.187b): discarded to Faithless Looting (paid with a Mox Ruby), it is cast from the
+# graveyard for its mayhem cost the same turn, paid exactly with Mana Crypt's {C}{C} for the generic and Mox Ruby's {R}, and
+# the pool ends empty. With Mox Emerald's {G} in place of the {R} (as much mana, one red fewer) it is not offered: the cost's
+# colored pips are pinned, and colorless mana for the generic leaves no room for another.
 
 [Bot1 Deck]
 Mox Ruby
 Faithless Looting
 Raging Goblinoids
+Mana Crypt
 Mox Emerald
-Mox Sapphire
 Mox Ruby
 Island x15
 
@@ -21,20 +22,19 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
 Bot1.Choose(Raging Goblinoids; Island)
-Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mana Crypt.Cast
 Bot1.Pass
-Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass
 ! Bot1.Graveyard.Raging Goblinoids.Cast(Ability: Mayhem; Mana: short)
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
-Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
 Bot1.Graveyard.Raging Goblinoids.Cast(Ability: Mayhem)
 Bot1.Pass
 ? Bot1.Mana = 
 
 [Expect]
-Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Ruby; Mox Sapphire; Raging Goblinoids
+Bot1.Battlefield = Mana Crypt; Mox Emerald; Mox Ruby; Mox Ruby; Raging Goblinoids
 Bot1.Graveyard = Faithless Looting; Island

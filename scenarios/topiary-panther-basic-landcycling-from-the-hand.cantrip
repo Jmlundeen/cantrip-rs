@@ -1,12 +1,14 @@
-# Topiary Panther's basic landcycling {1}{G} (CR 702.29e): paying it and discarding the card from the hand finds the Forest in
-# the library and puts it into the hand. The cost {1}{G} is paid with Moxen worth exactly that much: one short, the ability is
-# not offered, and the pool ends empty.
+# Topiary Panther's basic landcycling {1}{G} (CR 702.29e): paying it and discarding the card from the hand finds the Forest
+# in the library and puts it into the hand. The cost is paid exactly with Blasted Landscape's {C} for the generic and Mox
+# Emerald's {G}, and the pool ends empty; with Mox Sapphire's {U} in place of the {G} (two mana, no green) the ability is not
+# offered, so the cost's {G} is pinned, and colorless mana for the generic leaves no room for another colored pip.
 
 [Bot1 Deck]
+Blasted Landscape
 Mox Sapphire
 Mox Emerald
 Topiary Panther
-Plains x4
+Plains x3
 Forest
 Plains x12
 
@@ -14,12 +16,13 @@ Plains x12
 Island x24
 
 [Actions]
+Bot1.Hand.Blasted Landscape.Play
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Pass
 ! Bot1.Hand.Topiary Panther.Activate(Ability: Basic landcycling; Mana: short)
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass
-Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Blasted Landscape.Activate
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Topiary Panther.Activate(Ability: Basic landcycling)
 Bot1.Pass
@@ -28,4 +31,4 @@ Bot1.Search(Forest)
 
 [Expect]
 Bot1.Graveyard.Topiary Panther.Colors = Green
-Bot1.Hand = Forest; Plains; Plains; Plains; Plains
+Bot1.Hand = Forest; Plains; Plains; Plains

@@ -1,8 +1,10 @@
 # Zephyrim's miracle {1}{W} (CR 702.94a): it is the first card Bot1 draws on turn 3, so Bot1 reveals it and casts it for its
-# miracle cost, paid with two Moxen worth exactly {1}{W} (a normal cast costs {3}{W}); the pool ends empty.
+# miracle cost, paid exactly with Blasted Landscape's {C} for the generic and Mox Pearl's {W} (a normal cast costs {3}{W});
+# the pool ends empty, and colorless mana for the generic leaves no room for another colored pip.
+# zephyrim-miracle-still-owes-its-white-after-colorless-and-green-mana shows the {W} is needed.
 
 [Bot1 Deck]
-Mox Emerald
+Blasted Landscape
 Mox Pearl
 Island x5
 Zephyrim
@@ -12,13 +14,13 @@ Island x14
 Island x24
 
 [Actions]
-Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Blasted Landscape.Play
 Bot1.Hand.Mox Pearl.Cast
 Bot1.Pass
 [T3 Bot1.Draw]
 Bot1.Accept
 ? Bot1.Revealed = Zephyrim
-Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Blasted Landscape.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Accept
 Bot1.Pass
@@ -26,5 +28,5 @@ Bot1.Pass
 [T3 Bot1.Main1]
 
 [Expect]
-Bot1.Battlefield = Mox Emerald; Mox Pearl; Zephyrim
+Bot1.Battlefield = Blasted Landscape; Mox Pearl; Zephyrim
 Bot1.Hand.Count = 5

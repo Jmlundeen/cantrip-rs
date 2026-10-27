@@ -1,0 +1,32 @@
+# Kitchen Imp's madness cost is {B} (CR 702.35a): discarded to Faithless Looting (paid with a Mox Ruby) with Mox Emerald's
+# {G} in the pool - as much mana as the madness cost, no black - Bot1 accepts the cast, but it can't be paid and is
+# cancelled, so the card goes to the graveyard. A cost with a generic {1} in place of the {B} would be payable here, so this
+# pins the {B}.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Kitchen Imp
+Mox Emerald
+Island x16
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Kitchen Imp; Island)
+Bot1.Accept
+Bot1.Cancel
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby
+Bot1.Graveyard.Kitchen Imp.Colors = Black
+Exile.Count = 0

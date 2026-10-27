@@ -1,0 +1,35 @@
+# Zephyrim's miracle cost is {1}{W} (CR 702.94a): it is the first card Bot1 draws on turn 3 and Bot1 reveals it and accepts
+# the cast with Blasted Landscape's {C} and Mox Emerald's {G} in the pool - as much mana as the miracle cost, no white. The
+# pool pays the {1} and the cast still owes {W}, which Mox Pearl, tapped then, pays; one mana is left in the pool. A cost of
+# {2} would have been paid in full by the pool, leaving nothing owed and Mox Pearl's {W} unspent, so this pins the {W}.
+
+[Bot1 Deck]
+Blasted Landscape
+Mox Emerald
+Mox Pearl
+Island x4
+Zephyrim
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Draw]
+Bot1.Accept
+? Bot1.Revealed = Zephyrim
+Bot1.Battlefield.Blasted Landscape.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Accept
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+? Bot1.Mana = {G}
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Blasted Landscape; Mox Emerald; Mox Pearl; Zephyrim

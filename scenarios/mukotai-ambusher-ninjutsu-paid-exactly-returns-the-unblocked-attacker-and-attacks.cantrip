@@ -1,14 +1,17 @@
-# Mukotai Ambusher's ninjutsu {1}{B} (CR 702.49a): Fanatical Firebrand attacks and is unblocked, and in the declare blockers
-# step Moxen worth exactly {1}{B} pay for ninjutsu (the pool ends empty), returning the Firebrand to hand; Mukotai Ambusher
-# enters tapped and attacking and deals 3.
+# Mukotai Ambusher's ninjutsu {1}{B} (CR 702.49a): on turn 1 Fanatical Firebrand attacks and is unblocked, and in the declare
+# blockers step, with Blasted Landscape's {C} and Mox Emerald's {G} - as much mana as the cost, one {B} fewer - ninjutsu is
+# not offered, so the cost's {B} is pinned. On turn 3 the Firebrand attacks again and ninjutsu is paid exactly with Blasted
+# Landscape's {C} for the generic and Mox Jet's {B} (the pool ends empty; colorless mana for the generic leaves no room for
+# another colored pip), returning the Firebrand to hand; Mukotai Ambusher enters tapped and attacking and deals 3.
 
 [Bot1 Deck]
 Mox Ruby
 Fanatical Firebrand
 Mukotai Ambusher
+Blasted Landscape
 Mox Emerald
 Mox Jet
-Island x16
+Island x14
 
 [Bot2 Deck]
 Island x24
@@ -19,23 +22,29 @@ Bot1.Pass
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Fanatical Firebrand.Cast
 Bot1.Pass
+Bot1.Hand.Blasted Landscape.Play
 Bot1.Hand.Mox Emerald.Cast
-Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
 Bot1.Attack(Fanatical Firebrand > Bot2)
 [Bot1.Blockers]
-Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Mukotai Ambusher.Activate(Ability: Ninjutsu; Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Blasted Landscape.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Mukotai Ambusher.Activate(Ability: Ninjutsu)
 Bot1.Choose(Fanatical Firebrand)
 Bot1.Pass
 Bot1.Pass
 ? Bot1.Mana = 
-[Bot1.Main2]
+[T3 Bot1.Main2]
 
 [Expect]
-Bot2.Life = 17
+Bot2.Life = 16
 Bot1.Life = 23
 Bot1.Hand = Fanatical Firebrand; Island; Island
-Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Mukotai Ambusher
+Bot1.Battlefield = Blasted Landscape; Mox Emerald; Mox Jet; Mox Ruby; Mukotai Ambusher
 Bot1.Battlefield.Mukotai Ambusher.Tapped = true

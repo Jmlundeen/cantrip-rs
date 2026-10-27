@@ -1,14 +1,15 @@
-# Arrogant Wurm's madness {2}{G} (CR 702.35a): discarded to Faithless Looting while Moxen worth exactly {2}{G} (and a Mox Ruby
-# for the Looting) are tapped for mana, it is exiled and Bot1 casts it for its madness cost, which empties the pool.
+# Arrogant Wurm's madness {2}{G} (CR 702.35a): discarded to Faithless Looting (paid with a Mox Ruby) while Mana Crypt's
+# {C}{C} for the generic and Mox Emerald's {G} are in the pool, exactly the madness cost, it is exiled and Bot1 casts it for
+# its madness cost, which empties the pool; colorless mana for the generic leaves no room for another colored pip, and
+# arrogant-wurm-madness-is-not-paid-without-its-green shows the {G} is needed.
 
 [Bot1 Deck]
 Mox Ruby
 Faithless Looting
 Arrogant Wurm
-Mox Sapphire
-Mox Pearl
+Mana Crypt
 Mox Emerald
-Island x15
+Island x16
 
 [Bot2 Deck]
 Island x24
@@ -16,13 +17,12 @@ Island x24
 [Actions]
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
-Bot1.Hand.Mox Sapphire.Cast
-Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Pass
 Bot1.Battlefield.Mox Ruby.Activate
-Bot1.Battlefield.Mox Sapphire.Activate
-Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mana Crypt.Activate
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Faithless Looting.Cast
 Bot1.Pass
@@ -33,6 +33,6 @@ Bot1.Pass
 [Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield = Arrogant Wurm; Mox Emerald; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot1.Battlefield = Arrogant Wurm; Mana Crypt; Mox Emerald; Mox Ruby
 Bot1.Graveyard = Faithless Looting; Island
 Exile.Count = 0
