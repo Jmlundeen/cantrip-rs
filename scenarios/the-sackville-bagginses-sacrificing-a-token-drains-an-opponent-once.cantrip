@@ -1,7 +1,8 @@
 # The Sackville-Bagginses: "Whenever you sacrifice a token, target opponent loses 1 life." On turn 1 Bot1 casts Thraben
 # Inspector, whose Clue token it sacrifices on turn 3 to the Sackville-Bagginses's own enters ability (it can: "another creature
 # or artifact", and a Clue is an artifact). Bot1 draws a card and gets a Treasure; the sacrifice of the token triggers the second
-# ability (the Sackville-Bagginses is on the battlefield by then) and Bot2 loses exactly 1 life. The Inspector stays.
+# ability (the Sackville-Bagginses is on the battlefield by then) and Bot2 loses exactly 1 life. The Inspector stays: the
+# sacrifice is of one, so the Inspector and the Clue can't both go.
 
 [Bot1 Deck]
 Plains
@@ -22,6 +23,7 @@ Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Swamp.Activate
 Bot1.Hand.The Sackville-Bagginses.Cast
+! Bot1.Choose(Thraben Inspector; Clue Token)
 Bot1.Choose(Clue Token)
 [Bot1.Main2]
 
