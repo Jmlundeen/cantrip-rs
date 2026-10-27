@@ -7,7 +7,7 @@ pub mod run;
 
 pub use parse::GameScript;
 pub use parse::Expectation;
-pub use run::{Advance, Expected, Intent, ScriptFailure, ScriptResult, Scripted, run, run_on};
+pub use run::{Advance, Expected, Intent, ScriptFailure, ScriptResult, Scripted, Watch, run, run_on, run_watched};
 
 /// The marker of a known bug: a scenario that asserts what the rules require and that the engine does not do yet.
 pub const KNOWN_BUG: &str = "# Known bug:";

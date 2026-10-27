@@ -774,6 +774,47 @@ impl StateDump {
     pub fn render(&self) -> String {
         self.values.iter().map(|(k, v)| format!("  {k} = {v}\n")).collect()
     }
+
+    /// The keys whose values differ from `before`'s, as expectation lines of this state: `(absent)` for a key gone, the
+    /// value it had after `#` for one changed (`corpus --diff`). Which keys moved, for choosing what to expect; never the
+    /// values to expect, which are the rules' to say.
+    pub fn diff(&self, before: &StateDump) -> Vec<String> {
+        // An object only one side has (`BotN.<zone>.<name>`) is one line: gone, or new with its properties.
+        let object = |key: &str| -> Option<String> {
+            let p: Vec<&str> = key.splitn(4, '.').collect();
+            (p.len() == 4).then(|| p[..3].join(".")).filter(|o| object_key_shape(o))
+        };
+        let has = |dump: &StateDump, o: &str| dump.values.keys().any(|k| k.starts_with(&format!("{o}.")));
+        let mut out = Vec::new();
+        let mut objects = BTreeSet::new();
+        let keys: BTreeSet<&String> = self.values.keys().chain(before.values.keys()).collect();
+        for k in keys {
+            if let Some(o) = object(k)
+                && has(self, &o) != has(before, &o)
+            {
+                if objects.insert(o.clone()) {
+                    out.push(if has(self, &o) {
+                        let properties: Vec<String> = self
+                            .values
+                            .iter()
+                            .filter_map(|(k, v)| k.strip_prefix(&format!("{o}.")).map(|p| format!("{p} {v}")))
+                            .collect();
+                        format!("{o}    # new: {}", properties.join(", "))
+                    } else {
+                        format!("{o} = (absent)    # gone")
+                    });
+                }
+                continue;
+            }
+            match (before.values.get(k), self.values.get(k)) {
+                (Some(old), Some(new)) if old != new => out.push(format!("{k} = {new}    # was {old}")),
+                (None, Some(new)) => out.push(format!("{k} = {new}    # new")),
+                (Some(old), None) => out.push(format!("{k} = (absent)    # was {old}")),
+                _ => {}
+            }
+        }
+        out
+    }
 }
 
 /// The keys the dump writes outside any player (each list with `.Count` beside it).
