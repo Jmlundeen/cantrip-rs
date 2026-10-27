@@ -1947,6 +1947,13 @@ impl<'s> Run<'s> {
                     }
                 }
             }
+            // `! Bot1.Arrange(Shuffle)`: the question does not let the cards be shuffled instead of placed (Ponder's "you may
+            // shuffle" does; Thassa's Oracle's arrangement does not).
+            RequestKind::DistributeCards { may_shuffle, .. } if action.raw_arguments.trim().eq_ignore_ascii_case("shuffle") => {
+                if *may_shuffle {
+                    return fail(format!("line {line} says {text}, but the question lets the cards be shuffled"));
+                }
+            }
             // `! Bot1.Arrange(A; B | )`: the distribution is one the question refuses (too many to the hand, a card
             // unplaced), judged by the rules' own check of the answer.
             RequestKind::DistributeCards { cards, destinations, .. } if !action.raw_arguments.trim().is_empty() => {

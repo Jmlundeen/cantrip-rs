@@ -438,7 +438,8 @@ the removal spell still has the trigger above it, so pass once more.
 
 `! Bot1.Arrange(A; B | )` with arguments is a distribution the question must refuse (two cards to a hand that takes one, a
 card left unplaced), judged by the rules' own check of the answer at the next placement question; place it before the
-`Arrange` that answers, beside which it is the positive control.
+`Arrange` that answers, beside which it is the positive control. `! Bot1.Arrange(Shuffle)` says the next placement question
+does not let the cards be shuffled instead (Ponder's does, Thassa's Oracle's does not).
 `! Bot1.Discard` is the discard to hand size at cleanup (no maximum hand size): a refusal is checked until the player's next priority, so
 place it after the `Bot1.Pass` of the end step (`[T5 Bot1.End]`, `Bot1.Pass`) or the end step's own priority ends it first.
 
