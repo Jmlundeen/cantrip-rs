@@ -1065,6 +1065,15 @@ pub fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
     }
 }
 
+/// "Whenever another creature dies" (CR 700.4, 603.10a): a creature other than the source, using its last-known
+/// characteristics. Battle-Scarred Survivalist and Sephiroth, Fabled SOLDIER print it.
+pub fn another_creature_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, .. } if *old == source => None,
+        _ => creature_dies(q, source, event),
+    }
+}
+
 /// "Whenever a creature you control dies" (CR 700.4, 603.10a), looked back on: the creature as it last was on the
 /// battlefield, under the controller it last had, on a permanent or an emblem alike. Grave Venerations and Warhost's Frenzy
 /// print it.
@@ -1376,6 +1385,9 @@ pub const LEGENDARY_CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask:
 pub const ARTIFACT_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, artifact_you_control_enters);
 pub const ANOTHER_CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_enters);
 pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
+
+/// A different creature dies, using the characteristics it last had on the battlefield.
+pub const ANOTHER_CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, another_creature_dies);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_dies);
 pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, artifact_spell_you_cast);
 pub const CREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, creature_spell_you_cast);

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::target_player_loses_1_life_you_gain_1;
-use cantrip_mechanics::triggers::{creature_dies, CREATURE_DIES, THIS_ATTACKS, THIS_ENTERS_OR_ATTACKS};
+use cantrip_mechanics::triggers::{ANOTHER_CREATURE_DIES, CREATURE_DIES, THIS_ATTACKS, THIS_ENTERS_OR_ATTACKS};
 use cantrip_mechanics::{choose, targets, tokens};
 use cantrip_oracle as oracle;
 
@@ -19,14 +19,6 @@ fn sacrifice_another_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), S
         g.draw(you, 1);
     }
     Ok(())
-}
-
-/// "Whenever another creature dies" (CR 700.4, 603.10a), looked back on: any creature but Sephiroth itself.
-fn another_creature_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { old, .. } if *old == source => None,
-        _ => creature_dies(q, source, event),
-    }
 }
 
 /// "Target opponent loses 1 life and you gain 1 life. If this is the fourth time this ability has resolved this turn,
@@ -91,7 +83,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS_OR_ATTACKS, sacrifice_another_to_draw, "Whenever Sephiroth enters or attacks, you may sacrifice another creature. If you do, draw a card."),
         triggered(
-            when(EventMask::ZONE_CHANGE, another_creature_dies),
+            ANOTHER_CREATURE_DIES,
             drain_and_maybe_transform,
             "Whenever another creature dies, target opponent loses 1 life and you gain 1 life. If this is the fourth time this ability has resolved this turn, transform Sephiroth.",
         )
