@@ -190,8 +190,8 @@ pub fn plus_one_counter_on_each_other_of_subtype_you_control<const SUBTYPE: u16>
 /// "Put a +1/+1 counter on [this permanent]" (CR 122.1), the ability's source: none once it has left the battlefield, as a
 /// new object it is another (CR 400.7). The whole effect of a trigger or ability of Essence Channeler, Ajani Resolute's
 /// Ajani's Pridemate token, Leonardo, Cutting Edge, Blood Hustler, Cryptic Trilobite, Gau, Feral Youth, Hired Claw, Ivora,
-/// Insatiable Heir, Laelia, the Blade Reforged, Questing Druid, Shang-Chi and the Ten Rings, Tireless Tracker and Youthful
-/// Valkyrie.
+/// Insatiable Heir, Laelia, the Blade Reforged, Questing Druid, Shang-Chi and the Ten Rings, Battle-Scarred Survivalist,
+/// Tireless Tracker and Youthful Valkyrie.
 pub fn plus_one_counter_on_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 1);
     Ok(())
