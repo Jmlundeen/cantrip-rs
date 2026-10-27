@@ -1,20 +1,29 @@
-# Primoc Escapee's cycling {2} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Mox Jet on top.
+# Primoc Escapee's cycling {2} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on top.
+# The cost {2} is paid with Moxen worth exactly that much: one short, the ability is not offered, and the pool ends empty.
 
 [Bot1 Deck]
-Black Lotus
+Mox Emerald
+Mox Sapphire
 Primoc Escapee
-Plains x5
-Mox Jet
+Plains x4
+Forest
 Plains x12
 
 [Bot2 Deck]
 Island x24
 
 [Actions]
-Bot1.Hand.Black Lotus.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Hand.Primoc Escapee.Activate(Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Hand.Primoc Escapee.Activate
+Bot1.Pass
+? Bot1.Mana = 
 
 [Expect]
 Bot1.Graveyard.Primoc Escapee.Colors = Blue
-Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Mox Jet
+Bot1.Hand = Forest; Plains; Plains; Plains; Plains

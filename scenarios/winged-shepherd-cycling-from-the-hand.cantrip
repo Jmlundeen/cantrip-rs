@@ -1,20 +1,25 @@
-# Winged Shepherd's cycling {W} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Mox Jet on top.
+# Winged Shepherd's cycling {W} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on top.
+# The cost {W} is paid with Moxen worth exactly that much: one short, the ability is not offered, and the pool ends empty.
 
 [Bot1 Deck]
-Black Lotus
+Mox Pearl
 Winged Shepherd
 Plains x5
-Mox Jet
+Forest
 Plains x12
 
 [Bot2 Deck]
 Island x24
 
 [Actions]
-Bot1.Hand.Black Lotus.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: White)
+! Bot1.Hand.Winged Shepherd.Activate(Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Winged Shepherd.Activate
+Bot1.Pass
+? Bot1.Mana = 
 
 [Expect]
 Bot1.Graveyard.Winged Shepherd.Colors = White
-Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Mox Jet
+Bot1.Hand = Forest; Plains; Plains; Plains; Plains; Plains

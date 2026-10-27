@@ -1,10 +1,12 @@
-# Furnace Host Charger's mountaincycling {2} (CR 702.29e): paying it and discarding the card from the hand finds the Mountain in the
-# library and puts it into the hand.
+# Furnace Host Charger's mountaincycling {2} (CR 702.29e): paying it and discarding the card from the hand finds the Mountain
+# in the library and puts it into the hand. The cost {2} is paid with Moxen worth exactly that much: one short, the ability is
+# not offered, and the pool ends empty.
 
 [Bot1 Deck]
-Black Lotus
+Mox Emerald
+Mox Sapphire
 Furnace Host Charger
-Plains x5
+Plains x4
 Mountain
 Plains x12
 
@@ -12,11 +14,18 @@ Plains x12
 Island x24
 
 [Actions]
-Bot1.Hand.Black Lotus.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Hand.Furnace Host Charger.Activate(Ability: Mountaincycling; Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Hand.Furnace Host Charger.Activate(Ability: Mountaincycling)
+Bot1.Pass
+? Bot1.Mana = 
 Bot1.Search(Mountain)
 
 [Expect]
 Bot1.Graveyard.Furnace Host Charger.Colors = Red
-Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Mountain
+Bot1.Hand = Mountain; Plains; Plains; Plains; Plains

@@ -1,20 +1,25 @@
-# Imposing Vantasaur's cycling {1} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Mox Jet on top.
+# Imposing Vantasaur's cycling {1} (CR 702.29a): paying it and discarding the card from the hand draws a card, the Forest on
+# top. The cost {1} is paid with Moxen worth exactly that much: one short, the ability is not offered, and the pool ends empty.
 
 [Bot1 Deck]
-Black Lotus
+Mox Emerald
 Imposing Vantasaur
 Plains x5
-Mox Jet
+Forest
 Plains x12
 
 [Bot2 Deck]
 Island x24
 
 [Actions]
-Bot1.Hand.Black Lotus.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+! Bot1.Hand.Imposing Vantasaur.Activate(Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Imposing Vantasaur.Activate
+Bot1.Pass
+? Bot1.Mana = 
 
 [Expect]
 Bot1.Graveyard.Imposing Vantasaur.Colors = White
-Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Mox Jet
+Bot1.Hand = Forest; Plains; Plains; Plains; Plains; Plains
