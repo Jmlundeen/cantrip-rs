@@ -1,0 +1,52 @@
+# Anthropological Mission {2}{U}: Enchantment
+#   Whenever you cast a noncreature spell, put a quest counter on this enchantment. Draw a card. Then discard a card unless this enchantment has three or more quest counters on it.
+# Bot1 casts its whole opening hand, so its hand is empty as each trigger resolves. The first two Zuran Orbs give the
+# Mission one and two quest counters: Bot1 draws an Island and then discards it (a discard first would find the hand
+# empty and keep the Island). The third Orb's trigger gives it its third counter, exactly at "three or more", so Bot1
+# keeps the Memnite it draws. Memnite is a creature spell and triggers nothing (CR 603.2): the Mission stays at three.
+
+[Bot1 Deck]
+Anthropological Mission
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Zuran Orb
+Zuran Orb
+Zuran Orb
+Island
+Island
+Memnite
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Anthropological Mission.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Choose(Island)
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Choose(Island)
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Memnite
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Anthropological Mission.Counters.Quest = 3
+Bot1.Battlefield = Mox Sapphire; Mox Pearl; Mox Jet; Anthropological Mission; Zuran Orb; Zuran Orb; Zuran Orb; Memnite
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Island; Island

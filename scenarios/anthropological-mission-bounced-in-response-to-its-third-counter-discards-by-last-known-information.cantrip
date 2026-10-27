@@ -1,0 +1,58 @@
+# Anthropological Mission {2}{U}: Enchantment
+#   Whenever you cast a noncreature spell, put a quest counter on this enchantment. Draw a card. Then discard a card unless this enchantment has three or more quest counters on it.
+# The Mission takes two quest counters on turn 1. On turn 3 the third Zuran Orb triggers it, and Bot2 returns it to
+# Bot1's hand with Echoing Truth in response. Bot2 casts the bounce, not Bot1, because a spell Bot1 cast would trigger
+# the Mission again, and that trigger would resolve first and add the third counter. The trigger then resolves with its
+# source gone: no counter can be put on an object that changed zones (CR 400.7), so the condition reads the counters the
+# Mission last had on the battlefield, two (CR 608.2h). Bot1 still draws, then discards. A counter put on the departed
+# Mission would make three and skip the discard, leaving three cards in hand.
+
+[Bot1 Deck]
+Anthropological Mission
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Zuran Orb
+Zuran Orb
+Zuran Orb
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Echoing Truth
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Anthropological Mission.Cast
+Bot1.Pass
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Choose(Island)
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Choose(Island)
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Anthropological Mission.Counters.Quest = 2
+Bot1.Hand.Zuran Orb.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Echoing Truth.Cast(Bot1.Battlefield.Anthropological Mission)
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Pearl; Mox Jet; Zuran Orb; Zuran Orb; Zuran Orb
+Bot1.Hand = Island; Anthropological Mission
+Bot1.Graveyard = Island; Island; Island
+Bot2.Graveyard = Echoing Truth
