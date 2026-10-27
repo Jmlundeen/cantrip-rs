@@ -1,0 +1,50 @@
+# "If it's a green card" is a color word of Tamiyo, Seasoned Scholar's text (CR 612.2). Bot1's Mind Bend replaces green
+# with blue in it, so her -3 returning Natural Order (green, put into the graveyard by Bot2's Duress) adds no mana: the
+# changed text asks whether the card is blue (CR 612.1). Tamiyo transforms on Bot1's third draw of turn 3 (the draw step,
+# Ponder, Brainstorm), and Brainstorm puts two Islands back, keeping Mind Bend.
+[Bot1 Deck]
+Island x3
+Tamiyo, Inquisitive Student
+Ponder
+Brainstorm
+Natural Order
+Mind Bend
+Island x20
+[Bot2 Deck]
+Swamp x2
+Duress
+Swamp x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Tamiyo, Inquisitive Student.Cast
+[Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Natural Order)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+Bot1.Choose(Island; Island)
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Until your next turn)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mind Bend.Cast(Bot1.Battlefield.Tamiyo, Seasoned Scholar)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Return target instant or sorcery; Bot1.Graveyard.Natural Order)
+Bot1.Pass
+! Bot1.Colors
+? Bot1.Mana =
+? Bot1.Hand.Natural Order.Colors = Green
+[Expect]
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 1
