@@ -1,0 +1,34 @@
+# Assembly Specialist's enters trigger (CR 603.6a) creates one 1/1 colorless Borg artifact creature token (CR 111.1)
+# under its controller: the battlefield list pins the count and whose it is, the token's keys its characteristics.
+
+[Bot1 Deck]
+Assembly Specialist
+Mox Pearl
+Mox Sapphire
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Assembly Specialist.Cast
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Assembly Specialist.Power = 1
+Bot1.Battlefield.Assembly Specialist.Toughness = 1
+Bot1.Battlefield = Assembly Specialist; Borg Token; Mox Pearl; Mox Sapphire
+Bot1.Battlefield.Borg Token.Types = Artifact; Creature
+Bot1.Battlefield.Borg Token.Subtypes = Borg
+Bot1.Battlefield.Borg Token.Power = 1
+Bot1.Battlefield.Borg Token.Toughness = 1
+Bot1.Battlefield.Borg Token.Token = True
+Bot1.Battlefield.Borg Token.Colors = (absent)

@@ -31,8 +31,8 @@ pub static ILLUSION_3_3_ARTIFACT: CardDef = CardDef {
     ..token!(Illusion)
 };
 
-/// A 1/1 colorless Borg artifact creature token (CR 111). Antagonist Incorporator, Locutus of Borg, Conquest Mission and Join
-/// the Collective create this exact token.
+/// A 1/1 colorless Borg artifact creature token (CR 111). Antagonist Incorporator, Assembly Specialist, Locutus of Borg,
+/// Conquest Mission and Join the Collective create this exact token.
 pub static BORG: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
     power: Some(1),
