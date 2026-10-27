@@ -1,0 +1,27 @@
+# Bajor enters tapped, gaining 1 life; after untapping it taps for exactly one mana of the chosen color (CR 614.1d, 605.1a, 605.3b, 118.3, 106.4, 119.3, 603.6a).
+
+[Bot1 Deck]
+Bajor
+Mountain x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Bajor.Play
+? Bot1.Battlefield.Bajor.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+! Bot1.Battlefield.Bajor.Activate(Color: Red)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Bajor.Activate(Color: Green)
+Bot1.Battlefield.Bajor.Activate(Color: Red)
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Bajor.Tapped = true
+
+[Expect]
+Bot1.Life = 21
+Bot1.Mana = {R}
+Bot1.Battlefield.Bajor.Tapped = true
+Stack.Count = 0
