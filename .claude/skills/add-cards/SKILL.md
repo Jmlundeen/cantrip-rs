@@ -50,7 +50,7 @@ Three layers, kept apart by the compiler (`cantrip-api` is all a card can see):
 - build a zone destination the rules dictate (`Zone::graveyard(owner)`, `Zone::hand(owner)`, a library position), or
   call `move_together` for a rules action that has a verb: use `destroy_all`/`destroy_all_no_regen`, `sacrifice`,
   `exile_all`, `return_to_hand`, `put_into_library(.., LibraryPlace::..)`, `mill`, `discard_together`, `discard_hand`,
-  `library::search_to_hand`/`search_to_battlefield`/`search_to_top`;
+  `library::search`/`library::find_to_*`;
 - shuffle or randomise by hand (`put_into_library(.., LibraryPlace::BottomInRandomOrder)`, `bottom_in_random_order`,
   `library::random_of`);
 - loop over players or objects for something the rules make simultaneous (`damage_together`,
@@ -179,6 +179,8 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
 6. **Citations:** `python tools/maintenance/cr.py check --show <the card's file> <its scenarios>` prints every `CR`
    citation beside the rule it names. Read each pair: a rule that does not say what the comment claims is fixed or
    the citation dropped - a number copied from another card's comment is the usual way a wrong one gets in.
+   **Lint:** `python tools/maintenance/card-lint.py "Card Name"` checks the "never" list's mechanical items over the
+   card's file. A NEVER finding is fixed; a LOOK finding is read, and either fixed or answered in the report in a line.
 7. **Coverage:** `python tools/maintenance/card-coverage.py "Card Name"` reports every line of the card's file
    executed (from a bash shell call it so, not through `tools\card-coverage.cmd`, whose quoting `cmd //c` breaks; a
    file of statics alone has no lines to measure). A line no scenario can reach is wrong code or a

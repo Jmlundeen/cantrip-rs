@@ -18,7 +18,8 @@ checked for sufficiency, not exhaustiveness:
 - every `CR` citation in the card's file and scenarios: `cr.py check --show <files>` prints each beside the rule it
   names (and flags a number the current rules don't have) - each rule says what the comment says it does - citations copied from
   older code can name a rule that was renumbered (CR 712.4 is meld cards, not modal double-faced cards);
-- the "never" list, line by line;
+- the "never" list, line by line - `card-lint.py "Card Name"` finds its mechanical items (each NEVER blocks; each LOOK
+  is read, and the author's answer to it checked), the rest is read;
 - number widths are decided: `docs/rules-exceptions.md` RX-5 keeps today's widths (mana costs, X, multikicker, counters,
   power, toughness, damage, player counters) and their existing clamps, so a u8/u16 limit on those is not a finding; a
   card's own arithmetic that wraps (an i16 doubled) still is;
