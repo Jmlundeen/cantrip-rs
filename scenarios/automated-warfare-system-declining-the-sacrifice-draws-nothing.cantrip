@@ -1,0 +1,45 @@
+# Automated Warfare System: the sacrifice is a "may" - Bot1 declines with a Turtle and Mox Sapphire available, so nothing is
+# sacrificed and, with no "if you do", no card is drawn (CR 608.2c).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Sapphire
+Automated Warfare System
+Aegis Turtle
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Dwarven Trader
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Automated Warfare System.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aegis Turtle.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dwarven Trader.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Automated Warfare System)
+Bot1.Pass
+Bot1.Choose()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Aegis Turtle.Tapped = false
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Hand.Count = 2
+Bot2.Life = 18

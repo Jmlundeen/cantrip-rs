@@ -1,0 +1,26 @@
+# Automated Warfare System alone: with no other creature or artifact it is not asked, never sacrifices itself ("another"),
+# and draws nothing; it still flies in for 2 (Bot2 has no flier to block).
+
+[Bot1 Deck]
+Black Lotus
+Automated Warfare System
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Automated Warfare System.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Automated Warfare System)
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Automated Warfare System.Tapped = true
+Bot1.Graveyard.Count = 1
+Bot1.Hand.Count = 6
+Bot2.Life = 18

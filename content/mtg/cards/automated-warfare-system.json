@@ -1,0 +1,11 @@
+{
+  "name": "Automated Warfare System",
+  "manaCost": "{2}{B}",
+  "type": "Artifact Creature — Construct",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying\nWhenever this creature attacks, you may sacrifice another creature or artifact. If you do, draw a card.",
+  "keywords": [
+    "Flying"
+  ]
+}
