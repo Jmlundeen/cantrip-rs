@@ -1860,4 +1860,28 @@ mod card_type_tests {
         assert_eq!(Subtype::CREATURE_TYPES[85], Subtype::Elf);
         assert_eq!(Subtype::CREATURE_TYPES[324], Subtype::Borg);
     }
+
+    /// The client keeps its own lists of every creature type (`CreatureType.All`, which a "choose a creature type" prompt
+    /// offers, and the prompt gallery's `PromptFixtures.CreatureTypes`): a creature type added here and not there is a
+    /// type no player can name. They must hold exactly `CREATURE_TYPES`, alphabetically, as their docs say.
+    #[test]
+    fn the_clients_creature_type_lists_hold_every_creature_type_alphabetically() {
+        let lists = [
+            ("dotnet/src/Cantrip.Cards.Model/TypeLine.cs", include_str!("../../../dotnet/src/Cantrip.Cards.Model/TypeLine.cs"), "CreatureType.All"),
+            ("dotnet/src/Cantrip.Client.Presentation/PromptFixtures.cs", include_str!("../../../dotnet/src/Cantrip.Client.Presentation/PromptFixtures.cs"), "PromptFixtures.CreatureTypes"),
+        ];
+        let mut expected: Vec<&str> = Subtype::CREATURE_TYPES.iter().map(|s| s.name()).collect();
+        expected.sort();
+        for (path, source, what) in lists {
+            let marker = if what == "CreatureType.All" { "IReadOnlyList<string> All =" } else { "IReadOnlyList<string> CreatureTypes =" };
+            let start = source.find(marker).unwrap_or_else(|| panic!("{path}: {what} not found"));
+            let body = &source[start..];
+            let body = &body[..body.find("];").unwrap_or_else(|| panic!("{path}: {what} does not end"))];
+            let found: Vec<&str> = body.split('"').skip(1).step_by(2).collect();
+            assert!(found.windows(2).all(|w| w[0] < w[1]), "{path}: {what} is not alphabetical and duplicate-free");
+            let missing: Vec<_> = expected.iter().filter(|n| !found.contains(n)).collect();
+            let extra: Vec<_> = found.iter().filter(|n| !expected.contains(n)).collect();
+            assert!(missing.is_empty() && extra.is_empty(), "{path}: {what} lacks {missing:?} and has unknown {extra:?}");
+        }
+    }
 }
