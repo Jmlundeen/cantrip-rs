@@ -1,5 +1,5 @@
 # Yoked Ox, a vanilla (no rules text) creature: cast with Black Lotus mana, its characteristics as printed (power, toughness,
-# keywords, colors, types, protection), then attacking Bot2, who has no creatures.
+# keywords, colors, types, protection). With no power, it isn't sent to attack.
 
 [Bot1 Deck]
 Black Lotus
