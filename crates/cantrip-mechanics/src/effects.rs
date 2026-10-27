@@ -535,6 +535,16 @@ pub fn each_opponent_discards_a_card(g: &mut dyn Game, item: &StackItem) -> Resu
     Ok(())
 }
 
+/// "Target player discards N cards": their choice (CR 701.9), the player being the first target. Nothing if that player is
+/// no longer a legal target as it resolves (CR 608.2b): a modal spell whose other mode's target is still legal resolves
+/// without it (Kolaghan's Command). Demonic Pact ("target opponent"), Kolaghan's Command and Armus, Skin of Evil print it.
+pub fn target_player_discards<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(player) = crate::targets::player(g, item, 0) {
+        crate::discard_chosen(g, player, item.object, N)?;
+    }
+    Ok(())
+}
+
 /// "Sacrifice this [permanent]" (CR 701.21a): the ability's source, sacrificed by the ability's controller - by no one when
 /// another player has gained control of it since. City of Traitors and Carnage, Crimson Chaos print it.
 pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
