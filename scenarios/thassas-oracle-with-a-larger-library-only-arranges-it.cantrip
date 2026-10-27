@@ -1,5 +1,6 @@
 # Thassa's Oracle: devotion 2 looks at the top two cards; one goes on top, the other to the bottom, and with more cards
-# left in the library than that nobody wins.
+# left in the library than that nobody wins. The rest go to the bottom "in a random order", never a shuffle of the
+# library instead: the placement question offers none, and "up to one" refuses both on top.
 [Bot1 Deck]
 Thassa's Oracle
 Island x6
@@ -17,6 +18,8 @@ Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Island.Activate
 Bot1.Hand.Thassa's Oracle.Cast
+! Bot1.Arrange(Shuffle)
+! Bot1.Arrange(Swamp; Forest | )
 Bot1.Arrange(Swamp | Forest)
 [Bot1.Main2]
 [Expect]

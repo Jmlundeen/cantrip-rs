@@ -1,0 +1,22 @@
+# Thassa's Oracle: "If X is greater than or equal to the number of cards in your library, you win the game" - at equality
+# too. Its devotion to blue is 2 (UU) and two cards are left in Bot1's library after the turn-3 draw, so Bot1 wins
+# (CR 104.2b); thassas-oracle-with-a-larger-library-only-arranges-it is one card more than X, and nobody wins. "Up to one"
+# on top may be none: both cards go to the bottom.
+[Bot1 Deck]
+Thassa's Oracle
+Island x6
+Island
+Forest
+Swamp
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thassa's Oracle.Cast
+Bot1.Arrange( | Swamp; Forest)
+[Expect]
+Result = Bot1 won

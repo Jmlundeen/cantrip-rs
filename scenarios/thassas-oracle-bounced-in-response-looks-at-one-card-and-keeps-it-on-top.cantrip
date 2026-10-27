@@ -1,0 +1,43 @@
+# Thassa's Oracle's X is Bot1's devotion to blue as its trigger resolves (CR 700.5, 608.2h). Bot1 returns the Oracle to
+# its hand with Unsummon in response, leaving Fugitive Wizard's {U}: X is 1, so Bot1 looks at the top card alone. "Up to
+# one" goes on top and "the rest" - none - on the bottom: the Forest stays on top, the bottom group empty (CR 608.2c), and
+# with four cards left nobody wins. Each placement question still refuses two cards on top
+# (thassas-oracle-with-a-larger-library-only-arranges-it).
+[Bot1 Deck]
+Island
+Fugitive Wizard
+Island
+Thassa's Oracle
+Mox Sapphire
+Unsummon
+Island
+Island
+Forest
+Swamp
+Plains
+Mountain
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Fugitive Wizard.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thassa's Oracle.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Thassa's Oracle)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Forest | )
+[Bot1.Main2]
+[Expect]
+Result = InProgress
+Bot1.Library = Forest; Swamp; Plains; Mountain
+Bot1.Hand = Island; Island; Thassa's Oracle
