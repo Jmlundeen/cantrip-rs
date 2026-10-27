@@ -1,0 +1,11 @@
+{
+  "name": "Armus, Skin of Evil",
+  "manaCost": "{5}{B}{B}",
+  "type": "Legendary Creature — Ooze Horror",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Menace\nAt the beginning of your end step, target opponent discards two cards.\n{2}{B}, Discard this card: Target creature gets -4/-4 until end of turn.",
+  "keywords": [
+    "Menace"
+  ]
+}
