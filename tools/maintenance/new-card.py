@@ -1,6 +1,7 @@
 """Everything there is to read before porting a card to the native engine, in one call, and its file to start from.
 
     python tools/maintenance/new-card.py "Mind Stone" [--no-write]
+    python tools/maintenance/new-card.py "Mind Stone" --scenario [what-it-shows]
 
 Writes the card's content JSON from Scryfall when content/ has none (a single face, a double-faced card, an adventure;
 any other layout is written by hand), then prints the card's content JSON, the scenarios that use it and, for each of its abilities, the implemented cards that
@@ -11,6 +12,11 @@ file does not exist yet. Then the loop is: write the behavior, and
     cargo run --profile cards -p cantrip-script --bin corpus -- --card "Mind Stone"
 
 which runs only that card's scenarios and prints the full report of any that fail (docs/adding-cards.md).
+
+`--scenario` writes scenarios/<card>-<what-it-shows>.cantrip to start a scenario from instead: both decks, the card
+cast on turn 1 off zero-cost mana sources (the Moxen, Gleemox, Lotus Petal, Black Lotus) - or off a land a turn when
+those can't make its cost - the pool checked empty right after the cast, and a TODO expectation that fails until the
+real ones are written.
 """
 
 import importlib.util
@@ -334,8 +340,120 @@ def draft_content(name, index):
         f.write(json.dumps(card, indent=2, ensure_ascii=False) + "\n")
 
 
+MOX = {"W": "Mox Pearl", "U": "Mox Sapphire", "B": "Mox Jet", "R": "Mox Ruby", "G": "Mox Emerald"}
+BASIC = {"W": "Plains", "U": "Island", "B": "Swamp", "R": "Mountain", "G": "Forest"}
+COLOR_WORD = {"W": "White", "U": "Blue", "B": "Black", "R": "Red", "G": "Green"}
+
+
+def _cost(mana_cost):
+    """({color: symbols of it}, generic, whether it has X): a hybrid or Phyrexian symbol counted as its first color."""
+    colored, generic, x = {}, 0, False
+    for symbol in re.findall(r"\{([^}]+)\}", mana_cost or ""):
+        if symbol.isdigit():
+            generic += int(symbol)
+        elif symbol == "X":
+            x = True
+        elif symbol[0] in MOX:
+            colored[symbol[0]] = colored.get(symbol[0], 0) + 1
+        else:
+            return None  # {C}, {S}: no free source here makes it
+    return colored, generic, x
+
+
+def _free_mana(colored, generic):
+    """The zero-cost sources that make exactly this mana on turn 1, as (card, the activation's arguments), or None: Black
+    Lotus for three of one color, a Mox for one of its color, Gleemox and Lotus Petal for one of any - at most six cards,
+    so they and the card fit the opening hand."""
+    need, sources, left = dict(colored), [], generic
+    if need:
+        c = max(need, key=need.get)
+        if need[c] + left >= 3 and need[c] >= 2:
+            sources.append(("Black Lotus", f"Color: {COLOR_WORD[c]}"))
+            used = min(3, need[c])
+            need[c] -= used
+            left -= 3 - used
+    elif left >= 3:
+        sources.append(("Black Lotus", "Color: White"))
+        left -= 3
+    any_color = ["Gleemox", "Lotus Petal"]
+    for c, n in need.items():
+        for i in range(n):
+            if i == 0 and MOX[c] not in [s for s, _ in sources]:
+                sources.append((MOX[c], ""))
+            elif any_color:
+                sources.append((any_color.pop(0), f"Color: {COLOR_WORD[c]}"))
+            else:
+                return None
+    spare = [m for m in MOX.values() if m not in [s for s, _ in sources]] + any_color
+    for _ in range(left):
+        if not spare:
+            return None
+        card = spare.pop(0)
+        sources.append((card, "Color: White" if card in ("Gleemox", "Lotus Petal") else ""))
+    return sources if len(sources) <= 6 else None
+
+
+def write_scenario(card, what):
+    """A scenario to start from: the card cast (or played) on turn 1 off free mana, or on its controller's turn off lands,
+    and the pool checked empty right after; the rest is the author's (the write-game-script skill)."""
+    name, stem = card["name"], file_stem(card["name"]).replace("_", "-")
+    slug = f"{stem}-{what}" if what else f"{stem}-todo"
+    path = os.path.join(SCRIPTS, slug + ".cantrip")
+    if os.path.exists(path):
+        sys.exit(f"{os.path.relpath(path, ROOT)} exists already")
+    cost = _cost(card.get("manaCost", ""))
+    land = "Land" in card.get("type", "").split(" — ")[0].split()
+    first = next(iter(cost[0]), "U") if cost and cost[0] else "U"
+    deck, actions, how = [name], [], ""
+    if land:
+        actions.append(f"Bot1.Hand.{name}.Play")
+        how = "played on turn 1"
+    elif cost is None:
+        how = "TODO: its cost needs mana no free source here makes ({C}, snow): give Bot1 the lands for it"
+        actions.append(f"Bot1.Hand.{name}.Cast")
+    else:
+        colored, generic, x = cost
+        free = _free_mana(colored, generic)
+        if free is not None:
+            how = "cast on turn 1 off zero-cost mana sources"
+            deck += [s for s, _ in free]
+            for s, _ in free:
+                actions += [f"Bot1.Hand.{s}.Cast", "Bot1.Pass"]
+            for s, arg in free:
+                actions.append(f"Bot1.Battlefield.{s}.Activate" + (f"({arg})" if arg else ""))
+        else:
+            lands = [BASIC[c] for c, n in colored.items() for _ in range(n)] + [BASIC[first]] * generic
+            how = f"cast on turn {2 * len(lands) - 1} off a land played each turn"
+            deck += lands
+            for k, l in enumerate(lands):
+                actions += [f"[T{2 * k + 1} Bot1.Main1]", f"Bot1.Hand.{l}.Play"]
+            actions += [f"Bot1.Battlefield.{l}.Activate" for l in lands]
+        actions.append(f"Bot1.Hand.{name}.Cast" + ("(X: 0)" if x else ""))
+        # A cast announcing X stops at its pay prompt first, where a check would read the pool before it is paid.
+        actions += ["# TODO: its targets and choices, then: ? Bot1.Mana =" if x else "? Bot1.Mana =", "Bot1.Pass"]
+    cast = None
+    text = [f"# TODO: what this scenario shows, why it is arranged so, and the rule it tests (CR ...).",
+            f"# {name} {card.get('manaCost', '')}: {card.get('type', '')}"]
+    text += ["#   " + l for l in card.get("oracleText", "").split("\n")]
+    text += [f"# Written by new-card.py --scenario: {name} {how}. Grow it a line at a time with",
+             f"#   cargo run --profile cards -p cantrip-script --bin corpus -- --scenario {slug} --next --brief",
+             f"# and see which keys the card moved with --diff <the line number of its cast>.", "",
+             "[Bot1 Deck]", *deck, f"{BASIC[first]} x20", "", "[Bot2 Deck]", "Island x20", "", "[Actions]", *actions, "",
+             "[Expect]", "TODO = the state the Oracle text, the rulings and the CR require"]
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(text) + "\n")
+    return path
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    if "--scenario" in sys.argv:
+        found = find_card(args[0]) if args else None
+        if found is None:
+            sys.exit("new-card.py \"Card Name\" --scenario [what-it-shows]: the card must have its content JSON first")
+        path = write_scenario(found[3], args[1] if len(args) > 1 else "")
+        print(f"wrote {os.path.relpath(path, ROOT)}")
+        return
     if not args:
         sys.exit(__doc__)
     found = find_card(args[0])

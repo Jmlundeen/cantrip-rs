@@ -172,10 +172,16 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`. `new-card.py`'s **test points**
    list what its Oracle text makes a scenario pin down (an amount, a limit, each player's side, a time, "instead", a
    value read as it last existed, things done at once); every one needs an expectation that fails if the card gets it
-   wrong. Then **break the card**, once for each test point and each thing its own code decides (a number, a limit, a
+   wrong. `python tools\maintenance\new-card.py "Card Name" --scenario <what-it-shows>` starts a scenario file: the
+   decks, the card cast off free mana, the pool checked, a TODO expectation that fails until you write the real ones.
+   Then **break the card**, once for each test point and each thing its own code decides (a number, a limit, a
    condition, whose objects, each narrowing - a card type, a zone, a time): change it, see a scenario go red, restore
-   it (`git add` the card file first, and `git checkout -- <file>` restores it). A break no scenario catches is a
-   missing expectation. The report lists each test point with the scenario line that catches it, and what you broke.
+   it (`git add` the card file first, and `git checkout -- <file>` restores it). `python
+   tools\maintenance\card-mutate.py "Card Name"` makes the mechanical breaks for you - each number one off, each
+   comparison and `&&`/`||` flipped, each `!` dropped, each call to the game left out - one build and run each, and
+   lists the ones that SURVIVED; the breaks of meaning it cannot make (another filter, the other player's objects, an
+   earlier turn) are still yours. A break no scenario catches is a missing expectation, or a change that means the
+   same (say which). The report lists each test point with the scenario line that catches it, and what you broke.
 6. **Citations:** `python tools/maintenance/cr.py check --show <the card's file> <its scenarios>` prints every `CR`
    citation beside the rule it names. Read each pair: a rule that does not say what the comment claims is fixed or
    the citation dropped - a number copied from another card's comment is the usual way a wrong one gets in.
