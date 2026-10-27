@@ -23,8 +23,14 @@ pub fn is_ability_key(id: ObjectId) -> bool {
 
 /// Whether `viewer` may look into a zone: a hand is its player's, and the player controlling them (CR 723.4).
 pub fn looks_into(state: &GameState, viewer: PlayerId, zone: Zone) -> bool {
+    looks_into_as(viewer, zone, |p| state.sees_as(viewer, p))
+}
+
+/// `looks_into`, with whether `viewer` sees what a player sees given (`sees_as`): as it was when something happened, for
+/// what a seat learnt then (`GameState::sees_as` is now).
+pub fn looks_into_as(viewer: PlayerId, zone: Zone, sees_as: impl Fn(PlayerId) -> bool) -> bool {
     match zone.kind() {
-        ZoneKind::Hand => state.sees_as(viewer, zone.player),
+        ZoneKind::Hand => sees_as(zone.player),
         // A player may look at their own sideboard at any time (CR 400.11a; North Wind Avatar's ruling); nobody else may,
         // not even the player controlling them: it is outside the game (CR 723.4).
         ZoneKind::Sideboard => zone.player == viewer,
@@ -110,14 +116,19 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
 /// those who saw it go there anywhere else - and the player controlling any of them (CR 723.4). True of an object that is
 /// face up.
 pub fn knows_face(state: &GameState, viewer: PlayerId, id: ObjectId) -> bool {
+    knows_face_as(state, id, |p| state.sees_as(viewer, p))
+}
+
+/// `knows_face`, with whether the viewer sees what a player sees given (`sees_as`), as `looks_into_as` has it.
+pub fn knows_face_as(state: &GameState, id: ObjectId, sees_as: impl Fn(PlayerId) -> bool) -> bool {
     let obj = state.obj(id);
     if !obj.face_down {
         return true;
     }
     if obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut) {
-        state.sees_as(viewer, obj.controller)
+        sees_as(obj.controller)
     } else {
-        state.seats().any(|p| obj.seen_by & (1 << p.0) != 0 && state.sees_as(viewer, p))
+        state.seats().any(|p| obj.seen_by & (1 << p.0) != 0 && sees_as(p))
     }
 }
 

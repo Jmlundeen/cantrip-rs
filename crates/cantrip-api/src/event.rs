@@ -266,6 +266,11 @@ pub enum Event {
     /// `card` was put on the bottom of `player`'s library in a random order (CR 401.4): nobody knows where among the
     /// others it went. Recorded only.
     Randomized { player: PlayerId, card: ObjectId },
+    /// The player who controls `player` changed (CR 723.1): `controller` makes their choices and sees what they see from
+    /// now on (723.4, 723.5), or `player` themselves again when `controller` is `player` - the control ended as the next
+    /// turn began (723.1) or its controller left the game (CR 800.4a). Recorded only, so the history says who saw which
+    /// hidden card when (`GameState::player_controller` is who controls them now).
+    PlayerControlled { player: PlayerId, controller: PlayerId },
 }
 
 /// Why a player loses the game (CR 104.3): what a "can't lose the game" or "don't lose the game for ..." effect is asked
@@ -331,7 +336,8 @@ impl Event {
             | Event::GameLost { player, .. }
             | Event::Shown { player, .. }
             | Event::Shuffled { player }
-            | Event::Randomized { player, .. } => Some(player),
+            | Event::Randomized { player, .. }
+            | Event::PlayerControlled { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
             Event::LandPlayed { player, .. } => Some(player),
             Event::BecameTarget { controller, .. } | Event::EnteredFaceDown { controller, .. } => Some(controller),
@@ -381,7 +387,7 @@ impl Event {
             Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
             Event::Convoked { creature, spell } => creature == object || spell == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } | Event::Shuffled { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } | Event::Shuffled { .. } | Event::PlayerControlled { .. } => false,
         }
     }
 }
@@ -462,6 +468,8 @@ impl EventMask {
     pub const PAID_TO_ATTACK: EventMask = EventMask(1 << 57);
     /// A creature convoked a spell (CR 702.51c): recorded only, for the history.
     pub const CONVOKED: EventMask = EventMask(1 << 58);
+    /// The player controlling a player changed (CR 723.1): recorded only, for what each player saw.
+    pub const PLAYER_CONTROLLED: EventMask = EventMask(1 << 59);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -489,6 +497,7 @@ impl EventMask {
             Event::Shuffled { .. } => EventMask::SHUFFLED,
             Event::Randomized { .. } => EventMask::RANDOMIZED,
             Event::PhasedOut { .. } => EventMask::PHASED_OUT,
+            Event::PlayerControlled { .. } => EventMask::PLAYER_CONTROLLED,
             other => EventMask::of(other),
         }
     }

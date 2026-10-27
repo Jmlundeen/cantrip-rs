@@ -60,14 +60,14 @@ fn temp(name: &str) -> PathBuf {
     dir
 }
 
-fn corpus(every: usize) {
-    let sample = scenarios(every);
+/// Records the scenarios `sample`, in a directory of its own (`name`), as the tests run at once.
+fn corpus(name: &str, sample: Vec<PathBuf>) {
     let failures = Mutex::new(Failures::new());
     let problems = Mutex::new(Vec::<String>::new());
     let totals = Mutex::new((0usize, 0usize, 0usize));
     let next: [std::sync::atomic::AtomicUsize; 3] = Default::default();
     let threads = std::thread::available_parallelism().map_or(4, |n| n.get());
-    let dir = temp("corpus");
+    let dir = temp(name);
     std::thread::scope(|s| {
         for t in 0..threads {
             let (sample, failures, problems, totals, next, dir) =
@@ -148,13 +148,35 @@ fn corpus(every: usize) {
 
 #[test]
 fn a_sample_of_the_corpus_records_and_reads_back() {
-    corpus(50);
+    corpus("sample", scenarios(50));
+}
+
+/// Scenarios that once failed, checked whatever the sample takes.
+#[test]
+fn scenarios_that_once_failed_record() {
+    corpus(
+        "once-failed",
+        [
+            // Bot1 controls Bot2 during their turn (CR 723.1) and sees the card they draw (723.4): what a seat saw is what
+            // it could look into then, not now that the control has ended (`Event::PlayerControlled`).
+            "emrakul-the-promised-end-costs-one-less-for-each-card-type-in-your-graveyard",
+            "emrakul-the-promised-end-controls-the-next-turn-then-gives-an-extra-one-and-is-protected-from-instants",
+            "emrakul-the-promised-end-countered-still-controls-the-next-turn-and-gives-an-extra-one",
+        ]
+        .iter()
+        .map(|n| {
+            let path = root().join("scenarios").join(format!("{n}.cantrip"));
+            assert!(path.exists(), "{n} is no scenario");
+            path
+        })
+        .collect(),
+    );
 }
 
 #[test]
 #[ignore]
 fn the_whole_corpus_records_and_reads_back() {
-    corpus(1);
+    corpus("corpus", scenarios(1));
 }
 
 /// Recording is a walk over a copy: the same game recorded twice is the same bytes, and the game's own line ends where

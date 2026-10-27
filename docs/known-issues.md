@@ -64,7 +64,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-119](#ki-119-a-triggered-abilitys-text-in-a-card-file-is-not-always-its-oracle-text) | A triggered ability's text in a card file is not always its Oracle text | Pri-2 | Open |
 | [KI-121](#ki-121-the-host-never-marks-a-kicker-x-as-variable) | The host never marks a kicker {X} as variable | Pri-2 | Open |
 | [KI-122](#ki-122-a-declaration-taken-back-for-an-enlisted-creature-tapped-for-mana-says-nothing) | A declaration taken back for an enlisted creature tapped for mana says nothing | Pri-2 | Open |
-| [KI-123](#ki-123-the-ai-crates-knowledge-misjudges-what-a-seat-saw-across-the-control-of-a-player) | The AI crate's knowledge misjudges what a seat saw across the control of a player | Pri-2 | Open |
 | [KI-124](#ki-124-what-a-land-could-produce-is-judged-for-at-most-256-answers-to-its-mana-abilitys-questions) | What a land could produce is judged for at most 256 answers to its mana ability's questions | Pri-3 | Won't fix: beyond practical scale |
 | [KI-125](#ki-125-a-mana-abilitys-row-can-show-what-its-ability-lists-or-the-best-of-several-outcomes-under-replacement-effects-on-its-mana) | A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana | Pri-2 | Open |
 | [KI-128](#ki-128-the-non-tactical-bots-drop-an-attack-whose-phyrexian-cost-only-life-could-pay) | The non-tactical bots drop an attack whose Phyrexian cost only life could pay | Pri-2 | Open |
@@ -266,24 +265,6 @@ client's `{cost}` text in the `UnlessPays` question is built from the mana and l
 other parts with the prompt and has the client write them.
 
 **Scenarios.** None yet.
-### KI-123: The AI crate's knowledge misjudges what a seat saw across the control of a player
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-2 | Open | harness | 2026-10-22, review of the control of a player (CR 723) |
-
-**Notes.** `cantrip_ai::Knowledge` (`crates/cantrip-ai/src/knowledge.rs`) folds a seat's knowledge from the history,
-judging each record with today's `visibility::looks_into` and `knows_face`. Those now follow the control of a player (CR
-723.4: the controller looks into the controlled player's hand and knows the faces they know), which the history does not
-record turn by turn: a fold made during a controlled turn and one made from scratch afterwards judge the same records
-differently. So the seat's knowledge is wrong across a control boundary - it forgets or misplaces what it saw of the
-controlled player's hand, and an `Event::Looked`/`Event::Shown` recorded for the controlled player is not learnt by the
-controller who answered it - and under `CANTRIP_VERIFY` the periodic check against a fold from scratch would fail in a
-game that crossed one. No game reaches it today: no card in content gives control of a player, and the crate drives no
-seat. A fix judges each record by who controlled whom when it was made (the effects as they stood, from the history).
-
-**Scenarios.** none yet: Emrakul, the Promised End (issue #203) will reach it once built.
-
 
 ### KI-117: A search's world keeps what the real game did with hidden cards it cannot resample
 

@@ -4153,6 +4153,18 @@ pub fn win_game(cx: &mut Cx, player: PlayerId) {
     cx.st().set_outcome(Outcome::Won(player));
 }
 
+/// Records each player whose controller is no longer the one in `before`, which holds each player's (CR 723.1): what a
+/// seat sees follows who it controls (CR 723.4), and the history is where who saw which hidden card is asked.
+pub(crate) fn record_player_control(cx: &mut Cx, before: &[PlayerId]) {
+    for (i, &was) in before.iter().enumerate() {
+        let player = PlayerId(i as u8);
+        let controller = cx.s().player_controller(player);
+        if controller != was {
+            cx.record(Event::PlayerControlled { player, controller });
+        }
+    }
+}
+
 /// A player has left a game that goes on without them (CR 800.4a): every object they own leaves the game, together, and the
 /// effects that gave them control of anything end; then the objects on the stack they control that no card represents
 /// cease to exist; then what they still control is exiled. The last player standing wins at once instead (CR 104.2a), and
@@ -4187,12 +4199,14 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
         _ => false,
     };
     if cx.s().effects.iter().any(gave) {
+        let controllers: Vec<PlayerId> = (0..cx.s().players.len()).map(|i| cx.s().player_controller_before_leaving(PlayerId(i as u8), player)).collect();
         let effects_before = cx.s().effects.len();
         cx.st().effects_retain(|e| !gave(e));
         // An effect that ends changes the game with no event (CR 603.8).
         if cx.s().effects.len() < effects_before {
             cx.state_changed();
         }
+        record_player_control(cx, &controllers);
     }
     settle_control(cx);
     // Then the objects on the stack they control that no card represents (an ability, a copy of a spell) cease to exist,

@@ -7,14 +7,16 @@
 //! seat follows a card out of a zone it cannot see only when it knows which one left: a library's card by its place.
 //! Otherwise it can no longer tell which of its cards there is gone, and forgets them; a card it sees leave is taken to
 //! be the one of that name it knew of. So what it knows depends on what it saw, never on which of two alike cards the
-//! engine moved: two games it cannot tell apart give it the same knowledge.
+//! engine moved: two games it cannot tell apart give it the same knowledge. What it could look into when a card moved is
+//! what it could then (`Event::PlayerControlled`: a hand is seen by the player controlling its player, CR 723.4), never
+//! what it can now, so a fold record by record and one from scratch agree.
 //!
 //! The record holds engine ids, for the observation to look objects up by. It is never part of an observation.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::OnceLock;
 
-use cantrip_engine::visibility::{knows_face, looks_into};
+use cantrip_engine::visibility::{knows_face_as, looks_into_as};
 use cantrip_engine::*;
 
 /// One seat's knowledge of a game, folded from its history up to `folded` records.
@@ -30,12 +32,14 @@ pub struct Knowledge {
     /// How many of each card (by its front) the seat has seen each opponent hold, and how many of those it lost track of.
     seen: BTreeMap<(PlayerId, CardId), u16>,
     floating: BTreeMap<(PlayerId, CardId), u16>,
+    /// The players another player controls, and who (CR 723.1), as of the records folded.
+    controllers: BTreeMap<PlayerId, PlayerId>,
 }
 
 impl Knowledge {
     /// What `seat` knows at the deal: nothing hidden.
     pub fn new(seat: PlayerId) -> Knowledge {
-        Knowledge { seat, folded: 0, last: None, known: BTreeMap::new(), traced: BTreeSet::new(), seen: BTreeMap::new(), floating: BTreeMap::new() }
+        Knowledge { seat, folded: 0, last: None, known: BTreeMap::new(), traced: BTreeSet::new(), seen: BTreeMap::new(), floating: BTreeMap::new(), controllers: BTreeMap::new() }
     }
 
     /// Knowledge of the game as it stands, folded from scratch.
@@ -95,12 +99,25 @@ impl Knowledge {
         self.seen.iter().filter(move |((p, _), _)| *p == opponent).map(|(&(_, card), &n)| (card, n))
     }
 
+    /// Whether the seat saw what `player` saw as of the records folded (CR 723.4: `GameState::sees_as` then).
+    fn sees_as(&self, player: PlayerId) -> bool {
+        player == self.seat || self.controllers.get(&player) == Some(&self.seat)
+    }
+
+    fn looks_into(&self, zone: Zone) -> bool {
+        looks_into_as(self.seat, zone, |p| self.sees_as(p))
+    }
+
+    fn knows_face(&self, game: &Game, id: ObjectId) -> bool {
+        knows_face_as(&game.state, id, |p| self.sees_as(p))
+    }
+
     fn fold(&mut self, game: &Game, event: &Event) {
         let s = &game.state;
-        let me = self.seat;
         match *event {
             Event::Revealed { card, .. } => self.learn(game, card),
-            Event::Looked { player, card } | Event::Shown { player, card } if player == me => self.learn(game, card),
+            // What a player looks at, the player controlling them sees too (CR 723.4).
+            Event::Looked { player, card } | Event::Shown { player, card } if self.sees_as(player) => self.learn(game, card),
             // Another player looked at it, and may have put it anywhere among what they looked at.
             Event::Looked { card, .. } | Event::Shown { card, .. } => {
                 if let Some(placed) = self.known.get_mut(&card) {
@@ -122,6 +139,12 @@ impl Knowledge {
             }
             Event::TurnedFaceUp { permanent, .. } => self.see(game, permanent),
             Event::ZoneChange { old, new, from, to, .. } => self.moved(game, old, new, from, to),
+            Event::PlayerControlled { player, controller } if controller == player => {
+                self.controllers.remove(&player);
+            }
+            Event::PlayerControlled { player, controller } => {
+                self.controllers.insert(player, controller);
+            }
             _ => {}
         }
     }
@@ -129,7 +152,7 @@ impl Knowledge {
     /// The seat was shown this card: it knows it where it is hidden, and has seen it.
     fn learn(&mut self, game: &Game, id: ObjectId) {
         let zone = game.state.obj(id).zone;
-        if !looks_into(&game.state, self.seat, zone) && zone.kind().is_hidden() {
+        if !self.looks_into(zone) && zone.kind().is_hidden() {
             self.known.insert(id, zone.is(ZoneKind::Library));
         }
         self.see(game, id);
@@ -137,16 +160,16 @@ impl Knowledge {
 
     fn moved(&mut self, game: &Game, old: ObjectId, new: ObjectId, from: Zone, to: Zone) {
         let s = &game.state;
-        let me = self.seat;
         let stored = self.known.remove(&old);
         let traced = self.traced.remove(&old);
-        let sees_from = looks_into(s, me, from) && !from.is(ZoneKind::Gone);
-        let sees_new = looks_into(s, me, to) && knows_face(s, me, new);
+        let sees_from = self.looks_into(from) && !from.is(ZoneKind::Gone);
+        let sees_to = self.looks_into(to);
+        let sees_new = sees_to && self.knows_face(game, new);
         // It can tell which object left: it sees the zone, or knows the library card's place.
         let follows = sees_from || from.is(ZoneKind::Gone) || stored == Some(true);
-        let identity = follows && (stored.is_some() || (sees_from && knows_face(s, me, old)));
+        let identity = follows && (stored.is_some() || (sees_from && self.knows_face(game, old)));
         if follows {
-            if identity && !looks_into(s, me, to) && to.kind().is_hidden() {
+            if identity && !sees_to && to.kind().is_hidden() {
                 // Put on top or at the bottom is a place it knows; shuffled in or at random, the events that follow say not.
                 self.known.insert(new, to.is(ZoneKind::Library));
             }

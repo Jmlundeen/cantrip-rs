@@ -566,10 +566,23 @@ impl GameState {
     /// questions and what a seat sees follow it: every request is still asked of `player`, who keeps their objects and
     /// stays the active player (723.3).
     pub fn player_controller(&self, player: PlayerId) -> PlayerId {
+        self.player_controller_counting(player, None)
+    }
+
+    /// Who controlled `player` before `leaver` left the game (CR 800.4a): `player_controller` with `leaver` still
+    /// counted, while the effects that gave them control have not yet ended.
+    pub fn player_controller_before_leaving(&self, player: PlayerId, leaver: PlayerId) -> PlayerId {
+        self.player_controller_counting(player, Some(leaver))
+    }
+
+    fn player_controller_counting(&self, player: PlayerId, leaver: Option<PlayerId>) -> PlayerId {
         let mut by = player;
         let mut latest = None;
         for e in &self.effects {
-            if e.kind == EffectKind::ControlsPlayer(player) && latest.is_none_or(|t| e.timestamp > t) && self.in_game(e.controller) {
+            if e.kind == EffectKind::ControlsPlayer(player)
+                && latest.is_none_or(|t| e.timestamp > t)
+                && (self.in_game(e.controller) || leaver == Some(e.controller))
+            {
                 latest = Some(e.timestamp);
                 by = e.controller;
             }

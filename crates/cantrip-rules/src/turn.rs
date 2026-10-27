@@ -361,10 +361,12 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
             }
             // The turn begins: the control of a player for the turn before ends (CR 723.1), lasting through its cleanup and
             // any turn skipped since, and the effects waiting to control this turn's player during it apply.
+            let controllers: Vec<PlayerId> = (0..cx.s().players.len()).map(|i| cx.s().player_controller(PlayerId(i as u8))).collect();
             if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::ControlsPlayer(_))) {
                 cx.st().effects_retain(|e| !matches!(e.kind, EffectKind::ControlsPlayer(_)));
             }
             take_controlled_turn(cx, active);
+            ops::record_player_control(cx, &controllers);
             // CR 502: the turn begins; the active player's permanents untap. No one gets priority.
             let number = turn.number;
             cx.st().update_player(active, |p| {

@@ -364,6 +364,17 @@ fn play(game: &mut Game, moves: &[Move], mut until: impl FnMut(&Game) -> bool) -
     );
 }
 
+/// Who the history says came to control which player, in order (`Event::PlayerControlled`).
+fn control_changes(game: &Game) -> Vec<(PlayerId, PlayerId)> {
+    game.log
+        .iter()
+        .filter_map(|r| match r.event {
+            Event::PlayerControlled { player, controller } => Some((player, controller)),
+            _ => None,
+        })
+        .collect()
+}
+
 fn turn_is(n: u32) -> impl FnMut(&Game) -> bool {
     move |g: &Game| g.state.turn.number == n && g.state.turn.step() == Step::PrecombatMain
 }
@@ -646,8 +657,10 @@ fn a_controller_leaving_the_game_gives_the_player_back() {
         turn_is(2),
     );
     assert_eq!(game.state.player_controller(P2), P1);
+    assert_eq!(control_changes(&game), [(P2, P1)]);
     game.concede(P1);
     assert_eq!(game.state.player_controller(P2), P2);
+    assert_eq!(control_changes(&game), [(P2, P1), (P2, P2)], "the history says the control ended");
     assert!(
         !game
             .state
@@ -672,6 +685,7 @@ fn a_skip_decided_as_the_next_turn_would_begin_is_the_controllers() {
     let skip = asked.iter().find(|a| a.kind == "May" && a.player == P2).expect("Bot2 was asked to skip its extra turn");
     assert_eq!(skip.by, P1);
     assert_eq!(game.state.player_controller(P2), P2, "the control ended as turn 3 began");
+    assert_eq!(control_changes(&game), [(P2, P1), (P2, P2)], "the history says when the control began and ended");
 }
 
 /// The same with an effect that must skip the turn beside the one that may (CR 616.1): which applies first is chosen by Bot2,
@@ -717,6 +731,7 @@ fn a_controller_leaving_during_the_turn_leaves_it_to_the_one_before() {
     let turn = game.state.turn.number;
     game.concede(P2);
     assert_eq!(game.state.player_controller(P3), P1);
+    assert_eq!(control_changes(&game), [(P3, P2), (P3, P1)], "the history says who controls Bot3 after Bot2 left");
     let asked = play(&mut game, &[], |g| g.state.turn.number > turn);
     assert_eq!(answerers(&asked, turn, P3), HashSet::from([P1]));
 }
