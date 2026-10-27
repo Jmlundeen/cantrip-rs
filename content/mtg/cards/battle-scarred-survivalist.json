@@ -1,0 +1,11 @@
+{
+  "name": "Battle-Scarred Survivalist",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Klingon Scout",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nWhenever another creature dies, put a +1/+1 counter on this creature. This ability triggers only once each turn.",
+  "keywords": [
+    "Menace"
+  ]
+}

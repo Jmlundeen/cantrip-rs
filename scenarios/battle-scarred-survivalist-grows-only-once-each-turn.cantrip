@@ -1,0 +1,62 @@
+# Survivalist sees another creature die, but only once per turn. Two Fatal Pushes kill two creatures
+# in one turn but trigger once; your own creature dying on a later turn adds one more counter.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Battle-Scarred Survivalist
+Black Lotus
+Fatal Push
+Fatal Push
+Ornithopter
+Fatal Push
+Swamp x11
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Battle-Scarred Survivalist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Fatal Push.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Fatal Push.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Battle-Scarred Survivalist.Counters.PlusOnePlusOne = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Fatal Push.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Battle-Scarred Survivalist.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Battle-Scarred Survivalist.Keywords = Menace
+Bot1.Battlefield.Battle-Scarred Survivalist.Subtypes = Klingon; Scout
+Bot2.Graveyard = Ornithopter; Ornithopter
