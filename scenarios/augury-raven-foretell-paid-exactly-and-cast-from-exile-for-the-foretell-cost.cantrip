@@ -1,0 +1,33 @@
+# Augury Raven's foretell {1}{U} (CR 702.143a): on turn 1 Augury Raven is foretold for exactly {2} (two Moxen, and the pool
+# ends empty), and on turn 3 it is cast from exile for its foretell cost with Moxen worth exactly {1}{U}, the pool ending
+# empty.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Augury Raven
+Island x18
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Augury Raven.Foretell
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Augury Raven.Cast
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Augury Raven; Mox Emerald; Mox Sapphire
+Exile.Count = 0

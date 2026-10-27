@@ -1,0 +1,36 @@
+# Dregscape Zombie's unearth {B} (CR 702.84a): discarded to Faithless Looting, it is unearthed from the graveyard (one mana
+# short the ability is not offered) with Moxen worth exactly {B}, leaving the pool empty. It has haste and attacks for 2, and
+# is exiled at the beginning of the next end step.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Dregscape Zombie
+Mox Jet
+Island x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Dregscape Zombie; Island)
+! Bot1.Graveyard.Dregscape Zombie.Activate(Ability: Unearth; Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Dregscape Zombie.Activate(Ability: Unearth)
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Attack(Dregscape Zombie > Bot2)
+[Bot1.End]
+
+[Expect]
+Bot2.Life = 18
+Exile = Dregscape Zombie
+Bot1.Battlefield = Mox Jet; Mox Ruby
+Bot1.Graveyard = Faithless Looting; Island

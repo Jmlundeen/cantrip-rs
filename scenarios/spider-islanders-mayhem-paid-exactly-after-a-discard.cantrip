@@ -1,0 +1,36 @@
+# Spider-Islanders's mayhem {1}{R} (CR 702.187b): discarded to Faithless Looting this turn, it is cast from the graveyard for
+# its mayhem cost; a Mox Ruby casts Faithless Looting and Moxen worth exactly the mayhem cost are cast after it. One mana short
+# the cast is not offered, and the pool ends empty.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Spider-Islanders
+Mox Emerald
+Mox Ruby
+Island x16
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Spider-Islanders; Island)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Graveyard.Spider-Islanders.Cast(Ability: Mayhem; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Spider-Islanders.Cast(Ability: Mayhem)
+Bot1.Pass
+? Bot1.Mana = 
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Ruby; Spider-Islanders
+Bot1.Graveyard = Faithless Looting; Island

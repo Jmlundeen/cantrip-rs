@@ -1,0 +1,33 @@
+# Annoyed Altisaur's cascade (CR 702.85a): its library holds five Moxen (mana value 0) on top, and one cascade: 1 Mox is exiled
+# one cascade at a time and cast for free, so exactly 1 enters the battlefield with it and 4 stay in the library.
+
+[Bot1 Deck]
+Black Lotus x3
+Annoyed Altisaur
+Island x3
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#3.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Annoyed Altisaur.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Annoyed Altisaur; Mox Pearl
+Bot1.Library = Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island

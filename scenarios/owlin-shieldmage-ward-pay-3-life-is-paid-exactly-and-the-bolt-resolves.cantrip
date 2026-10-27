@@ -1,0 +1,36 @@
+# Owlin Shieldmage's ward, pay 3 life (CR 702.21a): Bolted on Bot2's turn, Bot2 pays 3 life to the ward, exactly, and the Bolt
+# resolves.
+
+[Bot1 Deck]
+Black Lotus x2
+Mox Jet
+Owlin Shieldmage
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Owlin Shieldmage.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Owlin Shieldmage)
+Bot2.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Owlin Shieldmage = (absent)
+Bot2.Graveyard.Count = 1

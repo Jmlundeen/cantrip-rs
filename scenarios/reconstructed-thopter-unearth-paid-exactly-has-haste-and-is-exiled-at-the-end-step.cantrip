@@ -1,0 +1,40 @@
+# Reconstructed Thopter's unearth {2} (CR 702.84a): discarded to Faithless Looting, it is unearthed from the graveyard (one
+# mana short the ability is not offered) with Moxen worth exactly {2}, leaving the pool empty. It has haste and attacks for 2,
+# and is exiled at the beginning of the next end step.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Reconstructed Thopter
+Mox Emerald
+Mox Sapphire
+Island x16
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Reconstructed Thopter; Island)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Graveyard.Reconstructed Thopter.Activate(Ability: Unearth; Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Reconstructed Thopter.Activate(Ability: Unearth)
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Attack(Reconstructed Thopter > Bot2)
+[Bot1.End]
+
+[Expect]
+Bot2.Life = 18
+Exile = Reconstructed Thopter
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Sapphire
+Bot1.Graveyard = Faithless Looting; Island

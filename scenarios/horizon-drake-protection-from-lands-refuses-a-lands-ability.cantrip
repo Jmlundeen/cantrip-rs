@@ -1,0 +1,35 @@
+# Horizon Drake's protection from lands (CR 702.16b): Yavimaya Hollow, a land, can't target it with its regeneration
+# ability, while Fanatical Firebrand, a creature, can (the 3/1 Drake dies to 1 damage). Black Lotus pays exactly {1}{U}{U}.
+
+[Bot1 Deck]
+Black Lotus
+Horizon Drake
+Yavimaya Hollow
+Mox Emerald
+Fanatical Firebrand
+Mox Ruby
+Plains x13
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Yavimaya Hollow.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Horizon Drake.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Yavimaya Hollow.Activate(Ability: Regenerate; Bot1.Battlefield.Horizon Drake)
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot1.Battlefield.Horizon Drake)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Horizon Drake; Fanatical Firebrand; Black Lotus
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Yavimaya Hollow

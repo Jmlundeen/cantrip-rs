@@ -1,0 +1,31 @@
+# Red Tiger Mechan's warp {1}{R} (CR 702.185a): cast for its warp cost, paid with Moxen worth exactly that (one short, the warp
+# cast is not offered, and the pool ends empty), it is exiled at the beginning of the next end step. It has haste, so it
+# attacks for 3 first.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Red Tiger Mechan
+Island x18
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Hand.Red Tiger Mechan.Cast(Ability: Warp; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Red Tiger Mechan.Cast(Ability: Warp)
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Attack(Red Tiger Mechan > Bot2)
+[Bot1.End]
+
+[Expect]
+Bot2.Life = 17
+Exile = Red Tiger Mechan
+Bot1.Battlefield = Mox Emerald; Mox Ruby

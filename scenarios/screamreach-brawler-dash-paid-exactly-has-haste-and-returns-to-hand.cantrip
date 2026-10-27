@@ -1,0 +1,31 @@
+# Screamreach Brawler's dash {1}{R} (CR 702.109a): cast for its dash cost, paid with Moxen worth exactly that (one short, the
+# dash cast is not offered, and the pool ends empty), it has haste and attacks the turn it arrives for 2, and is returned to
+# its owner's hand at the beginning of the next end step.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Screamreach Brawler
+Island x18
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Hand.Screamreach Brawler.Cast(Ability: Dash; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Screamreach Brawler.Cast(Ability: Dash)
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Attack(Screamreach Brawler > Bot2)
+[Bot1.End]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand = Island; Island; Island; Island; Screamreach Brawler
+Bot1.Battlefield = Mox Emerald; Mox Ruby

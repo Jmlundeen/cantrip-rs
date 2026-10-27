@@ -1,0 +1,30 @@
+# Zephyrim's miracle {1}{W} (CR 702.94a): it is the first card Bot1 draws on turn 3, so Bot1 reveals it and casts it for its
+# miracle cost, paid with two Moxen worth exactly {1}{W} (a normal cast costs {3}{W}); the pool ends empty.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Island x5
+Zephyrim
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Draw]
+Bot1.Accept
+? Bot1.Revealed = Zephyrim
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Accept
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Zephyrim
+Bot1.Hand.Count = 5

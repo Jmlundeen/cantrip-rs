@@ -1,0 +1,40 @@
+# Abomination, World Ravager's mayhem {4}{R} (CR 702.187b): discarded to Faithless Looting this turn, it is cast from the
+# graveyard for its mayhem cost; Black Lotus makes {R}{R}{R}, one of which casts Faithless Looting, and three Moxen add the
+# rest. One mana short the cast is not offered, and the pool ends empty.
+
+[Bot1 Deck]
+Black Lotus
+Faithless Looting
+Abomination, World Ravager
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Island x15
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Abomination, World Ravager; Island)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+! Bot1.Graveyard.Abomination, World Ravager.Cast(Ability: Mayhem; Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Abomination, World Ravager.Cast(Ability: Mayhem)
+Bot1.Pass
+? Bot1.Mana = 
+
+[Expect]
+Bot1.Battlefield = Abomination, World Ravager; Mox Emerald; Mox Pearl; Mox Sapphire
+Bot1.Graveyard = Faithless Looting; Island; Black Lotus

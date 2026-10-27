@@ -1,0 +1,34 @@
+# Angelic Curator's protection from artifacts (CR 702.16b): Pyrite Spellbomb, an artifact, can't target it with its damage
+# ability, while Fanatical Firebrand, a creature, can (the Curator dies to 1 damage). Black Lotus pays exactly {1}{W} for the
+# Curator and {1} for the Spellbomb.
+
+[Bot1 Deck]
+Black Lotus
+Angelic Curator
+Pyrite Spellbomb
+Fanatical Firebrand
+Mox Ruby x2
+Plains x13
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Angelic Curator.Cast
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+! Bot1.Battlefield.Pyrite Spellbomb.Activate(Ability: damage; Bot1.Battlefield.Angelic Curator)
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot1.Battlefield.Angelic Curator)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Angelic Curator; Fanatical Firebrand; Black Lotus
+Bot1.Battlefield = Mox Ruby; Mox Ruby; Pyrite Spellbomb

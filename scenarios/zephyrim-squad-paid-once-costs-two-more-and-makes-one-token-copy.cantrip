@@ -1,0 +1,27 @@
+# Zephyrim's squad {2} (CR 702.157a): cast with the squad cost paid once, on top of its mana cost {3}{W}, the six mana of two
+# Black Lotuses ({W}{W}{W}{W}{W}{W}) are exactly what it costs and the pool ends empty; when it enters, one token copy of it is
+# made, so two Zephyrim are on the battlefield.
+
+[Bot1 Deck]
+Black Lotus x2
+Zephyrim
+Island x18
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Zephyrim.Cast(Kicked: 1)
+Bot1.Pass
+? Bot1.Mana = 
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Zephyrim; Zephyrim
+Bot1.Battlefield.Zephyrim#2.Keywords = Flying; Vigilance
+Bot1.Graveyard = Black Lotus; Black Lotus

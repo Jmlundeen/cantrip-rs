@@ -1,0 +1,45 @@
+# Marauding Brinefang's ward {3} (CR 702.21a): Bolted on Bot2's turn, Bot2 has a Mox Ruby for the Bolt and exactly 3 more mana,
+# which pays the ward cost exactly: the Bolt resolves and the pool is left empty.
+
+[Bot1 Deck]
+Black Lotus x3
+Marauding Brinefang
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#3.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Marauding Brinefang.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Marauding Brinefang)
+Bot2.PayCost
+Bot1.Pass
+Bot2.Pass
+? Bot2.Mana = 
+
+[Expect]
+Bot2.Mana = 
+Bot1.Battlefield.Marauding Brinefang.Damage = 3
+Bot2.Graveyard.Count = 1

@@ -1,0 +1,30 @@
+# Loxodon Partisan's battle cry (CR 702.91a): on turn 3 it attacks with Grizzly Bears (2/2), and each other attacking creature
+# gets +1/+0 until end of turn but the Loxodon Partisan itself does not: Bot2 takes 3 + 3 combat damage.
+
+[Bot1 Deck]
+Black Lotus x2
+Mox Emerald
+Loxodon Partisan
+Grizzly Bears
+Island x16
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Loxodon Partisan.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Loxodon Partisan > Bot2; Grizzly Bears > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14

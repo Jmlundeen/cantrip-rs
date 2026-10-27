@@ -1,0 +1,33 @@
+# Vengeful Reaper's foretell {1}{B} (CR 702.143a): on turn 1 Vengeful Reaper is foretold for exactly {2} (two Moxen, and the
+# pool ends empty), and on turn 3 it is cast from exile for its foretell cost with Moxen worth exactly {1}{B}, the pool ending
+# empty.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Vengeful Reaper
+Island x18
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vengeful Reaper.Foretell
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Exile.Vengeful Reaper.Cast
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Jet; Vengeful Reaper
+Exile.Count = 0

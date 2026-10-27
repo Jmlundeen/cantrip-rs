@@ -1,0 +1,37 @@
+# Azorius First-Wing's protection from enchantments (CR 702.16c): Rancor, an Aura, can't be cast enchanting it, while
+# Fanatical Firebrand, a creature, can target it (2 toughness, so 1 damage is marked). A Mox Pearl and a Mox Sapphire pay
+# exactly {W}{U}.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Azorius First-Wing
+Rancor
+Mox Emerald
+Fanatical Firebrand
+Mox Ruby
+Plains x12
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Azorius First-Wing.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Rancor.Cast(Bot1.Battlefield.Azorius First-Wing)
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot1.Battlefield.Azorius First-Wing)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Azorius First-Wing.Damage = 1

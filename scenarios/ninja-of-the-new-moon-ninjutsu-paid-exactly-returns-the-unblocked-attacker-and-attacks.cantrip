@@ -1,0 +1,46 @@
+# Ninja of the New Moon's ninjutsu {3}{B} (CR 702.49a): Fanatical Firebrand attacks and is unblocked, and in the declare
+# blockers step Moxen worth exactly {3}{B} pay for ninjutsu (the pool ends empty), returning the Firebrand to hand; Ninja of
+# the New Moon enters tapped and attacking and deals 6.
+
+[Bot1 Deck]
+Mox Ruby
+Fanatical Firebrand
+Ninja of the New Moon
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[Bot1.Blockers]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ninja of the New Moon.Activate(Ability: Ninjutsu)
+Bot1.Choose(Fanatical Firebrand)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana = 
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Hand = Fanatical Firebrand
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ninja of the New Moon
+Bot1.Battlefield.Ninja of the New Moon.Tapped = true

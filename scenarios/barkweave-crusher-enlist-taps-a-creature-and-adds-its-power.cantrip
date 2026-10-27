@@ -1,0 +1,31 @@
+# Barkweave Crusher's enlist (CR 702.154a): on turn 3 it attacks alone and Bot1 taps Grizzly Bears, a creature that has been
+# under its control since the turn began and is not attacking; Barkweave Crusher gets +2/+0 (the Bears' power), so Bot2 takes 2
+# + 2.
+
+[Bot1 Deck]
+Black Lotus x2
+Barkweave Crusher
+Grizzly Bears
+Island x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Barkweave Crusher.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Barkweave Crusher > Bot2)
+Bot1.Choose(Grizzly Bears)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Grizzly Bears.Tapped = true
+Bot1.Battlefield.Barkweave Crusher.Power = 4

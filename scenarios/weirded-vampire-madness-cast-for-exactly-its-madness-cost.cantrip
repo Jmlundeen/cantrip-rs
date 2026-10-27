@@ -1,0 +1,38 @@
+# Weirded Vampire's madness {2}{B} (CR 702.35a): discarded to Faithless Looting while Moxen worth exactly {2}{B} (and a Mox
+# Ruby for the Looting) are tapped for mana, it is exiled and Bot1 casts it for its madness cost, which empties the pool.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Weirded Vampire
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Weirded Vampire; Island)
+Bot1.Accept
+Bot1.Pass
+? Bot1.Mana = 
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Mox Sapphire; Weirded Vampire
+Bot1.Graveyard = Faithless Looting; Island
+Exile.Count = 0

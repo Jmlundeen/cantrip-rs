@@ -1,0 +1,40 @@
+# Waterfall Aerialist's ward {2} (CR 702.21a): Bolted on Bot2's turn, Bot2 has a Mox Ruby for the Bolt and exactly 2 more mana,
+# which pays the ward cost exactly: the Bolt resolves and the pool is left empty.
+
+[Bot1 Deck]
+Black Lotus x2
+Waterfall Aerialist
+Island x18
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mox Emerald
+Mox Sapphire
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Waterfall Aerialist.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Waterfall Aerialist)
+Bot2.PayCost
+Bot1.Pass
+Bot2.Pass
+? Bot2.Mana = 
+
+[Expect]
+Bot2.Mana = 
+Bot1.Battlefield.Waterfall Aerialist = (absent)
+Bot2.Graveyard.Count = 1

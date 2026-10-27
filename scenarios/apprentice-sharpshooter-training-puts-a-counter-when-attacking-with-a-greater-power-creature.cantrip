@@ -1,0 +1,29 @@
+# Apprentice Sharpshooter's training (CR 702.149a): cast on turn 1 beside Kalonian Tusker (3/3), on turn 3 it attacks with the
+# Tusker, whose power 3 is greater than its own 1, so it gets a +1/+1 counter: Bot2 takes 2 + 3.
+
+[Bot1 Deck]
+Black Lotus x2
+Apprentice Sharpshooter
+Kalonian Tusker
+Island x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Kalonian Tusker.Cast
+Bot1.Hand.Apprentice Sharpshooter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Apprentice Sharpshooter > Bot2; Kalonian Tusker > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Apprentice Sharpshooter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Apprentice Sharpshooter.Power = 2
+Bot2.Life = 15
