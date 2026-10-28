@@ -1,0 +1,45 @@
+# Baron Strucker, HYDRA Overlord: "Villain spells you cast cost {1} less to cast" (CR 601.2f) - only its controller's. With Bot1's
+# Baron on the battlefield, Bot2's Agents of HYDRA still costs {1}{B}: on turn 2, with Mox Jet's {B} its only mana, the cast is
+# refused; on turn 4, with a second Mox, it is cast for exactly two mana.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Baron Strucker, HYDRA Overlord
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Agents of HYDRA
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Baron Strucker, HYDRA Overlord.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+! Bot2.Hand.Agents of HYDRA.Cast(Mana: short)
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Agents of HYDRA.Cast
+? Bot2.Mana =
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Agents of HYDRA.Power = 1
+Bot1.Battlefield.Baron Strucker, HYDRA Overlord.Power = 2
