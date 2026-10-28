@@ -15,7 +15,7 @@ pub static CAT: CardDef = CardDef {
 
 /// Create a 1/1 white Cat creature token. Then, if you have the city's blessing, for each token you control that entered this
 /// turn, create a token that's a copy of it: the board is read once, after the Cat has arrived, so the Cat is copied and the
-/// copies are not; every copy enters at once (CR 101.4).
+/// copies are not; every copy enters at once (CR 603.6a).
 fn cats(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     tokens::create(g, you, &CAT, 1)?;
@@ -24,16 +24,10 @@ fn cats(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let tokens: Vec<ObjectId> =
         g.permanents_of(you).into_iter().filter(|&t| g.obj(t).token && entered_this_turn(g.history(), t)).collect();
-    if tokens.iter().all(|&t| g.obj(t).copy.is_none()) {
-        let copies: Vec<(CardId, PlayerId)> = tokens.iter().map(|&t| (g.obj(t).card, you)).collect();
-        // A copy has the copiable values of what it copies (CR 707.2), not the words of Ocelot Pride's text.
-        g.create_tokens_worded(&copies, false, None, Words::NONE)?;
-    } else {
-        for t in tokens {
-            let values = g.copiable_values(t);
-            g.create_token_copies_of(values, you, 1)?;
-        }
-    }
+    // One instruction: every copy enters together, so each sees the others enter (CR 603.6a, 603.2c). A copy has the copiable
+    // values of what it copies (CR 707.2), exceptions of a copy effect included, not the words of Ocelot Pride's text.
+    let copies: Vec<(Copiable, PlayerId)> = tokens.iter().map(|&t| (g.copiable_values(t), you)).collect();
+    g.create_token_copies_together(&copies)?;
     Ok(())
 }
 

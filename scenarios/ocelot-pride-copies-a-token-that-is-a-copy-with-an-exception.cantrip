@@ -1,7 +1,7 @@
 # Ocelot Pride: "...for each token you control that entered this turn, create a token that's a copy of it." On turn 7 Bot1
 # has ten permanents (the city's blessing), and Reflection of Kiki-Jiki has made a hasty copy of its Goblin Shaman token that
 # turn: a token that is a copy with an exception (it has haste). The Pride's attack gains life, so at the end step it makes
-# a Cat and then copies the hasty Goblin copy and the Cat, each on its own, keeping the exception. The original hasty copy is
+# a Cat and then copies the hasty Goblin copy and the Cat, together, the Goblin copy keeping the exception. The original hasty copy is
 # sacrificed by Reflection's own end-step trigger, ordered after the Pride's.
 # Fable is cast on turn 1 with Black Lotus's red mana, chapter II is declined on turn 3 and chapter III flips it on turn 5.
 

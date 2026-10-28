@@ -1,0 +1,59 @@
+# Ocelot Pride: "...for each token you control that entered this turn, create a token that's a copy of it." The copies are one
+# instruction and enter together (CR 603.6a, 603.2c), so a creature that watches them sees every one enter. On turn 7 Bot1
+# attacks with Ocelot Pride (life gained, before anything says players can't), then casts Ajani, Nacatl Pariah (its Cat Warrior
+# token) and Rampaging Ferocidon ("Whenever another creature enters, it deals 1 damage to that creature's controller"), and
+# Reflection of Kiki-Jiki makes a hasty token copy of the Ferocidon. At the end step the Pride makes a Cat (seen by the
+# Ferocidon and its copy: 2 damage), then copies the Cat Warrior, the Ferocidon copy and the Cat at once: the Ferocidon sees 3
+# enter, its first copy 3, and the new copy the 2 others (8). Copied one at a time the new Ferocidon would miss the Cat copy (7).
+# Bot1: 20 + 1 lifelink - 1 (the copy of the Ferocidon entering) - 2 (the Cat) - 8 = 10.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Mox Jet
+Fable of the Mirror-Breaker
+Ocelot Pride
+Ajani, Nacatl Pariah
+Rampaging Ferocidon
+Black Lotus
+Ornithopter x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ocelot Pride.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Ocelot Pride)
+[T7 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Rampaging Ferocidon.Cast
+Bot1.Battlefield.Reflection of Kiki-Jiki.Activate(Rampaging Ferocidon)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Life = 10

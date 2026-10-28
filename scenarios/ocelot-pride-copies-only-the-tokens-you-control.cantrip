@@ -1,0 +1,60 @@
+# Ocelot Pride: "...for each token you control that entered this turn, create a token that's a copy of it." Only Bot1's own
+# tokens are copied. On turn 7 Bot1 casts Stroke of Midnight on Bot2's Ornithopter, so Bot2 creates a 1/1 Human token that
+# turn; then the Pride's attack gains life. At the end step its Cat is Bot1's tenth permanent (the city's blessing, CR
+# 702.131b), and the Pride copies the Cat alone: the Human entered this turn but Bot2 controls it.
+
+[Bot1 Deck]
+Plains
+Ocelot Pride
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Stroke of Midnight
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ocelot Pride.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stroke of Midnight.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ocelot Pride)
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Life = 21
+Bot1.Battlefield = Plains; Ocelot Pride; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Ornithopter; Ornithopter; Ornithopter; Cat Token; Cat Token
+Bot2.Battlefield = Human Token
+Bot1.Battlefield.Cat Token#1.Power = 1
+Bot1.Battlefield.Cat Token#1.Toughness = 1
+Bot1.Battlefield.Cat Token#1.Colors = White
+Bot1.Battlefield.Cat Token#1.Subtypes = Cat
+Bot1.Battlefield.Cat Token#2.Power = 1
+Bot1.Battlefield.Cat Token#2.Toughness = 1
+Bot1.Battlefield.Cat Token#2.Colors = White
+Bot1.Battlefield.Cat Token#2.Subtypes = Cat
