@@ -2132,6 +2132,13 @@ public sealed partial class TacticalPlay
 
     private TakeActionAnswer Paying(GameClient client, PayCostsPromptMessage prompt)
     {
+        // Helping pay for another player's spell (CR 702.132a), or the windows of one's own: the plainest legal answers, none
+        // of which gives up a spell that is not this seat's.
+        if (AutoPlay.Assisting(prompt) is { } assisting)
+        {
+            return assisting;
+        }
+
         if (prompt.AnnouncesXOrKicks && prompt.Kicker.Length > 0 && !prompt.VariableKicker)
         {
             return AutoPlay.Announce(prompt, _kick ? Math.Clamp(prompt.MostAffordable, 0, 1) : 0);

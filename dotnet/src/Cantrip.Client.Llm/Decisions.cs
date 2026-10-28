@@ -297,6 +297,22 @@ public sealed class Decisions
                 $"Play {name} as your land for this turn."
                 + (card?.OracleText is { Length: > 0 } land ? $" It reads: \"{land.ReplaceLineEndings(" / ")}\"" : string.Empty),
 
+            // Cast face down by morph or disguise (CR 702.37c, 702.168b, 708.4): a nameless 2/2 with no text for {3}, not the card.
+            ActionKindView.CastSpell when option.CastFaceDown =>
+                $"Cast {name}{CastFrom(client, card)} face down for {option.CostText}, as a 2/2 creature spell with no name, text, mana cost or color"
+                + (Disguised(option) ? " that has ward {2}" : string.Empty)
+                + $" ({option.Description}). Only you know what it is; once it is a permanent you may turn it face up at any time you have priority for the cost its keyword names."
+                + (card?.OracleText is { Length: > 0 } faceUp ? $" Face up it reads: \"{faceUp.ReplaceLineEndings(" / ")}\"" : string.Empty)
+                + Costs(option),
+
+            // Cast prototyped (CR 702.160a, 718.3): the prototype's mana cost, color, power and toughness; the card's abilities.
+            ActionKindView.CastSpell when option.CastPrototyped =>
+                $"Cast {name}{CastFrom(client, card)} prototyped ({option.Description})"
+                + (option.WithoutPayingManaCost ? string.Empty : $" for {option.CostText}")
+                + ": it has the prototype's mana cost, color, power and toughness, and keeps its other abilities and types."
+                + (card?.OracleText is { Length: > 0 } prototyped ? $" It reads: \"{prototyped.ReplaceLineEndings(" / ")}\"" : string.Empty)
+                + Costs(option),
+
             ActionKindView.CastSpell =>
                 $"Cast {name}"
                 + CastFrom(client, card)
@@ -311,7 +327,12 @@ public sealed class Decisions
             ActionKindView.ActivateAbility =>
                 $"Activate {name}: \"{option.Description}\"" + Costs(option),
 
-            ActionKindView.TurnFaceUp => $"Turn {name} face up for its mana cost.",
+            // Turning a face-down permanent face up (CR 116.2b): for the morph or disguise cost it would have face up, which the
+            // server names (CR 702.37e, 702.168d), or for its mana cost, a manifested or cloaked creature card's (CR 701.40b, 701.58b).
+            ActionKindView.TurnFaceUp when option.Description.StartsWith("Turn face up: ", StringComparison.Ordinal) =>
+                $"Turn {name} face up by paying the cost of its {option.Description["Turn face up: ".Length..]}"
+                + (option.CostText.Length > 0 ? $" ({option.CostText})" : string.Empty) + "." + Costs(option),
+            ActionKindView.TurnFaceUp => $"Turn {name} face up for its mana cost." + Costs(option),
             ActionKindView.TakeCompanion => $"Pay {{3}} to put your companion {name} into your hand.",
             ActionKindView.Plot => $"Plot {name}: exile it now and cast it for free on a later turn.",
             ActionKindView.Suspend =>
@@ -323,6 +344,9 @@ public sealed class Decisions
             _ => $"{option.Kind}: {name}",
         };
     }
+
+    /// <summary>Whether a face-down cast is by disguise (CR 702.168a), whose face-down spell and permanent have ward {2}.</summary>
+    private static bool Disguised(ActionOptionMessage option) => option.Description.StartsWith("Disguise", StringComparison.Ordinal);
 
     /// <summary>The zone a card is cast from when it is not the hand: a graveyard, exile, the top of a library (CR 601.2a).</summary>
     private static string CastFrom(GameClient client, ObjectView? card)
@@ -462,6 +486,13 @@ public sealed class Decisions
 
     private AnswerPayload Paying(GameClient client, PayCostsPromptMessage prompt)
     {
+        // Helping pay for another player's spell, or the windows of one's own (CR 702.132a): nothing is asked of the model.
+        // The windows close with nothing activated and the help announced is none, which is always legal.
+        if (AutoPlay.Assisting(prompt) is { } assisting)
+        {
+            return assisting;
+        }
+
         // CR 601.2b: X, or how many times to kick, is announced before the targets and the payment.
         if (prompt.AnnouncesXOrKicks)
         {
@@ -527,10 +558,10 @@ public sealed class Decisions
                 return lower;
             }
 
-            return Take(prompt, ActionKindView.CancelCasting)!;
+            return prompt.GiveUp();
         }
 
-        return Take(prompt, ActionKindView.ConfirmCasting) ?? Take(prompt, ActionKindView.CancelCasting)!;
+        return Take(prompt, ActionKindView.ConfirmCasting) ?? prompt.GiveUp();
     }
 
     /// <summary>Whether to pay an optional additional cost, and for multikicker how many times (CR 702.33).</summary>
@@ -1807,6 +1838,13 @@ public sealed class Decisions
 
     private AnswerPayload May(GameClient client, MayPromptMessage prompt)
     {
+        // Assist (CR 702.132a): choosing another player to help pay for this seat's spell is declined without asking. The
+        // seat pays for its own spells, and a payment in two players' steps is nothing the model is told how to make.
+        if (prompt.Verb == "Assist")
+        {
+            return new MayChosenAnswer { Accept = false };
+        }
+
         string source = GameText.Named(client, prompt.Source);
         string amount = prompt.Amount > 0 ? " " + prompt.Amount.ToString(CultureInfo.InvariantCulture) : string.Empty;
 

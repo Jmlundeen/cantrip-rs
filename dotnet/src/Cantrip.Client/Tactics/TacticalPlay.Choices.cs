@@ -1113,6 +1113,9 @@ public sealed partial class TacticalPlay
 
         bool accept = prompt.Verb switch
         {
+            // Assist (CR 702.132a): this seat pays for its own spells rather than choosing another player to help.
+            "Assist" => false,
+
             // Payments of life - a shockland's, ward's, Master of Death's - are the payment prompt's (WorthPaying).
             "DiscardUnlessCountered" => client.MyHand().Count > prompt.Amount,
 

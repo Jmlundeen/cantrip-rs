@@ -200,7 +200,8 @@ public sealed class RandomPlay : IAutoPlayer
             // make are each taken about half the time. A chain of them — Chain of Smog's copy, Lim-Dûl's Vault's
             // look again — ends because stopping is drawn eventually, which is what AutoPlay had to name each of by
             // hand to avoid.
-            MayPromptMessage => new MayChosenAnswer { Accept = Coin() },
+            // Not assist's "choose another player to help pay" (CR 702.132a), declined: this seat pays for its own spells.
+            MayPromptMessage may => new MayChosenAnswer { Accept = may.Verb != "Assist" && Coin() },
 
             // Combat damage division is left to the engine's own, which is always legal (CR 510.1c-d). Which
             // blocker gets how much is a division rather than a choice among offered things, and a random split
@@ -319,6 +320,12 @@ public sealed class RandomPlay : IAutoPlayer
     /// </summary>
     private AnswerPayload Pay(PayCostsPromptMessage prompt)
     {
+        // Helping pay for another player's spell, or the windows of one's own (CR 702.132a): the plainest legal answers.
+        if (AutoPlay.Assisting(prompt) is { } assisting)
+        {
+            return assisting;
+        }
+
         // CR 601.2b: X, or how many times to kick, is announced before the targets and the payment.
         if (prompt.AnnouncesXOrKicks)
         {
@@ -386,10 +393,10 @@ public sealed class RandomPlay : IAutoPlayer
                 return lower;
             }
 
-            return Answer(prompt, ActionKindView.CancelCasting)!;
+            return prompt.GiveUp();
         }
 
-        return Answer(prompt, ActionKindView.ConfirmCasting) ?? Answer(prompt, ActionKindView.CancelCasting)!;
+        return Answer(prompt, ActionKindView.ConfirmCasting) ?? prompt.GiveUp();
     }
 
     /// <summary>

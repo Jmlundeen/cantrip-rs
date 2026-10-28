@@ -119,7 +119,8 @@ public static class AutoPlay
                 // Does it: a search it may make is one it would rather make, and saying yes exercises more of the game.
                 // Not a Chain of Smog copy, though: two seats that always copy it pass it back and forth for ever.
                 // Nor Ad Nauseam's "you may repeat this process", which reveals until it dies to it.
-                client.Answer(new MayChosenAnswer { Accept = may.Verb is not ("CopySpell" or "RevealAgain") });
+                // Nor assist's "choose another player to help pay" (CR 702.132a): this seat pays for its own spells.
+                client.Answer(new MayChosenAnswer { Accept = may.Verb is not ("CopySpell" or "RevealAgain" or "Assist") });
                 return true;
 
             case AssignCombatDamagePromptMessage assign:
@@ -395,6 +396,11 @@ public static class AutoPlay
     {
         ArgumentNullException.ThrowIfNull(prompt);
 
+        if (Assisting(prompt) is { } assisting)
+        {
+            return assisting;
+        }
+
         if (prompt.AnnouncesXOrKicks)
         {
             return Announce(prompt, AnnouncedValue(prompt));
@@ -411,11 +417,10 @@ public static class AutoPlay
             // pay. A delve exile pays {1}, a tap the {1} or a color the creature has; whatever neither covers, nothing does.
             if (prompt.SpendsNoMana)
             {
-                ActionOptionMessage notMana = ExileToPay(prompt.Options)
+                ActionOptionMessage? notMana = ExileToPay(prompt.Options)
                     ?? prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.TapToPay)
-                    ?? prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.ConfirmCasting)
-                    ?? prompt.Options.First(option => option.Kind == ActionKindView.CancelCasting);
-                return Answer(notMana);
+                    ?? prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.ConfirmCasting);
+                return notMana is null ? prompt.GiveUp() : Answer(notMana);
             }
 
             // The pool already covers it, and convoke, delve or improvise could pay some of it instead (CR 601.2h):
@@ -473,7 +478,7 @@ public static class AutoPlay
                 return Answer(convoke);
             }
 
-            return Answer(prompt.Options.First(option => option.Kind == ActionKindView.CancelCasting));
+            return prompt.GiveUp();
         }
 
         return PayForX(prompt);
@@ -527,7 +532,27 @@ public static class AutoPlay
 
         return prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.ConfirmCasting) is { } confirm
             ? Answer(confirm)
-            : Answer(prompt.Options.First(option => option.Kind == ActionKindView.CancelCasting));
+            : prompt.GiveUp();
+    }
+
+    /// <summary>
+    /// The steps of a payment with assist (CR 702.132a) that this seat answers the plainest legal way, or null for any other
+    /// payment, and for the caster's own payment, which is paid as any other is. A window for mana abilities is closed with
+    /// nothing activated; the player chosen to help announces that they pay none of the generic mana, and if asked to pay
+    /// some anyway, pays with the first pool mana offered. None of the chosen player's steps offers giving up: the spell
+    /// is not theirs (<see cref="PayCostsPromptMessage.GiveUp"/>).
+    /// </summary>
+    public static TakeActionAnswer? Assisting(PayCostsPromptMessage prompt)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        return prompt.AssistStep switch
+        {
+            AssistSteps.HelperActivates or AssistSteps.CasterActivates =>
+                prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.ConfirmCasting) is { } done ? Answer(done) : prompt.GiveUp(),
+            AssistSteps.HelperAnnounces => Announce(prompt, 0),
+            AssistSteps.HelperPays => prompt.GiveUp(),
+            _ => null,
+        };
     }
 
     /// <summary>
@@ -575,7 +600,7 @@ public static class AutoPlay
 
             return prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.DecreaseX) is { } lower
                 ? Answer(lower)
-                : Answer(prompt.Options.First(option => option.Kind == ActionKindView.CancelCasting));
+                : prompt.GiveUp();
         }
 
         // Nothing owed at all: anything more raises X.
@@ -595,7 +620,7 @@ public static class AutoPlay
 
         return prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.ConfirmCasting) is { } confirm
             ? Answer(confirm)
-            : Answer(prompt.Options.First(option => option.Kind == ActionKindView.CancelCasting));
+            : prompt.GiveUp();
     }
 
     /// <summary>
