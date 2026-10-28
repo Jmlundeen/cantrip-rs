@@ -1,0 +1,63 @@
+# Tester of the Tangential keeps its counter when the counter can't be moved (CR 122.5: if the second object can't have the
+# counter put on it, none is removed from the first). Quick Study (three mana) gives the Tester its +1/+1 counter on turn 1
+# (increment, a 2/2). Bot2 plays Ornithopter and Solemnity ("Counters can't be put on artifacts or creatures") on turn 2.
+# At the beginning of combat on turn 3 Bot1 pays X = 1: the Ornithopter can't get the counter, so the Tester keeps it.
+# (The same move without Solemnity is tester-of-the-tangential-moves-only-x-counters-and-keeps-the-rest.)
+
+[Bot1 Deck]
+Tester of the Tangential
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Emerald
+Black Lotus
+Quick Study
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Solemnity
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tester of the Tangential.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Quick Study.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Tester of the Tangential.Counters.PlusOnePlusOne = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Solemnity.Cast
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost(X: 1)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Solemnity.Tapped = false
+Bot1.Battlefield.Tester of the Tangential.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Tester of the Tangential.Power = 2
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter.Toughness = 2

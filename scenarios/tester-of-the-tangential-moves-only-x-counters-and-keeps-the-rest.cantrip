@@ -1,0 +1,56 @@
+# Tester of the Tangential moves X +1/+1 counters, not all of them: two Quick Studies (three mana each) on turns 1 and 3 are
+# each greater than its power then (1, then 2), so increment gives it two counters (a 3/3). At the beginning of combat Bot1
+# pays X = 1 with Mox Pearl: one counter moves to Bot2's Ornithopter (a 1/3) and the Tester keeps the other (a 2/2).
+
+[Bot1 Deck]
+Tester of the Tangential
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Emerald
+Black Lotus
+Quick Study
+Quick Study
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tester of the Tangential.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Quick Study.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Tester of the Tangential.Counters.PlusOnePlusOne = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quick Study.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Tester of the Tangential.Counters.PlusOnePlusOne = 2
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost(X: 1)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Tester of the Tangential.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Tester of the Tangential.Power = 2
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Toughness = 3
