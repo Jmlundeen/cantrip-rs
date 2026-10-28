@@ -1303,7 +1303,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::DiscardToHandSize { count, hand } => PromptPayload::DiscardPromptMessage(DiscardPrompt {
             player,
             count: wire(*count),
-            maximum_hand_size: 7,
+            // The maximum the hand is cut down to (CR 402.2, 514.1): seven, or whatever an effect set (The Ten Rings: ten).
+            maximum_hand_size: wire(hand.len() as u32 - *count),
             hand: handles_of(handles, hand),
         }),
         RequestKind::Mulligan { mulligans } => PromptPayload::MulliganPromptMessage(MulliganPrompt {
@@ -1497,6 +1498,27 @@ mod tests {
         assert_eq!(kind_of("artifact or creature"), "artifact or creature");
         // Only creatures were eligible, and nothing was said: nothing is claimed.
         assert_eq!(kind_of(""), "");
+    }
+
+    /// The discard to the maximum hand size says the real maximum, the cards left once `count` are discarded (CR 402.2, 514.1),
+    /// not always seven: eleven cards and one to discard is a maximum of ten (The Ten Rings), eight and one is seven.
+    #[test]
+    fn a_discard_to_hand_size_says_the_real_maximum() {
+        let (game, hand) = game_with(&["Llanowar Elves", "Ornithopter", "Forest"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let library = game.state.zone(Zone::library(seat)).to_vec();
+        let maximum = |cards: &[ObjectId], count: u32| {
+            let request = Request { id: 1, player: seat, kind: RequestKind::DiscardToHandSize { count, hand: cards.to_vec() }, may_cancel: false };
+            match prompt(&game, &request, &mut HandleSpace::new()).expect("a prompt").0 {
+                PromptPayload::DiscardPromptMessage(p) => (p.count, p.maximum_hand_size),
+                other => panic!("{other:?}"),
+            }
+        };
+        let eleven: Vec<ObjectId> = hand.iter().chain(&library).copied().take(11).collect();
+        assert_eq!(eleven.len(), 11);
+        assert_eq!(maximum(&eleven, 1), (1, 10));
+        assert_eq!(maximum(&eleven[..8], 1), (1, 7));
+        assert_eq!(maximum(&eleven, 4), (4, 7));
     }
 
     /// A part of a test rule that refuses an Ornithopter: what a card's own rule would be.
