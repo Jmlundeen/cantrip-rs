@@ -1,0 +1,60 @@
+# Cosmic Cube: "the greatest power among attacking creatures you control". On turn 5 Bot1 attacks with Grizzly Bears (power 2) and
+# Memnite (power 1) and keeps home the Hill Giant (power 3) it has just cast. The limit is 2: Centaur Courser (mana value 3) among the
+# top six is refused - it would be allowed if the Hill Giant that is not attacking counted - and a second Grizzly Bears (mana value 2)
+# is cast free - it would be refused if the smaller attacker's power were the limit.
+
+[Bot1 Deck]
+Black Lotus
+Cosmic Cube
+Grizzly Bears
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Memnite
+Hill Giant
+Centaur Courser
+Grizzly Bears
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Ability: Sacrifice; Color: Green)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cosmic Cube.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2; Memnite > Bot2)
+! Bot1.Choose(Centaur Courser)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears#2.Power = 2
+Bot1.Battlefield.Count = 9
