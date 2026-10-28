@@ -1,0 +1,42 @@
+# Browser
+# Prototype (CR 702.160a, 718.3): with seven mana's worth of sources Bot1's page offers Blitz Automaton two ways, the card for
+# {7} and the prototyped cast, "Cast Blitz Automaton prototyped as a 3/2 for {2}{R}", told apart by what each costs and is.
+# Cast prototyped with Black Lotus's red, it is a red 3/2 with haste on the stack and on the battlefield (CR 718.3b).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Sol Ring
+Mox Ruby
+Mox Jet
+Blitz Automaton
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Blitz Automaton.Cast(Ability: Prototype)
+? Client.Bot1.Menu = Cast Blitz Automaton; Cast Blitz Automaton prototyped as a 3/2 for {2}{R}
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+? Stack.Blitz Automaton.Prototyped = true
+? Client.Bot1.Stack = Blitz Automaton
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Blitz Automaton.Prototyped = true
+Bot1.Battlefield.Blitz Automaton.Power = 3
+Bot1.Battlefield.Blitz Automaton.Toughness = 2
+Bot1.Battlefield.Blitz Automaton.Colors = Red

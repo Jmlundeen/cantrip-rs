@@ -659,8 +659,9 @@ public sealed class ScenarioPlayer
     {
         switch (action.Kind)
         {
+            // A window for mana abilities while a spell with assist is cast (CR 702.132a) is closed with Done; anything else is Okay.
             case ActionKindView.ConfirmCasting:
-                await _page.ClickAsync("Okay", "button");
+                await _page.ClickAsync(state.Dock?.Any(b => b.Label == "Done") == true ? "Done" : "Okay", "button");
                 return;
 
             // A payment's dock is its pay button (once the cost is covered) and its decline, each named by the card for what
@@ -1107,7 +1108,10 @@ public sealed class ScenarioPlayer
             else
             {
                 string place = row switch { "OpponentBattlefield" => "opponent-battlefield", _ => row.ToLowerInvariant() };
-                CardState? found = state.Cards.FirstOrDefault(c => c.Place == place && c.Name == name);
+                // A face-down card the page may look at (a spell cast face down, CR 708.5) is found by what it really is, as the
+                // script names it.
+                CardState? found = state.Cards.FirstOrDefault(c => c.Place == place && c.Name == name)
+                    ?? state.Cards.FirstOrDefault(c => c.Place == place && c.Name.Length == 0 && c.FaceDownName == name);
                 shown = found is null
                     ? $"(no {name} in {row}: {string.Join("; ", state.Cards.Where(c => c.Place == place).Select(c => c.Name))})"
                     : Face(found, attribute);

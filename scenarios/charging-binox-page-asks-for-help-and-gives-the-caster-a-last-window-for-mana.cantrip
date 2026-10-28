@@ -1,0 +1,53 @@
+# Browser
+# Assist from the caster's side (CR 702.132a), on Bot1's page. Casting Charging Binox, {7}{G}, the page asks whether to choose
+# another player to help pay, neither answer pressed by passing; Bot1 asks for help. Bot2, the only other player, makes two
+# green mana; then Bot1's page gives it its window for mana abilities - the last before paying, with Cancel, since the spell
+# is Bot1's - in which it makes six, and closes it with Done. Bot2 pays {2} of the generic mana; the pool pays the rest.
+
+[Bot1 Deck]
+Black Lotus
+Forest
+Forest
+Forest
+Charging Binox
+Forest x16
+
+[Bot2 Deck]
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Charging Binox.Cast
+? Client.Bot1.Prompt.Title = Charging Binox: choose another player to help pay for it?
+? Client.Bot1.Dock = Ask for help; Pay it yourself; Cancel
+Bot1.Accept
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+? Client.Bot1.Prompt.Title = Make mana for Charging Binox
+? Client.Bot1.Button.Done.Enabled = true
+? Client.Bot1.Button.Cancel.Enabled = true
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot2.PayCost(X: 2)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Charging Binox.Power = 7
+Bot2.Battlefield.Forest#1.Tapped = true
+Bot2.Battlefield.Forest#2.Tapped = true

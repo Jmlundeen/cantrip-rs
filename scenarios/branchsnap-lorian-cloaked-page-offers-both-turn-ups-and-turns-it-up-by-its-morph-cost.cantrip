@@ -1,0 +1,45 @@
+# Browser
+# A cloaked card with morph can be turned face up two ways (CR 701.58c, 702.37e): for its mana cost, as any cloaked creature
+# card, or for its morph cost. Cryptic Coat cloaks Branchsnap Lorian from the top of Bot1's library; Bot1's page offers the
+# face-down permanent both, each row naming its own cost - "Turn face up — Morph {G}" and "Turn face up for its mana cost" - and
+# Bot1 turns it up for {G} with Mox Emerald. Face up it is Branchsnap Lorian, a 4/1 with trample, and the Coat's +1/+0.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Mox Emerald
+Mox Pearl
+Forest
+Island
+Island
+Branchsnap Lorian
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield..FaceDownName = Branchsnap Lorian
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+? Client.Bot1.Battlefield..Actions = Turn face up for its mana cost | Turn face up — Morph {G}
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.#1.Activate(Ability: morph cost)
+? Bot1.Battlefield.Branchsnap Lorian.FaceDown = (absent)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Branchsnap Lorian.Power = 5
+Bot1.Battlefield.Branchsnap Lorian.Toughness = 1
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Cryptic Coat.AttachedTo = Branchsnap Lorian

@@ -1,0 +1,56 @@
+# Browser
+# What Bot1's page offers and shows of morph and disguise (CR 702.37c, 702.168b, 708.4, 708.5). With Black Lotus's three blue
+# mana floating, Abzan Guide's one row is its face-down cast: as a 2/2 for {3}, by its morph line, not the card for its mana
+# cost; Bolrac-Clan Basher's says it is a 2/2 with ward {2}, by its disguise line. Cast face down, the stack shows a nameless
+# card that the page may look at, Abzan Guide. Resolved, the face-down permanent's one row is turning it face up for its morph
+# cost, {2}{W}{B}{G}, offered on turn 3 once the fifth Mox is down, and paid with all five.
+
+[Bot1 Deck]
+Black Lotus
+Abzan Guide
+Bolrac-Clan Basher
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Island x13
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+? Client.Bot1.Hand.Abzan Guide.Actions = Cast Abzan Guide face down as a 2/2 for {3} — Morph {2}{W}{B}{G}
+? Client.Bot1.Hand.Bolrac-Clan Basher.Actions = Cast Bolrac-Clan Basher face down as a 2/2 with ward {2} for {3} — Disguise {3}{R}{R}
+Bot1.Hand.Abzan Guide.Cast(Ability: Morph)
+? Stack..FaceDown = true
+? Client.Bot1.Stack.Abzan Guide.FaceDownName = Abzan Guide
+? Client.Bot1.Stack = 
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+? Client.Bot1.Battlefield..Actions = Turn face up — Morph {2}{W}{B}{G}
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.#1.Activate(Ability: morph cost)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Abzan Guide.Power = 4
+Bot1.Battlefield.Abzan Guide.Toughness = 4

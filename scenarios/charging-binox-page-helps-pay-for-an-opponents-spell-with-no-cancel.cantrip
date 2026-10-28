@@ -1,0 +1,63 @@
+# Browser
+# Assist from the helping player's side (CR 702.132a), on Bot1's page. On turn 2 Bot2 casts Charging Binox, {7}{G}, with a
+# Forest and Black Lotus, and chooses Bot1 to help. Bot1's page gives it a window for mana abilities with Done and no Cancel -
+# the spell is not Bot1's to give up - in which Bot1 makes four mana with Sol Ring, Mox Jet and Mox Emerald. Once Bot2 has
+# made its own, the page asks how much of the {7} generic mana Bot1 pays, again with no Cancel; Bot1 pays {4} from its pool,
+# which empties, and Bot2 pays the rest.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Pearl
+Sol Ring
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Charging Binox
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Charging Binox.Cast
+Bot2.Accept
+? Client.Bot1.Prompt.Title = Help pay for Charging Binox: make mana
+? Client.Bot1.Button.Done.Enabled = true
+? Client.Bot1.Button.Cancel.Enabled = absent
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+? Client.Bot1.Prompt.Title = How much of the {7} generic mana of Charging Binox do you pay?
+? Client.Bot1.Button.Cancel.Enabled = absent
+Bot1.PayCost(X: 4)
+? Bot1.Mana =
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Charging Binox.Power = 7
+Bot2.Battlefield.Charging Binox.Toughness = 5
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Mana =

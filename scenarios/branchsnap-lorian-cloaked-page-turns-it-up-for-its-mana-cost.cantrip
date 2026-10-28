@@ -1,0 +1,44 @@
+# Browser
+# The other way up for a cloaked card with morph (CR 701.58c): its mana cost. Cryptic Coat cloaks Branchsnap Lorian from the
+# top of Bot1's library; Bot1's page offers both ways, and Bot1 turns it up for its mana cost, {1}{G}{G}, with Forest, Mox
+# Emerald and Mox Pearl. Face up it is Branchsnap Lorian, a 4/1 with trample, and the Coat's +1/+0.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Mox Emerald
+Mox Pearl
+Forest
+Island
+Island
+Branchsnap Lorian
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+? Client.Bot1.Battlefield..Actions = Turn face up for its mana cost | Turn face up — Morph {G}
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.#1.Activate(Ability: mana cost)
+? Bot1.Mana =
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Branchsnap Lorian.Power = 5
+Bot1.Battlefield.Branchsnap Lorian.Toughness = 1
+Bot1.Battlefield.Cryptic Coat.AttachedTo = Branchsnap Lorian
