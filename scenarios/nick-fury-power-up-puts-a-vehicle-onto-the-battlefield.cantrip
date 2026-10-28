@@ -1,0 +1,58 @@
+# Nick Fury, Agent of S.H.I.E.L.D.: "You may put a Hero, Equipment, or Vehicle card from among them onto the battlefield." The Vehicle
+# part: on turn 3 Bot1 powers him up for the full {W}{U}{B}{R}{G}; the top seven cards after the turn's draw are an Ornithopter (an
+# artifact creature, neither: refused), five Plains and, seventh, a Smuggler's Copter (a Vehicle, no Hero or Equipment), which Bot1 puts
+# onto the battlefield. It is not a double-faced card, so nobody is asked about transforming.
+
+[Bot1 Deck]
+Nick Fury, Agent of S.H.I.E.L.D.
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Plains
+Island
+Ornithopter
+Plains
+Plains
+Plains
+Plains
+Plains
+Smuggler's Copter
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Nick Fury, Agent of S.H.I.E.L.D..Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Nick Fury, Agent of S.H.I.E.L.D..Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Smuggler's Copter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Nick Fury, Agent of S.H.I.E.L.D.; Smuggler's Copter
+Bot1.Library.Count = 16
