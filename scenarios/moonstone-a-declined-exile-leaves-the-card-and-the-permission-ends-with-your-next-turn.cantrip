@@ -1,0 +1,53 @@
+# Moonstone, Harsh Mistress: "you may exile that card from your graveyard. If you do, until the end of your next turn, you may play
+# that card." Faithless Looting discards a Lightning Bolt and a Forest on turn 1: the Bolt's exile is accepted and the Forest's
+# declined, so the Forest stays in the graveyard. The Bolt may be played until the end of Bot1's next turn (turn 3) and no longer:
+# on turn 5, with the red mana for it in the pool, it can't be cast from exile.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Moonstone, Harsh Mistress
+Faithless Looting
+Lightning Bolt
+Forest
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Moonstone, Harsh Mistress.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Forest)
+Bot1.Decline
+Bot1.Accept
+[T3 Bot1.Main1]
+? Exile = Lightning Bolt
+? Bot1.Graveyard = Faithless Looting; Forest
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Exile = Lightning Bolt
+Bot2.Life = 20
+Bot1.Graveyard = Faithless Looting; Forest
