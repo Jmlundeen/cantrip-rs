@@ -67,10 +67,34 @@ impl Knowledge {
         }
         self.folded = log.len();
         self.last = log.last().copied();
-        // A fold from scratch is as long as the history: checked each time the history passes another 256 records.
-        if verify() && continues && (before / 256 != self.folded / 256) {
+        // A fold from scratch is as long as the history: checked each time the history passes another 256 records. Not
+        // in a search's fork (`Game::fork_for_search`): its hidden cards were dealt anew at its root (`rebind_hidden`), and a
+        // fold from scratch reads the present state, so it would take a past event to be of the card dealt there since
+        // (a card drawn taken for a copy the seat knew of in its library, which the world has since made another card).
+        // What the seat knows there is what it knew of the real game, folded on.
+        if verify() && continues && game.tree.root() == tree::NodeId::ROOT && (before / 256 != self.folded / 256) {
             let fresh = Knowledge::of_scratch(game, self.seat);
-            assert!(*self == fresh, "seat {}'s knowledge folded record by record differs from a fold from scratch", self.seat.0);
+            assert!(
+                *self == fresh,
+                "seat {}'s knowledge folded record by record differs from a fold from scratch:
+  known {:?}
+   vs   {:?}
+  traced {:?}
+   vs    {:?}
+  seen {:?}
+   vs  {:?}
+  floating {:?}
+   vs      {:?}",
+                self.seat.0,
+                self.known.iter().filter(|(k, v)| fresh.known.get(k) != Some(v)).collect::<Vec<_>>(),
+                fresh.known.iter().filter(|(k, v)| self.known.get(k) != Some(v)).collect::<Vec<_>>(),
+                self.traced.difference(&fresh.traced).collect::<Vec<_>>(),
+                fresh.traced.difference(&self.traced).collect::<Vec<_>>(),
+                self.seen.iter().filter(|(k, v)| fresh.seen.get(k) != Some(v)).collect::<Vec<_>>(),
+                fresh.seen.iter().filter(|(k, v)| self.seen.get(k) != Some(v)).collect::<Vec<_>>(),
+                self.floating,
+                fresh.floating,
+            );
         }
     }
 

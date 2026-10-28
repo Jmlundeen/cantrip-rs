@@ -150,6 +150,27 @@ impl Config {
     }
 }
 
+/// The real game's boards a cancel guard can name that a world can return to - the root's, and the start of each run
+/// still waiting there, which a take-back reverts to - each with the same board's hash in `world`, a fork of it dealt
+/// anew: the world's hidden cards change the hash. Frames are paired by place, each reverted to its own start.
+pub(crate) fn world_boards(real: &Game, world: &Game) -> Vec<(u64, u64)> {
+    let mut out = vec![(cancel::board_hash(&real.state), cancel::board_hash(&world.state))];
+    for (r, w) in real.state.agenda.iter().zip(&world.state.agenda) {
+        // Only a run still waiting is held back to its start (`Game::fork_for_search`), in both games.
+        if (r.pending.is_none() && r.answers.is_empty()) || (w.pending.is_none() && w.answers.is_empty()) {
+            continue;
+        }
+        // A copy holding the journal back to the run's start (a plain copy holds none), reverted to it.
+        let at = |g: &Game, mark: u32| {
+            let mut state = g.state.clone_with_journal_from(Mark(mark));
+            state.revert(Mark(mark));
+            cancel::board_hash(&state)
+        };
+        out.push((at(real, r.mark), at(world, w.mark)));
+    }
+    out
+}
+
 /// Requests answered with no choice in a row before a line is taken as a draw.
 pub const MAX_FORCED: usize = 2000;
 
@@ -747,7 +768,6 @@ pub fn search(
     clock: &dyn Clock,
 ) -> Result<Decision, EvalError> {
     let deadline = config.network_deadline.or(config.deadline);
-    let root_board = cancel::board_hash(&game.state);
     let mut root_guard = guard.clone();
     let request = &root_guard.filtered(game, request);
     let network = || {
@@ -812,10 +832,12 @@ pub fn search(
         if g.pending().is_none_or(|r| r.player != seat) {
             continue;
         }
-        // The real guard's root board is this world's root board: hidden cards the world dealt changed the hash.
+        // The real guard's boards are this world's: hidden cards the world dealt changed their hashes.
         let mut guards = vec![CancelGuard::default(); players];
         guards[seat.index()] = root_guard.clone();
-        guards[seat.index()].rekey_root(root_board, cancel::board_hash(&g.state));
+        if !root_guard.is_empty() {
+            guards[seat.index()].rekey(&world_boards(game, &g));
+        }
         let ks: Vec<Knowledge> = (0..players)
             .map(|p| {
                 if p == seat.index() {

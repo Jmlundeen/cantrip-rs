@@ -290,28 +290,32 @@ impl CancelGuard {
         self.record_cancel(game, board, None, name, false);
     }
 
-    /// Carries a cancellation at the real game's root board into a world whose hidden state changed that board's hash.
-    pub fn rekey_root(&mut self, from: u64, to: u64) {
-        if from == to {
-            return;
-        }
-        let Some(names) = self
-            .cancelled
-            .iter()
-            .find(|(hash, _)| *hash == from)
-            .map(|(_, names)| names.clone())
-        else {
-            return;
-        };
-        match self.cancelled.iter_mut().find(|(hash, _)| *hash == to) {
-            Some((_, held)) => {
-                for name in names {
-                    if !held.contains(&name) {
-                        held.push(name);
+    /// Moves the guard from the real game's boards to a world's (`boards`: each real board's hash and the same board's in
+    /// the world, as `search::world_boards` pairs them): its cancellations, and the board an action in progress began
+    /// on, which a take-back in the world returns to as the world's board.
+    pub fn rekey(&mut self, boards: &[(u64, u64)]) {
+        for &(from, to) in boards {
+            if from == to {
+                continue;
+            }
+            if let Some(at) = self.cancelled.iter().position(|(hash, _)| *hash == from) {
+                let (_, names) = self.cancelled.remove(at);
+                match self.cancelled.iter_mut().find(|(hash, _)| *hash == to) {
+                    Some((_, held)) => {
+                        for name in names {
+                            if !held.contains(&name) {
+                                held.push(name);
+                            }
+                        }
                     }
+                    None => self.cancelled.push((to, names)),
                 }
             }
-            None => self.cancelled.push((to, names)),
+        }
+        if let Some((hash, _, _)) = self.pending.as_mut()
+            && let Some(&(_, to)) = boards.iter().find(|(from, _)| *from == *hash)
+        {
+            *hash = to;
         }
     }
 
@@ -541,6 +545,18 @@ mod tests {
         assert_eq!(board_hash(&s), before, "history is not the board");
         s.players[0].life -= 1;
         assert_ne!(board_hash(&s), before, "a changed player is the board");
+    }
+
+    /// A world's deal changes the hash of every board the guard names, not only the root's: the board an action in
+    /// progress began on is moved too, so a take-back inside the world is recognised there.
+    #[test]
+    fn rekeying_moves_the_cancellations_and_the_board_an_action_began_on() {
+        let mut guard = CancelGuard::default();
+        guard.cancelled = vec![(1, vec!["Guard Test A"])];
+        guard.pending = Some((2, None, "Guard Test B"));
+        guard.rekey(&[(1, 10), (2, 20)]);
+        assert_eq!(guard.cancelled, vec![(10, vec!["Guard Test A"])]);
+        assert_eq!(guard.pending, Some((20, None, "Guard Test B")));
     }
 
     /// A cancel chosen inside a search's line is recorded at the board the undo returns to, not at the board the
