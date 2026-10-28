@@ -6,9 +6,10 @@ tools\\pr-watch.cmd runs it. Every --interval seconds it asks GitHub's REST API 
 the last answer's ETag: an unchanged list comes back 304 Not Modified, which costs nothing against the rate limit. A pull
 request is new work when its head commit is one no session has been started for (a new PR, or new commits pushed to
 one). New work starts `claude -p` in the repository root - a new session, so a new context each time - whose prompt has
-it clear the whole queue through the `review-card-pr` skill, two review agents at a time, and stop. When it exits,
-every open pull request's head is marked seen and the wait begins again; a PR the session left open (one waiting on a
-human's decision) is not taken up again until it gets new commits.
+it clear the whole queue through the `review-card-pr` skill, three pull requests in review at a time, and stop. When it
+exits, every open pull request is marked seen and the wait begins again; a PR the session left open is taken up again
+when it changes: new commits (a contributor's rebase after a conflict the session asked them to fix) or a new comment
+(the user's answer to a question the session asked on the PR - nothing waits on the user anywhere else).
 
 While a session runs the watcher prints its progress per pull request, from two sources. What it sees itself, every
 --interval seconds: a slot of the worktree pool taken or given back for a PR, an agent going to work in it or leaving
@@ -48,15 +49,38 @@ SEEN = STATE / "seen.json"
 SESSION = STATE / "session.json"  # the session running now, or one a terminated watcher left; gone once it reports
 MAX_RESUMES = 3  # a session that stops this many times running without a report is given up, and a new one adopts its slots
 
+MARK = "🤖 pr-watch:"  # starts every comment a session posts, so the user's answers can be told from its own
+
+RULES = f"""Review up to three pull requests at once, each in its own lease: at most three review or fix agents working at
+a time. Landings still go one at a time.
+
+Nothing waits on the user without telling them on GitHub, where they can answer. Every comment you post on a pull
+request starts with `{MARK}`, so that your comments and theirs can be told apart.
+- A cherry-pick or rebase conflict with `main` is the contributor's to fix, never resolved by guesswork: comment on the
+  PR asking them to rebase it onto `main`, naming the conflicting files and the commits on `main` they conflict with,
+  release the lease with --discard, and carry on. The watcher takes the PR up again when they push.
+- A decision only the user can make (a rules exception, a finding you cannot settle, a choice between designs) is
+  asked on the PR: one comment with the question, the options and your recommendation, ending "Reply on this pull
+  request to answer." Release the lease with --discard unless its slot holds work beyond the PR's commits (a
+  reviewer's or fix agent's commits): then push that work to a branch `pr-watch/<N>` first and say so in the comment.
+  Write `PR #<N>: NEEDS YOU - <the question in a few words> (answer on the PR)`, and carry on with the rest.
+- Before starting a pull request, read its comments (`gh pr view <N> --comments`). A question of yours there with a
+  comment after it from the user (jschibel) that doesn't start with `{MARK}` is answered: act on that answer, picking up
+  any `pr-watch/<N>` branch rather than starting over. Still unanswered: leave the PR be, and name it in your report.
+
+Report progress as you go: each time a pull request moves on (lease taken, review started, review verdict, fix agent
+started, fixes confirmed, tests passed or failed, landed, left open, needs the user), write a line of its own, on its
+own, that starts `PR #<N>:` and says it in a few words - for example `PR #741: review blocked, 2 findings; fix agent
+started`. The watcher prints those lines to whoever is watching; nothing else you write reaches them until the end."""
+
 PROMPT = f"""Clear the pull-request queue of {REPO}.
 
 List the open pull requests (`gh pr list --repo {REPO} --state open`) and land each one through the `review-card-pr`
-skill and `add-cards/coordinator.md`, oldest first, with at most two review agents working at a time: a lease and a
-cherry-pick, an Opus review agent, a Sonnet fix agent for findings that change code, the reviewer's confirmation, then
-the landing (the test run it names, fetch and rebase, push, `card-issues.py log N landed` where the card has an issue,
-`gh pr comment` with the hashes and what the review found, `gh pr close`, release the lease). A pull request that adds
-no card still gets a review agent, against CLAUDE.md. List the queue again after each landing: new pull requests that
-arrive while you work are part of it.
+skill and `add-cards/coordinator.md`, oldest first: a lease and a cherry-pick, an Opus review agent, a Sonnet fix agent
+for findings that change code, the reviewer's confirmation, then the landing (the test run it names, fetch and rebase,
+push, `card-issues.py log N landed` where the card has an issue, `gh pr comment` with the hashes and what the review
+found, `gh pr close`, release the lease). A pull request that adds no card still gets a review agent, against
+CLAUDE.md. List the queue again after each landing: new pull requests that arrive while you work are part of it.
 
 Before taking a new lease, read `tools\\worktree.cmd status`: a slot leased "for PR #N" whose pull request is still open
 was left by a session that was stopped (its lease ID is in `status pool-<n>`). Adopt it rather than starting that PR
@@ -65,19 +89,12 @@ again: evict its member if one is listed (its agent ended with the session), res
 reviewer's fixes, a fix agent's - and send that slot's commits to a fresh review agent, telling it which commits are
 the PR's and which were made on top. A slot leased for a pull request that is closed is released.
 
-A pull request that needs a decision only the user can make (a rules exception, a cherry-pick conflict, a finding you
-cannot settle) is left open and unlanded, its lease released with --discard, and named in your report; carry on with
-the rest.
-
-Report progress as you go: each time a pull request moves on (lease taken, review started, review verdict, fix agent
-started, fixes confirmed, tests passed or failed, landed, left open), write a line of its own, on its own, that starts
-`PR #<N>:` and says it in a few words - for example `PR #741: review blocked, 2 findings; fix agent started`. The
-watcher prints those lines to whoever is watching; nothing else you write reaches them until the end.
+{RULES}
 
 Do not start any wait, poll or sleep loop for new pull requests: something else does that. Do not end your turn while a
 subagent or a test run you started is still going - wait for its notification. When no open pull request is left that
 you can land, finish with a short report per pull request: what landed and its hashes, what the reviews found and
-changed, and anything left for the user."""
+changed, and anything left for the user - each question waiting on them, with its PR."""
 
 RESUME = f"""You were stopped part way through clearing the pull-request queue of {REPO}: the watcher that runs you was
 terminated, and every subagent you had running was killed with it. This is the same session, resumed; carry on from
@@ -91,8 +108,13 @@ First recover each lease you hold (`tools\\worktree.cmd status`, your lease IDs 
   token from `worktree.cmd token <lease>`, saying it was interrupted, that it rejoins with that token, restores any
   temporary break edit first, and redoes the step it was on - a test or build run it started did not finish;
 - a slot whose agent had already reported goes on to its next step as it would have.
-Then go on clearing the queue exactly as your first instructions say, listing it again, and finish with the same
-report. Keep writing a `PR #<N>:` line at each step, starting with one per PR saying it was resumed."""
+
+Then go on clearing the queue as your first instructions say, listing it again, and finish with the same report -
+following these rules, which replace your first instructions wherever they differ:
+
+{RULES}
+
+Start with a `PR #<N>:` line for each pull request you resume."""
 
 
 class Poller:
@@ -120,7 +142,8 @@ class Poller:
             if name.strip().lower() == "etag":
                 self.etag = value.strip()
         self.prs = [
-            {"number": p["number"], "sha": p["head"]["sha"], "title": p["title"], "author": p["user"]["login"], "draft": p.get("draft", False)}
+            {"number": p["number"], "sha": p["head"]["sha"], "updated": p["updated_at"], "title": p["title"],
+             "author": p["user"]["login"], "draft": p.get("draft", False)}
             for p in json.loads(body)
         ]
         return self.prs
@@ -134,7 +157,13 @@ def load_seen():
 
 
 def save_seen(prs):
-    SEEN.write_text(json.dumps({str(p["number"]): p["sha"] for p in prs}, indent=1), encoding="utf-8")
+    SEEN.write_text(json.dumps({str(p["number"]): state(p) for p in prs}, indent=1), encoding="utf-8")
+
+
+def state(pr):
+    """What a session last saw of a pull request: its head commit, and when it last changed - a comment (an answer to a
+    question the session asked there) changes it as a push does."""
+    return f"{pr['sha']} {pr['updated']}"
 
 
 def lock():
@@ -303,7 +332,7 @@ def main():
             time.sleep(args.interval)
             continue
         seen = load_seen()
-        new = [p for p in prs if seen.get(str(p["number"])) != p["sha"]]
+        new = [p for p in prs if seen.get(str(p["number"])) != state(p)]
         pending = interrupted()
         if pending and pending["resumes"] >= MAX_RESUMES:
             print(f"{stamp()} session {pending['id']} would not resume after {MAX_RESUMES} tries; a new session adopts its slots", flush=True)

@@ -10,7 +10,9 @@ A card that arrives as a pull request is handled exactly like a card a local car
 only says how the PR's commits get there. Nothing here relaxes the standard. You are the coordinator: you dispatch,
 check and land; you do not review or fix the card yourself.
 
-Take pull requests **one at a time**, oldest first unless the user names one; report each before starting the next.
+Take pull requests oldest first unless the user names one, **up to three in review at once**, each in its own lease:
+at most three review or fix agents working at a time, since each build takes every core. Landings go one at a time.
+Report each PR as it lands or stops.
 
 ## 1. The PR's commits in a fresh pool slot
 
@@ -24,7 +26,10 @@ git fetch origin pull/<N>/head:pr-<N>
 git cherry-pick origin/main..pr-<N>        # the PR's own commits, in order, authorship kept
 ```
 
-A cherry-pick conflict stops here and goes to the user; never resolve the contributor's code by guesswork. Note the
+A cherry-pick conflict stops here; never resolve the contributor's code by guesswork. It is the contributor's to fix:
+comment on the PR asking them to rebase onto `main`, naming the conflicting files and the commits on `main` they meet,
+and release the lease with `--discard` (a coordinator running unattended, `tools\pr-watch.cmd`, takes the PR up again
+when they push). Note the
 card(s) the PR adds or changes, every other card or shared function it touches, and the card's issue (`Closes #N` in
 the commits, or `gh issue list --search "<Card Name> in:title" --state all`; a card with no issue gets one with
 `card-issues.py claim --pr "Card Name"` (the PR's own branch has the card, so `--pr`) only if the user agrees - the claim may be the contributor's).
