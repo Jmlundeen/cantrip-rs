@@ -1,0 +1,53 @@
+# Gandalf, Spark Starter: "among one, two, or three targets" (CR 601.2d) - one is enough: all 3 damage goes to Bot2 (17),
+# and its Memnite and Ornithopter, not targeted, are untouched. The sibling scenarios divide it among two and three targets.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Gandalf, Spark Starter
+Island x20
+
+[Bot2 Deck]
+Memnite
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Gandalf, Spark Starter.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Divide(Bot2: 3)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Memnite.Damage = 0
+Bot2.Battlefield.Ornithopter.Damage = 0
