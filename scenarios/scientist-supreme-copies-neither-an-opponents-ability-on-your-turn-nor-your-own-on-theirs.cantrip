@@ -1,0 +1,60 @@
+# Scientist Supreme of A.I.M. copies only an ability "you control" and is activated "only during your turn" (CR 115.1, 602.5b),
+# each shown alone: on Bot1's turn 3 Bot2's Mind Stone draw ability (an artifact source, but not Bot1's) is no target; on Bot2's
+# turn 4 Bot1's own Mind Stone draw ability is a legal target in itself but the Scientist cannot be activated then.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Scientist Supreme of A.I.M.
+Mind Stone
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mind Stone
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Scientist Supreme of A.I.M..Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mind Stone.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot2.Battlefield.Mox Ruby.Activate
+? Stack.Count = 1
+! Bot1.Battlefield.Scientist Supreme of A.I.M..Activate(Stack.Mind Stone)
+? Bot1.Life = 20
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot1.Battlefield.Mox Sapphire.Activate
+? Stack.Count = 1
+! Bot1.Battlefield.Scientist Supreme of A.I.M..Activate(Stack.Mind Stone)
+? Bot1.Life = 20
