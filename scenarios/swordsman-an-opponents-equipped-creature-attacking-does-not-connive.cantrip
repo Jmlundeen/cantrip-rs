@@ -1,0 +1,51 @@
+# Swordsman, Sharp Scoundrel: "Whenever an equipped creature you control attacks, it connives" - only its controller's creatures
+# (CR 603.2, 701.50). Bot2's Savannah Lions, carrying Bot2's Stolen Stark Tech (3/1), attacks Bot1, who controls the Swordsman: it
+# does not connive, so Bot2 draws nothing extra and discards nothing, and it deals its 3 damage.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Swordsman, Sharp Scoundrel
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Savannah Lions
+Stolen Stark Tech
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Swordsman, Sharp Scoundrel.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Stolen Stark Tech.Cast
+Bot2.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Stolen Stark Tech.AttachedTo = Savannah Lions
+? Bot2.Hand.Count = 4
+Bot2.Attack(Savannah Lions > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Hand.Count = 4
+Bot2.Graveyard.Count = 0
+Bot1.Life = 17
