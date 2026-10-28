@@ -1,0 +1,38 @@
+# Browser
+# CR 708.9: at the end of the game every face-down permanent is revealed to all players. Bot2 casts Abzan Guide face down
+# (morph) on its turn, a nameless 2/2 Bot1's page may not look at, then concedes. The game is over, and Bot1's game log says
+# what the end of the game revealed: Bot2 reveals Abzan Guide, by name.
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Abzan Guide
+Mox Pearl
+Mox Jet
+Mox Emerald
+Island x16
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abzan Guide.Cast(Ability: Morph)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield..FaceDownName = Abzan Guide
+Bot2.Concede
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot2.Revealed = Abzan Guide
+Client.Bot1.Over = true
+Client.Bot1.Log.Has = Bot2 reveals [Abzan Guide].
