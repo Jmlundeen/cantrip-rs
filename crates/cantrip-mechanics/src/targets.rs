@@ -148,7 +148,7 @@ pub fn costs_less_if_it_targets_a_tapped_creature<const N: u8>(q: &dyn Query, _:
     let tapped = targets.iter().filter_map(|t| t.object()).any(|creature| q.obj(creature).tapped);
     if tapped { CostDelta::less(N) } else { CostDelta::NONE }
 }
-fn attacking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+pub fn attacking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.is_attacking(id))
 }
 
