@@ -167,7 +167,7 @@ public static class LogWriter
 
             CardsRevealedEvent revealed => revealed.Cards.Count == 0
                 ? null
-                : $"{Does(revealed.Player, "reveal", "reveals")} {string.Join(", ", revealed.Cards.Select(Card))}.",
+                : $"{Does(revealed.Player, "reveal", "reveals")} {string.Join(", ", revealed.Cards.Select(Shown))}.",
 
             _ => null,
         };
@@ -306,6 +306,21 @@ public static class LogWriter
 
             Named.Add(new LogReferenceView { Name = card.Name, Object = handle, Card = card });
             return $"[{card.Name}]";
+        }
+
+        /// <summary>
+        /// A card a player reveals, by name: one still face down - a face-down permanent or spell revealed at the end of the
+        /// game, or as its owner leaves it (CR 708.9) - by what it really is, which the seat may now look at, as its own name
+        /// is the face-down one's, none.
+        /// </summary>
+        private string Shown(ViewHandle handle)
+        {
+            if (!handle.IsNone && Object(handle) is { FaceDown: true, Known: true, FaceDownName.Length: > 0 } card)
+            {
+                return Card(handle, card.FaceDownName);
+            }
+
+            return Card(handle);
         }
 
         /// <summary>

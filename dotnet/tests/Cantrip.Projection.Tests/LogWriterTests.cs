@@ -152,6 +152,31 @@ public sealed class LogWriterTests
         Assert.Empty(unseen.References);
     }
 
+    /// <summary>
+    /// At the end of the game, and as their owner leaves it, face-down permanents and spells are revealed where they are (CR
+    /// 708.9): still face down, nameless, but the seat may now look at each, and the line names what it really is - one on
+    /// the battlefield by a handle the seat holds, and one that ceased to exist with its owner by a handle it never held. One
+    /// the seat may not look at is still "a card".
+    /// </summary>
+    [Fact]
+    public void A_face_down_card_revealed_where_it_is_is_named_as_what_it_really_is()
+    {
+        var permanent = new ViewHandle(40);
+        var gone = new ViewHandle(41);
+        var unknown = new ViewHandle(42);
+        PlayerView view = View(Rival);
+        view.Objects.Add(new ObjectView { Handle = permanent, FaceDown = true, Known = true, FaceDownName = "Abzan Guide", Zone = ZoneKindView.Battlefield, Owner = Me });
+        view.Objects.Add(new ObjectView { Handle = gone, FaceDown = true, Known = true, FaceDownName = "Bolrac-Clan Basher", Zone = ZoneKindView.Exile, Owner = Me });
+        view.Objects.Add(new ObjectView { Handle = unknown, FaceDown = true, Known = false, Zone = ZoneKindView.Battlefield, Owner = Me });
+
+        LogWriter.Line shown = LogWriter.Write(Rival, view, new CardsRevealedEvent { Player = Me, Cards = [permanent, gone] })!;
+        Assert.Equal("Alice reveals [Abzan Guide], [Bolrac-Clan Basher].", shown.Text);
+        Assert.Equal([permanent, gone], shown.References.Select(reference => reference.Object));
+        Assert.Equal(["Abzan Guide", "Bolrac-Clan Basher"], shown.References.Select(reference => reference.Name));
+
+        Assert.Equal("Alice reveals a card.", LogWriter.Write(Rival, view, new CardsRevealedEvent { Player = Me, Cards = [unknown] })!.Text);
+    }
+
     [Fact]
     public void Each_named_object_is_referenced_by_its_handle_in_the_order_the_line_names_it()
     {
