@@ -1,0 +1,56 @@
+# Matterbending Mage reads only its controller's spells ("whenever you cast"): on turn 3 Bot2 casts Fractalize with X=0 ({U}, a
+# spell with {X} in its mana cost) at its own Grizzly Bears in Bot1's main phase, and the Bears may still block the Mage. Both
+# 1/1 Bears and the 2/2 Mage trade damage: the Bears die, the Mage survives.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Matterbending Mage
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Mox Sapphire
+Fractalize
+Island
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Matterbending Mage.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Fractalize.Cast(Bot2.Battlefield.Grizzly Bears; X: 0)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Grizzly Bears.Power = 1
+Bot1.Attack(Matterbending Mage > Bot2)
+Bot2.Block(Grizzly Bears > Matterbending Mage)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Matterbending Mage.Damage = 1
+Bot2.Battlefield.Grizzly Bears = (absent)
