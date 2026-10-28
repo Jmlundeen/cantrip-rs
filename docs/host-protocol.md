@@ -184,7 +184,9 @@ control of. A client captions it with the subject's name, "The player you choose
 keyword line ("Morph {3}{W}"), whether the card is in a hand or a permission lets it be cast from elsewhere. The face-down spell
 is `FaceDown` on the stack, `Known` with its `FaceDownName` to its controller alone (CR 708.5); a face-down spell or permanent
 that leaves for anywhere but the battlefield is revealed (`CardsRevealedEvent`, CR 708.9), to a seat that may never have held a
-handle for it. A face-down permanent offers one `TurnFaceUp` per way to turn it up: for its morph or disguise cost
+handle for it. A manifested or cloaked instant or sorcery an effect would turn face up is revealed and stays face down (CR
+701.40g, 701.58g): every seat's view of the step that tells its `CardsRevealedEvent` has it `Known` with its `FaceDownName`,
+and the opponents' views after that step no longer do (CR 708.5). A face-down permanent offers one `TurnFaceUp` per way to turn it up: for its morph or disguise cost
 (`Description` "Turn face up: Morph {3}{W}", `CostText`, `HasX`, `LifeCost` that cost's) or for its mana cost, a manifested or
 cloaked creature card's (`Description` the ability's own words, "Turn this permanent face up by paying its mana cost."). A cast prototyped (CR 718.3) has `CastPrototyped`, `Description` the keyword line
 ("Prototype {2}{R} — 3/2") and `CostText` the prototype's mana cost; `ObjectView.Prototype` is that line for a prototype card in

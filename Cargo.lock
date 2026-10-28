@@ -156,6 +156,7 @@ name = "cantrip-host"
 version = "0.1.0"
 dependencies = [
  "cantrip-ai",
+ "cantrip-api",
  "cantrip-engine",
  "cantrip-obs",
  "cantrip-oracle",

@@ -391,10 +391,16 @@ pub struct Projector<'a> {
     pub names: &'a [String],
     /// Seats that conceded: they read as such rather than as lost.
     pub conceded: &'a [bool],
+    /// Objects whose face is shown to the viewer right now: revealed (CR 701.20a) or looked at (CR 701.20e). A face-down
+    /// permanent among them is seen as what it really is while it is shown, though it stays face down (a manifested or cloaked
+    /// instant an effect would turn up, CR 701.40g, 701.58g); once it is not, the viewer may look at it only as `knows_face`
+    /// allows (CR 708.5).
+    pub faces: &'a HashSet<ObjectId>,
 }
 
-/// `viewer`'s view of the game. `extra` are objects shown to the viewer right now, and `mentioned` objects whose
-/// handles must survive this projection because the events going out beside it name them.
+/// `viewer`'s view of the game. `extra` are objects shown to the viewer right now, `faces` those of them whose face is
+/// shown (`Projector::faces`), and `mentioned` objects whose handles must survive this projection because the events going
+/// out beside it name them.
 pub fn player_view(
     game: &Game,
     viewer: PlayerId,
@@ -402,9 +408,10 @@ pub fn player_view(
     names: &[String],
     conceded: &[bool],
     extra: &HashSet<ObjectId>,
+    faces: &HashSet<ObjectId>,
     mentioned: &HashSet<ObjectId>,
 ) -> PlayerView {
-    let projector = Projector { game, viewer, names, conceded };
+    let projector = Projector { game, viewer, names, conceded, faces };
     projector.build(handles, extra, mentioned)
 }
 
@@ -1403,8 +1410,8 @@ impl<'a> Projector<'a> {
             // Face down (CR 708.2a, 406.3): what it is face down goes to every seat, a nameless 2/2 on the battlefield and on
             // the stack (a spell cast face down by morph or disguise, CR 708.4) and no characteristics at all in exile; what it
             // really is only to a seat that may look at it, its controller for a permanent or a spell (CR 708.5) and those who
-            // saw it go there for a card (CR 406.3).
-            let looks = knows_face(s, self.viewer, id);
+            // saw it go there for a card (CR 406.3), and to a seat it is being shown to (a reveal, CR 701.20a, 701.40g).
+            let looks = knows_face(s, self.viewer, id) || self.faces.contains(&id);
             if !on_battlefield && !zone.is(ZoneKind::Stack) {
                 view.name = String::new();
                 view.mana_cost = String::new();

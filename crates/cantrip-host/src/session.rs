@@ -55,6 +55,10 @@ pub struct Session {
     told: Vec<Proto>,
     /// What each seat is being shown beyond its zones, as of the last step.
     extra: Vec<HashSet<ObjectId>>,
+    /// Of what each seat is being shown, as of the last step, the cards whose face it is shown: those revealed (CR 701.20a)
+    /// and those it looked at (CR 701.20e), not what its question names. A face-down permanent among them is shown as what it
+    /// really is for as long as that lasts, though it stays face down (CR 701.40g, 701.58g).
+    faces: Vec<HashSet<ObjectId>>,
     /// The view each seat was last sent: what a seat other than the one answering keeps while a run is in progress.
     sent: Vec<Option<PlayerView>>,
     /// The mana abilities that can still be taken back (`cantrip_engine::undo`).
@@ -213,6 +217,7 @@ impl Session {
             conceded: vec![false; seats],
             told: Vec::new(),
             extra: vec![HashSet::new(); seats],
+            faces: vec![HashSet::new(); seats],
             sent: vec![None; seats],
             undoable: Undo::default(),
             scenario: None,
@@ -258,6 +263,7 @@ impl Session {
             conceded: vec![false; seats],
             told: Vec::new(),
             extra: vec![HashSet::new(); seats],
+            faces: vec![HashSet::new(); seats],
             sent: vec![None; seats],
             undoable: Undo::default(),
             scenario: Some(Scenario {
@@ -271,6 +277,29 @@ impl Session {
         };
         session.play_scenario();
         Ok(session)
+    }
+
+    /// A table for a game already under way: a test's way into a position over cards no deal holds (test cards beside the
+    /// engine's). Nothing of it is published yet; its seats are named North, South and on.
+    #[cfg(test)]
+    fn of_game(game: Game) -> Session {
+        let seats = game.state.seats().count();
+        Session {
+            tracker: Tracker::new(&game),
+            names: (0..seats).map(|i| ["North", "South", "East", "West"].get(i).map_or_else(|| format!("Seat {}", i + 1), |n| n.to_string())).collect(),
+            decklists: vec![Vec::new(); seats],
+            handles: (0..seats).map(|_| HandleSpace::new()).collect(),
+            published: 0,
+            sequence: 0,
+            conceded: vec![false; seats],
+            told: Vec::new(),
+            extra: vec![HashSet::new(); seats],
+            faces: vec![HashSet::new(); seats],
+            sent: vec![None; seats],
+            undoable: Undo::default(),
+            scenario: None,
+            game,
+        }
     }
 
     /// Plays the scenario on to the next question to a driven seat, gathering the checks of what clients show on the
@@ -438,7 +467,8 @@ impl Session {
             return sent.clone();
         }
         let extra = self.extra[p.index()].clone();
-        let view = player_view(&self.game, p, &mut self.handles[p.index()], &self.names, &self.conceded, &extra, mentioned);
+        let faces = self.faces[p.index()].clone();
+        let view = player_view(&self.game, p, &mut self.handles[p.index()], &self.names, &self.conceded, &extra, &faces, mentioned);
         self.sent[p.index()] = Some(view.clone());
         view
     }
@@ -469,15 +499,17 @@ impl Session {
             .collect();
         let seats: Vec<PlayerId> = self.game.state.seats().collect();
         for &p in &seats {
-            let mut extra = revealed.clone();
+            let mut faces = revealed.clone();
             // Cards a player looked at are shown to that player alone, and to the player controlling them (CR 723.4).
             for proto in &protos {
                 if let Proto::Looked { player, cards } = proto
                     && self.game.state.sees_as(p, *player)
                 {
-                    extra.extend(cards.iter().copied());
+                    faces.extend(cards.iter().copied());
                 }
             }
+            let mut extra = faces.clone();
+            self.faces[p.index()] = faces;
             // What a request names is shown to the player it is asked of, and to the player answering it for them.
             if let Some(request) = pending.as_ref().filter(|r| self.game.state.sees_as(p, r.player)) {
                 extra.extend(request_objects(request));
@@ -1006,6 +1038,119 @@ mod tests {
                 assert_eq!(of_type(events, "GameEndedEvent").len(), 1, "{winner:?}: seat {seat}");
             }
             assert!(session.end(None).is_err(), "a game over is not ended again");
+        }
+    }
+
+    /// "Turn target face-down permanent face up." No printed card the engine has turns a permanent face up as an effect (Break
+    /// Open does), so a test card does here, beside every card the engine has.
+    fn unveil(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+        if let Target::Object(id) = item.target(0) {
+            g.turn_face_up(id, item.controller);
+        }
+        Ok(())
+    }
+
+    fn face_down_permanent(q: &dyn Query, _: &Asker, t: Target) -> bool {
+        matches!(t, Target::Object(id) if q.is_on_battlefield(id) && q.obj(id).face_down)
+    }
+
+    static UNVEIL: CardDef =
+        CardDef { name: "Probe Unveil", types: TypeSet::of(&[CardType::Instant]), spell: spell(&[target(face_down_permanent)], unveil), ..CardDef::BLANK };
+
+    /// North casts three Moxen and Cryptic Coat, which cloaks the Lightning Bolt on top of its library, then Probe Unveil at the
+    /// cloaked Bolt, at a table once the Unveil is on the stack. The Bolt's permanent.
+    fn unveiling_a_cloaked_bolt() -> (Session, ObjectId) {
+        let table: &'static CardTable = Box::leak(Box::new(CardTable::new(cards().cards.iter().copied().chain([&UNVEIL]))));
+        let names = |list: &[&str]| -> Vec<CardId> { list.iter().map(|n| table.find(n).unwrap_or_else(|| panic!("no card {n}"))).collect() };
+        let mut north = names(&["Mox Sapphire", "Mox Sapphire", "Mox Sapphire", "Cryptic Coat", "Probe Unveil", "Island", "Island", "Lightning Bolt"]);
+        north.extend(names(&["Island"; 12]));
+        // South holds an Unveil of its own: from the reveal on, its questions name the cloaked Bolt as a target it may choose.
+        let mut south = names(&["Probe Unveil"]);
+        south.extend(names(&["Island"; 19]));
+        let mut game = Game::new(table, &Setup { decks: vec![north, south], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
+        let mut casts = ["Mox Sapphire", "Mox Sapphire", "Mox Sapphire", "Cryptic Coat"].into_iter().peekable();
+        let cloaked = |game: &Game| game.state.battlefield().iter().copied().find(|&id| game.state.obj(id).face_down);
+        for _ in 0..200 {
+            game.run();
+            if game.state.stack.last().is_some_and(|item| game.name(item.object) == "Probe Unveil") {
+                let bolt = cloaked(&game).expect("the cloaked Bolt");
+                assert_eq!(game.cards.get(game.state.obj(bolt).card).name, "Lightning Bolt");
+                return (Session::of_game(game), bolt);
+            }
+            let request = game.pending().cloned().expect("the game goes on");
+            let answer = match &request.kind {
+                RequestKind::Priority { options } if request.player == PlayerId(0) => {
+                    let named = |name: &str| options.iter().find(|o| o.kind == ActionKind::CastSpell && o.source.is_some_and(|s| game.name(s) == name));
+                    if let Some(option) = casts.peek().and_then(|&name| named(name)) {
+                        casts.next();
+                        Answer::Act(Action::of(option))
+                    } else if let (Some(permanent), true) = (cloaked(&game), game.state.stack.is_empty()) {
+                        let mut action = Action::of(named("Probe Unveil").expect("the Unveil"));
+                        action.targets = vec![Target::Object(permanent)];
+                        Answer::Act(action)
+                    } else {
+                        Answer::Pass
+                    }
+                }
+                RequestKind::PayCosts { options, .. } => {
+                    let mox = options.iter().find(|o| o.kind == ActionKind::ActivateAbility && o.source.is_some_and(|s| game.name(s) == "Mox Sapphire"));
+                    let confirm = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting);
+                    Answer::Act(Action::of(confirm.or(mox).expect("a Mox to pay with, or the payment to confirm")))
+                }
+                RequestKind::Priority { .. } => Answer::Pass,
+                other => panic!("unexpected question {other:?}"),
+            };
+            game.answer(request.id, request.player, answer).unwrap();
+        }
+        panic!("Probe Unveil was never cast");
+    }
+
+    /// The seat's view of the object a handle names.
+    fn object_in<'a>(step: &'a Value, seat: &str, handle: &Value) -> &'a Value {
+        let objects = step["Views"][seat]["Objects"].as_array().unwrap();
+        objects.iter().find(|o| &o["Handle"] == handle).unwrap_or_else(|| panic!("seat {seat}: {handle} is in the view"))
+    }
+
+    /// CR 701.58g, 701.20a, 708.5: a cloaked instant an effect would turn face up is revealed by its controller and left face
+    /// down. Every seat is shown it: each seat's `CardsRevealedEvent` names an object its view says is the Bolt, face down.
+    /// The reveal over, the opponent may no longer look at the face-down permanent its controller still may, though the
+    /// question it is asked then names it (a target its Unveil may choose): a question shows what it names, not its face.
+    #[test]
+    fn a_cloaked_instant_an_effect_would_turn_up_is_shown_to_every_seat_and_stays_face_down() {
+        let (mut session, bolt) = unveiling_a_cloaked_bolt();
+        let mut step = session.step();
+        let mut passes = 0;
+        while of_type(step["Events"]["2"].as_array().unwrap(), "CardsRevealedEvent").is_empty() {
+            passes += 1;
+            assert!(passes < 5, "the Bolt was never revealed: {step}");
+            let request = session.pending_request().expect("a question");
+            let (payload, _) = session.payload(&Answer::Pass, &request);
+            step = session.answer(request.id, seat(session.game.state.player_controller(request.player)), &payload).ok().unwrap();
+        }
+        assert!(session.game.state.obj(bolt).face_down, "the Bolt stays face down");
+        for seat in ["1", "2"] {
+            let revealed = of_type(step["Events"][seat].as_array().unwrap(), "CardsRevealedEvent");
+            assert_eq!(revealed.len(), 1, "seat {seat}");
+            assert_eq!(revealed[0]["Player"], 1, "seat {seat}");
+            let object = object_in(&step, seat, &revealed[0]["Cards"][0]);
+            assert_eq!(object["FaceDown"], true, "seat {seat}: {object}");
+            assert_eq!(object["Known"], true, "seat {seat}: {object}");
+            assert_eq!(object["FaceDownName"], "Lightning Bolt", "seat {seat}: {object}");
+            assert_eq!(object["Zone"], "Battlefield", "seat {seat}: {object}");
+        }
+
+        // The next step, with the reveal over: the opponent's view no longer says what it is; its controller's does.
+        let request = session.pending_request().expect("a question");
+        let (payload, _) = session.payload(&Answer::Pass, &request);
+        let after = session.answer(request.id, seat(request.player), &payload).ok().unwrap();
+        assert_eq!(after["Requests"][0]["Seat"], 2, "South is asked: {after}");
+        assert!(request_objects(&session.pending_request().unwrap()).contains(&bolt), "South's question names the Bolt");
+        for (seat, known) in [("1", true), ("2", false)] {
+            let handle = json!(session.handles[seat.parse::<usize>().unwrap() - 1].existing(bolt));
+            let object = object_in(&after, seat, &handle);
+            assert_eq!(object["FaceDown"], true, "seat {seat}: {object}");
+            assert_eq!(object["Known"], known, "seat {seat}: {object}");
+            assert_eq!(object["FaceDownName"], if known { "Lightning Bolt" } else { "" }, "seat {seat}: {object}");
         }
     }
 

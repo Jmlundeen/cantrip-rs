@@ -79,7 +79,7 @@ fn take(g: &mut Game, pick: impl Fn(&ActionOption) -> bool) {
 fn view_of(g: &Game, viewer: PlayerId, id: ObjectId) -> ObjectView {
     let mut handles = HandleSpace::new();
     let names = vec!["You".to_string(), "Them".to_string()];
-    let view = player_view(g, viewer, &mut handles, &names, &[false, false], &HashSet::new(), &HashSet::new());
+    let view = player_view(g, viewer, &mut handles, &names, &[false, false], &HashSet::new(), &HashSet::new(), &HashSet::new());
     let handle = handles.existing(id);
     view.objects.into_iter().find(|o| o.handle == handle).expect("the object is in the view")
 }
