@@ -115,6 +115,13 @@ enum Request {
         #[serde(rename = "Seat")]
         seat: i32,
     },
+    /// The game ends from outside its rules: won by `Winner`'s seat, or a draw with none.
+    End {
+        #[serde(rename = "GameId")]
+        game_id: u32,
+        #[serde(rename = "Winner", default)]
+        winner: Option<i32>,
+    },
     View {
         #[serde(rename = "GameId")]
         game_id: u32,
@@ -249,6 +256,7 @@ impl Host {
                 self.ended(game_id);
                 reply
             }
+            Request::End { game_id, winner } => self.with(game_id, |g| g.end(winner)),
             Request::View { game_id, seat } => self.with(game_id, |g| g.view(seat).map(|v| json!({ "View": v }))),
             Request::Oracle { name } => {
                 let card = cantrip_engine_card(&name);

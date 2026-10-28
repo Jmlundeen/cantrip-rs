@@ -412,7 +412,12 @@ impl<'a> Projector<'a> {
     fn build(&self, handles: &mut HandleSpace, extra: &HashSet<ObjectId>, mentioned: &HashSet<ObjectId>) -> PlayerView {
         let game = self.game;
         let s = &game.state;
-        let visible = observable(game, self.viewer, extra);
+        let mut visible = observable(game, self.viewer, extra);
+        // A face-down permanent or spell revealed as its owner left the game (CR 708.9) has ceased to exist, in no zone, but it
+        // is shown right now all the same, so that what was revealed can be named.
+        visible.extend(extra.iter().copied().filter(|&id| {
+            !is_ability_key(id) && id.index() < s.objects.len() && s.obj(id).zone.is(ZoneKind::Gone) && s.obj(id).became.is_none()
+        }));
         // Before anything is minted: whatever this viewer can no longer see loses its handle, so if it ever comes back
         // it comes back unrecognisable.
         handles.retain(|o| visible.contains(&o) || mentioned.contains(&o));

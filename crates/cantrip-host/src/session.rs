@@ -719,6 +719,25 @@ impl Session {
         Ok(self.step())
     }
 
+    /// The game ends from outside its rules (`Game::end`): won by the seat `winner`, or a draw for none - a draw the players
+    /// agreed to, a match clock run out. What its end reveals (CR 708.9) is told with it.
+    pub fn end(&mut self, winner: Option<i32>) -> Result<Value, Rejection> {
+        if self.game.is_over() {
+            return Err(Rejection::new("IllegalAnswer", "the game is over"));
+        }
+        let outcome = match winner {
+            None => Outcome::Draw,
+            Some(seat_number) => Outcome::Won(
+                player_at(seat_number)
+                    .filter(|p| p.index() < self.names.len() && !self.game.state.player(*p).lost)
+                    .ok_or_else(|| Rejection::new("IllegalAnswer", "no such seat in the game"))?,
+            ),
+        };
+        self.undoable.clear();
+        self.game.end(outcome);
+        Ok(self.step())
+    }
+
     pub fn concede(&mut self, seat_number: i32) -> Result<Value, Rejection> {
         let p = player_at(seat_number).filter(|p| p.index() < self.names.len()).ok_or_else(|| Rejection::new("NotYourTurnToAnswer", "no such seat"))?;
         if self.game.is_over() {
@@ -905,6 +924,89 @@ mod tests {
 
     fn of_type<'a>(events: &'a [Value], kind: &str) -> Vec<&'a Value> {
         events.iter().filter(|e| e["$type"] == kind).collect()
+    }
+
+    /// CR 708.9: the face-down permanents and spells revealed as their owner leaves the game (a game of three that goes on)
+    /// and at the end of the game (a duel a concession ends) reach every seat as a `CardsRevealedEvent` by their owner, before
+    /// the game's end is told, each naming an object the seat's view says is what it really is - a face-down card the seat
+    /// may now look at, though one that left with its owner has ceased to exist.
+    #[test]
+    fn face_down_cards_revealed_as_their_owner_leaves_and_at_the_end_reach_every_seat() {
+        for (name, text, seats, over) in [
+            (
+                "leaves",
+                include_str!("../../../scenarios/face-down-cards-are-revealed-as-their-owner-concedes-a-game-of-three.cantrip"),
+                ["1", "2", "3"].as_slice(),
+                false,
+            ),
+            ("ends", include_str!("../../../scenarios/face-down-cards-are-revealed-at-the-end-of-the-game.cantrip"), ["1", "2"].as_slice(), true),
+            // The game ends with the cast's frame still waiting on its payment: what ended it is published all the same.
+            (
+                "ends mid-cast",
+                include_str!("../../../scenarios/a-face-down-spell-being-cast-is-revealed-when-a-concession-ends-the-game.cantrip"),
+                ["1", "2"].as_slice(),
+                true,
+            ),
+        ] {
+            let mut session = Session::scenario(text, name, Vec::new(), &[]).ok().unwrap();
+            let step = session.step();
+            assert_eq!(step["Scenario"]["Verdict"]["Passed"], true, "{name}: {step}");
+            assert_eq!(step["Finished"], over, "{name}");
+            for &seat in seats {
+                let events = step["Events"][seat].as_array().unwrap();
+                let revealed = of_type(events, "CardsRevealedEvent");
+                let objects = step["Views"][seat]["Objects"].as_array().unwrap();
+                let mut names: Vec<&str> = revealed
+                    .iter()
+                    .flat_map(|e| e["Cards"].as_array().unwrap())
+                    .map(|handle| {
+                        let object = objects.iter().find(|o| &o["Handle"] == handle).unwrap_or_else(|| panic!("{name}: seat {seat}: {handle} is in the view"));
+                        assert_eq!(object["Known"], true, "{name}: seat {seat}: {object}");
+                        assert_eq!(object["FaceDown"], true, "{name}: seat {seat}: {object}");
+                        object["FaceDownName"].as_str().unwrap()
+                    })
+                    .collect();
+                names.sort();
+                assert_eq!(names, ["Abzan Guide", "Bolrac-Clan Basher"], "{name}: seat {seat}");
+                assert!(revealed.iter().all(|e| e["Player"] == 1), "{name}: seat {seat}");
+                if over {
+                    let ended = of_type(events, "GameEndedEvent");
+                    assert_eq!(ended.len(), 1, "{name}: seat {seat}");
+                    assert!(revealed.iter().all(|e| e["Sequence"].as_u64() < ended[0]["Sequence"].as_u64()), "{name}: seat {seat}");
+                }
+            }
+        }
+    }
+
+    /// A game ended from outside its rules (`Session::end`: a draw agreed to, a match clock) ends as every game does: the
+    /// face-down permanent on the battlefield is revealed by its owner (CR 708.9) to every seat, with the game's end.
+    #[test]
+    fn a_game_ended_from_outside_its_rules_reveals_its_face_down_permanents() {
+        let text = "[Bot1 Deck]\nAbzan Guide\nMox Pearl\nMox Jet\nMox Emerald\nIsland x16\n\n[Bot2 Deck]\nIsland x20\n\n[Actions]\n\
+                    Bot1.Hand.Mox Pearl.Cast\nBot1.Pass\nBot1.Hand.Mox Jet.Cast\nBot1.Pass\nBot1.Hand.Mox Emerald.Cast\nBot1.Pass\n\
+                    Bot1.Battlefield.Mox Pearl.Activate\nBot1.Battlefield.Mox Jet.Activate\nBot1.Battlefield.Mox Emerald.Activate\n\
+                    Bot1.Hand.Abzan Guide.Cast(Ability: Morph)\nBot1.Pass\nBot2.Pass\n\n[Expect]\nBot1.Battlefield..FaceDownName = Abzan Guide\n";
+        for winner in [None, Some(2)] {
+            let mut session = Session::scenario(text, "ended", Vec::new(), &[]).ok().unwrap();
+            let step = session.step();
+            assert_eq!(step["Scenario"]["Verdict"]["Passed"], true, "{step}");
+            assert_eq!(step["Finished"], false);
+            let step = session.end(winner).ok().unwrap();
+            assert_eq!(step["Finished"], true, "{winner:?}");
+            assert_eq!(step["Outcome"], if winner.is_some() { "TeamWon" } else { "Draw" }, "{winner:?}");
+            for seat in ["1", "2"] {
+                let events = step["Events"][seat].as_array().unwrap();
+                let revealed = of_type(events, "CardsRevealedEvent");
+                assert_eq!(revealed.len(), 1, "{winner:?}: seat {seat}: {events:?}");
+                assert_eq!(revealed[0]["Player"], 1);
+                let handle = &revealed[0]["Cards"][0];
+                let objects = step["Views"][seat]["Objects"].as_array().unwrap();
+                let object = objects.iter().find(|o| &o["Handle"] == handle).expect("the revealed card is in the view");
+                assert_eq!((object["Known"].clone(), object["FaceDownName"].clone()), (Value::Bool(true), json!("Abzan Guide")), "{winner:?}: seat {seat}");
+                assert_eq!(of_type(events, "GameEndedEvent").len(), 1, "{winner:?}: seat {seat}");
+            }
+            assert!(session.end(None).is_err(), "a game over is not ended again");
+        }
     }
 
     /// Created events and object views publish the actual characteristic name, not the token definition's name

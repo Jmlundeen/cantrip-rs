@@ -114,7 +114,8 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
 
 /// Whether `viewer` may see what a face-down object really is (CR 708.5, 406.3): its controller on the battlefield or on
 /// the stack (a face-down spell, CR 708.4), those who saw it go there anywhere else - and the player controlling any of them (CR 723.4). True of an object that is
-/// face up.
+/// face up. Every seat once the game is over, which reveals every face-down permanent and spell (CR 708.9, `ops::end_game`);
+/// one revealed as its owner left the game was seen by every seat as it ceased to exist (`ops::leave_game`).
 pub fn knows_face(state: &GameState, viewer: PlayerId, id: ObjectId) -> bool {
     knows_face_as(state, id, |p| state.sees_as(viewer, p))
 }
@@ -126,7 +127,7 @@ pub fn knows_face_as(state: &GameState, id: ObjectId, sees_as: impl Fn(PlayerId)
         return true;
     }
     if obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut) || obj.zone.is(ZoneKind::Stack) {
-        sees_as(obj.controller)
+        state.is_over() || sees_as(obj.controller)
     } else {
         state.seats().any(|p| obj.seen_by & (1 << p.0) != 0 && sees_as(p))
     }
@@ -142,9 +143,14 @@ pub fn request_objects(request: &Request) -> HashSet<ObjectId> {
     out
 }
 
-/// The log up to where it can no longer be cut back: the start of the frame waiting on an answer, while one is.
+/// The log up to where it can no longer be cut back: the start of the frame waiting on an answer, while one is. All of it once
+/// the game is over, whatever frame was left waiting: nothing is answered again, and what ended it (the reveals of CR 708.9
+/// among it) reaches every seat.
 pub fn publishable(game: &Game) -> usize {
     let len = game.log.len();
+    if game.is_over() {
+        return len;
+    }
     match game.state.agenda.last() {
         Some(frame) if frame.pending.is_some() => (frame.log_mark as usize).min(len),
         _ => len,
