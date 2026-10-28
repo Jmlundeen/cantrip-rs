@@ -149,11 +149,21 @@ public sealed class GameSession : IDisposable
     public void Forfeit(IReadOnlyList<int> winners)
     {
         ArgumentNullException.ThrowIfNull(winners);
-        _forfeited = true;
-        _published.Clear();
         bool won = winners.Count > 0;
         int team = won ? _rules.Team(winners[0]) : 0;
+
+        // The rules end their game too, so that what every end of a game reveals (CR 708.9: the face-down permanents and
+        // spells) is told to every seat - its events, its views and its log lines - before the game is over.
+        RulesStep? ended = _rules.IsOver ? null : _rules.End(won ? winners[0] : null);
+        _forfeited = true;
+        _published.Clear();
         _forfeit = new GameOverMessage { Outcome = won ? GameOutcomeView.TeamWon : GameOutcomeView.Draw, WinningTeam = team };
+        if (ended is not null)
+        {
+            Publish(ended);
+            return;
+        }
+
         foreach (PlayerId id in Seats)
         {
             _outbox[id].Enqueue(new GameOverMessage { Outcome = _forfeit.Outcome, WinningTeam = _forfeit.WinningTeam });
@@ -868,13 +878,12 @@ public sealed class GameSession : IDisposable
 
         if (step.Finished)
         {
+            // A game ended from outside its rules (Forfeit) is over as that says, whatever the rules made of it.
             foreach (PlayerId id in Seats)
             {
-                _outbox[id].Enqueue(new GameOverMessage
-                {
-                    Outcome = _rules.Outcome,
-                    WinningTeam = _rules.WinningTeam,
-                });
+                _outbox[id].Enqueue(_forfeit is { } forfeit
+                    ? new GameOverMessage { Outcome = forfeit.Outcome, WinningTeam = forfeit.WinningTeam }
+                    : new GameOverMessage { Outcome = _rules.Outcome, WinningTeam = _rules.WinningTeam });
             }
         }
 

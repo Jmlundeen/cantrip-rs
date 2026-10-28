@@ -84,6 +84,13 @@ public interface IRulesHost : IDisposable
     /// </summary>
     RulesStep Leave(int seat);
 
+    /// <summary>
+    /// Ends the game from outside its rules - a draw its players agreed to, a match clock run out, a table abandoned: won by
+    /// <paramref name="winner"/>'s seat, or a draw for none - and says what its end produced: every face-down permanent and
+    /// face-down spell revealed (CR 708.9). Null for a rules host that keeps no game to end.
+    /// </summary>
+    RulesStep? End(int? winner) => null;
+
     /// <summary>A seat's current view, for a client being brought back up to date. Nothing advances.</summary>
     PlayerView View(int seat);
 

@@ -87,6 +87,32 @@ public sealed class DrawOfferTests
         Assert.Equal(nameof(PassAnswer), Assert.Single(rules.Answers).Kind);
     }
 
+    /// <summary>
+    /// A draw agreed to ends the rules' game too (<see cref="IRulesHost.End"/>), so what every end of a game reveals (CR 708.9: a
+    /// face-down permanent) reaches each seat - its event, and its line in the log, still written as the game ends - before
+    /// the one game-over message.
+    /// </summary>
+    [Fact]
+    public void A_draw_agreed_to_tells_every_seat_what_the_end_of_the_game_reveals_before_it_is_over()
+    {
+        (Round rules, GameSession session) = Deal(2);
+        rules.FaceDownAtEnd = new ObjectView { Handle = new ViewHandle(40), FaceDown = true, Known = true, FaceDownName = "Abzan Guide", Zone = ZoneKindView.Battlefield, Owner = 1 };
+
+        session.Submit(Seat(1), new OfferDrawMessage());
+        session.Submit(Seat(2), new AnswerDrawMessage { Accept = true });
+        Assert.True(session.IsOver);
+        Assert.True(session.DrawnByAgreement);
+        foreach ((int seat, List<ServerMessage> sent) in Drain(session))
+        {
+            int revealed = sent.FindIndex(message => message is EventsMessage events && events.Events.OfType<CardsRevealedEvent>().Any());
+            int logged = sent.FindIndex(message => message is LogMessage log && log.Entries.Any(entry => entry.Text == $"{(seat == 1 ? "You reveal" : "Seat 1 reveals")} [Abzan Guide]."));
+            int over = sent.FindIndex(message => message is GameOverMessage);
+            Assert.True(revealed >= 0 && logged > revealed && over > logged, $"seat {seat}: {string.Join(", ", sent.Select(message => message.GetType().Name))}");
+            Assert.Single(sent.OfType<GameOverMessage>());
+            Assert.Equal(GameOutcomeView.Draw, Outcome(sent));
+        }
+    }
+
     /// <summary>A game of three whose last player yet to accept leaves the game (its clock ran out): the rest have agreed.</summary>
     [Fact]
     public void A_draw_is_agreed_when_the_last_player_yet_to_accept_leaves_the_game()
@@ -656,17 +682,50 @@ public sealed class DrawOfferTests
             return Step();
         }
 
+        /// <summary>
+        /// A face-down permanent of seat 1's the end of the game reveals (CR 708.9), which makes these rules end their game
+        /// when it is ended from outside them (<see cref="End"/>); null for rules that end nothing.
+        /// </summary>
+        public ObjectView? FaceDownAtEnd { get; set; }
+
+        private bool _ended;
+
+        public RulesStep? End(int? winner)
+        {
+            if (FaceDownAtEnd is not { } revealed)
+            {
+                return null;
+            }
+
+            _ended = true;
+            return new RulesStep(
+                [],
+                Seats.ToDictionary(seat => seat, seat =>
+                {
+                    PlayerView view = ViewFor(seat);
+                    view.Objects.Add(revealed);
+                    return view;
+                }),
+                Seats.ToDictionary(seat => seat, IReadOnlyList<(long, GameEventView)> (_) =>
+                [
+                    (1, new CardsRevealedEvent { Player = 1, Cards = [revealed.Handle] }),
+                    (2, new GameEndedEvent { Outcome = GameOutcomeView.Draw }),
+                ]),
+                2,
+                true);
+        }
+
         public PlayerView View(int seat) => ViewFor(seat);
 
         public ObjectView? Oracle(string cardId) => null;
 
         private IEnumerable<int> Standing => Seats.Where(seat => !_left.Contains(seat) && !_lost.Contains(seat));
 
-        public bool IsOver => Standing.Count() <= 1;
+        public bool IsOver => _ended || Standing.Count() <= 1;
 
-        public GameOutcomeView Outcome => IsOver ? GameOutcomeView.TeamWon : GameOutcomeView.InProgress;
+        public GameOutcomeView Outcome => _ended ? GameOutcomeView.Draw : IsOver ? GameOutcomeView.TeamWon : GameOutcomeView.InProgress;
 
-        public int WinningTeam => IsOver ? Standing.FirstOrDefault() : 0;
+        public int WinningTeam => !_ended && IsOver ? Standing.FirstOrDefault() : 0;
 
         public IReadOnlyList<RulesAnswer> History => [];
 

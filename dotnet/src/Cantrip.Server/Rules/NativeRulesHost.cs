@@ -259,6 +259,16 @@ public sealed class NativeRulesHost : IRulesHost
         return Take(Send<StepReply>(new { Cmd = "Concede", GameId, Seat = seat }));
     }
 
+    public RulesStep? End(int? winner)
+    {
+        if (!_started || _finished)
+        {
+            return null;
+        }
+
+        return Take(Send<StepReply>(new { Cmd = "End", GameId, Winner = winner }));
+    }
+
     public PlayerView View(int seat)
     {
         if (!_started)
