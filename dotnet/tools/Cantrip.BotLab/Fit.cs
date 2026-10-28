@@ -38,7 +38,8 @@ public static class Fit
         TacticalModel from,
         double general = 200,
         double card = 400,
-        int epochs = 600)
+        int epochs = 600,
+        IReadOnlyCollection<string>? without = null)
     {
         ArgumentNullException.ThrowIfNull(samples);
         ArgumentNullException.ThrowIfNull(from);
@@ -55,7 +56,15 @@ public static class Fit
             }
         }
 
+        // --without: features left out of the fit altogether and weighed at nothing, for a fit to compare one with them against.
+        bool Left(string name) => without?.Any(prefix => name.StartsWith(prefix, StringComparison.Ordinal)) == true;
+        if (without is { Count: > 0 })
+        {
+            from = from.With(from.Weights.Keys.Where(Left).Select(name => KeyValuePair.Create(name, 0.0)).ToList());
+        }
+
         List<string> names = [.. counts
+            .Where(pair => !Left(pair.Key))
             .Where(pair => !pair.Key.StartsWith(TacticalModel.CardPrefix, StringComparison.Ordinal) || pair.Value >= Seen)
             .Select(pair => pair.Key)
             .Order(StringComparer.Ordinal)];

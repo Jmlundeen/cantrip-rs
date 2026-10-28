@@ -50,6 +50,12 @@ public sealed record MatchResult(int Winner, int Starter, int Turns, string Fail
 /// </summary>
 internal static class Match
 {
+    /// <summary>
+    /// The native hosts games are dealt among (<c>--hosts N</c>), a game to each by its shuffle; empty for the one shared host.
+    /// A host answers one request at a time, so on a machine with cores to spare one host is what a run waits on.
+    /// </summary>
+    public static IReadOnlyList<IRulesHostFactory> Hosts { get; set; } = [];
+
     private const int AnswerLimit = 200_000;
 
     /// <summary>
@@ -113,7 +119,8 @@ internal static class Match
             neural.Lane = lane;
         }
 
-        using HostedGame hosted = HostAndPlay.StartTable(lane?.Rules ?? RulesHostFactory.Native, decks, format, seed, [.. decks.Select((_, seat) => $"Bot {seat + 1}")]);
+        IRulesHostFactory rules = lane?.Rules ?? (Hosts.Count > 0 ? Hosts[(int)(seed % (ulong)Hosts.Count)] : RulesHostFactory.Native);
+        using HostedGame hosted = HostAndPlay.StartTable(rules, decks, format, seed, [.. decks.Select((_, seat) => $"Bot {seat + 1}")]);
 
         List<(GameClient Client, IAutoPlayer Bot)> seats = [];
         foreach (int seat in hosted.Seats)

@@ -48,6 +48,14 @@ public static class Program
             return 2;
         }
         EachShuffle = args.Contains("--each-shuffle");
+
+        // --hosts N: games dealt among N native hosts of their own rather than all sent to the one shared host. Not with
+        // --ai-record, whose recording is the shared host's.
+        int hosts = Number(args, "--hosts", 1);
+        if (hosts > 1 && !args.Contains("--ai-record"))
+        {
+            Match.Hosts = [.. Enumerable.Range(0, hosts).Select(_ => (IRulesHostFactory)new NativeRulesHostFactory(NativeHostProcess.Start()))];
+        }
         Mirrors = args.Contains("--mirrors");
         Neural = NeuralOptions.From(root, args);
 
@@ -480,6 +488,8 @@ public static class Program
         string output = Text(args, "--out", Path.Combine(root, "dotnet", "src", "Cantrip.Client", "Tactics", "tactical-model.txt"));
         string from = Text(args, "--from", "prior");
         List<DeckList> decks = Decks(root, args);
+        List<string> without = [.. Text(args, "--without", string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
 
         TacticalModel model = Named(root, from);
 
@@ -515,6 +525,16 @@ public static class Program
             Console.WriteLine(
                 $"  Fitted {report.Features} weights. Log loss on positions kept back: {report.Before:N4} before, {report.After:N4} after; " +
                 $"the favourite won {report.Accuracy:P1} of the time.");
+
+            // --without: the same games fitted again with those features left out and weighed at nothing, written beside the
+            // output, so that what a new feature is worth is a duel between two fits of one set of games.
+            if (without.Count > 0)
+            {
+                (TacticalModel control, FitReport controlReport) = Fit.Run(samples, model, general, card, without: without);
+                string controlPath = Path.ChangeExtension(output, null) + $".without-round{round}.txt";
+                File.WriteAllText(controlPath, control.Write($"Round {round}'s fit without {string.Join(", ", without)}."));
+                Console.WriteLine($"  Without {string.Join(", ", without)}: log loss {controlReport.After:N4}, written to {controlPath}.");
+            }
 
             // A model that predicts better is not thereby a model that plays better, so it is made to play.
             Tally against = Play(
@@ -1206,6 +1226,8 @@ public static class Program
             --games N           how many (default 400)
             --seed N            the first shuffle (default: a new one each run)
             --each-shuffle      every game its own shuffle, not each pair of games (on by itself for a recorded self-duel)
+            --hosts N           deal the games among N native hosts (default 1, the shared one): one host answers
+                                one request at a time, so this is what lets --parallel use the cores; not with --ai-record
             --cards N           which cards a seat won with: the N it did worst and best by, holding one against not
                                 (--least N: only cards held, and not held, in that many games; default 60)
             --ai-record DIR     the native host records every game that ends as AI training shards there
@@ -1240,6 +1262,8 @@ public static class Program
             --from WHICH        prior, shipped, or a path (default prior)
             --out PATH          where the model is written (default: the one the client ships)
             --deck NAME         as for duel
+            --without A,B       also fit the same games with the features whose names start so left out and weighed
+                                at nothing, written beside --out: what to duel a new feature's fit against
 
           tune    moves every weight, policy included, towards winning, by playing the model against itself nudged
             --steps N           how many nudges (default 300)
