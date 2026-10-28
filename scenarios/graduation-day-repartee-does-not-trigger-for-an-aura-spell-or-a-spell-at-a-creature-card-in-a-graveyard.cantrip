@@ -1,0 +1,44 @@
+# Graduation Day: Repartee wants an instant or sorcery spell that targets a creature (CR 109.2: a creature is a permanent).
+# Rancor, an Aura spell, targets Bot1's Ornithopter but is no instant or sorcery; Reanimate, a sorcery, targets a creature card
+# in Bot1's graveyard, which is not a creature. Neither puts a counter on anything Bot1 controls.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Graduation Day
+Ornithopter
+Ornithopter
+Rancor
+Reanimate
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Graduation Day.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Emerald; Mox Jet; Graduation Day; Ornithopter; Rancor; Ornithopter
+Bot1.Battlefield.Rancor.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
