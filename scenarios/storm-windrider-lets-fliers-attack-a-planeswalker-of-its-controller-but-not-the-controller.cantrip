@@ -1,0 +1,60 @@
+# Storm, Windrider: "Creatures with flying can't attack you" (CR 508.1c) forbids attacking Bot1 only - Bot1's planeswalker
+# stays attackable (CR 506.2). Bot1 casts Storm on turn 1 and Jace, the Mind Sculptor on turn 3 (not activated). On turn 4
+# Bot2's Flying Men may not attack Bot1 but may attack Jace, who goes from 3 loyalty to 2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Storm, Windrider
+Jace, the Mind Sculptor
+Island
+Plains x10
+
+[Bot2 Deck]
+Mox Sapphire
+Flying Men
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Storm, Windrider.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Flying Men.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+! Bot2.Attack(Flying Men > Bot1)
+Bot2.Attack(Flying Men > Jace, the Mind Sculptor)
+[T4 Bot2.Main2]
+? Bot1.Life = 20
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 2

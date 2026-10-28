@@ -1,0 +1,85 @@
+# Storm, Windrider: "those creatures" are one list, each object once, fixed as the ability triggers. Bot1's Urgent Necropsy
+# chooses Bot2's Memnite (an artifact creature) as its target artifact and as its target creature, and Bot2's Weaponize the
+# Monsters (an enchantment, not a creature) after it: three slots, two objects. Bot2 counters the Necropsy with Mana Leak (Bot1
+# declines to pay) so both targets are still there to be looked at: the Memnite has gained flying, the enchantment has not.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Storm, Windrider
+Black Lotus
+Urgent Necropsy
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Memnite
+Weaponize the Monsters
+Mana Leak
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Storm, Windrider.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Weaponize the Monsters.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Urgent Necropsy.Cast
+Bot1.Target(Memnite)
+Bot1.Target(Memnite)
+Bot1.Target(Weaponize the Monsters)
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Hand.Mana Leak.Cast(Stack.Urgent Necropsy)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield.Memnite.Keywords = Flying
+Bot2.Battlefield.Weaponize the Monsters.Keywords = (absent)
+Bot1.Graveyard = Urgent Necropsy; Black Lotus
+Exile = Lightning Bolt

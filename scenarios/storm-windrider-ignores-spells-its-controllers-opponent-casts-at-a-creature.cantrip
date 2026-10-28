@@ -1,0 +1,47 @@
+# Storm, Windrider: "Whenever you cast a spell that targets one or more creatures" is Storm's controller only. Bot2 casts
+# Giant Growth on its own Memnite while Bot1 controls Storm: the Growth resolves (Power 4) and the Memnite gains no flying.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Storm, Windrider
+Plains x12
+
+[Bot2 Deck]
+Mox Emerald
+Memnite
+Giant Growth
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Storm, Windrider.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Memnite)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield.Memnite.Power = 4
+Bot2.Battlefield.Memnite.Keywords = (absent)

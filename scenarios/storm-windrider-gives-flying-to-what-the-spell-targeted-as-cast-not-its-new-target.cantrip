@@ -1,0 +1,80 @@
+# Storm, Windrider: "those creatures" are the objects the spell targeted when it was cast, the trigger event; a later change of
+# targets (CR 115.7) is a separate event and changes none of them. Bot1's Giant Growth targets Bot2's Grizzly Bears and
+# Storm's trigger goes on the stack; Bot2 answers with Bolt Bend (full cost: no power-4 creature, Black Lotus makes up the
+# mana) and changes the Growth's target to Memnite. The Bears gain flying; the Memnite, which the Growth now pumps to 4/4,
+# does not.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Storm, Windrider
+Giant Growth
+Plains x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Black Lotus
+Memnite
+Grizzly Bears
+Bolt Bend
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Storm, Windrider.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Giant Growth.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Hand.Bolt Bend.Cast(Stack.Giant Growth)
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Target(Bot2.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Grizzly Bears.Keywords = Flying
+? Bot2.Battlefield.Memnite.Power = 4
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield.Memnite.Keywords = (absent)
+Bot2.Battlefield.Memnite.Toughness = 4
+Bot2.Battlefield.Grizzly Bears.Power = 2
