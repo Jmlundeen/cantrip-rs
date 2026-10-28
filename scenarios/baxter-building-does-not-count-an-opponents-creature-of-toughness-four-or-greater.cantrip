@@ -1,0 +1,46 @@
+# Baxter Building: "Activate only if you control a creature with toughness 4 or greater" (CR 602.5b). On turn 2 Bot2 casts a Wall of
+# Stone (0/8); on turn 3 Bot1 controls only a Grizzly Bears (2/2), so with four Moxen's mana to pay the {4} the draw is still not
+# offered: the opponent's creature does not count.
+
+[Bot1 Deck]
+Baxter Building
+Black Lotus
+Grizzly Bears
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Wall of Stone
+Island x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Ability: Sacrifice; Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Baxter Building.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Ability: Sacrifice; Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Baxter Building.Activate(Ability: Draw a card)
+
+[Expect]
+Bot2.Battlefield.Wall of Stone.Toughness = 8
+Bot1.Battlefield.Grizzly Bears.Toughness = 2
