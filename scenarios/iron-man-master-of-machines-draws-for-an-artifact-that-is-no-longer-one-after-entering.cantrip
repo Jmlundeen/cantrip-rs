@@ -1,0 +1,49 @@
+# Iron Man, Master of Machines: the artifact that entered is judged as it entered (CR 603.6a), not as it is now. Turn 1 Bot1
+# casts Iron Man off three Moxen and an Island. Turn 3 he casts Ornithopter (an artifact creature), then Kenrith's Transformation makes it
+# an Elk creature (drawing a card) - no longer an artifact. It entered as one under his control this turn, so Iron Man's attack draws:
+# hand 3 (2 would be no draw).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Kenrith's Transformation
+Iron Man, Master of Machines
+Ornithopter
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Iron Man, Master of Machines.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Kenrith's Transformation.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Types = Creature
+[T3 Bot1.Attackers]
+Bot1.Attack(Iron Man, Master of Machines > Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3

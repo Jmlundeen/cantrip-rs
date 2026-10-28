@@ -1,0 +1,53 @@
+# Iron Man, Master of Machines: "if an artifact entered the battlefield under your control this turn" asks what the permanent
+# was as it entered (CR 603.6a), not what it is now. Turn 1 Bot1 casts Iron Man off three Moxen and an Island. Turn 3 he casts
+# Grizzly Bears (not an artifact), then I Am Iron Man makes the Bears an artifact creature (and draws a card). The Bears
+# entered as a non-artifact, so Iron Man's attack draws nothing: hand 1 (2 would be a draw).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+I Am Iron Man
+Iron Man, Master of Machines
+Grizzly Bears
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Iron Man, Master of Machines.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.I Am Iron Man.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Types = Creature; Artifact
+[T3 Bot1.Attackers]
+Bot1.Attack(Iron Man, Master of Machines > Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 1
