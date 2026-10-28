@@ -1,0 +1,46 @@
+# Ultron, Artificial Malevolence: "it becomes a 2/2 Robot Villain creature" names the creature types in its own text, so
+# Artificial Evolution changing Robot to Goblin on Ultron (CR 612.2, 612.1) makes the token a Goblin Villain, not a Robot Villain.
+# Mox Ruby enters after the change and Black Lotus pays {2}; the token copy is a Mox Ruby that is also a 2/2 Goblin Villain creature.
+
+[Bot1 Deck]
+Black Lotus
+Ultron, Artificial Malevolence
+Artificial Evolution
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ultron, Artificial Malevolence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Ultron, Artificial Malevolence)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Robot)
+Bot1.Modes(Goblin)
+? Bot1.Battlefield.Ultron, Artificial Malevolence.Subtypes = Goblin; Villain
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Ability: Sacrifice; Color: Red)
+Bot1.PayCost
+[Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Mox Ruby#2.Types = Artifact; Creature
+Bot1.Battlefield.Mox Ruby#2.Subtypes = Goblin; Villain
+Bot1.Battlefield.Mox Ruby#2.Power = 2
