@@ -1,0 +1,47 @@
+# Browser
+# Ruthless Radrat: "Squad-Exile four cards from your graveyard." (CR 702.157a) Squad is not a kicker, and its cost is cards, not
+# mana: the page asks "Pay squad for Ruthless Radrat?", and says how many times the graveyard lets it be paid. With exactly
+# four Dark Rituals in Bot1's graveyard it is paid once, from the page: the four are exiled and one token copy is made.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Ruthless Radrat
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ruthless Radrat.Cast(Kicked: 1)
+? Client.Bot1.Prompt.Title = Pay squad for Ruthless Radrat?
+Bot1.Choose(Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual
+Bot1.Graveyard =
+Bot1.Battlefield = Mox Jet; Ruthless Radrat; Ruthless Radrat
+Bot1.Battlefield.Ruthless Radrat#2.Token = true
