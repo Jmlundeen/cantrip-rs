@@ -468,7 +468,8 @@ pub const FETCH_BASIC_TAPPED: Question = Question::new(
 /// battlefield `counts` accepts, read through the layers before the one being applied (so a land made an Island in layer 4 is
 /// counted by a layer 7a ability). "You" is the controller of `source` (CR 108.4: the engine keeps the owner as controller off the
 /// battlefield and stack, CR 108.4a, and the caster on the stack): Lumbering Worldwagon's power and Sandman's power and toughness ("works in all zones")
-/// count lands; `counts` is `|c| c.is(CardType::Land)` for them.
+/// count lands; `counts` is `|c| c.is(CardType::Land)` for them, and Desert Were-Worm's "for each Mountain you control" counts the permanents with the Mountain
+/// subtype.
 pub fn count_you_control(q: &dyn LayerQuery, source: ObjectId, counts: &dyn Fn(&Chars) -> bool) -> i16 {
     let state = q.state();
     let obj = state.obj(source);
