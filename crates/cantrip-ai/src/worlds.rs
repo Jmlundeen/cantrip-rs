@@ -174,9 +174,16 @@ pub fn determinize(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: InfoMod
             };
             let library = o.zone.is(ZoneKind::Library);
             let known = k.knows(id);
-            if sees(id) || known.is_some() {
+            // A row the object was before and the seat saw (a card of its hand shuffled back by a mulligan, a card
+            // revealed and then put into its library): the object is that card, whatever the seat can still tell of
+            // which object it is, as a card is the same card in every zone. Dealing it another would deal the seat a
+            // history it did not see (and change its decklist, which counts the rows the deal began with).
+            let seen_before = !hidden;
+            if sees(id) || known.is_some() || seen_before {
                 accounted.entry((o.owner, origin)).or_default().push(front(game, o.card));
-                if known == Some(false) && library {
+                // Its place is dealt anew where the seat does not know it - but not where it sees it now (a library it is
+                // searching shows its order).
+                if library && !sees(id) && known != Some(true) && (known == Some(false) || seen_before) {
                     unplaced.push(id);
                 }
                 continue;

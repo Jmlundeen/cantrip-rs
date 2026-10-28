@@ -420,6 +420,15 @@ at that node, so every node trims moves bad for itself, and an opponent's good r
    answer are search nodes the engine never sees.
 3. Sum the root visits across worlds; play the most visited (sampled proportionally for self-play's opening moves).
 
+**A world is a game the seat could be in.** Its root observation for the seat must be the real one
+(`Config::check_worlds` compares them; `every_world_dealt_shows_the_seat_the_game_it_is_in` requires it over whole
+games, mulligans included). A card the seat saw is that card in every zone, wherever the knowledge has lost track of
+which copy is which object (a hand shuffled back by a mulligan, a revealed card put into a library); a library the
+seat is searching keeps its order; and a request whose waiting run drew on the generator before it (the opening after
+a mulligan: shuffle and redraw) is answered by the network alone, since every world would re-run that run on its own
+generator and deal it again (`search::random_before`, `GameState::random_since`). A world's cancel guard is moved to
+every board a take-back can return to there (`search::world_boards`, `CancelGuard::rekey`).
+
 **The bias, stated.** In each world the tree's Q values come from a fully determined game, so the simulated opponent
 plays as if it knew the AI's hand. Priors from the acting seat's own observation soften this, but values are not
 fixed by it. PIMC overvalues bluffs and plays into tricks it "knows" are absent. The mode gap (below) measures it.

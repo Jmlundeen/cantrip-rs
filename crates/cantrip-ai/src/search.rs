@@ -109,6 +109,10 @@ pub struct Config {
     /// Whether a cut is held only while the trim still holds: a cut edge is restored once its best sibling's value has
     /// fallen so that the edge would no longer be cut (see the module). Off, a cut is for good.
     pub prune_reversible: bool,
+    /// Whether each world's root observation for the seat is compared with the real game's (`Searched::worlds_checked`,
+    /// `worlds_mismatched`): a world the seat could tell from the game it is in is one a deal must never make. Off in play;
+    /// tests turn it on. It changes no answer.
+    pub check_worlds: bool,
 }
 
 impl Default for Config {
@@ -131,6 +135,7 @@ impl Default for Config {
             prune_after: 2,
             prune_after_replies: 1,
             prune_reversible: true,
+            check_worlds: false,
         }
     }
 }
@@ -171,6 +176,16 @@ pub(crate) fn world_boards(real: &Game, world: &Game) -> Vec<(u64, u64)> {
     out
 }
 
+/// Whether a run still waiting in `game` drew on the generator since it began (`GameState::random_since`): re-run in a
+/// fork for search, it would draw otherwise than the game did.
+pub(crate) fn random_before(game: &Game) -> bool {
+    game.state
+        .agenda
+        .iter()
+        .filter(|f| f.pending.is_some() || !f.answers.is_empty())
+        .any(|f| !f.staged && game.state.random_since(Mark(f.mark)))
+}
+
 /// Requests answered with no choice in a row before a line is taken as a draw.
 pub const MAX_FORCED: usize = 2000;
 
@@ -207,6 +222,10 @@ pub struct Searched {
     /// Cut edges restored (`Config::prune_reversible`).
     pub restored: usize,
     pub elapsed: Duration,
+    /// With `Config::check_worlds`: the worlds dealt at the root, and those whose root observation for the seat is not
+    /// the real game's.
+    pub worlds_checked: usize,
+    pub worlds_mismatched: usize,
 }
 
 /// One root sub-step: the tokens chosen before it, its options' tokens, their visits, the one taken.
@@ -785,6 +804,13 @@ pub fn search(
     if !config.searches() {
         return network();
     }
+    // A run still waiting that drew on the generator before this request: any answer runs it again from its start
+    // (`Game::answer`), and a fork's generator is another (`Game::reseed`), so in every world it would draw otherwise -
+    // a mulligan's shuffle and redraw dealt again, a hand the seat never had. No world can be both dealt anew and the
+    // game the seat saw: the network answers alone.
+    if random_before(game) {
+        return network();
+    }
     if mode == InfoMode::Hidden && prior.is_empty() {
         // An empty prior deals an opponent's unseen library as it is (`determinize`): the search would read it.
         return Err(EvalError(
@@ -824,6 +850,7 @@ pub fn search(
         config.worlds.max(1)
     };
     let players = game.state.players.len();
+    let (mut worlds_checked, mut worlds_mismatched) = (0usize, 0usize);
     for w in 0..count {
         let seed = splitmix(config.seed ^ splitmix(w as u64 + 1));
         let mut g = game.fork_for_search();
@@ -857,6 +884,14 @@ pub fn search(
         });
         let world = s.worlds.len() - 1;
         let pos = s.position(world, ks, vec![None; players], guards);
+        if config.check_worlds
+            && let Some(p) = pos
+        {
+            worlds_checked += 1;
+            if s.worlds[world].positions[p].obs != obs {
+                worlds_mismatched += 1;
+            }
+        }
         let root = pos.and_then(|pos| {
             match forward(Machine::new(
                 &s.worlds[world].positions[pos].answering.ask,
@@ -1011,6 +1046,8 @@ pub fn search(
         pruned_shallow: s.pruned_shallow,
         restored: s.restored,
         elapsed: Duration::ZERO,
+        worlds_checked,
+        worlds_mismatched,
     };
     searched.tree_bytes = if counted {
         (crate::alloc::peak() - base).max(0) as usize

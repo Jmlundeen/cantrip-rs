@@ -1381,6 +1381,14 @@ impl GameState {
         }
     }
 
+    /// Whether the generator was drawn on since `mark` (journal entries the journal still holds): for a search's fork,
+    /// whose generator is another, to know whether re-running a run begun at `mark` would draw otherwise than the game
+    /// did (`cantrip_ai::search`). Reads only.
+    pub fn random_since(&self, mark: Mark) -> bool {
+        let from = mark.0.saturating_sub(self.journal.base) as usize;
+        self.journal.entries.get(from..).is_some_and(|tail| tail.iter().any(|u| matches!(u, Undo::Rng(_))))
+    }
+
     /// A random number below `bound`, from the state's own generator.
     pub fn random(&mut self, bound: u32) -> u32 {
         let old = self.rng;

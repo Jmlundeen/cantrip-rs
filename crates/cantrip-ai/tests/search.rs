@@ -660,3 +660,71 @@ fn searched_answers_are_accepted() {
     assert!(t.requests > 100 && t.searched > 30, "{t:?}");
     assert!(t.refused.is_empty(), "{:#?}", t.refused);
 }
+
+/// A decklist of `decks/standard`, its main deck only.
+fn deck(name: &str) -> Vec<String> {
+    let text = std::fs::read_to_string(root().join("decks/standard").join(name)).expect("the decklist");
+    let mut out = Vec::new();
+    for line in text.lines().map(str::trim) {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        if line.eq_ignore_ascii_case("sideboard") || line.eq_ignore_ascii_case("companion") {
+            break;
+        }
+        if let Some((n, card)) = line.split_once(' ')
+            && let Ok(n) = n.parse::<usize>()
+        {
+            out.extend(std::iter::repeat_n(card.trim().to_string(), n));
+        }
+    }
+    out
+}
+
+/// Every world a search deals shows the seat the game it is in: over whole games of both seats searching, mulligans
+/// included (the tiny network mulligans often: hands shuffled back, cards bottomed), each world's root observation is
+/// the real one. A hand card a mulligan shuffled back, or a revealed card put into a library, is that card in every
+/// world; a library the seat is searching keeps its order; and a run that drew on the generator before its request (a
+/// mulligan's shuffle and redraw) is answered without worlds, since every world would deal it again.
+#[test]
+fn every_world_dealt_shows_the_seat_the_game_it_is_in() {
+    let evaluator = TractEvaluator::load(&tiny(), table()).unwrap();
+    let decks = [deck("dimir-midrange.txt"), deck("boros-dragons.txt")];
+    let (mut searched, mut checked, mut mismatched) = (0usize, 0usize, 0usize);
+    for seed in 0..2u64 {
+        let mut game = deal(&[decks[0].clone(), decks[1].clone()], 77_000 + seed, true, None).unwrap();
+        let mut ks: Vec<Knowledge> = game.state.seats().map(Knowledge::new).collect();
+        let mut payments = vec![cantrip_ai::net::Payment::default(); 2];
+        for _ in 0..1500 {
+            if game.is_over() || game.state.turn.number > 12 {
+                break;
+            }
+            let Some(request) = game.pending().cloned() else { break };
+            let p = request.player.index();
+            ks[p].update(&game);
+            let config = Config {
+                worlds: 4,
+                seed: request.id as u64,
+                check_worlds: true,
+                ..Config::simulations(16)
+            };
+            let k = &ks[p];
+            let d = payments[p]
+                .decide(&game, &request, k, InfoMode::Decklist, |request, guard| {
+                    search::search(&game, request, k, InfoMode::Decklist, table(), &evaluator, &config, prior(), guard, &WallClock)
+                })
+                .unwrap();
+            if let Some(s) = d.search.as_ref().filter(|s| s.worlds_checked > 0) {
+                searched += 1;
+                checked += s.worlds_checked;
+                mismatched += s.worlds_mismatched;
+            }
+            let board = cantrip_ai::cancel::board_hash(&game.state);
+            payments[p].played(&game, board, &request, &d.answer);
+            game.answer(request.id, request.player, d.answer).expect("the answer is taken");
+        }
+    }
+    println!("{searched} searches, {checked} worlds dealt, {mismatched} unlike the game");
+    assert!(searched > 20 && checked > 100, "too few worlds dealt to check: {searched} searches, {checked} worlds");
+    assert_eq!(mismatched, 0, "worlds the seat could tell from its game, of {checked} over {searched} searches");
+}
