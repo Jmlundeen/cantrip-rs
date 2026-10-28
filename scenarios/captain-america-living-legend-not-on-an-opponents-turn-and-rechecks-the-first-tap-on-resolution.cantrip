@@ -1,0 +1,85 @@
+# Captain America, Living Legend: "Whenever a creature you control becomes tapped during your turn, if it's the first time
+# that creature has become tapped this turn, untap it." Turn 2 is Bot2's: Bot2's Pestermite taps the Captain, which stays
+# tapped (not during Bot1's turn). Turn 3: Bot1 taps Llanowar Elves for mana, its first tap, and the ability triggers. In
+# response Bot1's own Pestermite untaps the Elves and Bot1 taps them again (no trigger: not the first time). The intervening
+# "if" is checked again as the ability resolves (CR 603.4): the Elves have now been tapped twice this turn, so it does
+# nothing and they stay tapped.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Captain America, Living Legend
+Llanowar Elves
+Pestermite
+Island x13
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Pestermite
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Captain America, Living Legend.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Pestermite.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot1.Battlefield.Captain America, Living Legend)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(Tap)
+[T2 Bot2.End]
+? Bot1.Battlefield.Captain America, Living Legend.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Pestermite.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Untap)
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Activate
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = true
