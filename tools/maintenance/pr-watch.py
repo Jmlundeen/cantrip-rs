@@ -123,8 +123,11 @@ def run_session(dry_run):
         sys.exit("pr-watch: claude is not on PATH")
     log = STATE / (datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log")
     print(f"{stamp()} starting a Claude Code session; its output goes to {log}", flush=True)
+    # `claude -p` otherwise stops background subagents 10 minutes after the session's last turn - the review agents,
+    # killed mid-review with their slot leased and a break edit still in it.
+    env = dict(os.environ, CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS="0")
     with open(log, "w", encoding="utf-8") as out:
-        code = subprocess.run(cmd, cwd=ROOT, stdout=out, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL).returncode
+        code = subprocess.run(cmd, cwd=ROOT, env=env, stdout=out, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL).returncode
     print(f"{stamp()} the session ended (exit {code}); its report:", flush=True)
     print(log.read_text(encoding="utf-8", errors="replace").rstrip()[-4000:], flush=True)
 
