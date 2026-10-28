@@ -454,6 +454,16 @@ public sealed class Champion
                     {
                         checking.Check(check.Selected);
                     }
+                    else if (sent is CheckBlocksMessage blocks && Outbound is { } blocking)
+                    {
+                        // A declaration of blockers or of attackers is settled with the host before it is answered: a champion
+                        // whose check went nowhere would wait on a verdict for ever.
+                        blocking.CheckBlocks(blocks.Blocks);
+                    }
+                    else if (sent is CheckAttacksMessage attacks && Outbound is { } attacking)
+                    {
+                        attacking.CheckAttacks(attacks.Attacks);
+                    }
 
                     return null;
 
