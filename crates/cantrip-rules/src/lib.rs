@@ -94,6 +94,8 @@ mod instant_sorcery_entering_tests;
 #[cfg(test)]
 mod enters_as_tests;
 #[cfg(test)]
+mod left_battlefield_tests;
+#[cfg(test)]
 mod land_text_tests;
 #[cfg(test)]
 mod leave_game_tests;
