@@ -17,6 +17,20 @@ pub fn for_artifacts(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Coste
     less_for_each_permanent(q, player, costed, |id| q.chars(id).is(CardType::Artifact))
 }
 
+/// A spell costs {1} less to cast for each artifact creature you control (CR 702.41a). Borg Cube and Urza, Chief Artificer
+/// print affinity for artifact creatures.
+pub fn for_artifact_creatures(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    if !matches!(costed, Costed::Spell(_)) {
+        return CostDelta::NONE;
+    }
+    let creatures = q
+        .permanents_of(player)
+        .into_iter()
+        .filter(|&id| q.chars(id).is(CardType::Artifact) && q.chars(id).is(CardType::Creature))
+        .count();
+    CostDelta::less(creatures.min(255) as u8)
+}
+
 /// "Affinity for [basic land type]es" (CR 702.41a): this spell costs {1} less to cast for each land of that type you control,
 /// `TYPE` being `lands::sub(Subtype::Forest)` and so on. The type is a word of the spell's rules text, read through its words
 /// (CR 612.2), and a land has it when the layers made it that type (a Forest is any land with the subtype, basic or not).
