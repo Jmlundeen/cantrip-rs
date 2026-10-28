@@ -1,0 +1,61 @@
+# The Black Arrow: "If a Dragon is dealt damage this way, destroy it." Bot1 flashes it in at Bot2's end step and its 1 damage goes to
+# Bot2's Scion of Ugin, a 4/4 Dragon Spirit (a Dragon by its printed type line, no changeling): the damage alone would not kill it, the
+# destruction does (CR 120.3, 701.8a, 205.3m).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+The Black Arrow
+Island x17
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island
+Scion of Ugin
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Scion of Ugin.Cast
+Bot2.Pass
+[T2 Bot2.End]
+? Bot2.Battlefield.Scion of Ugin.Toughness = 4
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Black Arrow.Cast
+Bot1.Pass
+Bot1.Target(Scion of Ugin)
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Scion of Ugin
+Bot2.Battlefield = Island; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald
