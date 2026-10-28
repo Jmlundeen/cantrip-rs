@@ -1,0 +1,46 @@
+# Beast, Erudite Aerialist flies only for "+1/+1 counters" you put on him this turn (CR 611.3a): on turn 3 Bot1's Requiting Hex
+# blights him, a -1/-1 counter that Bot1 put on him this turn, and he does not fly: only the kind of counter is different from
+# the scenario where he does.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Beast, Erudite Aerialist
+Requiting Hex
+Island x3
+Island x14
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Beast, Erudite Aerialist.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Choose(Beast, Erudite Aerialist)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Memnite = (absent)
+Bot1.Battlefield.Beast, Erudite Aerialist.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Beast, Erudite Aerialist.Keywords = (absent)
