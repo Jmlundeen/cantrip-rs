@@ -1,0 +1,64 @@
+# Sheltering Ancient "Cumulative upkeep--Put a +1/+1 counter on a creature an opponent controls." (CR 702.24a). At Bot1's turn 3
+# upkeep the Ancient gets its first age counter and Bot1 puts a counter on Bot2's Balduvian Bears (the positive control). Bot1 then
+# casts Solemnity ("Counters can't be put on creatures", CR 122.6). At turn 5 no age counter is put on the Ancient (it keeps
+# its one) and a cost that puts counters on a creature can't be paid (CR 118.3, Solemnity's ruling), the Bears being a creature
+# they can't be put on: paying is not offered, the Ancient is sacrificed, and the Bears still has one counter.
+
+[Bot1 Deck]
+Sheltering Ancient
+Mox Emerald
+Forest
+Mox Pearl
+Plains
+Solemnity
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Balduvian Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sheltering Ancient.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Balduvian Bears.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+? Bot1.Battlefield.Sheltering Ancient.Counters.Age = 1
+? Bot2.Battlefield.Balduvian Bears.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Pass
+[T5 Bot1.Upkeep]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield.Balduvian Bears.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Sheltering Ancient

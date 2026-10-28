@@ -22,8 +22,7 @@ pub use cantrip_api as api;
 /// The cost of a cumulative upkeep ability, paid once for each age counter (CR 702.24a).
 #[derive(Clone, Copy)]
 pub enum Payment {
-    /// "Cumulative upkeep {1}": mana, `times` the age counters over (a cost whose multiple doesn't fit a mana cost can't be
-    /// paid by anyone).
+    /// "Cumulative upkeep {1}": mana, the cost multiplied by the age counters.
     Mana(ManaCost),
     /// "Cumulative upkeep--Pay 1 life.": this much life for each age counter (CR 119.4).
     Life(u8),
@@ -100,11 +99,16 @@ fn your_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> 
     }
 }
 
-/// Whether the creatures of the opponents of `payer` that a counter could be put on are there: any creature on the battlefield
-/// one of them controls.
+/// The creatures of the opponents of `payer` that a +1/+1 counter can be put on: a creature one of them controls, except one
+/// that can't have counters put on it, since a cost that puts counters on a creature can't be paid while they can't be (CR
+/// 101.2, 118.3; Solemnity's ruling).
 fn opposing_creatures(g: &dyn Game, payer: PlayerId) -> Vec<ObjectId> {
     let opponents: Vec<PlayerId> = g.state().opponents(payer).collect();
-    g.state().battlefield().iter().copied().filter(|&id| opponents.contains(&g.controller(id)) && g.chars(id).is(CardType::Creature)).collect()
+    let creatures = g.state().battlefield().iter().copied();
+    creatures
+        .filter(|&id| opponents.contains(&g.controller(id)) && g.chars(id).is(CardType::Creature))
+        .filter(|&id| !g.counters_banned(id, g.controller(id), CounterKind::PlusOne))
+        .collect()
 }
 
 /// The graveyards with two cards in them or more, who owns each.
@@ -127,18 +131,17 @@ fn paid_if<T>(g: &mut dyn Game, of: Option<T>, pay: impl FnOnce(&mut dyn Game, T
 /// 702.24a).
 fn pay(g: &mut dyn Game, item: &StackItem, payment: Payment, age: u32) -> Result<bool, Suspend> {
     let (payer, this) = (item.controller, item.object);
-    // A multiple that doesn't fit what a cost holds - 256 age counters - is a cost nobody can pay.
-    let count = u8::try_from(age).ok();
     let may = |g: &mut dyn Game, question: &'static Question| Ok(matches!(g.ask(payer, RequestKind::May { source: this, purpose: Purpose::Ask(question) })?, Answer::Yes));
     match payment {
-        Payment::Mana(mana) => paid_if(g, mana.times(u16::try_from(age).unwrap_or(u16::MAX)), |g, total| g.may_pay(payer, this, this, Cost::mana(total), &PAY)),
+        // Mana is the one payment held in a byte a symbol (and a mana pool in a byte a type): a total past 255 of one symbol is
+        // beyond what a player can make in a game (docs/known-issues.md), not a count to clamp.
+        Payment::Mana(mana) => paid_if(g, mana.times(age), |g, total| g.may_pay(payer, this, this, Cost::mana(total), &PAY)),
         Payment::Life(life) => g.may_pay(payer, this, this, Cost { life: u32::from(life) * age, ..Cost::NONE }, &PAY),
-        Payment::Sacrifice(filter) => paid_if(g, count, |g, count| g.may_pay(payer, this, this, Cost::sacrifice(count, filter), &SACRIFICE)),
-        Payment::PutMinusOneMinusOneCounterOnThis => {
-            paid_if(g, count, |g, count| g.may_pay(payer, this, this, put_counters(CounterKind::MinusOne, count), &COUNTER_ON_THIS))
-        }
+        Payment::Sacrifice(filter) => g.may_pay(payer, this, this, Cost::sacrifice(age, filter), &SACRIFICE),
+        Payment::PutMinusOneMinusOneCounterOnThis => g.may_pay(payer, this, this, put_counters(CounterKind::MinusOne, age), &COUNTER_ON_THIS),
         Payment::PutPlusOnePlusOneCounterOnAnOpposingCreature => {
-            if opposing_creatures(g, payer).is_empty() || !may(g, &COUNTER_ON_OPPOSING)? {
+            // Paid zero times, with no age counter on it (Solemnity's ruling), the cost is always payable.
+            if (age > 0 && opposing_creatures(g, payer).is_empty()) || !may(g, &COUNTER_ON_OPPOSING)? {
                 return Ok(false);
             }
             for _ in 0..age {
@@ -152,7 +155,8 @@ fn pay(g: &mut dyn Game, item: &StackItem, payment: Payment, age: u32) -> Result
         }
         Payment::OpponentGainsLife(life) => {
             let can = |g: &dyn Game| g.state().opponents(payer).filter(|&p| g.can_gain_life(p)).collect::<Vec<_>>();
-            if can(g).is_empty() || !may(g, &LIFE_FOR_OPPONENTS)? {
+            // Paid zero times, with no age counter on it (Solemnity's ruling), the cost is always payable.
+            if (age > 0 && can(g).is_empty()) || !may(g, &LIFE_FOR_OPPONENTS)? {
                 return Ok(false);
             }
             for _ in 0..age {

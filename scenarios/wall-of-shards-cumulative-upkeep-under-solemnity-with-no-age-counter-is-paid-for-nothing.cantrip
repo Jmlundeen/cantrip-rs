@@ -1,0 +1,55 @@
+# Wall of Shards "Cumulative upkeep--An opponent gains 1 life." (CR 702.24a) with Solemnity out (no counter on a creature) and
+# Bot2's Sunspine Lynx (players can't gain life, CR 119.7). The Wall arrives in turn 3; at turn 5 it can't get an age counter,
+# so the cost is paid zero times, and Solemnity's ruling says "If it has no age counters on it, you may pay {0}": the payment
+# is offered although no opponent can gain life, Bot1 accepts and keeps the Wall. Bot2's life is still 20.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Plains
+Solemnity
+Wall of Shards
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Sunspine Lynx
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sunspine Lynx.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wall of Shards.Cast
+Bot1.Pass
+[T5 Bot1.Upkeep]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T5 Bot1.Main1]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Wall of Shards.Power = 1

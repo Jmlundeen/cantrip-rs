@@ -1,0 +1,45 @@
+# Sheltering Ancient "Cumulative upkeep--Put a +1/+1 counter on a creature an opponent controls." (CR 702.24a) under Solemnity
+# ("Counters can't be put on creatures", CR 122.6). Bot2 controls no creature. The Ancient arrives in turn 3; at turn 5 its age
+# counter can't be put on it, so it has none, and the cost is paid zero times: Solemnity's ruling (2017-07-14) "If it has no age
+# counters on it, you may pay {0}". Bot1 is offered the payment even with no creature to put counters on, accepts, and keeps the
+# Ancient.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Plains
+Solemnity
+Sheltering Ancient
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sheltering Ancient.Cast
+Bot1.Pass
+[T5 Bot1.Upkeep]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Sheltering Ancient.Power = 5
+Bot1.Graveyard.Count = 0
