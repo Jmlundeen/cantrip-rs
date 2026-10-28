@@ -79,6 +79,27 @@ fn a_web_slinging_cast_row_says_its_creature_is_chosen_after_the_mana() {
     assert!(saw_web && saw_printed);
 }
 
+/// A cast face down by morph that a permission makes possible (CR 702.37c, 601.3e: Mystic Forge, from the top of the library)
+/// is marked so, as one from the hand is: its row is a face-down cast for {3}, and the card's ordinary cast is not offered.
+#[test]
+fn a_face_down_cast_a_permission_offers_says_so() {
+    let mut saw = false;
+    play_looking("mystic-forge-casts-a-morph-card-face-down-from-the-top-of-the-library", |_, views, step| {
+        if let Some(card) = views[0].objects.iter().find(|o| o.name == "Abzan Guide") {
+            let handle = serde_json::to_value(card.handle).unwrap();
+            let mut rows = Vec::new();
+            fields(&step["Requests"], "CastFaceDown", Some(&handle), &mut rows);
+            for (description, face_down) in rows {
+                assert!(description.contains("Morph {2}{W}{B}{G}"), "{description}");
+                assert_eq!(face_down, Value::Bool(true), "{description}");
+                saw = true;
+            }
+        }
+        false
+    });
+    assert!(saw, "the face-down cast from the top of the library was never offered");
+}
+
 /// Two permissions that would each let a card be cast for the same alternative cost (Lurrus of the Dream-Den's and Serra
 /// Paragon's, each with Primal Prayers' {E}) are two rows, each naming the permanent whose permission it is (CR 601.2b).
 #[test]

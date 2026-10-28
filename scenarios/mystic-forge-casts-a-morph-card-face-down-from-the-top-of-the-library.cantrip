@@ -1,0 +1,49 @@
+# Mystic Forge lets Bot1 cast colorless spells from the top of its library (CR 601.3e): Abzan Guide on top is a green, white
+# and black card, but cast face down by morph (CR 702.37c, 708.4) it is a colorless 2/2 spell, so the Forge's permission lets
+# it be cast so for {3}, paid with Sol Ring and Mox Ruby. On the stack it is face down, and it resolves as a nameless 2/2. The
+# host marks the cast as face down for the menu (`a_face_down_cast_a_permission_offers_says_so`).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mystic Forge
+Sol Ring
+Mox Ruby
+Island
+Island
+Abzan Guide
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mystic Forge.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Library.Abzan Guide.Cast(Ability: Morph)
+? Stack..FaceDown = true
+? Stack..FaceDownName = Abzan Guide
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield..FaceDown = true
+Bot1.Battlefield..FaceDownName = Abzan Guide
+Bot1.Battlefield..Power = 2
+Bot1.Battlefield..Toughness = 2
+Bot1.Library.Count = 10
