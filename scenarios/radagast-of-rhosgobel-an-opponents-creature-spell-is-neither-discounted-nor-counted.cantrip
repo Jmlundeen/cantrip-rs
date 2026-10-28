@@ -1,0 +1,69 @@
+# Radagast of Rhosgobel: "The first creature spell you cast each turn costs {2} less to cast and can be cast as though it had
+# flash" - only its controller's spells, and only theirs counted. On turn 2 Bot2's Grizzly Bears, Bot2's first creature spell
+# that turn, costs its full {1}{G} (two Moxen pay it exactly, none left floating). It is not one Bot1 cast, so at the end of that
+# turn Bot1's own Grizzly Bears is still the first and is flashed in for {G}. On turn 3 Bot2 is refused a creature spell in Bot1's
+# main phase, with a Mox Emerald and a Mox Jet untapped to pay for it: Radagast gives Bot2 no flash.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Radagast of Rhosgobel
+Grizzly Bears
+Plains x10
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Emerald
+Mox Jet
+Grizzly Bears
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Radagast of Rhosgobel.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Grizzly Bears.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Grizzly Bears.Power = 2
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+[T3 Bot1.Main1]
+! Bot2.Hand.Grizzly Bears.Cast
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears.Power = 2
