@@ -1,0 +1,54 @@
+# Wargling: "Ferocious - Whenever this creature attacks while you control a creature with power 4 or greater, until end of turn,
+# this creature gets +1/+0 and creatures you control gain trample." The "while" is part of the trigger event, checked only as
+# Wargling attacks and not again on resolution (no intervening "if", CR 603.4; the ruling). On turn 3 Bot2 exiles the Alpine Grizzly
+# (power 4) with Swords to Plowshares in response to the trigger: it still resolves, a 3/2 Wargling with trample.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Wargling
+Alpine Grizzly
+Plains x10
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wargling.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Wargling > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Alpine Grizzly)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Alpine Grizzly = (absent)
+Bot1.Battlefield.Wargling.Power = 3
+Bot1.Battlefield.Wargling.Toughness = 2
+Bot1.Battlefield.Wargling.Keywords = Trample
