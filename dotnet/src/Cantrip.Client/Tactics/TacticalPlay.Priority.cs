@@ -22,6 +22,9 @@ public sealed partial class TacticalPlay
     {
         IReadOnlyList<ObjectView> stack = client.Zone(ZoneKindView.Stack, 0);
 
+        // What a payment keeps open is the plan of the action about to be taken, and only that one.
+        _keepOpen = [];
+
         // Whatever was last tried has had its chance once the stack is empty again. A board that reads the same as
         // before it — a spell given up while paying, an ability that resolved and changed nothing — says it was not
         // worth doing, and it is not done again this turn: which is what stops a seat with no rules engine from
@@ -547,6 +550,7 @@ public sealed partial class TacticalPlay
 
         // Permanents first: whatever triggers on a noncreature spell is then already there to see the others cast.
         Candidate first = plan.OrderByDescending(candidate => candidate.Permanent).ThenByDescending(candidate => candidate.Gain).First();
+        KeepOpen(client, view, plan, first, candidates, budget, reserve);
         return Take(view, first);
     }
 
@@ -2209,6 +2213,12 @@ public sealed partial class TacticalPlay
             && NewColorFor(prompt) is { } colorful)
         {
             return colorful.Kind == ActionKindView.AssignMana ? AutoPlay.Assign(colorful) : AutoPlay.Answer(colorful);
+        }
+
+        // The source that leaves open the mana for what this seat means to do next (TacticalPlay.Mana).
+        if (Planned(client, prompt) is { } planned)
+        {
+            return planned;
         }
 
         // Generic mana, with nothing else owed and nothing to choose but which source: the one that leaves the most

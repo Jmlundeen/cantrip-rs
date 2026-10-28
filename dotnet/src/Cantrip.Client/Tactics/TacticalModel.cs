@@ -161,6 +161,9 @@ public sealed class TacticalModel
         // Draw-go: with mana kept up for a counterspell on its own turn, an instant or a flash card waits for the end
         // of the opponent's turn, when the counterspell has not been needed: 1, or 0 to cast it now, as before.
         ["policy.drawgo"] = 0.00,
+        // Whether a payment taps the sources that leave open the mana for the rest of the turn's plan and the instant held
+        // up for the opponent's turn: 1, or 0 for the first source that pays, as before.
+        ["policy.payplan"] = 1.00,
     });
 
     /// <summary>Reads weights as <c>name = value</c> lines over the prior; <c>#</c> starts a comment.</summary>

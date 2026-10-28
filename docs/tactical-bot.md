@@ -137,6 +137,26 @@ seat can be named with a weight set: `--a tactical --b tactical+policy.crew=0` i
 crewing on and off. `--has "Smuggler's Copter"` keeps only the decks of a pool that have the card the behaviour is
 about, which is where a behaviour about one card shows.
 
+Because the bot is deterministic, a pair of games (seats swapped, one shuffle) in which the two seats never decide
+differently comes out one each, and the whole difference is in the games where they do: a seat against itself, or a
+weight set to what it already is, comes out exactly even. That is why a behaviour that changes one game in twenty
+needs thousands of games to show, and why a tally within its margin of 50% is a behaviour that did no measurable
+harm, not one that helped.
+
+**A new feature.** A feature of the position is measured against the weights that ship, not against a refit of all
+of them: `train --only A,B --from shipped` fits only the weights whose names start so, every other weight kept as it
+came, and the fit is then duelled against the champion, on more than one pool. A refit of every weight over a new
+pool can lose more than a feature gains (a refit over `decks/standard` from the shipped weights won 45.7% of 4200
+against them), and a fit that wins on one pool can lose on another: the shipped weights were tuned by play on the RW
+aggro mirror, and every perturbation of them tried so far has cost a few points there. `train --without A,B` fits the
+same games a second time with those features left out and weighed at nothing, written beside the output, for a duel
+between two fits of one set of games.
+
+**Many hosts.** A native host answers one request at a time, so a duel, a fit or a tuning with every game on the one
+shared host waits on a single core whatever `--parallel` says. `--hosts N` deals the games among N hosts of the lab's
+own (not with `--ai-record`); the games and the results are the same. Several duel processes with their own
+`--seed`, their tallies added, do the same from outside.
+
 **The cards it wins with.** `duel --cards N` says, for each card, how often a seat won the games in which it held
 the card at some point against the games with the same decks in which it never did. In a mirror both seats have the
 card in their deck, so the deck is no part of the difference; what is left is whether drawing the card helped the
@@ -177,6 +197,32 @@ Diamond cast while the mana is being built (`imprint`), a planeswalker in hand c
 (`walkercast`), and graveyard hate used as that (`graveyard`): Soul-Guide Lantern or Ghost Vacuum exiling a creature
 an opponent's spell is bringing back, kept rather than cashed in while their graveyard holds a creature of mana value
 six or more, and aimed at their creature cards first. Mox Amber is mana only with a legend out.
+
+**Paying** (`TacticalPlay.Mana`, `payplan`). Which source pays follows the plan the payment is part of: when it takes
+the first action of a turn's plan, the seat notes the mana costs of the rest of that plan and of the instant it would
+hold up through the opponent's turn (the counterspell its mana is kept back for, or else the best instant-speed play
+left out of the plan that the mana after it still covers), and each mana ability it uses is one after which every
+symbol still owed and every cost kept open can still be paid, a source to a symbol. Failing that it lets go of the
+held instant, then of each later play. Of the sources that keep the plan whole it takes the one that costs no life,
+then the one that wastes least (a Sol Ring for one generic wastes one), then a plain land before an artifact and
+either before a creature, a land that becomes one or a land with another ability, then the one that makes the
+fewest colours. A cost with X, mana already in the pool, and costs paid by tapping or exiling permanents are paid as
+before. Against the seat paying the first source that fit, 2110 of 4200 Standard games (50.2% +/- 1.5%): the plays
+it saves are rare, and it gave nothing away.
+
+Tried and not kept, each against the bot without it over the 67 decks of `decks/standard` (4200 games unless said),
+so that the next attempt starts from the numbers. Most ideas are after Forge's AI.
+
+| idea | won |
+|---|---|
+| mulligan by the hand's plays on time, hypergeometric over the library left, London bottom by the best kept set (four versions of the bars and the bottoming) | 49.0% to 49.5% |
+| the attack back feared more when losing the race and less when winning it (turns to kill each way) | 49.8%, 49.7% at double weight |
+| instant-speed removal held through its own turn for the opponent's, after combat / in both main phases | 50.1% / 48.2% of 3357 |
+| permanents that do nothing for this turn's combat cast after it, their mana kept | 49.6% |
+| a creature's mana value, ward, abilities, state, and lands that do more than make mana, as fitted features | 51.5% here, but 47.3% on the RW aggro mirror and 48.4% on UB reanimator (2000 each) |
+
+The mulligan rule is the one most worth a second look: its decisions differ from two-to-five-lands in few hands at
+seven, and most of what it changed was the London bottom and the six-card keeps.
 
 ## Its own account of a game
 
