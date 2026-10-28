@@ -28,7 +28,11 @@
 //! once it has been descended `Config::prune_after` times and an opponent node below it has been expanded
 //! (`Config::prune_after_replies`). The best edge at a node is never cut, so every node keeps an option; an unvisited
 //! edge, an edge with no child yet, and an edge with virtual loss are never cut. `Child::Dead` (the engine refused an
-//! answer) is not a trim and stays as it was.
+//! answer) is not a trim and stays as it was. A cut holds only while the trim does (`Config::prune_reversible`): an
+//! edge's value is frozen when it is cut, at a shallow estimate, while its siblings' values keep moving as the search
+//! finds the replies to them, so each later path restores the cut edges at its nodes that the rule would no longer cut.
+//! Cut for good, an edge measured against a sibling's early, optimistic value was never looked at again once that
+//! sibling's value fell below it.
 //!
 //! Worlds: in Full mode the search plays in one fork of the game; in Decklist and Hidden modes in `Config::worlds`
 //! worlds dealt by `determinize` from the seat's knowledge, the root's visits summed over them by the option's token.
@@ -102,6 +106,9 @@ pub struct Config {
     pub prune_after: u32,
     /// Opponent decisions below an edge that must have been expanded before it can be cut for being below the best.
     pub prune_after_replies: u32,
+    /// Whether a cut is held only while the trim still holds: a cut edge is restored once its best sibling's value has
+    /// fallen so that the edge would no longer be cut (see the module). Off, a cut is for good.
+    pub prune_reversible: bool,
 }
 
 impl Default for Config {
@@ -123,6 +130,7 @@ impl Default for Config {
             prune_margin: 0.20,
             prune_after: 2,
             prune_after_replies: 1,
+            prune_reversible: true,
         }
     }
 }
@@ -175,6 +183,8 @@ pub struct Searched {
     pub pruned: usize,
     pub pruned_immediate: usize,
     pub pruned_shallow: usize,
+    /// Cut edges restored (`Config::prune_reversible`).
+    pub restored: usize,
     pub elapsed: Duration,
 }
 
@@ -329,6 +339,8 @@ struct Search<'a> {
     pruned: usize,
     pruned_immediate: usize,
     pruned_shallow: usize,
+    /// Cut edges restored once their trim no longer held (`Config::prune_reversible`).
+    restored: usize,
 }
 
 impl Search<'_> {
@@ -588,10 +600,21 @@ impl Search<'_> {
     }
 
     /// Cuts edges of one searched path that the search has already seen enough of, from the root down. Once an edge
-    /// is cut, nothing below it is reachable, so the rest of the path is left alone.
+    /// is cut, nothing below it is reachable, so the rest of the path is left alone. With `prune_reversible`, first
+    /// restores each cut edge at the path's nodes whose trim no longer holds against its siblings as they stand now.
     fn prune(&mut self, path: &[(usize, usize)]) {
         if !self.config.prune {
             return;
+        }
+        if self.config.prune_reversible {
+            for &(n, _) in path {
+                for k in 0..self.nodes[n].edges.len() {
+                    if self.nodes[n].edges[k].pruned && self.trim_holds(n, k).is_none() {
+                        self.nodes[n].edges[k].pruned = false;
+                        self.restored += 1;
+                    }
+                }
+            }
         }
         for &(n, e) in path {
             if self.nodes[n].edges[e].pruned {
@@ -613,10 +636,17 @@ impl Search<'_> {
     /// Whether the edge is to be cut, and why. The value is the edge's mean for the seat choosing at the node, so a
     /// node of either seat trims the moves bad for itself; the best visited edge at a node is never cut.
     fn prune_kind(&self, n: usize, e: usize) -> Option<PruneKind> {
+        if self.nodes[n].edges[e].pruned {
+            return None;
+        }
+        self.trim_holds(n, e)
+    }
+
+    /// Whether the trim rule holds of edge `e` of node `n` against its uncut visited siblings now, cut or not.
+    fn trim_holds(&self, n: usize, e: usize) -> Option<PruneKind> {
         let node = &self.nodes[n];
         let edge = &node.edges[e];
-        if edge.pruned
-            || edge.vl > 0
+        if edge.vl > 0
             || edge.n == 0
             || matches!(edge.child, Child::None | Child::Dead)
         {
@@ -766,6 +796,7 @@ pub fn search(
         pruned: 0,
         pruned_immediate: 0,
         pruned_shallow: 0,
+        restored: 0,
     };
     let count = if mode == InfoMode::Full {
         1
@@ -956,6 +987,7 @@ pub fn search(
         pruned: s.pruned,
         pruned_immediate: s.pruned_immediate,
         pruned_shallow: s.pruned_shallow,
+        restored: s.restored,
         elapsed: Duration::ZERO,
     };
     searched.tree_bytes = if counted {

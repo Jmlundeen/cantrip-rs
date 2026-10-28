@@ -148,6 +148,9 @@ enum Command {
         prune_after: Option<u32>,
         #[serde(rename = "PruneAfterReplies", default)]
         prune_after_replies: Option<u32>,
+        /// Whether a cut is held only while the trim holds (`search::Config::prune_reversible`), if not the default.
+        #[serde(rename = "PruneReversible", default)]
+        prune_reversible: Option<bool>,
     },
     /// The models loaded and the backend.
     Models,
@@ -445,6 +448,7 @@ impl AiHost {
                 prune_margin,
                 prune_after,
                 prune_after_replies,
+                prune_reversible,
             } => {
                 let received = Instant::now();
                 let Some(mirror) = self.games.get(&game_id).cloned() else {
@@ -527,6 +531,7 @@ impl AiHost {
                     prune_after: prune_after.unwrap_or(defaults.prune_after),
                     prune_after_replies: prune_after_replies
                         .unwrap_or(defaults.prune_after_replies),
+                    prune_reversible: prune_reversible.unwrap_or(defaults.prune_reversible),
                     ..defaults
                 };
                 if search.searches() && mode == InfoMode::Hidden && self.prior.is_empty() {

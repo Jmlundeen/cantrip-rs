@@ -403,9 +403,14 @@ at that node, so every node trims moves bad for itself, and an opponent's good r
 - `Child::Dead` still means the engine refused an answer; a pruned edge is not a refusal.
 - Pruning is per world and deterministic. Root visits and the root value leave pruned edges out, so the answer and the
   recorded visit target cannot choose one.
+- **A cut holds only while the trim does** (`prune_reversible`, on by default). A cut edge keeps the value it had when
+  it was cut, a shallow estimate, while its siblings' values keep moving as the search finds the replies to them; each
+  later path restores the cut edges at its nodes that the rule would no longer cut. Cut for good, an edge measured
+  against a sibling's early, optimistic value was never looked at again once that sibling's value fell below it, and
+  the search could settle on a worse move than the untrimmed search makes.
 
-`Prune`, `PruneBad`, `PruneMargin`, `PruneAfter` and `PruneAfterReplies` are `Config` fields and `AiStart` settings;
-`Searched` reports `pruned`, `pruned_immediate` and `pruned_shallow`.
+`Prune`, `PruneBad`, `PruneMargin`, `PruneAfter`, `PruneAfterReplies` and `PruneReversible` are `Config` fields and
+`AiStart` settings; `Searched` reports `pruned`, `pruned_immediate`, `pruned_shallow` and `restored`.
 
 ### PUCT in worlds (PIMC)
 
