@@ -1,0 +1,62 @@
+# Wilderland Scrounger: "Ferocious - Whenever this creature attacks while you control a creature with power 4 or greater, put a
+# +1/+1 counter on each creature you control." The "while" is part of the trigger event, checked only as the Scrounger attacks and
+# not again on resolution (no intervening "if", CR 603.4; the ruling). On turn 3 Bot2 exiles the Alpine Grizzly (power 4) with
+# Swords to Plowshares in response to the trigger: it still resolves, and the Scrounger gets its counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Wilderland Scrounger
+Plains
+Plains
+Alpine Grizzly
+Plains x10
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wilderland Scrounger.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Wilderland Scrounger > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Alpine Grizzly)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Alpine Grizzly = (absent)
+Bot1.Battlefield.Wilderland Scrounger.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Wilderland Scrounger.Power = 4
