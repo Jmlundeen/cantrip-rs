@@ -1,0 +1,59 @@
+# CR 708.9, 800.4a: a player who leaves the game reveals their face-down permanents and face-down spells to all players. In a
+# game of three Bot1 casts Abzan Guide face down (morph) and it resolves, then casts Bolrac-Clan Basher face down (disguise)
+# with Black Lotus's mana and concedes with it on the stack. Both are revealed by Bot1 as they leave the game with it; the game
+# goes on between Bot2 and Bot3, and nothing of theirs is revealed.
+
+[Bot1 Deck]
+Black Lotus
+Abzan Guide
+Bolrac-Clan Basher
+Mox Pearl
+Mox Jet
+Mox Emerald
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Bot3 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Abzan Guide.Cast(Ability: Morph)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Battlefield..FaceDownName = Abzan Guide
+? Bot1.Revealed = (absent)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Bolrac-Clan Basher.Cast(Ability: Disguise)
+? Stack..FaceDownName = Bolrac-Clan Basher
+Bot1.Concede
+
+[Expect]
+Result = InProgress
+Bot1.Status = Lost
+Bot1.Revealed = Abzan Guide; Bolrac-Clan Basher
+Bot2.Revealed = (absent)
+Bot3.Revealed = (absent)
+Stack.Count = 0
+Bot1.Battlefield.Count = 0

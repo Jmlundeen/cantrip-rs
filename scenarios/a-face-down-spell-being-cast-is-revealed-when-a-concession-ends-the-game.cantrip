@@ -1,0 +1,38 @@
+# CR 708.9, 104.3a, 601.2: Bot1 has Abzan Guide face down on the battlefield (morph, paid with Black Lotus) and is casting
+# Bolrac-Clan Basher face down (disguise) when Bot2 concedes - the {3} not yet paid, three Moxen untapped. The concession
+# ends the game part way through the cast, and the end of the game reveals both, the spell still being cast on the stack.
+
+[Bot1 Deck]
+Black Lotus
+Abzan Guide
+Bolrac-Clan Basher
+Mox Pearl
+Mox Jet
+Mox Emerald
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Abzan Guide.Cast(Ability: Morph)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Bolrac-Clan Basher.Cast(Ability: Disguise)
+Bot2.Concede
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot1.Revealed = Abzan Guide; Bolrac-Clan Basher
+Bot1.Battlefield..FaceDownName = Abzan Guide
+Stack..FaceDownName = Bolrac-Clan Basher

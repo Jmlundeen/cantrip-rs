@@ -1,0 +1,46 @@
+# CR 708.9, 104.3a: at the end of the game every face-down permanent and face-down spell is revealed to all players by its
+# owner. Bot1 casts Abzan Guide face down (morph) and it resolves, then casts Bolrac-Clan Basher face down (disguise) with
+# Black Lotus's mana; Bot2 concedes with it on the stack, which ends the game: Bot1 reveals both, where they are, still face down.
+
+[Bot1 Deck]
+Black Lotus
+Abzan Guide
+Bolrac-Clan Basher
+Mox Pearl
+Mox Jet
+Mox Emerald
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Abzan Guide.Cast(Ability: Morph)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Revealed = (absent)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Bolrac-Clan Basher.Cast(Ability: Disguise)
+Bot1.Pass
+Bot2.Concede
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot1.Revealed = Abzan Guide; Bolrac-Clan Basher
+Bot2.Revealed = (absent)
+Stack..FaceDown = true
+Stack..FaceDownName = Bolrac-Clan Basher
+Bot1.Battlefield..FaceDown = true
+Bot1.Battlefield..FaceDownName = Abzan Guide
