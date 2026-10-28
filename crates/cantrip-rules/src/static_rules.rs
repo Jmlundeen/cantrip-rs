@@ -16,6 +16,16 @@ fn sources<'a>(cx: &'a Cx, has: impl Fn(&CardDef) -> bool + 'a) -> impl Iterator
     })
 }
 
+/// "Each power-up ability of permanents you control can be activated an additional time" (CR 702.193a, 602.5b): how many more
+/// times than once `player`'s power-up abilities may be activated, the sum over the permanents they control with the ability
+/// (`CardDef::extra_power_up_activations`) that have not lost their abilities (CR 613.1f).
+pub fn extra_power_up_activations(cx: &Cx, player: PlayerId) -> u32 {
+    sources(cx, |d| d.extra_power_up_activations > 0)
+        .filter(|&(_, controller, _)| controller == player)
+        .map(|(_, _, def)| u32::from(def.extra_power_up_activations))
+        .sum()
+}
+
 /// The sources of the ordinary mana in `player`'s pool whose mana an ability of a permanent on the battlefield tells apart
 /// (CR 106.3, `CardDef::mana_told_apart`): mana its payer chooses to spend or keep (CR 601.2h, 118.3a). Asked only while
 /// that mana came from more than one source, since one source's mana is all alike: a pool of one land's mana searches

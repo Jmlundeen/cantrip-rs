@@ -909,12 +909,22 @@ fn limit_reached(cx: &Cx, id: ObjectId, chars: &Chars, index: usize, def: &Activ
     // ability before, in any turn. A permanent that left and came back is another object, with the ability unused.
     if def.once
         && let Some(ability) = chars.abilities().nth(index)
-        && cx
+    {
+        // A power-up ability may be activated an additional time for each permanent its controller controls that says so
+        // (CR 702.193a, 602.5b): only asked once it has been activated, which is rare.
+        let mut allowed = 1;
+        let mut activations = cx
             .history()
             .select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(id))
-            .any(|r| matches!(r.event, Event::AbilityActivated { ability: a, .. } if a == ability))
-    {
-        return true;
+            .filter(|r| matches!(r.event, Event::AbilityActivated { ability: a, .. } if a == ability));
+        if activations.next().is_some() {
+            if def.power_up {
+                allowed += static_rules::extra_power_up_activations(cx, cx.s().obj(id).controller);
+            }
+            if 1 + activations.count() >= allowed as usize {
+                return true;
+            }
+        }
     }
     if granted_limit_reached(cx, id, chars, index) {
         return true;
