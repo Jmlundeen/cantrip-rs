@@ -1,0 +1,63 @@
+# Captain America, Wings of Freedom (3/1) attacks; with his trigger on the stack Bot2's Last Gasp (-3/-3) kills him, so X is
+# his last-known toughness, -2. CR 107.1b: a calculation that determines an effect's result uses zero instead of a negative number,
+# so Bot1's Masked Meower (1/1 Hero) gets +0/+0 and survives.
+
+[Bot1 Deck]
+Captain America, Wings of Freedom
+Masked Meower
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Plains x20
+
+[Bot2 Deck]
+Last Gasp
+Mox Jet
+Mox Ruby
+Swamp
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Captain America, Wings of Freedom.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Captain America, Wings of Freedom > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Last Gasp.Cast(Bot1.Battlefield.Captain America, Wings of Freedom)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.PayCost
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Captain America, Wings of Freedom
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Masked Meower.Toughness = 1
+Bot1.Battlefield.Masked Meower.Power = 1
