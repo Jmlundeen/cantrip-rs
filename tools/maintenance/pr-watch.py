@@ -10,9 +10,12 @@ it clear the whole queue through the `review-card-pr` skill, two review agents a
 every open pull request's head is marked seen and the wait begins again; a PR the session left open (one waiting on a
 human's decision) is not taken up again until it gets new commits.
 
-The session streams its events (`--output-format stream-json`); the watcher prints, as they come, the `PR #N:` progress
-lines the prompt has the session write at each step, then its final report. Every event is written to
-.claude/pr-watch/<time>.jsonl (gitignored), and what has been seen to .claude/pr-watch/seen.json. --mark-seen marks today's open pull requests seen without starting a session, so only
+While a session runs the watcher prints its progress per pull request, from two sources. What it sees itself, every
+--interval seconds: a slot of the worktree pool taken or given back for a PR, an agent going to work in it or leaving
+(`worktree.cmd status`), and a PR closed or opened (GitHub). And what the session says: it streams its events
+(`--output-format stream-json`), and the watcher prints, as they come, the `PR #N:` lines its prompt has it write at
+each step, then its final report. Every event is written to .claude/pr-watch/<time>.jsonl (gitignored), and what has
+been seen to .claude/pr-watch/seen.json. --mark-seen marks today's open pull requests seen without starting a session, so only
 later work wakes it; --once stops after one session; --dry-run prints the command instead of running it. Only one
 watcher runs at a time (.claude/pr-watch/lock).
 """
@@ -21,9 +24,11 @@ import argparse
 import datetime
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -130,7 +135,41 @@ def progress(event):
     return [line.strip() for line in text.splitlines() if line.strip().startswith("PR #")], None
 
 
-def run_session(dry_run):
+def pool():
+    """What each leased slot of the worktree pool is for and who is at work in it: {slot: (purpose, member or None)}."""
+    out = subprocess.run([sys.executable, str(ROOT / "tools" / "maintenance" / "worktrees.py"), "status"],
+                         cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
+    slots = {}
+    for line in out.splitlines():
+        m = re.match(r"(pool-\d+): leased - (.+?), since [^;]+; member: (.*)$", line.strip())
+        if m:
+            member = m[3]  # "none", "M-... (writing, ...)" or "<name> M-... (writing, ...)"
+            slots[m[1]] = (m[2], None if member == "none" else member.split(" M-")[0] if " M-" in member else "an agent")
+    return slots
+
+
+def pool_changes(before, after):
+    for slot in sorted(set(before) | set(after)):
+        b, a = before.get(slot), after.get(slot)
+        if b == a:
+            continue
+        if b and (not a or a[0] != b[0]):
+            yield f"{b[0]}: gave back {slot}"
+        if a and (not b or b[0] != a[0]):
+            yield f"{a[0]}: took {slot}" + (f", {a[1]} at work" if a[1] else "")
+        elif a and a[1] != b[1]:
+            yield f"{a[0]}: " + (f"{a[1]} at work in {slot}" if a[1] else f"{b[1]} done in {slot}")
+
+
+def pr_changes(before, after):
+    was, now = {p["number"]: p for p in before}, {p["number"]: p for p in after}
+    for n in sorted(set(was) - set(now)):
+        yield f"PR #{n}: closed"
+    for n in sorted(set(now) - set(was)):
+        yield f"PR #{n}: opened by {now[n]['author']}, joins the queue - {now[n]['title']}"
+
+
+def run_session(dry_run, poller, interval):
     claude = shutil.which("claude")
     cmd = [claude or "claude", "-p", PROMPT, "--permission-mode", "auto", "--output-format", "stream-json", "--verbose"]
     if dry_run:
@@ -143,10 +182,9 @@ def run_session(dry_run):
     # `claude -p` otherwise stops background subagents 10 minutes after the session's last turn - the review agents,
     # killed mid-review with their slot leased and a break edit still in it.
     env = dict(os.environ, CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS="0")
-    report = None
-    with open(log, "w", encoding="utf-8") as out:
-        proc = subprocess.Popen(cmd, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                stdin=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace")
+    report = []
+
+    def read(proc, out):
         for line in proc.stdout:
             out.write(line)
             out.flush()
@@ -159,10 +197,33 @@ def run_session(dry_run):
             for status in lines:
                 print(f"{stamp()} {status}", flush=True)
             if result is not None:
-                report = result
-        code = proc.wait()
+                report.append(result)
+
+    slots, prs = pool(), poller.prs
+    with open(log, "w", encoding="utf-8") as out:
+        proc = subprocess.Popen(cmd, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                stdin=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace")
+        reader = threading.Thread(target=read, args=(proc, out), daemon=True)
+        reader.start()
+        # What the watcher sees for itself, so progress shows even when the session says nothing until it ends.
+        while proc.poll() is None:
+            reader.join(interval)
+            now = pool()
+            for status in pool_changes(slots, now):
+                print(f"{stamp()} {status}", flush=True)
+            slots = now
+            try:
+                now = poller.poll()
+            except (OSError, ValueError) as e:
+                print(f"{stamp()} poll failed: {e}", flush=True)
+                continue
+            for status in pr_changes(prs, now):
+                print(f"{stamp()} {status}", flush=True)
+            prs = now
+        reader.join()
+        code = proc.returncode
     print(f"{stamp()} the session ended (exit {code}); its report:", flush=True)
-    print((report or "(no report: see the events in the log)").rstrip(), flush=True)
+    print((report[-1] if report else "(no report: see the events in the log)").rstrip(), flush=True)
 
 
 def main():
@@ -193,7 +254,7 @@ def main():
         if new:
             for p in new:
                 print(f"{stamp()} #{p['number']} {p['author']}: {p['title']}", flush=True)
-            run_session(args.dry_run)
+            run_session(args.dry_run, poller, args.interval)
             after = poller.poll(fresh=True)
             save_seen(after)
             left = [p for p in after if args.include_drafts or not p["draft"]]
