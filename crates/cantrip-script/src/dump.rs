@@ -425,12 +425,15 @@ impl StateDump {
             let names = |ids: &[ObjectId]| ids.iter().map(|&id| game.known_name(id).to_string()).collect::<Vec<_>>();
             d.list(&format!("{b}.Hand"), names(s.zone(Zone::hand(p))), false);
             // Cards this player revealed, in order, from the history (`Event::Revealed`): a beheld card (CR 701.4a), a spliced one.
+            // A face-down permanent or spell revealed where it is (CR 708.9, 701.40g) by the card it really is.
             let revealed: Vec<String> = game
                 .history()
                 .all()
                 .iter()
                 .filter_map(|r| match r.event {
-                    Event::Revealed { player, card } if player == p => Some(game.known_name(card).to_string()),
+                    Event::Revealed { player, card } if player == p => {
+                        Some(if s.obj(card).face_down { game.cards.get(s.obj(card).card).name } else { game.known_name(card) }.to_string())
+                    }
                     _ => None,
                 })
                 .collect();
