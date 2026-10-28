@@ -1,0 +1,55 @@
+# The Kingpin of Crime: "until end of turn, creatures you control with toughness greater than their power assign combat
+# damage equal to their toughness rather than their power" (CR 510.1a). Every creature Bot1 controls is under it, not only the
+# Kingpin: Ornithopter (0/2) assigns 2. Savannah Lions (2/1) has toughness less than its power, so it still assigns its power, 2,
+# not its toughness. With the Kingpin's 5, Bot2 takes 9 and goes from 20 to 11.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+The Kingpin of Crime
+Savannah Lions
+Ornithopter
+Plains
+Swamp x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Kingpin of Crime.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(The Kingpin of Crime > Bot2; Savannah Lions > Bot2; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Life = 18
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 11
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 11
