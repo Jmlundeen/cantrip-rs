@@ -178,6 +178,23 @@ several objects in turn names the one it is asking about as `Subject` (no handle
 each of those permanents, choose a different opponent", verb `GainControlOf`, the permanent the chosen opponent gains
 control of. A client captions it with the subject's name, "The player you choose gains control of [Subject]". Version 216.
 
+**Face down, prototyped, assisted.** A cast by morph or disguise (CR 702.37c, 702.168b) is a `CastSpell` option with
+`CastFaceDown`: a 2/2 face-down spell with no name or text (ward {2} for disguise) for `CostText`, {3}, its `Description` the
+keyword line ("Morph {3}{W}"), whether the card is in a hand or a permission lets it be cast from elsewhere. The face-down spell
+is `FaceDown` on the stack, `Known` with its `FaceDownName` to its controller alone (CR 708.5); a face-down spell or permanent
+that leaves for anywhere but the battlefield is revealed (`CardsRevealedEvent`, CR 708.9), to a seat that may never have held a
+handle for it. A face-down permanent offers one `TurnFaceUp` per way to turn it up: for its morph or disguise cost
+(`Description` "Turn face up: Morph {3}{W}", `CostText`, `HasX`, `LifeCost` that cost's) or for its mana cost, a manifested or
+cloaked creature card's (`Description` empty). A cast prototyped (CR 718.3) has `CastPrototyped`, `Description` the keyword line
+("Prototype {2}{R} — 3/2") and `CostText` the prototype's mana cost; `ObjectView.Prototype` is that line for a prototype card in
+any zone, and `Prototyped` marks a prototyped spell or permanent, or a copy of one, whose cost, power, toughness and colors in
+the view are the prototype's. Assist (CR 702.132a) asks the caster a `May` with the verb `Assist` (a `ChoosePlayer`, verb
+`Assist`, with more than one other player), then `PayCostsPromptMessage`s with an `AssistStep`: `HelperActivates` and
+`CasterActivates` (a window for mana abilities closed by `ConfirmCasting`; `Remaining` is the whole of what is owed),
+`HelperAnnounces` (how much of the generic mana the chosen player pays, up to `MostAnnounced`), `HelperPays`, and `CasterPays`
+(no mana ability offered; `Assisted` is what the other player paid). The chosen player's steps offer no `CancelCasting`, and
+their default answer closes the window, announces nothing more, or assigns the first pool mana offered. Version 217.
+
 A draw the players agree to (`docs/rules-exceptions.md`, RX-4) is not a request of the host's: the offer and the answers to it
 are the server's (`GameSession.OfferDraw`, `AnswerDraw`, over the C# protocol's `OfferDrawMessage`, `AnswerDrawMessage` and
 `DrawOfferMessage`, version 201). Offering passes the offerer's priority, which the host is sent as any `PassAnswer`; once

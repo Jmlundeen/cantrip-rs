@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 216;
+    public const int ProtocolVersion = 217;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -642,6 +642,20 @@ public sealed class ObjectView
     /// </summary>
     [Key(59)]
     public string StationPt { get; set; } = string.Empty;
+
+    /// <summary>
+    /// For a prototype card, its prototype's keyword line as printed, "Prototype {2}{R} — 3/2" (CR 702.160a, 718.1): part of
+    /// the card in every zone, though it has those values only while prototyped (CR 718.4). Empty for any other card.
+    /// </summary>
+    [Key(60)]
+    public string Prototype { get; set; } = string.Empty;
+
+    /// <summary>
+    /// A prototyped spell or permanent, or a copy of one (CR 718.3b-d): its mana cost, power, toughness and colors, as this view
+    /// gives them, are the prototype's; everything else is the card's. Not a copy of anything.
+    /// </summary>
+    [Key(61)]
+    public bool Prototyped { get; set; }
 
     /// <summary>
     /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell,

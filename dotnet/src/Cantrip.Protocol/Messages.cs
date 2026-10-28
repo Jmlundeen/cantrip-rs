@@ -2423,6 +2423,21 @@ public sealed class ActionOptionMessage
     /// <summary>Opaque option identity in this question; echo it when choosing this option.</summary>
     [Key(32)]
     public int OptionId { get; set; }
+
+    /// <summary>
+    /// For a cast: it casts the card face down, by morph or disguise (CR 702.37c, 702.168b, 708.4), as a 2/2 face-down creature
+    /// spell with no name, text or mana cost (a disguised one with ward {2}) for <see cref="CostText"/>, {3}.
+    /// <see cref="Description"/> is the keyword line ("Morph {3}{W}"). Its controller alone may look at it on the stack (CR 708.5).
+    /// </summary>
+    [Key(33)]
+    public bool CastFaceDown { get; set; }
+
+    /// <summary>
+    /// For a cast: it casts the card prototyped (CR 702.160a, 718.3), with its prototype's mana cost (<see cref="CostText"/>),
+    /// power, toughness and color; <see cref="Description"/> is the keyword line ("Prototype {2}{R} — 3/2").
+    /// </summary>
+    [Key(34)]
+    public bool CastPrototyped { get; set; }
 }
 
 /// <summary>
@@ -2620,8 +2635,64 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(27)]
     public string XGoverns { get; set; } = string.Empty;
 
-    /// <summary>Giving up on the spell, which is always among the options (CR 733.1).</summary>
-    public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
+    /// <summary>
+    /// Paying for a spell with assist (CR 702.132a), the step this question is (<see cref="AssistSteps"/>): the chosen player's
+    /// chance to activate mana abilities (<see cref="AssistSteps.HelperActivates"/>), then the caster's
+    /// (<see cref="AssistSteps.CasterActivates"/>), each closed with <see cref="ActionKindView.ConfirmCasting"/>; the chosen
+    /// player announcing how much of the generic mana they pay (<see cref="AssistSteps.HelperAnnounces"/>, at most
+    /// <see cref="MostAnnounced"/>) and paying it from their pool (<see cref="AssistSteps.HelperPays"/>); and the caster paying
+    /// the rest with no mana ability offered (<see cref="AssistSteps.CasterPays"/>). The chosen player's steps offer no giving
+    /// up: the spell is not theirs. In the two windows <see cref="Remaining"/> is the whole of what is owed, not what the pool
+    /// leaves. Empty for any other payment.
+    /// </summary>
+    [Key(28)]
+    public string AssistStep { get; set; } = string.Empty;
+
+    /// <summary>The mana other players have paid towards this spell as it is cast: the assisting player's (CR 702.132a).</summary>
+    [Key(29)]
+    public int Assisted { get; set; }
+
+    /// <summary>
+    /// Giving up on the spell (CR 733.1). A question that offers no giving up - the steps of a player assisting with another's
+    /// spell (CR 702.132a) - closes their window or announces nothing more, or pays with the first pool mana offered: what they
+    /// announced they must pay. The host's own default answer, the same way.
+    /// </summary>
+    public override AnswerPayload Default() => GiveUp();
+
+    /// <summary><see cref="Default"/>, as the action it is.</summary>
+    public TakeActionAnswer GiveUp()
+    {
+        if (!Options.Exists(option => option.Kind == ActionKindView.CancelCasting))
+        {
+            if (Options.Find(option => option.Kind == ActionKindView.ConfirmCasting) is { } confirm)
+            {
+                return TakeActionAnswer.Take(confirm);
+            }
+
+            if (Options.Find(option => option.Kind == ActionKindView.AssignMana) is { } mana)
+            {
+                TakeActionAnswer answer = TakeActionAnswer.Take(mana);
+                answer.Mana = mana.Produces.Count > 0 ? mana.Produces[0] : null;
+                return answer;
+            }
+        }
+
+        return new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
+    }
+
+    /// <summary>Whether this asks the player assisting with another player's spell (CR 702.132a), who may not give it up.</summary>
+    [IgnoreMember]
+    public bool Assisting => AssistStep is AssistSteps.HelperActivates or AssistSteps.HelperAnnounces or AssistSteps.HelperPays;
+}
+
+/// <summary>The steps of a payment with assist (CR 702.132a), as <see cref="PayCostsPromptMessage.AssistStep"/> names them.</summary>
+public static class AssistSteps
+{
+    public const string HelperActivates = "HelperActivates";
+    public const string CasterActivates = "CasterActivates";
+    public const string HelperAnnounces = "HelperAnnounces";
+    public const string HelperPays = "HelperPays";
+    public const string CasterPays = "CasterPays";
 }
 
 /// <summary>
@@ -3436,6 +3507,24 @@ public sealed class TakeActionAnswer : AnswerPayload
     /// <summary>The mana value <see cref="Filter"/> names, as <see cref="RestrictedManaView.SpendManaValue"/>.</summary>
     [Key(14)]
     public int SpendManaValue { get; set; }
+
+    /// <summary>The answer that takes <paramref name="option"/> as offered, targets and the rest still to fill in.</summary>
+    public static TakeActionAnswer Take(ActionOptionMessage option)
+    {
+        ArgumentNullException.ThrowIfNull(option);
+        return new TakeActionAnswer
+        {
+            Kind = option.Kind,
+            Source = option.Source,
+            AbilityIndex = option.AbilityIndex,
+            OptionId = option.OptionId,
+            Tap = option.Tap,
+            Filter = option.Filter,
+            Effect = option.Effect,
+            SpendSubtypes = [.. option.SpendSubtypes],
+            SpendManaValue = option.SpendManaValue,
+        };
+    }
 }
 
 /// <summary>
