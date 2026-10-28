@@ -92,6 +92,8 @@ mod land_play_rules_tests;
 #[cfg(test)]
 mod instant_sorcery_entering_tests;
 #[cfg(test)]
+mod attached_entry_tests;
+#[cfg(test)]
 mod enters_as_tests;
 #[cfg(test)]
 mod left_battlefield_tests;
@@ -1858,6 +1860,10 @@ impl cantrip_api::Game for Cx<'_> {
         let becomes = Becomes { what, card: item.ability.card };
         let all: Vec<(ObjectId, PlayerId, bool)> = objects.iter().map(|&(id, p)| (id, p, false)).collect();
         ops::put_onto_battlefield_becoming_all(self, &all, becomes).map_err(|_| Suspend)
+    }
+
+    fn put_onto_battlefield_attached(&mut self, object: ObjectId, controller: PlayerId, host: ObjectId) -> Result<Option<ObjectId>, Suspend> {
+        ops::put_onto_battlefield_attached(self, object, controller, host).map_err(|_| Suspend)
     }
 
     fn sacrifice_and_return(&mut self, player: PlayerId, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend> {
