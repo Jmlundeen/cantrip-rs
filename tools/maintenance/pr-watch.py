@@ -10,8 +10,9 @@ it clear the whole queue through the `review-card-pr` skill, two review agents a
 every open pull request's head is marked seen and the wait begins again; a PR the session left open (one waiting on a
 human's decision) is not taken up again until it gets new commits.
 
-Each session's output is written to .claude/pr-watch/<time>.log (gitignored), and what has been seen to
-.claude/pr-watch/seen.json. --mark-seen marks today's open pull requests seen without starting a session, so only
+The session streams its events (`--output-format stream-json`); the watcher prints, as they come, the `PR #N:` progress
+lines the prompt has the session write at each step, then its final report. Every event is written to
+.claude/pr-watch/<time>.jsonl (gitignored), and what has been seen to .claude/pr-watch/seen.json. --mark-seen marks today's open pull requests seen without starting a session, so only
 later work wakes it; --once stops after one session; --dry-run prints the command instead of running it. Only one
 watcher runs at a time (.claude/pr-watch/lock).
 """
@@ -45,6 +46,11 @@ arrive while you work are part of it.
 A pull request that needs a decision only the user can make (a rules exception, a cherry-pick conflict, a finding you
 cannot settle) is left open and unlanded, its lease released with --discard, and named in your report; carry on with
 the rest.
+
+Report progress as you go: each time a pull request moves on (lease taken, review started, review verdict, fix agent
+started, fixes confirmed, tests passed or failed, landed, left open), write a line of its own, on its own, that starts
+`PR #<N>:` and says it in a few words - for example `PR #741: review blocked, 2 findings; fix agent started`. The
+watcher prints those lines to whoever is watching; nothing else you write reaches them until the end.
 
 Do not start any wait, poll or sleep loop for new pull requests: something else does that. Do not end your turn while a
 subagent or a test run you started is still going - wait for its notification. When no open pull request is left that
@@ -113,23 +119,50 @@ def stamp():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def progress(event):
+    """The `PR #N:` lines of a stream-json event the session itself wrote (not one of its subagents), or its final
+    report."""
+    if event.get("type") == "result":
+        return [], event.get("result") or ""
+    if event.get("type") != "assistant" or event.get("parent_tool_use_id"):
+        return [], None
+    text = "\n".join(b.get("text", "") for b in event.get("message", {}).get("content", []) if b.get("type") == "text")
+    return [line.strip() for line in text.splitlines() if line.strip().startswith("PR #")], None
+
+
 def run_session(dry_run):
     claude = shutil.which("claude")
-    cmd = [claude or "claude", "-p", PROMPT, "--permission-mode", "auto"]
+    cmd = [claude or "claude", "-p", PROMPT, "--permission-mode", "auto", "--output-format", "stream-json", "--verbose"]
     if dry_run:
-        print(f"{stamp()} would run: claude -p <prompt> --permission-mode auto", flush=True)
+        print(f"{stamp()} would run: claude -p <prompt> --permission-mode auto --output-format stream-json --verbose", flush=True)
         return
     if not claude:
         sys.exit("pr-watch: claude is not on PATH")
-    log = STATE / (datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".log")
-    print(f"{stamp()} starting a Claude Code session; its output goes to {log}", flush=True)
+    log = STATE / (datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".jsonl")
+    print(f"{stamp()} starting a Claude Code session; its events go to {log}", flush=True)
     # `claude -p` otherwise stops background subagents 10 minutes after the session's last turn - the review agents,
     # killed mid-review with their slot leased and a break edit still in it.
     env = dict(os.environ, CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS="0")
+    report = None
     with open(log, "w", encoding="utf-8") as out:
-        code = subprocess.run(cmd, cwd=ROOT, env=env, stdout=out, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL).returncode
+        proc = subprocess.Popen(cmd, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                stdin=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace")
+        for line in proc.stdout:
+            out.write(line)
+            out.flush()
+            try:
+                event = json.loads(line)
+            except ValueError:
+                print(f"{stamp()} {line.rstrip()}", flush=True)  # not an event: an error from the CLI itself
+                continue
+            lines, result = progress(event)
+            for status in lines:
+                print(f"{stamp()} {status}", flush=True)
+            if result is not None:
+                report = result
+        code = proc.wait()
     print(f"{stamp()} the session ended (exit {code}); its report:", flush=True)
-    print(log.read_text(encoding="utf-8", errors="replace").rstrip()[-4000:], flush=True)
+    print((report or "(no report: see the events in the log)").rstrip(), flush=True)
 
 
 def main():
