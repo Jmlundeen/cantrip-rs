@@ -1,0 +1,32 @@
+# Gene Pollinator's "{T}, Tap an untapped permanent you control" is one cost (CR 602.2b, 601.2h): it taps itself and an
+# Ornithopter at once, so Rewrite History's "whenever one or more creatures you control become tapped" triggers once
+# (CR 603.2c), as it does for a crew or convoke cost. One plan counter, not two (the source's tap announced on its own).
+
+[Bot1 Deck]
+Black Lotus
+Rewrite History
+Mox Emerald
+Gene Pollinator
+Ornithopter
+Island x2
+Island x15
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Rewrite History.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gene Pollinator.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gene Pollinator.Activate(Tap: Ornithopter; Color: Red)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Gene Pollinator.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Rewrite History.Counters.Plan = 1

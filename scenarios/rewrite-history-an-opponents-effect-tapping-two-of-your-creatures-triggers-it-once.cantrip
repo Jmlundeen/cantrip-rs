@@ -1,0 +1,42 @@
+# An opponent's Lost in the Maze taps X = 2 target creatures as one instruction (CR 701.26a): both of Bot1's Ornithopters
+# become tapped at once, so Bot1's Rewrite History triggers once (CR 603.2c): one plan counter (not two). Bot2 casts it on its
+# own turn off Black Lotus and a Mox; each Ornithopter, controlled by Bot1, also gets its stun counter.
+
+[Bot1 Deck]
+Black Lotus
+Rewrite History
+Ornithopter
+Ornithopter
+Island x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Lost in the Maze
+Forest x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Rewrite History.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lost in the Maze.Cast(X: 2)
+Bot2.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Ornithopter#2)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Ornithopter#1.Counters.Stun = 1
+Bot1.Battlefield.Ornithopter#2.Counters.Stun = 1
+Bot1.Battlefield.Rewrite History.Counters.Plan = 1
