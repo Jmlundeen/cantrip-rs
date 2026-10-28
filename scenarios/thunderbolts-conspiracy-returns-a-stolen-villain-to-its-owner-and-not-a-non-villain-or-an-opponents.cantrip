@@ -1,0 +1,97 @@
+# Thunderbolts Conspiracy: "Whenever a Villain you control dies, return it to the battlefield under its owner's control with a
+# finality counter on it" (CR 700.4, 603.10a, 110.2). Bot1 takes Bot2's Agents of HYDRA with Claim the Firstborn and sacrifices it
+# to Village Rites: it died a Villain Bot1 controlled, so it returns - under Bot2's control, its owner's, a Hero with a finality
+# counter. Bot1's own Savannah Lions, no Villain, stays in the graveyard when Bolted, and so does Bot2's Kingpin's Enforcers, a
+# Villain Bot1 never controlled.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Thunderbolts Conspiracy
+Savannah Lions
+Claim the Firstborn
+Village Rites
+Lightning Bolt
+Lightning Bolt
+Mountain
+Swamp x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Agents of HYDRA
+Kingpin's Enforcers
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Thunderbolts Conspiracy.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Agents of HYDRA.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Kingpin's Enforcers.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Claim the Firstborn.Cast(Bot2.Battlefield.Agents of HYDRA)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Village Rites.Cast
+Bot1.Choose(Agents of HYDRA)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot2.Battlefield.Agents of HYDRA.Counters.Finality = 1
+? Bot2.Battlefield.Agents of HYDRA.Subtypes = Hero; Human; Spy; Villain
+? Bot1.Battlefield.Villain Token.Token = true
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Savannah Lions)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Kingpin's Enforcers)
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Savannah Lions; Lightning Bolt; Village Rites; Claim the Firstborn
+Bot2.Graveyard = Kingpin's Enforcers
+Bot2.Battlefield.Agents of HYDRA.Counters.Finality = 1
+Bot1.Battlefield.Count = 8
