@@ -1408,3 +1408,9 @@ pub fn may_cast_first_target_free_exiling_it(g: &mut dyn Game, item: &StackItem)
     g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), exile_instead: ExileInstead::Spell, way, ..CastTerms::default() })?;
     Ok(())
 }
+
+/// "[This creature] connives" (CR 701.50): the source of the ability connives, even if it has already left the battlefield. Ledger
+/// Shredder, M.O.D.O.K., Madame Masque, Norman Osborn and Red Room Recruit print it.
+pub fn this_connives(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::connive(g, item.object, item.object)
+}
