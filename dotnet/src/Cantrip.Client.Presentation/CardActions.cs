@@ -297,10 +297,19 @@ public sealed class CardActions
             return $"Exile {name} to pay {{1}}";
         }
 
-        // A face-down permanent has no name to give (CR 708.2a); the server says what turning it up costs.
+        // A face-down permanent has no name to give (CR 708.2a). Each way of turning it up is a row of its own, naming its own
+        // cost: the morph or disguise cost it would have face up, which the server words as the keyword line (CR 702.37e,
+        // 702.168d), or a manifested or cloaked creature card's mana cost (CR 701.40b, 701.58b) - so a manifested morph card's
+        // two rows read apart.
         if (option.Kind == ActionKindView.TurnFaceUp)
         {
-            return option.Description.Length > 0 ? option.Description : "Turn face up";
+            // The mana cost's row carries the ability's own words ("Turn this permanent face up by paying its mana cost."), and
+            // what a static ability makes it cost after them, "(costs {2}{U})", which is all of them worth repeating.
+            const string Way = "Turn face up: ";
+            int costs = option.Description.LastIndexOf("(costs ", StringComparison.Ordinal);
+            return option.Description.StartsWith(Way, StringComparison.Ordinal)
+                ? $"Turn face up — {option.Description[Way.Length..]}{ellipsis}"
+                : $"Turn face up for its mana cost{(costs >= 0 ? " " + option.Description[costs..] : string.Empty)}{ellipsis}";
         }
 
         // Unlocking a Room's door (CR 709.5e): which door and what it costs are the whole of what tells this apart from
@@ -354,6 +363,38 @@ public sealed class CardActions
             ActionKindView.CastSpell => "Cast",
             _ => option.Kind.ToString(),
         };
+
+        // Cast face down by morph or disguise (CR 702.37c, 702.168b, 708.4): not the card for its cost, but a nameless 2/2 with
+        // no text for {3} - with ward {2}, disguised - beside the keyword line it is cast by, which says what turns it up.
+        if (option.Kind == ActionKindView.CastSpell && option.CastFaceDown)
+        {
+            string ward = option.Description.StartsWith("Disguise", StringComparison.Ordinal) ? " with ward {2}" : string.Empty;
+            string keyword = option.Description.Length > 0 ? $" — {option.Description}" : string.Empty;
+            return $"{verb} {name} face down as a 2/2{ward} for {option.CostText}{keyword}{ellipsis}";
+        }
+
+        // Cast prototyped (CR 702.160a, 718.3): the prototype's mana cost, color, power and toughness, beside the card's own
+        // cast. The server's description is the keyword line, "Prototype {2}{R} — 3/2", and after it any cost the cast is for.
+        if (option.Kind == ActionKindView.CastSpell && option.CastPrototyped)
+        {
+            string spell = option.SpellName.Length > 0 ? option.SpellName : name;
+            System.Text.RegularExpressions.Match line = System.Text.RegularExpressions.Regex.Match(
+                option.Description, @"^Prototype (?<cost>\S+) — (?<size>[^\s:(]+)(?<rest>.*)$");
+            if (!line.Success)
+            {
+                return $"{verb} {spell} prototyped — {option.Description}{ellipsis}";
+            }
+
+            string rest = line.Groups["rest"].Value.TrimStart(':', ' ');
+            if (option.WithoutPayingManaCost)
+            {
+                string still = option.CostText.Length > 0 && option.CostText != "{0}" ? $" · still costs {option.CostText}" : string.Empty;
+                return $"{verb} {spell} prototyped as a {line.Groups["size"].Value} — {(rest.Length > 0 ? rest : "Without paying its mana cost")}{still}{ellipsis}";
+            }
+
+            string cost = option.CostText.Length > 0 ? option.CostText : line.Groups["cost"].Value;
+            return $"{verb} {spell} prototyped as a {line.Groups["size"].Value} for {cost}{(rest.Length > 0 ? " " + rest : string.Empty)}{ellipsis}";
+        }
 
         // A cast without paying its mana cost (CR 118.9, Omniscience) says so, beside the ordinary cast it would otherwise read
         // the same as, and what it still costs where something raises it (Thalia's {1}). The server's description, after the

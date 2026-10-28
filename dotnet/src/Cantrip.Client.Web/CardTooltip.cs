@@ -165,20 +165,22 @@ public sealed class CardTooltip : Canvas
         if (card.FaceDown)
         {
             // A face-down permanent is a 2/2 with no text (CR 708.2a), or with the text the rule that turned it face down
-            // gives it (a cloaked one's ward {2}, CR 701.58a); a card exiled face down has no characteristics at all
-            // (CR 406.3a).
+            // gives it (a cloaked or disguised one's ward {2}, CR 701.58a, 702.168a); so is a spell cast face down by morph or
+            // disguise (CR 708.4); a card exiled face down has no characteristics at all (CR 406.3a).
             bool permanent = card.Zone == ZoneKindView.Battlefield;
+            bool spell = card.Zone == ZoneKindView.Stack;
+            string what = spell ? "creature spell" : "creature";
             List<string> said =
             [
-                !permanent ? "A card exiled face down. It has no name, text, types or cost."
+                !permanent && !spell ? "A card exiled face down. It has no name, text, types or cost."
                 : card.OracleText.Length > 0
-                    ? $"A face-down {card.Power}/{card.Toughness} creature with no name or cost. It has {char.ToLowerInvariant(card.OracleText[0])}{card.OracleText[1..].Replace('\n', ' ')}."
-                    : $"A face-down {card.Power}/{card.Toughness} creature with no name, text or cost.",
+                    ? $"A face-down {card.Power}/{card.Toughness} {what} with no name or cost. It has {char.ToLowerInvariant(card.OracleText[0])}{card.OracleText[1..].Replace('\n', ' ')}."
+                    : $"A face-down {card.Power}/{card.Toughness} {what} with no name, text or cost.",
             ];
 
             if (card.FaceDownName.Length > 0)
             {
-                said.Add(permanent
+                said.Add(permanent || spell
                     ? $"It is {card.FaceDownName}. Only you can see that."
                     : $"You are allowed to look at it: it is {card.FaceDownName}.");
             }
@@ -230,6 +232,12 @@ public sealed class CardTooltip : Canvas
         if (card.CantBeCountered && card.Zone == ZoneKindView.Stack)
         {
             lines.Add("Can't be countered (CR 101.2).");
+        }
+
+        // Prototyped (CR 718.3b-c): the cost, color and size shown are the prototype's, everything else the card's.
+        if (card.Prototyped)
+        {
+            lines.Add("Prototyped: its mana cost, color, power and toughness are its prototype's.");
         }
 
         foreach (PlayPermissionView permission in card.PlayPermissions)

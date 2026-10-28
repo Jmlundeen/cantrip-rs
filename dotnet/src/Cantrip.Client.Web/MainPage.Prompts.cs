@@ -306,6 +306,11 @@ public sealed partial class MainPage
         // A {C} still owed (CR 107.4c) is paid only with colorless mana.
         string colorless = prompt.RemainingColorless > 0 ? "  ·  only colorless mana pays {C}" : string.Empty;
 
+        if (prompt.AssistStep.Length > 0 && FillAssist(client, prompt, name))
+        {
+            return;
+        }
+
         if (prompt.AnnouncesXOrKicks)
         {
             FillAnnouncement(client, prompt, name);
@@ -401,11 +406,18 @@ public sealed partial class MainPage
                 // Life the total cost asks besides its mana (CR 119.4, 601.2h: Terror of the Peaks' additional 3 life), paid
                 // with it once the mana is.
                 string life = prompt.Life > 0 ? $"  ·  and {prompt.Life} life, paid with it" : string.Empty;
+
+                // Assist (CR 702.132a): the caster pays what the player helping did not, and no mana can be made now.
+                string helped = prompt.AssistStep != AssistSteps.CasterPays
+                    ? string.Empty
+                    : prompt.Assisted > 0
+                        ? $"  ·  {prompt.Assisted} paid by the player helping"
+                        : "  ·  the player helping paid none";
                 Prompt(
                     _actions.Assignable.Count > 0 ? $"Choose mana for {name}" : $"Pay for {name}",
                     covered
-                        ? $"your pool covers {prompt.Total}{life}  ·  {how}"
-                        : $"{prompt.Remaining} of {prompt.Total} still to pay{life}  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
+                        ? $"your pool covers {prompt.Total}{life}{helped}  ·  {how}"
+                        : $"{prompt.Remaining} of {prompt.Total} still to pay{life}{helped}  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
             }
 
             if (covered && _actions.Confirm is { } pay)
@@ -468,6 +480,93 @@ public sealed partial class MainPage
         if (_actions.Cancel is { } giveUp)
         {
             AddCancelButton(() => Send(client, AnswerFor(giveUp)));
+        }
+    }
+
+    /// <summary>
+    /// The steps of paying for a spell with assist (CR 702.132a) that are not an ordinary payment: each player's window for mana
+    /// abilities, closed with Done - the helper's with no Cancel, since the spell is not theirs - and the helper's announcement
+    /// of how much of the generic mana they pay. The helper's payment and the caster's are drawn as any payment is, with a line
+    /// saying whose spell it is or what the other player paid. False for a step this does not draw.
+    /// </summary>
+    private bool FillAssist(GameClient client, PayCostsPromptMessage prompt, string name)
+    {
+        string caster = client.Object(prompt.Spell) is { } spell && spell.Controller != client.ActingSeat ? NameOf(client, spell.Controller) : "Its caster";
+        switch (prompt.AssistStep)
+        {
+            // A window for mana abilities (CR 601.2g): what the question's Remaining says is the whole cost, not what is left.
+            case AssistSteps.HelperActivates or AssistSteps.CasterActivates:
+            {
+                bool helper = prompt.AssistStep == AssistSteps.HelperActivates;
+                Prompt(
+                    helper ? $"Help pay for {name}: make mana" : $"Make mana for {name}",
+                    helper
+                        ? $"{caster} chose you to help pay for {name}  ·  tap lands for mana now, then choose how much of its {prompt.Total} generic mana you pay"
+                        : $"{name} costs {prompt.Total}  ·  the last chance to make mana: once you are done, you pay from your pool");
+                if (_actions.Confirm is { } done)
+                {
+                    _pass = () => Send(client, AnswerFor(done));
+                    AddButton("Done", () => Send(client, AnswerFor(done)), primary: true).Tooltip =
+                        (helper ? "Done making mana" : "Done making mana: pay from your pool") + Suffix(PassKey);
+                }
+
+                if (_actions.Cancel is { } cancel)
+                {
+                    AddCancelButton(() => Send(client, AnswerFor(cancel)));
+                }
+
+                return true;
+            }
+
+            // How much of the generic mana the helper pays (CR 702.132a): at most the generic mana and what their pool holds.
+            case AssistSteps.HelperAnnounces:
+            {
+                int generic = prompt.RemainingGeneric;
+                int x = Announced(prompt);
+                Prompt(
+                    $"How much of the {{{generic}}} generic mana of {name} do you pay?",
+                    $"{caster} pays the rest  ·  your pool can pay up to {prompt.MostAnnounced}");
+                Action announce = () => Send(client, new AnnounceAnswer { Value = x });
+                if (_actions.Confirm is not null)
+                {
+                    _pass = announce;
+                    AddButton("Okay", announce, primary: true).Tooltip = $"Pay {x} of it from your pool" + Suffix(PassKey);
+                }
+
+                Action? lower = x > prompt.LeastAnnounced ? () => StepAnnounced(prompt, x - 1) : null;
+                Action? raise = x < prompt.MostAnnounced ? () => StepAnnounced(prompt, x + 1) : null;
+                _buttons.Children.Add(Stepper(
+                    8,
+                    AssistStep("−", "Pay one less", lower),
+                    new SymbolText(13, Theme.Fg, semibold: true) { Text = $"Pay {x}" },
+                    AssistStep("+", "Pay one more", raise)));
+                return true;
+            }
+
+            // The helper pays what they announced from their pool, as any payment from a pool is made, with no giving up.
+            case AssistSteps.HelperPays:
+                Prompt($"Help pay for {name}", $"{prompt.Remaining} still to pay from your pool  ·  click mana in your pool");
+                if (_actions.Confirm is { } covered)
+                {
+                    _pass = () => Send(client, AnswerFor(covered));
+                    AddButton("Okay", () => Send(client, AnswerFor(covered)), primary: true).Tooltip = "Pay it with the mana in your pool" + Suffix(PassKey);
+                }
+
+                return true;
+
+            default:
+                return false;
+        }
+
+        static DockButton AssistStep(string text, string tooltip, Action? step)
+        {
+            var button = new DockButton(text, primary: false, enabled: step is not null) { Tooltip = tooltip };
+            if (step is not null)
+            {
+                button.Clicked += step;
+            }
+
+            return button;
         }
     }
 
@@ -1189,7 +1288,12 @@ public sealed partial class MainPage
             _ => prompt.Verb,
         };
 
-        if (prompt.Verb == "Protection")
+        // Assist (CR 702.132a): the player chosen may pay any of the spell's generic mana; any other player, not only an opponent.
+        if (prompt.Verb == "Assist")
+        {
+            Prompt($"{source}: choose another player to help pay for it", "They may pay any amount of its generic mana  ·  you pay the rest");
+        }
+        else if (prompt.Verb == "Protection")
         {
             Prompt($"{source}: choose a player", "This creature has protection from the chosen player.");
         }
@@ -1959,6 +2063,17 @@ public sealed partial class MainPage
 
             case "DiscardUnlessCountered":
                 Ask($"Discard a card, or {source} is countered?", "Ward", "Discard a card", "Don't pay");
+                return;
+
+            // Assist (CR 702.132a): asked as the spell is cast, once its total cost is locked in. Neither button is primary, so
+            // passing through the announcement never hands part of a payment to another player by accident.
+            case "Assist":
+                Ask(
+                    $"{Named("This spell")}: choose another player to help pay for it?",
+                    "They may make mana and pay any amount of its generic mana  ·  then you may make mana, and you pay the rest",
+                    "Ask for help",
+                    "Pay it yourself",
+                    yesIsPrimary: false);
                 return;
 
             // Miracle (CR 702.94a): neither button is primary, so spamming Pass can never reveal a card.

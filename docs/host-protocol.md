@@ -185,7 +185,7 @@ is `FaceDown` on the stack, `Known` with its `FaceDownName` to its controller al
 that leaves for anywhere but the battlefield is revealed (`CardsRevealedEvent`, CR 708.9), to a seat that may never have held a
 handle for it. A face-down permanent offers one `TurnFaceUp` per way to turn it up: for its morph or disguise cost
 (`Description` "Turn face up: Morph {3}{W}", `CostText`, `HasX`, `LifeCost` that cost's) or for its mana cost, a manifested or
-cloaked creature card's (`Description` empty). A cast prototyped (CR 718.3) has `CastPrototyped`, `Description` the keyword line
+cloaked creature card's (`Description` the ability's own words, "Turn this permanent face up by paying its mana cost."). A cast prototyped (CR 718.3) has `CastPrototyped`, `Description` the keyword line
 ("Prototype {2}{R} — 3/2") and `CostText` the prototype's mana cost; `ObjectView.Prototype` is that line for a prototype card in
 any zone, and `Prototyped` marks a prototyped spell or permanent, or a copy of one, whose cost, power, toughness and colors in
 the view are the prototype's. Assist (CR 702.132a) asks the caster a `May` with the verb `Assist` (a `ChoosePlayer`, verb

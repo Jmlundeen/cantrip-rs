@@ -300,6 +300,14 @@ public sealed partial class MainPage
             PayCostsPromptMessage plan when PlansMana(plan) && card.Zone == ZoneKindView.Battlefield && ManaFrom(card.Handle) > 0 =>
                 PlannedLook(client, plan, card),
 
+            // A spell with assist while mana is made for it and the help is announced (CR 702.132a): nothing is paid yet, and
+            // the question's Remaining is the whole cost.
+            PayCostsPromptMessage { AssistStep: AssistSteps.HelperActivates or AssistSteps.CasterActivates or AssistSteps.HelperAnnounces } assisted
+                when assisted.Spell == card.Handle && _actions.For(card.Handle).Count == 0 =>
+                new CardLook(Note: assisted.AssistStep == AssistSteps.CasterActivates
+                    ? $"Being cast with assist. It costs {assisted.Total}."
+                    : $"Being cast with assist. Its generic mana is {assisted.Total}."),
+
             // The spell being paid for. Not a control, but it says what it is waiting on - unless it can help pay.
             PayCostsPromptMessage pay when pay.Spell == card.Handle && _actions.For(card.Handle).Count == 0 =>
                 new CardLook(Note: card.Zone switch
