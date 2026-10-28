@@ -1,0 +1,98 @@
+# Last Light of Durin's Day, the sixth Mountain (turn 13), sacrificed with no Dragon card in the hand: Bot1 declines to search its
+# library, so only the hand is searched, and with nothing there to find it is asked nothing more. No card is put onto the
+# battlefield, and the library - the Draconic Visitor still on top - is neither searched nor shuffled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Last Light of Durin's Day
+Mountain
+Island
+Island
+Island
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Island
+Draconic Visitor
+Island
+Plains
+Swamp
+Forest
+Island
+Plains
+Swamp
+Forest
+Island
+Plains
+Swamp
+Forest
+
+[Bot2 Deck]
+Mountain
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Last Light of Durin's Day.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Last Light of Durin's Day.Counters.Quest = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Last Light of Durin's Day.Counters.Quest = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Last Light of Durin's Day.Counters.Quest = 4
+[T11 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Last Light of Durin's Day.Counters.Quest = 5
+[T13 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+! Bot1.Choose
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Last Light of Durin's Day
+Bot1.Battlefield.Draconic Visitor = (absent)
+Bot1.Library = Draconic Visitor; Island; Plains; Swamp; Forest; Island; Plains; Swamp; Forest; Island; Plains; Swamp; Forest
