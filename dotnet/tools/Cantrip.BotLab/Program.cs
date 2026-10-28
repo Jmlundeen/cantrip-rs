@@ -490,6 +490,8 @@ public static class Program
         List<DeckList> decks = Decks(root, args);
         List<string> without = [.. Text(args, "--without", string.Empty)
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+        List<string> only = [.. Text(args, "--only", string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
 
         TacticalModel model = Named(root, from);
 
@@ -521,7 +523,7 @@ public static class Program
                 Console.WriteLine($"  {selfPlay.Failures.Count} did not finish: {selfPlay.Failures.GroupBy(failure => failure).OrderByDescending(group => group.Count()).First().Key}");
             }
 
-            (TacticalModel fitted, FitReport report) = Fit.Run(samples, model, general, card);
+            (TacticalModel fitted, FitReport report) = Fit.Run(samples, model, general, card, only: only);
             Console.WriteLine(
                 $"  Fitted {report.Features} weights. Log loss on positions kept back: {report.Before:N4} before, {report.After:N4} after; " +
                 $"the favourite won {report.Accuracy:P1} of the time.");
@@ -530,7 +532,7 @@ public static class Program
             // output, so that what a new feature is worth is a duel between two fits of one set of games.
             if (without.Count > 0)
             {
-                (TacticalModel control, FitReport controlReport) = Fit.Run(samples, model, general, card, without: without);
+                (TacticalModel control, FitReport controlReport) = Fit.Run(samples, model, general, card, without: without, only: only);
                 string controlPath = Path.ChangeExtension(output, null) + $".without-round{round}.txt";
                 File.WriteAllText(controlPath, control.Write($"Round {round}'s fit without {string.Join(", ", without)}."));
                 Console.WriteLine($"  Without {string.Join(", ", without)}: log loss {controlReport.After:N4}, written to {controlPath}.");
@@ -1262,6 +1264,8 @@ public static class Program
             --from WHICH        prior, shipped, or a path (default prior)
             --out PATH          where the model is written (default: the one the client ships)
             --deck NAME         as for duel
+            --only A,B          fit only the weights whose names start so, every other weight kept as it came: a new
+                                feature weighed against the weights that ship, not against a refit of all of them
             --without A,B       also fit the same games with the features whose names start so left out and weighed
                                 at nothing, written beside --out: what to duel a new feature's fit against
 

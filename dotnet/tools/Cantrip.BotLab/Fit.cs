@@ -39,7 +39,8 @@ public static class Fit
         double general = 200,
         double card = 400,
         int epochs = 600,
-        IReadOnlyCollection<string>? without = null)
+        IReadOnlyCollection<string>? without = null,
+        IReadOnlyCollection<string>? only = null)
     {
         ArgumentNullException.ThrowIfNull(samples);
         ArgumentNullException.ThrowIfNull(from);
@@ -65,6 +66,7 @@ public static class Fit
 
         List<string> names = [.. counts
             .Where(pair => !Left(pair.Key))
+            .Where(pair => only is not { Count: > 0 } || only.Any(prefix => pair.Key.StartsWith(prefix, StringComparison.Ordinal)))
             .Where(pair => !pair.Key.StartsWith(TacticalModel.CardPrefix, StringComparison.Ordinal) || pair.Value >= Seen)
             .Select(pair => pair.Key)
             .Order(StringComparer.Ordinal)];
