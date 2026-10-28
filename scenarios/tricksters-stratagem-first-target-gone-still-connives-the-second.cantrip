@@ -1,0 +1,59 @@
+# Trickster's Stratagem's two targets are judged apart as it resolves (CR 608.2b): in response Bot2 bolts its own Ornithopter,
+# so the first target is illegal and nothing is put into a library (Bot2 is asked nothing), but the spell still resolves for
+# the second: Bot1's Ornithopter connives, Bot1 draws a Lightning Bolt and discards it, a nonland card, so the Ornithopter gets
+# a +1/+1 counter (a 1/3). {3}{U} is paid exactly by Black Lotus and Mox Sapphire.
+
+[Bot1 Deck]
+Ornithopter
+Mox Sapphire
+Black Lotus
+Trickster's Stratagem
+Island x3
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x4
+Plains
+Swamp
+Mountain
+Forest
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Trickster's Stratagem.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Library = Swamp; Mountain; Forest
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Graveyard = Trickster's Stratagem; Lightning Bolt; Black Lotus
