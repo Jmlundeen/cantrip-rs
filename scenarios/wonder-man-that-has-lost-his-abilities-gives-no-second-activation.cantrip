@@ -1,0 +1,67 @@
+# Wonder Man, Hollywood Hero: "Each power-up ability of permanents you control can be activated an additional time" is an ability of
+# his, so he gives nothing once he has lost his abilities (CR 613.1f). Turn 3: Bot1 casts Quicksilver, Brash Blur and activates his
+# power-up once for {4}; Bot2's Turn to Frog makes Wonder Man a 1/1 Frog with no abilities, and a second activation is refused though
+# four mana (Mox Ruby, Sol Ring and Mox Jet) would pay for it.
+
+[Bot1 Deck]
+Ancient Tomb
+Mox Ruby
+Mox Ruby
+Mox Jet
+Sol Ring
+Wonder Man, Hollywood Hero
+Quicksilver, Brash Blur
+Ancient Tomb
+Island x12
+
+[Bot2 Deck]
+Mox Sapphire
+Turn to Frog
+Island x18
+
+[Actions]
+Bot1.Decline
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Wonder Man, Hollywood Hero.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Quicksilver, Brash Blur.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ancient Tomb#1.Activate
+Bot1.Battlefield.Ancient Tomb#2.Activate
+Bot1.Battlefield.Quicksilver, Brash Blur.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Turn to Frog.Cast(Bot1.Battlefield.Wonder Man, Hollywood Hero)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Wonder Man, Hollywood Hero.Power = 1
+! Bot1.Battlefield.Quicksilver, Brash Blur.Activate
+
+[Expect]
+Bot1.Battlefield.Quicksilver, Brash Blur.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Quicksilver, Brash Blur.Counters.DoubleStrike = 1
