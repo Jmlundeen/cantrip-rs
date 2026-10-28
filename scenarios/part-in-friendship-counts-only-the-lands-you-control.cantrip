@@ -1,0 +1,50 @@
+# Part in Friendship: "... If its mana value is less than or equal to the number of lands you control, put it onto the battlefield.
+# Otherwise, put it into your hand." Only its controller's lands count. Bot1 has played no land; Bot2 has a Mountain. When Bot2's
+# Lightning Bolt kills Bot1's Ornithopter, the revealed Llanowar Elves (mana value 1) is more than Bot1's zero lands, so it goes to
+# Bot1's hand, not onto the battlefield (the opponent's Mountain would have made it one).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Part in Friendship
+Ornithopter
+Plains
+Plains
+Llanowar Elves
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Part in Friendship.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Llanowar Elves = (absent)
+Bot1.Hand = Plains; Plains; Llanowar Elves
