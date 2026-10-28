@@ -1105,6 +1105,7 @@ counter_kinds! {
     Ice = 49, "ice", "Ice";
     Soul = 50, "soul", "Soul";
     Invitation = 51, "invitation", "Invitation";
+    Promotion = 52, "promotion", "Promotion";
 }
 
 impl CounterKind {
@@ -1544,6 +1545,15 @@ impl AbilityRef {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn promotion_counter_is_appended_without_renumbering_existing_counters() {
+        assert_eq!(CounterKind::Invitation as u8, 51);
+        assert_eq!(CounterKind::Promotion as u8, 52);
+        assert_eq!(CounterKind::ALL[52], CounterKind::Promotion);
+        assert_eq!(CounterKind::Promotion.name(), "promotion");
+        assert_eq!(CounterKind::Promotion.token(), "Promotion");
+    }
 
     /// A cost paid `n` times over (CR 603.12a): each symbol `n` times, none past what the cost's shape holds.
     #[test]
