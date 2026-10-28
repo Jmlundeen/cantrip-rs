@@ -26,10 +26,15 @@ git fetch origin pull/<N>/head:pr-<N>
 git cherry-pick origin/main..pr-<N>        # the PR's own commits, in order, authorship kept
 ```
 
-A cherry-pick conflict stops here; never resolve the contributor's code by guesswork. It is the contributor's to fix:
-comment on the PR asking them to rebase onto `main`, naming the conflicting files and the commits on `main` they meet,
-and release the lease with `--discard` (a coordinator running unattended, `tools\pr-watch.cmd`, takes the PR up again
-when they push). Note the
+A cherry-pick conflict is resolved here when it is mechanical: each side's intent survives untouched and the merge is
+plain - independent additions side by side (imports, entries, match arms, variants, `mod` lines, tests, docs), a
+rename or move on one side applied to the other's code, a version or key number both took (the next free one), or a
+PR commit already on `main` (left out). Build it, tell the review agent which commits were resolved and how so it
+reviews the resolution too, and name each resolution in the landing comment. A design conflict - both sides changing
+the same logic differently, one reworking what the other builds on, a resolution that would choose between designs
+or rewrite either side - is never resolved by guesswork: comment on the PR asking the contributor to rebase onto
+`main`, naming the conflicting files and the commits on `main` they meet, and release the lease with `--discard`
+(`tools\pr-watch.cmd` takes the PR up again when they push). Note the
 card(s) the PR adds or changes, every other card or shared function it touches, and the card's issue (`Closes #N` in
 the commits, or `gh issue list --search "<Card Name> in:title" --state all`; a card with no issue gets one with
 `card-issues.py claim --pr "Card Name"` (the PR's own branch has the card, so `--pr`) only if the user agrees - the claim may be the contributor's).

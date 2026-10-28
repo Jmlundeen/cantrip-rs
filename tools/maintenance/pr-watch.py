@@ -56,9 +56,19 @@ a time. Landings still go one at a time.
 
 Nothing waits on the user without telling them on GitHub, where they can answer. Every comment you post on a pull
 request starts with `{MARK}`, so that your comments and theirs can be told apart.
-- A cherry-pick or rebase conflict with `main` is the contributor's to fix, never resolved by guesswork: comment on the
-  PR asking them to rebase it onto `main`, naming the conflicting files and the commits on `main` they conflict with,
-  release the lease with --discard, and carry on. The watcher takes the PR up again when they push.
+- A cherry-pick or rebase conflict with `main` that is mechanical is yours to resolve, and the PR goes on to review
+  and landing as usual. Mechanical means each side's intent survives untouched and the merge is plain: independent
+  additions side by side (imports, list or table entries, match arms, enum variants, `mod` lines, tests, docs), a
+  rename or move on one side applied to the other's code, a version or key number both sides took (take the next
+  free one), or a PR commit whose change is already on `main` (leave it out). Build the resolution, and tell the
+  review agent which commits you resolved and how, so it reviews the resolution with the rest; name each resolution
+  in the landing comment.
+- A conflict that is a design conflict is not resolved: both sides change the same logic or behaviour in different
+  ways, one side reworks what the other builds on, or a resolution would mean choosing between two designs or
+  rewriting either side's code. Comment on the PR asking the contributor to rebase onto `main`, naming the
+  conflicting files and the commits on `main` they meet, release the lease with --discard, write `PR #<N>: conflict
+  with main, contributor asked to rebase`, and carry on. The watcher takes the PR up again when they push.
+- A pull request you left open over a conflict before these rules: take it up again under them.
 - A decision only the user can make (a rules exception, a finding you cannot settle, a choice between designs) is
   asked on the PR: one comment with the question, the options and your recommendation, ending "Reply on this pull
   request to answer." Release the lease with --discard unless its slot holds work beyond the PR's commits (a
