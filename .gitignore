@@ -24,6 +24,9 @@ image-reference/
 # Agent worktrees
 .claude/worktrees/
 
+# tools\pr-watch.cmd's state and session logs
+.claude/pr-watch/
+
 # Personal Claude Code permissions (for example letting auto mode run git push); each contributor sets their own.
 .claude/settings.json
 .claude/settings.local.json
