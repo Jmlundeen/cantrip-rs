@@ -131,6 +131,27 @@ public sealed class LogWriterTests
         Assert.Empty(line.References);
     }
 
+    /// <summary>
+    /// A face-down spell or permanent is revealed as it leaves for anywhere but the battlefield (CR 708.9): the reveal names the
+    /// card where it went, by a handle the opponent has never held. The view sent with it shows the card, which the line names;
+    /// a handle the view holds nothing for reads as a card, never a failure.
+    /// </summary>
+    [Fact]
+    public void A_reveal_of_a_card_the_seat_has_never_seen_names_what_the_view_shows()
+    {
+        var bounced = new ViewHandle(40);
+        PlayerView view = View(Rival);
+        view.Objects.Add(new ObjectView { Handle = bounced, Name = "Abzan Guide", Known = true, Zone = ZoneKindView.Hand, Owner = Me });
+
+        LogWriter.Line shown = LogWriter.Write(Rival, view, new CardsRevealedEvent { Player = Me, Cards = [bounced] })!;
+        Assert.Equal("Alice reveals [Abzan Guide].", shown.Text);
+        Assert.Equal(bounced, Assert.Single(shown.References).Object);
+
+        LogWriter.Line unseen = LogWriter.Write(Rival, View(Rival), new CardsRevealedEvent { Player = Me, Cards = [new ViewHandle(41)] })!;
+        Assert.Equal("Alice reveals a card.", unseen.Text);
+        Assert.Empty(unseen.References);
+    }
+
     [Fact]
     public void Each_named_object_is_referenced_by_its_handle_in_the_order_the_line_names_it()
     {
