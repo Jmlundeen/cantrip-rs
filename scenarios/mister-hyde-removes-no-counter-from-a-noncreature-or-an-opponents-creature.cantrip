@@ -1,0 +1,76 @@
+# Mister Hyde, Monster Within: "Remove a counter from a creature you control. If you do, draw a card." Bot1's Everflowing Chalice has a
+# charge counter (not a creature) and Bot2's Grizzly Bears have a +1/+1 counter (not Bot1's), while no creature Bot1 controls has a
+# counter: on turn 3 nothing is asked, nothing comes off and no card is drawn (the library is one card shorter only for the turn's draw).
+
+[Bot1 Deck]
+Gleemox
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mister Hyde, Monster Within
+Everflowing Chalice
+Forest x10
+
+[Bot2 Deck]
+Mox Pearl
+Gleemox
+Forest
+Grizzly Bears
+Go Nuts!
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mister Hyde, Monster Within.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Everflowing Chalice.Cast(Kicked: 1)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Gleemox.Cast
+Bot2.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Hand.Go Nuts!.Cast
+Bot2.Modes(Cast without teamwork)
+Bot2.Modes(1)
+Bot2.Target(Bot2.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Upkeep]
+? Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 1
+? Bot2.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 1
+? Bot1.Library.Count = 10
+Bot1.Modes(2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Library.Count = 9
+Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 1
+Bot2.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mister Hyde, Monster Within.Power = 2
