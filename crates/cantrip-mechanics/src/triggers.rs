@@ -17,6 +17,18 @@ pub fn this_enters(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
     }
 }
 
+/// "Whenever this permanent becomes tapped" (CR 603.2e, 701.26a): any event that taps the source permanent.
+/// Gran-Gran and Beckett Mariner print it.
+pub fn this_becomes_tapped(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Tapped { permanent } if *permanent == me.source => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// A self-tapped trigger condition, `triggered(THIS_BECOMES_TAPPED, ..)`.
+pub const THIS_BECOMES_TAPPED: Trigger = when_asked(EventMask::TAPPED, this_becomes_tapped);
+
 /// "Whenever another creature or planeswalker you control enters" (CR 603.6a): a different permanent that entered
 /// the battlefield under this source's controller's control, and is a creature or planeswalker as it entered. Liliana
 /// the Faultless and Liliana the Repentant print it.
