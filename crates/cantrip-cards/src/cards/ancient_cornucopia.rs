@@ -15,7 +15,7 @@ fn gain_ability(q: &dyn Query, source: ObjectId) -> AbilityRef {
 /// life with it this turn (CR 603.2h).
 fn you_cast_a_colored_spell(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, player, .. } if *player == me.controller && !q.history().done(me.source, gain_ability(q, me.source)) => {
+        Event::SpellCast { spell, player, .. } if *player == me.controller && !q.history().done(me.source, gain_ability(q, me.source), me.controller) => {
             let colors = q.chars(*spell).colors.iter().count() as u32;
             (colors > 0).then_some(Fired { subject: Target::Object(*spell), data: [colors, 0] })
         }
@@ -27,13 +27,13 @@ fn you_cast_a_colored_spell(q: &dyn Query, me: &Asker, event: &Event) -> Option<
 /// has not gained life with this permanent this turn, and spent only by a yes: declining leaves the next colored spell
 /// free to trigger it.
 fn may_gain_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if g.history().done(item.object, item.ability) {
+    if g.history().done(item.object, item.ability, item.controller) {
         return Ok(());
     }
     if !ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
-    g.note_done(item.object, item.ability);
+    g.note_done(item.object, item.ability, item.controller);
     g.gain_life(item.controller, item.data[0] as i32);
     Ok(())
 }

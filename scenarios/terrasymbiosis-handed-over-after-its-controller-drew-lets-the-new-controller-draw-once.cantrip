@@ -1,0 +1,61 @@
+# Terrasymbiosis: "Do this only once each turn" (CR 603.2h): "This ability triggers only if its source's controller has not
+# yet taken the indicated action that turn" - the controller now. On turn 3 Bot1 puts a +1/+1 counter on its Ornithopter
+# with Snakeskin Veil and draws 1, then gives Terrasymbiosis to Bot2 with Harmless Offering. Bot2 Veils its own
+# Ornithopter that same turn: Bot2 has not drawn with it, so it triggers for Bot2, who draws 1.
+# Bot2's hand: 7, + 1 drawn on turn 2, - Mountain - Ornithopter, - the Veil, + 1 = 6.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Terrasymbiosis
+Ornithopter
+Snakeskin Veil
+Harmless Offering
+Forest x12
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Snakeskin Veil
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Terrasymbiosis.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Accept
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Terrasymbiosis)
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Hand.Count = 6
+Bot1.Hand.Count = 1

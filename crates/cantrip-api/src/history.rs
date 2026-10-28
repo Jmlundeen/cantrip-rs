@@ -438,9 +438,13 @@ impl<'a> History<'a> {
             .count()
     }
 
-    /// Whether the player has done what this ability says they may do only once each turn (CR 603.2h).
-    pub fn done(&self, source: ObjectId, ability: AbilityRef) -> bool {
-        self.this_turn().iter().any(|r| matches!(r.event, Event::Done { source: s, ability: a, .. } if s == source && a == ability))
+    /// Whether `player` has done this turn what this ability of this object says may be done only once each turn (CR
+    /// 603.2h: it "triggers only if its source's controller has not yet taken the indicated action that turn"). Asked of
+    /// the source's controller now, so a player who gains control of it after another did it may still do it once.
+    pub fn done(&self, source: ObjectId, ability: AbilityRef, player: PlayerId) -> bool {
+        self.this_turn().iter().any(|r| {
+            matches!(r.event, Event::Done { source: s, ability: a, player: p } if s == source && a == ability && p == player)
+        })
     }
 
     /// Cards `player` has drawn this turn (CR 121).

@@ -19,7 +19,7 @@ fn you_put_plus_one_counters(q: &dyn Query, source: ObjectId, event: &Event) -> 
                 && *by == q.controller(source)
                 && q.controller(*object) == q.controller(source)
                 && q.chars(*object).is(CardType::Creature)
-                && !q.history().done(source, draw_ability(q, source)) =>
+                && !q.history().done(source, draw_ability(q, source), q.controller(source)) =>
         {
             Some(Fired { subject: Target::Object(*object), data: [*amount as u32, 0] })
         }
@@ -30,11 +30,11 @@ fn you_put_plus_one_counters(q: &dyn Query, source: ObjectId, event: &Event) -> 
 /// "You may draw that many cards. Do this only once each turn." Asked only while its controller has not drawn with
 /// this permanent this turn, and spent only by a yes; not offered a player who can't draw that many (CR 121.3, 121.2b).
 fn draw_that_many(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if item.data[0] == 0 || g.history().done(item.object, item.ability) {
+    if item.data[0] == 0 || g.history().done(item.object, item.ability, item.controller) {
         return Ok(());
     }
     if may_draw(g, item.controller, item.object, item.data[0], &ASK)? {
-        g.note_done(item.object, item.ability);
+        g.note_done(item.object, item.ability, item.controller);
     }
     Ok(())
 }

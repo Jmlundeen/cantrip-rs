@@ -2200,8 +2200,7 @@ impl cantrip_api::Game for Cx<'_> {
         day_night::become_designation(self, DayNight::Night).map_err(|_| Suspend)
     }
 
-    fn note_done(&mut self, source: ObjectId, ability: AbilityRef) {
-        let player = self.g.state.obj(source).controller;
+    fn note_done(&mut self, source: ObjectId, ability: AbilityRef, player: PlayerId) {
         self.record(Event::Done { source, ability, player });
     }
 

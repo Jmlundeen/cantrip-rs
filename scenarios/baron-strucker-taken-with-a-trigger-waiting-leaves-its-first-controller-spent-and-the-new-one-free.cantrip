@@ -1,0 +1,94 @@
+# Baron Strucker, HYDRA Overlord: "Do this only once each turn" (CR 603.2h) when control of him changes while his triggers
+# wait. On turn 5 Agents of HYDRA enters under Bot1 (a trigger), and in response Bot1 flashes in Swarm, Being of Bees (a
+# second trigger, above it). With both waiting, Bot2 takes Baron with Old Man of the Sea. Both triggers are still Bot1's
+# (CR 603.3a) and their "you" is Bot1: the second resolves and Bot1 has Swarm connive (an Ornithopter discarded: a +1/+1
+# counter) - Bot1's doing, though Bot2 controls Baron by then. The first finds Bot1 has connived with Baron this turn and
+# asks nothing, so Agents stays 1/1. Bot2, Baron's controller now, has not: Bot2's own Swarm, flashed in after, triggers
+# for Bot2 and connives (a Swamp discarded, no counter).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Baron Strucker, HYDRA Overlord
+Agents of HYDRA
+Swarm, Being of Bees
+Island
+Island
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Old Man of the Sea
+Swarm, Being of Bees
+Swamp
+Swamp
+Swamp
+Island
+Swamp
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Baron Strucker, HYDRA Overlord.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Agents of HYDRA.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swarm, Being of Bees.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Baron Strucker, HYDRA Overlord)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Baron Strucker, HYDRA Overlord.Tapped = false
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Choose(Ornithopter)
+? Bot1.Battlefield.Swarm, Being of Bees.Power = 3
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+? Stack.Count = 0
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Swarm, Being of Bees.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+Bot2.Choose(Swamp)
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Agents of HYDRA.Power = 1
+Bot1.Battlefield.Swarm, Being of Bees.Power = 3
+Bot2.Battlefield.Swarm, Being of Bees.Power = 2
+Bot1.Graveyard = Ornithopter
+Bot2.Graveyard = Swamp

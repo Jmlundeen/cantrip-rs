@@ -742,9 +742,9 @@ pub trait Game: Query {
     /// this transforms" ability (CR 712.20), which may ask a question.
     fn become_day(&mut self) -> Result<(), Suspend>;
     fn become_night(&mut self) -> Result<(), Suspend>;
-    /// Records that the controller did what the ability lets them do only once each turn (CR 603.2h), for
-    /// `History::done`.
-    fn note_done(&mut self, source: ObjectId, ability: AbilityRef);
+    /// Records that `player`, the ability's controller, did what this ability of this object lets them do only once each
+    /// turn (CR 603.2h), for `History::done`.
+    fn note_done(&mut self, source: ObjectId, ability: AbilityRef, player: PlayerId);
     /// Marks a permanent to be exiled instead if it would leave the battlefield (CR 702.84a).
     fn exile_on_leave(&mut self, permanent: ObjectId);
     fn shuffle(&mut self, player: PlayerId);

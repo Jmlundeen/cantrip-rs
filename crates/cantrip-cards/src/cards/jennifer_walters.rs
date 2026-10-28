@@ -26,7 +26,7 @@ fn creature_you_control_is_dealt_damage(q: &dyn Query, source: ObjectId, event: 
             if *amount > 0
                 && q.controller(*id) == q.controller(source)
                 && q.chars(*id).is(CardType::Creature)
-                && !q.history().done(source, retaliation(q, source)) =>
+                && !q.history().done(source, retaliation(q, source), q.controller(source)) =>
         {
             Some(Fired { subject: *target, data: [*amount as u32, 0] })
         }
@@ -38,7 +38,7 @@ fn creature_you_control_is_dealt_damage(q: &dyn Query, source: ObjectId, event: 
 /// limit is spent by the doing, not by the triggering: a "no" leaves the turn unspent, and a triggering that waited
 /// while another was done finds it spent.
 fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if g.history().done(item.object, item.ability) || !g.target_legal(item, 0) {
+    if g.history().done(item.object, item.ability, item.controller) || !g.target_legal(item, 0) {
         return Ok(());
     }
     let amount = item.data[0] as u16;
@@ -48,7 +48,7 @@ fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
-    g.note_done(item.object, item.ability);
+    g.note_done(item.object, item.ability, item.controller);
     g.damage(item.object, item.target(0), amount);
     Ok(())
 }

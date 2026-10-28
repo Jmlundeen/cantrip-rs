@@ -38,7 +38,7 @@ fn look_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     if ask_may(g, you, top, Purpose::CastFree)? && g.cast_during_resolution(top, Some(ManaCost::ZERO))? {
-        g.note_done(item.object, item.ability);
+        g.note_done(item.object, item.ability, you);
     }
     Ok(())
 }

@@ -1,0 +1,74 @@
+# The Sensational She-Hulk: "Do this only once each turn" (CR 603.2h): "This ability triggers only if its source's
+# controller has not yet taken the indicated action that turn" - the controller now. On turn 4 Bot2 bolts her and Bot1
+# has her deal 3 to Bot2. Bot2 then takes her with Act of Treason and bolts its own Ornithopter: a creature Bot2 controls
+# is dealt damage, Bot2 has not had her deal damage this turn, so it triggers for Bot2, who has her deal 3 to Bot1.
+# Bot1 casts her as her back face on turn 1 off a Plains and five Moxen.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Jennifer Walters
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Jet
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Act of Treason
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jennifer Walters.Cast(Ability: back face)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.The Sensational She-Hulk)
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot2.Pass
+Bot1.Accept
+? Bot2.Life = 17
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.The Sensational She-Hulk)
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot2.Target(Bot1)
+Bot1.Pass
+Bot2.Accept
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 17
+Bot2.Graveyard = Ornithopter; Lightning Bolt; Act of Treason; Lightning Bolt

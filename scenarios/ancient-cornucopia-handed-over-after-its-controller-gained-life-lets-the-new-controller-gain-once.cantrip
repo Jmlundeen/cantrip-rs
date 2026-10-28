@@ -1,0 +1,60 @@
+# Ancient Cornucopia: "Do this only once each turn" (CR 603.2h): "This ability triggers only if its source's controller has
+# not yet taken the indicated action that turn" - the controller now, not whoever had it before. On turn 3 Bot1 casts a
+# Lightning Bolt with Cornucopia's own red and gains 1, then gives it to Bot2 with Harmless Offering (red, but Bot1 has
+# done it this turn: not asked, a refusal). Bot2 then bolts Bot1 that same turn: Bot2 has not gained life with it, so it
+# triggers for Bot2, who gains 1.
+# Life: Bot1 20 + 1 - 3 = 18; Bot2 20 - 3 + 1 = 18.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Ancient Cornucopia
+Lightning Bolt
+Harmless Offering
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ancient Cornucopia.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ancient Cornucopia.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Accept
+Bot2.Pass
+? Bot1.Life = 21
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Ancient Cornucopia)
+Bot1.Pass
+! Bot1.Accept
+? Bot2.Battlefield.Ancient Cornucopia.Tapped = true
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot2.Accept
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18

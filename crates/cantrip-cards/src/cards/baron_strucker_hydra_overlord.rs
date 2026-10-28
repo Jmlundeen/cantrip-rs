@@ -24,7 +24,7 @@ fn connive_ability(q: &dyn Query, source: ObjectId) -> AbilityRef {
 /// "Whenever another Villain you control enters" (CR 603.2, 603.6a), not at all once its controller has done the "do this only
 /// once each turn" (CR 603.2h), as Terrasymbiosis does.
 fn another_villain_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    if q.history().done(me.source, connive_ability(q, me.source)) {
+    if q.history().done(me.source, connive_ability(q, me.source), me.controller) {
         return None;
     }
     triggers::another_of_subtype_you_control_enters::<{ lands::sub(Subtype::Villain) }>(q, me, event)
@@ -35,11 +35,11 @@ fn another_villain_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fi
 /// that waited while another was done finds it spent.
 fn may_connive(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(villain) = item.subject else { return Ok(()) };
-    if g.history().done(item.object, item.ability) {
+    if g.history().done(item.object, item.ability, item.controller) {
         return Ok(());
     }
     if ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
-        g.note_done(item.object, item.ability);
+        g.note_done(item.object, item.ability, item.controller);
         connive(g, villain, item.object)?;
     }
     Ok(())

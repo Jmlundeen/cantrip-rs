@@ -1,0 +1,62 @@
+# Baron Strucker, HYDRA Overlord: "Do this only once each turn" (CR 603.2h): "This ability triggers only if its source's
+# controller has not yet taken the indicated action that turn" - the controller now. On turn 3 Bot1's Agents of HYDRA
+# connives (Island discarded), then Bot1 gives Baron Strucker to Bot2 with Harmless Offering. Bot2 flashes in Swarm, Being
+# of Bees that same turn ({1}{B}: Baron's discount is Bot2's now): Bot2 has not connived with it, so it triggers for Bot2,
+# whose Swarm connives (a Swamp discarded, no counter).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Baron Strucker, HYDRA Overlord
+Agents of HYDRA
+Harmless Offering
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Swarm, Being of Bees
+Swamp x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Baron Strucker, HYDRA Overlord.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Agents of HYDRA.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Accept
+Bot1.Choose(Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Baron Strucker, HYDRA Overlord)
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Swarm, Being of Bees.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+Bot2.Choose(Swamp)
+
+[Expect]
+Bot2.Battlefield = Swamp; Mox Jet; Baron Strucker, HYDRA Overlord; Swarm, Being of Bees
+Bot2.Graveyard = Swamp
+Bot1.Graveyard = Harmless Offering; Island
