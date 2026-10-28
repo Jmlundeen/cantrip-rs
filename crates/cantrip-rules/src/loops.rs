@@ -167,7 +167,7 @@ pub fn at_priority(cx: &mut Cx) -> bool {
         return false;
     }
     clear(cx.st());
-    cx.st().set_outcome(Outcome::Draw);
+    crate::ops::end_game(cx, Outcome::Draw);
     cx.record(Event::GameDrawn { reason: DrawReason::MandatoryLoop });
     true
 }

@@ -42,6 +42,8 @@ mod cloak_tests;
 #[cfg(test)]
 mod morph_tests;
 #[cfg(test)]
+mod face_down_reveal_tests;
+#[cfg(test)]
 mod prototype_tests;
 #[cfg(test)]
 mod assist_tests;
@@ -424,7 +426,7 @@ impl Game {
             // RX-1: a game as long as the engine records is a draw, between two frames, so that no frame is left half done.
             if self.log.len() >= self.max_events {
                 let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
-                cx.st().set_outcome(Outcome::Draw);
+                ops::end_game(&mut cx, Outcome::Draw);
                 cx.record(Event::GameDrawn { reason: DrawReason::EventLimit });
                 return;
             }
@@ -668,6 +670,17 @@ impl Game {
             self.log.extend(events);
         }
         self.at = target;
+    }
+
+    /// The game ends from outside its rules with `outcome`, whatever is being asked of whom: a draw its players agree to (CR
+    /// 104.4a), or a match clock or an abandoned table ending it (`docs/rules-exceptions.md`, RX-4). Its end reveals what
+    /// every end does (CR 708.9, `ops::end_game`), and nothing more is asked. Nothing for a game already over.
+    pub fn end(&mut self, outcome: Outcome) {
+        if self.state.is_over() || outcome == Outcome::InProgress {
+            return;
+        }
+        let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+        ops::end_game(&mut cx, outcome);
     }
 
     /// `player` concedes (CR 104.3a), whatever is being asked of whom: they leave the game at once (`ops::concede`), after

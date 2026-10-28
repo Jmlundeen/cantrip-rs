@@ -463,10 +463,10 @@ fn check_once(cx: &mut Cx) -> R<bool> {
         let left: Vec<PlayerId> = cx.s().apnap().collect();
         match left.len() {
             0 => {
-                cx.st().set_outcome(Outcome::Draw);
+                ops::end_game(cx, Outcome::Draw);
                 cx.record(Event::GameDrawn { reason: DrawReason::AllLost });
             }
-            1 => cx.st().set_outcome(Outcome::Won(left[0])),
+            1 => ops::end_game(cx, Outcome::Won(left[0])),
             _ => {}
         }
     }

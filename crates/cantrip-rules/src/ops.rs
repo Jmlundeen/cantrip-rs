@@ -4138,12 +4138,37 @@ fn leaves_having_lost(cx: &mut Cx, player: PlayerId, reason: LossReason) {
     let left: Vec<PlayerId> = cx.s().apnap().collect();
     match left.len() {
         0 => {
-            cx.st().set_outcome(Outcome::Draw);
+            end_game(cx, Outcome::Draw);
             cx.record(Event::GameDrawn { reason: DrawReason::AllLost });
         }
-        1 => cx.st().set_outcome(Outcome::Won(left[0])),
+        1 => end_game(cx, Outcome::Won(left[0])),
         _ => {}
     }
+}
+
+/// The game ends with `outcome` (CR 104): every way it ends comes here. At its end every face-down permanent and face-down
+/// spell is revealed to all players by its owner (CR 708.9), recorded before the end is, so the history and every seat
+/// have it; a seat may look at each from then on (`visibility::knows_face`, the game being over).
+pub fn end_game(cx: &mut Cx, outcome: Outcome) {
+    if cx.s().is_over() {
+        return;
+    }
+    for (player, card) in face_down_to_reveal(cx, |_| true) {
+        cx.record(Event::Revealed { player, card });
+    }
+    cx.st().set_outcome(outcome);
+}
+
+/// The face-down permanents (phased out too) and face-down spells (CR 708.9) that `which` takes, each with its owner, who
+/// reveals it.
+fn face_down_to_reveal(cx: &Cx, which: impl Fn(&Obj) -> bool) -> Vec<(PlayerId, ObjectId)> {
+    let s = cx.s();
+    [Zone::BATTLEFIELD, Zone::PHASED_OUT, Zone::STACK]
+        .into_iter()
+        .flat_map(|zone| s.zone(zone).iter().copied())
+        .filter(|&id| s.obj(id).face_down && which(s.obj(id)))
+        .map(|id| (s.obj(id).owner, id))
+        .collect()
 }
 
 /// A player gets poison counters (CR 122.1f), put on them by `by` (CR 122.6a); ten lose the game as a state-based action
@@ -4189,7 +4214,7 @@ pub fn win_game(cx: &mut Cx, player: PlayerId) {
     for o in opponents {
         cx.record(Event::GameLost { player: o, reason: LossReason::Effect });
     }
-    cx.st().set_outcome(Outcome::Won(player));
+    end_game(cx, Outcome::Won(player));
 }
 
 /// Records each player whose controller is no longer the one in `before`, which holds each player's (CR 723.1): what a
@@ -4211,6 +4236,17 @@ pub(crate) fn record_player_control(cx: &mut Cx, before: &[PlayerId]) {
 pub fn leave_game(cx: &mut Cx, player: PlayerId) {
     if cx.s().apnap().count() < 2 {
         return;
+    }
+    // Their face-down permanents and spells are revealed to all players as they leave (CR 708.9), each of whom may look at
+    // it from then on, though it has ceased to exist (`visibility::knows_face`).
+    let revealed = face_down_to_reveal(cx, |o| o.owner == player);
+    if !revealed.is_empty() {
+        let everyone = cx.s().seats().fold(0u8, |mask, p| mask | 1 << p.0);
+        for &(_, card) in &revealed {
+            cx.st().update_obj(card, |o| o.seen_by = everyone);
+        }
+        let events: Vec<Event> = revealed.into_iter().map(|(player, card)| Event::Revealed { player, card }).collect();
+        cx.emit_batch(&events, None);
     }
     // Everything they own, wherever it is, leaves at once: each as it was before any of them left (`cease_together`).
     let owned: Vec<(Zone, ObjectId)> = cx
