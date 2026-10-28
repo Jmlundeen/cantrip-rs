@@ -415,7 +415,54 @@ impl AiHost {
                 request_id,
                 seat,
                 answer,
-            } => self.mirror(game_id, |s| s.answer(request_id, seat, &answer)),
+            } => {
+                // The answer actually given is what the seat's cancel guard learns from, whoever gave it. A cancel is
+                // noted before it is applied: the undo takes back the objects of the cast it names.
+                use cantrip_engine::{Action, ActionKind, ActionOption, Answer};
+                use cantrip_host::protocol::ActionKindView;
+                let cancel = match &answer {
+                    AnswerPayload::CancelAnnouncementAnswer(_) => Some(Answer::Cancel),
+                    AnswerPayload::TakeActionAnswer(a) if a.kind == ActionKindView::CancelCasting => Some(Answer::Act(
+                        Action::of(&ActionOption::simple(ActionKind::CancelCasting)),
+                    )),
+                    _ => None,
+                };
+                let asked = self.games.get(&game_id).and_then(|m| {
+                    let mut m = m.lock().unwrap_or_else(|e| e.into_inner());
+                    let request = m.session.pending_request().filter(|r| r.id == request_id)?;
+                    let board = cantrip_ai::cancel::board_hash(&m.session.game().state);
+                    if let Some(cancel) = &cancel {
+                        let Mirror { session, payments, .. } = &mut *m;
+                        if let Some(payment) = payments.get_mut(request.player.index()) {
+                            let game = session.game();
+                            // Bookkeeping of the AI's own: never what the mirror replies.
+                            let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                                payment.played(game, board, &request, cancel)
+                            }));
+                        }
+                    }
+                    Some((request, board))
+                });
+                let reply = self.mirror(game_id, |s| s.answer(request_id, seat, &answer));
+                if cancel.is_none()
+                    && reply.get("Ok").is_some()
+                    && let (Some((request, board)), Some(m)) = (asked, self.games.get(&game_id))
+                {
+                    let mut m = m.lock().unwrap_or_else(|e| e.into_inner());
+                    let Mirror { session, payments, .. } = &mut *m;
+                    let game = session.game();
+                    if let Some((id, player, given)) = game.tree.answer(game.at)
+                        && *id == request.id
+                        && let Some(payment) = payments.get_mut(player.index())
+                    {
+                        // Bookkeeping of the AI's own: never what the mirror replies.
+                        let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                            payment.played(game, board, &request, given)
+                        }));
+                    }
+                }
+                reply
+            }
             Command::Concede { game_id, seat } => self.mirror(game_id, |s| s.concede(seat)),
             Command::View { game_id, seat } => {
                 self.mirror(game_id, |s| s.view(seat).map(|v| json!({ "View": v })))

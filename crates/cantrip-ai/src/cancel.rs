@@ -31,7 +31,7 @@ use cantrip_engine::*;
 ///
 /// foldhash with a fixed seed: the hash is taken several times a search step, and it is the same in every process. The
 /// guard only compares it for equality, and it never leaves the process.
-pub(crate) fn board_hash(state: &GameState) -> u64 {
+pub fn board_hash(state: &GameState) -> u64 {
     let mut h = foldhash::fast::FixedState::with_seed(0).build_hasher();
     (
         &state.players,

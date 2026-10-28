@@ -234,8 +234,13 @@ pub fn play(
                 );
             }
         }
+        // Noted before it is given, while the objects it names stand; taken back if the engine refuses it.
+        let board = cantrip_ai::cancel::board_hash(&game.state);
+        let before = payments[p].clone();
+        payments[p].played(&game, board, &request, &decided.answer);
         if let Err(Rejected(why)) = game.answer(request.id, request.player, decided.answer.clone())
         {
+            payments[p] = before;
             // The search's answers are the engine's to accept (tests/search.rs); one refused is the network's turn.
             network_fallbacks += 1;
             roots.remove(&at);
@@ -250,6 +255,7 @@ pub fn play(
                 Choice::Best,
             )
             .map_err(|e| format!("refused ({why}), and the network: {}", e.0))?;
+            payments[p].played(&game, board, &request, &d.answer);
             game.answer(request.id, request.player, d.answer)
                 .map_err(|Rejected(why2)| format!("refused twice: {why}; {why2}"))?;
         }

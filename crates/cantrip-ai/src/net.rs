@@ -60,12 +60,16 @@ pub struct Decision {
 /// never shown; asked again there, it would give up a payment half made.
 ///
 /// Around every answer it keeps the AI's cancel guard (`crate::cancel::CancelGuard`): an action the seat gives up is
-/// not offered again while the board it was given up on stands.
+/// not offered again while the board it was given up on stands. The guard learns only the answers actually given
+/// (`played`), never what was decided: a decision the table answers differently (a person, or another player for the
+/// seat), or one decided again before any answer, is not a play.
 #[derive(Clone, Debug, Default)]
 pub struct Payment {
     run: Option<(PlayerId, u8, ObjectId, ObjectId, bool)>,
     decided: Option<(FactoredAnswer, f32)>,
     guard: CancelGuard,
+    /// The request last decided and the answer decided: a payment run is kept to only if that is the answer given.
+    proposed: Option<(u32, Answer)>,
 }
 
 impl Payment {
@@ -110,7 +114,7 @@ impl Payment {
             && let Ok(answer) =
                 Answering::new(game, request, &obs, &index).engine(game, request, &factored)
         {
-            self.guard.note(game, board, request, &answer);
+            self.proposed = Some((request.id, answer.clone()));
             return Ok(Decision {
                 answer,
                 factored,
@@ -141,10 +145,18 @@ impl Payment {
             (Ok(d), Some(_)) => Some((d.factored.clone(), d.value)),
             _ => None,
         };
-        if let Ok(d) = &decided {
-            self.guard.note(game, board, request, &d.answer);
-        }
+        self.proposed = decided.as_ref().ok().map(|d| (request.id, d.answer.clone()));
         decided
+    }
+
+    /// Notes the answer the seat actually gave to `request`, `board` the board before it (`cancel::board_hash`): what
+    /// the cancel guard learns from. A payment run decided for another answer is not kept to.
+    pub fn played(&mut self, game: &Game, board: u64, request: &Request, answer: &Answer) {
+        if self.proposed.take().is_none_or(|(id, a)| id != request.id || a != *answer) {
+            self.run = None;
+            self.decided = None;
+        }
+        self.guard.note(game, board, request, answer);
     }
 
     /// `request` with the actions cancelled on this board filtered out, for a caller answering outside `decide` (a
@@ -408,6 +420,59 @@ mod guard_tests {
             options.iter().filter_map(|o| o.source).collect::<Vec<_>>(),
             vec![b]
         );
+    }
+
+    /// A decision is not a play: the request searched again before any answer is given offers the same moves, where the
+    /// guard once took the decided action for one begun and, seeing its board again, for one given up.
+    #[test]
+    fn a_second_decision_of_the_same_request_offers_the_same_moves() {
+        let (game, a, b) = game();
+        let request = Request {
+            id: 1,
+            player: PlayerId(0),
+            kind: RequestKind::Priority {
+                options: vec![
+                    option(ActionKind::ActivateAbility, a),
+                    option(ActionKind::ActivateAbility, b),
+                ],
+            },
+            may_cancel: false,
+        };
+        let knowledge = Knowledge::of(&game, PlayerId(0));
+        let mut payment = Payment::default();
+        let mut offered = Vec::new();
+        for _ in 0..2 {
+            let decided = payment.decide(&game, &request, &knowledge, InfoMode::Decklist, |asked, _| {
+                let RequestKind::Priority { options } = &asked.kind else {
+                    panic!("a priority")
+                };
+                offered.push(options.iter().filter_map(|o| o.source).collect::<Vec<_>>());
+                Ok(Decision {
+                    answer: Answer::Act(Action::of(&option(ActionKind::ActivateAbility, a))),
+                    factored: FactoredAnswer::Pass,
+                    value: 0.0,
+                    evaluations: 0,
+                    rejected: Vec::new(),
+                    fallback: false,
+                    late: false,
+                    steps: 0,
+                    encode: Duration::ZERO,
+                    evaluate: Duration::ZERO,
+                    search: None,
+                })
+            });
+            assert!(decided.is_ok());
+        }
+        assert_eq!(offered, vec![vec![a, b], vec![a, b]]);
+
+        // A play given and then undone, back at its board, is what the guard keeps out.
+        let board = board_hash(&game.state);
+        payment.played(&game, board, &request, &Answer::Act(Action::of(&option(ActionKind::ActivateAbility, a))));
+        let filtered = payment.guard.filtered_on(&game, board, &request);
+        let RequestKind::Priority { options } = filtered.kind else {
+            panic!("a priority")
+        };
+        assert_eq!(options.iter().filter_map(|o| o.source).collect::<Vec<_>>(), vec![b]);
     }
 
     /// A ward's payment given up is declined when the same ward is offered again in the turn, not paid and given up again.
