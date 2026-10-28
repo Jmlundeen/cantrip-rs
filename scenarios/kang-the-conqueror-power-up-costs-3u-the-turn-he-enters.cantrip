@@ -1,0 +1,44 @@
+# Kang the Conqueror: "Power-up — {5}{U}{U}{U}" costs his mana cost, {2}{U}{U}, less the turn he enters: {3}{U} (CR
+# 702.193a-b). Bot1 casts Kang with Black Lotus's {U}{U}{U} and Island's {U}, then holds four colorless mana from Sol
+# Ring and Mana Crypt and no source of blue: the power-up is refused for want of its {U}. Mox Sapphire gives it, and
+# of the five mana in the pool the power-up takes exactly four, leaving one {C}.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mana Crypt
+Mox Jet
+Kang the Conqueror
+Sol Ring
+Mox Sapphire
+Island x10
+
+[Bot2 Deck]
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Kang the Conqueror.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+! Bot1.Battlefield.Kang the Conqueror.Activate(Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{C}{C}{C}{C}
+Bot1.Battlefield.Kang the Conqueror.Activate
+? Bot1.Mana = {C}
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Kang the Conqueror.Counters.PlusOnePlusOne = 1
