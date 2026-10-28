@@ -1,0 +1,74 @@
+# Heroic Feast: "choose up to that many target creatures you control": Healing Salve gains Bot1 3 life and it chooses none of its one
+# creature, so the Grizzly Bears get no counter (2/2); Bot2's Grizzly Bears, not a creature Bot1 controls, can't be chosen. The Feast
+# was cast on turn 3, the Salve on turn 5.
+
+[Bot1 Deck]
+Gleemox
+Mox Emerald
+Mox Jet
+Mox Pearl
+Forest
+Forest
+Grizzly Bears
+Heroic Feast
+Healing Salve
+Forest x10
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Grizzly Bears
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Heroic Feast.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Grizzly Bears)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears.Power = 2
