@@ -80,6 +80,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-141](#ki-141-a-creature-type-chosen-past-the-encoders-128-tokens-makes-no-training-sample) | A creature type chosen past the encoder's 128 tokens makes no training sample | Pri-3 | Open |
 | [KI-142](#ki-142-the-ai-encoder-cannot-tell-apart-options-that-differ-only-by-their-grant-or-a-companion-from-exiling-to-pay) | The AI encoder cannot tell apart options that differ only by their grant, or a companion from exiling to pay | Pri-3 | Open |
 | [KI-143](#ki-143-a-scenario-check-right-after-an-activation-can-read-the-pool-before-its-payment-finishes) | A scenario check right after an activation can read the pool before its payment finishes | Pri-2 | Open |
+| [KI-144](#ki-144-mathemagics-with-an-x-of-32-or-more-draws-at-most-4294967295-cards) | Mathemagics with an X of 32 or more draws at most 4,294,967,295 cards | Pri-3 | Won't fix: beyond practical scale |
 
 ## Issues
 
@@ -597,3 +598,22 @@ finish paying, so it reads the whole pool (`{B}{B}{B}{B}{R}{G}`) rather than wha
 Hellion put a refusal line between the activation and the check, which lands at the next priority after the payment.
 A fix either finishes the pending payment before a `?` check runs or refuses a check made mid-payment, so a check can't
 silently read a state no player would see.
+
+### KI-144: Mathemagics with an X of 32 or more draws at most 4,294,967,295 cards
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Won't fix: beyond practical scale | cards (`mathemagics.rs`) | 2026-10-28, Mathemagics |
+
+**Notes.** "Target player draws 2^X cards" counts its draws in 32 bits (`1u32.checked_shl(X)`), so from an X of 32 the count
+is 4,294,967,295 (`u32::MAX`) rather than 2^X. Play cannot tell the difference except in one case: no library holds 2^32
+cards, so every such instruction ends in the same state, the library empty and the player having drawn from it (CR 121.4,
+704.5b), and once it is empty `ops::draw_cards` stops at the first draw that cannot be made when nothing replaces draws
+(the repeats change nothing) instead of looping through the rest. An effect that replaces this player's draws (Hullbreacher; an X of 32
+needs {32}{32}{U}{U}, 66 mana) keeps the count running, one replaced draw at a time, to the clamped number; an unrelated
+replacement effect in the game (Rest in Peace) does not (`replace::draws_only_repeat_an_attempt_from_an_empty_library`
+asks for effects that would apply to this player's draw). Past that
+a different count would only follow from a card that puts a library of 2^32 cards into a game.
+
+**Scenarios.** `mathemagics-for-x-two-against-an-empty-library-stops-drawing-at-once-and-loses` (the early end of a
+draw against an empty library); an X of 32 is 66 mana and no scenario pays it.
