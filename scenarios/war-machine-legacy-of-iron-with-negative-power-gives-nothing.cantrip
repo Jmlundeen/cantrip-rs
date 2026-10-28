@@ -1,0 +1,55 @@
+# War Machine, Legacy of Iron: X is his power as the ability resolves, and a negative X counts as 0 (CR 107.1b). On turn 3
+# his beginning-of-combat ability targets Memnite, and in response Bot2's Depower gives him -4/-0: he is -3/3 as it resolves,
+# so Memnite gets +0/+0 and is still a 1/1, not -2/1.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+War Machine, Legacy of Iron
+Memnite
+Forest x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Depower
+Island x14
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.War Machine, Legacy of Iron.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.BeginCombat]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Hand.Depower.Cast(Bot1.Battlefield.War Machine, Legacy of Iron)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.War Machine, Legacy of Iron.Power = -3
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Memnite.Power = 1
