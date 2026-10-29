@@ -1,0 +1,52 @@
+# Northampton Farm: "{1}, {T}: Exile target creature you own" - Bot2's Ornithopter is not Bot1's to target - and Bot1's
+# Mutavault, a 2/2 creature until end of turn, is. In exile it is a land card, not a creature card (CR 400.7, 109.3), so
+# when the Farm is sacrificed it is no "creature card exiled with this land" to return to the battlefield: it is one of
+# "each other card exiled with this land", returned to its owner's hand (CR 607.2a).
+
+[Bot1 Deck]
+Mutavault
+Northampton Farm
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Plains x14
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Northampton Farm.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Northampton Farm.Activate(Ability: Exile target; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Northampton Farm.Activate(Ability: Exile target; Bot1.Battlefield.Mutavault)
+Bot2.Pass
+Bot1.Pass
+? Exile = Mutavault
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Northampton Farm.Activate(Ability: Return)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire
+Bot1.Hand = Mutavault; Plains; Plains; Plains
+Bot1.Graveyard = Northampton Farm
+Bot2.Battlefield = Ornithopter
