@@ -1,0 +1,61 @@
+# Ninja Teen's level 3 gives sneak to "creature cards in your graveyard" and lets "you" cast them: Bot1's level-3 Ninja Teen gives
+# nothing to Bot2. On turn 4 Bot2 attacks Bot1 with an unblocked Ornithopter and, in the declare blockers step with four mana
+# untapped ({3}{B}: Moxen and a Swamp), may not cast the Ornithopter in its own graveyard for sneak {3}{B}: it stays there, and
+# the attacking Ornithopter stays on the battlefield.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ninja Teen
+Swamp x16
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ornithopter
+Ornithopter
+Lightning Bolt
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ninja Teen.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Ornithopter; Lightning Bolt
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Ninja Teen.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Ninja Teen.Activate(Ability: Level 3)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Attack(Ornithopter > Bot1)
+[T4 Bot2.DeclareBlockers]
+! Bot2.Graveyard.Ornithopter.Cast(Ability: Sneak {3}{B})
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot2.Battlefield.Ornithopter.Tapped = true
