@@ -313,7 +313,8 @@ fn goldens() {
 }
 
 /// The scenario corpus's positions encoded with the engine's card index: every visible card the observations name has
-/// a row.
+/// a row, a token a text change renamed included (it is named for its definition). An object with no name, which is no
+/// card (a token copy of a face-down creature, CR 707.2, 708.2), has none to have.
 #[test]
 fn the_cards_of_the_sample_have_rows() {
     let table = CardIndex::engine();
@@ -327,6 +328,7 @@ fn the_cards_of_the_sample_have_rows() {
             for o in &p.obs.objects {
                 if let cantrip_obs::ObjectObs::Visible(v) = o
                     && let Some(n) = &v.name
+                    && !n.is_empty()
                 {
                     named += 1;
                     if table.row(n) == encode::UNKNOWN_CARD {

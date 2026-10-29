@@ -197,7 +197,7 @@ impl View<'_> {
                 mana_value: Query::mana_value(game, id),
             }
         };
-        let name = if o.face_down { looks.then(|| game.cards.get(o.card).name.to_string()) } else { Some(game.name(id).to_string()) };
+        let name = if o.face_down { looks.then(|| game.cards.get(o.card).name.to_string()) } else { Some(identity(game, id).to_string()) };
         let attacker = s.attackers.iter().find(|a| a.id == id);
         let item = s.stack.iter().find(|item| item.kind == StackKind::Spell && item.object == id);
         let mut v = VisibleObs {
@@ -260,7 +260,7 @@ impl View<'_> {
                 let name = if !public {
                     String::new()
                 } else if live(s, item.object) && !source.face_down {
-                    self.game.name(item.object).to_string()
+                    identity(self.game, item.object).to_string()
                 } else {
                     self.game.cards.get(source.card).name.to_string()
                 };
@@ -434,6 +434,13 @@ fn place_of(zone: Zone) -> Place {
         ZoneKind::Command | ZoneKind::Gone => (ZoneObs::Command, 0),
     };
     Place { zone: zone_obs, player }
+}
+
+/// The name of the card an object is: that of the card whose printed values its copiable values are (`Chars::card`), a
+/// row of the card index. Not the name it shows, which need be no card's: a token the text that made it names for its
+/// subtypes is named for them as a text change made them ("Phyrexian Elf Token" of a Hydra token, CR 111.4, 612.2a).
+fn identity(game: &Game, id: ObjectId) -> &'static str {
+    game.cards.get(game.chars(id).card).name
 }
 
 /// A request's kind by name: its variant.

@@ -127,7 +127,9 @@ pub struct VisibleObs {
     pub position: Option<u16>,
     pub owner: u8,
     pub controller: u8,
-    /// None for a face-down object whose face the seat may not see.
+    /// The name of the card it is, its card index row (its copiable values' card's, which a token renamed by a text change
+    /// is no less than its definition); empty for an object that has no name (a copy of a face-down creature, CR 707.2,
+    /// 708.2); none for a face-down object whose face the seat may not see.
     pub name: Option<String>,
     pub chars: CharsObs,
     pub face_down: bool,
