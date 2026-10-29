@@ -1,0 +1,84 @@
+# Blech, Loafing Pest puts a +1/+1 counter on each Pest, Bat, Insect, Snake and Spider its controller controls, one creature of
+# each type here: Blech itself (Pest, 3/4 -> 4/5), Eyetwitch (Eye Bat), Haywire Mite (Insect), Ankle Biter (Snake) and Masked
+# Meower (Spider Cat Hero), each 1/1 -> 2/2. Bot2's Teacher's Pest is a Pest Bot1 doesn't control, and stays 1/1 ("you
+# control").
+
+[Dice]
+1; 1; 1; 1; 1; 1
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Black Lotus
+Blech, Loafing Pest
+Eyetwitch
+Ankle Biter
+Masked Meower
+Haywire Mite
+Healing Salve
+Island x22
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Teacher's Pest
+Island x29
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blech, Loafing Pest.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Teacher's Pest.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Eyetwitch.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ankle Biter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield.Blech, Loafing Pest.Power = 4
+Bot1.Battlefield.Eyetwitch.Power = 2
+Bot1.Battlefield.Haywire Mite.Power = 2
+Bot1.Battlefield.Ankle Biter.Power = 2
+Bot1.Battlefield.Masked Meower.Power = 2
+Bot2.Battlefield.Teacher's Pest.Power = 1
