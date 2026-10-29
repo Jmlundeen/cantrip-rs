@@ -1,0 +1,30 @@
+# Retro-Mutation on Bot1's Dryad Arbor (a Land Creature - Forest Dryad): "Enchanted creature is a Turtle" replaces only its
+# creature types (CR 205.1b): Dryad goes, Forest stays, and it is still a land creature. "Loses all abilities" (layer 6) takes
+# the mana ability its Forest type gives it (CR 305.6, 613.1f), so it can't tap for {G}.
+
+[Bot1 Deck]
+Dryad Arbor
+Black Lotus
+Retro-Mutation
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Retro-Mutation.Cast(Bot1.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+! Bot1.Battlefield.Dryad Arbor.Activate
+
+[Expect]
+Bot1.Battlefield.Dryad Arbor.Subtypes = Forest; Turtle
+Bot1.Battlefield.Dryad Arbor.Power = 0
+Bot1.Battlefield.Dryad Arbor.Toughness = 1
