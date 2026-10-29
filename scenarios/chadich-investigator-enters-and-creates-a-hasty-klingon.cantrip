@@ -1,0 +1,30 @@
+# Cha'DIch Investigator's enter trigger creates a hasty 2/1 Klingon; the paid mana puts it onto the battlefield without combat.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Sol Ring
+Cha'DIch Investigator
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Cha'DIch Investigator.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Cha'DIch Investigator.Power = 4
+Bot1.Battlefield.Cha'DIch Investigator.Toughness = 4
+Bot1.Battlefield.Klingon Token.Power = 2
+Bot1.Battlefield.Klingon Token.Toughness = 1
+Bot1.Battlefield.Klingon Token.Keywords = Haste
+
