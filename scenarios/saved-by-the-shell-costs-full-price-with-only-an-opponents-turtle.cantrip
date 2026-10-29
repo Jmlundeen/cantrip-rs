@@ -1,0 +1,42 @@
+# Saved by the Shell: "This spell costs {1} less to cast if you control a Turtle" - a Turtle you control. Bot2 controls Aegis Turtle
+# and Bot1 controls none, so with only Mox Emerald's {G} Bot1 cannot cast it; Mox Jet's {B} added to it pays the full {1}{G}.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Ornithopter
+Saved by the Shell
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Aegis Turtle
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Aegis Turtle.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Saved by the Shell.Cast(Bot1.Battlefield.Ornithopter; Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Saved by the Shell.Cast(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 1
