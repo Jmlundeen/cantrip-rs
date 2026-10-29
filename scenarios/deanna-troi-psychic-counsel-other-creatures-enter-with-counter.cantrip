@@ -1,0 +1,36 @@
+# CR 614.12, 122.6: Bot1's other creature enters with a +1/+1 counter; Bot2's creature and Deanna do not.
+# Deanna Troi, Psychic Counsel {1}{W}: Legendary Creature — Betazoid Human Advisor
+#   Other creatures you control enter with an additional +1/+1 counter on them.
+# Written by new-card.py --scenario: Deanna Troi, Psychic Counsel cast on turn 1 off zero-cost mana sources. Grow it a line at a time with
+#   cargo run --profile cards -p cantrip-script --bin corpus -- --scenario deanna-troi-psychic-counsel-other-creatures-enter-with-counter --next --brief
+# and see which keys the card moved with --diff <the line number of its cast>.
+
+[Bot1 Deck]
+Deanna Troi, Psychic Counsel
+Mox Pearl
+Mox Sapphire
+Memnite
+Plains x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Deanna Troi, Psychic Counsel.Cast
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 2
+Bot2.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Deanna Troi, Psychic Counsel.Power = 2
