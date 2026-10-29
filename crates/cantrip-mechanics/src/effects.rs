@@ -58,6 +58,16 @@ pub fn target_creature_gets_and_gains_first_strike<const P: i16, const T: i16>(g
     Ok(())
 }
 
+/// "Tap target creature. Put two stun counters on it." Kaito, Bane of Nightmares and Constable Odo print this effect
+/// (CR 701.26a, 122.1d); target filters remain with each card.
+pub fn tap_and_stun_two_on_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = crate::targets::object(g, item, 0) {
+        g.tap(creature);
+        g.add_counters(creature, CounterKind::Stun, 2);
+    }
+    Ok(())
+}
+
 /// "One or two target creatures each get +`P`/+`T` until end of turn" (CR 611.2a): every target still legal as the spell
 /// resolves (CR 608.2b), pumped as one instruction. Appeal to Eirdu (+2/+1), Opera Love Song's mode (+2/+0) and Spiritcall
 /// Enthusiast's Scrollboost (+2/+2) print it.
