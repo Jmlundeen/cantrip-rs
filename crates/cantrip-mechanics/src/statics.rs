@@ -351,7 +351,7 @@ pub fn have_double_strike_and_trample(_: &dyn LayerQuery, _: ObjectId, chars: &m
 }
 
 /// "... has double strike" (CR 702.4, layer 6) as a static ability's `StaticDef::apply`. Hard-Won Jitte's equipped creature,
-/// Fireshrieker's and Burnout Bashtronaut's (at max speed) print it.
+/// Fireshrieker's, Burnout Bashtronaut's (at max speed) and Boldwyr Aggressor's other Giants print it.
 pub fn have_double_strike(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::DoubleStrike);
 }
