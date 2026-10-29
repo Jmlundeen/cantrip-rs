@@ -1913,6 +1913,12 @@ pub struct GrantedWay {
     /// it goes - the permanent it becomes, or the card countered into a graveyard, is a new object it knows nothing of
     /// beyond that move. A land played by the way (`lands`) is no spell, and gets none.
     pub spell_replacement: Option<u8>,
+    /// As `WayDef::instant_speed`: the way is offered whenever an instant could be cast, whatever the card is (sneak, CR
+    /// 702.190a). The times it may be used at are the cost's: `cost` is `None` outside them.
+    pub instant_speed: bool,
+    /// As `WayDef::enters_attacking`: a permanent spell cast by the way enters tapped and attacking what the creature its cost
+    /// returned to hand was attacking (sneak, CR 702.190b).
+    pub enters_attacking: bool,
 }
 
 impl GrantedWay {
@@ -1927,6 +1933,8 @@ impl GrantedWay {
         permission: false,
         kind: WayKind::Other,
         spell_replacement: None,
+        instant_speed: false,
+        enters_attacking: false,
     };
 }
 
