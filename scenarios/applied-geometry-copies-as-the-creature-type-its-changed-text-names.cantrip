@@ -1,0 +1,39 @@
+# "Fractal" is a creature type word in Applied Geometry's rules text (CR 612.2), so a text-changing effect changes what its copy
+# is: Bot1 casts Applied Geometry on Mox Ruby and, holding priority, its own Artificial Evolution on the spell, replacing
+# "Fractal" with "Elf" (CR 612.1). The token copy of Mox Ruby is then an Elf creature in addition to its other types, not a
+# Fractal (CR 707.9b, 612.2), with six +1/+1 counters.
+
+[Bot1 Deck]
+Applied Geometry
+Artificial Evolution
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Applied Geometry.Cast(Mox Ruby)
+Bot1.Hand.Artificial Evolution.Cast(Stack.Applied Geometry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Fractal)
+Bot1.Modes(Elf)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Mox Ruby#2.Counters.PlusOnePlusOne = 6
+Bot1.Battlefield.Mox Ruby#2.Types = Artifact; Creature
+Bot1.Battlefield.Mox Ruby#2.Subtypes = Elf
