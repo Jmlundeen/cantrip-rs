@@ -987,6 +987,14 @@ pub static DRAGON_5_5: CardDef = CardDef {
     ..token!(Dragon)
 };
 
+/// A 1/1 red Officer Token creature
+pub static OFFICER: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Red)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Officer)
+};
 /// The 2/2 green Bear creature token (CR 111.1, 111.4). Argoth, Sanctum of Nature, Ayula's Influence, Bearscape, Caller of the
 /// Claw, Dancing from Dark to Dawn, Path to the World Tree and Words of Wilding make it.
 pub static BEAR: CardDef = CardDef {
