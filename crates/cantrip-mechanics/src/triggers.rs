@@ -1558,6 +1558,21 @@ pub fn you_commit_a_crime(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fi
 /// "Whenever you commit a crime" as a trigger condition: `triggered(YOU_COMMIT_A_CRIME, ..)`.
 pub const YOU_COMMIT_A_CRIME: Trigger = when_asked(EventMask::CRIME, you_commit_a_crime);
 
+/// `player` faced a `dilemma`: You face a dilemma as you choose one or more modes for a spell or ability.
+/// If you choose multiple modes, including choosing the same mode more than once for spells and abilities
+/// that allow you to do so, that all counts as a single dilemma. In some cases, a modal triggered ability may trigger,
+/// and you can't legally choose any mode. This usually happens because each mode requires a target and there are no legal targets available,
+/// or because the card has some restrictions on which modes may be chosen. In these cases, you didn't choose a mode, so you didn't face a dilemma.
+pub fn you_face_a_dilemma(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ModesChosen { player, .. } if *player == me.controller => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "Whenever you face a dilemma" as a trigger condition: `triggered(YOU_FACE_A_DILEMMA, ..)`.
+pub const YOU_FACE_A_DILEMMA: Trigger = when_asked(EventMask::MODES_CHOSEN, you_face_a_dilemma);
+
 /// "Whenever you discard a card" (CR 701.9a): each card of a discard is its own event, so the ability triggers once for
 /// each card discarded, and the card, in the graveyard, is what it is about. With `.once_per_batch()` it is "whenever you
 /// discard one or more cards" (CR 603.2c). Ivora, Currency Converter, Marauding Mako, Inti and Cool but Rude print it.

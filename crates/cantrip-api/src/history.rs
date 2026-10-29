@@ -539,4 +539,9 @@ impl<'a> History<'a> {
     pub fn attacked_this_turn(&self, creature: ObjectId) -> bool {
         self.this_turn().iter().any(|r| matches!(r.event, Event::Attacks { attacker, .. } if attacker == creature))
     }
+
+    /// Number of dilemmas faced this turn by `player`.
+    pub fn dilemmas_faced_this_turn(&self, player: PlayerId) -> u32 {
+        self.this_turn().iter().filter(|r| matches!(r.event, Event::ModesChosen {player: p, .. } if p == player)).count() as u32
+    }
 }

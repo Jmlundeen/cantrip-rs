@@ -254,7 +254,7 @@ pub enum Event {
     Triggered { source: ObjectId, ability: AbilityRef },
     /// The modes of a modal spell or ability of this object were chosen (CR 601.2b, 602.2b, 603.3c, 700.2), as a
     /// `ModalDef` mask: what "choose one that hasn't been chosen" asks of the history.
-    ModesChosen { source: ObjectId, ability: AbilityRef, modes: u32 },
+    ModesChosen { player: PlayerId, source: ObjectId, ability: AbilityRef, modes: u32 },
     /// The player did what an ability says they may do only once each turn (CR 603.2h: "do this only once each turn").
     Done { source: ObjectId, ability: AbilityRef, player: PlayerId },
     /// An effect ended the turn (CR 724.1) of `player`, the player whose turn it was: recorded as the stack is exiled.
@@ -371,7 +371,8 @@ impl Event {
             | Event::Shown { player, .. }
             | Event::Shuffled { player }
             | Event::Randomized { player, .. }
-            | Event::PlayerControlled { player, .. } => Some(player),
+            | Event::PlayerControlled { player, .. }
+            | Event::ModesChosen {player, ..} => Some(player),
             Event::ControlChanged { controller, .. } => Some(controller),
             Event::Cast(c) => Some(c.player),
             Event::LandPlayed { player, .. } => Some(player),
