@@ -112,6 +112,29 @@ pub fn token_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Opt
     }
 }
 
+/// The card types `another_nontoken_you_control_enters` is parameterised by (`CardType as u8`).
+pub const ARTIFACT_TYPE: u8 = CardType::Artifact as u8;
+pub const CREATURE_TYPE: u8 = CardType::Creature as u8;
+
+/// "Whenever another nontoken [artifact or creature] you control enters" (CR 603.6a): a permanent of card type `TYPE`
+/// (`ARTIFACT_TYPE`, `CREATURE_TYPE`) that is not a token, other than the source, under the source's controller's control
+/// as it entered. The entering permanent is the
+/// event's subject. Arni, Humble Scribe (creatures) and Ultron, Artificial Malevolence (artifacts) print it.
+pub fn another_nontoken_you_control_enters<const TYPE: u8>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if *new != me.source
+                && to.is(ZoneKind::Battlefield)
+                && q.controller(*new) == me.controller
+                && !q.obj(*new).token
+                && q.chars(*new).types.0 & (1 << TYPE) != 0 =>
+        {
+            Fired::about(Target::Object(*new))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever [a permanent] you control leaves the battlefield during your turn" (CR 603.6c, 603.10a), looked back on: the
 /// permanent that left, under the source's controller's control as it last was on the battlefield, to whichever zone it went,
 /// while it is that controller's turn. The caller narrows it (another permanent, a type). Suki, Courageous Rescuer and
