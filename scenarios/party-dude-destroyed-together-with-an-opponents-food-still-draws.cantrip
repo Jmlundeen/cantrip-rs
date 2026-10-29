@@ -1,0 +1,51 @@
+# Party Dude, level 2: "Whenever an artifact an opponent controls is put into a graveyard from the battlefield, draw a card" looks
+# back in time (CR 603.10a). Bot2's Pest Control destroys Party Dude (mana value 1), both Food tokens and Bot2's two Moxen (mana
+# value 0) at once: Party Dude, level 2 as it last was on the battlefield, sees Bot2's three artifacts go and Bot1 draws three
+# cards (not four: its own Food doesn't count).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Party Dude
+Forest
+Forest
+Forest
+Forest x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Pest Control
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Party Dude.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Party Dude.Activate(Ability: Level 2)
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Pest Control.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Party Dude; Black Lotus
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Library.Count = 11
+Bot2.Battlefield.Count = 0
