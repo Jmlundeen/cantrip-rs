@@ -21,16 +21,8 @@ pub fn put_plus_one_counter_on_this_turn(history: History<'_>, player: PlayerId,
         .any(|record| matches!(record.event, Event::CountersPut { kind: CounterKind::PlusOne, amount, by, .. } if amount > 0 && by == player))
 }
 
-/// A card of `me`'s graveyard leaves it (CR 603.2, 603.10a). Hardened Academic and Blastoneuron use the same
-/// event matcher; `.once_per_batch()` on their abilities groups simultaneous departures into one trigger.
-pub fn cards_leave_your_graveyard(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { old, from, .. } if *from == Zone::graveyard(me.controller) => {
-            Fired::about(Target::Object(*old))
-        }
-        _ => None,
-    }
-}
+/// Kept for existing callers; event matchers live in `triggers`.
+pub use crate::triggers::cards_leave_your_graveyard;
 
 /// An opponent was dealt noncombat damage this turn (CR 120.2). Grim Repriser and Whiplash Wordsmith ask this
 /// same question, from an activated ability's condition and a static ability's layers respectively.
