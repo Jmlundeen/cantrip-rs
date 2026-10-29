@@ -1,0 +1,52 @@
+# Molten Note: with X = 1 the three mana spent ({G} from Llanowar Elves, {R} and {W} from the Moxen) are 3 damage to Bot2's
+# Gigantosaurus. The Elves were tapped to pay, and "untap all creatures you control" untaps them - Bot1's alone: Bot2's Raging
+# Goblin, tapped from attacking on turn 2, stays tapped, and so does Bot1's Mox Ruby, which is no creature.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Mox Pearl
+Molten Note
+Island x2
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Gigantosaurus
+Mountain
+Raging Goblin
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Gigantosaurus.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Attack(Raging Goblin > Bot1)
+[T2 Bot2.Main2]
+? Bot1.Life = 19
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Molten Note.Cast(Gigantosaurus; X: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Gigantosaurus.Damage = 3
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot2.Battlefield.Raging Goblin.Tapped = true
