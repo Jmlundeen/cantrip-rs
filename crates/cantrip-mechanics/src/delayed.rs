@@ -26,6 +26,18 @@ pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject
     );
 }
 
+/// "Exile [the target in slot `slot`]. Return that card to the battlefield under its owner's control at the beginning of the next
+/// end step" (CR 603.7): exiles the target and sets up the card's delayed ability number `ability` about the card exiled, but only
+/// if it is in exile: a token ceases to exist (CR 111.7, 400.7), and an exile replaced to somewhere else leaves nothing to
+/// return. Flickerwisp and Ennis, Debate Moderator print it.
+pub fn exile_target_then_return_at_next_end_step(g: &mut dyn Game, item: &StackItem, slot: usize, ability: u8) {
+    let Some(object) = crate::targets::object(g, item, slot) else { return };
+    let exiled = g.exile(object);
+    if g.obj(exiled).zone.is(ZoneKind::Exile) {
+        at_next_end_step(g, item, ability, Target::Object(exiled));
+    }
+}
+
 /// Sets up the card's delayed ability number 0 to trigger "this turn" (CR 603.7b): each time its `listens`/`matches`
 /// accept an event, until the turn ends, controlled by the resolving ability's controller. `source` is the object the
 /// ability's `matches` is asked of: the spell for "whenever a creature you control dies this turn", the creature it
