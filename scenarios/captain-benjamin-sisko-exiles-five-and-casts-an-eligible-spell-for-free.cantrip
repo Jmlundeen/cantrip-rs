@@ -1,0 +1,41 @@
+# Sisko has one Officer, so after exiling five cards he can cast the Lightning Bolt among them for free (CR 601.2b).
+
+[Bot1 Deck]
+Black Lotus x6
+Captain Benjamin Sisko
+Lightning Bolt
+Opt
+Ponder
+Brainstorm
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Captain Benjamin Sisko.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Captain Benjamin Sisko.Activate(Ability: {2}{W}{U}{B}{R}{G})
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Choose(Ponder)
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard.Ponder.Colors = Blue
+Exile.Count = 4
