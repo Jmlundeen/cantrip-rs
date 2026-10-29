@@ -788,7 +788,9 @@ scenario, `layer_dependency.rs`, the reviewer's order and off-field probes). New
 ### Events and triggers
 
 Triggers are indexed by the kinds of event they listen for (`EventMask`), so an event checks only the triggers that
-could match it. Where a triggered ability functions (CR 113.6) is `TriggeredDef::functions`, and the engine asks it in
+could match it. The mask is a `u64` and every bit is taken (`CREWED` is bit 63): the next kind of event either widens
+it or shares a bit, which both the trigger index (`EventMask::of`) and the history's filing (`EventMask::of_history`)
+must then still tell apart - a design decision for the change that adds it. Where a triggered ability functions (CR 113.6) is `TriggeredDef::functions`, and the engine asks it in
 those zones only, so no matcher checks its own zone: the battlefield, unless its trigger condition can't trigger from
 there (CR 113.6k) - "when you cast this spell" is made by `when_this_spell_is_cast` and functions from the stack, "when
 this card is put into a graveyard from anywhere" is a shared trigger that functions from the graveyard, "when you discard

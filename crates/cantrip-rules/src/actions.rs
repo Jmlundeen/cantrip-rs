@@ -9116,6 +9116,12 @@ fn activate(
     }
     pay_exert_and_tappers(cx, source, &def.cost, &tappers, &mut tapped);
     ops::tap_together_with(cx, &mut tapped, &[]);
+    // CR 702.122b-c: the creatures tapped for a crew cost crewed the Vehicle, for "creatures that crewed it" to ask the history.
+    if def.cost.tap_creatures.is_some_and(|t| t.greater_with == Some(Keyword::CrewsAsThoughPowerTwoGreater)) {
+        for &creature in &tappers {
+            cx.record(Event::Crewed { creature, vehicle: source });
+        }
+    }
     note_activation(cx, source, index as usize, def);
     // Craft exiles its source with its materials, last of all (`pay_materials`).
     if def.cost.exile_self && def.cost.materials.is_none() {

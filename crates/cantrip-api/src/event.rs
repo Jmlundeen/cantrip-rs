@@ -138,6 +138,11 @@ pub enum Event {
     /// `Tapped`, as the spell is cast, so "whenever [this] becomes tapped to pay a teamwork cost" triggers once the cast is
     /// complete. A tap for mana, for convoke or for any other cost is none.
     TappedForTeamwork { creature: ObjectId, spell: ObjectId },
+    /// `creature` crewed `vehicle` (CR 702.122b-c): it was tapped to pay the cost of the Vehicle's crew ability (not saddle's, nor
+    /// any other cost that taps creatures). Recorded for each creature tapped, after the cost's taps (announced together), as the ability is
+    /// activated. It names the creature and copies nothing out of it: what it is now, or was as it last existed, is its row
+    /// (CR 608.2h). Only recorded: "creatures that crewed it this turn" asks `History::crewed`.
+    Crewed { creature: ObjectId, vehicle: ObjectId },
     /// A player became the monarch (CR 725.1, 725.4): it was not theirs before.
     BecameMonarch { player: PlayerId },
     /// A player took the initiative (CR 726.1), even one who had it (CR 726.5): what makes them venture into Undercity
@@ -420,6 +425,7 @@ impl Event {
             Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
             Event::Convoked { creature, spell } | Event::TappedForTeamwork { creature, spell } => creature == object || spell == object,
+            Event::Crewed { creature, vehicle } => creature == object || vehicle == object,
             Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } | Event::Shuffled { .. } | Event::PlayerControlled { .. } => false,
         }
     }
@@ -510,6 +516,8 @@ impl EventMask {
     pub const CONTROL_CHANGED: EventMask = EventMask(1 << 61);
     /// A permanent entered the battlefield as it was (CR 603.6a): recorded only, for the history.
     pub const ENTERED: EventMask = EventMask(1 << 62);
+    /// A creature crewed a Vehicle (CR 702.122b): recorded only, for the history.
+    pub const CREWED: EventMask = EventMask(1 << 63);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -580,6 +588,7 @@ impl EventMask {
             Event::Attached { .. } => EventMask::ATTACHED,
             Event::Tapped { .. } => EventMask::TAPPED,
             Event::TappedForTeamwork { .. } => EventMask::TAPPED_FOR_TEAMWORK,
+            Event::Crewed { .. } => EventMask::CREWED,
             Event::BecameMonarch { .. } => EventMask::BECAME_MONARCH,
             Event::TookInitiative { .. } => EventMask::TOOK_INITIATIVE,
             Event::CoinFlipped { .. } => EventMask::COIN_FLIPPED,
