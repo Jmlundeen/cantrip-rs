@@ -19,6 +19,7 @@ Mountain x20
 
 [Actions]
 Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
 Bot1.Hand.Mox Pearl.Cast
 Bot1.Pass
 Bot1.Hand.Mox Sapphire.Cast
@@ -57,6 +58,16 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Pass
 ? Bot1.Battlefield.Count = 15
+? Bot1.Battlefield.Officer Token#1.Colors = Red
+? Bot1.Battlefield.Officer Token#1.Power = 1
+? Bot1.Battlefield.Officer Token#1.Toughness = 1
+? Bot1.Battlefield.Officer Token#1.Subtypes = Officer
+? Bot1.Battlefield.Officer Token#1.Types.Count = 1
 
 [Expect]
+Bot2.Battlefield.Mountain.Types = Land
 Bot1.Battlefield.Count = 15
+Bot1.Battlefield.Officer Token#1.Colors = Red
+Bot1.Battlefield.Officer Token#1.Power = 1
+Bot1.Battlefield.Officer Token#1.Toughness = 1
+Bot1.Battlefield.Officer Token#1.Subtypes = Officer
