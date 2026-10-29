@@ -1,0 +1,35 @@
+# Duel Tactics' flashback {1}{R} (CR 702.34a): cast from the hand on turn 1 at Bot1's own Ornithopter (0/2, it survives), then on
+# turn 3 from the graveyard with flashback, paid from a pool of exactly {R}{B} - empty right after the cast, so the cost was {1}{R},
+# neither more nor less. It deals its 1 damage again and is exiled instead of going to the graveyard.
+
+[Bot1 Deck]
+Duel Tactics
+Mox Ruby
+Mox Jet
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Duel Tactics.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Duel Tactics
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Duel Tactics.Cast(Bot1.Battlefield.Ornithopter; Ability: Flashback)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Damage = 1
+Exile = Duel Tactics
+Bot1.Graveyard.Count = 0
