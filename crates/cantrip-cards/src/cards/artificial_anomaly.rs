@@ -4,9 +4,7 @@ use cantrip_oracle as oracle;
 
 fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    for opponent in g.state().opponents(player) {
-        g.lose_life(opponent, 2);
-    }
+    g.each_opponent_loses_life(player, 2);
     g.gain_life(player, 2);
     tokens::create_by_rule(g, player, &tokens::NEW_PLANET, 1, true)?;
     Ok(())
