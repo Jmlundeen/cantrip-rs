@@ -1,0 +1,36 @@
+# Transcendent Archaic cast with colorless mana only (four Mana Crypts): no color was spent, so X is 0 (CR 105.1, the converge
+# rulings). Bot1 accepts the "may" and draws zero cards, which is not "one or more cards", so nothing is discarded: the Forest
+# and the Swamp stay in hand and the library is untouched (CR 608.2c).
+
+[Bot1 Deck]
+Mana Crypt
+Mana Crypt
+Mana Crypt
+Mana Crypt
+Transcendent Archaic
+Forest
+Swamp
+Plains
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mana Crypt#1.Activate
+Bot1.Battlefield.Mana Crypt#2.Activate
+Bot1.Battlefield.Mana Crypt#3.Activate
+Bot1.Battlefield.Mana Crypt#4.Activate
+Bot1.Hand.Transcendent Archaic.Cast
+Bot1.Accept
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Forest; Swamp
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 13
+Bot1.Battlefield.Transcendent Archaic.Power = 6
