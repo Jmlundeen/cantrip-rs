@@ -33,7 +33,7 @@ fn add_counters_plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
     g.add_player_effect(
         item.controller,
         item.object,
-        EffectKind::ReplacementRule(0),
+        EffectKind::ReplacementRule { card: item.ability.card, index: 0 },
         Duration::EndOfTurn,
     );
     Ok(())
@@ -53,3 +53,4 @@ pub static CARD: CardDef = CardDef {
     )],
     ..oracle::BRAD_BOIMLER_EAGER_ENSIGN
 };
+
