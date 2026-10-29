@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::amass::amass;
-use cantrip_mechanics::{effects, select, targets, tokens, triggers};
+use cantrip_mechanics::{effects, history, select, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// "When Bolg enters, you may sacrifice another creature. When you do, ..." (CR 701.21, 603.12): the sacrifice is a choice made as
@@ -12,16 +12,7 @@ fn may_sacrifice_another_creature(g: &mut dyn Game, item: &StackItem) -> Result<
     let you = item.controller;
     let rule = select::another_creature_permanents(select::up_to(1));
     let Some(&card) = effects::may_sacrifice(g, you, item.object, rule)?.first() else { return Ok(()) };
-    let power = g
-        .history()
-        .all()
-        .iter()
-        .rev()
-        .find_map(|r| match r.event {
-            Event::ZoneChange { old, new, reason: ZoneReason::Sacrifice, .. } if new == card => Some(old),
-            _ => None,
-        })
-        .map_or(0, |creature| g.chars(creature).power.unwrap_or(0).max(0) as u16);
+    let power = history::power_of_sacrificed_permanent(g, card).max(0) as u16;
     let this = g.card_id(&CARD);
     g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, power);
     Ok(())
