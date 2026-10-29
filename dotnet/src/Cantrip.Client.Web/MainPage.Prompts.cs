@@ -443,6 +443,9 @@ public sealed partial class MainPage
 
         // Kicker (CR 702.33) and buyback (CR 702.27): the count being chosen is how many times that cost is paid.
         bool kicker = prompt.Kicker.Length > 0;
+        string kickerCost = prompt.KickerAdditional.Length == 0
+            ? prompt.Kicker
+            : prompt.Kicker == "{0}" ? prompt.KickerAdditional : $"{prompt.Kicker} and {prompt.KickerAdditional}";
         string raise = _actions.IncreaseX is null
             ? string.Empty
             : !kicker
@@ -451,6 +454,8 @@ public sealed partial class MainPage
                 ? $"  ·  {Announcement.SquadRaiseHint(prompt)}"
             : prompt.Buyback
                 ? $"  ·  tap a land or click mana in your pool to buy it back for {prompt.Kicker}"
+                : prompt.KickerAdditional.Length > 0
+                    ? $"  ·  pay {kickerCost} to kick it"
                 : prompt.X == 0
                     ? $"  ·  tap a land or click mana in your pool to kick it for {prompt.Kicker}"
                     : $"  ·  tap a land or click mana in your pool to kick it again for {prompt.Kicker}";
@@ -660,7 +665,12 @@ public sealed partial class MainPage
         }
 
         bool kicker = prompt.Kicker.Length > 0;
-        string reach = prompt.MostAffordable < 0
+        string kickerCost = prompt.KickerAdditional.Length == 0
+            ? prompt.Kicker
+            : prompt.Kicker == "{0}" ? prompt.KickerAdditional : $"{prompt.Kicker} and {prompt.KickerAdditional}";
+        string reach = prompt.KickerAdditional.Length > 0
+            ? $"pay {kickerCost} if you kick it"
+            : prompt.MostAffordable < 0
             ? "not enough mana for it"
             : prompt.XPaidInLife
                 ? prompt.MostAffordable > 0

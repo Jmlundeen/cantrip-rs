@@ -824,6 +824,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     Some(more) => cost_text_of(&Cost { mana: k.cost, ..more }, def.name),
                     None => k.cost.to_string(),
                 }),
+                kicker_additional: kicker.map_or(String::new(), |k| k.additional_text.to_owned()),
                 multikicker: kicker.is_some_and(|k| k.multi),
                 // Squad is the one optional cost with more than mana in it (`multikicker_cost`).
                 squad: kicker.is_some_and(|k| k.extra.is_some()),

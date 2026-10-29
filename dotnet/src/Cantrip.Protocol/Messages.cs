@@ -2652,13 +2652,17 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(29)]
     public int Assisted { get; set; }
 
+    /// <summary>The printed nonmana parts of the kicker cost (CR 702.33a), empty when kicker only costs mana.</summary>
+    [Key(30)]
+    public string KickerAdditional { get; set; } = string.Empty;
+
     /// <summary>
     /// Whether that optional additional cost is squad (CR 702.157a) rather than kicker: payable any number of times as
     /// multikicker is, but <see cref="Kicker"/> then carries its whole cost in words (mana and what is beside it, such as
     /// exiling cards from a graveyard), so a client says "pay squad", not "kick", and speaks of the limit
     /// (<see cref="MostAnnounced"/>) as times, not as mana.
     /// </summary>
-    [Key(30)]
+    [Key(31)]
     public bool Squad { get; set; }
 
     /// <summary>

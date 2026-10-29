@@ -1147,6 +1147,9 @@ pub struct PayCostsPrompt {
     pub committed: Vec<RestrictedManaView>,
     pub remaining_hybrid: Vec<HybridSymbolView>,
     pub kicker: String,
+    /// The nonmana parts of kicker, in the card's printed wording (CR 702.33a).
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub kicker_additional: String,
     pub multikicker: bool,
     pub buyback: bool,
     /// Whether that optional additional cost is squad (CR 702.157a) rather than kicker: `kicker` carries its whole cost in
