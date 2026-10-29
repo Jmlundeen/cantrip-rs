@@ -1,0 +1,43 @@
+# Wildgrowth Archaic: "that creature enters with X additional +1/+1 counters" is an effect of the resolved trigger, not of the
+# Archaic, so it still applies when the Archaic is gone (CR 113.7a, 614.12). Bot1 casts Grizzly Bears with {G}{R}; the trigger
+# resolves; then, with the Bears still on the stack, Bot1 kills its own 1/1 Archaic with Lightning Bolt. The Bears still enter
+# with two +1/+1 counters.
+
+[Bot1 Deck]
+Wildgrowth Archaic
+Grizzly Bears
+Lightning Bolt
+Black Lotus
+Mox Emerald x3
+Mox Ruby
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Wildgrowth Archaic.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Battlefield.Wildgrowth Archaic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Wildgrowth Archaic; Lightning Bolt; Black Lotus
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 2
