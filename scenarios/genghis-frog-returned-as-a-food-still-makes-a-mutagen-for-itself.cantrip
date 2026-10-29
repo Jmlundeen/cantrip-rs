@@ -1,0 +1,58 @@
+# Genghis Frog: "Whenever Genghis Frog or another Mutant you control enters, create a Mutagen token." Bot2 casts its Genghis Frog on
+# turn 2 (its own Mutagen). On turn 3 Bot1 Lightning Bolts it and casts Supper for Spiders: the Frog comes back under Bot1's control as
+# a Food artifact that has lost all other types and subtypes (CR 614.12) - no Mutant, but still Genghis Frog with its ability - so its
+# "Genghis Frog ... enters" half triggers and Bot1 gets a Mutagen.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Lightning Bolt
+Supper for Spiders
+Plains x15
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Genghis Frog
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Genghis Frog.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Mutagen Token.Types = Artifact
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Genghis Frog)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Genghis Frog
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Supper for Spiders.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Genghis Frog.Subtypes = Food
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Genghis Frog.Types = Artifact
+Bot1.Battlefield.Mutagen Token.Types = Artifact
+Bot1.Battlefield.Count = 5
