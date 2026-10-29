@@ -1,0 +1,48 @@
+# Turtle Van: a Ninja that crewed it gets the counter and then doubles (CR 701.10e): Ninja of the Hand, a 2/2 cast this
+# turn, crews the Van with Ornithopter (summoning sickness does not stop a crew, CR 302.6), and with 1 counter doubled
+# to 2 is a 4/4. The Ornithopter stays a 0/2. The Van hits for 4.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Turtle Van
+Ninja of the Hand
+Ornithopter
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Turtle Van.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ninja of the Hand.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Turtle Van.Activate(Ability: Crew)
+Bot1.Choose(Ninja of the Hand; Ornithopter)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Turtle Van)
+Bot1.Target(Ninja of the Hand)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Ninja of the Hand.Power = 4
+Bot1.Battlefield.Ninja of the Hand.Toughness = 4
+Bot1.Battlefield.Ornithopter.Power = 0

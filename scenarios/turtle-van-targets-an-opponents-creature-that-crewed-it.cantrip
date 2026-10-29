@@ -1,0 +1,58 @@
+# Turtle Van: "target creature that crewed it this turn" is any creature, whoever controls it (CR 702.122c). On turn 3
+# Bot2 crews its Van with its Llanowar Elves, then Bot1 takes the Van with Act of Treason and attacks with it: the Elves,
+# Bot2's, crewed it this turn and are the target. They get the counter and are no Mutant, Ninja or Turtle: a 2/2. The
+# Van hits Bot2 for 4.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Act of Treason
+Plains x16
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Turtle Van
+Llanowar Elves
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turtle Van.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Turtle Van.Activate(Ability: Crew)
+Bot2.Choose(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Turtle Van)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Turtle Van)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot2.Battlefield.Llanowar Elves.Power = 2
+Bot2.Battlefield.Llanowar Elves.Toughness = 2

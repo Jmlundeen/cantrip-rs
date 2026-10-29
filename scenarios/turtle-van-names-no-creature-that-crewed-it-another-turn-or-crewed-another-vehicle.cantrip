@@ -1,0 +1,71 @@
+# Turtle Van: "target creature that crewed it this turn" (CR 702.122c). Turn 3 the Elves crew the Van and it attacks;
+# turn 5 the Elves crew Smuggler's Copter, and Incurable Ogre and Ornithopter crew the Van. The Elves crewed the Van, but
+# on another turn, and crewed a Vehicle this turn, but another one: no target. The Ogre is a Mutant: 1 counter doubled
+# to 2, the 5/1 a 7/3 (CR 701.10e). The Van hits for 4 each time.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Turtle Van
+Llanowar Elves
+Incurable Ogre
+Ornithopter
+Smuggler's Copter
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Turtle Van.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Incurable Ogre.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Turtle Van.Activate(Ability: Crew)
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Turtle Van)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot1.Choose(Llanowar Elves)
+Bot1.Battlefield.Turtle Van.Activate(Ability: Crew)
+Bot1.Choose(Incurable Ogre; Ornithopter)
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Turtle Van)
+! Bot1.Target(Llanowar Elves)
+Bot1.Target(Incurable Ogre)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Bot1.Battlefield.Incurable Ogre.Power = 7
+Bot1.Battlefield.Incurable Ogre.Toughness = 3
+Bot1.Battlefield.Llanowar Elves.Power = 2
