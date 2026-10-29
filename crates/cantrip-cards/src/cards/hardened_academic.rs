@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, targets, triggers};
+use cantrip_mechanics::{effects, history, targets};
 use cantrip_oracle as oracle;
 
 /// "This creature gains lifelink until end of turn." Nothing if it has left the battlefield by the time the ability
@@ -18,7 +18,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(discard_cards(1), lifelink, "Discard a card: This creature gains lifelink until end of turn."),
         triggered(
-            triggers::CARDS_LEAVE_YOUR_GRAVEYARD,
+            when_asked(EventMask::ZONE_CHANGE, history::cards_leave_your_graveyard),
             counter,
             "Whenever one or more cards leave your graveyard, put a +1/+1 counter on target creature you control.",
         )
