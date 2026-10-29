@@ -704,9 +704,8 @@ pub fn plus_one_counter_on_each_target(g: &mut dyn Game, item: &StackItem) -> Re
 /// "Tap [N] target [permanents]" (CR 701.26a, 608.2b): each target that is still legal as the ability resolves. Divining
 /// Duelist (as a mode), Quake, Agent of S.H.I.E.L.D. and Raft Security Officer print it.
 pub fn tap_targets(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for permanent in crate::targets::legal_objects(g, item) {
-        g.tap(permanent);
-    }
+    let permanents = crate::targets::legal_objects(g, item);
+    g.tap_together(&permanents);
     Ok(())
 }
 
