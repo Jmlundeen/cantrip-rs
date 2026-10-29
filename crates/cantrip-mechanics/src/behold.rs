@@ -53,6 +53,12 @@ pub fn elemental(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Elemental))
 }
 
+/// A Goblin, read through the words of the card whose text says it (CR 612): a permanent or a card in a hand. Mudbutton
+/// Cursetosser and Champion of the Weird behold one.
+pub fn goblin(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Goblin))
+}
+
 /// A Kithkin, read through the words of the card whose text says it (CR 612): a permanent or a card in a hand. Kinsbaile
 /// Aspirant and Champion of the Clachan behold one.
 pub fn kithkin(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
