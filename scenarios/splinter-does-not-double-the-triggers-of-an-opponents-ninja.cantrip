@@ -1,0 +1,60 @@
+# Splinter, Radical Rat: "If a triggered ability of a Ninja creature you control triggers, that ability triggers an additional time." Only Ninjas its controller controls:
+# Bot1 has Splinter, and on turn 2 Bot2 casts Foot Ninjas (a Ninja) for its mana cost; its "you gain 3 life" triggers once, so Bot2 gains 3, not 6.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Splinter, Radical Rat
+Island x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Foot Ninjas
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Splinter, Radical Rat.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Foot Ninjas.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Foot Ninjas.Power = 5
+Bot2.Life = 23
