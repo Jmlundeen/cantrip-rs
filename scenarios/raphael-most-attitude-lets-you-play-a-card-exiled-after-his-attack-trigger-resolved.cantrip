@@ -1,0 +1,69 @@
+# Raphael, Most Attitude: "Whenever Raphael attacks, until end of turn, you may play a card exiled with Raphael." The
+# permission changes no object's characteristics or controller, so it modifies the rules of the game and applies to cards
+# exiled with Raphael after it began, for the rest of the turn (CR 611.2c). Turn 5: Raphael and an Ornithopter attack, and
+# his attack trigger resolves with nothing exiled yet. In the declare blockers step Raphael, the Nightwatcher is cast for its
+# sneak cost, returning the unblocked Ornithopter; it enters attacking, Raphael's alliance ability exiles the top card,
+# Lightning Bolt, and Bot1 casts that Bolt from exile the same turn.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Raphael, Most Attitude
+Ornithopter
+Mox Ruby
+Raphael, the Nightwatcher
+Mountain
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Raphael, Most Attitude.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Raphael, Most Attitude > Bot2; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 0
+[T5 Bot1.DeclareBlockers]
+Bot1.Hand.Raphael, the Nightwatcher.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Exile = Lightning Bolt
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Lightning Bolt; Black Lotus
