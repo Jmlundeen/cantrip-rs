@@ -1,0 +1,82 @@
+# Dathon draws for both enchantment casts, deals 2 only for the Saga spell, and adds a lore counter to the Saga (CR 601.2i,
+# 603.2, 122.1).
+# Dathon, His Heart Open {G}{U}{R}: Legendary Creature — Tamarian Officer
+#   Whenever you cast an enchantment spell, draw a card. If it's a Saga spell, Dathon deals 2 damage to each opponent.
+#   {2}: Choose a counter on target enchantment you control. Put another counter of that kind on it. Activate only as a sorcery.
+# Written by new-card.py --scenario: Dathon, His Heart Open cast on turn 1 off zero-cost mana sources. Grow it a line at a time with
+#   cargo run --profile cards -p cantrip-script --bin corpus -- --scenario dathon-his-heart-open-enchantments-and-saga-damage --next --brief
+# and see which keys the card moved with --diff <the line number of its cast>.
+
+[Bot1 Deck]
+Dathon, His Heart Open
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Black Lotus
+Authority of the Consuls
+Kumano Faces Kakkazan
+Forest x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Authority of the Consuls
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dathon, His Heart Open.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Authority of the Consuls.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Authority of the Consuls.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Kumano Faces Kakkazan.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+! Bot1.Battlefield.Dathon, His Heart Open.Activate(Bot2.Battlefield.Authority of the Consuls; Ability: {2})
+! Bot1.Battlefield.Dathon, His Heart Open.Activate(Bot1.Battlefield.Mox Emerald; Ability: {2})
+Bot1.Battlefield.Dathon, His Heart Open.Activate(Kumano Faces Kakkazan; Ability: {2})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Dathon, His Heart Open.Activate(Authority of the Consuls; Ability: {2})
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Kumano Faces Kakkazan.Counters.Lore = 2
+Bot1.Battlefield.Authority of the Consuls.Counters.Lore = (absent)
