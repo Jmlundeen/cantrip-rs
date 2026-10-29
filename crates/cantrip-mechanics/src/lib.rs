@@ -389,7 +389,9 @@ fn chosen_to_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, cou
     choose::cards(g, player, source, Purpose::Sacrifice, eligible, u32::from(count), false)
 }
 
-fn untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+/// "An untapped creature you control" as the permanents a cost taps (CR 118.3): `TAP_AN_UNTAPPED_CREATURE` taps one, Group Project's
+/// flashback (`tap_untapped(3, ..)`) three. A creature that came under your control this turn counts (CR 302.6 limits only {T}).
+pub fn untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     q.controller(id) == asker.controller && !q.obj(id).tapped && q.chars(id).is(CardType::Creature)
 }
 
