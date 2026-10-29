@@ -126,6 +126,9 @@ pub struct EntersAs {
     /// "It's an [types]": exactly these card types (CR 205.1a), keeping the subtypes of those it still has
     /// (`EffectKind::SetTypes`). Not read with `aura`.
     pub types: Option<TypeSet>,
+    /// "It's a [creature type] artifact creature": these card types gained, keeping every card type it has (CR 205.1b), after
+    /// `types` (`EffectKind::AddTypes`). Brilliance Unleashed's Robot artifact creature is still the land or enchantment it was.
+    pub adds_types: TypeSet,
     /// "(It loses all other types and subtypes.)" (CR 205.1a): every subtype of each of these card types it still has after
     /// `types`, gone (`EffectKind::LoseSubtypesOf`). Supper for Spiders' Food artifacts are artifacts with no other artifact type.
     pub loses_subtypes_of: &'static [CardType],
@@ -142,11 +145,25 @@ pub struct EntersAs {
     /// The abilities it gains (CR 613.1f): indexes in its effect's card's `delayed` list (`EffectKind::AddAbility`). An index
     /// past that list names no ability and gives none.
     pub abilities: &'static [u8],
+    /// "It's a 3/3 ... creature": its power and toughness (CR 613.4b, `EffectKind::SetPt`), set from the moment it enters.
+    pub power_toughness: Option<(i16, i16)>,
+    /// "It's a ... creature with flying": the keyword abilities it gains (CR 613.1f, `EffectKind::AddKeywords`).
+    pub keywords: Keywords,
 }
 
 impl EntersAs {
     /// It enters as itself: nothing changed.
-    pub const NONE: EntersAs = EntersAs { types: None, loses_subtypes_of: &[], subtypes: &[], aura: false, loses_other_abilities: false, abilities: &[] };
+    pub const NONE: EntersAs = EntersAs {
+        types: None,
+        adds_types: TypeSet::of(&[]),
+        loses_subtypes_of: &[],
+        subtypes: &[],
+        aura: false,
+        loses_other_abilities: false,
+        abilities: &[],
+        power_toughness: None,
+        keywords: Keywords::of(&[]),
+    };
 }
 
 /// An `EntersAs` an effect gives a permanent as it enters (`Entering::becomes`): what it is, and the card whose ability says
