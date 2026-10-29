@@ -1,0 +1,58 @@
+# Don & Raph, Hard Science: "the next noncreature spell you cast" is the next one cast, however it is paid for. After the
+# attack Bot1 casts Shardless Agent, a creature spell, which neither gets the affinity nor uses it up; its cascade casts
+# Lightning Bolt without paying its mana cost (CR 702.85a), and the Bolt is that next noncreature spell: the affinity
+# applies to its total cost of {0} and is used up (CR 601.2f). Mind Stone ({2}) afterwards costs its full price, paid with
+# both Islands - had the affinity been left, the three Moxen would have taken off all of it and left {U}{U} floating.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Don & Raph, Hard Science
+Shardless Agent
+Mind Stone
+Island
+Island
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Don & Raph, Hard Science.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Don & Raph, Hard Science > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Shardless Agent.Cast
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 15
+? Stack = Shardless Agent
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Don & Raph, Hard Science; Island; Island; Mind Stone; Mox Emerald; Mox Ruby; Mox Sapphire; Shardless Agent
+Bot1.Mana =
