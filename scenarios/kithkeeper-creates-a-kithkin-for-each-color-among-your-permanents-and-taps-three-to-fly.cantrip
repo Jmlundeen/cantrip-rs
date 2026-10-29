@@ -1,0 +1,62 @@
+# Vivid: Kithkeeper enters and X is the number of colors among permanents Bot1 controls (CR 105.2): white (Kithkeeper) and
+# green (Llanowar Elves); the colorless Moxen and lands add none, and Bot2's blue Merfolk of the Pearl Trident is not Bot1's, so two
+# Kithkin tokens. Then "tap three untapped creatures you control" (summoning-sick ones too, Kithkeeper itself among them): the
+# first three are tapped, Kithkeeper is a 6/3 with flying, and with one untapped creature left the ability is refused.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Kithkeeper
+Mox Pearl
+Mox Ruby
+Black Lotus
+Plains
+Mox Jet
+Plains x13
+
+[Bot2 Deck]
+Island
+Merfolk of the Pearl Trident
+Plains x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Merfolk of the Pearl Trident.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Hand.Kithkeeper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kithkeeper.Activate
+Bot1.Pass
+Bot2.Pass
+
+! Bot1.Battlefield.Kithkeeper.Activate
+
+[Expect]
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Kithkin Token#1.Tapped = true
+Bot1.Battlefield.Kithkin Token#2.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Kithkeeper.Tapped = true
+Bot1.Battlefield.Kithkeeper.Power = 6
+Bot1.Battlefield.Kithkeeper.Toughness = 3
+Bot1.Battlefield.Kithkeeper.Keywords = Flying
