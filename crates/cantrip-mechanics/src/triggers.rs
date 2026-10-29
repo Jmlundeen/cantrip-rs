@@ -265,6 +265,20 @@ pub fn nth_counter_put_on_this<const KIND: u8, const N: i16>(_: &dyn Query, me: 
     }
 }
 
+/// "Whenever you cast a spell with {X} in its mana cost" (CR 107.3, 601.2i, 603.2): the spell's mana cost as it is on the
+/// stack, whatever X is chosen to be; a copy is not cast (CR 707.10). The trigger is about the spell (its subject), and
+/// carries no X: an ability that needs it reads the spell's X as the ability resolves (on the stack, or as it last was there
+/// once it has left, CR 608.2h), since X can change while the ability waits. The `listens` mask is `EventMask::SPELL_CAST`.
+/// Matterbending Mage and Geometer's Arthropod print it.
+pub fn you_cast_a_spell_with_x_in_its_mana_cost(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if *player == me.controller && q.mana_cost(*spell).x > 0 => {
+            Fired::about(Target::Object(*spell))
+        }
+        _ => None,
+    }
+}
+
 /// Cascade's effect (CR 702.85a): exile cards from the top of the library until a nonland card with a lesser mana
 /// value than the spell's; its controller may cast it without paying its mana cost; then every card exiled and not
 /// cast goes to the bottom of the library in a random order. The spell's mana value is its card's, X included, as it
@@ -1660,7 +1674,7 @@ pub fn you_activate_a_nonmana_ability(q: &dyn Query, me: &Asker, event: &Event) 
 pub const YOU_ACTIVATE_A_NONMANA_ABILITY: Trigger = when_asked(EventMask::ABILITY_ACTIVATED, you_activate_a_nonmana_ability);
 
 /// "Whenever one or more +1/+1 counters are put on this creature" (CR 122.6, 603.2c): one trigger per event, however many
-/// counters it put (the core announces only positive amounts). Emperor of Bones, Pensive Professor.
+/// counters it put (the core announces only positive amounts). Emperor of Bones, Pensive Professor, Berta, Wise Extrapolator.
 fn plus_one_counters_put_on_this(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::CountersPut { object, kind: CounterKind::PlusOne, .. } if *object == source => Fired::PLAIN,
@@ -1683,6 +1697,8 @@ pub const AN_OPPONENT_DRAWS_A_CARD: Trigger = when_asked(EventMask::DREW, an_opp
 pub const YOU_GAIN_LIFE: Trigger = when_asked(EventMask::LIFE_CHANGE, you_gain_life);
 /// "When you cast this spell": functions from the stack (CR 113.6k, `when_this_spell_is_cast`).
 pub const CAST_THIS_SPELL: Trigger = when_this_spell_is_cast(cast_this_spell);
+/// "Whenever you cast a spell with {X} in its mana cost" (`you_cast_a_spell_with_x_in_its_mana_cost`).
+pub const YOU_CAST_A_SPELL_WITH_X_IN_ITS_MANA_COST: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell_with_x_in_its_mana_cost);
 
 /// "When this card is put into a graveyard from anywhere" (CR 603.6c): its own move into a graveyard, from any zone, which
 /// can't trigger from the battlefield, so it functions from the graveyard it has just reached (CR 113.6k) - and as "from
