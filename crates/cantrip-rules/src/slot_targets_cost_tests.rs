@@ -95,6 +95,11 @@ fn theirs_unless_kicked(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if q.obj(id).zone.is(ZoneKind::Battlefield) && (q.obj(asker.source).kicked > 0 || q.obj(id).controller != asker.controller))
 }
 
+fn permanent_only_if_kicked(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    q.obj(asker.source).kicked > 0
+        && matches!(t, Target::Object(id) if q.obj(id).zone.is(ZoneKind::Battlefield))
+}
+
 /// "This spell costs {4} less to cast if it has two or more targets."
 fn less_for_two(_: &dyn Query, _: ObjectId, _: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
     if targets.iter().filter(|&&t| t != Target::None).count() >= 2 { CostDelta::less(4) } else { CostDelta::NONE }
@@ -144,6 +149,21 @@ static STRIKE: CardDef = CardDef {
     late_targets: true,
     kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, extra: None, multi: false, waterbend: false }),
     own_cost_changes: &[less_if_yours],
+    ..CardDef::BLANK
+};
+
+/// Kicker — Sacrifice an artifact or creature: the kicked spell may target a permanent (CR 702.33a).
+static SACRIFICE_STRIKE: CardDef = CardDef {
+    name: "Slot Test Sacrifice Strike",
+    has_cost: true,
+    types: TypeSet::of(&[CardType::Sorcery]),
+    spell: spell(&[target(permanent_only_if_kicked)], gain_three),
+    late_targets: true,
+    kicker: kicker_with_additional(
+        ManaCost::ZERO,
+        Cost::sacrifice(1, cantrip_mechanics::targets::filters::artifact_or_creature),
+        "Sacrifice an artifact or creature",
+    ),
     ..CardDef::BLANK
 };
 
@@ -388,7 +408,7 @@ static GRID: CardDef = CardDef {
 
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &TOWN, &PAIR, &SINGLE, &ENGINE, &CHOICE, &SWARM, &STRIKE, &DOUBLE, &PROMISE, &SPLIT, &RITE, &GRAFT, &SURGE, &WINGS, &WINGS_AURA, &DIAL, &HIVE, &BULK, &VOLLEY, &PAIRS, &COVENANT, &GRID])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &TOWN, &PAIR, &SINGLE, &ENGINE, &CHOICE, &SWARM, &STRIKE, &DOUBLE, &SACRIFICE_STRIKE, &PROMISE, &SPLIT, &RITE, &GRAFT, &SURGE, &WINGS, &WINGS_AURA, &DIAL, &HIVE, &BULK, &VOLLEY, &PAIRS, &COVENANT, &GRID])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -560,9 +580,37 @@ fn a_modal_spell_is_offered_for_the_mode_and_target_that_make_it_affordable_with
     pay_and_resolve(&mut g, r);
     assert_eq!(g.state.player(YOU).life, life + 3);
     assert_eq!(g.state.player(YOU).pool.total(), 0, "{{3}} was paid");
+    assert!(g.log.iter().any(|r| matches!(r.event, Event::ModesChosen { player, .. } if player == YOU)), "the event records who chose the spell's mode (CR 601.2b)");
     let (mut g, choice, _, _) = board(&CHOICE, false);
     add_mana(&mut g, 2);
     assert!(offered(&mut g, choice).is_none(), "no permanent of the caster's: {{4}} or {{6}}");
+}
+
+#[test]
+fn a_nonmana_kicker_must_be_payable_and_is_paid_as_an_additional_cost() {
+    let mut g = game();
+    let opponent_bear = put(&mut g, &BEAR, THEM, Zone::BATTLEFIELD);
+    let spell = put(&mut g, &SACRIFICE_STRIKE, YOU, Zone::hand(YOU));
+    assert!(offered(&mut g, spell).is_none(), "kicked-only target is unavailable when the kicker cost cannot be paid");
+    let sacrifice = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let option = offered(&mut g, spell).expect("the creature makes the kicker payable");
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Act(Action::of(&option)));
+    let r = next(&mut g);
+    assert!(matches!(r.kind, RequestKind::PayCosts { announcing: true, .. }), "the kicker is announced before targets");
+    answer(&mut g, &r, Answer::Announce(1));
+    let r = next(&mut g);
+    assert!(matches!(r.kind, RequestKind::ChooseTarget { .. }), "the kicked target is chosen after the kicker");
+    answer(&mut g, &r, Answer::Targets(vec![Target::Object(opponent_bear)]));
+    let r = next(&mut g);
+    match &r.kind {
+        RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. } => assert_eq!(crate::first_choices(&g, &r), vec![sacrifice]),
+        other => panic!("expected the kicker sacrifice choice, got {other:?}"),
+    }
+    answer(&mut g, &r, Answer::Cards(vec![sacrifice]));
+    next(&mut g);
+    assert_eq!(g.state.stack.last().map(|item| item.kicked), Some(1), "payment is linked to kicked status");
+    assert!(g.state.zone(Zone::graveyard(YOU)).iter().any(|&id| g.state.obj(id).card == g.cards.id_of(&BEAR)), "the kicker's creature was sacrificed");
 }
 
 #[test]

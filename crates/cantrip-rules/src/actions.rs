@@ -1804,7 +1804,8 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
                     || (if if_promised { target_candidates_if_promised(cx, asker, spec) } else { target_candidates(cx, asker, spec) }).len() >= spec.min as usize
             })
         };
-        return def.has_kicker() || met(false) || (def.gift.is_some() && met(true));
+        let can_kick = def.kicker.map_or(def.has_kicker(), |k| can_pay_other(cx, asker.source, asker.controller, &k.additional));
+        return can_kick || met(false) || (def.gift.is_some() && met(true));
     }
     // "If this spell was kicked, instead choose ..." (CR 702.33a, 601.2c): the targets wait for the kicker, and it may be
     // cast if it could be announced either unkicked or, with a kicker to pay, kicked.
@@ -2354,6 +2355,12 @@ fn some_cast(
                     Some(k) if k.cost.x > 0 => (kicks, u8::from(kicks > 0)),
                     _ => (x, kicks.min(255) as u8),
                 };
+                if kicked > 0
+                    && let Some(kicker) = def.kicker
+                    && !can_pay_other(cx, card, player, &kicker.additional.times(kicked))
+                {
+                    continue;
+                }
                 let counted = u32::from(if x > 0 { x } else { u16::from(kicked) });
                 let mut obj = *cx.s().obj(card);
                 (obj.x, obj.kicked, obj.paid) = (x, kicked, u32::from(paid));
@@ -7336,6 +7343,12 @@ fn cast(
             item.x = n;
             cx.st().update_obj(spell, |o| o.x = n);
         }
+    }
+    // A nonmana kicker is still an optional additional cost (CR 702.33a): announce it with the kicker in 601.2b,
+    // then choose and pay its parts with the other additional costs in 601.2h. Multikicker repeats the same cost once
+    // per time kicked; `Cost::times` combines like cost parts into the normal payment procedure.
+    if let Some(kicker) = def.kicker.filter(|_| item.kicked > 0) {
+        extra = extra.and(kicker.additional.times(item.kicked));
     }
     // CR 601.2b, 700.2a: the modes of a spell that chooses "both instead" when its additional cost was paid (or "any
     // number instead" when it was kicked), now that the intention to pay is announced.
