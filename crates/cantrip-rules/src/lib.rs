@@ -60,6 +60,8 @@ mod control_at_once_tests;
 #[cfg(test)]
 mod can_gain_life_tests;
 #[cfg(test)]
+mod crusher_additional_trigger_tests;
+#[cfg(test)]
 mod return_at_once_tests;
 #[cfg(test)]
 mod linked_text_tests;
