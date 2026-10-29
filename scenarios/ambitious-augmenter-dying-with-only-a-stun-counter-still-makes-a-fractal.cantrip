@@ -1,0 +1,55 @@
+# Ambitious Augmenter: "if it had one or more counters on it" counts counters of any kind, not only +1/+1 counters (CR 603.4,
+# 122.1). Bot1 casts Cryogen Relic before the Augmenter, so no increment counter; on turn 3 the attacking (tapped) Augmenter takes a
+# stun counter from the Relic, then Lightning Bolt kills it. It had a counter, so the ability makes a Fractal token and puts the
+# stun counter on it; the 0/0 Fractal then dies to state-based actions (CR 704.5f).
+
+[Bot1 Deck]
+Ambitious Augmenter
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Cryogen Relic
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cryogen Relic.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ambitious Augmenter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ambitious Augmenter.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Attack(Ambitious Augmenter > Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Cryogen Relic.Activate(Bot1.Battlefield.Ambitious Augmenter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ambitious Augmenter.Counters.Stun = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ambitious Augmenter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ambitious Augmenter; Lightning Bolt; Cryogen Relic
+LeftBattlefield = Cryogen Relic; Ambitious Augmenter (tapped); Fractal Token
