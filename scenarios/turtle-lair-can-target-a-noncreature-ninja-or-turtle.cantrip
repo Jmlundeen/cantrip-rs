@@ -1,0 +1,43 @@
+# Turtle Lair: "{3}, {T}: Target Ninja or Turtle can't be blocked this turn." A description with a subtype and no "card"
+# means a permanent of that subtype, not only a creature (CR 109.2). Firdoch Core, a Kindred Artifact with changeling, is
+# every creature type (CR 702.73a, 205.3d) - a Ninja and a Turtle - while it is not a creature, so it is a legal target.
+
+[Bot1 Deck]
+Turtle Lair
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Firdoch Core
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Turtle Lair.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Firdoch Core.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Turtle Lair.Activate(Firdoch Core; Ability: blocked)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Battlefield.Turtle Lair.Tapped = true
