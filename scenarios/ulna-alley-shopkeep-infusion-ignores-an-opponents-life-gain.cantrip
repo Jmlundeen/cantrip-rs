@@ -1,0 +1,38 @@
+# Ulna Alley Shopkeep: "as long as you gained life this turn" is its controller's life only. Bot2's Lightning Helix at Bot1 gains Bot2 3 life on
+# Bot2's turn, and Bot1's Shopkeep stays a 2/3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ulna Alley Shopkeep
+Swamp x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Lightning Helix
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ulna Alley Shopkeep.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 23
+Bot1.Life = 17
+Bot1.Battlefield.Ulna Alley Shopkeep.Power = 2
