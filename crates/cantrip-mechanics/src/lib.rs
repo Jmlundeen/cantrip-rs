@@ -163,6 +163,23 @@ pub mod vote;
 
 use cantrip_api::*;
 
+/// "The number of creature types among non-Borg creatures you control" (CR 205.3m): each creature type is counted
+/// once if at least one creature `player` controls has it. A creature with the Borg type is excluded altogether.
+/// Borg is read through `source`'s words (CR 612.2). Captain Jonathan Archer, Hoshi Sato, Exolinguist and Infinite
+/// Diversity print it.
+pub fn creature_types_among_non_borg(q: &dyn Query, source: ObjectId, player: PlayerId) -> usize {
+    let borg = q.words(source).subtype(Subtype::Borg);
+    let creatures: Vec<ObjectId> = q
+        .permanents_of(player)
+        .into_iter()
+        .filter(|&id| q.chars(id).is(CardType::Creature) && !q.chars(id).has_subtype(borg))
+        .collect();
+    Subtype::CREATURE_TYPES
+        .iter()
+        .filter(|&&kind| creatures.iter().any(|&id| q.chars(id).has_subtype(kind)))
+        .count()
+}
+
 /// "Activate only during your turn" (CR 602.5b), and "if it's your turn" on an alternative cost (CR 118.9): the
 /// ability's or spell's controller is the active player. Wishclaw Talisman, Vivi Ornitier, Sundial of the Infinite and
 /// Mine Collapse print it.
