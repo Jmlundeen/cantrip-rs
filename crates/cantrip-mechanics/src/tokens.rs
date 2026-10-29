@@ -999,8 +999,8 @@ pub static OFFICER: CardDef = CardDef {
 /// Planet land token named New Planet
 pub static NEW_PLANET: CardDef = CardDef {
     name: "New Planet",
+    token_words: &[],
     types: TypeSet::of(&[CardType::Land]),
-    subtypes: SubtypeSet::of(&[Subtype::Planet]),
     abilities: &[mana_ability(TAP, add_any_color(1).by(add_one_of_any_color), "{T}: Add one mana of any color.")],
     text: "{T}: Add one mana of any color.",
     ..token!(Planet)
@@ -1014,7 +1014,7 @@ pub static KLINGON: CardDef = CardDef {
     toughness: Some(1),
     keywords: Keywords::of(&[Keyword::Haste]),
     text: "Haste",
-    ..token!(Klingon)
+    ..token!(Klingon Warrior)
 };
 
 /// A 2/2 red and green worm creature token with "This token can't block."
