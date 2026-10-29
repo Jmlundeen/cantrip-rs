@@ -144,6 +144,22 @@ pub fn another_nontoken_you_control_enters<const TYPE: u8>(q: &dyn Query, me: &A
     }
 }
 
+/// "Whenever a nontoken artifact you control enters" (CR 603.6a): an artifact permanent, including an artifact creature,
+/// that entered under this ability's controller's control. Weapons Manufacturing and Conquest Mission print it.
+pub fn nontoken_artifact_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if to.is(ZoneKind::Battlefield)
+                && q.controller(*new) == me.controller
+                && !q.obj(*new).token
+                && q.chars(*new).is(CardType::Artifact) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever one or more cards leave your graveyard" (CR 603.2c, 603.10a): a card of the source's controller's graveyard going
 /// to any other zone. A token is in no graveyard long enough to leave one (CR 111.7, 704.5d), and the core records no departure
 /// for it. The cards that left together are the subjects of the matching events, so the batch triggers it once (with
@@ -1806,6 +1822,8 @@ pub const DRAGON_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE
 pub const OPPONENTS_CREATURE_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, opponents_creature_enters);
 pub const LEGENDARY_CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, legendary_creature_you_control_enters);
 pub const ARTIFACT_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, artifact_you_control_enters);
+pub const NONTOKEN_ARTIFACT_YOU_CONTROL_ENTERS: Trigger =
+    when_asked(EventMask::ZONE_CHANGE, nontoken_artifact_you_control_enters);
 pub const ANOTHER_ARTIFACT_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, another_artifact_you_control_enters);
 pub const ANOTHER_CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_enters);
 pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
