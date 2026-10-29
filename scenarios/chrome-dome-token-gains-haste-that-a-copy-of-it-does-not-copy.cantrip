@@ -1,0 +1,60 @@
+# Chrome Dome's token "gains haste": the haste is an effect on that token (layer 6, CR 613.1f), not part of its copiable
+# values, which are the Ornithopter's as printed (CR 707.2; the rulings: "The token copies exactly what was printed on the
+# original artifact"). Unlike Kiki-Jiki's "except it has haste" (CR 707.9b), a Phyrexian Metamorph that enters as a copy of
+# the token is a plain Ornithopter, a flyer without haste, and it is not sacrificed at the end step; the token is.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Chrome Dome
+Ornithopter
+Black Lotus
+Phyrexian Metamorph
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chrome Dome.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Chrome Dome.Activate(Ability: copy; Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter#2.Keywords = Flying; Haste
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Ornithopter#2)
+? Bot1.Battlefield.Ornithopter#3.Keywords = Flying
+? Bot1.Battlefield.Ornithopter#2.Keywords = Flying; Haste
+[T5 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire; Mox Emerald; Ornithopter; Chrome Dome; Ornithopter
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+Bot1.Battlefield.Ornithopter#2.Token = (absent)
