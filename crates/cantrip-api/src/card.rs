@@ -1543,7 +1543,6 @@ pub fn fused_half_unbuilt(half: &CardDef) -> Option<&'static str> {
     [
         (half.spell.is_none(), "no spell"),
         (half.modal.is_some(), "modes"),
-        (half.modes_up_to.is_some(), "a number of modes"),
         (half.cost.x > 0, "an {X}"),
         (half.kicker.is_some(), "a kicker"),
         (half.optional_cost.is_some(), "an optional additional cost"),
@@ -1831,6 +1830,9 @@ pub struct ModalDef {
     /// in content is a kicked modal spell), and gating it is owed with the first one.
     /// A spell's own: a modal triggered ability (Depth Defiler's) does not read it.
     pub when_paid: Option<(u8, u8)>,
+    /// A modal spell or ability's maximum number of modes when a condition is true (CR 700.2b): "If you have no cards in
+    /// hand, choose one or more instead". The condition is checked as the modes are chosen.
+    pub up_to_if: Option<(ModeCondition, u8)>,
     /// An instruction common to every mode, done once after the chosen modes on all of the item's targets (`ModalDef::shared`).
     pub shared: Option<Effect>,
 }
@@ -1844,8 +1846,11 @@ impl ModalDef {
 
     /// The most modes it may choose, with `counted` the count a `COUNTED` maximum reads. More than it has modes only
     /// matters for a modal that repeats; a count past a byte allows 255, more choices than any mask holds (`COUNT_BITS`).
-    pub fn most(&self, counted: u16) -> u8 {
-        if self.max == Self::COUNTED { u8::try_from(counted).unwrap_or(u8::MAX) } else { self.max }
+    pub fn most(&self, q: &dyn Query, asker: &Asker, counted: u16) -> u8 {
+        let max = self.up_to_if
+            .filter(|(condition, _)| condition(q, asker))
+            .map_or(self.max, |(_, max)| max);
+        if max == Self::COUNTED { u8::try_from(counted).unwrap_or(u8::MAX) } else { max }
     }
 
     /// How many bits a mode's count takes in a `StackItem::modes` mask, for a modal that repeats: counts up to 15, past the
@@ -1900,9 +1905,8 @@ pub struct SpellDef {
     pub effect: Effect,
 }
 
-/// The most modes a modal spell may choose, worked out from the board as the spell is cast (CR 601.2b, 700.2): "choose one.
-/// If you control a Wizard as you cast this spell, you may choose two instead". Asked once, as the modes are announced.
-pub type ModeCount = fn(&dyn Query, &Asker) -> u8;
+/// Whether a modal spell or ability may choose up to its conditional maximum.
+pub type ModeCondition = fn(&dyn Query, &Asker) -> bool;
 
 /// What the board was as a spell was cast, for its effect to read later: "if you controlled a Faerie as you cast this
 /// spell" (Faerie Fencing), "if you controlled a Mount" (Steer Clear), "a modified creature" (Flame Discharge), "for each
@@ -2856,8 +2860,6 @@ pub struct CardDef {
     pub divide: Option<Divide>,
     /// Its modes, chosen as it is cast (CR 601.2b, 700.2); its `spell` is `SpellDef::MODAL`.
     pub modal: Option<&'static ModalDef>,
-    /// The most modes the board lets it choose as it is cast, where that is more than `modal.max` (CR 700.2): Flame of Anor.
-    pub modes_up_to: Option<ModeCount>,
     /// What the board was as it was cast, which its effect reads from the history (CR 601.2i): `CastFact`.
     pub cast_fact: Option<CastFact>,
     /// An additional cost that depends on the targets announced (CR 601.2b-c, 601.2f): "as an additional cost to cast this
@@ -3269,7 +3271,6 @@ impl CardDef {
         optional_cost: None,
         divide: None,
         modal: None,
-        modes_up_to: None,
         cast_fact: None,
         cost_of_targets: None,
         end_step_riders: &[],
