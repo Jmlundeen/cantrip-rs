@@ -1,0 +1,65 @@
+# Raphael, Ninja Destroyer: "Until end of turn, you don't lose this mana as steps and phases end." That effect is an "until
+# end of turn" effect, which ends in the cleanup step's second action (CR 514.2); the mana then empties as that cleanup step
+# ends (CR 500.5), even when players had priority in it and another cleanup step follows (CR 514.3a). Turn 8, Bot2's: Bot1
+# Shocks its own Raphael for {R}{R}. In the cleanup step Bot2 discards to hand size, which triggers its Marauding Mako, so
+# players get priority and the mana is still in Bot1's pool; Bot2 casts Ancestral Recall, so the next cleanup step discards
+# again and Mako triggers again. In that second cleanup step Bot1's pool is empty.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Raphael, Ninja Destroyer
+Mountain
+Shock
+Mountain x15
+
+[Bot2 Deck]
+Mountain
+Mox Sapphire
+Marauding Mako
+Ancestral Recall
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raphael, Ninja Destroyer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Marauding Mako.Cast
+[T8 Bot2.Main1]
+? Bot2.Hand.Count = 8
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Raphael, Ninja Destroyer)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} lasting {R}{R}
+Bot2.Discard(Island)
+? Step = Cleanup
+? Stack.Count = 1
+? Bot1.Mana = {R}{R} lasting {R}{R}
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Discard(Island; Island)
+? Step = Cleanup
+? Stack.Count = 1
+? Bot1.Mana =
+[T9 Bot1.Upkeep]
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Raphael, Ninja Destroyer.Damage = 0
+Bot2.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 3
