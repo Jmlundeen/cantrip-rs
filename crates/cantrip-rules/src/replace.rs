@@ -311,12 +311,14 @@ fn graveyard_replaces_draws(cx: &Cx, player: PlayerId) -> bool {
 }
 
 /// Whether every draw `player` has left would only repeat the attempt from an empty library already made (CR 121.4): the
-/// library is empty and was drawn from (or no draw can happen, CR 121.2b), and nothing replaces a draw (CR 121.6).
+/// library is empty and was drawn from (or no draw can happen, CR 121.2b), and no effect would replace a draw of this
+/// player's (CR 121.6): an unrelated replacement effect in the game does not defeat the stop, only one that applies to
+/// this draw does (Hullbreacher).
 pub fn draws_only_repeat_an_attempt_from_an_empty_library(cx: &Cx, player: PlayerId) -> bool {
     cx.s().zone(Zone::library(player)).is_empty()
         && (cx.s().player(player).drew_from_empty || cantrip_api::cant_draw(cx, player, 1))
-        && !possible(cx, None)
         && !graveyard_replaces_draws(cx, player)
+        && (!possible(cx, None) || candidates(cx, &Proposal::Draw(CardDraw { player, replaced: false }), &[], None).is_empty())
 }
 
 fn subject_of(proposal: &Proposal) -> Option<ObjectId> {
@@ -1293,6 +1295,17 @@ mod tests {
         replacements: &[replacement(ReplacementKind::Draw, an_opponent_would_draw, instead, "draws nothing instead").optional(&SKIP)],
         ..CardDef::BLANK
     };
+    fn goes_to_the_graveyard(_: &dyn Query, _: &Asker, proposal: &Proposal) -> bool {
+        matches!(proposal, Proposal::ZoneChange(z) if z.to.is(ZoneKind::Graveyard))
+    }
+    fn nothing_changes(_: &dyn Query, _: &Asker, _: &mut Proposal) {}
+    /// A replacement effect of something else than draws, as Rest in Peace's.
+    static PEACE: CardDef = CardDef {
+        name: "Peace",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        replacements: &[replacement(ReplacementKind::ZoneChange, goes_to_the_graveyard, nothing_changes, "changes nothing")],
+        ..CardDef::BLANK
+    };
     static LIMITER: CardDef =
         CardDef { name: "Limiter", types: TypeSet::of(&[CardType::Enchantment]), cant_draw: &[one_each_turn], ..CardDef::BLANK };
 
@@ -1300,7 +1313,7 @@ mod tests {
     /// library, and a frame whose run is given `answers`.
     fn game(cards: &[(&'static CardDef, Zone)], answers: Vec<Answer>) -> Game {
         let table: &'static CardTable =
-            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER])));
+            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER, &PEACE])));
         let deck: Vec<CardId> = std::iter::repeat_n(table.id_of(&FILLER), 17).collect();
         let mut game = Game::new(table, &crate::Setup { decks: vec![deck, Vec::new()], ..Default::default() });
         for &(def, to) in cards {
@@ -1351,6 +1364,16 @@ mod tests {
         assert_eq!(draw(&mut game, 1), (8, 9, 20));
         let mut game = game_with(&[(&LIMITER, Zone::BATTLEFIELD), (&GAINER, Zone::BATTLEFIELD)]);
         assert_eq!(draw(&mut game, 2), (7, 10, 22));
+    }
+
+    /// CR 121.4, 121.6: "draw 2^32 or more cards" (Mathemagics) against an empty library returns at once with a replacement
+    /// effect of another event (Rest in Peace) in play; only an effect that would replace this player's draw keeps it going.
+    #[test]
+    fn an_unrelated_replacement_effect_does_not_keep_an_empty_library_drawing() {
+        let mut game = game_with(&[(&PEACE, Zone::BATTLEFIELD)]);
+        assert_eq!(draw(&mut game, 10), (17, 0, 20));
+        assert_eq!(draw(&mut game, u32::MAX), (17, 0, 20));
+        assert!(game.state.player(ME).drew_from_empty);
     }
 
     fn game_with(cards: &[(&'static CardDef, Zone)]) -> Game {
