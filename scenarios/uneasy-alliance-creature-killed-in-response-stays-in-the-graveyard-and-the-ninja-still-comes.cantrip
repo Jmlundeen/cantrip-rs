@@ -1,0 +1,58 @@
+# Uneasy Alliance: "Exile enchanted creature. You create a 1/1 black Ninja creature token." Bot1 enchants Bot2's Elvish Mystic
+# and on T3 pays {5} and sacrifices the Aura; in response Bot2 Bolts its own Mystic. As the ability resolves the creature is no
+# longer on the battlefield: the card in Bot2's graveyard is a new object (CR 400.7) and is not exiled, and Bot1 still creates
+# the Ninja.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Mox Jet
+Black Lotus
+Uneasy Alliance
+Plains
+Plains x13
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Elvish Mystic
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Uneasy Alliance.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Uneasy Alliance.Activate
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard.Elvish Mystic.Power = 1
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Elvish Mystic; Lightning Bolt
+Exile.Count = 0
+Bot1.Battlefield.Ninja Token.Power = 1
