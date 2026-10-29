@@ -137,6 +137,7 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         r if r == ManaRestriction::CREATURE_SPELLS_OR_ABILITIES_OF_CREATURES => ManaSpendFilterView::CreatureSpellsOrAbilitiesOfCreatures,
         r if r == ManaRestriction::CREATURE_SPELLS_OR_ABILITIES => ManaSpendFilterView::CreatureSpellsOrAbilities,
         r if r == ManaRestriction::ARTIFACT_SPELLS_OR_ABILITIES_OF_ARTIFACTS => ManaSpendFilterView::ArtifactSpellsOrAbilitiesOfArtifacts,
+        r if r == ManaRestriction::ARTIFACT_SPELLS_OR_ANY_ABILITY => ManaSpendFilterView::ArtifactSpellsOrAnyAbility,
         r => panic!("a mana restriction the wire has no word for: {}", r.name()),
     };
     let effect = match restriction.effects() {
@@ -180,7 +181,8 @@ pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, 
             },
         }));
     }
-    ManaRestriction::NAMED.into_iter().map(|(r, _)| r).find(|&r| restriction_view(r) == (filter, effect, Vec::new(), 0))
+    let unions = ManaRestriction::ANY_OF.into_iter().map(ManaRestriction::AnyOf);
+    ManaRestriction::NAMED.into_iter().map(|(r, _)| r).chain(unions).find(|&r| restriction_view(r) == (filter, effect, Vec::new(), 0))
 }
 
 pub fn mana_view(mana: Mana) -> ManaTypeView {
@@ -1532,6 +1534,18 @@ fn protection_words(c: &Chars, names: &[String]) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A restriction the wire has a word for reads back as it was sent, a union of restrictions (`AnyOf`) among them: Purple
+    /// Dragon Punks' mana is the same restriction when the client answers with it (CR 106.6).
+    #[test]
+    fn a_mana_restriction_reads_back_from_the_wire_as_it_was_sent() {
+        for restriction in ManaRestriction::NAMED.into_iter().map(|(r, _)| r).chain(ManaRestriction::ANY_OF.into_iter().map(ManaRestriction::AnyOf)) {
+            let (filter, effect, subtypes, mana_value) = restriction_view(restriction);
+            assert_eq!(restriction_of(filter, effect, &subtypes, mana_value), Some(restriction), "{}", restriction.name());
+        }
+        let (filter, ..) = restriction_view(ManaRestriction::ARTIFACT_SPELLS_OR_ANY_ABILITY);
+        assert_eq!(filter, ManaSpendFilterView::ArtifactSpellsOrAnyAbility);
+    }
 
     /// A power and toughness printed as stars are not a number on the printed card: the goyfs' sizes are their abilities'
     /// (CR 208.2a), and what the stars are worth once that is lost is the ability's (`StaticDef::lost_pt`), so the card as read
