@@ -1,0 +1,51 @@
+# "If you cast a spell this way, that creature enters with a finality counter on it" is a replacement effect about the spell,
+# not an ability Leonardo applies while he is there (CR 614.1c): the rider follows the spell, as the rulings on Kess,
+# Dissident Mage and Lier, Disciple of the Drowned say. A Mardu Scout dashed from the graveyard with Leonardo's permission
+# keeps it when Bot2's Lightning Bolt kills Leonardo with the spell still on the stack: it enters with a finality counter.
+
+[Bot1 Deck]
+Black Lotus
+Leonardo, Sewer Samurai
+Plains
+Mox Ruby
+Faithless Looting
+Mardu Scout
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mardu Scout; Plains)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Leonardo, Sewer Samurai.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Graveyard.Mardu Scout.Cast(Ability: Dash)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Leonardo, Sewer Samurai)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Leonardo, Sewer Samurai; Black Lotus; Faithless Looting; Plains
+Bot1.Battlefield.Mardu Scout.Power = 3
+Bot1.Battlefield.Mardu Scout.Counters.Finality = 1

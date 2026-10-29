@@ -1,0 +1,42 @@
+# Leonardo's permission judges the creature spell as it would be cast (CR 601.3e): Goring Warplow is a 5/4 card, but cast
+# prototyped it is a 1/1 spell (CR 718.3a), so it may be cast that way from the graveyard. Faithless Looting discards it on
+# turn 1, Leonardo comes down for Black Lotus and a Plains, and on turn 3 the Warplow is cast prototyped for {1}{B}: it is a
+# 1/1 with a finality counter.
+
+[Bot1 Deck]
+Black Lotus
+Leonardo, Sewer Samurai
+Plains
+Mox Ruby
+Mox Jet
+Faithless Looting
+Goring Warplow
+Plains
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Goring Warplow; Plains)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Leonardo, Sewer Samurai.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Graveyard.Goring Warplow.Cast(Ability: Prototype)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Goring Warplow.Power = 1
+Bot1.Battlefield.Goring Warplow.Toughness = 1
+Bot1.Battlefield.Goring Warplow.Counters.Finality = 1

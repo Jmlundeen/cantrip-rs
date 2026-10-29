@@ -1,0 +1,51 @@
+# "If you cast a spell this way, that creature enters with a finality counter on it" is about that spell alone (CR 614.1c,
+# 400.7). Faithless Looting discards Hovermyr (1/2) on turn 1 and Leonardo comes down for Black Lotus and a Plains. On turn 3
+# Bot1 casts Hovermyr from the graveyard with Leonardo's permission and, holding priority, flashes in Cathar Commando from hand
+# on top of it: the Commando resolves first and enters with no finality counter while the Hovermyr spell waits below, and then
+# Hovermyr enters with one.
+
+[Bot1 Deck]
+Black Lotus
+Leonardo, Sewer Samurai
+Plains
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Faithless Looting
+Hovermyr
+Plains
+Cathar Commando
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Hovermyr; Plains)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Leonardo, Sewer Samurai.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Hovermyr.Cast(Ability: During your turn)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cathar Commando.Counters.Finality = (absent)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Cathar Commando.Counters.Finality = (absent)
+Bot1.Battlefield.Hovermyr.Counters.Finality = 1
