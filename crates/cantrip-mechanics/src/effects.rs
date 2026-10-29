@@ -978,7 +978,8 @@ pub fn return_exiled_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Resul
 
 /// "Return target [card] from your graveyard to the battlefield" (CR 400.3): the first target, under the controller of the
 /// spell or ability, untapped; nothing if it is no longer a legal target (CR 608.2b), which for a lone required target
-/// means the spell or ability does not resolve at all. Emptiness and Ral Zarek, Guest Lecturer's −2 print it.
+/// means the spell or ability does not resolve at all. Emptiness, Ral Zarek, Guest Lecturer's −2, Primary Research, Recurring Nightmare,
+/// Restoration Seminar and Unearth print it.
 pub fn return_first_target_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = crate::targets::object(g, item, 0) {
         g.put_onto_battlefield(card, item.controller, false)?;
