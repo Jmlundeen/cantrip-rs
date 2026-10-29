@@ -40,7 +40,7 @@ Bot2.Pass
 Bot1.Hand.Llanowar Elves.Power = 1
 Bot1.Graveyard = Black Lotus
 Exile = Boarding Action
-Bot1.Battlefield.Klingon Token#1.Power = 2
-Bot1.Battlefield.Klingon Token#2.Power = 2
-Bot1.Battlefield.Klingon Token#1.Keywords = Haste
-Bot1.Battlefield.Klingon Token#2.Keywords = Haste
+Bot1.Battlefield.Klingon Warrior Token#1.Power = 2
+Bot1.Battlefield.Klingon Warrior Token#2.Power = 2
+Bot1.Battlefield.Klingon Warrior Token#1.Keywords = Haste
+Bot1.Battlefield.Klingon Warrior Token#2.Keywords = Haste
