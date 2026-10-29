@@ -1,0 +1,64 @@
+# Spinerock Tyrant: "Whenever you cast an instant or sorcery spell with a single target ..." - the limits its own trigger
+# condition sets. Bot2's Lightning Bolt (an instant with a single target, but not one "you" cast) does not trigger it: the Bolt
+# is alone on the stack. Bot1's Boulder Dash is a sorcery with two targets (CR 115.1, 601.2c), so it does not trigger it either.
+# Bot1's Cinder Strike, a sorcery with a single target, does: the trigger is on the stack above it, and Bot1 declines the copy.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Spinerock Tyrant
+Boulder Dash
+Cinder Strike
+Mountain
+Black Lotus
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spinerock Tyrant.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 17
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Boulder Dash.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Spinerock Tyrant)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot2.Life = 18
+Bot1.Hand.Cinder Strike.Cast
+Bot1.Modes(Cast without blighting)
+Bot1.Target(Spinerock Tyrant)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Spinerock Tyrant.Damage = 3
+Bot1.Graveyard = Cinder Strike; Boulder Dash; Black Lotus; Black Lotus
