@@ -350,6 +350,18 @@ pub fn each_player_draws_a_card(g: &mut dyn Game, _: &StackItem) -> Result<(), S
     Ok(())
 }
 
+/// "You and target opponent each draw `n` cards" (CR 121.1, 121.2c): the ability's controller and the target player in slot `slot`
+/// draw, in turn order from the active player, who is not always the controller (an ability can be activated on an opponent's
+/// turn). With the target illegal the ability does not resolve (CR 608.2b), so the controller draws nothing either. Loran of
+/// the Third Path and Joined Researchers' Secret Rendezvous print it.
+pub fn you_and_target_player_each_draw(g: &mut dyn Game, item: &StackItem, slot: usize, n: u32) {
+    let Some(target) = crate::targets::player(g, item, slot) else { return };
+    let players: Vec<PlayerId> = g.state().apnap().filter(|&p| p == item.controller || p == target).collect();
+    for player in players {
+        g.draw(player, n);
+    }
+}
+
 /// "Draw two cards, then discard a card" (CR 121.1, 701.9): the controller draws two, then chooses a card of their hand, the
 /// two drawn included, and discards it. Overlord of the Floodpits, Roiling Dragonstorm and Wistfulness print it.
 pub fn draw_two_then_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
