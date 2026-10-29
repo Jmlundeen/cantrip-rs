@@ -1,0 +1,68 @@
+# Pox Plague: half of a negative life total is no life to lose (CR 107.1b: a calculation that yields a negative number uses zero). Bot2 starts
+# at 1 life, casts Platinum Angel and is Bolted to -2, still in the game; Pox Plague leaves Bot2 at -2 (not -1 or -3) while Bot1 goes from 20 to 10.
+
+[Life]
+Bot2: 1
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Pox Plague
+Lightning Bolt
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Platinum Angel
+Island
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Platinum Angel.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = -2
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Battlefield.Mox Jet#5.Activate
+Bot1.Hand.Pox Plague.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Island)
+Bot1.Choose(Mox Jet#1; Mox Jet#2; Mox Jet#3)
+Bot2.Choose(Mox Pearl; Mox Ruby)
+
+[Expect]
+Bot1.Life = 10
+Bot2.Life = -2
+Result = InProgress
