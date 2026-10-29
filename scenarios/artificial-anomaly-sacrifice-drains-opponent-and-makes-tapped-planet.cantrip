@@ -1,0 +1,34 @@
+# Paying the land's full activation cost sacrifices it, drains each opponent for two, gains two, and creates a tapped Planet.
+
+[Bot1 Deck]
+Artificial Anomaly
+Swamp x4
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Artificial Anomaly.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Artificial Anomaly.Activate(Ability: Sacrifice this land)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Swamp#4.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Artificial Anomaly = (absent)
+Bot1.Battlefield.New Planet.Tapped = true
+Bot1.Battlefield.New Planet.Types = Land
