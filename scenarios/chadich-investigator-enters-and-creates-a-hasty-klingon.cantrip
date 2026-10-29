@@ -24,7 +24,7 @@ Bot2.Pass
 [Expect]
 Bot1.Battlefield.Cha'DIch Investigator.Power = 4
 Bot1.Battlefield.Cha'DIch Investigator.Toughness = 4
-Bot1.Battlefield.Klingon Token.Power = 2
-Bot1.Battlefield.Klingon Token.Toughness = 1
-Bot1.Battlefield.Klingon Token.Keywords = Haste
+Bot1.Battlefield.Klingon Warrior Token.Power = 2
+Bot1.Battlefield.Klingon Warrior Token.Toughness = 1
+Bot1.Battlefield.Klingon Warrior Token.Keywords = Haste
 
