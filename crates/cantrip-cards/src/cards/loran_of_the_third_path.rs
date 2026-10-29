@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{effects, targets};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -8,14 +8,9 @@ fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "You and target opponent each draw a card": you first, then the opponent if still a legal target.
+/// "You and target opponent each draw a card", in turn order from the active player (CR 121.2c).
 fn draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.draw(item.controller, 1);
-    if g.target_legal(item, 0)
-        && let Some(player) = item.target(0).player()
-    {
-        g.draw(player, 1);
-    }
+    effects::you_and_target_player_each_draw(g, item, 0, 1);
     Ok(())
 }
 
