@@ -1,0 +1,47 @@
+# Sally Pride, Lioness Leader: "create X 2/2 red Mutant creature tokens, where X is the number of nontoken creatures you
+# control." Jennika, Bad Apple Big Sister has already made a Mutant token when Sally enters: X counts Jennika and Sally, not
+# the token, so two more Mutants come (three in all), not three more.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Jennika, Bad Apple Big Sister
+Black Lotus
+Sally Pride, Lioness Leader
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Jennika, Bad Apple Big Sister.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutant Token.Power = 2
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Sally Pride, Lioness Leader.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mutant Token#3.Power = 2
+Bot1.Battlefield.Count = 8
