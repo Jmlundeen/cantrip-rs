@@ -1,0 +1,67 @@
+# Zaffai and the Tempests: "Once during each of your turns" - a split card cast fused for it (both halves, one spell, CR
+# 702.102a) uses it up like any other spell. Bot1 casts Zaffai on turn 1 with every source tapped; on turn 3, tapping nothing, it
+# casts Turn // Burn fused by Zaffai (Burn deals 2 damage to Bot2); its Lightning Bolt is then not offered free, and is cast for
+# its mana cost, paid by Mox Ruby.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sol Ring
+Zaffai and the Tempests
+Turn // Burn
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x25
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Zaffai and the Tempests.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Turn // Burn.Cast(Ability: Fuse: both halves - Once during each of your turns)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Once during each of your turns)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Graveyard = Lightning Bolt; Turn // Burn; Black Lotus

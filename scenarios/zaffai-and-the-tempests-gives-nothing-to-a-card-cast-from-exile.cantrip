@@ -1,0 +1,61 @@
+# Zaffai and the Tempests lets a spell be cast without paying its mana cost only "from your hand". Bot1 casts Zaffai on turn 1
+# with every source tapped. On turn 3 it casts Wrenn's Resolve for {1}{R} (Mox Ruby and Mox Jet), exiling Ancestral Recall and
+# a Lightning Bolt it may play until the end of its next turn: that Bolt, cast from exile, is not offered free, though the once is unused - the
+# Bolt drawn this turn, cast from the hand, still is, and deals 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sol Ring
+Zaffai and the Tempests
+Wrenn's Resolve
+Lightning Bolt
+Lightning Bolt
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Zaffai and the Tempests.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wrenn's Resolve.Cast
+Bot1.Pass
+Bot2.Pass
+? Exile = Ancestral Recall; Lightning Bolt
+! Bot1.Exile.Lightning Bolt.Cast(Bot2; Ability: Once during each of your turns)
+Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Once during each of your turns)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Exile = Ancestral Recall; Lightning Bolt
+Bot1.Graveyard = Lightning Bolt; Wrenn's Resolve; Black Lotus

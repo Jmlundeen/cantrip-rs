@@ -1,0 +1,60 @@
+# Zaffai and the Tempests: "you may cast an instant or sorcery spell from your hand without paying its mana cost." A split card
+# with fuse cast from the hand this way may be cast fused, both halves without paying their mana costs (Turn // Burn's ruling,
+# 2013-04-15; CR 702.102a, 118.9). Bot1 casts Zaffai on turn 1 with every source tapped; on turn 3, tapping nothing, it casts
+# Turn // Burn fused by Zaffai: Turn makes Bot2's Ornithopter a 0/1 and Burn deals 2 damage to Bot2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sol Ring
+Zaffai and the Tempests
+Turn // Burn
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x25
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Zaffai and the Tempests.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Turn // Burn.Cast(Ability: Fuse: both halves - Once during each of your turns)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Ornithopter.Toughness = 1
+Bot1.Graveyard = Turn // Burn; Black Lotus
