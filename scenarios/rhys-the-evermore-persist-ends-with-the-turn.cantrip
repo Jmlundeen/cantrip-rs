@@ -1,0 +1,44 @@
+# Rhys, the Evermore: "another target creature you control gains persist until end of turn" (CR 611.2a, 514.2). Bot1 casts Grizzly
+# Bears and then Rhys on turn 1, giving the Bears persist; on Bot2's turn 2 the effect is over, so Lightning Bolt kills the Bears for
+# good: it stays in the graveyard. The positive control is rhys-the-evermore-flashes-in-and-gives-persist-until-end-of-turn.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Emerald
+Grizzly Bears
+Rhys, the Evermore
+Plains x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Hand.Rhys, the Evermore.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Grizzly Bears; Black Lotus
+Bot1.Battlefield = Plains; Mox Emerald; Rhys, the Evermore
