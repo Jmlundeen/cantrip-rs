@@ -1,0 +1,52 @@
+# Quandrix, the Proof: "Instant and sorcery spells you cast from your hand have cascade" - an instant as well as a sorcery.
+# Quandrix's own cascade casts the Mox Pearl on top. On turn 3 Bot1 casts Lightning Bolt (mana value 1) from its hand at Bot2:
+# it cascades past the Plains into Mox Ruby (0, less than 1), cast free (CR 702.85a), and the Plains goes to the bottom.
+
+[Bot1 Deck]
+Quandrix, the Proof
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mountain
+Lightning Bolt
+Mox Pearl
+Island
+Plains
+Mox Ruby
+Island x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Quandrix, the Proof.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Quandrix, the Proof.Power = 6
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield = Mountain; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Quandrix, the Proof
+Bot1.Library = Island; Island; Island; Island; Island; Plains
+Exile.Count = 0
