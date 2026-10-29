@@ -1,0 +1,39 @@
+# Explosive Prodigy: "Vivid - When this creature enters, it deals X damage to target creature an opponent controls, where X is
+# the number of colors among permanents you control." Bot1 controls two Mountains (colorless, CR 105.2) and the red Prodigy
+# itself: one color, so X is exactly 1 - Bot2's 0/5 Armored Whirl Turtle survives with 1 damage marked, no more. Bot2's
+# Moxen are colorless and not Bot1's anyway.
+
+[Bot1 Deck]
+Explosive Prodigy
+Mountain x19
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Armored Whirl Turtle
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Armored Whirl Turtle.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Explosive Prodigy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Armored Whirl Turtle.Damage = 1
+
+[Expect]
+Bot2.Battlefield.Armored Whirl Turtle.Damage = 1
