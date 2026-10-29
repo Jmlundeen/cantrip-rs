@@ -627,6 +627,22 @@ pub fn gain_one_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     gain_life(g, item, 1)
 }
 
+/// "`player` loses half their life, rounded up" (CR 107.1a, 119.3): their life total as this is done. A life total of zero or
+/// less has no half to lose. Unstoppable Slasher and Dark Leo & Shredder print it for the player they damaged.
+pub fn lose_half_their_life(g: &mut dyn Game, player: PlayerId) {
+    let life = g.state().player(player).life;
+    g.lose_life(player, (life.max(0) + 1) / 2);
+}
+
+/// "They lose half their life, rounded up" of a trigger whose subject is the damaged player (see `lose_half_their_life`):
+/// Unstoppable Slasher's whole ability.
+pub fn subject_player_loses_half_their_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Player(player) = item.subject {
+        lose_half_their_life(g, player);
+    }
+    Ok(())
+}
+
 /// "Each opponent loses `N` life and you gain `N` life" (CR 119.3): every opponent still in the game loses it together, and the
 /// ability's controller gains `N`. Gollum, Riddle Master, Unholy Annex and Sneering Shadewriter print it of 2, and
 /// `each_opponent_loses_1_life_you_gain_1` is of 1.
