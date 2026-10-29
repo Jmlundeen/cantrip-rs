@@ -1372,6 +1372,15 @@ pub fn this_gains_first_strike(g: &mut dyn Game, item: &StackItem) -> Result<(),
     this_gains_until_end_of_turn(g, item, Keyword::FirstStrike)
 }
 
+/// "Enchanted creature gains first strike until end of turn" (CR 611.2a, 702.7a): the Aura's attached object when this
+/// ability resolves, or its last known attachment if the Aura has left (CR 608.2h). Captain's Tutelage and Super Speed print it.
+pub fn enchanted_creature_gains_first_strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(enchanted) = g.obj(item.object).attached_to {
+        gain_until_end_of_turn(g, item.object, enchanted, Keyword::FirstStrike);
+    }
+    Ok(())
+}
+
 /// "This creature gains deathtouch until end of turn" (CR 702.2b): `this_gains_until_end_of_turn` for deathtouch.
 pub fn this_gains_deathtouch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     this_gains_until_end_of_turn(g, item, Keyword::Deathtouch)
