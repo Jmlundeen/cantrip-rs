@@ -1,0 +1,46 @@
+# Mondo Gecko "becomes the color of your choice": the color is chosen, not a color word in its text, so a text-changing effect
+# does not touch it (CR 612.2, 612.1). Bot1's Sleight of Mind changes "red" to "green" in Mondo's text, which has no color
+# word; Bot1 then makes Mondo red, and it is red with hexproof from red: Bot2's Lightning Bolt can't target it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mondo Gecko
+Sleight of Mind
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mondo Gecko.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Mondo Gecko)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Colors(Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mondo Gecko.Activate
+Bot1.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mondo Gecko.Colors = Red
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mondo Gecko)
+
+[Expect]
+Bot1.Battlefield.Mondo Gecko.Colors = Red
