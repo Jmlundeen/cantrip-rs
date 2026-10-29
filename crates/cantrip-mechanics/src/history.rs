@@ -218,6 +218,19 @@ pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
         .map_or(0, |creature| q.chars(creature).power.unwrap_or(0) as i32)
 }
 
+/// "That creature's power" of a creature a resolving ability sacrificed (CR 701.21, 608.2h): the power of the permanent that
+/// `sacrificed` (the new object in the graveyard, as `effects::may_sacrifice` returns it) was before the sacrifice, as it last
+/// existed on the battlefield, pumps, counters and copy effects included. It is the old object of the zone change that made
+/// `sacrificed` (CR 400.7); zero for an object no zone change made. Bolg of the North and Rhovanion Rampager print it.
+pub fn power_of_sacrificed_permanent(q: &dyn Query, sacrificed: ObjectId) -> i16 {
+    q.history()
+        .all()
+        .iter()
+        .rev()
+        .find_map(|r| if let Event::ZoneChange { old, new, .. } = r.event && new == sacrificed { Some(old) } else { None })
+        .map_or(0, |old| crate::targets::power_or_last_known(q, old))
+}
+
 /// "Each creature that convoked it" (CR 702.51c, 109.2): the creatures that convoked `object` (a spell, or the permanent it
 /// became) that are creatures on the battlefield now. A convoker that has since left the battlefield is a new object
 /// wherever it went (CR 400.7), and one that is no longer a creature is not a creature that convoked it (CR 109.2: March of
