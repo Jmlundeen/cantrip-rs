@@ -147,7 +147,7 @@ static STRIKE: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Sorcery]),
     spell: spell(&[target(theirs_unless_kicked)], gain_three),
     late_targets: true,
-    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, extra: None, multi: false, waterbend: false }),
+    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, extra: None, additional: Cost::NONE, additional_text: "", multi: false, waterbend: false }),
     own_cost_changes: &[less_if_yours],
     ..CardDef::BLANK
 };
@@ -177,7 +177,7 @@ static DOUBLE: CardDef = CardDef {
     has_cost: true,
     types: TypeSet::of(&[CardType::Sorcery]),
     spell: spell(&ONE_OR_KICKED_TWO, gain_three),
-    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, extra: None, multi: false, waterbend: false }),
+    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, extra: None, additional: Cost::NONE, additional_text: "", multi: false, waterbend: false }),
     own_cost_changes: &[less_for_two],
     ..CardDef::BLANK
 };
@@ -255,7 +255,7 @@ static SURGE: CardDef = CardDef {
     has_cost: true,
     types: TypeSet::of(&[CardType::Instant]),
     spell: spell(&[target(permanent)], gain_three),
-    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, extra: None, multi: false, waterbend: false }),
+    kicker: Some(Kicker { cost: ManaCost { generic: 1, ..ManaCost::ZERO }, extra: None, additional: Cost::NONE, additional_text: "", multi: false, waterbend: false }),
     own_cost_changes: &[less_if_kicked],
     ..CardDef::BLANK
 };

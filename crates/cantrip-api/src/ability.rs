@@ -1098,12 +1098,39 @@ impl WayDef {
 
 /// Kicker (CR 702.33a): an optional additional cost, paid once.
 pub const fn kicker(cost: ManaCost) -> Option<Kicker> {
-    Some(Kicker { cost, extra: None, multi: false, waterbend: false })
+    Some(Kicker { cost, extra: None, additional: Cost::NONE, additional_text: "", multi: false, waterbend: false })
 }
 
 /// Multikicker (CR 702.33c): paid any number of times.
 pub const fn multikicker(cost: ManaCost) -> Option<Kicker> {
-    Some(Kicker { cost, extra: None, multi: true, waterbend: false })
+    Some(Kicker { cost, extra: None, additional: Cost::NONE, additional_text: "", multi: true, waterbend: false })
+}
+
+/// Kicker with a nonmana additional cost (CR 702.33a): pay it with the other costs if the spell is kicked. `text` is its
+/// printed wording for the kick announcement.
+pub const fn kicker_with_additional(cost: ManaCost, additional: Cost, text: &'static str) -> Option<Kicker> {
+    Some(Kicker { cost, extra: None, additional, additional_text: text, multi: false, waterbend: false })
+}
+
+/// Multikicker with a nonmana additional cost (CR 702.33c): repeat each part once per time the spell is kicked. `text` is
+/// its printed wording for the kick announcement.
+pub const fn multikicker_with_additional(cost: ManaCost, additional: Cost, text: &'static str) -> Option<Kicker> {
+    assert!(
+        !additional.tap
+            && !additional.sacrifice_self
+            && !additional.sacrifice_granter
+            && !additional.discard_self
+            && !additional.exile_self
+            && !additional.return_self
+            && !additional.unattach_self
+            && !additional.exert
+            && !additional.discard_hand
+            && additional.collect_evidence == 0
+            && additional.variable.is_none()
+            && additional.loyalty.is_none()
+            && additional.mana.x == 0
+    );
+    Some(Kicker { cost, extra: None, additional, additional_text: text, multi: true, waterbend: false })
 }
 
 /// A multikicker whose cost is more than mana (Squad--Exile four cards from your graveyard, CR 702.157a): paid any number of
@@ -1126,12 +1153,19 @@ pub const fn multikicker_cost(cost: Cost) -> Option<Kicker> {
             && cost.loyalty.is_none()
             && cost.mana.x == 0
     );
-    Some(Kicker { cost: cost.mana, extra: Some(Cost { mana: ManaCost::ZERO, ..cost }), multi: true, waterbend: false })
+    Some(Kicker {
+        cost: cost.mana,
+        extra: Some(Cost { mana: ManaCost::ZERO, ..cost }),
+        additional: Cost::NONE,
+        additional_text: "",
+        multi: true,
+        waterbend: false,
+    })
 }
 
 /// "As an additional cost to cast this spell, you may waterbend {N}" (CR 701.67a-b).
 pub const fn waterbend_kicker(cost: ManaCost) -> Option<Kicker> {
-    Some(Kicker { cost, extra: None, multi: false, waterbend: true })
+    Some(Kicker { cost, extra: None, additional: Cost::NONE, additional_text: "", multi: false, waterbend: true })
 }
 
 

@@ -1755,11 +1755,23 @@ pub struct Kicker {
     /// What the cost is beside mana (Squad--Exile four cards from your graveyard, CR 702.157a), paid once for each time it
     /// is kicked, with the mana (`Cost::times`); `None` for a cost that is mana alone.
     pub extra: Option<Cost>,
+    /// A nonmana part of the optional kicker cost (CR 601.2b, 601.2h), such as sacrificing an artifact or creature.
+    /// Repeated once per time multikicker is paid.
+    pub additional: Cost,
+    /// Printed wording for `additional`, shown in the kick announcement; empty when there is no nonmana kicker part.
+    pub additional_text: &'static str,
     /// Payable any number of times.
     pub multi: bool,
     /// A waterbend cost (CR 701.67a-b): as it is paid, an untapped artifact or creature may be tapped for each generic mana of
     /// it, and for no other mana of the spell's total cost. Spirit Water Revival's "you may waterbend {6}".
     pub waterbend: bool,
+}
+
+impl Kicker {
+    /// Nonmana kicker costs paid once per kicked count, including multikicker parts (CR 702.33a, 702.33c).
+    pub fn other_cost(self, times: u8) -> Cost {
+        self.extra.map_or(Cost::NONE, |cost| cost.times(times)).and(self.additional.times(times))
+    }
 }
 
 /// One way of paying an additional cost that names a choice ("discard a card or pay 3 life", CR 601.2b): its text,

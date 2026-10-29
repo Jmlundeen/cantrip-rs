@@ -1804,7 +1804,7 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
                     || (if if_promised { target_candidates_if_promised(cx, asker, spec) } else { target_candidates(cx, asker, spec) }).len() >= spec.min as usize
             })
         };
-        let can_kick = def.kicker.map_or(def.has_kicker(), |k| can_pay_other(cx, asker.source, asker.controller, &k.additional));
+        let can_kick = def.kicker.map_or(def.has_kicker(), |k| can_pay_other(cx, asker.source, asker.controller, &k.other_cost(1)));
         return can_kick || met(false) || (def.gift.is_some() && met(true));
     }
     // "If this spell was kicked, instead choose ..." (CR 702.33a, 601.2c): the targets wait for the kicker, and it may be
@@ -2357,7 +2357,7 @@ fn some_cast(
                 };
                 if kicked > 0
                     && let Some(kicker) = def.kicker
-                    && !can_pay_other(cx, card, player, &kicker.additional.times(kicked))
+                    && !can_pay_other(cx, card, player, &kicker.other_cost(kicked))
                 {
                     continue;
                 }
@@ -7297,12 +7297,13 @@ fn cast(
             let there = u32::try_from(variable_candidates(cx, spell, player, variable, Some(CostFor::Spell), None).len()).unwrap_or(u32::MAX);
             // An X ("sacrifice X creatures") is a u16 (`StackItem::x`); the number "any number" announces is not.
             if less_each > 0 { there } else { there.min(u32::from(u16::MAX)) }
-        } else if let Some(more) = def.kicker.and_then(|k| k.extra).filter(|_| def.kicker.is_some_and(|k| k.multi)) {
+        } else if let Some(kicker) = def.kicker.filter(|k| k.multi && (k.extra.is_some() || !k.additional_text.is_empty())) {
             // A multikicker whose cost is more than mana (Squad--Exile four cards from your graveyard): announced as many
             // times as its whole cost can be paid (CR 601.2b, 118.3), the kicker's mana apart, which the payment judges as it
             // does for any multikicker, and no more than a count of it holds (`Cost::most_times`).
             let paid_with = extra;
-            (1..=more.most_times()).take_while(|&n| can_pay_other(cx, spell, player, &paid_with.and(more.times(n as u8)))).count() as u32
+            let more = kicker.other_cost(1);
+            (1..=more.most_times()).take_while(|&n| can_pay_other(cx, spell, player, &paid_with.and(kicker.other_cost(n as u8)))).count() as u32
         } else {
             1000
         };
