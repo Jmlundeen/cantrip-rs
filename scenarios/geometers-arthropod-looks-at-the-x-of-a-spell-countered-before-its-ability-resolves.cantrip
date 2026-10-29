@@ -1,0 +1,44 @@
+# Geometer's Arthropod: the X it looks at is the spell's as the ability resolves, or as the spell last was on the stack once it
+# has left it (CR 608.2h; ruling 2026-03-20). Pterafractyl is cast for X = 1 and Bot1 counters it with Counterspell while the
+# Arthropod trigger waits above it: the spell is gone when the trigger resolves, and Bot1 still looks at the top 1 card (Lightning
+# Bolt) and puts it into hand; the Pterafractyl, Counterspell and Black Lotus are in the graveyard.
+
+[Bot1 Deck]
+Geometer's Arthropod
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Pterafractyl
+Island
+Island
+Counterspell
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Geometer's Arthropod.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pterafractyl.Cast(X: 1)
+Bot1.Hand.Counterspell.Cast(Stack.Pterafractyl)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 3
+Bot1.Hand = Island; Island; Lightning Bolt
