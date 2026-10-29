@@ -1,0 +1,46 @@
+# Hard casting creates a hasty Klingon; Beam me up later returns your creature, creates another, and exiles the spell.
+
+[Bot1 Deck]
+Black Lotus
+Llanowar Elves
+Mox Ruby x3
+Mountain
+Boarding Action
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boarding Action.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Graveyard.Boarding Action.Cast(Ability: Beam me up {2}{R})
+Bot1.Choose(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Llanowar Elves.Power = 1
+Bot1.Graveyard = Black Lotus
+Exile = Boarding Action
+Bot1.Battlefield.Klingon Token#1.Power = 2
+Bot1.Battlefield.Klingon Token#2.Power = 2
+Bot1.Battlefield.Klingon Token#1.Keywords = Haste
+Bot1.Battlefield.Klingon Token#2.Keywords = Haste
