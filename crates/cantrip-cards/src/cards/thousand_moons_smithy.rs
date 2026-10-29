@@ -54,9 +54,8 @@ fn may_tap_five_to_transform(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     if untapped.len() < 5 || !effects::ask_may(g, you, item.object, Purpose::Ask(&TAP_FIVE))? {
         return Ok(());
     }
-    for permanent in choose::cards(g, you, item.object, Purpose::Tap, untapped, 5, false)? {
-        g.tap(permanent);
-    }
+    let chosen = choose::cards(g, you, item.object, Purpose::Tap, untapped, 5, false)?;
+    g.tap_together(&chosen);
     g.transform_by(item.object, item)?;
     Ok(())
 }

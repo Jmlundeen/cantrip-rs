@@ -26,9 +26,7 @@ fn tap_myr(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if chosen.is_empty() {
         return Ok(());
     }
-    for &card in &chosen {
-        g.tap(card);
-    }
+    g.tap_together(&chosen);
     let x = chosen.len() as i16;
     pump(g, item.object, item.object, x, 0);
     let hit = match item.subject {

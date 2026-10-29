@@ -24,9 +24,7 @@ fn enter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// resolves (CR 608.2b), an already tapped one included.
 fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = targets::legal_objects(g, item);
-    for &creature in &creatures {
-        g.tap(creature);
-    }
+    g.tap_together(&creatures);
     let puts: Vec<(ObjectId, CounterKind, i16)> = creatures.iter().map(|&creature| (creature, CounterKind::Stun, 1)).collect();
     g.add_counters_together(&puts);
     Ok(())

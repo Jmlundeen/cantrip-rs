@@ -18,9 +18,8 @@ fn less_per_instant_and_sorcery_in_your_graveyard(q: &dyn Query, _: ObjectId, pl
 
 /// "Tap up to two target creatures": each target still legal is tapped (CR 608.2b).
 fn tap_them(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in targets::legal_objects(g, item) {
-        g.tap(creature);
-    }
+    let creatures = targets::legal_objects(g, item);
+    g.tap_together(&creatures);
     Ok(())
 }
 

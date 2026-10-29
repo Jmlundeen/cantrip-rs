@@ -20,9 +20,7 @@ const FOR_EACH_OPPONENT: TargetSpec = target(creature_the_slots_opponent_control
 /// the targets still legal when it resolves are tapped together and each gets a stun counter (CR 122.1).
 fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = targets::legal_objects(g, item);
-    for &id in &creatures {
-        g.tap(id);
-    }
+    g.tap_together(&creatures);
     let puts: Vec<(ObjectId, CounterKind, i16)> = creatures.into_iter().map(|id| (id, CounterKind::Stun, 1)).collect();
     g.add_counters_together(&puts);
     Ok(())

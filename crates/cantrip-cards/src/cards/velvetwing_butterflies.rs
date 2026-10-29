@@ -5,11 +5,7 @@ use cantrip_oracle as oracle;
 /// "Tap one or two target creatures" (CR 701.26a): those still legal as it resolves (CR 608.2b) are tapped.
 fn tap_them(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = targets::legal_objects(g, item);
-    instruction(g, |g| {
-        for creature in creatures {
-            g.tap(creature);
-        }
-    });
+    g.tap_together(&creatures);
     Ok(())
 }
 

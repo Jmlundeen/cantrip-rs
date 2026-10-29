@@ -8,9 +8,7 @@ use cantrip_oracle as oracle;
 /// "you don't control" is judged as the ability resolves.
 fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = targets::legal_objects(g, item);
-    for &creature in &creatures {
-        g.tap(creature);
-    }
+    g.tap_together(&creatures);
     let puts: Vec<(ObjectId, CounterKind, i16)> = creatures
         .into_iter()
         .filter(|&creature| g.obj(creature).controller != item.controller)
