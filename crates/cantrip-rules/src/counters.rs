@@ -136,6 +136,27 @@ pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i16) {
     }
 }
 
+/// "Move" up to `n` counters of one kind from `from` onto `to` (CR 122.5): taken off `from` and put onto `to` by the player doing it
+/// (CR 122.6a). If either action isn't possible - the same object, none of the kind on `from`, `to` can't have counters of the
+/// kind put on it (CR 101.2: `counters_banned`), or either has left its zone (CR 400.7) or phased out (CR 702.26b) - none is
+/// removed or put. How many came off `from`.
+pub fn mv(cx: &mut Cx, from: ObjectId, to: ObjectId, kind: CounterKind, n: i16) -> i16 {
+    let here = |cx: &Cx, id: ObjectId| live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut);
+    if n <= 0 || from == to || !here(cx, from) || !here(cx, to) || cx.s().obj(from).counters(kind) <= 0 {
+        return 0;
+    }
+    let controller = cx.s().obj(to).controller;
+    if crate::static_rules::counters_banned(cx, cx.cards(), to, controller, kind) {
+        return 0;
+    }
+    let before = cx.s().obj(from).counters(kind);
+    remove(cx, from, kind, n);
+    let moved = before - cx.s().obj(from).counters(kind);
+    let by = cx.doer();
+    put(cx, to, kind, moved, by, How::Effect);
+    moved
+}
+
 /// "Remove up to `maximum` counters from target creature" as an effect resolves (CR 608.2d, 122.1): `player` chooses
 /// which of the counters on `id`, of any kinds and how many of each, from none to `maximum` in all, and they come off
 /// together. Nothing is asked of an object that has changed zones (CR 400.7) or that has no counters. How many came off:
@@ -376,6 +397,33 @@ mod tests {
         put(&mut context, bear, CounterKind::PlusOne, 1, THEM, How::Effect);
         assert_eq!(context.s().obj(bear).counters(CounterKind::PlusOne), 4);
         assert!(matches!(context.g.log.last().unwrap().event, Event::CountersPut { object, amount: 2, total: 4, by: THEM, .. } if object == bear));
+    }
+
+    /// CR 122.5: a counter moves only if it can come off the first object and go onto a second, other one that is still in
+    /// play: the same object, a first with none, a phased-out second, and one that can't be put on by Solemnity-like rules
+    /// (the scenario) move nothing; an ordinary move takes them off and puts them on, up to what is there.
+    #[test]
+    fn counters_move_only_when_both_halves_are_possible() {
+        let table = Box::leak(Box::new(CardTable::new([&BEAR])));
+        let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+        let bear = |game: &mut Game| {
+            let id = game.state.push_obj(Obj::new(table.id_of(&BEAR), YOU, Zone::BATTLEFIELD));
+            game.state.zone_push(Zone::BATTLEFIELD, id);
+            id
+        };
+        let (a, b, c) = (bear(&mut game), bear(&mut game), bear(&mut game));
+        let mut context = cx(&mut game);
+        context.doer = Some(YOU);
+        put(&mut context, a, CounterKind::PlusOne, 3, YOU, How::Effect);
+        assert_eq!(mv(&mut context, a, a, CounterKind::PlusOne, 2), 0, "onto itself");
+        assert_eq!(mv(&mut context, b, a, CounterKind::PlusOne, 2), 0, "none to move");
+        assert_eq!(mv(&mut context, a, b, CounterKind::PlusOne, 0), 0, "none asked");
+        crate::phasing::phase_out(&mut context, &[c], None, false);
+        assert_eq!(mv(&mut context, a, c, CounterKind::PlusOne, 2), 0, "onto a phased-out permanent");
+        assert_eq!(context.s().obj(a).counters(CounterKind::PlusOne), 3);
+        assert_eq!(mv(&mut context, a, b, CounterKind::PlusOne, 5), 3, "as many as it has");
+        assert_eq!(context.s().obj(a).counters(CounterKind::PlusOne), 0);
+        assert_eq!(context.s().obj(b).counters(CounterKind::PlusOne), 3);
     }
 
     fn phase_recipient(g: &mut dyn cantrip_api::Game, _: &Asker, _: &Proposal, after: &Proposal) {

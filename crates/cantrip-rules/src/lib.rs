@@ -2270,6 +2270,10 @@ impl cantrip_api::Game for Cx<'_> {
         counters::put_together(self, &placements, counters::How::Effect);
     }
 
+    fn move_counters(&mut self, from: ObjectId, to: ObjectId, kind: CounterKind, amount: i16) -> i16 {
+        counters::mv(self, from, to, kind, amount)
+    }
+
     fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) -> i16 {
         let before = self.g.state.obj(object).counters(kind);
         counters::remove(self, object, kind, amount);

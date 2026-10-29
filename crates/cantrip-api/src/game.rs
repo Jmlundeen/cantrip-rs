@@ -1044,6 +1044,13 @@ pub trait Game: Query {
     /// that has changed zones (CR 400.7) or an amount of none or fewer gets none. "Put a +1/+1 counter on each creature you
     /// control", proliferate's permanents, "two +1/+1 counters and a flying counter on it".
     fn add_counters_together(&mut self, counters: &[(ObjectId, CounterKind, i16)]);
+    /// "Move" up to `amount` counters of one kind from `from` onto `to` (CR 122.5): each is removed from the first object and
+    /// put onto the second, through the replacement effects of counters being put and from `from` the player doing it. If either
+    /// action isn't possible - the objects are the same, `from` has none of the kind, `to` can't have counters of that kind put on
+    /// it (Solemnity, Melira, Sylvok Outcast), or either is no longer where it was (CR 400.7) or has phased out - no counter is
+    /// removed from or put onto anything. Says how many came off `from`: none when nothing could be moved. Tester of the
+    /// Tangential, Nesting Grounds, Bioshift, Fate Transfer, Daghatar the Adamant.
+    fn move_counters(&mut self, from: ObjectId, to: ObjectId, kind: CounterKind, amount: i16) -> i16;
     /// Removes up to `amount` counters of one kind from an object (CR 122.1) and says how many came off: none from an
     /// object that has changed zones (CR 400.7). It answers "if you do" and "for each counter removed this way", as Dawn of a
     /// New Age and Coalition Relic ask.
