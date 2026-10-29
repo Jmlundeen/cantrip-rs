@@ -1,0 +1,51 @@
+# Brilliance Unleashed, second mode, on an artifact land: Bot1 mills its own Darksteel Citadel (an Artifact Land, indestructible)
+# with Thought Scour on turn 1, and on turn 3 returns it with "Otherwise, return it to the battlefield and it's a 3/3 Robot artifact
+# creature with flying". It enters as an Artifact Land Creature - Robot (CR 205.1b): still a land, a 3/3 flyer that keeps its own
+# indestructible.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Thought Scour
+Brilliance Unleashed
+Swamp
+Darksteel Citadel
+Swamp
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Thought Scour; Swamp; Darksteel Citadel
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brilliance Unleashed.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Graveyard.Darksteel Citadel)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Darksteel Citadel.Types = Artifact; Land; Creature
+Bot1.Battlefield.Darksteel Citadel.Subtypes = Robot
+Bot1.Battlefield.Darksteel Citadel.Power = 3
+Bot1.Battlefield.Darksteel Citadel.Toughness = 3
+Bot1.Battlefield.Darksteel Citadel.Keywords = Flying; Indestructible
