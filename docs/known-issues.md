@@ -617,3 +617,18 @@ a different count would only follow from a card that puts a library of 2^32 card
 
 **Scenarios.** `mathemagics-for-x-two-against-an-empty-library-stops-drawing-at-once-and-loses` (the early end of a
 draw against an empty library); an X of 32 is 66 mana and no scenario pays it.
+
+### KI-145: A card exiled to pay a spell's cost is not shown as exiled with the permanent the spell became
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host view (`crates/cantrip-host/src/view.rs`) | 2026-10-30, review of Champion of the Clachan (PR #831) |
+
+**Notes.** The card a "behold a [quality] and exile it" cost exiles (Champion of the Clachan, Champions of the Shoal) is
+linked to the spell (`ExileLink::by` is the stack object, CR 607.2q), and the rules find it from the permanent through the
+spell's `became` (`ExileLink::is_by_in`). The view's `exiled_with` names `link.by` only while that object is on the
+battlefield, so the client shows the Kithkin or Merfolk in exile with no "exiled with" mark on the Champion, as it shows
+for Tidehollow Sculler. The rules are unaffected: the card returns when the permanent leaves. A fix follows `became` once
+from a stack object in the view, as `is_by_in` does.
+
+**Scenarios.** `champion-of-the-clachan-exiles-a-kithkin-from-hand-and-returns-it-when-it-leaves` (the rules side).
