@@ -175,7 +175,7 @@ fn a_creature_that_must_block_one_attacker_blocks_that_one() {
             g.state.update_obj(x, |o| o.tapped = true);
         }
         let timestamp = g.state.timestamp();
-        g.state.effect_push(ContinuousEffect { source: a1, controller: P0, timestamp, affected: x, kind: EffectKind::MustBlockAttacker(a1), duration: Duration::EndOfCombat });
+        g.state.effect_push(ContinuousEffect { source: a1, controller: P0, timestamp, affected: x, kind: EffectKind::MustBlockAttacker(a1), duration: Duration::EndOfCombat, granted_by: None });
         let ask = declare(&mut g, &[], &[a1, a2]);
         if case == "untapped" {
             assert_eq!(rules(&ask).required, vec![RequiredBlock { blocker: Some(x), attacker: Some(a1) }]);
