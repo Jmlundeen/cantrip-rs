@@ -218,6 +218,32 @@ pub fn remove_one_from_among(cx: &mut Cx, player: PlayerId, source: ObjectId, pe
     Ok(removed)
 }
 
+/// Chooses a kind already on one permanent without removing a counter (CR 122.1, 608.2d). No question if there's one kind.
+pub fn choose_kind(cx: &mut Cx, player: PlayerId, source: ObjectId, object: ObjectId) -> crate::R<Option<CounterKind>> {
+    if !live(cx.s(), object) || cx.s().obj(object).zone.is(ZoneKind::PhasedOut) {
+        return Ok(None);
+    }
+    let kinds: Vec<CounterKind> = CounterKind::ALL.into_iter().filter(|&kind| cx.s().obj(object).counters(kind) > 0).collect();
+    match kinds.as_slice() {
+        [] => Ok(None),
+        [kind] => Ok(Some(*kind)),
+        _ => {
+            let ask = RequestKind::ChooseModes {
+                source,
+                modes: kinds.iter().map(|&kind| Label::Counter(kind)).collect(),
+                eligible: (0..kinds.len() as u8).collect(),
+                count: 1,
+                at_most: 0,
+                affordable: Vec::new(),
+                additional_cost: false,
+                repeat: false,
+            };
+            let Answer::Modes(chosen) = cx.ask_core(player, ask, false)? else { return Ok(None) };
+            Ok(chosen.first().map(|&index| kinds[index as usize]))
+        }
+    }
+}
+
 /// A Siege that has lost its last defense counter triggers its defeat ability (CR 310.12b).
 fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
     if !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {

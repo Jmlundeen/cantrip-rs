@@ -1785,6 +1785,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::damage_together(self, damage)
     }
 
+    fn heal(&mut self, permanent: ObjectId) {
+        ops::heal(self, permanent)
+    }
+
     fn each_opponent_loses_life(&mut self, player: PlayerId, amount: i32) -> i32 {
         ops::each_opponent_loses_life(self, player, amount)
     }
@@ -2352,6 +2356,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn remove_a_counter_from_among(&mut self, player: PlayerId, source: ObjectId, permanents: &[ObjectId]) -> Result<bool, Suspend> {
         counters::remove_one_from_among(self, player, source, permanents).map_err(|_| Suspend)
+    }
+
+    fn choose_counter_kind(&mut self, player: PlayerId, source: ObjectId, object: ObjectId) -> Result<Option<CounterKind>, Suspend> {
+        counters::choose_kind(self, player, source, object).map_err(|_| Suspend)
     }
 
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {

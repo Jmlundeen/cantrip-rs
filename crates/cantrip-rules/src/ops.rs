@@ -257,6 +257,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     let mut plans: Vec<Plan> = Vec::with_capacity(moves.len());
     let mut regenerating: Vec<ObjectId> = Vec::new();
     let mut shielded: Vec<ObjectId> = Vec::new();
+    let mut replaced: Vec<ObjectId> = Vec::new();
     let together = moves.iter().any(|m| m.entering.is_some()) && moves.iter().any(|m| cx.s().obj(m.id).zone.is(ZoneKind::Battlefield));
     let leaving: Vec<ObjectId> =
         if together { moves.iter().map(|m| m.id).filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Battlefield)).collect() } else { Vec::new() };
@@ -308,6 +309,8 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             destroy: m.destroy || reason == ZoneReason::Destroy,
             regenerated: false,
             shielded: false,
+            destruction: m.destroy || matches!(reason, ZoneReason::Destroy | ZoneReason::DestroyNoRegen),
+            replaced: false,
         };
         // A permanent entering is judged as it would exist on the battlefield (CR 614.12), and its own replacements are
         // ordered with the others (CR 616.1). One its own replacement sent elsewhere instead does not enter at all.
@@ -329,6 +332,10 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         // permanent instead, once every move is worked out.
         if change.shielded {
             shielded.push(m.id);
+            continue;
+        }
+        if change.replaced {
+            replaced.push(m.id);
             continue;
         }
         let m = &m;
@@ -442,7 +449,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     }
     *cx.s().leaving_together.borrow_mut() = outer_leaving;
     // The permanents regenerated instead of destroyed stay (CR 701.19a): no attachment of theirs ends for their sake.
-    if !regenerating.is_empty() || !shielded.is_empty() {
+    if !regenerating.is_empty() || !shielded.is_empty() || !replaced.is_empty() {
         let moving = |id: &ObjectId| plans.iter().any(|p| p.m.id == *id);
         events.retain(|e| !matches!(e, Event::Unattached { attachment, from } if !moving(attachment) && !moving(from)));
         regenerate_instead(cx, &regenerating);
@@ -2123,6 +2130,8 @@ fn create_tokens_onto(
             destroy: false,
             regenerated: false,
             shielded: false,
+            destruction: false,
+            replaced: false,
         };
         let change = entry_replacements(cx, &mut entering, proposed);
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist
@@ -2942,6 +2951,25 @@ pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16
     batch.finish(cx, &mut events);
     cx.emit_batch(&events, None);
     dealt
+}
+
+/// Heals all damage marked on a permanent (CR 701.69a). A phased-out or new-zone object is not affected.
+pub fn heal(cx: &mut Cx, permanent: ObjectId) {
+    if !live(cx.s(), permanent)
+        || !cx.s().obj(permanent).zone.is(ZoneKind::Battlefield)
+        || cx.s().obj(permanent).zone.is(ZoneKind::PhasedOut)
+    {
+        return;
+    }
+    let object = cx.s().obj(permanent);
+    if object.damage == 0 && !object.deathtouched {
+        return;
+    }
+    cx.st().update_obj(permanent, |o| {
+        o.damage = 0;
+        o.deathtouched = false;
+    });
+    cx.state_changed();
 }
 
 /// The order in which the assignments of one simultaneous damage event (CR 120.2, 510.2) meet the prevention shields of

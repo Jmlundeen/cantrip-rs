@@ -388,7 +388,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
     }
     // Nor is a destruction a regeneration shield has replaced (CR 614.6).
     if let Proposal::ZoneChange(z) = proposal
-        && (z.regenerated || z.shielded)
+        && (z.regenerated || z.shielded || z.replaced)
     {
         return Vec::new();
     }
@@ -1442,6 +1442,8 @@ mod tests {
             destroy: false,
             regenerated: false,
             shielded: false,
+            destruction: false,
+            replaced: false,
         };
         let link = |p: Proposal| match p {
             Proposal::ZoneChange(z) => z.exiled_with,

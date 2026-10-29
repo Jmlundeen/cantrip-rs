@@ -577,6 +577,8 @@ pub trait Game: Query {
     /// event, so "whenever this deals damage" triggers once. Each entry is a source, a recipient and an amount; an effect
     /// that heals the damage already marked does not heal what the event itself dealt. How much each was dealt, in order.
     fn damage_together(&mut self, damage: &[(ObjectId, Target, u16)]) -> Vec<u16>;
+    /// Removes all damage marked on `permanent` (CR 701.69a). A permanent with no marked damage is unchanged.
+    fn heal(&mut self, permanent: ObjectId);
     /// Destroys permanents at once (CR 701.8a, 101.4, 603.10a): a leaves-the-battlefield ability sees all of them leave. An
     /// indestructible one stays (CR 702.12b); a regeneration shield replaces its destruction (CR 701.19a); the rest go to
     /// their owners' graveyards. Something that is no longer the object it was is not destroyed (CR 400.7). The new objects,
@@ -1091,6 +1093,9 @@ pub trait Game: Query {
     /// comes off. Whether one did, for "if you do": none when none of them has a counter or has changed zones (CR 400.7).
     /// Mister Hyde, Monster Within, Sanctuary Warden and Chisei, Heart of Oceans print it.
     fn remove_a_counter_from_among(&mut self, player: PlayerId, source: ObjectId, permanents: &[ObjectId]) -> Result<bool, Suspend>;
+    /// Chooses one kind of counter already on `object`, without removing it (CR 122.1, 608.2d). No choice when the object
+    /// has changed zones, phased out, or has no counters; otherwise the sole kind is automatic and several kinds are asked.
+    fn choose_counter_kind(&mut self, player: PlayerId, source: ObjectId, object: ObjectId) -> Result<Option<CounterKind>, Suspend>;
     /// A continuous effect from `source` on `affected` begins (CR 611.2). It is controlled by the controller of the spell or
     /// ability whose instruction makes it (CR 611.2a, 113.8) - or of the replacement effect or mana ability being carried
     /// out - whoever controls `source` by then: The One Ring's "you gain protection from everything" is its caster's though

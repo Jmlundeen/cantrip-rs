@@ -79,10 +79,15 @@ pub struct ZoneChange {
     pub destroy: bool,
     /// A regeneration shield replaced the destruction (CR 701.19a): the permanent does not move, and is regenerated instead.
     pub regenerated: bool,
-    /// A shield counter replaced the destruction (CR 122.1c): "if this permanent would be destroyed as the result of an effect,
-    /// instead remove a shield counter from it". The permanent does not move; a shield counter is removed from it. Not a
-    /// regeneration (the rulings), and not for a permanent that is sacrificed or destroyed by a state-based action.
+    /// A shield counter replaced destruction due to an effect (CR 122.1c): "if this permanent would be destroyed as the
+    /// result of an effect, instead remove a shield counter from it". Not a regeneration (the rulings), and not for state-based destruction.
     pub shielded: bool,
+    /// This proposed move is an attempted destruction under CR 701.8, whether or not regeneration can replace it. A later
+    /// replacement that changes `to` away from the owner's graveyard has changed the destruction event (CR 614.6).
+    pub destruction: bool,
+    /// A replacement effect made this event impossible, so the object does not move and no further replacement applies (CR 614.6).
+    /// Its `then` instructions still resolve as part of the effect that replaced it.
+    pub replaced: bool,
 }
 
 /// Counters that would be put on a permanent (CR 122.6, 614.1a): by an effect, or as it enters with them.
