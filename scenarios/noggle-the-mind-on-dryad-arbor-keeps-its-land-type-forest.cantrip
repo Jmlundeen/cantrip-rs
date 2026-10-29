@@ -1,0 +1,31 @@
+# Noggle the Mind replaces only creature types (CR 205.3d, the reminder "It loses ... all other creature types"): Bot2's Dryad Arbor, a green
+# Land Creature - Forest Dryad, becomes a colorless Forest Noggle - it keeps its land type Forest (a land type, not a creature type, CR 205.3i)
+# and loses Dryad.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Noggle the Mind
+Island x17
+
+[Bot2 Deck]
+Dryad Arbor
+Island x19
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Dryad Arbor.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+? Bot2.Battlefield.Dryad Arbor.Subtypes = Dryad; Forest
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Noggle the Mind.Cast(Bot2.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Dryad Arbor.Types = Land; Creature
+Bot2.Battlefield.Dryad Arbor.Subtypes = Forest; Noggle
+Bot2.Battlefield.Dryad Arbor.Colors = (absent)
