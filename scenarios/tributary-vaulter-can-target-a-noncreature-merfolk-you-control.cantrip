@@ -1,0 +1,51 @@
+# Tributary Vaulter: "another target Merfolk you control" is a Merfolk permanent, not only a creature (CR 109.2: a description with a
+# subtype and without "card" or "spell" means a permanent). Firdoch Core, a Kindred Artifact with changeling, is every creature type
+# and so a Merfolk while it is not a creature (CR 205.3m, 702.73a). Bot1's Vaulter attacks on turn 3 and its trigger targets the
+# Core, the only other Merfolk Bot1 controls; the Core gets +2/+0 until end of turn (CR 611.2c), which shows once Bot1 makes it a
+# 4/4 artifact creature in the second main phase: a 6/4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Tributary Vaulter
+Firdoch Core
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Hand.Tributary Vaulter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Tributary Vaulter)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Firdoch Core.Activate(Ability: #2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 19
+Bot1.Battlefield.Firdoch Core.Power = 6
+Bot1.Battlefield.Firdoch Core.Toughness = 4
