@@ -1,0 +1,52 @@
+# Karai, Future of the Foot. Turn 3: Bot1 attacks with Ornithopter, unblocked, and in the declare blockers step sneaks Karai in for
+# {2}{W}{B}, returning the Ornithopter; in response Choreographed Sparks (Lotus' RRR) copies the Karai spell. The copy resolves
+# first, a token Karai that enters tapped and attacking (its sneak cost was paid, CR 707.10); then the card Karai, and the legend
+# rule keeps the token, the card going to the graveyard. The token deals 3 combat damage: "return target creature card from your
+# graveyard to your hand. If her sneak cost was paid this turn, instead return that card to the battlefield" - the Karai card,
+# the only creature card there, returns to the battlefield (and the legend rule keeps the token again), not to hand.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Black Lotus
+Karai, Future of the Foot
+Choreographed Sparks
+Ornithopter
+Mountain
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Hand.Karai, Future of the Foot.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Choreographed Sparks.Cast
+Bot1.Modes(2)
+Bot1.Target(Stack.Karai, Future of the Foot)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+
+[Expect]
+Bot1.Hand = Ornithopter
