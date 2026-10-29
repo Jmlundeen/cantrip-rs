@@ -1006,6 +1006,17 @@ pub static NEW_PLANET: CardDef = CardDef {
     ..token!(Planet)
 };
 
+/// 2/1 red Klingon creature token with haste.
+pub static KLINGON: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Red)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Haste]),
+    text: "Haste",
+    ..token!(Klingon)
+};
+
 /// The 2/2 green Bear creature token (CR 111.1, 111.4). Argoth, Sanctum of Nature, Ayula's Influence, Bearscape, Caller of the
 /// Claw, Dancing from Dark to Dawn, Path to the World Tree and Words of Wilding make it.
 pub static BEAR: CardDef = CardDef {
