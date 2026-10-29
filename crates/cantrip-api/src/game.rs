@@ -922,6 +922,10 @@ pub trait Game: Query {
     fn unattach(&mut self, attachment: ObjectId);
     /// Taps a permanent (CR 701.26a): nothing happens to one already tapped, gone (CR 400.7) or phased out (CR 702.26b).
     fn tap(&mut self, permanent: ObjectId);
+    /// Taps several permanents as one instruction (CR 701.26a): each that is not tapped, gone (CR 400.7) or phased out is
+    /// tapped, then what watches them sees them become tapped together (CR 603.2c), so a "whenever one or more creatures
+    /// become tapped" ability triggers once. For "tap X target creatures", "tap five untapped artifacts".
+    fn tap_together(&mut self, permanents: &[ObjectId]);
     /// Untaps a permanent (CR 701.26a). One with a stun counter on it has one removed instead (CR 122.1d).
     fn untap(&mut self, permanent: ObjectId);
     /// Exerts a permanent (CR 701.43a): it won't untap during its controller's next untap step.

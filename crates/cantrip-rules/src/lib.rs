@@ -2146,6 +2146,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::tap(self, permanent);
     }
 
+    fn tap_together(&mut self, permanents: &[ObjectId]) {
+        ops::tap_together(self, permanents);
+    }
+
     fn untap(&mut self, permanent: ObjectId) {
         ops::untap(self, permanent);
     }

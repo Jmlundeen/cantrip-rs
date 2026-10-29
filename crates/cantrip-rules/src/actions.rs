@@ -888,15 +888,33 @@ fn choose_tappers(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) 
     }
 }
 
+/// Pays `{T}` on a cost's source (CR 602.2b, 601.2h): tapped now, before any other part of the cost moves it. When the cost also
+/// taps other permanents (`cost.tap_permanents`, or `others`: the creatures of a tap-creatures cost) they are tapped at once,
+/// so its `Event::Tapped` waits to be announced in their batch (CR 603.2c) and the source is returned as pending; otherwise it is
+/// announced here and nothing is pending.
+fn tap_source(cx: &mut Cx, source: ObjectId, cost: &Cost, others: bool) -> Vec<ObjectId> {
+    if !cost.tap {
+        return Vec::new();
+    }
+    if !(cost.tap_permanents || others) {
+        ops::tap(cx, source);
+        return Vec::new();
+    }
+    if ops::tap_quietly(cx, source) { vec![source] } else { Vec::new() }
+}
+
 /// Pays the exert and tap-creatures parts of a cost.
-fn pay_exert_and_tappers(cx: &mut Cx, source: ObjectId, cost: &Cost, tappers: &[ObjectId]) {
+fn pay_exert_and_tappers(cx: &mut Cx, source: ObjectId, cost: &Cost, tappers: &[ObjectId], pending: &mut Vec<ObjectId>) {
     if cost.exert {
         ops::exert(cx, source);
     }
     if cost.unattach_self {
         ops::unattach(cx, source);
     }
-    ops::tap_together(cx, tappers);
+    // Nothing to announce with, when there are none: the cost's `{T}` waits for its other taps (`tap_source`).
+    if !tappers.is_empty() {
+        ops::tap_together_with(cx, pending, tappers);
+    }
 }
 
 /// "Activate only once each turn" (CR 602.5b-c): whether the `index`th ability of this object has been activated this
@@ -1438,9 +1456,9 @@ fn choose_variable_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, v
 /// Pays the permanents part of a cost, once the rest is paid. `ability` is the activated ability whose cost it is: the
 /// permanents its cost exiles are "exiled with" its source, linked to the other abilities of its text (CR 406.6, 607.2a). A
 /// spell's are not: that rule is of abilities.
-fn pay_permanents(cx: &mut Cx, player: PlayerId, cost: &Cost, chosen: &[ObjectId], ability: Option<Linked>) {
+fn pay_permanents(cx: &mut Cx, player: PlayerId, cost: &Cost, chosen: &[ObjectId], ability: Option<Linked>, pending: &mut Vec<ObjectId>) {
     if cost.tap_permanents {
-        ops::tap_together(cx, chosen);
+        ops::tap_together_with(cx, pending, chosen);
         return;
     }
     match cost.permanents.map(|p| p.action) {
@@ -7500,7 +7518,7 @@ fn cast(
     pay_blight(cx, player, &extra, extra_blighted);
     pay_counters_among(cx, &removed);
     pay_counters_among(cx, &extra_removed);
-    pay_permanents(cx, player, &cost, &chosen, None);
+    pay_permanents(cx, player, &cost, &chosen, None, &mut Vec::new());
     pay_discards(cx, &discards);
     pay_discards(cx, &way_discards);
     pay_exiles(cx, &exiles);
@@ -7510,7 +7528,7 @@ fn cast(
     pay_exiles(cx, &extra_evidence);
     pay_exiles(cx, &hand_exiled);
     pay_life_and_counters(cx, player, spell, &cost);
-    pay_permanents(cx, player, &extra, &extra_chosen, None);
+    pay_permanents(cx, player, &extra, &extra_chosen, None, &mut Vec::new());
     let mut revealed = pay_behold(cx, player, &beheld);
     revealed.extend(pay_behold(cx, player, &extra_beheld));
     if let Some(at) = cx.s().stack.iter().rposition(|i| i.kind == StackKind::Spell && i.object == spell) {
@@ -7520,7 +7538,7 @@ fn cast(
     pay_discards(cx, &extra_discards);
     pay_discards(cx, &extra_variable_discards);
     pay_life_and_counters(cx, player, spell, &extra);
-    pay_exert_and_tappers(cx, spell, &extra, &extra_tappers);
+    pay_exert_and_tappers(cx, spell, &extra, &extra_tappers, &mut Vec::new());
     // CR 702.194a: the creatures tapped for the teamwork cost became tapped to pay it, which abilities of theirs trigger on.
     if item.paid > 0 && def.optional_cost.is_some_and(|o| o.cost.tap_creatures.is_some()) {
         for &creature in &extra_tappers {
@@ -8950,13 +8968,12 @@ fn activate(
     // the cost moves it: it was tapped as it left (CR 118.3), its last-known information says so (CR 608.2h), and
     // "whenever ... becomes tapped" sees the tap of a permanent still on the battlefield ("{T}, Exile this artifact",
     // "{T}, Sacrifice a creature" choosing itself).
-    if def.cost.tap {
-        ops::tap(cx, source);
-    }
+    // Tapped quietly, and announced in the batch of the cost's other taps if it has any (CR 603.2c).
+    let mut tapped = tap_source(cx, source, &def.cost, !tappers.is_empty());
     // Counters put on and taken off permanents next, so a permanent the cost also sacrifices leaves with them.
     pay_blight(cx, player, &def.cost, blighted);
     pay_counters_among(cx, &removed);
-    pay_permanents(cx, player, &def.cost, &chosen, Some(cx.linked(&item)));
+    pay_permanents(cx, player, &def.cost, &chosen, Some(cx.linked(&item)), &mut tapped);
     let revealed = pay_behold(cx, player, &beheld);
     let at = cx.s().stack.len() - 1;
     add_revealed_to_item(cx, at, &revealed);
@@ -8966,7 +8983,8 @@ fn activate(
     if let Some(kind) = counter {
         counters::remove(cx, source, kind, 1);
     }
-    pay_exert_and_tappers(cx, source, &def.cost, &tappers);
+    pay_exert_and_tappers(cx, source, &def.cost, &tappers, &mut tapped);
+    ops::tap_together_with(cx, &mut tapped, &[]);
     note_activation(cx, source, index as usize, def);
     // Craft exiles its source with its materials, last of all (`pay_materials`).
     if def.cost.exile_self && def.cost.materials.is_none() {
@@ -9145,12 +9163,10 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     if life > 0 {
         ops::change_life(cx, player, -life_paid(life));
     }
-    if whole.tap {
-        ops::tap(cx, source);
-    }
+    let mut tapped = tap_source(cx, source, &whole, !tappers.is_empty());
     pay_blight(cx, player, &whole, blighted);
     pay_counters_among(cx, &removed);
-    pay_permanents(cx, player, &whole, &chosen, None);
+    pay_permanents(cx, player, &whole, &chosen, None, &mut tapped);
     pay_behold(cx, player, &beheld);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
@@ -9158,7 +9174,8 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     if let Some(kind) = counter {
         counters::remove(cx, source, kind, 1);
     }
-    pay_exert_and_tappers(cx, source, &whole, &tappers);
+    pay_exert_and_tappers(cx, source, &whole, &tappers, &mut tapped);
+    ops::tap_together_with(cx, &mut tapped, &[]);
     if whole.sacrifice_self {
         ops::sacrifice(cx, player, &[source]);
     }
@@ -9236,9 +9253,7 @@ fn activate_mana_as(
     // How it was given, read before any cost moves the source (CR 113.7a).
     let granted = Grant::of(granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
     // {T} is paid on the permanent before any other part of the cost moves it (CR 605.3a, 601.2h, 118.3): see `activate`.
-    if def.cost.tap {
-        ops::tap(cx, source);
-    }
+    let mut tapped = tap_source(cx, source, &def.cost, false);
     if def.cost.exile_self {
         ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
     }
@@ -9252,12 +9267,13 @@ fn activate_mana_as(
             adds_nothing = sacrificed_names(cx, &chosen, color, colorless)?;
         }
     }
-    pay_exert_and_tappers(cx, source, &def.cost, &[]);
+    pay_exert_and_tappers(cx, source, &def.cost, &[], &mut tapped);
     if def.cost.discard_hand {
         let hand = choose_discards(cx, player, source, &def.cost, by)?;
         pay_discards(cx, &hand);
     }
-    pay_permanents(cx, player, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card), acquired }));
+    pay_permanents(cx, player, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card), acquired }), &mut tapped);
+    ops::tap_together_with(cx, &mut tapped, &[]);
     pay_life_and_counters(cx, player, source, &def.cost);
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, player, &[source]);
@@ -10766,12 +10782,10 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
         ops::change_life(cx, payer, -life_paid(life));
     }
     // {T} first, so a permanent the cost also moves was tapped as it left (CR 118.3), as `activate` pays it.
-    if cost.tap {
-        ops::tap(cx, source);
-    }
+    let mut tapped = tap_source(cx, source, cost, !tappers.is_empty());
     pay_blight(cx, payer, cost, blighted);
     pay_counters_among(cx, &removed);
-    pay_permanents(cx, payer, cost, &chosen, None);
+    pay_permanents(cx, payer, cost, &chosen, None, &mut tapped);
     // Revealed for the effect paying it, as part of that effect (CR 701.20a): no reveal of the effect's own lasts past the
     // instruction it is for (`ops::seen_by_all`).
     pay_behold(cx, payer, &beheld);
@@ -10786,7 +10800,8 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     if let Some(kind) = counter {
         counters::remove(cx, source, kind, 1);
     }
-    pay_exert_and_tappers(cx, source, cost, &tappers);
+    pay_exert_and_tappers(cx, source, cost, &tappers, &mut tapped);
+    ops::tap_together_with(cx, &mut tapped, &[]);
     if cost.exile_self {
         ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
     }

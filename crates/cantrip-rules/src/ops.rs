@@ -3720,9 +3720,16 @@ pub fn tap_quietly(cx: &mut Cx, id: ObjectId) -> bool {
 /// batch of events, so a "whenever one or more creatures you control become tapped" ability triggers once. The permanents that
 /// became tapped.
 pub fn tap_together(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
+    tap_together_with(cx, &mut Vec::new(), ids)
+}
+
+/// `tap_together` for a cost whose `{T}` was paid already (CR 602.2b, 601.2h): the permanents in `pending` were tapped
+/// quietly (`tap_quietly`) and are announced in the same batch as the ones tapped now, since one cost taps them at once. They
+/// are announced even when none of `ids` becomes tapped, and `pending` is left empty.
+pub fn tap_together_with(cx: &mut Cx, pending: &mut Vec<ObjectId>, ids: &[ObjectId]) -> Vec<ObjectId> {
     let tapped: Vec<ObjectId> = ids.iter().copied().filter(|&id| tap_quietly(cx, id)).collect();
-    if !tapped.is_empty() {
-        let events: Vec<Event> = tapped.iter().map(|&permanent| Event::Tapped { permanent }).collect();
+    let events: Vec<Event> = pending.drain(..).chain(tapped.iter().copied()).map(|permanent| Event::Tapped { permanent }).collect();
+    if !events.is_empty() {
         cx.emit_batch(&events, None);
     }
     tapped
