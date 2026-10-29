@@ -1,0 +1,49 @@
+# Mikey & Don, Party Planners: "If you cast a creature spell this way, that creature enters with an additional +1/+1 counter on it."
+# A rule of how the spell was cast, made as it is cast (CR 601.2a, 614.1c), so it still applies when Mikey & Don has left before
+# the spell resolves (the owner's ruling for Kess, Lier and Leonardo, Sewer Samurai). Bot1 casts Foot Elite (a Ninja) from the top of
+# its library, then Unsummons Mikey & Don in response: Foot Elite still enters a 3/5 with the counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mikey & Don, Party Planners
+Unsummon
+Island
+Foot Elite
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mikey & Don, Party Planners.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Library.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Library.Foot Elite.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Mikey & Don, Party Planners)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Mikey & Don, Party Planners
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Mikey & Don, Party Planners
+Bot1.Battlefield.Foot Elite.Power = 3
+Bot1.Battlefield.Foot Elite.Toughness = 5
+Bot1.Battlefield.Foot Elite.Counters.PlusOnePlusOne = 1
