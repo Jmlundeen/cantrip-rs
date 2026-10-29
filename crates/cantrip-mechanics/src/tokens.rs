@@ -995,6 +995,17 @@ pub static OFFICER: CardDef = CardDef {
     toughness: Some(1),
     ..token!(Officer)
 };
+
+/// Planet land token named New Planet
+pub static NEW_PLANET: CardDef = CardDef {
+    name: "New Planet",
+    types: TypeSet::of(&[CardType::Land]),
+    subtypes: SubtypeSet::of(&[Subtype::Planet]),
+    abilities: &[mana_ability(TAP, add_any_color(1).by(add_one_of_any_color), "{T}: Add one mana of any color.")],
+    text: "{T}: Add one mana of any color.",
+    ..token!(Planet)
+};
+
 /// The 2/2 green Bear creature token (CR 111.1, 111.4). Argoth, Sanctum of Nature, Ayula's Influence, Bearscape, Caller of the
 /// Claw, Dancing from Dark to Dawn, Path to the World Tree and Words of Wilding make it.
 pub static BEAR: CardDef = CardDef {
