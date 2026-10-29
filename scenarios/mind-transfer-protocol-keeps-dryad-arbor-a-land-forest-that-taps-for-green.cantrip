@@ -1,0 +1,33 @@
+# Mind Transfer Protocol on Bot1's Dryad Arbor (a Land Creature - Forest Dryad): an effect that makes an object an "artifact
+# creature" lets it keep all its prior card types and subtypes (CR 205.1b), so the Arbor is an artifact land creature, still a
+# Forest Dryad, a 4/5 that still taps for {G} (CR 305.6). Next turn it is a land creature again.
+
+[Bot1 Deck]
+Dryad Arbor
+Black Lotus
+Mind Transfer Protocol
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mind Transfer Protocol.Cast(Bot1.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dryad Arbor.Types = Land; Creature; Artifact
+? Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Forest
+? Bot1.Battlefield.Dryad Arbor.Power = 4
+? Bot1.Battlefield.Dryad Arbor.Toughness = 5
+Bot1.Battlefield.Dryad Arbor.Activate
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+
+[Expect]
+Bot1.Battlefield.Dryad Arbor.Power = 1
