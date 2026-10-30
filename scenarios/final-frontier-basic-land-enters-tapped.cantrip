@@ -34,5 +34,6 @@ Bot1.Pass
 [Expect]
 Bot1.Battlefield.Forest.Tapped = true
 Bot2.Library.Count = 13
+Bot1.Shuffles = 1
 
 

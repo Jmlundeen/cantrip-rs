@@ -370,6 +370,7 @@ impl StateDump {
             }
             d.set(format!("{b}.Life"), player.life);
             d.set(format!("{b}.Poison"), player.poison());
+            d.set(format!("{b}.Shuffles"), game.history().count(EventQuery::kind(EventMask::SHUFFLED).player(p)));
             if player.lost {
                 d.set(format!("{b}.Status"), "Lost");
             }
