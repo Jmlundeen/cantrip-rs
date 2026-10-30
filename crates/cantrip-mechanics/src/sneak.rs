@@ -72,28 +72,37 @@ pub fn paid(_: &dyn Query, item: &StackItem) -> bool {
 /// so the token it becomes had its sneak cost paid too. Leonardo, Leader in Blue and Turncoat Kunoichi ask it of the creature
 /// whose enters ability is on the stack. Read from the spell's `Cast` record (that of the spell a copy copied, through its `Copied` event), as `escape::escaped` is.
 pub fn was_cast_for_sneak(q: &dyn Query, id: ObjectId) -> bool {
+    sneak_cast_turn(q, id).is_some()
+}
+
+/// The turn the spell `id` was cast for its sneak cost in, or `None` if it was not (`was_cast_for_sneak`): for a copy of a
+/// spell, the turn of the cast it copied, whose sneak cost the copy has paid (CR 707.10). Karai, Future of the Foot asks if
+/// that is this turn.
+pub fn sneak_cast_turn(q: &dyn Query, id: ObjectId) -> Option<u32> {
     // The spell the permanent was, and, for a copy of a spell (no `Cast` of its own, CR 707.10), the spell it copied, back to
     // the one that was cast: a copy copies the alternative cost paid for it.
     let mut spell = id;
     let cast = loop {
         let is_it = |s: ObjectId| s == spell || q.obj(s).became == Some(spell);
         let cast = q.history().all().iter().rev().find_map(|r| match &r.event {
-            Event::Cast(c) if is_it(c.spell) => Some(Ok(*c)),
+            Event::Cast(c) if is_it(c.spell) => Some(Ok((*c, r.turn))),
             Event::Copied { copy, original, .. } if is_it(*copy) => Some(Err(*original)),
             _ => None,
         });
         match cast {
             Some(Ok(cast)) => break cast,
             Some(Err(original)) => spell = original,
-            None => return false,
+            None => return None,
         }
     };
-    match cast.granted_by() {
+    let (cast, turn) = cast;
+    let sneak = match cast.granted_by() {
         Some(grant) => grant
             .ability
             .as_granted_way()
             .and_then(|k| q.card(grant.ability.card).granted_ways.get(k))
             .is_some_and(|w| w.kind == WayKind::Sneak),
         None => cast.way > 0 && q.card(q.obj(cast.spell).card).ways.get(cast.way as usize - 1).is_some_and(|w| w.kind == WayKind::Sneak),
-    }
+    };
+    sneak.then_some(turn)
 }
