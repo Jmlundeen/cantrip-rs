@@ -1224,6 +1224,11 @@ pub trait Game: Query {
     /// `player` may play or cast `card` from where it is (CR 601.3, 305.1) under `grant`: a card in exile or a
     /// graveyard, a new object after a move (CR 400.7), so the permission is for this object only.
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant);
+    /// "Until end of turn, you may play [a card | cards] exiled with [this]" (CR 607.2a, 611.2c): `player` may play or
+    /// cast, under `grant`, the cards in exile linked to `by` (`exiled_with`) - those there now and those its linked
+    /// ability exiles later, for as long as `grant.expiry` lasts, whatever becomes of `by` (CR 611.2a). With `one` ("a
+    /// card") the permission is used up by the first card played by it. `Playable::ExiledWith`.
+    fn allow_play_exiled_with(&mut self, by: Linked, player: PlayerId, grant: PlayGrant, one: bool);
     /// "Creatures can't block this turn" (CR 509.1b): a rule of the game until the turn ends, reaching creatures that
     /// arrive later too (CR 611.2c).
     fn creatures_cant_block(&mut self);

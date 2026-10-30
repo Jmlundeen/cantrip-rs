@@ -536,7 +536,11 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
         // The permanent a "for as long as you control" permission is about, by where it is, as every object is.
         let source = p.grant.expiry.controlled().map(|id| canon.id(id));
         let grant = PlayGrant { expiry: if source.is_some() { Expiry::WhileControls(ObjectId::NONE) } else { p.grant.expiry }, ..p.grant };
-        (canon.id(p.card), p.player, grant, source, p.turn).hash(h);
+        match p.what {
+            Playable::Card(card) => (0u8, canon.id(card)).hash(h),
+            Playable::ExiledWith { by, one } => (1u8, canon.id(by.object), by.text, by.acquired, one).hash(h),
+        }
+        (p.player, grant, source, p.turn).hash(h);
     }
     s.triggers.len().hash(h);
     for t in &s.triggers {

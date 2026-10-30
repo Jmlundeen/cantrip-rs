@@ -5025,7 +5025,25 @@ fn loyalty_available(cx: &Cx, id: ObjectId) -> bool {
 /// The permissions `player` holds to play `card` from where it is (CR 601.3, 305.1), each its own: two that would both let
 /// it be played are two ways of playing it, and the player chooses which is used (CR 601.2b).
 pub fn permissions_for<'a>(cx: &'a Cx, card: ObjectId, player: PlayerId) -> impl Iterator<Item = &'a PlayPermission> + 'a {
-    cx.s().permissions.iter().filter(move |p| p.card == card && p.player == player && permission_stands(cx, p, player))
+    cx.s().permissions.iter().filter(move |p| p.player == player && cx.s().permission_covers(p, card) && permission_stands(cx, p, player))
+}
+
+/// Uses up the "a card" permission (`Playable::ExiledWith { one: true }`) that `player` plays or casts `card` by, as it is
+/// played and while the card is still where the permission covers it: one card is all it lets be played. Of two that are
+/// the same - two of one ability's triggers - one is used.
+fn use_up_permission(cx: &mut Cx, card: ObjectId, player: PlayerId, by: Option<Grant>) {
+    let Some(by) = by else { return };
+    let s = cx.s();
+    let Some(at) = s.permissions.iter().position(|p| {
+        matches!(p.what, Playable::ExiledWith { one: true, .. }) && p.player == player && p.by == by && s.permission_covers(p, card)
+    }) else {
+        return;
+    };
+    let mut i = s.permissions.len();
+    cx.st().permissions_retain(|_| {
+        i -= 1;
+        i != at
+    });
 }
 
 /// Whether a permission lets `player` play its card now, as far as its own terms say (CR 601.3, 305.1): not on the turn it
@@ -5297,8 +5315,25 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     }
     // A land a card lets this player play from where it is (CR 305.1): "you may play that card". Each permission is its own.
     for p in &cx.s().permissions {
-        if p.player == player && p.grant.lands && permission_stands(cx, p, player) && !cx.s().obj(p.card).zone.is(ZoneKind::Hand) {
-            offer(p.card, Some(p.by), options);
+        if p.player != player || !p.grant.lands || !permission_stands(cx, p, player) {
+            continue;
+        }
+        match p.what {
+            Playable::Card(card) => {
+                if !cx.s().obj(card).zone.is(ZoneKind::Hand) {
+                    offer(card, Some(p.by), options);
+                }
+            }
+            // The cards exiled with an object (CR 607.2a, 611.2c), whichever exile zone they are in.
+            Playable::ExiledWith { .. } => {
+                for zone in cx.s().seats().map(Zone::exile) {
+                    for &id in cx.s().zone(zone) {
+                        if cx.s().permission_covers(p, id) {
+                            offer(id, Some(p.by), options);
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -6294,7 +6329,7 @@ fn through(q: &dyn Query, cards: &CardTable, player: PlayerId, card: ObjectId, b
             _ => None,
         };
     }
-    if let Some(p) = s.permissions.iter().find(|p| p.card == card && p.player == player && p.by == g) {
+    if let Some(p) = s.permissions.iter().find(|p| p.player == player && p.by == g && s.permission_covers(p, card)) {
         return Some(Through::Route(Route::permission(by, p.grant)));
     }
     s.effects
@@ -6586,8 +6621,8 @@ fn permission_named(state: &GameState, source: ObjectId, g: Grant) -> bool {
     g.ability.as_play_rule().is_some()
         || g.ability.as_granted_way().is_some()
         || g.ability.is_retrace()
-        || !state.permissions.iter().any(|p| p.card == source && p.by == g)
-        || state.permissions.iter().filter(|p| p.card == source).count() > 1
+        || !state.permissions.iter().any(|p| p.by == g && state.permission_covers(p, source))
+        || state.permissions.iter().filter(|p| state.permission_covers(p, source)).count() > 1
 }
 
 fn describe_cast(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption, source: ObjectId) -> std::borrow::Cow<'static, str> {
@@ -6723,7 +6758,8 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             // The land is played by what the action names (CR 305.1): a permission that says it enters tapped makes it, and
             // no other permission for the card has any say, as every one ends as it leaves (CR 400.7).
             if !cx.s().permissions.is_empty() {
-                cx.st().permissions_retain(|p| p.card != source || Some(p.by) == action.granted_by);
+                use_up_permission(cx, source, player, action.granted_by);
+                cx.st().permissions_retain(|p| p.what != Playable::Card(source) || Some(p.by) == action.granted_by);
             }
             let way = action.granted_by.and_then(|g| named_way(cx.s(), cx.cards(), g));
             let land = if action.index == WAY_BACK_FACE {
@@ -7047,6 +7083,9 @@ fn cast(
     if def.face_down {
         cx.st().update_obj(card, |o| o.copy = Some(Copiable::of(face)));
     }
+    if !cx.s().permissions.is_empty() {
+        use_up_permission(cx, card, player, by.by);
+    }
     let spell = ops::move_to_for(cx, card, Zone::STACK, ZoneReason::Cast);
     cx.st().update_obj(spell, |o| {
         o.controller = player;
@@ -7077,9 +7116,9 @@ fn cast(
         cx.st().effect_push(ContinuousEffect { source: g.object, controller: way.controller, timestamp, affected: spell, kind, duration: Duration::Indefinite });
         cx.state_changed();
     }
-    // A permission is used up by the cast (CR 400.7: the card is a new object).
+    // A permission for the card is used up by the cast (CR 400.7: the card is a new object).
     if !cx.s().permissions.is_empty() {
-        cx.st().permissions_retain(|p| p.card != card);
+        cx.st().permissions_retain(|p| p.what != Playable::Card(card));
     }
     if inset.is_some() || back.is_some() || bestow.is_some() || half.is_some() || prototyped.is_some() {
         cx.st().update_obj(spell, |o| {
@@ -7926,7 +7965,7 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
     // Played by the effect, not by any permission on the card (CR 305.1, 608.2g): "each land played this way enters
     // tapped" (Lightstall Inquisitor's) has no say, and every permission for the card ends as it leaves (CR 400.7).
     if !cx.s().permissions.is_empty() {
-        cx.st().permissions_retain(|p| p.card != card);
+        cx.st().permissions_retain(|p| p.what != Playable::Card(card));
     }
     let moved = ops::put_onto_battlefield(cx, &[(card, player, false)], ZoneReason::PlayLand)?;
     let land = moved.first().copied().filter(|&land| land != card);
@@ -11197,7 +11236,7 @@ mod tests {
 
     /// A permission an effect gave.
     fn permission(card: ObjectId, grant: PlayGrant) -> PlayPermission {
-        PlayPermission { card, player: ME, grant, by: Grant { object: card, ability: AbilityRef::default() }, turn: 2 }
+        PlayPermission { what: Playable::Card(card), player: ME, grant, by: Grant { object: card, ability: AbilityRef::default() }, turn: 2 }
     }
 
     /// CR 118.9, 601.2b: a Dragon in hand that no mana could pay for is offered without paying its mana cost, and only that;

@@ -1072,7 +1072,7 @@ impl<'a> Projector<'a> {
     }
 
     /// A standing permission to play a card, as the viewer reads it: who may, what, and until when.
-    fn permission_text(&self, permission: &PlayPermission) -> String {
+    fn permission_text(&self, permission: &PlayPermission, card: ObjectId) -> String {
         let mine = permission.player == self.viewer;
         let (prefix, whose) = if mine {
             (String::new(), "your".to_string())
@@ -1100,6 +1100,11 @@ impl<'a> Projector<'a> {
             Some(PlayCondition::ControlsSubtype(subtype)) => text.push_str(&format!(", if {who} control a {}", subtype.name())),
             None => {}
         }
+        // "A card exiled with [it]" (CR 607.2a): one card of those it covers, then it is used up.
+        if let Playable::ExiledWith { by, one: true } = permission.what {
+            let name = self.game.cards.get(self.game.state.obj(by.object).card).name;
+            text.push_str(&format!(", one card exiled with {name}"));
+        }
         if grant.adventure_only {
             text.push_str(", as an Adventure");
         }
@@ -1117,7 +1122,7 @@ impl<'a> Projector<'a> {
         }
         // What the permission adds to playing it, for what the card can be played as: a spell's extra cost (CR 601.2f), a land's
         // entering tapped (CR 614.1c). A modal double-faced card may be either (CR 712.3, 712.12).
-        let chars = self.game.chars(permission.card);
+        let chars = self.game.chars(card);
         let def = self.game.cards.get(chars.card);
         let land = chars.is(CardType::Land) || def.back_land;
         let spell = !chars.is(CardType::Land) || def.back.is_some_and(|b| b.has_cost);
@@ -1294,10 +1299,10 @@ impl<'a> Projector<'a> {
                 }
             }
         }
-        for permission in s.permissions.iter().filter(|p| p.card == id) {
+        for permission in s.permissions.iter().filter(|p| s.permission_covers(p, id)) {
             view.play_permissions.push(PlayPermissionView {
                 seat: seat(permission.player),
-                text: self.permission_text(permission),
+                text: self.permission_text(permission, id),
             });
         }
         // A permanent's permission to cast a card in exile (CR 601.3), while it would allow the cast: what it adds to the cost

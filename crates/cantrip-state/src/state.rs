@@ -1054,6 +1054,18 @@ impl GameState {
         self.log(Undo::PermissionPushed);
     }
 
+    /// Whether `p` lets `card` be played from where it is now, as far as what it covers goes (`Playable`): the card it was
+    /// given for, or a card in exile linked to the object it names (CR 607.2a, 611.2c).
+    pub fn permission_covers(&self, p: &PlayPermission, card: ObjectId) -> bool {
+        match p.what {
+            Playable::Card(c) => c == card,
+            Playable::ExiledWith { by, .. } => {
+                let obj = self.obj(card);
+                obj.zone.is(ZoneKind::Exile) && !obj.card_copy && obj.exiled.is_some_and(|l| l.is_by(by))
+            }
+        }
+    }
+
     /// Whether a permission's "for as long as you control" duration still holds (`Expiry::WhileControls`, CR 611.2b): its
     /// holder controls that object, still the object it was (CR 400.7), on the battlefield (phased out is not, CR
     /// 702.26f). Any other expiry holds as far as this goes.

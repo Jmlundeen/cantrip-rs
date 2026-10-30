@@ -1586,7 +1586,8 @@ impl PlayGrant {
 /// the end of your next turn, you may play that card", airbend's "may cast it for {2}".
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct PlayPermission {
-    pub card: ObjectId,
+    /// The card or cards it lets be played.
+    pub what: Playable,
     pub player: PlayerId,
     pub grant: PlayGrant,
     /// The spell or ability whose effect gave it (CR 601.3): what a cast or land play by it is recorded as made by, and
@@ -1594,6 +1595,33 @@ pub struct PlayPermission {
     pub by: Grant,
     /// The turn it was granted on, for `Expiry::EndOfYourNextTurn`.
     pub turn: u32,
+}
+
+/// What a play permission lets be played (CR 601.3, 305.1).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Playable {
+    /// This card, from where it is: the object it is now, so the permission ends as the card moves (CR 400.7).
+    Card(ObjectId),
+    /// "Until end of turn, you may play [a card | cards] exiled with [this object]" (CR 607.2a, 611.2c): every card in exile
+    /// linked to `by` (`ExileLink::is_by`), whenever it was exiled. The permission changes no object, so it is a rule of the
+    /// game that reaches the cards `by`'s linked ability exiles after it began, for as long as it lasts (CR 611.2c), and it
+    /// is a resolved effect, so it goes on when `by` leaves the battlefield (CR 611.2a). A `by` that leaves and comes back is
+    /// a new object (CR 400.7), whose cards it never covers (Raphael, Most Attitude's ruling). `one` is "a card": the
+    /// permission is used up by the first card played by it (Raphael, Most Attitude; Lobelia, Defender of Bag End's "you
+    /// may play a card exiled with Lobelia without paying its mana cost"); without it, "cards" (Kayla's Music Box, Urianger
+    /// Augurelt). A card copy in exile is not exiled with anything. `PlayGrant::enters_tapped` is not read for it: no
+    /// printed permission of this kind says so.
+    ExiledWith { by: Linked, one: bool },
+}
+
+impl Playable {
+    /// The card, for a permission to play one card.
+    pub fn card(self) -> Option<ObjectId> {
+        match self {
+            Playable::Card(card) => Some(card),
+            Playable::ExiledWith { .. } => None,
+        }
+    }
 }
 
 /// A triggered ability that has triggered and waits to be put on the stack (CR 603.3).

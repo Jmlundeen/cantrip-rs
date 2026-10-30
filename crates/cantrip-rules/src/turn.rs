@@ -1603,9 +1603,9 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
     if !cx.s().permissions.is_empty() {
         let number = cx.s().turn.number;
         let moved: Vec<ObjectId> =
-            cx.s().permissions.iter().map(|p| p.card).filter(|&c| cx.s().obj(c).became.is_some()).collect();
+            cx.s().permissions.iter().filter_map(|p| p.what.card()).filter(|&c| cx.s().obj(c).became.is_some()).collect();
         cx.st().permissions_retain(|p| {
-            !moved.contains(&p.card)
+            p.what.card().is_none_or(|card| !moved.contains(&card))
                 && match p.grant.expiry {
                     Expiry::Never => true,
                     Expiry::EndOfTurn => false,

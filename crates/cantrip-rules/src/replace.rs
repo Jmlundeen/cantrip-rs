@@ -170,7 +170,7 @@ fn played_tapped_applies(cx: &Cx, z: &ZoneChange) -> bool {
     z.reason == ZoneReason::PlayLand
         && z.to.is(ZoneKind::Battlefield)
         && !z.tapped
-        && cx.s().permissions.iter().any(|p| p.card == z.object && p.grant.enters_tapped)
+        && cx.s().permissions.iter().any(|p| p.what == Playable::Card(z.object) && p.grant.enters_tapped)
 }
 
 /// Madness (CR 702.35a): "If a player would discard this card, that player discards it, but exiles it instead of putting

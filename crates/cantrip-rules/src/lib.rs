@@ -98,6 +98,8 @@ mod enter_rules_tests;
 #[cfg(test)]
 mod land_play_rules_tests;
 #[cfg(test)]
+mod exiled_with_permission_tests;
+#[cfg(test)]
 mod instant_sorcery_entering_tests;
 #[cfg(test)]
 mod attached_entry_tests;
@@ -1536,6 +1538,22 @@ impl Query for Cx<'_> {
 }
 
 impl Cx<'_> {
+    /// Gives `player` a permission to play `what` under `grant` (CR 601.3, 305.1), made by the spell or ability resolving,
+    /// which a cast or land play by it is recorded as made by - or, outside a resolution, by `fallback`'s own card.
+    fn permit(&mut self, what: Playable, fallback: ObjectId, player: PlayerId, grant: PlayGrant) {
+        let turn = self.g.state.turn.number;
+        let by = match self.cause() {
+            Cause::Spell(spell) => Grant { object: spell, ability: AbilityRef::spell(self.g.state.obj(spell).card) },
+            Cause::Ability { source, ability } => Grant { object: source, ability },
+            _ => Grant { object: fallback, ability: AbilityRef::spell(self.g.state.obj(fallback).card) },
+        };
+        let permission = PlayPermission { what, player, grant, by, turn };
+        // A "for as long as you control" duration that is already over as it would begin does nothing (CR 611.2b).
+        if self.g.state.permission_lasts(&permission) {
+            self.g.state.permission_push(permission);
+        }
+    }
+
     /// The ability in the `nth` place of `source`'s abilities (`Chars::abilities()`), as linked abilities know it where an
     /// effect gave it (`layers::given_link`): what an `Asker` for it asks as (`Asker::by`). None, worked out at no cost, where nothing could
     /// have given anything an ability.
@@ -2428,18 +2446,11 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant) {
-        let turn = self.g.state.turn.number;
-        // What gave it (CR 601.3): the spell or ability resolving, which a cast or land play by it is recorded as made by.
-        let by = match self.cause() {
-            Cause::Spell(spell) => Grant { object: spell, ability: AbilityRef::spell(self.g.state.obj(spell).card) },
-            Cause::Ability { source, ability } => Grant { object: source, ability },
-            _ => Grant { object: card, ability: AbilityRef::spell(self.g.state.obj(card).card) },
-        };
-        let permission = PlayPermission { card, player, grant, by, turn };
-        // A "for as long as you control" duration that is already over as it would begin does nothing (CR 611.2b).
-        if self.g.state.permission_lasts(&permission) {
-            self.g.state.permission_push(permission);
-        }
+        self.permit(Playable::Card(card), card, player, grant);
+    }
+
+    fn allow_play_exiled_with(&mut self, by: Linked, player: PlayerId, grant: PlayGrant, one: bool) {
+        self.permit(Playable::ExiledWith { by, one }, by.object, player, grant);
     }
 
     fn could_cast_transformed_during_resolution(&mut self, card: ObjectId) -> bool {

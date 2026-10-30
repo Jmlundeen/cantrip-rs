@@ -471,7 +471,7 @@ fn put(game: &mut RulesGame, name: &str, player: PlayerId) -> ObjectId {
 }
 
 fn permission(card: ObjectId, by: ObjectId, grant: PlayGrant) -> PlayPermission {
-    PlayPermission { card, player: ME, grant, by: Grant { object: by, ability: AbilityRef::spell(CardId(0)) }, turn: 1 }
+    PlayPermission { what: Playable::Card(card), player: ME, grant, by: Grant { object: by, ability: AbilityRef::spell(CardId(0)) }, turn: 1 }
 }
 
 fn casts_of(game: &RulesGame, card: ObjectId) -> Vec<ActionOption> {

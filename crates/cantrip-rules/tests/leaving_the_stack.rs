@@ -332,7 +332,7 @@ fn granted_flashback_casts_only_an_instant_or_sorcery_face() {
     let card = game.state.zone(Zone::graveyard(ME))[0];
     let source = game.state.push_obj(Obj::new(table().find("Leave Filler").unwrap(), ME, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, source);
-    let permission = |grant| PlayPermission { card, player: ME, grant, by: Grant { object: source, ability: AbilityRef::spell(CardId(0)) }, turn: 1 };
+    let permission = |grant| PlayPermission { what: Playable::Card(card), player: ME, grant, by: Grant { object: source, ability: AbilityRef::spell(CardId(0)) }, turn: 1 };
     game.state.update_player(ME, |p| p.pool.0[Mana::C as usize] = 2);
 
     let mut plain = game.clone();

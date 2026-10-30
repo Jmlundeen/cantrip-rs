@@ -1907,6 +1907,19 @@ the permission until another arrives; a spell already cast stays cast. The card 
 only a zone change ends it (CR 400.7). The host says the condition beside the permission ("Playable while it stays here,
 if you control a Wizard").
 
+### Permissions to play the cards exiled with an object
+
+"Until end of turn, you may play [a card | cards] exiled with [this]" (Raphael, Most Attitude; Lobelia, Defender of Bag
+End; Kayla's Music Box; Urianger Augurelt) is a `PlayPermission` whose subject is a set, not a card:
+`Playable::ExiledWith { by: Linked, one }`, given by `Game::allow_play_exiled_with`. A single-card permission
+(`Playable::Card`, `allow_play`) is for the object the card is when it is given; this one names the ability it is linked
+to (CR 607.2a) and covers whatever card in exile is linked to it when asked (`GameState::permission_covers`): it changes no
+object, so it is a rule of the game that reaches the cards the linked ability exiles after it began (CR 611.2c), and it
+is a resolved effect, so it lasts its `Expiry` whatever becomes of the object (CR 611.2a) - a permanent that leaves and
+returns is a new object whose cards it never covers (CR 400.7). `one` is "a card": the first card played or cast by it
+uses it up (`actions::use_up_permission`, before the card moves); two triggers' permissions are two cards. It is offered
+as any permission is (`permissions_for`, `land_plays`), with every timing rule and land play the card's type needs.
+
 ### Restricted mana
 
 An ability's explicit "Activate only as an instant" is `ActivatedDef::priority_only`, written with
