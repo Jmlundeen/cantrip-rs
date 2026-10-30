@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::greatest_power;
 use cantrip_oracle as oracle;
 
 /// This spell costs {X} less to cast, where X is the greatest power among creatures you control (CR 601.2f): generic
@@ -7,15 +8,7 @@ fn cheaper_by_greatest_power(q: &dyn Query, _: ObjectId, player: PlayerId, coste
     if !matches!(costed, Costed::Spell(_)) {
         return CostDelta::NONE;
     }
-    let greatest = q
-        .permanents_of(player)
-        .into_iter()
-        .map(|id| q.chars(id))
-        .filter(|c| c.is(CardType::Creature))
-        .map(|c| c.power.unwrap_or(0))
-        .max()
-        .unwrap_or(0)
-        .max(0);
+    let greatest = greatest_power::among_creatures_you_control(q, player);
     CostDelta::less(greatest.min(255) as u8)
 }
 
