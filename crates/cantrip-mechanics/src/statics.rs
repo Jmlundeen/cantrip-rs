@@ -110,6 +110,14 @@ pub fn itself_with_threshold(q: &dyn LayerQuery, source: ObjectId, affected: Obj
     source == affected && state.zone(Zone::graveyard(state.obj(source).controller)).len() >= 7
 }
 
+/// "As long as there are two or more creature cards in your graveyard" (CR 604.1, 611.3a) as a static ability's `StaticDef::affects`:
+/// only the source itself, and only while its controller's graveyard holds two or more creature cards (never tokens), each judged as
+/// the layers make it, asked again whenever characteristics are computed. Undercover Skrull and Killmonger, Scourge of Wakanda use it.
+pub fn itself_with_two_creature_cards_in_your_graveyard(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    let state = q.state();
+    source == affected && state.zone(Zone::graveyard(state.obj(source).controller)).iter().filter(|&&card| q.chars(card).is(CardType::Creature)).count() >= 2
+}
+
 /// "... attacks each combat if able" (CR 508.1d, layer 6) as a static ability's `StaticDef::apply`: one more requirement to attack
 /// (`Chars::must_attack`). Akoum Firebird, Alpine Guide, Anje's Ravager, Dragon's Rage Channeler (with delirium) and The Void, the
 /// token The Sentry, Golden Guardian gives, print it.

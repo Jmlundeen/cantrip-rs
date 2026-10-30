@@ -1,13 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::plus_pt;
+use cantrip_mechanics::statics::{itself_with_two_creature_cards_in_your_graveyard, plus_pt};
 use cantrip_oracle as oracle;
-
-/// "As long as there are two or more creature cards in your graveyard" (CR 604.1, 611.3a), affecting only this creature: the cards
-/// in its controller's graveyard that are creature cards, as the layers make them, asked again whenever characteristics are computed.
-fn itself_with_two_creature_cards_in_your_graveyard(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    let state = view.state();
-    source == affected && state.zone(Zone::graveyard(state.obj(source).controller)).iter().filter(|&&card| view.chars(card).is(CardType::Creature)).count() >= 2
-}
 
 /// "... is all creature types" (CR 205.3m, 613.1d, layer 4): every creature type in addition to the types it has. "All creature
 /// types" names no creature type, so no text-changing effect changes it (CR 612.2).
