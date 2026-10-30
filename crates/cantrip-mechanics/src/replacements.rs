@@ -252,6 +252,16 @@ pub fn you_would_draw_a_card(_: &dyn Query, asker: &Asker, proposal: &Proposal) 
     matches!(proposal, Proposal::Draw(d) if d.player == asker.controller)
 }
 
+/// "If you would draw a card, draw two cards instead." Thought Reflection and Mr. Spock, Science Officer print this.
+/// The two resulting draws are each considered by other draw replacements (CR 614.5), but not by this effect again;
+/// a second copy of this effect can therefore turn one draw into four.
+pub const DRAW_TWO_INSTEAD: ReplacementDef =
+    replacement(ReplacementKind::Draw, you_would_draw_a_card, instead_of_drawing, "draws two cards instead").then(draw_two);
+
+fn draw_two(g: &mut dyn Game, asker: &Asker, _: &Proposal, _: &Proposal) {
+    g.draw(asker.controller, 2);
+}
+
 /// "If an opponent would draw a card except the first one they draw in each of their draw steps" (CR 121.6, 614.1a): one
 /// draw, judged as it is about to be made (CR 121.2), by an opponent of the effect's controller, unless it would be the first
 /// card that player draws in their own draw step (a draw replaced before it was not drawn, CR 614.6). Hullbreacher and
@@ -269,10 +279,6 @@ fn you_would_draw_except_first_in_draw_step(q: &dyn Query, asker: &Asker, propos
 
 /// "... draw two cards instead": two draws, each meeting the replacement effects that have not yet had their opportunity at the
 /// draw this replaced (CR 614.5), so two such effects make four.
-fn draw_two(g: &mut dyn Game, asker: &Asker, _: &Proposal, _: &Proposal) {
-    g.draw(asker.controller, 2);
-}
-
 /// "If you would draw a card except the first one you draw in each of your draw steps, draw two cards instead." Alhammarret's
 /// Archive and Bard, King of Dale print it (and Teferi's Ageless Insight).
 pub const DRAW_TWO_INSTEAD_EXCEPT_THE_FIRST_IN_YOUR_DRAW_STEP: ReplacementDef =
