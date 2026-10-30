@@ -15,15 +15,27 @@ fn sacrifice_another_to_draw_two(g: &mut dyn Game, item: &StackItem) -> Result<(
     Ok(())
 }
 
-/// "You may cast this card from exile" is a static ability that functions in exile (CR 113.6e). The engine has no route
-/// for it yet: a card's permission to be cast from exile is `CardDef::exile_casts`, read off permanents on the
-/// battlefield alone (`cantrip-rules`' `given`). Scenarios/khan-vengeful-heart-may-be-cast-from-exile.cantrip holds the
-/// rules-correct outcome as a known bug.
+/// "You may cast this card from exile" (CR 113.6e, 601.3): a static ability that functions while Khan is in exile, so it is
+/// his own permission there - the engine reads a card's `exile_casts` off the card itself in exile, not off a permanent
+/// (`cantrip-rules`' `own_exile_casts`) - and it is his controller who may cast him by it. It is a permission and no cost of
+/// its own: he is cast for his mana cost, or an alternative cost another object gives.
+fn may_cast_from_exile(_: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> bool {
+    card == asker.source && player == asker.controller
+}
+
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
         triggers::THIS_ENTERS,
         sacrifice_another_to_draw_two,
         "When Khan enters, you may sacrifice another creature or artifact. If you do, draw two cards.",
     )],
+    exile_casts: &[ExileCast {
+        text: "Cast from exile",
+        allows: may_cast_from_exile,
+        additional: Cost::NONE,
+        any_type: false,
+        lands: false,
+        life_for_mana_value: false,
+    }],
     ..oracle::KHAN_VENGEFUL_HEART
 };

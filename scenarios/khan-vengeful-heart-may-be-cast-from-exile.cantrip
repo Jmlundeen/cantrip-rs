@@ -1,8 +1,8 @@
-# Known bug: a card's own "you may cast this card from exile" permission is not offered (CR 113.6e, 601.3).
-# Khan, Vengeful Heart's second line is a static ability that functions while the card is in exile. Bot1 casts Khan on turn
-# 1 (Lotus for three black, a Mox Jet for the fourth) and declines the enters sacrifice, keeping the Moxen. Bot2's Swords to
-# Plowshares exiles him on turn 2 and Bot1 gains 5 life (CR 119.3). On turn 3 four untapped Moxen pay {2}{B}{B} exactly, so
-# Khan must be castable from exile and returns to the battlefield, where his enters ability is offered again.
+# Khan, Vengeful Heart: "You may cast this card from exile" (CR 113.6e, 601.3), a static ability that functions while the
+# card is in exile, so the card itself offers the cast there. Bot1 casts Khan on turn 1 (Lotus for three black, a Mox Jet
+# for the fourth) and declines the enters sacrifice, keeping the Moxen. Bot2's Swords to Plowshares exiles him on turn 2 and
+# Bot1 gains 5 life (CR 119.3). On turn 3 four untapped Moxen pay {2}{B}{B} exactly, so Khan must be castable from exile and
+# returns to the battlefield, where his enters ability is offered again.
 
 [Bot1 Deck]
 Black Lotus

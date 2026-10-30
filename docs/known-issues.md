@@ -80,7 +80,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-141](#ki-141-a-creature-type-chosen-past-the-encoders-128-tokens-makes-no-training-sample) | A creature type chosen past the encoder's 128 tokens makes no training sample | Pri-3 | Open |
 | [KI-142](#ki-142-the-ai-encoder-cannot-tell-apart-options-that-differ-only-by-their-grant-or-a-companion-from-exiling-to-pay) | The AI encoder cannot tell apart options that differ only by their grant, or a companion from exiling to pay | Pri-3 | Open |
 | [KI-143](#ki-143-a-scenario-check-right-after-an-activation-can-read-the-pool-before-its-payment-finishes) | A scenario check right after an activation can read the pool before its payment finishes | Pri-2 | Open |
-| [KI-147](#ki-147-a-cards-own-permission-to-be-cast-from-exile-is-not-offered) | A card's own permission to be cast from exile is not offered | Pri-1 | Open |
 | [KI-144](#ki-144-mathemagics-with-an-x-of-32-or-more-draws-at-most-4294967295-cards) | Mathemagics with an X of 32 or more draws at most 4,294,967,295 cards | Pri-3 | Won't fix: beyond practical scale |
 
 ## Issues
@@ -633,19 +632,3 @@ for Tidehollow Sculler. The rules are unaffected: the card returns when the perm
 from a stack object in the view, as `is_by_in` does.
 
 **Scenarios.** `champion-of-the-clachan-exiles-a-kithkin-from-hand-and-returns-it-when-it-leaves` (the rules side).
-
-### KI-147: A card's own permission to be cast from exile is not offered
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Open | engine (`cantrip-api`, `cantrip-rules`) | 2026-10-30, adding Khan, Vengeful Heart |
-
-**Notes.** Khan, Vengeful Heart's "You may cast this card from exile" is a static ability that functions while the card is in
-exile (CR 113.6e, 601.3). The engine's only route for such a permission is `CardDef::exile_casts`, read off permanents on
-the battlefield and emblems (`cantrip-rules`' `given`, from `exile_casts_of`), so a card that grants itself the permission
-offers no cast route and stays in exile. A fix reads a card's own `exile_casts` while it is in exile, with the card as the
-spell it would be and its controller as "you", beside the permanents' permissions.
-
-**Scenarios.**
-- [`scenarios/khan-vengeful-heart-may-be-cast-from-exile.cantrip`](../scenarios/khan-vengeful-heart-may-be-cast-from-exile.cantrip) -
-  Khan is exiled by Swords to Plowshares and must be castable again for {2}{B}{B} on the next turn.
