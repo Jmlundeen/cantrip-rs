@@ -1,0 +1,66 @@
+# Azog, Moria's Ruin: "Its controller amasses Goblins X." The player who amasses puts the +1/+1 counters on their Army (CR 701.47a,
+# 122.6), not Azog's controller. Bot2 has Innkeeper's Talent at level 3 ("If you would put one or more counters on a permanent or
+# player, put twice that many ... instead") and a Memnite (power 1). Bot1's Azog destroys the Memnite; Bot2 creates a Goblin Army
+# and puts the counter on it, so its Talent doubles it: two +1/+1 counters, a 2/2. Were Bot1 the one putting it, it would be one.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Azog, Moria's Ruin
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Forest
+Sol Ring
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Innkeeper's Talent
+Memnite
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Innkeeper's Talent.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot2.Pass
+[T2 Bot2.Main2]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azog, Moria's Ruin.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Memnite)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Graveyard = Memnite; Black Lotus
+Bot2.Battlefield.Goblin Army Token.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Goblin Army Token.Power = 2
+Bot2.Battlefield.Goblin Army Token.Toughness = 2

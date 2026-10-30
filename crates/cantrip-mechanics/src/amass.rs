@@ -5,7 +5,8 @@
 use crate::choose;
 use cantrip_api::*;
 
-/// Amass `subtype` `n`: `token` is the 0/0 black `subtype` Army creature token created when `controller` has no Army.
+/// Amass `subtype` `n`: `controller` amasses, creating `token`, the 0/0 black `subtype` Army creature token, when they have no
+/// Army, and putting the counters on their Army themselves (CR 122.6), though another player's effect has them amass.
 /// `subtype` is the word the card prints, read through `source`'s text (CR 612.2): the rest of the Army is the keyword
 /// action's own (CR 701.47a), which no text change reaches.
 pub fn amass(
@@ -56,7 +57,8 @@ pub fn amass_army(
             None => return Ok(None),
         },
     };
-    g.add_counters(army, CounterKind::PlusOne, n);
+    // The amassing player puts them (CR 701.47a, 122.6), whoever controls the effect: Azog's "its controller amasses".
+    g.add_counters_by(controller, army, CounterKind::PlusOne, n);
     if !g.chars(army).has_subtype(subtype) {
         g.add_effect(source, army, EffectKind::AddSubtype(subtype), Duration::Indefinite);
     }
