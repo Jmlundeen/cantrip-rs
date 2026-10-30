@@ -843,14 +843,13 @@ pub fn destroy_and_its_controller_creates(g: &mut dyn Game, item: &StackItem, to
     Ok(())
 }
 
-/// "{1}, Sacrifice this creature: Destroy target artifact or enchantment." Cathar Commando, Outland Liberator
-/// (and its back face) and Shattered Acolyte print it.
-pub const SACRIFICE_TO_DESTROY_ARTIFACT_OR_ENCHANTMENT: AbilityDef = ability(
-    cost("{1}").and(SACRIFICE_THIS),
-    destroy_first_target,
-    "{1}, Sacrifice this creature: Destroy target artifact or enchantment.",
-)
-.targets(&[crate::targets::ARTIFACT_OR_ENCHANTMENT]);
+/// "{N}, Sacrifice this creature: Destroy target artifact or enchantment" (CR 602.2, 701.8, 118.3): the sacrifice is a
+/// cost paid as the ability is activated and the destroy needs a target. Cathar Commando, Outland Liberator (and its back
+/// face) and Shattered Acolyte print it with {1}, Kirk, Commanding Officer with {2}.
+pub const fn sacrifice_to_destroy_artifact_or_enchantment(generic_mana: u8, text: &'static str) -> AbilityDef {
+    ability(Cost { mana: generic(generic_mana), sacrifice_self: true, ..Cost::NONE }, destroy_first_target, text)
+        .targets(&[crate::targets::ARTIFACT_OR_ENCHANTMENT])
+}
 
 /// "Transform this [permanent]" (CR 701.27a): the ability's source, which does nothing if it has transformed since the
 /// ability was put on the stack or, for a delayed ability, created (CR 701.27f). Aang, Swift Savior, Concealing Curtains,
@@ -1178,6 +1177,27 @@ pub fn damage_each_creature_opponents_control(g: &mut dyn Game, item: &StackItem
         .copied()
         .filter(|&id| g.chars(id).is(CardType::Creature) && opponents.contains(&g.controller(id)))
         .map(|id| (item.object, Target::Object(id), n))
+        .collect();
+    g.damage_together(&hits);
+}
+
+/// "[This source] deals `n` damage to each opponent and each creature they control" (CR 120.2, 608.2c): one damage event
+/// for every opponent, and for every creature those opponents control, as the effect is carried out, all dealt together.
+/// Delayed Blast Fireball and Khan, Despot by Design print it.
+pub fn damage_each_opponent_and_their_creatures(g: &mut dyn Game, item: &StackItem, n: u16) {
+    let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
+    let creatures: Vec<ObjectId> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| g.chars(id).is(CardType::Creature) && opponents.contains(&g.controller(id)))
+        .collect();
+    let hits: Vec<(ObjectId, Target, u16)> = opponents
+        .iter()
+        .map(|&p| Target::Player(p))
+        .chain(creatures.into_iter().map(Target::Object))
+        .map(|target| (item.object, target, n))
         .collect();
     g.damage_together(&hits);
 }
