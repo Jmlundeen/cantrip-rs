@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::search_hand_and_or_library;
+use cantrip_mechanics::library::search_zone_and_or_library;
 use cantrip_mechanics::select::{self, Part, Selection};
 use cantrip_mechanics::{lands, triggers, typecycling};
 use cantrip_oracle as oracle;
@@ -37,7 +37,7 @@ fn quest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     g.end_sentence();
     let you = item.controller;
-    let (found, searched_library) = search_hand_and_or_library(g, you, item.object, SearchDestination::Battlefield, Purpose::PutOntoBattlefield, &SEARCH, DRAGON_CARD)?;
+    let (found, searched_library) = search_zone_and_or_library(g, you, item.object, Zone::hand(you), SearchDestination::Battlefield, Purpose::PutOntoBattlefield, &SEARCH, DRAGON_CARD)?;
     // "A Dragon card": at most one, from the hand or from the library.
     if let Some(&dragon) = found.first() { g.put_onto_battlefield(dragon, you, false)?; }
     g.end_sentence();
