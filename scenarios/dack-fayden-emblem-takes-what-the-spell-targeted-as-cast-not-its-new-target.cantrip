@@ -1,0 +1,84 @@
+# Dack Fayden's emblem: "those permanents" are what the spell targeted as it was cast (CR 115.7: a later change of targets is
+# a separate event and changes none of them). Bot1's -6 gives the emblem, then All That Glitters is cast on Bot2's Guerrilla
+# Gorilla; the emblem's ability goes on the stack and Bot2 answers with Bolt Bend (Black Lotus and Mox Ruby pay its full
+# cost), changing the Aura spell's target to Memnite. Bot1 still gains control of the Gorilla; the Memnite stays Bot2's, and
+# the Aura enters on it, since that is the spell's target now.
+
+[Bot1 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Plains
+Plains
+All That Glitters
+Island x20
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Black Lotus
+Mox Ruby
+Memnite
+Bolt Bend
+Forest x20
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot1.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T10 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.All That Glitters.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Pass
+Bot2.Hand.Bolt Bend.Cast(Stack.All That Glitters)
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Stack.Count = 0
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot1.Battlefield.All That Glitters.AttachedTo = Memnite
+Bot2.Battlefield = Forest; Forest; Memnite; Mox Ruby

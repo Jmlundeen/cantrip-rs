@@ -1,0 +1,85 @@
+# Dack Fayden's emblem: "those permanents" are what that spell targeted as it was cast, not what another spell its
+# controller casts while holding priority targets. Bot1's -6 gives the emblem, then All That Glitters is cast on Bot2's
+# Guerrilla Gorilla and, holding priority, Banishing Knack on Bot2's Memnite: each cast triggers the emblem. Bot2 Stifles
+# the Knack's trigger. The Glitters trigger takes the Gorilla alone (3/3: +1/+0 for the Aura itself); the Memnite stays Bot2's.
+
+[Bot1 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Plains
+Plains
+All That Glitters
+Banishing Knack
+Island x20
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Mox Sapphire
+Memnite
+Stifle
+Forest x20
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot1.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T10 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.All That Glitters.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Hand.Banishing Knack.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Hand.Stifle.Cast(Stack.Dack Fayden emblem)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Stack.Count = 0
+Bot1.Battlefield.Guerrilla Gorilla.Power = 3
+Bot1.Battlefield.All That Glitters.AttachedTo = Guerrilla Gorilla
+Bot2.Battlefield = Forest; Forest; Memnite; Mox Sapphire
+Bot2.Graveyard = Stifle; Forest

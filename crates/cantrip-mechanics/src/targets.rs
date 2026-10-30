@@ -417,6 +417,54 @@ pub fn permanent(q: &dyn Query, id: ObjectId) -> bool {
     on_battlefield(q, id)
 }
 
+/// The objects a spell targeted as it was cast, in the order it chose them (CR 601.2c), wherever they are now: "those
+/// permanents" of a trigger on the cast (Dack Fayden's emblem, "gain control of those permanents"; Storm, Windrider, "those
+/// creatures gain flying") are what the spell targeted when the ability triggered. A later change of targets (CR 115.7) is
+/// a separate event and changes none of them, and neither does the spell leaving the stack. Asked of the event history:
+/// the cast's own `BecameTarget` records (`by` the spell, not an ability's) are those with the same `Record::cause` as its
+/// `Cast` record: the player casting it. A change of targets happens while some spell or ability resolves, so its records
+/// have another cause, whatever else was recorded in between (a limited trigger's `Triggered`, mana abilities). Each object
+/// once, though it filled several slots (CR 115.3). A trigger on the cast is asked before those records are made, when the
+/// spell is just as cast: its stack item's targets stand in. A spell is cast and resolves in one turn.
+pub fn objects_targeted_as_cast(q: &dyn Query, spell: ObjectId) -> Vec<ObjectId> {
+    let turn = q.history().this_turn();
+    let Some(cast) = turn.iter().rposition(|r| matches!(r.event, Event::Cast(c) if c.spell == spell)) else {
+        return Vec::new();
+    };
+    let mut objects = Vec::new();
+    let mut recorded = false;
+    for r in turn[cast + 1..].iter().take_while(|r| r.cause == turn[cast].cause) {
+        if let Event::BecameTarget { target, by, ability: false, .. } = r.event
+            && by == spell
+        {
+            recorded = true;
+            if let Some(id) = target.object()
+                && !objects.contains(&id)
+            {
+                objects.push(id);
+            }
+        }
+    }
+    if !recorded {
+        // Not recorded yet: the cast is the event being answered.
+        let state = q.state();
+        if let Some(item) = state.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell) {
+            for id in state.targets(item).iter().filter_map(|t| t.object()) {
+                if !objects.contains(&id) {
+                    objects.push(id);
+                }
+            }
+        }
+    }
+    objects
+}
+
+/// The permanents a spell targeted as it was cast (`objects_targeted_as_cast`) that are on the battlefield right now
+/// (CR 110.1): what Dack Fayden's emblem gains control of.
+pub fn permanents_targeted_as_cast(q: &dyn Query, spell: ObjectId) -> Vec<ObjectId> {
+    objects_targeted_as_cast(q, spell).into_iter().filter(|&id| permanent(q, id)).collect()
+}
+
 /// "[This permanent]'s power" read by an ability of it: the power it has now, or the power it last had on the battlefield
 /// once it has left (CR 608.2h, 113.7a); zero for one with none. Ouroboroid's "where X is Ouroboroid's power" and Loki
 /// Laufeyson's "less than or equal to Loki's power" read it.

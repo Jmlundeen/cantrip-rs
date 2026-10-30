@@ -1,0 +1,90 @@
+# Dack Fayden's emblem: "those permanents" are found exactly from the cast's own records. Danitha, Sword of Hope ("triggers
+# only once each turn") records her triggering between Reckless Rage's SpellCast and its targets, which a reader that stops at
+# the first record that is not a target loses. Bot1's Reckless Rage targets Bot2's Guerrilla Gorilla and Danitha: the emblem
+# takes the Gorilla: Bot2's Mana Leak counters the Rage (Bot1 declines to pay) before the emblem's ability resolves, so the
+# spell is no longer on the stack to ask.
+
+[Bot1 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Plains
+Plains
+Danitha, Sword of Hope
+Reckless Rage
+Island x20
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Mox Sapphire
+Mana Leak
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot1.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Hand.Danitha, Sword of Hope.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T10 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Pass
+Bot1.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot1.Hand.Reckless Rage.Cast
+Bot1.Target(Guerrilla Gorilla)
+Bot1.Target(Danitha, Sword of Hope)
+Bot1.Pass
+Bot2.Hand.Mana Leak.Cast(Stack.Reckless Rage)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Stack.Count = 0
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot1.Graveyard = Reckless Rage; Dack Fayden; Island; Island; Island; Island; Island; Island
+Bot1.Battlefield.Danitha, Sword of Hope.Damage = 0

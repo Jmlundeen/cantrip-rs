@@ -22,38 +22,25 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 // --- The emblem ---------------------------------------------------------------------------------------------------
 
-/// The permanents a spell targets, on the battlefield right now (CR 110.1). A spell that has left the stack (countered
-/// in response) targeted what it last did (CR 608.2h).
-fn permanents_targeted(q: &dyn Query, spell: ObjectId) -> Vec<ObjectId> {
-    let state = q.state();
-    let Some(item) = state.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell).or_else(|| state.left_stack(spell)) else {
-        return Vec::new();
-    };
-    state.targets(item)
-        .iter()
-        .filter_map(|t| t.object())
-        .filter(|&id| targets::permanent(q, id))
-        .collect()
-}
-
 /// "Whenever you cast a spell that targets one or more permanents": a question about the spell, whose targets are
 /// public from the moment it was announced (CR 601.2c). A spell that targets only players, or only cards in a
 /// graveyard, sets nothing off.
 fn you_cast_a_spell_that_targets_a_permanent(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, player, .. } if *player == q.controller(source) && !permanents_targeted(q, *spell).is_empty() => {
+        Event::SpellCast { spell, player, .. } if *player == q.controller(source) && !targets::permanents_targeted_as_cast(q, *spell).is_empty() => {
             Fired::about(Target::Object(*spell))
         }
         _ => None,
     }
 }
 
-/// "Gain control of those permanents": read again as the ability resolves, so one that has left in response is not
-/// one to gain control of. The ability is above the spell on the stack, so they change hands before the spell does
+/// "Gain control of those permanents": the permanents the spell targeted as it was cast (a later change of its targets,
+/// CR 115.7, changes none of them), read again as the ability resolves, so one that has left in response is not one to gain
+/// control of. The ability is above the spell on the stack, so they change hands before the spell does
 /// anything to them, and it resolves with targets its controller now owns (CR 608.2b).
 fn seize(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(spell) = item.subject else { return Ok(()) };
-    let permanents = permanents_targeted(g, spell);
+    let permanents = targets::permanents_targeted_as_cast(g, spell);
     instruction(g, |g| {
         for permanent in permanents {
             g.gain_control(item.object, permanent, item.controller, Duration::Indefinite);
