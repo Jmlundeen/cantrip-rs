@@ -1,25 +1,9 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, storied};
+use cantrip_mechanics::{effects, lands, storied, triggers};
 use cantrip_oracle as oracle;
 
 const ASK: Question =
     Question::new("DiscardHandToDraw", "discard your hand?", "Then draw a card for each card discarded", "Discard hand", "Keep hand").no_default();
-
-/// "Whenever Balin or another Dwarf you control enters" (CR 603.6a): this permanent, or another Dwarf - a token too - under
-/// your control as it entered. "Dwarf" is a word of its text (CR 612).
-fn balin_or_another_dwarf_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield)
-                && (*new == me.source
-                    || (q.controller(*new) == me.controller
-                        && q.chars(*new).has_subtype(q.words(me.source).subtype(Subtype::Dwarf)))) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
 
 /// "You may discard your hand. Draw X cards, where X is the number of cards discarded this way. If you have an enduring
 /// story, Balin deals X damage to each opponent." An empty hand may be discarded too (the rulings), and X counts the cards
@@ -41,6 +25,6 @@ fn wheel(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     storied: true,
-    abilities: &[triggered(when_asked(EventMask::ZONE_CHANGE, balin_or_another_dwarf_enters), wheel, "Whenever Balin or another Dwarf you control enters, you may discard your hand. Draw X cards, where X is the number of cards discarded this way. If you have an enduring story, Balin deals X damage to each opponent.")],
+    abilities: &[triggered(when_asked(EventMask::ZONE_CHANGE, triggers::this_or_another_of_subtype_you_control_enters::<{ lands::sub(Subtype::Dwarf) }>), wheel, "Whenever Balin or another Dwarf you control enters, you may discard your hand. Draw X cards, where X is the number of cards discarded this way. If you have an enduring story, Balin deals X damage to each opponent.")],
     ..oracle::BALIN_LOREMASTER
 };

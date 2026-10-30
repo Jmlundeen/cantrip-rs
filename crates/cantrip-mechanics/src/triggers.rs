@@ -1283,6 +1283,23 @@ pub fn of_subtype_you_control_enters<const SUBTYPE: u16>(q: &dyn Query, me: &Ask
     }
 }
 
+/// "Whenever [this permanent] or another [subtype] you control enters" (CR 603.6a, 201.5): this permanent, whatever it is as it
+/// enters (the name is the object, not its types), or another permanent under your control as it entered that has that subtype,
+/// a token too, the type read through the words of the source's text (CR 612). `SUBTYPE` is a `Subtype` as `u16`
+/// (`lands::sub`). Genghis Frog (Mutants) and Balin, Loremaster (Dwarves) print it.
+pub fn this_or_another_of_subtype_you_control_enters<const SUBTYPE: u16>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if to.is(ZoneKind::Battlefield)
+                && (*new == me.source
+                    || (q.controller(*new) == me.controller && q.chars(*new).has_subtype(crate::lands::word(q, me.source, SUBTYPE)))) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever another [subtype] you control enters" (CR 603.6a), `SUBTYPE` a `Subtype` as `u16` (`lands::sub`): a permanent
 /// other than this one, under your control as it entered, that is that creature type (a token too), the type read through
 /// the words of the source's text (CR 612); the trigger is about that permanent (`StackItem::subject`). Thalia's Lieutenant (Humans),
