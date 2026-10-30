@@ -1690,12 +1690,18 @@ Every counter comes to be on an object or a player through one path, `cantrip_ru
 `entering` and `place_arrived` for what a permanent enters or a card arrives with, `put_on_player`), and every counter is
 put by a player, named there as a `PlayerId`, never left out: the controller of the spell or ability whose effect puts it
 (CR 608.2; card code's `Game::add_counters` asks `Cx::doer`, which is also the controller of a replacement effect or mana
-ability being carried out), the player paying a cost (CR 118.3) or doing a turn-based action ("that player puts a lore
+ability being carried out), or the player the effect has put them (CR 608.2c, 122.6: "target opponent blights 2",
+CR 701.68a; "its controller amasses", CR 701.47a - card code's `Game::add_counters_by`, and `add_counters_together_by` with
+a putter for each entry, "each player puts ..."; `amass` puts as the amassing player, Azog, Moria's Ruin's "its controller"),
+which changes only who puts them - the rest of the effect, the continuous effects it begins among it (CR 611.2a), stays its
+controller's, so it is a putter given to the verb and never `Cx::acting_as`; the player paying a cost (CR 118.3) or doing a turn-based action ("that player puts a lore
 counter", CR 714.3c), the controller of a source whose damage puts -1/-1 or gives poison counters (CR 120.3b, 120.3d), or
 for a permanent entering, its controller (CR 122.6a) - its intrinsic loyalty, defense and lore counters (CR 306.5b, 310.4b,
 714.3a) included, a token copy's too. The storage is private to `cantrip-state` (`Obj::counters`, `Player::poison`,
 `energy`, `experience`); reading and removing are open, and the one adder, `put_path_add`, is called from the put path
 alone, which a test (`only_the_put_path_puts_counters`) holds to. No scenario writes counters either: they are played on.
+The putter an effect names (`add_counters_by`, 2026-10-30) left the benchmark in the noise: 15.47 us per decision after
+against 16.02 us before, on a shared machine.
 
 Counters one instruction puts on several objects, or of several kinds on one, are one simultaneous event (CR 608.2, 101.4,
 122.6): `counters::put_together` (card code's `Game::add_counters_together`) takes every placement - what one

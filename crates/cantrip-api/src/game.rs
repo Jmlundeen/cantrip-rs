@@ -1061,6 +1061,14 @@ pub trait Game: Query {
     /// that has changed zones (CR 400.7) or an amount of none or fewer gets none. "Put a +1/+1 counter on each creature you
     /// control", proliferate's permanents, "two +1/+1 counters and a flying counter on it".
     fn add_counters_together(&mut self, counters: &[(ObjectId, CounterKind, i16)]);
+    /// `add_counters` where the effect names the player who puts them (CR 122.6, 608.2c): "target opponent blights 2"
+    /// (CR 701.68a), "its controller amasses" (CR 701.47a), "that player puts ... counters". The counters are that player's
+    /// in every replacement effect (Innkeeper's Talent's and Vorinclex's "if you would put") and trigger ("whenever you put
+    /// one or more counters") that asks who put them; everything else the effect does stays its controller's.
+    fn add_counters_by(&mut self, by: PlayerId, object: ObjectId, kind: CounterKind, amount: i16);
+    /// `add_counters_together` where each entry names the player who puts its counters (CR 122.6, 101.4): "each player puts
+    /// ...", "each opponent blights 1". One simultaneous event; entries for one object by one player are one placement on it.
+    fn add_counters_together_by(&mut self, counters: &[(PlayerId, ObjectId, CounterKind, i16)]);
     /// "Move" up to `amount` counters of one kind from `from` onto `to` (CR 122.5): each is removed from the first object and
     /// put onto the second, through the replacement effects of counters being put and from `from` the player doing it. If either
     /// action isn't possible - the objects are the same, `from` has none of the kind, `to` can't have counters of that kind put on

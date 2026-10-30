@@ -148,6 +148,8 @@ mod crewed_tests;
 #[cfg(test)]
 mod cycled_tests;
 #[cfg(test)]
+mod counters_putter_tests;
+#[cfg(test)]
 mod counters_together_tests;
 #[cfg(test)]
 mod toxic_tests;
@@ -1390,12 +1392,31 @@ impl<'a> Cx<'a> {
         }
     }
 
-    /// Runs `f` as `player`'s doing (`doer`): the effect of a replacement effect or a mana ability they control.
+    /// Runs `f` as `player`'s doing (`doer`): the effect of a replacement effect or a mana ability they control. Not for a
+    /// player a resolving effect names to put counters (`Game::add_counters_by`): the rest of that effect - the continuous
+    /// effects it begins (CR 611.2a) - stays its controller's.
     pub(crate) fn acting_as<T>(&mut self, player: PlayerId, f: impl FnOnce(&mut Self) -> T) -> T {
         let outer = self.doer.replace(player);
         let done = f(self);
         self.doer = outer;
         done
+    }
+
+    /// Counters one instruction of an effect puts (`Game::add_counters_together`, `add_counters_together_by`): what it puts on
+    /// an object by one player is one placement on it, every kind together (CR 122.6, 608.2), and all of them are one event.
+    fn put_counters_together(&mut self, puts: impl Iterator<Item = (PlayerId, ObjectId, CounterKind, i16)>, len: usize) {
+        let mut placements: Vec<counters::Placement> = Vec::with_capacity(len);
+        for (by, object, kind, amount) in puts.filter(|&(_, _, _, amount)| amount > 0) {
+            match placements.iter_mut().find(|p| p.object == object && p.by == by) {
+                Some(p) => p.counts[kind as usize] += amount,
+                None => {
+                    let mut counts = [0; CounterKind::COUNT];
+                    counts[kind as usize] = amount;
+                    placements.push(counters::Placement { object, counts, by });
+                }
+            }
+        }
+        counters::put_together(self, &placements, counters::How::Effect);
     }
 
     /// What the frame being run is doing, as an event's cause.
@@ -2303,19 +2324,16 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn add_counters_together(&mut self, puts: &[(ObjectId, CounterKind, i16)]) {
         let by = self.doer();
-        // What the one instruction puts on an object is one placement on it, every kind together (CR 122.6, 608.2).
-        let mut placements: Vec<counters::Placement> = Vec::with_capacity(puts.len());
-        for &(object, kind, amount) in puts.iter().filter(|&&(_, _, amount)| amount > 0) {
-            match placements.iter_mut().find(|p| p.object == object) {
-                Some(p) => p.counts[kind as usize] += amount,
-                None => {
-                    let mut counts = [0; CounterKind::COUNT];
-                    counts[kind as usize] = amount;
-                    placements.push(counters::Placement { object, counts, by });
-                }
-            }
-        }
-        counters::put_together(self, &placements, counters::How::Effect);
+        self.put_counters_together(puts.iter().map(|&(object, kind, amount)| (by, object, kind, amount)), puts.len());
+    }
+
+    fn add_counters_by(&mut self, by: PlayerId, object: ObjectId, kind: CounterKind, amount: i16) {
+        debug_assert!(amount >= 0, "use remove_counters");
+        counters::put(self, object, kind, amount, by, counters::How::Effect);
+    }
+
+    fn add_counters_together_by(&mut self, puts: &[(PlayerId, ObjectId, CounterKind, i16)]) {
+        self.put_counters_together(puts.iter().copied(), puts.len());
     }
 
     fn move_counters(&mut self, from: ObjectId, to: ObjectId, kind: CounterKind, amount: i16) -> i16 {
