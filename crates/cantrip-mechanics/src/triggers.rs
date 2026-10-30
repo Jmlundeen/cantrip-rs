@@ -1540,6 +1540,16 @@ pub fn you_activate_a_nonmana_ability(q: &dyn Query, me: &Asker, event: &Event) 
 
 pub const YOU_ACTIVATE_A_NONMANA_ABILITY: Trigger = when_asked(EventMask::ABILITY_ACTIVATED, you_activate_a_nonmana_ability);
 
+/// "Whenever one or more +1/+1 counters are put on this creature" (CR 122.6, 603.2c): one trigger per event, however many
+/// counters it put (the core announces only positive amounts). Emperor of Bones, Pensive Professor.
+fn plus_one_counters_put_on_this(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::CountersPut { object, kind: CounterKind::PlusOne, .. } if *object == source => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+pub const PLUS_ONE_COUNTERS_PUT_ON_THIS: Trigger = when(EventMask::COUNTERS, plus_one_counters_put_on_this);
 pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
 pub const THIS_BECOMES_TAPPED: Trigger = when(EventMask::TAPPED, this_becomes_tapped);
 pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enters_if_cast);

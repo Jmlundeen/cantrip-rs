@@ -1,6 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::{choose, targets};
 use cantrip_mechanics::adapt;
+use cantrip_mechanics::triggers::PLUS_ONE_COUNTERS_PUT_ON_THIS;
 use cantrip_oracle as oracle;
 
 /// Exile up to one target card from a graveyard: it is exiled with this creature (CR 607.2a), for its other ability.
@@ -15,14 +16,6 @@ fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn adapt(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     adapt::adapt(g, item.object, 2);
     Ok(())
-}
-
-/// "Whenever one or more +1/+1 counters are put on this creature" (CR 121.1, 603.2c).
-fn plus_one_counters_put(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::CountersPut { object, kind: CounterKind::PlusOne, amount, .. } if *object == source && *amount > 0 => Fired::PLAIN,
-        _ => None,
-    }
 }
 
 /// Put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it. It
@@ -51,7 +44,7 @@ pub static CARD: CardDef = CardDef {
         triggered(cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT, exile_it, "At the beginning of combat on your turn, exile up to one target card from a graveyard.")
             .targets(&[cantrip_mechanics::targets::CARD_IN_A_GRAVEYARD.optional()]),
         ability(cost("{1}{B}"), adapt, "{1}{B}: Adapt 2."),
-        triggered(when(EventMask::COUNTERS, plus_one_counters_put), reanimate, "Whenever one or more +1/+1 counters are put on this creature, put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it. It gains haste. Sacrifice it at the beginning of the next end step."),
+        triggered(PLUS_ONE_COUNTERS_PUT_ON_THIS, reanimate, "Whenever one or more +1/+1 counters are put on this creature, put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it. It gains haste. Sacrifice it at the beginning of the next end step."),
     ],
     delayed: &[delayed_trigger(cantrip_mechanics::delayed::sacrifice_subject, "Sacrifice it.")],
     ..oracle::EMPEROR_OF_BONES
