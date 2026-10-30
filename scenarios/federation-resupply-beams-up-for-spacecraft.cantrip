@@ -1,0 +1,48 @@
+# Beam Me Up pays {3}{W}, returns a creature you control, finds a Spacecraft, then exiles Federation Resupply.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Federation Resupply
+Ornithopter
+Rescue Skiff
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Federation Resupply.Cast
+Bot1.Search()
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Federation Resupply.Cast(Ability: Beam me up)
+Bot1.Choose(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Rescue Skiff)
+
+[Expect]
+Exile = Federation Resupply
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 19
