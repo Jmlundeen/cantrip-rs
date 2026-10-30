@@ -16,7 +16,13 @@ use cantrip_api::*;
 
 /// The additional cost "behold a [quality]" as a part of a cost, the quality named as the prompt says it ("Dragon").
 pub const fn cost(filter: ObjectFilter, quality: &'static str) -> Cost {
-    Cost { behold: Some((1, filter, quality)), ..Cost::NONE }
+    cost_of(1, filter, quality)
+}
+
+/// "Behold `count` [quality]s" as a part of a cost (CR 701.4a): each a different permanent you control or card in your hand.
+/// Kindle the Inner Flame's flashback cost beholds three Elementals.
+pub const fn cost_of(count: u8, filter: ObjectFilter, quality: &'static str) -> Cost {
+    Cost { behold: Some((count, filter, quality)), ..Cost::NONE }
 }
 
 /// "As an additional cost to cast this spell, you may behold a [quality]."
@@ -39,6 +45,12 @@ pub fn dragon(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
 /// Champions of the Shoal behold one.
 pub fn merfolk(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Merfolk))
+}
+
+/// An Elemental, read through the words of the card whose text says it (CR 612): a permanent or a card in a hand. Champion of
+/// the Path, Soulbright Seeker and Kindle the Inner Flame behold one.
+pub fn elemental(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Elemental))
 }
 
 /// A Kithkin, read through the words of the card whose text says it (CR 612): a permanent or a card in a hand. Kinsbaile
