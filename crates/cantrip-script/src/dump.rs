@@ -878,7 +878,7 @@ const GAME_KEYS: &[&str] = &[
 
 /// The keys the dump writes of a player, after `BotN.`.
 const PLAYER_KEYS: &[&str] = &[
-    "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
+    "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "LostTo", "Mana", "ManaFrom", "Shuffles", "LandsPlayed", "CitysBlessing",
     "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked", "Surveilled",
     "Hand", "Revealed", "Crimes", "Library", "Companion", "Sideboard", "Graveyard", "Emblems", "Battlefield", "PhasedOut",
 ];
@@ -1013,6 +1013,7 @@ mod tests {
         assert!(writable("Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne"));
         assert!(writable("Bot1.Battlefield.Grizzly Bears#2.Tapped"));
         assert!(writable("Bot2.Graveyard.Sandman, Shifting Scoundrel.Power"));
+        assert!(writable("Bot1.Shuffles"));
         assert!(writable("Bot1.Exile.Llanowar Elves.Counters.PlusOnePlusOne"));
         assert!(writable("Bot1.Exile.Llanowar Elves.Colors"));
         assert!(writable("Bot1.Battlefield.Grizzly Bears.Keywords.Count"));
