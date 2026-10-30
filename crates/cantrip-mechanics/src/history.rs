@@ -11,6 +11,16 @@ pub fn dealt_damage_this_turn(history: History<'_>, source: ObjectId) -> bool {
     history.damage_dealt().any(|d| d.source == source && d.amount > 0)
 }
 
+/// "You've put one or more +1/+1 counters on [it] this turn" (CR 122.6, 611.3a): `player` put at least one +1/+1 counter on
+/// `object` this turn, whether it was on the battlefield or entering with them (the counters' putter is the event's). The object
+/// is the one that received them, so a permanent that left and came back has had none put on it (CR 400.7). Kid Loki and Beast,
+/// Erudite Aerialist ask it from their static abilities' layers.
+pub fn put_plus_one_counter_on_this_turn(history: History<'_>, player: PlayerId, object: ObjectId) -> bool {
+    history
+        .select(EventQuery::kind(EventMask::COUNTERS).this_turn().object(object))
+        .any(|record| matches!(record.event, Event::CountersPut { kind: CounterKind::PlusOne, amount, by, .. } if amount > 0 && by == player))
+}
+
 /// An opponent was dealt noncombat damage this turn (CR 120.2). Grim Repriser and Whiplash Wordsmith ask this
 /// same question, from an activated ability's condition and a static ability's layers respectively.
 pub fn opponent_dealt_noncombat_damage_this_turn(history: History<'_>, state: &GameState, player: PlayerId) -> bool {

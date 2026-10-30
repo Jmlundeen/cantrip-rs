@@ -1,5 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::plus_one_counter_on_this;
+use cantrip_mechanics::history;
 use cantrip_mechanics::statics::{have_hexproof, your_creatures};
 use cantrip_mechanics::triggers::YOU_DRAW_YOUR_SECOND_CARD;
 use cantrip_oracle as oracle;
@@ -10,10 +11,7 @@ use cantrip_oracle as oracle;
 /// object (CR 400.7) and has had none put on it.
 fn creatures_you_put_plus_one_counters_on_this_turn(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
     let you = view.state().obj(source).controller;
-    your_creatures(view, source, affected, so_far)
-        && view.history().select(EventQuery::kind(EventMask::COUNTERS).this_turn().object(affected)).any(|record| {
-            matches!(record.event, Event::CountersPut { kind: CounterKind::PlusOne, amount, by, .. } if amount > 0 && by == you)
-        })
+    your_creatures(view, source, affected, so_far) && history::put_plus_one_counter_on_this_turn(view.history(), you, affected)
 }
 
 pub static CARD: CardDef = CardDef {
