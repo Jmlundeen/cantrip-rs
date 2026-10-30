@@ -1185,6 +1185,10 @@ pub enum EffectKind {
     Goaded,
     /// "Can't block" (CR 509.1b) for as long as the effect lasts.
     CantBlock,
+    /// "For as long as [its source] remains tapped, if a triggered ability of this creature triggers, that ability triggers an
+    /// additional time" (CR 603.2d, 611.2b): Lwaxana Troi's chosen creature. Read by `additional_triggers` of the source; the
+    /// effect ends when the source untaps, and with its `affected` object (CR 400.7).
+    TriggersAgainWhileSourceTapped,
     /// "It can't be blocked this turn" (CR 509.1b) for as long as the effect lasts: Escape Tunnel's, Manifold Key's, Creeping
     /// Tar Pit's. A resolved spell or ability that says so without "has" or "gains" makes an effect on the creature, not an
     /// ability it gains (CR 113.1a, 611.2c), so a creature that loses its abilities afterwards (CR 613.1f: Turn to Frog) still

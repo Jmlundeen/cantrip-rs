@@ -81,6 +81,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-142](#ki-142-the-ai-encoder-cannot-tell-apart-options-that-differ-only-by-their-grant-or-a-companion-from-exiling-to-pay) | The AI encoder cannot tell apart options that differ only by their grant, or a companion from exiling to pay | Pri-3 | Open |
 | [KI-143](#ki-143-a-scenario-check-right-after-an-activation-can-read-the-pool-before-its-payment-finishes) | A scenario check right after an activation can read the pool before its payment finishes | Pri-2 | Open |
 | [KI-144](#ki-144-mathemagics-with-an-x-of-32-or-more-draws-at-most-4294967295-cards) | Mathemagics with an X of 32 or more draws at most 4,294,967,295 cards | Pri-3 | Won't fix: beyond practical scale |
+| [KI-146](#ki-146-no-rule-stops-a-permanent-from-being-beamed-up) | No rule stops a permanent from being beamed up | Pri-2 | Open |
 
 ## Issues
 
@@ -632,3 +633,16 @@ for Tidehollow Sculler. The rules are unaffected: the card returns when the perm
 from a stack object in the view, as `is_by_in` does.
 
 **Scenarios.** `champion-of-the-clachan-exiles-a-kithkin-from-hand-and-returns-it-when-it-leaves` (the rules side).
+
+### KI-146: No rule stops a permanent from being beamed up
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | engine (cost payment, `cantrip-mechanics/src/beam_me_up.rs`) | 2026-10-30, Marooned |
+
+**Notes.** Marooned says "enchanted permanent ... can't be beamed up" (the beam-up keyword in `beam_me_up.rs`). Nothing in the engine checks that restriction when a beam-up cost is paid, and the existing `CostBan` covers only
+life and sacrifice payments. A fix needs a per-object "can't be beamed up" restriction that the beam-up payment checks,
+set by an aura's static ability and removed when the aura leaves (CR 611.2a, 400.7). Until then Marooned is not implemented.
+
+**Scenarios.** [`scenarios/marooned-todo.cantrip`](../scenarios/marooned-todo.cantrip) - unfinished; the card is not yet
+written in full.
