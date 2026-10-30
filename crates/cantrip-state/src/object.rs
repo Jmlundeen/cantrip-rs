@@ -1268,12 +1268,15 @@ pub enum EffectKind {
     /// `affected` object, which is only the source. `shield` is how much it has left to prevent (CR 615.7).
     Prevention { card: CardId, index: u8, to: Target, shield: Shield },
     /// A replacement effect (CR 611.2, 614) a resolving spell or ability made about its `affected` object, for as long
-    /// as its duration lasts: the nth of the source card's `granted_replacements`. It ends with the object, which is a
-    /// new one when it changes zones (CR 400.7): "if that creature would die this turn, exile it instead".
-    Replacement(u8),
+    /// as its duration lasts: the nth of the `granted_replacements` of `card`, the card whose spell or ability made it
+    /// (the face that was up), as `Prevention` names its own - never read from the source as it is later, which may have
+    /// become a copy of something else or turned over since (CR 707.2, 712.8). It ends with the object, which is a new
+    /// one when it changes zones (CR 400.7): "if that creature would die this turn, exile it instead". The core makes one
+    /// too for a granted way's "if you cast a spell this way" (`GrantedWay::spell_replacement`), about the spell.
+    Replacement { card: CardId, index: u8 },
     /// The same, about a player or the game and not an object ("if a card would be put into your graveyard from
     /// anywhere this turn, exile it instead"): its `affected` object is only the source, and it outlives it.
-    ReplacementRule(u8),
+    ReplacementRule { card: CardId, index: u8 },
     /// "You may play lands and cast spells from your graveyard" (CR 305.1, 601.3) for the effect's controller. About the
     /// player, and outlives its `affected` object, which is only the source.
     PlayFromGraveyard,
@@ -1355,7 +1358,7 @@ impl EffectKind {
                 | EffectKind::CantGainLife(_)
                 | EffectKind::LifeTotalCantChange(_)
                 | EffectKind::CantCastSpellsFrom(..)
-                | EffectKind::ReplacementRule(_)
+                | EffectKind::ReplacementRule { .. }
                 | EffectKind::CreaturesCantBlock(_)
                 | EffectKind::PlayFromGraveyard
                 | EffectKind::PlayerManaAbility(_)

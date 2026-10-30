@@ -10,7 +10,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let lessons = learn::lesson_cards_in_graveyard(g, item.controller);
-    exile_if_it_would_die(g, item.object, 0, creature);
+    exile_if_it_would_die(g, item, 0, creature);
     damage_target(g, item, 0, 2 + lessons as u16);
     Ok(())
 }

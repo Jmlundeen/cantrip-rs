@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// battlefield from the stack (CR 614.12), where X is read from the spell itself.
 fn give_the_spell_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(spell) = item.subject {
-        g.add_effect(item.object, spell, EffectKind::Replacement(0), Duration::EndOfTurn);
+        g.add_effect(item.object, spell, EffectKind::Replacement { card: item.ability.card, index: 0 }, Duration::EndOfTurn);
     }
     Ok(())
 }

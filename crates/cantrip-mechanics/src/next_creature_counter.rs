@@ -26,7 +26,7 @@ pub fn chapter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 fn give_the_spell_a_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(spell) = item.subject {
-        g.add_effect(item.object, spell, EffectKind::Replacement(0), Duration::EndOfTurn);
+        g.add_effect(item.object, spell, EffectKind::Replacement { card: item.ability.card, index: 0 }, Duration::EndOfTurn);
     }
     Ok(())
 }

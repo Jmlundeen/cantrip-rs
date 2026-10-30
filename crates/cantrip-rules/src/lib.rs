@@ -46,6 +46,8 @@ mod face_down_reveal_tests;
 #[cfg(test)]
 mod prototype_tests;
 #[cfg(test)]
+mod spell_replacement_tests;
+#[cfg(test)]
 mod assist_tests;
 #[cfg(test)]
 mod surge_freerunning_tests;

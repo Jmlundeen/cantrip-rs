@@ -7056,6 +7056,18 @@ fn cast(
         let ability = AbilityRef::delayed(g.ability.card, n);
         cx.st().update_obj(spell, |o| o.marks.gains = Some(ability));
     }
+    // "If you cast a spell this way, ...": the replacement effect the way's static ability makes about the spell
+    // (`GrantedWay::spell_replacement`, CR 614.1), named with the card whose way it is, and lasting as long as the spell
+    // does (CR 400.7) - whatever becomes of the permanent that gave the way, and of what it is a copy of.
+    if let Some(g) = by.by
+        && let Some(way) = named_way(cx.s(), cx.cards(), g)
+        && let Some(index) = way.what.spell_replacement
+    {
+        let timestamp = cx.st().timestamp();
+        let kind = EffectKind::Replacement { card: g.ability.card, index };
+        cx.st().effect_push(ContinuousEffect { source: g.object, controller: way.controller, timestamp, affected: spell, kind, duration: Duration::Indefinite });
+        cx.state_changed();
+    }
     // A permission is used up by the cast (CR 400.7: the card is a new object).
     if !cx.s().permissions.is_empty() {
         cx.st().permissions_retain(|p| p.card != card);

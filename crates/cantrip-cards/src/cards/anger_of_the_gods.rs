@@ -13,7 +13,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.end_sentence();
     instruction(g, |g| {
         for creature in dealt {
-            exile_if_it_would_die(g, item.object, 0, creature);
+            exile_if_it_would_die(g, item, 0, creature);
         }
     });
     Ok(())

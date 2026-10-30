@@ -1567,6 +1567,21 @@ cast. An emblem gives ways and alternative costs as a permanent does (CR 114.4: 
 zone), so Tamiyo, Field Researcher's "You may cast spells from your hand without paying their mana costs" is a
 `SpellAlternative` on its emblem; nothing else in the command zone gives any (CR 113.6).
 
+"If you cast a spell this way, ..." (CR 614.1a, 614.1c) is the way's `spell_replacement`: the index of one of the granting
+card's `granted_replacements`, which the core makes as the spell is put on the stack (`actions.rs`, beside the way's
+`gains`) - an `EffectKind::Replacement` about the spell, from the granting permanent, controlled by its controller then,
+lasting as long as the spell does (`Duration::Indefinite`). It is the lasting-effect machinery a resolving spell's "that
+creature enters with an additional +1/+1 counter" uses (`next_creature_counter`), not an ability of the permanent, so it
+applies whether or not the permanent is still there or still what it was (the rulings on Kess, Dissident Mage and Lier,
+Disciple of the Drowned): Leonardo, Sewer Samurai's "that creature enters with a finality counter on it" (applies to the
+spell entering from the stack), Kess's "if a spell cast this way would be put into your graveyard, exile it instead"
+(applies to the spell leaving the stack for that graveyard, resolved or countered). It is about the spell, the object
+(CR 400.7): a copy of it was not cast (CR 707.10) and has none, and once the spell has left the stack, whatever it became
+is a new object the effect knows nothing of, and the effect is dropped with the other effects about objects that are gone.
+A lasting replacement effect names the card it is defined on (`EffectKind::Replacement { card, index }`, as `Prevention`
+does), the card of the spell or ability that made it (`item.ability.card`) or of the way: never read from its source as
+the source is later, which may have become a copy of something else, turned over or left (CR 707.2, 712.8).
+
 ### Alternative costs a permanent gives the spells a player casts
 
 "You may cast Dragon spells without paying their mana costs" (Dracogenesis), "you may pay {W}{U}{B}{R}{G} rather than pay the

@@ -18,7 +18,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.end_sentence();
     instruction(g, |g| {
         for id in dealt {
-            exile_if_it_would_die(g, item.object, 0, id);
+            exile_if_it_would_die(g, item, 0, id);
         }
     });
     if bargained {

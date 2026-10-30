@@ -1897,6 +1897,17 @@ pub struct GrantedWay {
     /// (`cantrip_mechanics::escape::granted` for Underworld Breach's escape), so a spell cast by it is known to have been cast
     /// with that keyword whatever gave it (CR 702.138b: "cast from a graveyard with an escape ability").
     pub kind: WayKind,
+    /// "If you cast a spell this way, [it is replaced]" (CR 614.1a, 614.1c): the index in the granting card's
+    /// `granted_replacements` of a replacement effect about the spell cast by the way, which the core makes as the spell is
+    /// put on the stack (CR 601.2a), controlled by the granting permanent's controller then. It is a rule of how the
+    /// spell was cast, not an ability of the permanent: it applies whether or not the permanent is still there (Kess,
+    /// Dissident Mage's and Lier, Disciple of the Drowned's rulings), as the definition says - "that creature enters with a
+    /// finality counter on it" (Leonardo, Sewer Samurai; `affected` the spell, entering from the stack), "if a spell cast this
+    /// way would be put into your graveyard, exile it instead" (Kess, Dissident Mage). It is about that spell, the object
+    /// (CR 400.7): a copy of it was not cast (CR 707.10) and has none, and it ends as the spell leaves the stack, wherever
+    /// it goes - the permanent it becomes, or the card countered into a graveyard, is a new object it knows nothing of
+    /// beyond that move. A land played by the way (`lands`) is no spell, and gets none.
+    pub spell_replacement: Option<u8>,
 }
 
 impl GrantedWay {
@@ -1910,6 +1921,7 @@ impl GrantedWay {
         flashback: false,
         permission: false,
         kind: WayKind::Other,
+        spell_replacement: None,
     };
 }
 
@@ -2866,8 +2878,8 @@ pub struct CardDef {
     /// Its replacement effects (CR 614): "if this would happen, that happens instead". Functioning while it is on the
     /// battlefield, or in every zone for its own move (`ReplacementDef::own_everywhere`).
     pub replacements: &'static [ReplacementDef],
-    /// The replacement effects its resolving spells and abilities make for a duration (CR 611.2, 614): `EffectKind::Replacement(n)`
-    /// and `ReplacementRule(n)` name the nth. Not standing abilities: they function only while such an effect lasts.
+    /// The replacement effects its resolving spells and abilities make for a duration (CR 611.2, 614): `EffectKind::Replacement`
+    /// and `ReplacementRule` name the nth, with this card. Not standing abilities: they function only while such an effect lasts.
     pub granted_replacements: &'static [GrantedReplacementDef],
     /// Its prevention effects (CR 615) of static abilities: "prevent all damage that would be dealt to [this]". Functioning
     /// while it is on the battlefield.

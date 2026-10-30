@@ -198,12 +198,12 @@ fn redirect_once_to(destination: &'static CardDef, zone: Zone) -> (i32, u16, boo
     let to = game.state.push_obj(Obj::new(game.cards.id_of(destination), OTHER, zone));
     game.state.zone_push(zone, to);
     game.state.effect_push(ContinuousEffect {
-        source: redirector, affected: to, controller: YOU, kind: EffectKind::Replacement(0),
+        source: redirector, affected: to, controller: YOU, kind: EffectKind::Replacement { card: game.cards.id_of(&ONCE_REDIRECT), index: 0 },
         duration: Duration::EndOfTurn, timestamp: 1,
     });
     let mut cx = cx(&mut game);
     assert_eq!(damage(&mut cx, source, Target::Player(OTHER), 2, false), 2);
-    let waiting = cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement(0)));
+    let waiting = cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement { index: 0, .. }));
     (cx.s().player(OTHER).life, cx.s().obj(to).damage, waiting)
 }
 

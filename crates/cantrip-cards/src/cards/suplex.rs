@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// spell's own effect on that creature (CR 611.2c, 614.1a), made whether or not the damage is dealt, and before it.
 fn damage_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        exile_if_it_would_die(g, item.object, 0, creature);
+        exile_if_it_would_die(g, item, 0, creature);
         damage_target(g, item, 0, 3);
     }
     Ok(())

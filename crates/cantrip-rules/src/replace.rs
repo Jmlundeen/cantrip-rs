@@ -20,8 +20,8 @@ use crate::Cx;
 pub(crate) enum Origin {
     /// One of its source card's `replacements`.
     Printed,
-    /// One a spell or ability made (CR 611.2, `EffectKind::Replacement`), named by that effect's timestamp: one of its
-    /// source card's `granted_replacements`.
+    /// One a spell or ability made (CR 611.2, `EffectKind::Replacement`), named by that effect's timestamp: one of the
+    /// `granted_replacements` of the card the effect names.
     Granted(u32),
     /// Madness's static ability (CR 702.35a), the core's own keyword replacement, of the discarded card itself.
     Madness,
@@ -289,7 +289,7 @@ fn card_of(cx: &Cx, id: ObjectId) -> CardId {
 /// card, which has some that function from every zone. The guard that keeps the hot path free of replacement work.
 pub(crate) fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
     // An effect a spell or ability made, which lasts (CR 611.2).
-    if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement(_) | EffectKind::ReplacementRule(_) | EffectKind::Prevention { .. })) {
+    if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement { .. } | EffectKind::ReplacementRule { .. } | EffectKind::Prevention { .. })) {
         return true;
     }
     let cards = cx.cards();
@@ -471,9 +471,9 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
     }
     // The replacement effects spells and abilities made, still lasting (CR 611.2): one about an object ends with it.
     for e in &cx.s().effects {
-        let (index, about_player) = match e.kind {
-            EffectKind::Replacement(i) => (i, false),
-            EffectKind::ReplacementRule(i) => (i, true),
+        let (card, index, about_player) = match e.kind {
+            EffectKind::Replacement { card, index } => (card, index, false),
+            EffectKind::ReplacementRule { card, index } => (card, index, true),
             // A prevention effect a spell or ability made (CR 615.3): of damage to whom it names, if it names anyone, and of
             // the damage its definition describes. One about an object ends with it (CR 400.7).
             EffectKind::Prevention { card, index, to, .. } => {
@@ -496,7 +496,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
         if !about_player && !live(cx.s(), e.affected) {
             continue;
         }
-        let def = &cards.get(card_of(cx, e.source)).granted_replacements[index as usize];
+        let def = &cards.get(card).granted_replacements[index as usize];
         if def.kind != kind || applied.contains(&(e.source, index, Origin::Granted(e.timestamp))) {
             continue;
         }
@@ -595,12 +595,19 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
     found
 }
 
+/// The lasting replacement effect a spell or ability made (CR 611.2) that has this timestamp, with its definition: one of
+/// the `granted_replacements` of the card the effect names, whatever its source has become since.
+fn granted<'a>(cx: &'a Cx, timestamp: u32) -> Option<(&'a ContinuousEffect, &'static GrantedReplacementDef)> {
+    let e = cx.s().effects.iter().find(|e| e.timestamp == timestamp)?;
+    let (EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index }) = e.kind else { return None };
+    Some((e, &cx.cards().get(card).granted_replacements[index as usize]))
+}
+
 /// What an effect says it does, for the player who orders several (CR 616.1).
 fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
-    let card = cx.cards().get(card_of(cx, c.source));
     match c.origin {
-        Origin::Printed => card.replacements[c.index as usize].hint,
-        Origin::Granted(_) => card.granted_replacements[c.index as usize].hint,
+        Origin::Printed => cx.cards().get(card_of(cx, c.source)).replacements[c.index as usize].hint,
+        Origin::Granted(timestamp) => granted(cx, timestamp).map_or("", |(_, def)| def.hint),
         Origin::Madness => MADNESS_HINT,
         Origin::Flashback => FLASHBACK_HINT,
         Origin::ExileInstead => EXILE_INSTEAD_HINT,
@@ -613,7 +620,7 @@ fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
         Origin::ShieldCounter if matches!(proposal, Proposal::Damage(_)) => SHIELD_DAMAGE_HINT,
         Origin::ShieldCounter => SHIELD_DESTROY_HINT,
         Origin::Protection => PROTECTION_HINT,
-        Origin::Prevention => card.preventions[c.index as usize].hint,
+        Origin::Prevention => cx.cards().get(card_of(cx, c.source)).preventions[c.index as usize].hint,
         Origin::GrantedPrevention(timestamp) => match cx.s().effects.iter().find(|e| e.timestamp == timestamp).map(|e| e.kind) {
             Some(EffectKind::Prevention { card, index, .. }) => cx.cards().get(card).granted_preventions[index as usize].hint,
             _ => "",
@@ -765,8 +772,7 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
                 }
             }
             Origin::Granted(timestamp) => {
-                let e = *cx.s().effects.iter().find(|e| e.timestamp == timestamp).expect("the effect that applies");
-                let def = &cx.cards().get(card_of(cx, source)).granted_replacements[index as usize];
+                let Some((&e, def)) = granted(cx, timestamp) else { continue };
                 let (apply, then, once) = (def.apply, def.then, def.once);
                 let asker = Asker { source, controller: e.controller, by: None, spell: false };
                 let before = *proposal;
@@ -937,8 +943,7 @@ fn reshape(cx: &Cx, c: &Candidate, proposal: &mut Proposal) {
             (def.apply)(cx, &asker, proposal);
         }
         Origin::Granted(timestamp) => {
-            let Some(e) = cx.s().effects.iter().find(|e| e.timestamp == timestamp) else { return };
-            let def = &cx.cards().get(card_of(cx, c.source)).granted_replacements[c.index as usize];
+            let Some((e, def)) = granted(cx, timestamp) else { return };
             (def.apply)(cx, &Asker { source: c.source, controller: e.controller, by: None, spell: false }, e.affected, proposal);
         }
         // No other kind of effect applies to the mana a permanent produces.
@@ -957,8 +962,8 @@ pub(crate) fn mana_may_be_replaced(cx: &Cx) -> bool {
 pub(crate) fn mana_may_be_replaced_in(s: &GameState, cards: &CardTable) -> bool {
     s.battlefield().iter().any(|&id| cards.mana_replaces[cards.current(s.obj(id)).0 as usize])
         || s.effects.iter().any(|e| match e.kind {
-            EffectKind::Replacement(i) | EffectKind::ReplacementRule(i) => {
-                cards.get(cards.current(s.obj(e.source))).granted_replacements[i as usize].kind == ReplacementKind::ManaProduction
+            EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index } => {
+                cards.get(card).granted_replacements[index as usize].kind == ReplacementKind::ManaProduction
             }
             _ => false,
         })
@@ -1027,8 +1032,8 @@ pub(crate) fn mana_outcomes(cx: &Cx, production: ManaProduction) -> Vec<ManaProd
 pub(crate) fn damage_may_change(cx: &Cx) -> bool {
     let cards = cx.cards();
     cx.s().effects.iter().any(|e| match e.kind {
-        EffectKind::Replacement(i) | EffectKind::ReplacementRule(i) => {
-            cards.get(card_of(cx, e.source)).granted_replacements[i as usize].kind == ReplacementKind::Damage
+        EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index } => {
+            cards.get(card).granted_replacements[index as usize].kind == ReplacementKind::Damage
         }
         _ => false,
     }) || cx.s().battlefield().iter().any(|&id| {

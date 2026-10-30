@@ -177,10 +177,10 @@ pub fn exile_instead_apply_granted(q: &dyn Query, asker: &Asker, _: ObjectId, pr
 pub const EXILE_INSTEAD_OF_DYING: GrantedReplacementDef =
     granted_replacement(ReplacementKind::ZoneChange, exile_instead_of_dying_applies, exile_instead_apply_granted, "exiled instead of dying");
 
-/// Makes `EXILE_INSTEAD_OF_DYING` (the card's replacement number `index`) about `creature` until end of turn. It names the
-/// object, so it does not follow the creature if it leaves and returns as a new object (CR 400.7).
-pub fn exile_if_it_would_die(g: &mut dyn Game, source: ObjectId, index: u8, creature: ObjectId) {
-    g.add_effect(source, creature, EffectKind::Replacement(index), Duration::EndOfTurn);
+/// Makes `EXILE_INSTEAD_OF_DYING` (the resolving spell or ability's card's replacement number `index`) about `creature` until
+/// end of turn. It names the object, so it does not follow the creature if it leaves and returns as a new object (CR 400.7).
+pub fn exile_if_it_would_die(g: &mut dyn Game, item: &StackItem, index: u8, creature: ObjectId) {
+    g.add_effect(item.object, creature, EffectKind::Replacement { card: item.ability.card, index }, Duration::EndOfTurn);
 }
 
 /// Which permanents `opponents_enter_tapped` taps: a bit set of these.

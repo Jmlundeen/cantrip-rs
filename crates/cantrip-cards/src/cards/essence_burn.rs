@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// the damage is dealt, and before it, so it covers every way the permanent would die this turn (CR 700.4).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(permanent) = targets::object(g, item, 0) {
-        exile_if_it_would_die(g, item.object, 0, permanent);
+        exile_if_it_would_die(g, item, 0, permanent);
         damage_target(g, item, 0, 5);
     }
     Ok(())

@@ -10,7 +10,7 @@ fn shrink_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     effects::target_creature_gets::<-5, -5>(g, item)?;
     g.end_sentence();
-    exile_if_it_would_die(g, item.object, 0, creature);
+    exile_if_it_would_die(g, item, 0, creature);
     Ok(())
 }
 
