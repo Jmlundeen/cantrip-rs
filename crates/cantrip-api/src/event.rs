@@ -262,6 +262,9 @@ pub enum Event {
     /// `player`'s turn began (CR 500.1, 502): recorded only, as its untap step starts. A turn skipped (CR 614.10) never
     /// begins and has none.
     TurnBegan { player: PlayerId },
+    /// `player`'s extra turn began (CR 500.7): recorded only, alongside `TurnBegan`, as its untap step starts. A skipped
+    /// extra turn never begins and has none.
+    ExtraTurnBegan { player: PlayerId },
     /// `player` completed a dungeon (CR 309.7): their venture marker left its bottommost room, by the state-based action
     /// (CR 704.5t) or by venturing on from it (CR 701.49c). Recorded only.
     DungeonCompleted { player: PlayerId },
@@ -362,6 +365,7 @@ impl Event {
             | Event::Done { player, .. }
             | Event::TurnEnded { player }
             | Event::TurnBegan { player }
+            | Event::ExtraTurnBegan { player }
             | Event::DungeonCompleted { player }
             | Event::Scried { player, .. }
             | Event::Surveilled { player, .. }
@@ -427,7 +431,7 @@ impl Event {
             Event::ManaSpent { source, on, .. } => source == object || on == object,
             Event::Convoked { creature, spell } | Event::TappedForTeamwork { creature, spell } => creature == object || spell == object,
             Event::Crewed { creature, vehicle } => creature == object || vehicle == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } | Event::Shuffled { .. } | Event::PlayerControlled { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::ExtraTurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } | Event::Shuffled { .. } | Event::PlayerControlled { .. } => false,
         }
     }
 }
@@ -496,6 +500,8 @@ impl EventMask {
     pub const TOOK_INITIATIVE: EventMask = EventMask(1 << 50);
     /// A turn began (CR 502): recorded only, for the history.
     pub const TURN_BEGAN: EventMask = EventMask(1 << 51);
+    /// An extra turn began (CR 500.7): recorded only, for the history.
+    pub const EXTRA_TURN_BEGAN: EventMask = EventMask(1 << 60);
     /// A dungeon was completed (CR 309.7): recorded only, for the history.
     pub const DUNGEON_COMPLETED: EventMask = EventMask(1 << 52);
     /// What a seat was shown, a library shuffled, a card put on the bottom at random: recorded only, for what each
@@ -539,6 +545,7 @@ impl EventMask {
             Event::Done { .. } => EventMask::DONE,
             Event::TurnEnded { .. } => EventMask::TURN_ENDED,
             Event::TurnBegan { .. } => EventMask::TURN_BEGAN,
+            Event::ExtraTurnBegan { .. } => EventMask::EXTRA_TURN_BEGAN,
             Event::DungeonCompleted { .. } => EventMask::DUNGEON_COMPLETED,
             Event::GameLost { .. } | Event::GameDrawn { .. } => EventMask::GAME_OVER,
             Event::ManaSpent { .. } => EventMask::MANA_SPENT,
