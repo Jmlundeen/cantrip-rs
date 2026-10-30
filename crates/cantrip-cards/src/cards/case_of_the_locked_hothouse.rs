@@ -24,7 +24,7 @@ pub static CARD: CardDef = CardDef {
     // 702.169b: as long as this Case is solved; CR 401.2, 305.1, 601.3), for their mana costs.
     play_rules: &[
         PlayRule::ExtraLandPlays(1),
-        solved::play_rules(&[PlayRule::LookAtLibraryTop, PlayRule::LibraryTopLands, PlayRule::LibraryTopSpells(creature_or_enchantment)]),
+        solved::play_rules(&[PlayRule::LookAtLibraryTop, PlayRule::LibraryTopLands, PlayRule::LibraryTopSpells(creature_or_enchantment, None)]),
     ],
     ..oracle::CASE_OF_THE_LOCKED_HOTHOUSE
 };

@@ -1953,7 +1953,8 @@ pub struct GrantedWay {
     /// with that keyword whatever gave it (CR 702.138b: "cast from a graveyard with an escape ability").
     pub kind: WayKind,
     /// "If you cast a spell this way, [it is replaced]" (CR 614.1a, 614.1c): the index in the granting card's
-    /// `granted_replacements` of a replacement effect about the spell cast by the way, which the core makes as the spell is
+    /// `granted_replacements` of a replacement effect about the spell cast by the way (the top-of-library permission's is
+    /// `PlayRule::LibraryTopSpells`'s second field, the same effect), which the core makes as the spell is
     /// put on the stack (CR 601.2a), controlled by the granting permanent's controller then. It is a rule of how the
     /// spell was cast, not an ability of the permanent: it applies whether or not the permanent is still there (Kess,
     /// Dissident Mage's and Lier, Disciple of the Drowned's rulings), as the definition says - "that creature enters with a
@@ -2720,7 +2721,14 @@ pub enum PlayRule {
     /// artifact and colorless spells, Traveling Chocobo's Bird spells. Lands are not played from there. The filter is asked
     /// with the permanent whose rule it is and its controller (`Asker`), so that a creature type it names is read through
     /// that permanent's words (CR 612), and the card on top.
-    LibraryTopSpells(fn(&dyn Query, &Asker, ObjectId) -> bool),
+    ///
+    /// The second field is the rule's "If you cast a [creature] spell this way, [it is replaced]" (CR 614.1a, 614.1c), as
+    /// `GrantedWay::spell_replacement` is a granted way's: the index in the permanent's card's `granted_replacements` of a
+    /// replacement effect about the spell cast by the rule, which the core makes as the spell is put on the stack (CR
+    /// 601.2a), controlled by its caster. A rule of how the spell was cast, it applies whether or not the permanent is still
+    /// there when it resolves (the owner's ruling, as for Kess, Lier and Leonardo): Mikey & Don, Party Planners' "that
+    /// creature enters with an additional +1/+1 counter on it". `None` for a rule with no such rider.
+    LibraryTopSpells(fn(&dyn Query, &Asker, ObjectId) -> bool, Option<u8>),
     /// "You may play lands from the top of your library" (CR 305.1): Case of the Locked Hothouse, solved. Bolas's Citadel's
     /// `LibraryTop` includes it.
     LibraryTopLands,

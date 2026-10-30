@@ -106,7 +106,7 @@ fn colorless(q: &dyn Query, _: &Asker, card: ObjectId) -> bool {
 static COLORLESS_FROM_TOP: CardDef = CardDef {
     name: "Morph Test Colorless From Top",
     types: TypeSet::of(&[CardType::Artifact]),
-    play_rules: &[PlayRule::LibraryTopSpells(colorless)],
+    play_rules: &[PlayRule::LibraryTopSpells(colorless, None)],
     ..CardDef::BLANK
 };
 
@@ -117,7 +117,7 @@ fn white(q: &dyn Query, _: &Asker, card: ObjectId) -> bool {
 static WHITE_FROM_TOP: CardDef = CardDef {
     name: "Morph Test White From Top",
     types: TypeSet::of(&[CardType::Artifact]),
-    play_rules: &[PlayRule::LibraryTopSpells(white)],
+    play_rules: &[PlayRule::LibraryTopSpells(white, None)],
     ..CardDef::BLANK
 };
 

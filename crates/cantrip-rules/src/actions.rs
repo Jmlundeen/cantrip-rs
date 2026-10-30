@@ -5187,7 +5187,7 @@ fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
         PlayRule::LibraryTop | PlayRule::LibraryTopLands => {
             rules.top_lands.push(Grant { object: source, ability });
         }
-        PlayRule::LibraryTopSpells(_) | PlayRule::MaximumHandSize(_) | PlayRule::LookAtLibraryTop | PlayRule::While(..) => {}
+        PlayRule::LibraryTopSpells(..) | PlayRule::MaximumHandSize(_) | PlayRule::LookAtLibraryTop | PlayRule::While(..) => {}
     });
     // "You may play an additional land this turn" (CR 305.2, 611.2c): an effect a resolved spell or ability made, added to
     // the rest - the number a player can play is the sum of everything that increases it.
@@ -6261,7 +6261,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             let by = Some(Grant { object: source, ability });
             match rule {
                 PlayRule::LibraryTop => routes.push(Route::permission(by, PlayGrant { life_for_mana_value: true, ..PlayGrant::CAST })),
-                PlayRule::LibraryTopSpells(f) => {
+                PlayRule::LibraryTopSpells(f, _) => {
                     routes.push(Route { by, allows: Allows::Top(Asker { source, controller: player, by: None, spell: false }, *f), ..Route::RULES })
                 }
                 _ => {}
@@ -6331,7 +6331,7 @@ fn through(q: &dyn Query, cards: &CardTable, player: PlayerId, card: ObjectId, b
         let asker = Asker { source: g.object, controller: player, by: None, spell: false };
         return match rule {
             PlayRule::LibraryTop => Some(Through::Route(Route::permission(by, PlayGrant { life_for_mana_value: true, ..PlayGrant::CAST }))),
-            PlayRule::LibraryTopSpells(f) => Some(Through::Route(Route { by, allows: Allows::Top(asker, *f), ..Route::RULES })),
+            PlayRule::LibraryTopSpells(f, _) => Some(Through::Route(Route { by, allows: Allows::Top(asker, *f), ..Route::RULES })),
             _ => None,
         };
     }
@@ -6910,6 +6910,21 @@ fn apply_next_spell_effects(cx: &mut Cx, player: PlayerId, spell: ObjectId) {
     }
 }
 
+/// The "if you cast a spell this way" replacement effect (CR 614.1a, 614.1c) that what a cast was made by (`g`) makes about
+/// the spell, with the player who controls it: a granted way's (`GrantedWay::spell_replacement`), controlled by the granting
+/// permanent's controller, or a top-of-library rule's (`PlayRule::LibraryTopSpells`), whose permission is only ever its
+/// caster's, controlled by `caster`. Read from the card table, so it is the one the cast was offered by even if the permanent
+/// has left while the spell was paid for.
+fn spell_replacement_by(cx: &Cx, g: Grant, caster: PlayerId) -> Option<(Grant, PlayerId, u8)> {
+    if let Some(way) = named_way(cx.s(), cx.cards(), g) {
+        return way.what.spell_replacement.map(|index| (g, way.controller, index));
+    }
+    match play_rule_at(cx.cards(), g.ability)? {
+        PlayRule::LibraryTopSpells(_, Some(index)) => Some((g, caster, *index)),
+        _ => None,
+    }
+}
+
 /// What a cast is made by, beyond the terms an effect or a permission sets (`CastTerms`): read once, as the cast begins, from
 /// the action's `Grant`s, so the cast keeps them if what gave them leaves while it is paid for (Dawnhand Dissident's ruling)
 /// and is made exactly as it was offered.
@@ -7121,15 +7136,13 @@ fn cast(
         cx.st().update_obj(spell, |o| o.marks.gains = Some(ability));
     }
     // "If you cast a spell this way, ...": the replacement effect the way's static ability makes about the spell
-    // (`GrantedWay::spell_replacement`, CR 614.1), named with the card whose way it is, and lasting as long as the spell
-    // does (CR 400.7) - whatever becomes of the permanent that gave the way, and of what it is a copy of.
-    if let Some(g) = by.by
-        && let Some(way) = named_way(cx.s(), cx.cards(), g)
-        && let Some(index) = way.what.spell_replacement
-    {
+    // (`GrantedWay::spell_replacement`, CR 614.1), or the top-of-library rule's (`PlayRule::LibraryTopSpells`, whose
+    // permission is its caster's), named with the card whose way or rule it is, and lasting as long as the spell does (CR
+    // 400.7) - whatever becomes of the permanent that gave it, and of what it is a copy of.
+    if let Some((g, controller, index)) = by.by.and_then(|g| spell_replacement_by(cx, g, player)) {
         let timestamp = cx.st().timestamp();
         let kind = EffectKind::Replacement { card: g.ability.card, index };
-        cx.st().effect_push(ContinuousEffect { source: g.object, controller: way.controller, timestamp, affected: spell, kind, duration: Duration::Indefinite });
+        cx.st().effect_push(ContinuousEffect { source: g.object, controller, timestamp, affected: spell, kind, duration: Duration::Indefinite });
         cx.state_changed();
     }
     // A permission for the card is used up by the cast (CR 400.7: the card is a new object).
@@ -11060,7 +11073,7 @@ mod tests {
     static FORGE: CardDef = CardDef {
         name: "Alternative Test Forge",
         types: TypeSet::of(&[CardType::Artifact]),
-        play_rules: &[PlayRule::LibraryTopSpells(any_spell)],
+        play_rules: &[PlayRule::LibraryTopSpells(any_spell, None)],
         ..CardDef::BLANK
     };
     static DRAGON: CardDef = CardDef {

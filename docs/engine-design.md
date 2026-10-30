@@ -1580,7 +1580,11 @@ creature enters with an additional +1/+1 counter" uses (`next_creature_counter`)
 applies whether or not the permanent is still there or still what it was (the rulings on Kess, Dissident Mage and Lier,
 Disciple of the Drowned): Leonardo, Sewer Samurai's "that creature enters with a finality counter on it" (applies to the
 spell entering from the stack), Kess's "if a spell cast this way would be put into your graveyard, exile it instead"
-(applies to the spell leaving the stack for that graveyard, resolved or countered). It is about the spell, the object
+(applies to the spell leaving the stack for that graveyard, resolved or countered). A permission to cast from the top of
+the library carries the same rider in the same way: `PlayRule::LibraryTopSpells(filter, Some(n))`, the rule's card's
+`granted_replacements[n]` made about a spell cast by that rule (and by no other rule or way), controlled by its caster -
+Mikey & Don, Party Planners' "if you cast a creature spell this way, that creature enters with an additional +1/+1 counter
+on it", which still applies once Mikey & Don has left (`spell_replacement_by`). It is about the spell, the object
 (CR 400.7): a copy of it was not cast (CR 707.10) and has none, and once the spell has left the stack, whatever it became
 is a new object the effect knows nothing of, and the effect is dropped with the other effects about objects that are gone.
 A lasting replacement effect names the card it is defined on (`EffectKind::Replacement { card, index }`, as `Prevention`

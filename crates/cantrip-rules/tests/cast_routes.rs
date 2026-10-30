@@ -128,7 +128,7 @@ static LIFE_TOP: CardDef = CardDef {
 static MANA_TOP: CardDef = CardDef {
     name: "Route Library Mana Source",
     types: TypeSet::of(&[CardType::Artifact]),
-    play_rules: &[PlayRule::LibraryTopSpells(any_top_spell)],
+    play_rules: &[PlayRule::LibraryTopSpells(any_top_spell, None)],
     ..CardDef::BLANK
 };
 

@@ -23,7 +23,7 @@ fn land_or_bird_you_control_entering(q: &dyn Query, asker: &Asker, event: &Event
 pub static CARD: CardDef = CardDef {
     // "You may look at the top card of your library any time" (CR 401.2), and "you may play lands and cast Bird spells from
     // the top of your library" (CR 305.1, 601.3).
-    play_rules: &[PlayRule::LookAtLibraryTop, PlayRule::LibraryTopLands, PlayRule::LibraryTopSpells(bird_spell)],
+    play_rules: &[PlayRule::LookAtLibraryTop, PlayRule::LibraryTopLands, PlayRule::LibraryTopSpells(bird_spell, None)],
     additional_triggers: &[land_or_bird_you_control_entering],
     ..oracle::TRAVELING_CHOCOBO
 };
