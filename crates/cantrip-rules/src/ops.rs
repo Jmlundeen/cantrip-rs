@@ -2687,6 +2687,11 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
     // it out of combat (`enter_attacking`, CR 506.3b: its controller is not the attacking player).
     let attacking = item.attacking;
     let tokens = create_tokens_worded(cx, &[(values.card, item.controller)], attacking, copy, &[], words, Some(item))?;
+    // The spell became that token (CR 707.10f), as a card's spell becomes its permanent: what the copy was cast for, which a
+    // copy copies, is found through the copy's `Copied` event (`sneak::was_cast_for_sneak`).
+    if let Some(&token) = tokens.first() {
+        cx.st().update_obj(item.object, |o| o.became = Some(token));
+    }
     if attacking {
         enter_attacking(cx, &tokens, item.subject);
     }
