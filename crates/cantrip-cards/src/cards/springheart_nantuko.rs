@@ -10,15 +10,6 @@ const COPY: Question = Question::new(
     "Make an Insect",
 );
 
-/// The 1/1 green Insect creature token it makes.
-pub static INSECT: CardDef = CardDef {
-    colors: Some(ColorSet::of(Color::Green)),
-    types: TypeSet::of(&[CardType::Creature]),
-    power: Some(1),
-    toughness: Some(1),
-    ..token!(Insect)
-};
-
 const STATICS: &[StaticDef] = &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 1>, "Enchanted creature gets +1/+1.")];
 
 /// "You may pay {1}{G} if this permanent is attached to a creature you control. If you do, create a token that's a copy
@@ -38,7 +29,7 @@ fn landfall_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         created = !g.create_token_copies_of(values, item.controller, 1)?.is_empty();
     }
     if !created {
-        tokens::create(g, item.controller, &INSECT, 1)?;
+        tokens::create(g, item.controller, &tokens::INSECT, 1)?;
     }
     Ok(())
 }
@@ -61,4 +52,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::SPRINGHEART_NANTUKO
 };
 
-pub static EXTRA: &[&CardDef] = &[&INSECT, &BESTOWED];
+pub static EXTRA: &[&CardDef] = &[&tokens::INSECT, &BESTOWED];

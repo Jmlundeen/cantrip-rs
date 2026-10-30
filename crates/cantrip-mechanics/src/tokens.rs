@@ -603,6 +603,15 @@ pub fn create_a_mutant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     Ok(())
 }
 
+/// The 1/1 green Insect creature token. Ant-Man, Colony Commander, The Astonishing Ant-Man and Springheart Nantuko make it.
+pub static INSECT: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Insect)
+};
+
 /// The 4/4 white Angel creature token with flying and vigilance. Resplendent Angel and Parhelion II make it.
 pub static ANGEL: CardDef = CardDef {
     colors: Some(ColorSet::of(Color::White)),
