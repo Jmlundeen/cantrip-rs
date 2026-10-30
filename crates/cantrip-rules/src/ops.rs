@@ -291,6 +291,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             reason,
             controller: entry.map_or(old.controller, |e| e.controller),
             tapped: entry.is_some_and(|e| e.tapped),
+            attacking: false,
             counters: [0; CounterKind::COUNT],
             counters_by: entry.map_or(old.controller, |e| e.controller),
             reveal: false,
@@ -470,6 +471,8 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     // A token or a copy of a card ceases to exist there (CR 111.7, 704.5d-e), so it is in no order anyone can ask.
     let mut binned: Vec<(PlayerId, ObjectId)> = Vec::new();
     let mut entered: Vec<ObjectId> = Vec::new();
+    // The permanents a replacement makes arrive attacking (CR 614.1c, 508.4), put into the combat once they all are.
+    let mut attacking_arrivals: Vec<ObjectId> = Vec::new();
     for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known, .. } in plans {
         let m = &m;
         let row = cx.st().last_known_push(last_known);
@@ -564,9 +567,17 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         if entering {
             entered.push(new_id);
         }
+        if entering && change.attacking {
+            attacking_arrivals.push(new_id);
+        }
         if m.entering.is_some_and(|e| e.prepared) && entering {
             become_prepared(cx, new_id);
         }
+    }
+    // A replacement that has it arrive attacking (CR 614.1c, 508.4): in the combat as it arrives, before anything of its
+    // entry is announced, and attacking what its controller chooses (CR 508.4).
+    if !attacking_arrivals.is_empty() {
+        enter_attacking_by_choice(cx, &attacking_arrivals);
     }
     if binned.len() > 1 {
         arrange_graveyards(cx, &binned);
@@ -2057,6 +2068,8 @@ fn create_tokens_onto(
     let then = crate::settle::Then::none();
     let mut events = Vec::new();
     let mut created = Vec::new();
+    // The tokens a replacement has arrive attacking (CR 614.1c, 508.4).
+    let mut attacking: Vec<ObjectId> = Vec::new();
     // CR 614.12, 101.4: tokens created together enter together. Each one's entering choices and replacements are worked
     // out before any of them is on the battlefield, so none sees another (Giada counts the Angels already there).
     let mut arriving: Vec<(ObjectId, PlayerId, Entering)> = Vec::with_capacity(tokens.len());
@@ -2112,6 +2125,7 @@ fn create_tokens_onto(
             reason: if spell.is_some() { ZoneReason::Resolve } else { ZoneReason::Created },
             controller,
             tapped: entering.tapped,
+            attacking: false,
             counters: [0; CounterKind::COUNT],
             counters_by: controller,
             reveal: false,
@@ -2153,6 +2167,9 @@ fn create_tokens_onto(
         entering.counters = counts;
         entering.counters =
             judged_entering(cx, &entering, counts.iter().any(|&n| n > 0), |cx| counters::entering(cx, id, controller, controller, counts));
+        if change.attacking {
+            attacking.push(id);
+        }
         arriving.push((id, controller, entering));
     }
     for (id, controller, entering) in arriving {
@@ -2184,6 +2201,11 @@ fn create_tokens_onto(
         events.extend(entered_attached(cx, id));
         events.extend(put);
         created.push(id);
+    }
+    // A replacement that has it arrive attacking (CR 614.1c, 508.4): in the combat as it arrives, as a permanent put there
+    // by a move is (`move_together`).
+    if !attacking.is_empty() {
+        enter_attacking_by_choice(cx, &attacking);
     }
     // What each token was as it entered (CR 603.6a, 614.12): judged once they are all there, as the permanents that enter by
     // a move are, so the history says it of tokens too.
@@ -3945,17 +3967,79 @@ pub fn enter_attacking(cx: &mut Cx, entered: &[ObjectId], defender: Target) {
     // What it is attacked as (CR 506.4e): what the permanent is now; nothing, for a player.
     let attacked_as = defender.object().map_or(TypeSet::NONE, |d| attackable_types(&cx.chars(d)));
     let mut attackers = cx.s().attackers.clone();
+    let mut changed = false;
     for &id in entered {
         if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).controller != attacking {
             continue;
         }
         let chars = cx.chars(id);
-        if chars.is(CardType::Creature) && !chars.is(CardType::Battle) {
-            attackers.push(Attacker::new(id, defender, defending, attacked_as));
+        if !chars.is(CardType::Creature) || chars.is(CardType::Battle) {
+            continue;
+        }
+        // One already in this combat as it arrived - a replacement made it attack (`ZoneChange::attacking`, CR 508.4), which
+        // could only choose a defender - attacks what this instruction says instead: it names one, and the permanent is
+        // not put onto the battlefield twice.
+        match attackers.iter().position(|a| a.id == id) {
+            Some(at) => {
+                if attackers[at].target != defender {
+                    attackers[at] = Attacker::new(id, defender, defending, attacked_as);
+                    changed = true;
+                }
+            }
+            None => {
+                attackers.push(Attacker::new(id, defender, defending, attacked_as));
+                changed = true;
+            }
         }
     }
-    if attackers.len() != cx.s().attackers.len() {
+    if changed {
         cx.st().set_attackers(attackers);
+    }
+}
+
+/// Everything `player` could attack as a creature of theirs arrives attacking with nothing named (CR 508.4): each opponent,
+/// and the planeswalkers and battles they control or protect. Exactly the defenders `enter_attacking` takes for this player
+/// (`attackable`, CR 508.4a, 506.3c). The counterpart of the shared recipe `cantrip_mechanics::combat::attack_targets`, which
+/// the rules cannot read: `cantrip-mechanics` is a test-only dependency here.
+fn attack_targets(cx: &Cx, player: PlayerId) -> Vec<Target> {
+    let state = cx.s();
+    let mut out: Vec<Target> = state.opponents(player).filter(|&p| attackable(cx, player, Target::Player(p))).map(Target::Player).collect();
+    out.extend(state.battlefield().iter().copied().filter(|&id| attackable(cx, player, Target::Object(id))).map(Target::Object));
+    out
+}
+
+/// Permanents a replacement has arrive attacking (CR 614.1c, 508.4): its "instead it enters tapped and attacking" names no
+/// defender, so each attacks what its controller chooses as it arrives - asked only when there is a choice, as the effect
+/// that names one asks (`cantrip_mechanics::combat::choose_attack_target`), and the first candidate when the question cannot
+/// be answered yet, the run going on and being replayed with the answer (`Cx::ask_rule`, as the graveyard order is). A
+/// permanent the rules keep out of combat only enters (`enter_attacking`, CR 506.3).
+fn enter_attacking_by_choice(cx: &mut Cx, entered: &[ObjectId]) {
+    for &id in entered {
+        let controller = cx.s().obj(id).controller;
+        let candidates = attack_targets(cx, controller);
+        let defender = match candidates[..] {
+            [] => continue,
+            [only] => only,
+            _ => {
+                let ask = RequestKind::ChooseTarget {
+                    label: "Choose what it attacks as it enters attacking: a player, a planeswalker or a battle.",
+                    slot_player: None,
+                    together: None,
+                    source: id,
+                    purpose: Purpose::EnterAttacking,
+                    candidates: candidates.clone(),
+                    optional: false,
+                    least: 1,
+                    count: 1,
+                    any_number: false,
+                };
+                match cx.ask_rule(controller, ask) {
+                    Ok(Some(Answer::Targets(t))) => t.first().copied().unwrap_or(candidates[0]),
+                    _ => candidates[0],
+                }
+            }
+        };
+        enter_attacking(cx, &[id], defender);
     }
 }
 

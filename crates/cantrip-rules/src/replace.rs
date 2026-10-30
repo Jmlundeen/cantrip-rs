@@ -1424,6 +1424,7 @@ mod tests {
             reason: ZoneReason::Other,
             controller: ME,
             tapped: false,
+            attacking: false,
             counters: [0; CounterKind::COUNT],
             counters_by: ME,
             reveal: false,

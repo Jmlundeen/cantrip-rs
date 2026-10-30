@@ -5,10 +5,8 @@ use cantrip_oracle as oracle;
 /// "If a creature you control would enter while you control an attacking creature, instead it enters tapped and
 /// attacking" (CR 614.1d, 508.4): the condition is judged as the permanent would arrive, on the board as it is, and the
 /// replacement is Kira's own, so it functions only while she is on the battlefield (CR 604.1) - she does not turn her own
-/// arrival tapped. The tapped part is what `ZoneChange::tapped` carries. The engine has no route for a replacement to put
-/// an arriving permanent onto the battlefield attacking: an attacker needs a defender chosen as it enters
-/// (`combat::choose_attack_target`), which only `Game::enter_attacking`, called after the permanent has arrived, takes.
-/// Scenarios/kira-nerys-firebrand-enters-tapped-and-attacking.cantrip holds the rules-correct outcome as a known bug.
+/// arrival tapped. Tapped is `ZoneChange::tapped`; attacking is `ZoneChange::attacking`, whose defender the entering
+/// creature's controller chooses as it arrives (`ops::enter_attacking_by_choice`).
 fn a_creature_of_yours_enters_while_attacking(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z)
         if z.to.is(ZoneKind::Battlefield)
@@ -17,10 +15,11 @@ fn a_creature_of_yours_enters_while_attacking(q: &dyn Query, asker: &Asker, prop
         && q.state().battlefield().iter().any(|&id| q.controller(id) == asker.controller && q.is_attacking(id))
 }
 
-/// "…instead it enters tapped" (CR 614.1c): the one part of the replacement the arrival carries.
-fn enters_tapped(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+/// "…instead it enters tapped and attacking" (CR 614.1c): both parts of the arrival the replacement carries.
+fn enters_tapped_and_attacking(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     if let Proposal::ZoneChange(z) = proposal {
         z.tapped = true;
+        z.attacking = true;
     }
 }
 
@@ -42,8 +41,8 @@ pub static CARD: CardDef = CardDef {
     replacements: &[replacement(
         ReplacementKind::ZoneChange,
         a_creature_of_yours_enters_while_attacking,
-        enters_tapped,
-        "it enters tapped while you control an attacking creature",
+        enters_tapped_and_attacking,
+        "it enters tapped and attacking while you control an attacking creature",
     )],
     ..oracle::KIRA_NERYS_FIREBRAND
 };

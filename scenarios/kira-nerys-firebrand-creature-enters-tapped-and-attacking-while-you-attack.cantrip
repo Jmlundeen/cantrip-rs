@@ -1,5 +1,6 @@
-# Known bug: the engine has no way for a replacement effect to put an arriving permanent onto the battlefield attacking
-# (CR 614.1d, 508.4): the token enters tapped, but not attacking, so the combat holds one attacker instead of two.
+# Kira Nerys, Firebrand: "If a creature you control would enter while you control an attacking creature, instead it
+# enters tapped and attacking" (CR 614.1d, 508.4). The token is put into the combat as it arrives, attacking what its
+# controller chooses (here the only thing it could attack), so the combat holds two attackers.
 # Kira is cast on turn 1 with a Mox Ruby, a Mox Pearl and a Mox Jet ({1}{R}{W}) beside an Ornithopter, which attacks on turn
 # 3. In the declare attackers step, while it is attacking, Secure the Wastes makes one Warrior token: it is a creature Bot1
 # controls, so Kira's replacement makes it enter tapped and attacking (never declared, so nothing that watches attackers

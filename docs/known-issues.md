@@ -80,7 +80,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-141](#ki-141-a-creature-type-chosen-past-the-encoders-128-tokens-makes-no-training-sample) | A creature type chosen past the encoder's 128 tokens makes no training sample | Pri-3 | Open |
 | [KI-142](#ki-142-the-ai-encoder-cannot-tell-apart-options-that-differ-only-by-their-grant-or-a-companion-from-exiling-to-pay) | The AI encoder cannot tell apart options that differ only by their grant, or a companion from exiling to pay | Pri-3 | Open |
 | [KI-143](#ki-143-a-scenario-check-right-after-an-activation-can-read-the-pool-before-its-payment-finishes) | A scenario check right after an activation can read the pool before its payment finishes | Pri-2 | Open |
-| [KI-146](#ki-146-a-replacement-effect-cannot-make-an-arriving-permanent-enter-the-battlefield-attacking) | A replacement effect cannot make an arriving permanent enter the battlefield attacking | Pri-1 | Open |
 | [KI-147](#ki-147-a-cards-own-permission-to-be-cast-from-exile-is-not-offered) | A card's own permission to be cast from exile is not offered | Pri-1 | Open |
 | [KI-144](#ki-144-mathemagics-with-an-x-of-32-or-more-draws-at-most-4294967295-cards) | Mathemagics with an X of 32 or more draws at most 4,294,967,295 cards | Pri-3 | Won't fix: beyond practical scale |
 
@@ -634,25 +633,6 @@ for Tidehollow Sculler. The rules are unaffected: the card returns when the perm
 from a stack object in the view, as `is_by_in` does.
 
 **Scenarios.** `champion-of-the-clachan-exiles-a-kithkin-from-hand-and-returns-it-when-it-leaves` (the rules side).
-
-### KI-146: A replacement effect cannot make an arriving permanent enter the battlefield attacking
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Open | engine (`cantrip-api`, `cantrip-rules`) | 2026-10-30, adding Kira Nerys, Firebrand |
-
-**Notes.** Kira Nerys, Firebrand's "If a creature you control would enter while you control an attacking creature, instead
-it enters tapped and attacking" (CR 614.1c, 508.4) is half expressible today. A `ReplacementKind::ZoneChange` effect edits
-`ZoneChange` (`cantrip-api/src/replace.rs`), which carries `tapped` but nothing about attacking, and the attacker a
-permanent that enters attacking attacks is its controller's choice as it enters (`combat::choose_attack_target`, CR 508.4),
-which only `Game::enter_attacking` makes, after the permanent has arrived. The card's replacement therefore taps the
-permanent and records no attack, so a creature or token that should join the combat stays out of it. A fix gives the entry a
-defender chosen as the permanent arrives (a field on `ZoneChange`/`Entering` carried into the entry, applied with
-`ops::enter_attacking`) so any card that says "enters tapped and attacking" as a replacement can use it.
-
-**Scenarios.**
-- [`scenarios/kira-nerys-firebrand-creature-enters-tapped-and-attacking-while-you-attack.cantrip`](../scenarios/kira-nerys-firebrand-creature-enters-tapped-and-attacking-while-you-attack.cantrip) -
-  a Warrior token made in the declare attackers step enters tapped and attacking, and the combat must hold two attackers.
 
 ### KI-147: A card's own permission to be cast from exile is not offered
 
