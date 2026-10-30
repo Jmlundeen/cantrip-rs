@@ -1,5 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::{self, this_gains_indestructible_then_tap};
+use cantrip_mechanics::greatest_power;
 use cantrip_mechanics::TAP_ANOTHER_UNTAPPED_CREATURE;
 use cantrip_oracle as oracle;
 
@@ -7,14 +8,7 @@ use cantrip_oracle as oracle;
 /// worked out once, as the ability resolves (CR 608.2h, the ruling); with no creature it is 0, and a negative greatest power
 /// gives +0/+0 (CR 107.1b).
 fn pump_by_greatest_power(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = g
-        .permanents_of(item.controller)
-        .into_iter()
-        .filter(|&id| g.chars(id).is(CardType::Creature))
-        .filter_map(|id| g.chars(id).power)
-        .max()
-        .unwrap_or(0)
-        .max(0);
+    let x = greatest_power::among_creatures_you_control(g, item.controller) as i16;
     effects::pump_creatures_you_control(g, item, x, x);
     Ok(())
 }
