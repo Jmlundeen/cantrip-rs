@@ -609,6 +609,7 @@ impl EventMask {
             Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
             Event::DoorUnlocked { .. } => EventMask::DOOR_UNLOCKED,
             Event::GaveGift { .. } => EventMask::GAVE_GIFT,
+            Event::ModesChosen { .. } => EventMask::MODES_CHOSEN,
             Event::CrimeCommitted { .. } => EventMask::CRIME,
             Event::Scried { .. } => EventMask::SCRIED,
             Event::Surveilled { .. } => EventMask::SURVEILLED,

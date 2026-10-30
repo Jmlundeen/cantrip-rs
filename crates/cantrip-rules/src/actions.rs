@@ -8491,7 +8491,13 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, ab
     match cx.ask_core(player, ask, true)? {
         Answer::Modes(chosen) => {
             let modes = chosen.iter().fold(0u32, |mask, &i| modal.with(mask, i as usize));
-            cx.record(Event::ModesChosen { player, source, ability, modes });
+            let event = Event::ModesChosen { player, source, ability, modes };
+            if modes == 0 {
+                // No mode was chosen, so this was no dilemma. Keep the announcement in history for modal-card readings.
+                cx.record(event);
+            } else {
+                cx.emit(event);
+            }
             Ok(modes)
         }
         _ => Err(Stop::Cancel),
