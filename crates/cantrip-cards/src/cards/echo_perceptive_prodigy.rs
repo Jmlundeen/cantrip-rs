@@ -1,16 +1,9 @@
 use cantrip_api::*;
+use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// "Target activated or triggered ability you control from a creature source" (CR 115.1, 113.7a): an ability on the stack
-/// (a mana ability never is, CR 605.3b) that Echo's controller controls and whose source is a creature, as the source
-/// last existed if it has left the battlefield since (its characteristics when the ability was put on the stack).
-fn your_ability_from_a_creature_source(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    let Target::Ability(serial) = t else { return false };
-    q.state()
-        .stack
-        .iter()
-        .any(|i| i.kind != StackKind::Spell && i.serial == serial && i.controller == asker.controller && q.chars(i.object).is(CardType::Creature))
-}
+/// "a creature source": the types of the source a copied ability may come from.
+const CREATURE_SOURCE: u16 = TypeSet::of(&[CardType::Creature]).0;
 
 /// "Copy target activated or triggered ability you control from a creature source. You may choose new targets for the copy."
 /// (CR 707.10, 707.10c) The copy is neither activated nor triggered; its only target no longer legal, the
@@ -26,6 +19,6 @@ pub static CARD: CardDef = CardDef {
         copy_it,
         "{1}, {T}: Copy target activated or triggered ability you control from a creature source. You may choose new targets for the copy.",
     )
-    .targets(&[target(your_ability_from_a_creature_source)])],
+    .targets(&[target(targets::your_ability_from_a_source_of_types::<CREATURE_SOURCE>)])],
     ..oracle::ECHO_PERCEPTIVE_PRODIGY
 };

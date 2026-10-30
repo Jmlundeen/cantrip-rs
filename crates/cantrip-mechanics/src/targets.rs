@@ -274,6 +274,18 @@ pub const SPELL_OR_ABILITY: TargetSpec = target(spell_or_ability_filter);
 pub fn activated_or_triggered_ability_filter(_: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Ability(_))
 }
+
+/// "Target activated or triggered ability you control from a [type] source" (CR 115.1, 113.3, 113.7a): an ability on the stack (a
+/// mana ability never is, CR 605.3b) that the asker controls and whose source has one of the card types in `TYPES`, a bitset of
+/// `CardType` positions (`TypeSet(..).0`), as the source last existed if it has left the battlefield. Echo, Perceptive Prodigy
+/// (a creature source) and Scientist Supreme of A.I.M. (an artifact source) copy one.
+pub fn your_ability_from_a_source_of_types<const TYPES: u16>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    let Target::Ability(serial) = t else { return false };
+    q.state()
+        .stack
+        .iter()
+        .any(|i| i.kind != StackKind::Spell && i.serial == serial && i.controller == asker.controller && q.chars(i.object).types.0 & TYPES != 0)
+}
 pub const ACTIVATED_OR_TRIGGERED_ABILITY: TargetSpec = target(activated_or_triggered_ability_filter);
 
 /// "Target spell or ability with a single target" (CR 115.1, 115.7a): exactly one target across every slot, counted with
