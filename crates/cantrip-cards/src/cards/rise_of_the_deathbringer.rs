@@ -1,20 +1,13 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::pump_all_creatures;
+use cantrip_mechanics::greatest_power;
 use cantrip_oracle as oracle;
 
 /// "Draw cards equal to the greatest power among creatures you control. You lose life equal to the number of cards drawn
 /// this way." The greatest power is read as the spell resolves (CR 608.2h), negative powers counting as nothing, and the
 /// life lost is only for the cards actually drawn (CR 121.1), so a library with fewer cards draws fewer.
 fn draw_for_greatest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let greatest = g
-        .permanents_of(item.controller)
-        .into_iter()
-        .map(|id| g.chars(id))
-        .filter(|c| c.is(CardType::Creature))
-        .map(|c| c.power.unwrap_or(0))
-        .max()
-        .unwrap_or(0)
-        .max(0) as u32;
+    let greatest = greatest_power::among_creatures_you_control(g, item.controller) as u32;
     let before = g.history().drawn(item.controller);
     g.draw(item.controller, greatest);
     let drawn = g.history().drawn(item.controller) - before;
