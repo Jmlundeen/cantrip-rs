@@ -1,0 +1,36 @@
+# Jake gains life for each landfall trigger; only the second resolution that turn investigates (CR 603.2h, 701.16).
+# Jake Sisko, War Correspondent {1}{G}: Legendary Creature — Human Citizen
+#   Landfall — Whenever a land you control enters, you gain 1 life. If this is the second time this ability has resolved this turn, investigate. (Create a Clue token. It's an artifact with "{2}, Sacrifice this token: Draw a card.")
+# A Fabled Passage fetches a Forest after entering, so landfall resolves twice this turn.
+
+[Bot1 Deck]
+Jake Sisko, War Correspondent
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Fabled Passage
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Jake Sisko, War Correspondent.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Clue Token.Token = true
+Bot1.Battlefield.Count = 7
