@@ -1529,7 +1529,12 @@ cost). Nothing is re-derived and no permission is searched for again, so what th
 **The history records provenance.** `Cast::by` (read with `Cast::granted_by()`) and `Event::LandPlayed { land, player, way, granted_by }` keep what
 each cast and land play was made by, so "once during each of your turns" is a history question
 (`cantrip_mechanics::history::permission_used_this_turn`, which Lurrus and Serra Paragon share) and "if you cast it this
-way" can be one. Riders that outlive the cast are attached at cast from the action's grant (Serra Paragon's "it gains", a
+way" can be one. A cast paid for by an alternative cost another object gives (`paid_by`, a `SpellAlternative`) has it
+recorded too, as `Event::PaidAlternative { spell, by }` just before its `Cast` - an event of its own rather than a field of
+`Cast`, so the history's records stay small, and filed under `EventMask::CAST` - so the same question answers "once during
+each of your turns, you may cast ... from your hand without paying its mana cost" (Zaffai and the Tempests; Vision,
+Spectral Synthezoid; One with the Multiverse, whose casts from a library's top are permitted by one of its abilities and
+paid for by another, both recorded). Riders that outlive the cast are attached at cast from the action's grant (Serra Paragon's "it gains", a
 way's flashback). An activation is the same: `AbilityActivated { by }` records the object that gave the source the ability,
 where another did. The layers know the giving card of an ability (its `AbilityRef`), not the giving object, so
 `layers::ability_givers` works the object's characteristics out again watching each entry of layer 6 that puts an ability on

@@ -6808,7 +6808,15 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 exile_instead: route.terms.exile_instead,
                 ..CastTerms::default()
             };
-            let by = CastBy { by: action.granted_by, way, additional: route.additional, life_for_mana_value: route.life(), alternative, flash_alternative };
+            let by = CastBy {
+                by: action.granted_by,
+                way,
+                additional: route.additional,
+                life_for_mana_value: route.life(),
+                alternative,
+                paid_by: paid_by.map(|a| a.grant),
+                flash_alternative,
+            };
             cast(cx, player, source, action.index, &action.targets, terms, by, false)?
         }
         ActionKind::ActivateAbility if action.index >= PLAYER_MANA_ABILITY => {
@@ -6911,6 +6919,8 @@ struct CastBy {
     life_for_mana_value: bool,
     /// What an alternative cost another object gives has paid rather than the mana cost (CR 118.9, `ActionOption::paid_by`).
     alternative: Option<Cost>,
+    /// The static ability that gave that alternative cost, recorded with the cast (`Event::PaidAlternative`).
+    paid_by: Option<Grant>,
     /// That alternative cost, where it lets the spell be cast as though it had flash (Primal Prayers): a permission of its own
     /// to cast it at a time a sorcery couldn't have been cast (CR 307.5).
     flash_alternative: Option<Grant>,
@@ -6918,7 +6928,7 @@ struct CastBy {
 
 impl Default for CastBy {
     fn default() -> CastBy {
-        CastBy { by: None, way: None, additional: Cost::NONE, life_for_mana_value: false, alternative: None, flash_alternative: None }
+        CastBy { by: None, way: None, additional: Cost::NONE, life_for_mana_value: false, alternative: None, paid_by: None, flash_alternative: None }
     }
 }
 
@@ -7651,6 +7661,9 @@ fn cast(
         let item = cx.s().stack[at];
         cx.st().stack_set(at, StackItem { cast_known: known, ..item });
     }
+    if let Some(by) = by.paid_by {
+        cx.record(Event::PaidAlternative { spell, by });
+    }
     cx.record(Event::Cast(Cast {
         spell,
         player,
@@ -8015,6 +8028,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
     let whole = cx.card(cx.s().obj(card).card);
     let face = cast_face(whole, way);
     let mut alternative: Option<Cost> = None;
+    let mut paid_by: Option<Grant> = None;
     if pays_mana_cost && !terms.flashback {
         // The card itself and the face-down spell its morph or disguise would cast are judged apart (CR 601.3, 708.4): a ban
         // on the one need not be on the other.
@@ -8098,6 +8112,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
         let (_, index, given) = choices[chosen];
         way = index;
         alternative = given.map(|a| a.what.cost.cost());
+        paid_by = given.map(|a| a.grant);
     } else if pays_mana_cost && !face.has_cost {
         return Ok(false);
     }
@@ -8105,7 +8120,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
     let log_mark = cx.g.log.len();
     // CR 707.12: it is a copy of the card that is cast, and the card stays where it is. A cast given up reverts the copy too.
     let card = if terms.copy { ops::copy_card(cx, card, player) } else { card };
-    let by = CastBy { alternative, ..CastBy::default() };
+    let by = CastBy { alternative, paid_by, ..CastBy::default() };
     match cast(cx, player, card, way, &[], terms, by, true) {
         Ok(()) => Ok(true),
         Err(Stop::Cancel) => {

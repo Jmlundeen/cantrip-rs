@@ -48,6 +48,8 @@ mod face_down_reveal_tests;
 #[cfg(test)]
 mod prototype_tests;
 #[cfg(test)]
+mod paid_alternative_tests;
+#[cfg(test)]
 mod spell_replacement_tests;
 #[cfg(test)]
 mod assist_tests;

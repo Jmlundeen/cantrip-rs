@@ -305,15 +305,18 @@ pub fn scried_or_surveilled_this_turn(q: &dyn Query, player: PlayerId) -> bool {
         .any(|r| matches!(r.event, Event::Scried { player: p, .. } | Event::Surveilled { player: p, .. } if p == player))
 }
 
-/// Whether the permission `source` gives has been used this turn: a spell cast or a land played by it, as the history
-/// records what each was made by (`Cast::granted_by`, `Event::LandPlayed`). "Once during each of your turns, you may cast
-/// ... from your graveyard" (CR 601.3): Lurrus of the Dream-Den, and Serra Paragon, whose land plays share the once. It is
-/// that object's own: another permanent with the same ability is another permission, and one that left and came back is a
-/// new object (CR 400.7).
+/// Whether the permission or the alternative cost `source` gives has been used this turn: a spell cast or a land played by
+/// it, or a spell cast for it, as the history records what each was made by and paid with (`Cast::granted_by`,
+/// `Event::LandPlayed`, `Event::PaidAlternative`). "Once during each of your turns, you may cast ... from your graveyard"
+/// (CR 601.3): Lurrus of the Dream-Den, and Serra Paragon, whose land plays share the once; "once during each of your
+/// turns, you may cast ... from your hand without paying its mana cost" (CR 118.9): Zaffai and the Tempests, Vision,
+/// Spectral Synthezoid. It is that object's own: another permanent with the same ability is another permission, and one
+/// that left and came back is a new object (CR 400.7).
 pub fn permission_used_this_turn(q: &dyn Query, source: ObjectId) -> bool {
     q.history().this_turn().iter().any(|r| match r.event {
         Event::Cast(c) => c.granted_by().is_some_and(|g| g.object == source),
         Event::LandPlayed { granted_by, .. } => granted_by.some().is_some_and(|g| g.object == source),
+        Event::PaidAlternative { by, .. } => by.object == source,
         _ => false,
     })
 }

@@ -207,6 +207,14 @@ pub enum Event {
     /// A spell's characteristics as it became cast (CR 601.2i), recorded just before its `SpellCast`: what "the second
     /// creature spell you cast this turn" reads.
     Cast(Cast),
+    /// The alternative cost another object gives that a spell was cast for rather than its mana cost (CR 118.9, 601.2b):
+    /// `by` the static ability that gave it (Omniscience's "you may cast spells from your hand without paying their mana
+    /// costs", Jodah, Archmage Eternal's {W}{U}{B}{R}{G}), recorded with the spell's `Cast`, just before it, and only where
+    /// such a cost paid for it. What let the card be cast from where it was is the `Cast`'s own `by`: a spell cast from
+    /// the top of a library may have both (One with the Multiverse). "Once during each of your turns, you may cast ...
+    /// without paying its mana cost" asks it (Zaffai and the Tempests; Vision, Spectral Synthezoid). Kept out of `Cast`,
+    /// which holds what every cast has, so that the history's records stay small (`an_event_stays_small`).
+    PaidAlternative { spell: ObjectId, by: Grant },
     /// A land was played (CR 305.1, a special action, CR 116.2a): `land` is the permanent it became, `player` who played it,
     /// `way` the face it was played as (0 the card itself, `WAY_BACK_FACE` a modal double-faced card's back face, CR
     /// 712.12), and `granted_by` what let it be played from where it was, if anything beyond the rules did
@@ -374,6 +382,7 @@ impl Event {
         match *self {
             Event::SpellCast { spell, .. } | Event::Countered { spell } => spell == object,
             Event::Cast(c) => c.spell == object,
+            Event::PaidAlternative { spell, .. } => spell == object,
             Event::LandPlayed { land, .. } => land == object,
             Event::Copied { copy, original, .. } => copy == object || original == object,
             Event::BecameTarget { target, by, .. } => by == object || target == Target::Object(object),
@@ -444,6 +453,7 @@ impl EventMask {
     pub const REVEALED: EventMask = EventMask(1 << 17);
     pub const COUNTERED: EventMask = EventMask(1 << 18);
     pub const ABILITY_ACTIVATED: EventMask = EventMask(1 << 19);
+    /// A cast's records: its `Cast`, and the `PaidAlternative` it was paid with, if any.
     pub const CAST: EventMask = EventMask(1 << 20);
     pub const RESOLVED: EventMask = EventMask(1 << 21);
     pub const TRIGGERED: EventMask = EventMask(1 << 22);
@@ -511,7 +521,8 @@ impl EventMask {
             Event::Countered { .. } => EventMask::COUNTERED,
             Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
             Event::CountersPut { .. } => EventMask::COUNTERS,
-            Event::Cast(_) => EventMask::CAST,
+            // The alternative cost a cast was paid with is part of the cast's record.
+            Event::Cast(_) | Event::PaidAlternative { .. } => EventMask::CAST,
             Event::LandPlayed { .. } => EventMask::LAND_PLAYED,
             Event::Resolved { .. } => EventMask::RESOLVED,
             Event::Triggered { .. } => EventMask::TRIGGERED,
