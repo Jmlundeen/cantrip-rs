@@ -24,6 +24,10 @@ pub type TriggerMatch = fn(&dyn Query, ObjectId, &Event) -> Option<Fired>;
 /// its source now and wherever the source has gone. Any matcher a delayed ability can use that says "you" is written so.
 pub type AskedMatch = fn(&dyn Query, &Asker, &Event) -> Option<Fired>;
 
+/// The objects a trigger carries to its resolution (`Query::event_objects`), found as it triggers from the trigger event's
+/// subject (`Fired::subject`): "those creatures" of a cast trigger, fixed at the cast (CR 603.2, 608.2h).
+pub type TriggerMembers = fn(&dyn Query, Target) -> Vec<ObjectId>;
+
 /// What a triggered ability carries of the event that triggered it.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub struct Fired {
@@ -1471,6 +1475,7 @@ impl TriggeredDef {
         mana_yield: TriggeredMana::Unstated,
         sums_per_subject: false,
         triggers_each_turn: 0,
+        members_of: None,
         counted_by_amount: false,
         chapter: 0,
         state: None,
@@ -1574,6 +1579,10 @@ pub struct TriggeredDef {
     /// "This ability triggers only N times each turn" (no numbered rule; CR 603.2h is "do this only once each turn"): 0 for no limit. A triggering that would exceed it
     /// does not happen, and one that happens uses one up.
     pub triggers_each_turn: u8,
+    /// The objects the ability is about, found as it triggers (`TriggerMembers`) and read back by the resolving ability with
+    /// `Query::event_objects`, whichever way it triggered: as `once_per_batch` carries a batch's subjects, for an ability whose
+    /// objects are not events' subjects.
+    pub members_of: Option<TriggerMembers>,
     /// "Choose up to that many target ...", that many being the amount the trigger event carried (`Fired::data[0]`: the life gained):
     /// a `TargetSpec::COUNTED` bound reads it as the ability is put on the stack (CR 603.3d, 601.2c).
     pub counted_by_amount: bool,

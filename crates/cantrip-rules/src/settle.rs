@@ -1538,6 +1538,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             if n == 0 && !members.is_empty() {
                 trigger.members = cx.st().members_push(&members);
             }
+            if let Some(members_of) = def.members_of {
+                let objects = members_of(&*cx, trigger.subject);
+                trigger.members = cx.st().members_push(&objects);
+            }
             cx.st().trigger_push(trigger);
         }
     }

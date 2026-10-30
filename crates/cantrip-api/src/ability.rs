@@ -700,6 +700,12 @@ impl AbilityDef {
         AbilityDef::Triggered(TriggeredDef { triggers_each_turn: n, ..triggered_def(self, "only a triggered ability triggers") })
     }
 
+    /// The objects the ability is about, fixed as it triggers from the event's subject and read back as it resolves with
+    /// `Query::event_objects` (`TriggeredDef::members_of`).
+    pub const fn members_of(self, f: TriggerMembers) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { members_of: Some(f), ..triggered_def(self, "only a triggered ability carries members") })
+    }
+
     /// "Up to that many target ..." where that many is the amount of the event that triggered it, as the life gained or the damage
     /// dealt: a `TargetSpec::COUNTED` bound reads it as the ability is put on the stack (CR 603.3d, 601.2c).
     pub const fn counted_by_amount(self) -> AbilityDef {
