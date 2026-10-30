@@ -5,8 +5,10 @@ use cantrip_oracle as oracle;
 /// "Target creature gets +1/+0 until end of turn and can't be blocked this turn." (CR 611.2a, 509.1b). Both halves act on the
 /// same target: nothing if it is no longer a legal target as the spell resolves (CR 608.2b).
 fn pump_and_unblockable(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    effects::target_creature_gets::<1, 0>(g, item)?;
-    effects::target_creature_cant_be_blocked_this_turn(g, item)
+    g.one_instruction(&mut |g| {
+        effects::target_creature_gets::<1, 0>(g, item)?;
+        effects::target_creature_cant_be_blocked_this_turn(g, item)
+    })
 }
 
 /// "Surveil 2." (CR 701.25a).
