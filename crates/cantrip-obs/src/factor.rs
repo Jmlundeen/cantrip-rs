@@ -813,6 +813,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             requirements,
             most,
             max_attackers,
+            barred,
             ..
         } => {
             // A defender at its cap takes no more attackers (CR 508.1c). A declaration obeys `most` requirements (CR
@@ -829,7 +830,9 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                     .find(|r| r.0 == c && r.1 == d)
                     .map_or(0, |r| r.2)
             };
-            let best = |c: Ref| defenders.iter().map(|&d| gain(c, d)).max().unwrap_or(0);
+            // An attack a restriction forbids (CR 508.1c) is never offered, and obeys nothing.
+            let open = |c: Ref, d: Ref| !barred.contains(&(c, d));
+            let best = |c: Ref| defenders.iter().filter(|&&d| open(c, d)).map(|&d| gain(c, d)).max().unwrap_or(0);
             let mut rest: u32 = eligible.iter().map(|&c| best(c)).sum();
             let mut obeyed = 0u32;
             let mut attacking = vec![0usize; defenders.len()];
@@ -842,7 +845,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                     let room = cap(i) == u8::MAX || attacking[i] < usize::from(cap(i));
                     step.push(
                         Token::of(Tok::Attack, c, d, 0),
-                        room && obeyed + gain(c, d) + rest >= *most,
+                        room && open(c, d) && obeyed + gain(c, d) + rest >= *most,
                     );
                 }
                 if !step.mask.iter().any(|&m| m) {
@@ -1561,6 +1564,7 @@ mod tests {
             costs: vec![],
             can_pay: 0,
             max_attackers: vec![u8::MAX, u8::MAX],
+            barred: vec![],
         });
         let mut m = Machine::new(&a, &[]);
         m.choose_token(Token::on(Tok::Stay, o(1)));
@@ -1570,6 +1574,26 @@ mod tests {
             m.answer(),
             Some(&FactoredAnswer::Attack(vec![(o(2), o(9))]))
         );
+    }
+
+    #[test]
+    fn attacks_mask_a_forbidden_attack_and_a_requirement_counts_only_the_attacks_left() {
+        // Creature 1 may not attack player 1 (CR 508.1c: "creatures with flying can't attack you", Storm, Windrider) and
+        // must attack if able (CR 508.1d): the planeswalker is its one attack, and it may not stay home.
+        let a = ask(AskKind::DeclareAttackers {
+            eligible: vec![o(1)],
+            defenders: vec![Ref::Player(1), o(9)],
+            requirements: vec![(o(1), o(9), 1)],
+            most: 1,
+            costs: vec![],
+            can_pay: 0,
+            max_attackers: vec![u8::MAX, u8::MAX],
+            barred: vec![(o(1), Ref::Player(1))],
+        });
+        let m = Machine::new(&a, &[]);
+        assert!(!legal(&m, Token::of(Tok::Attack, o(1), Ref::Player(1), 0)));
+        assert!(!legal(&m, Token::on(Tok::Stay, o(1))));
+        assert!(legal(&m, Token::of(Tok::Attack, o(1), o(9), 0)));
     }
 
     #[test]
@@ -1583,6 +1607,7 @@ mod tests {
             costs: vec![],
             can_pay: 0,
             max_attackers: vec![1, 1],
+            barred: vec![],
         });
         let mut m = Machine::new(&a, &[]);
         m.choose_token(Token::of(Tok::Attack, o(1), Ref::Player(1), 0));
@@ -1607,6 +1632,7 @@ mod tests {
             costs: vec![],
             can_pay: 0,
             max_attackers: vec![u8::MAX, 1],
+            barred: vec![],
         });
         assert!(!legal(&Machine::new(&open, &[]), Token::on(Tok::Stay, o(3))));
         // Where attacking that player costs something (Ghostly Prison), the requirement is not to pay (CR 508.1d): it may.
@@ -1619,6 +1645,7 @@ mod tests {
             costs: vec![(o(3), Ref::Player(1), 2)],
             can_pay: 0,
             max_attackers: vec![u8::MAX],
+            barred: vec![],
         });
         assert!(legal(&Machine::new(&taxed, &[]), Token::on(Tok::Stay, o(3))));
         round_trip(&taxed, &FactoredAnswer::Attack(vec![(o(3), Ref::Player(1))]));
@@ -1640,6 +1667,7 @@ mod tests {
             costs: vec![],
             can_pay: 0,
             max_attackers: vec![u8::MAX; 3],
+            barred: vec![],
         });
         let m = Machine::new(&goaded, &[]);
         assert!(!legal(&m, Token::on(Tok::Stay, o(1))));
@@ -1654,6 +1682,7 @@ mod tests {
             costs: vec![],
             can_pay: 0,
             max_attackers: vec![u8::MAX],
+            barred: vec![],
         });
         round_trip(&gone, &FactoredAnswer::Attack(vec![]));
         // One creature may make up for another: one paying to obey two leaves the other free to stay home.
@@ -1669,6 +1698,7 @@ mod tests {
             costs: vec![(o(2), o(9), 3)],
             can_pay: 3,
             max_attackers: vec![u8::MAX; 2],
+            barred: vec![],
         });
         let m = walk(&paid, &[Token::on(Tok::Stay, o(1))]);
         assert!(!legal(&m, Token::on(Tok::Stay, o(2))));

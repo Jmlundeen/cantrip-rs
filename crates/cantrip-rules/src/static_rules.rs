@@ -490,14 +490,55 @@ pub fn activation_barred(cx: &Cx, forbidders: &[ObjectId], source: ObjectId, def
     })
 }
 
-/// Whether the static abilities of the permanents on the battlefield let `creature` attack (CR 508.1c): each attack rule of
-/// each permanent that has not lost its abilities (CR 613.1f), asked of the creature with the permanent as its source
-/// ("this creature can't attack unless ...", Patchwork Beastie).
-pub fn attack_rules_allow(q: &dyn Query, cards: &CardTable, creature: ObjectId) -> bool {
-    q.state().battlefield().iter().all(|&id| {
-        let card = cards.current(q.state().obj(id));
-        !cards.attack_rules[card.0 as usize] || q.lost_all_abilities(id) || cards.get(card).attack_rules.iter().all(|rule| rule(q, id, creature))
-    })
+/// The permanents on the battlefield with a static ability that restricts attacking and their abilities (CR 508.1c, 613.1f;
+/// `CardDef::attack_rules`), each with the `Asker` its rules are asked with. Nearly every board has none.
+fn attack_restrictors(q: &dyn Query, cards: &CardTable) -> Vec<(Asker, &'static CardDef)> {
+    q.state()
+        .battlefield()
+        .iter()
+        .filter_map(|&id| {
+            let obj = q.state().obj(id);
+            let card = cards.current(obj);
+            (cards.attack_rules[card.0 as usize] && !q.lost_all_abilities(id))
+                .then(|| (Asker { source: id, controller: obj.controller, by: None, spell: false }, cards.get(card)))
+        })
+        .collect()
+}
+
+/// Whether every restriction of `restrictors` lets `creature` attack `at` (CR 508.1c).
+fn restrictors_allow(q: &dyn Query, restrictors: &[(Asker, &'static CardDef)], creature: ObjectId, at: Target) -> bool {
+    restrictors.iter().all(|(asker, def)| def.attack_rules.iter().all(|rule| rule(q, asker, creature, at)))
+}
+
+/// What the static abilities of the permanents on the battlefield forbid `creatures` to attack among `targets` (CR 508.1c):
+/// each attack some attack rule of a permanent that has not lost its abilities (CR 613.1f) says no to, asked with that
+/// permanent's `Asker` ("this creature can't attack unless ...", Patchwork Beastie; "creatures with flying can't attack
+/// you", Storm, Windrider). A creature none of whose attacks is left can't attack at all.
+pub fn attacks_barred(q: &dyn Query, cards: &CardTable, creatures: &[ObjectId], targets: &[Target]) -> Vec<(ObjectId, Target)> {
+    let restrictors = attack_restrictors(q, cards);
+    if restrictors.is_empty() {
+        return Vec::new();
+    }
+    let mut barred = Vec::new();
+    for &creature in creatures {
+        for &at in targets {
+            if !restrictors_allow(q, &restrictors, creature, at) {
+                barred.push((creature, at));
+            }
+        }
+    }
+    barred
+}
+
+/// Whether the static abilities of the permanents on the battlefield let `creature` attack any of `targets` (CR 508.1c),
+/// or `targets` is empty; the targets are worked out only where some permanent restricts attacking.
+pub fn attack_rules_allow_any(q: &dyn Query, cards: &CardTable, creature: ObjectId, targets: impl FnOnce() -> Vec<Target>) -> bool {
+    let restrictors = attack_restrictors(q, cards);
+    if restrictors.is_empty() {
+        return true;
+    }
+    let targets = targets();
+    targets.is_empty() || targets.iter().any(|&at| restrictors_allow(q, &restrictors, creature, at))
 }
 
 /// The requirements to block that the static abilities of the permanents on the battlefield with their abilities (CR 613.1f)

@@ -14,8 +14,8 @@ fn turtle(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 /// "Enchanted creature can't attack" (CR 508.1c): asked of each creature that could be declared an attacker, with this Aura as
 /// the source. The Aura keeps its own ability whatever the creature loses.
-fn enchanted_creature_cant_attack(q: &dyn Query, source: ObjectId, attacker: ObjectId) -> bool {
-    q.obj(source).attached_to != Some(attacker)
+fn enchanted_creature_cant_attack(q: &dyn Query, asker: &Asker, attacker: ObjectId, _: Target) -> bool {
+    q.obj(asker.source).attached_to != Some(attacker)
 }
 
 pub static CARD: CardDef = CardDef {

@@ -16,6 +16,8 @@ mod attack_effect_tests;
 #[cfg(test)]
 mod attack_limit_tests;
 #[cfg(test)]
+mod attack_restriction_tests;
+#[cfg(test)]
 mod attack_option_tests;
 #[cfg(test)]
 mod attacking_tokens_tests;
@@ -981,10 +983,12 @@ impl Game {
         static_rules::may_attack_despite_defender(self, self.cards, creature)
     }
 
-    /// Whether the static abilities on the battlefield let `creature` attack (CR 508.1c): "this creature can't attack unless
-    /// ..." (Patchwork Beastie). A resolved "can't attack" effect is asked of the effects.
+    /// Whether the static abilities on the battlefield leave `creature` something to attack were its controller attacking
+    /// now (CR 508.1c): "this creature can't attack unless ..." (Patchwork Beastie) forbids every attack, "creatures with
+    /// flying can't attack you" (Storm, Windrider) only one on that player. A resolved "can't attack" effect is asked of
+    /// the effects.
     pub fn attack_rules_allow(&self, creature: ObjectId) -> bool {
-        static_rules::attack_rules_allow(self, self.cards, creature)
+        turn::attack_rules_allow(self, self.cards, creature)
     }
 
     /// The sources of the ordinary mana in `player`'s pool that a rule tells apart from other mana (CR 106.3): mana the player

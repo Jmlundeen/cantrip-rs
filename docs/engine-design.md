@@ -2336,19 +2336,35 @@ its source's words (CR 612.2: Lord of Atlantis with Island changed to Swamp gran
 printed landwalk follows a text change of its land type in layer 3 (Magical Hack's "swampwalk" to "plainswalk" on Bog
 Wraith). Another kind of landwalk (nonbasic, snow) is another keyword.
 
-### Can't attack unless
+### Can't attack unless, and can't attack you
 
-A static ability that keeps a creature from attacking (CR 508.1c), "this creature can't attack unless ...", is a
-`CardDef::attack_rules` entry (`AttackRule`, the creature asked with the permanent as its source), the counterpart of
-`block_rules` (CR 509.1b), which "can't block unless ..." is. `static_rules::attack_rules_allow` asks the permanents on the
-battlefield that have one and have not lost their abilities (CR 613.1f), only when some card in the table has one; a creature
-it refuses is not offered as an attacker (`turn::declare_attackers`), so no seat can declare it, and the host lists "Can't
-attack." with its granted abilities while that holds (nothing says "can't block": a block rule is asked of a pair, and the
-blockers question offers only the pairs it allows). It is judged as attackers are declared: an attacking creature whose
-condition fails later stays attacking (CR 506.4, Patchwork Beastie's ruling). Patchwork Beastie's delirium; Sea Serpent's and
-Dandân's "unless defending player controls an Island" are the same rule in a duel. Not built, as no card in content needs it: a
-rule that refuses some of one creature's attacks and not others (the prompt's `Forbidden` pairs, which the clients already
-read, are never filled).
+A static ability that keeps a creature from attacking (CR 508.1c) - "this creature can't attack unless ...", or "can't
+attack" a given player, planeswalker or battle - is a `CardDef::attack_rules` entry (`AttackRule`, `fn(q, asker, creature,
+at)`), the counterpart of `block_rules` (CR 509.1b), which "can't block unless ..." is and which is asked of a pair the same
+way. It is asked of each attack: the creature and each player, planeswalker or battle it could attack, with the `Asker` of
+the permanent that has it, so "you" is `asker.controller` as it is for an attack cost (`AttackCostRule`) or cap
+(`AttackLimitRule`). A rule that does not care what is attacked ignores `at` (Patchwork Beastie's delirium, Moat, Ensnaring
+Bridge; Sea Serpent's and Dandân's "unless defending player controls an Island" too, in a duel); one that does names it:
+Storm, Windrider's "creatures with flying can't attack you" and Blazing Archon's "creatures can't attack you" refuse an attack
+on their controller and leave that player's planeswalkers and battles open (CR 506.2, 508.1b), Sandwurm Convergence's and the
+Vows' "... can't attack you or planeswalkers you control" refuse both
+(`cantrip_mechanics::statics::attacks_you_or_your_planeswalker`). `static_rules::attacks_barred` asks the permanents on the
+battlefield that have one and have not lost their abilities (CR 613.1f) - collected once, and nothing more is done on a board
+with none - of each eligible creature and each target, as attackers are declared (`turn::declare_attackers`). A creature
+refused every attack is not offered as an attacker, so no seat can declare it, and the host lists "Can't attack." with its
+granted abilities while that holds (`Game::attack_rules_allow`, over what its controller could attack now). The rest are
+`AttackRules::barred`, the attacks one creature is forbidden: `judge` refuses a declaration with one (508.1c), an attack
+forbidden obeys no requirement, so the most a declaration must obey (508.1d) counts only the attacks left - a goaded flier
+under Storm attacks Storm's controller's planeswalker, and must where it can - and `addable`, `solve` and the assignment
+under caps never offer or choose one; the brute-force tests in `cantrip_state::attacks` check all of it against every
+declaration there is, with and without forbidden attacks. The host fills the prompt's `Forbidden` pairs with them, which the
+clients already read (`AttacksFor`, the tactical bot, "Attack with all"), and the AI's ask carries them (`barred`) to mask
+those attacks. It is judged as attackers are declared: an attacking creature whose condition fails later, or that gains
+flying, stays attacking what it attacks (CR 506.4, Patchwork Beastie's ruling). Not built, as no implemented card needs it
+yet: a resolved effect that forbids one attack ("until your next turn, creatures can't attack you", Chronomantic Escape),
+which would be an `EffectKind` read beside `CantAttack` into the same `barred`. The benchmark, three runs alternating with origin/main on a shared machine (2026-10-29): 15.10, 14.83, 14.73 us per
+decision after against 14.39, 15.32, 14.49 us before - lost in the noise, as nothing new runs while no permanent restricts
+attacking.
 
 ### Attacking as though it didn't have defender
 

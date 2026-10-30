@@ -229,10 +229,20 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
         RequestKind::DeclareAttackers { requirements, players, .. } if requirements.most > 0 && !players.is_empty() => {
             Answer::Attack(requirements.suggested.clone())
         }
-        RequestKind::DeclareAttackers { eligible, players, .. } => {
+        RequestKind::DeclareAttackers { eligible, players, requirements, .. } => {
             let n = random.below(eligible.len() + 1);
             let attackers = random.some(eligible, n);
-            Answer::Attack(attackers.into_iter().map(|a| (a, Target::Player(players[random.below(players.len())]))).collect())
+            // A player a restriction forbids the creature to attack (CR 508.1c) is not chosen; a creature forbidden every
+            // player stays home.
+            Answer::Attack(
+                attackers
+                    .into_iter()
+                    .filter_map(|a| {
+                        let open: Vec<PlayerId> = players.iter().copied().filter(|&p| !requirements.bars(a, Target::Player(p))).collect();
+                        (!open.is_empty()).then(|| (a, Target::Player(open[random.below(open.len())])))
+                    })
+                    .collect(),
+            )
         }
         RequestKind::AssignCombatDamage { divisions } => Answer::Shares(DamageDivision::suggested_shares(divisions)),
         // A declaration an effect makes requirements of (CR 509.1c): the engine's own, which obeys them.

@@ -36,12 +36,16 @@ pub struct RequiredAttack {
 }
 
 /// The rules of a declaration of attackers past which attacks are allowed (CR 508.1c-d), held in the question so the
-/// game-log tree moves through them: the requirements; the most creatures that may attack each player, planeswalker or
-/// battle, where something caps it; the most of them any declaration that obeys every restriction obeys without paying a
+/// game-log tree moves through them: the requirements; the attacks a restriction forbids one creature to make; the most
+/// creatures that may attack each player, planeswalker or battle, where something caps it; the most of them any declaration that obeys every restriction obeys without paying a
 /// cost, which the declaration must obey too; and one such declaration, the engine's suggestion.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct AttackRules {
     pub required: Vec<RequiredAttack>,
+    /// The attacks of an eligible creature at a player, planeswalker or battle it may otherwise attack that a restriction
+    /// forbids (CR 508.1c): "creatures with flying can't attack you" (Storm, Windrider) bars a flier's attack on that player
+    /// and no other. A creature forbidden every attack is not eligible at all.
+    pub barred: Vec<(ObjectId, Target)>,
     /// The most creatures that may attack each capped player, planeswalker or battle (CR 508.1c), one entry each.
     pub limits: Vec<(Target, u32)>,
     pub most: u32,
@@ -76,6 +80,11 @@ pub struct AttackIssue {
 }
 
 impl AttackRules {
+    /// Whether a restriction forbids `attacker` to attack `at` (CR 508.1c).
+    pub fn bars(&self, attacker: ObjectId, at: Target) -> bool {
+        self.barred.contains(&(attacker, at))
+    }
+
     /// Whether `attacker` attacking `at` obeys `r`.
     pub fn obeys(r: &RequiredAttack, attacker: ObjectId, at: Target) -> bool {
         r.attacker == attacker
@@ -86,7 +95,11 @@ impl AttackRules {
             }
     }
 
+    /// How many requirements `attacker` attacking `at` obeys: none where that attack is forbidden (CR 508.1c-d).
     fn gain(&self, attacker: ObjectId, at: Target) -> u32 {
+        if self.bars(attacker, at) {
+            return 0;
+        }
         count_u32(self.required.iter().filter(|r| Self::obeys(r, attacker, at)).count())
     }
 
@@ -106,7 +119,8 @@ impl AttackRules {
     }
 
     /// What each of `creatures` obeys attacking each of `targets`, by index (CR 508.1d): the requirements read once, however
-    /// many creatures and attacks are asked about.
+    /// many creatures and attacks are asked about; nothing for an attack a restriction forbids (CR 508.1c), which obeys
+    /// no requirement because it can't be made.
     fn gains(&self, creatures: &[ObjectId], targets: &[Target]) -> Vec<Vec<u32>> {
         let mut table = vec![vec![0u32; targets.len()]; creatures.len()];
         if self.required.is_empty() {
@@ -116,7 +130,7 @@ impl AttackRules {
         for r in &self.required {
             if let Some(&i) = index.get(&r.attacker) {
                 for (t, &at) in targets.iter().enumerate() {
-                    if Self::obeys(r, r.attacker, at) {
+                    if Self::obeys(r, r.attacker, at) && !self.bars(r.attacker, at) {
                         table[i][t] += 1;
                     }
                 }
@@ -149,7 +163,7 @@ impl AttackRules {
         for (i, &(a, t)) in attacks.iter().enumerate() {
             if attacks[..i].iter().any(|x| x.0 == a) {
                 found = issue(a, "can attack only once", None, "508.1a");
-            } else if !eligible.contains(&a) || !targets.contains(&t) {
+            } else if !eligible.contains(&a) || !targets.contains(&t) || self.bars(a, t) {
                 found = issue(a, "can't attack", Some(t), "508.1c");
             }
             if found.is_some() {
@@ -206,7 +220,7 @@ impl AttackRules {
             let mut list = Vec::new();
             for &(i, best) in &rest {
                 for (t, &at) in targets.iter().enumerate() {
-                    if declared + gains[i][t] + all - best >= self.most {
+                    if !self.bars(eligible[i], at) && declared + gains[i][t] + all - best >= self.most {
                         list.push((eligible[i], at));
                     }
                 }
@@ -235,7 +249,7 @@ impl AttackRules {
                     let shed = best.shed(i);
                     let loads = best.loads();
                     for (t, &at) in targets.iter().enumerate() {
-                        if !room[t] {
+                        if !room[t] || self.bars(a, at) {
                             continue;
                         }
                         let lose = match best.capped.iter().position(|c| c.0 == t) {
@@ -282,8 +296,8 @@ fn best_of(row: &[u32], attacker: ObjectId, targets: &[Target], costs: &[AttackC
 struct Assignment {
     /// Each creature's best attack where nothing caps it: what it obeys, and the target's index.
     open: Vec<(u32, Option<usize>)>,
-    /// What each creature obeys attacking each capped target; `None` where it may not (no room, or a cost where only
-    /// attacks that cost nothing count).
+    /// What each creature obeys attacking each capped target; `None` where it may not (no room, an attack a restriction
+    /// forbids, or a cost where only attacks that cost nothing count).
     at_cap: Vec<Vec<Option<u32>>>,
     /// Each capped target's index among the targets, and the room left there.
     capped: Vec<(usize, u32)>,
@@ -313,7 +327,7 @@ impl Assignment {
                 capped.push((i, most - used));
             }
         }
-        let allowed = |a: ObjectId, t: usize| !free_only || AttackCost::free(costs, a, targets[t]);
+        let allowed = |a: ObjectId, t: usize| !rules.bars(a, targets[t]) && (!free_only || AttackCost::free(costs, a, targets[t]));
         let open = creatures
             .iter()
             .zip(rows)
@@ -733,20 +747,22 @@ mod tests {
     }
 
     /// Checks the most, whether each declaration may be made and what may be added to each of `partial`, against every
-    /// declaration there is (CR 508.1c-d), for `creatures` under every mix of `menu`'s requirements, each of `caps` and each
-    /// of `costs`. A declaration within the caps is legal where it obeys as many as any declaration within them that pays
-    /// nothing; an attack is addable where some legal declaration extends the declaration with it.
+    /// declaration there is (CR 508.1c-d), for `creatures` under every mix of `menu`'s requirements, each of `caps`, each
+    /// of `bars` (the attacks a restriction forbids) and each of `costs`. A declaration within the caps that makes no
+    /// forbidden attack is legal where it obeys as many as any such declaration that pays nothing; an attack is addable
+    /// where some legal declaration extends the declaration with it.
     fn check_every_declaration(
         creatures: &[ObjectId],
         targets: &[Target],
         menu: &[&[AttackAim]],
         caps: &[&[(Target, u32)]],
+        bars: &[&[(ObjectId, Target)]],
         costs: &[&[AttackCost]],
         partial: &[Vec<(ObjectId, Target)>],
     ) {
         let declarations = every_declaration(creatures, targets);
         for &costs in costs {
-            for &limits in caps {
+            for (&limits, &barred) in caps.iter().flat_map(|c| bars.iter().map(move |b| (c, b))) {
                 for x in 0..menu.len().pow(count_u32(creatures.len())) {
                     let picks: Vec<usize> = (0..creatures.len()).map(|i| x / menu.len().pow(count_u32(i)) % menu.len()).collect();
                     let required = creatures
@@ -754,17 +770,19 @@ mod tests {
                         .zip(&picks)
                         .flat_map(|(&attacker, &p)| menu[p].iter().map(move |&aim| RequiredAttack { attacker, aim }))
                         .collect();
-                    let mut r = AttackRules { required, limits: limits.to_vec(), ..Default::default() };
-                    let within = |d: &[(ObjectId, Target)]| limits.iter().all(|&(t, n)| count_u32(d.iter().filter(|x| x.1 == t).count()) <= n);
+                    let mut r = AttackRules { required, limits: limits.to_vec(), barred: barred.to_vec(), ..Default::default() };
+                    let within = |d: &[(ObjectId, Target)]| {
+                        limits.iter().all(|&(t, n)| count_u32(d.iter().filter(|x| x.1 == t).count()) <= n) && !d.iter().any(|x| barred.contains(x))
+                    };
                     let free = |d: &[(ObjectId, Target)]| d.iter().all(|&(a, t)| AttackCost::free(costs, a, t));
                     let most = declarations.iter().filter(|d| within(d) && free(d)).map(|d| r.obeyed(d)).max().unwrap_or(0);
                     (r.most, r.suggested) = r.solve(creatures, targets, costs);
-                    assert_eq!(r.most, most, "{limits:?} {picks:?}");
-                    assert!(within(&r.suggested) && free(&r.suggested) && r.obeyed(&r.suggested) == most, "{limits:?} {picks:?}");
+                    assert_eq!(r.most, most, "{limits:?} {barred:?} {picks:?}");
+                    assert!(within(&r.suggested) && free(&r.suggested) && r.obeyed(&r.suggested) == most, "{limits:?} {barred:?} {picks:?}");
                     let mut legal = Vec::new();
                     for d in &declarations {
                         let ok = within(d) && r.obeyed(d) >= most;
-                        assert_eq!(r.judge(creatures, targets, costs, d, false).complete, ok, "{limits:?} {picks:?} {d:?}");
+                        assert_eq!(r.judge(creatures, targets, costs, d, false).complete, ok, "{limits:?} {barred:?} {picks:?} {d:?}");
                         if ok {
                             legal.push(d);
                         }
@@ -778,7 +796,7 @@ mod tests {
                                 }
                             }
                         }
-                        assert_eq!(r.judge(creatures, targets, costs, p, true).addable, want, "{limits:?} {picks:?} {p:?}");
+                        assert_eq!(r.judge(creatures, targets, costs, p, true).addable, want, "{limits:?} {barred:?} {picks:?} {p:?}");
                     }
                 }
             }
@@ -787,8 +805,9 @@ mod tests {
 
     /// Three creatures under every mix of requirements a goad, "attacks each combat if able" and "attacks that player or
     /// planeswalker if able" make, three targets under caps of none, zero, one and two, with and without a cost to one
-    /// attack: the most, every declaration and what may be added to an empty or one-attack declaration match every
-    /// declaration there is.
+    /// attack, and with no attack forbidden or with a restriction forbidding U to attack Player B and V to attack the
+    /// planeswalker ("creatures with flying can't attack you", Storm, Windrider): the most, every declaration and what may
+    /// be added to an empty or one-attack declaration match every declaration there is.
     #[test]
     fn the_most_and_addable_match_every_declaration() {
         const Y: ObjectId = ObjectId(8);
@@ -816,7 +835,8 @@ mod tests {
         let cost = [AttackCost { attacker: U, target: Target::Player(P3), cost: ManaCost { generic: 2, ..ManaCost::ZERO }, source: ObjectId(20) }];
         let mut partial = vec![Vec::new()];
         partial.extend(creatures.iter().flat_map(|&a| targets.iter().map(move |&t| vec![(a, t)])));
-        check_every_declaration(&creatures, &targets, &menu, &caps, &[&[], &cost], &partial);
+        let bars: [&[(ObjectId, Target)]; 2] = [&[], &[(U, Target::Player(P2)), (V, W)]];
+        check_every_declaration(&creatures, &targets, &menu, &caps, &bars, &[&[], &cost], &partial);
     }
 
     /// Four creatures against three targets all capped, where taking a creature out of the best declaration and putting it
@@ -852,7 +872,8 @@ mod tests {
                 }
             }
         }
-        check_every_declaration(&creatures, &targets, &menu, &caps, &[&[]], &partial);
+        let bars: [&[(ObjectId, Target)]; 2] = [&[], &[(V, Target::Player(P2)), (Y, W), (Z, Target::Player(P3))]];
+        check_every_declaration(&creatures, &targets, &menu, &caps, &bars, &[&[]], &partial);
     }
 
     /// Making room at a full capped target can take a chain of moves: with a cap of one on Player C and on the planeswalker,
@@ -876,7 +897,7 @@ mod tests {
         (r.most, r.suggested) = r.solve(&creatures, &targets, &[]);
         assert_eq!(r.most, 5);
         assert!(r.judge(&creatures, &targets, &[], &[], true).addable.contains(&(Y, W)));
-        check_every_declaration(&creatures, &targets, &menu, &[&[(c, 1), (W, 1)]], &[&[]], &[Vec::new(), vec![(Y, W)], vec![(V, b)]]);
+        check_every_declaration(&creatures, &targets, &menu, &[&[(c, 1), (W, 1)]], &[&[]], &[&[]], &[Vec::new(), vec![(Y, W)], vec![(V, b)]]);
     }
 
     /// A placing written out: each creature's best open attack (what it obeys), what it obeys at each capped target, where

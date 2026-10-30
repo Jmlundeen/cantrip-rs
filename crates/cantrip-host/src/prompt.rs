@@ -1237,7 +1237,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         AttackRequirementMessage { attacker: handles.handle(r.attacker), target_player, target_permanent, other_than }
                     })
                     .collect(),
-                forbidden: Vec::new(),
+                // CR 508.1c: the attacks a restriction forbids one creature ("creatures with flying can't attack you").
+                forbidden: attack_messages(handles, &requirements.barred),
                 costs: costs
                     .iter()
                     .map(|c| AttackCostMessage {

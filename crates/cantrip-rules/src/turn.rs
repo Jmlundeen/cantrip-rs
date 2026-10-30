@@ -614,17 +614,17 @@ const UNTAP_IT: Question = Question::new("UntapInUntapStep", "untap it during th
 
 /// The battles the active player may attack (CR 310.9b, 508.1b): those whose protector is one of the defending
 /// players. A Siege its attacker controls is one of them (CR 310.12a); one the attacker protects never is.
-fn attackable_battles(cx: &Cx, defending: &[PlayerId]) -> Vec<ObjectId> {
-    if !cx.s().battlefield().iter().any(|&id| cx.s().obj(id).marks.protector.is_some()) {
+fn attackable_battles(q: &dyn Query, defending: &[PlayerId]) -> Vec<ObjectId> {
+    let s = q.state();
+    if !s.battlefield().iter().any(|&id| s.obj(id).marks.protector.is_some()) {
         return Vec::new();
     }
-    cx.s()
-        .battlefield()
+    s.battlefield()
         .iter()
         .copied()
         .filter(|&id| {
-            cx.s().obj(id).marks.protector.is_some_and(|p| defending.contains(&p)) && {
-                let c = cx.chars(id);
+            s.obj(id).marks.protector.is_some_and(|p| defending.contains(&p)) && {
+                let c = q.chars(id);
                 c.is(CardType::Battle) && !c.has(Keyword::CantBeAttacked)
             }
         })
@@ -633,16 +633,38 @@ fn attackable_battles(cx: &Cx, defending: &[PlayerId]) -> Vec<ObjectId> {
 
 /// The planeswalkers the active player may attack (CR 508.1b): those a defending player controls, except one that
 /// can't be attacked (CR 508.1c).
-fn attackable_planeswalkers(cx: &Cx, defending: &[PlayerId]) -> Vec<ObjectId> {
-    cx.s()
-        .battlefield()
+fn attackable_planeswalkers(q: &dyn Query, defending: &[PlayerId]) -> Vec<ObjectId> {
+    let s = q.state();
+    s.battlefield()
         .iter()
         .copied()
-        .filter(|&id| defending.contains(&cx.s().obj(id).controller) && {
-            let c = cx.chars(id);
+        .filter(|&id| defending.contains(&s.obj(id).controller) && {
+            let c = q.chars(id);
             c.is(CardType::Planeswalker) && !c.has(Keyword::CantBeAttacked)
         })
         .collect()
+}
+
+/// What `active` may attack (CR 508.1b): each opponent (the defending players), the planeswalkers they control and the
+/// battles they protect that can be attacked, apart, and all of them as targets in that order.
+fn attack_targets(q: &dyn Query, active: PlayerId) -> (Vec<PlayerId>, Vec<ObjectId>, Vec<ObjectId>, Vec<Target>) {
+    let players: Vec<PlayerId> = q.state().opponents(active).collect();
+    // CR 310.9b, 508.1b: every battle a defending player protects, whoever controls it. Looked for only when a battle
+    // is on the battlefield.
+    let battles = attackable_battles(q, &players);
+    let planeswalkers = attackable_planeswalkers(q, &players);
+    let targets: Vec<Target> = players
+        .iter()
+        .map(|&p| Target::Player(p))
+        .chain(planeswalkers.iter().chain(&battles).map(|&id| Target::Object(id)))
+        .collect();
+    (players, planeswalkers, battles, targets)
+}
+
+/// Whether the static abilities on the battlefield leave `creature` something to attack were its controller attacking now
+/// (CR 508.1c): one of the players, planeswalkers and battles its controller could attack.
+pub(crate) fn attack_rules_allow(q: &dyn Query, cards: &CardTable, creature: ObjectId) -> bool {
+    crate::static_rules::attack_rules_allow_any(q, cards, creature, || attack_targets(q, q.state().obj(creature).controller).3)
 }
 
 fn defending_player(cx: &Cx, attack: Target) -> Option<PlayerId> {
@@ -664,9 +686,8 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
                 && chars.is(CardType::Creature)
                 && !chars.is(CardType::Battle)
                 && !obj.tapped
-                // CR 508.1c: an effect saying it can't attack, or a static ability.
+                // CR 508.1c: an effect saying it can't attack; a static ability's restriction is read below, of each attack.
                 && !cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantAttack && in_force(cx, e))
-                && crate::static_rules::attack_rules_allow(&*cx, cx.cards(), id)
                 && !summoning_sick(cx.cards(), cx.s(), &cx.g.log, id)
                 // CR 702.3b: defender, unless an effect or a static ability lets it attack as though it didn't have it
                 // (CR 609.4), which lifts no other restriction: asked last, of a creature that could otherwise attack.
@@ -676,21 +697,23 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     if eligible.is_empty() {
         return Ok(());
     }
-    let players: Vec<PlayerId> = cx.s().opponents(active).collect();
-    // CR 310.9b, 508.1b: every battle a defending player protects, whoever controls it. Looked for only when a battle
-    // is on the battlefield.
-    let battles = attackable_battles(cx, &players);
-    let planeswalkers = attackable_planeswalkers(cx, &players);
+    let (players, planeswalkers, battles, targets) = attack_targets(&*cx, active);
+    // CR 508.1c: the attacks a static ability forbids ("this creature can't attack unless ...", "creatures with flying
+    // can't attack you"). A creature forbidden every attack open to it can't attack at all.
+    let mut barred = crate::static_rules::attacks_barred(&*cx, cx.cards(), &eligible, &targets);
+    let mut eligible = eligible;
+    if !barred.is_empty() {
+        eligible.retain(|&id| targets.is_empty() || targets.iter().any(|&at| !barred.contains(&(id, at))));
+        barred.retain(|x| eligible.contains(&x.0));
+        if eligible.is_empty() {
+            return Ok(());
+        }
+    }
     // CR 508.1d, 508.1h: what each attack costs, where a static ability makes attacking cost something.
-    let targets: Vec<Target> = players
-        .iter()
-        .map(|&p| Target::Player(p))
-        .chain(planeswalkers.iter().chain(&battles).map(|&id| Target::Object(id)))
-        .collect();
     let costs = crate::static_rules::attack_costs(cx, &eligible, &targets);
     // CR 508.1d: the requirements, one for each ability, effect and player they come from, and the most of them a
     // declaration can obey without paying a cost to attack - a cost is never a requirement.
-    let requirements = attack_rules(cx, &eligible, &targets, &costs);
+    let requirements = attack_rules(cx, &eligible, &targets, barred, &costs);
     let can_pay = if costs.is_empty() { 0 } else { actions::available(cx, active).most_unrestricted() };
     let kind = RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, can_pay };
     let attacks = loop {
@@ -1012,9 +1035,10 @@ fn maximum_blockers(cx: &Cx, attacker: ObjectId, rule_sources: &[ObjectId]) -> u
 /// two (CR 701.15b-c: attack, and attack a player other than that one), goad being an effect and no ability, which a creature
 /// that loses its abilities is still under; and each "attacks [that player or permanent] if able" in force now
 /// (`EffectKind::MustAttackAt`, `in_force`).
-/// With the cap on how many may attack each of `targets` a static ability sets (CR 508.1c); with the most of them any
-/// declaration obeys attacking for free, and one that does (`AttackRules::solve`).
-fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[AttackCost]) -> AttackRules {
+/// With the attacks a static ability forbids, `barred`, and the cap on how many may attack each of `targets` a static
+/// ability sets (CR 508.1c); with the most of them any declaration obeys attacking for free, and one that does
+/// (`AttackRules::solve`).
+fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], barred: Vec<(ObjectId, Target)>, costs: &[AttackCost]) -> AttackRules {
     let mut required = Vec::new();
     for &id in eligible {
         for _ in 0..cx.chars(id).must_attack {
@@ -1034,7 +1058,7 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], costs: &[Att
             }
         }
     }
-    let mut rules = AttackRules { required, limits: crate::static_rules::attack_limits(cx, targets), most: 0, suggested: Vec::new() };
+    let mut rules = AttackRules { required, barred, limits: crate::static_rules::attack_limits(cx, targets), most: 0, suggested: Vec::new() };
     if !rules.required.is_empty() {
         (rules.most, rules.suggested) = rules.solve(eligible, targets, costs);
     }

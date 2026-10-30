@@ -556,6 +556,9 @@ pub(crate) fn ask_of(
                 })
                 .collect();
             costs.sort();
+            // CR 508.1c: the attacks a restriction forbids.
+            let mut barred: Vec<(Ref, Ref)> = requirements.barred.iter().map(|&(a, d)| (r(a), t(d))).collect();
+            barred.sort();
             AskKind::DeclareAttackers {
                 eligible: rs(eligible),
                 defenders,
@@ -564,6 +567,7 @@ pub(crate) fn ask_of(
                 costs,
                 can_pay: *can_pay,
                 max_attackers,
+                barred,
             }
         }
         RequestKind::AssignCombatDamage { divisions } => {

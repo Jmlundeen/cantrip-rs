@@ -3,8 +3,8 @@ use cantrip_mechanics::{targets, tokens};
 use cantrip_oracle as oracle;
 
 /// "Enchanted creature can't attack" (CR 508.1c): the creature this Aura is attached to.
-fn enchanted_creature_cant_attack(q: &dyn Query, source: ObjectId, attacker: ObjectId) -> bool {
-    q.attached_to(source) != Some(attacker)
+fn enchanted_creature_cant_attack(q: &dyn Query, asker: &Asker, attacker: ObjectId, _: Target) -> bool {
+    q.attached_to(asker.source) != Some(attacker)
 }
 
 /// "Enchanted creature can't ... block" (CR 509.1b).

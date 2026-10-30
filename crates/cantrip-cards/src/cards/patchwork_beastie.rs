@@ -4,8 +4,8 @@ use cantrip_oracle as oracle;
 
 /// "Delirium - This creature can't attack ... unless there are four or more card types among cards in your graveyard"
 /// (CR 508.1c; delirium is an ability word, CR 207.2c): asked of this creature as attackers are declared, "your" its controller's.
-fn attacks_only_with_delirium(q: &dyn Query, source: ObjectId, attacker: ObjectId) -> bool {
-    source != attacker || delirium(q, q.obj(source).controller)
+fn attacks_only_with_delirium(q: &dyn Query, asker: &Asker, attacker: ObjectId, _: Target) -> bool {
+    asker.source != attacker || delirium(q, asker.controller)
 }
 
 /// "... can't ... block unless there are four or more card types among cards in your graveyard" (CR 509.1b).

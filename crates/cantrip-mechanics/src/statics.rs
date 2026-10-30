@@ -576,9 +576,11 @@ pub fn attacking_you_or_your_planeswalkers_costs<const N: u8>(q: &dyn Query, ask
     attacks_you_or_your_planeswalker(q, asker, target).then_some(ManaCost { generic: N, ..ManaCost::ZERO })
 }
 
-/// Whether an attack on `target` is one on "you or planeswalkers you control" of an attack cost (CR 508.1d): the source's
-/// controller, or a planeswalker they control; never a battle. Baird, Steward of Argive and Archon of Absolution ask it
-/// with {1} (`attacking_you_or_your_planeswalkers_costs`), Norn's Annex with {W/P}.
+/// Whether an attack on `target` is one on "you or planeswalkers you control" of an attack cost (CR 508.1d) or an attack
+/// restriction (CR 508.1c, `CardDef::attack_rules`): the source's controller, or a planeswalker they control; never a
+/// battle. Baird, Steward of Argive and Archon of Absolution ask it with {1} (`attacking_you_or_your_planeswalkers_costs`),
+/// Norn's Annex with {W/P}; Sandwurm Convergence's "creatures with flying can't attack you or planeswalkers you control"
+/// and the Vows' "enchanted creature ... can't attack you or planeswalkers you control" forbid such an attack.
 pub fn attacks_you_or_your_planeswalker(q: &dyn Query, asker: &Asker, target: Target) -> bool {
     match target {
         Target::Player(p) => p == asker.controller,

@@ -11,8 +11,8 @@ fn seven_cards_in_exile(q: &dyn Query) -> bool {
 
 /// "Ketramose can't attack ... unless there are seven or more cards in exile" (CR 508.1c): asked of this creature as attackers
 /// are declared. Once declared it keeps attacking whatever happens to exile (the card's ruling).
-fn attacks_only_with_seven_in_exile(q: &dyn Query, source: ObjectId, attacker: ObjectId) -> bool {
-    source != attacker || seven_cards_in_exile(q)
+fn attacks_only_with_seven_in_exile(q: &dyn Query, asker: &Asker, attacker: ObjectId, _: Target) -> bool {
+    asker.source != attacker || seven_cards_in_exile(q)
 }
 
 /// "Ketramose can't ... block unless there are seven or more cards in exile" (CR 509.1b).
