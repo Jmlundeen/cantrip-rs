@@ -1,0 +1,37 @@
+# Chapter III's sacrifice is a "may": declining creates no Romulans, and the Clue stays. An opponent with no nontoken
+# creature sacrifices nothing to chapter I (CR 608.2c, 701.21a).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Black Lotus
+In the Pale Moonlight
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.In the Pale Moonlight.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Jet; Clue Token
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = In the Pale Moonlight; Black Lotus
