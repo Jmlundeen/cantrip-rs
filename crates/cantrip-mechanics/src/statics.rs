@@ -126,12 +126,29 @@ pub fn itself_with_threshold(q: &dyn LayerQuery, source: ObjectId, affected: Obj
     source == affected && state.zone(Zone::graveyard(state.obj(source).controller)).len() >= 7
 }
 
+/// The number of cards of a card type in the graveyard of `source`'s controller (never tokens, CR 111.7), each judged as the layers
+/// make it, for the statics that count "<type> cards in your graveyard". Elvish Reclaimer, Fiend Artisan, Killmonger, Scourge of
+/// Wakanda, Knight of the Reliquary and Undercover Skrull use it.
+pub fn card_type_cards_in_your_graveyard(q: &dyn LayerQuery, source: ObjectId, card_type: CardType) -> usize {
+    let state = q.state();
+    state.zone(Zone::graveyard(state.obj(source).controller)).iter().filter(|&&card| q.chars(card).is(card_type)).count()
+}
+
 /// "As long as there are two or more creature cards in your graveyard" (CR 604.1, 611.3a) as a static ability's `StaticDef::affects`:
 /// only the source itself, and only while its controller's graveyard holds two or more creature cards (never tokens), each judged as
 /// the layers make it, asked again whenever characteristics are computed. Undercover Skrull and Killmonger, Scourge of Wakanda use it.
 pub fn itself_with_two_creature_cards_in_your_graveyard(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    let state = q.state();
-    source == affected && state.zone(Zone::graveyard(state.obj(source).controller)).iter().filter(|&&card| q.chars(card).is(CardType::Creature)).count() >= 2
+    source == affected && card_type_cards_in_your_graveyard(q, source, CardType::Creature) >= 2
+}
+
+/// "This creature gets +1/+1 for each <card type> card in your graveyard" (CR 613.4c, layer 7c) as a static ability's `StaticDef::apply`,
+/// `TYPE` a `CardType` as `u8`: "your" is its controller's, and the count is taken whenever characteristics are computed. Fiend
+/// Artisan (creature cards) and Knight of the Reliquary (land cards) print it.
+pub fn plus_one_per_card_type_in_your_graveyard<const TYPE: u8>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let Some(&card_type) = CardType::ALL.iter().find(|&&t| t as u8 == TYPE) else { return };
+    let n = card_type_cards_in_your_graveyard(view, source, card_type) as i16;
+    chars.power = chars.power.map(|v| v + n);
+    chars.toughness = chars.toughness.map(|v| v + n);
 }
 
 /// "... attacks each combat if able" (CR 508.1d, layer 6) as a static ability's `StaticDef::apply`: one more requirement to attack
