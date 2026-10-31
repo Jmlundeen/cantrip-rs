@@ -1,0 +1,79 @@
+# Elvish Reclaimer: "{2}, {T}, Sacrifice a land: Search for a land card, put it onto the battlefield tapped, then shuffle" is paid by
+# exactly two Moxen (pool checked empty right after) and the sacrificed land is the cost, so it is in the graveyard before the search; a
+# Mox is no land to sacrifice, the Llanowar Elves in the library no land card to find, and the land found enters tapped. "+2/+2 as long
+# as there are three or more land cards in your graveyard" counts only land cards in its controller's graveyard (CR 604.1): Bot2 discards
+# seven Islands with Lion's Eye Diamond on turn 2, Bot1's Dark Ritual is a card but no land card, and Reclaimer stays 1/2 at one and two
+# lands of its own (three cards with the Ritual), then is 3/4 at exactly three.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Elvish Reclaimer
+Dark Ritual
+Forest
+Forest
+Forest
+Mountain x12
+Llanowar Elves
+
+[Bot2 Deck]
+Lion's Eye Diamond
+Island x6
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Reclaimer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Lion's Eye Diamond.Cast
+Bot2.Pass
+Bot2.Battlefield.Lion's Eye Diamond.Activate(Color: U)
+[T3 Bot1.Main1]
+? Bot2.Graveyard.Count = 8
+? Bot1.Battlefield.Elvish Reclaimer.Power = 1
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Elvish Reclaimer.Activate(Ability: Sacrifice a land)
+! Bot1.Choose(Mox Jet)
+Bot1.Choose(Forest)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana =
+! Bot1.Search(Llanowar Elves)
+Bot1.Search(Mountain)
+Bot1.Pass
+? Bot1.Graveyard = Forest; Dark Ritual
+? Bot1.Battlefield.Mountain.Tapped = true
+? Bot1.Battlefield.Elvish Reclaimer.Power = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Elvish Reclaimer.Activate(Ability: Sacrifice a land)
+Bot1.Choose(Forest)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Mountain)
+Bot1.Pass
+? Bot1.Graveyard.Count = 3
+? Bot1.Battlefield.Elvish Reclaimer.Power = 1
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Elvish Reclaimer.Activate(Ability: Sacrifice a land)
+Bot1.Choose(Forest)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Mountain)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Forest; Forest; Forest; Dark Ritual
+Bot1.Battlefield.Elvish Reclaimer.Power = 3
+Bot1.Battlefield.Elvish Reclaimer.Toughness = 4
+Bot2.Graveyard.Count = 8
