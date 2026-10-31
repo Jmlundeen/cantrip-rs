@@ -1,0 +1,85 @@
+# Each half of Dead // Gone cast alone (CR 709.3). Dead ({R}) deals 2 damage to any creature, either player's, and
+# nothing else: Bot2's Mox Emerald and Bot2 are refused, Bot2's Blind Phantasm (toughness 3) survives with 2 damage,
+# Bot1's own Ornithopter (toughness exactly 2) dies. Gone ({2}{R}) returns only a creature its caster does not control:
+# Bot1's own Ornithopter and Bot2's noncreature Mox Emerald are refused, Bot2's Blind Phantasm goes to its owner's hand.
+# Paid exactly.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ornithopter
+Dead // Gone
+Dead // Gone
+Dead // Gone
+Mountain x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Grizzly Bears
+Blind Phantasm
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Blind Phantasm.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Dead // Gone.Cast(Bot2.Battlefield.Mox Emerald; Ability: Dead)
+! Bot1.Hand.Dead // Gone.Cast(Bot2; Ability: Dead)
+Bot1.Hand.Dead // Gone.Cast(Bot2.Battlefield.Blind Phantasm; Ability: Dead)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Blind Phantasm.Damage = 2
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Dead // Gone.Cast(Bot1.Battlefield.Ornithopter; Ability: Gone)
+! Bot1.Hand.Dead // Gone.Cast(Bot2.Battlefield.Mox Emerald; Ability: Gone)
+Bot1.Hand.Dead // Gone.Cast(Bot2.Battlefield.Blind Phantasm; Ability: Gone)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Blind Phantasm = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dead // Gone.Cast(Bot1.Battlefield.Ornithopter; Ability: Dead)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Grizzly Bears.Damage = 0
+Bot2.Hand.Blind Phantasm.Power = 2
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Graveyard = Ornithopter; Dead // Gone; Dead // Gone; Dead // Gone

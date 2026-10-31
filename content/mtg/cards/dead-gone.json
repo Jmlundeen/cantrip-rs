@@ -1,0 +1,18 @@
+{
+  "name": "Dead // Gone",
+  "oracleText": "",
+  "halves": [
+    {
+      "name": "Dead",
+      "manaCost": "{R}",
+      "type": "Instant",
+      "oracleText": "Dead deals 2 damage to target creature."
+    },
+    {
+      "name": "Gone",
+      "manaCost": "{2}{R}",
+      "type": "Instant",
+      "oracleText": "Return target creature you don't control to its owner's hand."
+    }
+  ]
+}
