@@ -1,0 +1,39 @@
+# Swift Reconfiguration has flash and enchants any creature, Bot2's included. Bot2 attacks with Sundial, Dawn Tyrant (a 3/3
+# Legendary Artifact Creature - Construct); Bot1 flashes the Aura onto it. It becomes an artifact Vehicle and no longer a
+# creature, so it is removed from combat (CR 506.4, the ruling) and Bot1 takes no damage. The new subtype Vehicle replaces
+# Construct, an artifact it keeps and the legendary supertype stays (CR 205.1a, 613.1d).
+
+[Bot1 Deck]
+Mox Pearl
+Swift Reconfiguration
+Plains x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Sundial, Dawn Tyrant
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sundial, Dawn Tyrant.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Sundial, Dawn Tyrant > Bot1)
+Bot1.Hand.Swift Reconfiguration.Cast(Bot2.Battlefield.Sundial, Dawn Tyrant)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers.Count = 0
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield.Sundial, Dawn Tyrant.Types = Artifact
+Bot2.Battlefield.Sundial, Dawn Tyrant.Supertypes = Legendary
+Bot2.Battlefield.Sundial, Dawn Tyrant.Subtypes = Vehicle
+Bot2.Battlefield.Sundial, Dawn Tyrant.Power = (absent)
