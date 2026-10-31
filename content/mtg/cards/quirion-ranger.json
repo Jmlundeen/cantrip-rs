@@ -1,0 +1,8 @@
+{
+  "name": "Quirion Ranger",
+  "manaCost": "{G}",
+  "type": "Creature — Elf Ranger",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Return a Forest you control to its owner's hand: Untap target creature. Activate only once each turn."
+}

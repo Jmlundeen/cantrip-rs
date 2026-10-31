@@ -1,0 +1,33 @@
+# Quirion Ranger's cost needs a Forest you control. On T3 Bot1 has only an Island (and a Mox Emerald), and Bot2 has a Forest:
+# the activation is refused. After Bot1 plays a Forest of its own the same activation is offered (the positive control).
+
+[Bot1 Deck]
+Mox Emerald
+Quirion Ranger
+Island
+Forest
+Island x3
+Forest x10
+
+[Bot2 Deck]
+Forest
+Forest x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quirion Ranger.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Quirion Ranger.Activate
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Quirion Ranger.Activate(Quirion Ranger)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Mox Emerald; Quirion Ranger
+Bot2.Battlefield.Count = 1

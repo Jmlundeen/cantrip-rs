@@ -1147,7 +1147,7 @@ pub mod filters {
     /// An object of a land type (a permanent, or for craft a card in the graveyard too), `TYPE` being `lands::sub(Subtype::Mountain)` and so on. The type is a word of the asking
     /// object's rules text, read through its words (CR 612.2), and a permanent has it when the layers made it that type (CR 305.6).
     /// Fireblast, Mine Collapse and Lava Dart's flashback sacrifice Mountains; Daze, Gush and Waterlogged Hulk's craft return or
-    /// exile Islands.
+    /// exile Islands; Quirion Ranger returns a Forest.
     pub fn land_type<const TYPE: u16>(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
         q.chars(id).has_subtype(crate::lands::word(q, asker.source, TYPE))
     }

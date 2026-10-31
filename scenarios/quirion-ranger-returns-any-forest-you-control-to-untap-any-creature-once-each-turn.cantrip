@@ -1,0 +1,56 @@
+# Quirion Ranger: "Return a Forest you control to its owner's hand: Untap target creature. Activate only once each turn."
+# Breeding Pool (a Forest Island, not named Forest) pays the cost on T5 to untap Bot2's tapped Llanowar Elves (any creature,
+# an opponent's too; Bot2's Forest, not a creature, cannot be the target); a second activation the same turn is refused though a Forest is still there (Bot2's Forest does not
+# count either). On T7 it works again, the Forest returned untapping Bot1's own tapped Elves. CR 602.5b, 118.3, 205.3i.
+
+[Bot1 Deck]
+Forest
+Quirion Ranger
+Breeding Pool
+Llanowar Elves
+Island
+Island
+Island
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Quirion Ranger.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Breeding Pool.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot2.Battlefield.Llanowar Elves.Tapped = true
+! Bot1.Battlefield.Quirion Ranger.Activate(Bot2.Battlefield.Forest)
+Bot1.Battlefield.Quirion Ranger.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Breeding Pool)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Llanowar Elves.Tapped = false
+? Bot1.Battlefield.Breeding Pool = (absent)
+! Bot1.Battlefield.Quirion Ranger.Activate
+[T7 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Quirion Ranger.Activate(Bot1.Battlefield.Llanowar Elves)
+Bot1.Choose(Forest)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield = Island; Llanowar Elves; Quirion Ranger
