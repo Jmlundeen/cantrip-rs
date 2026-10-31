@@ -1026,9 +1026,10 @@ pub fn may_return_this_card_to_battlefield(g: &mut dyn Game, item: &StackItem) -
     Ok(())
 }
 
-/// "Return this card from your graveyard to the battlefield" (CR 400.7): the ability's own source, put onto the
-/// battlefield untapped under its controller; nothing if it is no longer the object the ability came from (the core skips a
-/// card that changed zones). Darklight Phoenix and Cauldron Familiar print it.
+/// "Return this card from your graveyard to the battlefield" and "Put this card from your hand onto the battlefield" (CR
+/// 400.7): the ability's own source, put onto the battlefield untapped under its controller; nothing if it is no longer the
+/// object the ability came from (the core skips a card that changed zones). Darklight Phoenix and Cauldron Familiar print
+/// the first, Urban Retreat and Talon Gates of Madara the second.
 pub fn return_this_card_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.put_onto_battlefield(item.object, item.controller, false)?;
     Ok(())
