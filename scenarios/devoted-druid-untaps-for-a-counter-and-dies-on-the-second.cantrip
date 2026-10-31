@@ -1,0 +1,46 @@
+# Devoted Druid: "{T}: Add {G}." and "Put a -1/-1 counter on this creature: Untap this creature." The counter is a cost (CR
+# 602.2b), so the first untap leaves a 0/1 with one counter that taps for a second {G}; the second untap's counter makes it
+# 0/0, and it dies (CR 704.5f) before the untap resolves, the ruling's case. Bot1 casts it on turn 1 off Forest and Mox
+# Emerald and, on turn 3 (no longer summoning sick), taps it, untaps it, taps it again and untaps it a second time. The
+# counter is on it while the first untap is still on the stack, and the second's has killed it before Bot1 gets priority.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Devoted Druid
+Forest x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Devoted Druid.Cast
+Bot1.Pass
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Devoted Druid.Activate(Ability: {T})
+? Bot1.Mana = {G}
+Bot1.Battlefield.Devoted Druid.Activate(Ability: -1/-1)
+? Bot1.Battlefield.Devoted Druid.Counters.MinusOneMinusOne = 1
+? Bot1.Battlefield.Devoted Druid.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Devoted Druid.Tapped = false
+? Bot1.Battlefield.Devoted Druid.Counters.MinusOneMinusOne = 1
+? Bot1.Battlefield.Devoted Druid.Toughness = 1
+Bot1.Battlefield.Devoted Druid.Activate(Ability: {T})
+? Bot1.Mana = {G}{G}
+Bot1.Battlefield.Devoted Druid.Activate(Ability: -1/-1)
+? Bot1.Battlefield.Devoted Druid = (absent)
+! Bot1.Battlefield.Devoted Druid.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Devoted Druid
+Bot1.Mana = {G}{G}

@@ -1,0 +1,8 @@
+{
+  "name": "Devoted Druid",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Elf Druid",
+  "power": 0,
+  "toughness": 2,
+  "oracleText": "{T}: Add {G}.\nPut a -1/-1 counter on this creature: Untap this creature."
+}
