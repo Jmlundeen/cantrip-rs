@@ -86,7 +86,7 @@ other than in the time left, and once more when the draft is over (`Grid` zero),
   and plays through the ordinary `/game` socket, in a phone layout of the ordinary client. A tablet's QR code holds a
   device token the relay minted (`?inperson=tablet&side=N&art=...#device=D`); tablets talk only to the relay's
   `/inperson/socket`. A welcomed device keeps a resume id and a 256-bit proof for its tab, compared in constant time;
-  scanning a QR code again takes the device's place over.
+  scanning a QR code again takes the device's place over. A device's link opened again in the tab it was opened in - the way back for a page that has stuck - loads the page anew (`InPerson.js`, `Ticket.js`): the credential was taken out of the address on the first load, so the link differs from it only after its `#`, and a browser would only move to the fragment (`LinkAgainTests`).
 - **Setup.** A setup page, served on loopback only since its QR codes hold credentials, takes the players' names, the
   cube, the packs and the layout, starts the draft and shows a QR code for each device and which are connected. Match
   and pick clocks are off by default, since the players are at the same table; a checkbox on the page turns them on.

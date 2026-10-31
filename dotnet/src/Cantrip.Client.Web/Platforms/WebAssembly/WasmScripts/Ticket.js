@@ -16,6 +16,15 @@
         }
         window.history.replaceState(window.history.state, "", url.toString());
     }
+
+    // A seat's link opened again in the same tab differs from the address left above only after its hash, so the browser
+    // only moves to the fragment and nothing would read the ticket; the page loads again instead, and takes it as any
+    // load does. That is also how a seat moved to a table on the same server goes there (cantripGoToTable).
+    window.addEventListener("hashchange", () => {
+        if (new URLSearchParams(window.location.hash.slice(1)).has("ticket")) {
+            window.location.reload();
+        }
+    });
 })();
 
 // A seat moved to another table - two forming tables short of a player made into one - goes there: the page loads

@@ -13,6 +13,15 @@
         url.hash = rest.length > 0 ? rest : "";
         window.history.replaceState(window.history.state, "", url.toString());
     }
+
+    // The tablet's link opened again in the same tab - the way back for a tablet whose page has stuck - differs from the
+    // address left above only after its hash, so the browser only moves to the fragment and nothing would read the token.
+    // The page loads again instead, and takes the token as any load does.
+    window.addEventListener("hashchange", () => {
+        if (new URLSearchParams(window.location.hash.slice(1)).has("device")) {
+            window.location.reload();
+        }
+    });
 })();
 
 // Under ?test, a tablet with no device token is fed by the test rather than a relay (InPerson/TabletTestState.cs): each
