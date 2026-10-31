@@ -1,0 +1,50 @@
+# CR 602.2a reveals the card an activated ability is activated from in a hidden zone; a special action is no activation
+# (CR 116.2), and a spell cast from the hand is moved to the stack, public, as it is proposed (CR 601.2a): neither makes
+# that reveal. On turn 1 Bot1 casts five Moxen from its hand, plots Pillage the Bog paying {1}{B}{G} (CR 116.2k, 702.170a)
+# and foretells Augury Raven paying {2} (CR 116.2h, 702.143a): it has revealed nothing. On turn 3 it activates the Simian
+# Spirit Guide it drew from its hand, which is revealed - the positive control: the same check sees a reveal when there is
+# one.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Pillage the Bog
+Augury Raven
+Simian Spirit Guide
+Island x15
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pillage the Bog.Activate(Ability: Plot)
+? Bot1.Mana = 
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Augury Raven.Foretell
+? Bot1.Mana = 
+? Exile.Count = 2
+? Bot1.Revealed = (absent)
+[T3 Bot1.Main1]
+? Bot1.Revealed = (absent)
+Bot1.Hand.Simian Spirit Guide.Activate
+? Bot1.Mana = {R}
+? Bot1.Revealed = Simian Spirit Guide
+
+[Expect]
+Turn = 3
+Exile.Count = 3
+Bot1.Revealed = Simian Spirit Guide
+Bot2.Revealed = (absent)

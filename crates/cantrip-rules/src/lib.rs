@@ -1028,9 +1028,10 @@ impl Game {
         actions::may_look_at_library_top(self, self.cards, player)
     }
 
-    /// The cards in a hand or a library that every player sees now, a reveal of them in effect (CR 701.20a): the card an
-    /// ability on the stack was activated from there (CR 602.2a), the cards a spell or ability on the stack revealed as
-    /// it was announced or paid for, and a card whose revealing triggered an ability not yet off the stack (miracle).
+    /// The cards in a hand or a library that every player sees now, a reveal of them in effect (CR 701.20a): the cards a
+    /// spell or ability on the stack revealed as it was announced or paid for (behold, splice), and a card whose revealing
+    /// triggered an ability not yet off the stack (miracle). The card an ability was activated from there is revealed by
+    /// the activation's event alone (CR 602.2a, RX-7 in `docs/rules-exceptions.md`).
     pub fn revealed_in_hidden_zones(&self) -> Vec<ObjectId> {
         ops::revealed_in_hidden_zones(self)
     }

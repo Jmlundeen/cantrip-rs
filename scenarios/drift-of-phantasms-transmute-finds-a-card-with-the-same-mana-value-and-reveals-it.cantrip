@@ -44,4 +44,5 @@ Bot1.Search(Mirran Crusader)
 [Expect]
 Bot1.Hand = Plains; Plains; Mirran Crusader
 Bot1.Graveyard = Drift of Phantasms
-Bot1.Revealed = Mirran Crusader
+# Drift of Phantasms, revealed as transmute is activated from the hand (CR 602.2a), and the card the search finds.
+Bot1.Revealed = Drift of Phantasms; Mirran Crusader

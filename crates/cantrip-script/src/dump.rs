@@ -446,7 +446,8 @@ impl StateDump {
             }
             let names = |ids: &[ObjectId]| ids.iter().map(|&id| game.known_name(id).to_string()).collect::<Vec<_>>();
             d.list(&format!("{b}.Hand"), names(s.zone(Zone::hand(p))), false);
-            // Cards this player revealed, in order, from the history (`Event::Revealed`): a beheld card (CR 701.4a), a spliced one.
+            // Cards this player revealed, sorted by name, one per reveal, from the history (`Event::Revealed`): a beheld card (CR
+            // 701.4a), a spliced one, the card an ability was activated from in a hand or a library (CR 602.2a).
             // A face-down permanent or spell revealed where it is (CR 708.9, 701.40g) by the card it really is.
             let revealed: Vec<String> = game
                 .history()

@@ -2,7 +2,7 @@
 //! both follow, so neither can see more than the other.
 //!
 //! A seat sees the zones it may look into, every spell and ability on the stack, the hidden cards a reveal in effect shows
-//! everyone (the card an ability on the stack was activated from, CR 602.2a), and what is being shown to it right now
+//! everyone (what a cost on the stack revealed: behold, splice; a miracle card), and what is being shown to it right now
 //! (`extra`: a reveal, a look, the objects its own outstanding request names). A face-down object's face goes to its
 //! controller on the battlefield and to those who saw it go there in exile. While the asked player is part way through
 //! announcing or paying, the log past the frame's start can still be cut back; it is theirs alone until then
@@ -113,8 +113,9 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
     visible.extend(s.zone(Zone::PHASED_OUT).iter().copied());
     visible.extend(s.zone(Zone::COMMAND).iter().copied());
     visible.extend(stack_entries(s).iter().map(StackEntry::key));
-    // A card in a hand or a library while a reveal of it is in effect: the card an ability on the stack was activated
-    // from there (ninjutsu, CR 602.2a), what a spell's announcement revealed, a miracle card (CR 701.20a).
+    // A card in a hand or a library while a reveal of it is in effect: what the cost or announcement of a spell or ability
+    // on the stack revealed, a miracle card (CR 701.20a). The card an ability was activated from there is shown by the
+    // activation's reveal event alone (CR 602.2a, RX-7), not while the ability waits.
     visible.extend(game.revealed_in_hidden_zones());
     for &id in extra {
         if !is_ability_key(id) && (id.index() < s.objects.len()) && live(s, id) {

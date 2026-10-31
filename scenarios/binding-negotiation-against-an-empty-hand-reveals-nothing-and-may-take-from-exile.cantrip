@@ -41,5 +41,7 @@ Turn = 2
 Stack.Count = 0
 Exile.Count = 0
 Bot1.Graveyard = Simian Spirit Guide
-Bot1.Revealed = (absent)
+# The Spirit Guide was revealed as its ability was activated from the hand (CR 602.2a, 605.3); the empty hand
+# reveals nothing more.
+Bot1.Revealed = Simian Spirit Guide
 Bot2.Graveyard = Binding Negotiation

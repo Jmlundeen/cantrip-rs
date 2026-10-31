@@ -746,12 +746,13 @@ Bot1.Pass
 [Handover Bot2.Pass]
 ";
 
-/// A card an ability on the stack was activated from in a hand is revealed (CR 602.2a): Bot2 sees Kaito in Bot1's hand
-/// while the ninjutsu waits, knows it from then on, and no world dealt for Bot2 makes it another card. One did (the AI
+/// A card an ability is activated from in a hand is revealed by the activation, one event (CR 602.2a; not kept revealed
+/// while the ability waits, RX-7 in `docs/rules-exceptions.md`): Bot2 is not shown Kaito in Bot1's hand while the ninjutsu
+/// waits, but knows it from the reveal on, and no world dealt for Bot2 makes it another card. One did (the AI
 /// host's search panicked resolving the ninjutsu as an ability of the Forest dealt in Kaito's place, CardTable::ability
 /// out of range): the deal took the card for unseen and gave the ability on the stack to the card dealt.
 #[test]
-fn a_card_an_ability_was_activated_from_in_a_hand_is_seen_and_kept_in_every_world() {
+fn a_card_an_ability_was_activated_from_in_a_hand_is_known_and_kept_in_every_world() {
     let game = handed_over(NINJUTSU_ON_THE_STACK);
     let (bot1, bot2) = (PlayerId(0), PlayerId(1));
     let item = *game.state.stack.last().expect("the ninjutsu on the stack");
@@ -759,7 +760,11 @@ fn a_card_an_ability_was_activated_from_in_a_hand_is_seen_and_kept_in_every_worl
     let name = |g: &Game, id: ObjectId| g.cards.get(g.state.obj(id).card).name;
     assert_eq!(game.state.obj(kaito).zone, Zone::hand(bot1));
     assert_eq!(name(&game, kaito), "Kaito, Bane of Nightmares");
-    assert!(observable(&game, bot2, &std::collections::HashSet::new()).contains(&kaito), "Bot2 sees the card the ninjutsu revealed");
+    assert!(!observable(&game, bot2, &std::collections::HashSet::new()).contains(&kaito), "the reveal is over: Kaito is in a hidden hand");
+    assert!(
+        game.log.iter().any(|r| matches!(r.event, Event::Revealed { player, card } if player == bot1 && card == kaito)),
+        "the ninjutsu's activation revealed Kaito"
+    );
     let knowledge = Knowledge::of(&game, bot2);
     assert_eq!(knowledge.knows(kaito), Some(false), "Bot2 knows the card in Bot1's hand");
     for seed in 0..32 {

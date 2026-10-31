@@ -1,0 +1,25 @@
+# CR 605.3, 602.2a: a mana ability is activated by the rules for any activated ability, so one activated from a hidden zone
+# reveals the card that has it, before its cost is paid. Elvish Spirit Guide's "Exile this card from your hand: Add {G}"
+# reveals it, then exiles it: Bot1 has revealed it once, the {G} is in its pool, and it pays for Llanowar Elves.
+
+[Bot1 Deck]
+Elvish Spirit Guide
+Llanowar Elves
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[Bot1.Main1]
+? Bot1.Revealed = (absent)
+Bot1.Hand.Elvish Spirit Guide.Activate
+? Bot1.Mana = {G}
+? Bot1.Revealed = Elvish Spirit Guide
+Bot1.Hand.Llanowar Elves.Cast
+
+[Expect]
+Exile = Elvish Spirit Guide
+Bot1.Battlefield = Llanowar Elves
+Bot1.Revealed = Elvish Spirit Guide
+Bot2.Revealed = (absent)

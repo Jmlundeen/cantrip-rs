@@ -1,0 +1,32 @@
+# CR 602.2a: activating an ability from a hidden zone reveals the card that has it - the first step of the activation,
+# before its costs are paid (CR 602.2b, 601.2h), so a cost that discards the card shows it first. Barkhide Mauler's cycling
+# {2} (CR 702.29a) discards it from the hand as the cost is paid: Bot1 has revealed it once, by the time the ability is on
+# the stack and the card is in the graveyard. The cycled card then draws the Forest.
+
+[Bot1 Deck]
+Blasted Landscape
+Mana Crypt
+Barkhide Mauler
+Plains x4
+Forest
+Plains x12
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+? Bot1.Revealed = (absent)
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Barkhide Mauler.Activate
+? Stack = Barkhide Mauler
+? Bot1.Graveyard = Barkhide Mauler
+? Bot1.Revealed = Barkhide Mauler
+Bot1.Pass
+
+[Expect]
+Bot1.Revealed = Barkhide Mauler
+Bot1.Hand = Forest; Plains; Plains; Plains; Plains
+Bot2.Revealed = (absent)

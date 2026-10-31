@@ -1,0 +1,39 @@
+# CR 602.2a: activating an ability from a hidden zone reveals the card that has it, as the ability is announced and put on
+# the stack - one event (the lasting reveal of CR 701.20a is RX-7, docs/rules-exceptions.md). Urban Retreat's "{2}, Return a tapped
+# creature you control to its owner's hand: Put this card from your hand onto the battlefield" keeps the card in the hand
+# while the ability waits on the stack. Before the activation nothing has been revealed; while the cost asks which tapped
+# creature to return, Urban Retreat has been revealed already, and once the cost is paid, with the ability on the stack and
+# the card still in the hand, it has been revealed by Bot1 once - not again as the activation goes on past that question. Bot1's Ornithopter attacks on turn 3 to be tapped, and the Moxen pay the {2}.
+
+[Bot1 Deck]
+Ornithopter
+Mox Pearl
+Mox Jet
+Urban Retreat
+Plains
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Revealed = (absent)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Urban Retreat.Activate
+? Bot1.Revealed = Urban Retreat
+Bot1.Choose(Ornithopter)
+? Stack = Urban Retreat
+? Bot1.Hand = Ornithopter; Plains; Plains; Plains; Plains; Urban Retreat
+? Bot1.Revealed = Urban Retreat
+
+[Expect]
+Bot1.Revealed = Urban Retreat
+Bot1.Battlefield = Mox Pearl; Mox Jet; Urban Retreat
+Bot2.Revealed = (absent)

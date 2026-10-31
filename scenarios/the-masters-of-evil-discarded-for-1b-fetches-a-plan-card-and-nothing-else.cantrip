@@ -36,4 +36,5 @@ Bot1.Search(Doom Reigns Supreme)
 [Expect]
 Bot1.Graveyard = The Masters of Evil
 Bot1.Hand.Count = 5
-Bot1.Revealed = Doom Reigns Supreme
+# The Masters of Evil, revealed as its ability is activated from the hand (CR 602.2a), and the card the search finds.
+Bot1.Revealed = Doom Reigns Supreme; The Masters of Evil

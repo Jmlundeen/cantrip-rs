@@ -132,3 +132,30 @@ to 15.
 
 **What the engine does instead, and why.** After seven mulligans the player keeps (`turn.rs`). A player who mulligans
 seven times has an empty opening hand to put cards back from, so an eighth mulligan makes no practical difference.
+
+### RX-7: A card an ability is activated from in a hidden zone is revealed once, not kept revealed while the ability is on the stack
+
+| Rule | Category | Decided by | Date |
+| --- | --- | --- | --- |
+| CR 701.20a (with 602.2a) | paper-only | jschibel | 2026-10-31 |
+
+**What the rules say.** Activating an ability from a hidden zone reveals the card that has it (CR 602.2a), and "the card
+remains revealed from the time the spell or ability is announced until the time it leaves the stack" (CR 701.20a).
+
+**What the engine does instead, and why.** The reveal is one atomic event, made once by the activation, as the ability is
+announced and put on the stack and before its costs are paid (`Event::Revealed`, by the activator; `reveal_if_hidden` in
+`cantrip-rules/src/actions.rs`). The card is not treated as seen by every player afterwards while the ability waits on the
+stack: not by the look-back rule (CR 603.10a, `ops::seen_by_all`) and not by what a seat is shown
+(`cantrip-engine/src/visibility.rs`). Keeping the card revealed is a logistical aid for paper games, so players can track
+what is on the stack: nothing triggers on it, and everything that must be public is made public by the event, which every
+player sees and the history keeps. The one rule that reads the lasting reveal is the look-back of CR 603.10a: a card moved
+from the hand or library into a hand or a library while its ability waits is judged hidden as it moves, so an ability that
+triggers on an object all players can see being put there does not look back for it. That case does not arise in
+practice: nearly every such ability moves its card to a public zone as part of its cost (cycling and channel discard
+it, a Spirit Guide exiles it, Urban Retreat and its kind put it onto the battlefield). Ninjutsu is the exception, and a
+single reveal serves it fully: a player who wants to respond to it, or stifle it, does so with exactly the information a
+lasting reveal would give.
+
+**Cards and cases it covers.** Every activated ability activated from a hand or a library, mana abilities included:
+cycling and typecycling, channel, ninjutsu, transmute, the Spirit Guides, Urban Retreat and the other "from your hand"
+abilities. The lasting reveals of behold, splice and miracle (also CR 701.20a) are not covered.

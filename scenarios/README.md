@@ -570,8 +570,10 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   (empty when both are locked), and the mana value they leave it. The Room is named by its unlocked doors (`Unholy Annex`,
   `Unholy Annex // Ritual Chamber`), and by nothing at all when neither is (`Bot1.Battlefield.#1`). A locked door is
   unlocked by `Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)`, a special action paid with the mana abilities that follow.
-- `BotN.Revealed` (present once the player has revealed a card): the cards they revealed, in order, from the history; a beheld
-  card (CR 701.4a) is revealed from a hand, a beheld permanent is not
+- `BotN.Revealed` (present once the player has revealed a card): the cards they revealed, sorted by name, from the history; a
+  beheld card (CR 701.4a) is revealed from a hand, a beheld permanent is not; a card whose ability they activated from a hand
+  or a library is revealed as the ability is announced (CR 602.2a), mana abilities' included (CR 605.3), special actions'
+  not (CR 116.2)
 - `BotN.Crimes` (present once the player has committed a crime, CR 700.13): the spells, and the sources of the abilities,
   by which they committed one, in order, from the history - one per spell or ability however many of its targets were crimes
 - `BotN.PhasedOut` (with `.Count`): the phased-out permanents the player controlled as they phased out (CR 702.26b), apart

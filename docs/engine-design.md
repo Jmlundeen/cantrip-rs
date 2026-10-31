@@ -827,10 +827,13 @@ ability, CR 603.6a). Whether all players could see the object is decided by the 
 instruction moving it is the one that reveals it ("reveal it and put it into your hand": the reveal-and-move verbs,
 `Game::return_to_hand_revealed` and its kin, mark the move; an effect's reveal lasts only through that instruction, so a
 later draw in the same effect moves a hidden card), a replacement reveals it as it moves, a cost or announcement of a
-spell or ability still on the stack revealed it (`StackItem::members`) or it is an ability's hidden source (CR 602.2a),
+spell or ability still on the stack revealed it (`StackItem::members`: behold, splice),
 or its reveal triggered an ability not yet off the stack (miracle). No card the engine has keeps a card revealed by a
 continuous effect; the first that does builds that. The history's `Event::Revealed` is what was shown, never whether a card is revealed
-now. No card declares anything. An ability that matches events of both kinds ("enters or dies") is
+now. The card an ability is activated from in a hand or a library is revealed by the activation itself, one
+`Event::Revealed` by the activator as it is announced and before any cost (CR 602.2a; a mana ability's too, CR 605.3; a
+special action none, CR 116.2), and is not kept revealed while the ability is on the stack (RX-7 in
+`docs/rules-exceptions.md`). No card declares anything. An ability that matches events of both kinds ("enters or dies") is
 judged on each as that event says. An unattachment and a countered spell are announced just before they happen, so the
 board they are judged on is the one before them. Phasing out and losing the game are recorded in the history but are no
 trigger events yet (`EventMask::of` gives them no mask), so nothing triggers on them; the rule already says they look

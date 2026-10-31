@@ -9056,6 +9056,8 @@ fn activate(
 ) -> R<()> {
     let def = activated(cx, ability).expect("activated");
     let paid = activating(def);
+    // CR 602.2a: announced, its card revealed if it is in a hand or a library, before any choice or cost.
+    reveal_if_hidden(cx, player, source);
     // What gave the source this ability (CR 113.2c, 613.1f): the option names it; read now, before any cost moves it (a cost
     // may sacrifice the very permanent that gave it).
     let granted = granted.or_else(|| granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
@@ -9311,6 +9313,20 @@ fn activate(
     Ok(())
 }
 
+/// The first step of activating an ability (CR 602.2a): the player announces it, and if `source` is a card in a hidden zone
+/// (a hand or a library, CR 400.2) that card is revealed (CR 701.20a) - once, by the player activating it, as the ability is
+/// announced and put on the stack, before any choice or cost of CR 602.2b, so a cost that discards or exiles the card
+/// (cycling, channel, a Spirit Guide's) is paid after it is shown. The reveal is this one event: the card is not kept
+/// revealed while the ability is on the stack (CR 701.20a's lasting reveal is RX-7 in `docs/rules-exceptions.md`).
+/// A special action is no activation (CR 116.2: foretell, plot, suspend reveal nothing by this rule), and a spell cast from a
+/// hand is moved to the stack (CR 601.2a), where all see it.
+fn reveal_if_hidden(cx: &mut Cx, player: PlayerId, source: ObjectId) {
+    let zone = cx.s().obj(source).zone;
+    if zone.is(ZoneKind::Hand) || zone.is(ZoneKind::Library) {
+        Game::reveal(cx, player, &[source]);
+    }
+}
+
 /// The mana a special action costs (CR 116.2): the ability's own, except for the two the rules word as "pay the mana cost of
 /// the object": turning a face-down creature card face up costs its mana cost, with X as 0 (CR 701.40b, 107.3b), and
 /// unlocking a Room's door the mana cost of that door (CR 709.5e).
@@ -9502,6 +9518,9 @@ fn activate_mana_as(
     }
     let ability = cx.chars(source).abilities().nth(index as usize).expect("ability");
     let def = activated(cx, ability).expect("activated");
+    // A mana ability is activated by the rules for any activated ability (CR 605.3, 602.2a): from a hand, its card is
+    // revealed first (Elvish Spirit Guide's, exiled as its cost is paid).
+    reveal_if_hidden(cx, player, source);
     // How the source acquired the ability (CR 607.5), read before any cost moves it: what it is linked by.
     let acquired = acquired_nth(cx, source, index as usize);
     // What restricts its mana, read from the source as it is activated, before a cost may take it away (CR 106.6).

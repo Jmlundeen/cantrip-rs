@@ -574,14 +574,16 @@ fn a_card_a_cost_revealed_is_looked_back_on_while_its_ability_is_on_the_stack() 
     }
 }
 
-/// A card an ability is activated from in a hand is revealed until the ability leaves the stack (CR 602.2a, 701.20a).
+/// A card an ability is activated from in a hand is revealed by the activation, one event (CR 602.2a), and is not kept
+/// revealed while the ability is on the stack (RX-7, `docs/rules-exceptions.md`): moved from the hand then, it is hidden as
+/// it moves - no look back.
 #[test]
-fn a_card_an_ability_on_the_stack_was_activated_from_is_looked_back_on() {
+fn a_card_an_ability_on_the_stack_was_activated_from_is_hidden_as_it_moves() {
     let (mut game, librarian, in_hand) = librarian_game();
     let card = game.state.obj(in_hand).card;
     game.state.stack_push(crate::actions::stack_item(StackKind::Activated, in_hand, AbilityRef { card, index: 0 }, PlayerId(0), &[]));
     let mut cx = cx(&mut game);
-    assert!(librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))));
+    assert!(!librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))));
 }
 
 /// A card revealed for miracle stays revealed until its triggered ability leaves the stack, while it waits to be put on it

@@ -120,17 +120,19 @@ struct Plan {
 /// because it was revealed once, which ended (the history's `Event::Revealed` is what was shown, not what is). An effect's
 /// reveal lasts only through the instruction about the card it revealed: the move that instruction makes is marked, and a
 /// later one in the same effect (a draw that takes it) is not. Otherwise: the cost or announcement of a spell or activated ability
-/// still on the stack revealed it, or it is the card an ability on the stack was activated from in that hidden zone (CR
-/// 602.2a); or its revealing triggered an ability that has not yet left the stack (miracle, CR 702.94a). No card the engine
-/// has keeps a card revealed by a continuous effect ("play with the top card of your library revealed"): the first that
-/// does adds that here.
+/// still on the stack revealed it (behold, splice); or its revealing triggered an ability that has not yet left the stack
+/// (miracle, CR 702.94a). The card an ability is activated from in a hidden zone is revealed by the activation alone, one
+/// event (CR 602.2a, `Event::Revealed`), and is not kept revealed while the ability is on the stack (RX-7,
+/// `docs/rules-exceptions.md`). No card the engine has keeps a card revealed by a continuous effect ("play with the top card
+/// of your library revealed"): the first that does adds that here.
 pub(crate) fn seen_by_all(cx: &Cx, id: ObjectId, revealed_by_move: bool) -> bool {
     seen_by_all_in(cx.g, id, revealed_by_move)
 }
 
-/// The cards in a hand or a library that a reveal in effect shows every player now (`seen_by_all`): those a spell or an
-/// activated ability still on the stack revealed - the card an ability was activated from in its hidden zone among them
-/// (CR 602.2a) - and those whose revealing triggered an ability not yet off the stack (CR 701.20a). What a seat may see
+/// The cards in a hand or a library that a reveal in effect shows every player now (`seen_by_all`): those the cost or
+/// announcement of a spell or an activated ability still on the stack revealed (behold, splice), and those whose revealing
+/// triggered an ability not yet off the stack (CR 701.20a). Not the card an ability was activated from there: its reveal is
+/// the activation's one event (CR 602.2a, RX-7). What a seat may see
 /// (`cantrip_engine::visibility::observable`) holds them.
 pub(crate) fn revealed_in_hidden_zones(g: &crate::Game) -> Vec<ObjectId> {
     let s = &g.state;
@@ -165,9 +167,10 @@ fn seen_by_all_in(g: &crate::Game, id: ObjectId, revealed_by_move: bool) -> bool
                     // until it leaves the stack (CR 701.20a) - while it is being cast (`being_cast`) and once it has become
                     // cast (`cast_known`, CR 601.2i). A copy of a spell or an ability was neither (CR 707.10), so it revealed
                     // nothing; a cast copy of a card was cast (CR 707.12). An activated ability's item is put on the stack
-                    // as it is announced (CR 602.2a), and only a copy of one is `copied`.
+                    // as it is announced (CR 602.2a), and only a copy of one is `copied`. Its own source, activated from a
+                    // hidden zone, is not among them: that reveal is the activation's event alone (RX-7).
                     StackKind::Spell => s.members(i.members).contains(&id) && (i.cast_known != u32::MAX || being_cast(g, i)),
-                    StackKind::Activated => !i.copied && (i.object == id || s.members(i.members).contains(&id)),
+                    StackKind::Activated => !i.copied && s.members(i.members).contains(&id),
                     // A copy (Strionic Resonator) was never triggered by the reveal (CR 707.10): only "that triggered
                     // ability" keeps the card revealed.
                     StackKind::Triggered => !i.copied && triggered_by_revealing(i.ability, i.object, id),

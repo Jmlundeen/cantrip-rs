@@ -35,7 +35,8 @@ Bot1.Hand.Hobbit Hole.Activate(Ability: Halflingcycling)
 Bot1.Pass
 ! Bot1.Search(Elvish Mystic)
 Bot1.Search(Delighted Halfling)
-? Bot1.Revealed = Delighted Halfling
+# Hobbit Hole, revealed as halflingcycling is activated from the hand (CR 602.2a), and the card the search finds.
+? Bot1.Revealed = Delighted Halfling; Hobbit Hole
 [T1 Bot1.Main2]
 
 [Expect]
