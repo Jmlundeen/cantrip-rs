@@ -1,0 +1,48 @@
+# Talon Gates of Madara: "{4}: Put this card from your hand onto the battlefield." and "When this land enters, up to one target
+# creature phases out." Bot1 has a Memnite and three Moxen, and casts a fourth on turn 3. With only three Moxen the ability is refused (it costs
+# exactly {4}); with the fourth it is activated from hand at instant speed (Bot1's main phase on turn 3, no land drop used), the
+# pool is empty right after, and the land's trigger targets Bot1's own Memnite, which phases out (CR 702.26b). Bot2 has its own
+# Memnite which is a legal target too (see the other scenario); a Mox is refused as a target (not a creature).
+
+[Bot1 Deck]
+Memnite
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Talon Gates of Madara
+Plains x20
+
+[Bot2 Deck]
+Memnite
+Plains x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Talon Gates of Madara.Activate(Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Talon Gates of Madara.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana =
+! Bot1.Target(Mox Pearl)
+Bot1.Target(Bot1.Battlefield.Memnite)
+
+[Expect]
+Bot1.Battlefield = Talon Gates of Madara; Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire
+Bot1.PhasedOut.Count = 1
+Bot1.PhasedOut.Memnite.Tapped = false
+Bot2.Battlefield = Memnite
+Bot1.Battlefield.Talon Gates of Madara.Tapped = false
