@@ -1,0 +1,54 @@
+# Escape to the Wilds: the top FIVE cards of Bot1's own library are exiled (the sixth, a Plains, stays; Bot2's library is
+# untouched), and the lands among them may be played until the end of Bot1's next turn (CR 514.2), under the ordinary
+# land-play rules. It also gives ONE additional land play this turn (CR 305.2): turn 1 plays a hand Plains and an exiled
+# Forest, the third land is refused. Turn 3 has one land play only: the other exiled Forest, a hand Plains is refused.
+# Turn 5 the grant has ended: the exiled Mountain cannot be played though a land play is free.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Escape to the Wilds
+Plains
+Plains
+Plains
+Forest
+Forest
+Plains
+Plains
+Mountain
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Escape to the Wilds.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 5
+? Bot1.Library.Count = 11
+? Bot2.Library.Count = 13
+Bot1.Hand.Plains.Play
+Bot1.Exile.Forest.Play
+? Bot1.LandsPlayed = 2
+! Bot1.Exile.Forest.Play
+! Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Exile.Forest.Play
+! Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+! Bot1.Exile.Mountain.Play
+Bot1.Hand.Plains.Play
+
+[Expect]
+Exile = Mountain; Plains; Plains
+Bot1.Battlefield.Forest#1.Tapped = false
