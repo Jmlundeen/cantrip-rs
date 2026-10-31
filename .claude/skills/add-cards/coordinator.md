@@ -49,7 +49,7 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    make. It says: claim before any work; `new-card.py` first; the core is closed to it (a missing keyword module may go
    in `cantrip-mechanics`); run only its card's scenarios and coverage and those of a card whose file or shared
    mechanic it changed; one commit per card, `Closes #N`, mechanics and client commits before it; no push; every command in the
-   foreground with a long timeout (up to 600000 ms: a shorter one moves a long run to the background), never in the
+   foreground with a long timeout (1800000 ms, the ceiling `BASH_MAX_TIMEOUT_MS` allows: a run that outlasts its timeout is moved to the background), never in the
    background (an agent that stops to wait on one is made to leave its slot, and loses it); every shell command `cd`s
    into its worktree first (the session's working directory is shared, and moves); scratch files (patches, probes) go
    in a scratchpad subfolder named for its agent id, never at the top, where another slot's agent can overwrite them; and a short

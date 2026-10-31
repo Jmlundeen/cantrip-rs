@@ -666,6 +666,11 @@ HOOK_COMMAND = 'python "$CLAUDE_PROJECT_DIR/tools/maintenance/worktrees.py" hook
 HOOK_EVENTS = {"SubagentStart": None, "PreToolUse": "Edit|Write|MultiEdit|NotebookEdit|Bash|PowerShell",
                "SubagentStop": None}
 
+# A foreground shell command that reaches its timeout is moved to the background, and an agent that then stops to wait
+# on it leaves its slot (SubagentStop). Claude Code's default timeout is 2 minutes and its ceiling 10; a whole
+# tools\test.cmd run, card-mutate.py or the benchmark outlasts that. Thirty minutes keeps them in the foreground.
+TIMEOUT_ENV = {"BASH_DEFAULT_TIMEOUT_MS": "1800000", "BASH_MAX_TIMEOUT_MS": "1800000"}
+
 
 def settings_path(root):
     """This machine's own Claude Code settings for the repository: gitignored, never committed."""
@@ -720,13 +725,21 @@ def hooks_command(root, action):
             hooks.pop(event, None)
     if not hooks:
         settings.pop("hooks")
+    env = settings.setdefault("env", {})
+    for name, value in TIMEOUT_ENV.items():
+        if action == "install":
+            env[name] = value
+        elif env.get(name) == value:
+            env.pop(name)
+    if not env:
+        settings.pop("env")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=2)
         f.write("\n")
     verb = "Installed" if action == "install" else "Removed"
-    return (f"{verb} the pool's hooks in {path}. Claude Code reads hooks when a session starts: restart it (or "
-            f"review them in /hooks) before the pool is used.")
+    return (f"{verb} the pool's hooks and its 30-minute shell timeouts in {path}. Claude Code reads them when a session "
+            f"starts: restart it (or review the hooks in /hooks) before the pool is used.")
 
 
 def digest(token):

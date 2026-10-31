@@ -55,7 +55,7 @@ temporary edit at a time in the card's own worktree, run, then restored at once 
 and tried there the same way (`corpus -- --file <path>`). It commits only the fixes the next paragraph but one gives it, cleans nothing, never
 clones the repository elsewhere, and leaves `git status` clean. It reaches that worktree only by the token in its prompt (`tools\worktree.cmd join`, its first
 command, and `leave` its last), never by a path it was given. Every command runs in the foreground with a long timeout
-(up to 600000 ms: a shorter one moves a long run to the background), never in the background: a reviewer that stops to
+(1800000 ms, the ceiling `BASH_MAX_TIMEOUT_MS` allows: a run that outlasts its timeout is moved to the background), never in the background: a reviewer that stops to
 wait on one is made to leave its worktree with its break edit still in place.
 
 Self-reported "exact" is not proof. A finding **blocks** the card when it is a rules deviation, a code defect (an

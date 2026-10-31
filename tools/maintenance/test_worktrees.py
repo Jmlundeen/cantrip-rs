@@ -391,6 +391,8 @@ class PoolTest(unittest.TestCase):
             settings = wt.json.load(f)
         self.assertEqual(len(settings["hooks"]["PreToolUse"]), 2)
         self.assertEqual(len(settings["hooks"]["SubagentStop"]), 1)
+        # Long foreground runs stay in the foreground: an agent waiting on a backgrounded one would leave its slot.
+        self.assertEqual(settings["env"], wt.TIMEOUT_ENV)
         wt.hooks_command(self.main, "uninstall")
         self.assertFalse(wt.hooks_installed(self.main))
         with open(wt.settings_path(self.main), encoding="utf-8") as f:

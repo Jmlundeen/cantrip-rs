@@ -12,8 +12,10 @@ opted in is never sent into the pool.
 
 1. **Install the hooks:** `tools\worktree.cmd hooks install`. It merges three hooks into the local settings, keeping
    everything else there: `SubagentStart` (tells a subagent its agent ID), `PreToolUse` on edits and shell commands
-   (denies a slot to anyone but its member) and `SubagentStop` (a stopped agent leaves its slot). Running it twice is
-   the same as once. Auto mode may refuse to let an agent change settings; the user then runs it at the prompt with `! python tools/maintenance/worktrees.py hooks install` (the `!` prompt is
+   (denies a slot to anyone but its member) and `SubagentStop` (a stopped agent leaves its slot). It also sets
+   `BASH_DEFAULT_TIMEOUT_MS` and `BASH_MAX_TIMEOUT_MS` to 30 minutes in the same file's `env`: a foreground command
+   that reaches its timeout (2 minutes by default) is moved to the background, and an agent that stops to wait on it
+   leaves its slot. Running it twice is the same as once. Auto mode may refuse to let an agent change settings; the user then runs it at the prompt with `! python tools/maintenance/worktrees.py hooks install` (the `!` prompt is
    bash, which drops a backslash).
 2. **Restart Claude Code** (or review the hooks in `/hooks`): hooks are read when a session starts. Check with
    `tools\worktree.cmd hooks check`.
