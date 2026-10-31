@@ -1,0 +1,61 @@
+# Wight of the Reliquary: vigilance (it attacks on turn 3 and stays untapped); "+1/+1 for each creature card in your graveyard"
+# counts only its controller's graveyard (Bot2's Elvish Mystic, discarded to hand size, is not counted) and is exactly +1 for the
+# sacrificed Ravine Raider (2/2 before, 3/3 after, CR 613.4c). "{T}, Sacrifice another creature" offers the Raider but
+# neither the Wight itself nor a noncreature Mox, the Raider is a cost (in the graveyard before the search), and the search finds a
+# nonbasic land card (Ancient Tomb) tapped but no nonland card (Hired Blade); Bot2's Forest stays in Bot2's library (CR 701.21,
+# 701.23). {B}{G} is paid exactly by two Moxen on turn 1.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Wight of the Reliquary
+Ravine Raider
+Swamp
+Swamp
+Swamp
+Swamp
+Ancient Tomb
+Hired Blade
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Elvish Mystic
+Island x8
+Forest
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wight of the Reliquary.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Ravine Raider.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Elvish Mystic
+? Bot1.Battlefield.Wight of the Reliquary.Power = 2
+Bot1.Attack(Wight of the Reliquary > Bot2)
+Bot1.Pass
+? Bot1.Battlefield.Wight of the Reliquary.Tapped = false
+[T3 Bot1.Main2]
+Bot1.Battlefield.Wight of the Reliquary.Activate
+! Bot1.Choose(Wight of the Reliquary)
+! Bot1.Choose(Mox Jet)
+Bot1.Choose(Ravine Raider)
+! Bot1.Search(Hired Blade)
+Bot1.Search(Ancient Tomb)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Ravine Raider
+Bot1.Battlefield.Ancient Tomb.Tapped = true
+Bot1.Battlefield.Wight of the Reliquary.Tapped = true
+Bot1.Battlefield.Wight of the Reliquary.Power = 3
+Bot1.Battlefield.Wight of the Reliquary.Toughness = 3
+Bot2.Graveyard = Elvish Mystic

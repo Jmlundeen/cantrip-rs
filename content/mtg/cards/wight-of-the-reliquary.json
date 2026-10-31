@@ -1,0 +1,11 @@
+{
+  "name": "Wight of the Reliquary",
+  "manaCost": "{B}{G}",
+  "type": "Creature — Zombie Knight",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Vigilance\nThis creature gets +1/+1 for each creature card in your graveyard.\n{T}, Sacrifice another creature: Search your library for a land card, put it onto the battlefield tapped, then shuffle.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

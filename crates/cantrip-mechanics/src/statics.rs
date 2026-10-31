@@ -143,7 +143,7 @@ pub fn itself_with_two_creature_cards_in_your_graveyard(q: &dyn LayerQuery, sour
 
 /// "This creature gets +1/+1 for each <card type> card in your graveyard" (CR 613.4c, layer 7c) as a static ability's `StaticDef::apply`,
 /// `TYPE` a `CardType` as `u8`: "your" is its controller's, and the count is taken whenever characteristics are computed. Fiend
-/// Artisan (creature cards) and Knight of the Reliquary (land cards) print it.
+/// Artisan and Wight of the Reliquary (creature cards) and Knight of the Reliquary (land cards) print it.
 pub fn plus_one_per_card_type_in_your_graveyard<const TYPE: u8>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let Some(&card_type) = CardType::ALL.iter().find(|&&t| t as u8 == TYPE) else { return };
     let n = card_type_cards_in_your_graveyard(view, source, card_type) as i16;
