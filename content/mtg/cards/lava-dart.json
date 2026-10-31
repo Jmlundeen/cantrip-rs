@@ -1,0 +1,6 @@
+{
+  "name": "Lava Dart",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Lava Dart deals 1 damage to any target.\nFlashback—Sacrifice a Mountain. (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+}

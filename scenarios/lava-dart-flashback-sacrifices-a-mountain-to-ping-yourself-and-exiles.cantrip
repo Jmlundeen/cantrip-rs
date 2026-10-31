@@ -1,0 +1,34 @@
+# Lava Dart hard-cast for {R} deals exactly 1 to the opponent (19) and goes to the graveyard; its flashback
+# (sacrifice a Mountain, no mana) then deals exactly 1 to its own caster (19) - any target includes you - and
+# the card is exiled (CR 702.34a). The Mountain is sacrificed; the Island stays.
+
+[Bot1 Deck]
+Lava Dart
+Mountain
+Island
+Mountain x5
+Island x20
+
+[Bot2 Deck]
+Plains x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lava Dart.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Graveyard = Lava Dart
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Graveyard.Lava Dart.Cast(Bot1; Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Exile = Lava Dart
+Bot1.Graveyard = Mountain
+Bot1.Battlefield = Island

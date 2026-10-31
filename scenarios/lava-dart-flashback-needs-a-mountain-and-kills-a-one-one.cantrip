@@ -1,0 +1,36 @@
+# Flashback—Sacrifice a Mountain is not offered without a Mountain (Bot1 controls only an Island on turn 3: the
+# refusal), and is offered once a Mountain is played (the positive control); the 1 damage kills Bot2's 1/1
+# Llanowar Elves. Lava Dart gets to the graveyard from a Black Lotus tapped for {R} on turn 1.
+
+[Bot1 Deck]
+Lava Dart
+Island
+Black Lotus
+Mountain
+Island x25
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Hand.Lava Dart.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Lava Dart.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Graveyard.Lava Dart.Cast(Llanowar Elves; Ability: Flashback)
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Exile = Lava Dart
+Bot1.Battlefield = Island
