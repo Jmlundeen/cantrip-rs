@@ -1144,6 +1144,13 @@ pub mod filters {
     pub fn another_creature(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
         id != asker.source && creature(q, asker, id)
     }
+    /// An object of a land type (a permanent, or for craft a card in the graveyard too), `TYPE` being `lands::sub(Subtype::Mountain)` and so on. The type is a word of the asking
+    /// object's rules text, read through its words (CR 612.2), and a permanent has it when the layers made it that type (CR 305.6).
+    /// Fireblast, Mine Collapse and Lava Dart's flashback sacrifice Mountains; Daze, Gush and Waterlogged Hulk's craft return or
+    /// exile Islands.
+    pub fn land_type<const TYPE: u16>(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+        q.chars(id).has_subtype(crate::lands::word(q, asker.source, TYPE))
+    }
     /// An artifact. Crabomination (emerge) and Time Sieve sacrifice one.
     pub fn artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         q.chars(id).is(CardType::Artifact)

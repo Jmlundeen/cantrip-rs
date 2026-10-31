@@ -8,12 +8,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn island(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Island))
-}
-
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::SPELL], effect),
-    ways: &[way(Cost::return_to_hand(1, island), ZoneKind::Hand, "Return an Island you control to its owner's hand")],
+    ways: &[way(Cost::return_to_hand(1, cantrip_mechanics::targets::filters::land_type::<{ cantrip_mechanics::lands::sub(Subtype::Island) }>), ZoneKind::Hand, "Return an Island you control to its owner's hand")],
     ..oracle::DAZE
 };

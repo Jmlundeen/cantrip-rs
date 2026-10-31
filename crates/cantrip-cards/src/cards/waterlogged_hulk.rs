@@ -11,13 +11,8 @@ fn mill_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Craft with Island": an Island you control or an Island card from your graveyard (CR 702.167b), the basic land type read
-/// through the Hulk's words (CR 612).
-fn island(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Island))
-}
-
-static ISLAND: Materials = craft::materials(1, false, island, "Island");
+/// "Craft with Island": an Island you control or an Island card from your graveyard (CR 702.167b), read through the Hulk's words (CR 612).
+static ISLAND: Materials = craft::materials(1, false, cantrip_mechanics::targets::filters::land_type::<{ cantrip_mechanics::lands::sub(Subtype::Island) }>, "Island");
 
 /// "Descend 8 - This Vehicle can't be blocked as long as there are eight or more permanent cards in your graveyard" (CR
 /// 207.2c: descend is an ability word; CR 110.4b): counted in its controller's graveyard whenever its characteristics are.

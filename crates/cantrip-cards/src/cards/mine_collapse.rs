@@ -8,13 +8,9 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn mountain(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mountain))
-}
-
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::CREATURE_OR_PLANESWALKER], effect),
-    ways: &[way(Cost::sacrifice(1, mountain), ZoneKind::Hand, "Sacrifice a Mountain")
+    ways: &[way(Cost::sacrifice(1, cantrip_mechanics::targets::filters::land_type::<{ cantrip_mechanics::lands::sub(Subtype::Mountain) }>), ZoneKind::Hand, "Sacrifice a Mountain")
         .condition(your_turn)],
     ..oracle::MINE_COLLAPSE
 };

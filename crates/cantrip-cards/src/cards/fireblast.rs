@@ -7,12 +7,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn mountain(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mountain))
-}
-
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::ANY], effect),
-    ways: &[way(Cost::sacrifice(2, mountain), ZoneKind::Hand, "Sacrifice two Mountains")],
+    ways: &[way(Cost::sacrifice(2, cantrip_mechanics::targets::filters::land_type::<{ cantrip_mechanics::lands::sub(Subtype::Mountain) }>), ZoneKind::Hand, "Sacrifice two Mountains")],
     ..oracle::FIREBLAST
 };
