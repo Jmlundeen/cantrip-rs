@@ -34,6 +34,30 @@ public sealed class FullScreenTests(WebClient web)
     private const string IPhoneAgent =
         "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 
+    /// <summary>
+    /// A screen wake lock that is always granted (headless Chromium refuses the real one), counting the locks held in
+    /// <c>globalThis.wakeLocksHeld</c>.
+    /// </summary>
+    private const string FakeWakeLock = """
+        globalThis.wakeLocksHeld = 0;
+        Object.defineProperty(Navigator.prototype, 'wakeLock', { configurable: true, get: () => ({
+            request: async (type) => {
+                if (type !== 'screen') throw new TypeError(type);
+                globalThis.wakeLocksHeld++;
+                const lock = new EventTarget();
+                lock.released = false;
+                lock.release = async () => {
+                    if (!lock.released) {
+                        lock.released = true;
+                        globalThis.wakeLocksHeld--;
+                        lock.dispatchEvent(new Event('release'));
+                    }
+                };
+                return lock;
+            },
+        }) });
+        """;
+
     /// <summary>What an app opened from an iPhone's Home Screen says of itself.</summary>
     private const string Standalone = "Object.defineProperty(Navigator.prototype, 'standalone', { get: () => true });";
 
@@ -49,21 +73,28 @@ public sealed class FullScreenTests(WebClient web)
         Assert.Equal("Full screen", button.GetProperty("caption").GetString());
         await tablet.PictureAsync("full-screen-button");
 
+        // The screen is kept on while full screen, and only then.
+        await tablet.Page.EvaluateAsync(FakeWakeLock);
+        Assert.False(await tablet.Page.EvaluateAsync<bool>("() => globalThis.cantripScreenAwake()"));
         await tablet.TapAsync(X(button), Y(button));
         await tablet.Page.WaitForFunctionAsync("() => document.fullscreenElement === document.documentElement", null, Wait);
         button = await FullScreenAsync(tablet.Page, "tablet", state => state.GetProperty("state").GetString() == "exit");
         Assert.Equal("Exit full screen", button.GetProperty("caption").GetString());
+        await tablet.Page.WaitForFunctionAsync("() => globalThis.cantripScreenAwake() && globalThis.wakeLocksHeld === 1", null, Wait);
 
         await tablet.TapAsync(X(button), Y(button));
         await tablet.Page.WaitForFunctionAsync("() => document.fullscreenElement === null", null, Wait);
         button = await FullScreenAsync(tablet.Page, "tablet", state => state.GetProperty("state").GetString() == "enter");
+        await tablet.Page.WaitForFunctionAsync("() => !globalThis.cantripScreenAwake() && globalThis.wakeLocksHeld === 0", null, Wait);
 
         // Left some other way - Escape, the system's own gesture - the button follows.
         await tablet.TapAsync(X(button), Y(button));
         await tablet.Page.WaitForFunctionAsync("() => document.fullscreenElement !== null", null, Wait);
         await FullScreenAsync(tablet.Page, "tablet", state => state.GetProperty("state").GetString() == "exit");
+        await tablet.Page.WaitForFunctionAsync("() => globalThis.wakeLocksHeld === 1", null, Wait);
         await tablet.Page.EvaluateAsync("() => document.exitFullscreen()");
         await FullScreenAsync(tablet.Page, "tablet", state => state.GetProperty("state").GetString() == "enter");
+        await tablet.Page.WaitForFunctionAsync("() => globalThis.wakeLocksHeld === 0", null, Wait);
         Assert.Empty(tablet.Errors);
     }
 
@@ -142,6 +173,10 @@ public sealed class FullScreenTests(WebClient web)
         // In an app the page has the whole screen already: no button.
         await launched.WaitForFunctionAsync("() => typeof globalThis.cantripTest === 'string' && JSON.parse(globalThis.cantripTest).inPerson?.fullScreen?.state === 'none'", null, Wait);
         Assert.False((await FullScreenAsync(launched, "phone")).GetProperty("shown").GetBoolean());
+
+        // An app has the whole screen, so it keeps the screen on; Safari's tab, not full screen, does not.
+        await launched.WaitForFunctionAsync("() => globalThis.cantripScreenAwake() && globalThis.wakeLocksHeld === 1", null, Wait);
+        Assert.False(await tab.EvaluateAsync<bool>("() => globalThis.cantripScreenAwake()"));
 
         // Launched again from the icon, its session gone: the code in its address is spent, and the ticket it kept is
         // what it brings.
@@ -249,6 +284,7 @@ public sealed class FullScreenTests(WebClient web)
         });
         if (iPhone) await context.AddInitScriptAsync(NoFullscreenApi);
         if (standalone) await context.AddInitScriptAsync(Standalone);
+        await context.AddInitScriptAsync(FakeWakeLock);
         return context;
     }
 

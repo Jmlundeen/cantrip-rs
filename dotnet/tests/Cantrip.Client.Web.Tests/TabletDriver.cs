@@ -209,7 +209,7 @@ public sealed record TabletState(
 /// </summary>
 public sealed record TabletGridState(bool Shown, int Grid, int Grids, int Decision, int Active, int Pick, bool Held, IReadOnlyList<TabletFace> Faces);
 
-/// <summary>One face of a tablet's grid draft, upright for <c>Seat</c>.</summary>
+/// <summary>A tablet's grid draft, upright for <c>Seat</c> (zero on the shared board: for both, <c>Turned</c> to face seat 2 on their pick).</summary>
 public sealed record TabletFace(int Seat, bool Turned, string Status, string Seats, IReadOnlyList<string> Recent, IReadOnlyList<TabletGridButton> Buttons);
 
 /// <summary>A button of the grid: a line's ("Row 1", "Column 3", <c>Line</c> 0 to 5) or Take (<c>Line</c> -1).</summary>

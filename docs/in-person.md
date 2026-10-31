@@ -52,10 +52,10 @@ press; a tap on a card picks nothing.
   only authority, and nothing new is trusted. A player's own tablet picks only for that player; a line for a pick already
   past, or one with no card left, goes nowhere; and with the picker's phone away it goes nowhere either, the tablet's
   buttons coming back after a few seconds.
-- **The shared tablet** shows the draft twice, as its stack band shows the stack: one face upright for seat 1 at the
-  tablet's bottom edge, one turned to face seat 2. Each player reads the grid upright on the face in front of them and
-  picks there. A grid cannot read upright for two people facing each other, and one turned sideways reads well for
-  neither.
+- **The shared tablet** shows the draft once, the grid and everything said of it turned to be upright for the player
+  whose pick it is: facing seat 1 at the tablet's bottom edge on their pick, turned to face seat 2 on theirs. Its buttons
+  are live on either player's pick, for that player. A pick just made stays upright for the player who made it while it
+  is shown, then the face turns for the next picker.
 - **Four devices.** Each player's tablet shows the grid, upright for its player, its buttons live on that player's pick:
   each picks on the board in front of them, and either can read the grid while the other picks.
 
@@ -116,6 +116,12 @@ no change to its viewport (`FullScreenTests` checks that).
   `"display": "fullscreen"` with icons from `cantrip.png`, `apple-mobile-web-app-capable`, a black-translucent status bar,
   an `apple-touch-icon`, and `viewport-fit=cover`. The button explains Add to Home Screen (Share, then Add to Home
   Screen) instead of doing nothing.
+- **The screen stays on.** While an in-person page is full screen - by the Fullscreen API, or as an app opened from the
+  Home Screen - it holds a screen wake lock (`navigator.wakeLock.request("screen")`), so a tablet or a phone does not go
+  dark mid-game, and lets it go when full screen is left. A browser drops the lock whenever the page is hidden; the
+  script asks again when it is shown, and after a tap, where a browser wants one first. A browser without the Screen
+  Wake Lock API (Safari before 16.4) sleeps as it is set to. `FullScreenTests` checks the lock with a stand-in for the
+  API, which headless Chromium refuses.
 - **The notch and the home indicator.** With `viewport-fit=cover` the page lies under them; the script reads
   `env(safe-area-inset-*)` from an element padded by them, and each in-person page pads itself by those insets, following
   them as the device turns.

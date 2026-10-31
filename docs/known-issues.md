@@ -82,6 +82,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-143](#ki-143-a-scenario-check-right-after-an-activation-can-read-the-pool-before-its-payment-finishes) | A scenario check right after an activation can read the pool before its payment finishes | Pri-2 | Open |
 | [KI-144](#ki-144-mathemagics-with-an-x-of-32-or-more-draws-at-most-4294967295-cards) | Mathemagics with an X of 32 or more draws at most 4,294,967,295 cards | Pri-3 | Won't fix: beyond practical scale |
 | [KI-146](#ki-146-the-booster-drafts-dragged-pick-test-once-saw-the-pick-fly-from-the-pack) | The booster draft's dragged-pick test once saw the pick fly from the pack | Pri-3 | Suspected |
+| [KI-147](#ki-147-two-tablet-browser-tests-wait-forever-for-unos-splash-to-go) | Two tablet browser tests wait forever for Uno's splash to go | Pri-3 | Open |
 
 ## Issues
 
@@ -652,3 +653,18 @@ for Tidehollow Sculler. The rules are unaffected: the card returns when the perm
 from a stack object in the view, as `is_by_in` does.
 
 **Scenarios.** `champion-of-the-clachan-exiles-a-kithkin-from-hand-and-returns-it-when-it-leaves` (the rules side).
+
+### KI-147: Two tablet browser tests wait forever for Uno's splash to go
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Open | harness (`dotnet/tests/Cantrip.Client.Web.Tests`) | 2026-10-31, the wake lock change; fails the same on the commit before it |
+
+**Notes.** `FullScreenTests.A_tablet_enters_and_leaves_full_screen_with_its_button_and_follows_the_browser` and
+`InPersonTests.A_tablet_draws_the_public_board_and_sends_only_what_is_tapped` time out after 90 seconds in their first
+`TabletDriver.PictureAsync`, which waits for `.uno-loader` to leave the page. Both open a tablet with no relay
+(`TabletDriver.OpenAsync` with no `site`); the tablets of `InPersonDraftTests`, at a real relay, lose the splash and
+pass. So the tablet's screen-wake-lock check in the first test has not run in a browser yet; the iPhone app's has.
+A fix finds why the splash stays on a tablet fed by the test (or why `PictureAsync` should not wait on it there).
+
+**Scenarios.** None: browser tests.

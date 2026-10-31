@@ -19,7 +19,7 @@ namespace Cantrip.Client.Web.InPerson;
 /// <c>seat</c> says whose half it is in. A tablet adds <c>layout</c>, <c>screen</c> (<c>phase</c> before the game,
 /// <c>grid</c> while the grid draft is drafted, <c>board</c> after), <c>phaseLine</c>, <c>held</c> (the faces of a card held
 /// up), <c>taps</c>, the taps it has sent, <c>lines</c>, the grid's lines it has sent, and <c>grid</c> (TabletDraft.cs); the
-/// grid's cards are under <c>cards</c> with the place <c>grid</c>, or <c>opponent-grid</c> on the turned face.
+/// grid's cards are under <c>cards</c> with the place <c>grid</c>, or <c>opponent-grid</c> while it is turned to face seat 2.
 /// </para>
 /// <para>
 /// A tablet opened with <c>?test</c> and no device token reads its device messages from the test instead of a relay:
@@ -160,31 +160,25 @@ public sealed partial class TabletPage
                 }
             }
 
-            // The draft's grid, once on each face: "grid" upright at the tablet's bottom edge, "opponent-grid" turned.
-            if (drafting)
+            // The draft's grid: "grid" upright at the tablet's bottom edge, "opponent-grid" turned to face seat 2.
+            CardBoardElement grid = _draft.Board;
+            if (drafting && grid.XamlRoot is not null && grid.ActualWidth > 0)
             {
-                foreach ((CardBoardElement row, bool turned) in _draft.Boards)
+                bool turned = _draft.IsTurned(grid);
+                GeneralTransform toPage = grid.TransformToVisual(_root);
+                foreach ((ObjectView card, Rect box, bool visible, _, _) in grid.Targets())
                 {
-                    if (row.XamlRoot is null || row.ActualWidth <= 0)
-                    {
-                        continue;
-                    }
-
-                    GeneralTransform toPage = row.TransformToVisual(_root);
-                    foreach ((ObjectView card, Rect box, bool visible, _, _) in row.Targets())
-                    {
-                        json.WriteStartObject();
-                        json.WriteString("name", card.Known ? card.Name : string.Empty);
-                        json.WriteString("faceDownName", string.Empty);
-                        json.WriteBoolean("visible", visible);
-                        json.WriteString("row", "grid");
-                        json.WriteString("place", turned ? "opponent-grid" : "grid");
-                        json.WriteNumber("seat", 0);
-                        json.WriteNumber("handle", card.Handle.Value);
-                        json.WriteBoolean("tapped", false);
-                        WriteBox(json, toPage.TransformBounds(box));
-                        json.WriteEndObject();
-                    }
+                    json.WriteStartObject();
+                    json.WriteString("name", card.Known ? card.Name : string.Empty);
+                    json.WriteString("faceDownName", string.Empty);
+                    json.WriteBoolean("visible", visible);
+                    json.WriteString("row", "grid");
+                    json.WriteString("place", turned ? "opponent-grid" : "grid");
+                    json.WriteNumber("seat", 0);
+                    json.WriteNumber("handle", card.Handle.Value);
+                    json.WriteBoolean("tapped", false);
+                    WriteBox(json, toPage.TransformBounds(box));
+                    json.WriteEndObject();
                 }
             }
 

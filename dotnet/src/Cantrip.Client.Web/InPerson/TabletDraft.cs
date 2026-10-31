@@ -15,15 +15,14 @@ namespace Cantrip.Client.Web.InPerson;
 /// pool, nothing either seat alone sees.
 /// <para>
 /// A finger picks a line in two taps, so a stray touch takes nothing: the first lights the line and chooses it, the second
-/// - on the same button, or on Take - takes it. Only the face in front of the player whose pick it is has its buttons
-/// live. Each tap goes to the relay (<see cref="TableLineMessage"/>), which hands it to that player's phone to send as
+/// - on the same button, or on Take - takes it. Only the player whose pick it is has the buttons live. Each tap goes to the relay (<see cref="TableLineMessage"/>), which hands it to that player's phone to send as
 /// its own pick; the table judges it, and the grid moves on when the table says so.
 /// </para>
 /// <para>
-/// The shared board shows the draft twice, as its stack band does: one face upright for seat 1 at the tablet's bottom edge,
-/// one turned to face seat 2 across the table, so each player reads the grid upright and picks on the face in front of
-/// them. A grid cannot read upright for two people facing each other, and one turned sideways reads well for neither. A
-/// player's own board shows one face, theirs, live only on their pick.
+/// The shared board shows the draft once, live on either player's pick and turned to be upright for the player picking:
+/// facing seat 1 at the tablet's bottom edge on their pick, turned to face seat 2 across the table on theirs. A pick just
+/// made stays upright for the player who made it while it is shown. A player's own board shows one face, theirs, live
+/// only on their pick.
 /// </para>
 /// </summary>
 public sealed class TabletDraft : Grid
@@ -37,7 +36,8 @@ public sealed class TabletDraft : Grid
     /// <summary>A clock with more than this left is not shown: an in-person table's "off" is a clock too long to matter.</summary>
     private static readonly TimeSpan LongestClockShown = TimeSpan.FromDays(1);
 
-    private readonly List<Face> _faces = [];
+    private readonly Face _face;
+    private readonly int _side;
     private readonly Action<DeviceClientMessage> _send;
     private readonly Func<int, string> _nameOf;
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(250) };
@@ -64,27 +64,13 @@ public sealed class TabletDraft : Grid
     {
         _send = send;
         _nameOf = nameOf;
+        _side = side;
         Background = Theme.Brush(Theme.Window);
         Visibility = Visibility.Collapsed;
 
-        if (side == 0)
-        {
-            RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            var turned = new Face(this, seat: 2, turned: true);
-            var upright = new Face(this, seat: 1, turned: false);
-            Grid.SetRow(upright, 1);
-            Children.Add(turned);
-            Children.Add(upright);
-            _faces.Add(upright);
-            _faces.Add(turned);
-        }
-        else
-        {
-            var face = new Face(this, side, turned: false);
-            Children.Add(face);
-            _faces.Add(face);
-        }
+        // The shared board's one face (seat zero) is for both players, live on whoever's pick it is.
+        _face = new Face(this, side);
+        Children.Add(_face);
 
         _timer.Tick += (_, _) => Tick();
         SizeChanged += (_, _) => Show();
@@ -93,11 +79,11 @@ public sealed class TabletDraft : Grid
     /// <summary>Whether a grid is being drafted and shown.</summary>
     public bool Drafting => _grid is not null;
 
-    /// <summary>The rows of cards, each with whether it is turned to face seat 2, for the page to make long-pressable.</summary>
-    public IEnumerable<(CardBoardElement Board, bool Turned)> Boards => _faces.Select(face => (face.Board, face.Turned));
+    /// <summary>The grid's cards, for the page to make long-pressable.</summary>
+    public CardBoardElement Board => _face.Board;
 
-    /// <summary>Whether a row of cards is the face turned to face seat 2.</summary>
-    public bool IsTurned(CardBoardElement board) => _faces.Any(face => face.Turned && face.Board == board);
+    /// <summary>Whether the grid's cards are turned to face seat 2 across the shared board, on seat 2's pick.</summary>
+    public bool IsTurned(CardBoardElement board) => board == _face.Board && _face.Turned;
 
     /// <summary>The draft as the relay last said: shown, or put away once it is over.</summary>
     public void Take(PublicGridMessage grid)
@@ -189,8 +175,8 @@ public sealed class TabletDraft : Grid
         Show();
     }
 
-    /// <summary>Whether a face's buttons pick now: it faces the player whose pick it is, and nothing is on its way.</summary>
-    private bool Live(Face face) => _grid is { } grid && _held is null && grid.Active == face.Seat && _sentFor != grid.Decision;
+    /// <summary>Whether a face's buttons pick now: it is for the player whose pick it is, and nothing is on its way.</summary>
+    private bool Live(Face face) => _grid is { } grid && _held is null && face.For(grid.Active) && _sentFor != grid.Decision;
 
     private void Show()
     {
@@ -199,10 +185,9 @@ public sealed class TabletDraft : Grid
             return;
         }
 
-        foreach (Face face in _faces)
-        {
-            face.Show(_held is { } held ? held.Grid : grid, grid, _held is { } shown ? shown.Line : _chosenFor == grid.Decision ? _chosen : null);
-        }
+        // The shared board's face upright for the player picking, or for the one whose pick is being shown.
+        _face.Turn(_side == 0 && (_held is { } picked ? picked.Seat : grid.Active) == 2);
+        _face.Show(_held is { } held ? held.Grid : grid, grid, _held is { } shown ? shown.Line : _chosenFor == grid.Decision ? _chosen : null);
 
         ShowClock();
     }
@@ -216,10 +201,7 @@ public sealed class TabletDraft : Grid
             clock = left <= TimeSpan.Zero ? "Time is up." : $"{(int)left.TotalMinutes}:{left.Seconds:00} left to pick";
         }
 
-        foreach (Face face in _faces)
-        {
-            face.Clock.Text = clock;
-        }
+        _face.Clock.Text = clock;
     }
 
     private static bool HasCards(PublicGridMessage grid, int line) => Places(line).Any(place => place < grid.Places.Count && grid.Places[place].Known);
@@ -241,7 +223,7 @@ public sealed class TabletDraft : Grid
         }
 
         string picker = _nameOf(grid.Active);
-        if (grid.Active != face.Seat)
+        if (!face.For(grid.Active))
         {
             return grid.Pick == 1 ? $"{picker} picks first from this grid." : $"{picker} picks from what is left.";
         }
@@ -264,7 +246,7 @@ public sealed class TabletDraft : Grid
     // --- For a page driven by a test (TabletTestState.cs) ---
 
     /// <summary>Whether the faces are laid out and nothing is held up to be seen: what a test waits for.</summary>
-    public bool Busy => Visibility == Visibility.Visible && (_held is not null || _faces.Any(face => face.Board.ActualWidth <= 0 || face.Board.Moving));
+    public bool Busy => Visibility == Visibility.Visible && (_held is not null || _face.Board.ActualWidth <= 0 || _face.Board.Moving);
 
     /// <summary>
     /// The draft as a test reads it, under the tablet's <c>grid</c>: the pick being made, and each face's seat, whether it is
@@ -281,7 +263,7 @@ public sealed class TabletDraft : Grid
         json.WriteNumber("pick", _grid?.Pick ?? 0);
         json.WriteBoolean("held", _held is not null);
         json.WriteStartArray("faces");
-        foreach (Face face in Drafting ? _faces : [])
+        foreach (Face face in Drafting ? [_face] : Array.Empty<Face>())
         {
             json.WriteStartObject();
             json.WriteNumber("seat", face.Seat);
@@ -338,26 +320,18 @@ public sealed class TabletDraft : Grid
         private readonly DockButton[] _lines = new DockButton[6];
         private readonly DockButton _take = new("Take", primary: true, fontSize: 18) { MinHeight = 56, MinWidth = 200, HorizontalAlignment = HorizontalAlignment.Left };
 
-        public Face(TabletDraft draft, int seat, bool turned)
+        public Face(TabletDraft draft, int seat)
         {
             _draft = draft;
             Seat = seat;
-            Turned = turned;
             Padding = new Thickness(18, 8, 18, 8);
-            BorderBrush = Theme.Brush(Theme.Line);
-            BorderThickness = turned ? new Thickness(0, 0, 0, 1) : new Thickness(0);
+            RenderTransformOrigin = new Point(0.5, 0.5);
 
             // The grid and what is said of it side by side, the pair in the middle of the face.
             ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(SideWidth + Spacing) });
             ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            if (turned)
-            {
-                RenderTransformOrigin = new Point(0.5, 0.5);
-                RenderTransform = new RotateTransform { Angle = 180 };
-            }
-
             Board = new CardBoardElement(BoardRows.StandardCardWidth, BoardRows.CardHeight(BoardRows.StandardCardWidth))
             {
                 FliesAlong = false,
@@ -393,10 +367,24 @@ public sealed class TabletDraft : Grid
             Children.Add(side);
         }
 
-        /// <summary>The seat of the player this face is upright for.</summary>
+        /// <summary>The seat of the player this face is upright for, or zero for the shared board's face, for both.</summary>
         public int Seat { get; }
 
-        public bool Turned { get; }
+        /// <summary>Whether this face is turned upside down, to face seat 2 across the shared board.</summary>
+        public bool Turned { get; private set; }
+
+        /// <summary>Turns the face to face seat 2, or back upright for the tablet's bottom edge.</summary>
+        public void Turn(bool turned)
+        {
+            if (turned != Turned)
+            {
+                Turned = turned;
+                RenderTransform = turned ? new RotateTransform { Angle = 180 } : null;
+            }
+        }
+
+        /// <summary>Whether this face picks for a seat.</summary>
+        public bool For(int seat) => Seat == 0 || Seat == seat;
 
         public CardBoardElement Board { get; }
 
@@ -421,7 +409,7 @@ public sealed class TabletDraft : Grid
         {
             Title.Text = $"Grid {now.Grid} of {now.Grids}";
             Seats.Text = string.Join("    ", now.Drafted.Select((count, i) => $"{_draft._nameOf(i + 1)}: {count} card{(count == 1 ? string.Empty : "s")}"));
-            bool mine = now.Active == Seat;
+            bool mine = For(now.Active);
             bool live = _draft.Live(this);
             Status.Text = _draft.Status(this, now);
             Status.Foreground = Theme.Brush(mine && _draft._held is null ? Theme.Accent : Theme.FgSoft);

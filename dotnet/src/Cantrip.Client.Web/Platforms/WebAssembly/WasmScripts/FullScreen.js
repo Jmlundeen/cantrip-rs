@@ -14,6 +14,9 @@
 //   (#reenter=...) - the address the icon opens, whether iOS takes it from the page or from the manifest's start_url,
 //   which the manifest leaves to be the page's own. The app's first launch trades it with the relay for a fresh seat
 //   ticket, which the app keeps in its own storage and brings on every launch after.
+// - While an in-person page is full screen - by the Fullscreen API, or as an app opened from the Home Screen - it holds a
+//   screen wake lock, so a tablet or a phone does not go dark mid-game. The browser lets one go whenever the page is
+//   hidden, so it is asked for again when the page is shown, and after a tap where a browser wants one first.
 (function () {
     const query = new URLSearchParams(window.location.search);
     const role = (query.get("inperson") || "").toLowerCase();
@@ -34,6 +37,52 @@
     // An iPad says it is a Mac with a touch screen, and has the Fullscreen API; an iPhone has neither.
     const iPhone = () => /iPhone|iPod/.test(navigator.userAgent || "");
 
+    // The screen kept on while the page is full screen (the Screen Wake Lock API). One lock at a time: a request on its
+    // way is not made twice, and a lock granted after full screen was left is let go at once.
+    let awake = null;
+    let asking = false;
+    const wantsAwake = () => inPerson && document.visibilityState === "visible" && (!!element() || standalone());
+    const keepAwake = () => {
+        if (!wantsAwake()) {
+            if (awake) {
+                const held = awake;
+                awake = null;
+                Promise.resolve(held.release()).catch(() => { });
+            }
+
+            return;
+        }
+
+        if (awake || asking || !navigator.wakeLock || typeof navigator.wakeLock.request !== "function") {
+            return;
+        }
+
+        asking = true;
+        let asked;
+        try {
+            asked = navigator.wakeLock.request("screen");
+        } catch (e) {
+            asking = false;
+            return;
+        }
+
+        Promise.resolve(asked).then((lock) => {
+            asking = false;
+            awake = lock;
+            lock.addEventListener("release", () => {
+                if (awake === lock) {
+                    awake = null;
+                }
+            });
+            if (!wantsAwake()) {
+                keepAwake();
+            }
+        }, () => {
+            // Refused - low battery, no permission, a browser that wants a tap first: asked again on the next.
+            asking = false;
+        });
+    };
+
     let changes = 0;
     for (const name of ["fullscreenchange", "webkitfullscreenchange"]) {
         document.addEventListener(name, () => {
@@ -45,8 +94,19 @@
                     // Nothing was locked, or the browser cannot.
                 }
             }
+
+            keepAwake();
         });
     }
+
+    if (inPerson) {
+        document.addEventListener("visibilitychange", keepAwake);
+        document.addEventListener("pointerup", keepAwake, true);
+        keepAwake();
+    }
+
+    // Whether the screen is being kept on, for a test.
+    globalThis.cantripScreenAwake = () => !!awake;
 
     // What the page's button is: "exit" while full screen, "enter" where the Fullscreen API is, "homescreen" on an
     // iPhone's browser, "none" anywhere else - an app opened from the Home Screen already has the whole screen. The

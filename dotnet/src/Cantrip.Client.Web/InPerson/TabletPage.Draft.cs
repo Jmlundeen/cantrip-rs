@@ -25,10 +25,7 @@ public sealed partial class TabletPage
 
         // Over the board and under the arrows, flights and the cards held up, which come next.
         _root.Children.Insert(1, _draft);
-        foreach ((CardBoardElement board, bool turned) in _draft.Boards)
-        {
-            MakeTappable(board, turned);
-        }
+        MakeTappable(_draft.Board, turned: false);
     }
 
     /// <summary>Whether the grid draft is up, in place of the phase screen before the game.</summary>

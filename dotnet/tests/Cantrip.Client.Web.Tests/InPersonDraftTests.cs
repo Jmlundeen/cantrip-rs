@@ -20,7 +20,7 @@ public sealed class InPersonDraftTests(WebClient web)
 {
     private const int Grids = 3;
 
-    /// <summary>The shared tablet: seat 2's face of the draft turned at the top, seat 1's upright at the bottom.</summary>
+    /// <summary>The shared tablet: one face of the draft, live on either player's pick and turned upright for the picker.</summary>
     [Fact]
     public async Task A_grid_draft_is_drafted_by_touch_on_the_shared_tablet_and_the_deck_built_on_a_phone()
     {
@@ -143,8 +143,8 @@ public sealed class InPersonDraftTests(WebClient web)
     }
 
     /// <summary>
-    /// Every pick of the draft made on a tablet: the face in front of the picker has its lines live, the other face's (or the
-    /// other player's tablet) none; a tap on a dead line takes nothing. The first line with cards is tapped to choose it -
+    /// Every pick of the draft made on a tablet: the face for the picker has its lines live, the other player's tablet none;
+    /// the shared tablet's one face is turned to face seat 2 on seat 2's pick and upright for seat 1 on theirs. The first line with cards is tapped to choose it -
     /// lit on the tablet, and chosen through the picker's phone - then taken, with a second tap on it on even picks and
     /// with Take on odd ones. The table's draft must move on to the next pick, with the cards in the picker's pool.
     /// </summary>
@@ -175,8 +175,12 @@ public sealed class InPersonDraftTests(WebClient web)
 
             // The tablet the picker picks on, and the face of it in front of them.
             (TabletDriver tablet, TabletState shown) = await PickerTabletAsync(tablets, active, decision);
-            TabletFace face = shown.Grid!.Faces.Single(each => each.Seat == active);
-            Assert.All(shown.Grid.Faces.Where(each => each.Seat != active).SelectMany(each => each.Buttons), button => Assert.False(button.Enabled, $"{button.Label} is live on the face of the player not picking."));
+            TabletFace face = shown.Grid!.Faces.Single(each => Picks(each, active));
+            if (face.Seat == 0)
+            {
+                Assert.Equal(active == 2, face.Turned);
+            }
+
             foreach (TabletDriver other in tablets.Where(each => each != tablet))
             {
                 TabletState theirs = await other.SettledAsync(state => state.Grid?.Decision == decision);
@@ -188,16 +192,9 @@ public sealed class InPersonDraftTests(WebClient web)
             Assert.Equal(poolBefore, pickerPhone.InPerson!.Draft!.Pool);
             await phones[2 - active].SettledAsync(state => state.InPerson?.Draft is { Shown: true, Mine: false });
 
-            // A tap on the dead face of a shared tablet, which must take nothing.
-            if (shown.Grid.Faces.FirstOrDefault(each => each.Seat != active) is { } dead
-                && dead.Buttons.FirstOrDefault(button => button.Line >= 0) is { } deadLine)
-            {
-                await tablet.TapAsync(deadLine.X, deadLine.Y);
-            }
-
             TabletGridButton line = face.Buttons.First(button => button.Line >= 0 && button.Enabled);
             await tablet.TapAsync(line.X, line.Y);
-            TabletState chosen = await tablet.SettledAsync(state => state.Grid!.Faces.Single(each => each.Seat == active).Buttons.Any(button => button.Line == line.Line && button.Chosen));
+            TabletState chosen = await tablet.SettledAsync(state => state.Grid!.Faces.Single(each => Picks(each, active)).Buttons.Any(button => button.Line == line.Line && button.Chosen));
             Assert.Equal(decision, Drafted(store, eventId).Decision);
             if (picks == 0)
             {
@@ -207,8 +204,8 @@ public sealed class InPersonDraftTests(WebClient web)
             await phones[active - 1].SettledAsync(state => state.InPerson!.Lines?.Any(each => each.Decision == decision && each.Line == line.Line && !each.Take) == true);
 
             TabletGridButton take = picks % 2 == 0
-                ? chosen.Grid!.Faces.Single(each => each.Seat == active).Buttons.Single(button => button.Line == line.Line)
-                : chosen.Grid!.Faces.Single(each => each.Seat == active).Buttons.Single(button => button.Line < 0);
+                ? chosen.Grid!.Faces.Single(each => Picks(each, active)).Buttons.Single(button => button.Line == line.Line)
+                : chosen.Grid!.Faces.Single(each => Picks(each, active)).Buttons.Single(button => button.Line < 0);
             Assert.True(take.Enabled, $"{take.Label} is not live once {line.Label} is chosen.");
             await tablet.TapAsync(take.X, take.Y);
             if (picks == 0)
@@ -242,6 +239,9 @@ public sealed class InPersonDraftTests(WebClient web)
         Assert.NotNull(host.Relay);
     }
 
+    /// <summary>Whether a tablet's face picks for a seat: that seat's own, or the shared board's, for both.</summary>
+    private static bool Picks(TabletFace face, int seat) => face.Seat == seat || face.Seat == 0;
+
     /// <summary>The tablet the player whose pick it is picks on, showing this pick, its lines live on their face.</summary>
     private static async Task<(TabletDriver Tablet, TabletState State)> PickerTabletAsync(List<TabletDriver> tablets, int active, int decision)
     {
@@ -251,7 +251,7 @@ public sealed class InPersonDraftTests(WebClient web)
             foreach (TabletDriver tablet in tablets)
             {
                 TabletState state = await tablet.SettledAsync(state => state.Grid is { Shown: true } grid && grid.Decision == decision);
-                if (state.Grid!.Faces.FirstOrDefault(face => face.Seat == active) is { } face && face.Buttons.Any(button => button.Line >= 0 && button.Enabled))
+                if (state.Grid!.Faces.FirstOrDefault(face => Picks(face, active)) is { } face && face.Buttons.Any(button => button.Line >= 0 && button.Enabled))
                 {
                     return (tablet, state);
                 }
