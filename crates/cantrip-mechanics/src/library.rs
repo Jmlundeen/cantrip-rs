@@ -820,6 +820,14 @@ pub fn exile_top_play_until_end_of_next_turn(g: &mut dyn Game, player: PlayerId,
     exile_top_may_play(g, player, count, player, grant)
 }
 
+/// "Search your library for a land card, put it onto the battlefield tapped, then shuffle" as a resolving ability's whole
+/// effect (CR 701.23, 701.24): the ability's controller searches for any land card, it enters tapped, then they shuffle.
+/// Elvish Reclaimer and Wight of the Reliquary print it.
+pub fn search_for_a_land_onto_the_battlefield_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    find_to_battlefield(g, item.controller, item.object, crate::select::LAND_CARD, true)?;
+    Ok(())
+}
+
 /// "Exile the top card of your library. You may play it until the end of your next turn" as a resolving ability's whole
 /// effect: `exile_top_play_until_end_of_next_turn` for the ability's controller, one card. An empty library exiles nothing.
 /// Clockwork Percussionist, Gundabad Opportunist and Snowslope Hunter print it.
