@@ -1,0 +1,29 @@
+# Mutagenic Growth's {G/P} paid with {G} from a Mox Emerald (CR 107.4f): no life is paid (20), and Bot1's own
+# Llanowar Elves (1/1) becomes exactly 3/3.
+
+[Bot1 Deck]
+Mox Emerald
+Llanowar Elves
+Mutagenic Growth
+Forest x13
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mutagenic Growth.Cast(Llanowar Elves)
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 3
+Bot1.Life = 20

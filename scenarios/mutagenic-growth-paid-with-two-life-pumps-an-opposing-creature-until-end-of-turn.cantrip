@@ -1,0 +1,33 @@
+# Mutagenic Growth's {G/P} paid with 2 life (CR 107.4f): Bot1 has no mana, so life goes 20 -> 18 and an opponent's
+# Mother of Runes (1/1) becomes exactly 3/3 (+2/+2); a non-creature (Mox Pearl) is not a legal target. The pump ends at
+# cleanup (CR 514.2): on turn 4 she is 1/1 again.
+
+[Bot1 Deck]
+Mutagenic Growth
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Mother of Runes
+Plains x13
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Mutagenic Growth.Cast(Mox Pearl)
+Bot1.Hand.Mutagenic Growth.Cast(Mother of Runes)
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 18
+? Bot2.Battlefield.Mother of Runes.Power = 3
+? Bot2.Battlefield.Mother of Runes.Toughness = 3
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Mother of Runes.Power = 1
+Bot2.Battlefield.Mother of Runes.Toughness = 1
+Bot1.Graveyard = Mutagenic Growth
