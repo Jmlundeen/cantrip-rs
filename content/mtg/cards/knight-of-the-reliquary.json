@@ -1,0 +1,8 @@
+{
+  "name": "Knight of the Reliquary",
+  "manaCost": "{1}{G}{W}",
+  "type": "Creature — Human Knight",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "This creature gets +1/+1 for each land card in your graveyard.\n{T}, Sacrifice a Forest or Plains: Search your library for a land card, put it onto the battlefield, then shuffle."
+}

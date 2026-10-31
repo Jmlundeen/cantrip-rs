@@ -437,6 +437,10 @@ const INERT: &[(&str, &str)] = &[
         "its effect gives the keywords of the cards used to craft it, read through the view (`LayerQuery::chars`), a link no synthetic state makes",
     ),
     (
+        "Knight of the Reliquary",
+        "its effect counts the land cards in its controller's graveyard, and the synthetic graveyards hold only creature cards; a scenario of the card shows the +1/+1 for each",
+    ),
+    (
         "Kinbinding",
         "its effect counts the creatures the event history says entered under its controller's control this turn, and a synthetic state has no history; a scenario of the card shows the +X/+X",
     ),

@@ -1,0 +1,71 @@
+# Knight of the Reliquary: "+1/+1 for each land card in your graveyard" counts only its controller's graveyard (Bot2's LED
+# discards seven Islands on turn 2 and Bot1's Knight stays 2/2) and only land cards there (Bot1's own Mishra's Bauble, sacrificed
+# on turn 1, is not counted). "{T}, Sacrifice a Forest or Plains" offers the Forest and the Plains but not a Mox or the Mountain,
+# the sacrificed land is a cost (in the graveyard before the search), the search finds any land card but no nonland card (Llanowar
+# Elves), and the Knight is 3/3 after one land card is in the graveyard, 4/4 after two (CR 613.4c, 701.21, 701.23). It needs a
+# turn without summoning sickness for {T}, hence the activations on turns 3 and 5.
+
+[Bot1 Deck]
+Knight of the Reliquary
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Forest
+Plains
+Mishra's Bauble
+Mountain x10
+Llanowar Elves
+Forest
+
+[Bot2 Deck]
+Lion's Eye Diamond
+Island x6
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Knight of the Reliquary.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Lion's Eye Diamond.Cast
+Bot2.Pass
+Bot2.Battlefield.Lion's Eye Diamond.Activate(Color: U)
+[T3 Bot1.Main1]
+? Bot2.Graveyard.Count = 8
+? Bot1.Battlefield.Knight of the Reliquary.Power = 2
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Knight of the Reliquary.Activate
+! Bot1.Choose(Mox Sapphire)
+Bot1.Choose(Forest)
+! Bot1.Search(Llanowar Elves)
+Bot1.Search(Mountain)
+Bot1.Pass
+? Bot1.Graveyard = Forest; Mishra's Bauble
+? Bot1.Battlefield.Mountain.Tapped = false
+? Bot1.Battlefield.Knight of the Reliquary.Power = 3
+? Bot1.Battlefield.Knight of the Reliquary.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Knight of the Reliquary.Activate
+! Bot1.Choose(Mountain)
+Bot1.Choose(Plains)
+Bot1.Search(Forest)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Plains; Forest; Mishra's Bauble
+Bot1.Battlefield.Knight of the Reliquary.Power = 4
+Bot1.Battlefield.Knight of the Reliquary.Toughness = 4
+Bot1.Battlefield.Forest.Subtypes = Forest
+Bot1.Battlefield.Mountain.Subtypes = Mountain
+Bot2.Graveyard.Count = 8
