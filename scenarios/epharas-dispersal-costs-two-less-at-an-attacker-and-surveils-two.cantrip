@@ -1,0 +1,53 @@
+# Ephara's Dispersal: "This spell costs {2} less to cast if it targets an attacking creature" (CR 601.2f). Bot1 attacks with
+# one of its two Grizzly Bears on turn 3. With only Mox Sapphire's {U}, Bot2 cannot cast it at the Bear that stayed home
+# ({2}{U}), but can at the attacker for {U} (pool empty right after). The attacker returns to Bot1's hand, so no damage
+# is dealt, then Bot2 surveils 2: one card goes to the graveyard and the other stays on top (the card is what the
+# surveil sees, in order).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Grizzly Bears
+Grizzly Bears
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Ephara's Dispersal
+Island x5
+Forest
+Mountain
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears#1 > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+! Bot2.Hand.Ephara's Dispersal.Cast(Bot1.Battlefield.Grizzly Bears#2; Mana: short)
+Bot2.Hand.Ephara's Dispersal.Cast(Bot1.Battlefield.Grizzly Bears#1)
+? Bot2.Mana =
+Bot2.Pass
+Bot2.Arrange(Island | Mountain)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Hand.Grizzly Bears.Power = 2
+Bot2.Life = 20
+Bot2.Graveyard = Ephara's Dispersal; Mountain
+Bot2.Library = Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island

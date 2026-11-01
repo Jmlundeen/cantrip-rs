@@ -1,0 +1,47 @@
+# Ephara's Dispersal under Thalia, Guardian of Thraben: the total cost is the mana cost plus every increase minus every
+# reduction (CR 601.2f), and a reduction of generic mana only takes generic (CR 118.7a). {2}{U} plus Thalia's {1} is
+# {3}{U}; at the attacking Thalia it is {2} less, {1}{U}, paid exactly by Bot2's two Islands (the pool is empty right
+# after: a reduction of {3} would leave {U} floating). At Bot1's Ornithopter, which stayed home, {3}{U} is short.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Thalia, Guardian of Thraben
+Island x16
+
+[Bot2 Deck]
+Ephara's Dispersal
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Thalia, Guardian of Thraben > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+! Bot2.Hand.Ephara's Dispersal.Cast(Bot1.Battlefield.Ornithopter; Mana: short)
+Bot2.Hand.Ephara's Dispersal.Cast(Bot1.Battlefield.Thalia, Guardian of Thraben)
+? Bot2.Mana =
+Bot2.Pass
+Bot2.Arrange(Island | Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Thalia, Guardian of Thraben = (absent)
+Bot1.Hand.Thalia, Guardian of Thraben.Power = 2
+Bot2.Life = 20
+Bot2.Graveyard = Ephara's Dispersal; Island

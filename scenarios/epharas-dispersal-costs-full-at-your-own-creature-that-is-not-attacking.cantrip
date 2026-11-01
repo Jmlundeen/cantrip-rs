@@ -1,0 +1,34 @@
+# Ephara's Dispersal at a creature that is not attacking costs the full {2}{U} (CR 601.2f), here paid exactly by Black
+# Lotus; the pool is empty right after. The target may be the caster's own creature (Ornithopter returns to Bot2's hand).
+# Surveil 2 then puts both cards back on top in the order given (Mountain over Forest, top first).
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Ornithopter
+Ephara's Dispersal
+Island x5
+Forest
+Mountain
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: U)
+Bot2.Hand.Ephara's Dispersal.Cast(Bot2.Battlefield.Ornithopter)
+? Bot2.Mana =
+Bot2.Pass
+Bot2.Arrange(Mountain; Forest | )
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter = (absent)
+Bot2.Hand.Count = 6
+Bot2.Graveyard = Ephara's Dispersal; Black Lotus
+Bot2.Library = Mountain; Forest; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island
