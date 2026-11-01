@@ -1,0 +1,52 @@
+# Whenever an Angel you control enters, you gain 4 life (CR 603.6a): two of Bot1's Segovian Angels gain 8 (28, so an amount of
+# 3 or 5 fails); Bot1's own Bishop (not an Angel) entering gains nothing; Bot2's Angel entering gains Bot1 nothing ("you control").
+# Bishop and the two Angels are cast with one turn's mana, so each Angel enters with the Bishop already out.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Black Lotus
+Bishop of Wings
+Segovian Angel
+Segovian Angel
+Plains
+Plains x15
+
+[Bot2 Deck]
+Mox Pearl
+Plains
+Segovian Angel
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bishop of Wings.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Hand.Segovian Angel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Segovian Angel.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Segovian Angel.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 28
+Bot2.Life = 20
+Bot1.Battlefield.Segovian Angel#1.Subtypes = Angel
+Bot2.Battlefield.Segovian Angel.Subtypes = Angel
+Stack.Count = 0

@@ -1,0 +1,71 @@
+# Whenever an Angel you control dies, create a 1/1 white Spirit creature token with flying (CR 700.4, 603.10a). One Wrath of God
+# kills Bot1's Bishop, two Segovian Angels, a Savannah Lions (white, not an Angel) and Bot2's Segovian Angel together: the Bishop,
+# dying at the same time, looks back and triggers once for each of Bot1's two Angels (ruling 2019-07-12) - two tokens, none for
+# the Lions (not an Angel) or Bot2's Angel (not under Bot1's control). The Bishop is not an Angel itself.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Plains
+Bishop of Wings
+Segovian Angel
+Segovian Angel
+Savannah Lions
+Plains
+Wrath of God
+Plains x15
+
+[Bot2 Deck]
+Mox Pearl
+Plains
+Segovian Angel
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bishop of Wings.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Segovian Angel.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Segovian Angel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Segovian Angel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Plains; Plains; Plains; Spirit Token; Spirit Token
+Bot1.Battlefield.Spirit Token#1.Token = true
+Bot1.Battlefield.Spirit Token#1.Colors = White
+Bot1.Battlefield.Spirit Token#1.Power = 1
+Bot1.Battlefield.Spirit Token#1.Toughness = 1
+Bot1.Battlefield.Spirit Token#1.Keywords = Flying
+Bot2.Battlefield = Mox Pearl; Plains
+Stack.Count = 0

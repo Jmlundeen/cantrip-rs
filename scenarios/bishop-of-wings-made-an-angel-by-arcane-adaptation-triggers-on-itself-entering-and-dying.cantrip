@@ -1,0 +1,54 @@
+# Bishop of Wings made an Angel by Arcane Adaptation (Angel chosen) triggers on itself (ruling 2019-07-12): it enters an Angel, so
+# "Whenever an Angel you control enters" gains Bot1 4 life (24); it dies to Wrath of God an Angel, and looking back as it last was
+# on the battlefield (CR 603.10a) "Whenever an Angel you control dies" makes a Spirit. The Spirit enters an Angel too, but the
+# Bishop is gone by then, so no more life: 24 stays.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Arcane Adaptation
+Bishop of Wings
+Plains
+Wrath of God
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot1.Modes(Angel)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bishop of Wings.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+? Bot1.Battlefield.Bishop of Wings.Subtypes = Angel; Cleric; Human
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Life = 24
+Bot1.Battlefield = Arcane Adaptation; Mox Pearl; Plains; Plains; Plains; Spirit Token
+Bot1.Battlefield.Spirit Token.Subtypes = Angel; Spirit
+Bot1.Graveyard = Wrath of God; Bishop of Wings; Black Lotus

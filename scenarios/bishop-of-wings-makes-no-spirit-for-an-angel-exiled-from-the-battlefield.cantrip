@@ -1,0 +1,45 @@
+# "Whenever an Angel you control dies" is put into a graveyard from the battlefield (CR 700.4), and nothing else: Bot1 exiles its
+# own Segovian Angel with Swords to Plowshares and gets no Spirit (the card's first printing also read "or is put into exile";
+# the current Oracle text does not). Bot1's life is 20 + 4 (the Angel entering) + 1 (Swords, its power) = 25.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Bishop of Wings
+Segovian Angel
+Swords to Plowshares
+Plains
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bishop of Wings.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Segovian Angel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Segovian Angel)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 25
+Bot1.Battlefield = Bishop of Wings; Mox Pearl; Plains; Plains
+Exile = Segovian Angel

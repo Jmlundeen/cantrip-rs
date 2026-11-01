@@ -1,0 +1,8 @@
+{
+  "name": "Bishop of Wings",
+  "manaCost": "{W}{W}",
+  "type": "Creature — Human Cleric",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "Whenever an Angel you control enters, you gain 4 life.\nWhenever an Angel you control dies, create a 1/1 white Spirit creature token with flying."
+}

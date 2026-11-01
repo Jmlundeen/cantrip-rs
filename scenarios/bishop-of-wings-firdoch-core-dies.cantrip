@@ -1,0 +1,46 @@
+# Firdoch Core, a Kindred artifact with changeling, is an Angel while on the battlefield though not a creature (CR 109.2, 702.73a):
+# entering it gains Bot1 4 life, and destroyed by Disenchant it dies (CR 700.4) - a Spirit.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Bishop of Wings
+Black Lotus
+Firdoch Core
+Disenchant
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bishop of Wings.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Disenchant.Cast(Firdoch Core)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Disenchant; Firdoch Core; Black Lotus
+Bot1.Battlefield = Bishop of Wings; Mox Pearl; Plains; Plains; Spirit Token
