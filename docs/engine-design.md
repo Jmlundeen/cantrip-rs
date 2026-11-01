@@ -1579,7 +1579,10 @@ is asked as it is announced.
 **Cost changes are one list** matched against what is costed (`Costed`: a spell, an ability, a special action, CR 116.1),
 asked once the targets and X are announced (CR 601.2f): "can't reduce the mana in that cost to less than one mana"
 (`CostDelta::less_to_one`, Forensic Gadgeteer, Zirda) is a change like any other. A land play has no cost and no change
-applies to it.
+applies to it. A card's own changes ("this spell costs {1} less to cast ...", `CardDef::own_cost_changes`) are asked only
+as it is cast (`Costed::Spell`, however it is cast), never for an ability of it or of its permanent (CR 602.2b) nor for a
+special action; an ability's own ("this ability costs {1} less to activate ...": channel) is that ability's
+(`ActivatedDef::cost_change`), asked only as it is activated.
 
 **On the wire** the host numbers each option of a question (`ActionOptionMessage::OptionId`, from 1) and the client echoes
 it (`TakeActionAnswer::OptionId`): the grants stay engine-side, so no hidden object leaks, and an answer naming an option by
