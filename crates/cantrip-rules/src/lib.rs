@@ -1315,7 +1315,8 @@ impl<'a> Cx<'a> {
         };
         let controller = self.doer.or_else(|| self.effect_controller()).unwrap_or(self.g.state.obj(source).controller);
         let timestamp = self.g.state.timestamp();
-        let effect = ContinuousEffect { source, controller, timestamp, affected, kind, duration };
+        let words = self.granting_words(source, kind);
+        let effect = ContinuousEffect { source, controller, timestamp, affected, kind, duration, words };
         // A duration already over as the effect would begin never starts, and the effect does nothing (CR 611.2b).
         if !ops::duration_begins(self, &effect) {
             return;
@@ -1525,6 +1526,13 @@ impl<'a> Cx<'a> {
         let result = f(self);
         self.g.own_text.set(outer);
         result
+    }
+
+    /// The words an effect that `source`'s text creates now keeps (`ContinuousEffect::words`): for one that grants an ability,
+    /// the words of that text as it is - a resolving ability's as it was put on the stack (`Cx::own_text`), a spell's own -
+    /// which the granted ability reads from then on (CR 611.2c, 113.7a). `Words::NONE` for any other effect.
+    pub(crate) fn granting_words(&self, source: ObjectId, kind: EffectKind) -> Words {
+        if matches!(kind, EffectKind::AddAbility(_)) { Query::words(self, source) } else { Words::NONE }
     }
 
     /// `own_text(false, ..)` for a question asked of a shared `Cx`: the other abilities' text is read until the guard drops.
@@ -2133,13 +2141,16 @@ impl cantrip_api::Game for Cx<'_> {
         let members = self.g.state.members_push(objects);
         let since = self.g.log.len() as u32;
         let acquired = self.resolving_acquired(source);
-        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject: Target::None, members, since, acquired });
+        // The creating text's words as it is now (CR 603.7, 113.7a): a resolving ability's as it was put on the stack.
+        let words = Some(Query::words(&*self, source));
+        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject: Target::None, members, since, acquired, words });
     }
 
     fn delayed_trigger(&mut self, when: DelayedWhen, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target) {
         let since = self.g.log.len() as u32;
         let acquired = self.resolving_acquired(source);
-        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject, members: cantrip_state::Span::default(), since, acquired });
+        let words = Some(Query::words(&*self, source));
+        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject, members: cantrip_state::Span::default(), since, acquired, words });
     }
 
     fn reflexive_trigger(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target) {
@@ -2473,7 +2484,7 @@ impl cantrip_api::Game for Cx<'_> {
     fn add_player_effect(&mut self, controller: PlayerId, source: ObjectId, kind: EffectKind, duration: Duration) {
         debug_assert!(kind.outlives_affected(), "a player's effect is about the player, not an object");
         let timestamp = self.g.state.timestamp();
-        self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected: source, kind, duration });
+        self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected: source, kind, duration, words: Words::NONE });
         self.state_changed();
     }
 

@@ -476,6 +476,7 @@ fn the_rules_own_delayed_abilities_offer_their_source_only_where_they_name_it() 
         members: cantrip_state::Span::default(),
         since: 0,
         acquired: Acquired::OWN,
+        words: None,
     };
     let upkeep = DelayedWhen::Step { step: Step::Upkeep, on_turn_of: Some(YOU) };
     let cleanup = DelayedWhen::Step { step: Step::Cleanup, on_turn_of: None };

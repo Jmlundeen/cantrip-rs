@@ -66,7 +66,7 @@ fn game() -> Game {
 /// An effect of `holder`'s, made now, about `affected`.
 fn effect(game: &mut Game, holder: ObjectId, affected: ObjectId, kind: EffectKind) {
     let timestamp = game.state.timestamp();
-    game.state.effect_push(ContinuousEffect { source: holder, controller: YOU, timestamp, affected, kind, duration: Duration::Indefinite });
+    game.state.effect_push(ContinuousEffect { source: holder, controller: YOU, timestamp, affected, kind, duration: Duration::Indefinite, words: Words::NONE });
 }
 
 /// The holder on the battlefield, entered first; then "your maximum hand size is five" from a resolved spell; then the holder

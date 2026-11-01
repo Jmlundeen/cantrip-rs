@@ -1,0 +1,51 @@
+# An ability a static ability grants is that static ability's text (CR 612.3), so a text change on the static ability's
+# source changes it, quoted ability included (CR 612.1). Artificial Evolution replaces Borg with Elf in Antagonist
+# Incorporator's text: the ability Memnite has from it now makes an Elf.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Memnite
+Antagonist Incorporator
+Artificial Evolution
+Island
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Antagonist Incorporator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Antagonist Incorporator)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Borg)
+Bot1.Modes(Elf)
+Bot1.Attack(Memnite > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Elf Token.Power = 1

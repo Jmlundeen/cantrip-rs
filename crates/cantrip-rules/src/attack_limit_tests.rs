@@ -84,7 +84,7 @@ fn game(permanents: &[(&'static CardDef, bool)], bears: usize) -> (Game, Request
         g.state.zone_push(Zone::BATTLEFIELD, id);
         if lost {
             let timestamp = g.state.timestamp();
-            g.state.effect_push(ContinuousEffect { source: id, controller: P0, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::Indefinite });
+            g.state.effect_push(ContinuousEffect { source: id, controller: P0, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::Indefinite, words: Words::NONE });
         }
     }
     let bears = (0..bears)

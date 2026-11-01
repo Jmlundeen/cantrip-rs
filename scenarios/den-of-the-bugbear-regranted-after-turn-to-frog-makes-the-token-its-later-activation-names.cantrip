@@ -1,0 +1,76 @@
+# An ability a resolved effect grants is the text of the effect that gave it (CR 611.2c), each instance its own. Den of the
+# Bugbear's first activation resolves saying Goblin; Artificial Evolution then changes the Den's Goblin to Elf, and the second
+# activation goes on the stack saying Elf. Turn to Frog in response takes every ability the Den has, the first activation's
+# attack trigger included (CR 613.1f). The second resolves after it: the Den's one granted attack trigger is the second
+# activation's, whose text says Elf, so attacking makes an Elf, not a Goblin.
+
+[Bot1 Deck]
+Den of the Bugbear
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mountain
+Island
+Swamp
+Artificial Evolution
+Turn to Frog
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Den of the Bugbear.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T11 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Den of the Bugbear.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Den of the Bugbear)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Goblin)
+Bot1.Modes(Elf)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Den of the Bugbear.Activate(Ability: Until end of turn)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Turn to Frog.Cast(Den of the Bugbear)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Den of the Bugbear.Subtypes = Frog
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Den of the Bugbear.Subtypes = Elf; Frog
+Bot1.Attack(Den of the Bugbear > Bot2)
+[T11 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Elf Token.Power = 1

@@ -272,6 +272,7 @@ fn a_permanent_named_by_the_combat_state_that_is_no_longer_attackable_is_dealt_n
         affected: walker,
         kind: EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])),
         duration: Duration::EndOfTurn,
+        words: Words::NONE,
     });
     let mut cx = cx(&mut game);
     assert_eq!(damage_to(&mut cx, walker), 0);

@@ -682,7 +682,7 @@ fn manifest(g: &mut Game, def: &'static CardDef) -> ObjectId {
 /// once it is turned face up (CR 708.8).
 fn loses_all_abilities_now(g: &mut Game, id: ObjectId) {
     let timestamp = g.state.timestamp();
-    g.state.effect_push(ContinuousEffect { source: id, controller: THEM, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::EndOfTurn });
+    g.state.effect_push(ContinuousEffect { source: id, controller: THEM, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::EndOfTurn, words: Words::NONE });
     reoffer(g);
 }
 

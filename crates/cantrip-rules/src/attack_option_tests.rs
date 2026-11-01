@@ -368,7 +368,7 @@ fn each_instance_of_enlist_pays_and_triggers_on_its_own() {
     let given = AbilityRef::delayed(g.cards.id_of(&GIFT), 0);
     for _ in 0..2 {
         let timestamp = g.state.timestamp();
-        g.state.effect_push(ContinuousEffect { source: bear, controller: YOU, timestamp, affected: bear, kind: EffectKind::AddAbility(given), duration: Duration::EndOfTurn });
+        g.state.effect_push(ContinuousEffect { source: bear, controller: YOU, timestamp, affected: bear, kind: EffectKind::AddAbility(given), duration: Duration::EndOfTurn, words: Words::NONE });
     }
     attack(&mut g, &[bear]);
     let (r, _) = enlist_offer(&mut g, bear);
@@ -386,7 +386,7 @@ fn an_attacker_without_its_abilities_is_offered_nothing() {
     let recruiter = put(&mut g, &RECRUITER, YOU);
     put(&mut g, &BEAR, YOU);
     let timestamp = g.state.timestamp();
-    g.state.effect_push(ContinuousEffect { source: recruiter, controller: THEM, timestamp, affected: recruiter, kind: EffectKind::LoseAllAbilities, duration: Duration::EndOfTurn });
+    g.state.effect_push(ContinuousEffect { source: recruiter, controller: THEM, timestamp, affected: recruiter, kind: EffectKind::LoseAllAbilities, duration: Duration::EndOfTurn, words: Words::NONE });
     attack(&mut g, &[recruiter]);
     to_blockers(&mut g);
     assert_eq!(power(&g, recruiter), 2);

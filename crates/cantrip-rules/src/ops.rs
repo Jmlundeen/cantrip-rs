@@ -715,6 +715,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             members: cantrip_state::Span::default(),
             since,
             acquired: Acquired::OWN,
+            words: None,
         });
     }
     // A permanent left the battlefield: what was exiled or phased out until it left comes back now (CR 610.3, 610.4).
@@ -1826,6 +1827,8 @@ fn enter_as(cx: &mut Cx, id: ObjectId, b: Becomes) {
     }
     for kind in kinds {
         let timestamp = cx.st().timestamp();
+        // An ability it gains is the text's that puts it onto the battlefield so (CR 611.2c, 612.1).
+        let words = if matches!(kind, EffectKind::AddAbility(_)) { b.words } else { Words::NONE };
         cx.st().effect_push(cantrip_state::ContinuousEffect {
             source: id,
             controller,
@@ -1833,6 +1836,7 @@ fn enter_as(cx: &mut Cx, id: ObjectId, b: Becomes) {
             affected: id,
             kind,
             duration: Duration::Indefinite,
+            words,
         });
         // A static ability given to it that affects other objects makes it a source of static abilities.
         if let EffectKind::AddAbility(ability) = kind
@@ -4620,6 +4624,7 @@ fn become_copy_of(cx: &mut Cx, source: ObjectId, id: ObjectId, values: Copiable,
         affected: id,
         kind: EffectKind::RestoreCopy(prior),
         duration,
+        words: Words::NONE,
     };
     if !duration_begins(cx, &effect) {
         return;

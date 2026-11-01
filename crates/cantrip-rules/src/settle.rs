@@ -844,18 +844,42 @@ fn consider(
     // Each ability is asked as the ability it is (CR 607.5): one an effect gave the object reads only its own links. Whether
     // any could have been given is found out once, and only for an ability that is asked.
     let given = std::cell::OnceCell::new();
+    // An ability an effect gave the object is the giving text's, and reads its words (`layers::granted_words`, CR 611.2c,
+    // 612.1, 612.3): its givers are worked out once, only where one may have been given.
+    // Nothing in the game could have given an ability, nearly always: then none is looked for.
+    let possible = statics.acquisition_possible(cx);
+    let givers = std::cell::OnceCell::new();
     for (nth, ability) in chars.abilities().enumerate() {
+        // Only a triggered ability is asked anything here.
+        let AbilityDef::Triggered(_) = cx.cards().ability(ability) else { continue };
         let by = || {
-            let given = *given.get_or_init(|| taken.is_some() || layers::acquisition_possible(cx.cards(), cx.s()));
+            let given = *given.get_or_init(|| taken.is_some() || possible);
             if given { layers::given_link(cx.cards(), cx.s(), source, ability, acquired_at(nth)) } else { None }
         };
+        let words = if possible && !layers::surely_its_text(cx.cards(), &chars, slot_of(&chars, nth)) {
+            let slot = slot_of(&chars, nth);
+            layers::granted_words(cx.s(), source, ability, givers.get_or_init(|| layers::ability_givers(cx.cards(), cx.s(), &cx.g.log, source))[slot])
+        } else {
+            None
+        };
+        let given_text = crate::resolve::Given {
+            q: cx,
+            earlier: &[],
+            subject: Target::None,
+            slot_player: None,
+            gift: false,
+            x: None,
+            text: words.map(|w| (source, w)),
+        };
+        // Asked through the game itself where its text is its object's own, which is nearly always.
+        let own: &dyn Query = if words.is_some() { &given_text } else { cx };
         // A state trigger (CR 603.8) triggers as soon as its state is true, so it is asked after every event, of the board as
         // it is now (never of a look-back pass), as well as each time a player would receive priority (`state_triggers`).
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
             && let Some(state) = t.state
         {
             if (later.is_some() || !look_back)
-                && state(cx, &Asker { source, controller, by: by(), spell: false })
+                && state(own, &Asker { source, controller, by: by(), spell: false })
                 && !state_trigger_waiting(cx, source, ability, found, later.as_deref())
             {
                 found.push((state_trigger(source, ability, controller, acquired_at(nth)), t, Again::new()));
@@ -872,13 +896,13 @@ fn consider(
             } else if t.attack_option.is_some() {
                 paid_to_attack(source, ability, chars.instance(nth), event)
             } else if t.listens.intersects(mask) {
-                t.fires(cx, &Asker { source, controller, by: by(), spell: false }, event)
+                t.fires(own, &Asker { source, controller, by: by(), spell: false }, event)
             } else {
                 None
             }
         {
             if let Some(condition) = t.condition
-                && !condition(cx, &Asker { source, controller, by: by(), spell: false })
+                && !condition(own, &Asker { source, controller, by: by(), spell: false })
             {
                 continue;
             }
@@ -908,7 +932,7 @@ fn consider(
                     count: None,
                     since: None,
                     acquired: acquired_at(nth),
-                    words: None,
+                    words,
                 },
                 t,
                 again,
@@ -1088,11 +1112,19 @@ pub(crate) struct TriggerStatics<'a> {
     now: Option<Vec<ObjectId>>,
     then: Option<Vec<ObjectId>>,
     before_effects: Option<&'a [ContinuousEffect]>,
+    /// Whether anything could have given an object an ability (`layers::acquisition_possible`), found once for the look.
+    acquisition: Option<bool>,
 }
 
 impl<'a> TriggerStatics<'a> {
     pub(crate) fn new(before: Option<&'a [ObjectId]>) -> Self {
-        TriggerStatics { before, now: None, then: None, before_effects: None }
+        TriggerStatics { before, now: None, then: None, before_effects: None, acquisition: None }
+    }
+
+    /// `layers::acquisition_possible`, asked once for the look: where nothing could have given an ability, every ability is
+    /// its object's own text, and no granted words are looked for.
+    fn acquisition_possible(&mut self, cx: &Cx) -> bool {
+        *self.acquisition.get_or_insert_with(|| layers::acquisition_possible(cx.cards(), cx.s()))
     }
 
     /// The permanents whose rules apply to this triggering (CR 603.10).
@@ -1401,14 +1433,24 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                     // created it (CR 603.7d-e), whoever controls its source now and wherever the source has gone. So is "you"
                     // in an intervening "if" (CR 603.4). Its event is asked of the object it watches (`Delayed::watched`).
                     let asker = Asker { source: d.watched(), controller: d.controller, by: delayed_link(cx, &d), spell: false };
+                    // Its text is the one that created it (`Delayed::words`, CR 603.7, 113.7a), its source's now notwithstanding.
+                    let own = crate::resolve::Given {
+                        q: &*cx,
+                        earlier: &[],
+                        subject: Target::None,
+                        slot_player: None,
+                        gift: false,
+                        x: None,
+                        text: d.words.map(|w| (d.source, w)),
+                    };
                     if d.when.is_event()
                         && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
                         // A delayed triggered mana ability never goes on the stack: it resolves as the mana ability that
                         // triggered it does (CR 605.1b, 605.4a), in `tapped_for_mana`.
                         && !t.mana_ability
                         && t.listens.intersects(mask)
-                        && let Some(fired) = t.fires(cx, &asker, event)
-                        && t.condition.is_none_or(|condition| condition(cx, &asker))
+                        && let Some(fired) = t.fires(&own, &asker, event)
+                        && t.condition.is_none_or(|condition| condition(&own, &asker))
                         // The end of an "until" exile is no triggered ability but the second one-shot effect the rules create
                         // immediately after the event (CR 610.3), so nothing that stops abilities triggering stops it, and the
                         // event that ends the wait always uses it up below. A "this turn" delayed ability is a triggered ability
@@ -1440,7 +1482,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                 // A delayed ability goes on the stack with the moment it was created (CR 701.27f).
                                 since: Some(d.since),
                                 acquired: d.acquired,
-                                words: None,
+                                words: d.words,
                             },
                             t,
                             Again::new(),
@@ -1643,7 +1685,7 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             } else {
                 at += 1;
             }
-            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None, since: Some(d.since), acquired: d.acquired, words: None });
+            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None, since: Some(d.since), acquired: d.acquired, words: d.words });
         } else {
             at += 1;
         }

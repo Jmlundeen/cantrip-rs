@@ -659,6 +659,7 @@ fn a_rule_or_the_cards_own_permission_stays_beside_a_permission_that_names_a_cos
                 affected: source,
                 kind: EffectKind::PlayFromGraveyard,
                 duration: Duration::Indefinite,
+                words: Words::NONE,
             });
         }
         if case == 2 {

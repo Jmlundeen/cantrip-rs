@@ -7360,7 +7360,7 @@ fn cast(
     if let Some((g, controller, index)) = by.by.and_then(|g| spell_replacement_by(cx, g, player)) {
         let timestamp = cx.st().timestamp();
         let kind = EffectKind::Replacement { card: g.ability.card, index };
-        cx.st().effect_push(ContinuousEffect { source: g.object, controller, timestamp, affected: spell, kind, duration: Duration::Indefinite });
+        cx.st().effect_push(ContinuousEffect { source: g.object, controller, timestamp, affected: spell, kind, duration: Duration::Indefinite, words: Words::NONE });
         cx.state_changed();
     }
     // A permission for the card is used up by the cast (CR 400.7: the card is a new object).
@@ -7892,6 +7892,7 @@ fn cast(
                 members: cantrip_state::Span::default(),
                 since,
                 acquired: Acquired::OWN,
+                words: None,
             });
         }
     }
@@ -9145,7 +9146,10 @@ fn activate(
     item.acquired = acquired_nth(cx, source, index as usize);
     // Its text is fixed as it is announced (CR 602.2, 113.7a): the source's words now, which nothing that changes the
     // source's text later changes.
-    item.words = cantrip_api::words(cx.s(), source);
+    // One an effect granted is the granting text's, with its words (`ContinuousEffect::words`, CR 611.2c).
+    let chars = cx.chars(source);
+    let slot = chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(index as usize).map_or(0, |(slot, _)| slot);
+    item.words = layers::granted_words_at(cx.cards(), cx.s(), &cx.g.log, source, &chars, slot).unwrap_or_else(|| cantrip_api::words(cx.s(), source));
     let mut mana = def.cost.mana;
     // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost: the
     // option it was offered as names which (`ActionOption::paid_by`), and it is paid if it still applies.

@@ -337,7 +337,12 @@ only the candidates the host's verdict on those picked says may be added.
   source's words then (`StackItem::words`), and while its own condition, targets and instructions are read
   (`Cx::own_text`, `resolve::Given::text`) `Query::words` of its source answers those - the engine turns that off while it
   asks other abilities in the middle of them (triggers, replacement effects, state triggers). A spell reads its own words
-  (a text change on the stack changes it); static abilities read their source's words now. Layer 3
+  (a text change on the stack changes it); static abilities read their source's words now. An ability a resolved effect
+  grants, and a delayed triggered ability, is the creating text's (611.2c, 603.7): the effect keeps that text's words
+  (`ContinuousEffect::words`, for `EffectKind::AddAbility`; `Delayed::words`), and the ability is asked whether it triggers,
+  and goes on the stack, with them (`PendingTrigger::words`, `layers::granted_words`, by the effect the layers say put each
+  instance there, `Giver::by`). One another object's static ability grants is that static ability's text, its source's
+  words now (612.3). Layer 3
   also changes the words of printed keyword abilities that name a color or a land type: "hexproof from [color]",
   "protection from [color]" (`CardDef::protection`, White Knight) and a basic landwalk (`Keyword::Islandwalk` ...,
   702.14: Bog Wraith's swampwalk to Magical Hack's plainswalk); an ability another permanent grants reads the word through

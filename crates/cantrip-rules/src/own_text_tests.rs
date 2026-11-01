@@ -12,7 +12,6 @@ use cantrip_state::{Frame, FrameKind};
 use std::cell::RefCell;
 
 const YOU: PlayerId = PlayerId(0);
-
 thread_local! {
     /// What each hook read "Goblin" as, by hook.
     static SEEN: RefCell<Vec<(&'static str, Subtype)>> = const { RefCell::new(Vec::new()) };
@@ -107,8 +106,15 @@ static SOURCE: CardDef = CardDef {
         replacement(ReplacementKind::ManaProduction, mana_only, mana_apply, "Goblin mana"),
     ],
     granted_preventions: &[GrantedPreventionDef { hint: "Goblin shield", damage: "damage", of_it: None, applies: shielded, then: None, text: "" }],
+    delayed: &[triggered(when(EventMask::SPELL_CAST, delayed_cast), nothing, "This turn, whenever a Goblin spell is cast, do nothing.")],
     ..CardDef::BLANK
 };
+
+/// The delayed ability's trigger event: notes the word, and triggers on any spell.
+fn delayed_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    note("delayed", q, source);
+    matches!(event, Event::SpellCast { .. }).then_some(Fired { subject: Target::None, data: [0; 2] })
+}
 
 static TOKEN: CardDef = CardDef { name: "Own Text Token", types: TypeSet::of(&[CardType::Artifact]), ..CardDef::BLANK };
 
@@ -146,6 +152,7 @@ fn resolving() -> (Game, ObjectId, usize) {
         affected: id,
         kind: EffectKind::ChangeText { from: Word::Subtype(Subtype::Goblin), to: Word::Subtype(Subtype::Elf) },
         duration: Duration::Indefinite,
+        words: Words::NONE,
     });
     SEEN.with(|s| s.borrow_mut().clear());
     (g, id, frame)
@@ -168,7 +175,17 @@ fn what_triggers_is_asked_of_the_text_now() {
     reads_its_own_text(&cx, id);
     cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1 });
     assert_eq!(seen("trigger"), Some(Subtype::Elf));
-    assert_eq!(seen("members"), Some(Subtype::Elf), "the objects a trigger is about are found by its text now");
+    reads_its_own_text(&cx, id);
+}
+
+/// The objects a triggered ability is about (`TriggeredDef::members_of`) are found as it triggers, after the trigger events
+/// are looked at, by its own text now - the guard around `members_of` in `settle::collect_batch`.
+#[test]
+fn the_objects_a_trigger_is_about_are_found_by_the_text_now() {
+    let (mut g, id, frame) = resolving();
+    let mut cx = own(&mut g, frame);
+    cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1 });
+    assert_eq!(seen("members"), Some(Subtype::Elf));
     reads_its_own_text(&cx, id);
 }
 
@@ -230,12 +247,30 @@ fn a_prevention_shield_is_judged_by_the_text_now() {
         affected: id,
         kind: EffectKind::Prevention { card, index: 0, to: Target::None, shield: Shield::Next(3) },
         duration: Duration::EndOfTurn,
+        words: Words::NONE,
     });
     let cx = own(&mut g, frame);
     let damage = DamageEvent { source: id, target: Target::Player(YOU), amount: 2, combat: false, heal_marked: false, shielded: None };
     let shields = crate::replace::shields(&cx, &damage);
     assert_eq!(seen("shield"), Some(Subtype::Elf), "{shields:?}");
     reads_its_own_text(&cx, id);
+}
+
+/// A delayed triggered ability the resolving ability creates is that ability's text (CR 603.7, 113.7a): it keeps the words
+/// the ability was put on the stack with, though its source says Elf, and reads them when it is asked whether it triggers
+/// and once it is on the stack - after the resolution, with nothing of the ability's own text read any more.
+#[test]
+fn a_delayed_ability_keeps_the_text_that_created_it() {
+    let (mut g, id, frame) = resolving();
+    let card = g.cards.id_of(&SOURCE);
+    let mut cx = own(&mut g, frame);
+    cantrip_api::Game::delayed_trigger(&mut cx, DelayedWhen::ThisTurn, id, YOU, AbilityRef::delayed(card, 0), Target::None);
+    cx.g.own_text.set(false);
+    assert_eq!(Query::words(&cx, id).subtype(Subtype::Goblin), Subtype::Elf, "the source says Elf to anything else");
+    cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1 });
+    assert_eq!(seen("delayed"), Some(Subtype::Goblin), "asked whether it triggers by the text that created it");
+    let pending = cx.s().triggers.iter().find(|t| t.ability == AbilityRef::delayed(card, 0)).expect("it triggered");
+    assert_eq!(pending.words.map(|w| w.subtype(Subtype::Goblin)), Some(Subtype::Goblin), "and put on the stack with it");
 }
 
 #[test]

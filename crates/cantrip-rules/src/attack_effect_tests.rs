@@ -26,7 +26,7 @@ fn required_after_losing_abilities(kind: EffectKind) -> u32 {
     g.state.zone_push(Zone::BATTLEFIELD, bear);
     for (controller, kind) in [(P1, kind), (P1, EffectKind::LoseAllAbilities)] {
         let timestamp = g.state.timestamp();
-        g.state.effect_push(ContinuousEffect { source: bear, controller, timestamp, affected: bear, kind, duration: Duration::EndOfTurn });
+        g.state.effect_push(ContinuousEffect { source: bear, controller, timestamp, affected: bear, kind, duration: Duration::EndOfTurn, words: Words::NONE });
     }
     for _ in 0..200 {
         g.run();
@@ -73,7 +73,7 @@ fn next_turn_requirements(stolen: bool) -> (Vec<(u32, PlayerId, u32)>, usize) {
     g.state.zone_push(Zone::BATTLEFIELD, bear);
     let timestamp = g.state.timestamp();
     let kind = EffectKind::MustAttackAt(Target::Player(P2));
-    g.state.effect_push(ContinuousEffect { source: bear, controller: P0, timestamp, affected: bear, kind, duration: Duration::DuringControllersNextTurn(1) });
+    g.state.effect_push(ContinuousEffect { source: bear, controller: P0, timestamp, affected: bear, kind, duration: Duration::DuringControllersNextTurn(1), words: Words::NONE });
     let mut seen = Vec::new();
     let mut left = usize::MAX;
     for _ in 0..1000 {
@@ -144,7 +144,7 @@ fn a_requirement_during_its_controllers_next_turn_is_spent_with_that_turn_whoeve
     }
     let timestamp = g.state.timestamp();
     let kind = EffectKind::MustAttackAt(Target::Player(P0));
-    g.state.effect_push(ContinuousEffect { source: bear, controller: P0, timestamp, affected: bear, kind, duration: Duration::DuringControllersNextTurn(1) });
+    g.state.effect_push(ContinuousEffect { source: bear, controller: P0, timestamp, affected: bear, kind, duration: Duration::DuringControllersNextTurn(1), words: Words::NONE });
     let mut seen = Vec::new();
     for _ in 0..1000 {
         g.run();
@@ -186,7 +186,7 @@ fn a_requirement_during_its_controllers_next_turn_moves_to_a_new_controller_whos
     }
     let timestamp = g.state.timestamp();
     let kind = EffectKind::MustAttackAt(Target::Player(P0));
-    g.state.effect_push(ContinuousEffect { source: bear, controller: P0, timestamp, affected: bear, kind, duration: Duration::DuringControllersNextTurn(1) });
+    g.state.effect_push(ContinuousEffect { source: bear, controller: P0, timestamp, affected: bear, kind, duration: Duration::DuringControllersNextTurn(1), words: Words::NONE });
     let mut seen = Vec::new();
     for _ in 0..2000 {
         g.run();

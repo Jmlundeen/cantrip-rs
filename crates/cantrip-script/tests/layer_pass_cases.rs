@@ -145,6 +145,7 @@ fn akromas_memorial_and_a_loss_of_all_abilities_apply_in_timestamp_order() {
             affected: ids[0],
             kind: EffectKind::LoseAllAbilities,
             duration: Duration::EndOfTurn,
+            words: Words::NONE,
         });
         assert_eq!(game.chars(ids[0]).has(Keyword::Flying), flying, "lost at {lost_at}");
     }
@@ -365,6 +366,7 @@ fn pump(game: &mut Game, id: ObjectId, timestamp: u32) {
         affected: id,
         kind: EffectKind::Pump(2, 2),
         duration: Duration::EndOfTurn,
+        words: Words::NONE,
     });
 }
 
@@ -390,6 +392,7 @@ fn a_granted_static_ability_depends_through_what_it_does() {
         affected: ids[0],
         kind: EffectKind::AddAbility(AbilityRef::delayed(rallier, 0)),
         duration: Duration::EndOfTurn,
+        words: Words::NONE,
     });
     assert_eq!(game.chars(ids[0]).power, Some(2), "+1/+0 for the Bird");
     pump(&mut game, ids[1], 30);

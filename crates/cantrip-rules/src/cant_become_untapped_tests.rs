@@ -35,7 +35,7 @@ fn permanent(game: &mut Game, def: &'static CardDef, tapped: bool) -> ObjectId {
 
 fn lose_all_abilities(game: &mut Game, id: ObjectId) {
     let timestamp = game.state.timestamp();
-    game.state.effect_push(ContinuousEffect { source: id, controller: YOU, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::EndOfTurn });
+    game.state.effect_push(ContinuousEffect { source: id, controller: YOU, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::EndOfTurn, words: Words::NONE });
 }
 
 fn cx(game: &mut Game) -> Cx<'_> {
@@ -90,7 +90,7 @@ fn a_resolved_effect_keeps_one_creature_tapped_and_its_stun_counter_in_place() {
     let held = permanent(&mut game, &BEAR, true);
     let free = permanent(&mut game, &BEAR, true);
     let timestamp = game.state.timestamp();
-    game.state.effect_push(ContinuousEffect { source: held, controller: YOU, timestamp, affected: held, kind: EffectKind::CantBecomeUntapped, duration: Duration::Indefinite });
+    game.state.effect_push(ContinuousEffect { source: held, controller: YOU, timestamp, affected: held, kind: EffectKind::CantBecomeUntapped, duration: Duration::Indefinite, words: Words::NONE });
     crate::counters::put(&mut cx(&mut game), held, CounterKind::Stun, 1, YOU, crate::counters::How::Effect);
     lose_all_abilities(&mut game, held);
     untap_step_of_yours(&mut game);

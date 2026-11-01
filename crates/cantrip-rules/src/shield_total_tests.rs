@@ -51,6 +51,7 @@ fn shields_hold_more_than_one_shields_width_between_them() {
             kind: EffectKind::Prevention { card: cards.id_of(&SHIELD), index: 0, to: Target::Player(OPPONENT), shield: Shield::Next(40_000) },
             duration: Duration::EndOfTurn,
             timestamp,
+            words: Words::NONE,
         });
     }
     let mut cx = cx(&mut game);

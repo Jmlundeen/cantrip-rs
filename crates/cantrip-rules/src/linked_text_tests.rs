@@ -130,6 +130,7 @@ fn a_front_face_ability_given_to_the_back_face_is_acquired_by_the_effect() {
         affected: source,
         kind: EffectKind::AddAbility(AbilityRef { card: t.id_of(&TRANSFORMING), index: 0 }),
         duration: Duration::EndOfTurn,
+        words: Words::NONE,
     });
     let chars = crate::layers::chars(t, &game.state, &game.log, source);
     let slot = |card: &'static CardDef| chars.abilities.iter().position(|a| a.is_some_and(|a| a.card == t.id_of(card))).expect("the ability");
@@ -181,6 +182,7 @@ fn a_static_ability_given_by_an_effect_reads_no_choice_the_permanents_own_text_m
         affected: source,
         kind: EffectKind::AddAbility(AbilityRef::delayed(t.id_of(&CHOOSER), 0)),
         duration: Duration::EndOfTurn,
+        words: Words::NONE,
     });
     let chars = crate::layers::chars(t, &game.state, &game.log, source);
     assert!(chars.abilities.contains(&Some(AbilityRef::delayed(t.id_of(&CHOOSER), 0))), "it has the given ability");
@@ -233,6 +235,7 @@ fn given_by_another(index: u8) -> (Game, ObjectId) {
         affected: source,
         kind: EffectKind::AddAbility(AbilityRef::delayed(t.id_of(&TRIGGERED_CHOOSER), index)),
         duration: Duration::EndOfTurn,
+        words: Words::NONE,
     });
     (game, source)
 }
@@ -273,7 +276,7 @@ fn an_ability_a_permanents_own_effect_gives_it_is_its_own_only_if_printed_within
     game.state.zone_push(Zone::BATTLEFIELD, source);
     let give = |game: &mut Game, ability: AbilityRef| {
         let timestamp = game.state.timestamp();
-        game.state.effect_push(ContinuousEffect { source, controller: me, timestamp, affected: source, kind: EffectKind::AddAbility(ability), duration: Duration::EndOfTurn });
+        game.state.effect_push(ContinuousEffect { source, controller: me, timestamp, affected: source, kind: EffectKind::AddAbility(ability), duration: Duration::EndOfTurn, words: Words::NONE });
         timestamp
     };
     // Its own text's ability, printed within the ability that gives it (CR 607.1a).
@@ -319,7 +322,7 @@ fn lend(game: &mut Game, lender: &'static CardDef, holder: ObjectId, ability: Ab
     let lent = game.state.push_obj(Obj::new(game.cards.id_of(lender), PlayerId(0), Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, lent);
     let timestamp = game.state.timestamp();
-    game.state.effect_push(ContinuousEffect { source: lent, controller: PlayerId(0), timestamp, affected: holder, kind: EffectKind::AddAbility(ability), duration: Duration::EndOfTurn });
+    game.state.effect_push(ContinuousEffect { source: lent, controller: PlayerId(0), timestamp, affected: holder, kind: EffectKind::AddAbility(ability), duration: Duration::EndOfTurn, words: Words::NONE });
     timestamp
 }
 

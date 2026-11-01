@@ -1173,6 +1173,11 @@ pub struct ContinuousEffect {
     pub affected: ObjectId,
     pub kind: EffectKind,
     pub duration: Duration,
+    /// For an effect that grants an ability (`EffectKind::AddAbility`), the words of the text that created it as it did
+    /// (CR 611.2c, 612.1): the granted ability is that text's, so it reads them - a text change on the object it was granted
+    /// to, or on its source afterwards, changes no ability it has from the effect (Artificial Evolution's ruling: "It will
+    /// not change any effects that are on the permanent"). `Words::NONE` for every other effect.
+    pub words: Words,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -1783,6 +1788,11 @@ pub struct Delayed {
     pub since: u32,
     /// How the source of the ability that created it acquired that ability (CR 607.5): what it is linked by as it resolves.
     pub acquired: Acquired,
+    /// The words of the text that created it, as it did (CR 603.7, 113.7a): the resolving spell's own, or the resolving
+    /// ability's as it was put on the stack. It is that text's ability, so what it watches for, what it targets and what it
+    /// does read these, whatever becomes of its source's text (`PendingTrigger::words`). None for one the rules make as a
+    /// spell is cast or a card moves (warp's, rebound's), which reads its source's words.
+    pub words: Option<Words>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

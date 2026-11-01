@@ -629,6 +629,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                             members: cantrip_state::Span::default(),
                             since,
                             acquired: Acquired::OWN,
+                            words: None,
                         });
                     }
                 }

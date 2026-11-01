@@ -33,7 +33,7 @@ fn permanent(game: &mut Game, def: &'static CardDef, tapped: bool) -> ObjectId {
 
 fn lose_all_abilities(game: &mut Game, id: ObjectId) {
     let timestamp = game.state.timestamp();
-    game.state.effect_push(ContinuousEffect { source: id, controller: YOU, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::EndOfTurn });
+    game.state.effect_push(ContinuousEffect { source: id, controller: YOU, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::EndOfTurn, words: Words::NONE });
 }
 
 fn untap_step_of_yours(game: &mut Game) {

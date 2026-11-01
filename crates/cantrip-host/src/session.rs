@@ -958,6 +958,7 @@ mod tests {
                 affected: source,
                 kind: EffectKind::ControlNextTurn { player: south, then_extra_turn: false },
                 duration: Duration::Indefinite,
+                words: Words::NONE,
             });
         })
         .ok()

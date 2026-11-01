@@ -62,6 +62,7 @@ fn an_extra_turn_skipped_at_untap_is_not_recorded_as_begun() {
         affected: source,
         kind: EffectKind::SkipNextTurn(PLAYER),
         duration: Duration::Indefinite,
+        words: Words::NONE,
     });
 
     begin_untap(&mut game);

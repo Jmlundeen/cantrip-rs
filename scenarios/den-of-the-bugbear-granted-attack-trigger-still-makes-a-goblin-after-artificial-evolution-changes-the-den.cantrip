@@ -1,0 +1,49 @@
+# An ability a resolved effect grants is part of that effect, whose text was fixed as it was created (CR 611.2c): a text
+# change on the permanent afterwards changes its own text (CR 612.1), not the effects on it (Artificial Evolution's ruling:
+# "It will not change any effects that are on the permanent"). Den of the Bugbear's activation resolves: until end of turn it
+# is a 3/2 red Goblin with "Whenever this creature attacks, create a 1/1 red Goblin creature token that's tapped and
+# attacking." Then Artificial Evolution replaces Goblin with Elf in the Den's text. The Den stays a Goblin (the effect set
+# that type), and its granted trigger still makes a Goblin when it attacks: Bot2 takes 3 + 1.
+
+[Bot1 Deck]
+Den of the Bugbear
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Artificial Evolution
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Den of the Bugbear.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Den of the Bugbear.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Den of the Bugbear)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Goblin)
+Bot1.Modes(Elf)
+? Bot1.Battlefield.Den of the Bugbear.Subtypes = Goblin
+Bot1.Attack(Den of the Bugbear > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Goblin Token.Power = 1
+Bot1.Battlefield.Goblin Token.Colors = Red

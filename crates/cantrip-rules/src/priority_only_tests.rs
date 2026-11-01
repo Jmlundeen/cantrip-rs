@@ -99,7 +99,7 @@ fn all_mana_sources_require_priority_if_their_own_ability_says_so() {
     game.state.effect_push(ContinuousEffect {
         source: restricted, affected: restricted, controller: YOU,
         kind: EffectKind::PlayerManaAbility(AbilityRef::delayed(game.cards.id_of(&PLAYER_MANA), 0)),
-        duration: Duration::EndOfTurn, timestamp: 1,
+        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE,
     });
     let cx = cx(&mut game);
     let mut priority = Vec::new();
@@ -188,7 +188,7 @@ fn a_granted_mana_ability_keeps_its_own_priority_restriction() {
     let ability = AbilityRef { card: game.cards.id_of(&PRIORITY_MANA), index: 0 };
     game.state.effect_push(ContinuousEffect {
         source: restricted, affected: ordinary, controller: YOU, kind: EffectKind::AddAbility(ability),
-        duration: Duration::EndOfTurn, timestamp: 1,
+        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE,
     });
     let cx = cx(&mut game);
     let mut priority = Vec::new();

@@ -85,7 +85,7 @@ fn game(restriction: &'static CardDef, lost: bool, creatures: &[&'static CardDef
     g.state.zone_push(Zone::BATTLEFIELD, id);
     if lost {
         let timestamp = g.state.timestamp();
-        g.state.effect_push(ContinuousEffect { source: id, controller: P0, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::Indefinite });
+        g.state.effect_push(ContinuousEffect { source: id, controller: P0, timestamp, affected: id, kind: EffectKind::LoseAllAbilities, duration: Duration::Indefinite, words: Words::NONE });
     }
     let creatures: Vec<ObjectId> = creatures
         .iter()
@@ -94,7 +94,7 @@ fn game(restriction: &'static CardDef, lost: bool, creatures: &[&'static CardDef
             g.state.zone_push(Zone::BATTLEFIELD, id);
             if goaded {
                 let timestamp = g.state.timestamp();
-                g.state.effect_push(ContinuousEffect { source: id, controller: P0, timestamp, affected: id, kind: EffectKind::Goaded, duration: Duration::Indefinite });
+                g.state.effect_push(ContinuousEffect { source: id, controller: P0, timestamp, affected: id, kind: EffectKind::Goaded, duration: Duration::Indefinite, words: Words::NONE });
             }
             id
         })

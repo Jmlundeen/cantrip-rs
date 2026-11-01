@@ -201,6 +201,7 @@ fn probe(charm_first: bool) -> Chars {
         affected: ids[3],
         kind: EffectKind::AddTypes(TypeSet::of(&[CardType::Land])),
         duration: Duration::Indefinite,
+        words: Words::NONE,
     });
     game.state.see_statics();
     if charm_first {

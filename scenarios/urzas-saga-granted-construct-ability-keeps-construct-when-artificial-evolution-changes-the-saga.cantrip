@@ -1,0 +1,44 @@
+# An ability a resolved effect grants is that effect's text (CR 611.2c), and a text change on the permanent afterwards changes
+# none of it (CR 612.3): Urza's Saga's chapter II gives it "{2}, {T}: Create a 0/0 colorless Construct artifact creature
+# token ...", then Artificial Evolution replaces Construct with Elf in the Saga's text. The ability is activated with the
+# text that granted it (CR 602.2, 113.7a): it still makes a Construct, a 4/4 with the three Moxen and itself.
+
+[Bot1 Deck]
+Urza's Saga
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Artificial Evolution
+Forest x2
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Urza's Saga.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Urza's Saga.Counters.Lore = 2
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Urza's Saga)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Construct)
+Bot1.Modes(Elf)
+Bot1.Battlefield.Urza's Saga.Activate(Ability: Construct)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Construct Token.Subtypes = Construct
+Bot1.Battlefield.Construct Token.Power = 4
+Bot1.Battlefield.Elf Token = (absent)

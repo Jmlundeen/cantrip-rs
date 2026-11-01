@@ -44,15 +44,25 @@ thread_local! {
 pub struct Giver {
     pub object: ObjectId,
     pub acquired: Acquired,
+    /// The entry of the layers that put the ability there, its object and its effect, even where linked abilities count it
+    /// as of the object's own text (an effect of its own giving it an ability printed within that text, CR 607.1a): whose
+    /// text the ability is (`granted_words`). `ObjectId::NONE` and `Acquired::OWN` for one no entry gave.
+    pub from: ObjectId,
+    pub by: Acquired,
 }
 
 impl Giver {
-    pub const NONE: Giver = Giver { object: ObjectId::NONE, acquired: Acquired::OWN };
+    pub const NONE: Giver = Giver { object: ObjectId::NONE, acquired: Acquired::OWN, from: ObjectId::NONE, by: Acquired::OWN };
+
+    /// The giver `object`'s effect `acquired` is, which put the ability there.
+    const fn entry(object: ObjectId, acquired: Acquired) -> Giver {
+        Giver { object, acquired, from: object, by: acquired }
+    }
 
     /// The giver of a resolved effect that gave an object an ability (`EffectKind::AddAbility`): its source, as the effect's
     /// entry gives it (`GEntry::giver`).
     fn of_effect(e: &ContinuousEffect) -> Giver {
-        Giver { object: e.source, acquired: Acquired { by: AcquiredBy::Grant, stamp: e.timestamp, part: 0 } }
+        Giver::entry(e.source, Acquired { by: AcquiredBy::Grant, stamp: e.timestamp, part: 0 })
     }
 }
 
@@ -111,7 +121,7 @@ pub fn acquisition_possible(cards: &CardTable, state: &GameState) -> bool {
 /// object that has the same one printed is a second one, CR 113.2c). An ability of the other face of a transforming card,
 /// though that face is the same text (CR 607.1b), can only have been given (Agatha's Soul Cauldron lending Jacob Hauken's
 /// to an animated Hauken's Insight), and is worked out.
-fn surely_its_text(cards: &CardTable, chars: &Chars, slot: usize) -> bool {
+pub(crate) fn surely_its_text(cards: &CardTable, chars: &Chars, slot: usize) -> bool {
     let Some(ability) = chars.abilities.get(slot).copied().flatten() else { return true };
     // One its card only lists to give (`CardDef::delayed`) it has only because an effect gave it: whose, is worked out.
     if ability.is_delayed() {
@@ -136,6 +146,32 @@ pub fn acquired(cards: &CardTable, state: &GameState, log: &[Record], id: Object
     }
     let giver = ability_givers(cards, state, log, id)[slot];
     if giver.object == ObjectId::NONE { text } else { giver.acquired }
+}
+
+/// The words of the text `ability`, an ability `id` has that `giver` put there (`ability_givers`), is printed in, where that
+/// is not `id`'s own text (CR 612.1, 612.3): for one a resolved effect granted (`EffectKind::AddAbility`), the words the
+/// granting text had as it did (`ContinuousEffect::words`, CR 611.2c), whatever has changed `id`'s text or the effect's
+/// source's since; for one another object's static ability grants, that object's words now (or as it last had them), as its
+/// static ability is (Antagonist Incorporator's quoted ability: a text change on the holder changes none of it, one on the
+/// Incorporator does). None for an ability of `id`'s own text.
+pub fn granted_words(state: &GameState, id: ObjectId, ability: AbilityRef, giver: Giver) -> Option<Words> {
+    if giver.by.by != AcquiredBy::Grant {
+        return None;
+    }
+    if let Some(e) = state.effects.iter().find(|e| e.timestamp == giver.by.stamp && e.affected == id && e.kind == EffectKind::AddAbility(ability)) {
+        return Some(e.words);
+    }
+    (giver.from != ObjectId::NONE && giver.from != id).then(|| cantrip_api::words(state, giver.from))
+}
+
+/// `granted_words` of the ability in `slot` of `chars`, `id`'s characteristics now, working out its giver only where it may
+/// have one (`acquired`).
+pub fn granted_words_at(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, chars: &Chars, slot: usize) -> Option<Words> {
+    let ability = chars.abilities.get(slot).copied().flatten()?;
+    if !acquisition_possible(cards, state) || surely_its_text(cards, chars, slot) {
+        return None;
+    }
+    granted_words(state, id, ability, ability_givers(cards, state, log, id)[slot])
 }
 
 /// `ability`, an ability `id` has, acquired `acquired` (`acquired`), as linked abilities know it (CR 607.1, 607.5), where that
@@ -204,7 +240,7 @@ fn watching_givers(cards: &CardTable, id: ObjectId, giver: Giver, chars: &mut Ch
                 moved[from] = true;
                 givers[from]
             }
-            None if giver.object == id && ability.is_some_and(|a| own_text(cards, chars, a)) => Giver::NONE,
+            None if giver.object == id && ability.is_some_and(|a| own_text(cards, chars, a)) => Giver { from: giver.from, by: giver.by, ..Giver::NONE },
             None => giver,
         };
     }
@@ -1056,6 +1092,7 @@ fn keyword_counters(state: &GameState, id: ObjectId, obj: &Obj, fx: &mut Vec<Con
                     affected: id,
                     kind: EffectKind::AddKeywords(Keywords::of(&[k])),
                     duration: Duration::Indefinite,
+                    words: Words::NONE,
                 },
             );
         }
@@ -1479,9 +1516,9 @@ impl GEntry {
             statics_of(cards, state, source).position(|s| std::ptr::eq(s, st)).unwrap_or(0)
         };
         match self.kind {
-            GKind::Static { source, st, .. } => Giver { object: source, acquired: grant(part_of(source, st)) },
-            GKind::Given { holder, st, .. } | GKind::Granted { holder, st, .. } => Giver { object: holder, acquired: grant(part_of(holder, st)) },
-            GKind::Effect(e) => Giver { object: e.source, acquired: grant(0) },
+            GKind::Static { source, st, .. } => Giver::entry(source, grant(part_of(source, st))),
+            GKind::Given { holder, st, .. } | GKind::Granted { holder, st, .. } => Giver::entry(holder, grant(part_of(holder, st))),
+            GKind::Effect(e) => Giver::entry(e.source, grant(0)),
         }
     }
 
@@ -3335,6 +3372,7 @@ mod tests {
             affected: ObjectId(1),
             kind,
             duration: Duration::EndOfTurn,
+            words: Words::NONE,
         }
     }
 
@@ -3609,7 +3647,7 @@ mod tests {
         let in_hand = state.push_obj(Obj::new(cards.find("Cart").unwrap(), PlayerId(0), Zone::hand(PlayerId(0))));
         state.zone_push(Zone::hand(PlayerId(0)), in_hand);
         assert_eq!(pt(&cards, &state, in_hand), (Some(3), Some(2)));
-        let on_cart = |timestamp, kind| ContinuousEffect { source: cart, controller: PlayerId(0), timestamp, affected: cart, kind, duration: Duration::EndOfTurn };
+        let on_cart = |timestamp, kind| ContinuousEffect { source: cart, controller: PlayerId(0), timestamp, affected: cart, kind, duration: Duration::EndOfTurn, words: Words::NONE };
         state.effect_push(on_cart(2, EffectKind::Pump(1, 1)));
         assert_eq!(pt(&cards, &state, cart), (None, None));
         state.effect_push(on_cart(3, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature]))));

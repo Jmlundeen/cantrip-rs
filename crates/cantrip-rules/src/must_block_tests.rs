@@ -175,7 +175,7 @@ fn a_creature_that_must_block_one_attacker_blocks_that_one() {
             g.state.update_obj(x, |o| o.tapped = true);
         }
         let timestamp = g.state.timestamp();
-        g.state.effect_push(ContinuousEffect { source: a1, controller: P0, timestamp, affected: x, kind: EffectKind::MustBlockAttacker(a1), duration: Duration::EndOfCombat });
+        g.state.effect_push(ContinuousEffect { source: a1, controller: P0, timestamp, affected: x, kind: EffectKind::MustBlockAttacker(a1), duration: Duration::EndOfCombat, words: Words::NONE });
         let ask = declare(&mut g, &[], &[a1, a2]);
         if case == "untapped" {
             assert_eq!(rules(&ask).required, vec![RequiredBlock { blocker: Some(x), attacker: Some(a1) }]);
@@ -200,7 +200,7 @@ fn a_creature_unable_to_block_is_required_nothing() {
             "tapped" => g.state.update_obj(x, |o| o.tapped = true),
             "can't block" => {
                 let timestamp = g.state.timestamp();
-                g.state.effect_push(ContinuousEffect { source: x, controller: P0, timestamp, affected: x, kind: EffectKind::CantBlock, duration: Duration::EndOfTurn });
+                g.state.effect_push(ContinuousEffect { source: x, controller: P0, timestamp, affected: x, kind: EffectKind::CantBlock, duration: Duration::EndOfTurn, words: Words::NONE });
             }
             _ => {}
         }
@@ -284,7 +284,7 @@ fn a_resolved_cant_be_blocked_outlasts_losing_all_abilities_and_a_printed_one_do
     let (effect, printed, x) = (ids[0], ids[1], ids[2]);
     let push = |g: &mut Game, affected: ObjectId, kind: EffectKind| {
         let timestamp = g.state.timestamp();
-        g.state.effect_push(ContinuousEffect { source: affected, controller: P0, timestamp, affected, kind, duration: Duration::EndOfTurn });
+        g.state.effect_push(ContinuousEffect { source: affected, controller: P0, timestamp, affected, kind, duration: Duration::EndOfTurn, words: Words::NONE });
     };
     push(&mut g, effect, EffectKind::CantBeBlocked);
     push(&mut g, effect, EffectKind::LoseAllAbilities);
@@ -304,7 +304,7 @@ fn a_resolved_block_restriction_outlasts_losing_all_abilities_and_is_only_on_its
     let card = g.cards.id_of(&RESTRICTING);
     let push = |g: &mut Game, affected: ObjectId, kind: EffectKind| {
         let timestamp = g.state.timestamp();
-        g.state.effect_push(ContinuousEffect { source: affected, controller: P0, timestamp, affected, kind, duration: Duration::EndOfTurn });
+        g.state.effect_push(ContinuousEffect { source: affected, controller: P0, timestamp, affected, kind, duration: Duration::EndOfTurn, words: Words::NONE });
     };
     push(&mut g, restricted, EffectKind::BlockRestriction { card, index: 0 });
     push(&mut g, restricted, EffectKind::LoseAllAbilities);

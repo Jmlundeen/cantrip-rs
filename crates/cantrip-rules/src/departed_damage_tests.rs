@@ -136,7 +136,7 @@ fn departed_damage_neither_consumes_nor_orders_prevention_shields() {
     game.state.effect_push(ContinuousEffect {
         source, affected: source, controller: YOU,
         kind: EffectKind::Prevention { card, index: 0, to: Target::Player(LEFT), shield: Shield::Next(3) },
-        duration: Duration::EndOfTurn, timestamp: 1,
+        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE,
     });
     let mut cx = cx(&mut game);
     let hits = [(source, Target::Player(LEFT), 2), (source, Target::Player(LEFT), 2)];
@@ -182,7 +182,7 @@ fn invalid_redirection_keeps_original_live_damage_and_does_not_use_destination_s
     game.state.effect_push(ContinuousEffect {
         source, affected: source, controller: YOU,
         kind: EffectKind::Prevention { card, index: 0, to: Target::Player(LEFT), shield: Shield::Next(3) },
-        duration: Duration::EndOfTurn, timestamp: 1,
+        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE,
     });
     let mut cx = cx(&mut game);
     assert_eq!(damage(&mut cx, source, Target::Player(OTHER), 2, false), 2);
@@ -203,7 +203,7 @@ fn redirect_once_to(destination: &'static CardDef, zone: Zone) -> (i32, u16, boo
     game.state.zone_push(zone, to);
     game.state.effect_push(ContinuousEffect {
         source: redirector, affected: to, controller: YOU, kind: EffectKind::Replacement { card: game.cards.id_of(&ONCE_REDIRECT), index: 0 },
-        duration: Duration::EndOfTurn, timestamp: 1,
+        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE,
     });
     let mut cx = cx(&mut game);
     assert_eq!(damage(&mut cx, source, Target::Player(OTHER), 2, false), 2);
