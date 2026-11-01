@@ -20,8 +20,9 @@ pub fn enter_as_copy(
     enter_as_copy_asking(g, entry, eligible, exception, &COPY_AS_ENTERS)
 }
 
-/// `enter_as_copy`, asked in the card's own words: Vesuva's "enter tapped as a copy", where what the copy does as it enters
-/// is part of the choice. Whether it enters as a copy is `entry.copy` afterwards.
+/// `enter_as_copy`, asked in the card's own words, for a card whose copy does something more as it enters that the question
+/// must say. Whether it enters as a copy is `entry.copy` afterwards. (Lands that "enter tapped as a copy" use
+/// `enter_tapped_as_copy_of_one_of`.)
 pub fn enter_as_copy_asking(
     g: &mut dyn Game,
     entry: &mut Entering,
@@ -43,8 +44,8 @@ pub fn enter_as_copy_asking(
 /// `enter_as_copy_asking` over the permanents the caller has already chosen: for a card whose "any creature on the
 /// battlefield" is narrowed by something the entering permanent knows (Mockingbird's mana value no greater than the mana
 /// spent to cast it), which a `fn(&Chars)` filter cannot see. `candidates` must not hold the entering permanent. It is the body of
-/// `enter_as_copy_asking`, so every `enter_as_copy` card goes through it (Clone, Evil Twin, Phantasmal Image, Phyrexian Metamorph, Omni-Changeling,
-/// Vesuva); Mockingbird calls it directly.
+/// `enter_as_copy_asking`, so every `enter_as_copy` card goes through it (Clone, Evil Twin, Phantasmal Image, Phyrexian Metamorph,
+/// Omni-Changeling); Mockingbird calls it directly, and Vesuva and Echoing Deeps through `enter_tapped_as_copy_of_one_of`.
 pub fn enter_as_copy_of_one_of(
     g: &mut dyn Game,
     entry: &mut Entering,
@@ -57,6 +58,32 @@ pub fn enter_as_copy_of_one_of(
     // exception on top.
     let values = g.copiable_values(chosen);
     entry.copy = Some(exception(g, values));
+    Ok(())
+}
+
+/// What a land that may "enter tapped as a copy" asks: entering as a copy is entering tapped, so the question says both.
+const ENTER_TAPPED_AS_A_COPY: Question = Question::new(
+    "CopyAsEnters",
+    "enter tapped as a copy of a land?",
+    "It enters tapped, as a copy of the land you choose next (the only land, if there is one). If you don't, it enters untapped as itself",
+    "Choose a land",
+    "Enter as itself",
+);
+
+/// "You may have this land enter tapped as a copy of [one of `candidates`], except [`exception`]" (CR 614.1c, 707.2, 707.9):
+/// `enter_as_copy_of_one_of` asked in these words, and the land enters tapped only if it copies something; if it copies
+/// nothing it enters untapped as itself (the rulings). Vesuva (lands on the battlefield) and Echoing Deeps (land cards in
+/// graveyards) print it.
+pub fn enter_tapped_as_copy_of_one_of(
+    g: &mut dyn Game,
+    entry: &mut Entering,
+    candidates: &[ObjectId],
+    exception: fn(&dyn Query, Copiable) -> Copiable,
+) -> Result<(), Suspend> {
+    enter_as_copy_of_one_of(g, entry, candidates, exception, &ENTER_TAPPED_AS_A_COPY)?;
+    if entry.copy.is_some() {
+        entry.tapped = true;
+    }
     Ok(())
 }
 
