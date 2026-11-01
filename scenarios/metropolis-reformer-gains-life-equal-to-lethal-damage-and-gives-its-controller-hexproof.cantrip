@@ -1,0 +1,41 @@
+# Metropolis Reformer: "You have hexproof" (CR 702.11c) - Bot2's Lightning Bolt can't target Bot1 (refusal, with the red mana
+# to cast it) but can target the Reformer. The Bolt's 3 damage is lethal to the 2/3 yet the trigger still happens and Bot1
+# gains that much life (CR 120.4b, 603.2c): 20 + 3 = 23, the Reformer in the graveyard.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Metropolis Reformer
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Metropolis Reformer.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Metropolis Reformer)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Metropolis Reformer
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

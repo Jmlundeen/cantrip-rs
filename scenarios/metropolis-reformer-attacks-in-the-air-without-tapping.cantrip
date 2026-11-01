@@ -1,0 +1,40 @@
+# Metropolis Reformer has flying and vigilance: a Llanowar Elves (no flying or reach) can't block it (refusal, the Elves
+# being untapped and able to block a ground creature), and after it attacks and deals 2 it is untapped (CR 702.9b, 702.20b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Metropolis Reformer
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Metropolis Reformer.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Metropolis Reformer > Bot2)
+! Bot2.Block(Llanowar Elves > Metropolis Reformer)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Metropolis Reformer.Tapped = false

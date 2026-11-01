@@ -1,0 +1,12 @@
+{
+  "name": "Metropolis Reformer",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Angel Cleric",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flying, vigilance\nYou have hexproof.\nWhenever this creature is dealt damage, you gain that much life.",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}

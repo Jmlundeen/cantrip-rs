@@ -1,0 +1,61 @@
+# The combat damage Bot2's two Canopy Spiders (reach) deal Metropolis Reformer together is dealt at once (CR 510.2, 120.4b):
+# its ability triggers once, for the total of 2 (CR 603.2c), not once per blocker. Bot1 gains 2 life in one event, so
+# Starscape Cleric's "whenever you gain life" drains Bot2 once (19); a trigger per blocker would gain twice and drain twice.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Metropolis Reformer
+Starscape Cleric
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Canopy Spider
+Canopy Spider
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Metropolis Reformer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Starscape Cleric.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Canopy Spider.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Canopy Spider.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Metropolis Reformer > Bot2)
+Bot2.Block(Canopy Spider#1 > Metropolis Reformer; Canopy Spider#2 > Metropolis Reformer)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 19
+Bot1.Battlefield.Metropolis Reformer.Damage = 2
+Stack.Count = 0
