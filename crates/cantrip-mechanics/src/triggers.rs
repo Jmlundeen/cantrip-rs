@@ -1483,6 +1483,24 @@ pub fn creature_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Op
     }
 }
 
+/// "Whenever a [subtype] you control dies" (CR 700.4, 603.10a), `SUBTYPE` a `Subtype` as `u16` (`lands::sub`), looked back on: a
+/// permanent that had that subtype as it last was on the battlefield (a creature or not, CR 109.2, 205.3), under the controller it
+/// last had, the type read through the words of the source's text (CR 612). This permanent too, if it is one. Bishop of Wings
+/// (Angels) and Slimefoot, the Stowaway (Saprolings) print it.
+pub fn of_subtype_you_control_dies<const SUBTYPE: u16>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, from, to, .. }
+            if from.is(ZoneKind::Battlefield)
+                && to.is(ZoneKind::Graveyard)
+                && q.obj(*old).controller == me.controller
+                && q.chars(*old).has_subtype(crate::lands::word(q, me.source, SUBTYPE)) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever another creature you control dies" (CR 700.4, 603.10a): a creature other than the source, looked back on as it last
 /// was on the battlefield, under the controller it last had. Heirloom Auntie and Pitiless Plunderer print it.
 pub fn another_creature_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
