@@ -35,7 +35,7 @@ LINE_CHECKS = [
     (NEVER, r"(?<!rest_to_)\bbottom_in_random_order\b|\bBottomInRandomOrder\b|\blibrary::random_of\b",
      "shuffling or randomising by hand: the verb that does it (`library::rest_to_bottom_in_random_order`, a shuffle)"
      " or `g.choose_at_random`"),
-    (NEVER, r"\bchoose::(?:card|cards|card_from|cards_from)\(|\bsearch_library\(|\blibrary::Find\b|\blibrary::search_to_\w+\(",
+    (NEVER, r"\bchoose::(?:card|cards|card_from|cards_from|cards_from_kind)\(|\bsearch_library\(|\blibrary::Find\b|\blibrary::search_to_\w+\(",
      "an older choice or search kept for existing cards: a selection rule (`cantrip_mechanics::select`) asked with"
      " `choose::select`, `library::search` or `library::find_to_*`"),
     (NEVER, r"\bmove_(?:to|together(?:_revealed)?)\([^;]*Zone::(?:graveyard|hand|library)\(",
