@@ -92,9 +92,10 @@ mechanic names in its doc comment at least two printed cards that use it exactly
 that card. A keyword module cites its CR rule and names its cards. Never widen a central switch to encode a card.
 
 **Share what is the same, and only that.** If an existing function does what the card needs, use it. If another card
-already does the same thing in its own code - the prior art shows it, or you come across it - move it into one shared
-function and change every card that has a copy to call it, in this change: it is part of the card, never a note left
-for later. Never stretch a shared function over something that only looks alike: a flag or parameter only one
+already does the same thing in its own code - the prior art shows it, you come across it, or `python
+tools/maintenance/card-dupes.py "Card Name"` lists it (every function of the card's file whose body another card file
+repeats, kinds and numbers masked; run it once the card is written) - move it into one shared function and change every
+card that has a copy to call it, in this change: it is part of the card, never a note left for later. Never stretch a shared function over something that only looks alike: a flag or parameter only one
 caller uses, or a branch on which card is calling, means it was not the same thing.
 
 **A card never tells the engine what the rules already decide.** Where the rules fix a property of an ability or an
