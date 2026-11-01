@@ -1,0 +1,20 @@
+# "...unless you control a Swamp or a Mountain": the Mountain branch, read by land type and not by name (CR 305.6,
+# 205.3i; the ruling). Stomping Ground is a Mountain (and a Forest, which does not count) and no Swamp is anywhere, so
+# the Summit enters untapped.
+
+[Bot1 Deck]
+Stomping Ground
+Dragonskull Summit
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Stomping Ground.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Dragonskull Summit.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Dragonskull Summit.Tapped = false

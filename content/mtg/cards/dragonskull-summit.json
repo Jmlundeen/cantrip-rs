@@ -1,0 +1,5 @@
+{
+  "name": "Dragonskull Summit",
+  "type": "Land",
+  "oracleText": "This land enters tapped unless you control a Swamp or a Mountain.\n{T}: Add {B} or {R}."
+}
