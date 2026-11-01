@@ -1,0 +1,38 @@
+# Festering Gulch: it is a Desert (Ipnu Rivulet and Shefet Dunes count them), it enters tapped, and its enters trigger
+# deals exactly 1 damage to target opponent. Its controller is not a legal target, so the opponent is the only candidate
+# and no target question is asked (a trigger that could target either player would ask); its controller stays at 20.
+# Next turn it untaps and adds {B} or {G} and nothing else: white, blue, red and colorless are refused beside the black
+# it does add, and the pool holds exactly one mana after the tap (the cost {T} paid once); the turn after, it adds
+# green.
+
+[Bot1 Deck]
+Festering Gulch
+Forest x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Festering Gulch.Play
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Life = 20
+? Bot1.Battlefield.Festering Gulch.Tapped = true
+? Bot1.Battlefield.Festering Gulch.Subtypes = Desert
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Festering Gulch.Activate(Color: White)
+! Bot1.Battlefield.Festering Gulch.Activate(Color: Blue)
+! Bot1.Battlefield.Festering Gulch.Activate(Color: Red)
+! Bot1.Battlefield.Festering Gulch.Activate(Color: Colorless)
+Bot1.Battlefield.Festering Gulch.Activate(Color: Black)
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Festering Gulch.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot1.Battlefield.Festering Gulch.Tapped = true
