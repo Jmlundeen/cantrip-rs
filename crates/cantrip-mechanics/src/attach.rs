@@ -170,10 +170,11 @@ pub fn enchanted_creature_cant_block(q: &dyn Query, source: ObjectId, blocker: O
 }
 
 /// "Enchanted creature" / "equipped creature" as a rule of the source's own that is no ability of the creature (CR 113.1a,
-/// 301.5, 303.4): the `CardDef::untap_bans`, `cant_become_untapped` and `sacrifice_bans` of an Aura or Equipment, true of
-/// exactly the permanent the source is attached to. It is no ability of that permanent, so the permanent losing all its
-/// abilities leaves the rule in force (CR 613.1f). Infinite Coursework's and Enchanted River's Grasp's "doesn't untap"
-/// (CR 502.3) and Frozen in Ice's "can't become untapped" print it.
+/// 301.5, 303.4): the `CardDef::untap_bans`, `cant_become_untapped`, `sacrifice_bans` and `face_up_bans` of an Aura or
+/// Equipment, true of exactly the permanent the source is attached to. It is no ability of that permanent, so the permanent
+/// losing all its abilities leaves the rule in force (CR 613.1f). Infinite Coursework's and Enchanted River's Grasp's
+/// "doesn't untap" (CR 502.3), Frozen in Ice's "can't become untapped" and Unable to Scream's "can't be turned face up"
+/// (CR 708.7) print it.
 pub fn attached_to_it(q: &dyn Query, asker: &Asker, affected: ObjectId) -> bool {
     q.obj(asker.source).attached_to == Some(affected)
 }

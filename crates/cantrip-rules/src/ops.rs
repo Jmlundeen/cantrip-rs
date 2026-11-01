@@ -891,6 +891,7 @@ pub fn put_all_onto_battlefield_face_down(cx: &mut Cx, ids: &[ObjectId], control
 }
 
 /// `player` turns a face-down permanent face up (CR 701.40b, 708.2): it is the card it is, the same object (CR 708.8).
+/// Nothing happens where a static ability says it can't be turned face up (CR 101.2, `CardDef::face_up_bans`).
 /// `player` is the one who took the special action, or the controller of the effect that turns it up.
 pub fn turn_face_up(cx: &mut Cx, id: ObjectId, player: PlayerId) {
     turn_face_up_as(cx, id, player, false);
@@ -901,6 +902,11 @@ pub fn turn_face_up(cx: &mut Cx, id: ObjectId, player: PlayerId) {
 /// turned face up sees the counter on it.
 pub fn turn_face_up_as(cx: &mut Cx, id: ObjectId, player: PlayerId, megamorph: bool) {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || !cx.s().obj(id).face_down {
+        return;
+    }
+    // "Can't be turned face up" beats the rule or effect that would turn it up (CR 101.2, 708.7): it stays face down, and
+    // as nothing would turn it face up, a cloaked instant or sorcery card is not revealed either (CR 701.58g).
+    if crate::static_rules::cant_be_turned_face_up(cx, cx.cards(), id) {
         return;
     }
     // CR 701.40g, 701.58g: a manifested or cloaked instant or sorcery card that would turn face up is revealed by its

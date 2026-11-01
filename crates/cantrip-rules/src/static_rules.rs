@@ -645,6 +645,15 @@ pub fn cant_become_untapped(q: &dyn Query, cards: &'static CardTable, id: Object
         || any_static(q, cards, |d| d.cant_become_untapped, |rule, asker| rule(q, asker, id))
 }
 
+/// Whether the face-down permanent `id` can't be turned face up (CR 101.2, 708.7): a static ability of a permanent on the
+/// battlefield says so (`CardDef::face_up_bans`: Unable to Scream's enchanted creature, Karlov Watchdog's "permanents your
+/// opponents control ... during your turn"). No ability of `id`'s, so it holds whatever abilities `id` has lost (CR 613.1f).
+/// Asked where a face-down permanent would be turned face up - as its special actions are offered (CR 116.2b) and as it is
+/// turned up, by them or by an effect - so it stops every way, and lifts the moment the ban does.
+pub fn cant_be_turned_face_up(q: &dyn Query, cards: &'static CardTable, id: ObjectId) -> bool {
+    any_static(q, cards, |d| d.face_up_bans, |rule, asker| rule(q, asker, id))
+}
+
 /// Whether the permanent `id` can't be sacrificed (CR 101.2, 701.21a), for any reason and by anyone: it has "this permanent
 /// can't be sacrificed" (`Keyword::CantBeSacrificed`, printed or granted, so losing its abilities ends it), a resolved effect
 /// says so (`EffectKind::CantBeSacrificed`, which it keeps whatever abilities it loses), or a static ability of a permanent on

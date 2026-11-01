@@ -163,13 +163,39 @@ static HUMBLER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "As long as enchanted creature is face down, it can't be turned face up" (Unable to Scream's): a rule of the Aura's, true
+/// of the permanent it is attached to (CR 101.2, 708.7).
+fn attached(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.obj(asker.source).attached_to == Some(id)
+}
+static SHROUDER: CardDef = CardDef {
+    name: "Morph Test Shrouder",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura]),
+    face_up_bans: &[attached],
+    ..CardDef::BLANK
+};
+
+/// "Permanents your opponents control can't be turned face up during your turn" (Karlov Watchdog's).
+fn opponents_during_your_turn(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.state().turn.active == asker.controller && q.obj(id).controller != asker.controller
+}
+static WATCHER: CardDef = CardDef {
+    name: "Morph Test Watcher",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    face_up_bans: &[opponents_during_your_turn],
+    ..CardDef::BLANK
+};
+
 fn cx(game: &mut Game) -> Cx<'_> {
     Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
 }
 
 /// Your main phase with priority and an empty stack.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &SKYWARDEN, &GROWER, &MASK, &CUTTHROAT, &SWELLER, &BIRD_FLASH, &CREATURE_FLASH, &COLORLESS_FROM_TOP, &WHITE_FROM_TOP, &NO_WHITE, &NO_COLORLESS, &CASTER, &BEAR, &HUMBLER])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &SKYWARDEN, &GROWER, &MASK, &CUTTHROAT, &SWELLER, &BIRD_FLASH, &CREATURE_FLASH, &COLORLESS_FROM_TOP, &WHITE_FROM_TOP, &NO_WHITE, &NO_COLORLESS, &CASTER, &BEAR, &HUMBLER, &SHROUDER, &WATCHER])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -750,4 +776,133 @@ fn a_face_down_copy_is_turned_up_for_the_morph_cost_of_what_it_copies() {
     assert_eq!(g.chars(bear).name, "", "still a face-down 2/2 (CR 708.10)");
     assert!(turn_up_option(&mut g, bear, TurnUp::Morph).is_some());
     assert!(turn_up_option(&mut g, morph, TurnUp::Morph).is_none());
+}
+
+/// Puts the Shrouder onto the battlefield under `THEM`, attached to `permanent`: it can't be turned face up.
+fn shroud(g: &mut Game, permanent: ObjectId) -> ObjectId {
+    let aura = put(g, &SHROUDER, Zone::BATTLEFIELD);
+    g.state.update_obj(aura, |o| {
+        o.controller = THEM;
+        o.attached_to = Some(permanent);
+    });
+    g.state.see_statics();
+    reoffer(g);
+    aura
+}
+
+/// The Shrouder no longer attached to anything: the ban on the permanent it was on lifts.
+fn unshroud(g: &mut Game, aura: ObjectId) {
+    g.state.update_obj(aura, |o| o.attached_to = None);
+    reoffer(g);
+}
+
+/// CR 101.2, 708.7, 701.40b, 702.37e: "can't be turned face up" beats the special actions that would, for its mana cost and
+/// for its morph cost - and the one for its mana cost the rules give back to a face-down permanent that lost its abilities
+/// (Unable to Scream's own "loses all abilities") - and they are offered again once it lifts.
+#[test]
+fn a_face_down_permanent_that_cant_be_turned_face_up_is_offered_no_way_to_until_that_ends() {
+    for humbled in [false, true] {
+        let mut g = game();
+        let manifested = manifest(&mut g, &SKYWARDEN);
+        add(&mut g, Mana::W, 5);
+        if humbled {
+            humble(&mut g);
+        }
+        assert!(turn_up_option(&mut g, manifested, TurnUp::ManaCost).is_some(), "humbled: {humbled}");
+        let aura = shroud(&mut g, manifested);
+        for by in [TurnUp::ManaCost, TurnUp::Morph, TurnUp::Disguise] {
+            assert!(turn_up_option(&mut g, manifested, by).is_none(), "{by:?}, humbled: {humbled}");
+        }
+        unshroud(&mut g, aura);
+        assert_eq!(turn_up_option(&mut g, manifested, TurnUp::Morph).is_some(), !humbled);
+        let option = turn_up_option(&mut g, manifested, TurnUp::ManaCost).expect("its mana cost is offered again");
+        take(&mut g, &option);
+        assert!(!g.state.obj(manifested).face_down);
+    }
+}
+
+/// CR 101.2, 702.168d: as for a manifested card, for a card cast face down by disguise: its disguise cost doesn't turn it up
+/// while it can't be turned face up, and does again after.
+#[test]
+fn a_disguised_permanent_that_cant_be_turned_face_up_is_not_turned_up_for_its_disguise_cost() {
+    let mut g = game();
+    let card = put(&mut g, &MASK, Zone::hand(YOU));
+    add(&mut g, Mana::C, 3);
+    let spell = cast_face_down(&mut g, card);
+    resolve_all(&mut g);
+    let permanent = g.state.obj(spell).became.expect("it resolved");
+    add(&mut g, Mana::U, 2);
+    assert!(turn_up_option(&mut g, permanent, TurnUp::Disguise).is_some());
+    let aura = shroud(&mut g, permanent);
+    assert!(turn_up_option(&mut g, permanent, TurnUp::Disguise).is_none());
+    unshroud(&mut g, aura);
+    let option = turn_up_option(&mut g, permanent, TurnUp::Disguise).expect("its disguise cost is offered again");
+    take(&mut g, &option);
+    assert!(!g.state.obj(permanent).face_down);
+    assert_eq!(g.chars(permanent).name, "Morph Test Mask");
+}
+
+/// CR 101.2, 708.7: an effect that says to turn a face-down permanent face up - manifested, cloaked, or cast by morph - does
+/// nothing to one that can't be: it stays face down, and nothing triggers on its turning up; once the ban ends, the same
+/// instruction turns it up.
+#[test]
+fn an_effect_does_not_turn_up_a_permanent_that_cant_be_turned_face_up() {
+    for how in [Some(FaceDown::Manifested), Some(FaceDown::Cloaked), None] {
+        let mut g = game();
+        let permanent = match how {
+            Some(how) => {
+                let card = put(&mut g, &SKYWARDEN, Zone::library(YOU));
+                cantrip_api::Game::put_onto_battlefield_face_down(&mut cx(&mut g), card, YOU, how, false)
+                    .expect("nothing is asked")
+                    .expect("it enters face down")
+            }
+            None => {
+                let card = put(&mut g, &SKYWARDEN, Zone::hand(YOU));
+                add(&mut g, Mana::C, 3);
+                let spell = cast_face_down(&mut g, card);
+                resolve_all(&mut g);
+                g.state.obj(spell).became.expect("it resolved")
+            }
+        };
+        let aura = shroud(&mut g, permanent);
+        crate::ops::turn_face_up(&mut cx(&mut g), permanent, THEM);
+        assert!(g.state.obj(permanent).face_down, "{how:?}");
+        assert!(!g.log.iter().any(|r| matches!(r.event, Event::TurnedFaceUp { .. })), "{how:?}");
+        unshroud(&mut g, aura);
+        crate::ops::turn_face_up(&mut cx(&mut g), permanent, THEM);
+        assert!(!g.state.obj(permanent).face_down, "{how:?}");
+        assert!(g.log.iter().any(|r| matches!(r.event, Event::TurnedFaceUp { permanent: p, player } if p == permanent && player == THEM)));
+    }
+}
+
+/// Karlov Watchdog's "permanents your opponents control can't be turned face up during your turn" (CR 101.2, 708.7): judged
+/// as each turn-up is tried, so its controller's opponent's face-down permanent can't be turned up during its controller's
+/// turn - by the special action or by an effect - and can during the opponent's own; its controller's own can, whenever.
+#[test]
+fn a_ban_on_opponents_permanents_during_your_turn_holds_only_then() {
+    let mut g = game();
+    let watcher = put(&mut g, &WATCHER, Zone::BATTLEFIELD);
+    g.state.update_obj(watcher, |o| o.controller = THEM);
+    g.state.see_statics();
+    let yours = manifest(&mut g, &SKYWARDEN);
+    let card = put(&mut g, &BEAR, Zone::library(YOU));
+    let theirs = cantrip_api::Game::put_onto_battlefield_face_down(&mut cx(&mut g), card, THEM, FaceDown::Manifested, false)
+        .expect("nothing is asked")
+        .expect("it enters face down");
+    add(&mut g, Mana::W, 5);
+    assert!(turn_up_option(&mut g, yours, TurnUp::ManaCost).is_some(), "your own turn");
+    g.state.update_turn(|t| t.active = THEM);
+    reoffer(&mut g);
+    for by in [TurnUp::ManaCost, TurnUp::Morph] {
+        assert!(turn_up_option(&mut g, yours, by).is_none(), "{by:?} during their turn");
+    }
+    crate::ops::turn_face_up(&mut cx(&mut g), yours, YOU);
+    assert!(g.state.obj(yours).face_down);
+    crate::ops::turn_face_up(&mut cx(&mut g), theirs, THEM);
+    assert!(!g.state.obj(theirs).face_down, "the Watcher's controller's own permanent is no opponent's");
+    g.state.update_turn(|t| t.active = YOU);
+    reoffer(&mut g);
+    let option = turn_up_option(&mut g, yours, TurnUp::ManaCost).expect("offered again on your turn");
+    take(&mut g, &option);
+    assert!(!g.state.obj(yours).face_down);
 }

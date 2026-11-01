@@ -4903,6 +4903,12 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             {
                 continue;
             }
+            // A face-down permanent a static ability says can't be turned face up is offered none of the special actions
+            // that would (CR 101.2, 116.2b): restored after "loses all abilities" (`layers::turn_face_up_actions`), they are
+            // vetoed here.
+            if def.special_action && cx.cards().turns_face_up(ability) && static_rules::cant_be_turned_face_up(cx, cx.cards(), id) {
+                continue;
+            }
             // A special action's whole cost: turning a face-down permanent up for a morph cost that is not mana alone
             // ("Morph—Pay 5 life") is offered only where that could be paid (CR 702.37e, 118.3).
             let whole = if def.special_action { special_action_whole_cost(cx, id, ability, def) } else { def.cost };

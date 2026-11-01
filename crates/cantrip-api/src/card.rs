@@ -2661,6 +2661,16 @@ pub type CostBan = fn(&dyn Query, &Asker, PlayerId, CostFor, CostPayment) -> boo
 /// granted, is `Keyword::CantBeSacrificed`; the core reads both (`Game::can_sacrifice`).
 pub type SacrificeBan = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// A static ability that says face-down permanents can't be turned face up (CR 101.2, 708.7): true for a face-down
+/// permanent on the battlefield that can't be, judged as it is now. "Can't" beats every "can" (CR 101.2), so it stops each
+/// way the rules or an effect turn it up - the special actions for its mana cost (CR 701.40b, 701.58b), its morph cost
+/// (CR 702.37e) and its disguise cost (CR 702.168d), and "turn it face up" as an instruction. It is the source's effect, no
+/// ability of the permanent, so one that loses its abilities is still under it: Unable to Scream's "as long as enchanted
+/// creature is face down, it can't be turned face up" (`cantrip_mechanics::attach::attached_to_it`), Karlov Watchdog's
+/// "permanents your opponents control can't be turned face up during your turn". The core reads it wherever a permanent
+/// would be turned face up.
+pub type FaceUpBan = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// A static ability that says permanents don't untap during their controllers' untap steps (CR 502.3): true for a permanent
 /// of the active player, judged as it is now, before anything untaps. It is the source's effect, no ability of the
 /// permanent - "doesn't untap" has no "has" (CR 113.1a) - so one that loses its abilities is still under it (CR 613.1f), and
@@ -3209,6 +3219,10 @@ pub struct CardDef {
     /// Its static abilities that say permanents can't be sacrificed (CR 101.2, 701.21a), while it is on the battlefield with
     /// its abilities: Assault Suit's "equipped creature ... can't be sacrificed". See `SacrificeBan`.
     pub sacrifice_bans: &'static [SacrificeBan],
+    /// Its static abilities that say face-down permanents can't be turned face up (CR 101.2, 708.7), while it is on the
+    /// battlefield with its abilities: Karlov Watchdog's "permanents your opponents control can't be turned face up during
+    /// your turn". See `FaceUpBan`.
+    pub face_up_bans: &'static [FaceUpBan],
     /// Its static abilities that say permanents don't untap during their controllers' untap steps (CR 502.3), while it is on
     /// the battlefield with its abilities. See `UntapBan`.
     pub untap_bans: &'static [UntapBan],
@@ -3418,6 +3432,7 @@ impl CardDef {
         player_counter_bans: &[],
         cost_bans: &[],
         sacrifice_bans: &[],
+        face_up_bans: &[],
         untap_bans: &[],
         cant_become_untapped: &[],
         damage_by_toughness: &[],
@@ -3513,6 +3528,7 @@ impl CardDef {
             (!self.player_counter_bans.is_empty(), "player counter bans"),
             (!self.cost_bans.is_empty(), "cost bans"),
             (!self.sacrifice_bans.is_empty(), "sacrifice bans"),
+            (!self.face_up_bans.is_empty(), "face-up bans"),
             (!self.untap_bans.is_empty(), "untap bans"),
             (!self.cant_become_untapped.is_empty(), "rules against becoming untapped"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),

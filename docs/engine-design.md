@@ -500,7 +500,11 @@ only the candidates the host's verdict on those picked says may be added.
   ruling). Its cost is the way's `turn_up`, a whole `Cost` paid as an
   activation's is (`special_action_whole_cost`: "Morph—Pay 5 life", a discard, a return), X announced and kept on the
   permanent (702.37f); megamorph's +1/+1 counter is put by `ops::turn_face_up_as` before `TurnedFaceUp` is recorded
-  (702.37b, 708.11), only for that action.
+  (702.37b, 708.11), only for that action. "Can't be turned face up" (101.2) is another permanent's static ability
+  (`CardDef::face_up_bans`: Unable to Scream, Karlov Watchdog), read by `static_rules::cant_be_turned_face_up` where the
+  special actions are offered (`activated_options`, so the ones `layers::turn_face_up_actions` gives back are vetoed too)
+  and in `ops::turn_face_up_as`, which every turning up - special action or instruction - goes through: a banned permanent
+  stays face down, unrevealed.
 - **A prototype card cast prototyped (702.160a, 718)** is cast as its prototyped face (`WAY_PROTOTYPE`): the card with only
   the inset frame's mana cost, power and toughness, and the color that mana cost gives (718.3b). The values are the card's
   content (`"prototype": {"manaCost", "power", "toughness"}`, `CardDef::prototype`); the face is made from the card by
