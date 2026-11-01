@@ -194,6 +194,9 @@ def test_points(abilities):
                     out.append(line)
             continue
         before = len(out)
+        if re.search(r":\s*Add\b", text):  # nothing generates a mana ability: a file that sets `abilities` writes it
+            out.append(f"  [{i}] {ab.text[:80]}: a mana ability - the card file's `abilities` must list it"
+                       " (`mana_ability(..)` or a `lands::` helper); a scenario taps it and checks the pool")
         for pattern, what in TEST_POINTS:
             for m in dict.fromkeys(x.group(0) for x in re.finditer(pattern, text, re.I)):
                 line = f"  [{i}] " + what.format(m=m)
