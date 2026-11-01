@@ -1,0 +1,56 @@
+# Depala, Pilot Exemplar, tapped by attacking on turn 3: Bot1 pays X = 4 (Mox Ruby, Pearl, Jet and Sapphire, all the mana it has).
+# The top four cards are revealed: every Dwarf and Vehicle card of them (Magda,
+# Smuggler's Copter) goes to the hand, the rest (Island, Lightning Bolt) to the bottom. The fifth card, Dain's Company, a Dwarf
+# but past X, stays on top of the library, so it is what turn 5 draws (CR 701.20a, 401.4, 107.3f). Bot2's library, full of Dwarves, is untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Depala, Pilot Exemplar
+Island
+Island
+Magda, Brazen Outlaw
+Island
+Smuggler's Copter
+Lightning Bolt
+Dáin's Company
+Island x12
+
+[Bot2 Deck]
+Island x7
+Kíli the Resourceful x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Depala, Pilot Exemplar.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Depala, Pilot Exemplar > Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost(X: 4)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Library.Count = 15
+? Bot1.Hand = Island; Island; Magda, Brazen Outlaw; Smuggler's Copter
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Dáin's Company; Island; Island; Magda, Brazen Outlaw; Smuggler's Copter
+Bot1.Library.Count = 14
+Bot2.Library.Count = 11
+Bot1.Revealed = Island; Lightning Bolt; Magda, Brazen Outlaw; Smuggler's Copter

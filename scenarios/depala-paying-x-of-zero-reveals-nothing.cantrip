@@ -1,0 +1,46 @@
+# Depala, Pilot Exemplar tapped by attacking: X may be 0 (CR 107.3f). Paying {0} is still paying, but the top zero cards are
+# revealed - none - so nothing is taken, the library keeps its cards and the Dwarf on top is not drawn into the hand.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Depala, Pilot Exemplar
+Island
+Island
+Magda, Brazen Outlaw
+Island
+Smuggler's Copter
+Lightning Bolt
+Dáin's Company
+Island x12
+
+[Bot2 Deck]
+Island x7
+Kíli the Resourceful x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Depala, Pilot Exemplar.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Depala, Pilot Exemplar > Bot2)
+Bot1.PayCost(X: 0)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island
+Bot1.Library.Count = 17
+Bot1.Revealed = (absent)

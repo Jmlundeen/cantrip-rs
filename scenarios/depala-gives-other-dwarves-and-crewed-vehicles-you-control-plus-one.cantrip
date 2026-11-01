@@ -1,0 +1,86 @@
+# Depala, Pilot Exemplar's two statics (CR 613.4c). Bot1's other Dwarf, Kili the Resourceful (1/2), is a 2/3 while Depala herself
+# stays 3/3 ("Other"). Bot1's Smuggler's Copter is not a creature until crewed (crew 1, tapping Kili), so on turn 3 it is a 4/4
+# once crewed, "as long as it's a creature". Bot2's Kili and crewed Copter (crewed on turn 4 by its Llanowar Elves) get nothing:
+# "you control". Bot1's Copter, uncrewed again on turn 4, is no creature again and has no power to raise.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Depala, Pilot Exemplar
+Kíli the Resourceful
+Smuggler's Copter
+Island x17
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Black Lotus
+Kíli the Resourceful
+Llanowar Elves
+Smuggler's Copter
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Depala, Pilot Exemplar.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Kíli the Resourceful.Cast
+Bot2.Pass
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot2.Hand.Smuggler's Copter.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kíli the Resourceful.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Pass
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot1.Choose(Kíli the Resourceful)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Smuggler's Copter.Types = Artifact; Creature
+? Bot1.Battlefield.Smuggler's Copter.Power = 4
+? Bot1.Battlefield.Smuggler's Copter.Toughness = 4
+? Bot1.Battlefield.Kíli the Resourceful.Power = 2
+? Bot1.Battlefield.Kíli the Resourceful.Toughness = 3
+? Bot1.Battlefield.Depala, Pilot Exemplar.Power = 3
+[T4 Bot2.Main1]
+Bot2.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot2.Choose(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Smuggler's Copter.Types = Artifact; Creature
+Bot2.Battlefield.Smuggler's Copter.Power = 3
+Bot2.Battlefield.Smuggler's Copter.Toughness = 3
+Bot2.Battlefield.Kíli the Resourceful.Power = 1
+Bot2.Battlefield.Kíli the Resourceful.Toughness = 2
+Bot1.Battlefield.Smuggler's Copter.Types = Artifact
+Bot1.Battlefield.Smuggler's Copter.Power = (absent)
+Bot1.Battlefield.Kíli the Resourceful.Power = 2
+Bot1.Battlefield.Depala, Pilot Exemplar.Power = 3
