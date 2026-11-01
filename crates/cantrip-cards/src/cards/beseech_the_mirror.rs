@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{bargain, choose, search_library, effects};
+use cantrip_mechanics::{bargain, discover, search_library};
 use cantrip_oracle as oracle;
 
 /// "Search your library for a card, exile it face down, then shuffle. If this spell was bargained, you may cast the
@@ -22,12 +22,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = exiled else { return Ok(()) };
     if bargain::bargained(item) {
         // "If that spell's mana value is 4 or less": the face it is cast as is the spell (CR 709.3b, 715.3b).
-        let ways = g.cast_ways_during_resolution(card).into_iter().filter(|w| w.mana_value <= 4).collect::<Vec<_>>();
-        if !ways.is_empty()
-            && effects::ask_may(g, you, card, Purpose::CastFoundOrHand)?
-            && let Some(way) = choose::cast_way(g, you, card, ways)?
-            && g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way: Some(way.way), ..CastTerms::default() })?
-        {
+        if discover::may_cast_free(g, you, card, 4)? {
             return Ok(());
         }
     }
