@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_oracle as oracle;
 
-/// "Whenever a Villain you control dies" (CR 700.4, 603.6c, 603.10a), looked back on: a creature that was a Villain as it last
+/// "Whenever a Villain you control dies" (CR 700.4, 603.6c, 603.10a), looked back on: a permanent (a creature or not, CR 109.2) that was a Villain as it last
 /// was on the battlefield, under the controller it last had, its creature type read through the words of this enchantment's
 /// text (CR 612). The trigger is about the card it became in the graveyard, which is what it returns; a token has no card to return.
 fn villain_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -10,7 +10,6 @@ fn villain_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<
             if from.is(ZoneKind::Battlefield)
                 && to.is(ZoneKind::Graveyard)
                 && q.obj(*old).controller == me.controller
-                && q.chars(*old).is(CardType::Creature)
                 && q.chars(*old).has_subtype(q.words(me.source).subtype(Subtype::Villain)) =>
         {
             Fired::about(Target::Object(*new))
