@@ -1,0 +1,72 @@
+# Rust Harvester's ability is activated at Bot2 (the Bauble is exiled as the cost), and Bot2 answers with Swift Reconfiguration on
+# the Harvester: it is a Vehicle artifact and no longer a creature (CR 205.1a). The ability resolves: the +1/+1 counter goes on the
+# Harvester, still the same permanent, and "it deals damage equal to its power" uses its current information (CR 608.2h) - a
+# noncreature permanent has no power (CR 208.3), so it deals no damage (CR 120.8) and Bot2 stays at 20. The counter was put on a
+# noncreature permanent, where it did nothing; once Disenchant destroys the Aura the Harvester is a creature again and the counter
+# applies (CR 208.3a, 613.4c): a 2/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mishra's Bauble
+Rust Harvester
+Plains
+Plains
+Disenchant
+Plains x12
+
+[Bot2 Deck]
+Plains
+Swift Reconfiguration
+Plains x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rust Harvester.Cast
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot1)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Rust Harvester.Activate(Bot2)
+Bot1.Choose(Mishra's Bauble)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swift Reconfiguration.Cast(Bot1.Battlefield.Rust Harvester)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Rust Harvester.Types = Artifact
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+? Bot1.Battlefield.Rust Harvester.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Rust Harvester.Types = Artifact
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Swift Reconfiguration)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Battlefield.Rust Harvester.Types = Artifact; Creature
+Bot1.Battlefield.Rust Harvester.Power = 2
+Bot1.Battlefield.Rust Harvester.Toughness = 2
+Bot1.Battlefield.Rust Harvester.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard = Swift Reconfiguration
+Bot1.Graveyard = Disenchant
+Exile = Mishra's Bauble

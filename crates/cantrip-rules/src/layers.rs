@@ -330,7 +330,9 @@ impl<'a> View<'a> {
                 &owned
             }
         };
-        chars_at(&Ctx { cards: self.cards, state: self.state, log: self.log, pass }, id, stage, false).chars
+        let mut chars = chars_at(&Ctx { cards: self.cards, state: self.state, log: self.log, pass }, id, stage, false).chars;
+        noncreature_permanent_pt(self.state, id, LAYERS[stage.li], &mut chars);
+        chars
     }
 }
 
@@ -422,6 +424,31 @@ const LAYERS: [Layer; 8] =
 /// The characteristics with every layer before `stop` applied (CR 613.1): the copiable values, then each layer's
 /// static abilities and other continuous effects in turn, in the order the layer's pass gives them (CR 613.7, 613.8).
 pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, stop: Layer) -> Chars {
+    let mut chars = worked_out(cards, state, log, id, stop);
+    noncreature_permanent_pt(state, id, stop, &mut chars);
+    chars
+}
+
+/// CR 208.3: "A noncreature permanent has no power or toughness, even if it's a card with a power and toughness printed on
+/// it (such as a Vehicle)." What every read of the object sees once layer 4 has settled its types: the power and toughness
+/// the layers worked out are kept in the pass, not here, so an effect that sets or modifies them, and its counters, still
+/// apply the moment it is a creature again (CR 208.3a). A noncreature object off the battlefield keeps what it prints (CR
+/// 208.3), as the layers give it. An object that has ceased to be one is as it last was (`LastKnown`, taken through here).
+#[inline]
+fn noncreature_permanent_pt(state: &GameState, id: ObjectId, stop: Layer, chars: &mut Chars) {
+    if stop <= Layer::Type || chars.is(CardType::Creature) || (chars.power.is_none() && chars.toughness.is_none()) {
+        return;
+    }
+    let obj = state.obj(id);
+    if (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) && obj.became.is_none() && obj.last_known.is_none() {
+        chars.power = None;
+        chars.toughness = None;
+    }
+}
+
+/// `chars_before` as the layers work it out, before what CR 208.3 makes of it (`noncreature_permanent_pt`).
+#[inline(always)]
+fn worked_out(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, stop: Layer) -> Chars {
     let layers = LAYERS.iter().take_while(|&&l| l < stop).count();
     match object(cards, state, id) {
         Object::Fixed(chars) => *chars,
@@ -460,12 +487,14 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
 /// all through.
 fn chars_in(cx: &Ctx, id: ObjectId, stop: Layer) -> Chars {
     let layers = LAYERS.iter().take_while(|&&l| l < stop).count();
-    match object(cx.cards, cx.state, id) {
+    let mut chars = match object(cx.cards, cx.state, id) {
         Object::Fixed(chars) => *chars,
         Object::Bare(card, spell) => bare(cx.cards, card, spell, stop),
         Object::Full(o) if layers == 0 => o.start(cx.cards),
         Object::Full(o) => before(cx, &o, layers, watched_givers(id).is_some()).chars,
-    }
+    };
+    noncreature_permanent_pt(cx.state, id, stop, &mut chars);
+    chars
 }
 
 /// With `CANTRIP_VERIFY`, one answer in `CROSS_CHECK_STRIDE`, and every answer from a pass made at another `epoch`, is worked
@@ -3556,6 +3585,35 @@ mod tests {
     fn pt(cards: &CardTable, state: &GameState, id: ObjectId) -> (Option<i16>, Option<i16>) {
         let c = chars(cards, state, &[], id);
         (c.power, c.toughness)
+    }
+
+    /// A Vehicle's shape: an artifact that prints a 3/2 box.
+    static CART: CardDef = CardDef {
+        name: "Cart",
+        types: TypeSet::of(&[CardType::Artifact]),
+        subtypes: SubtypeSet::of(&[Subtype::Vehicle]),
+        power: Some(3),
+        toughness: Some(2),
+        ..CardDef::BLANK
+    };
+
+    /// CR 208.3: a noncreature permanent has no power or toughness, though its card prints them; a noncreature card off the
+    /// battlefield has the ones it prints. CR 208.3a: an effect that modifies a noncreature permanent's power and toughness
+    /// does nothing until it is a creature, and then applies: +1/+1 on the Cart is nothing, and once it is a creature too, 4/3.
+    #[test]
+    fn a_noncreature_permanent_has_no_power_or_toughness_until_it_is_a_creature() {
+        let cards = CardTable::new([&CART]);
+        let (mut state, ids) = battlefield(&cards, &["Cart"]);
+        let cart = ids[0];
+        assert_eq!(pt(&cards, &state, cart), (None, None));
+        let in_hand = state.push_obj(Obj::new(cards.find("Cart").unwrap(), PlayerId(0), Zone::hand(PlayerId(0))));
+        state.zone_push(Zone::hand(PlayerId(0)), in_hand);
+        assert_eq!(pt(&cards, &state, in_hand), (Some(3), Some(2)));
+        let on_cart = |timestamp, kind| ContinuousEffect { source: cart, controller: PlayerId(0), timestamp, affected: cart, kind, duration: Duration::EndOfTurn };
+        state.effect_push(on_cart(2, EffectKind::Pump(1, 1)));
+        assert_eq!(pt(&cards, &state, cart), (None, None));
+        state.effect_push(on_cart(3, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature]))));
+        assert_eq!(pt(&cards, &state, cart), (Some(4), Some(3)));
     }
 
     /// CR 613.6, its third example: the part of an effect in layer 7b applies to the permanents its layer-4 part applied to,

@@ -563,6 +563,12 @@ only the candidates the host's verdict on those picked says may be added.
   (which does not move the epoch) needs no invalidation; the condition's answer changes the moment an event is recorded
   and the moment a new turn begins. Essence Channeler and Shardmage's Rescue read it; the "this turn" conditions printed on
   Tenured Concocter, Thornfist Striker, Brightspear Zealot, Eyekite and the celebration cards are the same shape.
+- **A noncreature permanent has no power or toughness (CR 208.3):** every read of an object's characteristics once layer 4
+  has settled its types (`layers::chars_before`, and the layers' own reads of other objects) gives a noncreature permanent
+  none, a Vehicle's printed box included, so no reader checks "is it a creature" to get 0 (`.power.unwrap_or(0)`, CR 208.5).
+  The layer pass itself keeps what it worked out, so an effect or a counter that modifies a noncreature permanent's power
+  applies the moment it is a creature again (CR 208.3a). A noncreature object off the battlefield keeps what it prints.
+  The host sends the printed box apart (`ObjectView::printed_power`), for the face to draw.
 - **No strings at runtime:** keywords, types, subtypes and colors are enums or bitsets, card behavior is reached by
   function index, and nothing about a card is read from JSON while a game runs.
 

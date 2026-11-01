@@ -1,0 +1,45 @@
+# Giant Growth makes Bot1's Isamaru a 5/5 until end of turn. Swift Reconfiguration then makes Isamaru a Vehicle artifact, no longer
+# a creature, which has no power or toughness (CR 208.3) - but the effect that gives +3/+3 still exists and applies again the
+# moment it is a creature (CR 208.3a). Disenchant destroys the Aura: Isamaru is a creature again, and a 5/5, not its printed 2/2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Isamaru, Hound of Konda
+Giant Growth
+Swift Reconfiguration
+Disenchant
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Isamaru, Hound of Konda)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Isamaru, Hound of Konda.Power = 5
+Bot1.Hand.Swift Reconfiguration.Cast(Isamaru, Hound of Konda)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Isamaru, Hound of Konda.Types = Artifact
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Swift Reconfiguration)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Isamaru, Hound of Konda.Types = Creature
+Bot1.Battlefield.Isamaru, Hound of Konda.Power = 5
+Bot1.Battlefield.Isamaru, Hound of Konda.Toughness = 5
+Bot1.Graveyard = Disenchant; Swift Reconfiguration; Giant Growth; Black Lotus
