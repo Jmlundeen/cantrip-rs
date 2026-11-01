@@ -53,6 +53,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
 | [KI-114](#ki-114-the-web-client-cannot-name-colorless-mana-for-a-sacrificed-land-that-could-also-produce-a-color) | The web client cannot name colorless mana for a sacrificed land that could also produce a color | Pri-2 | Open |
 | [KI-116](#ki-116-a-resolutions-unless-pays-question-shows-only-the-mana-and-life-parts-of-its-cost) | A resolution's "unless pays" question shows only the mana and life parts of its cost | Pri-2 | Open |
+| [KI-148](#ki-148-a-waiting-when-event-delayed-trigger-is-shown-beside-its-controllers-life-not-on-the-object-it-watches) | A waiting "when [event]" delayed trigger is shown beside its controller's life, not on the object it watches | Pri-2 | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Pri-3 | Fix queued |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Pri-3 | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Pri-3 | Open |
@@ -85,6 +86,20 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-147](#ki-147-two-tablet-browser-tests-wait-forever-for-unos-splash-to-go) | Two tablet browser tests wait forever for Uno's splash to go | Pri-3 | Open |
 
 ## Issues
+
+### KI-148: A waiting "when [event]" delayed trigger is shown beside its controller's life, not on the object it watches
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client | 2026-11-01, review of `DelayedWhen::WhenEvent` (earthbend's return) |
+
+**Notes.** Earthbend's return is now a delayed triggered ability (CR 603.7, 701.66a) that watches the earthbent land.
+The host view lists it beside its controller's life total, named for its source (Badgermole Cub, Dai Li
+Indoctrination); nothing on the land shows that it will return, and the text does not say which land is watched. Rules
+are unaffected; a fix shows the waiting ability on (or pointing at) its watched object.
+
+**Scenarios.**
+- none needed (display only); any earthbend scenario shows the state.
 
 ### KI-146: The booster draft's dragged-pick test once saw the pick fly from the pack
 
