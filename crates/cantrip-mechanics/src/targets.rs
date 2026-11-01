@@ -1054,6 +1054,14 @@ fn creature_card_with_mana_value_3_or_less_in_your_graveyard_filter(q: &dyn Quer
 /// Call a Surprise Witness and Leonardo's Technique print it.
 pub const CREATURE_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec = target(creature_card_with_mana_value_3_or_less_in_your_graveyard_filter);
 
+fn creature_card_with_mana_value_2_or_less_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard_with_mana_value_at_most(q, asker, t, &[CardType::Creature], 2)
+}
+
+/// "Target creature card with mana value 2 or less from your graveyard" (CR 115.1, 202.3). Extraction Specialist, Driver of
+/// the Dead, Timely Hordemate, Ojutai's Command and Silverquill Command print it.
+pub const CREATURE_CARD_WITH_MANA_VALUE_2_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec = target(creature_card_with_mana_value_2_or_less_in_your_graveyard_filter);
+
 fn instant_or_sorcery_card_with_mana_value_3_or_less_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_your_graveyard_with_mana_value_at_most(q, asker, t, &[CardType::Instant, CardType::Sorcery], 3)
 }

@@ -3,6 +3,17 @@
 
 use cantrip_api::*;
 
+fn you_control_source(q: &dyn Query, e: &ContinuousEffect) -> bool {
+    q.is_on_battlefield(e.source) && q.controller(e.source) == e.controller
+}
+
+/// "For as long as you control [this permanent]" (CR 611.2b), as a card's `lasting` entry that `Duration::AsLongAs` names:
+/// the effect's source is the same object still on the battlefield (a card that left is a new object, CR 400.7) and the
+/// effect's controller still controls it. Once it has left or another player controls it, the effect is over for good, though
+/// control come back. Spider-Woman, Secret Agent's "can't become untapped" and Extraction Specialist's "can't attack or
+/// block" last so.
+pub const YOU_CONTROL_SOURCE: Lasting = Lasting { text: "you control {source}", holds: you_control_source };
+
 /// "The number of counters on" an object (CR 122.1): counters of every kind, a +1/+1 and a -1/-1 counter both counted while
 /// state-based actions have not yet removed the pair (CR 704.5q). Read from the object as it last existed if it has left the
 /// battlefield (CR 608.2h). Jadzia Dax, Living Legacy and Savanti Romero, Time's Exile ask it of themselves. A count of one
