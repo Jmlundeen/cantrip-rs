@@ -1,0 +1,8 @@
+{
+  "name": "Dread Presence",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Nightmare",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever a Swamp you control enters, choose one —\n• You draw a card and you lose 1 life.\n• This creature deals 2 damage to any target and you gain 2 life."
+}

@@ -1,0 +1,69 @@
+# Ruling 2019-07-12: if the second mode's target is illegal as the ability tries to resolve, the ability doesn't resolve
+# (CR 608.2b) - no 2 life, and it does not become the first mode. Turn 3: Bot1's Swamp triggers Dread Presence, the damage mode
+# at Bot2's Ornithopter; in response Bot2 Lightning Bolts its own Ornithopter. Bot1 stays at 20 and draws nothing (two Swamps
+# left in hand, not three).
+
+[Bot1 Deck]
+Dread Presence
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Plains x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dread Presence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Modes(2)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Ornithopter; Lightning Bolt
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Hand.Count = 2
+Stack.Count = 0
+Bot2.Graveyard = Ornithopter; Lightning Bolt

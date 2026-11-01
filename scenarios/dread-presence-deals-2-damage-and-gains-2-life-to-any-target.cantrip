@@ -1,0 +1,76 @@
+# Dread Presence's second mode (CR 700.2, 120.3, 119.3): each of its Swamps chooses "deals 2 damage to any target and you gain 2
+# life" - turn 3 at Bot2's Ornithopter (a 0/2: dead from exactly 2), turn 5 at Dread Presence itself (one of your own: 3 toughness,
+# it lives with 2 damage), turn 7 at Bot2 (18). A Mox Jet is no creature, planeswalker, battle or player, so it is refused beside
+# the allowed Ornithopter. Bot1 gains 2 each time (22, 24, 26).
+
+[Bot1 Deck]
+Dread Presence
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Plains x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dread Presence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Modes(2)
+! Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+? Bot2.Battlefield.Ornithopter = (absent)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Dread Presence)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+? Bot1.Battlefield.Dread Presence.Damage = 2
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Modes(2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 26
+Bot2.Life = 18
