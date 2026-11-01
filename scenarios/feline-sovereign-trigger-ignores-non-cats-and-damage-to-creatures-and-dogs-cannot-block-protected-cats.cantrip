@@ -1,0 +1,74 @@
+# Bot1's Feline Sovereign, Grizzly Bears (not a Cat) and Sacred Cat (a Cat with protection from Dogs, CR 702.16f) attack on turn 3;
+# Bot2 has a Long-Bodied Grey Dog, its own Sacred Cat, a Mox Jet and a Treasure token. The Dog may not block Sacred Cat, but may
+# block Feline Sovereign (not "other", so no protection); Bot2's Cat blocks Sacred Cat. No Cat of Bot1's deals combat damage to a
+# player: Sovereign and Sacred Cat damage creatures only, and the unblocked Grizzly Bears is no Cat. So the trigger never
+# goes on the stack (no target is asked), and Bot2 keeps every artifact.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Feline Sovereign
+Sacred Cat
+Grizzly Bears
+Forest
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Long-Bodied Grey Dog
+Sacred Cat
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Feline Sovereign.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sacred Cat.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Long-Bodied Grey Dog.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sacred Cat.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Feline Sovereign > Bot2; Grizzly Bears > Bot2; Sacred Cat > Bot2)
+[T3 Bot1.DeclareBlockers]
+! Bot2.Block(Long-Bodied Grey Dog > Sacred Cat)
+Bot2.Block(Long-Bodied Grey Dog > Feline Sovereign; Sacred Cat > Sacred Cat)
+[T3 Bot1.CombatDamage]
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Graveyard = Sacred Cat; Long-Bodied Grey Dog; Black Lotus
+Bot2.Battlefield = Mox Jet; Mox Pearl; Treasure Token
+Bot1.Battlefield.Feline Sovereign.Damage = 2

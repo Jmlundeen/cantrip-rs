@@ -1,0 +1,8 @@
+{
+  "name": "Feline Sovereign",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Cat",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Other Cats you control get +1/+1 and have protection from Dogs.\nWhenever one or more Cats you control deal combat damage to a player, destroy up to one target artifact or enchantment that player controls."
+}

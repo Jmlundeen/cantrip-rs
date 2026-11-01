@@ -1,0 +1,70 @@
+# Feline Sovereign (a 2/3 Cat) and Sacred Cat (a 1/1 Cat, 2/2 with "Other Cats you control get +1/+1") both connect with Bot2 in
+# the same combat damage step: "one or more Cats you control deal combat damage to a player" (CR 603.2c) triggers once, so one
+# artifact or enchantment Bot2 controls is destroyed, not two. The target must be Bot2's: Bot1's own Mox Pearl, and a creature of
+# Bot2's are refused, while Bot2's artifact (Mox Jet), Treasure token and enchantment are all legal. Bot1 picks
+# Bot2's Shapers' Sanctuary; Mox Jet and the Treasure survive.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Feline Sovereign
+Sacred Cat
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Long-Bodied Grey Dog
+Shapers' Sanctuary
+Forest
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Feline Sovereign.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sacred Cat.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sacred Cat.Power = 2
+? Bot1.Battlefield.Sacred Cat.Toughness = 2
+? Bot1.Battlefield.Feline Sovereign.Power = 2
+? Bot1.Battlefield.Feline Sovereign.Toughness = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Shapers' Sanctuary.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Long-Bodied Grey Dog.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Feline Sovereign > Bot2; Sacred Cat > Bot2)
+[T3 Bot1.CombatDamage]
+! Bot1.Target(Bot1.Battlefield.Mox Pearl)
+! Bot1.Target(Bot2.Battlefield.Long-Bodied Grey Dog)
+Bot1.Target(Bot2.Battlefield.Shapers' Sanctuary)
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot2.Graveyard = Shapers' Sanctuary; Black Lotus
+Bot2.Battlefield = Mox Emerald; Mox Jet; Long-Bodied Grey Dog; Treasure Token
+Bot1.Battlefield = Feline Sovereign; Mox Pearl; Sacred Cat

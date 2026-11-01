@@ -1,0 +1,100 @@
+# Feline Sovereign gives "other Cats you control" +1/+1 and protection from Dogs (CR 702.16e, 702.16f, layers 7c and 6). Bot1 has Feline
+# Sovereign (2/3, not "other"), Sacred Cat (a 1/1 Cat, so 2/2), and Grizzly Bears (not a Cat: 2/2, no protection). Bot2's own
+# Sacred Cat (1/1) gets nothing: "you control". On turn 4 both Dogs attack with Bot2's Cat; Bot1 blocks one Dog with Feline Sovereign,
+# which is dealt damage, and the other with Sacred Cat, whose damage from a Dog is prevented, though it kills the Dog. Bot2's
+# unblocked Cat hits Bot1 for 1 without triggering Bot1's Feline Sovereign (it is not Bot1's Cat).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Feline Sovereign
+Sacred Cat
+Forest
+Grizzly Bears
+Plains
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Long-Bodied Grey Dog
+Long-Bodied Grey Dog
+Sacred Cat
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Feline Sovereign.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sacred Cat.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Long-Bodied Grey Dog.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Long-Bodied Grey Dog.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sacred Cat.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Feline Sovereign.Power = 2
+? Bot1.Battlefield.Feline Sovereign.Toughness = 3
+? Bot1.Battlefield.Feline Sovereign.ProtectionFromSubtypes = (absent)
+? Bot1.Battlefield.Sacred Cat.Power = 2
+? Bot1.Battlefield.Sacred Cat.Toughness = 2
+? Bot1.Battlefield.Sacred Cat.ProtectionFromSubtypes = Dog
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+? Bot1.Battlefield.Grizzly Bears.Toughness = 2
+? Bot1.Battlefield.Grizzly Bears.ProtectionFromSubtypes = (absent)
+? Bot2.Battlefield.Sacred Cat.Power = 1
+? Bot2.Battlefield.Sacred Cat.Toughness = 1
+? Bot2.Battlefield.Sacred Cat.ProtectionFromSubtypes = (absent)
+[T4 Bot2.Main1]
+Bot2.Attack(Long-Bodied Grey Dog#1 > Bot1; Long-Bodied Grey Dog#2 > Bot1; Sacred Cat > Bot1)
+[T4 Bot2.DeclareBlockers]
+Bot1.Block(Feline Sovereign > Long-Bodied Grey Dog#1; Sacred Cat > Long-Bodied Grey Dog#2)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Feline Sovereign.Damage = 2
+? Bot1.Battlefield.Sacred Cat.Damage = 0
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 21
+Bot2.Battlefield.Sacred Cat.Damage = 0
+Bot1.Battlefield = Feline Sovereign; Forest; Grizzly Bears; Mox Pearl; Sacred Cat

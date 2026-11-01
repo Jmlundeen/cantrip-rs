@@ -1,0 +1,60 @@
+# Feline Sovereign (2/3) and Sabretooth Tiger (a first-strike 2/1 Cat, 3/2 with Sovereign) attack Bot2 unblocked. The Tiger deals its
+# damage in the first-strike combat damage step and Sovereign in the regular one: two events, so "Whenever one or more Cats you control
+# deal combat damage to a player" triggers once in each step (CR 603.2c, 510.4), and the second is Sovereign's own damage - it is a Cat
+# it controls, not "other". Bot1 destroys Bot2's Mox Emerald with the first and Mox Sapphire with the second; Mox Jet survives.
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Feline Sovereign
+Sabretooth Tiger
+Plains x10
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Feline Sovereign.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sabretooth Tiger.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sabretooth Tiger.Power = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Feline Sovereign > Bot2; Sabretooth Tiger > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Target(Bot2.Battlefield.Mox Emerald)
+? Bot2.Life = 17
+Bot1.Target(Bot2.Battlefield.Mox Sapphire)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Mox Sapphire; Mox Emerald
+Bot2.Battlefield = Mox Jet
