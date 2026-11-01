@@ -644,6 +644,12 @@ pub fn gain_three_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     gain_life(g, item, 3)
 }
 
+/// "You gain that much life" as a triggered ability (CR 119.3): the amount the trigger carries in `data[0]`. Bloodthirsty
+/// Conqueror (life lost) and Metropolis Reformer (damage dealt to it) print it.
+pub fn gain_that_much_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    gain_life(g, item, item.data[0] as i32)
+}
+
 /// "You gain 1 life" as a triggered or activated ability. Koth of the Homestead and Medic's Kitesail use this callback.
 pub fn gain_one_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     gain_life(g, item, 1)

@@ -14,13 +14,7 @@ fn opponent_loses_life(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired
     }
 }
 
-/// "You gain that much life."
-fn gain_that_much(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.gain_life(item.controller, item.data[0] as i32);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when_asked(EventMask::LIFE_CHANGE, opponent_loses_life), gain_that_much, "Whenever an opponent loses life, you gain that much life. (Damage causes loss of life.)")],
+    abilities: &[triggered(when_asked(EventMask::LIFE_CHANGE, opponent_loses_life), cantrip_mechanics::effects::gain_that_much_life, "Whenever an opponent loses life, you gain that much life. (Damage causes loss of life.)")],
     ..oracle::BLOODTHIRSTY_CONQUEROR
 };
