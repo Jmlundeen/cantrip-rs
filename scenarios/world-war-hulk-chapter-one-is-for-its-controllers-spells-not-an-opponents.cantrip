@@ -1,0 +1,40 @@
+# World War Hulk's chapter I: "The next red or green creature spell you cast this turn" - Bot1's spells only. With the effect made,
+# Bot2, holding Pouncing Cheetah (a green creature with flash) and no mana, is refused the free cast in Bot1's turn, and Bot1's
+# Runeclaw Bear is still cast with it afterwards: Bot2's attempt neither took nor used it up (CR 109.5, 611.2a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+World War Hulk
+Runeclaw Bear
+Hill Giant
+Forest x14
+
+[Bot2 Deck]
+Pouncing Cheetah
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.World War Hulk.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+! Bot2.Hand.Pouncing Cheetah.Cast(Ability: Without paying its mana cost)
+Bot2.Pass
+[T1 Bot1.Main2]
+Bot1.Hand.Runeclaw Bear.Cast(Ability: Without paying its mana cost)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Runeclaw Bear.Power = 2
+Bot2.Hand.Count = 7
