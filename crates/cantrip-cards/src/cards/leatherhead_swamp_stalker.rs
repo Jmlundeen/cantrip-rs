@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
+use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT;
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("RemoveACounter", "remove a counter from her?", "When you do, destroy target artifact or enchantment that player controls", "Remove a counter", "Keep it");
@@ -45,33 +45,22 @@ fn remove_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Target artifact or enchantment that player controls": the player Leatherhead dealt combat damage to is the one she
-/// is attacking (CR 506.4, 510.2); the reflexive trigger goes on the stack with her still attacking.
-fn artifact_or_enchantment_of_the_attacked_player(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+/// "Target artifact or enchantment that player controls": the player Leatherhead dealt combat damage to, the trigger's
+/// subject, whether or not she is still in combat.
+fn artifact_or_enchantment_that_player_controls(q: &dyn Query, _: &Asker, t: Target) -> bool {
     let Target::Object(id) = t else { return false };
-    if !targets::permanent(q, id) {
+    if !targets::controlled_by_that_player(q, id) {
         return false;
     }
     let c = q.chars(id);
-    if !(c.is(CardType::Artifact) || c.is(CardType::Enchantment)) {
-        return false;
-    }
-    q.state()
-        .attackers
-        .iter()
-        .any(|a| a.id == asker.source && matches!(a.target, Target::Player(p) if p == q.controller(id)))
-}
-
-fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    cantrip_mechanics::destroy_target(g, item, 0);
-    Ok(())
+    c.is(CardType::Artifact) || c.is(CardType::Enchantment)
 }
 
 pub static CARD: CardDef = CardDef {
     // "Leatherhead enters with a hexproof counter on her" (CR 122.1b, 614.1c).
     enters: Some(cantrip_mechanics::effects::enters_with_a_counter::<{ CounterKind::Hexproof as usize }>),
-    abilities: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, remove_counter, "Whenever Leatherhead deals combat damage to a player, you may remove a counter from her. When you do, destroy target artifact or enchantment that player controls.")],
-    delayed: &[delayed_trigger(destroy, "When you do, destroy target artifact or enchantment that player controls.")
-        .targets(&[target(artifact_or_enchantment_of_the_attacked_player)])],
+    abilities: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT, remove_counter, "Whenever Leatherhead deals combat damage to a player, you may remove a counter from her. When you do, destroy target artifact or enchantment that player controls.")],
+    delayed: &[delayed_trigger(cantrip_mechanics::effects::destroy_first_target, "When you do, destroy target artifact or enchantment that player controls.")
+        .targets(&[target(artifact_or_enchantment_that_player_controls)])],
     ..oracle::LEATHERHEAD_SWAMP_STALKER
 };

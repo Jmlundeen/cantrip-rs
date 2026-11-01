@@ -952,6 +952,15 @@ pub const fn spell_of_either_color<const A: u8, const B: u8>() -> TargetSpec {
     target(spell_of_either_color_filter::<A, B>)
 }
 
+/// "... that player controls" of "Whenever this creature deals combat damage to a player, ... target [permanent] that player
+/// controls" (CR 603.12): the permanent is on the battlefield under the control of the player the trigger's event is about (its
+/// subject), the one the damage was dealt to - read from the trigger, so it holds whether or not the source is still in combat.
+/// A target filter reads it beside the permanent's own type. Leatherhead, Swamp Stalker (artifact or enchantment), Dokuchi
+/// Silencer (creature or planeswalker), Dreadmaw's Ire (artifact) and Questing Beast (planeswalker) print it.
+pub fn controlled_by_that_player(q: &dyn Query, id: ObjectId) -> bool {
+    matches!(q.event_subject(), Target::Player(p) if on_battlefield(q, id) && q.controller(id) == p)
+}
+
 /// "Target creature or planeswalker that's [color A] or [color B]" (CR 115.1, 105.2): a creature or planeswalker that is
 /// either color, or both. The color words are those of the targeting spell's own text (CR 612); `A` and `B` are `Color`s as
 /// `u8`. Devout Decree (black or red), Refute Destiny (green or blue), Terminal Criticism (blue or red) and, worded

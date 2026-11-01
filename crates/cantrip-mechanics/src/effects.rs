@@ -509,6 +509,19 @@ pub fn may_discard_a_card(g: &mut dyn Game, item: &StackItem) -> Result<bool, Su
     Ok(!g.discard_together(&[card]).is_empty())
 }
 
+/// "You may discard a [kind of] card" (CR 701.9): the player chooses, as the effect resolves and not as a cost (CR 608.2d), up to
+/// what `rule` allows of the cards of their hand, or none (asked whenever the hand has a card). Returns whether a
+/// card was discarded, for the reflexive "when you do" (CR 603.12) that follows: a card chosen that its owner can't be made to
+/// discard stays (CR 101.2), and then nothing was done. Dokuchi Silencer (a creature card) and Hypothesizzle (a nonland card) print it.
+pub fn may_discard(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection) -> Result<bool, Suspend> {
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    let chosen = crate::choose::select(g, player, source, Purpose::Discard, hand, rule)?;
+    if chosen.is_empty() {
+        return Ok(false);
+    }
+    Ok(!g.discard_together(&chosen).is_empty())
+}
+
 /// "Sacrifice any number of lands, then search your library for up to that many land cards, put them onto the battlefield
 /// tapped, then shuffle" (CR 701.21a, 608.2c-d, 701.23b). The number found is the number actually sacrificed; the search and
 /// shuffle still happen when the player sacrifices none. Scapeshift and Genesis Device print it.

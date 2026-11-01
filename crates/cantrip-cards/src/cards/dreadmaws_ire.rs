@@ -21,17 +21,9 @@ fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Target artifact that player controls": the player the creature dealt combat damage to is the one it attacked
-/// (CR 506.4, 510.2); the ability is put on the stack with the creature still attacking.
-fn artifact_the_attacked_player_controls(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    let Target::Object(id) = t else { return false };
-    if !(targets::ARTIFACT.filter)(q, asker, t) {
-        return false;
-    }
-    q.state()
-        .attackers
-        .iter()
-        .any(|a| a.id == asker.source && matches!(a.target, Target::Player(p) if p == q.controller(id)))
+/// "Target artifact that player controls": the player the creature dealt combat damage to, the trigger's subject.
+fn artifact_that_player_controls(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    (targets::ARTIFACT.filter)(q, asker, t) && matches!(t, Target::Object(id) if targets::controlled_by_that_player(q, id))
 }
 
 fn destroy_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -42,6 +34,6 @@ fn destroy_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: spell(&[target(attacking_creature)], grant),
     delayed: &[triggered(triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT, destroy_artifact, "Whenever this creature deals combat damage to a player, destroy target artifact that player controls.")
-        .targets(&[target(artifact_the_attacked_player_controls)])],
+        .targets(&[target(artifact_that_player_controls)])],
     ..oracle::DREADMAWS_IRE
 };

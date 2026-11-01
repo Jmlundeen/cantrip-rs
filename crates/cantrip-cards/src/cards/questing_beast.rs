@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::damage_target;
+use cantrip_mechanics::{damage_target, targets};
 use cantrip_oracle as oracle;
 
 /// "Combat damage that would be dealt by creatures you control can't be prevented" (CR 615.12): the damage of any
@@ -23,8 +23,7 @@ fn deals_combat_damage_to_an_opponent(q: &dyn Query, source: ObjectId, event: &E
 
 /// "Target planeswalker that player controls", the player the damage was dealt to being the event's subject.
 fn planeswalker_that_player_controls(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!((t, q.event_subject()), (Target::Object(id), Target::Player(p))
-        if q.is_on_battlefield(id) && q.controller(id) == p && q.chars(id).is(CardType::Planeswalker))
+    matches!(t, Target::Object(id) if targets::controlled_by_that_player(q, id) && q.chars(id).is(CardType::Planeswalker))
 }
 
 /// "It deals that much damage to target planeswalker that player controls."

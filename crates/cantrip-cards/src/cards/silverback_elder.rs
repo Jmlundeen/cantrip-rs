@@ -3,12 +3,6 @@ use cantrip_mechanics::{effects, library, targets};
 use cantrip_mechanics::triggers::CREATURE_SPELL_YOU_CAST;
 use cantrip_oracle as oracle;
 
-/// Mode 1: "Destroy target artifact or enchantment." (CR 701.8)
-fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    cantrip_mechanics::destroy_target(g, item, 0);
-    Ok(())
-}
-
 /// Mode 2: "Look at the top five cards of your library. You may put a land card from among them onto the battlefield
 /// tapped. Put the rest on the bottom of your library in a random order."
 fn look_for_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -17,7 +11,7 @@ fn look_for_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 static MODAL: ModalDef = modes(&[
-    mode(destroy, "Destroy target artifact or enchantment.").targets(&[targets::ARTIFACT_OR_ENCHANTMENT]),
+    mode(cantrip_mechanics::effects::destroy_first_target, "Destroy target artifact or enchantment.").targets(&[targets::ARTIFACT_OR_ENCHANTMENT]),
     mode(look_for_a_land, "Look at the top five cards of your library. You may put a land card from among them onto the battlefield tapped. Put the rest on the bottom of your library in a random order."),
     mode(|g, item| effects::gain_life(g, item, 4), "You gain 4 life."),
 ]);

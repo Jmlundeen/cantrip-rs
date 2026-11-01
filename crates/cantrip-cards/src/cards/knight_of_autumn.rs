@@ -3,15 +3,9 @@ use cantrip_mechanics::{effects, targets};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
-/// Mode 1: destroy target artifact or enchantment.
-fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    cantrip_mechanics::destroy_target(g, item, 0);
-    Ok(())
-}
-
 static MODAL: ModalDef = modes(&[
     mode(effects::two_plus_one_counters_on_this, "Put two +1/+1 counters on this creature."),
-    mode(destroy, "Destroy target artifact or enchantment.")
+    mode(cantrip_mechanics::effects::destroy_first_target, "Destroy target artifact or enchantment.")
         .targets(&[targets::ARTIFACT_OR_ENCHANTMENT]),
     mode(|g, item| cantrip_mechanics::effects::gain_life(g, item, 4), "You gain 4 life."),
 ]);

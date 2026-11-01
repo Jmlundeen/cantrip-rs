@@ -25,16 +25,10 @@ fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Destroy target artifact or enchantment." (CR 701.8.)
-fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    cantrip_mechanics::destroy_target(g, item, 0);
-    Ok(())
-}
-
 /// The reflexive ability's modes, as many as {G} was paid times at most (CR 603.12a, 700.2b), chosen with their targets as
 /// it is put on the stack (CR 603.3c).
 static MODAL: ModalDef = modes(&[
-    mode(destroy, "Destroy target artifact or enchantment.").targets(&[targets::ARTIFACT_OR_ENCHANTMENT]),
+    mode(cantrip_mechanics::effects::destroy_first_target, "Destroy target artifact or enchantment.").targets(&[targets::ARTIFACT_OR_ENCHANTMENT]),
     mode(effects::exile_first_target_players_graveyard, "Exile target player's graveyard.").targets(&[targets::PLAYER]),
     mode(|g, item| effects::gain_life(g, item, 4), "You gain 4 life."),
 ])

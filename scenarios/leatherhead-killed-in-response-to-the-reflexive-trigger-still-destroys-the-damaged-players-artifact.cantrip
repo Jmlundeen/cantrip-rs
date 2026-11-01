@@ -1,0 +1,52 @@
+# Leatherhead, Swamp Stalker (5/4) connects with Bot2 and removes her hexproof counter; Bot2 answers the reflexive trigger
+# with two Lightning Bolts, killing her. "That player" is still Bot2, so the trigger's target, Mox Pearl, is legal (CR 603.12,
+# 608.2b) and is destroyed even though she left combat (CR 506.4).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Leatherhead, Swamp Stalker
+Forest x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Lightning Bolt
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leatherhead, Swamp Stalker.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
+Bot1.Accept
+Bot1.Target(Mox Pearl)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Leatherhead, Swamp Stalker)
+Bot2.Hand.Lightning Bolt.Cast(Leatherhead, Swamp Stalker)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Mox Pearl; Lightning Bolt; Lightning Bolt
+Bot1.Graveyard = Leatherhead, Swamp Stalker
