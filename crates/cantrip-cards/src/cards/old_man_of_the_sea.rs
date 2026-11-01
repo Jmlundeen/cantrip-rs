@@ -2,11 +2,10 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// A creature's power for "power less than or equal to": one that is no longer a creature has none, and counts as 0
-/// (the card's ruling).
+/// A creature's power for "power less than or equal to": one that is no longer a creature has none (CR 208.3), and counts
+/// as 0 (the card's ruling).
 fn power(q: &dyn Query, id: ObjectId) -> i16 {
-    let c = q.chars(id);
-    if c.is(CardType::Creature) { c.power.unwrap_or(0) } else { 0 }
+    q.chars(id).power.unwrap_or(0)
 }
 
 /// "Target creature with power less than or equal to this creature's power" (CR 115.1), judged as the ability is activated

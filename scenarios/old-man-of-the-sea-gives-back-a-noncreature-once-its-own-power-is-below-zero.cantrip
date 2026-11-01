@@ -1,0 +1,61 @@
+# Old Man of the Sea holds what it took "for as long as ... that creature's power remains less than or equal to this creature's
+# power" (CR 611.2b); "if it stops being a creature, its power is considered to be 0" (its ruling). Bot1's Old Man (2/3) takes
+# Bot2's Llanowar Elves. Bot2 makes the Elves a Vehicle artifact with Swift Reconfiguration: no creature, no power (CR 208.3),
+# counted as 0 - no more than Old Man's 2, so Bot1 keeps it. Bot2 then casts Ray of Enfeeblement on Old Man (blue, so -4/-1):
+# a -2/2, and 0 is greater than -2, so the effect ends at once and the Elves goes back to Bot2.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Pearl
+Mox Jet
+Swift Reconfiguration
+Ray of Enfeeblement
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Types = Creature
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swift Reconfiguration.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Llanowar Elves.Types = Artifact
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ray of Enfeeblement.Cast(Bot1.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Old Man of the Sea.Power = -2
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Island; Old Man of the Sea
+Bot1.Battlefield.Old Man of the Sea.Tapped = true
+Bot1.Battlefield.Old Man of the Sea.Toughness = 2
+Bot2.Battlefield.Llanowar Elves.Types = Artifact
+Bot2.Graveyard = Ray of Enfeeblement
