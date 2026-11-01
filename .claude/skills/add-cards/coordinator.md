@@ -50,7 +50,10 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    in `cantrip-mechanics`); run only its card's scenarios and coverage and those of a card whose file or shared
    mechanic it changed; one commit per card, `Closes #N`, mechanics and client commits before it; no push; every command in the
    foreground with a long timeout (1800000 ms, the ceiling `BASH_MAX_TIMEOUT_MS` allows: a run that outlasts its timeout is moved to the background), never in the
-   background (an agent that stops to wait on one is made to leave its slot, and loses it); every shell command `cd`s
+   background (an agent that stops to wait on one is made to leave its slot, and loses it). The harness moves a command
+   that runs past about 180 s into the background whatever its timeout (card-mutate, a cold build, `test.cmd`): the
+   agent then waits for it with short blocking foreground checks of its output, never ends its turn and never uses
+   Monitor while it runs - the prompt says so, since three agents in one run lost their slot to it; every shell command `cd`s
    into its worktree first (the session's working directory is shared, and moves); scratch files (patches, probes) go
    in a scratchpad subfolder named for its agent id, never at the top, where another slot's agent can overwrite them; and a short
    report when committed - its commits, its own scenarios' pass line run on the commit as it stands (again after each
