@@ -1,0 +1,59 @@
+# Each half of Breaking // Entering cast alone (CR 702.102a: one half or both from the hand). Breaking, paid {U}{B}
+# exactly, makes Bot1 mill its own top eight, putting Aegis Turtle in its graveyard. On turn 5 Entering, paid {4}{B}{R}
+# exactly, chooses among creature cards in both graveyards (Bot1's Aegis Turtle, Bot2's Dwarven Trader discarded to hand
+# size; an Island, no card at all and both creatures refused: one creature card, and not optional) and takes Bot1's own,
+# its own graveyard being one of them too (the fused scenario takes Bot2's). It enters with haste that lasts the turn.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Sol Ring
+Island
+Breaking // Entering
+Breaking // Entering
+Island
+Aegis Turtle
+Island x11
+
+[Bot2 Deck]
+Island x7
+Dwarven Trader
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Breaking // Entering.Cast(Bot1; Ability: Breaking)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Breaking // Entering.Cast(Ability: Entering)
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Choose(Island)
+! Bot1.Choose()
+! Bot1.Choose(Aegis Turtle; Dwarven Trader)
+Bot1.Choose(Aegis Turtle)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Aegis Turtle.Keywords = Haste
+
+[Expect]
+Bot1.Battlefield.Aegis Turtle.Toughness = 5
+Bot1.Battlefield.Aegis Turtle.Tapped = false
+Bot1.Graveyard.Aegis Turtle = (absent)
+Bot2.Graveyard.Dwarven Trader.Power = 1
+Bot1.Library.Count = 3

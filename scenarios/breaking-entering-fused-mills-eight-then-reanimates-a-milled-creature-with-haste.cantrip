@@ -1,0 +1,52 @@
+# Breaking // Entering cast fused from the hand (CR 702.102): Breaking mills Bot2's top eight cards first, then Entering
+# (not targeted, chosen as it resolves) puts a creature card from a graveyard onto Bot1's battlefield - here one just
+# milled, with an Island refused. The cost is {U}{B} + {4}{B}{R}, paid exactly from five artifacts (pool empty right
+# after). The creature has haste that turn and lost it the turn after (CR 611.2a).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Black Lotus
+Sol Ring
+Breaking // Entering
+Island
+Island x13
+
+[Bot2 Deck]
+Island x8
+Aegis Turtle
+Island
+Dwarven Trader
+Island x9
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Breaking // Entering.Cast(Bot2; Ability: Fuse)
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Choose(Island)
+Bot1.Choose(Dwarven Trader)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Dwarven Trader.Keywords = Haste
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Dwarven Trader.Keywords = (absent)
+Bot1.Battlefield.Dwarven Trader.Power = 1
+Bot2.Graveyard.Aegis Turtle.Power = 0
+Bot2.Graveyard.Dwarven Trader = (absent)
+Bot2.Library.Count = 3
+Bot1.Library.Count = 11
