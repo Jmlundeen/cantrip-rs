@@ -924,9 +924,11 @@ pub fn transform_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 /// has no back face and stays in the graveyard. The trigger looks back (CR 603.10a). Aclazotz, Deepest Betrayal and Ojer
 /// Axonil, Deepest Might print it.
 pub fn return_it_tapped_and_transformed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    let owner = g.obj(card).owner;
-    g.put_onto_battlefield_transformed(card, owner, true)?;
+    // Each card of a merged permanent (CR 730.3c), of which only a double-faced one returns (CR 712.14a).
+    for card in g.found_all_after_move(item.object) {
+        let owner = g.obj(card).owner;
+        g.put_onto_battlefield_transformed(card, owner, true)?;
+    }
     Ok(())
 }
 

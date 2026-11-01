@@ -56,12 +56,12 @@ fn dies_or_is_exiled(_: &dyn Query, land: ObjectId, event: &Event) -> Option<Fir
 }
 
 /// "Return it to the battlefield tapped under your control": the card the land became, if it is still where it went (CR
-/// 400.7e, 603.7c), under the ability's controller.
+/// 400.7e, 603.7c), under the ability's controller - each card of a merged permanent, together (CR 730.3c).
 fn return_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(land) = item.subject
-        && let Some(card) = g.found_after_move(land)
-    {
-        g.put_onto_battlefield(card, item.controller, true)?;
+    let Target::Object(land) = item.subject else { return Ok(()) };
+    let cards: Vec<(ObjectId, PlayerId, bool)> = g.found_all_after_move(land).into_iter().map(|c| (c, item.controller, true)).collect();
+    if !cards.is_empty() {
+        g.put_all_onto_battlefield_as(&cards)?;
     }
     Ok(())
 }

@@ -23,8 +23,10 @@ static AN_ENCHANTMENT: EntersAs = EntersAs { types: Some(TypeSet::of(&[CardType:
 /// enchantment, never as a creature (CR 614.12), and stays one for as long as it is the object that returned (CR 611.2a,
 /// 613.1d).
 pub fn return_as_enchantment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    let owner = g.obj(card).owner;
-    g.put_onto_battlefield_as(card, owner, item, &AN_ENCHANTMENT)?;
+    // Each card of a merged permanent, together (CR 730.3c).
+    let cards: Vec<(ObjectId, PlayerId)> = g.found_all_after_move(item.object).into_iter().map(|c| (c, g.obj(c).owner)).collect();
+    if !cards.is_empty() {
+        g.put_all_onto_battlefield_becoming(&cards, item, &AN_ENCHANTMENT, &[])?;
+    }
     Ok(())
 }

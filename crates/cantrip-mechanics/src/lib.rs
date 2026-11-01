@@ -90,6 +90,7 @@ pub mod max_speed;
 pub mod miracle;
 pub mod melee;
 pub mod mentor;
+pub mod mutate;
 pub mod myriad;
 pub mod extort;
 pub mod evolve;
