@@ -349,6 +349,13 @@ pub fn draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
     Ok(())
 }
 
+/// "You gain LIFE life and draw CARDS card(s)" (CR 119.3, 121.1): the controller gains the life, then draws. Candy Trail and
+/// Chevill, Bane of Monsters print it with 3 life and a card, Inspiring Overseer with 1 life and a card.
+pub fn gain_life_then_draw<const LIFE: i32, const CARDS: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    gain_life(g, item, LIFE)?;
+    draw(g, item, CARDS)
+}
+
 /// "You draw a card and lose 1 life" (CR 121.1, 119.3): the controller draws, then loses the life. Plumb the Forbidden,
 /// Robot Domination (before its counter) and Elegy Acolyte print it.
 pub fn draw_a_card_and_lose_1_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
